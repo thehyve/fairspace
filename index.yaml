@@ -1,0 +1,22 @@
+apiVersion: v1
+entries:
+  jupyterhub:
+  - apiVersion: v1
+    created: 2018-06-11T17:09:25.073592089+02:00
+    description: Multi-user Jupyter installation
+    digest: c78e47df6e6703a177a223995d63411dd50fc493ad43676e6d4c7628dbe8008e
+    name: jupyterhub
+    urls:
+    - charts/jupyterhub-v0.6.tgz
+    version: v0.6
+  vre-ws:
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: 2018-06-11T17:09:25.072738479+02:00
+    description: A Helm chart for Kubernetes
+    digest: 4ca4c2321bb2da970e260eb387eab7d680a9826daa17688fc8bd969156516ec3
+    name: vre-ws
+    urls:
+    - vre-ws-0.1.0.tgz
+    version: 0.1.0
+generated: 2018-06-11T17:09:25.071550666+02:00
