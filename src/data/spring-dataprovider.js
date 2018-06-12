@@ -13,9 +13,9 @@ import {
 } from 'react-admin';
 
 /**
- * Maps react-admin queries to a json-server powered REST API
+ * Maps react-admin queries to a Spring Data REST powered REST API
  *
- * @see https://github.com/typicode/json-server
+ * @see https://projects.spring.io/spring-data-rest/
  * @example
  * GET_LIST     => GET http://my.api.url/posts?sort=title,ASC&page=0&size=24
  * GET_ONE      => GET http://my.api.url/posts/123
@@ -25,6 +25,10 @@ import {
  * DELETE       => DELETE http://my.api.url/posts/123
  */
 export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
+    const EMBEDDED_FIELD_NAME = "_embedded";
+    const PAGE_FIELD_NAME = "page";
+    const TOTAL_ELEMENTS_FIELD_NAME = "totalElements";
+
     /**
      * @param {String} type One of the constants appearing at the top if this file, e.g. 'UPDATE'
      * @param {String} resource Name of the resource to fetch, e.g. 'posts'
@@ -104,8 +108,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case GET_LIST:
             case GET_MANY_REFERENCE:
                 return {
-                    data: json["_embedded"][resource],
-                    total: json["page"]["totalElements"]
+                    data: json[EMBEDDED_FIELD_NAME][resource],
+                    total: json[PAGE_FIELD_NAME][TOTAL_ELEMENTS_FIELD_NAME]
                 };
             case DELETE:
                 return { data: params.previousData };

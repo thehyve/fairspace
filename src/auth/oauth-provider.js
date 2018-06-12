@@ -1,24 +1,26 @@
 import {AUTH_CHECK, AUTH_ERROR, AUTH_LOGIN, AUTH_LOGOUT} from 'react-admin';
 
-export default (adapter) => {
+export default (baseUrl = 'http://localhost:8080') => {
     return (type, params) => {
         if (type === AUTH_LOGIN) {
-            adapter.login();
+            console.log('Login');
+            window.location.href = baseUrl + '/login';
         }
         if (type === AUTH_LOGOUT) {
-            return adapter.logout();
+            window.location.href = baseUrl + '/logout';
         }
 
         if (type === AUTH_ERROR) {
             const status = params.status;
             if (status === 401 || status === 403) {
-                return adapter.refresh();
+                window.location.href = baseUrl + '/login';
+                return Promise.reject();
             }
             return Promise.resolve();
         }
 
         if (type === AUTH_CHECK) {
-            return adapter.hasToken();
+            return true
         }
         return Promise.resolve();
     }
