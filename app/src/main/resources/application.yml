@@ -1,0 +1,18 @@
+security:
+  oauth2:
+    client:
+      clientId: web_app
+      clientSecret: web_app
+      user-authorization-uri: http://localhost:9080/auth/realms/jhipster/protocol/openid-connect/auth
+      access-token-uri: http://localhost:9080/auth/realms/jhipster/protocol/openid-connect/token
+      authentication-scheme: header
+    resource:
+      user-info-uri: http://localhost:9080/auth/realms/jhipster/protocol/openid-connect/userinfo
+      prefer-token-info: false
+
+zuul:
+  routes:
+    workspaces:
+      path: /workspaces/**
+      url: http://localhost:8088/
+      strip-prefix: false
