@@ -14,9 +14,10 @@ CSRF functionality is enabled. A csrf token is returned on each request in the `
 For POST, PUT and PATCH requests, that value should be returned in the `X-CSRF-TOKEN` header in the request.
 
 ## OAuth2 Refresh token
-Currently, when an oAuth2 access token expires, it is not automatically refreshed. Functionality to do so, will
-be implemented in Spring Security and is currently planned for 5.1. In the meantime, we should 
-use longer-lived access-tokens and handle refreshes in the frontend. See also 
+Currently, when an oAuth2 access token expires, it is automatically refreshed, by a workaround implemented
+ manually in `WebSecurityConfiguration.java`. Functionality to do this automatically will
+be implemented in Spring Security and is currently planned for 5.1. When that version is released,
+we can remove our custom code. See also 
 https://github.com/spring-projects/spring-security/issues/4371
 
 ## Creating a compatible backend
