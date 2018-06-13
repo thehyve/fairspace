@@ -37,6 +37,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                     .cors().configurationSource(corsConfigurationSource())
                 .and()
+                    .logout()
+                    .logoutSuccessUrl("http://localhost:9080/auth/realms/jhipster/protocol/openid-connect/logout?redirect_uri=http%3A%2F%2Fwww.google.com%0D%0A")
+                .and()
                     .csrf().disable();
     }
 
