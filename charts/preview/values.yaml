@@ -4,9 +4,10 @@ expose:
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: hook-succeeded
   config:
+    domain: preview.test.fairdev.app
     exposer: Ingress
-    http: true
-    tlsacme: false
+    http: false
+    tlsacme: true
 
 cleanup:
   Args:
