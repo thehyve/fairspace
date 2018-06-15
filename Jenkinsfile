@@ -3,11 +3,29 @@ pipeline {
       label "jenkins-gradle"
     }
     environment {
-      ORG               = 'fairspace-ci'
+      ORG               = 'fairspace'
       APP_NAME          = 'pluto'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
     }
     stages {
+      stage('CI Build') {
+        when {
+          not {
+            anyOf {
+              branch 'PR-*'
+              branch 'master'
+            }
+          }
+        }
+        environment {
+          PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
+        }
+        steps {
+          container('gradle') {
+            sh "gradle clean build test"
+          }
+        }
+      }
       stage('CI Build and push snapshot') {
         when {
           branch 'PR-*'
@@ -19,9 +37,7 @@ pipeline {
         }
         steps {
           container('gradle') {
-            // TODO 
-            //sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-            sh "gradle clean build"
+            sh "gradle clean build test"
             sh 'export VERSION=$PREVIEW_VERSION && skaffold run -f skaffold.yaml'
             sh "jx step validate --min-jx-version 1.2.36"
             sh "jx step post build --image \$JENKINS_X_DOCKER_REGISTRY_SERVICE_HOST:\$JENKINS_X_DOCKER_REGISTRY_SERVICE_PORT/$ORG/$APP_NAME:$PREVIEW_VERSION"
@@ -57,7 +73,7 @@ pipeline {
             }
           }
           container('gradle') {
-            sh 'gradle clean build'
+            sh 'gradle clean build test'
 
             sh 'export VERSION=`cat VERSION` && skaffold run -f skaffold.yaml'
             sh "jx step validate --min-jx-version 1.2.36"
