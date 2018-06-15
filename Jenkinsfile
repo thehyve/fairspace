@@ -12,7 +12,7 @@ pipeline {
         when {
           not {
             anyOf {
-              branch 'feature-*'
+              branch 'PR-*'
               branch 'master'
             }
           }
@@ -28,7 +28,7 @@ pipeline {
       }
       stage('CI Build and push snapshot') {
         when {
-          branch 'feature-*'
+          branch 'PR-*'
         }
         environment {
           PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
