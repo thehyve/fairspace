@@ -28,6 +28,8 @@ pipeline {
           PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
           PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
+
+          PREVIEW_DOMAIN = "preview.test.fairdev.app"
         }
         steps {
           container('gradle') {
@@ -40,7 +42,7 @@ pipeline {
           dir ('./charts/preview') {
            container('gradle') {
              sh "make preview"
-             sh "jx preview --app $APP_NAME --dir ../.."
+             sh "jx preview --app $APP_NAME --dir ../.." --domain $PREVIEW_DOMAIN --http false --tls-acme true
            }
           }
         }

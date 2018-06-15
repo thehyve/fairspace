@@ -24,8 +24,8 @@ preview:
 
   resources:
     limits:
-      cpu: 100m
+      cpu: 500m
       memory: 768Mi
     requests:
-      cpu: 100m
+      cpu: 400m
       memory: 768Mi
