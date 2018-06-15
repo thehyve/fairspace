@@ -21,3 +21,11 @@ preview:
     repository:
     tag:
     pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 768Mi
+    requests:
+      cpu: 100m
+      memory: 768Mi
