@@ -33,6 +33,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                     .mvcMatchers(HttpMethod.OPTIONS).permitAll()
+                    .antMatchers("/actuator/health").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .cors().configurationSource(corsConfigurationSource())
