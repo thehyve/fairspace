@@ -21,7 +21,7 @@ sourceCompatibility = 1.8
 
 repositories {
 	maven { url "https://nexus.jx.test.fairdev.app/repository/maven-central/" }
-	maven { url "https://repo.spring.io/milestone" }
+	maven { url "https://nexus.jx.test.fairdev.app/repository/spring-milestone/" }
 }
 
 
