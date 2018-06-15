@@ -12,7 +12,7 @@ pipeline {
         when {
           not {
             anyOf {
-              branch 'feature.*'
+              branch 'feature-*'
               branch 'master'
             }
           }
@@ -28,7 +28,7 @@ pipeline {
       }
       stage('CI Build and push snapshot') {
         when {
-          branch 'feature.*'
+          branch 'feature-*'
         }
         environment {
           PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
@@ -102,7 +102,7 @@ pipeline {
     }
     post {
       always {
-        junit 'build/test-results/**/*.xml'
+        junit 'app/build/test-results/**/*.xml'
         cleanWs()
       }
     }
