@@ -42,7 +42,7 @@ pipeline {
           dir ('./charts/preview') {
            container('gradle') {
              sh "make preview"
-             sh "jx preview --app $APP_NAME --dir ../.." --domain $PREVIEW_DOMAIN --http false --tls-acme true
+             sh "jx preview --app $APP_NAME --dir ../.. --domain $PREVIEW_DOMAIN --http false --tls-acme true"
            }
           }
         }
