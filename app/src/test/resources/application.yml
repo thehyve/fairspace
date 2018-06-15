@@ -1,0 +1,18 @@
+security:
+  oauth2:
+    client:
+      clientId: web_app
+      clientSecret: web_app
+      user-authorization-uri: https://user.authorization.uri.test
+      access-token-uri: https://access.token.uri.test
+      authentication-scheme: header
+    resource:
+      user-info-uri: https://user.info.uri.test
+      prefer-token-info: false
+
+zuul:
+  routes:
+    hyve:
+      path: /thehyve/**
+      url: https://thehyve.nl/
+      strip-prefix: true
