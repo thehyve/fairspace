@@ -1,8 +1,16 @@
-
 expose:
   Annotations:
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: hook-succeeded
+  Args:
+    - --domain
+    - preview.test.fairdev.app
+    - --exposer
+    - Ingress
+    - --http
+    - true
+    - --tlsacme
+    - true
   config:
     domain: preview.test.fairdev.app
     exposer: Ingress
