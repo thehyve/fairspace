@@ -3,7 +3,7 @@ pipeline {
         label "jenkins-nodejs"
     }
     environment {
-      ORG               = 'fairspace-ci'
+      ORG               = 'fairspace'
       APP_NAME          = 'mercury'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
     }
