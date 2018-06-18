@@ -5,14 +5,14 @@ expose:
   Args:
     # Use nip.io as preview domain, as the fairdev.app domain requires tls to be setup
     - --domain
-    - 200.205.190.35.nip.io
+    - 35.190.205.200.nip.io
     - --exposer
     - Ingress
     - --http
     - false
   config:
     # Use nip.io as preview domain, as the fairdev.app domain requires tls to be setup
-    domain: 200.205.190.35.nip.io
+    domain: 35.190.205.200.nip.io
     exposer: Ingress
     http: false
     tlsacme: true
