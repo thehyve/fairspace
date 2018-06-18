@@ -8,7 +8,7 @@ expose:
     - --exposer
     - Ingress
     - --http
-    - true
+    - false
   config:
     domain: preview.test.fairdev.app
     exposer: Ingress
