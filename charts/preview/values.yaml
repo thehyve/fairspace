@@ -3,10 +3,9 @@ expose:
   Annotations:
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: hook-succeeded
-  Args:
-    - --domain
-    - 35.190.205.200.nip.io
   config:
+    # Use nip.io as preview domain, as the fairdev.app domain requires tls to be setup
+    domain: 35.190.205.200.nip.io
     exposer: Ingress
     http: true
     tlsacme: false
