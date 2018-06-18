@@ -3,7 +3,7 @@ pipeline {
         label "jenkins-nodejs"
     }
     environment {
-      ORG               = 'fairspace-ci'
+      ORG               = 'fairspace'
       APP_NAME          = 'mercury'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
     }
@@ -20,9 +20,10 @@ pipeline {
         steps {
           container('nodejs') {
             sh "npm install"
-            sh "CI=true DISPLAY=:99 npm test"
+            // sh "CI=true DISPLAY=:99 npm test"
+            sh "npm run build"
 
-            sh 'export VERSION=$PREVIEW_VERSION && skaffold run -f skaffold.yaml'
+            sh 'export VERSION=$PREVIEW_VERSION && skaffold run -v debug -f skaffold.yaml'
 
             sh "jx step validate --min-jx-version 1.2.36"
             sh "jx step post build --image \$JENKINS_X_DOCKER_REGISTRY_SERVICE_HOST:\$JENKINS_X_DOCKER_REGISTRY_SERVICE_PORT/$ORG/$APP_NAME:$PREVIEW_VERSION"
@@ -57,7 +58,8 @@ pipeline {
           }
           container('nodejs') {
             sh "npm install"
-            sh "CI=true DISPLAY=:99 npm test"
+            // sh "CI=true DISPLAY=:99 npm test"
+            sh "npm run build"
 
             sh 'export VERSION=`cat VERSION` && skaffold run -f skaffold.yaml'
             sh "jx step validate --min-jx-version 1.2.36"
