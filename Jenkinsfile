@@ -29,7 +29,8 @@ pipeline {
           PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
 
-          PREVIEW_DOMAIN = "preview.test.fairdev.app"
+          // Use nip.io as preview domain, as the fairdev.app domain requires tls to be setup
+          PREVIEW_DOMAIN = "200.205.190.35.nip.io"
         }
         steps {
           container('gradle') {
