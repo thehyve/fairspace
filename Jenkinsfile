@@ -28,9 +28,6 @@ pipeline {
           PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
           PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
-
-          // Use nip.io as preview domain, as the fairdev.app domain requires tls to be setup
-          PREVIEW_DOMAIN = "200.205.190.35.nip.io"
         }
         steps {
           container('gradle') {
@@ -43,7 +40,7 @@ pipeline {
           dir ('./charts/preview') {
            container('gradle') {
              sh "make preview"
-             sh "jx preview --app $APP_NAME --dir ../.. --domain $PREVIEW_DOMAIN --http false --tls-acme true"
+             sh "jx preview --app $APP_NAME --dir ../.."
            }
           }
         }
