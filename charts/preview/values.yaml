@@ -9,8 +9,6 @@ expose:
     - Ingress
     - --http
     - true
-    - --tlsacme
-    - true
   config:
     domain: preview.test.fairdev.app
     exposer: Ingress
