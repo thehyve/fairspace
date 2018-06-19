@@ -6,7 +6,9 @@ pipeline {
       ORG               = 'fairspace'
       APP_NAME          = 'pluto'
       DOCKER_REPO       = 'docker-registry.jx.test.fairdev.app'
+
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
+      DOCKER_REPO_CREDS = credentials('jenkins-x-docker-repo')
 
       DOCKER_TAG_PREFIX = '$DOCKER_REPO/$ORG/$APP_NAME'
     }
@@ -32,7 +34,7 @@ pipeline {
         steps {
           container('gradle') {
             sh "echo \$(jx-release-version) > VERSION"
-            sh "docker login $DOCKER_REPO -u $DOCKER_REPO_USR -p $DOCKER_REPO_PWD"
+            sh "docker login $DOCKER_REPO -u $DOCKER_REPO_CREDS_USR -p $DOCKER_REPO_CREDS_PSW"
             sh "export VERSION=`cat VERSION` && docker build . --tag $DOCKER_TAG_PREFIX:$VERSION && docker push $DOCKER_TAG_PREFIX:$VERSION"
           }
         }
