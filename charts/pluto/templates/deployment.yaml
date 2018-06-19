@@ -40,4 +40,6 @@ spec:
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
+        env:
+{{ toYaml .Values.env | indent 12 }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}

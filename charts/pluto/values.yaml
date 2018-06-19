@@ -21,6 +21,10 @@ resources:
   requests:
     cpu: 400m
     memory: 768Mi
+env:
+  PLUTO_OAUTH2_BASEURL:
+  PLUTO_OAUTH2_REALM:
+  ZUUL_ROUTES_UI_URL:
 probePath: /actuator/health
 livenessProbe:
   initialDelaySeconds: 60
