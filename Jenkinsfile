@@ -56,6 +56,11 @@ pipeline {
         steps {
           dir ('./charts/pluto') {
             container('gradle') {
+              // Ensure the git command line tool has access to proper credentials
+              sh "git config --global credential.helper store"
+              sh "jx step validate --min-jx-version 1.1.73"
+              sh "jx step git credentials"
+
               sh "make tag"
               sh "make release"
             }
