@@ -34,7 +34,6 @@ pipeline {
         steps {
           container('gradle') {
             sh "echo \$(jx-release-version) > VERSION"
-            sh "docker login $DOCKER_REPO -u $DOCKER_REPO_CREDS_USR -p $DOCKER_REPO_CREDS_PSW"
             sh "export VERSION=`cat VERSION` && docker build . --tag $DOCKER_TAG_PREFIX:$VERSION && docker push $DOCKER_TAG_PREFIX:$VERSION"
           }
         }
