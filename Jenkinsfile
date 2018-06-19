@@ -5,90 +5,58 @@ pipeline {
     environment {
       ORG               = 'fairspace'
       APP_NAME          = 'pluto'
+      DOCKER_REPO       = 'docker-registry.jx.test.fairdev.app'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
+
+      DOCKER_TAG_PREFIX = '$DOCKER_REPO/$ORG/$APP_NAME'
     }
     stages {
-      stage('CI Build') {
-        when {
-          not {
-            branch 'master'
-          }
-        }
+      stage('Build application') {
         steps {
           container('gradle') {
             sh "gradle clean build test"
           }
         }
       }
-      stage('CI Push snapshot') {
-        when {
-          branch 'PR-*'
-        }
-        environment {
-          PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
-          PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
-          HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
-        }
+      stage('Build docker image') {
         steps {
           container('gradle') {
-            sh "gradle build"
-            sh 'export VERSION=$PREVIEW_VERSION && skaffold run -f skaffold.yaml'
-            sh "jx step validate --min-jx-version 1.2.36"
-            sh "jx step post build --image \$JENKINS_X_DOCKER_REGISTRY_SERVICE_HOST:\$JENKINS_X_DOCKER_REGISTRY_SERVICE_PORT/$ORG/$APP_NAME:$PREVIEW_VERSION"
-          }
-
-          dir ('./charts/preview') {
-           container('gradle') {
-             sh "make preview"
-             sh "jx preview --app $APP_NAME --dir ../.."
-           }
+            sh "docker build ."
           }
         }
       }
-      stage('Build Release') {
+      stage('Release docker image') {
         when {
           branch 'master'
         }
         steps {
           container('gradle') {
-            // ensure we're not on a detached head
-            sh "git checkout master"
-            sh "git config --global credential.helper store"
-            sh "jx step validate --min-jx-version 1.1.73"
-            sh "jx step git credentials"
-            // so we can retrieve the version in later steps
             sh "echo \$(jx-release-version) > VERSION"
-            // TODO
-            //sh "mvn versions:set -DnewVersion=\$(cat VERSION)"
+            sh "docker login $DOCKER_REPO -u $DOCKER_REPO_USR -p $DOCKER_REPO_PWD"
+            sh "export VERSION=`cat VERSION` && docker build . --tag $DOCKER_TAG_PREFIX:$VERSION && docker push $DOCKER_TAG_PREFIX:$VERSION"
           }
+        }
+      }
+
+      stage('Build helm chart') {
+        steps {
+          dir ('./charts/pluto') {
+            container('gradle') {
+              sh "make build"
+            }
+          }
+        }
+      }
+
+      stage('Release helm chart') {
+        when {
+          branch 'master'
+        }
+        steps {
           dir ('./charts/pluto') {
             container('gradle') {
               sh "make tag"
-            }
-          }
-          container('gradle') {
-            sh 'gradle clean build test'
-
-            sh 'export VERSION=`cat VERSION` && skaffold run -f skaffold.yaml'
-            sh "jx step validate --min-jx-version 1.2.36"
-            sh "jx step post build --image \$JENKINS_X_DOCKER_REGISTRY_SERVICE_HOST:\$JENKINS_X_DOCKER_REGISTRY_SERVICE_PORT/$ORG/$APP_NAME:\$(cat VERSION)"
-          }
-        }
-      }
-      stage('Promote to Environments') {
-        when {
-          branch 'master'
-        }
-        steps {
-          dir ('./charts/pluto') {
-            container('gradle') {
-              sh 'jx step changelog --version v\$(cat ../../VERSION)'
-
-              // release the helm chart
-              sh 'make release'
-
-              // promote through all 'Auto' promotion Environments
-              sh 'jx promote -b --all-auto --timeout 1h --version \$(cat ../../VERSION)'
+              sh "make release"
             }
           }
         }
