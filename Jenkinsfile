@@ -15,7 +15,7 @@ pipeline {
     stages {
       stage('Build helm chart') {
         steps {
-          dir ('./hyperspace') {
+          dir ('./workspace') {
             container('gradle') {
               sh "make build"
             }
