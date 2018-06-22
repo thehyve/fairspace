@@ -13,19 +13,6 @@ service:
   type: ClusterIP
   port: 80
 
-ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  path: /
-  hosts:
-    - chart-example.local
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -43,3 +30,15 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+jupyterhub:
+    hub:
+        ingress:
+            enabled: true
+            path: /
+            hosts:
+                 - fairspace.thehyve.net
+            annotations:
+                 kubernetes.io/ingress.class: nginx
+    proxy:
+        secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
