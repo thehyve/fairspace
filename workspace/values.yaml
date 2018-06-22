@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  repository: docker-registry.jx.test.fairdev.app/fairspace/workspace
+  tag: 0.1.3
   pullPolicy: IfNotPresent
 
 service:
@@ -35,7 +35,7 @@ jupyterhub:
     singleuser:
       image:
         name: "docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser"
-        tag: "0.0.1"
+        tag: 0.1.3
     hub:
         ingress:
             enabled: true
