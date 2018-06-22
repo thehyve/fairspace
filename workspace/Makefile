@@ -7,6 +7,8 @@ RELEASE_VERSION := $(shell jx-release-version)
 build: clean
 	helm init --client-only
 	rm -rf requirements.lock
+	helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+	helm repo update
 	helm dependency build
 	helm lint
 
@@ -24,6 +26,8 @@ clean:
 	rm -rf ${NAME}*.tgz
 
 release: clean
+	helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+	helm repo update
 	helm dependency build
 	helm lint
 	helm init --client-only
