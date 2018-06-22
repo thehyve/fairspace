@@ -32,7 +32,10 @@ tolerations: []
 affinity: {}
 
 jupyterhub:
-    hub:
+    singleuser:
+        image: "docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser"
+        tag: "0.0.1"
+    hub:se 
         ingress:
             enabled: true
             path: /
