@@ -35,7 +35,7 @@ jupyterhub:
     singleuser:
         image: "docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser"
         tag: "0.0.1"
-    hub:se 
+    hub:
         ingress:
             enabled: true
             path: /
