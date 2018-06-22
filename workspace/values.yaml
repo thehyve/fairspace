@@ -33,7 +33,8 @@ affinity: {}
 
 jupyterhub:
     singleuser:
-        image: "docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser"
+      image:
+        name: "docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser"
         tag: "0.0.1"
     hub:
         ingress:
