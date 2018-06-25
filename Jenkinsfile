@@ -3,6 +3,7 @@ pipeline {
       label "jenkins-gradle"
     }
     environment {
+      JENKINS_CONTAINER_TAG = 'gradle'
       ORG               = 'fairspace'
       APP_NAME          = 'pluto'
       DOCKER_REPO       = 'docker-registry.jx.test.fairdev.app'
@@ -15,14 +16,14 @@ pipeline {
     stages {
       stage('Build application') {
         steps {
-          container('gradle') {
+          container(JENKINS_CONTAINER_TAG) {
             sh "gradle clean build test"
           }
         }
       }
       stage('Build docker image') {
         steps {
-          container('gradle') {
+          container(JENKINS_CONTAINER_TAG) {
             sh "docker build ."
           }
         }
@@ -32,7 +33,7 @@ pipeline {
           branch 'master'
         }
         steps {
-          container('gradle') {
+          container(JENKINS_CONTAINER_TAG) {
             sh "echo \$(jx-release-version) > VERSION"
             sh "export VERSION=`cat VERSION` && docker build . --tag \$DOCKER_TAG_PREFIX:\$VERSION && docker push \$DOCKER_TAG_PREFIX:\$VERSION"
           }
@@ -41,8 +42,8 @@ pipeline {
 
       stage('Build helm chart') {
         steps {
-          dir ('./charts/pluto') {
-            container('gradle') {
+          dir ("./charts/$APP_NAME") {
+            container(JENKINS_CONTAINER_TAG) {
               sh "make build"
             }
           }
@@ -54,8 +55,8 @@ pipeline {
           branch 'master'
         }
         steps {
-          dir ('./charts/pluto') {
-            container('gradle') {
+          dir ("./charts/$APP_NAME") {
+            container(JENKINS_CONTAINER_TAG) {
               // Ensure the git command line tool has access to proper credentials
               sh "git config --global credential.helper store"
               sh "jx step validate --min-jx-version 1.1.73"
