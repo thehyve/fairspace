@@ -3,4 +3,4 @@ dependencies:
   repository: https://jupyterhub.github.io/helm-chart/
   version: v0.6
 digest: sha256:12f6e5eb66f479e9b3a2694bfcf0fa80a540efeb58d3f3a42f49b4b6d2059bac
-generated: 2018-06-11T17:06:33.534733926+02:00
+generated: 2018-06-25T10:11:59.830181259Z
