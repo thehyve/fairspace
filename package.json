@@ -1,13 +1,12 @@
 {
-  "name": "Mercury",
+  "name": "mercury",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
-    "ra-data-json-hal": "^1.0.7",
-    "ra-data-json-server": "^2.0.2",
-    "react": "^16.4.0",
-    "react-admin": "^2.0.2",
-    "react-dom": "^16.4.0",
+    "@material-ui/core": "latest",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "react-scripts": "1.1.4"
   },
   "scripts": {
@@ -15,6 +14,5 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  },
-  "publicPath" : "./"
+  }
 }
