@@ -2,3 +2,6 @@ dependencies:
 - name: jupyterhub
   version: "0.6"
   repository: https://jupyterhub.github.io/helm-chart/
+- name: pluto
+  version: v0.0.3
+  repository: https://chartmuseum.jx.test.fairdev.app/
