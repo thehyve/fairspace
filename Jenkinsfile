@@ -9,8 +9,6 @@ pipeline {
 
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
       DOCKER_REPO_CREDS = credentials('jenkins-x-docker-repo')
-
-      DOCKER_TAG_PREFIX = "$DOCKER_REPO/$ORG/$APP_NAME"
     }
     stages {
       stage('Build helm chart') {
