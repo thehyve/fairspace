@@ -27,6 +27,7 @@ clean:
 
 release: clean
 	helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+	helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
 	helm repo update
 	helm dependency build
 	helm lint
