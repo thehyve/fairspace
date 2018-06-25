@@ -5,3 +5,6 @@ dependencies:
 - name: pluto
   version: v0.0.7
   repository: https://chartmuseum.jx.test.fairdev.app/
+- name: mercury
+  version: v0.0.2
+  repository: https://chartmuseum.jx.test.fairdev.app/
