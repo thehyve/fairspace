@@ -1,0 +1,68 @@
+import React from 'react';
+import './MenuDrawer.css';
+import Drawer from "@material-ui/core/Drawer";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import Icon from "@material-ui/core/Icon";
+
+function MenuDrawer(props) {
+    const { classes } = props;
+    return (
+        <Drawer
+            variant="permanent"
+            classes={{
+                paper: classes.drawerPaper,
+            }}
+        >
+            <div className={classes.toolbar} />
+            <List>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Icon>home</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="Home" />
+                </ListItem>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Icon>folder_open</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="Files" />
+                </ListItem>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Icon>bar_chart</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="Notebooks" />
+                </ListItem>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Icon>transform</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="Workflows" />
+                </ListItem>
+            </List>
+            <Divider />
+            <List>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Icon>share</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="Dataverse" />
+                </ListItem>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Icon>public</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="cBioportal" />
+                </ListItem>
+            </List>
+        </Drawer>
+    );
+}
+
+export default MenuDrawer;
+
+
