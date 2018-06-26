@@ -9,7 +9,7 @@ import UserMenu from "../UserMenu/UserMenu";
 function TopBar(props) {
     const { classes } = props;
 
-    const handleLogout = () => { window.location.href = config.logoutUrl }
+    const handleLogout = () => { window.location.href = config.urls.logout }
 
     return (
         <AppBar position="absolute" className={classes.appBar}>
