@@ -1,3 +1,4 @@
 {
-  "logoutUrl": "/logout"
+  "logoutUrl": "/logout",
+  "accountNameUrl": "/account/name"
 }
