@@ -2,6 +2,8 @@ pluto:
   oauth2:
     base-url: http://localhost:9080
     realm: keycloak
+    logout-url: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
+    redirect-after-logout-url: https://www.google.com
 
 security:
   oauth2:

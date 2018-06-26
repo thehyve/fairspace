@@ -1,5 +1,6 @@
 package nl.fairspace.pluto.app.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateFactory;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -28,6 +30,12 @@ import java.util.Collections;
 @EnableOAuth2Sso
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+    @Value("${pluto.oauth2.logout-url}")
+    String logoutUrl;
+
+    @Value("${pluto.oauth2.redirect-after-logout-url}")
+    String redirectAfterLogoutUrl;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -39,7 +47,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .cors().configurationSource(corsConfigurationSource())
                 .and()
                     .logout()
-                    .logoutSuccessUrl("http://localhost:9080/auth/realms/jhipster/protocol/openid-connect/logout?redirect_uri=http%3A%2F%2Fwww.google.com%0D%0A")
+                    .logoutSuccessUrl(String.format(logoutUrl, URLEncoder.encode(redirectAfterLogoutUrl, "UTF-8")))
                 .and()
                     .csrf().disable();
     }
