@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing the current user's account.
@@ -30,9 +33,11 @@ public class AccountResource {
      * @return a map with authorizations for the current user.
      */
     @GetMapping("/authorizations")
-    public Collection<? extends GrantedAuthority> getAuthorizations(Authentication authentication) {
+    public List<String> getAuthorizations(Authentication authentication) {
         log.debug("REST authentication to retrieve authorizations");
-        return authentication.getAuthorities();
+        return authentication.getAuthorities().stream()
+                .map(authority -> ((GrantedAuthority) authority).getAuthority())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -42,9 +47,9 @@ public class AccountResource {
      * @return the login if the user is authenticated
      */
     @GetMapping("/name")
-    public String getName(HttpServletRequest request) {
+    public Map<String, String> getName(HttpServletRequest request) {
         log.debug("REST request to check if the current user is authenticated");
-        return request.getRemoteUser();
+        return Collections.singletonMap("username", request.getRemoteUser());
     }
 
 }
