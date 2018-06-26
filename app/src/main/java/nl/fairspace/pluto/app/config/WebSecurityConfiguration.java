@@ -35,6 +35,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Value("${pluto.oauth2.redirect-after-logout-url}")
     String redirectAfterLogoutUrl;
+    
+    @Value("${pluto.oauth2.required-authority}")
+    String requiredAuthority;    
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -42,7 +45,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .mvcMatchers(HttpMethod.OPTIONS).permitAll()
                     .antMatchers("/actuator/health").permitAll()
-                    .anyRequest().authenticated()
+                    .antMatchers("/account/name", "/ui").authenticated()
+                    .anyRequest().hasAuthority(requiredAuthority)
                 .and()
                     .cors().configurationSource(corsConfigurationSource())
                 .and()
