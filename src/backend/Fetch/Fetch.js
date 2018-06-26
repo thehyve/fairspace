@@ -71,6 +71,7 @@ class Fetch extends Component {
                 method: props.method,
                 headers: props.headers,
                 body: isEvent(body) ? null : body,
+                credentials: 'same-origin'
             })
             .then(response => {
                 if (this.willUnmount) {
