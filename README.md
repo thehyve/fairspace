@@ -1,24 +1,25 @@
 # Neptune
 Service for working with triples. Currently leveraging Apache Jena and SQL.
 
-##Starting the service
+## Starting the service
 The `src` directory contains the actual application. It can be run from the IDE or from the command line
 using gradle: `gradle bootRun`.
 
 
-##API
+## API
+
 | Command | Description |
 | --- | --- |
-|GET /metadata?uri=|Retrieve the metadata assosciated with the corresponding uri|
-|POST /metadata| Store triples |
-|DELETE /metadata| Delete triples|
-|POST /metadata/predicate| Store a predicate with it's label|
-|DELETE /metadata/predicate| Delete a predicate with it's label|
-|POST /metadata/predicates| Store a list of  predicates with their label|
-|DELETE /metadata/predicates| Delete a list of predicate with their label|
+| GET /metadata?uri=|Retrieve the metadata assosciated with the corresponding uri |
+| POST /metadata| Store triples |
+| DELETE /metadata| Delete triples |
+| POST /metadata/predicate| Store a predicate with it's label |
+| DELETE /metadata/predicate| Delete a predicate with it's label |
+| POST /metadata/predicates| Store a list of  predicates with their label |
+| DELETE /metadata/predicates| Delete a list of predicate with their label |
 
-###JSON format
-####Triple
+### JSON format
+#### Triple
 ```
 {
     "subject": "http:///file1",
@@ -31,14 +32,14 @@ using gradle: `gradle bootRun`.
             }
 }
 ```
-####Predicate
+#### Predicate
  ```
 {
 	"uri": "http://schema.org/Author",
 	"label": "creator"
 }
 ```
-####Response GET /metadata
+#### Response GET /metadata
 ```
 {
     "triples": [
