@@ -57,11 +57,19 @@ public class OAuth2IntegrationTests {
 	}
 
 	@Test
-	@WithMockUser
-	public void accessAllowedWithUser() throws Exception {
+	@WithMockUser(authorities = {"user-workspace"})
+	public void accessAllowedAfterLoginAndWithProperAuthorities() throws Exception {
 		mockMvc
 				.perform(get("/thehyve"))
 				.andExpect(status().is2xxSuccessful());
+	}
+
+	@Test
+	@WithMockUser
+	public void accessNotAllowedWithoutCorrectAuthority() throws Exception {
+		mockMvc
+				.perform(get("/thehyve"))
+				.andExpect(status().isForbidden());
 	}
 
 	@Test(expected = UserRedirectRequiredException.class)

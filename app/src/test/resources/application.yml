@@ -2,6 +2,7 @@ pluto:
   oauth2:
     logout-url: https://test.logout.url/%s
     redirect-after-logout-url: https://test.redirect.after.logout.url
+    required-authority: user-workspace
 
 security:
   oauth2:

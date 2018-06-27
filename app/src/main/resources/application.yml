@@ -4,6 +4,7 @@ pluto:
     realm: keycloak
     logout-url: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
     redirect-after-logout-url: https://www.google.com
+    required-authority: user-workspace
 
 security:
   oauth2:
@@ -13,6 +14,7 @@ security:
       user-authorization-uri: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/auth
       access-token-uri: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/token
       authentication-scheme: header
+      scope: openid
     resource:
       user-info-uri: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/userinfo
       prefer-token-info: false

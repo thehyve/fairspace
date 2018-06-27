@@ -20,6 +20,13 @@ be implemented in Spring Security and is currently planned for 5.1. When that ve
 we can remove our custom code. See also 
 https://github.com/spring-projects/spring-security/issues/4371
 
+## Authorization
+Pluto requires the OIDC provider (keycloak) to return a specific authority (configurable, defaults to user-workspace)for the 
+user to be allowed to use this workspace.
+If the user has logged in, but does not have access to the workspace, most requests will return a HTTP status 403. The user will
+however be able to access the frontend at `/ui` and his name at `/account/name`. This allows the frontend to check `/account/authorizations`
+to see if the user is allowed to use this workspace, and if not, show a nice errormessage.
+
 ## Creating a compatible backend
 The backend microservices that are exposed with this gateway, should also be able to handle the OAuth2 tokens. This can 
 easily be done using Spring Security
