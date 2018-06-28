@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LocalDbPredicateService implements PredicateService {
@@ -33,20 +33,10 @@ public class LocalDbPredicateService implements PredicateService {
         }
     }
 
-    public void deletePredicate(PredicateInfo predicate) {
-        predicateInfoRepository.delete(convertToLocalDbPredicate(predicate));
-    }
-
-    public void deletePredicateList(List<PredicateInfo> predicateInfoList) {
-        predicateInfoRepository.deleteAll(convertToListLocalDbPedicates(predicateInfoList));
-    }
-
     private List<LocalDbPredicateInfo> convertToListLocalDbPedicates(List<PredicateInfo> predicateInfoList) {
-        List<LocalDbPredicateInfo> localDbPredicateInfoList = new ArrayList<>();
-        for (PredicateInfo predicateInfo: predicateInfoList) {
-            localDbPredicateInfoList.add(convertToLocalDbPredicate(predicateInfo));
-        }
-        return  localDbPredicateInfoList;
+        return predicateInfoList.stream()
+                .map(this::convertToLocalDbPredicate)
+                .collect(Collectors.toList());
     }
 
 
@@ -56,10 +46,5 @@ public class LocalDbPredicateService implements PredicateService {
         localDbPredicateInfo.setUri(predicateInfo.getUri());
         return localDbPredicateInfo;
     }
-
-//    private PredicateInfo convertToPredicateInfo(LocalDbPredicateInfo localDbPredicateInfo) {
-//        return new PredicateInfo(localDbPredicateInfo.getLabel(), localDbPredicateInfo.getUri());
-//    }
-
 
 }

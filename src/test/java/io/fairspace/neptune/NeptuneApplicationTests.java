@@ -12,12 +12,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class NeptuneApplicationTests {
 
-	@MockBean
-	CeresService ceresService;
-
-	@MockBean
-	LocalDbPredicateService localDbPredicateService;
-
 	@Test
 	public void contextLoads() {
 	}

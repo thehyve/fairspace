@@ -5,8 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class MetadataService {
@@ -19,13 +20,12 @@ public class MetadataService {
 
     public CombinedTriplesWithPredicateInfo retrieveMetadata(URI uri) {
         List<Triple> triples = tripleService.retrieveTriples(uri);
-        List<PredicateInfo> predicateInfos = new ArrayList<>();
-        for (Triple triple : triples) {
-            PredicateInfo predicateInfo = predicateService.retrievePredicateInfo(triple.getPredicate());
-            if (!predicateInfos.contains(predicateInfo)) {
-                predicateInfos.add(predicateInfo);
-            }
-        }
+        List<PredicateInfo> predicateInfos = triples.stream()
+                .map(Triple::getPredicate)
+                .distinct()
+                .map(predicate -> predicateService.retrievePredicateInfo(predicate))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
         return new CombinedTriplesWithPredicateInfo(triples, predicateInfos);
     }
 
@@ -41,16 +41,8 @@ public class MetadataService {
         predicateService.insertPredicateList(predicateInfoList);
     }
 
-    public void deletePredicateInfoList(List<PredicateInfo> predicateInfoList) {
-        predicateService.deletePredicateList(predicateInfoList);
-    }
-
     public void postPredicateInfo(PredicateInfo predicateInfo) {
         predicateService.insertPredicate(predicateInfo);
-    }
-
-    public void deletePredicateInfo(PredicateInfo predicateInfo) {
-        predicateService.deletePredicate(predicateInfo);
     }
 
 }

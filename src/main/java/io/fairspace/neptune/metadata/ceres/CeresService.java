@@ -3,6 +3,7 @@ package io.fairspace.neptune.metadata.ceres;
 import io.fairspace.neptune.business.Triple;
 import io.fairspace.neptune.business.TripleService;
 import io.fairspace.neptune.metadata.rdfjson.TriplesRdfJsonConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class CeresService implements TripleService {
 
     private static final MediaType RDF_JSON_MEDIA_TYPE = new MediaType("application", "rdf+json");
@@ -36,8 +39,13 @@ public class CeresService implements TripleService {
     private String ceresApiEndpoint;
 
     public List<Triple> retrieveTriples(URI uri) {
-        Map<String, Map<String, List<Map<String, String>>>> result = restTemplate.exchange(ceresUri + ceresApiEndpoint + "?subject={uri}", HttpMethod.GET, GET_ENTITY, Map.class, uri).getBody();
-        return triplesRdfJsonConverter.convertRdfToTriples(result);
+        try {
+            Map<String, Map<String, List<Map<String, String>>>> result = restTemplate.exchange(ceresUri + ceresApiEndpoint + "?subject={uri}", HttpMethod.GET, GET_ENTITY, Map.class, uri).getBody();
+            return triplesRdfJsonConverter.convertRdfToTriples(result);
+        } catch (HttpClientErrorException e) {
+            log.error("Error", e);
+            throw new RuntimeException("Some context", e);
+        }
     }
 
 

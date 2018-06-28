@@ -10,12 +10,11 @@ import java.util.*;
 @Component
 public class TriplesRdfJsonConverter {
 
-    public List<Triple> convertRdfToTriples(Map<String, Map<String, List<Map<String,String>>>> rdf) {
+    public List<Triple> convertRdfToTriples(Map<String, Map<String, List<Map<String, String>>>> rdf) {
         List<Triple> triples = new ArrayList<>();
         for (String subject : rdf.keySet()) {
             for (String predicate : rdf.get(subject).keySet()) {
-                List<Map<String,String>> objects = rdf.get(subject).get(predicate);
-                for (Map<String,String> rdfObject : objects) {
+                for (Map<String, String> rdfObject : rdf.get(subject).get(predicate)) {
                     URI datatype = rdfObject.containsKey("dataType") ? URI.create(rdfObject.get("dataType")) : null;
                     TripleObject tripleObject = new TripleObject(rdfObject.getOrDefault("type", null),
                             rdfObject.getOrDefault("value", null),
@@ -30,21 +29,13 @@ public class TriplesRdfJsonConverter {
     public Map<String, Map<String, List<TripleObject>>> convertTriplesToRdf(List<Triple> triples) {
         Map<String, Map<String, List<TripleObject>>> rdfJson = new LinkedHashMap<>();
         for (Triple triple : triples) {
-            if (!rdfJson.keySet().contains(triple.getSubject())) {
-                Map<String, List<TripleObject>> predicateMap = new LinkedHashMap<>();
-                List<TripleObject> tripleObjectList = new ArrayList<>(Arrays.asList(triple.getObject()));
-                predicateMap.put(triple.getPredicate().toString(), tripleObjectList);
-                rdfJson.put(triple.getSubject(), predicateMap);
-            } else if (rdfJson.keySet().contains(triple.getSubject())) {
-                Map<String, List<TripleObject>> predicateMap = rdfJson.get(triple.getSubject());
-                if (!predicateMap.keySet().contains(triple.getPredicate().toString())) {
-                    List<TripleObject> tripleObjectList = new ArrayList<>(Arrays.asList(triple.getObject()));
-                    predicateMap.put(triple.getPredicate().toString(), tripleObjectList);
-                } else {
-                    List<TripleObject> tripleObjectList = predicateMap.get(triple.getPredicate().toString());
-                    tripleObjectList.add(triple.getObject());
-                }
+            if (!rdfJson.containsKey((triple.getSubject()))) {
+                rdfJson.put(triple.getSubject(), new HashMap<>());
             }
+            if (!rdfJson.get(triple.getSubject()).containsKey(triple.getPredicate().toString())) {
+                rdfJson.get(triple.getSubject()).put(triple.getPredicate().toString(), new ArrayList<>());
+            }
+            rdfJson.get(triple.getSubject()).get(triple.getPredicate().toString()).add(triple.getObject());
         }
         return rdfJson;
     }

@@ -25,6 +25,7 @@ public class MetadataController {
 
     /**
      * Get all the metadata surrounding the uri.
+     *
      * @param uri the uri of interest.
      * @return the triples with predicates and their information
      */
@@ -35,6 +36,7 @@ public class MetadataController {
 
     /**
      * Store a list of triples.
+     *
      * @param triples a list of triple objects.
      */
     @PostMapping
@@ -44,6 +46,7 @@ public class MetadataController {
 
     /**
      * Delete a list of triples.
+     *
      * @param triples a list of triple objects.
      */
     @DeleteMapping
@@ -53,6 +56,7 @@ public class MetadataController {
 
     /**
      * Store a predicate with a specified label
+     *
      * @param predicateInfo the predicate with label
      */
     @PostMapping("/predicate")
@@ -61,16 +65,8 @@ public class MetadataController {
     }
 
     /**
-     * Delete a predicate with a specified label
-     * @param predicateInfo the predicate with label
-     */
-    @DeleteMapping("/predicate")
-    public void deletePredicateInfo(@RequestBody PredicateInfo predicateInfo) {
-        metadataService.deletePredicateInfo(predicateInfo);
-    }
-
-    /**
      * Store a list of predicates with their specified label
+     *
      * @param predicateInfoList the list of predicates with their label
      */
     @PostMapping("/predicates")
@@ -78,12 +74,4 @@ public class MetadataController {
         metadataService.postPredicateInfoList(predicateInfoList);
     }
 
-    /**
-     * Delete a list of predicates with their specified label
-     * @param predicateInfoList the list of predicates with their label
-     */
-    @DeleteMapping("/predicates")
-    public void deletePredicateInfo(@RequestBody List<PredicateInfo> predicateInfoList) {
-        metadataService.deletePredicateInfoList(predicateInfoList);
-    }
 }

@@ -12,10 +12,6 @@ public interface PredicateService {
 
     void insertPredicateList(List<PredicateInfo> predicateInfoList);
 
-    void deletePredicate(PredicateInfo predicateInfo);
-
-    void deletePredicateList(List<PredicateInfo> predicateInfoList);
-
     PredicateInfo retrievePredicateInfo(URI uri);
 
 }

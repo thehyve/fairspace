@@ -44,24 +44,23 @@ public class MetaDataControllerTest {
 
     @MockBean
     MetadataService metadataService;
+    public static final URI uri =URI.create("http://schema.org/Author").create("http://schema.org/Author");
 
     @Test
     public void retrievecombinedMetadataWithPredicateInfoTest() throws Exception {
-        URI uri = URI.create("http://schema.org/Author");
         URI uri2 = URI.create("http%3A%2F%2Fschema.org%2FAuthor");
         TripleObject tripleObject = new TripleObject(
                 "Literal", "1", "en", uri);
         URI uriPredicate = URI.create("http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral");
         Triple triple = new Triple("test", uriPredicate, tripleObject);
         when(metadataService.retrieveMetadata(uri2)).thenReturn(new CombinedTriplesWithPredicateInfo(createTriples(), createPredicate()));
-        mvc.perform(get("/metadata/retrieve?uri=http%3A%2F%2Fschema.org%2FAuthor"))
+        mvc.perform(get("/metadata?uri=http%3A%2F%2Fschema.org%2FAuthor"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.triples[0].subject", is(uri2.toString())).exists())
                 .andExpect(jsonPath("$.predicateInfo[0].label", is("Author")).exists());
     }
 
     private List<Triple> createTriples() {
-        URI uri = URI.create("http://schema.org/Author");
         TripleObject tripleObject = new TripleObject(
                 "Literal", "1", "en", uri);
         URI uriPredicate = URI.create("http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral");
@@ -69,11 +68,10 @@ public class MetaDataControllerTest {
     }
 
     private List<PredicateInfo> createPredicate() {
-        URI uri = URI.create("http://schema.org/Author");
-        List<URI> alternatives = new ArrayList<>();
-        alternatives.add(URI.create("htpp://schema.org/Creator"));
-        alternatives.add(URI.create("http://www.w3.org/ns/dcat#creator"));
-        return Collections.singletonList(new LocalDbPredicateInfo("Author", uri, alternatives));
+        LocalDbPredicateInfo localDbPredicateInfo = new LocalDbPredicateInfo();
+        localDbPredicateInfo.setUri(uri);
+        localDbPredicateInfo.setLabel("Author");
+        return Collections.singletonList(localDbPredicateInfo);
     }
 
 }
