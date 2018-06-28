@@ -1,6 +1,9 @@
 spring:
   datasource:
-    url: "jdbc:h2:mem:"
+    url: "jdbc:h2:~/test;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE"
+  jpa:
+    hibernate:
+      ddl-auto: update
 ceres:
   url: "http://localhost:8001"
   endpoint: "/model/mymodel/statements"

@@ -17,9 +17,10 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(value = {HttpClientErrorException.class})
     protected ResponseEntity<Object> wrongCall(
             RuntimeException ex, WebRequest request) {
-        String bodeOfResponse = "Ceres did not answer the phone.";
-        log.error(request.toString());
-        return handleExceptionInternal(ex, bodeOfResponse,
+        String bodyOfResponse = "Someone, or something, did not answer the phone.";
+        log.debug(request.toString());
+        log.error(ex.getMessage(), ex);
+        return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 

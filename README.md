@@ -28,7 +28,7 @@ using gradle: `gradle bootRun`.
                 "type": "literal",
                 "value": "Hans",
                 "lang": "en",
-                "datatype": "http://www.w3.org/2001/vcard-rdf/3.0#FN"
+                "dataType": "http://www.w3.org/2001/vcard-rdf/3.0#FN"
             }
 }
 ```
@@ -50,7 +50,7 @@ using gradle: `gradle bootRun`.
                 "type": "literal",
                 "value": "Hans",
                 "lang": "en",
-                "datatype": "http://www.w3.org/2001/vcard-rdf/3.0#FN"
+                "dataType": "http://www.w3.org/2001/vcard-rdf/3.0#FN"
             }
         },
         {

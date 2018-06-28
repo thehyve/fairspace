@@ -2,6 +2,7 @@ package io.fairspace.neptune.metadata.rdfjson;
 
 import io.fairspace.neptune.business.Triple;
 import io.fairspace.neptune.business.TripleObject;
+import io.fairspace.neptune.metadata.ceres.RdfObject;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -26,8 +27,8 @@ public class TriplesRdfJsonConverter {
         return triples;
     }
 
-    public Map<String, Map<String, List<TripleObject>>> convertTriplesToRdf(List<Triple> triples) {
-        Map<String, Map<String, List<TripleObject>>> rdfJson = new LinkedHashMap<>();
+    public Map<String, Map<String, List<RdfObject>>> convertTriplesToRdf(List<Triple> triples) {
+        Map<String, Map<String, List<RdfObject>>> rdfJson = new LinkedHashMap<>();
         for (Triple triple : triples) {
             if (!rdfJson.containsKey((triple.getSubject()))) {
                 rdfJson.put(triple.getSubject(), new HashMap<>());
@@ -35,9 +36,14 @@ public class TriplesRdfJsonConverter {
             if (!rdfJson.get(triple.getSubject()).containsKey(triple.getPredicate().toString())) {
                 rdfJson.get(triple.getSubject()).put(triple.getPredicate().toString(), new ArrayList<>());
             }
-            rdfJson.get(triple.getSubject()).get(triple.getPredicate().toString()).add(triple.getObject());
+            rdfJson.get(triple.getSubject()).get(triple.getPredicate().toString()).add(convertTripleObjectToRdfObject(triple.getObject()));
         }
         return rdfJson;
+    }
+
+    private RdfObject convertTripleObjectToRdfObject(TripleObject tripleObject) {
+    return new RdfObject(tripleObject.getType(), tripleObject.getValue(),
+            tripleObject.getLang(), tripleObject.getDataType());
     }
 
 }

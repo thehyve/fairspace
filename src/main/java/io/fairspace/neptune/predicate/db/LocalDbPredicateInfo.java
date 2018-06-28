@@ -16,7 +16,7 @@ import java.net.URI;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LocalDbPredicateInfo extends PredicateInfo {
+public class LocalDbPredicateInfo {
 
     @Id
     @GeneratedValue

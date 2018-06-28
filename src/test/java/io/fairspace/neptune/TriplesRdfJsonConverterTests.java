@@ -2,6 +2,7 @@ package io.fairspace.neptune;
 
 import io.fairspace.neptune.business.Triple;
 import io.fairspace.neptune.business.TripleObject;
+import io.fairspace.neptune.metadata.ceres.RdfObject;
 import io.fairspace.neptune.metadata.rdfjson.TriplesRdfJsonConverter;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,21 +21,21 @@ public class TriplesRdfJsonConverterTests {
     @Test
     public void convertTriplesToRdfTest() {
         List<Triple> triples = getTriples();
-        Map<String,Map<String,List<TripleObject>>> convertedMap = triplesRdfJsonConverter.convertTriplesToRdf(triples);
+        Map<String,Map<String,List<RdfObject>>> convertedMap = triplesRdfJsonConverter.convertTriplesToRdf(triples);
         Assert.assertEquals(convertedMap, getTriplesMap());
     }
 
     @Test
     public void convertTriplesToRdfMultiplePredicatesTest() {
         List<Triple> triples = getTriplesMultiplePredicates();
-        Map<String,Map<String,List<TripleObject>>> convertedMap = triplesRdfJsonConverter.convertTriplesToRdf(triples);
+        Map<String,Map<String,List<RdfObject>>> convertedMap = triplesRdfJsonConverter.convertTriplesToRdf(triples);
         Assert.assertEquals(convertedMap, getTriplesMapMultiplePredicates());
     }
 
     @Test
     public void convertTriplesToRdfMultipleObjectsTest() {
         List<Triple> triples = getTriplesMultipleObjects();
-        Map<String,Map<String,List<TripleObject>>> convertedMap = triplesRdfJsonConverter.convertTriplesToRdf(triples);
+        Map<String,Map<String,List<RdfObject>>> convertedMap = triplesRdfJsonConverter.convertTriplesToRdf(triples);
         Assert.assertEquals(convertedMap, getTriplesMapMultipleObjects());
     }
 
@@ -75,7 +76,7 @@ public class TriplesRdfJsonConverterTests {
     private Map<String,Map<String,List<Object>>> getTriplesMap(){
         Map<String,Map<String,List<Object>>> map = new LinkedHashMap<>();
         List<Object> tripleObjectList = new ArrayList<>();
-        tripleObjectList.add(new TripleObject("Literal", "1", "en", URI.create("http://schema.org/Author")));
+        tripleObjectList.add(new RdfObject("Literal", "1", "en", URI.create("http://schema.org/Author")));
         Map<String, List<Object>> nestedMap = new LinkedHashMap<>();
         nestedMap.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral", tripleObjectList);
         map.put("test", nestedMap);
@@ -86,7 +87,7 @@ public class TriplesRdfJsonConverterTests {
     private Map<String,Map<String,List<Object>>> getTriplesMapMultiplePredicates(){
         Map<String,Map<String,List<Object>>> map = new LinkedHashMap<>();
         List<Object> tripleObjectList = new ArrayList<>();
-        tripleObjectList.add(new TripleObject("Literal", "1", "en", URI.create("http://schema.org/Author")));
+        tripleObjectList.add(new RdfObject("Literal", "1", "en", URI.create("http://schema.org/Author")));
         Map<String, List<Object>> nestedMap = new LinkedHashMap<>();
         String uriPredicate1 = "http://www.schema.org/Person";
         String uriPredicate2 = "http://www.schema.org/Creator";
@@ -99,8 +100,8 @@ public class TriplesRdfJsonConverterTests {
     private Map<String,Map<String,List<Object>>> getTriplesMapMultipleObjects(){
         Map<String,Map<String,List<Object>>> map = new LinkedHashMap<>();
         List<Object> tripleObjectList = new ArrayList<>();
-        tripleObjectList.add(new TripleObject("Literal", "1", "en", URI.create("http://schema.org/Author")));
-        tripleObjectList.add(new TripleObject("Literal", "2", "en", URI.create("http://schema.org/Author")));
+        tripleObjectList.add(new RdfObject("Literal", "1", "en", URI.create("http://schema.org/Author")));
+        tripleObjectList.add(new RdfObject("Literal", "2", "en", URI.create("http://schema.org/Author")));
         Map<String, List<Object>> nestedMap = new LinkedHashMap<>();
         nestedMap.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral", tripleObjectList);
         map.put("test", nestedMap);

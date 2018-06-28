@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class LocalDbPredicateService implements PredicateService {
         List<LocalDbPredicateInfo> predicateInfoList = predicateInfoRepository.findByUri(uri);
 
         if (predicateInfoList.size() > 0) {
-            return predicateInfoList.get(0);
+            return convertToPredicateInfo(predicateInfoList.get(0));
         } else {
             return null;
         }
@@ -40,11 +41,17 @@ public class LocalDbPredicateService implements PredicateService {
     }
 
 
+
     private LocalDbPredicateInfo convertToLocalDbPredicate(PredicateInfo predicateInfo) {
         LocalDbPredicateInfo localDbPredicateInfo = new LocalDbPredicateInfo();
         localDbPredicateInfo.setLabel(predicateInfo.getLabel());
         localDbPredicateInfo.setUri(predicateInfo.getUri());
         return localDbPredicateInfo;
     }
+
+    private PredicateInfo convertToPredicateInfo(LocalDbPredicateInfo localDbPredicateInfo) {
+        return new PredicateInfo(localDbPredicateInfo.getLabel(), localDbPredicateInfo.getUri());
+    }
+
 
 }
