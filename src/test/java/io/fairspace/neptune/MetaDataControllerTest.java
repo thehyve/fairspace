@@ -5,7 +5,7 @@ import io.fairspace.neptune.business.PredicateInfo;
 import io.fairspace.neptune.business.Triple;
 import io.fairspace.neptune.business.TripleObject;
 import io.fairspace.neptune.metadata.ceres.CeresService;
-import io.fairspace.neptune.predicate.db.LocalDbPredicate;
+import io.fairspace.neptune.predicate.db.LocalDbPredicateInfo;
 import io.fairspace.neptune.predicate.db.LocalDbPredicateService;
 import io.fairspace.neptune.web.CombinedTriplesWithPredicateInfo;
 import io.fairspace.neptune.web.MetadataController;
@@ -53,7 +53,7 @@ public class MetaDataControllerTest {
                 "Literal", "1", "en", uri);
         URI uriPredicate = URI.create("http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral");
         Triple triple = new Triple("test", uriPredicate, tripleObject);
-        when(metadataService.retrievMetadata(uri2)).thenReturn(new CombinedTriplesWithPredicateInfo(createTriples(), createPredicate()));
+        when(metadataService.retrieveMetadata(uri2)).thenReturn(new CombinedTriplesWithPredicateInfo(createTriples(), createPredicate()));
         mvc.perform(get("/metadata/retrieve?uri=http%3A%2F%2Fschema.org%2FAuthor"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.triples[0].subject", is(uri2.toString())).exists())
@@ -73,7 +73,7 @@ public class MetaDataControllerTest {
         List<URI> alternatives = new ArrayList<>();
         alternatives.add(URI.create("htpp://schema.org/Creator"));
         alternatives.add(URI.create("http://www.w3.org/ns/dcat#creator"));
-        return Collections.singletonList(new LocalDbPredicate("Author", uri, alternatives));
+        return Collections.singletonList(new LocalDbPredicateInfo("Author", uri, alternatives));
     }
 
 }

@@ -1,6 +1,6 @@
 package io.fairspace.neptune;
 
-import io.fairspace.neptune.predicate.db.LocalDbPredicate;
+import io.fairspace.neptune.predicate.db.LocalDbPredicateInfo;
 import io.fairspace.neptune.predicate.db.LocalDbPredicateService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class LocalDbLocalDbPredicateServiceTest {
+public class LocalDbLocalDbPredicateInfoServiceTest {
 
     @MockBean
     private LocalDbPredicateService localDbPredicateService;
@@ -24,8 +24,8 @@ public class LocalDbLocalDbPredicateServiceTest {
         URI uri =  URI.create("http://schema.org/Author");
         List<URI> alternatives = new ArrayList<>();
         alternatives.add(uri);
-        LocalDbPredicate localDbPredicate = new LocalDbPredicate("Author", uri, alternatives);
-        localDbPredicateService.insertPredicate(localDbPredicate);
+        LocalDbPredicateInfo localDbPredicateInfo = new LocalDbPredicateInfo("Author", uri, alternatives);
+        localDbPredicateService.insertPredicate(localDbPredicateInfo);
     }
 
 }

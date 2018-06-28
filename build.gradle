@@ -35,7 +35,6 @@ ext {
 
 
 dependencies {
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("com.h2database:h2")

@@ -1,6 +1,5 @@
 package io.fairspace.neptune;
 
-import com.google.gson.Gson;
 import io.fairspace.neptune.business.Triple;
 import io.fairspace.neptune.business.TripleObject;
 import io.fairspace.neptune.metadata.rdfjson.TriplesRdfJsonConverter;
@@ -8,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
 import java.util.*;
@@ -29,7 +27,7 @@ public class TriplesRdfJsonConverterTests {
     @Test
     public void convertRdfToTriples() {
         Map<String,Map<String,List<Object>>> map = getMap();
-        List<Triple> triples = triplesRdfJsonConverter.convertToTriples(map);
+        List<Triple> triples = triplesRdfJsonConverter.convertRdfToTriples(map);
         Assert.assertEquals(triples, getTriples());
 
     }

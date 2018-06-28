@@ -1,7 +1,5 @@
 package io.fairspace.neptune.metadata.rdfjson;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import io.fairspace.neptune.business.Triple;
 import io.fairspace.neptune.business.TripleObject;
 import org.springframework.stereotype.Component;
@@ -12,15 +10,16 @@ import java.util.*;
 @Component
 public class TriplesRdfJsonConverter {
 
-    public List<Triple> convertToTriples(Map<String, Map<String, List<Object>>> result) {
+    public List<Triple> convertRdfToTriples(Map<String, Map<String, List<Map<String,String>>>> rdf) {
         List<Triple> triples = new ArrayList<>();
-        for (String subject : result.keySet()) {
-            for (String predicate : result.get(subject).keySet()) {
-                List<Object> objects = result.get(subject).get(predicate);
-                for (Object rdfObject : objects) {
-                    Gson gson = new Gson();
-                    JsonElement jsonElement = gson.toJsonTree(rdfObject);
-                    TripleObject tripleObject = gson.fromJson(jsonElement, TripleObject.class);
+        for (String subject : rdf.keySet()) {
+            for (String predicate : rdf.get(subject).keySet()) {
+                List<Map<String,String>> objects = rdf.get(subject).get(predicate);
+                for (Map<String,String> rdfObject : objects) {
+                    URI datatype = rdfObject.containsKey("dataType") ? URI.create(rdfObject.get("dataType")) : null;
+                    TripleObject tripleObject = new TripleObject(rdfObject.getOrDefault("type", null),
+                            rdfObject.getOrDefault("value", null),
+                            rdfObject.getOrDefault("lang", null), datatype);
                     triples.add(new Triple(subject, URI.create(predicate), tripleObject));
                 }
             }
@@ -29,15 +28,15 @@ public class TriplesRdfJsonConverter {
     }
 
     public Map<String, Map<String, List<TripleObject>>> convertTriplesToRdf(List<Triple> triples) {
-        Map<String, Map<String, List<TripleObject>>> subjectMap = new LinkedHashMap<>();
+        Map<String, Map<String, List<TripleObject>>> rdfJson = new LinkedHashMap<>();
         for (Triple triple : triples) {
-            if (!subjectMap.keySet().contains(triple.getSubject())) {
+            if (!rdfJson.keySet().contains(triple.getSubject())) {
                 Map<String, List<TripleObject>> predicateMap = new LinkedHashMap<>();
                 List<TripleObject> tripleObjectList = new ArrayList<>(Arrays.asList(triple.getObject()));
                 predicateMap.put(triple.getPredicate().toString(), tripleObjectList);
-                subjectMap.put(triple.getSubject(), predicateMap);
-            } else if (subjectMap.keySet().contains(triple.getSubject())) {
-                Map<String, List<TripleObject>> predicateMap = subjectMap.get(triple.getSubject());
+                rdfJson.put(triple.getSubject(), predicateMap);
+            } else if (rdfJson.keySet().contains(triple.getSubject())) {
+                Map<String, List<TripleObject>> predicateMap = rdfJson.get(triple.getSubject());
                 if (!predicateMap.keySet().contains(triple.getPredicate().toString())) {
                     List<TripleObject> tripleObjectList = new ArrayList<>(Arrays.asList(triple.getObject()));
                     predicateMap.put(triple.getPredicate().toString(), tripleObjectList);
@@ -47,7 +46,7 @@ public class TriplesRdfJsonConverter {
                 }
             }
         }
-        return subjectMap;
+        return rdfJson;
     }
 
 }

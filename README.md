@@ -1,5 +1,5 @@
 # Neptune
-Service for working with triples. Currently leveraging Apache Jena and SQL.
+Service for working with triples. Currently leveraging Ceres and SQL.
 
 ## Starting the service
 The `src` directory contains the actual application. It can be run from the IDE or from the command line

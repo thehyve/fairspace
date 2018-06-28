@@ -6,8 +6,8 @@ import org.springframework.data.repository.CrudRepository;
 import java.net.URI;
 import java.util.List;
 
-public interface PredicateInfoRepository extends CrudRepository<PredicateInfo, Long> {
+public interface PredicateInfoRepository extends CrudRepository<LocalDbPredicateInfo, Long> {
 
-    List<PredicateInfo> findByUri(URI uri);
+    List<LocalDbPredicateInfo> findByUri(URI uri);
 
 }

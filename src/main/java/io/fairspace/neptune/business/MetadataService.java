@@ -17,7 +17,7 @@ public class MetadataService {
     @Autowired
     public PredicateService predicateService;
 
-    public CombinedTriplesWithPredicateInfo retrievMetadata(URI uri) {
+    public CombinedTriplesWithPredicateInfo retrieveMetadata(URI uri) {
         List<Triple> triples = tripleService.retrieveTriples(uri);
         List<PredicateInfo> predicateInfos = new ArrayList<>();
         for (Triple triple : triples) {

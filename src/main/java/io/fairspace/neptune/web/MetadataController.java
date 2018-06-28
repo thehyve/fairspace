@@ -30,7 +30,7 @@ public class MetadataController {
      */
     @GetMapping
     public CombinedTriplesWithPredicateInfo get(@RequestParam URI uri) {
-        return metadataService.retrievMetadata(uri);
+        return metadataService.retrieveMetadata(uri);
     }
 
     /**
