@@ -15,4 +15,4 @@ FetchUsername.propTypes = {
     children: PropTypes.func
 }
 
-export default FetchUsername;
+export default FetchUsername

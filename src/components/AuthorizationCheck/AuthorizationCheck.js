@@ -74,4 +74,4 @@ class AuthorizationCheck extends React.Component {
     }
 }
 
-export default AuthorizationCheck;
+export default AuthorizationCheck
