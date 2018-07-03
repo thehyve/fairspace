@@ -3,17 +3,14 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 image:
-  repository: draft
-  tag: dev
+  repository: docker-registry.jx.test.fairdev.app/fairspace/pluto
+  tag: 0.1.16
   pullPolicy: IfNotPresent
 service:
   name: pluto
   type: ClusterIP
   externalPort: 80
   internalPort: 8080
-  annotations:
-    fabric8.io/expose: "true"
-    fabric8.io/ingress.annotations: "kubernetes.io/ingress.class: nginx"
 resources:
   limits:
     cpu: 500m
@@ -21,10 +18,6 @@ resources:
   requests:
     cpu: 400m
     memory: 768Mi
-env:
-  PLUTO_OAUTH2_BASEURL:
-  PLUTO_OAUTH2_REALM:
-  ZUUL_ROUTES_UI_URL:
 probePath: /actuator/health
 livenessProbe:
   initialDelaySeconds: 60
@@ -36,3 +29,22 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 terminationGracePeriodSeconds: 10
+
+# Reference to the workspace
+workspace:
+  name:
+
+# Keycloak configuration for authentication
+keycloak:
+  baseUrl:
+  client:
+    id:
+    secret:
+  realm:
+  redirectAfterLogoutUrl: https://fairspace.com
+  requiredAuthority:
+
+# Where to find the backends for this proxy
+backends:
+  mercury: http://mercury
+  neptune: http://neptune

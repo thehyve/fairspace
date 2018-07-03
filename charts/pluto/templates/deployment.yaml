@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "pluto.fullname" . }}
   labels:
     draft: {{ default "draft-app" .Values.draft }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
@@ -11,7 +11,7 @@ spec:
     metadata:
       labels:
         draft: {{ default "draft-app" .Values.draft }}
-        app: {{ template "fullname" . }}
+        app: {{ template "pluto.fullname" . }}
 {{- if .Values.podAnnotations }}
       annotations:
 {{ toYaml .Values.podAnnotations | indent 8 }}
@@ -23,6 +23,9 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/config
         livenessProbe:
           httpGet:
             path: {{ .Values.probePath }}
@@ -41,5 +44,18 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         env:
-{{ toYaml .Values.env | indent 12 }}
+        - name: SECURITY_OAUTH2_CLIENT_CLIENTID
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "pluto.fullname" . }}-oauth
+              key: clientId
+        - name: SECURITY_OAUTH2_CLIENT_CLIENTSECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "pluto.fullname" . }}-oauth
+              key: clientSecret
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ template "pluto.fullname" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}

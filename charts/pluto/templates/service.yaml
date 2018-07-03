@@ -4,7 +4,7 @@ metadata:
 {{- if .Values.service.name }}
   name: {{ .Values.service.name }}
 {{- else }}
-  name: {{ template "fullname" . }}
+  name: {{ template "pluto.fullname" . }}
 {{- end }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
@@ -20,4 +20,4 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: {{ template "fullname" . }}
+    app: {{ template "pluto.fullname" . }}

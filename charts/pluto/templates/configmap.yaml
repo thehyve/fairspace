@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "pluto.fullname" . }}
+  labels:
+    app: {{ template "pluto.name" . }}
+    chart: {{ template "pluto.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  application.yaml: |-
+    pluto:
+      oauth2:
+        base-url: {{ .Values.keycloak.baseUrl }}
+        realm: {{ .Values.keycloak.realm }}
+        redirect-after-logout-url: {{ .Values.keycloak.redirectAfterLogoutUrl }}
+        required-authority: {{ .Values.keycloak.requiredAuthority | default (printf "user-%s" .Values.workspace.name) }}
+
+    zuul:
+      routes:
+        ui:
+          url: {{ .Values.backends.mercury }}
