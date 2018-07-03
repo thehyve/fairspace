@@ -99,7 +99,7 @@ public class WebSecurityConfigurationTest {
         headers.set("Authorization", "Bearer " + jwt.serialize());
 
         HttpEntity<Object> request = new HttpEntity<>(headers);
-        return restTemplate.exchange("http://localhost:" + port + "/test-proxy", HttpMethod.GET, request, String.class);
+        return restTemplate.exchange("http://localhost:" + port + "/metadata?uri=http%3A%2F%2Ffairspace.com", HttpMethod.GET, request, String.class);
     }
 
     private SignedJWT getSignedJWT() throws JOSEException {
