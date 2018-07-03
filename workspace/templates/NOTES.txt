@@ -1,18 +1,38 @@
-Workspace
-Fairspace VRE
+Workspace setup for Fairspace
 
 Your release is named {{ .Release.Name }} and installed into the namespace {{ .Release.Namespace }}.
+It might take a few minutes for all pods to be ready. You can check it with the following command:
 
-You can find if the hub and proxy is ready by doing:
+  kubectl --namespace={{ .Release.Namespace }} get pod
 
- kubectl --namespace={{ .Release.Namespace }} get pod
+All pods should have status 'Running'
 
-and watching for both those pods to be in status 'Ready'.
+----------------------------
 
-You can find the public IP of the JupyterHub by doing:
+Your workspace is named {{ .Values.workspace.name }} and can be accessed via
 
-kubectl --namespace={{ .Release.Namespace }} get svc proxy-public
+{{- if .Values.workspace.ingress.enabled }}
 
+  - http{{ if $.Values.workspace.ingress.tls.enabled }}s{{ end }}://jupyterhub.{{ .Values.workspace.ingress.domain }}
 
-It might take a few minutes for it to appear!
+{{- else }}
+
+* Run these commands in the same shell:
+
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services proxy-public)
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+
+{{- end }}
+
+The installation contains an instance of JupyterHub.
+
+----------------------------
+
+A user has been setup in hyperspace {{ .Values.hyperspace.domain }} that is able to login to the workspace.
+You can find the credentials for this user with the following commands:
+
+kubectl get secret --namespace {{ .Release.Namespace }} testuser-secret -o jsonpath="{.data.username}" | base64 --decode; echo
+kubectl get secret --namespace {{ .Release.Namespace }} testuser-secret -o jsonpath="{.data.password}" | base64 --decode; echo
+
 
