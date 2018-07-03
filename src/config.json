@@ -1,3 +1,7 @@
 {
-  "logoutUrl": "/logout"
+  "urls": {
+    "logout": "/logout",
+    "accountName": "/account/name",
+    "authorizations": "/account/authorizations"
+  }
 }
