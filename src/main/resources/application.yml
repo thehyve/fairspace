@@ -7,3 +7,10 @@ spring:
 ceres:
   url: "http://localhost:8001"
   endpoint: "/model/mymodel/statements"
+security:
+  oauth2:
+    resource:
+      user-info-uri: http://localhost:9080/auth/realms/jhipster/protocol/openid-connect/userinfo
+      prefer-token-info: false
+      jwk:
+        key-set-uri: http://localhost:9080/auth/realms/jhipster/protocol/openid-connect/certs

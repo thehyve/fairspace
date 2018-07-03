@@ -1,0 +1,13 @@
+# Spring should handle authentication on incoming requests by validating the oAuth token
+security:
+  oauth2:
+    resource:
+      user-info-uri: http://localhost:${wiremock.server.port}/userinfo
+      jwk:
+        key-set-uri: http://localhost:${wiremock.server.port}/certs
+spring:
+  datasource:
+    url: "jdbc:h2:mem:"
+ceres:
+  url: "http://localhost:8001"
+  endpoint: "/model/mymodel/statements"
