@@ -1,0 +1,35 @@
+{{- $ingress := .Values.workspace.ingress -}}
+{{- if $ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "workspace.name" . }}-jupyterhub-ingress
+{{- with $ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ template "workspace.name" . }}
+    chart: {{ template "workspace.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+{{- if $ingress.tls }}
+  tls:
+    - hosts:
+      - jupyterhub.{{ $ingress.domain }}
+      secretName: {{ template "workspace.tlsSecretName" $ }}
+{{- end }}
+  rules:
+    - host: jupyterhub.{{ $ingress.domain }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: proxy-public
+              servicePort: 80
+{{- end -}}
+
+
+
+

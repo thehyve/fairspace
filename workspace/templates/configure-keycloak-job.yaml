@@ -1,0 +1,49 @@
+{{- $scripts := .Values.workspace.configurationScripts -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{.Release.Name}}-keycloak-configuration"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{.Release.Name}}-keycloak-configuration"
+      labels:
+        heritage: {{.Release.Service | quote }}
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: configure-keycloak-job
+        image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.tag }}"
+        imagePullPolicy: {{ $scripts.pullPolicy }}
+        env:
+          - name: KEYCLOAK_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "keycloak-credentials"
+                key: password
+          - name: TESTUSER_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: "testuser-secret"
+                key: username
+          - name: TESTUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "testuser-secret"
+                key: password
+        command:
+        - "/opt/jboss/scripts/setup-keycloak-workspace.sh"
+        - "{{ template "keycloak.baseUrl" . }}/auth"
+        - "{{.Values.hyperspace.keycloak.username}}"
+        - "{{.Values.hyperspace.keycloak.realm}}"
+        - "{{.Values.workspace.name}}"
