@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "neptune.fullname" . }}
+  labels:
+    app: {{ template "neptune.name" . }}
+    chart: {{ template "neptune.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  application.yaml: |-
+    neptune:
+      oauth2:
+        base-url: {{ .Values.keycloak.baseUrl }}
+        realm: {{ .Values.keycloak.realm }}
+        redirect-after-logout-url: {{ .Values.keycloak.redirectAfterLogoutUrl }}
+        required-authority: {{ .Values.keycloak.requiredAuthority | default (printf "user-%s" .Values.workspace.name) }}
+    ceres:
+      url: {{ .Values.ceres.baseUrl }}
+      endpoint: {{ .Values.ceres.endpoint }}
+    spring:
+      datasource:
+        url: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresDatabase }}"
+        username: "{{ .Values.postgresUser }}"
+        password: "{{ .Values.postgresPassword }}"
+      jpa:
+        hibernate:
+          ddl-auto: update
+
+

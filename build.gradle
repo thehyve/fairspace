@@ -35,11 +35,13 @@ ext {
 
 
 dependencies {
+    compile("org.springframework.boot:spring-boot-starter-actuator")
     compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("com.h2database:h2")
+    compile('org.postgresql:postgresql:9.4-1201-jdbc41')
     compile('com.nimbusds:nimbus-jose-jwt:5.7')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.security:spring-security-test')
