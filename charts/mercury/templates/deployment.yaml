@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "mercury.fullname" . }}
   labels:
     draft: {{ default "draft-app" .Values.draft }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
@@ -11,7 +11,7 @@ spec:
     metadata:
       labels:
         draft: {{ default "draft-app" .Values.draft }}
-        app: {{ template "fullname" . }}
+        app: {{ template "mercury.fullname" . }}
 {{- if .Values.podAnnotations }}
       annotations:
 {{ toYaml .Values.podAnnotations | indent 8 }}

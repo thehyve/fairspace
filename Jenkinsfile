@@ -12,6 +12,7 @@ pipeline {
       DOCKER_REPO_CREDS = credentials('jenkins-x-docker-repo')
 
       DOCKER_TAG_PREFIX = "$DOCKER_REPO/$ORG/$APP_NAME"
+      VERSION           = "0.1.${env.BUILD_NUMBER}"
     }
     stages {
       stage('Build application') {
@@ -36,8 +37,8 @@ pipeline {
         }
         steps {
           container(JENKINS_CONTAINER_TAG) {
-            sh "echo \$(jx-release-version) > VERSION"
-            sh "export VERSION=`cat VERSION` && docker build . --tag \$DOCKER_TAG_PREFIX:\$VERSION && docker push \$DOCKER_TAG_PREFIX:\$VERSION"
+            sh "echo $VERSION > VERSION"
+            sh "docker build . --tag \$DOCKER_TAG_PREFIX:\$VERSION && docker push \$DOCKER_TAG_PREFIX:\$VERSION"
           }
         }
       }
