@@ -7,7 +7,7 @@ app:
 # Configuration for sql database which stores predicates and labels
 spring:
   datasource:
-    url: "jdbc:postgresql://192.168.99.100:30187/postgres"
+    url: "jdbc:postgresql://demo-postgresql:5432/postgres"
     username: "postgres"
     password: "test123"
   jpa:
