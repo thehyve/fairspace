@@ -38,7 +38,7 @@ overrideTemplates:
   keycloak:
     baseUrl:
     client:
-      secretName:
+      secretNamePostfix:
     realm:
 
 # Reference to the workspace

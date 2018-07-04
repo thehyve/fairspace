@@ -39,7 +39,7 @@ Simple template to allow overrides of the oauth credentials in parent charts
 */}}
 {{- define "pluto.keycloak.client.secret" -}}
 {{- if .Values.overrideTemplates.keycloak.client.secretName -}}
-{{ include .Values.overrideTemplates.keycloak.client.secretName }}
+{{ printf "%s-%s" .Chart.Name (include .Values.overrideTemplates.keycloak.client.secretNamePostfix .)}}
 {{- else -}}
 {{- printf "%s-oauth" (include "pluto.fullname" .) -}}
 {{- end -}}
