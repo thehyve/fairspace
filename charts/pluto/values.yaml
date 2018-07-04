@@ -7,7 +7,6 @@ image:
   tag: 0.1.16
   pullPolicy: IfNotPresent
 service:
-  name: pluto
   type: ClusterIP
   externalPort: 80
   internalPort: 8080
@@ -30,6 +29,18 @@ readinessProbe:
   timeoutSeconds: 1
 terminationGracePeriodSeconds: 10
 
+# Template references to override the default settings
+# The values reference a template (probably in the parent chart)
+# which allows for dynamic computation of the actual values
+overrideTemplates:
+  workspace:
+    name:
+  keycloak:
+    baseUrl:
+    client:
+      secretName:
+    realm:
+
 # Reference to the workspace
 workspace:
   name:
@@ -46,5 +57,5 @@ keycloak:
 
 # Where to find the backends for this proxy
 backends:
-  mercury: http://mercury
-  neptune: http://neptune
+  mercury:
+  neptune:

@@ -47,12 +47,12 @@ spec:
         - name: SECURITY_OAUTH2_CLIENT_CLIENTID
           valueFrom:
             secretKeyRef:
-              name: {{ template "pluto.fullname" . }}-oauth
+              name: {{ template "pluto.keycloak.client.secret" . }}
               key: clientId
         - name: SECURITY_OAUTH2_CLIENT_CLIENTSECRET
           valueFrom:
             secretKeyRef:
-              name: {{ template "pluto.fullname" . }}-oauth
+              name: {{ template "pluto.keycloak.client.secret" . }}
               key: clientSecret
       volumes:
       - name: config-volume

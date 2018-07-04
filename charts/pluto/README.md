@@ -25,8 +25,42 @@ Now install pluto with the following command:
 
 `helm install fairspace/pluto -f config.yaml`
 
+## Installing from parent chart
+This chart contains some override parameters to dynamically set values
+from a parent chart. This can be done in the `overrideTemplates`  section in the 
+`values.yaml` file. See for example below:
+
+```yaml
+overrideTemplates:
+  workspace:
+    name: workspace-name 
+  keycloak:
+    baseUrl: keycloak-baseurl
+    client:
+      secretNamePostfix: oauth-client 
+    realm: keycloak-realm
+```
+
+This will read the workspace name from the template `workspace-name`, the baseUrl from template `keycloak-baseurl` etc.
+Please note that if the `secretNamePostfix` is set, the template `<release-name>-<secretNamePostfix>` will be used. In this case
+it would be `<release-name-oauth-client>`.
+
 ## Configuration
 Use `helm ... -f config.yaml` to override default configuration parameters from `values.yaml`.
+
+#### Generic parameters
+| Parameter  | Description  | Default |
+|---|---|---|
+| `service.name` | Name of the service that will be created. | `<release-name>-pluto` |
+| `service.type` | Kubernetes service type that is used. | ClusterIP |
+
+#### Overrides
+| Parameter  | Description  | Default |
+|---|---|---|
+| `overrideTemplates.workspace.name` | Name of the template that produces the workspace name. | |
+| `overrideTemplates.keycloak.baseUrl` | Name of the template that produces the keycloak base url. | |
+| `overrideTemplates.keycloak.realm` | Name of the template that produces the keycloak realm. | |
+| `overrideTemplates.keycloak.client.secretNamePostfix` | Postfix that is added behind the release name to produce the secret name that contains oauth client credentials. The secret should contain a `clientId` and `clientSecret` value. E.g. if release name is `melanoma` and postfix is `oauth-client`, the secret name `melanoma-oauth-client` will be used. | |
 
 #### Authentication parameters
 | Parameter  | Description  | Default |
