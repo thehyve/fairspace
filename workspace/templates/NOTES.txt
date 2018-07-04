@@ -9,7 +9,7 @@ All pods should have status 'Running'
 
 ----------------------------
 
-Your workspace is named {{ template "workspace.name" }} and can be accessed via
+Your workspace is named {{ template "workspace.name" . }} and can be accessed via
 
 {{- if .Values.workspace.ingress.enabled }}
 

@@ -53,3 +53,4 @@ spec:
         - "{{.Values.hyperspace.keycloak.realm}}"
         - "{{ template "workspace.name" . }}"
         - "{{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}"
+        - "{{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}"

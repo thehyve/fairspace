@@ -30,13 +30,17 @@ hyperspace:
         realm: hyperspace
 
 workspace:
-    name: melanoma
     testuser:
         password: secret-password
 
 jupyterhub:
     proxy:
         secretToken: 3fca8159e7e0c07db4f6601799d961e82836965bf2b5d7a4310b7686cb18762e
+        
+pluto:
+    keycloak:
+        baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
+        realm: hyperspace        
 ```
 
 After that, you can install the chart using helm. More details on the parameters can be found below.
@@ -44,7 +48,7 @@ After that, you can install the chart using helm. More details on the parameters
 ```
 helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
 helm repo update
-helm install --name=workspace chartmuseum/workspace --namespace=workspace -f config.yaml
+helm install --name=melanoma-workspace chartmuseum/workspace --namespace=workspaces -f config.yaml
 ```
 
 ## Install on minikube
@@ -62,13 +66,17 @@ hyperspace:
         realm: hyperspace
 
 workspace:
-    name: melanoma
-    testuser:
-        password: secret-password
     ingress:
         enabled: false
 
+pluto:
+    service:
+        type: NodePort
+    keycloak:
+        baseUrl: http://192.168.99.100:30867
+        realm: hyperspace
 ```
+
 It can be installed in the same way as above.
 ```
 helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
@@ -122,6 +130,7 @@ describes the most important settings for a workspace. See the `values.yaml` fil
 |---|---|---|
 | `pluto.keycloak.baseUrl` | Base url of the keycloak installation, with scheme, without /auth. For example: `https://keycloak.hyperspace.fairspace.app`  |   |
 | `pluto.keycloak.realm`   | Keycloak realm that is used for this hyperspace.  |   |
+| `pluto.keycloak.redirectAfterLogoutUrl`   | URL to redirect the user to after logging out  |   |
 
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:

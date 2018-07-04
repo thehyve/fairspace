@@ -79,7 +79,7 @@ workspace:
     configurationScripts:
         dockerRepository: docker-registry.jx.test.fairdev.app
         image: fairspace/keycloak-configuration
-        tag: 0.0.9
+        tag: 0.0.10
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto
@@ -92,6 +92,7 @@ pluto:
   keycloak:
     baseUrl:
     realm:
+    redirectAfterLogoutUrl: https://fairspace.com
 
 # Specific settings for JupyterHub subchart
 jupyterhub:

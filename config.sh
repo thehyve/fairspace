@@ -3,7 +3,6 @@
 set -e
 
 read -p 'Workspace name:' WSNAME
-echo "workspace.name: '$WSNAME'" > $WSNAME-config.yaml
 echo "jupyterhub.proxy.secretToken: $(openssl rand -hex 32)" > $WSNAME-config.yaml
 
 read -n 1 -p "Use Ingress (y/n)? " answer
