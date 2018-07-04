@@ -72,6 +72,7 @@ pipeline {
     }
     post {
       always {
+        archiveArtifacts artifacts: 'build/libs/**/*.jar', fingerprint: true
         junit 'app/build/test-results/**/*.xml'
         cleanWs()
       }
