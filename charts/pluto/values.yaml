@@ -29,17 +29,13 @@ readinessProbe:
   timeoutSeconds: 1
 terminationGracePeriodSeconds: 10
 
-# Template references to override the default settings
-# The values reference a template (probably in the parent chart)
-# which allows for dynamic computation of the actual values
-overrideTemplates:
-  workspace:
-    name:
+# Secret name to be used for oauth credentials can be set
+# to read the credentials from a secret instead of passing them
+# in the config
+overrides:
   keycloak:
-    baseUrl:
     client:
       secretNamePostfix:
-    realm:
 
 # Reference to the workspace
 workspace:

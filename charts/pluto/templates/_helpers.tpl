@@ -38,42 +38,16 @@ Create chart name and version as used by the chart label.
 Simple template to allow overrides of the oauth credentials in parent charts
 */}}
 {{- define "pluto.keycloak.client.secret" -}}
-{{- if .Values.overrideTemplates.keycloak.client.secretName -}}
-{{ printf "%s-%s" .Chart.Name (include .Values.overrideTemplates.keycloak.client.secretNamePostfix .)}}
+{{- if .Values.overrides.keycloak.client.secretNamePostfix -}}
+{{ printf "%s-%s" .Release.Name .Values.overrides.keycloak.client.secretNamePostfix}}
 {{- else -}}
 {{- printf "%s-oauth" (include "pluto.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
-Simple template to allow overrides of the workspace name in parent charts
+Simple template to set workspace name
 */}}
 {{- define "pluto.workspace.name" -}}
-{{- if .Values.overrideTemplates.workspace.name -}}
-{{- include .Values.overrideTemplates.workspace.name -}}
-{{- else -}}
-{{- .Values.workspace.name -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Simple template to allow overrides of the oauth baseurl in parent charts
-*/}}
-{{- define "pluto.keycloak.baseUrl" -}}
-{{- if .Values.overrideTemplates.keycloak.baseUrl -}}
-{{ include .Values.overrideTemplates.keycloak.baseUrl }}
-{{- else -}}
-{{- .Values.keycloak.baseUrl -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Simple template to allow overrides of the oauth realm in parent charts
-*/}}
-{{- define "pluto.keycloak.realm" -}}
-{{- if .Values.overrideTemplates.keycloak.realm -}}
-{{ include .Values.overrideTemplates.keycloak.realm }}
-{{- else -}}
-{{- .Values.keycloak.realm -}}
-{{- end -}}
+{{- default .Release.Name .Values.workspace.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

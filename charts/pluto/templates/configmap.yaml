@@ -11,10 +11,12 @@ data:
   application.yaml: |-
     pluto:
       oauth2:
-        base-url: {{ template "pluto.keycloak.baseUrl" . }}
-        realm: {{ template "pluto.keycloak.realm" . }}
+        base-url: {{ .Values.keycloak.baseUrl }}
+        realm: {{ .Values.keycloak.realm }}
         redirect-after-logout-url: {{ .Values.keycloak.redirectAfterLogoutUrl }}
         required-authority: {{ .Values.keycloak.requiredAuthority | default (printf "user-%s" (include "pluto.workspace.name" .)) }}
+        test: {{ .Values.keycloak.requiredAuthority }}
+        test2: {{ printf "user-%s" (include "pluto.workspace.name" .) }}
 
     zuul:
       routes:
