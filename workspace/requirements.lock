@@ -2,8 +2,11 @@ dependencies:
 - name: jupyterhub
   repository: https://jupyterhub.github.io/helm-chart/
   version: v0.6
+- name: pluto
+  repository: https://chartmuseum.jx.test.fairdev.app/
+  version: 0.1.18
 - name: mercury
   repository: https://chartmuseum.jx.test.fairdev.app/
   version: 0.0.3
-digest: sha256:46c643ff85295cd7fe7a74677f64c156249dec1c34bf0673e3e8283c4f4792fe
-generated: 2018-06-28T17:21:24.927913278+02:00
+digest: sha256:1386df8065b92407b9133a5e98e053080dc93e044aae546c5746fb70cf19bee9
+generated: 2018-07-03T15:30:31.518916066+02:00

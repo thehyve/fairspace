@@ -1,9 +1,9 @@
 {{/* vim: set filetype=mustache: */}}
 {{/*
-Expand the name of the chart.
+Expand the name of the workspace.
 */}}
 {{- define "workspace.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- .Values.nameOverride | default .Release.Name | default "workspace" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -67,5 +67,42 @@ Create the keycloak baseUrl, either by using the override value or constructing 
 
 {{- end -}}
 {{- end -}}
+
+{{/*
+Define the keycloak realm, by using a set value. This allows us to pass the value to subcharts
+*/}}
+{{- define "keycloak.realm" -}}
+{{- .Values.hyperspace.keycloak.realm -}}
+{{- end -}}
+
+{{/*
+Scheme to access workspace components (http or https)
+*/}}
+{{- define "workspace.scheme" -}}
+{{- if .Values.workspace.ingress.enabled -}}
+{{- if .Values.workspace.ingress.tls.enabled -}}
+{{- "https" -}}
+{{- else -}}
+{{- "http" -}}
+{{- end -}}
+{{- else -}}
+{{- "http" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Jupyterhub external hostname
+*/}}
+{{- define "jupyterhub.hostname" -}}
+{{- printf "jupyterhub.%s" .Values.workspace.ingress.domain -}}
+{{- end -}}
+
+{{/*
+Pluto external hostname
+*/}}
+{{- define "pluto.hostname" -}}
+{{- printf "pluto.%s" .Values.workspace.ingress.domain -}}
+{{- end -}}
+
 
 

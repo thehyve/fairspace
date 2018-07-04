@@ -29,21 +29,27 @@ spec:
           - name: KEYCLOAK_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: "keycloak-credentials"
+                name: "{{ template "workspace.fullname" . }}-keycloak-credentials"
                 key: password
           - name: TESTUSER_USERNAME
             valueFrom:
               secretKeyRef:
-                name: "testuser-secret"
+                name: "{{ template "workspace.fullname" . }}-testuser"
                 key: username
           - name: TESTUSER_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: "testuser-secret"
+                name: "{{ template "workspace.fullname" . }}-testuser"
                 key: password
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-oauth-client"
+                key: clientSecret
         command:
         - "/opt/jboss/scripts/setup-keycloak-workspace.sh"
         - "{{ template "keycloak.baseUrl" . }}/auth"
         - "{{.Values.hyperspace.keycloak.username}}"
         - "{{.Values.hyperspace.keycloak.realm}}"
-        - "{{.Values.workspace.name}}"
+        - "{{ template "workspace.name" . }}"
+        - "{{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}"

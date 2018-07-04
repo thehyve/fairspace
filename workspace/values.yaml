@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Set specific workspace name. Defaults to release name
+# Please note that if this is set, also set it for pluto in `pluto.workspace.name`
+nameOverride:
+
 replicaCount: 1
 
 image:
@@ -28,6 +32,8 @@ tolerations: []
 affinity: {}
 
 # Hyperspace that this workspace is connected to
+# Please note that pluto also has to know about the
+# keycloak baseUrl and realm, see the pluto configuration
 hyperspace:
     tls: true
     domain: hyperspace.ci.test.fairdev.app
@@ -51,7 +57,6 @@ hyperspace:
 
 # Setup ingress for workspace components
 workspace:
-    name: workspace
     ingress:
         enabled: true
         domain: workspace.ci.test.fairdev.app
@@ -74,8 +79,19 @@ workspace:
     configurationScripts:
         dockerRepository: docker-registry.jx.test.fairdev.app
         image: fairspace/keycloak-configuration
-        tag: 0.0.8
+        tag: 0.0.9
         pullPolicy: IfNotPresent
+
+# Specific settings for pluto
+pluto:
+  overrides:
+    keycloak:
+      client:
+        secretNamePostfix: oauth-client
+
+  keycloak:
+    baseUrl:
+    realm:
 
 # Specific settings for JupyterHub subchart
 jupyterhub:

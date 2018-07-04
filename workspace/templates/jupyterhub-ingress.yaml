@@ -17,11 +17,11 @@ spec:
 {{- if $ingress.tls }}
   tls:
     - hosts:
-      - jupyterhub.{{ $ingress.domain }}
+      - {{ template "jupyterhub.hostname" $ }}
       secretName: {{ template "workspace.tlsSecretName" $ }}
 {{- end }}
   rules:
-    - host: jupyterhub.{{ $ingress.domain }}
+    - host: {{ template "jupyterhub.hostname" $ }}
       http:
         paths:
           - path: /

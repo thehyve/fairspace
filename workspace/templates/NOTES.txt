@@ -9,30 +9,48 @@ All pods should have status 'Running'
 
 ----------------------------
 
-Your workspace is named {{ .Values.workspace.name }} and can be accessed via
+Your workspace is named {{ template "workspace.name" }} and can be accessed via
 
 {{- if .Values.workspace.ingress.enabled }}
 
-  - http{{ if $.Values.workspace.ingress.tls.enabled }}s{{ end }}://jupyterhub.{{ .Values.workspace.ingress.domain }}
+  - {{ template "workspace.scheme" . }}://{{ template "jupyterhub.hostname" . }}
+  - {{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}
 
 {{- else }}
 
 * Run these commands in the same shell:
 
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services proxy-public)
+  export JUPYTER_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services proxy-public)
+  export PLUTO_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{.Release.Name}}-pluto)
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo http://$NODE_IP:$NODE_PORT
+  echo JupyterHub at http://$NODE_IP:$JUPYTER_PORT
+  echo Pluto at http://$NODE_IP:$PLUTO_PORT
 
 {{- end }}
 
-The installation contains an instance of JupyterHub.
+The installation contains an instance of JupyterHub and Pluto
 
 ----------------------------
 
 A user has been setup in hyperspace {{ .Values.hyperspace.domain }} that is able to login to the workspace.
 You can find the credentials for this user with the following commands:
 
-kubectl get secret --namespace {{ .Release.Namespace }} testuser-secret -o jsonpath="{.data.username}" | base64 --decode; echo
-kubectl get secret --namespace {{ .Release.Namespace }} testuser-secret -o jsonpath="{.data.password}" | base64 --decode; echo
+kubectl get secret --namespace {{ .Release.Namespace }} {{ template "workspace.fullname" . }}-testuser -o jsonpath="{.data.username}" | base64 --decode; echo
+kubectl get secret --namespace {{ .Release.Namespace }} {{ template "workspace.fullname" . }}-testuser -o jsonpath="{.data.password}" | base64 --decode; echo
 
 
+
+{{- if not .Values.workspace.ingress.enabled }}
+----------------------------
+Please note that as ingress is disabled, we do not know the url of pluto while configuring keycloak. This means
+that the client `{{ template "workspace.name" . }}-pluto` in keycloak should be configured to allow pluto as return url.
+
+You can do so with the following steps:
+
+- Log in to Keycloak at {{ template "keycloak.baseUrl" .}}
+- Go to realm {{ .Values.hyperspace.keycloak.realm }}
+- Go to client {{ template "workspace.name" . }}-pluto
+- Add the pluto url (with /*, so for example http://localhost:32124/*) as valid return url
+- Save the client.
+
+{{- end -}}

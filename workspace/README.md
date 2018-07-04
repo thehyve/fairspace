@@ -92,12 +92,13 @@ must use the exact same workspace name as in the configuration script.
 `./install.sh`
 
 ## Configuration
-Use `helm ... -f config.yaml` to override default configuration parameters from `values.yaml`.
+Use `helm ... -f config.yaml` to override default configuration parameters from `values.yaml`. This section
+describes the most important settings for a workspace. See the `values.yaml` file for more settings.
 
 #### Workspace parameters
 | Parameter  | Description  | Default |
 |---|---|---|
-| `workspace.name`  | Unique name for the workspace to install | workspace |
+| `nameOverride`  | Unique name for the workspace to install. Please note that if you override the name, also set `pluto.workspace.name` | <release name> |
 | `workspace.testuser.username`  | Username for the testuser that will be created for this workspace | `test-<workspace_name>` |
 | `workspace.testuser.password`  | Password for the testuser for this workspace | `fairspace123` |
 | `workspace.ingress.enabled`  | Whether or not an ingress is setup for the workspace components. Should be set to false when running locally.  | true |
@@ -114,7 +115,13 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 | `hyperspace.locationOverrides.keycloak` | Optional override for the location of keycloak. Can be used if it runs on a non-standard location. Must include the scheme as well. For example: `http://192.168.99.100:30867` | (Generate url from `hyperspace.domain` property) |
 | `hyperspace.keycloak.username`  | Username used for setting up keycloak users. Must have access to the master realm | |
 | `hyperspace.keycloak.password`  | Password used for setting up keycloak users. | |
-| `hyperspace.keycloak.realm`  | Keycloak realm that is used for this hyperspace. | |
+| `hyperspace.keycloak.realm`  | Keycloak realm that is used for this hyperspace. Also set this variable in `pluto.keycloak.realm`| |
+
+#### Pluto parameters
+| Parameter  | Description  | Default |
+|---|---|---|
+| `pluto.keycloak.baseUrl` | Base url of the keycloak installation, with scheme, without /auth. For example: `https://keycloak.hyperspace.fairspace.app`  |   |
+| `pluto.keycloak.realm`   | Keycloak realm that is used for this hyperspace.  |   |
 
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:
@@ -122,6 +129,10 @@ Configuration settings for specific applications should be put under a correspon
 * Jupyterhub
 Settings for jupyterhub should be in the section `jupyterhub`. 
 See [Jupyterhub docs](http://zero-to-jupyterhub.readthedocs.io/en/latest/user-environment.html) for more information on the specific settings
+
+* Pluto
+Settings for pluto should be in the section `pluto`. 
+See [Pluto README](https://github.com/fairspace/pluto/blob/master/README.md) for more information on the specific settings
 
 * Mercury
 Settings for mercury should be in the section `mercury`. 
