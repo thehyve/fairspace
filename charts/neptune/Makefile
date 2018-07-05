@@ -6,6 +6,7 @@ RELEASE_VERSION := $(shell cat ../../VERSION)
 
 build: clean
 	rm -rf requirements.lock
+	helm init --client-only
 	helm dependency build
 	helm lint
 
