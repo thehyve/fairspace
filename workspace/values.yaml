@@ -9,8 +9,8 @@ nameOverride:
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  repository: docker-registry.jx.test.fairdev.app/fairspace/workspace
+  tag: 0.1.11
   pullPolicy: IfNotPresent
 
 resources: {}
@@ -79,7 +79,7 @@ workspace:
     configurationScripts:
         dockerRepository: docker-registry.jx.test.fairdev.app
         image: fairspace/keycloak-configuration
-        tag: 0.0.10
+        tag: 0.1.11
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto
@@ -99,7 +99,7 @@ jupyterhub:
     singleuser:
       image:
         name: "docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser"
-        tag: "0.0.1"
+        tag: 0.1.11
       defaultUrl: "/lab"
     hub:
         ingress:
