@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,6 @@ public class LocalDbPredicateService implements PredicateService {
                 .map(this::convertToLocalDbPredicate)
                 .collect(Collectors.toList());
     }
-
 
 
     private LocalDbPredicateInfo convertToLocalDbPredicate(PredicateInfo predicateInfo) {
