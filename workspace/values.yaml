@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Set specific workspace name. Defaults to release name
+# Please note that if this is set, also set it for pluto in `pluto.workspace.name`
+nameOverride:
+
 replicaCount: 1
 
 image:
@@ -27,6 +31,70 @@ tolerations: []
 
 affinity: {}
 
+# Hyperspace that this workspace is connected to
+# Please note that pluto also has to know about the
+# keycloak baseUrl and realm, see the pluto configuration
+hyperspace:
+    tls: true
+    domain: hyperspace.ci.test.fairdev.app
+    locationOverrides:
+        keycloak:
+
+    # TODO: determine better way to handle keycloak credentials
+    # Keycloak credentials are needed to setup the workspace (e.g. users, clients)
+    # in keycloak. Please note that this is not a sustainable way of doing, due
+    # to the sensitive nature of these parameters
+    #
+    # We could either:
+    # - have the hyperspace setup keycloak itself, when creating a new workspace
+    # - use temporary credentials for setting up these users
+    # - ...
+    keycloak:
+        username:
+        password:
+        realm:
+
+
+# Setup ingress for workspace components
+workspace:
+    ingress:
+        enabled: true
+        domain: workspace.ci.test.fairdev.app
+        annotations:
+            kubernetes.io/ingress.class: nginx
+        tls:
+            enabled: true
+            secretNameOverride:
+            certificate:
+                obtain: true
+                issuerRef:
+                    name: letsencrypt-prod
+                    kind: ClusterIssuer
+                dns01Provider: clouddns
+
+    testuser:
+         password: fairspace123
+
+    # Scripts for setting up keycloak for a workspace
+    configurationScripts:
+        dockerRepository: docker-registry.jx.test.fairdev.app
+        image: fairspace/keycloak-configuration
+        tag: 0.0.10
+        pullPolicy: IfNotPresent
+
+# Specific settings for pluto
+pluto:
+  overrides:
+    keycloak:
+      client:
+        secretNamePostfix: oauth-client
+
+  keycloak:
+    baseUrl:
+    realm:
+    redirectAfterLogoutUrl: https://fairspace.com
+
+# Specific settings for JupyterHub subchart
 jupyterhub:
     singleuser:
       image:
@@ -35,12 +103,7 @@ jupyterhub:
       defaultUrl: "/lab"
     hub:
         ingress:
-            enabled: true
-            path: /
-            hosts:
-                 - fairspace.thehyve.net
-            annotations:
-                 kubernetes.io/ingress.class: nginx
+            enabled: false
         extraEnv:
             JUPYTER_ENABLE_LAB: 1
         extraConfig: |

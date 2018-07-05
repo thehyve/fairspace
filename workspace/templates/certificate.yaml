@@ -1,0 +1,27 @@
+{{- $ingress := .Values.workspace.ingress -}}
+{{- if $ingress.enabled -}}
+{{- if $ingress.tls.certificate.obtain -}}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-workspace
+  labels:
+    app: {{ template "workspace.name" . }}
+    chart: {{ template "workspace.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  secretName: {{ template "workspace.tlsSecretName" . }}
+{{- with $ingress.tls.certificate.issuerRef }}
+  issuerRef:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  commonName: '*.{{ $ingress.domain }}'
+  acme:
+    config:
+    - dns01:
+        provider: {{ $ingress.tls.certificate.dns01Provider}}
+      domains:
+      - '*.{{ $ingress.domain }}'
+{{- end -}}
+{{- end -}}
