@@ -5,7 +5,7 @@ pipeline {
     environment {
       JENKINS_CONTAINER_TAG = 'gradle'
       ORG               = 'fairspace'
-      APP_NAME          = 'Neptune'
+      APP_NAME          = 'neptune'
       DOCKER_REPO       = 'docker-registry.jx.test.fairdev.app'
 
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
@@ -72,7 +72,6 @@ pipeline {
     }
     post {
       always {
-        archiveArtifacts artifacts: 'build/libs/**/*.jar', fingerprint: true
         junit 'app/build/test-results/**/*.xml'
         cleanWs()
       }
