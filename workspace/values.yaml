@@ -59,7 +59,7 @@ hyperspace:
 workspace:
     ingress:
         enabled: true
-        domain: workspace.ci.test.fairdev.app
+        domain:
         annotations:
             kubernetes.io/ingress.class: nginx
         tls:
@@ -79,7 +79,7 @@ workspace:
     configurationScripts:
         dockerRepository: docker-registry.jx.test.fairdev.app
         image: fairspace/keycloak-configuration
-        tag: 0.0.10
+        configurationScriptsTag: 0.0.10
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto

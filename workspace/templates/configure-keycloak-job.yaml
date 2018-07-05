@@ -23,7 +23,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: configure-keycloak-job
-        image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.tag }}"
+        image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.configurationScriptsTag }}"
         imagePullPolicy: {{ $scripts.pullPolicy }}
         env:
           - name: KEYCLOAK_PASSWORD
