@@ -37,6 +37,10 @@ public class MetadataService {
         tripleService.deleteTriples(triples);
     }
 
+    public PredicateInfo getPredicateInfo(URI uri) {
+        return predicateService.retrievePredicateInfo(uri);
+    }
+
     public void postPredicateInfoList(List<PredicateInfo> predicateInfoList) {
         predicateService.insertPredicateList(predicateInfoList);
     }
@@ -44,5 +48,6 @@ public class MetadataService {
     public void postPredicateInfo(PredicateInfo predicateInfo) {
         predicateService.insertPredicate(predicateInfo);
     }
+
 
 }
