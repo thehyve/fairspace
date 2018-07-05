@@ -30,9 +30,6 @@ pipeline {
         }
       }
       stage('Release docker image') {
-        when {
-          branch 'master'
-        }
         steps {
           container(JENKINS_CONTAINER_TAG) {
             sh "echo $VERSION > VERSION"
@@ -52,9 +49,6 @@ pipeline {
       }
 
       stage('Release helm chart') {
-        when {
-          branch 'master'
-        }
         steps {
           dir ("./charts/$APP_NAME") {
             container(JENKINS_CONTAINER_TAG) {
