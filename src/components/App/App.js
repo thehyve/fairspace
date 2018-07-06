@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Typography from '@material-ui/core/Typography';
 import {withStyles} from '@material-ui/core/styles';
 import './App.css';
 import styles from './App.styles';
 import TopBar from "../TopBar/TopBar";
 import MenuDrawer from "../MenuDrawer/MenuDrawer";
 import AuthorizationCheck from "../AuthorizationCheck/AuthorizationCheck";
+import {BrowserRouter as Router, Route} from "react-router-dom";
+import Home from "../../pages/Home/Home";
+import Files from "../../pages/Files/Files";
+import Notebooks from "../../pages/Notebooks/Notebooks";
 
 function App(props) {
     const {classes} = props;
@@ -24,13 +27,18 @@ function App(props) {
     return (
         <div className={classes.root}>
             <TopBar classes={classes}></TopBar>
-            <AuthorizationCheck transformError={transformError}>
-                <MenuDrawer classes={classes}></MenuDrawer>
-                <main className={classes.content}>
-                    <div className={classes.toolbar}/>
-                    <Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography>
-                </main>
-            </AuthorizationCheck>
+            <Router>
+                <AuthorizationCheck transformError={transformError}>
+                    <MenuDrawer classes={classes}></MenuDrawer>
+                    <main className={classes.content}>
+                        <div className={classes.toolbar}/>
+
+                        <Route exact path="/" component={Home} />
+                        <Route path="/files" component={Files} />
+                        <Route path="/notebooks" component={Notebooks} />
+                    </main>
+                </AuthorizationCheck>
+            </Router>
         </div>
     );
 }
