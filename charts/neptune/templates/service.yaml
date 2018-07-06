@@ -16,4 +16,3 @@ spec:
       name: http
   selector:
     app: {{ template "neptune.fullname" . }}
-##    release: {{ .Release.Name }}
