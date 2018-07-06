@@ -13,9 +13,9 @@ spec:
   template:
     metadata:
       labels:
-        release: {{ .Release.Name }}
         draft: {{ default "draft-app" .Values.draft }}
         app: {{ template "neptune.fullname" . }}
+        release: {{ .Release.Name }}
 {{- if .Values.podAnnotations }}
       annotations:
 {{ toYaml .Values.podAnnotations | indent 8 }}

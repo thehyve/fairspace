@@ -40,7 +40,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
 
-    runtime('org.postgresql:postgresql:9.4-1201-jdbc41')
+    runtime('org.postgresql:postgresql')
 
     testCompile("com.h2database:h2")
     testCompile('com.nimbusds:nimbus-jose-jwt:5.7')

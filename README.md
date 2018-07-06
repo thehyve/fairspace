@@ -10,7 +10,7 @@ This image can use an postgresql image to use as it's SQL database. To use this 
 
 Create a postgres image
 
-`docker run -d --name demo-postgres -e  POSTGRES_PASSWORD=test123 -e POSTGRES_USER=dbuser POSTGRES_DB=demo -it postgres`
+`docker run -d --name demo-postgres -e  POSTGRES_PASSWORD=test123 -e POSTGRES_USER=dbuser -e POSTGRES_DB=demo -it postgres`
 
 Build the .jar file and create image
 
@@ -23,6 +23,10 @@ Link the images together
 `docker run -d  --name neptune-service-dev  --link demo-postgres:postgres -p 8080:8080 -e SPRING_DATASOURCE_USERNAME=dbuser -e SPRING_DATASOURCE_PASSWORD=test123 -e SPRING_DATASOURCE_URL=jdbc:postgresql://demo-postgres:5432/demo neptune`
 
 **Reminder** this service also needs Ceres, which is not included in this setup.
+
+## Starting with Kubernetes
+
+See [charts readme](/charts/neptune/README.md)
 
 ## API
 
