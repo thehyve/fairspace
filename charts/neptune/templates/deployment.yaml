@@ -41,8 +41,6 @@ spec:
           periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-        resources:
-{{ toYaml .Values.resources | indent 12 }}
 #        env:
 #        - name: SECURITY_OAUTH2_CLIENT_CLIENTID
 #          valueFrom:

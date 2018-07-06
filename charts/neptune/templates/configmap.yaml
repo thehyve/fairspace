@@ -9,22 +9,17 @@ metadata:
     heritage: "{{ .Release.Service }}"
 data:
   application.yaml: |-
-    neptune:
+    app:
       oauth2:
-        base-url: {{ .Values.keycloak.baseUrl }}
-        realm: {{ .Values.keycloak.realm }}
-        redirect-after-logout-url: {{ .Values.keycloak.redirectAfterLogoutUrl }}
-        required-authority: {{ .Values.keycloak.requiredAuthority | default (printf "user-%s" .Values.workspace.name) }}
+        base-url: {{ .Values.app.oauth2.baseUrl }}
+        realm: {{ .Values.app.oauth2.realm }}
     ceres:
-      url: {{ .Values.ceres.baseUrl }}
+      url: {{ .Values.ceres.url }}
       endpoint: {{ .Values.ceres.endpoint }}
     spring:
       datasource:
-        url: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresDatabase }}"
-        username: "{{ .Values.postgresUser }}"
-        password: "{{ .Values.postgresPassword }}"
-      jpa:
-        hibernate:
-          ddl-auto: update
+        url: "jdbc:postgresql://{{ .Release.Name }}-{{ .Values.postgresql.nameOverride }}:5432/{{ .Values.postgresql.postgresDatabase }}"
+        username: "{{ .Values.postgresql.postgresUser }}"
+        password: "{{ .Values.postgresql.postgresPassword }}"
 
 

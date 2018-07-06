@@ -7,11 +7,10 @@ replicaCount: 1
 image:
   repository: neptune
   tag: 0.4
-  pullPolicy: Never
+  pullPolicy: IfNotPresent
 
 service:
-  name: neptune
-  type: NodePort
+  type: ClusterIP
   externalPort: 80
   internalPort: 8080
 
@@ -34,33 +33,17 @@ readinessProbe:
   timeoutSeconds: 1
 terminationGracePeriodSeconds: 10
 
-workspace:
-  name:
-
-keycloak:
-  baseUrl:
-  client:
-    id:
-    secret:
-  realm:
-  redirectAfterLogoutUrl: https://fairspace.com
-  requiredAuthority:
-
 ceres:
-  url:
-  edpoint:
+  url: http://localhost:8001
+  endpoint: /model/mymodel/statements
 
-postgresUser: postgres
-postgresPassword: test123
-postgresDatabase: postgres
+app:
+  oauth2:
+    baseUrl: http://localhost:9080
+    realm: keycloak
 
-spring:
-  datasource:
-    url: 
-    username:
-    password:
-  jpa:
-    hibernate:
-      ddl-auto: update
-    generate-ddl: true
-
+postgresql:
+  postgresUser: postgres
+  postgresPassword: test123
+  postgresDatabase: postgres
+  nameOverride: neptune-postgresql
