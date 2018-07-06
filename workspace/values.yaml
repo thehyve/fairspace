@@ -36,7 +36,7 @@ affinity: {}
 # keycloak baseUrl and realm, see the pluto configuration
 hyperspace:
     tls: true
-    domain: hyperspace.ci.test.fairdev.app
+    domain:
     locationOverrides:
         keycloak:
 

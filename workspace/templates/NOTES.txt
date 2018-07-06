@@ -13,7 +13,7 @@ Your workspace is named {{ template "workspace.name" . }} and can be accessed vi
 
 {{- if .Values.workspace.ingress.enabled }}
 
-  - {{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}
+  - {{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}/ui/
   - {{ template "workspace.scheme" . }}://{{ template "jupyterhub.hostname" . }}
 
 {{- else }}

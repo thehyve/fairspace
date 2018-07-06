@@ -1,9 +1,10 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
-    keycloak:
-        username: keycloak
-        password: keycloak-ci-123
-        realm: ci
+  domain: hyperspace.ci.test.fairdev.app
+  keycloak:
+    username: keycloak
+    password: keycloak-ci-123
+    realm: ci
 
 # Settings for the workspace
 workspace:
@@ -11,6 +12,6 @@ workspace:
     domain: workspace.ci.test.fairdev.app
 
 pluto:
-    keycloak:
-        baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
-        realm: ci
+  keycloak:
+    baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
+    realm: ci
