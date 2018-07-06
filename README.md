@@ -5,6 +5,35 @@ Service for working with triples. Currently leveraging Ceres and SQL.
 The `src` directory contains the actual application. It can be run from the IDE or from the command line
 using gradle: `gradle bootRun`.
 
+## Starting with Docker
+This image can use an postgresql image to use as it's SQL database. To use this functionality, enter the following commands:
+
+Create a postgres image
+
+`docker run -d --name demo-postgres -e  POSTGRES_PASSWORD=test123 -e POSTGRES_USER=dbuser -e POSTGRES_DB=demo -it postgres`
+
+Build the .jar file and create image
+
+`gradle clean build test`
+
+`docker build . --tag neptune`
+
+Link the images together
+
+`docker run -d  --name neptune-service-dev  --link demo-postgres:postgres -p 8080:8080 -e SPRING_DATASOURCE_USERNAME=dbuser -e SPRING_DATASOURCE_PASSWORD=test123 -e SPRING_DATASOURCE_URL=jdbc:postgresql://demo-postgres:5432/demo neptune`
+
+**Reminder** this service also needs Ceres, which is not included in this setup.
+
+## Starting with Kubernetes
+
+See [charts readme](/charts/neptune/README.md)
+
+## Developers
+
+If you want to develop on Neptune, it is recommended to activate the dev Spring profile. This is also needed for Gradle as
+it uses a different database (h2) in development mode. To do so set SPRING_PROFILE=dev in your environment variables.
+If you do not want to use development mode you will need to install a postgresql database locally, or run it as a Docker 
+container.
 
 ## API
 

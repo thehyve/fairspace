@@ -54,6 +54,18 @@ public class MetadataController {
         metadataService.deleteTriples(triples);
     }
 
+
+    /**
+     * Retrieves the label of a predicate
+     *
+     * @param uri the uri of the predicate
+     */
+    @GetMapping("/predicate")
+    public PredicateInfo getredicateInfo(@RequestParam URI uri) {
+        return metadataService.getPredicateInfo(uri);
+    }
+
+
     /**
      * Store a predicate with a specified label
      *

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "neptune.fullname" . }}
+  labels:
+    app: {{ template "neptune.name" . }}
+    chart: {{ template "neptune.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    app:
+      oauth2:
+        base-url: {{ .Values.app.oauth2.baseUrl }}
+        realm: {{ .Values.app.oauth2.realm }}
+    ceres:
+      url: {{ .Values.ceres.url }}
+      endpoint: {{ .Values.ceres.endpoint }}
+    spring:
+      datasource:
+        url: "jdbc:postgresql://{{ .Release.Name }}-{{ .Values.postgresql.nameOverride }}:5432/{{ .Values.postgresql.postgresDatabase }}"
+        username: "{{ .Values.postgresql.postgresUser }}"
+        password: "{{ .Values.postgresql.postgresPassword }}"
+
+

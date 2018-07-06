@@ -1,0 +1,49 @@
+# Default values for neptune.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: neptune
+  tag: 0.4
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8080
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1024Mi
+  requests:
+    cpu: 400m
+    memory: 768Mi
+probePath: /actuator/health
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+readinessProbe:
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+terminationGracePeriodSeconds: 10
+
+ceres:
+  url: http://localhost:8001
+  endpoint: /model/mymodel/statements
+
+app:
+  oauth2:
+    baseUrl: http://localhost:9080
+    realm: keycloak
+
+postgresql:
+  postgresUser: postgres
+  postgresPassword: test123
+  postgresDatabase: postgres
+  nameOverride: neptune-postgresql

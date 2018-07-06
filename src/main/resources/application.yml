@@ -7,10 +7,14 @@ app:
 # Configuration for sql database which stores predicates and labels
 spring:
   datasource:
-    url: "jdbc:h2:~/test;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE"
+    url: "jdbc:postgresql://demo-postgresql:5432/postgres"
+    username: "postgres"
+    password: "test123"
   jpa:
     hibernate:
       ddl-auto: update
+    generate-ddl: true
+
 
 # Pointer to the Ceres service
 ceres:
