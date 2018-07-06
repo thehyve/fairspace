@@ -28,6 +28,13 @@ Link the images together
 
 See [charts readme](/charts/neptune/README.md)
 
+## Developers
+
+If you want to develop on Neptune, it is recommended to activate the dev Spring profile. This is also needed for Gradle as
+it uses a different database (h2) in development mode. To do so set SPRING_PROFILE=dev in your environment variables.
+If you do not want to use development mode you will need to install a postgresql database locally, or run it as a Docker 
+container.
+
 ## API
 
 | Command | Description |

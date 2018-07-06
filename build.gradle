@@ -31,6 +31,7 @@ repositories {
 
 ext {
     springCloudVersion = 'Finchley.RELEASE'
+    isDev = System.getenv('SPRING_PROFILE') == 'dev'
 }
 
 
@@ -40,7 +41,12 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
 
-    runtime('org.postgresql:postgresql')
+    if (isDev){
+        compile("com.h2database:h2")
+    }
+    else {
+        runtime('org.postgresql:postgresql')
+    }
 
     testCompile("com.h2database:h2")
     testCompile('com.nimbusds:nimbus-jose-jwt:5.7')
