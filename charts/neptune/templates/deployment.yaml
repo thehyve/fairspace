@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   name: {{ template "neptune.fullname" . }}
   labels:
+    app : {{ template "neptune.name" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
     draft: {{ default "draft-app" .Values.draft }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
@@ -10,6 +13,7 @@ spec:
   template:
     metadata:
       labels:
+        release: {{ .Release.Name }}
         draft: {{ default "draft-app" .Values.draft }}
         app: {{ template "neptune.fullname" . }}
 {{- if .Values.podAnnotations }}
@@ -41,17 +45,6 @@ spec:
           periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-#        env:
-#        - name: SECURITY_OAUTH2_CLIENT_CLIENTID
-#          valueFrom:
-#            secretKeyRef:
-#              name: {{ template "neptune.fullname" . }}-oauth
-#              key: clientId
-#        - name: SECURITY_OAUTH2_CLIENT_CLIENTSECRET
-#          valueFrom:
-#            secretKeyRef:
-#              name: {{ template "neptune.fullname" . }}-oauth
-#              key: clientSecret
       volumes:
       - name: config-volume
         configMap:
