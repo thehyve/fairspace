@@ -3,8 +3,11 @@ kind: Deployment
 metadata:
   name: {{ template "pluto.fullname" . }}
   labels:
+    app : {{ template "pluto.name" . }}
     draft: {{ default "draft-app" .Values.draft }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   template:
@@ -12,6 +15,7 @@ spec:
       labels:
         draft: {{ default "draft-app" .Values.draft }}
         app: {{ template "pluto.fullname" . }}
+        release: {{ .Release.Name }}
 {{- if .Values.podAnnotations }}
       annotations:
 {{ toYaml .Values.podAnnotations | indent 8 }}
