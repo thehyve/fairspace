@@ -44,7 +44,7 @@ To install Neptune within your Kubernetes cluster run the following command:
 | Parameter  | Description  | Default |
 |---|---|---|
 | `app.oauth2.baseUrl` | URL where the oauth2 provider is running |  |
-| `app.oauth2.realm` | The realm that you want to use | |
+| `app.oauth2.realm` | The realm that you want to use |  |
 
 #### Database parameters
 | Parameter  | Description  | Default |
