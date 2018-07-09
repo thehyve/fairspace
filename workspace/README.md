@@ -56,10 +56,11 @@ By default, on minikube one would want to run the system without TLS and ingress
 configuration file would be something like
 
 ```yaml
+# Provide your own hyperspace settings here
 hyperspace:
     tls: false
     locationOverrides:
-        keycloak: http://192.168.99.100:30867
+        keycloak: http://192.168.99.100:30867 
     keycloak:
         username: keycloak
         password: abcdefghi
@@ -73,6 +74,7 @@ pluto:
     service:
         type: NodePort
     keycloak:
+        # Provide your own keycloak settings here
         baseUrl: http://192.168.99.100:30867
         realm: hyperspace
 ```
