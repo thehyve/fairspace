@@ -10,6 +10,10 @@ buildscript {
 	}
 }
 
+plugins {
+	id 'net.ltgt.apt' version '0.10'
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
@@ -30,11 +34,15 @@ ext {
 }
 
 dependencies {
+	compileOnly 'org.projectlombok:lombok:1.18.0'
+
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.cloud:spring-cloud-starter-oauth2')
   compile("org.springframework.boot:spring-boot-starter-actuator")
+	compile('org.springframework.session:spring-session-core')
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')
 	testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")

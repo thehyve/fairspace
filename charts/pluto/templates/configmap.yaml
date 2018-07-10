@@ -15,10 +15,12 @@ data:
         realm: {{ .Values.keycloak.realm }}
         redirect-after-logout-url: {{ .Values.keycloak.redirectAfterLogoutUrl }}
         required-authority: {{ .Values.keycloak.requiredAuthority | default (printf "user-%s" (include "pluto.workspace.name" .)) }}
-        test: {{ .Values.keycloak.requiredAuthority }}
-        test2: {{ printf "user-%s" (include "pluto.workspace.name" .) }}
 
     zuul:
       routes:
         ui:
-          url: {{ .Values.backends.mercury | default (printf "http://%s-mercury.%s" .Release.Name .Release.Namespace)}}
+          url: {{ .Values.backends.ui | default (printf "http://%s-mercury.%s" .Release.Name .Release.Namespace)}}
+        storage:
+          url: {{ .Values.backends.storage | default (printf "http://%s-hydra.%s" .Release.Name .Release.Namespace)}}
+        metadata:
+          url: {{ .Values.backends.metadata | default (printf "http://%s-neptune.%s" .Release.Name .Release.Namespace)}}

@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -29,6 +30,7 @@ import java.util.Collections;
 @Configuration
 @EnableOAuth2Sso
 @EnableWebSecurity
+@Profile("!noAuth")
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${pluto.oauth2.logout-url}")
     String logoutUrl;

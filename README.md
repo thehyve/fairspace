@@ -5,6 +5,14 @@ This application functions as a proxy between the microservices and the frontend
 to use OpenID (against Keycloak). The application leverages the [Netflix Zuul](https://github.com/Netflix/zuul/wiki) proxy and
 [Spring Security](https://docs.spring.io/spring-security/site/docs/5.0.5.RELEASE/reference/htmlsingle/), which is described as [spring-cloud-security](https://cloud.spring.io/spring-cloud-security/1.2.x/single/spring-cloud-security.html)
 
+## Backends
+The application is currently configured to proxy:
+* `/storage/**` to hydra
+* `/metadata/**` to neptune
+* `/**` to mercury
+
+Also, spring-boot-actuator provides a health endpoint at `/actuator/health`, accessible without authentication.
+
 ## Structure
 The `app` directory contains the actual application. It can be run from the IDE or from the command line
 using gradle: `gradle bootRun`.

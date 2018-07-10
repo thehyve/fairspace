@@ -21,6 +21,14 @@ security:
 
 zuul:
   routes:
+    storage:
+      path: /storage/**
+      url: http://hydra/
+    metadata:
+      path: /metadata/**
+      url: http://neptune/
     ui:
-      path: /ui/**
+      path: /**
       url: http://mercury/
+  ignored-patterns:
+  - /actuator/**
