@@ -46,7 +46,6 @@ pluto:
 minio:
   accessKey: IFGZ2M0W8LB0C92FYA3J
   secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
-  mode: standalone
 ```
 
 After that, you can install the chart using helm. More details on the parameters can be found below.
@@ -88,7 +87,6 @@ minio:
   accessKey: IFGZ2M0W8LB0C92FYA3J
   secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
   mode: standalone
-
 ```
 
 It can be installed in the same way as above.
@@ -151,7 +149,7 @@ describes the most important settings for a workspace. See the `values.yaml` fil
 |---|---|---|
 | minio.accessKey | Default access key (5 to 20 characters) for Minio | IFGZ2M0W8LB0C92FYA3J |
 | minio.secretKey | Default secret key (8 to 40 characters) for Minio | xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB |
-| minio.mode | Minio server mode (`standalone`, `shared` or `distributed`)| `standalone` |  |
+| minio.mode | Minio server mode (`standalone`, `shared` or `distributed`)| `standalone` | 
 | minio.persistence.enabled | Use persistent volume to store data | true |
 
 
