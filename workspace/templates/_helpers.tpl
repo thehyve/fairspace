@@ -101,8 +101,16 @@ Jupyterhub external hostname
 Pluto external hostname
 */}}
 {{- define "pluto.hostname" -}}
-{{- printf "pluto.%s" .Values.workspace.ingress.domain -}}
+{{- .Values.workspace.ingress.domain -}}
 {{- end -}}
+
+{{/*
+Storage external hostname (through pluto to hydra)
+*/}}
+{{- define "storage.hostname" -}}
+{{- printf "storage.%s" .Values.workspace.ingress.domain -}}
+{{- end -}}
+
 
 
 

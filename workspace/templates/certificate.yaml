@@ -1,5 +1,6 @@
 {{- $ingress := .Values.workspace.ingress -}}
 {{- if $ingress.enabled -}}
+{{- if $ingress.tls.enabled -}}
 {{- if $ingress.tls.certificate.obtain -}}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
@@ -17,11 +18,13 @@ spec:
 {{ toYaml . | indent 4 }}
 {{- end }}
   commonName: '*.{{ $ingress.domain }}'
+  dnsNames: '{{ $ingress.domain }}'
   acme:
     config:
     - dns01:
         provider: {{ $ingress.tls.certificate.dns01Provider}}
       domains:
       - '*.{{ $ingress.domain }}'
+{{- end -}}
 {{- end -}}
 {{- end -}}

@@ -14,7 +14,7 @@ metadata:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 spec:
-{{- if $ingress.tls }}
+{{- if $ingress.tls.enabled }}
   tls:
     - hosts:
       - {{ template "jupyterhub.hostname" $ }}
