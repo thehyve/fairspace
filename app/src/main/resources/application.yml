@@ -32,3 +32,4 @@ zuul:
       url: http://mercury/
   ignored-patterns:
   - /actuator/**
+  - /account/**

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,10 @@ public class AccountResource {
     @GetMapping("/authorizations")
     public List<String> getAuthorizations(Authentication authentication) {
         log.debug("REST authentication to retrieve authorizations");
+        if(authentication == null || authentication.getAuthorities() == null) {
+            return Collections.EMPTY_LIST;
+        }
+        
         return authentication.getAuthorities().stream()
                 .map(authority -> ((GrantedAuthority) authority).getAuthority())
                 .collect(Collectors.toList());
