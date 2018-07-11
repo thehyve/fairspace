@@ -3,9 +3,10 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "workspace.name" . }}-pluto-ingress
-{{- with $ingress.annotations }}
+  name: {{ template "workspace.name" . }}-storage-ingress
   annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /storage
+{{- with $ingress.annotations }}
 {{ toYaml . | indent 4 }}
 {{- end }}
   labels:
@@ -17,11 +18,11 @@ spec:
 {{- if $ingress.tls.enabled }}
   tls:
     - hosts:
-      - {{ template "pluto.hostname" $ }}
+      - {{ template "storage.hostname" $ }}
       secretName: {{ template "workspace.tlsSecretName" $ }}
 {{- end }}
   rules:
-    - host: {{ template "pluto.hostname" $ }}
+    - host: {{ template "storage.hostname" $ }}
       http:
         paths:
           - path: /
