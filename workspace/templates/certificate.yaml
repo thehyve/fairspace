@@ -26,6 +26,7 @@ spec:
         provider: {{ $ingress.tls.certificate.dns01Provider}}
       domains:
       - '*.{{ $ingress.domain }}'
+      - '{{ $ingress.domain }}'
 {{- end -}}
 {{- end -}}
 {{- end -}}
