@@ -1,4 +1,4 @@
-pluto:
+app:
   oauth2:
     base-url: http://192.168.99.100:31303
     realm: curie
@@ -10,3 +10,7 @@ security:
       clientId: ws1-pluto
       clientSecret: d51ddd79-f3e0-43ef-8113-997a49164899
 
+zuul:
+  routes:
+    storage:
+      url: http://localhost:8091/

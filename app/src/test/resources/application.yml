@@ -1,8 +1,15 @@
-pluto:
+app:
   oauth2:
     logout-url: https://test.logout.url/%s
     redirect-after-logout-url: https://test.redirect.after.logout.url
     required-authority: user-workspace
+  urls:
+    permitAll:
+    - /actuator/health
+    needsAuthentication:
+    - /noauthz
+    needsAuthorization:
+    - /thehyve
 
 security:
   oauth2:
@@ -20,5 +27,9 @@ zuul:
   routes:
     hyve:
       path: /thehyve/**
+      url: https://thehyve.nl/
+      strip-prefix: true
+    noauthz:
+      path: /noauthz/**
       url: https://thehyve.nl/
       strip-prefix: true

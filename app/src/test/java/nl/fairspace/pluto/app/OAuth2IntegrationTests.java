@@ -57,6 +57,13 @@ public class OAuth2IntegrationTests {
 	}
 
 	@Test
+	public void applicationProvides401WithAjaxHeader() throws Exception {
+		mockMvc
+				.perform(get("/thehyve").header("X-Requested-With", "XMLHttpRequest"))
+				.andExpect(status().is4xxClientError());
+	}
+
+	@Test
 	@WithMockUser(authorities = {"user-workspace"})
 	public void accessAllowedAfterLoginAndWithProperAuthorities() throws Exception {
 		mockMvc
@@ -72,8 +79,23 @@ public class OAuth2IntegrationTests {
 				.andExpect(status().isForbidden());
 	}
 
+	@Test
+	@WithMockUser
+	public void accessAllowedWithoutCorrectAuthorityToNoAuthzEndpoint() throws Exception {
+		mockMvc
+				.perform(get("/noauthz"))
+				.andExpect(status().is2xxSuccessful());
+	}
+
 	@Test(expected = UserRedirectRequiredException.class)
 	public void loginRedirectsToOauthServer() throws Exception {
 		mockMvc.perform(get("/login"));
+	}
+
+	@Test
+	public void healthEndpointIsAvailableWithoutAuthentication() throws Exception {
+		mockMvc
+				.perform(get("/actuator/health"))
+				.andExpect(status().is2xxSuccessful());
 	}
 }

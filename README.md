@@ -23,6 +23,11 @@ using gradle: `gradle bootRun`.
 CSRF functionality is enabled. A csrf token is returned on each request in the `X-CSRF-TOKEN` header of the response.
 For POST, PUT and PATCH requests, that value should be returned in the `X-CSRF-TOKEN` header in the request.
 
+## Ajax requests
+Ajax requests should send along the `X-Requested-With` with value `XMLHttpRequest`. This will tell the application
+to return a 401 status on failing authentication instead of a 302 redirect to the login form. The frontend should then
+handle the authentication failure itself.
+
 ## OAuth2 Refresh token
 Currently, when an oAuth2 access token expires, it is automatically refreshed, by a workaround implemented
  manually in `WebSecurityConfiguration.java`. Functionality to do this automatically will
@@ -34,7 +39,7 @@ https://github.com/spring-projects/spring-security/issues/4371
 Pluto requires the OIDC provider (keycloak) to return a specific authority (configurable, defaults to user-workspace)for the 
 user to be allowed to use this workspace.
 If the user has logged in, but does not have access to the workspace, most requests will return a HTTP status 403. The user will
-however be able to access the frontend at `/ui` and his name at `/account/name`. This allows the frontend to check `/account/authorizations`
+however be able to access the frontend at `/` and his name at `/account/name`. This allows the frontend to check `/account/authorizations`
 to see if the user is allowed to use this workspace, and if not, show a nice errormessage.
 
 ## Creating a compatible backend

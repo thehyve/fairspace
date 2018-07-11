@@ -9,7 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
-    pluto:
+    app:
       oauth2:
         base-url: {{ .Values.keycloak.baseUrl }}
         realm: {{ .Values.keycloak.realm }}
