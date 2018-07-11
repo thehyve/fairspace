@@ -18,7 +18,8 @@ spec:
 {{ toYaml . | indent 4 }}
 {{- end }}
   commonName: '*.{{ $ingress.domain }}'
-  dnsNames: '{{ $ingress.domain }}'
+  dnsNames:
+  - '{{ $ingress.domain }}'
   acme:
     config:
     - dns01:
