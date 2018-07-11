@@ -8,3 +8,6 @@ dependencies:
 - name: mercury
   version: v0.1.7
   repository: https://chartmuseum.jx.test.fairdev.app/
+- name: hydra
+  version: v0.1.4
+  repository: https://chartmuseum.jx.test.fairdev.app/
