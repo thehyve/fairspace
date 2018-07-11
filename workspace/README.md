@@ -1,10 +1,11 @@
 # A Helm chart for VRE workspaces
 This helm chart will install and setup a single VRE workspace. It includes
-an instance of JupyterHub.
+an instance of JupyterHub and Minio.
 
 Contains:
 - JupyterHub with Python 3 and R kernels and JupyterLab extension
 - Mercury
+- Minio
 
 ## Prerequisites
 A workspace within Fairspace is always associated with a hyperspace. The
@@ -40,7 +41,11 @@ jupyterhub:
 pluto:
     keycloak:
         baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
-        realm: hyperspace        
+        realm: hyperspace     
+        
+minio:
+  accessKey: IFGZ2M0W8LB0C92FYA3J
+  secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
 ```
 
 After that, you can install the chart using helm. More details on the parameters can be found below.
@@ -77,6 +82,10 @@ pluto:
         # Provide your own keycloak settings here
         baseUrl: http://192.168.99.100:30867
         realm: hyperspace
+        
+minio:
+  accessKey: IFGZ2M0W8LB0C92FYA3J
+  secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
 ```
 
 It can be installed in the same way as above.
@@ -134,6 +143,15 @@ describes the most important settings for a workspace. See the `values.yaml` fil
 | `pluto.keycloak.realm`   | Keycloak realm that is used for this hyperspace.  |   |
 | `pluto.keycloak.redirectAfterLogoutUrl`   | URL to redirect the user to after logging out  |   |
 
+#### Minio parameters
+| Parameter  | Description  | Default |
+|---|---|---|
+| `minio.accessKey` | Default access key (5 to 20 characters) for Minio | IFGZ2M0W8LB0C92FYA3J |
+| `minio.secretKey` | Default secret key (8 to 40 characters) for Minio | xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB |
+| `minio.persistence.enabled` | Use persistent volume to store data | true |
+
+
+
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:
 
@@ -148,3 +166,7 @@ See [Pluto README](https://github.com/fairspace/pluto/blob/master/README.md) for
 * Mercury
 Settings for mercury should be in the section `mercury`. 
 See [Mercury README](https://github.com/fairspace/mercury/blob/master/README.md) for more information on the specific settings
+
+* Minio
+Setting for minio should be in the section `minio`.
+See [Minio README](https://github.com/kubernetes/charts/blob/master/stable/minio/README.md) for more information on the specific settings

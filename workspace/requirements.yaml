@@ -11,3 +11,6 @@ dependencies:
 - name: hydra
   version: v0.1.4
   repository: https://chartmuseum.jx.test.fairdev.app/
+- name: minio
+  version: v1.3.4
+  repository: "@stable"
