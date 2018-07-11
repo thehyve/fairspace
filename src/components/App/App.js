@@ -7,9 +7,15 @@ import styles from './App.styles';
 import TopBar from "../TopBar/TopBar";
 import MenuDrawer from "../MenuDrawer/MenuDrawer";
 import AuthorizationCheck from "../AuthorizationCheck/AuthorizationCheck";
+import BucketList from "../BucketList/BucketList";
 
 function App(props) {
+
     const {classes} = props;
+
+    const bucketlisProps = {
+        title : 'popop'
+    }
 
     // If an error is to be shown, it should be underneath the
     // AppBar. This method take care of it
@@ -28,7 +34,9 @@ function App(props) {
                 <MenuDrawer classes={classes}></MenuDrawer>
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
-                    <Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography>
+                    <Typography noWrap>{'You think water moves fast?? You should see ice.'}</Typography>
+                    <div className={classes.toolbar}/>
+                    <BucketList props={bucketlisProps}/>
                 </main>
             </AuthorizationCheck>
         </div>
