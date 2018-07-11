@@ -36,7 +36,7 @@ public class AccountResource {
     public List<String> getAuthorizations(Authentication authentication) {
         log.debug("REST authentication to retrieve authorizations");
         if(authentication == null || authentication.getAuthorities() == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return authentication.getAuthorities().stream()
