@@ -1,16 +1,19 @@
 package nl.fairspace.pluto.app.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
@@ -29,31 +32,35 @@ import java.util.Collections;
 @Configuration
 @EnableOAuth2Sso
 @EnableWebSecurity
+@Profile("!noAuth")
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
-    @Value("${pluto.oauth2.logout-url}")
-    String logoutUrl;
-
-    @Value("${pluto.oauth2.redirect-after-logout-url}")
-    String redirectAfterLogoutUrl;
-    
-    @Value("${pluto.oauth2.required-authority}")
-    String requiredAuthority;    
+    @Autowired
+    AppConfig appConfig;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                    .mvcMatchers(HttpMethod.OPTIONS).permitAll()
-                    .antMatchers("/actuator/health").permitAll()
-                    .antMatchers("/account/name", "/ui").authenticated()
-                    .anyRequest().hasAuthority(requiredAuthority)
-                .and()
-                    .cors().configurationSource(corsConfigurationSource())
-                .and()
-                    .logout()
-                    .logoutSuccessUrl(String.format(logoutUrl, URLEncoder.encode(redirectAfterLogoutUrl, "UTF-8")))
-                .and()
-                    .csrf().disable();
+            .cors().configurationSource(corsConfigurationSource())
+            .and()
+                .logout()
+                .logoutSuccessUrl(String.format(appConfig.getOauth2().getLogoutUrl(), URLEncoder.encode(appConfig.getOauth2().getRedirectAfterLogoutUrl(), "UTF-8")))
+            .and()
+                .csrf().disable()
+            .authorizeRequests()
+                // Allow all OPTIONS pre-flight requests
+                .mvcMatchers(HttpMethod.OPTIONS).permitAll()
+
+                // Allow access to specific urls without any credentials (e.g. health check)
+                .antMatchers(appConfig.getUrls().getPermitAll()).permitAll()
+
+                // Allow access to specific urls with authentication without needing the correct authority
+                .antMatchers(appConfig.getUrls().getNeedsAuthentication()).authenticated()
+
+                // Allow access to specific urls with authentication and the correct authority
+                .antMatchers(appConfig.getUrls().getNeedsAuthorization()).hasAuthority(appConfig.getOauth2().getRequiredAuthority())
+
+                // UI runs on / and should be allowed for all authenticated users
+                .anyRequest().authenticated();
     }
 
     @Bean

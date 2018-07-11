@@ -1,26 +1,46 @@
-pluto:
+app:
   oauth2:
     base-url: http://localhost:9080
     realm: keycloak
-    logout-url: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
+    logout-url: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
     redirect-after-logout-url: https://www.google.com
     required-authority: user-workspace
+
+  # Specify urls for security configuration. There are
+  urls:
+    permitAll:
+    - /actuator/health
+    needsAuthentication:
+    - /account/name
+    needsAuthorization:
+    - /account/authorizations
+    - /storage
+    - /metadata
 
 security:
   oauth2:
     client:
       clientId: web_app
       clientSecret: web_app
-      user-authorization-uri: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/auth
-      access-token-uri: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/token
+      user-authorization-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
+      access-token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
       authentication-scheme: header
       scope: openid
     resource:
-      user-info-uri: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/userinfo
+      user-info-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/userinfo
       prefer-token-info: false
 
 zuul:
   routes:
+    storage:
+      path: /storage/**
+      url: http://hydra/
+    metadata:
+      path: /metadata/**
+      url: http://neptune/
     ui:
-      path: /ui/**
+      path: /**
       url: http://mercury/
+  ignored-patterns:
+  - /actuator/**
+  - /account/**

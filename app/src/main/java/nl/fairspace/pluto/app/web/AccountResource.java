@@ -35,6 +35,10 @@ public class AccountResource {
     @GetMapping("/authorizations")
     public List<String> getAuthorizations(Authentication authentication) {
         log.debug("REST authentication to retrieve authorizations");
+        if(authentication == null || authentication.getAuthorities() == null) {
+            return Collections.emptyList();
+        }
+
         return authentication.getAuthorities().stream()
                 .map(authority -> ((GrantedAuthority) authority).getAuthority())
                 .collect(Collectors.toList());
