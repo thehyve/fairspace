@@ -1,0 +1,15 @@
+dependencies:
+- name: pluto
+  repository: https://chartmuseum.jx.test.fairdev.app/
+  version: 0.1.22
+- name: mercury
+  repository: https://chartmuseum.jx.test.fairdev.app/
+  version: 0.1.7
+- name: hydra
+  repository: https://chartmuseum.jx.test.fairdev.app/
+  version: 0.1.4
+- name: minio
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 1.3.4
+digest: sha256:0c0ecdc207a1ca64ac8320ccfb93b9eeccaa7b721d5ee167982c50acdbc9cda5
+generated: 2018-07-11T16:27:23.428849038Z
