@@ -104,7 +104,7 @@ hydra:
 
   overrides:
     minio:
-      secretNamePostfix:
+      secretNamePostfix: minio
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
