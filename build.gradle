@@ -1,0 +1,58 @@
+buildscript {
+    ext {
+        kotlin_version = '1.2.51'
+        ktor_version = '0.9.3'
+        jena_version = '3.7.0'
+        koin_version = '0.9.3'
+        mockito_kotlin_version = '1.6.0'
+        logback_version = '1.2.1'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+group 'io.fairspace'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+mainClassName = 'io.fairspace.ceres.AppKt'
+
+sourceCompatibility = 1.8
+
+kotlin { experimental { coroutines "enable" } }
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://dl.bintray.com/kotlin/ktor" }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.apache.jena:apache-jena-libs:$jena_version"
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "ch.qos.logback:logback-classic:$logback_version"
+    compile "io.ktor:ktor-auth-jwt:$ktor_version"
+    compile "org.koin:koin-core:$koin_version"
+    compile "org.koin:koin-ktor:$koin_version"
+
+    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testCompile "com.nhaarman:mockito-kotlin:$mockito_kotlin_version"
+    compile "org.koin:koin-test:$koin_version"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
