@@ -2,15 +2,17 @@ app:
   oauth2:
     base-url: http://192.168.99.100:31303
     realm: curie
-    required-authority: user-ws1
+    required-authority: user-fashionable-bison
 
 security:
   oauth2:
     client:
-      clientId: ws1-pluto
-      clientSecret: d51ddd79-f3e0-43ef-8113-997a49164899
+      clientId: fashionable-bison-pluto
+      clientSecret: b6a9f4bd-f8b8-4bb5-9223-4040ea05b5f2
 
 zuul:
   routes:
     storage:
-      url: http://localhost:8091/
+      url: http://192.168.99.100:31098/
+    ui:
+      url: http://192.168.99.100:30721/
