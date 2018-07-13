@@ -10,16 +10,12 @@ import io.ktor.server.netty.Netty
 import org.apache.jena.tdb2.TDB2Factory
 import org.koin.dsl.module.applicationContext
 import org.koin.standalone.StandAloneContext.startKoin
-import java.util.concurrent.TimeUnit
 
-val runtimeContext = applicationContext {
+private val runtimeContext = applicationContext {
     bean { ConfigFactory.load()}
     bean { TDB2Factory.connectDataset(get<Config>().getString("jena.dataset.path")) }
     bean { ModelRepository(get()) }
-    bean { JwkProviderBuilder(get<Config>().getString("authentication.jwt.issuer"))
-            .cached(10, 24, TimeUnit.HOURS)
-            .rateLimited(10, 1, TimeUnit.MINUTES)
-            .build() }
+    bean { JwkProviderBuilder(get<Config>().getString("authentication.jwt.issuer")).build() }
 }
 
 fun main(args: Array<String>) {
