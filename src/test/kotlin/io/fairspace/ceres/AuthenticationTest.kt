@@ -18,11 +18,10 @@ import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 
-class AuthenticationTest: BaseCeresTest() {
+class AuthenticationTest : BaseCeresTest() {
     private val keyPair =
             KeyPairGenerator.getInstance("RSA").apply { initialize(2048, SecureRandom()) }.generateKeyPair()
     private val algorithm = Algorithm.RSA256(keyPair.public as RSAPublicKey, keyPair.private as RSAPrivateKey)
@@ -42,43 +41,49 @@ class AuthenticationTest: BaseCeresTest() {
 
     @Test
     fun `Requests with a valid JWT should succeed`() =
-            expectSuccess(createToken())
+            tokenShouldBeAccepted(createToken())
 
     @Test
-    fun `Requests without a JWT should fail`() =
-            expectFail("")
+    fun `Requests without a JWT should be rejected`() =
+            tokenShouldBeRejected("")
 
     @Test
-    fun `Requests with a wrong scheme should fail`() =
-        expectFail(createToken(prefix = "Bear "))
+    fun `Requests with a wrong scheme should be rejected`() =
+            tokenShouldBeRejected(createToken(prefix = "Bear "))
 
     @Test
-    fun `Requests with a wrong issuer should fail`() =
-        expectFail(createToken(issuer = "wrong"))
+    fun `Requests with a wrong issuer should be rejected`() =
+            tokenShouldBeRejected(createToken(issuer = "wrong"))
 
     @Test
-    fun `Requests with a wrong keyId should fail`() =
-        expectFail(createToken(keyId = "wrong"))
+    fun `Requests with a wrong keyId should be rejected`() =
+            tokenShouldBeRejected(createToken(keyId = "wrong"))
 
     @Test
-    fun `Requests with an expired token should fail`() =
-        expectFail(createToken(expiresAt = YESTERDAY))
+    fun `Requests with an expired token should be rejected`() =
+            tokenShouldBeRejected(createToken(expiresAt = YESTERDAY))
+
+    @Ignore // TODO: Re-enable when audience check is implemented
+    @Test
+    fun `Requests with a wrong audience should be rejected`() =
+            tokenShouldBeRejected(createToken(audience = "wrong"))
 
 
+    private fun tokenShouldBeAccepted(token: String) =
+            sendRequestToRestrictedApiAndExpectStatus(token, HttpStatusCode.OK)
 
+    private fun tokenShouldBeRejected(token: String) =
+            sendRequestToRestrictedApiAndExpectStatus(token, HttpStatusCode.Unauthorized)
 
-    private fun expectSuccess(token: String) = expectStatus(token, HttpStatusCode.OK)
-
-    private fun expectFail(token: String) = expectStatus(token, HttpStatusCode.Unauthorized)
-
-    private fun expectStatus(token: String, status: HttpStatusCode) =
-        test {
-            with(handleRequest {
-                uri = "/model/m1/statements"
-                addHeader(HttpHeaders.Authorization, token) }) {
-                assertEquals(status, status)
+    private fun sendRequestToRestrictedApiAndExpectStatus(token: String, status: HttpStatusCode) =
+            test {
+                with(handleRequest {
+                    uri = "/model/m1/statements"
+                    addHeader(HttpHeaders.Authorization, token)
+                }) {
+                    assertEquals(status, response.status())
+                }
             }
-        }
 
     private fun <R> test(block: TestApplicationEngine.() -> R) {
         withTestApplication({
@@ -95,14 +100,13 @@ class AuthenticationTest: BaseCeresTest() {
     private fun createToken(prefix: String = "Bearer ",
                             issuer: String = this.issuer, audience: String = this.audience,
                             keyId: String = this.keyId, algorithm: Algorithm = this.algorithm,
-                            expiresAt: Date = TOMORROW ) =
+                            expiresAt: Date = TOMORROW) =
             prefix + JWT.create()
                     .withAudience(audience)
                     .withIssuer(issuer)
                     .withKeyId(keyId)
                     .withExpiresAt(expiresAt)
                     .sign(algorithm)
-
 
     override fun koinModules(): List<Module> {
         return super.koinModules() + applicationContext {
