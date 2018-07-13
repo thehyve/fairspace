@@ -23,30 +23,23 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["-config=/opt/ceres/config/application.conf"]
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
+          volumeMounts:
+          - name: config-volume
+            mountPath: /opt/ceres/config
           livenessProbe:
             httpGet:
               path: /
-              port: http
+              port: {{ .Values.service.internalPort }}
           readinessProbe:
             httpGet:
               path: /
-              port: http
+              port: {{ .Values.service.internalPort }}
           resources:
-          env:
-          - name: CERES_DATA_DIR
-            value: "{{ .Values.persistence.mountPath }}"
-          - name: CERES_AUTH_ENABLED
-            value: "{{ .Values.ceres.auth.enabled }}"
-          - name: CERES_AUTH_ISSUER
-            value: "{{ .Values.ceres.auth.jwt.issuer }}"
-          - name: CERES_AUTH_REALM
-            value: "{{ .Values.ceres.auth.jwt.realm }}"
-          - name: CERES_AUTH_AUDIENCE
-            value: "{{ .Values.ceres.auth.jwt.audience }}"
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -60,3 +53,7 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ template "ceres.fullname" . }}

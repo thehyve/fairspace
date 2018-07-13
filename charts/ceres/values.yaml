@@ -19,7 +19,7 @@ resources:
     cpu: 500m
     memory: 1024Mi
   requests:
-    cpu: 400m
+    cpu: 256m
 ## Persist data to a persistent volume
 persistence:
   enabled: true
