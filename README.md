@@ -23,11 +23,10 @@ To run with custom configuration
 
 Default configuration file:
 
-```
+```yaml
 ktor {
   deployment {
     port = 8080
-    port = ${?CERES_PORT}
   }
 
   application {
@@ -37,22 +36,14 @@ ktor {
 jena {
   dataset {
     path = data
-    path = ${?CERES_DATA_DIR}
   }
 }
 authentication {
   jwt {
-    enabled = true
-    enabled = ${?CERES_AUTH_ENABLED}
-
+    enabled = false
     issuer = "http://localhost:9080"
-    issuer = ${?CERES_AUTH_ISSUER}
-
     realm = fairspace
-    realm = ${?CERES_AUTH_REALM}
-
     audience = fairspace
-    audience = ${?CERES_AUTH_AUDIENCE}
   }
 }
 ```
