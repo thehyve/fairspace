@@ -2,6 +2,7 @@
   "urls": {
     "logout": "/logout",
     "accountName": "/account/name",
-    "authorizations": "/account/authorizations"
+    "authorizations": "/account/authorizations",
+    "storage": "http://localhost:9000"
   }
 }

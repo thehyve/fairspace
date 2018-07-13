@@ -1,22 +1,30 @@
-import * as minio from 'minio'
+import * as AWS from 'aws-sdk'
+import config from "../../config";
 
 function listCollections() {
     return new Promise((resolve, reject) => {
-        const minioClient = new minio.Client({
-            endPoint: '127.0.0.1',
-            port: 9000,
-            secure: false,
-            accessKey: 'AKIAIOSFODNN7EXAMPLE',
-            secretKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+
+        let endpoint = config.urls.storage;
+
+        const s3Client  = new AWS.S3({
+            accessKeyId: 'AKIAIOSFODNN7EXAMPLE' ,
+            secretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY' ,
+            endpoint: endpoint,
+            s3ForcePathStyle: true,
+            signatureVersion: 'v4',
+            httpOptions: {
+                xhrWithCredentials: true,
+            }
         });
 
-        minioClient.listBuckets((err, buckets) => {
+
+        s3Client.listBuckets((err, buckets) => {
             if (err) {
                 reject(err);
                 console.error(err);
             }
-            resolve(buckets)
-        });
+            resolve(buckets.Buckets)
+        })
     });
 }
 

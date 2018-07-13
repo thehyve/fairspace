@@ -16,7 +16,6 @@ class BucketList extends Component {
             this.setState({
                 bucketList: successBucketList
             });
-            console.log(this.state.bucketList)
         });
     }
 
@@ -24,7 +23,7 @@ class BucketList extends Component {
         return (
             <ul>
                 {this.state.bucketList.map(function (bucket) {
-                    return <li>{bucket.name}<p><i>Created on: {bucket.creationDate.toLocaleDateString()}</i></p></li>
+                    return <li>{bucket.Name}<p><i>Created on: {bucket.CreationDate.toLocaleDateString()}{}</i></p></li>
                 })
                 }
             </ul>
