@@ -1,6 +1,6 @@
 app:
   oauth2:
-    base-url: http://192.168.99.100:31303
+    base-url: http://keycloak.hyperspace.test.local:31303
     realm: curie
     required-authority: user-fashionable-bison
 

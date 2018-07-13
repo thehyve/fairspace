@@ -10,6 +10,7 @@ app:
   urls:
     permitAll:
     - /actuator/health
+    - /error
     needsAuthentication:
     - /account/name
     needsAuthorization:
@@ -44,3 +45,5 @@ zuul:
   ignored-patterns:
   - /actuator/**
   - /account/**
+  - /login
+  - /logout
