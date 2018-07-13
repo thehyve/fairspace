@@ -22,7 +22,9 @@ public class SessionConfiguration {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setCookieName("JSESSIONID");
         serializer.setCookiePath("/");
-        serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
+
+        // Use the full hostname as domain name pattern, if it is not an ip address
+        serializer.setDomainNamePattern("^((?:\\w+\\.)+[a-z]+)$");
         return serializer;
     }
 }
