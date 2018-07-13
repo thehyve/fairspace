@@ -25,31 +25,32 @@ import java.io.ByteArrayOutputStream
 class ModelConverter(private val format: RDFFormat) : ContentConverter {
     val contentType = ContentType.parse(format.lang.headerString)
 
-    override suspend fun convertForReceive(context: PipelineContext<ApplicationReceiveRequest, ApplicationCall>): Model {
-        return ModelFactory.createDefaultModel().also {
-            val channel = context.subject.value as ByteReadChannel
-            RDFDataMgr.read(it, channel.toInputStream(), format.lang)
-        }
-    }
+    override suspend fun convertForReceive(context: PipelineContext<ApplicationReceiveRequest, ApplicationCall>): Model =
+            ModelFactory.createDefaultModel().also {
+                val channel = context.subject.value as ByteReadChannel
+                RDFDataMgr.read(it, channel.toInputStream(), format.lang)
+            }
 
-    override suspend fun convertForSend(context: PipelineContext<Any, ApplicationCall>, contentType: ContentType, value: Any): Any? {
-        if (value is Model) {
-            return TextContent(value.toString(format), contentType)
-        } else throw UnsupportedMediaTypeException(contentType)
-    }
+    override suspend fun convertForSend(context: PipelineContext<Any, ApplicationCall>, contentType: ContentType, value: Any): Any? =
+            when (value) {
+                is Model -> TextContent(value.toString(format), contentType)
+                else -> throw UnsupportedMediaTypeException(contentType)
+            }
 }
 
 /**
  * Converts a [ResultSet] to JSON
  */
 object ResultSetJsonConverter : ContentConverter {
-    override suspend fun convertForSend(context: PipelineContext<Any, ApplicationCall>, contentType: ContentType, value: Any): Any? {
-        if (value is ResultSet) {
-            val out = ByteArrayOutputStream()
-            ResultSetFormatter.outputAsJSON(out, value)
-            return out.toString()
-        } else throw UnsupportedMediaTypeException(contentType)
-    }
+    override suspend fun convertForSend(context: PipelineContext<Any, ApplicationCall>, contentType: ContentType, value: Any): Any? =
+            when (value) {
+                is ResultSet -> {
+                    val out = ByteArrayOutputStream()
+                    ResultSetFormatter.outputAsJSON(out, value)
+                    out.toString()
+                }
+                else -> throw UnsupportedMediaTypeException(contentType)
+            }
 
     override suspend fun convertForReceive(context: PipelineContext<ApplicationReceiveRequest, ApplicationCall>): Any? {
         throw UnsupportedMediaTypeException(context.context.request.contentType())
@@ -64,7 +65,6 @@ object TextConverter : ContentConverter {
         throw UnsupportedMediaTypeException(context.context.request.contentType())
     }
 
-    override suspend fun convertForSend(context: PipelineContext<Any, ApplicationCall>, contentType: ContentType, value: Any): Any? {
-        return TextContent(value.toString(), contentType)
-    }
+    override suspend fun convertForSend(context: PipelineContext<Any, ApplicationCall>, contentType: ContentType, value: Any): Any? =
+            TextContent(value.toString(), contentType)
 }
