@@ -34,7 +34,7 @@ private fun Application.installAuthentication() {
             jwt {
                 val issuer = cfg.property("issuer").getString()
                 val audience = cfg.propertyOrNull("audience")?.getString() ?: "fairspace"
-                realm = cfg.propertyOrNull("audience")?.getString() ?: "fairspace"
+                realm = cfg.propertyOrNull("realm")?.getString() ?: "fairspace"
 
                 validate { credentials ->
                     when {
