@@ -9,6 +9,10 @@ you can use the provided `express.js` server by running `node server/server.js` 
 
 To get the app itself running, enter `yarn start`. This requires you to have [yarn](https://yarnpkg.com/lang/en/) installed.
 
+### Development
+If you want to develop locally on this application. You need to change the `retrieveExternalConfig` in `config.json` to
+an empty string.
+
 ### Pluto
 This frontend will be served by [pluto](https://github.com/fairspace/pluto) to avoid any cross-domain issues when talking to the backend.
 

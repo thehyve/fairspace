@@ -5,6 +5,14 @@ function listCollections() {
     return new Promise((resolve, reject) => {
 
         let endpoint = config.urls.storage;
+        let retrieveExternalConfig = config.retrieveExternalConfig;
+
+        if (retrieveExternalConfig !== "") {
+            fetch(retrieveExternalConfig)
+                .then(response => {
+                    endpoint = response.data.urls.storage;
+                });
+        }
 
         const s3Client  = new AWS.S3({
             accessKeyId: 'AKIAIOSFODNN7EXAMPLE' ,
