@@ -135,6 +135,7 @@ describes the most important settings for a workspace. See the `values.yaml` fil
 | `hyperspace.keycloak.username`  | Username used for setting up keycloak users. Must have access to the master realm | |
 | `hyperspace.keycloak.password`  | Password used for setting up keycloak users. | |
 | `hyperspace.keycloak.realm`  | Keycloak realm that is used for this hyperspace. Also set this variable in `pluto.keycloak.realm`| |
+| `hyperspace.keycloak.clientSecret`  | UUID that is used as client secret in communication between pluto and keycloak.| <random uuid> |
 
 #### Pluto parameters
 | Parameter  | Description  | Default |
@@ -149,7 +150,6 @@ describes the most important settings for a workspace. See the `values.yaml` fil
 | `minio.accessKey` | Default access key (5 to 20 characters) for Minio | IFGZ2M0W8LB0C92FYA3J |
 | `minio.secretKey` | Default secret key (8 to 40 characters) for Minio | xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB |
 | `minio.persistence.enabled` | Use persistent volume to store data | true |
-
 
 
 #### Tool configuration
@@ -170,3 +170,15 @@ See [Mercury README](https://github.com/fairspace/mercury/blob/master/README.md)
 * Minio
 Setting for minio should be in the section `minio`.
 See [Minio README](https://github.com/kubernetes/charts/blob/master/stable/minio/README.md) for more information on the specific settings
+
+## Upgrading installations
+Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades 
+of the chart, as the random values may be computed again. 
+
+Other properties may contain default values, which is not advised to use. For those reasons it is strongly advised to define values for at
+least the following properties:
+
+* `hyperspace.keycloak.password`
+* `hyperspace.keycloak.clientSecret`
+* `minio.accessKey`
+* `minio.secretKey`

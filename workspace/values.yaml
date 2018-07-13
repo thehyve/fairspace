@@ -53,6 +53,7 @@ hyperspace:
         username:
         password:
         realm:
+        clientSecret:
 
 
 # Setup ingress for workspace components

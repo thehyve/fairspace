@@ -5,6 +5,7 @@ hyperspace:
     username: keycloak
     password: keycloak-ci-123
     realm: ci
+    clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
 
 # Settings for the workspace
 workspace:
