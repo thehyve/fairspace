@@ -19,6 +19,9 @@ import org.apache.jena.riot.RDFDataMgr
 import org.apache.jena.riot.RDFFormat
 import java.io.ByteArrayOutputStream
 
+/**
+ * Converts [Model] to/from a textual representation defined by RDFFormat
+ */
 class ModelConverter(private val format: RDFFormat) : ContentConverter {
     val contentType = ContentType.parse(format.lang.headerString)
 
@@ -36,6 +39,9 @@ class ModelConverter(private val format: RDFFormat) : ContentConverter {
     }
 }
 
+/**
+ * Converts a [ResultSet] to JSON
+ */
 object ResultSetJsonConverter : ContentConverter {
     override suspend fun convertForSend(context: PipelineContext<Any, ApplicationCall>, contentType: ContentType, value: Any): Any? {
         if (value is ResultSet) {
@@ -50,6 +56,9 @@ object ResultSetJsonConverter : ContentConverter {
     }
 }
 
+/**
+ * Converts any object to plain text, e.g. text/boolean
+ */
 object TextConverter : ContentConverter {
     override suspend fun convertForReceive(context: PipelineContext<ApplicationReceiveRequest, ApplicationCall>): Any? {
         throw UnsupportedMediaTypeException(context.context.request.contentType())
