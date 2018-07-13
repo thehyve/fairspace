@@ -26,6 +26,9 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
+        volumeMounts:
+          - name: config-storage
+            mountPath: /usr/share/nginx/html/config/
         livenessProbe:
           httpGet:
             path: {{ .Values.probePath }}
@@ -44,3 +47,7 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 12 }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      volumes:
+      - name: config-storage
+        configMap:
+          name: {{ template "mercury.fullname" . }}
