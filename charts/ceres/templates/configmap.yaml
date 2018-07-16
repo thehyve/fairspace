@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ceres.fullname" . }}
+  labels:
+    app: {{ template "ceres.name" . }}
+    chart: {{ template "ceres.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.conf: |-
+    ktor {
+      deployment {
+        port = {{ .Values.service.internalPort }}
+      }
+
+      application {
+        modules = [io.fairspace.ceres.ModuleKt.ceresModule]
+      }
+    }
+    jena {
+      dataset {
+        path = {{ .Values.persistence.mountPath }}
+      }
+    }
+    authentication {
+      jwt {
+        enabled = {{ .Values.ceres.auth.enabled }}
+        issuer = "{{ .Values.ceres.auth.jwt.issuer }}"
+        realm = "{{ .Values.ceres.auth.jwt.realm }}"
+        audience = "{{ .Values.ceres.auth.jwt.audience }}"
+      }
+    }
