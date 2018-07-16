@@ -34,17 +34,7 @@ private fun Application.installAuthentication() {
             jwt {
                 val issuer = cfg.property("issuer").getString()
                 realm = cfg.propertyOrNull("realm")?.getString() ?: "fairspace"
-
-                // TODO: Restore audience validation
-//                val audience = cfg.propertyOrNull("audience")?.getString() ?: "fairspace"
-
-                validate { credentials -> JWTPrincipal(credentials.payload)
-//                    when {
-//                        credentials.payload.audience.contains(audience) -> JWTPrincipal(credentials.payload)
-//                        else -> null
-//                    }
-                }
-
+                validate { credentials -> JWTPrincipal(credentials.payload) }
                 verifier(get(), issuer)
             }
         }
