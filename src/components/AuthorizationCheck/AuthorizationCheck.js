@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import Fetch from "../../backend/Fetch/Fetch";
-import config from "../../config";
+import Config from "../Config/Config";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
 
@@ -68,7 +68,7 @@ class AuthorizationCheck extends React.Component {
     }
 
     render() {
-        return (<Fetch url={config.urls.authorizations}>
+        return (<Fetch url={Config.get().urls.authorizations}>
                 {this.handleFetchedData.bind(this)}
             </Fetch>)
     }

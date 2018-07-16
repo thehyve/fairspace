@@ -6,41 +6,63 @@ import styles from './App.styles';
 import TopBar from "../TopBar/TopBar";
 import MenuDrawer from "../MenuDrawer/MenuDrawer";
 import AuthorizationCheck from "../AuthorizationCheck/AuthorizationCheck";
+import Config from "../Config/Config";
+
 import {BrowserRouter as Router, Route} from "react-router-dom";
 import Home from "../../pages/Home/Home";
 import Files from "../../pages/Files/Files";
 import Notebooks from "../../pages/Notebooks/Notebooks";
 
-function App(props) {
-    const {classes} = props;
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.classes = props.classes;
+
+        this.state = {configLoaded: false};
+    }
+
+    componentDidMount() {
+        // Wait for the configuration to be loaded
+        Config.waitFor()
+            .then(() => {
+                this.setState({configLoaded: true})
+            })
+    }
 
     // If an error is to be shown, it should be underneath the
     // AppBar. This method take care of it
-    const transformError = (errorContent) =>
-            (<main className={classes.content}>
-                <div className={classes.toolbar}/>
-                {errorContent}
-             </main>)
+    transformError(errorContent) {
+        return (<main className={this.classes.content}>
+            <div className={this.classes.toolbar}/>
+            {errorContent}
+        </main>)
+    }
 
-    // The app itself consists of a topbar, a drawer and the actual page
-    // The topbar is shown even if the user has no proper authorization
-    return (
-        <div className={classes.root}>
-            <TopBar classes={classes}></TopBar>
-            <Router>
-                <AuthorizationCheck transformError={transformError}>
-                    <MenuDrawer classes={classes}></MenuDrawer>
-                    <main className={classes.content}>
-                        <div className={classes.toolbar}/>
+    render() {
+        if(this.state.configLoaded) {
+            // The app itself consists of a topbar, a drawer and the actual page
+            // The topbar is shown even if the user has no proper authorization
+            return (
+                <div className={this.classes.root}>
+                    <TopBar classes={this.classes}></TopBar>
+                    <Router>
+                        <AuthorizationCheck transformError={this.transformError.bind(this)}>
+                            <MenuDrawer classes={this.classes}></MenuDrawer>
+                            <main className={this.classes.content}>
+                                <div className={this.classes.toolbar}/>
 
-                        <Route exact path="/" component={Home} />
-                        <Route path="/files" component={Files} />
-                        <Route path="/notebooks" component={Notebooks} />
-                    </main>
-                </AuthorizationCheck>
-            </Router>
-        </div>
-    );
+                                <Route exact path="/" component={Home}/>
+                                <Route path="/files" component={Files}/>
+                                <Route path="/notebooks" component={Notebooks}/>
+                            </main>
+                        </AuthorizationCheck>
+                    </Router>
+                </div>
+            );
+        } else {
+            return (<div>Loading...</div>);
+        }
+    }
 }
 
 App.propTypes = {

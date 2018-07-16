@@ -5,5 +5,5 @@
     "authorizations": "/account/authorizations",
     "storage": "http://localhost:9000"
   },
-  "retrieveExternalConfig": "/config/config.json"
+  "externalConfigurationFiles": ["/config/config.json"]
 }

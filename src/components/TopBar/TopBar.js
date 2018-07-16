@@ -3,13 +3,15 @@ import './TopBar.css';
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import config from "../../config";
+import Config from "../Config/Config";
 import UserMenu from "../UserMenu/UserMenu";
 
 function TopBar(props) {
     const { classes } = props;
 
-    const handleLogout = () => { window.location.href = config.urls.logout }
+    const handleLogout = () => {
+        window.location.href = Config.get().urls.logout
+    }
 
     return (
         <AppBar position="absolute" className={classes.appBar}>
