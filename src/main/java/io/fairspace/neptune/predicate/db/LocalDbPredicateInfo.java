@@ -1,7 +1,6 @@
 package io.fairspace.neptune.predicate.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.fairspace.neptune.business.PredicateInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

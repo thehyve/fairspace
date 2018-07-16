@@ -1,4 +1,4 @@
-package io.fairspace.neptune.business;
+package io.fairspace.neptune.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +9,9 @@ import java.net.URI;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Triple {
+public class PredicateInfo {
 
-    private String subject;
-    private URI predicate;
-    private TripleObject object;
+    private String label;
+    private URI uri;
 
 }

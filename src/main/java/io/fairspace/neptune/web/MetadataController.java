@@ -1,8 +1,8 @@
 package io.fairspace.neptune.web;
 
-import io.fairspace.neptune.business.MetadataService;
-import io.fairspace.neptune.business.PredicateInfo;
-import io.fairspace.neptune.business.Triple;
+import io.fairspace.neptune.service.MetadataService;
+import io.fairspace.neptune.model.PredicateInfo;
+import io.fairspace.neptune.model.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

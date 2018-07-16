@@ -1,7 +1,7 @@
 package io.fairspace.neptune.web;
 
-import io.fairspace.neptune.business.PredicateInfo;
-import io.fairspace.neptune.business.Triple;
+import io.fairspace.neptune.model.PredicateInfo;
+import io.fairspace.neptune.model.Triple;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

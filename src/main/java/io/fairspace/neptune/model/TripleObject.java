@@ -1,4 +1,4 @@
-package io.fairspace.neptune.business;
+package io.fairspace.neptune.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
