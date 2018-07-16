@@ -20,6 +20,8 @@ import org.springframework.security.oauth2.client.token.AccessTokenProviderChain
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.RequestEnhancer;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -87,6 +89,17 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         restTemplate.setAccessTokenProvider(new AccessTokenProviderChain(Collections.singletonList(accessTokenProvider)));
 
         return restTemplate;
+    }
+
+    @Bean
+    public RedirectStrategy createRedirectStrategy()
+    {
+        // create the redirect strategy to avoid having
+        // a http link for redirect
+        DefaultRedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+        redirectStrategy.setContextRelative(false);
+
+        return redirectStrategy;
     }
 
     private static class AcceptJsonRequestEnhancer implements RequestEnhancer {
