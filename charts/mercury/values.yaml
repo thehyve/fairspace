@@ -5,7 +5,7 @@ replicaCount: 1
 image:
   repository: mercury
   tag: dev
-  pullPolicy: Never
+  pullPolicy: IfNotPresent
 service:
   type: ClusterIP
   externalPort: 80
