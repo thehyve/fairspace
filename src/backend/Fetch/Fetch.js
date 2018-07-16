@@ -24,6 +24,10 @@ class Fetch extends Component {
         transformError: error => error
     }
 
+    static defaultHeaders = {
+        'X-Requsted-With': 'XMLHttpRequest'
+    }
+
     state = {
         isFetching: !this.props.lazy,
         response: null,
@@ -65,11 +69,14 @@ class Fetch extends Component {
     dispatch = (body = this.props.body, props = this.props) => {
         this.setState({ isFetching: true, error: null })
 
+        // Append extra headers used in the backend
+        let headers = this.extendWithDefaultHeaders(props.headers);
+
         fetch(
             this.buildUrl(props.url, props.params),
             {
                 method: props.method,
-                headers: props.headers,
+                headers: headers,
                 body: isEvent(body) ? null : body,
                 credentials: 'same-origin'
             })
@@ -112,6 +119,10 @@ class Fetch extends Component {
                     error: transformedError
                 })
             })
+    }
+
+    extendWithDefaultHeaders(headers) {
+        return Object.assign({}, headers, Fetch.defaultHeaders);
     }
 
     render() {
