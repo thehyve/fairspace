@@ -10,8 +10,8 @@ import Config from '../../components/Config/Config';
  */
 class WithS3Client extends React.Component {
     static s3Client  = new AWS.S3({
-        accessKeyId: 'AKIAIOSFODNN7EXAMPLE' ,
-        secretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY' ,
+        accessKeyId: 'not-needed' ,
+        secretAccessKey: 'due-to-oauth-authentication' ,
         endpoint: "/",
         s3ForcePathStyle: true,
         signatureVersion: 'v4',
