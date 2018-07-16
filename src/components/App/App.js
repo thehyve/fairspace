@@ -14,6 +14,12 @@ import Files from "../../pages/Files/Files";
 import Notebooks from "../../pages/Notebooks/Notebooks";
 
 class App extends React.Component {
+    cancellable = {
+        // it's important that this is one level down, so we can drop the
+        // reference to the entire object by setting it to undefined.
+        setState: this.setState.bind(this)
+    };
+
     constructor(props) {
         super(props);
         this.classes = props.classes;
@@ -23,10 +29,14 @@ class App extends React.Component {
 
     componentDidMount() {
         // Wait for the configuration to be loaded
-        Config.waitFor()
-            .then(() => {
-                this.setState({configLoaded: true})
-            })
+        Config.init()
+            .then(() =>
+                this.cancellable.setState && this.cancellable.setState({configLoaded: true})
+            );
+    }
+
+    componentWillUnmount() {
+        this.cancellable.setState = undefined;
     }
 
     // If an error is to be shown, it should be underneath the

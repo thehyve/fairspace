@@ -3,7 +3,7 @@
     "logout": "/logout",
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
-    "storage": "http://localhost:9000"
+    "storage": ""
   },
   "externalConfigurationFiles": ["/config/config.json"]
 }
