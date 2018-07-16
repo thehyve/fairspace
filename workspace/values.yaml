@@ -84,6 +84,8 @@ workspace:
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto
+# Default configuration points to hydra, mercury and neptune
+# in the same workspace
 pluto:
   overrides:
     keycloak:
@@ -95,13 +97,14 @@ pluto:
     realm:
     redirectAfterLogoutUrl: https://fairspace.com
 
-#Specific setting for hydra
+# Specific setting for hydra
+# Default configuration points to minio in the same workspace
+# and uses the credentials from the minio secret
 hydra:
-  minio:
-    accessKey: IFGZ2M0W8LB0C92FYA3J
-    secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
-    baseUrl: http://minio:9000
-    webRpcPath: /minio/webrpc
+  app:
+    oauth2:
+      baseUrl:
+      realm:
 
   overrides:
     minio:

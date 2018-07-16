@@ -20,15 +20,8 @@ pluto:
 hydra:
   app:
     oauth2:
-      base-url: https://keycloak.hyperspace.ci.test.fairdev.app
+      baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
       realm: ci
-  minio:
-    baseUrl: http://workspace-minio:9000
-    webRpcPath: /minio/webrpc
-
-  overrides:
-    minio:
-      secretNamePostfix: minio
 
 minio:
   accessKey: IFGZ2M0W8LB0C92FYA3J
