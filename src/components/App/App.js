@@ -64,6 +64,10 @@ class App extends React.Component {
                                 <Route exact path="/" component={Home}/>
                                 <Route path="/files" component={Files}/>
                                 <Route path="/notebooks" component={Notebooks}/>
+
+                                {/* Handle auth urls that should go to the server */}
+                                <Route path="/login" render={() => {window.location.href = '/login';}}/>
+                                <Route path="/logout" render={() => {window.location.href = '/logout';}}/>
                             </main>
                         </AuthorizationCheck>
                     </Router>
