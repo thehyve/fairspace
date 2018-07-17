@@ -9,10 +9,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
@@ -20,8 +22,13 @@ import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.RequestEnhancer;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestHeaderRequestMatcher;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.accept.ContentNegotiationStrategy;
+import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -46,9 +53,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             .cors().configurationSource(corsConfigurationSource())
             .and()
-                .exceptionHandling()
-                    .authenticationEntryPoint(loginUrlAuthenticationEntryPoint(sso.getLoginPath()))
-            .and()
                 .logout()
                 .logoutSuccessUrl(String.format(appConfig.getOauth2().getLogoutUrl(), URLEncoder.encode(appConfig.getOauth2().getRedirectAfterLogoutUrl(), "UTF-8")))
             .and()
@@ -68,6 +72,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 // UI runs on / and should be allowed for all authenticated users
                 .anyRequest().authenticated();
+
+        addAuthenticationEntryPoint(http, sso.getLoginPath());
     }
 
     @Bean
@@ -95,6 +101,40 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         return restTemplate;
     }
+
+    /**
+     * This method is copied from {@link ExceptionHandlingConfigurer} as we need a specific LoginUrlAuthenticationEntryPoint
+     * @param http
+     * @param loginPath
+     * @throws Exception
+     */
+    private void addAuthenticationEntryPoint(HttpSecurity http, String loginPath) throws Exception {
+        ExceptionHandlingConfigurer<HttpSecurity> exceptions = http.exceptionHandling();
+        ContentNegotiationStrategy contentNegotiationStrategy = http
+                .getSharedObject(ContentNegotiationStrategy.class);
+        if (contentNegotiationStrategy == null) {
+            contentNegotiationStrategy = new HeaderContentNegotiationStrategy();
+        }
+
+        // By default, return http status 401 UnAuthorized when X-Requested-With is specified
+        HttpStatusWithLoginUrlEntryPoint entryPoint = new HttpStatusWithLoginUrlEntryPoint(HttpStatus.UNAUTHORIZED, loginPath);
+        exceptions.defaultAuthenticationEntryPointFor(
+                entryPoint,
+                new RequestHeaderRequestMatcher("X-Requested-With", "XMLHttpRequest"));
+        exceptions.defaultAuthenticationEntryPointFor(
+                entryPoint,
+                new MediaTypeRequestMatcher(contentNegotiationStrategy, MediaType.APPLICATION_JSON));
+
+        // Otherwise, return a redirect to the login page
+        MediaTypeRequestMatcher preferredMatcher = new MediaTypeRequestMatcher(
+                contentNegotiationStrategy, MediaType.APPLICATION_XHTML_XML,
+                new MediaType("image", "*"), MediaType.TEXT_HTML, MediaType.TEXT_PLAIN);
+        preferredMatcher.setIgnoredMediaTypes(Collections.singleton(MediaType.ALL));
+        exceptions.defaultAuthenticationEntryPointFor(
+                loginUrlAuthenticationEntryPoint(loginPath),
+                preferredMatcher);
+    }
+
 
     public AuthenticationEntryPoint loginUrlAuthenticationEntryPoint(String loginPath) {
         LoginUrlAuthenticationEntryPoint entryPoint = new LoginUrlAuthenticationEntryPoint(loginPath);

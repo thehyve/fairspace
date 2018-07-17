@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -49,12 +50,21 @@ public class OAuth2IntegrationTests {
 	}
 
 	@Test
-	public void applicationRequiresAuthentication() throws Exception {
+	public void applicationRequiesAuthentication() throws Exception {
 		mockMvc
 				.perform(get("/thehyve"))
+				.andExpect(status().is4xxClientError());
+	}
+
+
+	@Test
+	public void applicationRedirectsWhenHtmlIsAccepted() throws Exception {
+		mockMvc
+				.perform(get("/thehyve").accept(MediaType.TEXT_HTML))
 				.andExpect(status().is3xxRedirection())
 				.andExpect(header().string("Location", endsWith("/login")));
 	}
+
 
 	@Test
 	public void applicationProvides401WithAjaxHeader() throws Exception {
