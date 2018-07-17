@@ -1,8 +1,8 @@
 package nl.fairspace.pluto.app.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2SsoProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +13,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.RequestEnhancer;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -37,10 +38,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     AppConfig appConfig;
 
+    @Autowired
+    OAuth2SsoProperties sso;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .cors().configurationSource(corsConfigurationSource())
+            .and()
+                .exceptionHandling()
+                    .authenticationEntryPoint(loginUrlAuthenticationEntryPoint(sso.getLoginPath()))
             .and()
                 .logout()
                 .logoutSuccessUrl(String.format(appConfig.getOauth2().getLogoutUrl(), URLEncoder.encode(appConfig.getOauth2().getRedirectAfterLogoutUrl(), "UTF-8")))
@@ -89,6 +96,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return restTemplate;
     }
 
+    public AuthenticationEntryPoint loginUrlAuthenticationEntryPoint(String loginPath) {
+        LoginUrlAuthenticationEntryPoint entryPoint = new LoginUrlAuthenticationEntryPoint(loginPath);
+        entryPoint.setForceHttps(true);
+        return entryPoint;
+    }
+
     private static class AcceptJsonRequestEnhancer implements RequestEnhancer {
         @Override
         public void enhance(AccessTokenRequest request,
@@ -98,3 +111,4 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         }
     }
 }
+
