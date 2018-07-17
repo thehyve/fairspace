@@ -18,7 +18,14 @@ const isLocalhost = Boolean(
     )
 );
 
+const TEST_DOMAIN = 'test.fairdev.app';
+
 export default function register() {
+  // Avoid service worker in test environments
+  if(window.location.indexOf(TEST_DOMAIN)) {
+      return;
+  }
+
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location);
