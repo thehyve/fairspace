@@ -27,6 +27,7 @@ public class TriplesRdfJsonConverterTests {
     private final RdfJsonPayload payload = new RdfJsonPayload() {{
         put(subject1, new LinkedMultiValueMap<URI, RdfObject>() {{
             add(property1, object1);
+            add(property1, object2);
         }});
 
         put(subject2, new LinkedMultiValueMap<URI, RdfObject>() {{
@@ -38,6 +39,7 @@ public class TriplesRdfJsonConverterTests {
 
     private final List<Triple> triples = Arrays.asList(
             new Triple(subject1, property1, new TripleObject(ObjectType.literal, "value1", "language1", datatype1)),
+            new Triple(subject1, property1,  new TripleObject(ObjectType.uri, "http://example.com", null, null)),
             new Triple(subject2, property1, new TripleObject(ObjectType.literal, "value1", "language1", datatype1)),
             new Triple(subject2, property2, new TripleObject(ObjectType.uri, "http://example.com", null, null))
     );
