@@ -84,11 +84,21 @@ class Fetch extends Component {
                 if (this.willUnmount) {
                     return
                 }
+
                 if (props.onResponse) {
                     props.onResponse(null, response)
                 }
 
-                return response.json();
+                if(response.ok) {
+                    return response.json();
+                } else if(response.status === 401 || response.status === 403) {
+                    // When the authentication has failed, the user is being sent to the login page
+                    window.location.href = '/login';
+                    throw Error('Authentication failed. Redirecting to login page');
+                } else {
+                    console.error("An error occurred while fetching", props.url,": ", response.status, response.statusText);
+                    throw Error(response.statusText);
+                }
             })
             .then(data => {
                 if (this.willUnmount) {
