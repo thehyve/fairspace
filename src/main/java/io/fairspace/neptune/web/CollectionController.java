@@ -18,7 +18,7 @@ public class CollectionController {
         return collectionService.getCollections();
     }
 
-    @PutMapping
+    @PostMapping
     public void createCollection(@RequestBody Collection collection) {
         collectionService.createCollection(collection);
     }
