@@ -2,6 +2,8 @@
   "urls": {
     "logout": "/logout",
     "accountName": "/account/name",
-    "authorizations": "/account/authorizations"
-  }
+    "authorizations": "/account/authorizations",
+    "storage": ""
+  },
+  "externalConfigurationFiles": ["/config/config.json"]
 }

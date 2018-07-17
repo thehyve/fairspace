@@ -1,6 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import AuthorizationCheck from './AuthorizationCheck';
+import Config from '../Config/Config';
+
+beforeAll(() => {
+    Config.setConfig({
+        "externalConfigurationFiles": []
+    });
+
+    return Config.init();
+});
 
 it('renders without crashing', () => {
   const div = document.createElement('div');

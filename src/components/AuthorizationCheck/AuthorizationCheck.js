@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import Fetch from "../../backend/Fetch/Fetch";
-import config from "../../config";
+import Config from "../Config/Config";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
 
@@ -30,6 +30,11 @@ class AuthorizationCheck extends React.Component {
         this.props = props;
     }
 
+    /**
+     * Check whether the given array contains the authorization that is asked for
+     * @param data
+     * @returns {boolean}
+     */
     hasAuthorization(data) {
         if (data && Array.isArray(data)) {
             // If no authorization is given as property, the only check is for a status 200 response
@@ -42,6 +47,11 @@ class AuthorizationCheck extends React.Component {
         return false;
     }
 
+    /**
+     * Handle data fetched from the backend
+     * @param fetch
+     * @returns {*}
+     */
     handleFetchedData(fetch) {
         const {isFetching, data} = fetch;
 
@@ -68,7 +78,7 @@ class AuthorizationCheck extends React.Component {
     }
 
     render() {
-        return (<Fetch url={config.urls.authorizations}>
+        return (<Fetch url={Config.get().urls.authorizations}>
                 {this.handleFetchedData.bind(this)}
             </Fetch>)
     }

@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 image:
-  repository: draft
+  repository: mercury
   tag: dev
   pullPolicy: IfNotPresent
 service:
@@ -28,3 +28,6 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 terminationGracePeriodSeconds: 10
+
+urls:
+  storage: http://hydra.com

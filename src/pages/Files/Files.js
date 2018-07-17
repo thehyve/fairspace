@@ -1,9 +1,16 @@
 import React from 'react';
 import {Typography} from "@material-ui/core";
+import WithS3Client from "../../backend/WithS3Client/WithS3Client";
+import CollectionList from "../../components/CollectionList/CollectionList";
 
 function Files(props) {
     return (
-        <Typography noWrap>{'Files overview'}</Typography>
+        <div>
+            <Typography variant="title" paragraph={true} noWrap>{'Files overview'}</Typography>
+            <WithS3Client>
+                <CollectionList />
+            </WithS3Client>
+        </div>
     );
 }
 
