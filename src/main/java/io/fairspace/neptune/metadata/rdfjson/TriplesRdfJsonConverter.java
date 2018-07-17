@@ -1,6 +1,7 @@
 package io.fairspace.neptune.metadata.rdfjson;
 
 import io.fairspace.neptune.metadata.ceres.RdfJsonPayload;
+import io.fairspace.neptune.model.ObjectType;
 import io.fairspace.neptune.model.Triple;
 import io.fairspace.neptune.model.TripleObject;
 import io.fairspace.neptune.metadata.ceres.RdfObject;
@@ -32,12 +33,12 @@ public class TriplesRdfJsonConverter {
     }
 
     private static TripleObject convert(RdfObject rdfObject) {
-        return new TripleObject(rdfObject.getType(), rdfObject.getValue(),
+        return new TripleObject(ObjectType.valueOf(rdfObject.getType()), rdfObject.getValue(),
                         rdfObject.getLang(), rdfObject.getDataType());
     }
 
     private static RdfObject convert(TripleObject tripleObject) {
-        return new RdfObject(tripleObject.getType(), tripleObject.getValue(),
+        return new RdfObject(tripleObject.getType().toString(), tripleObject.getValue(),
                 tripleObject.getLang(), tripleObject.getDataType());
     }
 

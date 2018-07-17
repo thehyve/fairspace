@@ -10,4 +10,3 @@ spring:
     url: "jdbc:h2:mem:"
 ceres:
   url: "http://localhost:8001"
-  endpoint: "/model/mymodel/statements"

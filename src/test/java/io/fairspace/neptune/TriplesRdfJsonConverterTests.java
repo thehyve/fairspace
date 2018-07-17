@@ -1,5 +1,6 @@
 package io.fairspace.neptune;
 
+import io.fairspace.neptune.model.ObjectType;
 import io.fairspace.neptune.model.Triple;
 import io.fairspace.neptune.model.TripleObject;
 import io.fairspace.neptune.metadata.ceres.RdfJsonPayload;
@@ -20,9 +21,8 @@ public class TriplesRdfJsonConverterTests {
     private final URI property2 = URI.create("http://property2.org");
 
     private final URI datatype1 = URI.create("http://type1.org");
-    private final URI datatype2 = URI.create("http://type2.org");
-    private final RdfObject object1 = new RdfObject("type1", "value1", "language1", datatype1);
-    private final RdfObject object2 = new RdfObject("type2", "value2", "language2", datatype2);
+    private final RdfObject object1 = new RdfObject("literal", "value1", "language1", datatype1);
+    private final RdfObject object2 = new RdfObject("uri", "http://example.com", null, null);
 
     private final RdfJsonPayload payload = new RdfJsonPayload() {{
         put(subject1, new LinkedMultiValueMap<URI, RdfObject>() {{
@@ -37,9 +37,9 @@ public class TriplesRdfJsonConverterTests {
     }};
 
     private final List<Triple> triples = Arrays.asList(
-            new Triple(subject1, property1, new TripleObject("type1", "value1", "language1",datatype1)),
-            new Triple(subject2, property1, new TripleObject("type1", "value1", "language1", datatype1)),
-            new Triple(subject2, property2, new TripleObject("type2", "value2", "language2", datatype2))
+            new Triple(subject1, property1, new TripleObject(ObjectType.literal, "value1", "language1", datatype1)),
+            new Triple(subject2, property1, new TripleObject(ObjectType.literal, "value1", "language1", datatype1)),
+            new Triple(subject2, property2, new TripleObject(ObjectType.uri, "http://example.com", null, null))
     );
 
     @Test

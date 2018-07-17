@@ -13,7 +13,7 @@ import java.net.URI;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TripleObject {
 
-    private String type;
+    private ObjectType type;
     private String value;
     private String lang;
     private URI dataType;

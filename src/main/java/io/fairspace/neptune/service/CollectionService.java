@@ -1,0 +1,70 @@
+package io.fairspace.neptune.service;
+
+import io.fairspace.neptune.model.Collection;
+import io.fairspace.neptune.model.ObjectType;
+import io.fairspace.neptune.model.Triple;
+import io.fairspace.neptune.model.TripleObject;
+import io.fairspace.neptune.vocabulary.Fairspace;
+import io.fairspace.neptune.vocabulary.Rdf;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+
+@Service
+public class CollectionService {
+    private static final String GET_COLLECTIONS = "" +
+            "PREFIX rdf: <" + Rdf.NS + ">\n" +
+            "PREFIX fsp: <" + Fairspace.NS + ">\n" +
+            "CONSTRUCT { ?s ?p ?o }\n" +
+            "WHERE {\n" +
+            "?s ?p ?o .\n" +
+            "?s rdf:type fsp:Collection . }\n";
+
+    @Autowired
+    private TripleService tripleService;
+
+
+    public void createCollection(Collection collection) {
+        tripleService.postTriples(toTriples(collection));
+    }
+
+    public List<Collection> getCollections() {
+        Map<URI, List<Triple>> triplesBySubject = tripleService
+                .executeConstructQuery(GET_COLLECTIONS)
+                .stream()
+                .collect(groupingBy(Triple::getSubject));
+        return triplesBySubject
+                .values()
+                .stream()
+                .map(CollectionService::fromTriples)
+                .collect(toList());
+    }
+
+    private static List<Triple> toTriples(Collection collection) {
+        return Arrays.asList(
+                new Triple(collection.getUri(), Rdf.TYPE, new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
+                new Triple(collection.getUri(), Fairspace.NAME, new TripleObject(ObjectType.literal, collection.getName(), null, null)),
+                new Triple(collection.getUri(), Fairspace.DESCRIPTION, new TripleObject(ObjectType.literal, collection.getDescription(), null, null))
+        );
+    }
+
+    private static Collection fromTriples(List<Triple> triples) {
+        Collection collection = new Collection();
+        triples.forEach(t -> {
+            collection.setUri(t.getSubject());
+            if (t.getPredicate().equals(Fairspace.NAME)) {
+                collection.setName(t.getObject().getValue());
+            } else if (t.getPredicate().equals(Fairspace.DESCRIPTION)) {
+                collection.setDescription(t.getObject().getValue());
+            }
+        });
+        return collection;
+    }
+}

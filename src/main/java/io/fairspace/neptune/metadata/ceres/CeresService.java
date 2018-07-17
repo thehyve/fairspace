@@ -11,7 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -29,30 +28,34 @@ public class CeresService implements TripleService {
     RestTemplate restTemplate;
 
     @Value("${ceres.url}/model/default/statements/")
-    private String ceresApiEndpoint;
+    private String statementsEndpoint;
+
+    @Value("${ceres.url}/model/default/query/")
+    private String queryEndpoint;
 
     public List<Triple> retrieveTriples(URI uri) {
-
-        try {
             RdfJsonPayload result =
-                    restTemplate.exchange(ceresApiEndpoint + "?subject={uri}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, uri).getBody();
+                    restTemplate.exchange(statementsEndpoint + "?subject={uri}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, uri).getBody();
             return TriplesRdfJsonConverter.convertRdfToTriples(result);
-        } catch (HttpClientErrorException e) {
-            log.error("Error", e);
-            throw new RuntimeException("Some context", e);
-        }
     }
 
 
     public void postTriples(List<Triple> triples) {
         HttpEntity entity = getRdfJsonEntity(triples);
-        restTemplate.postForEntity(ceresApiEndpoint, entity, void.class);
+        restTemplate.postForEntity(statementsEndpoint, entity, void.class);
+    }
+
+    @Override
+    public List<Triple> executeConstructQuery(String query) {
+        RdfJsonPayload result =
+                restTemplate.exchange(statementsEndpoint + "?query={query}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, query).getBody();
+        return TriplesRdfJsonConverter.convertRdfToTriples(result);
     }
 
 
     public void deleteTriples(List<Triple> triples) {
         HttpEntity entity = getRdfJsonEntity(triples);
-        restTemplate.exchange(ceresApiEndpoint, HttpMethod.DELETE, entity, void.class);
+        restTemplate.exchange(statementsEndpoint, HttpMethod.DELETE, entity, void.class);
     }
 
     private HttpEntity getRdfJsonEntity(List<Triple> triples) {
