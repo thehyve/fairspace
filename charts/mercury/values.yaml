@@ -30,4 +30,4 @@ readinessProbe:
 terminationGracePeriodSeconds: 10
 
 urls:
-  storage: http://hydra.com
+  storage:

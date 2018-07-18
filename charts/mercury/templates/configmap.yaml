@@ -11,7 +11,7 @@ data:
   config.json: |-
     {
       "urls": {
-        "storage": {{ .Values.urls.storage}}
+        "storage": "{{ .Values.urls.storage }}"
       }
     }
 
