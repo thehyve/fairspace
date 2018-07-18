@@ -43,6 +43,9 @@ zuul:
     ui:
       path: /**
       url: http://mercury/
+  ignored-headers:
+  - Access-Control-Allow-Credentials
+  - Access-Control-Allow-Origin
   ignored-patterns:
   - /actuator/**
   - /account/**

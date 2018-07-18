@@ -1,5 +1,6 @@
 package nl.fairspace.pluto.app.config;
 
+import nl.fairspace.pluto.app.config.dto.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2SsoProperties;
@@ -9,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,9 +28,6 @@ import org.springframework.security.web.util.matcher.RequestHeaderRequestMatcher
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -50,14 +47,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .cors().configurationSource(corsConfigurationSource())
-            .and()
-                .logout()
-                .invalidateHttpSession(true)
-                .deleteCookies(appConfig.getSessionCookieName())
-                .logoutSuccessUrl(String.format(appConfig.getOauth2().getLogoutUrl(), URLEncoder.encode(appConfig.getOauth2().getRedirectAfterLogoutUrl(), "UTF-8")))
-            .and()
-                .csrf().disable()
             .authorizeRequests()
                 // Allow all OPTIONS pre-flight requests
                 .mvcMatchers(HttpMethod.OPTIONS).permitAll()
@@ -72,19 +61,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(appConfig.getUrls().getNeedsAuthorization()).hasAuthority(appConfig.getOauth2().getRequiredAuthority())
 
                 // UI runs on / and should be allowed for all authenticated users
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+            .and().cors()
+            .and().logout()
+                    .invalidateHttpSession(true)
+                    .deleteCookies(appConfig.getSessionCookieName())
+                    .logoutSuccessUrl(String.format(appConfig.getOauth2().getLogoutUrl(), URLEncoder.encode(appConfig.getOauth2().getRedirectAfterLogoutUrl(), "UTF-8")))
+            .and().csrf()
+                .disable();
 
         addAuthenticationEntryPoint(http, sso.getLoginPath());
-    }
-
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.applyPermitDefaultValues();
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        return source;
     }
 
     @Bean
@@ -132,8 +118,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         exceptions.defaultAuthenticationEntryPointFor(
                 loginUrlAuthenticationEntryPoint(loginPath),
                 preferredMatcher);
-
-
     }
 
     public AuthenticationEntryPoint loginUrlAuthenticationEntryPoint(String loginPath) {

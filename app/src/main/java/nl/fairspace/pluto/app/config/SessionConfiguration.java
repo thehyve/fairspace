@@ -1,5 +1,6 @@
 package nl.fairspace.pluto.app.config;
 
+import nl.fairspace.pluto.app.config.dto.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

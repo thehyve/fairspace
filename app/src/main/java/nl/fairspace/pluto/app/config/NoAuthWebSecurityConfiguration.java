@@ -16,7 +16,9 @@ public class NoAuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter
                 .authorizeRequests()
                     .anyRequest().permitAll()
                 .and()
-                    .cors().disable()
+                    .cors()
+                .and()
                     .csrf().disable();
     }
+
 }

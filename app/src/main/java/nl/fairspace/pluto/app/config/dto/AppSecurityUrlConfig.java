@@ -1,8 +1,6 @@
-package nl.fairspace.pluto.app.config;
+package nl.fairspace.pluto.app.config.dto;
 
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * Specifies the url patterns that are allowed for anyone, only
