@@ -28,14 +28,12 @@ fun Application.ceresModule() {
 }
 
 private fun Application.installAuthentication() {
-    val cfg = environment.config.config("authentication.jwt")
-    if (cfg.property("enabled").getString().toBoolean()) {
+    if (environment["authentication.jwt.enabled"].toBoolean()) {
         install(Authentication) {
             jwt {
-                val issuer = cfg.property("issuer").getString()
-                realm = cfg.propertyOrNull("realm")?.getString() ?: "fairspace"
+                realm = environment["authentication.jwt.realm"]
                 validate { credentials -> JWTPrincipal(credentials.payload) }
-                verifier(get(), issuer)
+                verifier(get(), environment["authentication.jwt.issuer"])
             }
         }
     }

@@ -11,12 +11,11 @@ import org.koin.standalone.StandAloneContext.startKoin
 
 fun main(args: Array<String>) {
     val env = commandLineEnvironment(args)
-    val cfg = env.config
 
     startKoin(listOf(applicationContext {
-        bean { TDB2Factory.connectDataset(cfg.property("jena.dataset.path").getString()) }
+        bean { TDB2Factory.connectDataset(env["jena.dataset.path"]) }
         bean { ModelRepository(get()) }
-        bean { JwkProviderBuilder(cfg.property("authentication.jwt.issuer").getString()).build() }
+        bean { JwkProviderBuilder(env["authentication.jwt.issuer"]).build() }
     }))
 
     embeddedServer(Netty, env).start(wait = true)
