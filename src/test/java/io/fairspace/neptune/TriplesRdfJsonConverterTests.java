@@ -15,8 +15,8 @@ import java.util.*;
 import static org.junit.Assert.assertEquals;
 
 public class TriplesRdfJsonConverterTests {
-    private final URI subject1 = URI.create("http://subject1.org");
-    private final URI subject2 = URI.create("http://subject2.org");
+    private final String subject1 = "http://subject1.org";
+    private final String subject2 = "http://subject2.org";
     private final URI property1 = URI.create("http://property1.org");
     private final URI property2 = URI.create("http://property2.org");
 

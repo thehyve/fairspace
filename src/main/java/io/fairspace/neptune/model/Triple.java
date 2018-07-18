@@ -10,7 +10,7 @@ import java.net.URI;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Triple {
-    private URI subject;
+    private String subject;
     private URI predicate;
     private TripleObject object;
 

@@ -34,7 +34,7 @@ public class CollectionService {
     }
 
     public List<Collection> getCollections() {
-        Map<URI, List<Triple>> triplesBySubject = tripleService
+        Map<String, List<Triple>> triplesBySubject = tripleService
                 .executeConstructQuery(GET_COLLECTIONS)
                 .stream()
                 .collect(groupingBy(Triple::getSubject));
@@ -46,17 +46,18 @@ public class CollectionService {
     }
 
     private static List<Triple> toTriples(Collection collection) {
+        String subject = collection.getUri().toString();
         return Arrays.asList(
-                new Triple(collection.getUri(), Rdf.TYPE, new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
-                new Triple(collection.getUri(), Fairspace.NAME, new TripleObject(ObjectType.literal, collection.getName(), null, null)),
-                new Triple(collection.getUri(), Fairspace.DESCRIPTION, new TripleObject(ObjectType.literal, collection.getDescription(), null, null))
+                new Triple(subject, Rdf.TYPE, new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
+                new Triple(subject, Fairspace.NAME, new TripleObject(ObjectType.literal, collection.getName(), null, null)),
+                new Triple(subject, Fairspace.DESCRIPTION, new TripleObject(ObjectType.literal, collection.getDescription(), null, null))
         );
     }
 
     private static Collection fromTriples(List<Triple> triples) {
         Collection collection = new Collection();
         triples.forEach(t -> {
-            collection.setUri(t.getSubject());
+            collection.setUri(URI.create(t.getSubject()));
             if (t.getPredicate().equals(Fairspace.NAME)) {
                 collection.setName(t.getObject().getValue());
             } else if (t.getPredicate().equals(Fairspace.DESCRIPTION)) {

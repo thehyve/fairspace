@@ -51,7 +51,7 @@ public class MetadataServiceTests {
         URI uri = URI.create("http://schema.org/Author");
         TripleObject tripleObject = new TripleObject(ObjectType.literal, "1", "en", uri);
         URI uriPredicate = URI.create("http://www.schema.org/Person");
-        return Arrays.asList(new Triple(URI.create("http://test"), uriPredicate, tripleObject), new Triple(URI.create("test1"), uriPredicate, tripleObject));
+        return Arrays.asList(new Triple("http://test", uriPredicate, tripleObject), new Triple("test1", uriPredicate, tripleObject));
     }
 
     private PredicateInfo createPredicate() {
