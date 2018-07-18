@@ -4,4 +4,4 @@ spring:
 
 ceres:
   url: "http://localhost:8001"
-  endpoint: "/model/mymodel/statements"
+  model: "default"
