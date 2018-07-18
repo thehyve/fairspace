@@ -65,6 +65,12 @@ public class OAuth2IntegrationTests {
 				.andExpect(header().string("Location", endsWith("/login")));
 	}
 
+	@Test
+	public void applicationRedirectsWhenHtmlAndJsonIsAccepted() throws Exception {
+		mockMvc
+				.perform(get("/thehyve").accept(MediaType.TEXT_HTML, MediaType.APPLICATION_JSON))
+				.andExpect(status().is3xxRedirection());
+	}
 
 	@Test
 	public void applicationProvides401WithAjaxHeader() throws Exception {
@@ -72,6 +78,21 @@ public class OAuth2IntegrationTests {
 				.perform(get("/thehyve").header("X-Requested-With", "XMLHttpRequest"))
 				.andExpect(status().is4xxClientError());
 	}
+
+	@Test
+	public void applicationProvides401WithOnlyJsonAccepted() throws Exception {
+		mockMvc
+				.perform(get("/thehyve").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().is4xxClientError());
+	}
+
+	@Test
+	public void applicationProvidesLoginPathInHeader() throws Exception {
+		mockMvc
+				.perform(get("/thehyve").accept(MediaType.APPLICATION_JSON))
+				.andExpect(header().string("X-Login-Path", endsWith("/login")));
+	}
+
 
 	@Test
 	@WithMockUser(authorities = {"user-workspace"})

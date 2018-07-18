@@ -22,7 +22,6 @@ import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.RequestEnhancer;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestHeaderRequestMatcher;
@@ -117,15 +116,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         }
 
         // By default, return http status 401 UnAuthorized when X-Requested-With is specified
-        HttpStatusWithLoginUrlEntryPoint entryPoint = new HttpStatusWithLoginUrlEntryPoint(HttpStatus.UNAUTHORIZED, loginPath);
+        // This behaviour is also the default, when no other match is being made (i.e. when no HTML is accepted)
+        OAuth2AuthenticationWithLoginUrlEntryPoint entryPoint = new OAuth2AuthenticationWithLoginUrlEntryPoint(loginPath);
         exceptions.defaultAuthenticationEntryPointFor(
                 entryPoint,
                 new RequestHeaderRequestMatcher("X-Requested-With", "XMLHttpRequest"));
-        exceptions.defaultAuthenticationEntryPointFor(
-                entryPoint,
-                new MediaTypeRequestMatcher(contentNegotiationStrategy, MediaType.APPLICATION_JSON));
 
-        // Otherwise, return a redirect to the login page
+        // Otherwise, if HTML or an image is accepted, return a redirect to the login page
         MediaTypeRequestMatcher preferredMatcher = new MediaTypeRequestMatcher(
                 contentNegotiationStrategy, MediaType.APPLICATION_XHTML_XML,
                 new MediaType("image", "*"), MediaType.TEXT_HTML, MediaType.TEXT_PLAIN);
@@ -133,6 +130,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         exceptions.defaultAuthenticationEntryPointFor(
                 loginUrlAuthenticationEntryPoint(loginPath),
                 preferredMatcher);
+
+
     }
 
 
