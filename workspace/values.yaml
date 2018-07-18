@@ -135,3 +135,7 @@ minio:
   persistence:
     enabled: true
 
+# Specific setting for mercury on what url to access the storage
+mercury:
+  urls:
+    storage:
