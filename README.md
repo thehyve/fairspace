@@ -46,8 +46,8 @@ container.
 | DELETE /metadata/predicate| Delete a predicate with it's label |
 | POST /metadata/predicates| Store a list of  predicates with their label |
 | DELETE /metadata/predicates| Delete a list of predicate with their label |
-| GET /collections | Get collections |
-| POST /collections | Create a collection |
+| GET /collections | Get collections' metadata |
+| POST /collections | Store metadata for a collection |
 
 ### JSON format
 #### Triple
@@ -102,7 +102,7 @@ container.
 }
 ```
 
-### Create a collection
+#### Store collection metadata
 
 ```
 POST /collections HTTP/1.1
@@ -116,7 +116,7 @@ Content-Type: application/json
 }
 ```
 
-### List collections
+#### Retrieve collection metadata
 
 ```
 GET /collections HTTP/1.1
@@ -125,7 +125,7 @@ Accept: application/json
 
 ```
 
-Returns 
+#### Response from GET /collections
 
 ```json
 [
@@ -133,7 +133,12 @@ Returns
         "uri": "http://example.com/coll1",
         "name": "Collection 1",
         "description": "My first collection"
-    }
+    },
+    {
+        "uri": "http://example.com/coll2",
+        "name": "Collection 2",
+        "description": "My second collection"
+    }    
 ]
 
 ```
