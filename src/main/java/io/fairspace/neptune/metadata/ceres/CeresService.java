@@ -48,7 +48,7 @@ public class CeresService implements TripleService {
     @Override
     public List<Triple> executeConstructQuery(String query) {
         RdfJsonPayload result =
-                restTemplate.exchange(statementsEndpoint + "?query={query}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, query).getBody();
+                restTemplate.exchange(queryEndpoint + "?query={query}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, query).getBody();
         return TriplesRdfJsonConverter.convertRdfToTriples(result);
     }
 
