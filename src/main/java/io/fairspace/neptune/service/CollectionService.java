@@ -19,19 +19,17 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class CollectionService {
-    private static final String GET_COLLECTIONS = "" +
-            "PREFIX rdf: <" + Rdf.NS + ">\n" +
-            "PREFIX fsp: <" + Fairspace.NS + ">\n" +
-            "CONSTRUCT { ?s ?p ?o }\n" +
-            "WHERE {\n" +
-            "?s ?p ?o .\n" +
-            "?s rdf:type fsp:Collection . }\n";
+    private static final String GET_COLLECTIONS =
+            String.format(
+                    "CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o . ?s <%s> <%s> . }",
+                    Rdf.TYPE, Fairspace.COLLECTION);
 
     @Autowired
     private TripleService tripleService;
 
 
     public void createCollection(Collection collection) {
+
         tripleService.postTriples(toTriples(collection));
     }
 
