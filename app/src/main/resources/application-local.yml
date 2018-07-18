@@ -1,4 +1,5 @@
 app:
+  forceHttps: false
   oauth2:
     base-url: http://keycloak.hyperspace.test.local:31303
     realm: curie

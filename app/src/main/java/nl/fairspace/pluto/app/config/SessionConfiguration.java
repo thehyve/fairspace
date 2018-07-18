@@ -1,5 +1,6 @@
 package nl.fairspace.pluto.app.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.MapSessionRepository;
@@ -12,6 +13,9 @@ import java.util.HashMap;
 @Configuration
 @EnableSpringHttpSession
 public class SessionConfiguration {
+    @Autowired
+    AppConfig appConfig;
+
     @Bean
     public MapSessionRepository sessionRepository() {
         return new MapSessionRepository(new HashMap<>());
@@ -20,7 +24,7 @@ public class SessionConfiguration {
     @Bean
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setCookieName("JSESSIONID");
+        serializer.setCookieName(appConfig.getSessionCookieName());
         serializer.setCookiePath("/");
 
         // Use the full hostname as domain name pattern, if it is not an ip address

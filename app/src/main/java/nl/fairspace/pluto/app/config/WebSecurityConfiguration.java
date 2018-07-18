@@ -53,6 +53,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .cors().configurationSource(corsConfigurationSource())
             .and()
                 .logout()
+                .invalidateHttpSession(true)
+                .deleteCookies(appConfig.getSessionCookieName())
                 .logoutSuccessUrl(String.format(appConfig.getOauth2().getLogoutUrl(), URLEncoder.encode(appConfig.getOauth2().getRedirectAfterLogoutUrl(), "UTF-8")))
             .and()
                 .csrf().disable()
@@ -134,10 +136,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     }
 
-
     public AuthenticationEntryPoint loginUrlAuthenticationEntryPoint(String loginPath) {
         LoginUrlAuthenticationEntryPoint entryPoint = new LoginUrlAuthenticationEntryPoint(loginPath);
-        entryPoint.setForceHttps(true);
+        entryPoint.setForceHttps(appConfig.isForceHttps());
         return entryPoint;
     }
 

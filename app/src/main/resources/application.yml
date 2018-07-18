@@ -3,7 +3,7 @@ app:
     base-url: http://localhost:9080
     realm: keycloak
     logout-url: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
-    redirect-after-logout-url: https://www.google.com
+    redirect-after-logout-url: https://fairspace.com
     required-authority: user-workspace
 
   # Specify urls for security configuration. There are
@@ -17,6 +17,9 @@ app:
     - /account/authorizations
     - /storage
     - /metadata
+
+  forceHttps: true
+  sessionCookieName: JSESSIONID
 
 security:
   oauth2:
