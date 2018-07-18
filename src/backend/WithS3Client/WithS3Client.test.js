@@ -32,7 +32,7 @@ it('renders without crashing', () => {
 
 it('passes s3 client into all children', () => {
     const wrapper = mount(<WithS3Client><MockComponent property={['config', 'credentials', 'accessKeyId']}></MockComponent></WithS3Client>);
-    expect(wrapper.text()).toEqual('AKIAIOSFODNN7EXAMPLE');
+    expect(wrapper.text()).toEqual('not-needed');
 });
 
 it('sends credentials along with the API', () => {

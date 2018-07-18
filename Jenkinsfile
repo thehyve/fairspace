@@ -19,7 +19,7 @@ pipeline {
         steps {
           container(JENKINS_CONTAINER_TAG) {
             sh "npm install"
-            // sh "CI=true DISPLAY=:99 npm test"
+            sh "CI=true DISPLAY=:99 npm test"
             sh "npm run build"
           }
         }
