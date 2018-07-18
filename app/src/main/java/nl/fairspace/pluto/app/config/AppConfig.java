@@ -11,8 +11,8 @@ public class AppConfig {
     private AppOAuth2Config oauth2;
     private AppSecurityUrlConfig urls;
 
-    private String sessionCookieName;
-    private boolean forceHttps;
+    private String sessionCookieName = "JSESSIONID";
+    private boolean forceHttps = true;
 
 }
 

@@ -19,9 +19,6 @@ app:
     - /storage
     - /metadata
 
-  forceHttps: true
-  sessionCookieName: JSESSIONID
-
 security:
   oauth2:
     client:
