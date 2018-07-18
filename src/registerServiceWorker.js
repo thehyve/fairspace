@@ -22,7 +22,7 @@ const TEST_DOMAIN = 'test.fairdev.app';
 
 export default function register() {
   // Avoid service worker in test environments
-  if(window.location.indexOf(TEST_DOMAIN)) {
+  if(window.location.hostname.indexOf(TEST_DOMAIN)) {
       return;
   }
 
