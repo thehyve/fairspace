@@ -56,7 +56,7 @@ See also: [Ktor configuration](https://ktor.io/servers/configuration.html#availa
 ## How to use
 
 ```
-POST /models/mymodel/statements HTTP/1.1
+POST /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Content-Type: application/rdf+json
@@ -91,21 +91,21 @@ Content-Type: application/rdf+json
 ```
 
 ```
-GET /models/mymodel/statements HTTP/1.1
+GET /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Accept: application/rdf+json
 ```
 
 ```
-GET /models/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
+GET /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Accept: application/rdf+json
 ```
 
 ```
-DELETE /models/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
+DELETE /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Content-Type: application/rdf+json
