@@ -11,6 +11,7 @@ app:
     permitAll:
     - /actuator/health
     - /error
+    - /manifest.json
     needsAuthentication:
     - /account/name
     needsAuthorization:
