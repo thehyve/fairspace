@@ -89,15 +89,15 @@ private fun Route.restrictedApi() {
                 call.respond(HttpStatusCode.NoContent)
             }
             get {
-                val subject = call.request.queryParameters["subject"]
-                val predicate = call.request.queryParameters["predicate"]
+                val subject = call.parameters["subject"]
+                val predicate = call.parameters["predicate"]
 
                 val result = repository.list(model!!, subject, predicate)
                 call.respond(result)
             }
             delete {
-                val subject = call.request.queryParameters["subject"]
-                val predicate = call.request.queryParameters["predicate"]
+                val subject = call.parameters["subject"]
+                val predicate = call.parameters["predicate"]
 
                 repository.remove(model!!, subject, predicate)
                 call.respond(HttpStatusCode.NoContent)
