@@ -1,4 +1,4 @@
-package io.fairspace.neptune.business;
+package io.fairspace.neptune.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.net.URI;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TripleObject {
 
-    private String type;
+    private ObjectType type;
     private String value;
     private String lang;
     private URI dataType;

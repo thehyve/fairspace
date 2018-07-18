@@ -39,13 +39,15 @@ container.
 
 | Command | Description |
 | --- | --- |
-| GET /metadata?uri=|Retrieve the metadata assosciated with the corresponding uri |
+| GET /metadata?uri=|Retrieve the metadata associated with the corresponding uri |
 | POST /metadata| Store triples |
 | DELETE /metadata| Delete triples |
 | POST /metadata/predicate| Store a predicate with it's label |
 | DELETE /metadata/predicate| Delete a predicate with it's label |
 | POST /metadata/predicates| Store a list of  predicates with their label |
 | DELETE /metadata/predicates| Delete a list of predicate with their label |
+| GET /collections | Get collections' metadata |
+| POST /collections | Store metadata for a collection |
 
 ### JSON format
 #### Triple
@@ -98,4 +100,45 @@ container.
         }
     ]
 }
+```
+
+#### Store collection metadata
+
+```
+POST /collections HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "uri": "http://example.com/coll1",
+  "name": "Collection 1",
+  "description": "My first collection""
+}
+```
+
+#### Retrieve collection metadata
+
+```
+GET /collections HTTP/1.1
+Host: localhost:8080
+Accept: application/json
+
+```
+
+#### Response from GET /collections
+
+```json
+[
+    {
+        "uri": "http://example.com/coll1",
+        "name": "Collection 1",
+        "description": "My first collection"
+    },
+    {
+        "uri": "http://example.com/coll2",
+        "name": "Collection 2",
+        "description": "My second collection"
+    }    
+]
+
 ```

@@ -1,5 +1,6 @@
-package io.fairspace.neptune.business;
+package io.fairspace.neptune.service;
 
+import io.fairspace.neptune.model.Triple;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -14,4 +15,5 @@ public interface TripleService {
 
     void postTriples(List<Triple> triples);
 
+    List<Triple> executeConstructQuery(String query);
 }

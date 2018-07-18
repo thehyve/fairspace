@@ -1,7 +1,7 @@
 package io.fairspace.neptune.metadata.ceres;
 
-import io.fairspace.neptune.business.Triple;
-import io.fairspace.neptune.business.TripleService;
+import io.fairspace.neptune.model.Triple;
+import io.fairspace.neptune.service.TripleService;
 import io.fairspace.neptune.metadata.rdfjson.TriplesRdfJsonConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +11,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -29,41 +27,41 @@ public class CeresService implements TripleService {
     @Autowired
     RestTemplate restTemplate;
 
-    @Autowired
-    TriplesRdfJsonConverter triplesRdfJsonConverter;
+    @Value("${ceres.url}/model/default/statements/")
+    private String statementsEndpoint;
 
-    @Value("${ceres.url}")
-    URI ceresUri;
-
-    @Value("${ceres.endpoint}")
-    private String ceresApiEndpoint;
+    @Value("${ceres.url}/model/default/query/")
+    private String queryEndpoint;
 
     public List<Triple> retrieveTriples(URI uri) {
-        try {
-            Map<String, Map<String, List<Map<String, String>>>> result = restTemplate.exchange(ceresUri + ceresApiEndpoint + "?subject={uri}", HttpMethod.GET, GET_ENTITY, Map.class, uri).getBody();
-            return triplesRdfJsonConverter.convertRdfToTriples(result);
-        } catch (HttpClientErrorException e) {
-            log.error("Error", e);
-            throw new RuntimeException("Some context", e);
-        }
+            RdfJsonPayload result =
+                    restTemplate.exchange(statementsEndpoint + "?subject={uri}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, uri).getBody();
+            return TriplesRdfJsonConverter.convertRdfToTriples(result);
     }
 
 
     public void postTriples(List<Triple> triples) {
         HttpEntity entity = getRdfJsonEntity(triples);
-        restTemplate.postForEntity(ceresUri + ceresApiEndpoint, entity, void.class);
+        restTemplate.postForEntity(statementsEndpoint, entity, void.class);
+    }
+
+    @Override
+    public List<Triple> executeConstructQuery(String query) {
+        RdfJsonPayload result =
+                restTemplate.exchange(queryEndpoint + "?query={query}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, query).getBody();
+        return TriplesRdfJsonConverter.convertRdfToTriples(result);
     }
 
 
     public void deleteTriples(List<Triple> triples) {
         HttpEntity entity = getRdfJsonEntity(triples);
-        restTemplate.exchange(ceresUri + ceresApiEndpoint, HttpMethod.DELETE, entity, void.class);
+        restTemplate.exchange(statementsEndpoint, HttpMethod.DELETE, entity, void.class);
     }
 
     private HttpEntity getRdfJsonEntity(List<Triple> triples) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(RDF_JSON_MEDIA_TYPE);
-        return new HttpEntity(triplesRdfJsonConverter.convertTriplesToRdf(triples), httpHeaders);
+        return new HttpEntity(TriplesRdfJsonConverter.convertTriplesToRdf(triples), httpHeaders);
     }
 
     private static HttpEntity acceptRdfJsonHttpEntity() {

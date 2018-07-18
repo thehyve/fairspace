@@ -1,31 +1,32 @@
-package io.fairspace.neptune.business;
+package io.fairspace.neptune.service;
 
+import io.fairspace.neptune.model.PredicateInfo;
+import io.fairspace.neptune.model.Triple;
 import io.fairspace.neptune.web.CombinedTriplesWithPredicateInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class MetadataService {
 
     @Autowired
-    public TripleService tripleService;
+    private TripleService tripleService;
 
     @Autowired
-    public PredicateService predicateService;
+    private PredicateService predicateService;
 
     public CombinedTriplesWithPredicateInfo retrieveMetadata(URI uri) {
         List<Triple> triples = tripleService.retrieveTriples(uri);
-        List<PredicateInfo> predicateInfos = triples.stream()
+        Set<URI> predicates = triples.stream()
                 .map(Triple::getPredicate)
-                .distinct()
-                .map(predicate -> predicateService.retrievePredicateInfo(predicate))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+        List<PredicateInfo> predicateInfos = predicateService.retrievePredicateInfos(predicates);
+
         return new CombinedTriplesWithPredicateInfo(triples, predicateInfos);
     }
 
@@ -48,6 +49,5 @@ public class MetadataService {
     public void postPredicateInfo(PredicateInfo predicateInfo) {
         predicateService.insertPredicate(predicateInfo);
     }
-
 
 }
