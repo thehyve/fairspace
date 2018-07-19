@@ -1,4 +1,4 @@
-import internalConfig from "../../config";
+import internalConfig from "../../../config";
 import merge from 'deepmerge'
 
 class Config {

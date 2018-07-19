@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import Config from "../Config/Config";
+import Config from "../generic/Config/Config";
 
 beforeAll(() => {
     Config.setConfig({

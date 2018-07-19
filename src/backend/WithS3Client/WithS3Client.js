@@ -1,6 +1,6 @@
 import React from "react";
 import AWS from "aws-sdk/index";
-import Config from '../../components/Config/Config';
+import Config from '../../components/generic/Config/Config';
 
 /**
  * Passes a configured S3 client into the childrens props
