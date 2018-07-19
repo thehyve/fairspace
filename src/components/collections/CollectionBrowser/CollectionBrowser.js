@@ -3,6 +3,7 @@ import CollectionList from "../CollectionList/CollectionList";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import Typography from "@material-ui/core/Typography";
+import InformationDrawer from "../InformationDrawer/InformationDrawer";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -14,7 +15,9 @@ class CollectionBrowser extends React.Component {
         this.state = {
             loading: false,
             error: false,
-            collections: []
+
+            collections: [],
+            infoDrawerOpened: false
         };
     }
 
@@ -51,6 +54,23 @@ class CollectionBrowser extends React.Component {
         });
     }
 
+    handleCloseInfoDrawer(e) {
+        this.closeDrawer();
+    }
+
+    handleCollectionClick(collection) {
+        this.openDrawer();
+    }
+
+    openDrawer() {
+        this.setState({infoDrawerOpened: true});
+    }
+
+    closeDrawer() {
+        this.setState({infoDrawerOpened: false});
+    }
+
+
     render() {
         // Actual contents
         let contents;
@@ -60,7 +80,7 @@ class CollectionBrowser extends React.Component {
             contents = (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>)
         } else {
             contents = (<div>
-                    <CollectionList collections={this.state.collections}/>
+                    <CollectionList collections={this.state.collections} onCollectionClick={this.handleCollectionClick.bind(this)}/>
 
                     <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
                         <Icon>add</Icon>
@@ -74,6 +94,8 @@ class CollectionBrowser extends React.Component {
                 <Typography variant="title" paragraph={true} noWrap>{'Collections overview'}</Typography>
 
                 {contents}
+
+                <InformationDrawer open={this.state.infoDrawerOpened} onClose={this.handleCloseInfoDrawer.bind(this)}/>
             </div>
         );
     }

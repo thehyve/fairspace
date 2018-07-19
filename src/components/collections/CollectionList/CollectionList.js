@@ -8,7 +8,7 @@ function CollectionList(props) {
         return (
             <ul>
                 {props.collections.map(function (collection) {
-                    return (<li key={collection.Name}><Collection collection={collection}/></li>)
+                    return (<li key={collection.Name} onClick={() => props.onCollectionClick(collection)}><Collection collection={collection}/></li>)
                 })}
             </ul>
         );

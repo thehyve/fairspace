@@ -14,7 +14,7 @@ function MenuDrawer(props) {
         <Drawer
             variant="permanent"
             classes={{
-                paper: classes.drawerPaper,
+                paper: classes.menuDrawerPaper,
             }}
         >
             <div className={classes.toolbar} />
