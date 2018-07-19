@@ -27,6 +27,7 @@ class AuthenticationTest : BaseCeresTest() {
     private val algorithm = Algorithm.RSA256(keyPair.public as RSAPublicKey, keyPair.private as RSAPrivateKey)
     private val issuer = "https://jwt-provider-domain/"
     private val audience = "jwt-audience"
+    private val realm = "realm"
     private val keyId = "NkJCQzIyQzRBMEU4NjhGNUU4MzU4RkY0M0ZDQzkwOUQ0Q0VGNUMwQg"
     private val YESTERDAY = Date(Date().time - TimeUnit.DAYS.toMillis(1))
     private val TOMORROW = Date(Date().time + TimeUnit.DAYS.toMillis(1))
@@ -90,6 +91,7 @@ class AuthenticationTest : BaseCeresTest() {
             (environment.config as MapApplicationConfig).apply {
                 put("authentication.jwt.enabled", "true")
                 put("authentication.jwt.issuer", issuer)
+                put("authentication.jwt.realm", realm)
                 put("authentication.jwt.audience", audience)
             }
 

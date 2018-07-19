@@ -1,9 +1,6 @@
 package io.fairspace.ceres
 
-import com.typesafe.config.ConfigFactory
 import io.fairspace.ceres.repository.ModelRepository
-import io.ktor.config.ApplicationConfig
-import io.ktor.config.HoconApplicationConfig
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.RDFFormat
@@ -19,7 +16,6 @@ open class BaseCeresTest : KoinTest {
     private val context = applicationContext {
         bean { DatasetFactory.create() }
         bean { ModelRepository(get()) }
-        bean { HoconApplicationConfig(ConfigFactory.load()) as ApplicationConfig }
     }
 
     val personURI = "http://somewhere/JohnSmith"

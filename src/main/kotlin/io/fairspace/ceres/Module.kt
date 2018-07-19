@@ -28,14 +28,12 @@ fun Application.ceresModule() {
 }
 
 private fun Application.installAuthentication() {
-    val cfg = environment.config.config("authentication.jwt")
-    if (cfg.property("enabled").getString().toBoolean()) {
+    if (environment["authentication.jwt.enabled"].toBoolean()) {
         install(Authentication) {
             jwt {
-                val issuer = cfg.property("issuer").getString()
-                realm = cfg.propertyOrNull("realm")?.getString() ?: "fairspace"
+                realm = environment["authentication.jwt.realm"]
                 validate { credentials -> JWTPrincipal(credentials.payload) }
-                verifier(get(), issuer)
+                verifier(get(), environment["authentication.jwt.issuer"])
             }
         }
     }
@@ -65,12 +63,9 @@ private fun Application.configureRouting() {
             call.respondText("Hi, I'm Ceres!", ContentType.Text.Plain)
         }
 
-        if (featureOrNull(Authentication) != null) {
-            authenticate {
-                restrictedApi()
-            }
-        } else {
-            restrictedApi()
+        when (featureOrNull(Authentication)) {
+            null -> restrictedApi()
+            else -> authenticate { restrictedApi() }
         }
     }
 }
@@ -91,15 +86,15 @@ private fun Route.restrictedApi() {
                 call.respond(HttpStatusCode.NoContent)
             }
             get {
-                val subject = call.request.queryParameters["subject"]
-                val predicate = call.request.queryParameters["predicate"]
+                val subject = call.parameters["subject"]
+                val predicate = call.parameters["predicate"]
 
                 val result = repository.list(model!!, subject, predicate)
                 call.respond(result)
             }
             delete {
-                val subject = call.request.queryParameters["subject"]
-                val predicate = call.request.queryParameters["predicate"]
+                val subject = call.parameters["subject"]
+                val predicate = call.parameters["predicate"]
 
                 repository.remove(model!!, subject, predicate)
                 call.respond(HttpStatusCode.NoContent)
