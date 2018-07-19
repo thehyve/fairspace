@@ -63,12 +63,9 @@ private fun Application.configureRouting() {
             call.respondText("Hi, I'm Ceres!", ContentType.Text.Plain)
         }
 
-        if (featureOrNull(Authentication) != null) {
-            authenticate {
-                restrictedApi()
-            }
-        } else {
-            restrictedApi()
+        when (featureOrNull(Authentication)) {
+            null -> restrictedApi()
+            else -> authenticate { restrictedApi() }
         }
     }
 }
