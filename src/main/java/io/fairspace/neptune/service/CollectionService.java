@@ -10,10 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -48,9 +47,12 @@ public class CollectionService {
     private static List<Triple> toTriples(Collection collection) {
         String subject = collection.getUri().toString();
         return Arrays.asList(
-                new Triple(subject, Rdf.TYPE, new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
-                new Triple(subject, Fairspace.NAME, new TripleObject(ObjectType.literal, collection.getName(), null, null)),
-                new Triple(subject, Fairspace.DESCRIPTION, new TripleObject(ObjectType.literal, collection.getDescription(), null, null))
+                new Triple(subject, Rdf.TYPE,
+                        new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
+                new Triple(subject, Fairspace.NAME,
+                        new TripleObject(ObjectType.literal, requireNonNull(collection.getName(), "Collection name is mandatory"), null, null)),
+                new Triple(subject, Fairspace.DESCRIPTION,
+                        new TripleObject(ObjectType.literal, Optional.ofNullable(collection.getDescription()).orElse(""), null, null))
         );
     }
 
