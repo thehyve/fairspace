@@ -14,7 +14,7 @@ data:
         base-url: {{ .Values.app.oauth2.baseUrl }}
         realm: {{ .Values.app.oauth2.realm }}
     ceres:
-      url: {{ .Values.ceres.url }}
+      url: {{ .Values.ceres.url | default (printf "http://%s-ceres.%s:9000" .Release.Name .Release.Namespace)}}
       model: {{ .Values.ceres.model }}
     spring:
       datasource:

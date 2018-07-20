@@ -34,7 +34,7 @@ readinessProbe:
 terminationGracePeriodSeconds: 10
 
 ceres:
-  url: http://localhost:8001
+  url:
   model: default
 
 app:
