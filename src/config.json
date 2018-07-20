@@ -5,5 +5,12 @@
     "authorizations": "/account/authorizations",
     "storage": ""
   },
-  "externalConfigurationFiles": ["/config/config.json"]
+
+  "externalConfigurationFiles": ["/config/config.json"],
+
+  "metadata": {
+    "urlPatterns": {
+      "collections": "http://fairspace.com/iri/collections/{id}"
+    }
+  }
 }

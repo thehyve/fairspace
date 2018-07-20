@@ -6,7 +6,14 @@ import Config from "../../components/generic/Config/Config"
 const FetchUsername = (props) => {
     return (
         <Fetch url={Config.get().urls.accountName}>
-            {props.children}
+            {(fetch) => {
+                // Store username in config to be able to use it anywhere
+                if (fetch.data) {
+                    Config.get().user = fetch.data;
+                }
+
+                return props.children(fetch);
+            }}
         </Fetch>
     )
 }

@@ -48,8 +48,8 @@ class UserMenu extends React.Component {
         return (
             <div>
                 <FetchUsername>
-                    {({fetching, data, error}) => {
-                        if (fetching) {
+                    {({isFetching, data, error}) => {
+                        if (isFetching) {
                             return "Unknown";
                         }
                         if (data) {

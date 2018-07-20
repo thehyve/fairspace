@@ -71,6 +71,10 @@ class Config {
         return this.fullConfig;
     }
 
+    /**
+     * Sets the internal configuration. Can be used for testing purposes
+     * @param configuration
+     */
     setConfig(configuration) {
         this.internalConfig = configuration;
     }

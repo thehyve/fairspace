@@ -5,10 +5,15 @@ const storagePort = 5001;
 
 // Start a generic server on port 5000 that serves default API
 const app = express();
-app.get('/account/name', (req, res) => res.send({username: 'John Butler'}));
-app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "ROLE_USER"]));
 app.get('/config/config.json', (req, res) => res.send({ urls: { storage: 'http://localhost:5001' }}));
 app.get('/api/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
+
+// Account API
+app.get('/account/name', (req, res) => res.send({username: 'John Butler'}));
+app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "ROLE_USER"]));
+
+// Metadata API
+app.post('/metadata/collections', (req, res) => res.send());
 
 app.listen(port, () => console.log('Backend stub listening on port ' + port ))
 
