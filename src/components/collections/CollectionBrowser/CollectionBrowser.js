@@ -64,6 +64,7 @@ class CollectionBrowser extends React.Component {
     }
 
     generateId() {
+        // TODO: Determine the best way to generate a new id
         return '' + (Math.random() * 10000000);
     }
 
@@ -78,6 +79,7 @@ class CollectionBrowser extends React.Component {
                 console.error("An error occurred while creating a collection", err);
             } else {
                 // Store information about the name
+                // TODO: Determine the default description to be set
                 this.metadataStore.addCollectionMetadata({
                     id: collectionId,
                     name: Config.get().user.username + "'s collection",
