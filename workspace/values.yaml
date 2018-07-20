@@ -135,6 +135,11 @@ minio:
   persistence:
     enabled: true
 
+# Specific setting for mercury on what url to access the storage
+mercury:
+  urls:
+    storage:
+
 # Specific settings for Ceres subchart
 ceres:
     persistence:
@@ -150,3 +155,4 @@ ceres:
           issuer: 
           realm: 
           audience: 
+
