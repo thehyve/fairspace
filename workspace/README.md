@@ -46,6 +46,17 @@ pluto:
 minio:
   accessKey: IFGZ2M0W8LB0C92FYA3J
   secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
+
+ceres:
+    persistence:
+      size: 8Gi
+    ceres:
+      auth:
+        enabled: true
+        jwt:
+          issuer: 
+          realm: 
+          audience: 
 ```
 
 After that, you can install the chart using helm. More details on the parameters can be found below.
@@ -86,6 +97,17 @@ pluto:
 minio:
   accessKey: IFGZ2M0W8LB0C92FYA3J
   secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
+
+ceres:
+    persistence:
+      size: 8Gi
+    ceres:
+      auth:
+        enabled: true
+        jwt:
+          issuer: 
+          realm: 
+          audience: 
 ```
 
 It can be installed in the same way as above.

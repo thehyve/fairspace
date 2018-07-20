@@ -139,3 +139,20 @@ minio:
 mercury:
   urls:
     storage:
+
+# Specific settings for Ceres subchart
+ceres:
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 8Gi
+      subPath: "ceres-db"
+      mountPath: /data/ceres
+    ceres:
+      auth:
+        enabled: true
+        jwt:
+          issuer: 
+          realm: 
+          audience: 
+
