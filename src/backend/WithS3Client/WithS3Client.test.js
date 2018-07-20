@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import WithS3Client from './WithS3Client';
 import Config from "../../components/generic/Config/Config";
 import {mount} from "enzyme";
+import configFile from "../../config";
 
 const MockComponent = function(props) {
     let {property, s3} = props;
@@ -17,9 +18,9 @@ const MockComponent = function(props) {
 }
 
 beforeAll(() => {
-    Config.setConfig({
-        "externalConfigurationFiles": []
-    });
+    Config.setConfig(Object.assign(configFile, {
+        "externalConfigurationFiles": [],
+    }));
 
     return Config.init();
 });

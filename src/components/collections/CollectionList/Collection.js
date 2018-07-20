@@ -6,8 +6,8 @@ function Collection(props) {
 
     return (
         <div>
-            <Typography variant="subheading">{collection.Name}</Typography>
-            <Typography>Created on: {collection.CreationDate.toLocaleDateString()}</Typography>
+            <Typography variant="headline">{collection.name}</Typography>
+            <Typography variant="subheading">{collection.description}</Typography>
         </div>
     );
 }

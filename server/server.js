@@ -14,6 +14,7 @@ app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "R
 
 // Metadata API
 app.post('/metadata/collections', (req, res) => res.send());
+app.get('/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-metadata.json'));
 
 app.listen(port, () => console.log('Backend stub listening on port ' + port ))
 

@@ -2,11 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import Config from "../generic/Config/Config";
+import configFile from "../../config";
 
 beforeAll(() => {
-    Config.setConfig({
-        "externalConfigurationFiles": []
-    });
+    Config.setConfig(Object.assign(configFile, {
+        "externalConfigurationFiles": [],
+    }));
 
     return Config.init();
 });
