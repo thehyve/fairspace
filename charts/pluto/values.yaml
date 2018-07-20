@@ -28,6 +28,9 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 terminationGracePeriodSeconds: 10
+rollingUpdate:
+  maxUnavailable: 25%
+  maxSurge: 25%
 
 # Secret name to be used for oauth credentials can be set
 # to read the credentials from a secret instead of passing them

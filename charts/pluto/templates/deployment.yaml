@@ -21,6 +21,10 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
+      strategy:
+        rollingUpdate:
+          maxSurge: {{ .Values.rollingUpdate.maxSurge | default "25%" }}
+          maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable | default "25%" }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
