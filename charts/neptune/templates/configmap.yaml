@@ -15,7 +15,7 @@ data:
         realm: {{ .Values.app.oauth2.realm }}
     ceres:
       url: {{ .Values.ceres.url }}
-      endpoint: {{ .Values.ceres.endpoint }}
+      model: {{ .Values.ceres.model }}
     spring:
       datasource:
         url: "jdbc:postgresql://{{ .Release.Name }}-{{ .Values.postgresql.nameOverride }}:5432/{{ .Values.postgresql.postgresDatabase }}"
