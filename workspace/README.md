@@ -57,6 +57,12 @@ ceres:
           issuer: 
           realm: 
           audience: 
+
+neptune:
+    app:
+      oauth2:
+        baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
+        realm: hyperspace
 ```
 
 After that, you can install the chart using helm. More details on the parameters can be found below.
@@ -105,9 +111,21 @@ ceres:
       auth:
         enabled: true
         jwt:
-          issuer: 
-          realm: 
+          # Provide your own keycloak settings here
+          issuer: http://192.168.99.100:30867
+          realm: hyperspace
           audience: 
+
+neptune:
+    ceres:
+      url: 
+      model: default
+
+    app:
+      oauth2:
+         # Provide your own keycloak settings here
+        baseUrl: http://192.168.99.100:30867
+        realm: hyperspace
 ```
 
 It can be installed in the same way as above.
@@ -173,6 +191,25 @@ describes the most important settings for a workspace. See the `values.yaml` fil
 | `minio.secretKey` | Default secret key (8 to 40 characters) for Minio | xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB |
 | `minio.persistence.enabled` | Use persistent volume to store data | true |
 
+#### Ceres parameters
+| Parameter  | Description  | Default |
+|---|---|---|
+| `ceres.ceres.persistence.size` | Size of the persistent volume. | `8Gi` |
+| `ceres.ceres.auth.enabled` | Enables authentication | `true` |
+| `ceres.ceres.auth.jwt.issuer` | Base url for the JWT issuer instance to communicate with. For example: `https://keycloak.hyperspace.fairspace.app` | |
+| `ceres.ceres.auth.jwt.realm` | Realm that is used for authentication | |
+
+#### Neptune parameters
+| Parameter  | Description  | Default |
+|---|---|---|
+| `neptune.postgresql.postgresUser` | Name of the user within postgres | postgres |
+| `neptune.postgresql.postgresDatabase` | Name of the postgres database | test123 |
+| `neptune.postgresql.postgresPassword` | Password for `postgresql.postgresUser` | postgres |
+| `neptune.postgresql.nameOverride` | Name of the app | neptune-postgresql |
+| `neptune.app.oauth2.baseUrl` | URL where the oauth2 provider is running |  |
+| `neptune.app.oauth2.realm` | The realm that you want to use |  |
+| `neptune.ceres.url` | URL where Ceres service is running | |
+| `neptune.ceres.endpoint` | Endpoint of Ceres where queries can be send to | /model/mymodel/statements |
 
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:
