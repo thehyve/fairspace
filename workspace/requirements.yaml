@@ -15,7 +15,7 @@ dependencies:
   version: v0.1.x
   repository: https://chartmuseum.jx.test.fairdev.app/
 - name: neptune
-  version: v0.1.x
+  version: v0.2.x
   repository: https://chartmuseum.jx.test.fairdev.app/
 - name: minio
   version: v1.3.4
