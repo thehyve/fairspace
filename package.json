@@ -17,12 +17,15 @@
     "react-test-renderer": "^16.4.1"
   },
   "scripts": {
+    "dev": "concurrently \"yarn server\" \"yarn start\"",
+    "server": "node server/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "cors": "^2.8.4"
+    "cors": "^2.8.4",
+    "concurrently": "^3.5.0"
   }
 }
