@@ -49,11 +49,7 @@ minio:
 
 ceres:
     persistence:
-      enabled: true
-      accessMode: ReadWriteOnce
       size: 8Gi
-      subPath: "ceres-db"
-      mountPath: /data/ceres
     ceres:
       auth:
         enabled: true
@@ -104,11 +100,7 @@ minio:
 
 ceres:
     persistence:
-      enabled: true
-      accessMode: ReadWriteOnce
       size: 8Gi
-      subPath: "ceres-db"
-      mountPath: /data/ceres
     ceres:
       auth:
         enabled: true
