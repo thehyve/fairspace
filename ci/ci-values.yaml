@@ -30,3 +30,20 @@ mercury:
 minio:
   accessKey: IFGZ2M0W8LB0C92FYA3J
   secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
+
+# Specific settings for Ceres subchart
+ceres:
+    ceres:
+      auth:
+        enabled: true
+        jwt:
+          issuer: https://keycloak.hyperspace.ci.test.fairdev.app
+          realm: ci
+          audience: 
+
+# Specific settings for Neptune subchart
+neptune:
+    app:
+      oauth2:
+        baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
+        realm: ci
