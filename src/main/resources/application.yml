@@ -19,7 +19,7 @@ spring:
 # Pointer to the Ceres service
 ceres:
   url: "http://localhost:8001"
-  endpoint: "/model/mymodel/statements"
+  model: "default"
 
 # Security configuration
 security:

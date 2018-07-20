@@ -27,10 +27,10 @@ public class CeresService implements TripleService {
     @Autowired
     RestTemplate restTemplate;
 
-    @Value("${ceres.url}/model/default/statements/")
+    @Value("${ceres.url}/model/${ceres.model}/statements/")
     private String statementsEndpoint;
 
-    @Value("${ceres.url}/model/default/query/")
+    @Value("${ceres.url}/model/${ceres.model}/query/")
     private String queryEndpoint;
 
     public List<Triple> retrieveTriples(URI uri) {
