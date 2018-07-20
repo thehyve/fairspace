@@ -4,12 +4,14 @@ import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import Typography from "@material-ui/core/Typography";
 import InformationDrawer from "../InformationDrawer/InformationDrawer";
+import Config from "../../generic/Config/Config";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
         this.s3Client = props.s3;
+        this.metadataStore = props.metadataStore;
 
         // Initialize state
         this.state = {
@@ -25,31 +27,71 @@ class CollectionBrowser extends React.Component {
         this.loadCollections();
     }
 
+    componentWillUnmount() {
+        this.isUnmounting = true;
+    }
+
     loadCollections() {
         this.setState({loading: true});
+
         this.s3Client.listBuckets((err, buckets) => {
+            if(this.isUnmounting) {
+                return;
+            }
+
             if (err) {
-                console.error(err);
+                console.error("An error occurred while loading collections", err);
                 this.setState({error: true, loading: false});
             } else {
-                this.setState({loading: false, collections: buckets.Buckets});
+                this.metadataStore
+                    .getCollectionMetadata(buckets.Buckets.map(bucket => bucket.Name))
+                    .then((collections) => {
+                        if(this.isUnmounting) {
+                            return;
+                        }
+
+                        this.setState({loading: false, collections: collections});
+                    }).catch((e) => {
+                        if(this.isUnmounting) {
+                            return;
+                        }
+
+                        console.error("An error occurred while loading collection metadata", e);
+                        this.setState({error: true, loading: false});
+                    });
             }
         });
     }
 
     generateId() {
+        // TODO: Determine the best way to generate a new id
         return '' + (Math.random() * 10000000);
     }
 
     handleAddClick(e) {
+        const collectionId = this.generateId();
+
+        // Create the bucket in storage
         this.s3Client.createBucket({
-            'Bucket': this.generateId()
+            'Bucket': collectionId
         }, (err) => {
             if(err) {
-                console.error("An error occurred while creating a bucket", err);
+                console.error("An error occurred while creating a collection", err);
             } else {
-                // Load collections after creating a bucket
-                this.loadCollections();
+                // Store information about the name
+                // TODO: Determine the default description to be set
+                this.metadataStore.addCollectionMetadata({
+                    id: collectionId,
+                    name: Config.get().user.username + "'s collection",
+                    description: "Beyond the horizon"
+                }).then(() => {
+                    // Load collections after creating a bucket
+                    this.loadCollections();
+                }).catch((e) => {
+                    // Load collections as a new bucket has been created, but without metadata
+                    this.loadCollections();
+                    console.error("An error occurred while adding collection metadata", e);
+                });
             }
         });
     }
@@ -81,7 +123,6 @@ class CollectionBrowser extends React.Component {
         } else {
             contents = (<div>
                     <CollectionList collections={this.state.collections} onCollectionClick={this.handleCollectionClick.bind(this)}/>
-
                     <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
                         <Icon>add</Icon>
                     </Button>
