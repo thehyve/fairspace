@@ -159,7 +159,6 @@ ceres:
 # Specific settings for Neptune subchart
 neptune:
     ceres:
-      url: 
       model: default
 
     app:
