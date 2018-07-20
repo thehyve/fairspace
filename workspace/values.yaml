@@ -156,13 +156,3 @@ ceres:
           realm: 
           audience: 
 
-# Specific settings for Neptune subchart
-neptune:
-    ceres:
-      url: 
-      model: default
-
-    app:
-      oauth2:
-        baseUrl: 
-        realm: 
