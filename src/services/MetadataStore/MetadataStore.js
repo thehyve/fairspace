@@ -1,5 +1,11 @@
 import Config from "../../components/generic/Config/Config";
 
+function failOnHttpError(response, message) {
+    if(!response.ok) {
+        throw Error(message, response.error);
+    }
+}
+
 class MetadataStore {
     static postHeaders = new Headers({'Content-Type': 'application/json'});
     static getHeaders = new Headers({'Accept': 'application/json'});
@@ -35,9 +41,7 @@ class MetadataStore {
             credentials: "same-origin",
             body: JSON.stringify(body)
         }).then((response) => {
-            if(!response.ok) {
-                throw Error("Failure when adding collection to the metadata store", response.error);
-            }
+            failOnHttpError(response, "Failure when adding collection to the metadata store");
 
             return response;
         });
@@ -55,9 +59,7 @@ class MetadataStore {
             credentials: "same-origin"
         }).then((response) => {
             // Handle error or convert to json
-            if(!response.ok) {
-                throw Error("Failure when retrieving collection metadata", response.error);
-            }
+            failOnHttpError(response, "Failure when retrieving collection metadata");
 
             return response.json();
         }).then(json => {
