@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import './App.css';
 import styles from './App.styles';
-import TopBar from "../TopBar/TopBar";
-import MenuDrawer from "../MenuDrawer/MenuDrawer";
-import AuthorizationCheck from "../AuthorizationCheck/AuthorizationCheck";
-import Config from "../Config/Config";
+import TopBar from "../layout/TopBar/TopBar";
+import MenuDrawer from "../layout/MenuDrawer/MenuDrawer";
+import AuthorizationCheck from "../generic/AuthorizationCheck/AuthorizationCheck";
+import Config from "../generic/Config/Config";
 
 import {BrowserRouter as Router, Route} from "react-router-dom";
 import Home from "../../pages/Home/Home";
-import Files from "../../pages/Files/Files";
+import Collections from "../../pages/Collections/Collections";
 import Notebooks from "../../pages/Notebooks/Notebooks";
 
 class App extends React.Component {
@@ -62,7 +62,7 @@ class App extends React.Component {
                                 <div className={this.classes.toolbar}/>
 
                                 <Route exact path="/" component={Home}/>
-                                <Route path="/files" component={Files}/>
+                                <Route path="/collections" component={Collections}/>
                                 <Route path="/notebooks" component={Notebooks}/>
 
                                 {/* Handle auth urls that should go to the server */}

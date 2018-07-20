@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import Fetch from "../../backend/Fetch/Fetch";
+import Fetch from "../../../backend/Fetch/Fetch";
 import Config from "../Config/Config";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";

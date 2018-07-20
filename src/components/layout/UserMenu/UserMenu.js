@@ -4,7 +4,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from "@material-ui/core/Avatar";
 import { withStyles } from '@material-ui/core/styles';
-import FetchUsername from "../../backend/FetchUsername/FetchUsername";
+import FetchUsername from "../../../backend/FetchUsername/FetchUsername";
 
 const styles = {
     row: {

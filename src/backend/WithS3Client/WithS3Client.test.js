@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import WithS3Client from './WithS3Client';
-import Config from "../../components/Config/Config";
+import Config from "../../components/generic/Config/Config";
 import {mount} from "enzyme";
 
 const MockComponent = function(props) {

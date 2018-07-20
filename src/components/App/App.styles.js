@@ -1,4 +1,4 @@
-const drawerWidth = 240;
+const menuDrawerWidth = 240;
 
 const styles = theme => ({
     root: {
@@ -12,9 +12,9 @@ const styles = theme => ({
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
     },
-    drawerPaper: {
+    menuDrawerPaper: {
         position: 'relative',
-        width: drawerWidth,
+        width: menuDrawerWidth,
     },
     content: {
         flexGrow: 1,

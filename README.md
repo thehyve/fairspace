@@ -3,11 +3,15 @@
 This application contains a portal UI for within a workspace. The UI is based on 
 [material-ui](https://material-ui.com/).
 
-### Running the app
-The app needs a backend to communicate with. It is supposed to run on localhost port 5000. For development purposes,
-you can use the provided `express.js` server by running `node server/server.js` in a separate tab.
+### Running the app in development mode
+The app needs a backend to communicate with. For convenience, there are 2 npm/yarn scripts
+to use for local development:
 
-To get the app itself running, enter `yarn start`. This requires you to have [yarn](https://yarnpkg.com/lang/en/) installed.
+`yarn server` starts the backend server at port 5000. It can be configured in the file `server/server.js`
+`yarn dev` starts the server and the app itself (`yarn start`) concurrently.   
+
+This requires you to have [yarn](https://yarnpkg.com/lang/en/) installed. Alternatively, it should also
+work with npm (`npm server` and `npm dev`)
 
 ### External configuration
 This application loads external configuration from the url `/config/config.json`. This file can locally be 

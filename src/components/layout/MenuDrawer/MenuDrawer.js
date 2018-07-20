@@ -14,7 +14,7 @@ function MenuDrawer(props) {
         <Drawer
             variant="permanent"
             classes={{
-                paper: classes.drawerPaper,
+                paper: classes.menuDrawerPaper,
             }}
         >
             <div className={classes.toolbar} />
@@ -26,11 +26,11 @@ function MenuDrawer(props) {
                         </ListItemIcon>
                         <ListItemText primary="Home" />
                     </ListItem>
-                    <ListItem component={Link} to="/files" button>
+                    <ListItem component={Link} to="/collections" button>
                         <ListItemIcon>
                             <Icon>folder_open</Icon>
                         </ListItemIcon>
-                        <ListItemText primary="Files" />
+                        <ListItemText primary="Collections" />
                     </ListItem>
                     <ListItem component={Link} to="/notebooks" button>
                         <ListItemIcon>
