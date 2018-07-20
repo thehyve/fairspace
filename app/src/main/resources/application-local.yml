@@ -17,3 +17,16 @@ zuul:
       url: http://192.168.99.100:31098/
     ui:
       url: http://192.168.99.100:30721/
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include:
+        - health
+        - info
+        - httptrace
+
+
+
