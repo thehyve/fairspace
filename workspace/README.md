@@ -59,10 +59,6 @@ ceres:
           audience: 
 
 neptune:
-    ceres:
-      url: 
-      model: default
-
     app:
       oauth2:
         baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
