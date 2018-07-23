@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -22,10 +23,12 @@ import java.util.List;
 public class CeresService implements TripleService {
 
     private static final MediaType RDF_JSON_MEDIA_TYPE = new MediaType("application", "rdf+json");
-    private static final HttpEntity GET_ENTITY = acceptRdfJsonHttpEntity();
 
     @Autowired
     RestTemplate restTemplate;
+    
+    @Autowired
+    private HttpServletRequest incomingRequest;
 
     @Value("${ceres.url}/model/${ceres.model}/statements/")
     private String statementsEndpoint;
@@ -35,7 +38,7 @@ public class CeresService implements TripleService {
 
     public List<Triple> retrieveTriples(URI uri) {
             RdfJsonPayload result =
-                    restTemplate.exchange(statementsEndpoint + "?subject={uri}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, uri).getBody();
+                    restTemplate.exchange(statementsEndpoint + "?subject={uri}", HttpMethod.GET, acceptRdfJsonHttpEntity(), RdfJsonPayload.class, uri).getBody();
             return TriplesRdfJsonConverter.convertRdfToTriples(result);
     }
 
@@ -48,7 +51,7 @@ public class CeresService implements TripleService {
     @Override
     public List<Triple> executeConstructQuery(String query) {
         RdfJsonPayload result =
-                restTemplate.exchange(queryEndpoint + "?query={query}", HttpMethod.GET, GET_ENTITY, RdfJsonPayload.class, query).getBody();
+                restTemplate.exchange(queryEndpoint + "?query={query}", HttpMethod.GET, acceptRdfJsonHttpEntity(), RdfJsonPayload.class, query).getBody();
         return TriplesRdfJsonConverter.convertRdfToTriples(result);
     }
 
@@ -68,12 +71,14 @@ public class CeresService implements TripleService {
     private HttpEntity getRdfJsonEntity(List<Triple> triples) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(RDF_JSON_MEDIA_TYPE);
+        httpHeaders.set(HttpHeaders.AUTHORIZATION, incomingRequest.getHeader(HttpHeaders.AUTHORIZATION));
         return new HttpEntity(TriplesRdfJsonConverter.convertTriplesToRdf(triples), httpHeaders);
     }
 
-    private static HttpEntity acceptRdfJsonHttpEntity() {
+    private HttpEntity acceptRdfJsonHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(RDF_JSON_MEDIA_TYPE));
+        headers.set(HttpHeaders.AUTHORIZATION, incomingRequest.getHeader(HttpHeaders.AUTHORIZATION));
         return new HttpEntity<>("", headers);
     }
 
