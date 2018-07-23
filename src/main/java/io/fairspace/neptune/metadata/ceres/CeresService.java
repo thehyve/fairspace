@@ -59,8 +59,10 @@ public class CeresService implements TripleService {
     }
 
     public void patchTriples(List<Triple> triples) {
-        HttpEntity entity = getRdfJsonEntity(triples);
-        restTemplate.exchange(statementsEndpoint, HttpMethod.PATCH, entity, Void.class);
+        if(!triples.isEmpty()) {
+            HttpEntity entity = getRdfJsonEntity(triples);
+            restTemplate.exchange(statementsEndpoint, HttpMethod.PATCH, entity, Void.class);
+        }
     }
 
     private HttpEntity getRdfJsonEntity(List<Triple> triples) {
