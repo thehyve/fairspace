@@ -96,4 +96,45 @@ public class CollectionServiceTest {
         assertEquals(COLLECTION_NAME, collections.get(0).getName());
         assertEquals(COLLECTION_DESCRIPTION, collections.get(0).getDescription());
     }
+
+    @Test
+    public void collectionsWithPropertiesShouldHavePatchableName() {
+        Collection c = new Collection();
+        c.setUri(URI.create(COLLECTION_URI));
+        c.setName(COLLECTION_NAME);
+        c.setDescription(COLLECTION_DESCRIPTION);
+
+        collectionService.createCollection(c);
+
+        c.setName(COLLECTION_NAME+"test");
+
+        collectionService.patchCollection(c);
+
+        verify(tripleService, times(1)).patchTriples(Arrays.asList(
+                new Triple(COLLECTION_URI, Fairspace.NAME,
+                        new TripleObject(ObjectType.literal, COLLECTION_NAME+"test", null, null)),
+                new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
+                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION, null, null))));
+    }
+
+    @Test
+    public void collectionsWithPropertiesShouldHavePatchableDescription() {
+        Collection c = new Collection();
+        c.setUri(URI.create(COLLECTION_URI));
+        c.setName(COLLECTION_NAME);
+        c.setDescription(COLLECTION_DESCRIPTION);
+
+        collectionService.createCollection(c);
+
+        c.setDescription(COLLECTION_DESCRIPTION+"test");
+
+        collectionService.patchCollection(c);
+
+        verify(tripleService, times(1)).patchTriples(Arrays.asList(
+                new Triple(COLLECTION_URI, Fairspace.NAME,
+                        new TripleObject(ObjectType.literal, COLLECTION_NAME, null, null)),
+                new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
+                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION+"test", null, null))));
+    }
+
 }
