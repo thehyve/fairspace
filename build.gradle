@@ -40,6 +40,7 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.apache.httpcomponents:httpclient")
 
     if (isDev){
         compile("com.h2database:h2")

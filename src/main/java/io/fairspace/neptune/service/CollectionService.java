@@ -28,8 +28,11 @@ public class CollectionService {
 
 
     public void createCollection(Collection collection) {
-
         tripleService.postTriples(toTriples(collection));
+    }
+
+    public void patchCollection(Collection collection) {
+        tripleService.patchTriples(toTriplesForUpdate(collection));
     }
 
     public List<Collection> getCollections() {
@@ -54,6 +57,22 @@ public class CollectionService {
                 new Triple(subject, Fairspace.DESCRIPTION,
                         new TripleObject(ObjectType.literal, Optional.ofNullable(collection.getDescription()).orElse(""), null, null))
         );
+    }
+
+    private static List<Triple> toTriplesForUpdate(Collection collection) {
+        String subject = collection.getUri().toString();
+        List<Triple> triples = new ArrayList<>();
+        if (collection.getName() != null) {
+            triples.add(new Triple(subject, Fairspace.NAME,
+                    new TripleObject(ObjectType.literal, collection.getName(), null, null))
+            );
+        }
+        if (collection.getDescription() != null) {
+            triples.add(new Triple(subject, Fairspace.DESCRIPTION,
+                    new TripleObject(ObjectType.literal, collection.getDescription(), null, null))
+            );
+        }
+        return triples;
     }
 
     private static Collection fromTriples(List<Triple> triples) {
