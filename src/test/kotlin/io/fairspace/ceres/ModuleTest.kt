@@ -21,18 +21,18 @@ class ModuleTest: BaseCeresTest() {
      fun `Test Post and Get`() {
         test {
              with(handleRequest(HttpMethod.Post, "/model/test/statements") {
-                 addHeader(HttpHeaders.ContentType, RDF_JSON)
-                 setBody(model.toString(RDFFormat.RDFJSON))
+                 addHeader(HttpHeaders.ContentType, JSONLD)
+                 setBody(model.toString(RDFFormat.JSONLD))
              }) {
                  assertEquals(HttpStatusCode.NoContent, response.status())
              }
 
              with(handleRequest(HttpMethod.Get, "/model/test/statements") {
-                 addHeader(HttpHeaders.Accept, RDF_JSON)
+                 addHeader(HttpHeaders.Accept, JSONLD)
              }) {
                  assertEquals(HttpStatusCode.OK, response.status())
-                 assertEquals(RDF_JSON, response.headers[HttpHeaders.ContentType])
-                 val model = RDFFormat.RDFJSON.parse(response.content!!)
+                 assertEquals(JSONLD, response.headers[HttpHeaders.ContentType])
+                 val model = RDFFormat.JSONLD.parse(response.content!!)
                  assertFalse(this@ModuleTest.model == model)
                  assertTrue(this@ModuleTest.model.isIsomorphicWith(model))
              }
@@ -66,7 +66,7 @@ class ModuleTest: BaseCeresTest() {
     fun `Test invalid body handling`() {
         test {
             with(handleRequest(HttpMethod.Post, "/model/test/statements") {
-                addHeader(HttpHeaders.ContentType, RDF_JSON)
+                addHeader(HttpHeaders.ContentType, JSONLD)
                 setBody("{'a':1}")
             }) {
                 assertEquals(HttpStatusCode.InternalServerError, response.status())
