@@ -15,5 +15,7 @@ public interface TripleService {
 
     void postTriples(List<Triple> triples);
 
+    void patchTriples(List<Triple> triples);
+
     List<Triple> executeConstructQuery(String query);
 }
