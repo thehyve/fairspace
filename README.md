@@ -59,7 +59,7 @@ See also: [Ktor configuration](https://ktor.io/servers/configuration.html#availa
 POST /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Content-Type: application/rdf+json
+Content-Type: application/ld+json
 
 { 
   "http://somewhere/BillKidd" : { 
@@ -94,19 +94,19 @@ Content-Type: application/rdf+json
 GET /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Accept: application/rdf+json
+Accept: application/ld+json
 ```
 
 ```
 GET /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Accept: application/rdf+json
+Accept: application/ld+json
 ```
 
 ```
 DELETE /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Content-Type: application/rdf+json
+Content-Type: application/ld+json
 ```
