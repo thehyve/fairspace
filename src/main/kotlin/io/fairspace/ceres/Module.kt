@@ -102,8 +102,12 @@ private fun Route.restrictedApi() {
             patch {
                 val delta = call.receive<Model>()
 
-                repository.update(model!!, delta)
-                call.respond(HttpStatusCode.NoContent)
+                try {
+                    repository.update(model!!, delta)
+                    call.respond(HttpStatusCode.NoContent)
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.NotFound)
+                }
             }
         }
         route("/query") {

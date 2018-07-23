@@ -41,6 +41,9 @@ class ModelRepository(private val dataset: Dataset) {
     fun update(model: String, delta: Model) {
         dataset.write(model) {
             delta.listStatements().forEach { stmt ->
+                if (!containsResource(stmt.subject)) {
+                    throw IllegalArgumentException(stmt.subject.uri)
+                }
                 removeAll(stmt.subject, stmt.predicate, null)
             }
             add(delta)
