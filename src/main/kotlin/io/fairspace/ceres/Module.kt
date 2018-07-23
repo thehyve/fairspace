@@ -99,6 +99,12 @@ private fun Route.restrictedApi() {
                 repository.remove(model!!, subject, predicate)
                 call.respond(HttpStatusCode.NoContent)
             }
+            patch {
+                val delta = call.receive<Model>()
+
+                repository.update(model!!, delta)
+                call.respond(HttpStatusCode.NoContent)
+            }
         }
         route("/query") {
             get {

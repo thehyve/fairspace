@@ -37,4 +37,13 @@ class ModelRepository(private val dataset: Dataset) {
                 }
             }
         }
+
+    fun update(model: String, delta: Model) {
+        dataset.write(model) {
+            delta.listStatements().forEach { stmt ->
+                removeAll(stmt.subject, stmt.predicate, null)
+            }
+            add(delta)
+        }
+    }
 }
