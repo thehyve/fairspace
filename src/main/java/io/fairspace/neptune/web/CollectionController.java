@@ -24,6 +24,8 @@ public class CollectionController {
     }
 
     @PatchMapping
-    public void patchCollection(@RequestBody Collection collection) { collectionService.patchCollection(collection); }
+    public void patchCollection(@RequestBody Collection collection) {
+        collectionService.patchCollection(collection);
+    }
 
 }

@@ -32,7 +32,7 @@ public class CollectionService {
     }
 
     public void patchCollection(Collection collection) {
-        tripleService.patchTriples(toPatchTriples(collection));
+        tripleService.patchTriples(toTriplesForUpdate(collection));
     }
 
     public List<Collection> getCollections() {
@@ -59,7 +59,7 @@ public class CollectionService {
         );
     }
 
-    private static List<Triple> toPatchTriples(Collection collection) {
+    private static List<Triple> toTriplesForUpdate(Collection collection) {
         String subject = collection.getUri().toString();
         List<Triple> triples = new ArrayList<>();
         if (collection.getName() != null) {
