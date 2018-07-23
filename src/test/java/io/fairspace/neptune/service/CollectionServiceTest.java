@@ -99,42 +99,78 @@ public class CollectionServiceTest {
 
     @Test
     public void collectionsWithPropertiesShouldHavePatchableName() {
-        Collection c = new Collection();
-        c.setUri(URI.create(COLLECTION_URI));
-        c.setName(COLLECTION_NAME);
-        c.setDescription(COLLECTION_DESCRIPTION);
+        Collection c = getCollection();
 
         collectionService.createCollection(c);
 
-        c.setName(COLLECTION_NAME+"test");
+        c.setDescription(null);
+        c.setName(COLLECTION_NAME + "test");
 
         collectionService.patchCollection(c);
 
         verify(tripleService, times(1)).patchTriples(Arrays.asList(
                 new Triple(COLLECTION_URI, Fairspace.NAME,
-                        new TripleObject(ObjectType.literal, COLLECTION_NAME+"test", null, null)),
-                new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
-                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION, null, null))));
+                        new TripleObject(ObjectType.literal, COLLECTION_NAME + "test", null, null))
+        ));
     }
 
     @Test
     public void collectionsWithPropertiesShouldHavePatchableDescription() {
-        Collection c = new Collection();
-        c.setUri(URI.create(COLLECTION_URI));
-        c.setName(COLLECTION_NAME);
-        c.setDescription(COLLECTION_DESCRIPTION);
+        Collection c = getCollection();
 
         collectionService.createCollection(c);
 
+        c.setName(null);
+        c.setDescription(COLLECTION_DESCRIPTION+"test");
+
+        collectionService.patchCollection(c);
+
+        verify(tripleService, times(1)).patchTriples(Arrays.asList(
+                new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
+                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION+"test", null, null))
+        ));
+    }
+
+    @Test
+    public void collectionsWithPropertiesShouldBeAbleToPatchBoth() {
+        Collection c = getCollection();
+
+        collectionService.createCollection(c);
+
+        c.setName(COLLECTION_NAME + "test");
         c.setDescription(COLLECTION_DESCRIPTION+"test");
 
         collectionService.patchCollection(c);
 
         verify(tripleService, times(1)).patchTriples(Arrays.asList(
                 new Triple(COLLECTION_URI, Fairspace.NAME,
-                        new TripleObject(ObjectType.literal, COLLECTION_NAME, null, null)),
+                        new TripleObject(ObjectType.literal, COLLECTION_NAME + "test", null, null)),
                 new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
-                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION+"test", null, null))));
+                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION+"test", null, null))
+        ));
+    }
+
+    @Test
+    public void collectionsWithPropertiesShouldDoNothingWhenBothEmpty() {
+        Collection c = getCollection();
+
+        collectionService.createCollection(c);
+
+        c.setName(null);
+        c.setDescription(null);
+
+        collectionService.patchCollection(c);
+
+        verify(tripleService, times(1)).patchTriples(Arrays.asList(
+        ));
+    }
+
+    private Collection getCollection() {
+        Collection c = new Collection();
+        c.setUri(URI.create(COLLECTION_URI));
+        c.setName(COLLECTION_NAME);
+        c.setDescription(COLLECTION_DESCRIPTION);
+        return c;
     }
 
 }
