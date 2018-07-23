@@ -48,6 +48,8 @@ container.
 | DELETE /metadata/predicates| Delete a list of predicate with their label |
 | GET /collections | Get collections' metadata |
 | POST /collections | Store metadata for a collection |
+| PATCH /collections | Change name or description of collections' metadata |
+
 
 ### JSON format
 #### Triple
