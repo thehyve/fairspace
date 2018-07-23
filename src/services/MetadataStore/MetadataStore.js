@@ -58,8 +58,11 @@ class MetadataStore {
             headers: MetadataStore.getHeaders,
             credentials: "same-origin"
         }).then((response) => {
-            // Handle error or convert to json
-            failOnHttpError(response, "Failure when retrieving collection metadata");
+            // If an error occurs, return some info to the user as a fallback
+            if(!response.ok) {
+                console.error("Failure when retrieving collection metadata", response.status);
+                return collectionIds.map((id) => { return {uri: this.createUri(id), name: id, error: true}; } );
+            }
 
             return response.json();
         }).then(json => {

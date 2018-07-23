@@ -59,3 +59,19 @@ it('returns metadata only for the selected collections', () => {
             expect(collections[0].name).toEqual('name1');
         }).catch((e) => { fail(e) });
 });
+
+
+it('returns metadata if an error occurs', () => {
+    window.fetch = jest.fn(() =>
+        Promise.resolve(mockResponse(404, 'Not Found', ''))
+    );
+
+    // Server returns no metadata
+    // We expect the id to be returns as name
+    MetadataStore.getCollectionMetadata(['1', '3'])
+        .then((collections) => {
+            expect(collections.length).toEqual(2);
+            expect(collections[0].id).toEqual('1');
+            expect(collections[0].name).toEqual('1');
+        }).catch((e) => { fail(e) });
+});
