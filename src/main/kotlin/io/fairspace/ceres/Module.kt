@@ -31,9 +31,10 @@ private fun Application.installAuthentication() {
     if (environment["authentication.jwt.enabled"].toBoolean()) {
         install(Authentication) {
             jwt {
+                val issuer ="${environment["authentication.jwt.issuer"]}/auth/realms/${environment["authentication.jwt.realm"]}"
                 realm = environment["authentication.jwt.realm"]
                 validate { credentials -> JWTPrincipal(credentials.payload) }
-                verifier(get(), environment["authentication.jwt.issuer"])
+                verifier(get(), issuer)
             }
         }
     }
