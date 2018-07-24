@@ -7,7 +7,7 @@ function failOnHttpError(response, message) {
 }
 
 class MetadataStore {
-    static postHeaders = new Headers({'Content-Type': 'application/json'});
+    static changeHeaders = new Headers({'Content-Type': 'application/json'});
     static getHeaders = new Headers({'Accept': 'application/json'});
 
     constructor() {
@@ -37,11 +37,38 @@ class MetadataStore {
 
         return fetch(this.collectionsBackendUrl, {
             method: 'POST',
-            headers: MetadataStore.postHeaders,
+            headers: MetadataStore.changeHeaders,
             credentials: "same-origin",
             body: JSON.stringify(body)
         }).then((response) => {
             failOnHttpError(response, "Failure when adding collection to the metadata store");
+
+            return response;
+        });
+    }
+
+    /**
+     * Updates collection metadata
+     * @param collection Object with collection metadata. At least an id should be present. Currently the fields
+     *                   name and description are supported in the backend
+     * @returns {Promise<Response>}
+     */
+    updateCollectionMetadata(collection) {
+        if(!collection || !collection.id) {
+            return Promise.reject("No proper collection provided.");
+        }
+
+        let body = Object.assign({}, collection, {
+            "uri": this.createUri(collection.id)
+        });
+
+        return fetch(this.collectionsBackendUrl, {
+            method: 'PATCH',
+            headers: MetadataStore.changeHeaders,
+            credentials: "same-origin",
+            body: JSON.stringify(body)
+        }).then((response) => {
+            failOnHttpError(response, "Failure when updating collection in the metadata store");
 
             return response;
         });

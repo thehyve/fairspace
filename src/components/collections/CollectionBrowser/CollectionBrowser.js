@@ -19,7 +19,8 @@ class CollectionBrowser extends React.Component {
             error: false,
 
             collections: [],
-            infoDrawerOpened: false
+            infoDrawerOpened: false,
+            selectedCollection: null
         };
     }
 
@@ -101,7 +102,23 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionClick(collection) {
-        this.openDrawer();
+        this.setState({infoDrawerOpened: true, selectedCollection: collection});
+    }
+
+    handleCollectionDetailsChange(collectionId, parameters) {
+        // Update information about the name and collection
+        this.metadataStore.updateCollectionMetadata({
+            id: collectionId,
+            name: parameters.name,
+            description: parameters.description
+        }).then(() => {
+            // Load collections after creating a bucket
+            this.loadCollections();
+        }).catch((e) => {
+            // Load collections as a new bucket has been created, but without metadata
+            this.loadCollections();
+            console.error("An error occurred while updating collection metadata", e);
+        });
     }
 
     openDrawer() {
@@ -136,7 +153,13 @@ class CollectionBrowser extends React.Component {
 
                 {contents}
 
-                <InformationDrawer open={this.state.infoDrawerOpened} onClose={this.handleCloseInfoDrawer.bind(this)}/>
+                <InformationDrawer
+                    open={this.state.infoDrawerOpened}
+                    collection={this.state.selectedCollection}
+                    onClose={this.handleCloseInfoDrawer.bind(this)}
+                    onChangeDetails={this.handleCollectionDetailsChange.bind(this)}
+                >
+                </InformationDrawer>
             </div>
         );
     }

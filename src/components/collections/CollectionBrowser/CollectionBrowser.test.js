@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CollectionBrowser from "./CollectionBrowser";
+import InformationDrawer from "../InformationDrawer/InformationDrawer";
 import {shallow, mount} from "enzyme";
 import Button from "@material-ui/core/Button";
 import Config from "../../generic/Config/Config";
@@ -32,6 +33,7 @@ beforeEach(() => {
     mockMetadataStore = {
         addCollectionMetadata: jest.fn(() => Promise.resolve()),
         getCollectionMetadata: jest.fn(() => Promise.resolve([])),
+        updateCollectionMetadata: jest.fn(() => Promise.resolve([])),
     }
 
 });
@@ -82,6 +84,20 @@ it('reloads the collection list on succesful creation', () => {
         expect(mockS3.listBuckets.mock.calls.length).toEqual(2);
     });
 });
+
+it('reloads the collection list on succesful update', () => {
+    const wrapper = shallow(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore} />);
+    expect(mockS3.listBuckets.mock.calls.length).toEqual(1);
+
+    // Setup proper state
+    wrapper.setState({loading: false});
+    wrapper.find(InformationDrawer).get(0).props.onChangeDetails(1, {});
+
+    return flushPromises().then(() =>{
+        expect(mockS3.listBuckets.mock.calls.length).toEqual(2);
+    });
+});
+
 
 it('does not store metadata is bucket creation fails', () => {
     mockS3.createBucket = jest.fn((options, cb)  => cb("Error"));
