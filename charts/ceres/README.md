@@ -38,5 +38,5 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 | Parameter  | Description  | Default |
 |---|---|---|
 | `ceres.auth.enabled` | Enables authentication | `true` |
-| `ceres.auth.jwt.issuer` | Base url for the JWT issuer instance to communicate with. For example: `https://keycloak.hyperspace.fairspace.app` | |
+| `ceres.auth.jwt.issuer` | Base url for the JWT issuer instance to communicate with, including the base path. For example: `https://keycloak.hyperspace.fairspace.app/auth/realms/ci` | |
 | `ceres.auth.jwt.realm` | Realm that is used for authentication | |

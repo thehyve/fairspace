@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
         bean { TDB2Factory.connectDataset(env["jena.dataset.path"]) }
         bean { ModelRepository(get()) }
         bean {
-            val url = "${env["authentication.jwt.issuer"]}/auth/realms/${env["authentication.jwt.realm"]}/protocol/openid-connect/certs"
+            val url = "${env["authentication.jwt.issuer"]}/protocol/openid-connect/certs"
             JwkProviderBuilder(URL(url))
                     .build()
         }
