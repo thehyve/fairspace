@@ -10,20 +10,15 @@ import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 
 class Collection extends React.Component{
-    state = {
-        collection: {},
-        editValues: {},
-        editing: false,
-        showEditButton: false
-    }
-
     constructor(props) {
         super(props);
         this.onChangeDetails = props.onChangeDetails;
 
         this.state = {
             collection: props.collection,
-            editValues: this.determineEditValues(props.collection)
+            editValues: this.determineEditValues(props.collection),
+            editing: false,
+            showEditButton: false
         };
     }
 
@@ -48,18 +43,18 @@ class Collection extends React.Component{
         }
     }
 
-    close() {
+    closeEditDialog() {
         this.setState({editing: false});
     }
 
     handleCancel() {
         this.resetValues();
-        this.close();
+        this.closeEditDialog();
     }
 
     handleChangeDetails() {
         this.onChangeDetails(this.state.collection.id, this.state.editValues);
-        this.close();
+        this.closeEditDialog();
     }
 
     handleInputChange(event) {
@@ -94,7 +89,7 @@ class Collection extends React.Component{
 
                 <Dialog
                     open={this.state.editing}
-                    onClose={this.close.bind(this)}
+                    onClose={this.closeEditDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >
                     <DialogTitle id="form-dialog-title">Edit collection: {this.state.collection.name}</DialogTitle>

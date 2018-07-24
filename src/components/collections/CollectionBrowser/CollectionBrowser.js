@@ -112,11 +112,15 @@ class CollectionBrowser extends React.Component {
             name: parameters.name,
             description: parameters.description
         }).then(() => {
-            // Load collections after creating a bucket
+            // Update the currently selected collection
+            this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, parameters)});
+
+            // Reload list of collections to ensure the latest version
             this.loadCollections();
         }).catch((e) => {
             // Load collections as a new bucket has been created, but without metadata
             this.loadCollections();
+            this.closeDrawer();
             console.error("An error occurred while updating collection metadata", e);
         });
     }
