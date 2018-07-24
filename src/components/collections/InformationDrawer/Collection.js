@@ -23,10 +23,7 @@ class Collection extends React.Component{
 
         this.state = {
             collection: props.collection,
-            editValues: {
-                name: props.collection.name ? props.collection.name : '',
-                description: props.collection.description ? props.collection.description : ''
-            }
+            editValues: this.determineEditValues(props.collection)
         };
     }
 
@@ -34,20 +31,21 @@ class Collection extends React.Component{
         this.setState({
             collection: props.collection,
             editing: false,
-            editValues: {
-                name: props.collection.name ? props.collection.name : '',
-                description: props.collection.description ? props.collection.description : ''
-            }
+            editValues: this.determineEditValues(props.collection)
         });
     }
 
     resetValues() {
         this.setState({
-            editValues: {
-                name: this.state.collection.name ? this.state.collection.name : '',
-                description: this.state.collection.description ? this.state.collection.description : ''
-            }
+            editValues: this.determineEditValues(this.state.collection)
         })
+    }
+
+    determineEditValues(collection) {
+        return {
+            name: collection.name  || '',
+            description: collection.description || ''
+        }
     }
 
     close() {
