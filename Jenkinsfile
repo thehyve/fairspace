@@ -83,6 +83,15 @@ pipeline {
           }
         }
       }
+      stage('Trigger workspace deploy') {
+        when {
+          branch 'master'
+        }
+        steps {
+          build job: '/workspace/master', wait: false, propagate: false
+        }
+      }
+
     }
     post {
       always {
