@@ -15,7 +15,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import sun.net.www.http.HttpClient;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -28,9 +27,6 @@ public class CeresService implements TripleService {
 
     @Autowired
     RestTemplate restTemplate;
-    
-    @Autowired
-    private HttpServletRequest incomingRequest;
 
     @Value("${ceres.url}/model/${ceres.model}/statements/")
     private String statementsEndpoint;
@@ -139,16 +135,12 @@ public class CeresService implements TripleService {
     private HttpEntity getRdfJsonEntity(List<Triple> triples) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(RDF_JSON_MEDIA_TYPE);
-        httpHeaders.set(HttpHeaders.AUTHORIZATION, incomingRequest.getHeader(HttpHeaders.AUTHORIZATION));
         return new HttpEntity(TriplesRdfJsonConverter.convertTriplesToRdf(triples), httpHeaders);
     }
 
     private HttpEntity acceptRdfJsonHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(RDF_JSON_MEDIA_TYPE));
-        headers.set(HttpHeaders.AUTHORIZATION, incomingRequest.getHeader(HttpHeaders.AUTHORIZATION));
         return new HttpEntity<>("", headers);
     }
-
-
 }

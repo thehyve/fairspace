@@ -7,11 +7,15 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AppConfig {
+    @Bean
+    HttpComponentsClientHttpRequestFactory authorizedRequestFactory() {
+        return new AuthorizedClientHttpRequestFactory();
+    }
+
 
     @Bean
     RestTemplate ceresRestTemplate() {
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        return new RestTemplate(requestFactory);
+        return new RestTemplate(authorizedRequestFactory());
     }
 
 }
