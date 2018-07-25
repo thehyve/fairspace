@@ -91,6 +91,9 @@ pipeline {
       }
     }
     post {
+      always {
+        junit 'build/test-results/**/*.xml'
+      }
       failure {
         script {
           hipchat.notifyFailure()
