@@ -93,12 +93,14 @@ pipeline {
     post {
       always {
         junit 'app/build/test-results/**/*.xml'
-        cleanWs()
       }
       failure {
         script {
           hipchat.notifyFailure()
         }
+      }
+      cleanup {
+        cleanWs()
       }
     }
 }
