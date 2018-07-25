@@ -78,6 +78,7 @@ pipeline {
           branch 'master'
         }
         steps {
+          hipchat.notifySuccess()
         }
       }
     }
@@ -88,13 +89,6 @@ pipeline {
       failure {
         script {
           hipchat.notifyFailure()
-        }
-      }
-      success {
-        script {
-          if(${env.GIT_BRANCH} == 'master') {
-            hipchat.notifySuccess()
-          }
         }
       }
     }
