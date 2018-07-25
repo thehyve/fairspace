@@ -1,3 +1,5 @@
+@Library("hipchat") _
+
 pipeline {
     agent {
       label "jenkins-nodejs"
@@ -71,10 +73,25 @@ pipeline {
           }
         }
       }
+      stage('Hipchat notification') {
+        when {
+          branch 'master'
+        }
+        steps {
+          script {
+            hipchat.notifySuccess()
+          }
+        }
+      }
     }
     post {
       always {
         cleanWs()
+      }
+      failure {
+        script {
+          hipchat.notifyFailure()
+        }
       }
     }
 }
