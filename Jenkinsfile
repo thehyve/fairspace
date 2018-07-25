@@ -1,3 +1,5 @@
+@Library("hipchat") _
+
 pipeline {
     agent {
       label "jenkins-gradle"
@@ -69,10 +71,33 @@ pipeline {
           }
         }
       }
+      stage('Hipchat notification') {
+        when {
+          branch 'master'
+        }
+        steps {
+          script {
+            hipchat.notifySuccess()
+          }
+        }
+      }
+      stage('Trigger workspace deploy') {
+        when {
+          branch 'master'
+        }
+        steps {
+          build job: '/workspace/master', wait: false, propagate: false
+        }
+      }
     }
     post {
       always {
         cleanWs()
+      }
+      failure {
+        script {
+          hipchat.notifyFailure()
+        }
       }
     }
 }
