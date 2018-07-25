@@ -91,13 +91,13 @@ pipeline {
       }
     }
     post {
-      always {
-        cleanWs()
-      }
       failure {
         script {
           hipchat.notifyFailure()
         }
+      }
+      cleanup {
+        cleanWs()
       }
     }
 }
