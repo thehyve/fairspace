@@ -78,7 +78,9 @@ pipeline {
           branch 'master'
         }
         steps {
-          hipchat.notifySuccess()
+          script {
+            hipchat.notifySuccess()
+          }
         }
       }
     }
