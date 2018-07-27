@@ -1,6 +1,6 @@
 package io.fairspace.neptune.metadata.ceres;
 
-import io.fairspace.neptune.config.JsonldModelConverter;
+import io.fairspace.neptune.web.JsonldModelConverter;
 import io.fairspace.neptune.service.TripleService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class CeresService implements TripleService {
     @Override
     public Model retrieveTriples(@NonNull String uri) {
         try {
-            return restTemplate.exchange(statementsEndpoint + "?subject={uri}", HttpMethod.GET, acceptRdfJsonHttpEntity(), Model.class, uri).getBody();
+            return restTemplate.exchange(statementsEndpoint + "?subject={uri}", HttpMethod.GET, acceptJsonLdHttpEntity(), Model.class, uri).getBody();
         } catch (Exception e) {
             log.error(String.format("An exception occurred while retrieving triples for uri %s: %s", uri, e.getMessage()));
             log.debug("Stacktrace", e);
@@ -47,7 +47,7 @@ public class CeresService implements TripleService {
         }
 
         try {
-            HttpEntity entity = getRdfJsonEntity(triples);
+            HttpEntity entity = getJsonLdEntity(triples);
             restTemplate.postForEntity(statementsEndpoint, entity, Void.class);
         } catch (Exception e) {
             log.error("An exception occurred while storing {} triples: {}", triples.size(), e.getMessage());
@@ -62,7 +62,7 @@ public class CeresService implements TripleService {
     @Override
     public Model executeConstructQuery(String query) {
         try {
-            return restTemplate.exchange(queryEndpoint + "?query={query}", HttpMethod.GET, acceptRdfJsonHttpEntity(), Model.class, query).getBody();
+            return restTemplate.exchange(queryEndpoint + "?query={query}", HttpMethod.GET, acceptJsonLdHttpEntity(), Model.class, query).getBody();
         } catch (Exception e) {
             log.error("An exception occurred while executing construct query {}: {}", query, e.getMessage());
             log.debug("Stacktrace", e);
@@ -77,7 +77,7 @@ public class CeresService implements TripleService {
             return;
         }
         try {
-            HttpEntity entity = getRdfJsonEntity(triples);
+            HttpEntity entity = getJsonLdEntity(triples);
             restTemplate.exchange(statementsEndpoint, HttpMethod.DELETE, entity, Void.class);
         } catch (Exception e) {
             log.error("An exception occurred while deleting {} triples: {}", triples.size(), e.getMessage());
@@ -94,7 +94,7 @@ public class CeresService implements TripleService {
             return;
         }
         try {
-            HttpEntity<Model> entity = getRdfJsonEntity(triples);
+            HttpEntity<Model> entity = getJsonLdEntity(triples);
             restTemplate.exchange(statementsEndpoint, HttpMethod.PATCH, entity, Void.class);
         } catch (HttpClientErrorException e) {
             // We could expect a 404 here if the subject for one of the triples does not exist
@@ -121,13 +121,13 @@ public class CeresService implements TripleService {
         }
     }
 
-    private HttpEntity<Model> getRdfJsonEntity(Model triples) {
+    private HttpEntity<Model> getJsonLdEntity(Model triples) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(JsonldModelConverter.JSON_LD);
         return new HttpEntity<>(triples, httpHeaders);
     }
 
-    private HttpEntity acceptRdfJsonHttpEntity() {
+    private HttpEntity acceptJsonLdHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(JsonldModelConverter.JSON_LD));
         return new HttpEntity<>("", headers);

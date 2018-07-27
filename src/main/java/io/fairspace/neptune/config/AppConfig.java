@@ -1,5 +1,6 @@
 package io.fairspace.neptune.config;
 
+import io.fairspace.neptune.web.JsonldModelConverter;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -60,7 +60,7 @@ public class MetadataController {
      * @param uri the uri of the predicate
      */
     @GetMapping("/predicate")
-    public PredicateInfo getredicateInfo(@RequestParam String uri) {
+    public PredicateInfo getPredicateInfo(@RequestParam String uri) {
         return metadataService.getPredicateInfo(uri);
     }
 
@@ -84,5 +84,4 @@ public class MetadataController {
     public void postPredicateInfo(@RequestBody List<PredicateInfo> predicateInfoList) {
         metadataService.postPredicateInfoList(predicateInfoList);
     }
-
 }
