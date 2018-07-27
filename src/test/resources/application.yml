@@ -3,6 +3,7 @@ security:
   oauth2:
     resource:
       user-info-uri: http://localhost:${wiremock.server.port}/userinfo
+      prefer-token-info: false
       jwk:
         key-set-uri: http://localhost:${wiremock.server.port}/certs
 spring:
