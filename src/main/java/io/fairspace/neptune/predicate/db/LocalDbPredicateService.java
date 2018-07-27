@@ -5,7 +5,6 @@ import io.fairspace.neptune.service.PredicateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ public class LocalDbPredicateService implements PredicateService {
     }
 
     @Override
-    public PredicateInfo retrievePredicateInfo(URI uri) {
+    public PredicateInfo retrievePredicateInfo(String uri) {
         List<LocalDbPredicateInfo> predicateInfoList = predicateInfoRepository.findByUri(uri);
 
         if (!predicateInfoList.isEmpty()) {
@@ -38,14 +37,14 @@ public class LocalDbPredicateService implements PredicateService {
     }
 
     @Override
-    public List<PredicateInfo> retrievePredicateInfos(Collection<URI> uris) {
+    public List<PredicateInfo> retrievePredicateInfos(Collection<String> uris) {
         return predicateInfoRepository.findAllByUri(uris).stream()
                 .map(this::convertToPredicateInfo)
                 .collect(Collectors.toList());
     }
 
     private List<LocalDbPredicateInfo> convertToListLocalDbPedicates(Collection<PredicateInfo> predicateInfoList) {
-        return  predicateInfoList.stream()
+        return predicateInfoList.stream()
                 .map(this::convertToLocalDbPredicate)
                 .collect(Collectors.toList());
     }
@@ -59,7 +58,7 @@ public class LocalDbPredicateService implements PredicateService {
     }
 
     private PredicateInfo convertToPredicateInfo(LocalDbPredicateInfo localDbPredicateInfo) {
-        return new PredicateInfo(localDbPredicateInfo.getLabel(), localDbPredicateInfo.getUri());
+        return new PredicateInfo(localDbPredicateInfo.getUri(), localDbPredicateInfo.getLabel());
     }
 
 

@@ -1,27 +1,29 @@
 package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.model.ObjectType;
-import io.fairspace.neptune.model.Triple;
-import io.fairspace.neptune.model.TripleObject;
 import io.fairspace.neptune.vocabulary.Fairspace;
-import io.fairspace.neptune.vocabulary.Rdf;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @Service
 public class CollectionService {
     private static final String GET_COLLECTIONS =
             String.format(
                     "CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o . ?s <%s> <%s> . }",
-                    Rdf.TYPE, Fairspace.COLLECTION);
+                    RDF.type.getURI(), Fairspace.Collection);
 
     @Autowired
     private TripleService tripleService;
@@ -36,10 +38,12 @@ public class CollectionService {
     }
 
     public List<Collection> getCollections() {
-        Map<String, List<Triple>> triplesBySubject = tripleService
+        Map<String, List<Statement>> triplesBySubject = tripleService
                 .executeConstructQuery(GET_COLLECTIONS)
+                .listStatements()
+                .toList()
                 .stream()
-                .collect(groupingBy(Triple::getSubject));
+                .collect(groupingBy(s -> s.getSubject().getURI()));
         return triplesBySubject
                 .values()
                 .stream()
@@ -47,42 +51,40 @@ public class CollectionService {
                 .collect(toList());
     }
 
-    private static List<Triple> toTriples(Collection collection) {
-        String subject = collection.getUri().toString();
-        return Arrays.asList(
-                new Triple(subject, Rdf.TYPE,
-                        new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
-                new Triple(subject, Fairspace.NAME,
-                        new TripleObject(ObjectType.literal, requireNonNull(collection.getName(), "Collection name is mandatory"), null, null)),
-                new Triple(subject, Fairspace.DESCRIPTION,
-                        new TripleObject(ObjectType.literal, Optional.ofNullable(collection.getDescription()).orElse(""), null, null))
-        );
+    private static Model toTriples(Collection collection) {
+        Model model = createDefaultModel();
+
+        Resource subject = model.createResource(collection.getUri());
+        model.add(subject, RDF.type, Fairspace.Collection);
+        model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collection.getName(), "Collection name is mandatory")));
+        model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
+
+        return model;
     }
 
-    private static List<Triple> toTriplesForUpdate(Collection collection) {
-        String subject = collection.getUri().toString();
-        List<Triple> triples = new ArrayList<>();
+    private static Model toTriplesForUpdate(Collection collection) {
+        Model model = createDefaultModel();
+
+        Resource subject = model.createResource(collection.getUri());
+
         if (collection.getName() != null) {
-            triples.add(new Triple(subject, Fairspace.NAME,
-                    new TripleObject(ObjectType.literal, collection.getName(), null, null))
-            );
+            model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collection.getName(), "Collection name is mandatory")));
         }
+
         if (collection.getDescription() != null) {
-            triples.add(new Triple(subject, Fairspace.DESCRIPTION,
-                    new TripleObject(ObjectType.literal, collection.getDescription(), null, null))
-            );
+            model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
         }
-        return triples;
+        return model;
     }
 
-    private static Collection fromTriples(List<Triple> triples) {
+    private static Collection fromTriples(List<Statement> triples) {
         Collection collection = new Collection();
         triples.forEach(t -> {
-            collection.setUri(URI.create(t.getSubject()));
-            if (t.getPredicate().equals(Fairspace.NAME)) {
-                collection.setName(t.getObject().getValue());
-            } else if (t.getPredicate().equals(Fairspace.DESCRIPTION)) {
-                collection.setDescription(t.getObject().getValue());
+            collection.setUri(t.getSubject().getURI());
+            if (t.getPredicate().equals(Fairspace.name)) {
+                collection.setName(t.getObject().asLiteral().getString());
+            } else if (t.getPredicate().equals(Fairspace.description)) {
+                collection.setDescription(t.getObject().asLiteral().toString());
             }
         });
         return collection;
