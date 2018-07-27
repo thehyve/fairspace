@@ -1,12 +1,13 @@
 package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.model.PredicateInfo;
-import io.fairspace.neptune.model.Triple;
-import io.fairspace.neptune.web.CombinedTriplesWithPredicateInfo;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,25 +21,31 @@ public class MetadataService {
     @Autowired
     private PredicateService predicateService;
 
-    public CombinedTriplesWithPredicateInfo retrieveMetadata(URI uri) {
-        List<Triple> triples = tripleService.retrieveTriples(uri);
-        Set<URI> predicates = triples.stream()
-                .map(Triple::getPredicate)
+    public Model retrieveMetadata(String uri) {
+        Model triples = tripleService.retrieveTriples(uri);
+        Set<String> predicates = triples.listStatements().toList().stream()
+                .map(statement -> statement.getPredicate().getURI())
                 .collect(Collectors.toSet());
         List<PredicateInfo> predicateInfos = predicateService.retrievePredicateInfos(predicates);
 
-        return new CombinedTriplesWithPredicateInfo(triples, predicateInfos);
+        predicateInfos.forEach(predicateInfo -> {
+            Resource predicate = triples.createResource(predicateInfo.getUri());
+            triples.add(predicate, RDF.type, RDF.Property);
+            triples.add(predicate, RDFS.label, predicateInfo.getLabel());
+        });
+
+        return triples;
     }
 
-    public void postTriples(List<Triple> triples) {
+    public void postTriples(Model triples) {
         tripleService.postTriples(triples);
     }
 
-    public void deleteTriples(List<Triple> triples) {
+    public void deleteTriples(Model triples) {
         tripleService.deleteTriples(triples);
     }
 
-    public PredicateInfo getPredicateInfo(URI uri) {
+    public PredicateInfo getPredicateInfo(String uri) {
         return predicateService.retrievePredicateInfo(uri);
     }
 

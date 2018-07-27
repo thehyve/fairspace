@@ -9,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.net.URI;
 
 @Entity
 @Data
@@ -23,6 +22,6 @@ public class LocalDbPredicateInfo {
     private Long id;
     private String label;
     @Column(unique = true)
-    private URI uri;
+    private String uri;
 
 }

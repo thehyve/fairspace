@@ -1,11 +1,9 @@
 package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.model.ObjectType;
-import io.fairspace.neptune.model.Triple;
-import io.fairspace.neptune.model.TripleObject;
 import io.fairspace.neptune.vocabulary.Fairspace;
-import io.fairspace.neptune.vocabulary.Rdf;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +11,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -33,66 +35,85 @@ public class CollectionServiceTest {
     @Autowired
     private CollectionService collectionService;
 
+
     @Test
     public void collectionsWithAllPropertiesShouldBeAccepted() {
-        Collection c = new Collection();
-        c.setUri(URI.create(COLLECTION_URI));
-        c.setName(COLLECTION_NAME);
-        c.setDescription(COLLECTION_DESCRIPTION);
+        Collection c = getCollection();
 
         collectionService.createCollection(c);
 
-        verify(tripleService, times(1)).postTriples(Arrays.asList(
-                new Triple(COLLECTION_URI, Rdf.TYPE,
-                        new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
-                new Triple(COLLECTION_URI, Fairspace.NAME,
-                        new TripleObject(ObjectType.literal, COLLECTION_NAME, null, null)),
-                new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
-                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION, null, null))));
+        verify(tripleService, times(1))
+                .postTriples(argThat(m -> m.size() == 3
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        RDF.type,
+                        Fairspace.Collection)
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        Fairspace.name,
+                        m.createLiteral(c.getName()))
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        Fairspace.description,
+                        m.createLiteral(c.getDescription()))));
     }
 
     @Test
     public void collectionsWithEmptyDescriptionShouldBeAccepted() {
         Collection c = new Collection();
-        c.setUri(URI.create(COLLECTION_URI));
+        c.setUri(COLLECTION_URI);
         c.setName(COLLECTION_NAME);
 
         collectionService.createCollection(c);
 
-        verify(tripleService, times(1)).postTriples(Arrays.asList(
-                new Triple(COLLECTION_URI, Rdf.TYPE,
-                        new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
-                new Triple(COLLECTION_URI, Fairspace.NAME,
-                        new TripleObject(ObjectType.literal, COLLECTION_NAME, null, null)),
-                new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
-                        new TripleObject(ObjectType.literal, "", null, null))));
+        verify(tripleService, times(1))
+                .postTriples(argThat(m -> m.size() == 3
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        RDF.type,
+                        Fairspace.Collection)
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        Fairspace.name,
+                        m.createLiteral(c.getName()))
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        Fairspace.description,
+                        m.createLiteral(""))));
     }
 
     @Test(expected = RuntimeException.class)
     public void collectionsWithEmptyNameShouldBeRejected() {
         Collection c = new Collection();
-        c.setUri(URI.create(COLLECTION_URI));
+        c.setUri(COLLECTION_URI);
         c.setDescription(COLLECTION_DESCRIPTION);
 
         collectionService.createCollection(c);
-        verify(tripleService, never()).postTriples(any());
     }
 
     @Test
-    public void collectionsShouldBeSerializedProperly() {
+    public void collectionsShouldBeDeserializedProperly() {
+        Model m = createDefaultModel();
+        m.add(
+                m.createResource(COLLECTION_URI),
+                RDF.type,
+                Fairspace.Collection);
+        m.add(
+                m.createResource(COLLECTION_URI),
+                Fairspace.name,
+                m.createLiteral(COLLECTION_NAME));
+        m.add(
+                m.createResource(COLLECTION_URI),
+                Fairspace.description,
+                m.createLiteral(COLLECTION_DESCRIPTION));
+
         when(tripleService.executeConstructQuery(any()))
-                .thenReturn(Arrays.asList(
-                        new Triple(COLLECTION_URI, Rdf.TYPE,
-                                new TripleObject(ObjectType.uri, Fairspace.COLLECTION.toString(), null, null)),
-                        new Triple(COLLECTION_URI, Fairspace.NAME,
-                                new TripleObject(ObjectType.literal, COLLECTION_NAME, null, null)),
-                        new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
-                                new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION, null, null))));
+                .thenReturn(m);
 
         List<Collection> collections = collectionService.getCollections();
 
         assertEquals(1, collections.size());
-        assertEquals(URI.create(COLLECTION_URI), collections.get(0).getUri());
+        assertEquals(COLLECTION_URI, collections.get(0).getUri());
         assertEquals(COLLECTION_NAME, collections.get(0).getName());
         assertEquals(COLLECTION_DESCRIPTION, collections.get(0).getDescription());
     }
@@ -108,10 +129,12 @@ public class CollectionServiceTest {
 
         collectionService.patchCollection(c);
 
-        verify(tripleService, times(1)).patchTriples(Arrays.asList(
-                new Triple(COLLECTION_URI, Fairspace.NAME,
-                        new TripleObject(ObjectType.literal, COLLECTION_NAME + "test", null, null))
-        ));
+        verify(tripleService, times(1))
+                .patchTriples(argThat(m -> m.size() == 1
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        Fairspace.name,
+                        m.createLiteral(c.getName()))));
     }
 
     @Test
@@ -121,14 +144,16 @@ public class CollectionServiceTest {
         collectionService.createCollection(c);
 
         c.setName(null);
-        c.setDescription(COLLECTION_DESCRIPTION+"test");
+        c.setDescription(COLLECTION_DESCRIPTION + "test");
 
         collectionService.patchCollection(c);
 
-        verify(tripleService, times(1)).patchTriples(Arrays.asList(
-                new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
-                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION+"test", null, null))
-        ));
+        verify(tripleService, times(1))
+                .patchTriples(argThat(m -> m.size() == 1
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        Fairspace.description,
+                        m.createLiteral(c.getDescription()))));
     }
 
     @Test
@@ -138,16 +163,20 @@ public class CollectionServiceTest {
         collectionService.createCollection(c);
 
         c.setName(COLLECTION_NAME + "test");
-        c.setDescription(COLLECTION_DESCRIPTION+"test");
+        c.setDescription(COLLECTION_DESCRIPTION + "test");
 
         collectionService.patchCollection(c);
 
-        verify(tripleService, times(1)).patchTriples(Arrays.asList(
-                new Triple(COLLECTION_URI, Fairspace.NAME,
-                        new TripleObject(ObjectType.literal, COLLECTION_NAME + "test", null, null)),
-                new Triple(COLLECTION_URI, Fairspace.DESCRIPTION,
-                        new TripleObject(ObjectType.literal, COLLECTION_DESCRIPTION+"test", null, null))
-        ));
+        verify(tripleService, times(1))
+                .patchTriples(argThat(m -> m.size() == 2
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        Fairspace.name,
+                        m.createLiteral(c.getName()))
+                        && m.contains(
+                        m.createResource(COLLECTION_URI),
+                        Fairspace.description,
+                        m.createLiteral(c.getDescription()))));
     }
 
     @Test
@@ -161,13 +190,12 @@ public class CollectionServiceTest {
 
         collectionService.patchCollection(c);
 
-        verify(tripleService, times(1)).patchTriples(Arrays.asList(
-        ));
+        verify(tripleService, times(1)).patchTriples(argThat(Model::isEmpty));
     }
 
     private Collection getCollection() {
         Collection c = new Collection();
-        c.setUri(URI.create(COLLECTION_URI));
+        c.setUri(COLLECTION_URI);
         c.setName(COLLECTION_NAME);
         c.setDescription(COLLECTION_DESCRIPTION);
         return c;

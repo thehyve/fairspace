@@ -1,12 +1,11 @@
 package io.fairspace.neptune.web;
 
-import io.fairspace.neptune.service.MetadataService;
 import io.fairspace.neptune.model.PredicateInfo;
-import io.fairspace.neptune.model.Triple;
+import io.fairspace.neptune.service.MetadataService;
+import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -30,7 +29,7 @@ public class MetadataController {
      * @return the triples with predicates and their information
      */
     @GetMapping
-    public CombinedTriplesWithPredicateInfo get(@RequestParam URI uri) {
+    public Model get(@RequestParam String uri) {
         return metadataService.retrieveMetadata(uri);
     }
 
@@ -40,7 +39,7 @@ public class MetadataController {
      * @param triples a list of triple objects.
      */
     @PostMapping
-    public void postTriples(@RequestBody List<Triple> triples) {
+    public void postTriples(@RequestBody Model triples) {
         metadataService.postTriples(triples);
     }
 
@@ -50,7 +49,7 @@ public class MetadataController {
      * @param triples a list of triple objects.
      */
     @DeleteMapping
-    public void deleteTriples(@RequestBody List<Triple> triples) {
+    public void deleteTriples(@RequestBody Model triples) {
         metadataService.deleteTriples(triples);
     }
 
@@ -61,7 +60,7 @@ public class MetadataController {
      * @param uri the uri of the predicate
      */
     @GetMapping("/predicate")
-    public PredicateInfo getredicateInfo(@RequestParam URI uri) {
+    public PredicateInfo getredicateInfo(@RequestParam String uri) {
         return metadataService.getPredicateInfo(uri);
     }
 

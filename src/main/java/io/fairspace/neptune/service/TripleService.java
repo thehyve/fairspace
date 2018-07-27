@@ -1,21 +1,19 @@
 package io.fairspace.neptune.service;
 
-import io.fairspace.neptune.model.Triple;
+import org.apache.jena.rdf.model.Model;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.util.List;
 
 @Service
 public interface TripleService {
 
-    List<Triple> retrieveTriples(URI uri);
+    Model retrieveTriples(String uri);
 
-    void deleteTriples(List<Triple> triples);
+    void deleteTriples(Model triples);
 
-    void postTriples(List<Triple> triples);
+    void postTriples(Model triples);
 
-    void patchTriples(List<Triple> triples);
+    void patchTriples(Model triples);
 
-    List<Triple> executeConstructQuery(String query);
+    Model executeConstructQuery(String query);
 }

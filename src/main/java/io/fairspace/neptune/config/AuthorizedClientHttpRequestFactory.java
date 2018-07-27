@@ -17,7 +17,10 @@ class AuthorizedClientHttpRequestFactory extends HttpComponentsClientHttpRequest
     @Override
     public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
         ClientHttpRequest request = super.createRequest(uri, httpMethod);
-        request.getHeaders().add(HttpHeaders.AUTHORIZATION, incomingRequest.getHeader(HttpHeaders.AUTHORIZATION));
+        String authorization = incomingRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authorization != null) {
+            request.getHeaders().add(HttpHeaders.AUTHORIZATION, authorization);
+        }
         return request;
     }
 }

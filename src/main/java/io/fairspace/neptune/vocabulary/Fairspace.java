@@ -1,16 +1,25 @@
 package io.fairspace.neptune.vocabulary;
 
 import lombok.experimental.UtilityClass;
-
-import java.net.URI;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 @UtilityClass
 public class Fairspace {
-    public static final URI NS = URI.create("http://fairspace.io/ontology#");
+    public static final String uri = "http://fairspace.io/ontology#";
 
-    public static final URI COLLECTION = URI.create(NS + "Collection");
+    private static Resource resource(String local) {
+        return ResourceFactory.createResource(uri + local);
+    }
 
-    public static final URI NAME = URI.create(NS + "name");
+    private static Property property(String local) {
+        return ResourceFactory.createProperty(uri, local);
+    }
 
-    public static final URI DESCRIPTION = URI.create(NS + "description");
+    public static final Resource Collection = resource("Collection");
+
+    public static final Property name = property("name");
+
+    public static final Property description = property("description");
 }
