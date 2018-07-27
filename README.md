@@ -61,7 +61,7 @@ See also: [Ktor configuration](https://ktor.io/servers/configuration.html#availa
 POST /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Content-Type: application/rdf+json
+Content-Type: application/ld+json
 
 { 
   "http://somewhere/BillKidd" : { 
@@ -98,7 +98,7 @@ Content-Type: application/rdf+json
 GET /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Accept: application/rdf+json
+Accept: application/ld+json
 ```
 
 ### To retrieve all statements for a specific subject (add `&predicate=...` to filter by predicate as well)
@@ -107,7 +107,7 @@ Accept: application/rdf+json
 GET /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Accept: application/rdf+json
+Accept: application/ld+json
 ```
 
 
@@ -117,7 +117,7 @@ Accept: application/rdf+json
 DELETE /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Content-Type: application/rdf+json
+Content-Type: application/ld+json
 ```
 
 ### To update a model (removes all existing triples with provided subjects and predicates then adds new statements)

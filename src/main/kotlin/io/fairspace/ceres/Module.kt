@@ -42,7 +42,7 @@ private fun Application.installAuthentication() {
 
 private fun Application.installConverters() {
     install(ContentNegotiation) {
-        listOf(RDFFormat.RDFJSON)
+        listOf(RDFFormat.JSONLD)
                 .map(::ModelConverter)
                 .forEach { register(it.contentType, it) }
         register(ContentType.parse("text/boolean"), TextConverter)

@@ -32,7 +32,7 @@ open class BaseCeresTest : KoinTest {
                                 .addProperty(VCARD.Family, familyName))
     }
 
-    val RDF_JSON = RDFFormat.RDFJSON.lang.headerString
+    val JSONLD = RDFFormat.JSONLD.lang.headerString
 
     @BeforeTest
     fun before(){
