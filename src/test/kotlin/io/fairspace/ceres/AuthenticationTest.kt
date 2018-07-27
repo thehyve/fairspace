@@ -105,7 +105,7 @@ class AuthenticationTest : BaseCeresTest() {
                             expiresAt: Date = TOMORROW) =
             prefix + JWT.create()
                     .withAudience(audience)
-                    .withIssuer(issuer)
+                    .withIssuer("${issuer}/auth/realms/${realm}")
                     .withKeyId(keyId)
                     .withExpiresAt(expiresAt)
                     .sign(algorithm)

@@ -24,6 +24,7 @@ fun Dataset.write(model: String, action: Model.() -> Unit) {
         commit()
     } catch (e: Exception) {
         abort()
+        throw e
     }
 }
 

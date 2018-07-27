@@ -57,3 +57,10 @@ spec:
       - name: config-volume
         configMap:
           name: {{ template "ceres.fullname" . }}
+      - name: export
+        {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim | default (include "ceres.fullname" .) }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
