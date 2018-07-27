@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PredicateInfo {
-
-    private String label;
-    private String uri;
-
+    String uri;
+    String label;
 }

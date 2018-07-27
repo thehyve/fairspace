@@ -44,6 +44,7 @@ dependencies {
     compile "org.apache.jena:apache-jena-libs:$jena_version"
     compile("com.h2database:h2")
     compile('org.postgresql:postgresql')
+    compile("javax.xml.bind:jaxb-api")
 
     testCompile('com.nimbusds:nimbus-jose-jwt:5.7')
     testCompile('org.springframework.boot:spring-boot-starter-test')

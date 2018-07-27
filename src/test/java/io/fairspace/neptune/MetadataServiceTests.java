@@ -45,14 +45,14 @@ public class MetadataServiceTests {
         Model combi = metadataService.retrieveMetadata(SUBJECT_URI);
 
 
-        assertTrue(combi.contains(combi.createResource(SUBJECT_URI), combi.createProperty(PREDICATE_URI)));
+        assertTrue(combi.containsAll(createTriples()));
         assertTrue(combi.contains(combi.createResource(PREDICATE_URI), RDF.type, RDF.Property));
-        assertTrue(combi.contains(combi.createResource(PREDICATE_URI), RDFS.label, combi.createProperty(PREDICATE_LABEL)));
+        assertTrue(combi.contains(combi.createResource(PREDICATE_URI), RDFS.label, combi.createLiteral(PREDICATE_LABEL)));
     }
 
     private Model createTriples() {
         Model m = createDefaultModel();
-        m.add(m.createResource(SUBJECT_URI), m.createProperty(PREDICATE_LABEL), "test");
+        m.add(m.createResource(SUBJECT_URI), m.createProperty(PREDICATE_URI), "test");
         return m;
     }
 }

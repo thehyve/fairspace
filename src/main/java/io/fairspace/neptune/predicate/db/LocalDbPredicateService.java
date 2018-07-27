@@ -58,7 +58,7 @@ public class LocalDbPredicateService implements PredicateService {
     }
 
     private PredicateInfo convertToPredicateInfo(LocalDbPredicateInfo localDbPredicateInfo) {
-        return new PredicateInfo(localDbPredicateInfo.getLabel(), localDbPredicateInfo.getUri());
+        return new PredicateInfo(localDbPredicateInfo.getUri(), localDbPredicateInfo.getLabel());
     }
 
 
