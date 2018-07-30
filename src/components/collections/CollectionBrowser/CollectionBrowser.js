@@ -36,7 +36,7 @@ class CollectionBrowser extends React.Component {
         this.setState({loading: true});
 
         this.s3Client.listBuckets((err, buckets) => {
-            if(this.isUnmounting) {
+            if (this.isUnmounting) {
                 return;
             }
 
@@ -47,19 +47,19 @@ class CollectionBrowser extends React.Component {
                 this.metadataStore
                     .getCollectionMetadata(buckets.Buckets.map(bucket => bucket.Name))
                     .then((collections) => {
-                        if(this.isUnmounting) {
+                        if (this.isUnmounting) {
                             return;
                         }
 
                         this.setState({loading: false, collections: collections});
                     }).catch((e) => {
-                        if(this.isUnmounting) {
-                            return;
-                        }
+                    if (this.isUnmounting) {
+                        return;
+                    }
 
-                        console.error("An error occurred while loading collection metadata", e);
-                        this.setState({error: true, loading: false});
-                    });
+                    console.error("An error occurred while loading collection metadata", e);
+                    this.setState({error: true, loading: false});
+                });
             }
         });
     }
@@ -76,7 +76,7 @@ class CollectionBrowser extends React.Component {
         this.s3Client.createBucket({
             'Bucket': collectionId
         }, (err) => {
-            if(err) {
+            if (err) {
                 console.error("An error occurred while creating a collection", err);
             } else {
                 // Store information about the name
@@ -137,23 +137,27 @@ class CollectionBrowser extends React.Component {
     render() {
         // Actual contents
         let contents;
-        if(this.state.loading) {
+        if (this.state.loading) {
             contents = (<Typography variant="body2" paragraph={true} noWrap>Loading...</Typography>)
-        } else if(this.state.error) {
+        } else if (this.state.error) {
             contents = (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>)
         } else {
-            contents = (<div>
-                    <CollectionList collections={this.state.collections} onCollectionClick={this.handleCollectionClick.bind(this)}/>
-                    <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
-                        <Icon>add</Icon>
-                    </Button>
+            contents = (
+                <div>
+                    <CollectionList collections={this.state.collections}
+                                    onCollectionClick={this.handleCollectionClick.bind(this)}/>
                 </div>)
         }
 
         // Markup and title
         return (
             <div>
-                <Typography variant="title" paragraph={true} noWrap>{'Collections overview'}</Typography>
+                <Typography variant="title" paragraph={true}
+                            noWrap>{'Collections overview'}</Typography>
+
+                <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
+                    <Icon>add</Icon>
+                </Button>
 
                 {contents}
 

@@ -85,7 +85,7 @@ it('reloads the collection list on succesful creation', () => {
     });
 });
 
-it('reloads the collection list on succesful update', () => {
+it('reloads the collection list on successful update', () => {
     const wrapper = shallow(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore} />);
     expect(mockS3.listBuckets.mock.calls.length).toEqual(1);
 
