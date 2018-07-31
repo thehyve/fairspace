@@ -75,36 +75,36 @@ private fun Route.restrictedApi() {
     val repository: ModelRepository by application.inject()
 
     route("/model/{model}") {
-        var model: String? = null
+        lateinit var model: String
         intercept(ApplicationCallPipeline.Call) {
-            model = call.parameters["model"]
+            model = call.parameters["model"]!!
         }
         route("/statements") {
             post {
                 val delta = call.receive<Model>()
 
-                repository.add(model!!, delta)
+                repository.add(model, delta)
                 call.respond(HttpStatusCode.NoContent)
             }
             get {
                 val subject = call.parameters["subject"]
                 val predicate = call.parameters["predicate"]
 
-                val result = repository.list(model!!, subject, predicate)
+                val result = repository.list(model, subject, predicate)
                 call.respond(result)
             }
             delete {
                 val subject = call.parameters["subject"]
                 val predicate = call.parameters["predicate"]
 
-                repository.remove(model!!, subject, predicate)
+                repository.remove(model, subject, predicate)
                 call.respond(HttpStatusCode.NoContent)
             }
             patch {
                 val delta = call.receive<Model>()
 
                 try {
-                    repository.update(model!!, delta)
+                    repository.update(model, delta)
                     call.respond(HttpStatusCode.NoContent)
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.NotFound)
@@ -113,10 +113,10 @@ private fun Route.restrictedApi() {
         }
         route("/query") {
             get {
-                call.respond(repository.query(model!!, call.parameters["query"]!!))
+                call.respond(repository.query(model, call.parameters["query"]!!))
             }
             post {
-                call.respond(repository.query(model!!, call.receive()))
+                call.respond(repository.query(model, call.receive()))
             }
         }
     }
