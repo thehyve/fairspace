@@ -63,32 +63,22 @@ Host: localhost:8080
 Cache-Control: no-cache
 Content-Type: application/ld+json
 
-{ 
-  "http://somewhere/BillKidd" : { 
-    "http://www.w3.org/2001/vcard-rdf/3.0#FN" : [ { 
-      "type" : "literal" ,
-      "value" : "Bill Kidd"
-    }
-     ] ,
-    "http://www.w3.org/2001/vcard-rdf/3.0#N" : [ { 
-      "type" : "bnode" ,
-      "value" : "_:b764ccf5-ca28-4d3e-890c-46de043af0bb"
-    }
-     ]
-  }
-   ,
-  "_:b764ccf5-ca28-4d3e-890c-46de043af0bb" : { 
-    "http://www.w3.org/2001/vcard-rdf/3.0#Given" : [ { 
-      "type" : "literal" ,
-      "value" : "Bill"
-    }
-     ] ,
-    "http://www.w3.org/2001/vcard-rdf/3.0#Family" : [ { 
-      "type" : "literal" ,
-      "value" : "Kidd"
-    }
-     ]
-  }
+{
+  "@context": "http://schema.org",
+  "@type": "Book",
+  "name": "Semantic Web Primer (First Edition)",
+  "publisher": "Linked Data Tools",
+  "inLanguage": "English",
+  "bookFormat":
+  {
+     "@type": "EBook"
+  },
+  "offers":
+  {
+     "@type": "Offer",
+     "price": "2.95",
+     "priceCurrency": "USD",
+  },
 }
 ```
 
