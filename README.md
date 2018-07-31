@@ -117,7 +117,7 @@ Content-Type: application/ld+json
 PATCH /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Content-Type: application/rdf+json
+Content-Type: application/ld+json
 
 {
   "@context": "http://schema.org",
