@@ -31,6 +31,8 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /opt/ceres/config
+          - name: data
+            mountPath: /data/ceres
           livenessProbe:
             httpGet:
               path: /
@@ -57,7 +59,7 @@ spec:
       - name: config-volume
         configMap:
           name: {{ template "ceres.fullname" . }}
-      - name: export
+      - name: data
         {{- if .Values.persistence.enabled }}
         persistentVolumeClaim:
           claimName: {{ .Values.persistence.existingClaim | default (include "ceres.fullname" .) }}
