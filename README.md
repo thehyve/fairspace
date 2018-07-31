@@ -119,13 +119,21 @@ Host: localhost:8080
 Cache-Control: no-cache
 Content-Type: application/rdf+json
 
-{ 
-  "http://somewhere/BillKidd" : { 
-    "http://www.w3.org/2001/vcard-rdf/3.0#FN" : [ { 
-      "type" : "literal" ,
-      "value" : "William Shakespeare"
-    }
-     ] 
-  }
+{
+  "@context": "http://schema.org",
+  "@type": "Book",
+  "name": "Semantic Web Primer (First Edition)",
+  "publisher": "Linked Data Tools",
+  "inLanguage": "English",
+  "bookFormat":
+  {
+     "@type": "EBook"
+  },
+  "offers":
+  {
+     "@type": "Offer",
+     "price": "2.95",
+     "priceCurrency": "USD",
+  },
 }
 ```
