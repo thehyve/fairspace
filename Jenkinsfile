@@ -6,7 +6,7 @@ pipeline {
     }
     environment {
       ORG               = 'fairspace'
-      APP_NAME          = 'workspace'
+      APP_NAME          = 'Janus'
       DOCKER_REPO       = 'docker-registry.jx.test.fairdev.app'
 
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
