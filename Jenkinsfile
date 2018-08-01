@@ -1,9 +1,7 @@
 @Library("hipchat") _
 
 pipeline {
-    agent {
-      label "jenkins-gradle"
-    }
+    agent none
     environment {
       ORG               = 'fairspace'
       APP_NAME          = 'workspace'
@@ -14,6 +12,9 @@ pipeline {
     }
     stages {
       stage('Build helm chart') {
+        agent {
+              label "jenkins-gradle"
+        }
         steps {
           dir ('./workspace') {
             container('gradle') {
@@ -24,6 +25,9 @@ pipeline {
       }
 
       stage('Release helm chart') {
+        agent {
+              label "jenkins-gradle"
+        }
         when {
           branch 'master'
         }
@@ -43,6 +47,9 @@ pipeline {
       }
 
       stage('Deploy on CI') {
+        agent {
+              label "jenkins-gradle"
+        }
         when {
           branch 'master'
         }
@@ -57,12 +64,15 @@ pipeline {
         }
       }
       stage('Run e2e tests') {
+        agent {
+              label "jenkins-javascript"
+        }
         when {
            branch 'master'
         }
         steps {
           dir ('./workspace') {
-            container('gradle') {
+            container('javascript') {
               sh "npm install cypress --save-dev"
               sh "git clone https://github.com/fairspace/Janus.git"
               sh "cd Janus"
