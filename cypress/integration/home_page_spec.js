@@ -34,7 +34,7 @@ describe('The Home Page', function() {
     it('successfully change name of collection', function() {
         cy.contains("Collections").click()
         cy.wait(500)
-        cy.get('ul').find('li').eq(0).click()
+        cy.get('ul').find('li').contains("Test workspace-ci's collection").click()
         cy.get('h2').contains("Test workspace-ci's collection").click()
         cy.get('input[name=name]').clear().type('test change name')
         cy.get('button').contains('Save').click()
