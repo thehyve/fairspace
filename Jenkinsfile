@@ -56,6 +56,20 @@ pipeline {
           }
         }
       }
+      stage('Run e2e tests') {
+        when {
+           branch 'master'
+        }
+        steps {
+          dir ('./workspace') {
+            container('cypress/base') {
+              sh "git clone https://github.com/fairspace/Janus.git"
+              sh "cd Janus"
+              sh "cypress run --record"
+            }
+          }
+        }
+      }
       stage('Hipchat notification') {
         when {
           branch 'master'
