@@ -2,9 +2,10 @@
 
 pipeline {
     agent {
-      label "jenkins-javascript"
+      label "jenkins-nodejs"
     }
     environment {
+      JENKINS_CONTAINER_TAG = 'nodejs'
       ORG               = 'fairspace'
       APP_NAME          = 'Janus'
       DOCKER_REPO       = 'docker-registry.jx.test.fairdev.app'
@@ -14,16 +15,9 @@ pipeline {
     }
     stages {
       stage('Run e2e tests') {
-        when {
-           branch 'master'
-        }
         steps {
           dir ('./Janus') {
-            container('javascript') {
-              sh "git config --global credential.helper store"
-              sh "jx step validate --min-jx-version 1.1.73"
-              sh "jx step git credentials"
-
+            container(JENKINS_CONTAINER_TAG) {
               sh "npm install cypress --save-dev"
               sh "cypress run --record"
             }
