@@ -19,6 +19,9 @@ pipeline {
           dir ('./Janus') {
             container(JENKINS_CONTAINER_TAG) {
               sh "npm install cypress"
+              sh "ls"
+              sh "pwd"
+              sh "find / -name cypress"
               sh "./node_modules/.bin/cypress run --record"
             }
           }
