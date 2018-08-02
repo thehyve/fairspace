@@ -16,12 +16,9 @@ pipeline {
     stages {
       stage('Run e2e tests') {
         steps {
-          dir ('./Janus') {
-            container(JENKINS_CONTAINER_TAG) {
-              sh "npm install cypress"
-              sh "find / -name cypress.json"
-              sh "../node_modules/.bin/cypress run"
-            }
+          container(JENKINS_CONTAINER_TAG) {
+            sh "npm install cypress"
+            sh "node_modules/.bin/cypress run"
           }
         }
       }
