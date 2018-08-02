@@ -1,7 +1,9 @@
 @Library("hipchat") _
 
 pipeline {
-    agent none
+    agent {
+      label "jenkins-gradle"
+    }
     environment {
       ORG               = 'fairspace'
       APP_NAME          = 'workspace'
@@ -12,9 +14,6 @@ pipeline {
     }
     stages {
       stage('Build helm chart') {
-        agent {
-              label "jenkins-gradle"
-        }
         steps {
           dir ('./workspace') {
             container('gradle') {
@@ -25,17 +24,6 @@ pipeline {
       }
 
       stage('Release helm chart') {
-        agent {
-              label "jenkins-gradle"
-        }
-        environment {
-          ORG               = 'fairspace'
-          APP_NAME          = 'workspace'
-          DOCKER_REPO       = 'docker-registry.jx.test.fairdev.app'
-
-          CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
-          DOCKER_REPO_CREDS = credentials('jenkins-x-docker-repo')
-        }
         when {
           branch 'master'
         }
@@ -55,17 +43,6 @@ pipeline {
       }
 
       stage('Deploy on CI') {
-        agent {
-              label "jenkins-gradle"
-        }
-        environment {
-          ORG               = 'fairspace'
-          APP_NAME          = 'workspace'
-          DOCKER_REPO       = 'docker-registry.jx.test.fairdev.app'
-
-          CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
-          DOCKER_REPO_CREDS = credentials('jenkins-x-docker-repo')
-        }
         when {
           branch 'master'
         }
@@ -79,26 +56,12 @@ pipeline {
           }
         }
       }
-      stage('Run e2e tests') {
-        agent {
-              label "jenkins-javascript"
-        }
+      stage('Trigger Janus e2e tests') {
         when {
-           branch 'master'
+          branch 'master'
         }
         steps {
-          dir ('./workspace') {
-            container('javascript') {
-              sh "git config --global credential.helper store"
-              sh "jx step validate --min-jx-version 1.1.73"
-              sh "jx step git credentials"
-                          
-              sh "npm install cypress --save-dev"
-              sh "git clone https://github.com/fairspace/Janus.git"
-              sh "cd Janus"
-              sh "cypress run --record"
-            }
-          }
+          build job: '/Janus/master', wait: false, propagate: false
         }
       }
       stage('Hipchat notification') {
