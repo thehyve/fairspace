@@ -1,3 +1,7 @@
 {
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "video": false,
+  "baseUrl": "https://workspace.ci.test.fairdev.app/",
+  "user_name": "test-workspace-ci",
+  "password": "fairspace123"
 }
