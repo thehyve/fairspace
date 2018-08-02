@@ -17,7 +17,7 @@ service:
 resources:
   limits:
     cpu: 500m
-    memory: 1024Mi
+    memory: 256Mi
   requests:
     cpu: 256m
 ## Persist data to a persistent volume
@@ -38,7 +38,7 @@ persistence:
   ##
   # storageClass: "-"
   accessMode: ReadWriteOnce
-  size: 8Gi
+  size: 512Mi
   subPath: "ceres-db"
   mountPath: /data/ceres
 ceres:
