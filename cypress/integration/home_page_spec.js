@@ -13,13 +13,13 @@ describe('The Home Page', function() {
 
     it('successfully see list of collections', function() {
         cy.contains("Collections").click()
-        cy.wait(1000)
+        cy.get('h3')
         cy.get('ul').find('li').should('length.above', 0)
     })
 
     it('successfully add collection', function() {
         cy.contains("Collections").click()
-        cy.wait(500)
+        cy.get('h3')
         let number = 0
         cy.get('ul>li').each(() => {
             number += 1
@@ -33,7 +33,7 @@ describe('The Home Page', function() {
 
     it('successfully change name of collection', function() {
         cy.contains("Collections").click()
-        cy.wait(500)
+        cy.get('h3')
         cy.get('ul').find('li').contains("Test workspace-ci's collection").click()
         cy.get('h2').contains("Test workspace-ci's collection").click()
         cy.get('input[name=name]').clear().type('test change name')
