@@ -13,7 +13,7 @@ describe('The Home Page', function() {
 
     it('successfully see list of collections', function() {
         cy.contains("Collections").click()
-        cy.wait(500)
+        cy.wait(1000)
         cy.get('ul').find('li').should('length.above', 0)
     })
 
