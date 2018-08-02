@@ -51,7 +51,7 @@ pipeline {
             container('gradle') {
               sh "helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/"
               sh "helm repo update"
-              sh "helm upgrade --install workspace-ci chartmuseum/workspace --namespace=workspace-ci -f ../ci/ci-values.yaml"
+              sh "helm upgrade --install --wait workspace-ci chartmuseum/workspace --namespace=workspace-ci -f ../ci/ci-values.yaml"
             }
           }
         }
