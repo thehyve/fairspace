@@ -37,7 +37,7 @@ persistence:
   ##   GKE, AWS & OpenStack)
   ##
   # storageClass: "-"
-  accessMode: ReadWriteOnce
+  accessMode: ReadWriteMany
   size: 512Mi
   subPath: "ceres-db"
   mountPath: /data/ceres
