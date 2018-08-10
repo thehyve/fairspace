@@ -5,6 +5,8 @@ import Icon from "@material-ui/core/Icon";
 import Typography from "@material-ui/core/Typography";
 import InformationDrawer from "../InformationDrawer/InformationDrawer";
 import Config from "../../generic/Config/Config";
+import DirectoryBrowser from "./DirectoryBrowser";
+import WithS3Client from "../../../backend/WithS3Client/WithS3Client";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -20,6 +22,7 @@ class CollectionBrowser extends React.Component {
 
             collections: [],
             infoDrawerOpened: false,
+            showDirectories: false,
             selectedCollection: null
         };
     }
@@ -97,12 +100,20 @@ class CollectionBrowser extends React.Component {
         });
     }
 
+    handleHomeClick(e) {
+        this.setState({showDirectories: false})
+    }
+
     handleCloseInfoDrawer(e) {
         this.closeDrawer();
     }
 
     handleCollectionClick(collection) {
         this.setState({infoDrawerOpened: true, selectedCollection: collection});
+    }
+
+    handleCollectionDoubleClick(collection) {
+        this.setState({infoDrawerOpened: false, selectedCollection: collection, showDirectories: true});
     }
 
     handleCollectionDetailsChange(collectionId, parameters) {
@@ -133,43 +144,55 @@ class CollectionBrowser extends React.Component {
         this.setState({infoDrawerOpened: false});
     }
 
-
     render() {
-        // Actual contents
-        let contents;
-        if (this.state.loading) {
-            contents = (<Typography variant="body2" paragraph={true} noWrap>Loading...</Typography>)
-        } else if (this.state.error) {
-            contents = (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>)
-        } else {
-            contents = (
+        if (this.state.showDirectories) {
+            return (
                 <div>
-                    <CollectionList collections={this.state.collections}
-                                    onCollectionClick={this.handleCollectionClick.bind(this)}/>
+                    <Button variant="fab" color="primary" aria-label="Home" onClick={this.handleHomeClick.bind(this)}>
+                        <Icon>home</Icon>
+                    </Button>
+                    <WithS3Client>
+                    <DirectoryBrowser collection={this.state.selectedCollection}/>
+                    </WithS3Client>
                 </div>)
+        } else {
+            // Actual contents
+            let contents;
+            if (this.state.loading) {
+                contents = (<Typography variant="body2" paragraph={true} noWrap>Loading...</Typography>)
+            } else if (this.state.error) {
+                contents = (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>)
+            } else {
+                contents = (
+                    <div>
+                        <CollectionList collections={this.state.collections}
+                                        onCollectionClick={this.handleCollectionClick.bind(this)}
+                                        onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
+                        />
+                    </div>)
+            }
+            // Markup and title
+            return (
+                <div>
+                    <Typography variant="title" paragraph={true}
+                                noWrap>{'Collections overview'}</Typography>
+
+                    <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
+                        <Icon>add</Icon>
+                    </Button>
+
+                    {contents}
+
+                    <InformationDrawer
+                        open={this.state.infoDrawerOpened}
+                        collection={this.state.selectedCollection}
+                        onClose={this.handleCloseInfoDrawer.bind(this)}
+                        onChangeDetails={this.handleCollectionDetailsChange.bind(this)}
+                    >
+                    </InformationDrawer>
+                </div>
+            );
         }
-
-        // Markup and title
-        return (
-            <div>
-                <Typography variant="title" paragraph={true}
-                            noWrap>{'Collections overview'}</Typography>
-
-                <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
-                    <Icon>add</Icon>
-                </Button>
-
-                {contents}
-
-                <InformationDrawer
-                    open={this.state.infoDrawerOpened}
-                    collection={this.state.selectedCollection}
-                    onClose={this.handleCloseInfoDrawer.bind(this)}
-                    onChangeDetails={this.handleCollectionDetailsChange.bind(this)}
-                >
-                </InformationDrawer>
-            </div>
-        );
     }
 }
 

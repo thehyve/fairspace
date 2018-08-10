@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+    <Name>bucket</Name>
+    <Prefix/>
+    <KeyCount>2</KeyCount>
+    <MaxKeys>1000</MaxKeys>
+    <IsTruncated>false</IsTruncated>
+    <Contents>
+        <Key>text.txt</Key>
+        <LastModified>2018-10-23T17:50:30.000Z</LastModified>
+        <ETag>&quot;fba9dede5f27731c9766645a39863328&quot;</ETag>
+        <Size>256</Size>
+        <StorageClass>STANDARD</StorageClass>
+    </Contents>
+    <Contents>
+        <Key>folder/subfolder1/my-image.jpg</Key>
+        <LastModified>2009-10-12T17:50:30.000Z</LastModified>
+        <ETag>&quot;fba9dede5f27731c9771645a39863328&quot;</ETag>
+        <Size>434234</Size>
+        <StorageClass>STANDARD</StorageClass>
+    </Contents>
+    <Contents>
+        <Key>folder/subfolder2/my-image.jpg</Key>
+        <LastModified>2009-10-23T17:50:30.000Z</LastModified>
+        <ETag>&quot;fba9dede5f27731c9766645a39863328&quot;</ETag>
+        <Size>4342334</Size>
+        <StorageClass>STANDARD</StorageClass>
+    </Contents>
+</ListBucketResult>
