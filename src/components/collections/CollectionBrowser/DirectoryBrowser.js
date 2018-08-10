@@ -154,7 +154,7 @@ class DirectoryBrowser extends React.Component {
             const directory = dest.path;
             this.s3Client.putObject( // the only way to create a directory
                 {
-                    Bucket: this.props.collection,
+                    Bucket: this.props.collection.id,
                     Key: directory + (directory === '' ? '' : '/') + name + '/.ignore',
                     Body: ''
                 },
@@ -181,7 +181,7 @@ class DirectoryBrowser extends React.Component {
             .map(file =>
                 this.s3Client.putObject(
                     {
-                        Bucket: this.props.collection,
+                        Bucket: this.props.collection.id,
                         Key: (directory === '/' ? '' : (directory + '/')) + file.name,
                         ContentType: file.type,
                         Body: file
