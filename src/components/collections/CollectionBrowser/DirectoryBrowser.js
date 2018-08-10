@@ -52,6 +52,11 @@ class DirectoryBrowser extends React.Component {
         ERROR_HANDLER: {
             defaultErrorMessage: 'Error while loading collections',
             enabled: true
+        },
+        COLUMN_MANAGER: {
+            sortable: {
+                enabled: false
+            }
         }
     };
 
@@ -60,7 +65,7 @@ class DirectoryBrowser extends React.Component {
             dataIndex: 'name', name: 'Name', expandable: true, width: '60%', renderer: ({column, value, row}) =>
                 (<span><FontAwesomeIcon icon={row.isDirectory ? faFolder : faFile}/> {value}</span>)
         },
-        {dataIndex: 'displayType', name: 'Type', expandable: false, width: '10%'},
+        {dataIndex: 'extension', name: 'Type', expandable: false, width: '10%'},
         {dataIndex: 'size', name: 'Size', expandable: false, width: '15%'},
         {dataIndex: 'lastModified', name: 'Modified', expandable: false, width: '15%'}
     ];
@@ -121,7 +126,6 @@ class DirectoryBrowser extends React.Component {
                     parentId: parent.id,
                     name: fileName,
                     extension: ext,
-                    displayType: ext,
                     isDirectory: false,
                     path: obj.Key,
                     lastModified: obj.LastModified.toLocaleString(),
@@ -132,7 +136,38 @@ class DirectoryBrowser extends React.Component {
             }
         });
 
+        DirectoryBrowser.sortChildren(root);
+
         return {data: {root: {id: -1, parentId: null, children: [root]}}}
+    }
+
+    static compareFiles(f1, f2) {
+        if (f1.isDirectory && !f2.isDirectory) {
+            return -1
+        }
+        if (f2.isDirectory && !f1.isDirectory) {
+            return 1
+        }
+        if (f1.name < f2.name) {
+            return -1
+        }
+        if (f2.name < f1.name) {
+            return 1
+        }
+        if (f1.extension < f2.extension) {
+            return -1
+        }
+        if (f2.extension < f1.extension) {
+            return 1
+        }
+        return 0;
+    }
+
+    static sortChildren(root) {
+        if (root.children) {
+            root.children.sort(DirectoryBrowser.compareFiles);
+            root.children.forEach(DirectoryBrowser.sortChildren);
+        }
     }
 
     reloadContents() {
