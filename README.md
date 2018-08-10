@@ -52,55 +52,54 @@ container.
 
 
 ### JSON format
-#### Triple
-```
-{
-    "subject": "http:///file1",
-    "predicate": "http://schema.org/Author",
-            "object": {
-                "type": "literal",
-                "value": "Hans",
-                "lang": "en",
-                "dataType": "http://www.w3.org/2001/vcard-rdf/3.0#FN"
-            }
-}
-```
-#### Predicate
- ```
-{
-	"uri": "http://schema.org/Author",
-	"label": "creator"
-}
-```
+
 #### Response GET /metadata
 ```
+GET /metadaata?uri=http://store.example.com HTTP/1.1
+Host: localhost:8080
+Content-Type: application/ld+json
+
 {
-    "triples": [
+    "@id": "http://store.example.com/",
+    "@type": "Store",
+    "name": "Links Bike Shop",
+    "description": "The most \"linked\" bike store on earth!",
+    "product": [
         {
-            "subject": "http://file1",
-            "predicate": "http://schema.org/Author",
-            "object": {
-                "type": "literal",
-                "value": "Hans",
-                "lang": "en",
-                "dataType": "http://www.w3.org/2001/vcard-rdf/3.0#FN"
-            }
+            "@id": "p:links-swift-chain",
+            "@type": "Product",
+            "name": "Links Swift Chain",
+            "description": "A fine chain with many links.",
+            "category": ["cat:parts", "cat:chains"],
+            "price": "10.00",
+            "stock": 10
         },
         {
-            "subject": "http://file1",
-            "predicate": "http://schema.org/creator",
-            "object": {
-                "type": "bnode",
-                "value": "_:7c9f11751f117771ad79000c2f3fbc19"
-            }
+            "@id": "p:links-speedy-lube",
+            "@type": "Product",
+            "name": "Links Speedy Lube",
+            "description": "Lubricant for your chain links.",
+            "category": ["cat:lube", "cat:chains"],
+            "price": "5.00",
+            "stock": 20
         }
     ],
-    "predicateInfo": [
+    "@context": {
+        "Store": "http://ns.example.com/store#Store",
+        "Product": "http://ns.example.com/store#Product",
+        "product": "http://ns.example.com/store#product",
+        "category":
         {
-            "label": "Author",
-            "uri": "http://schema.org/Author"
-        }
-    ]
+          "@id": "http://ns.example.com/store#category",
+          "@type": "@id"
+        },
+        "price": "http://ns.example.com/store#price",
+        "stock": "http://ns.example.com/store#stock",
+        "name": "http://purl.org/dc/terms/title",
+        "description": "http://purl.org/dc/terms/description",
+        "p": "http://store.example.com/products/",
+        "cat": "http://store.example.com/category/"
+    }
 }
 ```
 
