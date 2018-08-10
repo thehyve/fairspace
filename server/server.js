@@ -30,6 +30,6 @@ storage.use(cors({
 }));
 storage.get('/', (req, res) => res.sendFile(__dirname  + '/listallbuckets-response.xml'));
 storage.put('/:bucketName', (req, res) => res.header("Location", "/" + req.params.bucketName).status(200).send());
-
+storage.get('/quotes', (req, res) => res.sendFile(__dirname  + '/listfiles-response.xml'));
 storage.listen(storagePort, () => console.log('Storage stub listening on port ' + storagePort ))
 
