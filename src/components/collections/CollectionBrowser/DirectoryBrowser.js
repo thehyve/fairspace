@@ -30,7 +30,7 @@ class DirectoryBrowser extends React.Component {
                 if (rowData) {
                     this.setState({selectedRow: rowData})
                 }
-                return (rowData && rowData.isDirectory) ? [] : ['menu-item-upload-file', 'menu-item-create-directory'];
+                return [];
             },
             menu: [
                 {
@@ -171,14 +171,13 @@ class DirectoryBrowser extends React.Component {
     }
 
     onFileToUploadSelected(event) {
-        this.uploadFiles(event.target.files);
+        this.uploadFiles([...event.target.files]);
     }
 
     uploadFiles(files) {
         const directory = this.currentDirectory();
-        const promises = new Array(files.length)
-            .map((x, i) => files[i])
-            .map(file =>
+        const promises =
+            files.map(file =>
                 this.s3Client.putObject(
                     {
                         Bucket: this.props.collection.id,
