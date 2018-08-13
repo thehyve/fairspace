@@ -146,53 +146,59 @@ class CollectionBrowser extends React.Component {
 
     render() {
         if (this.state.showDirectories) {
-            return (
-                <div>
-                    <Button variant="fab" color="primary" aria-label="Home" onClick={this.handleHomeClick.bind(this)}>
-                        <Icon>home</Icon>
-                    </Button>
-                    <WithS3Client>
-                    <DirectoryBrowser collection={this.state.selectedCollection}/>
-                    </WithS3Client>
-                </div>)
+            return this.showDirectories()
         } else {
-            // Actual contents
-            let contents;
-            if (this.state.loading) {
-                contents = (<Typography variant="body2" paragraph={true} noWrap>Loading...</Typography>)
-            } else if (this.state.error) {
-                contents = (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>)
-            } else {
-                contents = (
-                    <div>
-                        <CollectionList collections={this.state.collections}
-                                        onCollectionClick={this.handleCollectionClick.bind(this)}
-                                        onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
-                        />
-                    </div>)
-            }
-            // Markup and title
-            return (
-                <div>
-                    <Typography variant="title" paragraph={true}
-                                noWrap>{'Collections overview'}</Typography>
-
-                    <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
-                        <Icon>add</Icon>
-                    </Button>
-
-                    {contents}
-
-                    <InformationDrawer
-                        open={this.state.infoDrawerOpened}
-                        collection={this.state.selectedCollection}
-                        onClose={this.handleCloseInfoDrawer.bind(this)}
-                        onChangeDetails={this.handleCollectionDetailsChange.bind(this)}
-                    >
-                    </InformationDrawer>
-                </div>
-            );
+            return this.showCollections();
         }
+    }
+
+    showDirectories() {
+        return (
+            <div>
+                <Button variant="fab" color="primary" aria-label="Home" onClick={this.handleHomeClick.bind(this)}>
+                    <Icon>home</Icon>
+                </Button>
+                <DirectoryBrowser collection={this.state.selectedCollection} s3={this.s3Client}/>
+            </div>);
+    }
+
+    showCollections() {
+        // Actual contents
+        let contents;
+        if (this.state.loading) {
+            contents = (<Typography variant="body2" paragraph={true} noWrap>Loading...</Typography>)
+        } else if (this.state.error) {
+            contents = (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>)
+        } else {
+            contents = (
+                <div>
+                    <CollectionList collections={this.state.collections}
+                                    onCollectionClick={this.handleCollectionClick.bind(this)}
+                                    onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
+                    />
+                </div>)
+        }
+        // Markup and title
+        return (
+            <div>
+                <Typography variant="title" paragraph={true}
+                            noWrap>{'Collections overview'}</Typography>
+
+                <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
+                    <Icon>add</Icon>
+                </Button>
+
+                {contents}
+
+                <InformationDrawer
+                    open={this.state.infoDrawerOpened}
+                    collection={this.state.selectedCollection}
+                    onClose={this.handleCloseInfoDrawer.bind(this)}
+                    onChangeDetails={this.handleCollectionDetailsChange.bind(this)}
+                >
+                </InformationDrawer>
+            </div>
+        );
     }
 }
 
