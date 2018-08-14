@@ -44,6 +44,12 @@ function MenuDrawer(props) {
                         </ListItemIcon>
                         <ListItemText primary="Workflows" />
                     </ListItem>
+                    <ListItem component={Link} to="/metadata" button>
+                        <ListItemIcon>
+                            <Icon>assignment</Icon>
+                        </ListItemIcon>
+                        <ListItemText primary="Metadata" />
+                    </ListItem>
                 </List>
                 <Divider />
                 <List>
