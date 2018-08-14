@@ -9,24 +9,24 @@ import org.apache.jena.sparql.resultset.ResultSetMem
 
 class ModelRepository(private val dataset: Dataset) {
 
-    fun list(model: String, subject: String?, predicate: String?): Model =
-            dataset.read(model) {
+    fun list(subject: String?, predicate: String?): Model =
+            dataset.read {
                 listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
                         .toModel()
             }
 
-    fun add(model: String, delta: Model) {
-        dataset.write(model) { add(delta) }
+    fun add(delta: Model) {
+        dataset.write { add(delta) }
     }
 
-    fun remove(model: String, subject: String?, predicate: String?) {
-        dataset.write(model) {
+    fun remove(subject: String?, predicate: String?) {
+        dataset.write {
             removeAll(subject?.let(::createResource), predicate?.let(::createProperty), null)
         }
     }
 
-    fun query(model: String, queryString: String): Any = // ResultSet | Model | Boolean
-        dataset.read(model) {
+    fun query(queryString: String): Any = // ResultSet | Model | Boolean
+        dataset.read {
             QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
                 when (query.queryType) {
                     QueryTypeSelect -> ResultSetMem(execSelect())
@@ -38,8 +38,8 @@ class ModelRepository(private val dataset: Dataset) {
             }
         }
 
-    fun update(model: String, delta: Model) {
-        dataset.write(model) {
+    fun update(delta: Model) {
+        dataset.write {
             delta.listStatements().forEach { stmt ->
                 if (!containsResource(stmt.subject)) {
                     throw IllegalArgumentException(stmt.subject.uri)

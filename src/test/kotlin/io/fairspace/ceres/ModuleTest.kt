@@ -24,14 +24,14 @@ class ModuleTest : BaseCeresTest() {
     @Test
     fun `Test Post and Get`() {
         test {
-             with(handleRequest(HttpMethod.Post, "/model/test/statements") {
+             with(handleRequest(HttpMethod.Post, "/statements") {
                  addHeader(HttpHeaders.ContentType, JSONLD)
                  setBody(model.toString(RDFFormat.JSONLD))
              }) {
                  assertEquals(HttpStatusCode.NoContent, response.status())
              }
 
-             with(handleRequest(HttpMethod.Get, "/model/test/statements") {
+             with(handleRequest(HttpMethod.Get, "/statements") {
                  addHeader(HttpHeaders.Accept, JSONLD)
              }) {
                  assertEquals(HttpStatusCode.OK, response.status())
@@ -46,7 +46,7 @@ class ModuleTest : BaseCeresTest() {
     @Test
     fun `Test Content-Type handling`() {
         test {
-            with(handleRequest(HttpMethod.Post, "/model/test/statements") {
+            with(handleRequest(HttpMethod.Post, "/statements") {
                 addHeader(HttpHeaders.ContentType, "application/json")
                 setBody(model.toString(RDFFormat.RDFJSON))
             }) {
@@ -58,7 +58,7 @@ class ModuleTest : BaseCeresTest() {
     @Test
     fun `Test Accept handling`() {
         test {
-            with(handleRequest(HttpMethod.Get, "/model/test/statements") {
+            with(handleRequest(HttpMethod.Get, "/statements") {
                 addHeader(HttpHeaders.Accept, "application/json")
             }) {
                 assertEquals(HttpStatusCode.NotAcceptable, response.status())
@@ -69,7 +69,7 @@ class ModuleTest : BaseCeresTest() {
     @Test
     fun `Test invalid body handling`() {
         test {
-            with(handleRequest(HttpMethod.Post, "/model/test/statements") {
+            with(handleRequest(HttpMethod.Post, "/statements") {
                 addHeader(HttpHeaders.ContentType, JSONLD)
                 setBody("{'a':1}")
             }) {
@@ -81,14 +81,14 @@ class ModuleTest : BaseCeresTest() {
     @Test
     fun `Test Patch`() {
         test {
-            with(handleRequest(HttpMethod.Post, "/model/test/statements") {
+            with(handleRequest(HttpMethod.Post, "/statements") {
                 addHeader(HttpHeaders.ContentType, JSONLD)
                 setBody(model.toString(RDFFormat.JSONLD))
             }) {
                 assertEquals(HttpStatusCode.NoContent, response.status())
             }
 
-            with(handleRequest(HttpMethod.Get, "/model/test/statements") {
+            with(handleRequest(HttpMethod.Get, "/statements") {
                 addHeader(HttpHeaders.Accept, JSONLD)
             }) {
                 assertEquals(HttpStatusCode.OK, response.status())
@@ -102,14 +102,14 @@ class ModuleTest : BaseCeresTest() {
                         .addProperty(VCARD.FN, "William Shakespeare")
             }
 
-            with(handleRequest(HttpMethod.Patch, "/model/test/statements") {
+            with(handleRequest(HttpMethod.Patch, "/statements") {
                 addHeader(HttpHeaders.ContentType, JSONLD)
                 setBody(delta.toString(RDFFormat.JSONLD))
             }) {
                 assertEquals(HttpStatusCode.NoContent, response.status())
             }
 
-            with(handleRequest(HttpMethod.Get, "/model/test/statements") {
+            with(handleRequest(HttpMethod.Get, "/statements") {
                 addHeader(HttpHeaders.Accept, JSONLD)
             }) {
                 assertEquals(HttpStatusCode.OK, response.status())
