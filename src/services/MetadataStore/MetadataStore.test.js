@@ -18,7 +18,6 @@ beforeAll(() => {
                 "collections": "/metadata/{id}"
             }
         },
-        "externalConfigurationFiles": []
     });
 
     return Config.init().then(() => {MetadataStore.init() });

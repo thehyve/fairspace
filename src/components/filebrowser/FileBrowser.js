@@ -15,6 +15,10 @@ class FileBrowser extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
+        this.baseUrl = props.baseUrl || "/collections";
+        this.collectionId = props.collectionId;
+        this.collectionName = props.collectionName;
+        this.prefix = props.prefix;
 
         // Initialize state
         let path = this.getPath(props.path);
@@ -32,14 +36,17 @@ class FileBrowser extends React.Component {
         const pathId = this.getPathId(path)
 
         this.setState({loading: true});
-        fetch('http://localhost:3020/files/' + pathId + '/children')
+        fetch('/files/' + pathId + '/children')
             .then(data => data.json())
             .then(json => this.setState({loading: false, contents: json.items}))
+            .catch(err => {
+                this.setState({loading: false, error: true});
+            })
     }
 
     componentWillReceiveProps(nextProps) {
         let path = this.getPath(nextProps.path);
-        console.log("WillReceiveProps", nextProps, path);
+
         this.setState({
             path: path,
             contents: []
@@ -49,11 +56,18 @@ class FileBrowser extends React.Component {
 
     // Parse path into array
     getPath(path) {
+        if(!path)
+            return [];
+
+        if(path[0] === '/')
+            path = path.slice(1);
+
         return path ? path.split('/') : [];
     }
 
     getPathId(path) {
-        return btoa('/' + path.join('/')).replace(/=/g, '');
+        const completePath = [this.prefix, ...path].join('/');
+        return btoa(completePath).replace(/=/g, '');
     }
 
     render() {
@@ -63,7 +77,11 @@ class FileBrowser extends React.Component {
 
         return (
             <div>
-                <BreadCrumbs segments={this.state.path} />
+                <BreadCrumbs
+                    homeUrl={this.baseUrl}
+                    rootName={this.collectionName}
+                    rootUrl={this.baseUrl + "/" + this.collectionId}
+                    segments={this.state.path} />
 
                 {this.state.contents != null && this.state.contents[0] != null ?
                     (<Table>
@@ -99,7 +117,7 @@ class FileBrowser extends React.Component {
 
     handleClickRow(row) {
         if(row.type === 'dir') {
-            this.props.history.push('/files' + atob(row.id));
+            this.props.history.push(this.baseUrl + "/" + this.collectionId + atob(row.id));
         }
     }
 }

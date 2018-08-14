@@ -1,11 +1,9 @@
 const express = require('express')
 const cors = require('cors')
 const port = process.env.PORT || 5000;
-const storagePort = 5001;
 
 // Start a generic server on port 5000 that serves default API
 const app = express();
-app.get('/config/config.json', (req, res) => res.send({ urls: { storage: 'http://localhost:5001' }}));
 app.get('/api/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
 
 // Account API
@@ -17,19 +15,12 @@ app.post('/metadata/collections', (req, res) => res.send());
 app.patch('/metadata/collections', (req, res) => res.send());
 app.get('/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-metadata.json'));
 
+// Collections
+app.get('/collections', (req, res) => res.sendFile(__dirname + '/collections.json'));
+app.post('/collections', (req, res) => res.send());
+
+// Files
+app.get('/files/L3F1b3Rlcw/children', (req, res) => res.sendFile(__dirname + '/files-root.json'));
+
+
 app.listen(port, () => console.log('Backend stub listening on port ' + port ))
-
-// Start a storage server on port 5001 that serves the storage api
-const storage = express();
-
-storage.use(cors({
-    origin: function (origin, callback) {
-        callback(null, true)
-    },
-    credentials: true
-}));
-storage.get('/', (req, res) => res.sendFile(__dirname  + '/listallbuckets-response.xml'));
-storage.put('/:bucketName', (req, res) => res.header("Location", "/" + req.params.bucketName).status(200).send());
-storage.get('/quotes', (req, res) => res.sendFile(__dirname  + '/listfiles-response.xml'));
-storage.listen(storagePort, () => console.log('Storage stub listening on port ' + storagePort ))
-

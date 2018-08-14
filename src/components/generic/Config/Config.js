@@ -1,5 +1,4 @@
 import internalConfig from "../../../config";
-import merge from 'deepmerge'
 
 class Config {
     static instance;
@@ -23,33 +22,14 @@ class Config {
         this.internalConfig = internalConfig;
     }
 
+    /**
+     * This initialization allows to load external configuration files if needed
+     * @returns {Promise<any> | *}
+     */
     init() {
-        // Load external configuration files. Please note that
-        // if multiple files are provided, there is no guarantee
-        // about ordering, so it is best for the configuration files
-        // not to contain the same properties.
-        if(this.internalConfig.externalConfigurationFiles) {
-            this.loadingPromise = Promise.all(
-                this.internalConfig.externalConfigurationFiles.map(file => {
-                    return fetch(file, {'credentials': 'same-origin'})
-                        .then(response => response.ok ? response.json() : Promise.reject("Error loading configuration file " + file))
-                        .then((json) => {
-                            Config.instance.externalConfig = merge(Config.instance.externalConfig, json);
-                        })
-                })
-            ).catch((msg) => {
-                // Log error message and continue with the default configuration
-                console.warn(msg);
-            }).then(() => {
-                this.loaded = true;
-                this.fullConfig = merge(Object.assign({}, this.internalConfig), this.externalConfig);
-                return this.fullConfig;
-            });
-        } else {
-            this.loaded = true;
-            this.fullConfig = internalConfig;
-            this.loadingPromise = Promise.resolve(this.fullConfig);
-        }
+        this.loaded = true;
+        this.fullConfig = this.internalConfig;
+        this.loadingPromise = Promise.resolve(this.fullConfig);
 
         return this.loadingPromise;
     }

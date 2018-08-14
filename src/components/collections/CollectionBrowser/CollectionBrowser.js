@@ -6,7 +6,6 @@ import Typography from "@material-ui/core/Typography";
 import InformationDrawer from "../InformationDrawer/InformationDrawer";
 import Config from "../../generic/Config/Config";
 import DirectoryBrowser from "./DirectoryBrowser";
-import WithS3Client from "../../../backend/WithS3Client/WithS3Client";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -23,6 +22,7 @@ class CollectionBrowser extends React.Component {
             collections: [],
             infoDrawerOpened: false,
             showDirectories: false,
+
             selectedCollection: null
         };
     }

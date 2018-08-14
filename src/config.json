@@ -3,10 +3,9 @@
     "logout": "/logout",
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
-    "storage": ""
+    "collections": "/collections",
+    "metadata": "/metadata"
   },
-
-  "externalConfigurationFiles": ["/config/config.json"],
 
   "metadata": {
     "urlPatterns": {

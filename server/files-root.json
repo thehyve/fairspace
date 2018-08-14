@@ -1,0 +1,1202 @@
+{
+  "items": [
+    {
+      "id": "Ly5jb20uZ29vZ2xlLkNocm9tZS51Nm9tbDY",
+      "name": ".com.google.Chrome.u6oml6",
+      "createdTime": "2018-08-14T06:45:32.154Z",
+      "modifiedTime": "2018-08-14T06:45:32.154Z",
+      "capabilities": {},
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Ly5mb250LXVuaXg",
+      "name": ".font-unix",
+      "createdTime": "2018-08-14T06:41:28.977Z",
+      "modifiedTime": "2018-08-14T06:41:28.977Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": []
+    },
+    {
+      "id": "Ly5JQ0UtdW5peA",
+      "name": ".ICE-unix",
+      "createdTime": "2018-08-14T06:45:11.666Z",
+      "modifiedTime": "2018-08-14T06:45:11.666Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Ly5UZXN0LXVuaXg",
+      "name": ".Test-unix",
+      "createdTime": "2018-08-14T06:41:28.977Z",
+      "modifiedTime": "2018-08-14T06:41:28.977Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Ly5YMTEtdW5peA",
+      "name": ".X11-unix",
+      "createdTime": "2018-08-14T06:45:10.602Z",
+      "modifiedTime": "2018-08-14T06:45:10.602Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Ly5YSU0tdW5peA",
+      "name": ".XIM-unix",
+      "createdTime": "2018-08-14T06:41:28.977Z",
+      "modifiedTime": "2018-08-14T06:41:28.977Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L2hzcGVyZmRhdGFfcm9iZXJ0",
+      "name": "hsperfdata_robert",
+      "createdTime": "2018-08-14T07:18:40.518Z",
+      "modifiedTime": "2018-08-14T07:18:40.518Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L25wbS0xODk3Ni02NDkwMTI4OA",
+      "name": "npm-18976-64901288",
+      "createdTime": "2018-08-14T06:57:32.528Z",
+      "modifiedTime": "2018-08-14T06:57:32.528Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L25wbS0xOTg1My02NTRkZmRlMA",
+      "name": "npm-19853-654dfde0",
+      "createdTime": "2018-08-14T07:00:24.814Z",
+      "modifiedTime": "2018-08-14T07:00:24.814Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L25wbS0yMDEwNi0zMDU3NzlmZQ",
+      "name": "npm-20106-305779fe",
+      "createdTime": "2018-08-14T07:01:08.511Z",
+      "modifiedTime": "2018-08-14T07:01:08.511Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L25wbS0yMDEyMS1kMDZkNzFiNw",
+      "name": "npm-20121-d06d71b7",
+      "createdTime": "2018-08-14T07:01:13.175Z",
+      "modifiedTime": "2018-08-14T07:01:13.175Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3NzaC1SWFlhVXliUkU3d1o",
+      "name": "ssh-RXYaUybRE7wZ",
+      "createdTime": "2018-08-14T06:45:11.538Z",
+      "modifiedTime": "2018-08-14T06:45:11.538Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3N5c3RlbWQtcHJpdmF0ZS1lZjE5OTE3ZWY1MDQ0MmFhODA2ZjE5MTIwMzZlMTI2NS1hcGFjaGUyLnNlcnZpY2UtUjdnNmFF",
+      "name": "systemd-private-ef19917ef50442aa806f1912036e1265-apache2.service-R7g6aE",
+      "createdTime": "2018-08-14T06:41:30.501Z",
+      "modifiedTime": "2018-08-14T06:41:30.501Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3N5c3RlbWQtcHJpdmF0ZS1lZjE5OTE3ZWY1MDQ0MmFhODA2ZjE5MTIwMzZlMTI2NS1ib2x0LnNlcnZpY2UtVmd5UEFj",
+      "name": "systemd-private-ef19917ef50442aa806f1912036e1265-bolt.service-VgyPAc",
+      "createdTime": "2018-08-14T06:41:35.789Z",
+      "modifiedTime": "2018-08-14T06:41:35.789Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3N5c3RlbWQtcHJpdmF0ZS1lZjE5OTE3ZWY1MDQ0MmFhODA2ZjE5MTIwMzZlMTI2NS1jb2xvcmQuc2VydmljZS1iOGxXTUk",
+      "name": "systemd-private-ef19917ef50442aa806f1912036e1265-colord.service-b8lWMI",
+      "createdTime": "2018-08-14T06:41:30.041Z",
+      "modifiedTime": "2018-08-14T06:41:30.041Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3N5c3RlbWQtcHJpdmF0ZS1lZjE5OTE3ZWY1MDQ0MmFhODA2ZjE5MTIwMzZlMTI2NS1md3VwZC5zZXJ2aWNlLWVBbzdXbw",
+      "name": "systemd-private-ef19917ef50442aa806f1912036e1265-fwupd.service-eAo7Wo",
+      "createdTime": "2018-08-14T06:45:15.322Z",
+      "modifiedTime": "2018-08-14T06:45:15.322Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3N5c3RlbWQtcHJpdmF0ZS1lZjE5OTE3ZWY1MDQ0MmFhODA2ZjE5MTIwMzZlMTI2NS1paW8tc2Vuc29yLXByb3h5LnNlcnZpY2Utck9BOW5X",
+      "name": "systemd-private-ef19917ef50442aa806f1912036e1265-iio-sensor-proxy.service-rOA9nW",
+      "createdTime": "2018-08-14T06:41:29.273Z",
+      "modifiedTime": "2018-08-14T06:41:29.273Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3N5c3RlbWQtcHJpdmF0ZS1lZjE5OTE3ZWY1MDQ0MmFhODA2ZjE5MTIwMzZlMTI2NS1ydGtpdC1kYWVtb24uc2VydmljZS1IMFVyTUg",
+      "name": "systemd-private-ef19917ef50442aa806f1912036e1265-rtkit-daemon.service-H0UrMH",
+      "createdTime": "2018-08-14T06:41:33.817Z",
+      "modifiedTime": "2018-08-14T06:41:33.817Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3N5c3RlbWQtcHJpdmF0ZS1lZjE5OTE3ZWY1MDQ0MmFhODA2ZjE5MTIwMzZlMTI2NS1zeXN0ZW1kLXRpbWVzeW5jZC5zZXJ2aWNlLW9oYVVWZQ",
+      "name": "systemd-private-ef19917ef50442aa806f1912036e1265-systemd-timesyncd.service-ohaUVe",
+      "createdTime": "2018-08-14T06:41:28.981Z",
+      "modifiedTime": "2018-08-14T06:41:28.981Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": false,
+        "canDownload": false,
+        "canListChildren": true,
+        "canAddChildren": true,
+        "canRemoveChildren": true
+      },
+      "type": "dir",
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Ly5YMTAyNC1sb2Nr",
+      "name": ".X1024-lock",
+      "createdTime": "2018-08-14T06:41:33.097Z",
+      "modifiedTime": "2018-08-14T06:41:33.097Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 11,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkYxOTkyNTcyNjQyMDcwMDI5MjI3LnRtcA",
+      "name": "+~JF1992572642070029227.tmp",
+      "createdTime": "2018-08-14T07:18:42.618Z",
+      "modifiedTime": "2018-08-14T07:18:42.618Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 252032,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkYyNTAwMjE0MzU2NzA1ODgxODU2LnRtcA",
+      "name": "+~JF2500214356705881856.tmp",
+      "createdTime": "2018-08-14T07:18:42.618Z",
+      "modifiedTime": "2018-08-14T07:18:42.618Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 220772,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkY1NzE2MTQ4OTQ1Njk4MzM5NTM2LnRtcA",
+      "name": "+~JF5716148945698339536.tmp",
+      "createdTime": "2018-08-14T07:18:42.610Z",
+      "modifiedTime": "2018-08-14T07:18:42.610Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 197004,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkY1OTY4NDAxMTk5MTM5NzkxNzMyLnRtcA",
+      "name": "+~JF5968401199139791732.tmp",
+      "createdTime": "2018-08-14T07:18:42.618Z",
+      "modifiedTime": "2018-08-14T07:18:42.618Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 218476,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkY2MDk0OTU5NzI0ODMyNzY1MTEzLnRtcA",
+      "name": "+~JF6094959724832765113.tmp",
+      "createdTime": "2018-08-14T07:18:42.618Z",
+      "modifiedTime": "2018-08-14T07:18:42.618Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 221184,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkY2NTI5MDEyNTc3MDE2NzQ2MTc4LnRtcA",
+      "name": "+~JF6529012577016746178.tmp",
+      "createdTime": "2018-08-14T07:18:42.614Z",
+      "modifiedTime": "2018-08-14T07:18:42.614Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 220044,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkY2OTY5Njc5MzY0NTE3MzczNDExLnRtcA",
+      "name": "+~JF6969679364517373411.tmp",
+      "createdTime": "2018-08-14T07:18:42.610Z",
+      "modifiedTime": "2018-08-14T07:18:42.610Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 162976,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkY3MDgwMjQ4Nzk3NzEyNjM4NDQyLnRtcA",
+      "name": "+~JF7080248797712638442.tmp",
+      "createdTime": "2018-08-14T07:18:42.594Z",
+      "modifiedTime": "2018-08-14T07:18:42.594Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 22416,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkY4MDA2MDYyNzE2MDY0NzM5NjY2LnRtcA",
+      "name": "+~JF8006062716064739666.tmp",
+      "createdTime": "2018-08-14T07:18:42.610Z",
+      "modifiedTime": "2018-08-14T07:18:42.610Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 163624,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "Lyt-SkY4NDA2MzMzMjk0NDIwMjUzMzg2LnRtcA",
+      "name": "+~JF8406333294420253386.tmp",
+      "createdTime": "2018-08-14T07:18:42.606Z",
+      "modifiedTime": "2018-08-14T07:18:42.606Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 197644,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L2NvbmZpZy1lcnItSTIwampi",
+      "name": "config-err-I20jjb",
+      "createdTime": "2018-08-14T06:45:11.474Z",
+      "modifiedTime": "2018-08-14T06:45:11.474Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 0,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3N5c3RyYXlfT1FtazRF",
+      "name": "systray_OQmk4E",
+      "createdTime": "2018-08-14T06:45:13.614Z",
+      "modifiedTime": "2018-08-14T06:45:13.614Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 1105,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    },
+    {
+      "id": "L3Zib3hkcnYtTW9kdWxlLnN5bXZlcnM",
+      "name": "vboxdrv-Module.symvers",
+      "createdTime": "2018-08-14T06:41:40.045Z",
+      "modifiedTime": "2018-08-14T06:41:40.045Z",
+      "capabilities": {
+        "canDelete": true,
+        "canRename": true,
+        "canCopy": true,
+        "canEdit": true,
+        "canDownload": true
+      },
+      "type": "file",
+      "size": 25226,
+      "parentId": "Lw",
+      "ancestors": [
+        {
+          "id": "Lw",
+          "name": "Root",
+          "createdTime": "2018-08-14T07:21:04.221Z",
+          "modifiedTime": "2018-08-14T07:21:04.221Z",
+          "capabilities": {
+            "canDelete": false,
+            "canRename": false,
+            "canCopy": false,
+            "canEdit": false,
+            "canDownload": false,
+            "canListChildren": true,
+            "canAddChildren": true,
+            "canRemoveChildren": true
+          },
+          "type": "dir",
+          "ancestors": []
+        }
+      ]
+    }
+  ]
+}

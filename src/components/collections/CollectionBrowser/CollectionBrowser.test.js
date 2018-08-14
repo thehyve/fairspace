@@ -9,7 +9,6 @@ import configFile from "../../../config";
 
 beforeAll(() => {
     Config.setConfig(Object.assign(configFile, {
-        "externalConfigurationFiles": [],
         "user": {
             "username": "John"
         }

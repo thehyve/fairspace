@@ -1,19 +1,21 @@
 import React from 'react';
 import Collection from "./Collection";
+import ListItem from "@material-ui/core/ListItem";
+import List from "@material-ui/core/List";
 
 function CollectionList(props) {
     if(!props.collections || props.collections.length === 0) {
         return "No collections";
     } else {
         return (
-            <ul>
+            <List>
                 {props.collections.map(function (collection) {
-                    return (<li key={collection.id}
+                    return (<ListItem key={collection.name}
                                 onClick={() => props.onCollectionClick(collection)}
                                 onDoubleClick={() => props.onCollectionDoubleClick(collection)}
-                    ><Collection collection={collection}/></li>)
+                    ><Collection collection={collection}/></ListItem>)
                 })}
-            </ul>
+            </List>
         );
     }
 }

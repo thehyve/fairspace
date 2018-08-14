@@ -27,12 +27,12 @@ class MetadataStore {
      * @returns {Promise<Response>}
      */
     addCollectionMetadata(collection) {
-        if(!collection || !collection.id) {
+        if(!collection || !collection.name) {
             return Promise.reject("No proper collection provided.");
         }
 
         let body = Object.assign({}, collection, {
-            "uri": this.createUri(collection.id)
+            "uri": this.createUri(collection.name)
         });
 
         return fetch(this.collectionsBackendUrl, {
@@ -54,12 +54,12 @@ class MetadataStore {
      * @returns {Promise<Response>}
      */
     updateCollectionMetadata(collection) {
-        if(!collection || !collection.id) {
+        if(!collection || !collection.name) {
             return Promise.reject("No proper collection provided.");
         }
 
         let body = Object.assign({}, collection, {
-            "uri": this.createUri(collection.id)
+            "uri": this.createUri(collection.name)
         });
 
         return fetch(this.collectionsBackendUrl, {

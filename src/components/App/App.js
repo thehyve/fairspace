@@ -13,7 +13,6 @@ import Home from "../../pages/Home/Home";
 import Collections from "../../pages/Collections/Collections";
 import Notebooks from "../../pages/Notebooks/Notebooks";
 import MetadataStore from "../../services/MetadataStore/MetadataStore";
-import Files from "../../pages/Home/Files";
 
 class App extends React.Component {
     cancellable = {
@@ -66,8 +65,7 @@ class App extends React.Component {
                                 <div className={this.classes.toolbar}/>
 
                                 <Route exact path="/" component={Home}/>
-                                <Route path="/files/:path(.*)?" component={Files}/>
-                                <Route path="/collections" component={Collections}/>
+                                <Route path="/collections/:collection?/:path(.*)?" component={Collections}/>
                                 <Route path="/notebooks" component={Notebooks}/>
 
                                 {/* Handle auth urls that should go to the server */}
