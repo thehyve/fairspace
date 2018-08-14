@@ -14,7 +14,14 @@ spring:
     hibernate:
       ddl-auto: update
     generate-ddl: true
-
+  mvc:
+    static-path-pattern: /static/**
+  resources:
+    cache:
+      period: 604800s
+      cachecontrol:
+        max-age: 604800s
+        cache-public: true
 
 # Pointer to the Ceres service
 ceres:
