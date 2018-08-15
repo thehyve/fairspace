@@ -61,34 +61,24 @@ See also: [Ktor configuration](https://ktor.io/servers/configuration.html#availa
 POST /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Content-Type: application/rdf+json
+Content-Type: application/ld+json
 
-{ 
-  "http://somewhere/BillKidd" : { 
-    "http://www.w3.org/2001/vcard-rdf/3.0#FN" : [ { 
-      "type" : "literal" ,
-      "value" : "Bill Kidd"
-    }
-     ] ,
-    "http://www.w3.org/2001/vcard-rdf/3.0#N" : [ { 
-      "type" : "bnode" ,
-      "value" : "_:b764ccf5-ca28-4d3e-890c-46de043af0bb"
-    }
-     ]
-  }
-   ,
-  "_:b764ccf5-ca28-4d3e-890c-46de043af0bb" : { 
-    "http://www.w3.org/2001/vcard-rdf/3.0#Given" : [ { 
-      "type" : "literal" ,
-      "value" : "Bill"
-    }
-     ] ,
-    "http://www.w3.org/2001/vcard-rdf/3.0#Family" : [ { 
-      "type" : "literal" ,
-      "value" : "Kidd"
-    }
-     ]
-  }
+{
+  "@context": "http://schema.org",
+  "@type": "Book",
+  "name": "Semantic Web Primer (First Edition)",
+  "publisher": "Linked Data Tools",
+  "inLanguage": "English",
+  "bookFormat":
+  {
+     "@type": "EBook"
+  },
+  "offers":
+  {
+     "@type": "Offer",
+     "price": "2.95",
+     "priceCurrency": "USD",
+  },
 }
 ```
 
@@ -98,7 +88,7 @@ Content-Type: application/rdf+json
 GET /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Accept: application/rdf+json
+Accept: application/ld+json
 ```
 
 ### To retrieve all statements for a specific subject (add `&predicate=...` to filter by predicate as well)
@@ -107,7 +97,7 @@ Accept: application/rdf+json
 GET /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Accept: application/rdf+json
+Accept: application/ld+json
 ```
 
 
@@ -117,7 +107,7 @@ Accept: application/rdf+json
 DELETE /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Content-Type: application/rdf+json
+Content-Type: application/ld+json
 ```
 
 ### To update a model (removes all existing triples with provided subjects and predicates then adds new statements)
@@ -127,15 +117,23 @@ Content-Type: application/rdf+json
 PATCH /model/mymodel/statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
-Content-Type: application/rdf+json
+Content-Type: application/ld+json
 
-{ 
-  "http://somewhere/BillKidd" : { 
-    "http://www.w3.org/2001/vcard-rdf/3.0#FN" : [ { 
-      "type" : "literal" ,
-      "value" : "William Shakespeare"
-    }
-     ] 
-  }
+{
+  "@context": "http://schema.org",
+  "@type": "Book",
+  "name": "Semantic Web Primer (First Edition)",
+  "publisher": "Linked Data Tools",
+  "inLanguage": "English",
+  "bookFormat":
+  {
+     "@type": "EBook"
+  },
+  "offers":
+  {
+     "@type": "Offer",
+     "price": "2.95",
+     "priceCurrency": "USD",
+  },
 }
 ```

@@ -12,6 +12,8 @@ import java.net.URL
 
 
 fun main(args: Array<String>) {
+    println("Ceres - RDF and SPARQL over HTTP")
+
     val env = commandLineEnvironment(args)
 
     startKoin(listOf(applicationContext {

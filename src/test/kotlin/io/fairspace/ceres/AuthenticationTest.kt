@@ -105,16 +105,13 @@ class AuthenticationTest : BaseCeresTest() {
                             expiresAt: Date = TOMORROW) =
             prefix + JWT.create()
                     .withAudience(audience)
-                    .withIssuer("${issuer}/auth/realms/${realm}")
+                    .withIssuer("$issuer/auth/realms/$realm")
                     .withKeyId(keyId)
                     .withExpiresAt(expiresAt)
                     .sign(algorithm)
 
-    override fun koinModules(): List<Module> {
-        return super.koinModules() + applicationContext {
-            bean { getJwkProviderMock() }
-        }
-    }
+    override fun koinModules(): List<Module> =
+            super.koinModules() + applicationContext { bean { getJwkProviderMock() } }
 
     private fun getJwkProviderMock(): JwkProvider {
         val jwk = mock<Jwk> {

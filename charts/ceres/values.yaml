@@ -17,7 +17,7 @@ service:
 resources:
   limits:
     cpu: 500m
-    memory: 1024Mi
+    memory: 256Mi
   requests:
     cpu: 256m
 ## Persist data to a persistent volume
@@ -37,8 +37,8 @@ persistence:
   ##   GKE, AWS & OpenStack)
   ##
   # storageClass: "-"
-  accessMode: ReadWriteOnce
-  size: 8Gi
+  accessMode: ReadWriteMany
+  size: 512Mi
   subPath: "ceres-db"
   mountPath: /data/ceres
 ceres:

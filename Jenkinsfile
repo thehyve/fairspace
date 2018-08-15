@@ -99,5 +99,10 @@ pipeline {
       cleanup {
         cleanWs()
       }
+      failure {
+        script {
+          hipchat.notifyFailure()
+        }
+      }
     }
 }
