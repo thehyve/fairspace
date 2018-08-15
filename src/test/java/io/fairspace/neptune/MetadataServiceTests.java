@@ -46,8 +46,6 @@ public class MetadataServiceTests {
 
 
         assertTrue(combi.containsAll(createTriples()));
-        assertTrue(combi.contains(combi.createResource(PREDICATE_URI), RDF.type, RDF.Property));
-        assertTrue(combi.contains(combi.createResource(PREDICATE_URI), RDFS.label, combi.createLiteral(PREDICATE_LABEL)));
     }
 
     private Model createTriples() {

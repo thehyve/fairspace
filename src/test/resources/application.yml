@@ -13,5 +13,5 @@ spring:
     active:
       - dev
 ceres:
-  url: "http://localhost:8001"
+  url: http://localhost:${wiremock.server.port}/ceres
   model: "default"

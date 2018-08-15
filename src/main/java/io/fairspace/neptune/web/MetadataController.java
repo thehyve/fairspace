@@ -28,7 +28,7 @@ public class MetadataController {
      * @param uri the uri of interest.
      * @return the triples with predicates and their information
      */
-    @GetMapping
+    @GetMapping(produces = "application/ld+json")
     public Model get(@RequestParam String uri) {
         return metadataService.retrieveMetadata(uri);
     }
@@ -38,7 +38,7 @@ public class MetadataController {
      *
      * @param triples a list of triple objects.
      */
-    @PostMapping
+    @PostMapping(consumes = "application/ld+json")
     public void postTriples(@RequestBody Model triples) {
         metadataService.postTriples(triples);
     }
@@ -48,40 +48,8 @@ public class MetadataController {
      *
      * @param triples a list of triple objects.
      */
-    @DeleteMapping
+    @DeleteMapping(consumes = "application/ld+json")
     public void deleteTriples(@RequestBody Model triples) {
         metadataService.deleteTriples(triples);
-    }
-
-
-    /**
-     * Retrieves the label of a predicate
-     *
-     * @param uri the uri of the predicate
-     */
-    @GetMapping("/predicate")
-    public PredicateInfo getPredicateInfo(@RequestParam String uri) {
-        return metadataService.getPredicateInfo(uri);
-    }
-
-
-    /**
-     * Store a predicate with a specified label
-     *
-     * @param predicateInfo the predicate with label
-     */
-    @PostMapping("/predicate")
-    public void postPredicateInfo(@RequestBody PredicateInfo predicateInfo) {
-        metadataService.postPredicateInfo(predicateInfo);
-    }
-
-    /**
-     * Store a list of predicates with their specified label
-     *
-     * @param predicateInfoList the list of predicates with their label
-     */
-    @PostMapping("/predicates")
-    public void postPredicateInfo(@RequestBody List<PredicateInfo> predicateInfoList) {
-        metadataService.postPredicateInfoList(predicateInfoList);
     }
 }
