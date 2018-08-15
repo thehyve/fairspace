@@ -37,5 +37,4 @@ public class AppConfig implements WebMvcConfigurer {
         extendMessageConverters(restTemplate.getMessageConverters());
         return restTemplate;
     }
-
 }
