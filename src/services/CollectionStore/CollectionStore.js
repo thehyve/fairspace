@@ -21,12 +21,23 @@ class CollectionStore {
         })
     }
 
-    addCollection(collectionName) {
+    getCollection(id) {
+        return fetch(Config.get().urls.collections + "/" + id, {
+            method: 'GET',
+            headers: CollectionStore.getHeaders,
+            credentials: 'same-origin'
+        }).then(response => {
+            failOnHttpError(response, "Failure when retrieving list of collections");
+            return response.json();
+        })
+    }
+
+    addCollection(name, description) {
         return fetch(Config.get().urls.collections, {
             method: 'POST',
             headers: CollectionStore.changeHeaders,
             credentials: 'same-origin',
-            body: {name: collectionName, type: "local-file"}
+            body: { name: name, description: description }
         }).then(response => {
             failOnHttpError(response, "Failure while saving collection");
             return response;

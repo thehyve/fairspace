@@ -13,11 +13,8 @@ app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "R
 // Metadata API
 app.post('/metadata/collections', (req, res) => res.send());
 app.patch('/metadata/collections', (req, res) => res.send());
-app.get('/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-metadata.json'));
-
-// Collections
-app.get('/collections', (req, res) => res.sendFile(__dirname + '/collections.json'));
-app.post('/collections', (req, res) => res.send());
+app.get('/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-list.json'));
+app.get('/metadata/collections/:id', (req, res) => res.sendFile(__dirname + '/single-collection.json'));
 
 // Files
 app.get('/files/L3F1b3Rlcw/children', (req, res) => res.sendFile(__dirname + '/files-root.json'));

@@ -15,7 +15,6 @@ class FileStore {
 
     constructor(collection) {
         this.collection = collection;
-        this.params = collection.params;
         this.baseUrl = Config.get().urls.files;
     }
 
@@ -57,7 +56,7 @@ class FileStore {
 
     _getPathId(path) {
         const parts = this._parsePath(path);
-        const completePath = [this.params.path, ...parts].join('/');
+        const completePath = '/' + [this.collection.typeIdentifier, ...parts].join('/');
         return btoa(completePath).replace(/=/g, '');
     }
 

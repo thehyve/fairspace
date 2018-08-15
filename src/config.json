@@ -3,7 +3,7 @@
     "logout": "/logout",
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
-    "collections": "/collections",
+    "collections": "/metadata/collections",
     "metadata": "/metadata",
     "files": "/files"
   },

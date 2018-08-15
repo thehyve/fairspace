@@ -6,7 +6,6 @@ class CollectionOverview extends React.Component {
         super(props);
         this.props = props;
         this.collectionStore = props.collectionStore;
-        this.metadataStore = props.metadataStore;
         this.onCollectionsDidLoad = props.onCollectionsDidLoad;
 
         // Initialize state
@@ -35,34 +34,13 @@ class CollectionOverview extends React.Component {
                     return;
                 }
 
-                return this.metadataStore
-                    .getCollectionMetadata(collections.map(collection => collection.name))
-                    .then((metadata) => {
-                        if (this.isUnmounting) {
-                            return;
-                        }
+                // Update the state and send out events
+                this.setState({loading: false, collections: collections});
+                if(this.onCollectionsDidLoad) {
+                    this.onCollectionsDidLoad(collections);
+                }
 
-                        const lookupCollectionMetadata = (name) => {
-                            const collectionUri = this.metadataStore.createUri(name);
-                            const foundMetadata = metadata.filter((item) => item.uri === collectionUri);
-                            return foundMetadata.length > 0 ? foundMetadata[0] : {};
-                        }
-
-                        // Merge metadata with collections
-                        const mergedCollections = collections.map(collection => ({
-                            ...collection,
-                            metadata: lookupCollectionMetadata(collection.name)
-                        }));
-
-
-                        // Update the state and send out events
-                        this.setState({loading: false, collections: mergedCollections});
-                        if(this.onCollectionsDidLoad) {
-                            this.onCollectionsDidLoad(mergedCollections);
-                        }
-
-                        return mergedCollections;
-                    });
+                return collections;
             })
             .catch(err => {
                 if (this.isUnmounting) {

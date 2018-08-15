@@ -26,8 +26,8 @@ function CollectionList(props) {
                         return (
                             <ClickHandler
                                     component={TableRow}
-                                    key={collection.name}
-                                    selected={props.selectedCollection && collection.name === props.selectedCollection.name}
+                                    key={collection.id}
+                                    selected={props.selectedCollection && collection.id === props.selectedCollection.id}
                                       onSingleClick={() => props.onCollectionClick(collection)}
                                       onDoubleClick={() => props.onCollectionDoubleClick(collection)}>
                                 <TableCell>

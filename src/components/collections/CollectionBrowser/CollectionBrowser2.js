@@ -62,55 +62,32 @@ class CollectionBrowser extends React.Component {
         }
     }
 
-    openCollectionAndPath(selectedCollectionName, selectedPath) {
-        let collectionDetails = null;
-        if(selectedCollectionName) {
+    openCollectionAndPath(selectedCollectionId, selectedPath) {
+        if(selectedCollectionId) {
             // Retrieve collection details
-            // TODO: Make backend call
-            collectionDetails = {
-                name: selectedCollectionName,
-                params: { path: '/' + selectedCollectionName },
-                metadata: {
-                    name: selectedCollectionName
-                }
-            };
-
-            this.fileStore = new FileStore(collectionDetails);
+            this.collectionStore
+                .getCollection(selectedCollectionId)
+                .then(collection => {
+                    this.fileStore = new FileStore(collection);
+                    this.setState({openedCollection: collection, openedPath: selectedPath});
+                });
+        } else {
+            this.setState({openedCollection: null, openedPath: selectedPath});
         }
-        this.setState({openedCollection: collectionDetails, openedPath: selectedPath});
     }
 
     closeCollections() {
         this.setState({openedCollection: null});
     }
 
-    generateId() {
-        // TODO: Determine the best way to generate a new id
-        return '' + (Math.random() * 10000000);
-    }
-
     handleAddCollectionClick() {
-        const collectionId = this.generateId();
+        const name = Config.get().user.username + "'s collection";
+        const description = "Beyond the horizon";
 
         // Create the bucket in storage
         this.collectionStore
-            .addCollection(collectionId)
-            .then(() => {
-                // Store information about the name
-                // TODO: Determine the default description to be set
-                this.metadataStore.addCollectionMetadata({
-                    id: collectionId,
-                    name: Config.get().user.username + "'s collection",
-                    description: "Beyond the horizon"
-                }).then(() => {
-                    // Reload collections after creating a new one
-                    this.requireRefresh();
-                }).catch((e) => {
-                    // Load collections as a new bucket has been created, but without metadata
-                    this.requireRefresh();
-                    console.error("An error occurred while adding collection metadata", e);
-                });
-            })
+            .addCollection(name, description)
+            .then(this.requireRefresh)
             .catch(err => {
                 console.error("An error occurred while creating a collection", err);
             });
@@ -122,7 +99,7 @@ class CollectionBrowser extends React.Component {
 
     handleCollectionClick(collection) {
         // If this collection is already selected, deselect
-        if(this.state.selectedCollection && this.state.selectedCollection.name === collection.name) {
+        if(this.state.selectedCollection && this.state.selectedCollection.id === collection.id) {
             this.deselectCollection();
         } else {
             this.selectCollection(collection);
@@ -153,7 +130,9 @@ class CollectionBrowser extends React.Component {
         this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, { metadata: parameters})});
 
         // Reload list of collections to ensure the latest version
-        this.loadCollections();
+        if(!this.state.selectedCollection) {
+            this.requireRefresh();
+        }
     }
 
     handleUpload(files) {
@@ -208,7 +187,7 @@ class CollectionBrowser extends React.Component {
 
 
     openCollection(collection) {
-        this.props.history.push("/collections/" + collection.name);
+        this.props.history.push("/collections/" + collection.id);
     }
 
     openDir(path) {
@@ -286,7 +265,7 @@ class CollectionBrowser extends React.Component {
     renderBreadCrumbs(selectedCollection, selectedPath) {
         let pathSegments = [];
         if(selectedCollection) {
-            pathSegments.push({segment: selectedCollection.name, label: selectedCollection.metadata.name});
+            pathSegments.push({segment: selectedCollection.id, label: selectedCollection.metadata.name});
             pathSegments.push(...this.parsePath(selectedPath));
         }
 
@@ -328,7 +307,7 @@ class CollectionBrowser extends React.Component {
     renderCollection(collection) {
         return (
             <FileOverview
-                prefix={collection.params.path}
+                prefix={"/" + collection.typeIdentifier}
                 path={this.state.openedPath}
                 selectedPath={this.state.selectedPath ? this.state.selectedPath.id : null}
                 refreshFiles={this.state.refreshRequired}
@@ -343,7 +322,6 @@ class CollectionBrowser extends React.Component {
     renderCollectionList() {
         return (
             <CollectionOverview
-                            metadataStore={this.metadataStore}
                             collectionStore={this.collectionStore}
                             selectedCollection={this.state.selectedCollection}
                             refreshCollections={this.state.refreshRequired}
