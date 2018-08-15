@@ -7,6 +7,7 @@ class CollectionOverview extends React.Component {
         this.props = props;
         this.collectionStore = props.collectionStore;
         this.metadataStore = props.metadataStore;
+        this.onCollectionsDidLoad = props.onCollectionsDidLoad;
 
         // Initialize state
         this.state = {

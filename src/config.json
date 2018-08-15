@@ -4,7 +4,8 @@
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
     "collections": "/collections",
-    "metadata": "/metadata"
+    "metadata": "/metadata",
+    "files": "/files"
   },
 
   "metadata": {

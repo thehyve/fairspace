@@ -5,10 +5,13 @@ class FileOverview extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
+        this.fileStore = props.fileStore;
         this.prefix = props.prefix;
+        this.onFilesDidLoad = props.onFilesDidLoad;
 
         // Initialize state
-        let path = this.getPath(props.path);
+        let path = props.path;
+
         this.state = {
             loading: false,
             path: path,
@@ -22,12 +25,14 @@ class FileOverview extends React.Component {
     }
 
     loadContents(path) {
-        const pathId = this.getPathId(path)
-
         this.setState({loading: true});
-        fetch('/files/' + pathId + '/children')
-            .then(data => data.json())
-            .then(json => this.setState({loading: false, contents: json.items}))
+        this.fileStore.list(path)
+            .then(json => this.setState({loading: false, contents: json}))
+            .then(json => {
+                if(this.onFilesDidLoad) {
+                    this.onFilesDidLoad(json);
+                }
+            })
             .catch(err => {
                 this.setState({loading: false, error: true});
             })
@@ -35,21 +40,20 @@ class FileOverview extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         // See if we need updating
-        if(nextProps.path !== this.props.path) {
-            let path = this.getPath(nextProps.path);
-
+        if(nextProps.path !== this.props.path || nextProps.refreshFiles) {
             this.setState({
-                path: path,
+                path: nextProps.path,
                 contents: [],
                 selectedPath: nextProps.selectedPath
             });
-            this.loadContents(path);
+            this.loadContents(nextProps.path);
         } else {
             this.setState({
                 selectedPath: nextProps.selectedPath
             });
-            this.props = nextProps;
         }
+
+        this.props = nextProps;
     }
 
     // Parse path into array
@@ -61,11 +65,6 @@ class FileOverview extends React.Component {
             path = path.slice(1);
 
         return path ? path.split('/') : [];
-    }
-
-    getPathId(path) {
-        const completePath = [this.prefix, ...path].join('/');
-        return btoa(completePath).replace(/=/g, '');
     }
 
     render() {

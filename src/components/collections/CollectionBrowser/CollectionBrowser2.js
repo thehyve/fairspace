@@ -12,6 +12,8 @@ import CollectionOverview from "../CollectionOverview/CollectionOverview";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import {Column, Row} from 'simple-flexbox';
+import UploadButton from "../UploadButton/UploadButton";
+import FileStore from "../../../services/FileStore/FileStore";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -20,6 +22,7 @@ class CollectionBrowser extends React.Component {
 
         this.metadataStore = props.metadataStore;
         this.collectionStore = props.collectionStore;
+        this.fileStore = null;
 
         // Initialize state
         this.state = {
@@ -71,6 +74,8 @@ class CollectionBrowser extends React.Component {
                     name: selectedCollectionName
                 }
             };
+
+            this.fileStore = new FileStore(collectionDetails);
         }
         this.setState({openedCollection: collectionDetails, openedPath: selectedPath});
     }
@@ -84,7 +89,7 @@ class CollectionBrowser extends React.Component {
         return '' + (Math.random() * 10000000);
     }
 
-    handleAddClick() {
+    handleAddCollectionClick() {
         const collectionId = this.generateId();
 
         // Create the bucket in storage
@@ -99,10 +104,10 @@ class CollectionBrowser extends React.Component {
                     description: "Beyond the horizon"
                 }).then(() => {
                     // Reload collections after creating a new one
-                    this.setState({refreshCollections: true});
+                    this.requireRefresh();
                 }).catch((e) => {
                     // Load collections as a new bucket has been created, but without metadata
-                    this.setState({refreshCollections: true});
+                    this.requireRefresh();
                     console.error("An error occurred while adding collection metadata", e);
                 });
             })
@@ -151,8 +156,26 @@ class CollectionBrowser extends React.Component {
         this.loadCollections();
     }
 
-    handleCollectionsDidLoad(collections) {
-        this.setState({refreshCollections: false});
+    handleUpload(files) {
+        if(files && files.length > 0) {
+            this.fileStore
+                .upload(this.state.openedPath, files)
+                .catch(err => {
+                    console.error("An error occurred while uploading files", err);
+                });
+        }
+    }
+
+    handleDidLoad() {
+        this.setState({refreshRequired: false});
+    }
+
+    handleDidUpload() {
+        this.requireRefresh();
+    }
+
+    requireRefresh() {
+        this.setState({refreshRequired: true});
     }
 
     openDrawer() {
@@ -273,10 +296,25 @@ class CollectionBrowser extends React.Component {
     }
 
     renderButtons(selectedCollection, selectedPath) {
-        return (
-            <Button variant="fab" mini color="secondary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
-                <Icon>add</Icon>
-            </Button>)
+        return this.renderAddButton(selectedCollection);
+    }
+
+    renderAddButton(selectedCollection) {
+        if(selectedCollection) {
+            return (<UploadButton
+                variant="fab"
+                mini
+                color="secondary"
+                aria-label="Upload"
+                onUpload={this.handleUpload.bind(this)}
+                onDidUpload={this.handleDidUpload.bind(this)}>
+                <Icon>cloud_upload</Icon>
+            </UploadButton>)
+        } else {
+            return (<Button variant="fab" mini color="secondary" aria-label="Add" onClick={this.handleAddCollectionClick.bind(this)}>
+                    <Icon>add</Icon>
+                </Button>)
+        }
     }
 
     renderError() {
@@ -293,6 +331,9 @@ class CollectionBrowser extends React.Component {
                 prefix={collection.params.path}
                 path={this.state.openedPath}
                 selectedPath={this.state.selectedPath ? this.state.selectedPath.id : null}
+                refreshFiles={this.state.refreshRequired}
+                fileStore={this.fileStore}
+                onFilesDidLoad={this.handleDidLoad.bind(this)}
                 onPathClick={this.handlePathClick.bind(this)}
                 onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
             />
@@ -305,8 +346,8 @@ class CollectionBrowser extends React.Component {
                             metadataStore={this.metadataStore}
                             collectionStore={this.collectionStore}
                             selectedCollection={this.state.selectedCollection}
-                            refreshCollections={this.state.refreshCollections}
-                            onCollectionsDidLoad={this.handleCollectionsDidLoad.bind(this)}
+                            refreshCollections={this.state.refreshRequired}
+                            onCollectionsDidLoad={this.handleDidLoad.bind(this)}
                             onCollectionClick={this.handleCollectionClick.bind(this)}
                             onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
             />);
