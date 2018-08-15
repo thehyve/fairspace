@@ -1,7 +1,7 @@
 import Config from "../../components/generic/Config/Config";
 
 function failOnHttpError(response, message) {
-    if(!response.ok) {
+    if (!response.ok) {
         throw Error(message, response.error);
     }
 }
@@ -22,7 +22,10 @@ class FileStore {
     list(path) {
         const pathId = this._getPathId(path);
 
-        return fetch(this.baseUrl + '/' + pathId + '/children')
+        return fetch(
+            this.baseUrl + '/' + pathId + '/children',
+            {credentials: "same-origin"}
+        )
             .then(response => {
                 failOnHttpError(response, "Failure when retrieving list of files");
                 return response.json();
@@ -33,6 +36,7 @@ class FileStore {
     upload(path, files) {
         const pathId = this._getPathId(path);
 
+        // Prepare formdata object to post
         var data = new FormData()
         data.append('parentId', pathId);
         data.append('type', 'file');
@@ -40,13 +44,15 @@ class FileStore {
             data.append('files', file, file.name);
         }
 
+        // Perform actual backend call
         return fetch(this.baseUrl, {
-                method: 'POST',
-                body: data
-            }).then(response => {
-                failOnHttpError(response, "Failure while uploading file");
-                return response;
-            })
+            method: 'POST',
+            body: data,
+            credentials: "same-origin"
+        }).then(response => {
+            failOnHttpError(response, "Failure while uploading file");
+            return response;
+        })
     }
 
     _getPathId(path) {
@@ -57,10 +63,10 @@ class FileStore {
 
     // Parse path into array
     _parsePath(path) {
-        if(!path)
+        if (!path)
             return [];
 
-        if(path[0] === '/')
+        if (path[0] === '/')
             path = path.slice(1);
 
         return path ? path.split('/') : [];
