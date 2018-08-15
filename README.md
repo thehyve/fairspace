@@ -42,20 +42,18 @@ container.
 | GET /metadata?uri=|Retrieve the metadata associated with the corresponding uri |
 | POST /metadata| Store triples |
 | DELETE /metadata| Delete triples |
-| POST /metadata/predicate| Store a predicate with it's label |
-| DELETE /metadata/predicate| Delete a predicate with it's label |
-| POST /metadata/predicates| Store a list of  predicates with their label |
-| DELETE /metadata/predicates| Delete a list of predicate with their label |
-| GET /collections | Get collections' metadata |
-| POST /collections | Store metadata for a collection |
-| PATCH /collections | Change name or description of collections' metadata |
+| GET /collections | Get list of collections |
+| POST /collections | Store a new collection |
+| GET /collections/<id> | Get collection |
+| PATCH /collections/<id> | Change name or description of collections' metadata |
+| DELETE /collections/<id> | Delete a single collection |
 
 
 ### JSON format
 
 #### Response GET /metadata
 ```
-GET /metadaata?uri=http://store.example.com HTTP/1.1
+GET /metadata?uri=http://store.example.com HTTP/1.1
 Host: localhost:8080
 Content-Type: application/ld+json
 
@@ -111,9 +109,11 @@ Host: localhost:8080
 Content-Type: application/json
 
 {
-  "uri": "http://example.com/coll1",
-  "name": "Collection 1",
-  "description": "My first collection""
+  "metadata": 
+    {
+      "name": "Collection 1",
+      "description": "My first collection""
+    }
 }
 ```
 
@@ -131,15 +131,41 @@ Accept: application/json
 ```json
 [
     {
-        "uri": "http://example.com/coll1",
-        "name": "Collection 1",
-        "description": "My first collection"
+        "id": 1,
+        "type": "LOCAL_FILE",
+        "typeIdentifier": "1",
+        "metadata": {
+            "uri": "http://fairspace.com/iri/collections/1",
+            "name": "Collection 1",
+            "description": "My first collection"
+        }
     },
     {
-        "uri": "http://example.com/coll2",
-        "name": "Collection 2",
-        "description": "My second collection"
-    }    
+        "id": 2,
+        "type": "LOCAL_FILE",
+        "typeIdentifier": "2",
+        "metadata": {
+            "uri": "http://fairspace.com/iri/collections/2",
+            "name": "Collection 2",
+            "description": "My first collection"
+        }
+    }
 ]
 
+```
+
+#### Update collection metadata
+
+```
+PATCH /collections/1 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "metadata": 
+    {
+      "name": "Collection 1",
+      "description": "My first collection""
+    }
+}
 ```
