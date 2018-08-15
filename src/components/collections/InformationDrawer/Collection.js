@@ -12,7 +12,8 @@ import Icon from "@material-ui/core/Icon";
 class Collection extends React.Component{
     constructor(props) {
         super(props);
-        this.onChangeDetails = props.onChangeDetails;
+        this.onDidChangeDetails = props.onDidChangeDetails;
+        this.metadataStore = props.metadataStore;
 
         this.state = {
             collection: props.collection,
@@ -47,14 +48,32 @@ class Collection extends React.Component{
         this.setState({editing: false});
     }
 
+    storeChangedDetails(collectionId, parameters) {
+        // Update information about the name and collection
+        return this.metadataStore.updateCollectionMetadata({
+            id: collectionId,
+            name: parameters.name,
+            description: parameters.description
+        });
+    }
+
     handleCancel() {
         this.resetValues();
         this.closeEditDialog();
     }
 
     handleChangeDetails() {
-        this.onChangeDetails(this.state.collection.id, this.state.editValues);
         this.closeEditDialog();
+
+        this.storeChangedDetails(this.state.collection.id, this.state.editValues)
+            .then(() => {
+                if(this.onDidChangeDetails) {
+                    this.onDidChangeDetails(this.state.collection.id, this.state.editValues);
+                }
+            })
+            .catch((e) => {
+                console.error("An error occurred while updating collection metadata", e);
+            });
     }
 
     handleInputChange(event) {

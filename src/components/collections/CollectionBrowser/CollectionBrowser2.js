@@ -1,15 +1,14 @@
 import React from 'react';
 import classNames from 'classnames';
-import CollectionList from "../CollectionList/CollectionList";
-import Button from "@material-ui/core/Button";
-import Icon from "@material-ui/core/Icon";
 import Typography from "@material-ui/core/Typography";
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import InformationDrawer from "../InformationDrawer/InformationDrawer";
 import Config from "../../generic/Config/Config";
-import FileBrowser from "../../filebrowser/FileBrowser";
 import {withRouter} from "react-router-dom";
 import styles from "./CollectionBrowser.styles";
+import BreadCrumbs from "../BreadCrumbs/BreadCrumbs";
+import FileOverview from "../FileOverview/FileOverview";
+import CollectionOverview from "../CollectionOverview/CollectionOverview";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -24,9 +23,11 @@ class CollectionBrowser extends React.Component {
             loading: false,
             error: false,
 
-            collections: [],
             selectedCollection: null,
             selectedPath: null,
+
+            openedCollection: null,
+            openedPath: null,
 
             infoDrawerOpened: false,
             infoDrawerSelection: {}
@@ -34,16 +35,10 @@ class CollectionBrowser extends React.Component {
     }
 
     componentDidMount() {
-        this.loadCollections()
-            .then(collections => {
-                // Check whether a collection has been selected before
-                if(this.props.collection) {
-                    let selectedCollections = collections.filter(collection => collection.name === this.props.collection);
-                    if(selectedCollections.length > 0) {
-                        this.setState({selectedCollection: selectedCollections[0], selectedPath: this.props.path});
-                    }
-                }
-            })
+        // Check whether a collection has been selected before
+        if(this.props.collection) {
+            this.openCollectionAndPath(this.props.collection, this.props.path);
+        }
     }
 
     componentWillUnmount() {
@@ -52,57 +47,33 @@ class CollectionBrowser extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         // Check whether a collection has been selected before
+        // If so, find the proper collection information (e.g. metadata) from the list of
+        // collections
         if(nextProps.collection) {
-            let selectedCollections = this.state.collections.filter(collection => collection.name === nextProps.collection);
-            if(selectedCollections.length > 0) {
-                this.setState({selectedCollection: selectedCollections[0], selectedPath: nextProps.path});
-            }
+            this.openCollectionAndPath(nextProps.collection, nextProps.path);
         } else {
-            this.setState({selectedCollection: null});
+            this.closeCollections();
         }
-
     }
 
-    loadCollections() {
-        this.setState({loading: true});
-
-        return this.collectionStore
-            .getCollections()
-            .then(collections => {
-                if (this.isUnmounting) {
-                    return;
+    openCollectionAndPath(selectedCollectionName, selectedPath) {
+        let collectionDetails = null;
+        if(selectedCollectionName) {
+            // Retrieve collection details
+            // TODO: Make backend call
+            collectionDetails = {
+                name: selectedCollectionName,
+                params: { path: '/' + selectedCollectionName },
+                metadata: {
+                    name: selectedCollectionName
                 }
+            };
+        }
+        this.setState({openedCollection: collectionDetails, openedPath: selectedPath});
+    }
 
-                return this.metadataStore
-                    .getCollectionMetadata(collections.map(collection => collection.name))
-                    .then((metadata) => {
-                        if (this.isUnmounting) {
-                            return;
-                        }
-
-                        const lookupCollectionMetadata = (name) => {
-                            const collectionUri = this.metadataStore.createUri(name);
-                            const foundMetadata = metadata.filter((item) => item.uri === collectionUri);
-                            return foundMetadata.length > 0 ? foundMetadata[0] : {};
-                        }
-
-                        // Merge metadata with collections
-                        const mergedCollections = collections.map(collection => ({
-                            ...collection,
-                                metadata: lookupCollectionMetadata(collection.name)
-                        }));
-
-                        this.setState({loading: false, collections: mergedCollections});
-                        return mergedCollections;
-                    });
-            })
-            .catch(err => {
-                if (this.isUnmounting) {
-                    return;
-                }
-                console.error("An error occurred while loading collections", err);
-                this.setState({error: true, loading: false});
-            });
+    closeCollections() {
+        this.setState({openedCollection: null});
     }
 
     generateId() {
@@ -142,31 +113,39 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionClick(collection) {
-        this.setState({infoDrawerOpened: true, infoDrawerSelection: { collection: collection }});
+        // If this collection is already selected, deselect
+        if(this.state.selectedCollection && this.state.selectedCollection.name === collection.name) {
+            this.deselectCollection();
+        } else {
+            this.selectCollection(collection);
+        }
     }
 
     handleCollectionDoubleClick(collection) {
-        this.props.history.push("/collections/" + collection.name);
+        this.openCollection(collection);
     }
 
-    handleCollectionDetailsChange(collectionId, parameters) {
-        // Update information about the name and collection
-        this.metadataStore.updateCollectionMetadata({
-            id: collectionId,
-            name: parameters.name,
-            description: parameters.description
-        }).then(() => {
-            // Update the currently selected collection
-            this.setState({infoDrawerSelection: { collection: Object.assign({}, this.state.selectedCollection, { metadata: parameters})}});
+    handlePathClick(path) {
+        // If this pathis already selected, deselect
+        if(this.state.selectedPath && this.state.selectedPath.id === path.id) {
+            this.deselectPath();
+        } else {
+            this.selectPath(path);
+        }
+    }
 
-            // Reload list of collections to ensure the latest version
-            this.loadCollections();
-        }).catch((e) => {
-            // Load collections as a new bucket has been created, but without metadata
-            this.loadCollections();
-            this.closeDrawer();
-            console.error("An error occurred while updating collection metadata", e);
-        });
+    handlePathDoubleClick(path) {
+        if(path.type === 'dir') {
+            this.openDir(atob(path.id));
+        }
+    }
+
+    handleDidCollectionDetailsChange(collectionId, parameters) {
+        // Update the currently selected collection
+        this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, { metadata: parameters})});
+
+        // Reload list of collections to ensure the latest version
+        this.loadCollections();
     }
 
     openDrawer() {
@@ -177,16 +156,66 @@ class CollectionBrowser extends React.Component {
         this.setState({infoDrawerOpened: false});
     }
 
+    selectCollection(collection) {
+        this.setState({infoDrawerOpened: true, selectedCollection: collection})
+    }
+
+    deselectCollection() {
+        this.setState({selectedCollection: null})
+    }
+
+    selectPath(path) {
+        this.setState({
+            infoDrawerOpened: true,
+            selectedCollection: this.state.openedCollection,
+            selectedPath: path
+        })
+    }
+
+    deselectPath() {
+        this.setState({selectedPath: null})
+    }
+
+
+    openCollection(collection) {
+        this.props.history.push("/collections/" + collection.name);
+    }
+
+    openDir(path) {
+        this.props.history.push("/collections/" + this.state.openedCollection.name + path);
+    }
+
+    // Parse path into array
+    parsePath(path) {
+        if(!path)
+            return [];
+
+        if(path[0] === '/')
+            path = path.slice(1);
+
+        return path ? path.split('/') : [];
+    }
+
     render() {
-        const {selectedCollection, infoDrawerOpened, infoDrawerSelection} = this.state;
+        const {openedCollection, openedPath, infoDrawerOpened, selectedCollection, selectedPath} = this.state;
         const {classes} = this.props;
 
-        let mainPanel;
+        // The screen consists of 3 parts:
+        // - a list of breadcrumbs
+        // - an overview of items (mainPanel)
+        // - an infodrawer
 
-        if (selectedCollection) {
-            mainPanel = this.showCollection(selectedCollection)
+        let breadCrumbs = this.renderBreadCrumbs(openedCollection, openedPath);
+
+        let mainPanel;
+        if (this.state.loading) {
+            mainPanel = this.renderLoading()
+        } else if (this.state.error) {
+            mainPanel = this.renderError()
+        } else if (openedCollection) {
+            mainPanel = this.renderCollection(openedCollection)
         } else {
-            mainPanel = this.showCollections();
+            mainPanel = this.renderCollectionList();
         }
 
         // Markup and title
@@ -197,61 +226,63 @@ class CollectionBrowser extends React.Component {
                         [classes.contentShift]: infoDrawerOpened
                     }
                 )}>
+                    {breadCrumbs}
                     {mainPanel}
                 </main>
                 <InformationDrawer
                     open={infoDrawerOpened}
-                    collection={infoDrawerSelection.collection}
+                    collection={selectedCollection}
+                    path={selectedPath}
                     onClose={this.handleCloseInfoDrawer.bind(this)}
-                    onChangeDetails={this.handleCollectionDetailsChange.bind(this)}
+                    onDidChangeDetails={this.handleDidCollectionDetailsChange.bind(this)}
+                    metadataStore={this.metadataStore}
                 >
                 </InformationDrawer>
             </div>
         );
     }
 
-    showCollection(collection) {
+    renderBreadCrumbs(selectedCollection, selectedPath) {
+        let pathSegments = [];
+        if(selectedCollection) {
+            pathSegments.push({segment: selectedCollection.name, label: selectedCollection.metadata.name});
+            pathSegments.push(...this.parsePath(selectedPath));
+        }
+
+        return (<BreadCrumbs
+            homeUrl={this.baseUrl}
+            segments={pathSegments} />)
+    }
+
+    renderError() {
+        return (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>);
+    }
+
+    renderLoading() {
+        return (<Typography variant="body2" paragraph={true} noWrap>Loading...</Typography>);
+    }
+
+    renderCollection(collection) {
         return (
-            <FileBrowser
-                baseUrl="/collections"
-                collectionId={collection.name}
-                collectionName={collection.metadata.name}
+            <FileOverview
                 prefix={collection.params.path}
-                path={this.state.selectedPath} />
+                path={this.state.openedPath}
+                selectedPath={this.state.selectedPath ? this.state.selectedPath.id : null}
+                onPathClick={this.handlePathClick.bind(this)}
+                onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
+            />
         )
     }
 
-    showCollections() {
-        // Actual contents
-        let contents;
-        if (this.state.loading) {
-            contents = (<Typography variant="body2" paragraph={true} noWrap>Loading...</Typography>)
-        } else if (this.state.error) {
-            contents = (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>)
-        } else {
-            contents = (
-                <div>
-                    <CollectionList collections={this.state.collections}
-                                    onCollectionClick={this.handleCollectionClick.bind(this)}
-                                    onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
-                    />
-                </div>)
-        }
-
-        // Markup and title
+    renderCollectionList() {
         return (
-            <div>
-                <Typography variant="title" paragraph={true}
-                            noWrap>{'Collections overview'}</Typography>
-
-                <Button variant="fab" color="primary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
-                    <Icon>add</Icon>
-                </Button>
-
-                {contents}
-
-            </div>
-        );
+            <CollectionOverview
+                            metadataStore={this.metadataStore}
+                            collectionStore={this.collectionStore}
+                            selectedCollection={this.state.selectedCollection}
+                            onCollectionClick={this.handleCollectionClick.bind(this)}
+                            onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
+            />);
     }
 }
 

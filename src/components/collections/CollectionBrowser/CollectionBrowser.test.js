@@ -90,7 +90,7 @@ it('reloads the collection list on successful update', () => {
 
     // Setup proper state
     wrapper.setState({loading: false});
-    wrapper.find(InformationDrawer).get(0).props.onChangeDetails(1, {});
+    wrapper.find(InformationDrawer).get(0).props.onDidChangeDetails(1, {});
 
     return flushPromises().then(() =>{
         expect(mockS3.listBuckets.mock.calls.length).toEqual(2);

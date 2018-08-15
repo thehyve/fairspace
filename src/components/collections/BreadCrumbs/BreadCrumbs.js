@@ -17,21 +17,27 @@ function jsxJoin (array, str) {
         : null;
 }
 
+
+function expandSegment(input) {
+    if(typeof input === 'string') {
+        return { segment: input, label: input }
+    } else {
+        return input
+    }
+}
+
 function BreadCrumbs(props) {
     let homeUrl = props.homeUrl || defaultHomeUrl;
-    let rootName = props.rootName || "/";
-    let rootUrl = props.rootUrl|| homeUrl;
 
     let breadcrumbs = [
-        getBreadCrumbLink((<Icon>home</Icon>), homeUrl, props.classes.link),
-        getBreadCrumbLink(rootName, rootUrl, props.classes.link)
+        getBreadCrumbLink((<Icon>home</Icon>), homeUrl, props.classes.link)
     ];
 
     if(props.segments) {
-        let currentPath = rootUrl;
-        for(let segment of props.segments) {
-            currentPath += "/" + segment;
-            breadcrumbs.push(getBreadCrumbLink(segment, currentPath, props.classes.link))
+        let currentPath = homeUrl;
+        for(let segment of props.segments.map(expandSegment)) {
+            currentPath += "/" + segment.segment;
+            breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, props.classes.link))
         }
     }
 

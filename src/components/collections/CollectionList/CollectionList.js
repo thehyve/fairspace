@@ -1,21 +1,47 @@
 import React from 'react';
 import Collection from "./Collection";
-import ListItem from "@material-ui/core/ListItem";
-import List from "@material-ui/core/List";
+import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import TableBody from "@material-ui/core/TableBody";
+import Icon from "@material-ui/core/Icon";
+import ClickHandler from "../ClickHandler/ClickHandler"
 
 function CollectionList(props) {
     if(!props.collections || props.collections.length === 0) {
         return "No collections";
     } else {
         return (
-            <List>
-                {props.collections.map(function (collection) {
-                    return (<ListItem key={collection.name}
-                                onClick={() => props.onCollectionClick(collection)}
-                                onDoubleClick={() => props.onCollectionDoubleClick(collection)}
-                    ><Collection collection={collection}/></ListItem>)
-                })}
-            </List>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell numeric>Owner</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {props.collections.map(collection => {
+                        return (
+                            <ClickHandler
+                                    component={TableRow}
+                                    key={collection.name}
+                                    selected={props.selectedCollection && collection.name === props.selectedCollection.name}
+                                      onSingleClick={() => props.onCollectionClick(collection)}
+                                      onDoubleClick={() => props.onCollectionDoubleClick(collection)}>
+                                <TableCell>
+                                    <Icon>folder_open</Icon>
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    <Collection collection={collection}/>
+                                </TableCell>
+                                <TableCell numeric>...</TableCell>
+                            </ClickHandler>
+                        );
+                    })}
+                </TableBody>
+            </Table>
         );
     }
 }

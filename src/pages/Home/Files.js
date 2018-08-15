@@ -1,5 +1,5 @@
 import React from 'react';
-import FileBrowser from "../../components/filebrowser/FileBrowser";
+import FileBrowser from "../../components/collections/FileList/FileBrowser";
 
 function Files(props) {
     const { match: { params }} = props;
