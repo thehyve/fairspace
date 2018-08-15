@@ -1,14 +1,17 @@
 import React from 'react';
+import {withRouter} from "react-router-dom";
 import classNames from 'classnames';
 import Typography from "@material-ui/core/Typography";
 import {withStyles} from '@material-ui/core/styles';
 import InformationDrawer from "../InformationDrawer/InformationDrawer";
 import Config from "../../generic/Config/Config";
-import {withRouter} from "react-router-dom";
 import styles from "./CollectionBrowser.styles";
 import BreadCrumbs from "../BreadCrumbs/BreadCrumbs";
 import FileOverview from "../FileOverview/FileOverview";
 import CollectionOverview from "../CollectionOverview/CollectionOverview";
+import Button from "@material-ui/core/Button";
+import Icon from "@material-ui/core/Icon";
+import {Column, Row} from 'simple-flexbox';
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -81,7 +84,7 @@ class CollectionBrowser extends React.Component {
         return '' + (Math.random() * 10000000);
     }
 
-    handleAddClick(e) {
+    handleAddClick() {
         const collectionId = this.generateId();
 
         // Create the bucket in storage
@@ -95,11 +98,11 @@ class CollectionBrowser extends React.Component {
                     name: Config.get().user.username + "'s collection",
                     description: "Beyond the horizon"
                 }).then(() => {
-                    // Load collections after creating a bucket
-                    this.loadCollections();
+                    // Reload collections after creating a new one
+                    this.setState({refreshCollections: true});
                 }).catch((e) => {
                     // Load collections as a new bucket has been created, but without metadata
-                    this.loadCollections();
+                    this.setState({refreshCollections: true});
                     console.error("An error occurred while adding collection metadata", e);
                 });
             })
@@ -146,6 +149,10 @@ class CollectionBrowser extends React.Component {
 
         // Reload list of collections to ensure the latest version
         this.loadCollections();
+    }
+
+    handleCollectionsDidLoad(collections) {
+        this.setState({refreshCollections: false});
     }
 
     openDrawer() {
@@ -206,6 +213,7 @@ class CollectionBrowser extends React.Component {
         // - an infodrawer
 
         let breadCrumbs = this.renderBreadCrumbs(openedCollection, openedPath);
+        let buttons = this.renderButtons(openedCollection, openedPath);
 
         let mainPanel;
         if (this.state.loading) {
@@ -226,7 +234,17 @@ class CollectionBrowser extends React.Component {
                         [classes.contentShift]: infoDrawerOpened
                     }
                 )}>
-                    {breadCrumbs}
+                    <Row>
+                        <Column flexGrow={1} vertical='center' horizontal='start'>
+                            <div>
+                                {breadCrumbs}
+                            </div>
+                        </Column>
+                        <Column>
+                            {buttons}
+                        </Column>
+                    </Row>
+
                     {mainPanel}
                 </main>
                 <InformationDrawer
@@ -252,6 +270,13 @@ class CollectionBrowser extends React.Component {
         return (<BreadCrumbs
             homeUrl={this.baseUrl}
             segments={pathSegments} />)
+    }
+
+    renderButtons(selectedCollection, selectedPath) {
+        return (
+            <Button variant="fab" mini color="secondary" aria-label="Add" onClick={this.handleAddClick.bind(this)}>
+                <Icon>add</Icon>
+            </Button>)
     }
 
     renderError() {
@@ -280,6 +305,8 @@ class CollectionBrowser extends React.Component {
                             metadataStore={this.metadataStore}
                             collectionStore={this.collectionStore}
                             selectedCollection={this.state.selectedCollection}
+                            refreshCollections={this.state.refreshCollections}
+                            onCollectionsDidLoad={this.handleCollectionsDidLoad.bind(this)}
                             onCollectionClick={this.handleCollectionClick.bind(this)}
                             onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
             />);

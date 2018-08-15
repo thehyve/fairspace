@@ -1,6 +1,4 @@
 import React from 'react';
-import 'font-awesome/css/font-awesome.min.css';
-import {withRouter} from "react-router-dom";
 import CollectionList from "../CollectionList/CollectionList";
 
 class CollectionOverview extends React.Component {
@@ -55,7 +53,13 @@ class CollectionOverview extends React.Component {
                             metadata: lookupCollectionMetadata(collection.name)
                         }));
 
+
+                        // Update the state and send out events
                         this.setState({loading: false, collections: mergedCollections});
+                        if(this.onCollectionsDidLoad) {
+                            this.onCollectionsDidLoad(mergedCollections);
+                        }
+
                         return mergedCollections;
                     });
             })
@@ -69,6 +73,10 @@ class CollectionOverview extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        if(nextProps.refreshCollections) {
+            this.loadContents();
+        }
+
         this.setState({
             selectedCollection: nextProps.selectedCollection
         });
@@ -88,4 +96,4 @@ class CollectionOverview extends React.Component {
     }
 }
 
-export default withRouter(CollectionOverview);
+export default CollectionOverview;

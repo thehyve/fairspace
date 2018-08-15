@@ -1,6 +1,4 @@
 import React from 'react';
-import 'font-awesome/css/font-awesome.min.css';
-import {withRouter} from "react-router-dom";
 import FileList from "../FileList/FileList";
 
 class FileOverview extends React.Component {
@@ -83,4 +81,4 @@ class FileOverview extends React.Component {
     }
 }
 
-export default withRouter(FileOverview);
+export default FileOverview;

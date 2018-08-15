@@ -1,5 +1,4 @@
 import React from 'react';
-import 'font-awesome/css/font-awesome.min.css';
 
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
