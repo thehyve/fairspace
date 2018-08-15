@@ -15,11 +15,11 @@ import java.net.ConnectException;
 
 @Slf4j
 @ControllerAdvice
+@ResponseBody
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {HttpServerErrorException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
     protected ErrorBody handleServerException(
             RuntimeException ex, WebRequest request) {
         ErrorBody errorBody = new ErrorBody("Could not talk to storage backend");
@@ -30,7 +30,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ExceptionHandler(value = {HttpClientErrorException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
     protected ErrorBody handleHttpclientException(
             RuntimeException ex, WebRequest request) {
         ErrorBody errorBody = new ErrorBody("Someone, or something, did not answer the phone.");
@@ -41,7 +40,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ExceptionHandler(value = {ConnectException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
     protected ErrorBody handleConnectException(
             RuntimeException ex) {
         ErrorBody errorBody = new ErrorBody("Could not reach storage backend");
@@ -50,9 +48,15 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return errorBody;
     }
 
+    @ExceptionHandler(value = {CollectionNotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    protected ErrorBody handleNotFoundException(
+            CollectionNotFoundException ex) {
+        return new ErrorBody("Collection could not be found");
+    }
+
     @ExceptionHandler(value = {Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
     protected ErrorBody handleGenericException(
             RuntimeException ex) {
         ErrorBody errorBody = new ErrorBody("An internal error occurred.");

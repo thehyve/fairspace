@@ -1,204 +1,114 @@
 package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.vocabulary.Fairspace;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.vocabulary.RDF;
+import io.fairspace.neptune.model.CollectionMetadata;
+import io.fairspace.neptune.repository.CollectionRepository;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.matches;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 public class CollectionServiceTest {
-    private static final String COLLECTION_URI = "http://example.com";
-    private static final String COLLECTION_NAME = "name";
-    private static final String COLLECTION_DESCRIPTION = "desc";
+    private CollectionService service;
 
-    @MockBean
-    private TripleService tripleService;
+    @Mock
+    private CollectionRepository collectionRepository;
 
-    @Autowired
-    private CollectionService collectionService;
+    @Mock
+    private CollectionMetadataService collectionMetadataService;
 
-
-    @Test
-    public void collectionsWithAllPropertiesShouldBeAccepted() {
-        Collection c = getCollection();
-
-        collectionService.createCollection(c);
-
-        verify(tripleService, times(1))
-                .postTriples(argThat(m -> m.size() == 3
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        RDF.type,
-                        Fairspace.Collection)
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        Fairspace.name,
-                        m.createLiteral(c.getName()))
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        Fairspace.description,
-                        m.createLiteral(c.getDescription()))));
+    @Before
+    public void setUp() throws Exception {
+        service = new CollectionService(collectionRepository, collectionMetadataService);
+        when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
     @Test
-    public void collectionsWithEmptyDescriptionShouldBeAccepted() {
-        Collection c = new Collection();
-        c.setUri(COLLECTION_URI);
-        c.setName(COLLECTION_NAME);
+    public void testFindAll() {
+        List<Collection> collections = new ArrayList<>();
+        collections.add(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null));
+        collections.add(new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", null));
+        when(collectionRepository.findAll()).thenReturn(collections);
 
-        collectionService.createCollection(c);
+        List<CollectionMetadata> metadata = new ArrayList<>();
+        metadata.add(new CollectionMetadata(getUri(1L), "My quotes", "quote item"));
+        metadata.add(new CollectionMetadata(getUri(3L), "My dataset", "dataset"));
+        when(collectionMetadataService.getCollections()).thenReturn(metadata);
 
-        verify(tripleService, times(1))
-                .postTriples(argThat(m -> m.size() == 3
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        RDF.type,
-                        Fairspace.Collection)
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        Fairspace.name,
-                        m.createLiteral(c.getName()))
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        Fairspace.description,
-                        m.createLiteral(""))));
-    }
+        List<Collection> mergedCollections = toList(service.findAll().iterator());
 
-    @Test(expected = RuntimeException.class)
-    public void collectionsWithEmptyNameShouldBeRejected() {
-        Collection c = new Collection();
-        c.setUri(COLLECTION_URI);
-        c.setDescription(COLLECTION_DESCRIPTION);
+        // The first item should be merged
+        assertTrue(mergedCollections.contains(collections.get(0).addMetadata(metadata.get(0))));
 
-        collectionService.createCollection(c);
+        // The second item does not have any metadata, and should be added as is
+        assertTrue(mergedCollections.contains(collections.get(1)));
+
+        // The 3rd item should not be present, as there is only metadata
+        assertEquals(2, mergedCollections.size());
     }
 
     @Test
-    public void collectionsShouldBeDeserializedProperly() {
-        Model m = createDefaultModel();
-        m.add(
-                m.createResource(COLLECTION_URI),
-                RDF.type,
-                Fairspace.Collection);
-        m.add(
-                m.createResource(COLLECTION_URI),
-                Fairspace.name,
-                m.createLiteral(COLLECTION_NAME));
-        m.add(
-                m.createResource(COLLECTION_URI),
-                Fairspace.description,
-                m.createLiteral(COLLECTION_DESCRIPTION));
+    public void testFindById() {
+        Long id = 1L;
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
-        when(tripleService.executeConstructQuery(any()))
-                .thenReturn(m);
+        CollectionMetadata metadata = new CollectionMetadata(getUri(1L), "My quotes", "quote item");
+        when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.of(metadata));
 
-        List<Collection> collections = collectionService.getCollections();
+        Optional<Collection> mergedCollection = service.findById(id);
 
-        assertEquals(1, collections.size());
-        assertEquals(COLLECTION_URI, collections.get(0).getUri());
-        assertEquals(COLLECTION_NAME, collections.get(0).getName());
-        assertEquals(COLLECTION_DESCRIPTION, collections.get(0).getDescription());
+        assertTrue(mergedCollection.isPresent());
+        assertEquals(collection.addMetadata(metadata), mergedCollection.get());
     }
 
     @Test
-    public void collectionsWithPropertiesShouldHavePatchableName() {
-        Collection c = getCollection();
+    public void testFindByNonExistingId() {
+        Long id = 1L;
+        when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
-        collectionService.createCollection(c);
+        Optional<Collection> mergedCollection = service.findById(id);
 
-        c.setDescription(null);
-        c.setName(COLLECTION_NAME + "test");
-
-        collectionService.patchCollection(c);
-
-        verify(tripleService, times(1))
-                .patchTriples(argThat(m -> m.size() == 1
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        Fairspace.name,
-                        m.createLiteral(c.getName()))));
+        assertTrue(!mergedCollection.isPresent());
+        verify(collectionMetadataService, times(0)).getCollection(anyString());
     }
 
     @Test
-    public void collectionsWithPropertiesShouldHavePatchableDescription() {
-        Collection c = getCollection();
+    public void testFindByIdWithoutMetadata() {
+        Long id = 1L;
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
-        collectionService.createCollection(c);
+        when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.empty());
 
-        c.setName(null);
-        c.setDescription(COLLECTION_DESCRIPTION + "test");
+        Optional<Collection> mergedCollection = service.findById(id);
 
-        collectionService.patchCollection(c);
-
-        verify(tripleService, times(1))
-                .patchTriples(argThat(m -> m.size() == 1
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        Fairspace.description,
-                        m.createLiteral(c.getDescription()))));
+        assertTrue(mergedCollection.isPresent());
+        assertEquals(collection, mergedCollection.get());
     }
 
-    @Test
-    public void collectionsWithPropertiesShouldBeAbleToPatchBoth() {
-        Collection c = getCollection();
-
-        collectionService.createCollection(c);
-
-        c.setName(COLLECTION_NAME + "test");
-        c.setDescription(COLLECTION_DESCRIPTION + "test");
-
-        collectionService.patchCollection(c);
-
-        verify(tripleService, times(1))
-                .patchTriples(argThat(m -> m.size() == 2
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        Fairspace.name,
-                        m.createLiteral(c.getName()))
-                        && m.contains(
-                        m.createResource(COLLECTION_URI),
-                        Fairspace.description,
-                        m.createLiteral(c.getDescription()))));
+    private <E> List<E> toList(Iterator<E> iterator) {
+        List<E> list = new ArrayList<>();
+        iterator.forEachRemaining(list::add);
+        return list;
     }
 
-    @Test
-    public void collectionsWithPropertiesShouldDoNothingWhenBothEmpty() {
-        Collection c = getCollection();
-
-        collectionService.createCollection(c);
-
-        c.setName(null);
-        c.setDescription(null);
-
-        collectionService.patchCollection(c);
-
-        verify(tripleService, times(1)).patchTriples(argThat(Model::isEmpty));
+    private String getUri(Long id) {
+        return "/fairspace/" + id;
     }
-
-    private Collection getCollection() {
-        Collection c = new Collection();
-        c.setUri(COLLECTION_URI);
-        c.setName(COLLECTION_NAME);
-        c.setDescription(COLLECTION_DESCRIPTION);
-        return c;
-    }
-
 }
