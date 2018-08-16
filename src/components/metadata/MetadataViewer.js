@@ -1,4 +1,5 @@
 import React from 'react';
+import { JsonToTable } from "react-json-to-table";
 
 /**
  * This compp
@@ -11,7 +12,7 @@ class MetadataViewer extends React.Component {
         this.idsMap = {};
         this.contentMap = {};
         this.metadata = props.metadata;
-        this.vocab = props.vocab;
+        this.vocab =  props.vocab;
     }
 
     addtoIdsMap(key, metadata) {
@@ -23,7 +24,6 @@ class MetadataViewer extends React.Component {
             else {
                 itemList.push(this.idsMap[key]);
             }
-            itemList.push(", ");
             itemList.push(metadata[key]);
             this.idsMap[key] = itemList;
         }
@@ -48,7 +48,7 @@ class MetadataViewer extends React.Component {
     getLabels() {
         for (let label in this.idsMap) {
             let found = false;
-            for (const labelObject of this.props.vocab["@graph"]) {
+            for (const labelObject of this.vocab["@graph"]) {
                 if (labelObject["@id"] === label) {
                     this.contentMap[labelObject["rdfs:label"]] = this.idsMap[label];
                     found = true;
@@ -61,12 +61,6 @@ class MetadataViewer extends React.Component {
         }
     }
 
-    renderContentMap() {
-        return Object.keys(this.contentMap).map((content) =>
-            <li><b>{content}</b>: {this.contentMap[content]}</li>
-        );
-    }
-
     componentWillMount() {
         this.getIds(this.metadata);
         this.getLabels();
@@ -75,9 +69,7 @@ class MetadataViewer extends React.Component {
     render() {
         return (
             <div>
-                <ul>
-                {this.renderContentMap()}
-                </ul>
+                <JsonToTable json={this.contentMap} />
             </div>
         )
 
