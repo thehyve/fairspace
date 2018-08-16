@@ -16,9 +16,7 @@ function InformationDrawer(props) {
     } else {
         contents = (<Typography variant="title">No collection</Typography>);
     }
-
-    console.log(props);
-
+    
     return (
         <Drawer
             variant="persistent"
