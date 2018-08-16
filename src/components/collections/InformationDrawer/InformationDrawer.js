@@ -6,6 +6,7 @@ import styles from './InformationDrawer.styles';
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "@material-ui/core/Icon";
 import Collection from "./Collection";
+import MetadataViewer from "../../metadata/MetadataViewer";
 
 function InformationDrawer(props) {
     let contents;
@@ -15,6 +16,8 @@ function InformationDrawer(props) {
     } else {
         contents = (<Typography variant="title">No collection</Typography>);
     }
+
+    console.log(props)
 
     return (
         <Drawer
@@ -31,6 +34,9 @@ function InformationDrawer(props) {
             </IconButton>
 
             {contents}
+
+            <MetadataViewer/>
+
 
         </Drawer>
     );
