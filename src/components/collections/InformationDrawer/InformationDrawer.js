@@ -17,7 +17,7 @@ function InformationDrawer(props) {
         contents = (<Typography variant="title">No collection</Typography>);
     }
 
-    console.log(props)
+    console.log(props);
 
     return (
         <Drawer
@@ -35,7 +35,10 @@ function InformationDrawer(props) {
 
             {contents}
 
-            <MetadataViewer/>
+            <MetadataViewer
+                metadata={props.metadata}
+                vocab={props.vocab}>
+            </MetadataViewer>
 
 
         </Drawer>

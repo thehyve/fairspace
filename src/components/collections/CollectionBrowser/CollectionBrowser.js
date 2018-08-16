@@ -23,7 +23,9 @@ class CollectionBrowser extends React.Component {
             collections: [],
             infoDrawerOpened: false,
             showDirectories: false,
-            selectedCollection: null
+            selectedCollection: null,
+            metadata: null,
+            vocab: null,
         };
     }
 
@@ -195,6 +197,8 @@ class CollectionBrowser extends React.Component {
                     collection={this.state.selectedCollection}
                     onClose={this.handleCloseInfoDrawer.bind(this)}
                     onChangeDetails={this.handleCollectionDetailsChange.bind(this)}
+                    metadata={this.state.metadata}
+                    vocab={this.state.vocab}
                 >
                 </InformationDrawer>
             </div>
