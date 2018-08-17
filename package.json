@@ -42,11 +42,14 @@
     "dev": "concurrently \"yarn server\" \"yarn start\"",
     "server": "node server/server.js",
     "start": "react-scripts start",
+    "prepare-build": "./node_modules/.bin/babel ./node_modules/webdav/dist --out-dir ./node_modules/webdav/dist --presets env",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "concurrently": "^3.5.0",
     "webdav-server": "^2.3.22"
   }
