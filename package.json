@@ -40,7 +40,7 @@
   },
   "scripts": {
     "dev": "concurrently \"yarn server\" \"yarn start\"",
-    "server": "node server/server.js",
+    "server": "node mock-server/server.js",
     "start": "react-scripts start",
     "prepare-build": "./node_modules/.bin/babel ./node_modules/webdav/dist --out-dir ./node_modules/webdav/dist --presets env",
     "build": "react-scripts build",
