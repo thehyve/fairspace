@@ -1,4 +1,4 @@
-# Triton File Server
+# Titan File Server
 
 ## To start
 
