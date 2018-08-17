@@ -17,9 +17,8 @@ class FileStore {
     static changeHeaders = new Headers({'Content-Type': 'application/json'});
     static getHeaders = new Headers({'Accept': 'application/json'});
 
-    constructor(collection) {
-        this.collection = collection;
-        this.basePath = '/' + collection.typeIdentifier;
+    constructor(collectionSubDirectory) {
+        this.basePath = '/' + collectionSubDirectory;
 
         const baseUrl = Config.get().urls.files;
         this.client = CreateWebdavClient(baseUrl)
@@ -50,7 +49,6 @@ class FileStore {
             return;
         }
 
-        console.log(this.client.getFileDownloadLink(fullPath));
         window.location.href = this.client.getFileDownloadLink(fullPath);
     }
 

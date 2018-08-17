@@ -6,11 +6,5 @@
     "collections": "/metadata/collections",
     "metadata": "/metadata",
     "files": "/files"
-  },
-
-  "metadata": {
-    "urlPatterns": {
-      "collections": "http://fairspace.com/iri/collections/{id}"
-    }
   }
 }
