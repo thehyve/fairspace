@@ -3,7 +3,6 @@ package io.fairspace.neptune.service;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.CollectionMetadata;
 import io.fairspace.neptune.repository.CollectionRepository;
-import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Objects.requireNonNull;
@@ -39,35 +37,32 @@ public class CollectionService {
         return StreamSupport.stream(collections.spliterator(), false)
                 .map(collection -> {
                     String uri = collectionMetadataService.getUri(collection.getId());
-                    Optional<CollectionMetadata> collectionMetadata = metadata.stream()
+
+                    return metadata.stream()
                             .filter(Objects::nonNull)
                             .filter(m -> uri.equals(m.getUri()))
-                            .findFirst();
-
-                    if (collectionMetadata.isPresent()) {
-                        return collection.addMetadata(collectionMetadata.get());
-                    } else {
-                        return collection;
-                    }
+                            .findFirst()
+                            .map(collection::withMetadata)
+                            .orElse(collection);
                 })
                 .collect(Collectors.toList());
 
     }
 
     public Optional<Collection> findById(Long id) {
-        Optional<Collection> collection = repository.findById(id);
+        // First retrieve collection itself
+        Optional<Collection> optionalCollection = repository.findById(id);
 
-        if(!collection.isPresent()) {
-            return collection;
-        }
+        return optionalCollection
+                .map(collection -> {
+                    // If it exists, retrieve metadata
+                    Optional<CollectionMetadata> optionalMetadata = collectionMetadataService.getCollection(collectionMetadataService.getUri(id));
 
-        // Retrieve metadata
-        Optional<CollectionMetadata> metadata = collectionMetadataService.getCollection(collectionMetadataService.getUri(id));
+                    return optionalMetadata
+                            .map(collection::withMetadata)
+                            .orElse(collection);
+                });
 
-        if(!metadata.isPresent()) {
-            return collection;
-        }
-        return Optional.of(collection.get().addMetadata(metadata.get()));
     }
 
     public Collection add(Collection collection) {

@@ -6,7 +6,6 @@ import io.fairspace.neptune.repository.CollectionRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -53,7 +52,7 @@ public class CollectionServiceTest {
         List<Collection> mergedCollections = toList(service.findAll().iterator());
 
         // The first item should be merged
-        assertTrue(mergedCollections.contains(collections.get(0).addMetadata(metadata.get(0))));
+        assertTrue(mergedCollections.contains(collections.get(0).withMetadata(metadata.get(0))));
 
         // The second item does not have any metadata, and should be added as is
         assertTrue(mergedCollections.contains(collections.get(1)));
@@ -74,7 +73,7 @@ public class CollectionServiceTest {
         Optional<Collection> mergedCollection = service.findById(id);
 
         assertTrue(mergedCollection.isPresent());
-        assertEquals(collection.addMetadata(metadata), mergedCollection.get());
+        assertEquals(collection.withMetadata(metadata), mergedCollection.get());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package io.fairspace.neptune.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,13 +24,15 @@ public class Collection {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @JsonIgnore
     private CollectionType type = CollectionType.LOCAL_FILE;
+
     private String typeIdentifier;
 
     @Transient
     private CollectionMetadata metadata;
 
-    public Collection addMetadata(CollectionMetadata metadata) {
+    public Collection withMetadata(CollectionMetadata metadata) {
         return new Collection(id, type, typeIdentifier, metadata);
     }
 }

@@ -29,13 +29,8 @@ public class CollectionController {
 
     @GetMapping("/{id}")
     public Collection getCollection(@PathVariable Long id) {
-        Optional<Collection> collection = collectionService.findById(id);
-
-        if(!collection.isPresent()) {
-            throw new CollectionNotFoundException();
-        }
-
-        return collection.get();
+        return collectionService.findById(id)
+                .orElseThrow(CollectionNotFoundException::new);
     }
 
     @PostMapping
