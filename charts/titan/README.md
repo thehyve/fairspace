@@ -28,4 +28,5 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 | `service.name` | Name of the service that will be created. | `<release-name>-titan` |
 | `service.type` | Kubernetes service type that is used. | ClusterIP |
 | `persistence.size` | Size of the persistent volume. | `8Gi` |
+| `persistence.subPath` | A sub-path inside the referenced volume. | `titan` |
 
