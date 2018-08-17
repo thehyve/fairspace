@@ -18,23 +18,8 @@ public class MetadataService {
     @Autowired
     private TripleService tripleService;
 
-    @Autowired
-    private PredicateService predicateService;
-
     public Model retrieveMetadata(String uri) {
-        Model triples = tripleService.retrieveTriples(uri);
-        Set<String> predicates = triples.listStatements().toList().stream()
-                .map(statement -> statement.getPredicate().getURI())
-                .collect(Collectors.toSet());
-        List<PredicateInfo> predicateInfos = predicateService.retrievePredicateInfos(predicates);
-
-        predicateInfos.forEach(predicateInfo -> {
-            Resource predicate = triples.createResource(predicateInfo.getUri());
-            triples.add(predicate, RDF.type, RDF.Property);
-            triples.add(predicate, RDFS.label, predicateInfo.getLabel());
-        });
-
-        return triples;
+        return tripleService.retrieveTriples(uri);
     }
 
     public void postTriples(Model triples) {
@@ -44,17 +29,4 @@ public class MetadataService {
     public void deleteTriples(Model triples) {
         tripleService.deleteTriples(triples);
     }
-
-    public PredicateInfo getPredicateInfo(String uri) {
-        return predicateService.retrievePredicateInfo(uri);
-    }
-
-    public void postPredicateInfoList(List<PredicateInfo> predicateInfoList) {
-        predicateService.insertPredicateList(predicateInfoList);
-    }
-
-    public void postPredicateInfo(PredicateInfo predicateInfo) {
-        predicateService.insertPredicate(predicateInfo);
-    }
-
 }

@@ -43,6 +43,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
@@ -66,6 +68,8 @@ public class WebSecurityConfigurationTest {
         storeKeypair();
         JWK jwk = generateKeyset(keyId);
         serveKeyset(jwk);
+
+        serveCeres();
     }
 
     @Test
@@ -99,7 +103,7 @@ public class WebSecurityConfigurationTest {
         headers.set("Authorization", "Bearer " + jwt.serialize());
 
         HttpEntity<Object> request = new HttpEntity<>(headers);
-        return restTemplate.exchange("http://localhost:" + port + "/metadata/predicate?uri=http%3A%2F%2Ffairspace.com", HttpMethod.GET, request, String.class);
+        return restTemplate.exchange("http://localhost:" + port + "/metadata?uri=http%3A%2F%2Ffairspace.com", HttpMethod.GET, request, String.class);
     }
 
     private SignedJWT getSignedJWT() throws JOSEException {
@@ -171,6 +175,21 @@ public class WebSecurityConfigurationTest {
         stubFor(get(urlEqualTo("/certs"))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(jsonKeySet.toJSONString())));
     }
+
+    private void serveCeres() {
+        // Setup wiremock endpoint to return keyset
+        stubFor(get(urlPathEqualTo("/ceres/model/default/statements/"))
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/ld+json")
+                                .withBody("{\n" +
+                                        "  \"@context\": \"http://schema.org\",\n" +
+                                        "  \"@type\": \"Book\",\n" +
+                                        "  \"name\": \"Semantic Web Primer (First Edition)\",\n" +
+                                        "  \"publisher\": \"Linked Data Tools\",\n" +
+                                        "  \"inLanguage\": \"English\"}")));
+    }
+
 
     private Date getDefaultExpiryDate() {
         return new Date(new Date().getTime() + 60 * 1000);
