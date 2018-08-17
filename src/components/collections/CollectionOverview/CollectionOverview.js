@@ -25,6 +25,10 @@ class CollectionOverview extends React.Component {
     }
 
     loadContents() {
+        if(this.state.loading) {
+            return;
+        }
+
         this.setState({loading: true});
 
         return this.collectionStore

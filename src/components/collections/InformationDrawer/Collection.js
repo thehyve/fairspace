@@ -13,7 +13,7 @@ class Collection extends React.Component{
     constructor(props) {
         super(props);
         this.onDidChangeDetails = props.onDidChangeDetails;
-        this.metadataStore = props.metadataStore;
+        this.collectionStore = props.collectionStore;
 
         this.state = {
             collection: props.collection,
@@ -50,11 +50,7 @@ class Collection extends React.Component{
 
     storeChangedDetails(collectionId, parameters) {
         // Update information about the name and collection
-        return this.metadataStore.updateCollectionMetadata({
-            id: collectionId,
-            name: parameters.name,
-            description: parameters.description
-        });
+        return this.collectionStore.updateCollection(collectionId, parameters.name, parameters.description);
     }
 
     handleCancel() {

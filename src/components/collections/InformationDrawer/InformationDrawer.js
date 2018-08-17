@@ -13,7 +13,7 @@ function InformationDrawer(props) {
     if(props.collection) {
         contents = (<Collection
             collection={props.collection}
-            metadataStore={props.metadataStore}
+            collectionStore={props.collectionStore}
             onDidChangeDetails={props.onDidChangeDetails}
         />)
     } else {

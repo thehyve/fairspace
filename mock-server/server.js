@@ -12,7 +12,7 @@ app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "R
 
 // Metadata API
 app.post('/metadata/collections', (req, res) => res.send());
-app.patch('/metadata/collections', (req, res) => res.send());
+app.patch('/metadata/collections/:id', (req, res) => res.send());
 app.get('/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-list.json'));
 app.get('/metadata/collections/:id', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '.json'));
 
