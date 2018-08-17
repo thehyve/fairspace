@@ -1,10 +1,14 @@
 import Config from "../../components/generic/Config/Config";
+import CreateWebdavClient from "webdav";
 
-function failOnHttpError(response, message) {
-    if (!response.ok) {
-        throw Error(message, response.error);
-    }
-}
+// Ensure that the window fetch method is used for webdav calls
+// and that is passes along the credentials
+const defaultOptions = { credentials: 'same-origin' };
+CreateWebdavClient.setFetchMethod((input, init) => {
+    const options = init ? Object.assign({}, init, defaultOptions) : defaultOptions;
+
+    return fetch(input, options);
+})
 
 /**
  * Service to perform file operations
@@ -15,62 +19,58 @@ class FileStore {
 
     constructor(collection) {
         this.collection = collection;
-        this.baseUrl = Config.get().urls.files;
+        this.basePath = '/' + collection.typeIdentifier;
+
+        const baseUrl = Config.get().urls.files;
+        this.client = CreateWebdavClient(baseUrl)
     }
 
     list(path) {
-        const pathId = this._getPathId(path);
+        const fullPath = this.getFullPath(path);
 
-        return fetch(
-            this.baseUrl + '/' + pathId + '/children',
-            {credentials: "same-origin"}
-        )
-            .then(response => {
-                failOnHttpError(response, "Failure when retrieving list of files");
-                return response.json();
-            })
-            .then(json => json.items);
+        return this.client
+            .getDirectoryContents(fullPath);
     }
 
     upload(path, files) {
-        const pathId = this._getPathId(path);
-
-        // Prepare formdata object to post
-        var data = new FormData()
-        data.append('parentId', pathId);
-        data.append('type', 'file');
-        for (const file of files) {
-            data.append('files', file, file.name);
+        if(!files) {
+            return;
         }
 
-        // Perform actual backend call
-        return fetch(this.baseUrl, {
-            method: 'POST',
-            body: data,
-            credentials: "same-origin"
-        }).then(response => {
-            failOnHttpError(response, "Failure while uploading file");
-            return response;
-        })
+        const fullPath = this.getFullPath(path);
+
+        return Promise.all(
+            files.map(file =>
+                this.client.putFileContents(fullPath + '/' + file.name, file))
+        );
     }
 
-    _getPathId(path) {
-        const parts = this._parsePath(path);
-        const completePath = '/' + [this.collection.typeIdentifier, ...parts].join('/');
-        return btoa(completePath).replace(/=/g, '');
+    download(fullPath) {
+        if(!fullPath) {
+            return;
+        }
+
+        console.log(this.client.getFileDownloadLink(fullPath));
+        window.location.href = this.client.getFileDownloadLink(fullPath);
     }
 
-    // Parse path into array
-    _parsePath(path) {
-        if (!path)
-            return [];
-
-        if (path[0] === '/')
-            path = path.slice(1);
-
-        return path ? path.split('/') : [];
+    /**
+     * Converts the path within a collection to a path with the base path
+     * @param path
+     * @returns {string|*}
+     */
+    getFullPath(path) {
+        return path ? this.basePath + path : this.basePath;
     }
 
+    /**
+     * Converts a path as given by the backend to a path within the collection
+     * @param path
+     * @returns {*}
+     */
+    getPathWithinCollection(path) {
+        return path ? path.replace(this.basePath, '') : path;
+    }
 }
 
 export default FileStore;

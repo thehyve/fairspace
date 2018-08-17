@@ -12,7 +12,7 @@ function Collections(props) {
             collectionStore={collectionStore}
 
             collection={params.collection}
-            path={params.path}
+            path={params.path ? '/' + params.path : undefined}
         />
     );
 }

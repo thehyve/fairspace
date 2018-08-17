@@ -2,7 +2,17 @@
   "name": "mercury",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": {
+    "/files": {
+      "target": "http://localhost:5000"
+    },
+    "/metadata": {
+      "target": "http://localhost:5000"
+    },
+    "/account": {
+      "target": "http://localhost:5000"
+    }
+  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.2",
     "@fortawesome/free-regular-svg-icons": "^5.2.0",
@@ -25,7 +35,8 @@
     "react-table": "^6.8.6",
     "react-test-renderer": "^16.4.1",
     "redux": "^4.0.0",
-    "simple-flexbox": "^1.2.0"
+    "simple-flexbox": "^1.2.0",
+    "webdav": "^1.5.3"
   },
   "scripts": {
     "dev": "concurrently \"yarn server\" \"yarn start\"",
@@ -37,6 +48,6 @@
   },
   "devDependencies": {
     "concurrently": "^3.5.0",
-    "cors": "^2.8.4"
+    "webdav-server": "^2.3.22"
   }
 }

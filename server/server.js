@@ -1,5 +1,5 @@
-const express = require('express')
-const cors = require('cors')
+const express = require('express');
+const webdav = require('webdav-server').v2;
 const port = process.env.PORT || 5000;
 
 // Start a generic server on port 5000 that serves default API
@@ -14,10 +14,28 @@ app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "R
 app.post('/metadata/collections', (req, res) => res.send());
 app.patch('/metadata/collections', (req, res) => res.send());
 app.get('/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-list.json'));
-app.get('/metadata/collections/:id', (req, res) => res.sendFile(__dirname + '/single-collection.json'));
+app.get('/metadata/collections/:id', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '.json'));
 
-// Files
-app.get('/files/L3F1b3Rlcw/children', (req, res) => res.sendFile(__dirname + '/files-root.json'));
+// Add webdav server on /files
+const server = new webdav.WebDAVServer();
 
+server.rootFileSystem().addSubTree(server.createExternalContext(), {
+    'quotes': {
+        'file1.txt': webdav.ResourceType.File,
+        'file2.txt': webdav.ResourceType.File
+    },
+    'samples': {
+        'samples.txt': webdav.ResourceType.File,
+        'other-sample.csv': webdav.ResourceType.File
+    },
+    'external': {
+        'external-data.txt': webdav.ResourceType.File,
+        'sub-dir': {
+            'subdirfile.txt': webdav.ResourceType.File,
+        }
+    }
+})
+
+app.use(webdav.extensions.express('/files', server))
 
 app.listen(port, () => console.log('Backend stub listening on port ' + port ))

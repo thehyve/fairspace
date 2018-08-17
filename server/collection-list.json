@@ -12,7 +12,7 @@
     {
         "id": 2,
         "type": "LOCAL_FILE",
-        "typeIdentifier": "2",
+        "typeIdentifier": "samples",
         "metadata": {
             "uri": "http://fairspace.com/iri/collections/2",
             "name": "John's samples",
@@ -22,7 +22,7 @@
     {
         "id": 3,
         "type": "LOCAL_FILE",
-        "typeIdentifier": "3",
+        "typeIdentifier": "external",
         "metadata": {
             "uri": "http://fairspace.com/iri/collections/3",
             "name": "External data on AWS S3",

@@ -36,7 +36,7 @@ function InformationDrawer(props) {
 
             {contents}
 
-            {props.path ? 'Path: ' + props.path : 'No path selected'}
+            {props.path ? 'Path: ' + JSON.stringify(props.path) : 'No path selected'}
 
         </Drawer>
     );

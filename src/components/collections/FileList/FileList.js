@@ -26,18 +26,20 @@ function FileList(props) {
                         return (
                             <ClickHandler
                                 component={TableRow}
-                                key={row.id}
-                                selected={row.id === props.selectedPath}
+                                key={row.filename}
+                                selected={row.filename === props.selectedPath}
                                 onSingleClick={() => props.onPathClick(row)}
                                 onDoubleClick={() => props.onPathDoubleClick(row)}>
                                 <TableCell>
-                                    <Icon>{row.type === 'dir' ? 'folder_open' : 'note_open'}</Icon>
+                                    <Icon>{row.type === 'directory' ? 'folder_open' : 'note_open'}</Icon>
                                 </TableCell>
                                 <TableCell component="th" scope="row">
-                                    {row.name}
+                                    {row.basename}
                                 </TableCell>
-                                <TableCell numeric>{row.size}</TableCell>
-                                <TableCell numeric>{row.modifiedTime}</TableCell>
+                                <TableCell numeric>
+                                    {row.size ? row.size : ''}
+                                </TableCell>
+                                <TableCell numeric>{row.lastmod}</TableCell>
                             </ClickHandler>
                         );
                     })}

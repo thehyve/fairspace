@@ -70,14 +70,17 @@ class CollectionBrowser extends React.Component {
                 .then(collection => {
                     this.fileStore = new FileStore(collection);
                     this.setState({openedCollection: collection, openedPath: selectedPath});
+                })
+                .catch(e => {
+                    this.setState({loading: false, error: true});
                 });
         } else {
-            this.setState({openedCollection: null, openedPath: selectedPath});
+            this.setState({error: false, openedCollection: null, openedPath: selectedPath});
         }
     }
 
     closeCollections() {
-        this.setState({openedCollection: null});
+        this.setState({error: false, openedCollection: null});
     }
 
     handleAddCollectionClick() {
@@ -112,7 +115,7 @@ class CollectionBrowser extends React.Component {
 
     handlePathClick(path) {
         // If this pathis already selected, deselect
-        if(this.state.selectedPath && this.state.selectedPath.id === path.id) {
+        if(this.state.selectedPath && this.state.selectedPath.filename === path.filename) {
             this.deselectPath();
         } else {
             this.selectPath(path);
@@ -120,8 +123,10 @@ class CollectionBrowser extends React.Component {
     }
 
     handlePathDoubleClick(path) {
-        if(path.type === 'dir') {
-            this.openDir(atob(path.id));
+        if(path.type === 'directory') {
+            this.openDir(path.filename);
+        } else {
+            this.downloadFile(path.filename);
         }
     }
 
@@ -191,7 +196,12 @@ class CollectionBrowser extends React.Component {
     }
 
     openDir(path) {
-        this.props.history.push("/collections/" + this.state.openedCollection.name + path);
+        const pathWithinCollection = this.fileStore.getPathWithinCollection(path);
+        this.props.history.push("/collections/" + this.state.openedCollection.id + pathWithinCollection);
+    }
+
+    downloadFile(path) {
+        this.fileStore.download(path);
     }
 
     // Parse path into array
@@ -309,7 +319,7 @@ class CollectionBrowser extends React.Component {
             <FileOverview
                 prefix={"/" + collection.typeIdentifier}
                 path={this.state.openedPath}
-                selectedPath={this.state.selectedPath ? this.state.selectedPath.id : null}
+                selectedPath={this.state.selectedPath ? this.state.selectedPath.filename : null}
                 refreshFiles={this.state.refreshRequired}
                 fileStore={this.fileStore}
                 onFilesDidLoad={this.handleDidLoad.bind(this)}
