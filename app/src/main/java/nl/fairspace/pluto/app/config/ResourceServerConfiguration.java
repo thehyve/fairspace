@@ -37,11 +37,11 @@ public class ResourceServerConfiguration {
 
     public DefaultAccessTokenConverter defaultAccessTokenConverter() {
         DefaultAccessTokenConverter defaultAccessTokenConverter = new DefaultAccessTokenConverter();
-        defaultAccessTokenConverter.setUserTokenConverter(new MyUserAuthenticationConverter());
+        defaultAccessTokenConverter.setUserTokenConverter(new Oauth2UserAuthenticationConverter());
         return defaultAccessTokenConverter;
     }
 
-    class MyUserAuthenticationConverter extends DefaultUserAuthenticationConverter {
+    class Oauth2UserAuthenticationConverter extends DefaultUserAuthenticationConverter {
         private AuthoritiesExtractor authoritiesExtractor = new FixedAuthoritiesExtractor();
         private PrincipalExtractor principalExtractor = new FixedPrincipalExtractor();
 
