@@ -5,6 +5,6 @@
     "authorizations": "/account/authorizations",
     "collections": "/metadata/collections",
     "metadata": "/metadata",
-    "files": "/files"
+    "files": "/storage/webdav"
   }
 }
