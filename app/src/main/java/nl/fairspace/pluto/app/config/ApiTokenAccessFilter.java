@@ -6,9 +6,7 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 
 public class ApiTokenAccessFilter extends OAuth2AuthenticationProcessingFilter {
-
     public ApiTokenAccessFilter(ResourceServerTokenServices resourceServerTokenServices) {
-
         super();
         setStateless(false);
         setAuthenticationManager(oauthAuthenticationManager(resourceServerTokenServices));
@@ -18,9 +16,8 @@ public class ApiTokenAccessFilter extends OAuth2AuthenticationProcessingFilter {
 
         OAuth2AuthenticationManager oauthAuthenticationManager = new OAuth2AuthenticationManager();
 
-        oauthAuthenticationManager.setResourceId("oauth2-resource");
+        oauthAuthenticationManager.setResourceId(null);
         oauthAuthenticationManager.setTokenServices(tokenServices);
-        oauthAuthenticationManager.setClientDetailsService(null);
 
         return oauthAuthenticationManager;
     }

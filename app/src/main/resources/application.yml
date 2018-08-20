@@ -29,6 +29,8 @@ security:
       authentication-scheme: header
       scope: openid
     resource:
+      jwk:
+        key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
       user-info-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/userinfo
       prefer-token-info: false
 
