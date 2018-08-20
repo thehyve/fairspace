@@ -70,12 +70,13 @@ public class CollectionService {
 
         // Update typeIdentifier based on given id
         Long id = savedCollection.getId();
-        repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
+        Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
 
         // Update metadata. Ensure that the correct uri is specified
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), collection.getMetadata().getName(), collection.getMetadata().getDescription());
         collectionMetadataService.createCollection(metadataToSave);
-        return collection;
+
+        return finalCollection.withMetadata(metadataToSave);
     }
 
     public Collection update(Long id, Collection patch) {

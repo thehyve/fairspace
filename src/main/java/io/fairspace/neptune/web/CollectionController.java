@@ -4,6 +4,7 @@ import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.service.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 @RestController
@@ -34,9 +37,9 @@ public class CollectionController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createCollection(@RequestBody Collection collection) {
-        collectionService.add(collection);
+    public ResponseEntity<?> createCollection(@RequestBody Collection collection) throws URISyntaxException {
+        Collection addedCollection = collectionService.add(collection);
+        return ResponseEntity.created(new URI(addedCollection.getMetadata().getUri())).build();
     }
 
     @PatchMapping("/{id}")
