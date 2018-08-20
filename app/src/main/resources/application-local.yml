@@ -1,15 +1,15 @@
 app:
   forceHttps: false
   oauth2:
-    base-url: http://keycloak.hyperspace.test.local:31303
+    base-url: http://192.168.99.100:31303
     realm: curie
-    required-authority: user-fashionable-bison
+    required-authority: user-ws1
 
 security:
   oauth2:
     client:
-      clientId: fashionable-bison-pluto
-      clientSecret: b6a9f4bd-f8b8-4bb5-9223-4040ea05b5f2
+      clientId: ws1-pluto
+      clientSecret: d51ddd79-f3e0-43ef-8113-997a49164899
 
 zuul:
   routes:

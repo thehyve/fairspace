@@ -20,14 +20,20 @@ security:
       access-token-uri: https://access.token.uri.test
       authentication-scheme: header
     resource:
-      user-info-uri: https://user.info.uri.test
-      prefer-token-info: false
+      jwk:
+        key-set-uri: http://localhost:8531/certs
+      user-info-uri: http://localhost:8531/userinfo
+      prefer-token-info: true
 
 zuul:
   routes:
     hyve:
       path: /thehyve/**
       url: https://thehyve.nl/
+      strip-prefix: true
+    echo:
+      path: /echo-token/**
+      url: http://localhost:8531/echo-token
       strip-prefix: true
     noauthz:
       path: /noauthz/**

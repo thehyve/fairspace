@@ -21,8 +21,10 @@ import org.springframework.security.oauth2.client.token.AccessTokenProviderChain
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.RequestEnhancer;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestHeaderRequestMatcher;
 import org.springframework.util.MultiValueMap;
@@ -43,6 +45,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     OAuth2SsoProperties sso;
+
+    @Autowired
+    private ResourceServerTokenServices jwtTokenServices;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -68,7 +73,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .deleteCookies(appConfig.getSessionCookieName())
                     .logoutSuccessUrl(String.format(appConfig.getOauth2().getLogoutUrl(), URLEncoder.encode(appConfig.getOauth2().getRedirectAfterLogoutUrl(), "UTF-8")))
             .and().csrf()
-                .disable();
+                .disable()
+
+            .addFilterBefore(new ApiTokenAccessFilter(jwtTokenServices), AbstractPreAuthenticatedProcessingFilter.class);
 
         addAuthenticationEntryPoint(http, sso.getLoginPath());
     }
