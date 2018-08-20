@@ -273,9 +273,10 @@ class CollectionBrowser extends React.Component {
 
     renderBreadCrumbs(selectedCollection, selectedPath) {
         let pathSegments = [];
+        const toBreadcrumb = segment => ({segment: segment, label: segment})
         if(selectedCollection) {
             pathSegments.push({segment: selectedCollection.id, label: selectedCollection.metadata.name});
-            pathSegments.push(...this.parsePath(selectedPath));
+            pathSegments.push(...this.parsePath(selectedPath).map(toBreadcrumb));
         }
 
         return (<BreadCrumbs
