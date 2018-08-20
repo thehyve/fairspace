@@ -1,5 +1,5 @@
 import React from 'react';
-import * as jsonld from 'jsonld/dist/jsonld';
+import combine from './MetadataUtils';
 
 
 /**
@@ -10,13 +10,12 @@ class MetadataViewer extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
-        this.contentMap = {};
-        // this.vocab = null;
+        // this.vocab = props.vocab;
         this.metadata = this.testData;
         this.state = {
             metadata: null,
             vocab: null,
-            contentMap: null
+            properties: []
         };
     }
 
@@ -62,74 +61,19 @@ class MetadataViewer extends React.Component {
         ]
     };
 
-    updateMetadataState = (value) => {
-        this.setState({metadata: value});
-    };
 
-    updateVocabState = (value) => {
-        this.setState({vocab: value});
-    };
 
-    createVocabMapping = () => {
-        const labelsById = {};
-        this.state.vocab.forEach(propertyDefinition => {
-            let id = propertyDefinition["@id"];
-            let label = propertyDefinition['http://www.w3.org/2000/01/rdf-schema#label'][0];
-            labelsById[id] = label["@value"];
-        });
-        return labelsById;
-    };
-
-    addToContentMap = (label, value) => {
-        console.log(this.state.metadata);
-        console.log(this.state.vocab);
-        let itemList;
-        if (label in this.contentMap) {
-            if (typeof this.contentMap[label] === "object") {
-                itemList = this.contentMap[label];
-            }
-            else {
-                itemList = [this.contentMap[label]];
-            }
-            itemList.push(value);
-            this.contentMap[label] = itemList;
-        }
-        else {
-            this.contentMap[label] = value;
-        }
-        // if (itemList.length === 0 ) {
-        //     this.setState({})
-        // }
-        // else {
-        //     this.setState({})
-        // }
-    };
-
-    createMetadataWithLabels = (labelsById) => {
-        Object.keys(this.state.metadata).forEach((key) => {
-            if (key in labelsById) {
-                this.state.metadata[key].forEach((valObj) => {
-                    this.addToContentMap(labelsById[key], valObj["@value"]);
-                });
-            }
-        });
-
-    };
 
     componentWillMount() {
-        jsonld.expand(this.vocab)
-            .then(this.updateVocabState);
+        combine(this.vocab, this.metadata)
+            .then(props => { this.setState({properties: props})});
 
-        jsonld.expand(this.metadata)
-            .then(metadataItems => this.updateMetadataState(metadataItems[0]))
-            .then(this.createVocabMapping)
-            .then(this.createMetadataWithLabels);
     }
 
     renderContentMap() {
-        console.log(this.contentMap);
-        return Object.keys(this.contentMap).map((contentLabel) =>
-            <li><b>{contentLabel}</b>: {this.contentMap[contentLabel]}</li>
+        console.log(this.state.contentMap);
+        return this.state.properties.map(p =>
+            <li key={p.label}><b>{p.label}</b>: {p.values.join(', ')}</li>
         );
     }
 

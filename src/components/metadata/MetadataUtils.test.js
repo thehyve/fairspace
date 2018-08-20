@@ -1,35 +1,5 @@
-import MetadataViewer from "./MetadataViewer"
-import React from 'react';
 import {mount} from "enzyme";
-
-function flushPromises() {
-    return new Promise((resolve, reject) => resolve());
-}
-
-it('combines vocabulary and metadata', () => {
-    const wrapper = mount(<MetadataViewer vocab={vocab} metadata={metadata1} />);
-
-    return flushPromises().then(() => {
-        const result = wrapper.find("li");
-        console.log(wrapper);
-        console.log(result);
-        expect(result.length).toEqual(2);
-    });
-});
-
-// it('adds non fairspace identifiers, no label', () => {
-//     const check = new MetadataViewer({"vocab": vocab, "metadata": metadata2});
-//     check.getIds(check.metadata);
-//     check.getLabels();
-//     expect(check.contentMap).toEqual({"Collection": "this url", "Description": "What", "dats:name": "John's quotes"});
-// });
-//
-// it('adds multiple nested', () => {
-//     const check = new MetadataViewer({"vocab": vocab, "metadata": metadata3});
-//     check.getIds(check.metadata);
-//     check.getLabels();
-//     expect(check.contentMap).toEqual({"Collection": "this url", "Description": "What", "Name": "test123456789"});
-// });
+import combine from './MetadataUtils';
 
 const metadata1 = {
     "@id": "http://fairspace.com/iri/collections/1",
@@ -84,3 +54,11 @@ const vocab = {
         }
     ]
 };
+
+it('combines vocabulary and metadata', () => {
+    combine(vocab, metadata1)
+        .then(result => {
+            expect(result.length).toEqual(2);
+        });
+
+});
