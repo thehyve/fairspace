@@ -52,7 +52,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWireMock(port = 0)
+@AutoConfigureWireMock(port = 8531)
 @DirtiesContext
 public class OAuth2ValidationTests {
 	@LocalServerPort
@@ -74,7 +74,6 @@ public class OAuth2ValidationTests {
 		serveUserInfo();
 		serveEchoToken();
 	}
-
 
 	@Test
 	public void applicationIsAccessibleWithAuthenticationHeader() throws Exception {
