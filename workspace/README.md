@@ -5,7 +5,9 @@ an instance of JupyterHub and Minio.
 Contains:
 - JupyterHub with Python 3 and R kernels and JupyterLab extension
 - Mercury
-- Minio
+- Titan
+- Neptune
+- Ceres
 
 ## Prerequisites
 A workspace within Fairspace is always associated with a hyperspace. The
@@ -43,9 +45,7 @@ pluto:
         baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
         realm: hyperspace     
         
-minio:
-  accessKey: IFGZ2M0W8LB0C92FYA3J
-  secretKey: xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB
+titan:
 
 ceres:
     persistence:
