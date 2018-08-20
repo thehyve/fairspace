@@ -1,0 +1,33 @@
+[
+    {
+        "id": 1,
+        "type": "LOCAL_FILE",
+        "typeIdentifier": "quotes",
+        "metadata": {
+            "uri": "http://fairspace.com/iri/collections/1",
+            "name": "John's quotes",
+            "description": "A nice dataset with memorable quotes"
+        }
+    },
+    {
+        "id": 2,
+        "type": "LOCAL_FILE",
+        "typeIdentifier": "samples",
+        "metadata": {
+            "uri": "http://fairspace.com/iri/collections/2",
+            "name": "John's samples",
+            "description": "The big set of samples retrieved from the lab last year"
+        }
+    },
+    {
+        "id": 3,
+        "type": "LOCAL_FILE",
+        "typeIdentifier": "external",
+        "metadata": {
+            "uri": "http://fairspace.com/iri/collections/3",
+            "name": "External data on AWS S3",
+            "description": "The big set of samples located outside the system"
+        }
+    }
+
+]

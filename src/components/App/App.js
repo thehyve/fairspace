@@ -66,7 +66,7 @@ class App extends React.Component {
                                 <div className={this.classes.toolbar}/>
 
                                 <Route exact path="/" component={Home}/>
-                                <Route path="/collections" component={Collections}/>
+                                <Route path="/collections/:collection?/:path(.*)?" component={Collections}/>
                                 <Route path="/notebooks" component={Notebooks}/>
                                 <Route path="/metadata/:type(projects|patients|samples|consents)/:id" component={Metadata}/>
 

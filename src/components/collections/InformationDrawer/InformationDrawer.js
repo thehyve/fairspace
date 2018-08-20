@@ -11,7 +11,11 @@ function InformationDrawer(props) {
     let contents;
 
     if(props.collection) {
-        contents = (<Collection collection={props.collection} onChangeDetails={props.onChangeDetails}/>)
+        contents = (<Collection
+            collection={props.collection}
+            collectionStore={props.collectionStore}
+            onDidChangeDetails={props.onDidChangeDetails}
+        />)
     } else {
         contents = (<Typography variant="title">No collection</Typography>);
     }
@@ -31,6 +35,8 @@ function InformationDrawer(props) {
             </IconButton>
 
             {contents}
+
+            {props.path ? 'Path: ' + JSON.stringify(props.path) : 'No path selected'}
 
         </Drawer>
     );

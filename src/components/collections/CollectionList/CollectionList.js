@@ -1,19 +1,47 @@
 import React from 'react';
 import Collection from "./Collection";
+import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import TableBody from "@material-ui/core/TableBody";
+import Icon from "@material-ui/core/Icon";
+import ClickHandler from "../ClickHandler/ClickHandler"
 
 function CollectionList(props) {
     if(!props.collections || props.collections.length === 0) {
         return "No collections";
     } else {
         return (
-            <ul>
-                {props.collections.map(function (collection) {
-                    return (<li key={collection.id}
-                                onClick={() => props.onCollectionClick(collection)}
-                                onDoubleClick={() => props.onCollectionDoubleClick(collection)}
-                    ><Collection collection={collection}/></li>)
-                })}
-            </ul>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell numeric>Owner</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {props.collections.map(collection => {
+                        return (
+                            <ClickHandler
+                                    component={TableRow}
+                                    key={collection.id}
+                                    selected={props.selectedCollection && collection.id === props.selectedCollection.id}
+                                      onSingleClick={() => props.onCollectionClick(collection)}
+                                      onDoubleClick={() => props.onCollectionDoubleClick(collection)}>
+                                <TableCell>
+                                    <Icon>folder_open</Icon>
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    <Collection collection={collection}/>
+                                </TableCell>
+                                <TableCell numeric>...</TableCell>
+                            </ClickHandler>
+                        );
+                    })}
+                </TableBody>
+            </Table>
         );
     }
 }

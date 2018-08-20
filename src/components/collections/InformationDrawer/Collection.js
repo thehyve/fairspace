@@ -12,7 +12,8 @@ import Icon from "@material-ui/core/Icon";
 class Collection extends React.Component{
     constructor(props) {
         super(props);
-        this.onChangeDetails = props.onChangeDetails;
+        this.onDidChangeDetails = props.onDidChangeDetails;
+        this.collectionStore = props.collectionStore;
 
         this.state = {
             collection: props.collection,
@@ -38,13 +39,18 @@ class Collection extends React.Component{
 
     determineEditValues(collection) {
         return {
-            name: collection.name  || '',
-            description: collection.description || ''
+            name: collection.metadata.name  || collection.name || '',
+            description: collection.metadata.description || ''
         }
     }
 
     closeEditDialog() {
         this.setState({editing: false});
+    }
+
+    storeChangedDetails(collectionId, parameters) {
+        // Update information about the name and collection
+        return this.collectionStore.updateCollection(collectionId, parameters.name, parameters.description);
     }
 
     handleCancel() {
@@ -53,8 +59,17 @@ class Collection extends React.Component{
     }
 
     handleChangeDetails() {
-        this.onChangeDetails(this.state.collection.id, this.state.editValues);
         this.closeEditDialog();
+
+        this.storeChangedDetails(this.state.collection.id, this.state.editValues)
+            .then(() => {
+                if(this.onDidChangeDetails) {
+                    this.onDidChangeDetails(this.state.collection.id, this.state.editValues);
+                }
+            })
+            .catch((e) => {
+                console.error("An error occurred while updating collection metadata", e);
+            });
     }
 
     handleInputChange(event) {
@@ -83,8 +98,8 @@ class Collection extends React.Component{
                     onMouseEnter={this.handleTextMouseEnter.bind(this)}
                     onMouseLeave={this.handleTextMouseLeave.bind(this)}
                 >
-                    <Typography variant="title">{this.state.collection.name} {this.state.showEditButton ? (<Icon>edit</Icon>) : ''}</Typography>
-                    <Typography variant="subheading">{this.state.collection.description}</Typography>
+                    <Typography variant="title">{this.state.collection.metadata.name} {this.state.showEditButton ? (<Icon>edit</Icon>) : ''}</Typography>
+                    <Typography variant="subheading">{this.state.collection.metadata.description}</Typography>
                 </div>
 
                 <Dialog
@@ -92,7 +107,7 @@ class Collection extends React.Component{
                     onClose={this.closeEditDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Edit collection: {this.state.collection.name}</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Edit collection: {this.state.collection.metadata.name}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
                             You can edit the collection name and description here.
