@@ -7,7 +7,7 @@ function flushPromises() {
 }
 
 it('combines vocabulary and metadata', () => {
-    const wrapper = mount(<MetadataViewer vocab={vocab} metadata={metadata1} />);
+    const wrapper = mount(<MetadataViewer vocabulary={vocab} metadata={metadata1} />);
 
     return flushPromises().then(() => {
         const result = wrapper.find("li");
@@ -18,14 +18,14 @@ it('combines vocabulary and metadata', () => {
 });
 
 // it('adds non fairspace identifiers, no label', () => {
-//     const check = new MetadataViewer({"vocab": vocab, "metadata": metadata2});
+//     const check = new MetadataViewer({"vocabulary": vocabulary, "metadata": metadata2});
 //     check.getIds(check.metadata);
 //     check.getLabels();
 //     expect(check.contentMap).toEqual({"Collection": "this url", "Description": "What", "dats:name": "John's quotes"});
 // });
 //
 // it('adds multiple nested', () => {
-//     const check = new MetadataViewer({"vocab": vocab, "metadata": metadata3});
+//     const check = new MetadataViewer({"vocabulary": vocabulary, "metadata": metadata3});
 //     check.getIds(check.metadata);
 //     check.getLabels();
 //     expect(check.contentMap).toEqual({"Collection": "this url", "Description": "What", "Name": "test123456789"});

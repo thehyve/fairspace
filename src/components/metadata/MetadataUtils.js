@@ -6,7 +6,7 @@ function combine(vocabulary, metadata) {
             jsonld.expand(metadata)
                 .then(expandedMetadata => {
                     const root = expandedMetadata[0];
-                    const resultMap = {};
+                    const result = {};
                     for (const key in root) {
                         const label = labelsById[key];
                         if (label) {
@@ -17,7 +17,7 @@ function combine(vocabulary, metadata) {
                             result[label] = values;
                         }
                     }
-                    return Object.keys(resultMap).map(label => ({label: label, values: resultMap[label]}));
+                    return Object.keys(result).map(label => ({label: label, values: result[label]}));
                 }));
 }
 
