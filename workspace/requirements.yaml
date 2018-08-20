@@ -8,7 +8,7 @@ dependencies:
 - name: mercury
   version: v0.1.x
   repository: https://chartmuseum.jx.test.fairdev.app/
-- name: hydra
+- name: titan
   version: v0.1.x
   repository: https://chartmuseum.jx.test.fairdev.app/
 - name: ceres
@@ -17,7 +17,5 @@ dependencies:
 - name: neptune
   version: v0.2.x
   repository: https://chartmuseum.jx.test.fairdev.app/
-- name: minio
-  version: v1.3.4
-  repository: "@stable"
+
 
