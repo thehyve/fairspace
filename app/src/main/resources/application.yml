@@ -38,7 +38,7 @@ zuul:
   routes:
     storage:
       path: /storage/**
-      url: http://hydra/
+      url: http://titan/
     metadata:
       path: /metadata/**
       url: http://neptune/

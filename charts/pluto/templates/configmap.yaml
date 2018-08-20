@@ -21,6 +21,6 @@ data:
         ui:
           url: {{ .Values.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
         storage:
-          url: {{ .Values.backends.storage | default (printf "http://%s-hydra.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+          url: {{ .Values.backends.storage | default (printf "http://%s-titan.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
         metadata:
           url: {{ .Values.backends.metadata | default (printf "http://%s-neptune.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
