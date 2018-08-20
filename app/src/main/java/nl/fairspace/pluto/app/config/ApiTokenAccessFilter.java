@@ -16,7 +16,6 @@ public class ApiTokenAccessFilter extends OAuth2AuthenticationProcessingFilter {
 
         OAuth2AuthenticationManager oauthAuthenticationManager = new OAuth2AuthenticationManager();
 
-        oauthAuthenticationManager.setResourceId(null);
         oauthAuthenticationManager.setTokenServices(tokenServices);
 
         return oauthAuthenticationManager;
