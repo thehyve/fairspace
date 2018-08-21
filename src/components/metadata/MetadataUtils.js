@@ -23,8 +23,8 @@ function extractLabelsByIdMap(vocabulary) {
         .then(expandedVocabulary => {
             const labelsById = {};
             expandedVocabulary.forEach(property => {
-                let id = property["@id"];
-                let label = property['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"];
+                const id = property["@id"];
+                const label = property['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"];
                 labelsById[id] = label;
             });
             return labelsById;

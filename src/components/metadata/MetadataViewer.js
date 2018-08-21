@@ -23,20 +23,25 @@ class MetadataViewer extends React.Component {
 
     }
 
-    renderProperty(p) {
-        return (<li key={p.label}><b>{p.label}</b>: {p.values.join(', ')}</li>);
+    renderValue(v) {
+        return (<li key={v}>{v}</li>)
     }
+
+
+    renderProperty(p) {
+        const items = p.values.map(this.renderValue.bind(this));
+        return (<li key={p.label}><b>{p.label}:</b><ul>{items}</ul></li>);
+    }
+
 
     render() {
         return (
             <div>
                 <ul>
-                    {this.state.properties.map(this.renderProperty)}
+                    {this.state.properties.map(this.renderProperty.bind(this))}
                 </ul>
-
             </div>
         )
-
     }
 }
 
