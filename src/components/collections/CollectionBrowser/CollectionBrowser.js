@@ -89,7 +89,7 @@ class CollectionBrowser extends React.Component {
         // Create the bucket in storage
         this.collectionStore
             .addCollection(name, description)
-            .then(this.requireRefresh)
+            .then(this.requireRefresh.bind(this))
             .catch(err => {
                 console.error("An error occurred while creating a collection", err);
             });
