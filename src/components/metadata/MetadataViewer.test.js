@@ -6,7 +6,7 @@ function flushPromises() {
     return new Promise(resolve => setImmediate(resolve));
 }
 
-it('Combines vocabulary and metadata', () => {
+it('combines vocabulary and metadata', () => {
     const wrapper = mount(<MetadataViewer vocabulary={vocabulary} metadata={metadata1} />);
     return flushPromises().then(() => {
         wrapper.update();
@@ -17,7 +17,7 @@ it('Combines vocabulary and metadata', () => {
     });
 });
 
-it('Does not show metadata with missing label', () => {
+it('does not show metadata with missing label', () => {
     const wrapper = mount(<MetadataViewer vocabulary={vocabulary} metadata={metadata2} />);
     return flushPromises().then(() => {
         wrapper.update();
@@ -28,7 +28,7 @@ it('Does not show metadata with missing label', () => {
     });
 });
 
-it('No vocabulary provided', () => {
+it('shows nothing when there is no vocabulary provided', () => {
     const wrapper = mount(<MetadataViewer vocabulary={empty_vocabulary} metadata={metadata1} />);
     return flushPromises().then(() => {
         wrapper.update();
@@ -39,7 +39,7 @@ it('No vocabulary provided', () => {
     });
 });
 
-it('No metadata provided', () => {
+it('shows nothing when there is no metadata provided', () => {
     const wrapper = mount(<MetadataViewer vocabulary={vocabulary} metadata={empty_metadata} />);
     return flushPromises().then(() => {
         wrapper.update();
@@ -50,7 +50,7 @@ it('No metadata provided', () => {
     });
 });
 
-it('Does not show extra label', () => {
+it('does not show extra labels', () => {
     const wrapper = mount(<MetadataViewer vocabulary={vocabulary2} metadata={metadata2} />);
     return flushPromises().then(() => {
         wrapper.update();

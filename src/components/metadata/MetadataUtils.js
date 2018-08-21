@@ -1,5 +1,13 @@
 import * as jsonld from 'jsonld/dist/jsonld';
 
+
+/**
+ * Expands the json-ld format of the vocabulary and metadata and
+ * combines them to make a list of objects with the label and value as keys.
+ * @param vocabulary json-ld format where labels are specified.
+ * @param metadata json-ld format with actual metadata.
+ * @returns {*}
+ */
 function combine(vocabulary, metadata) {
     return extractLabelsByIdMap(vocabulary)
         .then(labelsById =>
@@ -17,7 +25,12 @@ function combine(vocabulary, metadata) {
                 }));
 }
 
-
+/**
+ * Maps the @id to the label.
+ *
+ * @param vocabulary json-ld format where labels are specified.
+ * @returns {*}
+ */
 function extractLabelsByIdMap(vocabulary) {
     return jsonld.expand(vocabulary)
         .then(expandedVocabulary => {
