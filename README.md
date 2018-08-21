@@ -22,4 +22,3 @@ This frontend will be served by [pluto](https://github.com/fairspace/pluto) to a
 
 ### React
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app). See [REACT.md](REACT.md) for more information.
-

@@ -89,7 +89,7 @@ class CollectionBrowser extends React.Component {
         // Create the bucket in storage
         this.collectionStore
             .addCollection(name, description)
-            .then(this.requireRefresh)
+            .then(this.requireRefresh.bind(this))
             .catch(err => {
                 console.error("An error occurred while creating a collection", err);
             });
@@ -265,6 +265,7 @@ class CollectionBrowser extends React.Component {
                     onClose={this.handleCloseInfoDrawer.bind(this)}
                     onDidChangeDetails={this.handleDidCollectionDetailsChange.bind(this)}
                     collectionStore={this.collectionStore}
+                    metadataStore={this.metadataStore}
                 >
                 </InformationDrawer>
             </div>

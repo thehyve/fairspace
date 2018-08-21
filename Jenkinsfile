@@ -15,11 +15,18 @@ pipeline {
 
       DOCKER_TAG_PREFIX = "$DOCKER_REPO/$ORG/$APP_NAME"
       VERSION           = "0.1.${env.BUILD_NUMBER}"
+
+      PATH              = "/opt/rh/devtoolset-3/root/usr/bin:$PATH"
     }
     stages {
       stage('Build application') {
         steps {
           container(JENKINS_CONTAINER_TAG) {
+          /* There are currently two lines added as well as the setting of the PATH within the environment.
+           This is due to the version of gcc needing to be at least 4.9 to properly install the
+           jsonld dependency rdf-canonize. */
+            sh "yum install -y centos-release-scl-rh"
+            sh "yum install -y  devtoolset-3-gcc devtoolset-3-gcc-c++"
             sh "npm install"
             sh "CI=true DISPLAY=:99 npm test"
             sh "npm run prepare-build"

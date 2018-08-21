@@ -4,7 +4,8 @@
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
     "collections": "/metadata/collections",
-    "metadata": "/metadata",
-    "files": "/storage/webdav"
+    "files": "/storage/webdav",
+    "vocabulary": "/metadata/static/vocabulary.jsonld",
+    "metadata": "/metadata/metadata?uri="
   }
 }

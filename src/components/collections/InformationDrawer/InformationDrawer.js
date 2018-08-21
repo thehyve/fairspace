@@ -6,16 +6,25 @@ import styles from './InformationDrawer.styles';
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "@material-ui/core/Icon";
 import Collection from "./Collection";
+import Metadata from "../../metadata/Metadata";
 
 function InformationDrawer(props) {
     let contents;
 
     if(props.collection) {
-        contents = (<Collection
-            collection={props.collection}
-            collectionStore={props.collectionStore}
-            onDidChangeDetails={props.onDidChangeDetails}
-        />)
+        contents = (
+            <React.Fragment>
+                <Collection
+                    collection={props.collection}
+                    collectionStore={props.collectionStore}
+                    onDidChangeDetails={props.onDidChangeDetails}
+                />
+                <Metadata
+                    subject={props.collection.metadata.uri}
+                    metadataStore={props.metadataStore}
+                />
+            </React.Fragment>
+        )
     } else {
         contents = (<Typography variant="title">No collection</Typography>);
     }
