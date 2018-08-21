@@ -3,16 +3,9 @@
     "logout": "/logout",
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
-    "storage": "",
+    "collections": "/metadata/collections",
+    "files": "/storage/webdav",
     "vocabulary": "/metadata/static/vocabulary.jsonld",
     "metadata": "/metadata/metadata?uri="
-  },
-
-  "externalConfigurationFiles": ["/config/config.json"],
-
-  "metadata": {
-    "urlPatterns": {
-      "collections": "http://fairspace.com/iri/collections/{id}"
-    }
   }
 }

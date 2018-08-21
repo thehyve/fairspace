@@ -14,7 +14,11 @@ function InformationDrawer(props) {
     if(props.collection) {
         contents = (
             <React.Fragment>
-                <Collection collection={props.collection} onChangeDetails={props.onChangeDetails}/>
+                <Collection
+                    collection={props.collection}
+                    collectionStore={props.collectionStore}
+                    onDidChangeDetails={props.onDidChangeDetails}
+                />
                 <Metadata subject={props.collection.uri} />
             </React.Fragment>
         )
@@ -38,6 +42,7 @@ function InformationDrawer(props) {
 
             {contents}
 
+            {props.path ? 'Path: ' + JSON.stringify(props.path) : 'No path selected'}
 
         </Drawer>
     );

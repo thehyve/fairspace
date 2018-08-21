@@ -2,7 +2,17 @@
   "name": "mercury",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": {
+    "/storage": {
+      "target": "http://localhost:5000"
+    },
+    "/metadata": {
+      "target": "http://localhost:5000"
+    },
+    "/account": {
+      "target": "http://localhost:5000"
+    }
+  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.2",
     "@fortawesome/free-regular-svg-icons": "^5.2.0",
@@ -26,18 +36,22 @@
     "react-table": "^6.8.6",
     "react-test-renderer": "^16.4.1",
     "redux": "^4.0.0",
-    "simple-flexbox": "^1.2.0"
+    "simple-flexbox": "^1.2.0",
+    "webdav": "^1.5.3"
   },
   "scripts": {
     "dev": "concurrently \"yarn server\" \"yarn start\"",
-    "server": "node server/server.js",
+    "server": "node mock-server/server.js",
     "start": "react-scripts start",
+    "prepare-build": "./node_modules/.bin/babel ./node_modules/webdav/dist --out-dir ./node_modules/webdav/dist --presets env",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "concurrently": "^3.5.0",
-    "cors": "^2.8.4"
+    "webdav-server": "^2.3.22"
   }
 }

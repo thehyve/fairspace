@@ -26,6 +26,7 @@ pipeline {
             sh "yum install -y  devtoolset-3-gcc devtoolset-3-gcc-c++"
             sh "npm install"
             sh "CI=true DISPLAY=:99 npm test"
+            sh "npm run prepare-build"
             sh "npm run build"
           }
         }

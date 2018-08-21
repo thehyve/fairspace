@@ -6,10 +6,10 @@ import {shallow, mount} from "enzyme";
 import Button from "@material-ui/core/Button";
 import Config from "../../generic/Config/Config";
 import configFile from "../../../config";
+import MemoryRouter from "react-router-dom/MemoryRouter";
 
 beforeAll(() => {
     Config.setConfig(Object.assign(configFile, {
-        "externalConfigurationFiles": [],
         "user": {
             "username": "John"
         }
@@ -19,122 +19,61 @@ beforeAll(() => {
 });
 
 
-let mockS3, mockMetadataStore;
+let mockCollectionStore, mockFileStore, mockMetadataStore, mockFileStoreFactory;
+let collectionBrowser;
 
 function flushPromises() {
     return new Promise(resolve => setImmediate(resolve));
 }
 
 beforeEach(() => {
-    mockS3 = {
-        listBuckets: jest.fn(cb  => cb(null, { Buckets: [] })),
-        createBucket: jest.fn((options, cb)  => cb())
+    mockFileStoreFactory = {
+        build: () => mockFileStore
+    };
+
+    mockMetadataStore = {}
+
+    mockFileStore = {
+        list: jest.fn(() => Promise.resolve()),
+        upload: jest.fn(() => Promise.resolve()),
+        download: jest.fn()
+    };
+
+    mockCollectionStore = {
+        getCollections: jest.fn(() => Promise.resolve()),
+        getCollection: jest.fn(() => Promise.resolve([])),
+        addCollection: jest.fn(() => Promise.resolve([])),
     }
-    mockMetadataStore = {
-        addCollectionMetadata: jest.fn(() => Promise.resolve()),
-        getCollectionMetadata: jest.fn(() => Promise.resolve([])),
-        updateCollectionMetadata: jest.fn(() => Promise.resolve([])),
-    }
+
+    collectionBrowser = (
+        <MemoryRouter>
+            <CollectionBrowser
+                collectionStore={mockCollectionStore}
+                metadataStore={mockMetadataStore}
+                fileStoreFactory={mockFileStoreFactory}
+            />
+        </MemoryRouter>
+    )
 
 });
 
 it('renders without crashing', () => {
     const div = document.createElement('div');
-    ReactDOM.render(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore}/>, div);
+    ReactDOM.render(collectionBrowser, div);
     ReactDOM.unmountComponentAtNode(div);
 });
 
-it('calls the s3 listBuckets API on load', () => {
-    const wrapper = shallow(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore} />);
-
-    expect(mockS3.listBuckets.mock.calls.length).toEqual(1);
-});
-
 it('creates a new collection on button click', () => {
-    const wrapper = mount(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore} />);
+    const wrapper = mount(collectionBrowser);
 
     // Setup proper state
     wrapper.setState({loading: false});
     let button = wrapper.find(Button);
-    expect(button.length).toEqual(1);
+    expect(button.length).toEqual(2);
 
     // Click on button
-    button.simulate('click');
+    button.at(1).simulate('click');
 
     // Expect the collection to be created in storage
-    expect(mockS3.createBucket.mock.calls.length).toEqual(1);
-
-    // Expect the collection metadata to be stored
-    expect(mockMetadataStore.addCollectionMetadata.mock.calls.length).toEqual(1);
-});
-
-
-it('reloads the collection list on succesful creation', () => {
-    const wrapper = shallow(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore} />);
-    expect(mockS3.listBuckets.mock.calls.length).toEqual(1);
-
-    // Setup proper state
-    wrapper.setState({loading: false});
-    let button = wrapper.find(Button);
-    expect(button.length).toEqual(1);
-
-    button.simulate('click');
-
-    return flushPromises().then(() =>{
-        expect(mockS3.listBuckets.mock.calls.length).toEqual(2);
-    });
-});
-
-it('reloads the collection list on successful update', () => {
-    const wrapper = shallow(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore} />);
-    expect(mockS3.listBuckets.mock.calls.length).toEqual(1);
-
-    // Setup proper state
-    wrapper.setState({loading: false});
-    wrapper.find(InformationDrawer).get(0).props.onChangeDetails(1, {});
-
-    return flushPromises().then(() =>{
-        expect(mockS3.listBuckets.mock.calls.length).toEqual(2);
-    });
-});
-
-
-it('does not store metadata is bucket creation fails', () => {
-    mockS3.createBucket = jest.fn((options, cb)  => cb("Error"));
-    const wrapper = shallow(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore} />);
-
-    // Setup proper state
-    wrapper.setState({loading: false});
-    let button = wrapper.find(Button);
-    expect(button.length).toEqual(1);
-
-    button.simulate('click');
-
-    return flushPromises().then(() => {
-        // Expect the collection to be created in storage
-        expect(mockS3.createBucket.mock.calls.length).toEqual(1);
-
-        // Expect the collection metadata not to be stored
-        expect(mockMetadataStore.addCollectionMetadata.mock.calls.length).toEqual(0);
-
-        // Expect the list not to be reloaded
-        expect(mockS3.listBuckets.mock.calls.length).toEqual(1);
-    });
-});
-
-it('does reload the collection list if storing metadata fails', () => {
-    mockMetadataStore.addCollectionMetadata = jest.fn(() => Promise.reject());
-
-    const wrapper = shallow(<CollectionBrowser s3={mockS3} metadataStore={mockMetadataStore} />);
-    expect(mockS3.listBuckets.mock.calls.length).toEqual(1);
-
-    wrapper.setState({loading: false});
-
-    let button = wrapper.find(Button);
-    expect(button.length).toEqual(1);
-    button.simulate('click');
-
-    return flushPromises().then(() => {
-        expect(mockS3.listBuckets.mock.calls.length).toEqual(2);
-    });
+    expect(mockCollectionStore.addCollection.mock.calls.length).toEqual(1);
 });

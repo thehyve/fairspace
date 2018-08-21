@@ -1,13 +1,20 @@
 import React from 'react';
-import WithS3Client from "../../backend/WithS3Client/WithS3Client";
 import CollectionBrowser from "../../components/collections/CollectionBrowser/CollectionBrowser";
 import metadataStore from "../../services/MetadataStore/MetadataStore";
+import collectionStore from "../../services/CollectionStore/CollectionStore";
+import FileStoreFactory from "../../services/FileStore/FileStoreFactory";
 
 function Collections(props) {
+    const {match: { params }} = props;
+
     return (
-        <WithS3Client>
-            <CollectionBrowser metadataStore={metadataStore}/>
-        </WithS3Client>
+        <CollectionBrowser
+            metadataStore={metadataStore}
+            collectionStore={collectionStore}
+            fileStoreFactory={FileStoreFactory}
+            collection={params.collection}
+            path={params.path ? '/' + params.path : undefined}
+        />
     );
 }
 

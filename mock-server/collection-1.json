@@ -1,0 +1,10 @@
+{
+  "id": 1,
+  "type": "LOCAL_FILE",
+  "typeIdentifier": "quotes",
+  "metadata": {
+    "uri": "http://fairspace.com/iri/collections/1",
+    "name": "John's quotes",
+    "description": "A nice dataset with memorable quotes"
+  }
+}
