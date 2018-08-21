@@ -3,7 +3,7 @@ import combine from './MetadataUtils';
 const metadata1 = {
     "@id": "http://fairspace.com/iri/collections/1",
     "@type": "http://fairspace.io/ontology#Collection",
-    "description": "My first collection",
+    "description": ["My first collection", "More info"],
     "name": "Collection 5",
     "@context": {
         "name": {
@@ -42,7 +42,7 @@ const vocabulary = {
     ]
 };
 
-const correct_response = [{label: 'Description', values: ['My first collection']},
+const correct_response = [{label: 'Description', values: ['My first collection', 'More info']},
     {label: 'Name', values: ['Collection 5']}];
 
 it('combines vocabulary and metadata', () => {
