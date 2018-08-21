@@ -11,7 +11,7 @@ function getBreadCrumbLink(text, path, linkClass) {
 }
 
 function jsxJoin (array, str) {
-    if(!array || array.length == 0)
+    if(!array || array.length === 0)
         return [];
 
     let returnArray = [];
