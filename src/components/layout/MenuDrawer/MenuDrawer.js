@@ -26,12 +26,6 @@ function MenuDrawer(props) {
                         </ListItemIcon>
                         <ListItemText primary="Home" />
                     </ListItem>
-                    <ListItem component={Link} to="/files" button>
-                        <ListItemIcon>
-                            <Icon>file</Icon>
-                        </ListItemIcon>
-                        <ListItemText primary="Files" />
-                    </ListItem>
                     <ListItem component={Link} to="/collections" button>
                         <ListItemIcon>
                             <Icon>folder_open</Icon>
