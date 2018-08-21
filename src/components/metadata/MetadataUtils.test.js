@@ -15,18 +15,6 @@ const metadata1 = {
     }
 };
 
-const metadata2 = {
-    "dats:name": "John's quotes",
-    "fairspace:description": "What",
-    "fairspace:Collection": "this url",
-};
-
-const metadata3 = {
-    "test1": {"test2": [{"fairspace:name": "test123456789"}]},
-    "fairspace:description": "What",
-    "fairspace:Collection": "this url",
-};
-
 const vocabulary = {
     "@context": {
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
@@ -55,7 +43,7 @@ const vocabulary = {
 };
 
 const correct_response = [{label: 'Description', values: ['My first collection']},
-    {label: 'Name', values: ['Collection 5']}]
+    {label: 'Name', values: ['Collection 5']}];
 
 it('combines vocabulary and metadata', () => {
     combine(vocabulary, metadata1)
@@ -63,5 +51,4 @@ it('combines vocabulary and metadata', () => {
             expect(result.length).toEqual(2);
             expect(result).toEqual(correct_response);
         });
-
 });
