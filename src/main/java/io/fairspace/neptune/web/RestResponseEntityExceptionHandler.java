@@ -18,50 +18,43 @@ import java.net.ConnectException;
 @ResponseBody
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = {HttpServerErrorException.class})
+    @ExceptionHandler(HttpServerErrorException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    protected ErrorBody handleServerException(
-            RuntimeException ex, WebRequest request) {
+    protected ErrorBody handleServerException(HttpServerErrorException ex, WebRequest request) {
         ErrorBody errorBody = new ErrorBody("Could not talk to storage backend");
         log.debug(request.toString());
-        log.error("A http server error exception occurred. This is most probably caused by an error in the storage backend itself. Please check its logs.");
+        log.error("A http server error exception occurred. This is most probably caused by an error in the storage backend itself. Please check its logs.", ex);
         return errorBody;
     }
 
-    @ExceptionHandler(value = {HttpClientErrorException.class})
+    @ExceptionHandler(HttpClientErrorException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    protected ErrorBody handleHttpclientException(
-            RuntimeException ex, WebRequest request) {
+    protected ErrorBody handleHttpclientException(HttpClientErrorException ex, WebRequest request) {
         ErrorBody errorBody = new ErrorBody("Someone, or something, did not answer the phone.");
         log.debug(request.toString());
-        log.error("A client error exception occurred. This is most probably caused by Neptune sending an improper request to the storage backend or a misconfiguration of Neptune.");
+        log.error("A client error exception occurred. This is most probably caused by Neptune sending an improper request to the storage backend or a misconfiguration of Neptune.", ex);
         return errorBody;
     }
 
-    @ExceptionHandler(value = {ConnectException.class})
+    @ExceptionHandler(ConnectException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    protected ErrorBody handleConnectException(
-            RuntimeException ex) {
+    protected ErrorBody handleConnectException(ConnectException ex) {
         ErrorBody errorBody = new ErrorBody("Could not reach storage backend");
-        log.error("Connect exception occurred. This is most probably caused by a misconfiguration of the metadata storage backend. Message: {}", ex.getMessage());
-        log.debug("Stacktrace", ex);
+        log.error("Connect exception occurred. This is most probably caused by a misconfiguration of the metadata storage backend.", ex);
         return errorBody;
     }
 
-    @ExceptionHandler(value = {CollectionNotFoundException.class})
+    @ExceptionHandler(CollectionNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    protected ErrorBody handleNotFoundException(
-            CollectionNotFoundException ex) {
+    protected ErrorBody handleNotFoundException(CollectionNotFoundException ex) {
         return new ErrorBody("Collection could not be found");
     }
 
-    @ExceptionHandler(value = {Exception.class})
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    protected ErrorBody handleGenericException(
-            RuntimeException ex) {
+    protected ErrorBody handleGenericException(Exception ex) {
         ErrorBody errorBody = new ErrorBody("An internal error occurred.");
-        log.error("An unexpected error occurred: {}", ex.getMessage());
-        log.debug("Stacktrace", ex);
+        log.error("An unexpected error occurred.", ex);
         return errorBody;
     }
 
