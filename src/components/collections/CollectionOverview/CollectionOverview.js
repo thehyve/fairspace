@@ -38,21 +38,13 @@ class CollectionOverview extends React.Component {
                     return;
                 }
 
-                // Ensure proper structure of collections, e.g. that metadata is present
-                const cleanCollections = collections.map(collection => {
-                    if(!collection.metadata) {
-                        collection.metadata = { name: '[anonymous collection]' }
-                    }
-                    return collection;
-                })
-
                 // Update the state and send out events
-                this.setState({loading: false, collections: cleanCollections});
+                this.setState({loading: false, collections: collections});
                 if(this.onCollectionsDidLoad) {
-                    this.onCollectionsDidLoad(cleanCollections);
+                    this.onCollectionsDidLoad(collections);
                 }
 
-                return cleanCollections;
+                return collections;
             })
             .catch(err => {
                 if (this.isUnmounting) {

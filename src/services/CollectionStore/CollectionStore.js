@@ -18,7 +18,7 @@ class CollectionStore {
         }).then(response => {
             failOnHttpError(response, "Failure when retrieving list of collections");
             return response.json();
-        })
+        }).then(collections => collections.map(this._ensureCollectionMetadata))
     }
 
     getCollection(id) {
@@ -29,7 +29,7 @@ class CollectionStore {
         }).then(response => {
             failOnHttpError(response, "Failure when retrieving list of collections");
             return response.json();
-        })
+        }).then(this._ensureCollectionMetadata)
     }
 
     addCollection(name, description) {
@@ -54,6 +54,14 @@ class CollectionStore {
             failOnHttpError(response, "Failure while updating collection");
             return response;
         })
+    }
+
+    _ensureCollectionMetadata(collection) {
+        // Ensure proper structure of collections, e.g. that metadata is present
+        if(!collection.metadata) {
+            collection.metadata = { name: '[anonymous collection]' }
+        }
+        return collection;
     }
 
 }

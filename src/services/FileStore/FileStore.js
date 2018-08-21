@@ -28,7 +28,15 @@ class FileStore {
         const fullPath = this.getFullPath(path);
 
         return this.client
-            .getDirectoryContents(fullPath);
+            .getDirectoryContents(fullPath)
+            .catch(e => {
+                // If the directory does not exist, create it
+                if(e.status === 404) {
+                    return this.client.createDirectory(fullPath).then(() => [])
+                } else {
+                    throw e;
+                }
+            });
     }
 
     upload(path, files) {
