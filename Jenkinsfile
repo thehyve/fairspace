@@ -23,6 +23,7 @@ pipeline {
             sh "yum install -y centos-release-scl-rh"
             sh "yum install -y  devtoolset-3-gcc devtoolset-3-gcc-c++"
             sh "scl enable devtoolset-3 bash"
+            sh "gcc -v"
             sh "npm install"
             sh "CI=true DISPLAY=:99 npm test"
             sh "npm run build"
