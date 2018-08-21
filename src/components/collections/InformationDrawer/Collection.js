@@ -64,7 +64,7 @@ class Collection extends React.Component{
         this.storeChangedDetails(this.state.collection.id, this.state.editValues)
             .then(() => {
                 if(this.onDidChangeDetails) {
-                    this.onDidChangeDetails(this.state.collection.id, this.state.editValues);
+                    this.onDidChangeDetails(this.state.collection.id, Object.assign({uri: this.state.collection.metadata.uri}, this.state.editValues));
                 }
             })
             .catch((e) => {

@@ -26,7 +26,7 @@ class Metadata extends React.Component {
             return;
         }
 
-        this.setState({loading: true});
+        this.setState({loading: true, error: false});
 
         Promise.all([
             this.metadataStore.getVocabulary(),

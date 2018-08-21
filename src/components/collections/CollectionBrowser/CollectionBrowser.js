@@ -134,9 +134,7 @@ class CollectionBrowser extends React.Component {
         this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, { metadata: parameters})});
 
         // Reload list of collections to ensure the latest version
-        if(!this.state.selectedCollection) {
-            this.requireRefresh();
-        }
+        this.requireRefresh();
     }
 
     handleUpload(files) {
