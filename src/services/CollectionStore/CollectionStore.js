@@ -37,7 +37,7 @@ class CollectionStore {
             method: 'POST',
             headers: CollectionStore.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({ name: name, description: description })
+            body: JSON.stringify({ metadata: {name: name, description: description} })
         }).then(response => {
             failOnHttpError(response, "Failure while saving collection");
             return response;
@@ -49,7 +49,7 @@ class CollectionStore {
             method: 'PATCH',
             headers: CollectionStore.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({ name: name, description: description })
+            body: JSON.stringify({ metadata: {name: name, description: description} })
         }).then(response => {
             failOnHttpError(response, "Failure while updating collection");
             return response;
