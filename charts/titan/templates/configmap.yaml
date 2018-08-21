@@ -7,3 +7,4 @@ metadata:
     chart: {{ template "titan.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+data: {}
