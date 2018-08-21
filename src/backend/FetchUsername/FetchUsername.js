@@ -16,10 +16,10 @@ const FetchUsername = (props) => {
             }}
         </Fetch>
     )
-}
+};
 
 FetchUsername.propTypes = {
     children: PropTypes.func
-}
+};
 
 export default FetchUsername

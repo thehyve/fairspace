@@ -3,7 +3,9 @@
     "logout": "/logout",
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
-    "storage": ""
+    "storage": "",
+    "vocabulary": "/metadata/static/vocabulary.jsonld",
+    "metadata": "/metadata/metadata?uri="
   },
 
   "externalConfigurationFiles": ["/config/config.json"],
