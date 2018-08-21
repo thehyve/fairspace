@@ -35,7 +35,7 @@ function InformationDrawer(props) {
 
             <MetadataViewer
                 metadata={props.metadata}
-                vocab={props.vocab}>
+                vocabulary={props.vocabulary}>
             </MetadataViewer>
 
 

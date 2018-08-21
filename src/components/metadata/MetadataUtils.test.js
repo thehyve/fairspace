@@ -28,7 +28,7 @@ const metadata3 = {
     "fairspace:Collection" : "this url",
 };
 
-const vocab = {
+const vocabulary = {
     "@context": {
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -56,7 +56,7 @@ const vocab = {
 };
 
 it('combines vocabulary and metadata', () => {
-    combine(vocab, metadata1)
+    combine(vocabulary, metadata1)
         .then(result => {
             expect(result.length).toEqual(2);
         });

@@ -10,7 +10,7 @@ class MetadataViewer extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
-        this.vocabulary = props.vocab;
+        this.vocabulary = props.vocabulary;
         this.metadata = props.metadata;
         this.state = {
             properties: []
