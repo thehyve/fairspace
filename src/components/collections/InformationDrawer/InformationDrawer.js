@@ -6,13 +6,18 @@ import styles from './InformationDrawer.styles';
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "@material-ui/core/Icon";
 import Collection from "./Collection";
-import MetadataViewer from "../../metadata/MetadataViewer";
+import Metadata from "../../metadata/Metadata";
 
 function InformationDrawer(props) {
     let contents;
 
     if(props.collection) {
-        contents = (<Collection collection={props.collection} onChangeDetails={props.onChangeDetails}/>)
+        contents = (
+            <React.Fragment>
+                <Collection collection={props.collection} onChangeDetails={props.onChangeDetails}/>
+                <Metadata subject={props.collection.uri} />
+            </React.Fragment>
+        )
     } else {
         contents = (<Typography variant="title">No collection</Typography>);
     }
@@ -32,11 +37,6 @@ function InformationDrawer(props) {
             </IconButton>
 
             {contents}
-
-            <MetadataViewer
-                metadata={props.metadata}
-                vocabulary={props.vocabulary}>
-            </MetadataViewer>
 
 
         </Drawer>
