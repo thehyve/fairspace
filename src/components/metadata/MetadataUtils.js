@@ -10,11 +10,7 @@ function combine(vocabulary, metadata) {
                     for (const key in root) {
                         const label = labelsById[key];
                         if (label) {
-                            const value = root[key][0]['@value'];
-                            const values = result[label] || [];
-                            values.push(value);
-
-                            result[label] = values;
+                            result[label] = root[key].map(item => item['@value']);
                         }
                     }
                     return Object.keys(result).map(label => ({label: label, values: result[label]}));
