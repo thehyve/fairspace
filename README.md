@@ -23,3 +23,6 @@ This frontend will be served by [pluto](https://github.com/fairspace/pluto) to a
 ### React
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app). See [REACT.md](REACT.md) for more information.
 
+#### Important notice
+Within the Jenkinsfile the are currently two lines added as well as the setting of the PATH within the environment. 
+This is due to the version of gcc needing to be at least 4.9 to properly install the jsonld dependency rdf-canonize.
