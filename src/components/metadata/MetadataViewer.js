@@ -19,8 +19,16 @@ class MetadataViewer extends React.Component {
 
     componentWillMount() {
         combine(this.vocabulary, this.metadata)
-            .then(props => this.setState({properties: props}));
+            .then(props => {
+                if (this.willUnmount) {
+                    return
+                }
+                this.setState({properties: props});
+            });
+    }
 
+    componentWillUnmount() {
+        this.willUnmount = true
     }
 
     renderValue(v) {
@@ -30,7 +38,9 @@ class MetadataViewer extends React.Component {
 
     renderProperty(p) {
         const items = p.values.map(this.renderValue.bind(this));
-        return (<li key={p.label}><b>{p.label}:</b><ul>{items}</ul></li>);
+        return (<li key={p.label}><b>{p.label}:</b>
+            <ul>{items}</ul>
+        </li>);
     }
 
 
