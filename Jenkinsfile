@@ -15,6 +15,8 @@ pipeline {
 
       DOCKER_TAG_PREFIX = "$DOCKER_REPO/$ORG/$APP_NAME"
       VERSION           = "0.1.${env.BUILD_NUMBER}"
+
+      PATH              = "/opt/rh/devtoolset-3/root/usr/bin:$PATH"
     }
     stages {
       stage('Build application') {
@@ -22,7 +24,6 @@ pipeline {
           container(JENKINS_CONTAINER_TAG) {
             sh "yum install -y centos-release-scl-rh"
             sh "yum install -y  devtoolset-3-gcc devtoolset-3-gcc-c++"
-            sh "export PATH=/opt/rh/devtoolset-3/root/usr/bin:$PATH"
             sh "gcc -v"
             sh "npm install"
             sh "CI=true DISPLAY=:99 npm test"
