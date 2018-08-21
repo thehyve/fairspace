@@ -30,8 +30,9 @@ class FileStore {
         return this.client
             .getDirectoryContents(fullPath)
             .catch(e => {
-                // If the directory does not exist, create it
-                if(e.status === 404) {
+                // If the root directory does not exist, create it
+                if(!path && e.status === 404) {
+                    console.info("Root directory for collection does not exist. Creating it.")
                     return this.client.createDirectory(fullPath).then(() => [])
                 } else {
                     throw e;
