@@ -1,4 +1,4 @@
 module.exports = {
-    askForAuthentication: () => ([]),
+    askForAuthentication: () => [],
     getUser: (ctx, callback) => callback()
 }
