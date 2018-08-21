@@ -19,7 +19,10 @@ function InformationDrawer(props) {
                     collectionStore={props.collectionStore}
                     onDidChangeDetails={props.onDidChangeDetails}
                 />
-                <Metadata subject={props.collection.uri} />
+                <Metadata
+                    subject={props.collection.metadata.uri}
+                    metadataStore={props.metadataStore}
+                />
             </React.Fragment>
         )
     } else {

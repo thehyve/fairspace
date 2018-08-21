@@ -21,7 +21,4 @@ beforeAll(() => {
     Config.init();
 });
 
-it('should be initializedproperly', () => {
-    return MetadataStore.init();
-});
 

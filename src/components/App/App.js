@@ -12,7 +12,6 @@ import {BrowserRouter as Router, Route} from "react-router-dom";
 import Home from "../../pages/Home/Home";
 import Collections from "../../pages/Collections/Collections";
 import Notebooks from "../../pages/Notebooks/Notebooks";
-import MetadataStore from "../../services/MetadataStore/MetadataStore";
 import Metadata from "../../pages/Metadata/Metadata";
 
 class App extends React.Component {
@@ -35,8 +34,6 @@ class App extends React.Component {
             .then(() =>
                 this.cancellable.setState && this.cancellable.setState({configLoaded: true})
             );
-
-        MetadataStore.init();
     }
 
     componentWillUnmount() {

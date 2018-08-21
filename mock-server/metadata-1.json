@@ -1,0 +1,14 @@
+{
+  "@id": "http://fairspace.com/iri/collections/1",
+  "@type": "http://fairspace.io/ontology#Collection",
+  "description": "A nice dataset with memorable quotes",
+  "name": "John's quotes",
+  "@context": {
+    "name": {
+      "@id": "http://fairspace.io/ontology#name"
+    },
+    "description": {
+      "@id": "http://fairspace.io/ontology#description"
+    }
+  }
+}

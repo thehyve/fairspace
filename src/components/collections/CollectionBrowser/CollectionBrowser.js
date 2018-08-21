@@ -265,6 +265,7 @@ class CollectionBrowser extends React.Component {
                     onClose={this.handleCloseInfoDrawer.bind(this)}
                     onDidChangeDetails={this.handleDidCollectionDetailsChange.bind(this)}
                     collectionStore={this.collectionStore}
+                    metadataStore={this.metadataStore}
                 >
                 </InformationDrawer>
             </div>

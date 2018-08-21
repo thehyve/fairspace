@@ -16,6 +16,10 @@ class Metadata extends React.Component {
     }
 
     componentWillMount() {
+        this.loadData();
+    }
+
+    loadData() {
         if(!this.subject) {
             console.warn("No subject given to retrieve metadata for");
             this.setState({error: true});
@@ -41,6 +45,13 @@ class Metadata extends React.Component {
 
     componentWillUnmount() {
         this.willUnmount = true
+    }
+
+    componentWillReceiveProps(props) {
+        if(props.subject !== this.subject) {
+            this.subject = props.subject;
+            this.loadData();
+        }
     }
 
     render() {

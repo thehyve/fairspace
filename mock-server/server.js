@@ -10,11 +10,16 @@ app.get('/api/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.htt
 app.get('/account/name', (req, res) => res.send({username: 'John Butler'}));
 app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "ROLE_USER"]));
 
-// Metadata API
+// Collections API
 app.post('/metadata/collections', (req, res) => res.send());
 app.patch('/metadata/collections/:id', (req, res) => res.send());
 app.get('/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-list.json'));
 app.get('/metadata/collections/:id', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '.json'));
+
+// Metadata API
+app.get('/metadata/metadata', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));
+app.get('/metadata/static/vocabulary.jsonld', (req, res) => res.sendFile(__dirname + '/vocabulary.jsonld'));
+
 
 // Add webdav server on /files
 const server = new webdav.WebDAVServer();
