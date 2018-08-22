@@ -84,7 +84,7 @@ workspace:
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto
-# Default configuration points to hydra, mercury and neptune
+# Default configuration points to titan, mercury and neptune
 # in the same workspace
 pluto:
   overrides:
@@ -96,19 +96,6 @@ pluto:
     baseUrl:
     realm:
     redirectAfterLogoutUrl: https://fairspace.com
-
-# Specific setting for hydra
-# Default configuration points to minio in the same workspace
-# and uses the credentials from the minio secret
-hydra:
-  app:
-    oauth2:
-      baseUrl:
-      realm:
-
-  overrides:
-    minio:
-      secretNamePostfix: minio
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
@@ -155,6 +142,7 @@ neptune:
       metadata:
         baseUrl:
 
+# Specific settings for Titan subchart                
 titan:
     persistence:
       enabled: true
