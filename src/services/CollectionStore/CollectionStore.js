@@ -56,6 +56,17 @@ class CollectionStore {
         })
     }
 
+    deleteCollection(id) {
+        return fetch(Config.get().urls.collections + '/' + id, {
+            method: 'DELETE',
+            headers: CollectionStore.changeHeaders,
+            credentials: 'same-origin'
+        }).then(response => {
+            failOnHttpError(response, "Failure while deleting collection");
+            return response;
+        })
+    }
+
     _ensureCollectionMetadata(collection) {
         // Ensure proper structure of collections, e.g. that metadata is present
         if(!collection.metadata) {

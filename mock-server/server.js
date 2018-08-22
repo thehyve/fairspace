@@ -12,9 +12,10 @@ app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "R
 
 // Collections API
 app.post('/api/metadata/collections', (req, res) => res.send());
-app.patch('/api/metadata/collections/:id', (req, res) => res.send());
 app.get('/api/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-list.json'));
 app.get('/api/metadata/collections/:id', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '.json'));
+app.patch('/api/metadata/collections/:id', (req, res) => res.send());
+app.delete('/api/metadata/collections/:id', (req, res) => res.send());
 
 // Metadata API
 app.get('/api/metadata/metadata', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));
