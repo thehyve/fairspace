@@ -39,6 +39,7 @@ zuul:
     storage:
       path: /storage/**
       url: http://titan/
+      strip-prefix: false
     metadata:
       path: /metadata/**
       url: http://neptune/
