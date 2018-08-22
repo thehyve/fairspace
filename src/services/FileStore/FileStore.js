@@ -53,12 +53,12 @@ class FileStore {
         );
     }
 
-    download(fullPath) {
-        if(!fullPath) {
+    download(path) {
+        if(!path) {
             return;
         }
 
-        window.location.href = this.client.getFileDownloadLink(fullPath);
+        window.location.href = this.client.getFileDownloadLink(this.getFullPath(path));
     }
 
     /**
@@ -70,14 +70,6 @@ class FileStore {
         return path ? this.basePath + path : this.basePath;
     }
 
-    /**
-     * Converts a path as given by the backend to a path within the collection
-     * @param path
-     * @returns {*}
-     */
-    getPathWithinCollection(path) {
-        return path ? path.replace(this.basePath, '') : path;
-    }
 }
 
 export default FileStore;

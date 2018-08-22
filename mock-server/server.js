@@ -37,6 +37,9 @@ server.rootFileSystem().addSubTree(server.createExternalContext(), {
         'external-data.txt': webdav.ResourceType.File,
         'sub-dir': {
             'subdirfile.txt': webdav.ResourceType.File,
+            'another-dir': {
+                'deeply-nested.txt': webdav.ResourceType.File,
+            }
         }
     }
 })

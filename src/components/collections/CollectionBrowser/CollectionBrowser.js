@@ -123,9 +123,9 @@ class CollectionBrowser extends React.Component {
 
     handlePathDoubleClick(path) {
         if(path.type === 'directory') {
-            this.openDir(path.filename);
+            this.openDir(path.basename);
         } else {
-            this.downloadFile(path.filename);
+            this.downloadFile(path.basename);
         }
     }
 
@@ -193,12 +193,13 @@ class CollectionBrowser extends React.Component {
     }
 
     openDir(path) {
-        const pathWithinCollection = this.fileStore.getPathWithinCollection(path);
-        this.props.history.push("/collections/" + this.state.openedCollection.id + pathWithinCollection);
+        const basePath = this.state.openedPath || '';
+        this.props.history.push("/collections/" + this.state.openedCollection.id + basePath + '/' + path);
     }
 
     downloadFile(path) {
-        this.fileStore.download(path);
+        const basePath = this.state.openedPath || '';
+        this.fileStore.download(basePath + '/' + path);
     }
 
     // Parse path into array

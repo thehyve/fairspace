@@ -27,12 +27,6 @@ it('uses the collection name in the webdav path', () => {
     expect(fileStore.getFullPath()).toEqual('/subdir');
 })
 
-it('is capable of removing the collection name from a path', () => {
-    const fileStore = new FileStore('subdir')
-    expect(fileStore.getPathWithinCollection('/subdir/filename')).toEqual('/filename');
-    expect(fileStore.getPathWithinCollection('/subdir')).toEqual('');
-})
-
 if('uploads multiple files', () => {
     const fileStore = new FileStore('subdir')
     fileStore.client = {putFileContents: jest.fn(() => Promise.resolve())};
