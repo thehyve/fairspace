@@ -19,9 +19,6 @@ pluto:
 
 titan: {}
 
-mercury:
-  urls:
-    storage: https://storage.workspace.ci.test.fairdev.app
 
 # Specific settings for Ceres subchart
 ceres:
@@ -39,3 +36,5 @@ neptune:
       oauth2:
         baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
         realm: ci
+      metadata:
+        baseUrl: https://workspace.ci.test.fairdev.app
