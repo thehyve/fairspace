@@ -46,12 +46,16 @@ zuul:
     ui:
       path: /**
       url: http://mercury/
-  ignored-headers:
-  - Access-Control-Allow-Credentials
-  - Access-Control-Allow-Origin
   ignored-patterns:
   - /actuator/**
   - /account/**
   - /login
   - /logout
   add-host-header: true
+  ignored-headers:
+    - Access-Control-Allow-Credentials
+    - Access-Control-Allow-Origin
+    - Pragma
+    - X-Frame-Options
+    - X-Content-Type-Options
+    - X-XSS-Protection
