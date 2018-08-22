@@ -131,7 +131,7 @@ class CollectionBrowser extends React.Component {
 
     handleDidCollectionDetailsChange(collectionId, parameters) {
         // Update the currently selected collection
-        this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, { metadata: parameters})});
+        this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, {metadata: parameters})});
 
         // Reload list of collections to ensure the latest version
         this.requireRefresh();

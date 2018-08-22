@@ -48,10 +48,8 @@ class Metadata extends React.Component {
     }
 
     componentWillReceiveProps(props) {
-        if(props.subject !== this.subject) {
-            this.subject = props.subject;
-            this.loadData();
-        }
+        this.subject = props.subject;
+        this.loadData();
     }
 
     render() {
