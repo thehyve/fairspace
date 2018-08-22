@@ -7,8 +7,17 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Icon from "@material-ui/core/Icon";
 import ClickHandler from "../ClickHandler/ClickHandler"
+import IconButton from "@material-ui/core/IconButton";
 
 function CollectionList(props) {
+    function onDelete(event, collection) {
+        event.stopPropagation();
+
+        if(props.onCollectionDelete) {
+            props.onCollectionDelete(collection);
+        }
+    }
+
     if(!props.collections || props.collections.length === 0) {
         return "No collections";
     } else {
@@ -36,7 +45,11 @@ function CollectionList(props) {
                                 <TableCell component="th" scope="row">
                                     <Collection collection={collection}/>
                                 </TableCell>
-                                <TableCell numeric>...</TableCell>
+                                <TableCell numeric>
+                                    <IconButton onClick={(e) => onDelete(e, collection)}>
+                                        <Icon>delete</Icon>
+                                    </IconButton>
+                                </TableCell>
                             </ClickHandler>
                         );
                     })}
