@@ -7,8 +7,8 @@ to use OpenID (against Keycloak). The application leverages the [Netflix Zuul](h
 
 ## Backends
 The application is currently configured to proxy:
-* `/storage/**` to titan
-* `/metadata/**` to neptune
+* `/api/storage/**` to titan
+* `/api/metadata/**` to neptune
 * `/**` to mercury
 
 ## Additional endpoints

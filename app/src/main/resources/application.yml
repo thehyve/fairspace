@@ -17,7 +17,7 @@ app:
     needsAuthorization:
     - /account/authorizations
     - /storage
-    - /metadata
+    - /api/metadata
 
 security:
   oauth2:
@@ -37,11 +37,11 @@ security:
 zuul:
   routes:
     storage:
-      path: /storage/**
+      path: /api/storage/**
       url: http://titan/
       strip-prefix: false
     metadata:
-      path: /metadata/**
+      path: /api/metadata/**
       url: http://neptune/
     ui:
       path: /**
