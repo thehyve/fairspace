@@ -3,9 +3,9 @@
     "logout": "/logout",
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
-    "collections": "/metadata/collections",
-    "files": "/storage/webdav",
-    "vocabulary": "/metadata/static/vocabulary.jsonld",
-    "metadata": "/metadata/metadata?uri="
+    "collections": "/api/metadata/collections",
+    "files": "/api/storage/webdav",
+    "vocabulary": "/api/metadata/static/vocabulary.jsonld",
+    "metadata": "/api/metadata/metadata?uri="
   }
 }
