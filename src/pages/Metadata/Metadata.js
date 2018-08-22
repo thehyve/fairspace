@@ -2,8 +2,8 @@ import React from 'react';
 import Typography from "@material-ui/core/Typography";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import * as MetadataComponent from '../../components/metadata/Metadata';
 import metadataStore from "../../services/MetadataStore/MetadataStore";
+import MetadataComponent from '../../components/metadata/Metadata';
 
 function Metadata(props) {
     const {match: { params }} = props;
