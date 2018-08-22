@@ -39,7 +39,15 @@ public class CollectionController {
     @PostMapping
     public ResponseEntity<?> createCollection(@RequestBody Collection collection) throws URISyntaxException {
         Collection addedCollection = collectionService.add(collection);
-        return ResponseEntity.created(new URI(addedCollection.getMetadata().getUri())).build();
+
+        // Determine the URI for this collection
+        URI uri = null;
+
+        if(addedCollection.getMetadata() != null) {
+            uri = new URI(addedCollection.getMetadata().getUri());
+        }
+
+        return ResponseEntity.created(uri).build();
     }
 
     @PatchMapping("/{id}")
