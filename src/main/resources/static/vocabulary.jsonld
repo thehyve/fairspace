@@ -21,6 +21,36 @@
       "@id": "fairspace:Collection",
       "@type": "rdf:Class",
       "rdfs:label": "Collection"
+    },
+    {
+      "@id": "fairspace:derivesFrom",
+      "@type": "rdf:Property",
+      "rdfs:label": "Derives from"
+    },
+    {
+      "@id": "fairspace:isConsentOf",
+      "@type": "rdf:Property",
+      "rdfs:label": "Is consent of"
+    },
+    {
+      "@id": "schema:about",
+      "@type": "rdf:Property",
+      "rdfs:label": "Is about"
+    },
+    {
+      "@id": "schema:Dataset",
+      "@type": "rdf:Class",
+      "rdfs:label": "Dataset"
+    },
+    {
+      "@id": "schema:Person",
+      "@type": "rdf:Class",
+      "rdfs:label": "Person"
+    },
+    {
+      "@id": "schema:Material",
+      "@type": "rdf:Class",
+      "rdfs:label": "Material"
     }
   ]
 }
