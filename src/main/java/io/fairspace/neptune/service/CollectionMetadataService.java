@@ -33,7 +33,7 @@ public class CollectionMetadataService {
     @Autowired
     public CollectionMetadataService(
             TripleService tripleService,
-            @Value("app.metadata.base-url") String metadataBaseUrl) {
+            @Value("${app.metadata.base-url}") String metadataBaseUrl) {
         this.tripleService = tripleService;
         this.metadataBaseUrl = metadataBaseUrl;
     }
