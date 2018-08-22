@@ -31,13 +31,30 @@ class MetadataViewer extends React.Component {
         this.willUnmount = true
     }
 
-    renderValue(v) {
-        return (<li key={v}>{v}</li>)
+    static renderValue(v) {
+        return MetadataViewer.isValidUrl(v)
+            ? (<a href={MetadataViewer.navigableLink(v)}>{v}</a>)
+            : (<li key={v}>{v}</li>)
+    }
+
+    static isValidUrl(s) {
+        try {
+            new URL(s);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    static navigableLink(link) {
+        return link.startsWith(window.location.origin)
+            ? link.replace('/iri/', '/metadata/')
+            : link
     }
 
 
     renderProperty(p) {
-        const items = p.values.map(this.renderValue.bind(this));
+        const items = p.values.map(MetadataViewer.renderValue.bind(this));
         return (<li key={p.label}><b>{p.label}:</b>
             <ul>{items}</ul>
         </li>);
