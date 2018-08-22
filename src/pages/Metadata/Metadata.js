@@ -2,6 +2,8 @@ import React from 'react';
 import Typography from "@material-ui/core/Typography";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
+import * as MetadataComponent from '../../components/metadata/Metadata';
+import metadataStore from "../../services/MetadataStore/MetadataStore";
 
 function Metadata(props) {
     const {match: { params }} = props;
@@ -14,7 +16,10 @@ function Metadata(props) {
                 <ListItem>Id: {params.id}</ListItem>
             </List>
 
-            Insert metadata component here
+            <MetadataComponent
+                metadataStore={metadataStore}
+                subject={`${window.location.origin}/iri/${params.type}/${params.id}`}
+            />
         </div>
     );
 }
