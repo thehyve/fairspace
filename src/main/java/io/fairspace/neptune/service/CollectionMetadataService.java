@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,14 +21,22 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @Service
 public class CollectionMetadataService {
-    private static final String COLLECTION_URI_FORMAT = "http://fairspace.com/iri/collections/%d";
+    private static final String COLLECTION_URI_FORMAT = "%s/iri/collections/%d";
     private static final String GET_COLLECTIONS =
             String.format(
                     "CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o . ?s <%s> <%s> . }",
                     RDF.type.getURI(), Fairspace.Collection);
 
-    @Autowired
+    private String metadataBaseUrl;
     private TripleService tripleService;
+
+    @Autowired
+    public CollectionMetadataService(
+            TripleService tripleService,
+            @Value("app.metadata.base-url") String metadataBaseUrl) {
+        this.tripleService = tripleService;
+        this.metadataBaseUrl = metadataBaseUrl;
+    }
 
     public Optional<CollectionMetadata> getCollection(String uri) {
         Model model = tripleService.retrieveTriples(uri);
@@ -100,6 +109,6 @@ public class CollectionMetadataService {
     }
 
     public String getUri(Long id) {
-        return String.format(COLLECTION_URI_FORMAT, id);
+        return String.format(COLLECTION_URI_FORMAT, this.metadataBaseUrl, id);
     }
 }
