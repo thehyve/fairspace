@@ -9,20 +9,18 @@ import * as jsonld from 'jsonld/dist/jsonld';
  * @returns {*}
  */
 function combine(vocabulary, metadata) {
-    return extractLabelsByIdMap(vocabulary)
-        .then(labelsById =>
-            jsonld.expand(metadata)
-                .then(expandedMetadata => {
-                    const root = expandedMetadata[0];
-                    const result = {};
-                    for (const key in root) {
-                        const label = labelsById[key];
-                        if (label) {
-                            result[label] = root[key].map(item => item['@value']);
-                        }
-                    }
-                    return Object.keys(result).map(label => ({label: label, values: result[label]}));
-                }));
+    return Promise.all([extractLabelsByIdMap(vocabulary), jsonld.expand(metadata)])
+        .then(([labelsById, expandedMetadata]) => {
+            const root = expandedMetadata[0];
+            const result = {};
+            for (const key in root) {
+                const label = labelsById[key];
+                if (label) {
+                    result[label] = root[key].map(item => item['@value']);
+                }
+            }
+            return Object.keys(result).map(label => ({label: label, values: result[label]}));
+        });
 }
 
 /**
