@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -47,7 +48,16 @@ public class ResourceServerConfiguration {
 
         @Override
         public Authentication extractAuthentication(Map<String, ?> map) {
-            Object principal = principalExtractor.extractPrincipal((Map<String, Object>) map);
+            Map<String,Object> mutableMap = (Map<String, Object>) map;
+
+            Object principal = principalExtractor.extractPrincipal(mutableMap);
+
+            // Set client ID in the details map to allow refreshing the token
+            // The calling code will overwrite the request created below
+            if(map.containsKey(AccessTokenConverter.AUD) && !map.containsKey(AccessTokenConverter.CLIENT_ID)) {
+                mutableMap.put(AccessTokenConverter.CLIENT_ID, map.get(AccessTokenConverter.AUD));
+            }
+
             List<GrantedAuthority> authorities = authoritiesExtractor.extractAuthorities((Map<String, Object>) map);
 
             OAuth2Request request = new OAuth2Request(null, null, null, true, null,
@@ -57,6 +67,6 @@ public class ResourceServerConfiguration {
             token.setDetails(map);
             return new OAuth2Authentication(request, token);
         }
-    };
+    }
 
 }
