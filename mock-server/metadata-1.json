@@ -2,7 +2,7 @@
   "@id": "http://fairspace.com/iri/collections/1",
   "@type": "http://fairspace.io/ontology#Collection",
   "description": "A nice dataset with memorable quotes",
-  "name": "John's quotes",
+  "name": "http://localhost:3000/iri/patients/blah",
   "@context": {
     "name": {
       "@id": "http://fairspace.io/ontology#name"
