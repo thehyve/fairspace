@@ -55,6 +55,23 @@ class CollectionOverview extends React.Component {
             });
     }
 
+    deleteCollection(collection) {
+        if(window.confirm("Are you sure?")) {
+            return this.collectionStore
+                .deleteCollection(collection.id)
+                .then(this.loadContents.bind(this))
+                .catch(err => {
+                    if (this.isUnmounting) {
+                        return;
+                    }
+                    console.error("An error occurred while deleting collection", err);
+                    this.setState({error: true, loading: false});
+                })
+        } else {
+            return Promise.resolve();
+        }
+    }
+
     componentWillReceiveProps(nextProps) {
         if(nextProps.refreshCollections) {
             this.loadContents();
@@ -75,6 +92,7 @@ class CollectionOverview extends React.Component {
                             selectedCollection={this.state.selectedCollection}
                             onCollectionClick={this.props.onCollectionClick}
                             onCollectionDoubleClick={this.props.onCollectionDoubleClick}
+                            onCollectionDelete={this.deleteCollection.bind(this)}
             />);
     }
 }
