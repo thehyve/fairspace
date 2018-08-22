@@ -3,10 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": {
-    "/storage": {
-      "target": "http://localhost:5000"
-    },
-    "/metadata": {
+    "/api": {
       "target": "http://localhost:5000"
     },
     "/account": {
