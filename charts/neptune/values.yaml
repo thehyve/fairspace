@@ -41,6 +41,8 @@ app:
   oauth2:
     baseUrl: http://localhost:9080
     realm: keycloak
+  metadata:
+    baseUrl: http://fairspace.com
 
 postgresql:
   postgresUser: postgres
