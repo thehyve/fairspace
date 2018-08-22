@@ -7,5 +7,5 @@ const server = supertest(app);
 describe('Titan', () => {
     it('responds to /', () => server.get('/').expect(200, 'Hi, I\'m Titan!'));
 
-    it('responds to /webdav/ when the file file is present', () => server.propfind('/webdav/').expect(207));
+    it('responds to /webdav/ when the file file is present', () => server.propfind('/storage/webdav/').expect(207));
 });
