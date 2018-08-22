@@ -53,3 +53,4 @@ zuul:
   - /account/**
   - /login
   - /logout
+  add-host-header: true
