@@ -10,7 +10,7 @@ class ClickHandler extends React.Component {
         super(props);
         this.props = props;
 
-        this.doubleClickTimeout = props.doubleClickTimeout || 200;
+        this.doubleClickTimeout = props.doubleClickTimeout || 400;
 
         this.onSingleClick = props.onSingleClick;
         this.onDoubleClick = props.onDoubleClick;
@@ -22,13 +22,13 @@ class ClickHandler extends React.Component {
     handleClicks() {
         this.clickCount++;
         if (this.clickCount === 1) {
-            this.singleClickTimer = setTimeout(function () {
+            this.singleClickTimer = setTimeout(() => {
                 this.clickCount = 0;
 
                 if(this.onSingleClick) {
                     this.onSingleClick();
                 }
-            }.bind(this), this.doubleClickTimeout);
+            }, this.doubleClickTimeout);
         } else if (this.clickCount === 2) {
             clearTimeout(this.singleClickTimer);
             this.clickCount = 0;
