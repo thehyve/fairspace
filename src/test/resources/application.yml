@@ -1,3 +1,7 @@
+app:
+  metadata:
+    base-url: http://fairspace.com
+
 # Spring should handle authentication on incoming requests by validating the oAuth token
 security:
   oauth2:
