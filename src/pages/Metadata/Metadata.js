@@ -18,7 +18,7 @@ function Metadata(props) {
 
             <MetadataComponent
                 metadataStore={metadataStore}
-                subject={`http://fairspace.com/iri/${params.type}/${params.id}`}
+                subject={`${window.location.origin}/iri/${params.type}/${params.id}`}
             />
         </div>
     );
