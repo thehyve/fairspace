@@ -42,13 +42,12 @@ const vocabulary = {
     ]
 };
 
-const correct_response = [{label: 'Description', values: ['My first collection', 'More info']},
-    {label: 'Name', values: ['Collection 5']}];
+const correct_response = [
+    {label: 'Description', values: ['My first collection', 'More info']},
+    {label: 'Name', values: ['Collection 5']}
+    ];
 
 it('combines vocabulary and metadata', () => {
     combine(vocabulary, metadata1)
-        .then(result => {
-            expect(result.length).toEqual(2);
-            expect(result).toEqual(correct_response);
-        });
+        .then(result => expect(result).toEqual(correct_response));
 });
