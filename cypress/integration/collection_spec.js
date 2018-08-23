@@ -65,6 +65,7 @@ describe('e2e tests checking collections for Fairspace', function () {
     });
 
     it('successfully deletes a collection', function () {
+        beforeEach();
         cy.contains("Collections").click();
         cy.request("/metadata/collections", "GET").as("getCollections")
             .then(() => {
