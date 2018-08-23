@@ -15,8 +15,8 @@ describe('e2e tests for Fairspace', function () {
         cy.contains("Collections").click();
         cy.request("/metadata/collections", "GET").as("getCollections")
             .then(() => {
-                cy.get('h3');
-                cy.get('ul').find('li').should('length.above', 0);
+                cy.get('table');
+                cy.get('tbody').find('tr').should('length.above', 0);
         });
     });
 
@@ -25,12 +25,12 @@ describe('e2e tests for Fairspace', function () {
         cy.request("/metadata/collections", "GET").as("getCollections")
             .then(() => {
                 let number = 0;
-                cy.get('ul>li').each(() => {
+                cy.get('tbody>tr').each(() => {
                     number += 1;
                    return number;
                 }).then(() => {
                     cy.get('button').contains("add").click();
-                    cy.get('ul>li').should('length.above', number);
+                    cy.get('tbody>tr').should('length.above', number);
                 })
             });
     });
@@ -39,12 +39,14 @@ describe('e2e tests for Fairspace', function () {
         cy.contains("Collections").click();
         cy.request("/metadata/collections", "GET").as("getCollections")
             .then(() => {
-                cy.get('h3');
-                cy.get('ul').find('li').contains("Test workspace-ci's collection").click();
+                cy.get('tbody');
+                cy.get('tr').find('th').contains("Test workspace-ci's collection").click();
+                cy.wait(1000);
                 cy.get('h2').contains("Test workspace-ci's collection").click();
                 cy.get('input[name=name]').clear().type('test change name');
                 cy.get('button').contains('Save').click();
                 cy.get('ul>li').should('contain', 'test change name');
             });
     });
+
 });
