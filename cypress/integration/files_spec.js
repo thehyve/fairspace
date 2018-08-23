@@ -19,7 +19,7 @@ describe('e2e tests checking files for Fairspace', function () {
         cy.get('input[name=password').type(Cypress.config("password") + '{enter}');
     });
 
-    it('successfully see list of files and upload one', function () {
+    it('successfully see list of files, uploads a file and downloads a file', function () {
         cy.contains("Collections").click();
         cy.request("/metadata/collections", "GET").as("getCollections")
             .then(() => {
@@ -32,7 +32,15 @@ describe('e2e tests checking files for Fairspace', function () {
                 cy.get("span").contains("Close").click();
                 cy.wait(1000);
                 cy.get("tbody>tr>th").contains("myfile.csv");
-                cy.get("tbody>tr>td>span").contains("note_open");
+                let collectionId;
+                cy.url().should((url) => {
+                    collectionId = url.toString().split("/").pop();
+                }).then(() => {
+                    cy.request("/api/storage/webdav/" + collectionId.toString() + "/myfile.csv", "GET").as("downloadFile")
+                        .then((response) => {
+                            expect(response.isOkStatusCode);
+                        })
+                });
         })
     });
 
