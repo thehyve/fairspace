@@ -43,7 +43,7 @@ const vocabulary = {
 };
 
 const correct_response = [
-    {label: 'Description', values: ['My first collection', 'More info']},
+    {label: 'Description', values: ['More info', 'My first collection']},
     {label: 'Name', values: ['Collection 5']}
     ];
 

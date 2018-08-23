@@ -16,10 +16,10 @@ function combine(vocabulary, metadata) {
             for (const key in root) {
                 const label = labelsById[key];
                 if (label) {
-                    result[label] = root[key].map(item => item['@value']);
+                    result[label] = root[key].map(item => item['@value']).sort();
                 }
             }
-            return Object.keys(result).map(label => ({label: label, values: result[label]}));
+            return Object.keys(result).sort().map(label => ({label: label, values: result[label]}));
         });
 }
 
