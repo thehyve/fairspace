@@ -30,6 +30,7 @@ describe('e2e tests checking files for Fairspace', function () {
                 cy.get("button[aria-label=Upload]").click();
                 cy.upload_file("input[type=file]", 'myfile.csv').then(() => {
                     cy.get("span").contains("Close").click({force: true});
+                    cy.wait(5000);
                     cy.get("tbody>tr>th").contains("myfile.csv");
                 });
                 let collectionId;
