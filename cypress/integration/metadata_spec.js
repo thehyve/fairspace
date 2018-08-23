@@ -13,8 +13,8 @@ describe('e2e tests checking metadata for Fairspace', function () {
                 cy.get('button').contains("add").click();
                 cy.wait(500);
                 cy.get('tr').find('th').contains("GSE8581").click();
-                cy.wait(500);
-                cy.get('a').contains("https://workspace.ci.test.fairdev.app/iri/patients/GSM210004").click();
+                cy.wait(1000);
+                cy.get('a').contains("https://workspace.ci.test.fairdev.app/iri/patients/GSM210004").click({force: true});
                 cy.get("ul>li").contains("Type: patients");
             });
     });
