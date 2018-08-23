@@ -16,6 +16,7 @@ describe('e2e tests checking metadata for Fairspace', function () {
                 cy.wait(1000);
                 cy.get('a').contains("https://workspace.ci.test.fairdev.app/iri/patients/GSM210004").click({force: true});
                 cy.get("ul>li").contains("Type: patients");
+                cy.get("ul>li").contains("Id: GSM210004");
             });
     });
 
