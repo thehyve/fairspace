@@ -68,7 +68,11 @@ class CollectionBrowser extends React.Component {
                 .getCollection(selectedCollectionId)
                 .then(collection => {
                     this.fileStore = this.props.fileStoreFactory.build(collection);
-                    this.setState({openedCollection: collection, openedPath: selectedPath});
+                    this.setState({
+                        openedCollection: collection,
+                        selectedCollection: collection,
+                        openedPath: selectedPath
+                    });
                 })
                 .catch(e => {
                     this.setState({loading: false, error: true});
