@@ -3,12 +3,16 @@
   "@type": "http://fairspace.io/ontology#Collection",
   "description": "A nice dataset with memorable quotes",
   "name": "John's quotes",
+  "about" : [ "http://localhost:3000/iri/patients/GSM212811", "http://localhost:3000/iri/patients/GSM212850", "http://localhost:3000/iri/patients/GSM212810", "http://localhost:3000/iri/patients/GSM210994", "http://localhost:3000/iri/patients/GSM210010", "http://localhost:3000/iri/patients/GSM210007", "http://localhost:3000/iri/patients/GSM210012", "http://localhost:3000/iri/patients/GSM213020", "http://localhost:3000/iri/patients/GSM210009", "http://localhost:3000/iri/patients/GSM212848", "http://localhost:3000/iri/patients/GSM211865", "http://localhost:3000/iri/patients/GSM210194", "http://localhost:3000/iri/patients/GSM213034", "http://localhost:3000/iri/patients/GSM210192", "http://localhost:3000/iri/patients/GSM212855", "http://localhost:3000/iri/patients/GSM213036", "http://localhost:3000/iri/patients/GSM212854", "http://localhost:3000/iri/patients/GSM211010", "http://localhost:3000/iri/patients/GSM211007", "http://localhost:3000/iri/patients/GSM211008", "http://localhost:3000/iri/patients/GSM213019", "http://localhost:3000/iri/patients/GSM212075", "http://localhost:3000/iri/patients/GSM210004", "http://localhost:3000/iri/patients/GSM210090", "http://localhost:3000/iri/patients/GSM212852", "http://localhost:3000/iri/patients/GSM212849", "http://localhost:3000/iri/patients/GSM213035", "http://localhost:3000/iri/patients/GSM210014", "http://localhost:3000/iri/patients/GSM210978", "http://localhost:3000/iri/patients/GSM213037", "http://localhost:3000/iri/patients/GSM213017", "http://localhost:3000/iri/patients/GSM211872", "http://localhost:3000/iri/patients/GSM210196", "http://localhost:3000/iri/patients/GSM212787", "http://localhost:3000/iri/patients/GSM210188", "http://localhost:3000/iri/patients/GSM210011", "http://localhost:3000/iri/patients/GSM210992", "http://localhost:3000/iri/patients/GSM210005", "http://localhost:3000/iri/patients/GSM210993", "http://localhost:3000/iri/patients/GSM212068", "http://localhost:3000/iri/patients/GSM210006", "http://localhost:3000/iri/patients/GSM210193", "http://localhost:3000/iri/patients/GSM210008", "http://localhost:3000/iri/patients/GSM212853", "http://localhost:3000/iri/patients/GSM210087", "http://localhost:3000/iri/patients/GSM212067", "http://localhost:3000/iri/patients/GSM210015", "http://localhost:3000/iri/patients/GSM212788", "http://localhost:3000/iri/patients/GSM211009", "http://localhost:3000/iri/patients/GSM212809", "http://localhost:3000/iri/patients/GSM210979", "http://localhost:3000/iri/patients/GSM212070", "http://localhost:3000/iri/patients/GSM212789", "http://localhost:3000/iri/patients/GSM212074", "http://localhost:3000/iri/patients/GSM212790", "http://localhost:3000/iri/patients/GSM213018", "http://localhost:3000/iri/patients/GSM210071", "http://localhost:3000/iri/patients/GSM212069" ],
   "@context": {
     "name": {
       "@id": "http://fairspace.io/ontology#name"
     },
     "description": {
       "@id": "http://fairspace.io/ontology#description"
+    },
+    "about" : {
+      "@id" : "http://schema.org/about"
     }
   }
 }

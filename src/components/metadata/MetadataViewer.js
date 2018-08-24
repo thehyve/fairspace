@@ -1,5 +1,7 @@
 import React from 'react';
 import combine from './MetadataUtils';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 
 
 /**
@@ -32,9 +34,10 @@ class MetadataViewer extends React.Component {
     }
 
     static renderValue(v) {
-        return MetadataViewer.isValidUrl(v)
-            ? (<a href={MetadataViewer.navigableLink(v)}>{v}</a>)
-            : (<li key={v}>{v}</li>)
+        return (
+            <ListItem>
+                {MetadataViewer.isValidUrl(v) ? (<a href={MetadataViewer.navigableLink(v)}>{v}</a>) : v}
+            </ListItem>)
     }
 
     static isValidUrl(s) {
@@ -55,20 +58,17 @@ class MetadataViewer extends React.Component {
 
     renderProperty(p) {
         const items = p.values.map(MetadataViewer.renderValue.bind(this));
-        return (<li key={p.label}><b>{p.label}:</b>
-            <ul>{items}</ul>
-        </li>);
+        return (
+            <ListItem>
+                <div>
+                    <b>{p.label}:</b>
+                    <List dense={true}>{items}</List>
+                </div>
+            </ListItem>);
     }
 
-
     render() {
-        return (
-            <div>
-                <ul>
-                    {this.state.properties.map(this.renderProperty.bind(this))}
-                </ul>
-            </div>
-        )
+        return (<List>{this.state.properties.map(this.renderProperty.bind(this))}</List>)
     }
 }
 
