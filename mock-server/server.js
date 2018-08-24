@@ -11,15 +11,15 @@ app.get('/account/name', (req, res) => res.send({username: 'John Butler'}));
 app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "ROLE_USER"]));
 
 // Collections API
-app.post('/api/metadata/collections', (req, res) => res.send());
-app.get('/api/metadata/collections', (req, res) => res.sendFile(__dirname + '/collection-list.json'));
-app.get('/api/metadata/collections/:id', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '.json'));
-app.patch('/api/metadata/collections/:id', (req, res) => res.send());
-app.delete('/api/metadata/collections/:id', (req, res) => res.send());
+app.post('/api/collections', (req, res) => res.send());
+app.get('/api/collections', (req, res) => res.sendFile(__dirname + '/collection-list.json'));
+app.get('/api/collections/:id', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '.json'));
+app.patch('/api/collections/:id', (req, res) => res.send());
+app.delete('/api/collections/:id', (req, res) => res.send());
 
 // Metadata API
-app.get('/api/metadata/metadata', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));
-app.get('/api/metadata/static/vocabulary.jsonld', (req, res) => res.sendFile(__dirname + '/vocabulary.jsonld'));
+app.get('/api/metadata/statements', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));
+//app.get('/api/metadata/static/vocabulary.jsonld', (req, res) => res.sendFile(__dirname + '/vocabulary.jsonld'));
 
 
 // Add webdav server on /files
