@@ -3,6 +3,8 @@ package io.fairspace.ceres
 import io.fairspace.ceres.repository.ModelRepository
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.reasoner.Reasoner
+import org.apache.jena.reasoner.rulesys.GenericRuleReasoner
 import org.apache.jena.riot.RDFFormat
 import org.apache.jena.vocabulary.VCARD
 import org.koin.dsl.module.Module
@@ -15,7 +17,8 @@ import kotlin.test.BeforeTest
 open class BaseCeresTest : KoinTest {
     private val context = applicationContext {
         bean { DatasetFactory.create() }
-        bean { ModelRepository(get()) }
+        bean<Reasoner> { GenericRuleReasoner(emptyList()) }
+        bean { ModelRepository(get(), get()) }
     }
 
     val personURI = "http://somewhere/JohnSmith"

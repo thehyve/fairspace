@@ -1,85 +1,70 @@
 package io.fairspace.ceres.repository
 
-import io.fairspace.ceres.BaseCeresTest
-import org.apache.jena.rdf.model.Model
+import org.apache.jena.query.DatasetFactory
 import org.apache.jena.rdf.model.ModelFactory
-import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.reasoner.ReasonerRegistry
 import org.apache.jena.util.FileManager
-import org.junit.Before
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 
-class InferenceTest: BaseCeresTest() {
-    var NS = "http://fairspace.io/ontology#"
+class InferenceTest {
+    private val NS = "http://fairspace.io/ontology#"
 
     // Build a trivial example data set
-    val modelForInference = ModelFactory.createDefaultModel()
-    var inferenceModel: Model? = null
+    private val modelForInference = ModelFactory.createDefaultModel()
 
-    var sample = modelForInference.createResource(NS + "sample")
-    var subject = modelForInference.createResource(NS + "subject")
+    private val sample = modelForInference.createResource(NS + "sample")
+    private val subject = modelForInference.createResource(NS + "subject")
 
-    var derivesFrom = modelForInference.createProperty(NS, "derivesFrom")
-    var provides = modelForInference.createProperty(NS, "provides")
+    private val derivesFrom = modelForInference.createProperty(NS, "derivesFrom")
+    private val provides = modelForInference.createProperty(NS, "provides")
 
-    @Before
-    fun init() {
-        modelForInference.removeAll()
-        inferenceModel = FileManager.get().loadModel("inference-model.jsonld")
-    }
+    private val repo = ModelRepository(DatasetFactory.create(), {
+        val inferenceModel = FileManager.get().loadModel("inference-model.jsonld")
+        ReasonerRegistry.getOWLReasoner().bindSchema(inferenceModel)
+    }())
 
     @Test
     fun `see if model is setup properly`() {
         modelForInference.add(sample, derivesFrom, subject)
 
-        val sampleStatements = modelForInference.listStatements(sample, derivesFrom, null as RDFNode?)
-        assertTrue(sampleStatements.hasNext());
-
-        val subjectStatements = modelForInference.listStatements(subject, provides, null as RDFNode?)
-        assertFalse(subjectStatements.hasNext());
+        assertTrue(modelForInference.contains(sample, derivesFrom, subject))
+        assertFalse(modelForInference.contains(subject, provides, sample))
     }
 
     @Test
     fun `see if inference works`() {
         modelForInference.add(sample, derivesFrom, subject)
 
-        var reasoner = ReasonerRegistry.getOWLReasoner()
-        reasoner = reasoner.bindSchema(inferenceModel)
+        repo.add(modelForInference)
+        val inferred = repo.list(null, null)
 
-        val inferred = ModelFactory.createInfModel(reasoner, modelForInference)
-
-        val subjectStatements = inferred.listStatements(subject, provides, null as RDFNode?)
-        assertTrue(subjectStatements.hasNext());
+        assertTrue(inferred.contains(subject, provides, sample))
     }
 
     @Test
     fun `see if inference works the other way around`() {
         modelForInference.add(subject, provides, sample)
 
-        var reasoner = ReasonerRegistry.getOWLReasoner()
-        reasoner = reasoner.bindSchema(inferenceModel)
+        repo.add(modelForInference)
+        val inferred = repo.list(null, null)
 
-        val inferred = ModelFactory.createInfModel(reasoner, modelForInference)
-
-        val sampleStatements = inferred.listStatements(sample, derivesFrom, null as RDFNode?)
-        assertTrue(sampleStatements.hasNext());
+        assertTrue(inferred.contains(sample, derivesFrom, subject))
     }
 
     @Test
     fun `see if inference works with data added after the inferred model was created`() {
+        repo.add(modelForInference)
 
-        var reasoner = ReasonerRegistry.getOWLReasoner()
-        reasoner = reasoner.bindSchema(inferenceModel)
+        val update = ModelFactory.createDefaultModel()
+        update.add(sample, derivesFrom, subject)
+        repo.add(update)
 
-        val inferred = ModelFactory.createInfModel(reasoner, modelForInference)
+        val inferred = repo.list(null, null)
 
-        modelForInference.add(sample, derivesFrom, subject)
-
-        val subjectStatements = inferred.listStatements(subject, provides, null as RDFNode?)
-        assertTrue(subjectStatements.hasNext());
+        assertTrue(inferred.contains(subject, provides, sample))
     }
 
 }
