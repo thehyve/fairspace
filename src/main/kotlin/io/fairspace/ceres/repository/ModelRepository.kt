@@ -3,43 +3,47 @@ package io.fairspace.ceres.repository
 import org.apache.jena.query.*
 import org.apache.jena.query.Query.*
 import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
+import org.apache.jena.system.Txn
 
 
-class ModelRepository(private val dataset: Dataset) {
+class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
+    private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)
 
-    fun list(model: String, subject: String?, predicate: String?): Model =
-            dataset.read(model) {
+    fun list(subject: String?, predicate: String?): Model =
+            read {
                 listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
                         .toModel()
             }
 
-    fun add(model: String, delta: Model) {
-        dataset.write(model) { add(delta) }
+    fun add(delta: Model) {
+        write { add(delta) }
     }
 
-    fun remove(model: String, subject: String?, predicate: String?) {
-        dataset.write(model) {
+    fun remove(subject: String?, predicate: String?) {
+        write {
             removeAll(subject?.let(::createResource), predicate?.let(::createProperty), null)
         }
     }
 
-    fun query(model: String, queryString: String): Any = // ResultSet | Model | Boolean
-        dataset.read(model) {
-            QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
-                when (query.queryType) {
-                    QueryTypeSelect -> ResultSetMem(execSelect())
-                    QueryTypeConstruct -> execConstruct()
-                    QueryTypeDescribe -> execDescribe()
-                    QueryTypeAsk -> execAsk()
-                    else -> throw IllegalArgumentException("Cannot parse query: $queryString")
+    fun query(queryString: String): Any = // ResultSet | Model | Boolean
+            read {
+                QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
+                    when (query.queryType) {
+                        QueryTypeSelect -> ResultSetMem(execSelect())
+                        QueryTypeConstruct -> execConstruct()
+                        QueryTypeDescribe -> execDescribe()
+                        QueryTypeAsk -> execAsk()
+                        else -> throw IllegalArgumentException("Cannot parse query: $queryString")
+                    }
                 }
             }
-        }
 
-    fun update(model: String, delta: Model) {
-        dataset.write(model) {
+    fun update(delta: Model) {
+        write {
             delta.listStatements().forEach { stmt ->
                 if (!containsResource(stmt.subject)) {
                     throw IllegalArgumentException(stmt.subject.uri)
@@ -48,5 +52,11 @@ class ModelRepository(private val dataset: Dataset) {
             }
             add(delta)
         }
+    }
+
+    private fun <R> read(action: Model.() -> R): R = Txn.calculateRead(dataset) { action(model) }
+
+    private fun write(action: Model.() -> Unit) {
+        Txn.executeWrite(dataset) { action(model) }
     }
 }

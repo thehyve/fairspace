@@ -79,7 +79,7 @@ class AuthenticationTest : BaseCeresTest() {
     private fun sendRequestToRestrictedApiAndExpectStatus(token: String, status: HttpStatusCode) =
             test {
                 with(handleRequest {
-                    uri = "/model/m1/statements"
+                    uri = "/statements"
                     addHeader(HttpHeaders.Authorization, token)
                 }) {
                     assertEquals(status, response.status())

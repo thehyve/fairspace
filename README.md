@@ -58,7 +58,7 @@ See also: [Ktor configuration](https://ktor.io/servers/configuration.html#availa
 ### To add statements
 
 ```
-POST /model/mymodel/statements HTTP/1.1
+POST /statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Content-Type: application/ld+json
@@ -85,7 +85,7 @@ Content-Type: application/ld+json
 ### To retrieve all statements in a model
 
 ```
-GET /model/mymodel/statements HTTP/1.1
+GET /statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Accept: application/ld+json
@@ -94,7 +94,7 @@ Accept: application/ld+json
 ### To retrieve all statements for a specific subject (add `&predicate=...` to filter by predicate as well)
 
 ```
-GET /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
+GET /statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Accept: application/ld+json
@@ -104,7 +104,7 @@ Accept: application/ld+json
 ### To delete all statements for a specific subject (add `&predicate=...` to filter by predicate as well)
 
 ```
-DELETE /model/mymodel/statements?subject=http://somewhere/BillKidd HTTP/1.1
+DELETE /statements?subject=http://somewhere/BillKidd HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Content-Type: application/ld+json
@@ -114,7 +114,7 @@ Content-Type: application/ld+json
 
 
 ```
-PATCH /model/mymodel/statements HTTP/1.1
+PATCH /statements HTTP/1.1
 Host: localhost:8080
 Cache-Control: no-cache
 Content-Type: application/ld+json

@@ -1,0 +1,21 @@
+{
+    "@context": {
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "fairspace": "http://fairspace.io/ontology#",
+        "schema": "http://schema.org/"
+    },
+    "@graph": [
+        {
+            "@id": "fairspace:derivesFrom",
+            "owl:inverseOf": {"@id": "fairspace:provides"}
+        },
+        {
+            "@id": "fairspace:isConsentOf",
+            "owl:inverseOf": {"@id": "fairspace:gaveConsent"}
+        },
+        {
+            "@id": "schema:about",
+            "owl:inverseOf": {"@id": "fairspace:belongsTo"}
+        }
+    ]
+}
