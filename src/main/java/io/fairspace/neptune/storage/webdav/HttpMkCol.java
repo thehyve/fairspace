@@ -8,12 +8,7 @@ public class HttpMkCol extends HttpRequestBase {
 
     public final static String METHOD_NAME = "MKCOL";
 
-    public HttpMkCol() {
-        super();
-    }
-
     public HttpMkCol(final URI uri) {
-        super();
         setURI(uri);
     }
 
@@ -21,7 +16,6 @@ public class HttpMkCol extends HttpRequestBase {
      * @throws IllegalArgumentException if the uri is invalid.
      */
     public HttpMkCol(final String uri) {
-        super();
         setURI(URI.create(uri));
     }
 
