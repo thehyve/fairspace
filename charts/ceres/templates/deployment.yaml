@@ -9,6 +9,10 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.rollingUpdate.maxSurge | default "0%" }}
+      maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable | default "100%" }}
   selector:
     matchLabels:
       app: {{ template "ceres.name" . }}
