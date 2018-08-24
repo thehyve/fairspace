@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
+import org.apache.jena.system.Txn
 
 
 class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
@@ -53,23 +54,9 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
         }
     }
 
-    private fun <R> read(action: Model.() -> R): R {
-        dataset.begin(ReadWrite.READ)
-        try {
-            return action(model)
-        } finally {
-            dataset.end()
-        }
-    }
+    private fun <R> read(action: Model.() -> R): R = Txn.calculateRead(dataset) { action(model) }
 
     private fun write(action: Model.() -> Unit) {
-        dataset.begin(ReadWrite.WRITE)
-        try {
-            action(model)
-            dataset.commit()
-        } catch (e: Exception) {
-            dataset.abort()
-            throw e
-        }
+        Txn.executeWrite(dataset) { action(model) }
     }
 }
