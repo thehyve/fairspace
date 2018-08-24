@@ -28,7 +28,6 @@ spring:
 # Pointer to the Ceres service
 ceres:
   url: "http://localhost:8001"
-  model: "default"
 
 titan:
   url: "http://localhost:8002"

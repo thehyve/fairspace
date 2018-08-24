@@ -8,7 +8,6 @@ Create a config.yaml file with the following contents:
 
 ceres:
   url: http://localhost:8001
-  model: default
 
 titan:
   url: http://localhost:8002
@@ -53,7 +52,6 @@ To install Neptune within your Kubernetes cluster run the following command:
 | Parameter  | Description  | Default |
 |---|---|---|
 | `ceres.url` | URL where Ceres service is running | |
-| `ceres.model` | Model in ceres to use | default |
 
 #### Titan parameters
 | Parameter  | Description  | Default |

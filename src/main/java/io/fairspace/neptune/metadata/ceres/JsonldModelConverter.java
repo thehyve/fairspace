@@ -1,4 +1,4 @@
-package io.fairspace.neptune.web;
+package io.fairspace.neptune.metadata.ceres;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
