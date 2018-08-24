@@ -6,16 +6,34 @@
     },
     "@graph": [
         {
+            "@id": "schema:about"
+        },
+        {
+            "@id": "fairspace:provides"
+        },
+        {
+            "@id": "fairspace:gaveConsent"
+        },
+        {
+            "@id": "fairspace:belongsTo"
+        },
+        {
             "@id": "fairspace:derivesFrom",
-            "owl:inverseOf": {"@id": "fairspace:provides"}
+            "owl:inverseOf": {
+                "@id": "fairspace:provides"
+            }
         },
         {
             "@id": "fairspace:isConsentOf",
-            "owl:inverseOf": {"@id": "fairspace:gaveConsent"}
+            "owl:inverseOf": {
+                "@id": "fairspace:gaveConsent"
+            }
         },
         {
             "@id": "schema:about",
-            "owl:inverseOf": {"@id": "fairspace:belongsTo"}
+            "owl:inverseOf": {
+                "@id": "fairspace:belongsTo"
+            }
         }
     ]
 }
