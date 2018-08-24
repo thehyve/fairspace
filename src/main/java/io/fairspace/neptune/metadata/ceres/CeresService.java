@@ -1,6 +1,5 @@
 package io.fairspace.neptune.metadata.ceres;
 
-import io.fairspace.neptune.web.JsonldModelConverter;
 import io.fairspace.neptune.service.TripleService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,14 +18,20 @@ import java.util.Collections;
 @Service
 @Slf4j
 public class CeresService implements TripleService {
+    private final RestTemplate restTemplate;
+    private final String statementsEndpoint;
+    private final String queryEndpoint;
+
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Value("${ceres.url}/model/${ceres.model}/statements/")
-    private String statementsEndpoint;
-
-    @Value("${ceres.url}/model/${ceres.model}/query/")
-    private String queryEndpoint;
+    public CeresService(
+            RestTemplate restTemplate,
+            @Value("${ceres.url}/statements/") String statementsEndpoint,
+            @Value("${ceres.url}/query/") String queryEndpoint
+            ) {
+        this.restTemplate = restTemplate;
+        this.statementsEndpoint = statementsEndpoint;
+        this.queryEndpoint = queryEndpoint;
+    }
 
     @Override
     public Model retrieveTriples(@NonNull String uri) {

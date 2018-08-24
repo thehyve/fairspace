@@ -12,12 +12,14 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 import com.nimbusds.jwt.SignedJWT;
+import io.fairspace.neptune.service.CollectionService;
 import net.minidev.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -47,6 +49,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -60,6 +63,9 @@ public class WebSecurityConfigurationTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @MockBean
+    private CollectionService collectionService;
+
     private RSAPublicKey publicKey;
     private RSAPrivateKey privateKey;
     private String keyId = UUID.randomUUID().toString();
@@ -70,12 +76,11 @@ public class WebSecurityConfigurationTest {
         storeKeypair();
         JWK jwk = generateKeyset(keyId);
         serveKeyset(jwk);
-
-        serveCeres();
     }
 
     @Test
     public void testValidAccessToken() throws JOSEException {
+        when(collectionService.findAll()).thenReturn(Collections.emptyList());
         ResponseEntity<String> response = getWithKey(getSignedJWT());
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -105,7 +110,7 @@ public class WebSecurityConfigurationTest {
         headers.set("Authorization", "Bearer " + jwt.serialize());
 
         HttpEntity<Object> request = new HttpEntity<>(headers);
-        return restTemplate.exchange("http://localhost:" + port + "/metadata?uri=http%3A%2F%2Ffairspace.com", HttpMethod.GET, request, String.class);
+        return restTemplate.exchange("http://localhost:" + port + "/collections", HttpMethod.GET, request, String.class);
     }
 
     private SignedJWT getSignedJWT() throws JOSEException {
@@ -177,21 +182,6 @@ public class WebSecurityConfigurationTest {
         stubFor(get(urlEqualTo("/certs"))
                 .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(jsonKeySet.toJSONString())));
     }
-
-    private void serveCeres() {
-        // Setup wiremock endpoint to return keyset
-        stubFor(get(urlPathEqualTo("/ceres/model/default/statements/"))
-                .willReturn(
-                        aResponse()
-                                .withHeader("Content-Type", "application/ld+json")
-                                .withBody("{\n" +
-                                        "  \"@context\": \"http://schema.org\",\n" +
-                                        "  \"@type\": \"Book\",\n" +
-                                        "  \"name\": \"Semantic Web Primer (First Edition)\",\n" +
-                                        "  \"publisher\": \"Linked Data Tools\",\n" +
-                                        "  \"inLanguage\": \"English\"}")));
-    }
-
 
     private Date getDefaultExpiryDate() {
         return new Date(new Date().getTime() + 60 * 1000);

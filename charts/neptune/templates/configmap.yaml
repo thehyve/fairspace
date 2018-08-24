@@ -17,7 +17,6 @@ data:
         base-url: {{ .Values.app.metadata.baseUrl }}
     ceres:
       url: {{ .Values.ceres.url | default (printf "http://%s-ceres.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
-      model: {{ .Values.ceres.model }}
     titan:
       url: {{ .Values.titan.url | default (printf "http://%s-titan.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
     spring:

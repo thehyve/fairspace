@@ -35,7 +35,6 @@ terminationGracePeriodSeconds: 10
 
 ceres:
   url:
-  model: default
 
 titan:
   url:

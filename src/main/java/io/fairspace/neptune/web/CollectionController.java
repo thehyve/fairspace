@@ -21,7 +21,7 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/collections")
+@RequestMapping("/")
 public class CollectionController {
     @Autowired
     private CollectionService collectionService;
