@@ -3,9 +3,8 @@
     "logout": "/logout",
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
-    "collections": "/api/metadata/collections",
+    "collections": "/api/collections",
     "files": "/api/storage/webdav",
-    "vocabulary": "/api/metadata/static/vocabulary.jsonld",
-    "metadata": "/api/metadata/metadata?uri="
+    "metadata": "/api/metadata/statements?subject="
   }
 }

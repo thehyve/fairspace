@@ -1,4 +1,5 @@
 import Config from "../../components/generic/Config/Config";
+import vocabulary from './vocabulary'
 
 function failOnHttpError(response, message) {
     if(!response.ok) {
@@ -22,14 +23,7 @@ class MetadataStore {
     }
 
     getVocabulary() {
-        return fetch(Config.get().urls.vocabulary, {
-            method: 'GET',
-            headers: MetadataStore.getHeaders,
-            credentials: 'same-origin'
-        }).then(response => {
-            failOnHttpError(response, "Failure when retrieving vocabulary");
-            return response.json();
-        });
+        return Promise.resolve(vocabulary)
     }
 
 }
