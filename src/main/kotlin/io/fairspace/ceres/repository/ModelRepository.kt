@@ -15,13 +15,13 @@ class ModelRepository(private val dataset: Dataset) {
     val reasoner = ReasonerRegistry.getOWLReasoner().bindSchema(FileManager.get().loadModel("inference-model.jsonld"))
 
     fun list(model: String, subject: String?, predicate: String?): Model =
-            dataset.read(model) {
+            dataset.read {
                 listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
                         .toModel()
             }
 
     fun listWithReasoning(model: String, subject: String?, predicate: String?): Model =
-            dataset.read(model) {
+            dataset.read {
                 ModelFactory.createInfModel(reasoner, this)
                         .listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
                         .toModel()
@@ -29,17 +29,17 @@ class ModelRepository(private val dataset: Dataset) {
 
 
     fun add(model: String, delta: Model) {
-        dataset.write(model) { add(delta) }
+        dataset.write { add(delta) }
     }
 
     fun remove(model: String, subject: String?, predicate: String?) {
-        dataset.write(model) {
+        dataset.write {
             removeAll(subject?.let(::createResource), predicate?.let(::createProperty), null)
         }
     }
 
     fun query(model: String, queryString: String): Any = // ResultSet | Model | Boolean
-        dataset.read(model) {
+        dataset.read {
             QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
                 when (query.queryType) {
                     QueryTypeSelect -> ResultSetMem(execSelect())
@@ -52,7 +52,7 @@ class ModelRepository(private val dataset: Dataset) {
         }
 
     fun update(model: String, delta: Model) {
-        dataset.write(model) {
+        dataset.write {
             delta.listStatements().forEach { stmt ->
                 if (!containsResource(stmt.subject)) {
                     throw IllegalArgumentException(stmt.subject.uri)
