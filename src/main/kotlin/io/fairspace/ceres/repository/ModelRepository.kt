@@ -14,13 +14,13 @@ class ModelRepository(private val dataset: Dataset) {
     // Create a single instance of a reasoner to do inference
     val reasoner = ReasonerRegistry.getOWLReasoner().bindSchema(FileManager.get().loadModel("inference-model.jsonld"))
 
-    fun list(model: String, subject: String?, predicate: String?): Model =
+    fun list(subject: String?, predicate: String?): Model =
             dataset.read {
                 listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
                         .toModel()
             }
 
-    fun listWithReasoning(model: String, subject: String?, predicate: String?): Model =
+    fun listWithReasoning(subject: String?, predicate: String?): Model =
             dataset.read {
                 ModelFactory.createInfModel(reasoner, this)
                         .listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
@@ -28,17 +28,17 @@ class ModelRepository(private val dataset: Dataset) {
             }
 
 
-    fun add(model: String, delta: Model) {
+    fun add(delta: Model) {
         dataset.write { add(delta) }
     }
 
-    fun remove(model: String, subject: String?, predicate: String?) {
+    fun remove(subject: String?, predicate: String?) {
         dataset.write {
             removeAll(subject?.let(::createResource), predicate?.let(::createProperty), null)
         }
     }
 
-    fun query(model: String, queryString: String): Any = // ResultSet | Model | Boolean
+    fun query(queryString: String): Any = // ResultSet | Model | Boolean
         dataset.read {
             QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
                 when (query.queryType) {
@@ -51,7 +51,7 @@ class ModelRepository(private val dataset: Dataset) {
             }
         }
 
-    fun update(model: String, delta: Model) {
+    fun update(delta: Model) {
         dataset.write {
             delta.listStatements().forEach { stmt ->
                 if (!containsResource(stmt.subject)) {
