@@ -19,3 +19,6 @@ spring:
 ceres:
   url: http://localhost:${wiremock.server.port}/ceres
   model: "default"
+
+titan:
+  url: http://localhost:${wiremock.server.port}/titan

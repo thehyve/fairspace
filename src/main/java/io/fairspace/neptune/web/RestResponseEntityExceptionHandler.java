@@ -50,6 +50,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return new ErrorBody("Collection could not be found");
     }
 
+    @ExceptionHandler(InvalidCollectionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ErrorBody handleInvalidCollectionException(InvalidCollectionException ex) {
+        return new ErrorBody("Invalid collection given");
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected ErrorBody handleGenericException(Exception ex) {

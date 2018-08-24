@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class CollectionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCollection(@RequestBody Collection collection) throws URISyntaxException {
+    public ResponseEntity<?> createCollection(@RequestBody Collection collection) throws URISyntaxException, IOException {
         Collection addedCollection = collectionService.add(collection);
 
         // Determine the URI for this collection

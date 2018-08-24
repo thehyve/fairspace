@@ -3,19 +3,24 @@ package io.fairspace.neptune.service;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.CollectionMetadata;
 import io.fairspace.neptune.repository.CollectionRepository;
+import io.fairspace.neptune.web.CollectionNotFoundException;
+import io.fairspace.neptune.web.InvalidCollectionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,11 +34,14 @@ public class CollectionServiceTest {
     private CollectionRepository collectionRepository;
 
     @Mock
+    private StorageService storageService;
+
+    @Mock
     private CollectionMetadataService collectionMetadataService;
 
     @Before
     public void setUp() throws Exception {
-        service = new CollectionService(collectionRepository, collectionMetadataService);
+        service = new CollectionService(collectionRepository, storageService, collectionMetadataService);
         when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
@@ -99,6 +107,61 @@ public class CollectionServiceTest {
 
         assertTrue(mergedCollection.isPresent());
         assertEquals(collection, mergedCollection.get());
+    }
+
+    @Test
+    public void testAddCollection() throws IOException {
+        Long id = 1L;
+        CollectionMetadata metadata = new CollectionMetadata("http://uri", "collection", "description");
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
+
+        when(collectionRepository.save(any())).thenReturn(collection);
+
+        service.add(collection);
+
+        verify(collectionMetadataService).createCollection(any());
+        verify(storageService).addCollection(any());
+    }
+
+    @Test(expected = InvalidCollectionException.class)
+    public void testAddCollectionWithoutMetadata() throws IOException {
+        Long id = 1L;
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+
+        service.add(collection);
+    }
+
+    @Test
+    public void testAddCollectionReturnsStoredIdAndUri() throws IOException {
+        CollectionMetadata metadata = new CollectionMetadata("http://uri", "collection", "description");
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
+        Collection storedCollection = new Collection(2L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
+
+        when(collectionRepository.save(any())).thenReturn(storedCollection);
+
+        Collection added = service.add(collection);
+
+        assertEquals(storedCollection.getId(), added.getId());
+        verify(collectionMetadataService).createCollection(new CollectionMetadata("/fairspace/2", "collection", "description"));
+    }
+
+    @Test
+    public void testDeleteCollection() throws IOException {
+        Long id = 1L;
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
+
+        service.deleteById(id);
+
+        verify(storageService).deleteCollection(collection);
+    }
+
+    @Test(expected = CollectionNotFoundException.class)
+    public void testDeleteCollectionNotFound() throws IOException {
+        Long id = 1L;
+        when(collectionRepository.findById(id)).thenReturn(Optional.empty());
+
+        service.deleteById(id);
     }
 
     private <E> List<E> toList(Iterator<E> iterator) {
