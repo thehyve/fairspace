@@ -30,8 +30,8 @@ describe('e2e tests checking files for Fairspace', function () {
                 cy.get("button[aria-label=Upload]").click();
                 cy.upload_file("input[type=file]", 'myfile.csv').then(() => {
                     cy.get("span").contains("Close").click({force: true});
-                    cy.wait(5000);
-                    cy.get("main").contains("No files");
+                    cy.wait(1000);
+                    cy.reload();
                     cy.get("tbody>tr>th").contains("myfile.csv");
                 });
                 let collectionId;
@@ -47,8 +47,8 @@ describe('e2e tests checking files for Fairspace', function () {
     });
 
     afterEach(() => {
-        beforeEach();
-        cy.contains("Collections").click();
+        cy.get("a").contains("home").click({force: true});
+        cy.contains("Collections").click({force: true});
         cy.request("/metadata/collections", "GET").as("getCollections")
             .then(() => {
                 cy.get("tbody>tr").each(($rows) => {
