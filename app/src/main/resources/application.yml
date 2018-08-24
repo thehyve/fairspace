@@ -42,6 +42,9 @@ zuul:
       strip-prefix: false
     metadata:
       path: /api/metadata/**
+      url: http://ceres/
+    collections:
+      path: /api/collections/**
       url: http://neptune/
     ui:
       path: /**
