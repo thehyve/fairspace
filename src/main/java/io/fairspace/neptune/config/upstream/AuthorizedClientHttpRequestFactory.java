@@ -1,4 +1,4 @@
-package io.fairspace.neptune.config;
+package io.fairspace.neptune.config.upstream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;

@@ -37,6 +37,9 @@ ceres:
   url:
   model: default
 
+titan:
+  url:
+
 app:
   oauth2:
     baseUrl: http://localhost:9080

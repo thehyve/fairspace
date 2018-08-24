@@ -30,6 +30,9 @@ ceres:
   url: "http://localhost:8001"
   model: "default"
 
+titan:
+  url: "http://localhost:8002"
+
 # Security configuration
 security:
   oauth2:
