@@ -116,6 +116,6 @@ public class CollectionService {
             repository.deleteById(id);
 
             return foundCollection;
-        }).orElseThrow(() -> new CollectionNotFoundException());
+        }).orElseThrow(CollectionNotFoundException::new);
     }
 }

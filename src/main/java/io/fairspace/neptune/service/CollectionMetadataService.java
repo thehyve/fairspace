@@ -24,8 +24,8 @@ public class CollectionMetadataService {
     private static final String COLLECTION_URI_FORMAT = "%s/iri/collections/%d";
     private static final String GET_COLLECTIONS =
             String.format(
-                    "CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o . ?s <%s> <%s> . }",
-                    RDF.type.getURI(), Fairspace.Collection);
+                    "CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o . ?s a <%s> . }",
+                    Fairspace.Collection);
 
     private String metadataBaseUrl;
     private TripleService tripleService;
