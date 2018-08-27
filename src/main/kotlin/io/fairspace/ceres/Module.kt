@@ -6,6 +6,7 @@ import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
 import io.ktor.auth.jwt.JWTPrincipal
 import io.ktor.auth.jwt.jwt
+import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
 import io.ktor.http.ContentType
@@ -25,6 +26,7 @@ fun Application.ceresModule() {
     installExceptionHandlers()
     installAuthentication()
     configureRouting()
+    install(CallLogging)
 }
 
 private fun Application.installAuthentication() {
@@ -52,7 +54,8 @@ private fun Application.installConverters() {
 
 private fun Application.installExceptionHandlers() {
     install(StatusPages) {
-        exception<RuntimeException> {
+        exception<RuntimeException> { cause ->
+            log.error("Internal Server Error", cause)
             call.respond(HttpStatusCode.InternalServerError)
         }
     }
