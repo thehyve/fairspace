@@ -1,4 +1,4 @@
-const drawerWidth = 240;
+const drawerWidth = 360
 const styles = theme => ({
     content: {
         flexGrow: 1,

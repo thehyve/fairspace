@@ -1,4 +1,4 @@
-const infoDrawerWidth = 480;
+const infoDrawerWidth = 360;
 
 const styles = theme => ({
     infoDrawerPaper: {
