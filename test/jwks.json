@@ -1,0 +1,13 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "d": "bKySjPgiORG16LCvv7U6c8OxRtiFn1vpPPot35gLrRnAI0Ia8cLyNvLhe8RoWxbaGF6XAKj0BmKt_nynf7rw3dkWTEhP_BPk0VI3SPVa_YANZZ2ouCdtq1sMls0ua94Ns3_6dExjKoCNEuRIyMgt2OcCQ545dvWrD08dnavH80nGXmMZBEGsFHhmqP0baWjKdLQJP5bC2du4-pfZWnVqubd3ui5kj-Hi67GtzsFKp1A30bwaad63FQcAjA4CVoiN5jL8I_NzFve8eVl5CFAN1t1tKWgFh1DSE2rBuMumcsYTX7FRpWq3y5ZvNhRfgGis8-sXrhwVJe-OuaFEzK69yQ",
+      "e": "AQAB",
+      "use": "sig",
+      "kid": "internal-testing",
+      "alg": "RS256",
+      "n": "5ZPHEwbAbcAScCpR0CFbDUdQSZ9GTBywTUQxXHqVt1hdH4yXCt3tcuJjKSKRgrZk6jId-zriHUAtsT-yVf0mVjdF0IHBeFIQkDxowoUi68h4yghjAVimLx_gdbhmVS4y9dbWxG-pLi8MkCf4QIFQKPg-mrpasthunfoER-95-xZEUz-TgSTHzrgwqJ2W8eQBjTKCWbbo-j1RLuZX-KkeI7Twv5EYNRVAaom5dMwJsaGhjPXx9hOBUOGA7KypmdXzkweaZIl4MmlWP2IbTSs5rfD2lWqifW2Y5w7PhnujCaCWS5Hp3_5tl_AV0hkzDU0BTmhUCpYLvxwp4ALRHJOjuw"
+    }
+  ]
+}
