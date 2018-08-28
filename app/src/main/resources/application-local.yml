@@ -17,3 +17,5 @@ zuul:
       url: http://192.168.99.100:31098/
     ui:
       url: http://192.168.99.100:30721/
+    collections:
+      url: http://localhost:8082/
