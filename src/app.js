@@ -1,7 +1,7 @@
 const app = require('express')();
 const webdav = require('webdav-server').v2;
 const rootPath = process.env.FILES_FOLDER || '/data';
-const noopHttpAuthentication = require('./noop-http-authentication');
+const noopHttpAuthentication = require('./auth/noop-http-webdav-authentication');
 
 const server = new webdav.WebDAVServer({
     httpAuthentication: noopHttpAuthentication,
