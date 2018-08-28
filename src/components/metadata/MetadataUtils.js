@@ -16,11 +16,20 @@ function combine(vocabulary, metadata) {
             for (const key in root) {
                 const label = labelsById[key];
                 if (label) {
-                    result[label] = root[key].map(item => item['@value']).sort();
+                    result[label] = root[key].sort(compareValues);
                 }
             }
             return Object.keys(result).sort().map(label => ({label: label, values: result[label]}));
-        });
+        })
+        .catch(err => console.error('Error combining metadata and vocabulary', err));
+}
+
+function compareValues(x, y) {
+    return ('@id' in x) ? comparePrimitives(x['@id'], y['@id']) : comparePrimitives(x['@value'], y['@value'])
+}
+
+function comparePrimitives(x, y) {
+    return (x < y) ? -1 : (x > y) ? 1 : 0
 }
 
 /**

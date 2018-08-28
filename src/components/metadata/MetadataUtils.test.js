@@ -43,8 +43,8 @@ const vocabulary = {
 };
 
 const correct_response = [
-    {label: 'Description', values: ['More info', 'My first collection']},
-    {label: 'Name', values: ['Collection 5']}
+    {label: 'Description', values: [{'@value': 'More info'}, {'@value': 'My first collection'}]},
+    {label: 'Name', values: [{'@value': 'Collection 5'}]}
     ];
 
 it('combines vocabulary and metadata', () => {

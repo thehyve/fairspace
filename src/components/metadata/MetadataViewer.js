@@ -36,17 +36,8 @@ class MetadataViewer extends React.Component {
     static renderValue(v) {
         return (
             <ListItem>
-                {MetadataViewer.isValidUrl(v) ? (<a href={MetadataViewer.navigableLink(v)}>{v}</a>) : v}
+                {('@id' in v) ? (<a href={MetadataViewer.navigableLink(v['@id'])}>{v['@id']}</a>) : v['@value']}
             </ListItem>)
-    }
-
-    static isValidUrl(s) {
-        try {
-            new URL(s);
-            return true;
-        } catch (_) {
-            return false;
-        }
     }
 
     static navigableLink(link) {
