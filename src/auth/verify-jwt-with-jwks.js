@@ -12,6 +12,10 @@ const axios = require('axios'),
 function getKeySet(options) {
     const expirationTimeInSeconds = options.cacheExpirationTimeInSeconds || 86400;
 
+    if(!options.url) {
+        throw(new Error("No JWKS url provided"));
+    }
+
     // Try cache first
     const cachedValue = cache.get(options.url);
     if(cachedValue) {
@@ -37,12 +41,6 @@ function getKeySet(options) {
  */
 function middleware(options) {
     console.log("Use JWK middleware to verify JWT tokens against remote keys. Using options ", options);
-
-    // Retrieve keyset during startup so the first calls will be faster
-    module.exports.keySetProvider(options)
-        .catch((e) => {
-            console.error("Error while fetching JWKS:", e.message);
-        });
 
     // Actual middleware function
     return function(req, res, next) {
