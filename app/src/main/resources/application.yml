@@ -19,6 +19,15 @@ app:
     - /storage
     - /api/metadata
 
+spring:
+  application:
+    name: Pluto
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://jaeger-collector.jaeger:9411/
+
 security:
   oauth2:
     client:
