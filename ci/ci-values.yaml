@@ -17,8 +17,8 @@ pluto:
     baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
     realm: ci
 
-titan: {}
-
+titan:
+  jwksUrl: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/certs
 
 # Specific settings for Ceres subchart
 ceres:
