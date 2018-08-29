@@ -2,20 +2,25 @@ process.env.FILES_FOLDER = __dirname;
 
 const supertest = require('supertest');
 const fs = require('fs');
+const jwk2pem = require('pem-jwk').jwk2pem;
+const jwt = require("jsonwebtoken");
 const jwks = JSON.parse(fs.readFileSync(__dirname + '/jwks.json'));
+const invalidJWK = JSON.parse(fs.readFileSync(__dirname + '/invalidKey.json'));
 
-// Mock keyset provider
-require('../src/auth/verify-jwt-with-jwks').keySetProvider = () => Promise.resolve(jwks);
+mockPublicKeyset();
+
+// Create valid authorization tokens
+const key = jwk2pem(jwks.keys[0]);
+const invalidKey = jwk2pem(invalidJWK);
+
+const token = jwt.sign({foo: 'bar', exp: Math.floor(Date.now() / 1000) + (60 * 60)}, key, {algorithm: 'RS256'});
+const nonExpiringToken = jwt.sign({foo: 'bar'}, key, {algorithm: 'RS256'});
+const expiredToken = jwt.sign({foo: 'bar', exp: Math.floor(Date.now() / 1000) - (60 * 60)}, key, {algorithm: 'RS256'});
+const invalidSignature = jwt.sign({foo: 'bar'}, invalidKey, {algorithm: 'RS256'});
 
 // Start test
 const app = require('../src/app');
 const server = supertest(app);
-
-// Create valid authorization tokens (valid one expires in 2028)
-// For some reason, when generating the tokens on the fly,
-// the test failed once every 5 or 6 runs.
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJleHAiOjE4NTA4MjQ3MTgsImlhdCI6MTUzNTQ2NDcxOH0.eCT_gijss7ijgGRL7YUSLlvmMvyazGZXoaFduwiwkD0'
-const expiredToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJleHAiOjE1MzU0NjExMTgsImlhdCI6MTUzNTQ2NDcxOH0.GxFWrs6RBmi-Ocz2qfCbNrZ5EGMQBeKKApuwbSICqjs';
 
 describe('Titan', () => {
     it('responds to / anonymously', () => server.get('/').expect(200, 'Hi, I\'m Titan!'));
@@ -28,6 +33,12 @@ describe('Titan', () => {
 });
 
 describe('Authentication', () => {
+    it('responds to /api/storage/webdav/ when no authorization without expiry is provided', () =>
+        server
+            .propfind('/api/storage/webdav/')
+            .set('Authorization', 'Bearer ' + nonExpiringToken)
+            .expect(207)
+    );
     it('responds a 401 to /api/storage/webdav/ when no authorization is provided', () =>
         server
             .propfind('/api/storage/webdav/')
@@ -45,6 +56,29 @@ describe('Authentication', () => {
             .set('Authorization', 'Bearer ' + expiredToken)
             .expect(401)
     );
+    it('responds a 401 to /api/storage/webdav/ when authorization with invalid signature is provided', () =>
+        server
+            .propfind('/api/storage/webdav/')
+            .set('Authorization', 'Bearer ' + invalidSignature)
+            .expect(401)
+    );
 
 
 })
+
+
+function mockPublicKeyset() {
+    const publicKeyset = {
+        keys: jwks.keys.map(key => ({
+            "kty": key.kty,
+            "e": key.e,
+            "use": key.use,
+            "kid": key.kid,
+            "alg": key.alg,
+            "n": key.n
+        }))
+    };
+
+    // Mock keyset provider
+    require('../src/auth/verify-jwt-with-jwks').keySetProvider = () => Promise.resolve(publicKeyset);
+}
