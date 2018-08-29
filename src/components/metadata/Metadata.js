@@ -11,6 +11,7 @@ class Metadata extends React.Component {
         this.state = {
             loading: false,
             error: false,
+            errorMessage: null,
             vocabulary: {},
             metadata: {}
         };
@@ -22,8 +23,8 @@ class Metadata extends React.Component {
 
     loadData() {
         if(!this.subject) {
-            console.warn("No subject given to retrieve metadata for");
-            this.setState({error: true});
+            this.setState({error: true, errorMessage: "No subject given to retrieve metadata for"});
+            console.warn(this.state.errorMessage);
             return;
         }
 
@@ -38,9 +39,8 @@ class Metadata extends React.Component {
             this.setState({loading: false, vocabulary: vocabulary, metadata: metadata})
         }).catch(e => {
             if(this.willUnmount) return;
-
-            console.error("Error while loading metadata", e);
-            this.setState({error: true});
+            this.setState({error: true, errorMessage: "Error while loading metadata"});
+            console.error(this.state.errorMessage, e);
         })
     }
 
@@ -55,7 +55,7 @@ class Metadata extends React.Component {
 
     render() {
         if(this.state.error) {
-            return (<Error message={"Error while loading metadata"}/>)
+            return (<Error message={this.state.errorMessage}/>)
         } else if(this.state.loading) {
             return (<div>Loading...</div>)
         } else {
