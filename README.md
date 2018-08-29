@@ -46,6 +46,10 @@ container.
 | GET /<id> | Get collection |
 | PATCH /<id> | Change name or description of collections' metadata |
 | DELETE /<id> | Delete a single collection |
+| GET /<id>/authorizations | Get a list of permissions for a specific collection |
+| GET /<id>/authorizations?user=<user> | Get a permission for specific collection and user |
+| GET /authorizations?user=<user> | Get a permission for a specific user |
+| PUT /authorizations | Adds or modifies a permission |
 
 
 ### JSON format
@@ -115,5 +119,53 @@ Content-Type: application/json
       "name": "Collection 1",
       "description": "My first collection""
     }
+}
+```
+
+#### Get authorizations for a collection.
+
+```
+GET /123/authorizations?user=user@example.com HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+[
+    {
+      "user": "user@example.com",
+      "collectionId": 123,
+      "permission": "Write"
+    },
+    {
+      "user": "user2@example.com",
+      "collectionId": 123,
+      "permission": "Read"
+    }
+]
+```
+
+#### Get user's authorization. Returns `"permission": "None"` if no permission was assigned.
+
+```
+GET /123/authorizations?user=user@example.com HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "user": "user@example.com",
+  "collectionId": 123,
+  "permission": "Write"
+}
+```
+
+#### Set user's authorization
+
+```
+PUT /authorization HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "user": "user@example.com",
+  "collectionId": 123,
+  "permission": "Write"
 }
 ```

@@ -27,12 +27,14 @@ public class Collection {
     @JsonIgnore
     private CollectionType type = CollectionType.LOCAL_FILE;
 
-    private String typeIdentifier;
+    private String location;
+
+    private String owner;
 
     @Transient
     private CollectionMetadata metadata;
 
     public Collection withMetadata(CollectionMetadata metadata) {
-        return new Collection(id, type, typeIdentifier, metadata);
+        return new Collection(id, type, location, owner, metadata);
     }
 }

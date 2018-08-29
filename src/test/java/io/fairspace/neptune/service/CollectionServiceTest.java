@@ -17,14 +17,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionServiceTest {
@@ -34,6 +32,9 @@ public class CollectionServiceTest {
     private CollectionRepository collectionRepository;
 
     @Mock
+    private AuthorizationService authorizationService;
+
+    @Mock
     private StorageService storageService;
 
     @Mock
@@ -41,15 +42,15 @@ public class CollectionServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new CollectionService(collectionRepository, storageService, collectionMetadataService);
+        service = new CollectionService(collectionRepository, authorizationService, storageService, collectionMetadataService);
         when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
     @Test
     public void testFindAll() {
         List<Collection> collections = new ArrayList<>();
-        collections.add(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null));
-        collections.add(new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", null));
+        collections.add(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null));
+        collections.add(new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", "user", null));
         when(collectionRepository.findAll()).thenReturn(collections);
 
         List<CollectionMetadata> metadata = new ArrayList<>();
@@ -72,7 +73,7 @@ public class CollectionServiceTest {
     @Test
     public void testFindById() {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         CollectionMetadata metadata = new CollectionMetadata(getUri(1L), "My quotes", "quote item");
@@ -98,7 +99,7 @@ public class CollectionServiceTest {
     @Test
     public void testFindByIdWithoutMetadata() {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.empty());
@@ -113,7 +114,7 @@ public class CollectionServiceTest {
     public void testAddCollection() throws IOException {
         Long id = 1L;
         CollectionMetadata metadata = new CollectionMetadata("http://uri", "collection", "description");
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", metadata);
 
         when(collectionRepository.save(any())).thenReturn(collection);
 
@@ -121,12 +122,13 @@ public class CollectionServiceTest {
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
+        verify(authorizationService).add(any());
     }
 
     @Test(expected = InvalidCollectionException.class)
     public void testAddCollectionWithoutMetadata() throws IOException {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null);
 
         service.add(collection);
     }
@@ -134,8 +136,8 @@ public class CollectionServiceTest {
     @Test
     public void testAddCollectionReturnsStoredIdAndUri() throws IOException {
         CollectionMetadata metadata = new CollectionMetadata("http://uri", "collection", "description");
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
-        Collection storedCollection = new Collection(2L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", metadata);
+        Collection storedCollection = new Collection(2L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", metadata);
 
         when(collectionRepository.save(any())).thenReturn(storedCollection);
 
@@ -148,7 +150,7 @@ public class CollectionServiceTest {
     @Test
     public void testDeleteCollection() throws IOException {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         service.deleteById(id);
