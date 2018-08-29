@@ -1,51 +1,17 @@
 import React from 'react';
-import combine from './MetadataUtils';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 
 
 /**
- * This compp
+ * This component will always display correct metadata. If any error occurs it is handled by Metadata
  */
 class MetadataViewer extends React.Component {
 
     constructor(props) {
         super(props);
         this.props = props;
-        this.vocabulary = props.vocabulary;
-        this.metadata = props.metadata;
-        this.state = {
-            properties: [],
-            error: false,
-            loading: false,
-            errorMessage: ""
-        };
-    }
-
-    componentWillMount() {
-        this.setState({loading: true});
-        combine(this.vocabulary, this.metadata)
-            .catch(err => {
-                this.setState({error: true, errorMessage: "Error occured while combining vocabulary and metadata."});
-                console.error(this.state.errorMessage, err);
-            })
-            .then(props => {
-                if (this.willUnmount) {
-                    return
-                } else if (props.length === 0) {
-                    this.setState({
-                        error: true, loading: false,
-                        errorMessage: "No metadata found"
-                    });
-                    console.warn(this.state.errorMessage);
-                    return
-                }
-                this.setState({properties: props, loading: false});
-            });
-    }
-
-    componentWillUnmount() {
-        this.willUnmount = true
+        this.properties = props.properties;
     }
 
     static renderValue(v) {
@@ -84,13 +50,8 @@ class MetadataViewer extends React.Component {
     }
 
     render() {
-        if (this.state.error) {
-            return (<div>{this.state.errorMessage}</div>)
-        } else if (this.state.loading) {
-            return ("Loading...")
-        } else {
-            return (<List>{this.state.properties.map(this.renderProperty.bind(this))}</List>)
-        }
+        return (<List>{this.properties.map(this.renderProperty.bind(this))}</List>)
+
     }
 }
 

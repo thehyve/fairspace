@@ -1,5 +1,6 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
+import combine from "./MetadataUtils";
 
 class Metadata extends React.Component {
     constructor(props) {
@@ -10,8 +11,7 @@ class Metadata extends React.Component {
         this.state = {
             loading: false,
             error: false,
-            vocabulary: {},
-            metadata: {}
+            properties: {}
         };
     }
 
@@ -20,7 +20,7 @@ class Metadata extends React.Component {
     }
 
     loadData() {
-        if(!this.subject) {
+        if (!this.subject) {
             console.warn("No subject given to retrieve metadata for");
             this.setState({error: true});
             return;
@@ -32,11 +32,18 @@ class Metadata extends React.Component {
             this.metadataStore.getVocabulary(),
             this.metadataStore.get(this.subject)
         ]).then(([vocabulary, metadata]) => {
-            if(this.willUnmount) return;
+            if (this.willUnmount) return;
 
-            this.setState({loading: false, vocabulary: vocabulary, metadata: metadata})
+            combine(vocabulary, metadata)
+                .then(props => {
+                    if (this.willUnmount) return;
+
+                    this.setState({properties: props, loading: false});
+                }).catch(err => {
+                console.error("Error occured while combining vocabulary and metadata.", err);
+            });
         }).catch(e => {
-            if(this.willUnmount) return;
+            if (this.willUnmount) return;
 
             console.error("Error while loading metadata", e);
             this.setState({error: true});
@@ -53,12 +60,14 @@ class Metadata extends React.Component {
     }
 
     render() {
-        if(this.state.error) {
+        if (this.state.error) {
             return (<div>Error loading metadata</div>)
-        } else if(this.state.loading) {
+        } else if (this.state.loading) {
             return (<div>Loading...</div>)
+        } else if (this.state.properties.length === 0) {
+            return (<div>No metadata found</div>)
         } else {
-            return (<MetadataViewer vocabulary={this.state.vocabulary} metadata={this.state.metadata}/>)
+            return (<MetadataViewer properties={this.state.properties}/>)
         }
     }
 
