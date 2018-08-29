@@ -24,7 +24,7 @@ it('does not show metadata with missing label', () => {
     }).then(() => {
         const result = wrapper.find("li");
         expect(result.length).toEqual(6);
-        expect(wrapper.text()).toEqual("Description:My first collectionName:Collection 5Type:Collection");
+        expect(wrapper.text()).not.toContain("what");
     });
 });
 
@@ -35,7 +35,7 @@ it('shows non labelled type when there is no vocabulary provided', () => {
     }).then(() => {
         const result = wrapper.find("li");
         expect(result.length).toEqual(2);
-        expect(wrapper.text()).toEqual("Type:http://fairspace.io/ontology#Collection");
+        expect(wrapper.text()).toContain("Type:http://fairspace.io/ontology#Collection");
     });
 });
 
@@ -57,7 +57,7 @@ it('does not show extra labels', () => {
     }).then(() => {
         const result = wrapper.find("li");
         expect(result.length).toEqual(6);
-        expect(wrapper.text()).toEqual("Description:My first collectionName:Collection 5Type:Collection");
+        expect(wrapper.text()).not.toContain("Patient");
     });
 });
 
@@ -69,7 +69,7 @@ it('shows types when multiple defined', () => {
         const result = wrapper.find("li");
         expect(result.length).toEqual(7);
         expect(wrapper.text())
-            .toEqual("Description:An example collection with testdata from GSE8581Name:GSE8581Types:CollectionDataset");
+            .toEqual("Description:An example collection with testdata from GSE8581Name:GSE8581Type:CollectionDataset");
     });
 });
 
@@ -221,31 +221,6 @@ const full_vocab = {
             "rdfs:label": "Collection"
         },
         {
-            "@id": "fairspace:derivesFrom",
-            "@type": "rdf:Property",
-            "rdfs:label": "Derives from"
-        },
-        {
-            "@id": "fairspace:provides",
-            "@type": "rdf:Property",
-            "rdfs:label": "Provides"
-        },
-        {
-            "@id": "fairspace:isConsentOf",
-            "@type": "rdf:Property",
-            "rdfs:label": "Is consent of"
-        },
-        {
-            "@id": "fairspace:gaveConsent",
-            "@type": "rdf:Property",
-            "rdfs:label": "Gave consent"
-        },
-        {
-            "@id": "fairspace:belongsTo",
-            "@type": "rdf:Property",
-            "rdfs:label": "BelongsTo"
-        },
-        {
             "@id": "schema:about",
             "@type": "rdf:Property",
             "rdfs:label": "Is about"
@@ -254,16 +229,6 @@ const full_vocab = {
             "@id": "schema:Dataset",
             "@type": "rdf:Class",
             "rdfs:label": "Dataset"
-        },
-        {
-            "@id": "schema:Person",
-            "@type": "rdf:Class",
-            "rdfs:label": "Person"
-        },
-        {
-            "@id": "schema:Material",
-            "@type": "rdf:Class",
-            "rdfs:label": "Material"
         }
     ]
 };

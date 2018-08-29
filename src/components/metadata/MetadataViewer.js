@@ -36,7 +36,7 @@ class MetadataViewer extends React.Component {
     static renderValue(v) {
         return (
             <ListItem>
-                {this.setItem(v)}
+                {this.retrieveDisplayableItem(v)}
             </ListItem>)
     }
 
@@ -46,17 +46,23 @@ class MetadataViewer extends React.Component {
             : link
     }
 
-    setItem(v) {
-        if ('@type' in v && 'rdfs:label' in v) {
-            if (v['rdfs:label']){
-                return (<a href={MetadataViewer.navigableLink(v['@type'])}>{v['rdfs:label']}</a>)
-            } else {
-                return (<a href={MetadataViewer.navigableLink(v['@type'])}>{v['@type']}</a>)
-            }
-        } else if ('@id' in v) {
-            return (<a href={MetadataViewer.navigableLink(v['@id'])}>{v['@id']}</a>)
+    retrieveDisplayableItem(v) {
+        let displayValue;
+
+        if(v['rdfs:label']) {
+            displayValue = v['rdfs:label'];
+        } else if(v['@id']) {
+            displayValue = v['@id'];
+        } else if(v['@value']) {
+            displayValue = v['@value'];
         } else {
-            return v['@value']
+            displayValue = '';
+        }
+
+        if ('@id' in v) {
+            return (<a href={MetadataViewer.navigableLink(v['@id'])}>{displayValue}</a>)
+        } else {
+            return displayValue;
         }
     }
 
@@ -73,10 +79,10 @@ class MetadataViewer extends React.Component {
     }
 
     render() {
-        if (Object.keys(this.metadata).length === 0) {
-            return ("No metadata found")
-        } else {
+        if (Object.keys(this.metadata).length) {
             return (<List>{this.state.properties.map(this.renderProperty.bind(this))}</List>)
+        } else {
+            return ("No metadata found")
         }
     }
 }
