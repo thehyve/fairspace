@@ -42,7 +42,7 @@ class MetadataViewer extends React.Component {
 
     static navigableLink(link) {
         return link.startsWith(window.location.origin)
-            ? link.replace('/iri/', '/metadata/')
+            ? link.replace('/iri/collections/', '/collections/').replace('/iri/', '/metadata/')
             : link
     }
 
