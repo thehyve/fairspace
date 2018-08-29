@@ -13,6 +13,7 @@ import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import {Column, Row} from 'simple-flexbox';
 import UploadButton from "../UploadButton/UploadButton";
+import Error from "../../error/Error";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -95,7 +96,8 @@ class CollectionBrowser extends React.Component {
             .addCollection(name, description)
             .then(this.requireRefresh.bind(this))
             .catch(err => {
-                console.error("An error occurred while creating a collection", err);
+                this.errorMessage = "An error occurred while creating a collection";
+                console.error(this.errorMessage, err);
             });
     }
 
@@ -146,7 +148,8 @@ class CollectionBrowser extends React.Component {
             this.fileStore
                 .upload(this.state.openedPath, files)
                 .catch(err => {
-                    console.error("An error occurred while uploading files", err);
+                    this.errorMessage = "An error occurred while uploading files";
+                    console.error(this.errorMessage, err);
                 });
         }
     }
@@ -311,7 +314,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderError() {
-        return (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>);
+        return (<Typography variant="body2" paragraph={true} noWrap><Error message={this.errorMessage}/></Typography>);
     }
 
     renderLoading() {

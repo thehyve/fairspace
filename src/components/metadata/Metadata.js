@@ -1,5 +1,6 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
+import Error from "../error/Error";
 
 class Metadata extends React.Component {
     constructor(props) {
@@ -54,7 +55,7 @@ class Metadata extends React.Component {
 
     render() {
         if(this.state.error) {
-            return (<div>Error loading metadata</div>)
+            return (<Error message={"Error while loading metadata"}/>)
         } else if(this.state.loading) {
             return (<div>Loading...</div>)
         } else {
