@@ -47,17 +47,7 @@ class MetadataViewer extends React.Component {
     }
 
     retrieveDisplayableItem(v) {
-        let displayValue;
-
-        if(v['rdfs:label']) {
-            displayValue = v['rdfs:label'];
-        } else if(v['@id']) {
-            displayValue = v['@id'];
-        } else if(v['@value']) {
-            displayValue = v['@value'];
-        } else {
-            displayValue = '';
-        }
+        let displayValue = v['rdfs:label'] || v['@id'] || v['@value'] || '';
 
         if ('@id' in v) {
             return (<a href={MetadataViewer.navigableLink(v['@id'])}>{displayValue}</a>)
