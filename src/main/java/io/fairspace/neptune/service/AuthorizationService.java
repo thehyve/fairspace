@@ -45,15 +45,15 @@ public class AuthorizationService {
 
         return authorizationRepository.findByUserAndCollectionId(authorization.getUser(), collection)
                 .map(existing -> {
-                    if (authorization.getAccess() == Permission.None) {
+                    if (authorization.getPermission() == Permission.None) {
                         authorizationRepository.delete(existing);
                         return authorization;
                     }
 
-                    existing.setAccess(authorization.getAccess());
+                    existing.setPermission(authorization.getPermission());
                     return authorizationRepository.save(existing);
                 }).orElseGet(() -> {
-                    if (authorization.getAccess() == Permission.None) {
+                    if (authorization.getPermission() == Permission.None) {
                         return authorization;
                     }
                     return authorizationRepository.save(authorization);

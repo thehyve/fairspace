@@ -86,7 +86,7 @@ public class CollectionService {
         Authorization authorization = new Authorization();
         authorization.setCollectionId(finalCollection.getId());
         authorization.setUser(collection.getOwner());
-        authorization.setAccess(Permission.Manage);
+        authorization.setPermission(Permission.Manage);
         authorizationService.add(authorization);
 
         // Update metadata. Ensure that the correct uri is specified

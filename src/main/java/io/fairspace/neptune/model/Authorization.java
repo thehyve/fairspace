@@ -28,5 +28,5 @@ public class Authorization {
     Long collectionId;
 
     @NotNull
-    Permission access;
+    Permission permission;
 }
