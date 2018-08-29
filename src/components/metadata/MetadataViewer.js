@@ -36,7 +36,7 @@ class MetadataViewer extends React.Component {
     static renderValue(v) {
         return (
             <ListItem>
-                {('@id' in v) ? (<a href={MetadataViewer.navigableLink(v['@id'])}>{v['@id']}</a>) : v['@value']}
+                {this.setItem(v)}
             </ListItem>)
     }
 
@@ -44,6 +44,20 @@ class MetadataViewer extends React.Component {
         return link.startsWith(window.location.origin)
             ? link.replace('/iri/', '/metadata/')
             : link
+    }
+
+    setItem(v) {
+        if ('@type' in v && 'rdfs:label' in v) {
+            if (v['rdfs:label']){
+                return (<a href={MetadataViewer.navigableLink(v['@type'])}>{v['rdfs:label']}</a>)
+            } else {
+                return (<a href={MetadataViewer.navigableLink(v['@type'])}>{v['@type']}</a>)
+            }
+        } else if ('@id' in v) {
+            return (<a href={MetadataViewer.navigableLink(v['@id'])}>{v['@id']}</a>)
+        } else {
+            return v['@value']
+        }
     }
 
 
@@ -59,7 +73,11 @@ class MetadataViewer extends React.Component {
     }
 
     render() {
-        return (<List>{this.state.properties.map(this.renderProperty.bind(this))}</List>)
+        if (Object.keys(this.metadata).length === 0) {
+            return ("No metadata found")
+        } else {
+            return (<List>{this.state.properties.map(this.renderProperty.bind(this))}</List>)
+        }
     }
 }
 

@@ -17,6 +17,17 @@ function combine(vocabulary, metadata) {
                 const label = labelsById[key];
                 if (label) {
                     result[label] = root[key].sort(compareValues);
+                } else if (key === "@type") {
+                    const result2 = [];
+                    for (const i in root[key]) {
+                        const type = root[key][i];
+                        result2.push({"@type": type, "rdfs:label": labelsById[type]});
+                    }
+                    if (result2.length > 1) {
+                        result["Types"] = result2;
+                    } else {
+                        result["Type"] = result2;
+                    }
                 }
             }
             return Object.keys(result).sort().map(label => ({label: label, values: result[label]}));
