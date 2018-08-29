@@ -32,8 +32,16 @@ spec:
               containerPort: 80
               protocol: TCP
           env:
+              - name: AUTH_ENABLED
+                value: "{{ .Values.auth.enabled }}"
               - name: JWKS_URL
-                value: "{{ .Values.jwksUrl }}"
+                value: "{{ .Values.auth.jwksUrl }}"
+              - name: TRACING_ENABLED
+                value: "{{ .Values.tracing.enabled }}"
+              - name: ZIPKIN_URL
+                value: "{{ .Values.tracing.zipkinUrl }}"
+              - name: ZIPKIN_SAMPLING_RATE
+                value: "{{ .Values.tracing.samplingRate }}"
           volumeMounts:
           - name: data
             mountPath: /data

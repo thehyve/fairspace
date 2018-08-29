@@ -8,17 +8,20 @@ const jwksVerifier = require('./auth/verify-jwt-with-jwks');
 
 // Configuration parameters
 const rootPath = process.env.FILES_FOLDER || '/data';
+
 const jwksUrl = process.env.JWKS_URL;
 const authEnabled = process.env.AUTH_ENABLED !== 'false';
-const zipkinEndointUrl = process.env.ZIPKIN_URL || 'http://localhost:9411'; // || 'http://jaeger-collector.jaeger:9411';
-const zipkinSamplingRate = process.env.ZIPKIN_SAMPLING_RATE || 1; // 0.01;
+
+const tracingEnabled = process.env.TRACING_ENABLED !== 'false';
+const zipkinEndointUrl = process.env.ZIPKIN_URL || 'http://jaeger-collector.jaeger:9411';
+const zipkinSamplingRate = process.env.ZIPKIN_SAMPLING_RATE || 0.01;
 
 // Respond to / anonymously to allow for health checks
 app.get('/', (req, res) => res.send('Hi, I\'m Titan!').end());
 
-app.use(setupTracingMiddleware(zipkinEndointUrl, zipkinSamplingRate))
-if(authEnabled)
-    app.use(setupAuthMiddleware(jwksUrl))
+if(tracingEnabled) app.use(setupTracingMiddleware(zipkinEndointUrl, zipkinSamplingRate));
+if(authEnabled) app.use(setupAuthMiddleware(jwksUrl));
+
 app.use(setupWebdavMiddleware(rootPath));
 
 module.exports = app;
