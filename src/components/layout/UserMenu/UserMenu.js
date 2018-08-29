@@ -60,7 +60,7 @@ class UserMenu extends React.Component {
                                         color="inherit"
                                         onClick={this.handleClick.bind(this)}
                                         className={this.classes.row}>
-                                    <Avatar alt="{data.username}" src="./images/avatar.png" className={this.classes.avatar}/>
+                                    <Avatar alt="{data.username}" src="/images/avatar.png" className={this.classes.avatar}/>
                                     <span>{data.username}</span>
                                 </Button>)
                         }
