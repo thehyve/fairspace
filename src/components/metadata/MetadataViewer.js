@@ -15,17 +15,32 @@ class MetadataViewer extends React.Component {
         this.vocabulary = props.vocabulary;
         this.metadata = props.metadata;
         this.state = {
-            properties: []
+            properties: [],
+            error: false,
+            loading: false,
+            errorMessage: ""
         };
     }
 
     componentWillMount() {
+        this.setState({loading: true});
         combine(this.vocabulary, this.metadata)
+            .catch(err => {
+                this.setState({error: true, errorMessage: "Error occured while combining vocabulary and metadata."});
+                console.error(this.state.errorMessage, err);
+            })
             .then(props => {
                 if (this.willUnmount) {
                     return
+                } else if (props.length === 0) {
+                    this.setState({
+                        error: true, loading: false,
+                        errorMessage: "No metadata found"
+                    });
+                    console.warn(this.state.errorMessage);
+                    return
                 }
-                this.setState({properties: props});
+                this.setState({properties: props, loading: false});
             });
     }
 
@@ -69,10 +84,12 @@ class MetadataViewer extends React.Component {
     }
 
     render() {
-        if (Object.keys(this.metadata).length) {
-            return (<List>{this.state.properties.map(this.renderProperty.bind(this))}</List>)
+        if (this.state.error) {
+            return (<div>{this.state.errorMessage}</div>)
+        } else if (this.state.loading) {
+            return ("Loading...")
         } else {
-            return ("No metadata found")
+            return (<List>{this.state.properties.map(this.renderProperty.bind(this))}</List>)
         }
     }
 }
