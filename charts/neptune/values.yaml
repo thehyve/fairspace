@@ -51,3 +51,8 @@ postgresql:
   postgresPassword: test123
   postgresDatabase: postgres
   nameOverride: neptune-postgresql
+
+# Enable tracing
+tracing:
+  enabled: true
+  baseUrl: http://jaeger-collector.jaeger:9411

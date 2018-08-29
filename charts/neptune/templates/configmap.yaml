@@ -20,6 +20,9 @@ data:
     titan:
       url: {{ .Values.titan.url | default (printf "http://%s-titan.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
     spring:
+      zipkin:
+        enabled: {{ .Values.tracing.enabled }}
+        base-url: {{ .Values.tracing.baseUrl }}
       datasource:
         url: "jdbc:postgresql://{{ .Release.Name }}-{{ .Values.postgresql.nameOverride }}:5432/{{ .Values.postgresql.postgresDatabase }}"
         username: "{{ .Values.postgresql.postgresUser }}"

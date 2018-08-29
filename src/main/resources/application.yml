@@ -8,6 +8,13 @@ app:
 
 # Configuration for sql database which stores predicates and labels
 spring:
+  application:
+    name: Neptune
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://jaeger-collector.jaeger:9411/
   datasource:
     url: "jdbc:postgresql://demo-postgresql:5432/postgres"
     username: "postgres"
