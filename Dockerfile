@@ -4,7 +4,7 @@ MAINTAINER fairspace.io
 
 RUN mkdir /titan
 
-COPY ./*.js /titan/
+COPY ./src /titan/
 COPY ./package.json /titan
 COPY ./bin /titan/bin
 

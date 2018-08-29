@@ -20,6 +20,9 @@ resources:
   requests:
     cpu: 100m
 
+# URL to retrieve the jwks from
+jwksUrl:
+
 ## Persist data to a persistent volume
 persistence:
   enabled: true
