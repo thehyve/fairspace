@@ -28,6 +28,7 @@ class CollectionBrowser extends React.Component {
         this.state = {
             loading: false,
             error: false,
+            errorMessage: null,
 
             selectedCollection: null,
             selectedPath: null,
@@ -96,8 +97,8 @@ class CollectionBrowser extends React.Component {
             .addCollection(name, description)
             .then(this.requireRefresh.bind(this))
             .catch(err => {
-                this.errorMessage = "An error occurred while creating a collection";
-                console.error(this.errorMessage, err);
+                this.setState({errormessage: "An error occurred while creating a collection", error: true});
+                console.error(this.state.errorMessage, err);
             });
     }
 
@@ -148,8 +149,8 @@ class CollectionBrowser extends React.Component {
             this.fileStore
                 .upload(this.state.openedPath, files)
                 .catch(err => {
-                    this.errorMessage = "An error occurred while uploading files";
-                    console.error(this.errorMessage, err);
+                    this.setState({errorMessage: "An error occurred while uploading files", error: true});
+                    console.error(this.state.errorMessage, err);
                 });
         }
     }
@@ -314,7 +315,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderError() {
-        return (<Typography variant="body2" paragraph={true} noWrap><Error message={this.errorMessage}/></Typography>);
+        return (<Typography variant="body2" paragraph={true} noWrap><Error message={this.state.errorMessage}/></Typography>);
     }
 
     renderLoading() {

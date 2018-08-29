@@ -12,6 +12,7 @@ class CollectionOverview extends React.Component {
         // Initialize state
         this.state = {
             loading: false,
+            error: false,
             collections: [],
             selectedCollection: props.selectedCollection
         };
@@ -51,9 +52,8 @@ class CollectionOverview extends React.Component {
                 if (this.isUnmounting) {
                     return;
                 }
-                this.errorMessage = "An error occurred while loading collections";
-                console.error(this.errorMessage, err);
-                this.setState({error: true, loading: false});
+                this.setState({error: true, loading: false, errorMessage: "An error occurred while loading collections"});
+                console.error(this.state.errorMessage, err);
             });
     }
 
@@ -66,9 +66,8 @@ class CollectionOverview extends React.Component {
                     if (this.isUnmounting) {
                         return;
                     }
-                    this.errorMessage = "An error occurred while deleting collection";
-                    console.error(this.errorMessage, err);
-                    this.setState({error: true, loading: false});
+                    this.setState({error: true, loading: false, errorMessage: "An error occurred while deleting collection"});
+                    console.error(this.state.errorMessage, err);
                 })
         } else {
             return Promise.resolve();
@@ -87,7 +86,7 @@ class CollectionOverview extends React.Component {
 
     render() {
         if (this.state.error) {
-            return (<Error message={this.errorMessage}/>)
+            return (<Error message={this.state.errorMessage}/>)
         }
         else if(this.state.loading) {
             return (<div>Loading...</div>);

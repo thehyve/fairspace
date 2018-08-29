@@ -15,6 +15,8 @@ class FileOverview extends React.Component {
 
         this.state = {
             loading: false,
+            error: false,
+            errorMessage: null,
             path: path,
             contents: [],
             selectedPath: props.selectedPath
@@ -35,9 +37,8 @@ class FileOverview extends React.Component {
                 }
             })
             .catch(err => {
-                this.errorMessage = "Error loading files. ";
-                console.error(this.errorMessage, err);
-                this.setState({loading: false, error: true});
+                this.setState({loading: false, error: true, errorMessage: "Error loading files. "});
+                console.error(this.state.errorMessage, err);
             })
     }
 
@@ -72,7 +73,7 @@ class FileOverview extends React.Component {
 
     render() {
         if (this.state.error) {
-            return (<Error message={this.errorMessage}/>)
+            return (<Error message={this.state.errorMessage}/>)
         }
         else if(this.state.loading) {
             return (<div>Loading...</div>);
