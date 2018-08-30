@@ -7,6 +7,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Icon from "@material-ui/core/Icon";
 import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
+import Permissions from '../../permissions/Permissions'
 
 function InformationDrawer(props) {
     let contents;
@@ -19,6 +20,10 @@ function InformationDrawer(props) {
                     collectionStore={props.collectionStore}
                     onDidChangeDetails={props.onDidChangeDetails}
                 />
+                <hr/>
+
+                <Permissions collectionId={props.collection.id}/>
+                <hr/>
                 <Metadata
                     subject={props.collection.metadata.uri}
                     metadataStore={props.metadataStore}

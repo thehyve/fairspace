@@ -1,6 +1,7 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
 import combine from "./MetadataUtils";
+import Typography from "@material-ui/core/Typography";
 
 class Metadata extends React.Component {
     constructor(props) {
@@ -40,7 +41,7 @@ class Metadata extends React.Component {
 
                     this.setState({properties: props, loading: false});
                 }).catch(err => {
-                console.error("Error occured while combining vocabulary and metadata.", err);
+                console.error("Error occurred while combining vocabulary and metadata.", err);
             });
         }).catch(e => {
             if (this.willUnmount) return;
@@ -59,7 +60,7 @@ class Metadata extends React.Component {
         this.loadData();
     }
 
-    render() {
+    renderBody() {
         if (this.state.error) {
             return (<div>Error loading metadata</div>)
         } else if (this.state.loading) {
@@ -71,6 +72,14 @@ class Metadata extends React.Component {
         }
     }
 
+    render() {
+        return (
+        <div>
+            <Typography variant="subheading">Metadata:</Typography>
+            {this.renderBody()}
+        </div>
+        )
+    }
 }
 
 export default Metadata

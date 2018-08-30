@@ -1,6 +1,7 @@
 import React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import Typography from "@material-ui/core/Typography";
 
 
 /**
@@ -43,7 +44,7 @@ class MetadataViewer extends React.Component {
         return (
             <ListItem>
                 <div>
-                    <b>{p.label}:</b>
+                    <Typography variant="subheading">{p.label}:</Typography>
                     <List dense={true}>{items}</List>
                 </div>
             </ListItem>);
