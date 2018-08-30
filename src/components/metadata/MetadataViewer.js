@@ -35,7 +35,7 @@ class MetadataViewer extends React.Component {
 
     static renderValue(v) {
         return (
-            <ListItem>
+            <ListItem key={v}>
                 {('@id' in v) ? (<a href={MetadataViewer.navigableLink(v['@id'])}>{v['@id']}</a>) : v['@value']}
             </ListItem>)
     }
@@ -50,7 +50,7 @@ class MetadataViewer extends React.Component {
     renderProperty(p) {
         const items = p.values.map(MetadataViewer.renderValue.bind(this));
         return (
-            <ListItem>
+            <ListItem key={p.label}>
                 <div>
                     <b>{p.label}:</b>
                     <List dense={true}>{items}</List>

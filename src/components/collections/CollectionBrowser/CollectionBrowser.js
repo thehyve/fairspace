@@ -13,7 +13,7 @@ import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import {Column, Row} from 'simple-flexbox';
 import UploadButton from "../UploadButton/UploadButton";
-import Error from "../../error/Error";
+import ErrorDialog from "../../error/ErrorDialog";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -28,7 +28,6 @@ class CollectionBrowser extends React.Component {
         this.state = {
             loading: false,
             error: false,
-            errorMessage: null,
 
             selectedCollection: null,
             selectedPath: null,
@@ -97,8 +96,9 @@ class CollectionBrowser extends React.Component {
             .addCollection(name, description)
             .then(this.requireRefresh.bind(this))
             .catch(err => {
-                this.setState({errormessage: "An error occurred while creating a collection", error: true});
-                console.error(this.state.errorMessage, err);
+                const errorMessage =  "An error occurred while creating a collection";
+                this.setState({error: true});
+                ErrorDialog.showError(err, errorMessage);
             });
     }
 
@@ -149,8 +149,9 @@ class CollectionBrowser extends React.Component {
             this.fileStore
                 .upload(this.state.openedPath, files)
                 .catch(err => {
-                    this.setState({errorMessage: "An error occurred while uploading files", error: true});
-                    console.error(this.state.errorMessage, err);
+                    const errorMessage =  "An error occurred while uploading files";
+                    this.setState({error: true});
+                    ErrorDialog.showError(err, errorMessage);
                 });
         }
     }
@@ -315,7 +316,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderError() {
-        return (<Typography variant="body2" paragraph={true} noWrap><Error message={this.state.errorMessage}/></Typography>);
+        return (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>);
     }
 
     renderLoading() {
