@@ -67,7 +67,7 @@ class ErrorDialog extends React.Component {
                     <DialogTitle id="alert-dialog-slide-title">
                         <Row>
                             <Column vertical='center' horizontal='start'>
-                                    <Icon color="error" style={{fontSize: 40}}>report_problem</Icon>
+                                    <Icon color="error" style={{fontSize: 40, padding: '5px'}}>report_problem</Icon>
                             </Column>
                             <Column vertical='center' horizontal='start'>
                                 {"An error has occurred"}
