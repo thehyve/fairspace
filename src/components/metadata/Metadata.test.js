@@ -22,7 +22,7 @@ it('shows error when no subject provided', () => {
     }).then(() => {
         const result = wrapper.find("li");
         expect(result.length).toEqual(0);
-        expect(wrapper.text()).toEqual("Error loading metadata");
+        expect(wrapper.text()).toEqual("Metadata:Error loading metadata");
     });
 });
 
@@ -33,6 +33,6 @@ it('shows nothing when there is no metadata found', () => {
     }).then(() => {
         const result = wrapper.find("li");
         expect(result.length).toEqual(0);
-        expect(wrapper.text()).toEqual("No metadata found");
+        expect(wrapper.text()).toEqual("Metadata:No metadata found");
     });
 });
