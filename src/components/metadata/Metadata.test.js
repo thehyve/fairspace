@@ -25,3 +25,14 @@ it('shows error when no subject provided', () => {
         expect(wrapper.text()).toEqual("Error loading metadata");
     });
 });
+
+it('shows nothing when there is no metadata found', () => {
+    const wrapper = mount(<Metadata subject={"test"} metadataStore={mockMetadataStore}/>);
+    return flushPromises().then(() => {
+        wrapper.update();
+    }).then(() => {
+        const result = wrapper.find("li");
+        expect(result.length).toEqual(0);
+        expect(wrapper.text()).toEqual("No metadata found");
+    });
+});

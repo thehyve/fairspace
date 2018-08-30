@@ -17,6 +17,13 @@ function combine(vocabulary, metadata) {
                 const label = labelsById[key];
                 if (label) {
                     result[label] = root[key].sort(compareValues);
+                    // @type is not a label. Therefore, this needs to be a separate check. Where the label needs  to be retrieved.
+                } else if (key === "@type") {
+                    const types = [];
+                    root[key].forEach(type => {
+                        types.push({"@id": type, "rdfs:label": labelsById[type]});
+                    });
+                    result["Type"] = types.sort(compareValues);
                 }
             }
             return Object.keys(result).sort().map(label => ({label: label, values: result[label]}));
