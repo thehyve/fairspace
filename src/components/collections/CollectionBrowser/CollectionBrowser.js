@@ -76,7 +76,8 @@ class CollectionBrowser extends React.Component {
                     });
                 })
                 .catch(e => {
-                    this.setState({loading: false, error: true});
+                    this.setState({error: true});
+                    ErrorDialog.showError(e, "An error occurred while retrieving collections");
                 });
         } else {
             this.setState({error: false, openedCollection: null, openedPath: selectedPath});
@@ -98,7 +99,7 @@ class CollectionBrowser extends React.Component {
             .catch(err => {
                 const errorMessage =  "An error occurred while creating a collection";
                 this.setState({error: true});
-                ErrorDialog.showError(err, errorMessage);
+                ErrorDialog.showError(err, errorMessage, this.handleAddCollectionClick.bind(this));
             });
     }
 
@@ -151,7 +152,7 @@ class CollectionBrowser extends React.Component {
                 .catch(err => {
                     const errorMessage =  "An error occurred while uploading files";
                     this.setState({error: true});
-                    ErrorDialog.showError(err, errorMessage);
+                    ErrorDialog.showError(err, errorMessage, this.handleUpload.bind(this));
                 });
         }
     }

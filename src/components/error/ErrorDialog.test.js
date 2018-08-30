@@ -16,13 +16,20 @@ beforeEach(() => {
     }
 });
 
-it('shows error when no subject provided', () => {
-    const wrapper = mount(<ErrorDialog><Metadata subject={""} metadataStore={mockMetadataStore} /></ErrorDialog>);
+it('shows error dialog when no subject provided', () => {
+    const wrapper = mount(
+        <ErrorDialog>
+        <div className={"test"}>test</div>
+        <div className={"test2"}>
+                <Metadata subject={""} metadataStore={mockMetadataStore} />
+        </div>
+        </ErrorDialog>);
     return flushPromises().then(() => {
         wrapper.update();
     }).then(() => {
-        const result = wrapper.find("li");
-        expect(result.length).toEqual(0);
-        expect(wrapper.text()).toEqual("No subject given to retrieve metadata for");
+        const resultHeader = wrapper.find("h2");
+        expect(resultHeader.text()).toEqual("report_problemAn error has occurred");
+        const resultContent = wrapper.find("p");
+        expect(resultContent.text()).toEqual("No subject given to retrieve metadata for");
     });
 });
