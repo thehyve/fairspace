@@ -8,26 +8,24 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  application.conf: |-
-    ktor {
-      deployment {
-        port = {{ .Values.service.internalPort }}
-      }
+  application.yaml: |-
+    server.port: {{ .Values.service.internalPort }}
 
-      application {
-        modules = [io.fairspace.ceres.ModuleKt.ceresModule]
-      }
-    }
-    jena {
-      dataset {
-        path = {{ .Values.persistence.mountPath }}
-      }
-    }
-    authentication {
-      jwt {
-        enabled = {{ .Values.ceres.auth.enabled }}
-        issuer = "{{ .Values.ceres.auth.jwt.issuer }}"
-        realm = "{{ .Values.ceres.auth.jwt.realm }}"
-        audience = "{{ .Values.ceres.auth.jwt.audience }}"
-      }
-    }
+    # OAuth2 base configuration
+    app:
+      oauth2:
+        base-url: {{ .Values.app.oauth2.baseUrl }}
+        realm: {{ .Values.app.oauth2.realm }}
+
+    # Tracing configuration
+    spring:
+      sleuth:
+        sampler:
+          probability: {{ .Values.app.tracing.samplingRate }}
+      zipkin:
+        base-url: {{ .Values.app.tracing.zipkinUrl }}
+
+    # Where to store the dataset
+    jena:
+      dataset:
+        path: {{ .Values.persistence.mountPath }}

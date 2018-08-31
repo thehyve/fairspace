@@ -1,0 +1,30 @@
+# OAuth2 base configuration
+app:
+  oauth2:
+    base-url: http://localhost:9080
+    realm: keycloak
+
+
+# Security configuration
+security:
+  oauth2:
+    resource:
+      user-info-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/userinfo
+      prefer-token-info: false
+      jwk:
+        key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
+
+# Where to store the dataset
+jena:
+  dataset:
+    path: data
+
+# Tracing configuration
+spring:
+  application:
+    name: Ceres
+  sleuth:
+    sampler:
+      probability: 0.1
+  zipkin:
+    base-url: http://jaeger-collector.jaeger:9411/

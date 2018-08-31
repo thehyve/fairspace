@@ -1,14 +1,16 @@
 package io.fairspace.ceres.repository
 
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.reasoner.ReasonerRegistry
 import org.apache.jena.util.FileManager
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.junit.MockitoJUnitRunner
 
-
+@RunWith(MockitoJUnitRunner::class)
 class InferenceTest {
     private val NS = "http://fairspace.io/ontology#"
 

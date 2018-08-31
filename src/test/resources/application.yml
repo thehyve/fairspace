@@ -1,0 +1,19 @@
+# Security configuration
+security:
+  oauth2:
+    resource:
+      user-info-uri: http://localhost:${wiremock.server.port}/userinfo
+      prefer-token-info: false
+      jwk:
+        key-set-uri: http://localhost:${wiremock.server.port}/certs
+jena:
+  dataset:
+    path: data
+
+
+logging.level.org.springframework.security: DEBUG
+
+spring:
+  test:
+    mockmvc:
+      print: log_debug

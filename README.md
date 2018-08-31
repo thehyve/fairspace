@@ -5,52 +5,14 @@
 `./gradlew clean build`
 
 
-## How to run
-
-```
-# copy ceres-*.zip from <Ceres project directory>/build/distributions/
-unzip ceres-*.zip
-cd ceres-*/bin/
-./ceres
-```
+## Starting the service
+The `src` directory contains the actual application. It can be run from the IDE or from the command line
+using gradle: `gradle bootRun`.
 
 ## Configuration
 
-To run with custom configuration
-```
-./ceres -config myconfig.conf
-```
-
-Default configuration file:
-
-```yaml
-ktor {
-  deployment {
-    port = 8080
-  }
-
-  application {
-    modules = [io.fairspace.ceres.ModuleKt.ceresModule]
-  }
-}
-jena {
-  dataset {
-    path = data
-  }
-}
-authentication {
-  jwt {
-    enabled = false
-    issuer = "http://localhost:9080"
-    realm = fairspace
-    audience = fairspace
-  }
-}
-```
-
-Alternatively, you can use environment variables, e.g. `CERES_AUTH_ENABLED`, to alter configuration settings
-
-See also: [Ktor configuration](https://ktor.io/servers/configuration.html#available-config)
+Configuration is done using Spring Boot, so you can use any of the methods from [Spring boot externalized configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html)
+to alter the configuration. For available properties, see `resources/application.yaml`
 
 
 ## How to use
