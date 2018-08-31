@@ -47,7 +47,7 @@ Cypress.Commands.add("addCollection", () => {
     cy.url().should('contain', '/collections')
 
     // Add a collection
-    cy.get('button').contains("add").click();
+    cy.get('button').contains("add").click({force: true});
 
     // Recount after loading
     cy.wait(500)

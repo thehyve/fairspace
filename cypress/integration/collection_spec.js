@@ -14,14 +14,12 @@ describe('Collection browser', function () {
     });
 
     it('should show a list of collections', function () {
-        cy.getCookie('JSESSIONID').should('exist');
         cy.listCollections();
 
         cy.get('tbody').find('tr').should('length.above', 0);
     });
 
     it('should successfully add and remove a collection', function () {
-        cy.getCookie('JSESSIONID').should('exist');
         cy.listCollections();
 
         // Count the current number of collections
