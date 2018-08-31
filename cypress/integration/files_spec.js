@@ -32,6 +32,7 @@ describe('e2e tests checking files for Fairspace', function () {
                     cy.get("span").contains("Close").click({force: true});
                     cy.wait(1000);
                     cy.reload();
+                    cy.wait(1000);
                     cy.get("tbody>tr>th").contains("myfile.csv");
                 });
                 let collectionId;
