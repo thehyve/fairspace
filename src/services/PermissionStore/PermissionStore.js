@@ -17,7 +17,7 @@ class PermissionStore {
     getCollectionPermissions(collectionId) {
         let url = format(Config.get().urls.collectionPermissions, collectionId);
         return fetch(url, PermissionStore.getConfig)
-            .then(failOnHttpError('Error while loading permissions'))
+            .then(failOnHttpError('Error while loading collection permissions'))
             .then(response => response.json())
     }
 
@@ -27,10 +27,10 @@ class PermissionStore {
      * @param user The user.
      * @returns {Promise<'Manage' | 'Write' | 'Read' | 'None'>}
      */
-    getPermission(collectionId, user) {
+    getUserPermission(collectionId, user) {
         let url = format(Config.get().urls.collectionPermissions, collectionId) + '?user=' + user;
         return fetch(url, PermissionStore.getConfig)
-            .then(failOnHttpError('Error while loading permissions'))
+            .then(failOnHttpError('Error while fetching user\'s permission'))
             .then(response => response.json())
             .then(json => json.permission)
     }
