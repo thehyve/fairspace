@@ -75,7 +75,7 @@ describe('Collection browser', function () {
         cy.get('tr')
             .contains(changedName)
             .parentsUntil('tbody')
-            .find("button").click();
+            .find("button").click({force: true});
 
     });
 });

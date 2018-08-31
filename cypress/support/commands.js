@@ -57,7 +57,7 @@ Cypress.Commands.add("addCollection", () => {
 Cypress.Commands.add("deleteLastCollection", () => {
     cy.url().should('contain', '/collections')
     cy.get('tbody>tr').last()
-        .find("button").click();
+        .find("button").click({force: true});
 })
 
 
