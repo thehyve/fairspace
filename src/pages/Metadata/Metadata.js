@@ -12,7 +12,6 @@ function Metadata(props) {
         <div>
             <Typography noWrap>{'Metadata'}</Typography>
             <List>
-                <ListItem>Type: {params.type}</ListItem>
                 <ListItem>Id: {params.id}</ListItem>
             </List>
 

@@ -1,49 +1,40 @@
 import React from 'react';
-import combine from './MetadataUtils';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 
 
 /**
- * This compp
+ * This component will always display correct metadata. If any error occurs it is handled by Metadata
  */
 class MetadataViewer extends React.Component {
 
     constructor(props) {
         super(props);
         this.props = props;
-        this.vocabulary = props.vocabulary;
-        this.metadata = props.metadata;
-        this.state = {
-            properties: []
-        };
-    }
-
-    componentWillMount() {
-        combine(this.vocabulary, this.metadata)
-            .then(props => {
-                if (this.willUnmount) {
-                    return
-                }
-                this.setState({properties: props});
-            });
-    }
-
-    componentWillUnmount() {
-        this.willUnmount = true
+        this.properties = props.properties;
     }
 
     static renderValue(v) {
         return (
-            <ListItem key={v}>
-                {('@id' in v) ? (<a href={MetadataViewer.navigableLink(v['@id'])}>{v['@id']}</a>) : v['@value']}
+            <ListItem>
+                {this.retrieveDisplayableItem(v)}
             </ListItem>)
     }
 
     static navigableLink(link) {
         return link.startsWith(window.location.origin)
-            ? link.replace('/iri/', '/metadata/')
+            ? link.replace('/iri/collections/', '/collections/').replace('/iri/', '/metadata/')
             : link
+    }
+
+    retrieveDisplayableItem(v) {
+        let displayValue = v['rdfs:label'] || v['@id'] || v['@value'] || '';
+
+        if ('@id' in v) {
+            return (<a href={MetadataViewer.navigableLink(v['@id'])}>{displayValue}</a>)
+        } else {
+            return displayValue;
+        }
     }
 
 
@@ -59,7 +50,8 @@ class MetadataViewer extends React.Component {
     }
 
     render() {
-        return (<List>{this.state.properties.map(this.renderProperty.bind(this))}</List>)
+        return (<List>{this.properties.map(this.renderProperty.bind(this))}</List>)
+
     }
 }
 

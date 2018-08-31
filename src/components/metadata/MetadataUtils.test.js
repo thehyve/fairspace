@@ -44,7 +44,8 @@ const vocabulary = {
 
 const correct_response = [
     {label: 'Description', values: [{'@value': 'More info'}, {'@value': 'My first collection'}]},
-    {label: 'Name', values: [{'@value': 'Collection 5'}]}
+    {label: 'Name', values: [{'@value': 'Collection 5'}]}, {"label": "Type", "values":
+            [{"@id": "http://fairspace.io/ontology#Collection", "rdfs:label": "Collection"}]}
     ];
 
 it('combines vocabulary and metadata', () => {
