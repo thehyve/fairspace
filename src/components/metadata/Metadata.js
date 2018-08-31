@@ -1,5 +1,6 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
+import ErrorMessage from "../error/ErrorMessage";
 import combine from "./MetadataUtils";
 
 class Metadata extends React.Component {
@@ -11,6 +12,7 @@ class Metadata extends React.Component {
         this.state = {
             loading: false,
             error: false,
+            errorMessage: null,
             properties: {}
         };
     }
@@ -43,10 +45,9 @@ class Metadata extends React.Component {
                 console.error("Error occured while combining vocabulary and metadata.", err);
             });
         }).catch(e => {
-            if (this.willUnmount) return;
-
+            if(this.willUnmount) return;
             console.error("Error while loading metadata", e);
-            this.setState({error: true});
+            this.setState({error: true, loading: false});
         })
     }
 
@@ -60,9 +61,9 @@ class Metadata extends React.Component {
     }
 
     render() {
-        if (this.state.error) {
-            return (<div>Error loading metadata</div>)
-        } else if (this.state.loading) {
+        if(this.state.error) {
+            return (<div><ErrorMessage message="An error has occurred" /></div>)
+        } else if(this.state.loading) {
             return (<div>Loading...</div>)
         } else if (this.state.properties.length === 0) {
             return (<div>No metadata found</div>)

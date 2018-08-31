@@ -13,6 +13,7 @@ import Home from "../../pages/Home/Home";
 import Collections from "../../pages/Collections/Collections";
 import Notebooks from "../../pages/Notebooks/Notebooks";
 import Metadata from "../../pages/Metadata/Metadata";
+import ErrorDialog from "../error/ErrorDialog";
 
 class App extends React.Component {
     cancellable = {
@@ -55,6 +56,7 @@ class App extends React.Component {
             // The topbar is shown even if the user has no proper authorization
             return (
                 <div className={this.classes.root}>
+                    <ErrorDialog>
                     <TopBar classes={this.classes}></TopBar>
                     <Router>
                         <AuthorizationCheck transformError={this.transformError.bind(this)}>
@@ -73,6 +75,7 @@ class App extends React.Component {
                             </main>
                         </AuthorizationCheck>
                     </Router>
+                    </ErrorDialog>
                 </div>
             );
         } else {

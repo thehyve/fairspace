@@ -1,5 +1,7 @@
 import React from 'react';
 import CollectionList from "../CollectionList/CollectionList";
+import ErrorDialog from "../../error/ErrorDialog";
+import ErrorMessage from "../../error/ErrorMessage";
 
 class CollectionOverview extends React.Component {
     constructor(props) {
@@ -11,6 +13,7 @@ class CollectionOverview extends React.Component {
         // Initialize state
         this.state = {
             loading: false,
+            error: false,
             collections: [],
             selectedCollection: props.selectedCollection
         };
@@ -50,8 +53,8 @@ class CollectionOverview extends React.Component {
                 if (this.isUnmounting) {
                     return;
                 }
-                console.error("An error occurred while loading collections", err);
                 this.setState({error: true, loading: false});
+                console.error("An error occurred while loading collections", err);
             });
     }
 
@@ -64,8 +67,9 @@ class CollectionOverview extends React.Component {
                     if (this.isUnmounting) {
                         return;
                     }
-                    console.error("An error occurred while deleting collection", err);
-                    this.setState({error: true, loading: false});
+                    const errorMessage =  "An error occurred while deleting collection";
+                    this.setState({loading: false});
+                    ErrorDialog.showError(err, errorMessage, this.deleteCollection.bind(this));
                 })
         } else {
             return Promise.resolve();
@@ -83,7 +87,10 @@ class CollectionOverview extends React.Component {
     }
 
     render() {
-        if(this.state.loading) {
+        if (this.state.error) {
+            return (<ErrorMessage message="An error has occurred" />)
+        }
+        else if(this.state.loading) {
             return (<div>Loading...</div>);
         }
 
