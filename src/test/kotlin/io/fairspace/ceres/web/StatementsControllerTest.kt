@@ -4,9 +4,9 @@ import io.fairspace.ceres.TestData
 import io.fairspace.ceres.repository.ModelRepository
 import io.fairspace.ceres.repository.parse
 import io.fairspace.ceres.repository.toString
+import org.apache.jena.riot.RDFFormat
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.apache.jena.riot.RDFFormat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
@@ -114,12 +114,6 @@ class StatementsControllerTest {
                 .perform(patch("/statements")
                         .content(TestData.model.toString(RDFFormat.JSONLD)))
                 .andExpect(status().isUnsupportedMediaType())
-
-//        this.mockMvc
-//                .perform(patch("/statements")
-//                        .contentType("application/json")
-//                        .content(TestData.model.toString(RDFFormat.JSONLD)))
-//                .andExpect(status().isUnsupportedMediaType())
     }
 
 }

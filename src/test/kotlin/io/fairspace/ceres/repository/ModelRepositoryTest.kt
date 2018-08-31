@@ -1,13 +1,13 @@
 package io.fairspace.ceres.repository
 
 import io.fairspace.ceres.TestData
-import org.junit.Assert.*
 import org.apache.jena.query.Dataset
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.reasoner.rulesys.GenericRuleReasoner
 import org.apache.jena.vocabulary.VCARD
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

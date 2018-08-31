@@ -1,7 +1,9 @@
 package io.fairspace.ceres.repository
 
-import org.apache.jena.query.*
+import org.apache.jena.query.Dataset
 import org.apache.jena.query.Query.*
+import org.apache.jena.query.QueryExecutionFactory
+import org.apache.jena.query.QueryFactory
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.RDFNode

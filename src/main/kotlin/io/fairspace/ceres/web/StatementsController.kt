@@ -1,7 +1,6 @@
 package io.fairspace.ceres.web
 
 import io.fairspace.ceres.repository.ModelRepository
-import io.fairspace.ceres.web.converters.JsonLdModelConverter
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.shared.NotFoundException
 import org.springframework.http.HttpStatus

@@ -1,11 +1,11 @@
 package io.fairspace.ceres.repository
 
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.reasoner.ReasonerRegistry
 import org.apache.jena.util.FileManager
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner

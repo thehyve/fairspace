@@ -1,9 +1,6 @@
 package io.fairspace.ceres.web
 
 import io.fairspace.ceres.repository.ModelRepository
-import org.apache.jena.rdf.model.Model
-import org.apache.jena.shared.NotFoundException
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController

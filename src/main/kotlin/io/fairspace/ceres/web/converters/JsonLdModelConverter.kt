@@ -4,7 +4,6 @@ import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.RDFDataMgr
 import org.apache.jena.riot.RDFFormat
-import org.apache.jena.riot.RiotException
 import org.springframework.http.HttpInputMessage
 import org.springframework.http.HttpOutputMessage
 import org.springframework.http.MediaType
