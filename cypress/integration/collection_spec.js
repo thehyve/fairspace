@@ -1,89 +1,83 @@
-describe('e2e tests checking collections for Fairspace', function () {
+describe('Collection browser', function () {
+    let uniqueId = 0;
+
+    before(() => {
+        cy.login(Cypress.config("user_name"), Cypress.config("password"));
+    })
+
+    after(() => {
+        cy.logout()
+    })
+
     beforeEach(() => {
-        cy.visit('');
-        cy.url().should('include', '/auth/realms');
-        cy.get('input[name=username]').type(Cypress.config("user_name"));
-        cy.get('input[name=password').type(Cypress.config("password") + '{enter}');
+        uniqueId = Math.round(100000 + (Math.random() * 900000));
     });
 
-    it('successfully log in', function () {
-        cy.url().should('include', 'https://workspace.ci.test.fairdev.app/');
+    it('should show a list of collections', function () {
         cy.getCookie('JSESSIONID').should('exist');
+        cy.listCollections();
+
+        cy.get('tbody').find('tr').should('length.above', 0);
     });
 
-    it('successfully see list of collections', function () {
-        cy.contains("Collections").click();
-        cy.request("/metadata/collections", "GET").as("getCollections")
-            .then(() => {
-                cy.get('table');
-                cy.get('tbody').find('tr').should('length.above', 0);
-        });
+    it('should successfully add and remove a collection', function () {
+        cy.getCookie('JSESSIONID').should('exist');
+        cy.listCollections();
+
+        // Count the current number of collections
+        let rowCount = 0;
+        cy.get('tbody>tr').its('length').then(length => rowCount = length);
+
+        cy.addCollection();
+
+        // Verify the number of rows has increased
+        cy.get('tbody>tr').should('length.above', rowCount);
+
+        // Remove the last entry again
+        cy.deleteLastCollection();
+
     });
 
-    it('successfully add collection', function () {
-        cy.contains("Collections").click();
-        cy.request("/metadata/collections", "GET").as("getCollections")
-            .then(() => {
-                let number = 0;
-                cy.get('tbody>tr').each(() => {
-                    number += 1;
-                   return number;
-                }).then(() => {
-                    cy.get('button').contains("add").click();
-                    cy.get('tbody>tr').should('length.above', number);
-                })
-            });
-    });
+    it('should store changes in collection details', function () {
+        cy.listCollections();
+        cy.addCollection();
 
-    it('successfully change name of collection', function () {
-        cy.contains("Collections").click();
-        cy.request("/metadata/collections", "GET").as("getCollections")
-            .then(() => {
-                cy.get('tbody');
-                cy.get('tr').find('th').contains("Test workspace-ci's collection").click();
-                cy.wait(1000);
-                cy.get('h2').contains("Test workspace-ci's collection").click();
-                cy.get('input[name=name]').clear().type('test change name');
-                cy.get('button').contains('Save').click();
-                cy.get('ul>li').should('contain', 'test change name');
-            });
-    });
+        // Find one of the collections created with the default name
+        // Click on it to open the right panel
+        cy.get('tr').contains("Test workspace-ci's collection").click();
 
-    it('successfully change description of collection', function () {
-        cy.contains("Collections").click();
-        cy.request("/metadata/collections", "GET").as("getCollections")
-            .then(() => {
-                cy.get('tbody');
-                cy.get('tr').find('th').contains("test change name").click();
-                cy.wait(1000);
-                cy.get('h2').contains("test change name").click();
-                cy.get('textarea[name=description]').clear().type('this is just a test');
-                cy.get('button').contains('Save').click();
-                cy.wait(500);
-                cy.get('ul>li').should('contain', 'this is just a test');
-            });
-    });
+        // Wait for the right panel to open
+        cy.wait(500);
 
-    it('successfully deletes a collection', function () {
-        cy.get("a").contains("home").click({force: true});
-        cy.contains("Collections").click({force: true});
-        cy.request("/metadata/collections", "GET").as("getCollections")
-            .then(() => {
-                let number = 0;
-                cy.get('tbody>tr').each(() => {
-                    number += 1;
-                    return number;
-                }).then(() => {
-                    cy.get("tbody>tr").each(($rows) => {
-                        const txt = $rows.text();
-                        if (txt.includes("test change name")) {
-                            $rows.find("button").click();
-                        }
-                    });
-                }).then(() => {
-                    cy.get('tbody>tr').should('length.below', number);
-                });
-            });
-    });
+        // Click on the name to edit it
+        cy.get('h2').contains("Test workspace-ci's collection").click();
 
+        // Determine a random number to avoid having accidental successes
+
+        let changedName = 'changed ' + uniqueId;
+        let changedDescription = 'description ' + uniqueId;
+
+        // Alter the name
+        cy.get('input[name=name]').clear().type(changedName);
+        cy.get('textarea[name=description]').clear().type(changedDescription);
+        cy.get('button').contains('Save').click();
+
+        // The collection details should be updated immediately
+        cy.get('ul>li')
+            .should('contain', changedName)
+            .should('contain', changedDescription);
+
+        // The collection details  should be present after reloading
+        cy.listCollections();
+        cy.get('tr')
+            .should('contain', changedName)
+            .should('contain', changedDescription);
+
+        // Delete the collection again
+        cy.get('tr')
+            .contains(changedName)
+            .parentsUntil('tbody')
+            .find("button").click();
+
+    });
 });

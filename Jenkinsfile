@@ -36,6 +36,7 @@ pipeline {
     post {
       always {
         junit 'results/**/*.xml'
+        archiveArtifacts artifacts: 'cypress/screenshots/**'
       }
       failure {
         script {
