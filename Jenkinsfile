@@ -34,6 +34,9 @@ pipeline {
       }
     }
     post {
+      always {
+        junit 'results/**/*.xml'
+      }
       failure {
         script {
           hipchat.notifyFailure()
