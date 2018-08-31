@@ -36,9 +36,9 @@ pipeline {
     post {
       always {
         junit 'results/**/*.xml'
-        archiveArtifacts artifacts: 'cypress/screenshots/**'
       }
       failure {
+        archiveArtifacts artifacts: 'cypress/screenshots/**'
         script {
           hipchat.notifyFailure()
         }
