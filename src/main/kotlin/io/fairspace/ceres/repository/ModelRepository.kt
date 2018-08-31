@@ -1,7 +1,9 @@
 package io.fairspace.ceres.repository
 
-import org.apache.jena.query.*
+import org.apache.jena.query.Dataset
 import org.apache.jena.query.Query.*
+import org.apache.jena.query.QueryExecutionFactory
+import org.apache.jena.query.QueryFactory
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.RDFNode
@@ -9,11 +11,10 @@ import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
 import org.apache.jena.system.Txn
 
-
 class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
     private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)
 
-    fun list(subject: String?, predicate: String?): Model =
+    fun list(subject: String?, predicate: String? = null): Model =
             read {
                 listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
                         .toModel()
@@ -23,7 +24,7 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
         write { add(delta) }
     }
 
-    fun remove(subject: String?, predicate: String?) {
+    fun remove(subject: String?, predicate: String? = null) {
         write {
             removeAll(subject?.let(::createResource), predicate?.let(::createProperty), null)
         }

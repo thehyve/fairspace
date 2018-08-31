@@ -9,6 +9,7 @@ image:
   repository: ceres
   tag: dev
   pullPolicy: IfNotPresent
+
 service:
   name: ceres
   type: ClusterIP
@@ -17,12 +18,25 @@ service:
   annotations:
     fabric8.io/expose: "true"
     fabric8.io/ingress.annotations: "kubernetes.io/ingress.class: nginx"
+
 resources:
   limits:
     cpu: 500m
     memory: 256Mi
   requests:
     cpu: 100m
+
+probePath: /actuator/health
+livenessProbe:
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+readinessProbe:
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+terminationGracePeriodSeconds: 10
 
 ## Persist data to a persistent volume
 persistence:
@@ -45,10 +59,11 @@ persistence:
   size: 512Mi
   subPath: "ceres-db"
   mountPath: /data/ceres
-ceres:
-  auth:
-    enabled: true
-    jwt:
-      issuer: http://192.168.99.100:32639
-      realm: fairspace
-      audience: fairspace
+
+app:
+  oauth2:
+    baseUrl: http://192.168.99.100:32639
+    realm: fairspace
+  tracing:
+    samplingRate: 0.1
+    zipkinUrl: http://jaeger-collector.jaeger:9411/

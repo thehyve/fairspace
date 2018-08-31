@@ -27,24 +27,28 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: ["-config=/opt/ceres/config/application.conf"]
           ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
+          - containerPort: {{ .Values.service.internalPort }}
           volumeMounts:
           - name: config-volume
-            mountPath: /opt/ceres/config
+            mountPath: /opt/config
           - name: data
             mountPath: /data/ceres
           livenessProbe:
             httpGet:
-              path: /
+              path: {{ .Values.probePath }}
               port: {{ .Values.service.internalPort }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
           readinessProbe:
             httpGet:
-              path: /
+              path: {{ .Values.probePath }}
               port: {{ .Values.service.internalPort }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
