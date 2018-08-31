@@ -2,6 +2,8 @@ package io.fairspace.ceres.config
 
 import io.fairspace.ceres.web.converters.JsonLdModelConverter
 import io.fairspace.ceres.web.converters.ResultSetConverter
+import org.apache.jena.query.ResultSet
+import org.apache.jena.rdf.model.Model
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter
@@ -24,10 +26,7 @@ class WebMvcConfiguration : WebMvcConfigurer {
 
             converters.add(object : MappingJackson2HttpMessageConverter() {
                 override fun canWrite(clazz: Class<*>, mediaType: MediaType?): Boolean {
-                    if (mediaType?.equals(JsonLdModelConverter.JSON_LD) == true)
-                        return false
-
-                    if (mediaType?.equals(ResultSetConverter.SPARQL_RESULTS) == true)
+                    if(Model::class.java.isAssignableFrom(clazz) || ResultSet::class.java.isAssignableFrom(clazz))
                         return false
 
                     return super.canWrite(clazz, mediaType)

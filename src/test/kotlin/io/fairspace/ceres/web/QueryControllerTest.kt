@@ -16,6 +16,7 @@ import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
@@ -38,6 +39,7 @@ class QueryControllerTest {
     fun setUp() {
         `when`(modelRepository.query("model")).thenReturn(TestData.model)
         `when`(modelRepository.query("sparql")).thenReturn(TestData.resultset)
+        `when`(modelRepository.query("boolean")).thenReturn(true)
     }
 
     @Test
@@ -62,7 +64,15 @@ class QueryControllerTest {
     }
 
     @Test
-    fun testGetOtherAcceptHeader() {
+    fun testGetBoolean() {
+        this.mockMvc
+                .perform(get("/query?query=boolean").accept("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"))
+    }
+
+    @Test
+    fun testGetOtherAcceptHeaderJsonLd() {
         this.mockMvc
                 .perform(get("/query?query=model"))
                 .andExpect(status().isNotAcceptable())
@@ -71,12 +81,19 @@ class QueryControllerTest {
                 .perform(get("/query?query=model").accept("application/json"))
                 .andExpect(status().isNotAcceptable())
 
-        // Sparql result does not serialize to JSON_LD or the other way around
+        this.mockMvc
+                .perform(get("/query?query=model").accept(SPARQL))
+                .andExpect(status().isNotAcceptable())
+    }
+
+    @Test
+    fun testGetOtherAcceptHeaderSparql() {
         this.mockMvc
                 .perform(get("/query?query=sparql").accept(JSON_LD))
                 .andExpect(status().isNotAcceptable())
+
         this.mockMvc
-                .perform(get("/query?query=model").accept(SPARQL))
+                .perform(get("/query?query=sparql").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable())
     }
 
@@ -99,6 +116,13 @@ class QueryControllerTest {
                 .perform(post("/query").accept(SPARQL).content("sparql"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(SPARQL))
+    }
+
+    @Test
+    fun testPostBoolean() {
+        this.mockMvc
+                .perform(post("/query").accept(MediaType.APPLICATION_JSON).content("boolean"))
+                .andExpect(status().isOk())
     }
 
     @Test
