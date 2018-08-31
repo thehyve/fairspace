@@ -122,19 +122,13 @@ ceres:
       size: 512Mi
       subPath: "ceres-db"
       mountPath: /data/ceres
-    ceres:
-      auth:
-        enabled: true
-        jwt:
-          issuer: 
-          realm: 
-          audience: 
+    app:
+      oauth2:
+        baseUrl:
+        realm:
 
 # Specific settings for Neptune subchart
 neptune:
-    ceres:
-      model: default
-
     app:
       oauth2:
         baseUrl: 

@@ -16,26 +16,31 @@ pluto:
   keycloak:
     baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
     realm: ci
+  tracing:
+    samplingRate: 1
 
 titan:
   auth:
     jwksUrl: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/certs
+  tracing:
+    samplingRate: 1
 
 # Specific settings for Ceres subchart
 ceres:
-    ceres:
-      auth:
-        enabled: true
-        jwt:
-          issuer: https://keycloak.hyperspace.ci.test.fairdev.app
-          realm: ci
-          audience: 
+  app:
+    oauth2:
+      baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
+      realm: ci
+    tracing:
+      samplingRate: 1
 
 # Specific settings for Neptune subchart
 neptune:
-    app:
-      oauth2:
-        baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
-        realm: ci
-      metadata:
-        baseUrl: https://workspace.ci.test.fairdev.app
+  app:
+    oauth2:
+      baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
+      realm: ci
+    tracing:
+      samplingRate: 1
+    metadata:
+      baseUrl: https://workspace.ci.test.fairdev.app
