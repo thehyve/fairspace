@@ -11,26 +11,26 @@ import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
 import org.apache.jena.system.Txn
 
-open class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
+class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
     private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)
 
-    open fun list(subject: String?, predicate: String? = null): Model =
+    fun list(subject: String?, predicate: String? = null): Model =
             read {
                 listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
                         .toModel()
             }
 
-    open fun add(delta: Model) {
+    fun add(delta: Model) {
         write { add(delta) }
     }
 
-    open fun remove(subject: String?, predicate: String? = null) {
+    fun remove(subject: String?, predicate: String? = null) {
         write {
             removeAll(subject?.let(::createResource), predicate?.let(::createProperty), null)
         }
     }
 
-    open fun query(queryString: String): Any = // ResultSet | Model | Boolean
+    fun query(queryString: String): Any = // ResultSet | Model | Boolean
             read {
                 QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
                     when (query.queryType) {
@@ -43,7 +43,7 @@ open class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
                 }
             }
 
-    open fun update(delta: Model) {
+    fun update(delta: Model) {
         write {
             delta.listStatements().forEach { stmt ->
                 if (!containsResource(stmt.subject)) {
