@@ -99,7 +99,7 @@ class CollectionBrowser extends React.Component {
             .then(this.requireRefresh.bind(this))
             .catch(err => {
                 const errorMessage = "An error occurred while creating a collection";
-                this.setState({error: true, loading: false});
+                this.setState({loading: false});
                 ErrorDialog.showError(err, errorMessage, this.handleAddCollectionClick.bind(this));
             });
     }
@@ -152,7 +152,6 @@ class CollectionBrowser extends React.Component {
                 .upload(this.state.openedPath, files)
                 .catch(err => {
                     const errorMessage = "An error occurred while uploading files";
-                    this.setState({error: true});
                     ErrorDialog.showError(err, errorMessage, this.handleUpload.bind(this));
                 });
         }

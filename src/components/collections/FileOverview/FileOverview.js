@@ -37,7 +37,7 @@ class FileOverview extends React.Component {
                 }
             })
             .catch(err => {
-                console.error("Error loading files.");
+                console.error("Error loading files.", err);
                 this.setState({error: true, loading: false});
             })
     }

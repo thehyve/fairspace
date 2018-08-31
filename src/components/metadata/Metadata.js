@@ -46,7 +46,7 @@ class Metadata extends React.Component {
             });
         }).catch(e => {
             if(this.willUnmount) return;
-            console.error("Error while loading metadata");
+            console.error("Error while loading metadata", e);
             this.setState({error: true, loading: false});
         })
     }

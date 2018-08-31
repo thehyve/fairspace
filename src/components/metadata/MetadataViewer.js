@@ -41,7 +41,7 @@ class MetadataViewer extends React.Component {
     renderProperty(p) {
         const items = p.values.map(MetadataViewer.renderValue.bind(this));
         return (
-            <ListItem key={p.label}>
+            <ListItem>
                 <div>
                     <b>{p.label}:</b>
                     <List dense={true}>{items}</List>
