@@ -1,10 +1,9 @@
 import Config from "../../components/generic/Config/Config";
 import vocabulary from './vocabulary'
-import ErrorDialog from "../../components/error/ErrorDialog";
 
 function failOnHttpError(response, message) {
     if(!response.ok) {
-        ErrorDialog.showError(response.error, message);
+        throw Error(message, response.error);
     }
 }
 

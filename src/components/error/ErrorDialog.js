@@ -34,7 +34,6 @@ class ErrorDialog extends React.Component {
 
     static showError(error, message, onRetry = null) {
         console.error(message, error);
-        console.log(onRetry);
         if (ErrorDialog.instance) {
             ErrorDialog.instance.setState({error: true, errorBody: error, message: message, onRetry: onRetry})
         }
@@ -56,7 +55,6 @@ class ErrorDialog extends React.Component {
 
     render() {
         let dialog = (
-            <div>
                 <Dialog
                     open={this.state.error}
                     TransitionComponent={Transition}
@@ -91,7 +89,6 @@ class ErrorDialog extends React.Component {
                         }
                     </DialogActions>
                 </Dialog>
-            </div>
         );
         return this.props.children.concat([dialog]);
     }

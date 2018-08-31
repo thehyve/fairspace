@@ -1,9 +1,8 @@
 import Config from "../../components/generic/Config/Config";
-import ErrorDialog from "../../components/error/ErrorDialog";
 
-function failOnHttpError(response, message, onRetry) {
+function failOnHttpError(response, message) {
     if(!response.ok) {
-        ErrorDialog.showError(response.error, message, onRetry);
+        throw Error(message, response.error);
     }
 }
 
@@ -40,7 +39,7 @@ class CollectionStore {
             credentials: 'same-origin',
             body: JSON.stringify({ metadata: {name: name, description: description} })
         }).then(response => {
-            failOnHttpError(response, "Failure while saving collection", () => this.addCollection(name, description));
+            failOnHttpError(response, "Failure while saving collection");
             return response;
         })
     }

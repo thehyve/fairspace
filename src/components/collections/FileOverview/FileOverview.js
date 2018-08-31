@@ -1,6 +1,7 @@
 import React from 'react';
 import FileList from "../FileList/FileList";
-import ErrorDialog from "../../error/ErrorDialog";
+import ErrorMessage from "../../error/ErrorMessage";
+
 
 class FileOverview extends React.Component {
     constructor(props) {
@@ -16,7 +17,6 @@ class FileOverview extends React.Component {
         this.state = {
             loading: false,
             error: false,
-            errorMessage: null,
             path: path,
             contents: [],
             selectedPath: props.selectedPath
@@ -37,9 +37,8 @@ class FileOverview extends React.Component {
                 }
             })
             .catch(err => {
-                const errorMessage =  "Error loading files.";
+                console.error("Error loading files.");
                 this.setState({error: true, loading: false});
-                ErrorDialog.showError(err, errorMessage);
             })
     }
 
@@ -74,7 +73,9 @@ class FileOverview extends React.Component {
 
     render() {
         if (this.state.error) {
-            return (<div>An error has occurred</div>)
+            return (<div>
+                        <ErrorMessage message="An error has occurred" />
+                    </div>)
         }
         else if(this.state.loading) {
             return (<div>Loading...</div>);

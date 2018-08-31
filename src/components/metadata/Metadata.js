@@ -1,6 +1,6 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
-import ErrorDialog from "../error/ErrorDialog";
+import ErrorMessage from "../error/ErrorMessage";
 
 class Metadata extends React.Component {
     constructor(props) {
@@ -23,9 +23,8 @@ class Metadata extends React.Component {
 
     loadData() {
         if(!this.subject) {
-            const errorMessage =  "No subject given to retrieve metadata for";
+            console.warn("No subject given to retrieve metadata for");
             this.setState({error: true});
-            ErrorDialog.showError("No subject provided", errorMessage);
             return;
         }
 
@@ -40,9 +39,8 @@ class Metadata extends React.Component {
             this.setState({loading: false, vocabulary: vocabulary, metadata: metadata})
         }).catch(e => {
             if(this.willUnmount) return;
-            const errorMessage = "Error while loading metadata";
-            this.setState({error: true});
-            ErrorDialog.showError(e, errorMessage);
+            console.error("Error while loading metadata");
+            this.setState({error: true, loading: false});
         })
     }
 
@@ -57,7 +55,7 @@ class Metadata extends React.Component {
 
     render() {
         if(this.state.error) {
-            return (<div>An error has occured</div>)
+            return (<div><ErrorMessage message="An error has occurred" /></div>)
         } else if(this.state.loading) {
             return (<div>Loading...</div>)
         } else {

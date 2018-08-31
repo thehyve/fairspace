@@ -14,6 +14,8 @@ import Icon from "@material-ui/core/Icon";
 import {Column, Row} from 'simple-flexbox';
 import UploadButton from "../UploadButton/UploadButton";
 import ErrorDialog from "../../error/ErrorDialog";
+import ErrorMessage from "../../error/ErrorMessage";
+
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -42,7 +44,7 @@ class CollectionBrowser extends React.Component {
 
     componentDidMount() {
         // Check whether a collection has been selected before
-        if(this.props.collection) {
+        if (this.props.collection) {
             this.openCollectionAndPath(this.props.collection, this.props.path);
         }
     }
@@ -55,7 +57,7 @@ class CollectionBrowser extends React.Component {
         // Check whether a collection has been selected before
         // If so, find the proper collection information (e.g. metadata) from the list of
         // collections
-        if(nextProps.collection) {
+        if (nextProps.collection) {
             this.openCollectionAndPath(nextProps.collection, nextProps.path);
         } else {
             this.closeCollections();
@@ -63,7 +65,7 @@ class CollectionBrowser extends React.Component {
     }
 
     openCollectionAndPath(selectedCollectionId, selectedPath) {
-        if(selectedCollectionId) {
+        if (selectedCollectionId) {
             // Retrieve collection details
             this.collectionStore
                 .getCollection(selectedCollectionId)
@@ -76,8 +78,7 @@ class CollectionBrowser extends React.Component {
                     });
                 })
                 .catch(e => {
-                    this.setState({error: true});
-                    ErrorDialog.showError(e, "An error occurred while retrieving collections");
+                    this.setState({error: true, loading: false});
                 });
         } else {
             this.setState({error: false, openedCollection: null, openedPath: selectedPath});
@@ -97,8 +98,8 @@ class CollectionBrowser extends React.Component {
             .addCollection(name, description)
             .then(this.requireRefresh.bind(this))
             .catch(err => {
-                const errorMessage =  "An error occurred while creating a collection";
-                this.setState({error: true});
+                const errorMessage = "An error occurred while creating a collection";
+                this.setState({error: true, loading: false});
                 ErrorDialog.showError(err, errorMessage, this.handleAddCollectionClick.bind(this));
             });
     }
@@ -109,7 +110,7 @@ class CollectionBrowser extends React.Component {
 
     handleCollectionClick(collection) {
         // If this collection is already selected, deselect
-        if(this.state.selectedCollection && this.state.selectedCollection.id === collection.id) {
+        if (this.state.selectedCollection && this.state.selectedCollection.id === collection.id) {
             this.deselectCollection();
         } else {
             this.selectCollection(collection);
@@ -122,7 +123,7 @@ class CollectionBrowser extends React.Component {
 
     handlePathClick(path) {
         // If this pathis already selected, deselect
-        if(this.state.selectedPath && this.state.selectedPath.filename === path.filename) {
+        if (this.state.selectedPath && this.state.selectedPath.filename === path.filename) {
             this.deselectPath();
         } else {
             this.selectPath(path);
@@ -130,7 +131,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handlePathDoubleClick(path) {
-        if(path.type === 'directory') {
+        if (path.type === 'directory') {
             this.openDir(path.basename);
         } else {
             this.downloadFile(path.basename);
@@ -146,11 +147,11 @@ class CollectionBrowser extends React.Component {
     }
 
     handleUpload(files) {
-        if(files && files.length > 0) {
+        if (files && files.length > 0) {
             this.fileStore
                 .upload(this.state.openedPath, files)
                 .catch(err => {
-                    const errorMessage =  "An error occurred while uploading files";
+                    const errorMessage = "An error occurred while uploading files";
                     this.setState({error: true});
                     ErrorDialog.showError(err, errorMessage, this.handleUpload.bind(this));
                 });
@@ -214,10 +215,10 @@ class CollectionBrowser extends React.Component {
 
     // Parse path into array
     parsePath(path) {
-        if(!path)
+        if (!path)
             return [];
 
-        if(path[0] === '/')
+        if (path[0] === '/')
             path = path.slice(1);
 
         return path ? path.split('/') : [];
@@ -284,14 +285,14 @@ class CollectionBrowser extends React.Component {
     renderBreadCrumbs(selectedCollection, selectedPath) {
         let pathSegments = [];
         const toBreadcrumb = segment => ({segment: segment, label: segment})
-        if(selectedCollection) {
+        if (selectedCollection) {
             pathSegments.push({segment: selectedCollection.id, label: selectedCollection.metadata.name});
             pathSegments.push(...this.parsePath(selectedPath).map(toBreadcrumb));
         }
 
         return (<BreadCrumbs
             homeUrl={this.baseUrl}
-            segments={pathSegments} />)
+            segments={pathSegments}/>)
     }
 
     renderButtons(selectedCollection, selectedPath) {
@@ -299,7 +300,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderAddButton(selectedCollection) {
-        if(selectedCollection) {
+        if (selectedCollection) {
             return (<UploadButton
                 variant="fab"
                 mini
@@ -310,14 +311,17 @@ class CollectionBrowser extends React.Component {
                 <Icon>cloud_upload</Icon>
             </UploadButton>)
         } else {
-            return (<Button variant="fab" mini color="secondary" aria-label="Add" onClick={this.handleAddCollectionClick.bind(this)}>
-                    <Icon>add</Icon>
-                </Button>)
+            return (<Button variant="fab" mini color="secondary" aria-label="Add"
+                            onClick={this.handleAddCollectionClick.bind(this)}>
+                <Icon>add</Icon>
+            </Button>)
         }
     }
 
     renderError() {
-        return (<Typography variant="body2" paragraph={true} noWrap>An error occurred</Typography>);
+        return (<Typography variant="body2" paragraph={true} noWrap>
+                    <ErrorMessage message="An error has occurred" />
+                </Typography>);
     }
 
     renderLoading() {
@@ -342,12 +346,12 @@ class CollectionBrowser extends React.Component {
     renderCollectionList() {
         return (
             <CollectionOverview
-                            collectionStore={this.collectionStore}
-                            selectedCollection={this.state.selectedCollection}
-                            refreshCollections={this.state.refreshRequired}
-                            onCollectionsDidLoad={this.handleDidLoad.bind(this)}
-                            onCollectionClick={this.handleCollectionClick.bind(this)}
-                            onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
+                collectionStore={this.collectionStore}
+                selectedCollection={this.state.selectedCollection}
+                refreshCollections={this.state.refreshRequired}
+                onCollectionsDidLoad={this.handleDidLoad.bind(this)}
+                onCollectionClick={this.handleCollectionClick.bind(this)}
+                onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
             />);
     }
 }
