@@ -21,7 +21,7 @@ it('shows result when subject provided', () => {
         wrapper.update();
     }).then(() => {
         const result = wrapper.find("li");
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(6);
     });
 });
 
