@@ -29,12 +29,10 @@ public class Collection {
 
     private String location;
 
-    private String owner;
-
     @Transient
     private CollectionMetadata metadata;
 
     public Collection withMetadata(CollectionMetadata metadata) {
-        return new Collection(id, type, location, owner, metadata);
+        return new Collection(id, type, location, metadata);
     }
 }

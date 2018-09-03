@@ -3,6 +3,7 @@ package io.fairspace.neptune.web;
 import io.fairspace.neptune.model.Authorization;
 import io.fairspace.neptune.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
@@ -28,7 +29,7 @@ public class AuthorizationController {
 
 
     @PutMapping("/authorizations")
-    public Authorization addPermission(@RequestBody Authorization authorization) {
-        return authorizationService.add(authorization);
+    public Authorization addPermission(@RequestBody Authorization authorization, Authentication user) {
+        return authorizationService.add(authorization, user);
     }
 }

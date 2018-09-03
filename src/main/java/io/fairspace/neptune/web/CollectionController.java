@@ -5,6 +5,8 @@ import io.fairspace.neptune.service.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -38,8 +41,8 @@ public class CollectionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCollection(@RequestBody Collection collection) throws URISyntaxException, IOException {
-        Collection addedCollection = collectionService.add(collection);
+    public ResponseEntity<?> createCollection(@RequestBody Collection collection, Principal principal) throws URISyntaxException, IOException {
+        Collection addedCollection = collectionService.add(collection, principal.getName());
 
         // Determine the URI for this collection
         URI uri = null;
@@ -52,13 +55,13 @@ public class CollectionController {
     }
 
     @PatchMapping("/{id}")
-    public void patchCollection(@PathVariable Long id, @RequestBody Collection patchedCollection) {
-        collectionService.update(id, patchedCollection);
+    public void patchCollection(@PathVariable Long id, @RequestBody Collection patchedCollection, Authentication user) {
+        collectionService.update(id, patchedCollection, user);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCollection(@PathVariable Long id) {
-        collectionService.deleteById(id);
+    public void deleteCollection(@PathVariable Long id, Authentication principal) {
+        collectionService.deleteById(id, principal);
     }
 
 

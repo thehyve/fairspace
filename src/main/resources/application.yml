@@ -3,6 +3,7 @@ app:
   oauth2:
     base-url: http://localhost:9080
     realm: keycloak
+    superuser-authority: workspace-admin
   metadata:
     base-url: http://fairspace.com
 

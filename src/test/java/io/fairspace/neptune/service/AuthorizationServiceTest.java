@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.core.Authentication;
 
 
 import java.util.Optional;
@@ -27,6 +28,15 @@ public class AuthorizationServiceTest {
     @Mock
     private CollectionRepository collectionRepository;
 
+    @Mock
+    private Authentication user1;
+
+    @Mock
+    private Authentication user2;
+
+    @Mock
+    private Authentication superuser;
+
     @Before
     public void setUp() {
         authorizationService = new AuthorizationService(authorizationRepository, collectionRepository);
@@ -39,7 +49,7 @@ public class AuthorizationServiceTest {
         when(collectionRepository.findById(0L))
                 .thenReturn(Optional.empty());
         when(collectionRepository.findById(1L))
-                .thenReturn(Optional.of(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "location", "user1", null)));
+                .thenReturn(Optional.of(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "location",  null)));
     }
 
     @Test(expected = CollectionNotFoundException.class)
@@ -49,7 +59,7 @@ public class AuthorizationServiceTest {
 
     @Test(expected = CollectionNotFoundException.class)
     public void testAddingPermissionsForUnknownCollection() {
-        authorizationService.add(new Authorization(null, "user1", 0L, Permission.Write));
+        authorizationService.add(new Authorization(null, "user1", 0L, Permission.Write), superuser);
     }
 
     @Test
@@ -66,13 +76,13 @@ public class AuthorizationServiceTest {
 
     @Test
     public void testAddingPermissionsForKnownCollection() {
-        authorizationService.add(new Authorization(null, "user1", 1L, Permission.Write));
+        authorizationService.add(new Authorization(null, "user1", 1L, Permission.Write), superuser);
         verify(authorizationRepository).save(any());
     }
 
     @Test
     public void testSettingNoneAccess() {
-        authorizationService.add(new Authorization(null, "user1", 1L, Permission.None));
+        authorizationService.add(new Authorization(null, "user1", 1L, Permission.None), superuser);
         verify(authorizationRepository).delete(any());
     }
 

@@ -8,6 +8,7 @@ import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class CollectionService {
 
     }
 
-    public Collection add(Collection collection) throws IOException {
+    public Collection add(Collection collection, String creator) throws IOException {
         if(collection.getMetadata() == null) {
             throw new InvalidCollectionException();
         }
@@ -81,13 +82,13 @@ public class CollectionService {
 
         // Update location based on given id
         Long id = savedCollection.getId();
-        Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), savedCollection.getOwner(), null));
+        Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
 
         Authorization authorization = new Authorization();
         authorization.setCollectionId(finalCollection.getId());
-        authorization.setUser(collection.getOwner());
+        authorization.setUser(creator);
         authorization.setPermission(Permission.Manage);
-        authorizationService.add(authorization);
+        authorizationService.add(authorization, null);
 
         // Update metadata. Ensure that the correct uri is specified
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), collection.getMetadata().getName(), collection.getMetadata().getDescription());
@@ -99,10 +100,12 @@ public class CollectionService {
         return finalCollection.withMetadata(metadataToSave);
     }
 
-    public Collection update(Long id, Collection patch) {
+    public Collection update(Long id, Collection patch, Authentication user) {
         if(patch.getMetadata() == null) {
             throw new InvalidCollectionException();
         }
+
+        authorizationService.checkPermission(Permission.Write, user, id);
 
         // Updating is currently only possible on the metadata
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), patch.getMetadata().getName(), patch.getMetadata().getDescription());
@@ -110,8 +113,10 @@ public class CollectionService {
         return patch;
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(Long id, Authentication user) {
         Optional<Collection> collection = repository.findById(id);
+
+        authorizationService.checkPermission(Permission.Manage, user, id);
 
         collection.map(foundCollection -> {
             // Remove contents of the collection as well
@@ -125,4 +130,5 @@ public class CollectionService {
             return foundCollection;
         }).orElseThrow(CollectionNotFoundException::new);
     }
+
 }

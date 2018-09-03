@@ -7,6 +7,10 @@ import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.repository.AuthorizationRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +20,8 @@ public class AuthorizationService {
     private final AuthorizationRepository authorizationRepository;
     private final CollectionRepository collectionRepository;
 
+    @Value("app.oauth2.superuser-authority")
+    private String superuserAuthority;
 
     @Autowired
     public AuthorizationService(AuthorizationRepository authorizationRepository, CollectionRepository collectionRepository) {
@@ -40,8 +46,12 @@ public class AuthorizationService {
                 .orElseGet(() -> new Authorization(null, user, collectionId, Permission.None));
     }
 
-    public Authorization add(Authorization authorization) {
+    public Authorization add(Authorization authorization, Authentication user) {
         Collection collection = collectionRepository.findById(authorization.getCollectionId()).orElseThrow(CollectionNotFoundException::new);
+
+        if (user != null) {
+            checkPermission(Permission.Manage, user, authorization.getCollectionId());
+        }
 
         return authorizationRepository.findByUserAndCollectionId(authorization.getUser(), collection)
                 .map(existing -> {
@@ -59,4 +69,14 @@ public class AuthorizationService {
                     return authorizationRepository.save(authorization);
                 });
     }
+
+    void checkPermission(Permission required, Authentication user, Long collectionId) {
+        if (user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(superuserAuthority))) {
+            return;
+        }
+        Permission permission = findByUserAndCollectionId(user.getName(), collectionId).getPermission();
+        if (permission.compareTo(required) < 0) {
+            throw new AccessDeniedException("Insufficient permissions");
+        }
+   }
 }

@@ -41,7 +41,7 @@ public class CollectionServiceTest {
     private CollectionMetadataService collectionMetadataService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         service = new CollectionService(collectionRepository, authorizationService, storageService, collectionMetadataService);
         when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
@@ -49,8 +49,8 @@ public class CollectionServiceTest {
     @Test
     public void testFindAll() {
         List<Collection> collections = new ArrayList<>();
-        collections.add(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null));
-        collections.add(new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", "user", null));
+        collections.add(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null));
+        collections.add(new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", null));
         when(collectionRepository.findAll()).thenReturn(collections);
 
         List<CollectionMetadata> metadata = new ArrayList<>();
@@ -73,7 +73,7 @@ public class CollectionServiceTest {
     @Test
     public void testFindById() {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         CollectionMetadata metadata = new CollectionMetadata(getUri(1L), "My quotes", "quote item");
@@ -99,7 +99,7 @@ public class CollectionServiceTest {
     @Test
     public void testFindByIdWithoutMetadata() {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.empty());
@@ -114,34 +114,34 @@ public class CollectionServiceTest {
     public void testAddCollection() throws IOException {
         Long id = 1L;
         CollectionMetadata metadata = new CollectionMetadata("http://uri", "collection", "description");
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", metadata);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
 
         when(collectionRepository.save(any())).thenReturn(collection);
 
-        service.add(collection);
+        service.add(collection, "user");
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
-        verify(authorizationService).add(any());
+        verify(authorizationService).add(any(), eq(null));
     }
 
     @Test(expected = InvalidCollectionException.class)
     public void testAddCollectionWithoutMetadata() throws IOException {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
 
-        service.add(collection);
+        service.add(collection, "user");
     }
 
     @Test
     public void testAddCollectionReturnsStoredIdAndUri() throws IOException {
         CollectionMetadata metadata = new CollectionMetadata("http://uri", "collection", "description");
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", metadata);
-        Collection storedCollection = new Collection(2L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", metadata);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
+        Collection storedCollection = new Collection(2L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
 
         when(collectionRepository.save(any())).thenReturn(storedCollection);
 
-        Collection added = service.add(collection);
+        Collection added = service.add(collection, "user");
 
         assertEquals(storedCollection.getId(), added.getId());
         verify(collectionMetadataService).createCollection(new CollectionMetadata("/fairspace/2", "collection", "description"));
@@ -150,10 +150,10 @@ public class CollectionServiceTest {
     @Test
     public void testDeleteCollection() throws IOException {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", "user", null);
+        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
-        service.deleteById(id);
+        service.deleteById(id, "user");
 
         verify(storageService).deleteCollection(collection);
     }
@@ -163,7 +163,7 @@ public class CollectionServiceTest {
         Long id = 1L;
         when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
-        service.deleteById(id);
+        service.deleteById(id, "user");
     }
 
     private <E> List<E> toList(Iterator<E> iterator) {
