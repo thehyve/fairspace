@@ -3,6 +3,7 @@ package io.fairspace.ceres.repository
 import io.fairspace.ceres.TestData
 import org.apache.jena.query.Dataset
 import org.apache.jena.query.DatasetFactory
+import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.reasoner.rulesys.GenericRuleReasoner
@@ -68,15 +69,14 @@ class ModelRepositoryTest {
         assertTrue(repo!!.list(TestData.personURI).contains(personResource, VCARD.FN, TestData.fullName))
 
         // Add a new name
-        val delta = ModelFactory.createDefaultModel().apply {
-            createResource(TestData.personURI)
-                    .addProperty(VCARD.FN, newName)
-        }
+        val delta = createFullNameModel(newName)
         repo!!.add(delta)
 
         // Ensure the fullname has been added, but that the previous one is still there
-        assertTrue(repo!!.list(TestData.personURI).contains(personResource, VCARD.FN, newName))
-        assertTrue(repo!!.list(TestData.personURI).contains(personResource, VCARD.FN, TestData.fullName))
+        val list = repo!!.list(TestData.personURI, VCARD.FN.toString())
+        assertEquals(2, list.size())
+        assertTrue(list.contains(personResource, VCARD.FN, newName))
+        assertTrue(list.contains(personResource, VCARD.FN, TestData.fullName))
     }
 
     @Test
@@ -92,18 +92,51 @@ class ModelRepositoryTest {
         val name = repo!!.list(TestData.personURI, VCARD.N.toString())
 
         // Update the persons name
+        val delta = createFullNameModel(newName)
+        repo!!.update(delta)
+
+        // Ensure the fullname has changed
+        val list = repo!!.list(TestData.personURI, VCARD.FN.toString())
+        assertEquals(1, list.size())
+        assertTrue(list.contains(personResource, VCARD.FN, newName))
+        assertFalse(list.contains(personResource, VCARD.FN, TestData.fullName))
+
+        // Ensure the name (first and last) have not changed
+        assertTrue(name.isIsomorphicWith(repo!!.list(TestData.personURI, VCARD.N.toString())))
+    }
+
+    @Test
+    fun `updating data also works if multiple values were present`() {
+        val personResource = TestData.model.createResource(TestData.personURI);
+        val newName = "William Shakespeare"
+        val finalName = "Leonardo da Vinci"
+
+        // Initialize with initial model
+        repo!!.add(TestData.model)
+
+        // Add an additional persons name
+        val delta = createFullNameModel(newName)
+        repo!!.add(delta)
+
+        val list = repo!!.list(TestData.personURI, VCARD.FN.toString())
+        assertEquals(2, list.size())
+
+        // Now update the value
+        val finalDelta = createFullNameModel(finalName)
+        repo!!.update(finalDelta)
+
+        // Ensure the fullname has changed
+        val finalList = repo!!.list(TestData.personURI, VCARD.FN.toString())
+        assertEquals(1, finalList.size())
+        assertTrue(finalList.contains(personResource, VCARD.FN, finalName))
+    }
+
+    private fun createFullNameModel(newName: String): Model {
         val delta = ModelFactory.createDefaultModel().apply {
             createResource(TestData.personURI)
                     .addProperty(VCARD.FN, newName)
         }
-        repo!!.update(delta)
-
-        // Ensure the fullname has changed
-        assertTrue(repo!!.list(TestData.personURI).contains(personResource, VCARD.FN, newName))
-        assertFalse(repo!!.list(TestData.personURI).contains(personResource, VCARD.FN, TestData.fullName))
-
-        // Ensure the name (first and last) have not changed
-        assertTrue(name.isIsomorphicWith(repo!!.list(TestData.personURI, VCARD.N.toString())))
+        return delta
     }
 
 }
