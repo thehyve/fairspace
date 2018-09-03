@@ -62,7 +62,7 @@ class Metadata extends React.Component {
 
     render() {
         if(this.state.error) {
-            return (<div><ErrorMessage message="An error has occurred" /></div>)
+            return (<div><ErrorMessage message="An error occurred while loading metadata" /></div>)
         } else if(this.state.loading) {
             return (<div>Loading...</div>)
         } else if (this.state.properties.length === 0) {

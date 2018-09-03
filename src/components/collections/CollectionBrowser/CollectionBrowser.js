@@ -227,6 +227,10 @@ class CollectionBrowser extends React.Component {
         const {openedCollection, openedPath, infoDrawerOpened, selectedCollection, selectedPath} = this.state;
         const {classes} = this.props;
 
+        if (this.state.error) {
+            return this.renderError(this.state.error);
+        }
+
         // The screen consists of 3 parts:
         // - a list of breadcrumbs
         // - an overview of items (mainPanel)
@@ -238,8 +242,6 @@ class CollectionBrowser extends React.Component {
         let mainPanel;
         if (this.state.loading) {
             mainPanel = this.renderLoading()
-        } else if (this.state.error) {
-            mainPanel = this.renderError()
         } else if (openedCollection) {
             mainPanel = this.renderCollection(openedCollection)
         } else {
@@ -317,10 +319,8 @@ class CollectionBrowser extends React.Component {
         }
     }
 
-    renderError() {
-        return (<Typography variant="body2" paragraph={true} noWrap>
-                    <ErrorMessage message="An error has occurred" />
-                </Typography>);
+    renderError(errorMessage) {
+        return (<ErrorMessage message={errorMessage} />);
     }
 
     renderLoading() {

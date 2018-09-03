@@ -5,24 +5,13 @@ import Typography from "@material-ui/core/Typography";
 /**
  * This component is displayed when an error has occurred.
  */
-class ErrorMessage extends React.Component {
-    static  instance;
-
-    constructor(props) {
-        super(props);
-        this.props = props;
-        this.message = props.message;
-    }
-
-
-    render() {
-        return (<div>
-            <Typography variant="subheading" color="error" align="justify" noWrap>
-            <Icon>report_problem</Icon>
-            <b>{this.message}</b>
-            </Typography>
-        </div>);
-    }
+function ErrorMessage(props) {
+    return (<div style={{textAlign: 'center', margin: 10}}>
+        <Icon style={{fontSize: '4em', marginBottom: 10}}>error_outline</Icon>
+        <Typography noWrap>
+            <span>{props.message || 'An error occurred'}</span>
+        </Typography>
+    </div>);
 }
 
 export default ErrorMessage;

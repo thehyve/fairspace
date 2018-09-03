@@ -19,8 +19,6 @@ app.delete('/api/collections/:id', (req, res) => res.send());
 
 // Metadata API
 app.get('/api/metadata/statements', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));
-//app.get('/api/metadata/static/vocabulary.jsonld', (req, res) => res.sendFile(__dirname + '/vocabulary.jsonld'));
-
 
 // Add webdav server on /files
 const server = new webdav.WebDAVServer();

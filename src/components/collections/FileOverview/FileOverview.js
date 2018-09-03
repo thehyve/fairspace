@@ -73,9 +73,7 @@ class FileOverview extends React.Component {
 
     render() {
         if (this.state.error) {
-            return (<div>
-                        <ErrorMessage message="An error has occurred" />
-                    </div>)
+            return (<ErrorMessage message="An error occurred while loading directory. Please reload to retry." />)
         }
         else if(this.state.loading) {
             return (<div>Loading...</div>);

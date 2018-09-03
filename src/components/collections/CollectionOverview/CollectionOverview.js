@@ -88,7 +88,7 @@ class CollectionOverview extends React.Component {
 
     render() {
         if (this.state.error) {
-            return (<ErrorMessage message="An error has occurred" />)
+            return (<ErrorMessage message="An error occurred while loading collections. Please reload to retry" />)
         }
         else if(this.state.loading) {
             return (<div>Loading...</div>);
