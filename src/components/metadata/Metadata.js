@@ -1,5 +1,6 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
+import ErrorMessage from "../error/ErrorMessage";
 import combine from "./MetadataUtils";
 import Typography from "@material-ui/core/Typography";
 
@@ -12,6 +13,7 @@ class Metadata extends React.Component {
         this.state = {
             loading: false,
             error: false,
+            errorMessage: null,
             properties: {}
         };
     }
@@ -47,7 +49,7 @@ class Metadata extends React.Component {
             if (this.willUnmount) return;
 
             console.error("Error while loading metadata", e);
-            this.setState({error: true});
+            this.setState({error: true, loading: false});
         })
     }
 
@@ -62,7 +64,7 @@ class Metadata extends React.Component {
 
     renderBody() {
         if (this.state.error) {
-            return (<div>Error loading metadata</div>)
+            return (<ErrorMessage message="An error occurred while loading metadata"/>)
         } else if (this.state.loading) {
             return (<div>Loading...</div>)
         } else if (this.state.properties.length === 0) {
