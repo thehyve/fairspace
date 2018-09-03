@@ -28,5 +28,6 @@ public class Authorization {
     Long collectionId;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     Permission permission;
 }

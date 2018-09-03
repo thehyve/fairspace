@@ -1,7 +1,9 @@
 package io.fairspace.neptune.service;
 
+import io.fairspace.neptune.model.Authorization;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.CollectionMetadata;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
@@ -17,11 +19,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,6 +47,12 @@ public class CollectionServiceTest {
     @Before
     public void setUp() {
         service = new CollectionService(collectionRepository, authorizationService, storageService, collectionMetadataService);
+
+        when(authorizationService.findByUser(eq("user1")))
+                .thenReturn(asList(
+                        new Authorization(1L, "user1", 1L, Permission.Manage),
+                        new Authorization(2L, "user1", 2L, Permission.Read)));
+
         when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
@@ -51,14 +61,14 @@ public class CollectionServiceTest {
         List<Collection> collections = new ArrayList<>();
         collections.add(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null));
         collections.add(new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", null));
-        when(collectionRepository.findAll()).thenReturn(collections);
+        when(collectionRepository.findAllById(asList(1L, 2L))).thenReturn(collections);
 
         List<CollectionMetadata> metadata = new ArrayList<>();
         metadata.add(new CollectionMetadata(getUri(1L), "My quotes", "quote item"));
         metadata.add(new CollectionMetadata(getUri(3L), "My dataset", "dataset"));
         when(collectionMetadataService.getCollections()).thenReturn(metadata);
 
-        List<Collection> mergedCollections = toList(service.findAll().iterator());
+        List<Collection> mergedCollections = toList(service.findAll("user1").iterator());
 
         // The first item should be merged
         assertTrue(mergedCollections.contains(collections.get(0).withMetadata(metadata.get(0))));
@@ -79,7 +89,7 @@ public class CollectionServiceTest {
         CollectionMetadata metadata = new CollectionMetadata(getUri(1L), "My quotes", "quote item");
         when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.of(metadata));
 
-        Optional<Collection> mergedCollection = service.findById(id);
+        Optional<Collection> mergedCollection = service.findById(id, "user1");
 
         assertTrue(mergedCollection.isPresent());
         assertEquals(collection.withMetadata(metadata), mergedCollection.get());
@@ -90,7 +100,7 @@ public class CollectionServiceTest {
         Long id = 1L;
         when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
-        Optional<Collection> mergedCollection = service.findById(id);
+        Optional<Collection> mergedCollection = service.findById(id, "user1");
 
         assertTrue(!mergedCollection.isPresent());
         verify(collectionMetadataService, times(0)).getCollection(anyString());
@@ -104,7 +114,7 @@ public class CollectionServiceTest {
 
         when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.empty());
 
-        Optional<Collection> mergedCollection = service.findById(id);
+        Optional<Collection> mergedCollection = service.findById(id, "user1");
 
         assertTrue(mergedCollection.isPresent());
         assertEquals(collection, mergedCollection.get());
@@ -153,7 +163,7 @@ public class CollectionServiceTest {
         Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
-        service.deleteById(id, "user");
+        service.deleteById(id, "user1");
 
         verify(storageService).deleteCollection(collection);
     }
@@ -163,7 +173,7 @@ public class CollectionServiceTest {
         Long id = 1L;
         when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
-        service.deleteById(id, "user");
+        service.deleteById(id, "user1");
     }
 
     private <E> List<E> toList(Iterator<E> iterator) {

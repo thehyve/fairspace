@@ -1,8 +1,8 @@
 package io.fairspace.neptune.model;
 
 public enum Permission {
-    Manage,
-    Write,
+    None,
     Read,
-    None
+    Write,
+    Manage
 }

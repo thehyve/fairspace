@@ -1,14 +1,13 @@
 package io.fairspace.neptune.service;
 
-import io.fairspace.neptune.model.Permission;
+import io.fairspace.neptune.model.Authorization;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.CollectionMetadata;
-import io.fairspace.neptune.model.Authorization;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,8 +15,9 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Merges data from the collection repository and the metadatastore
@@ -37,8 +37,15 @@ public class CollectionService {
         this.collectionMetadataService = collectionMetadataService;
     }
 
-    public Iterable<Collection> findAll() {
-        Iterable<Collection> collections = repository.findAll();
+    public Iterable<Collection> findAll(String user) {
+        Iterable<Collection> collections =
+                repository.findAllById(
+                        authorizationService
+                                .findByUser(user)
+                                .stream()
+                                .map(Authorization::getCollectionId)
+                                .collect(toList()));
+
         List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
 
         // Merge collections with metadata
@@ -53,11 +60,13 @@ public class CollectionService {
                             .map(collection::withMetadata)
                             .orElse(collection);
                 })
-                .collect(Collectors.toList());
+                .collect(toList());
 
     }
 
-    public Optional<Collection> findById(Long id) {
+    public Optional<Collection> findById(Long id, String user) {
+        authorizationService.checkPermission(Permission.Read, user, id);
+
         // First retrieve collection itself
         Optional<Collection> optionalCollection = repository.findById(id);
 
@@ -74,7 +83,7 @@ public class CollectionService {
     }
 
     public Collection add(Collection collection, String creator) throws IOException {
-        if(collection.getMetadata() == null) {
+        if (collection.getMetadata() == null) {
             throw new InvalidCollectionException();
         }
 
@@ -100,8 +109,8 @@ public class CollectionService {
         return finalCollection.withMetadata(metadataToSave);
     }
 
-    public Collection update(Long id, Collection patch, Authentication user) {
-        if(patch.getMetadata() == null) {
+    public Collection update(Long id, Collection patch, String user) {
+        if (patch.getMetadata() == null) {
             throw new InvalidCollectionException();
         }
 
@@ -113,7 +122,7 @@ public class CollectionService {
         return patch;
     }
 
-    public void deleteById(Long id, Authentication user) {
+    public void deleteById(Long id, String user) {
         Optional<Collection> collection = repository.findById(id);
 
         authorizationService.checkPermission(Permission.Manage, user, id);
