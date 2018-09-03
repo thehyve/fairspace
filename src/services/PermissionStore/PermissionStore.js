@@ -20,20 +20,6 @@ class PermissionStore {
             .then(failOnHttpError('Error while loading collection permissions'))
             .then(response => response.json())
     }
-
-    /**
-     * Retrieves an access permission a user has to a specific collection.
-     * @param collectionId The id of the collection.
-     * @param user The user.
-     * @returns {Promise<'Manage' | 'Write' | 'Read' | 'None'>}
-     */
-    getUserPermission(collectionId, user) {
-        let url = format(Config.get().urls.collectionPermissions, collectionId) + '?user=' + user;
-        return fetch(url, PermissionStore.getConfig)
-            .then(failOnHttpError('Error while fetching user\'s permission'))
-            .then(response => response.json())
-            .then(json => json.permission)
-    }
 }
 
 export default new PermissionStore();
