@@ -1,0 +1,13 @@
+# Where to store the dataset
+jena:
+  dataset:
+    path: /tmp/data
+
+# Tracing configuration
+spring:
+  zipkin:
+    enabled: false
+
+server:
+  port: 8001
+
