@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@material-ui/core": "latest",
+    "ajv": "^6.5.3",
     "deepmerge": "^2.1.1",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
@@ -19,13 +20,12 @@
     "jsonld": "^1.0.4",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-dropzone": "^4.3.0",
+    "react-dropzone": "^5.0.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
     "react-split-pane": "^0.1.82",
     "react-table": "^6.8.6",
     "react-test-renderer": "^16.4.1",
-    "redux": "^4.0.0",
     "simple-flexbox": "^1.2.0",
     "webdav": "^1.5.3"
   },

@@ -8,10 +8,17 @@ function flushPromises() {
 
 let mockMetadataStore;
 
+let mockNoMetadataStore;
+
 beforeEach(() => {
     mockMetadataStore = {
         getVocabulary: jest.fn(() => Promise.resolve(vocabulary)),
         get: jest.fn(() => Promise.resolve(metadata))
+    };
+
+    mockNoMetadataStore = {
+        getVocabulary: jest.fn(() => Promise.resolve(vocabulary)),
+        get: jest.fn(() => Promise.resolve([]))
     }
 });
 
@@ -26,18 +33,18 @@ it('shows result when subject provided', () => {
 });
 
 it('shows error when no subject provided', () => {
-    const wrapper = mount(<Metadata subject={""} metadataStore={mockMetadataStore} />);
+    const wrapper = mount(<Metadata subject={""} metadataStore={mockNoMetadataStore} />);
     return flushPromises().then(() => {
         wrapper.update();
     }).then(() => {
         const result = wrapper.find("li");
         expect(result.length).toEqual(0);
-        expect(wrapper.text()).toEqual("Metadata:Error loading metadata");
+        expect(wrapper.text()).toEqual("Metadata:error_outlineAn error occurred while loading metadata");
     });
 });
 
 it('shows nothing when there is no metadata found', () => {
-    const wrapper = mount(<Metadata subject={"test"} metadataStore={mockMetadataStore}/>);
+    const wrapper = mount(<Metadata subject={"test"} metadataStore={mockNoMetadataStore}/>);
     return flushPromises().then(() => {
         wrapper.update();
     }).then(() => {
