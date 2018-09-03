@@ -1,10 +1,8 @@
-FROM openjdk:8-jdk-slim
-
-RUN apt-get update && apt-get install haveged -y
+FROM openjdk:10-jre-slim
 
 ENV PORT 8080
 EXPOSE 8080
 COPY build/libs/*.jar /opt/app.jar
 WORKDIR /opt
 
-CMD ["java", "-jar", "app.jar", "-Djava.security.egd=file:/dev/./urandom"]
+CMD ["java", "--add-modules", "java.se.ee", "-jar", "app.jar"]
