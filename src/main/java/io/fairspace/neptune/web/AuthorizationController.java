@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/")
@@ -13,14 +14,9 @@ public class AuthorizationController {
     @Autowired
     private AuthorizationService authorizationService;
 
-    @GetMapping("/{collectionId}/authorization")
-    public Object getCollectionPermission(@PathVariable Long collectionId, Principal principal) {
-        return authorizationService.getUserAuthorization(collectionId, principal.getName());
-    }
-
     @GetMapping("/{collectionId}/authorizations")
-    public Object getCollectionPermissions(@PathVariable Long collectionId, Principal principal) {
-        return authorizationService.getAllUsersAuthorizations(collectionId, principal.getName());
+    public List<Authorization> getCollectionPermissions(@PathVariable Long collectionId) {
+        return authorizationService.getAuthorizations(collectionId);
     }
 
     @PutMapping("/authorizations")

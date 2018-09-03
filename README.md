@@ -57,7 +57,6 @@ A creator of a collection automatically gets `Manage` permissions.
 | PATCH /<id> | Change name or description of collections' metadata |
 | DELETE /<id> | Delete a single collection |
 | GET /<id>/authorizations | Get a list of permissions for a specific collection |
-| GET /<id>/authorization | Get current user's permission for a specific collection |
 | GET /authorizations?user=<user> | Get a permission for a specific user |
 | PUT /authorizations | Adds or modifies a permission |
 

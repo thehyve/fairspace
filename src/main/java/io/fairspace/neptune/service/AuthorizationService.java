@@ -27,8 +27,7 @@ public class AuthorizationService {
         this.collectionRepository = collectionRepository;
     }
 
-    public List<Authorization> getAllUsersAuthorizations(Long collectionId, String user) {
-        checkPermission(Permission.Manage, user, collectionId);
+    public List<Authorization> getAuthorizations(Long collectionId) {
         Collection collection = collectionRepository.findById(collectionId).orElseThrow(CollectionNotFoundException::new);
         return authorizationRepository.findByCollectionId(collection);
     }
