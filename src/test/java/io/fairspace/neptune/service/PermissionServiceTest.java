@@ -48,7 +48,7 @@ public class PermissionServiceTest {
                 .thenReturn(Optional.of(collection1));
 
         when(permissionRepository.findBySubjectAndCollection("creator", collection1))
-                .thenReturn(Optional.of(new Permission(1L, "creator", collection1.getId(), Access.Manage)));
+                .thenReturn(Optional.of(new Permission(1L, "creator", collection1, Access.Manage)));
 
         when(permissionRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
     }
@@ -60,7 +60,7 @@ public class PermissionServiceTest {
 
     @Test(expected = CollectionNotFoundException.class)
     public void testAddingPermissionsForUnknownCollection() {
-        permissionService.authorize(new Permission(null, "user2", 0L, Access.Write), false);
+        permissionService.authorize(new Permission(null, "user2", new Collection() {{ setId(0L); }}, Access.Write), false);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class PermissionServiceTest {
     @Test
     public void testAddingPermissionsForKnownCollection() {
         as("creator", () -> {
-            permissionService.authorize(new Permission(null, "user2", 1L, Access.Write), true);
+            permissionService.authorize(new Permission(null, "user2", collection1, Access.Write), true);
             verify(permissionRepository).save(any());
         });
     }
@@ -85,7 +85,7 @@ public class PermissionServiceTest {
     @Test
     public void testSettingNoneAccess() {
         as("creator", () -> {
-            permissionService.authorize(new Permission(null, "creator", 1L, Access.None), false);
+            permissionService.authorize(new Permission(null, "creator", collection1, Access.None), false);
             verify(permissionRepository).delete(any());
         });
     }
@@ -93,7 +93,7 @@ public class PermissionServiceTest {
     @Test(expected = AccessDeniedException.class)
     public void testGrantingAccessWithoutPermission() {
         as("trespasser", () ->
-                permissionService.authorize(new Permission(null, "trespasser", 1L, Access.Manage), false));
+                permissionService.authorize(new Permission(null, "trespasser", collection1, Access.Manage), false));
     }
 
     private void as(String user, Runnable action) {

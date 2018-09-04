@@ -14,10 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -43,25 +40,24 @@ public class CollectionServiceTest {
     @Mock
     private CollectionMetadataService collectionMetadataService;
 
+    private List<Collection> collections = Arrays.asList(
+            new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null),
+            new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", null));
+
     @Before
     public void setUp() {
         service = new CollectionService(collectionRepository, permissionService, storageService, collectionMetadataService);
 
         when(permissionService.getAllBySubject())
                 .thenReturn(asList(
-                        new Permission(1L, "user1", 1L, Access.Manage),
-                        new Permission(2L, "user1", 2L, Access.Read)));
+                        new Permission(1L, "user1", collections.get(0), Access.Manage),
+                        new Permission(2L, "user1", collections.get(1), Access.Read)));
 
         when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
     @Test
     public void testFindAll() {
-        List<Collection> collections = new ArrayList<>();
-        collections.add(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null));
-        collections.add(new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", null));
-        when(collectionRepository.findAllById(asList(1L, 2L))).thenReturn(collections);
-
         List<CollectionMetadata> metadata = new ArrayList<>();
         metadata.add(new CollectionMetadata(getUri(1L), "My quotes", "quote item"));
         metadata.add(new CollectionMetadata(getUri(3L), "My dataset", "dataset"));

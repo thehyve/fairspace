@@ -42,17 +42,15 @@ public class PermissionService {
 
         String subject = getSubject();
         return permissionRepository.findBySubjectAndCollection(subject, collection)
-                .orElseGet(() -> new Permission(null, subject, collectionId, Access.None));
+                .orElseGet(() -> new Permission(null, subject, collection, Access.None));
     }
 
     public Permission authorize(Permission permission, boolean isNew) {
-        Collection collection = collectionRepository.findById(permission.getCollection()).orElseThrow(CollectionNotFoundException::new);
-
         if (!isNew) {
-            checkPermission(Access.Manage, permission.getCollection());
+            checkPermission(Access.Manage, permission.getCollection().getId());
         }
 
-        return permissionRepository.findBySubjectAndCollection(permission.getSubject(), collection)
+        return permissionRepository.findBySubjectAndCollection(permission.getSubject(), permission.getCollection())
                 .map(existing -> {
                     if (permission.getAccess() == Access.None) {
                         permissionRepository.delete(existing);

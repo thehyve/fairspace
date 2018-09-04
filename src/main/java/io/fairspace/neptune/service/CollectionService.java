@@ -38,18 +38,17 @@ public class CollectionService {
     }
 
     public Iterable<Collection> findAll() {
-        Iterable<Collection> collections =
-                repository.findAllById(
-                        permissionService
-                                .getAllBySubject()
-                                .stream()
-                                .map(Permission::getCollection)
-                                .collect(toList()));
+        List<Collection> collections =
+                permissionService
+                        .getAllBySubject()
+                        .stream()
+                        .map(Permission::getCollection)
+                        .collect(toList());
 
         List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
 
         // Merge collections with metadata
-        return StreamSupport.stream(collections.spliterator(), false)
+        return collections.stream()
                 .map(collection -> {
                     String uri = collectionMetadataService.getUri(collection.getId());
 
@@ -94,7 +93,7 @@ public class CollectionService {
         Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
 
         Permission permission = new Permission();
-        permission.setCollection(finalCollection.getId());
+        permission.setCollection(finalCollection);
         permission.setSubject(permissionService.getSubject());
         permission.setAccess(Access.Manage);
         permissionService.authorize(permission, true);
