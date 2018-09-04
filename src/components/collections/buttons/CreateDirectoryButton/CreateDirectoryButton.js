@@ -26,6 +26,9 @@ class CreateDirectoryButton extends React.Component{
     }
 
     componentWillReceiveProps(props) {
+        if(props.onCreate)
+            this.onCreate = props.onCreate;
+
         this.setState({
             creating: false
         });

@@ -135,7 +135,6 @@ class FileStore {
      * @param paths
      */
     joinPaths(...paths) {
-        console.log(paths.join(FileStore.PATH_SEPARATOR));
         return paths.join(FileStore.PATH_SEPARATOR);
     }
 

@@ -7,19 +7,20 @@ import Icon from "@material-ui/core/Icon";
 function FileOperations(props) {
     const {fileStore, path, selection, onDidFileOperation} = props;
 
-    function handleUpload(files) {
+    function handleUpload(path, files) {
         if (files && files.length > 0) {
             return fileStore
-                .upload(selection, files)
+                .upload(path, files)
                 .catch(err => {
-                    ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(files));
+                    ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(path, files));
                 });
         } else {
             return Promise.resolve();
         }
     }
 
-    function handleCreateDirectory(name) {
+    function handleCreateDirectory(path, name) {
+        console.log("Create directory within path", path);
         return fileStore
             .createDirectory(fileStore.joinPaths(path, name))
             .then(onDidFileOperation)
@@ -34,17 +35,19 @@ function FileOperations(props) {
             });
     }
 
+    console.log("Render file operations for path ", path);
+
     return (<React.Fragment>
         <CreateDirectoryButton
             aria-label="Create directory"
-            onCreate={handleCreateDirectory}>
-            <Icon>add</Icon>
+            onCreate={(name) => handleCreateDirectory(path, name)}>
+            <Icon>add</Icon>{path}
         </CreateDirectoryButton>
 
         <UploadButton
             color="primary"
             aria-label="Upload"
-            onUpload={handleUpload}
+            onUpload={(files) => handleUpload(path, files)}
             onDidUpload={onDidFileOperation}>
             <Icon>cloud_upload</Icon>
         </UploadButton>

@@ -31,6 +31,9 @@ class UploadButton extends React.Component{
     }
 
     componentWillReceiveProps(props) {
+        this.onDidUpload = props.onDidUpload;
+        this.onUpload = props.onUpload;
+
         this.setState({
             uploading: false,
         });
