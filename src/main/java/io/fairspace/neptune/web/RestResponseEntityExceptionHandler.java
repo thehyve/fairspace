@@ -2,6 +2,7 @@ package io.fairspace.neptune.web;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -64,5 +65,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return errorBody;
     }
 
-
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ErrorBody handleAccessDeniedException(AccessDeniedException ex) {
+        ErrorBody errorBody = new ErrorBody(ex.getMessage());
+        log.error("Access denied exception occurred.", ex);
+        return errorBody;
+    }
 }
