@@ -3,9 +3,24 @@ import ErrorDialog from "../../error/ErrorDialog";
 import UploadButton from "../buttons/UploadButton/UploadButton";
 import CreateDirectoryButton from "../buttons/CreateDirectoryButton/CreateDirectoryButton";
 import Icon from "@material-ui/core/Icon";
+import IconButton from "@material-ui/core/IconButton";
+import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 
 function FileOperations(props) {
-    const {fileStore, path, selection, onDidFileOperation} = props;
+    const {fileStore, path, onDidFileOperation, onCut, onCopy, onPaste} = props;
+
+    function handleCut(e) {
+        e.stopPropagation()
+        onCut()
+    }
+    function handleCopy(e) {
+        e.stopPropagation()
+        onCopy()
+    }
+    function handlePaste(e) {
+        e.stopPropagation()
+        onPaste();
+    }
 
     function handleUpload(path, files) {
         if (files && files.length > 0) {
@@ -35,9 +50,23 @@ function FileOperations(props) {
             });
     }
 
-    console.log("Render file operations for path ", path);
-
     return (<React.Fragment>
+        <IconButton
+            aria-label="Copy"
+            onClick={handleCopy}>
+            <ContentCopy/>
+        </IconButton>
+        <IconButton
+            aria-label="Cut"
+            onClick={handleCut}>
+            <ContentCut/>
+        </IconButton>
+        <IconButton
+            aria-label="Paste"
+            onClick={handlePaste}>
+            <ContentPaste/>
+        </IconButton>
+
         <CreateDirectoryButton
             aria-label="Create directory"
             onCreate={(name) => handleCreateDirectory(path, name)}>

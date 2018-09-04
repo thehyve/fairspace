@@ -169,6 +169,51 @@ class CollectionBrowser extends React.Component {
         this.requireRefresh();
     }
 
+    handleCut() {
+        this.setState({
+            clipboard: {
+                action: 'cut',
+                sourceDir: this.state.openedPath,
+                paths: [this.state.selectedPath]
+            }
+        })
+    }
+
+    handleCopy() {
+        this.setState({
+            clipboard: {
+                action: 'copy',
+                sourceDir: this.state.openedPath,
+                paths: [this.state.selectedPath]
+            }
+        })
+    }
+
+    handlePaste() {
+        if(this.state.clipboard && this.state.clipboard.paths) {
+            const {sourceDir, paths, action} = this.state.clipboard;
+
+            Promise.all(paths.map(path => {
+                const sourceFile = this.fileStore.joinPaths(sourceDir || '', path.basename);
+                const destinationFile = this.fileStore.joinPaths(this.state.openedPath || '', path.basename);
+
+                if(action === 'cut') {
+                    return this.fileStore.move(sourceFile, destinationFile);
+                } else if(action === 'copy') {
+                    return this.fileStore.copy(sourceFile, destinationFile);
+                } else {
+                    return Promise.reject("Invalid clipboard action: " + action);
+                }
+            }))
+                .then(() => this.setState({clipboard: null}))
+                .then(this.requireRefresh.bind(this))
+                .catch(err => {
+                    ErrorDialog.showError(err, "An error occurred while pasting your contents");
+                });
+
+        }
+    }
+
     requireRefresh() {
         this.setState({refreshRequired: true});
     }
@@ -317,6 +362,9 @@ class CollectionBrowser extends React.Component {
                         path={openedPath}
                         selection={selection}
                         fileStore={this.fileStore}
+                        onCut={this.handleCut.bind(this)}
+                        onCopy={this.handleCopy.bind(this)}
+                        onPaste={this.handlePaste.bind(this)}
                         onDidFileOperation={this.handleDidFileOperation.bind(this)}/>
         } else {
             return <Button variant="fab" mini color="secondary" aria-label="Add"
