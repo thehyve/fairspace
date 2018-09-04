@@ -28,16 +28,7 @@ class FileStore {
         const fullPath = this.getFullPath(path);
 
         return this.client
-            .getDirectoryContents(fullPath)
-            .catch(e => {
-                // If the root directory does not exist, create it
-                if(!path && e.status === 404) {
-                    console.info("Root directory for collection does not exist. Creating it.")
-                    return this.client.createDirectory(fullPath).then(() => [])
-                } else {
-                    throw e;
-                }
-            });
+            .getDirectoryContents(fullPath);
     }
 
     upload(path, files) {
