@@ -7,6 +7,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Icon from "@material-ui/core/Icon";
 import ClickHandler from "../ClickHandler/ClickHandler";
+import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
 
 function FileList(props) {
     if (!props.files || props.files.length === 0 || props.files[0] === null) {
@@ -19,6 +20,7 @@ function FileList(props) {
                         <TableCell>Name</TableCell>
                         <TableCell numeric>size</TableCell>
                         <TableCell numeric>Last Modified</TableCell>
+                        <TableCell></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -40,6 +42,12 @@ function FileList(props) {
                                     {row.size ? row.size : ''}
                                 </TableCell>
                                 <TableCell numeric>{row.lastmod}</TableCell>
+                                <TableCell numeric>
+                                    {props.onDelete ?
+                                        <ButtonWithVerification aria-label={"Delete " + row.filename} onClick={() => props.onDelete(row)}>
+                                            <Icon>delete</Icon>
+                                        </ButtonWithVerification> : null}
+                                </TableCell>
                             </ClickHandler>
                         );
                     })}

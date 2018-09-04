@@ -137,6 +137,14 @@ class CollectionBrowser extends React.Component {
         }
     }
 
+    handlePathDelete(path) {
+        return this.deleteFile(path.basename)
+            .then(this.requireRefresh.bind(this))
+            .catch(err => {
+                ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
+            });
+    }
+
     handleDidCollectionDetailsChange(collectionId, parameters) {
         // Update the currently selected collection
         this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, {metadata: parameters})});
@@ -196,8 +204,15 @@ class CollectionBrowser extends React.Component {
     }
 
     downloadFile(path) {
-        const basePath = this.state.openedPath || '';
-        this.fileStore.download(basePath + '/' + path);
+        this.fileStore.download(this._getFullPath(path));
+    }
+
+    deleteFile(path) {
+        return this.fileStore.delete(this._getFullPath(path));
+    }
+
+    _getFullPath(path) {
+        return this.fileStore.joinPaths(this.state.openedPath || '', path);
     }
 
     // Parse path into array
@@ -318,6 +333,7 @@ class CollectionBrowser extends React.Component {
                 onFilesDidLoad={this.handleDidLoad.bind(this)}
                 onPathClick={this.handlePathClick.bind(this)}
                 onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
+                onPathDelete={this.handlePathDelete.bind(this)}
             />
         )
     }

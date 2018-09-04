@@ -36,14 +36,12 @@ function FileOperations(props) {
 
     return (<React.Fragment>
         <CreateDirectoryButton
-            mini={true}
             aria-label="Create directory"
             onCreate={handleCreateDirectory}>
             <Icon>add</Icon>
         </CreateDirectoryButton>
 
         <UploadButton
-            mini={true}
             color="primary"
             aria-label="Upload"
             onUpload={handleUpload}
