@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ErrorMessage from "../../error/ErrorMessage";
 
 class Loader extends React.Component {
     static propTypes = {
@@ -56,7 +57,7 @@ class Loader extends React.Component {
             case 'loading':
                 return (<div>Loading...</div>);
             case 'error':
-                return (<div>{`Error loading ${this.what}`}</div>);
+                return (<ErrorMessage>message={`Error loading ${this.what}`}</ErrorMessage>);
             default:
                 return this.state.data
                     ? this.onRender(this.state.data)
