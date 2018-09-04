@@ -2,7 +2,7 @@ import FileStore from "./FileStore";
 
 const factory = {
     build: (collection) => {
-        return new FileStore(collection.typeIdentifier)
+        return new FileStore(collection.location)
     }
 }
 
