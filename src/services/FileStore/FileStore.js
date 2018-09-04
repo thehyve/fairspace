@@ -24,6 +24,11 @@ class FileStore {
         this.client = CreateWebdavClient(baseUrl)
     }
 
+    /**
+     * List directory contents
+     * @param path
+     * @returns {Promise<T>}
+     */
     list(path) {
         const fullPath = this.getFullPath(path);
 
@@ -31,9 +36,15 @@ class FileStore {
             .getDirectoryContents(fullPath);
     }
 
+    /**
+     * Uploads the given files into the provided path
+     * @param path
+     * @param files
+     * @returns Promise<any>
+     */
     upload(path, files) {
         if(!files) {
-            return;
+            return Promise.reject();
         }
 
         const fullPath = this.getFullPath(path);
@@ -44,6 +55,10 @@ class FileStore {
         );
     }
 
+    /**
+     * Downloads the file given by path. Downloading is done by redirecting the user to the file
+     * @param path
+     */
     download(path) {
         if(!path) {
             return;
