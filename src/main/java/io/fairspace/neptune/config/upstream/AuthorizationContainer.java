@@ -3,6 +3,7 @@ package io.fairspace.neptune.config.upstream;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 
 @Component
+@Profile("!dev")
 public class AuthorizationContainer {
     private static final TypeReference<Map<String, Object>> CLAIMS_MAP = new TypeReference<Map<String, Object>>() {};
 
