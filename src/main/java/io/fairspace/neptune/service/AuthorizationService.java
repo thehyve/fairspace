@@ -1,5 +1,6 @@
 package io.fairspace.neptune.service;
 
+import io.fairspace.neptune.config.upstream.AuthorizationContainer;
 import io.fairspace.neptune.model.Authorization;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
@@ -11,44 +12,50 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AuthorizationService {
     private final AuthorizationRepository authorizationRepository;
     private final CollectionRepository collectionRepository;
+    private final AuthorizationContainer authorizationContainer;
 
     @Value("app.oauth2.superuser-authority")
     private String superuserAuthority;
 
     @Autowired
-    public AuthorizationService(AuthorizationRepository authorizationRepository, CollectionRepository collectionRepository) {
+    public AuthorizationService(AuthorizationRepository authorizationRepository, CollectionRepository collectionRepository, AuthorizationContainer authorizationContainer) {
         this.authorizationRepository = authorizationRepository;
         this.collectionRepository = collectionRepository;
+        this.authorizationContainer = authorizationContainer;
     }
 
-    public List<Authorization> getAuthorizations(Long collectionId) {
+    public List<Authorization> getByCollection(Long collectionId) {
         Collection collection = collectionRepository.findById(collectionId).orElseThrow(CollectionNotFoundException::new);
+        checkPermission(Permission.Read, collectionId);
         return authorizationRepository.findByCollectionId(collection);
     }
 
-    List<Authorization> findByUser(String user) {
-        return authorizationRepository.findByUser(user);
+    public List<Authorization> getAll() {
+        return authorizationRepository.findByUser(getCurrentUser());
     }
 
-    public Authorization getUserAuthorization(Long collectionId, String user) {
+    public Authorization getUserAuthorization(Long collectionId) {
         Collection collection = collectionRepository.findById(collectionId).orElseThrow(CollectionNotFoundException::new);
 
+        String user = getCurrentUser();
         return authorizationRepository.findByUserAndCollectionId(user, collection)
                 .orElseGet(() -> new Authorization(null, user, collectionId, Permission.None));
     }
 
-    public Authorization add(Authorization authorization, String user) {
+    public Authorization authorize(Authorization authorization) {
         Collection collection = collectionRepository.findById(authorization.getCollectionId()).orElseThrow(CollectionNotFoundException::new);
 
-        checkPermission(Permission.Manage, user, authorization.getCollectionId());
+        checkPermission(Permission.Manage, authorization.getCollectionId());
 
-        return authorizationRepository.findByUserAndCollectionId(user, collection)
+        return authorizationRepository.findByUserAndCollectionId(authorization.getUser(), collection)
                 .map(existing -> {
                     if (authorization.getPermission() == Permission.None) {
                         authorizationRepository.delete(existing);
@@ -65,10 +72,22 @@ public class AuthorizationService {
                 });
     }
 
-    void checkPermission(Permission required, String user, Long collectionId) {
-        Permission permission = getUserAuthorization(collectionId, user).getPermission();
-        if (permission.compareTo(required) < 0) {
-            throw new AccessDeniedException("Insufficient permissions");
+    @NotNull
+    public String getCurrentUser() {
+        try {
+            return Objects.requireNonNull(authorizationContainer.getSubject());
+        } catch (Exception e) {
+            throw new AccessDeniedException("No valid authorization", e);
         }
-   }
+    }
+
+    boolean hasPermission(Permission required, Long collectionId) {
+        return required.compareTo(getUserAuthorization(collectionId).getPermission()) <= 0;
+    }
+
+    void checkPermission(Permission required, Long collectionId) {
+        if (!hasPermission(required, collectionId)) {
+            throw new AccessDeniedException("Unauthorized");
+        }
+    }
 }

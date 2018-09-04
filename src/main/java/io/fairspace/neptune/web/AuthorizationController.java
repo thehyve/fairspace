@@ -5,7 +5,6 @@ import io.fairspace.neptune.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -15,12 +14,12 @@ public class AuthorizationController {
     private AuthorizationService authorizationService;
 
     @GetMapping("/{collectionId}/authorizations")
-    public List<Authorization> getCollectionPermissions(@PathVariable Long collectionId) {
-        return authorizationService.getAuthorizations(collectionId);
+    public List<Authorization> getCollectionAuthorizations(@PathVariable Long collectionId) {
+        return authorizationService.getByCollection(collectionId);
     }
 
     @PutMapping("/authorizations")
-    public Authorization addPermission(@RequestBody Authorization authorization, Principal principal) {
-        return authorizationService.add(authorization, principal.getName());
+    public Authorization setAuthorization(@RequestBody Authorization authorization) {
+        return authorizationService.authorize(authorization);
     }
 }

@@ -74,7 +74,7 @@ public class WebSecurityConfigurationTest {
 
     @Test
     public void testValidAccessToken() throws JOSEException {
-        when(collectionService.findAll(eq("username"))).thenReturn(Collections.singletonList(new Collection()));
+        when(collectionService.findAll()).thenReturn(Collections.singletonList(new Collection()));
         ResponseEntity<String> response = getWithKey(getSignedJWT());
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("[{\"id\":null,\"location\":null,\"metadata\":null}]", response.getBody());
@@ -145,7 +145,6 @@ public class WebSecurityConfigurationTest {
                 .subject("alice")
                 .issuer("https://test.com")
                 .expirationTime(expires)
-                .claim(UserAuthenticationConverter.USERNAME, "username")
                 .claim(UserAuthenticationConverter.AUTHORITIES, Collections.singletonList("authority"))
                 .build();
     }

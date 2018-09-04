@@ -48,7 +48,7 @@ public class CollectionServiceTest {
     public void setUp() {
         service = new CollectionService(collectionRepository, authorizationService, storageService, collectionMetadataService);
 
-        when(authorizationService.findByUser(eq("user1")))
+        when(authorizationService.getAll())
                 .thenReturn(asList(
                         new Authorization(1L, "user1", 1L, Permission.Manage),
                         new Authorization(2L, "user1", 2L, Permission.Read)));
@@ -68,7 +68,7 @@ public class CollectionServiceTest {
         metadata.add(new CollectionMetadata(getUri(3L), "My dataset", "dataset"));
         when(collectionMetadataService.getCollections()).thenReturn(metadata);
 
-        List<Collection> mergedCollections = toList(service.findAll("user1").iterator());
+        List<Collection> mergedCollections = toList(service.findAll().iterator());
 
         // The first item should be merged
         assertTrue(mergedCollections.contains(collections.get(0).withMetadata(metadata.get(0))));
@@ -89,7 +89,7 @@ public class CollectionServiceTest {
         CollectionMetadata metadata = new CollectionMetadata(getUri(1L), "My quotes", "quote item");
         when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.of(metadata));
 
-        Optional<Collection> mergedCollection = service.findById(id, "user1");
+        Optional<Collection> mergedCollection = service.findById(id);
 
         assertTrue(mergedCollection.isPresent());
         assertEquals(collection.withMetadata(metadata), mergedCollection.get());
@@ -100,7 +100,7 @@ public class CollectionServiceTest {
         Long id = 1L;
         when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
-        Optional<Collection> mergedCollection = service.findById(id, "user1");
+        Optional<Collection> mergedCollection = service.findById(id);
 
         assertTrue(!mergedCollection.isPresent());
         verify(collectionMetadataService, times(0)).getCollection(anyString());
@@ -114,7 +114,7 @@ public class CollectionServiceTest {
 
         when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.empty());
 
-        Optional<Collection> mergedCollection = service.findById(id, "user1");
+        Optional<Collection> mergedCollection = service.findById(id);
 
         assertTrue(mergedCollection.isPresent());
         assertEquals(collection, mergedCollection.get());
@@ -128,11 +128,11 @@ public class CollectionServiceTest {
 
         when(collectionRepository.save(any())).thenReturn(collection);
 
-        service.add(collection, "user");
+        service.add(collection);
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
-        verify(authorizationService).add(any(), eq(null));
+        verify(authorizationService).authorize(any());
     }
 
     @Test(expected = InvalidCollectionException.class)
@@ -140,7 +140,7 @@ public class CollectionServiceTest {
         Long id = 1L;
         Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
 
-        service.add(collection, "user");
+        service.add(collection);
     }
 
     @Test
@@ -151,7 +151,7 @@ public class CollectionServiceTest {
 
         when(collectionRepository.save(any())).thenReturn(storedCollection);
 
-        Collection added = service.add(collection, "user");
+        Collection added = service.add(collection);
 
         assertEquals(storedCollection.getId(), added.getId());
         verify(collectionMetadataService).createCollection(new CollectionMetadata("/fairspace/2", "collection", "description"));
@@ -163,17 +163,17 @@ public class CollectionServiceTest {
         Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
-        service.deleteById(id, "user1");
+        service.delete(id);
 
         verify(storageService).deleteCollection(collection);
     }
 
     @Test(expected = CollectionNotFoundException.class)
-    public void testDeleteCollectionNotFound() throws IOException {
+    public void testDeleteCollectionNotFound() {
         Long id = 1L;
         when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
-        service.deleteById(id, "user1");
+        service.delete(id);
     }
 
     private <E> List<E> toList(Iterator<E> iterator) {

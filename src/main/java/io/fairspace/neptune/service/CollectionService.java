@@ -37,11 +37,11 @@ public class CollectionService {
         this.collectionMetadataService = collectionMetadataService;
     }
 
-    public Iterable<Collection> findAll(String user) {
+    public Iterable<Collection> findAll() {
         Iterable<Collection> collections =
                 repository.findAllById(
                         authorizationService
-                                .findByUser(user)
+                                .getAll()
                                 .stream()
                                 .map(Authorization::getCollectionId)
                                 .collect(toList()));
@@ -64,8 +64,8 @@ public class CollectionService {
 
     }
 
-    public Optional<Collection> findById(Long id, String user) {
-        authorizationService.checkPermission(Permission.Read, user, id);
+    public Optional<Collection> findById(Long id) {
+        authorizationService.checkPermission(Permission.Read, id);
 
         // First retrieve collection itself
         Optional<Collection> optionalCollection = repository.findById(id);
@@ -82,7 +82,7 @@ public class CollectionService {
 
     }
 
-    public Collection add(Collection collection, String creator) throws IOException {
+    public Collection add(Collection collection) throws IOException {
         if (collection.getMetadata() == null) {
             throw new InvalidCollectionException();
         }
@@ -95,9 +95,9 @@ public class CollectionService {
 
         Authorization authorization = new Authorization();
         authorization.setCollectionId(finalCollection.getId());
-        authorization.setUser(creator);
+        authorization.setUser(authorizationService.getCurrentUser());
         authorization.setPermission(Permission.Manage);
-        authorizationService.add(authorization, null);
+        authorizationService.authorize(authorization);
 
         // Update metadata. Ensure that the correct uri is specified
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), collection.getMetadata().getName(), collection.getMetadata().getDescription());
@@ -109,12 +109,12 @@ public class CollectionService {
         return finalCollection.withMetadata(metadataToSave);
     }
 
-    public Collection update(Long id, Collection patch, String user) {
+    public Collection update(Long id, Collection patch) {
         if (patch.getMetadata() == null) {
             throw new InvalidCollectionException();
         }
 
-        authorizationService.checkPermission(Permission.Write, user, id);
+        authorizationService.checkPermission(Permission.Write, id);
 
         // Updating is currently only possible on the metadata
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), patch.getMetadata().getName(), patch.getMetadata().getDescription());
@@ -122,10 +122,10 @@ public class CollectionService {
         return patch;
     }
 
-    public void deleteById(Long id, String user) {
+    public void delete(Long id) {
         Optional<Collection> collection = repository.findById(id);
 
-        authorizationService.checkPermission(Permission.Manage, user, id);
+        authorizationService.checkPermission(Permission.Manage, id);
 
         collection.map(foundCollection -> {
             // Remove contents of the collection as well

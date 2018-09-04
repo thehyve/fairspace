@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/")
@@ -18,19 +17,19 @@ public class CollectionController {
     private CollectionService collectionService;
 
     @GetMapping
-    public Iterable<Collection> getCollections(Principal principal) {
-        return collectionService.findAll(principal.getName());
+    public Iterable<Collection> getCollections() {
+        return collectionService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Collection getCollection(@PathVariable Long id, Principal principal) {
-        return collectionService.findById(id, principal.getName())
+    public Collection getCollection(@PathVariable Long id) {
+        return collectionService.findById(id)
                 .orElseThrow(CollectionNotFoundException::new);
     }
 
     @PostMapping
-    public ResponseEntity<?> createCollection(@RequestBody Collection collection, Principal principal) throws URISyntaxException, IOException {
-        Collection addedCollection = collectionService.add(collection, principal.getName());
+    public ResponseEntity<?> createCollection(@RequestBody Collection collection) throws URISyntaxException, IOException {
+        Collection addedCollection = collectionService.add(collection);
 
         // Determine the URI for this collection
         URI uri = null;
@@ -43,13 +42,13 @@ public class CollectionController {
     }
 
     @PatchMapping("/{id}")
-    public void patchCollection(@PathVariable Long id, @RequestBody Collection patchedCollection, Principal principal) {
-        collectionService.update(id, patchedCollection, principal.getName());
+    public void patchCollection(@PathVariable Long id, @RequestBody Collection patchedCollection) {
+        collectionService.update(id, patchedCollection);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCollection(@PathVariable Long id, Principal principal) {
-        collectionService.deleteById(id, principal.getName());
+    public void deleteCollection(@PathVariable Long id) {
+        collectionService.delete(id);
     }
 
 

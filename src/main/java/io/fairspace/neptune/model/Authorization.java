@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(uniqueConstraints={@UniqueConstraint(columnNames = {"user" , "collectionId"})})
 public class Authorization {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
