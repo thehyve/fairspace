@@ -55,6 +55,9 @@ zuul:
     collections:
       path: /api/collections/**
       url: http://neptune/
+    permissions:
+      path: /api/collections/**/permissions
+      url: http://neptune/      
     ui:
       path: /**
       url: http://mercury/
