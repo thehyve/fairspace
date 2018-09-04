@@ -1,4 +1,5 @@
 import * as jsonld from 'jsonld/dist/jsonld';
+import {compareBy, comparing} from "../../utils/comparators";
 
 
 /**
@@ -16,27 +17,17 @@ function combine(vocabulary, metadata) {
             for (const key in root) {
                 const label = labelsById[key];
                 if (label) {
-                    result[label] = root[key].sort(compareValues);
+                    result[label] = root[key].sort(comparing(compareBy('@id'), compareBy('@value')));
                     // @type is not a label. Therefore, this needs to be a separate check. Where the label needs  to be retrieved.
                 } else if (key === "@type") {
-                    const types = [];
-                    root[key].forEach(type => {
-                        types.push({"@id": type, "rdfs:label": labelsById[type]});
-                    });
-                    result["Type"] = types.sort(compareValues);
+                    result["Type"] = root[key]
+                        .map(type => ({"@id": type, "rdfs:label": labelsById[type]}))
+                        .sort(comparing(compareBy('rdfs:label'), compareBy('@id')));
                 }
             }
             return Object.keys(result).sort().map(label => ({label: label, values: result[label]}));
         })
         .catch(err => console.error('Error combining metadata and vocabulary', err));
-}
-
-function compareValues(x, y) {
-    return ('@id' in x) ? comparePrimitives(x['@id'], y['@id']) : comparePrimitives(x['@value'], y['@value'])
-}
-
-function comparePrimitives(x, y) {
-    return (x < y) ? -1 : (x > y) ? 1 : 0
 }
 
 /**

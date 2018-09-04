@@ -1,0 +1,22 @@
+[
+    {
+        "collectionId": 1,
+        "user": "user2",
+        "permission": "Write"
+    },
+    {
+        "collectionId": 1,
+        "user": "user4",
+        "permission": "Read"
+    },
+    {
+        "collectionId": 1,
+        "user": "user3",
+        "permission": "Read"
+    },
+    {
+        "collectionId": 1,
+        "user": "user1",
+        "permission": "Manage"
+    }
+]

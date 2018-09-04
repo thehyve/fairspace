@@ -14,11 +14,13 @@ app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "R
 app.post('/api/collections', (req, res) => res.send());
 app.get('/api/collections', (req, res) => res.sendFile(__dirname + '/collection-list.json'));
 app.get('/api/collections/:id', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '.json'));
+app.get('/api/collections/:id/permissions', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '-permissions.json'));
 app.patch('/api/collections/:id', (req, res) => res.send());
 app.delete('/api/collections/:id', (req, res) => res.send());
 
 // Metadata API
 app.get('/api/metadata/statements', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));
+
 
 // Add webdav server on /files
 const server = new webdav.WebDAVServer();
