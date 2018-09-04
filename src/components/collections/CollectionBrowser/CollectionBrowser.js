@@ -385,7 +385,7 @@ class CollectionBrowser extends React.Component {
     renderCollection(collection) {
         return (
             <FileOverview
-                prefix={"/" + collection.typeIdentifier}
+                prefix={"/" + collection.location}
                 path={this.state.openedPath}
                 selectedPath={this.state.selectedPath ? this.state.selectedPath.filename : null}
                 refreshFiles={this.state.refreshRequired}

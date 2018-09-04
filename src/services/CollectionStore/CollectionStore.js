@@ -1,10 +1,5 @@
 import Config from "../../components/generic/Config/Config";
-
-function failOnHttpError(response, message) {
-    if(!response.ok) {
-        throw Error(message, response.error);
-    }
-}
+import {failOnHttpError} from "../../utils/httputils";
 
 class CollectionStore {
     static changeHeaders = new Headers({'Content-Type': 'application/json'});
@@ -15,10 +10,10 @@ class CollectionStore {
             method: 'GET',
             headers: CollectionStore.getHeaders,
             credentials: 'same-origin'
-        }).then(response => {
-            failOnHttpError(response, "Failure when retrieving list of collections");
-            return response.json();
-        }).then(collections => collections.map(this._ensureCollectionMetadata))
+        })
+            .then(failOnHttpError("Failure when retrieving a list of collections"))
+            .then(response => response.json())
+            .then(collections => collections.map(this._ensureCollectionMetadata))
     }
 
     getCollection(id) {
@@ -26,10 +21,10 @@ class CollectionStore {
             method: 'GET',
             headers: CollectionStore.getHeaders,
             credentials: 'same-origin'
-        }).then(response => {
-            failOnHttpError(response, "Failure when retrieving list of collections");
-            return response.json();
-        }).then(this._ensureCollectionMetadata)
+        })
+            .then(failOnHttpError("Failure when retrieving a collection"))
+            .then(response => response.json())
+            .then(this._ensureCollectionMetadata)
     }
 
     addCollection(name, description) {
@@ -38,10 +33,7 @@ class CollectionStore {
             headers: CollectionStore.changeHeaders,
             credentials: 'same-origin',
             body: JSON.stringify({ metadata: {name: name, description: description} })
-        }).then(response => {
-            failOnHttpError(response, "Failure while saving collection");
-            return response;
-        })
+        }).then(failOnHttpError("Failure while saving a collection"))
     }
 
     updateCollection(id, name, description) {
@@ -50,10 +42,7 @@ class CollectionStore {
             headers: CollectionStore.changeHeaders,
             credentials: 'same-origin',
             body: JSON.stringify({ metadata: {name: name, description: description} })
-        }).then(response => {
-            failOnHttpError(response, "Failure while updating collection");
-            return response;
-        })
+        }).then(failOnHttpError("Failure while updating a collection"))
     }
 
     deleteCollection(id) {
@@ -61,10 +50,7 @@ class CollectionStore {
             method: 'DELETE',
             headers: CollectionStore.changeHeaders,
             credentials: 'same-origin'
-        }).then(response => {
-            failOnHttpError(response, "Failure while deleting collection");
-            return response;
-        })
+        }).then(failOnHttpError("Failure while deleting collection"))
     }
 
     _ensureCollectionMetadata(collection) {
