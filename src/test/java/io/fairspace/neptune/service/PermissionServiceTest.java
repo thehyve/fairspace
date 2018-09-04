@@ -47,17 +47,15 @@ public class PermissionServiceTest {
         when(collectionRepository.findById(1L))
                 .thenReturn(Optional.of(collection1));
 
-        when(permissionRepository.findByUserAndCollectionId("creator", collection1))
+        when(permissionRepository.findBySubjectAndCollection("creator", collection1))
                 .thenReturn(Optional.of(new Permission(1L, "creator", collection1.getId(), Access.Manage)));
 
         when(permissionRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
     }
 
-    ;
-
     @Test(expected = CollectionNotFoundException.class)
     public void testGettingPermissionsForUnknownCollection() {
-        permissionService.getUserPermission(0L);
+        permissionService.getSubjectsPermission(0L);
     }
 
     @Test(expected = CollectionNotFoundException.class)
@@ -68,11 +66,11 @@ public class PermissionServiceTest {
     @Test
     public void testGettingPermissionsForExistingCollection() {
         as("creator", () -> {
-            Permission auth = permissionService.getUserPermission(1L);
+            Permission auth = permissionService.getSubjectsPermission(1L);
 
             assertEquals(Access.Manage, auth.getAccess());
 
-            verify(permissionRepository).findByUserAndCollectionId(eq("creator"), eq(collection1));
+            verify(permissionRepository).findBySubjectAndCollection(eq("creator"), eq(collection1));
         });
     }
 

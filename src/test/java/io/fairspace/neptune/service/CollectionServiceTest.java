@@ -47,7 +47,7 @@ public class CollectionServiceTest {
     public void setUp() {
         service = new CollectionService(collectionRepository, permissionService, storageService, collectionMetadataService);
 
-        when(permissionService.getAllByCurrentUser())
+        when(permissionService.getAllBySubject())
                 .thenReturn(asList(
                         new Permission(1L, "user1", 1L, Access.Manage),
                         new Permission(2L, "user1", 2L, Access.Read)));

@@ -13,7 +13,7 @@ public class PermissionController {
     @Autowired
     private PermissionService permissionService;
 
-    @GetMapping("/{collectionId}/permissions")
+    @GetMapping("/{collection}/permissions")
     public List<Permission> getCollectionAuthorizations(@PathVariable Long collectionId) {
         return permissionService.getByCollection(collectionId);
     }

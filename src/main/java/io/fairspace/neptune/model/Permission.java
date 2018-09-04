@@ -21,11 +21,11 @@ public class Permission {
     private Long id;
 
     @NotNull
-    String user;
+    String subject;
 
     @ManyToOne(targetEntity = Collection.class, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    Long collectionId;
+    Long collection;
 
     @NotNull
     @Enumerated(EnumType.STRING)

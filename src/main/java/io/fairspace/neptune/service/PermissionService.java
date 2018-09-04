@@ -8,11 +8,9 @@ import io.fairspace.neptune.repository.PermissionRepository;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,9 +19,6 @@ public class PermissionService {
     private final PermissionRepository permissionRepository;
     private final CollectionRepository collectionRepository;
     private final AuthorizationContainer authorizationContainer;
-
-    @Value("app.oauth2.superuser-authority")
-    private String superuserAuthority;
 
     @Autowired
     public PermissionService(PermissionRepository permissionRepository, CollectionRepository collectionRepository, AuthorizationContainer authorizationContainer) {
@@ -35,29 +30,29 @@ public class PermissionService {
     public List<Permission> getByCollection(Long collectionId) {
         Collection collection = collectionRepository.findById(collectionId).orElseThrow(CollectionNotFoundException::new);
         checkPermission(Access.Read, collectionId);
-        return permissionRepository.findByCollectionId(collection);
+        return permissionRepository.findByCollection(collection);
     }
 
-    public List<Permission> getAllByCurrentUser() {
-        return permissionRepository.findByUser(getCurrentUser());
+    public List<Permission> getAllBySubject() {
+        return permissionRepository.findBySubject(getSubject());
     }
 
-    public Permission getUserPermission(Long collectionId) {
+    public Permission getSubjectsPermission(Long collectionId) {
         Collection collection = collectionRepository.findById(collectionId).orElseThrow(CollectionNotFoundException::new);
 
-        String user = getCurrentUser();
-        return permissionRepository.findByUserAndCollectionId(user, collection)
-                .orElseGet(() -> new Permission(null, user, collectionId, Access.None));
+        String subject = getSubject();
+        return permissionRepository.findBySubjectAndCollection(subject, collection)
+                .orElseGet(() -> new Permission(null, subject, collectionId, Access.None));
     }
 
     public Permission authorize(Permission permission, boolean isNew) {
-        Collection collection = collectionRepository.findById(permission.getCollectionId()).orElseThrow(CollectionNotFoundException::new);
+        Collection collection = collectionRepository.findById(permission.getCollection()).orElseThrow(CollectionNotFoundException::new);
 
         if (!isNew) {
-            checkPermission(Access.Manage, permission.getCollectionId());
+            checkPermission(Access.Manage, permission.getCollection());
         }
 
-        return permissionRepository.findByUserAndCollectionId(permission.getUser(), collection)
+        return permissionRepository.findBySubjectAndCollection(permission.getSubject(), collection)
                 .map(existing -> {
                     if (permission.getAccess() == Access.None) {
                         permissionRepository.delete(existing);
@@ -74,8 +69,7 @@ public class PermissionService {
                 });
     }
 
-    @NotNull
-    public String getCurrentUser() {
+    public String getSubject() {
         try {
             return Objects.requireNonNull(authorizationContainer.getSubject());
         } catch (Exception e) {
@@ -84,7 +78,7 @@ public class PermissionService {
     }
 
     boolean hasPermission(Access required, Long collectionId) {
-        return required.compareTo(getUserPermission(collectionId).getAccess()) <= 0;
+        return required.compareTo(getSubjectsPermission(collectionId).getAccess()) <= 0;
     }
 
     void checkPermission(Access required, Long collectionId) {

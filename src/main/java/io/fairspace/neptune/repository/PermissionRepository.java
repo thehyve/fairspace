@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PermissionRepository extends CrudRepository<Permission, Long> {
-    List<Permission> findByCollectionId(Collection collection);
+    List<Permission> findByCollection(Collection collection);
 
-    List<Permission> findByUser(String user);
+    List<Permission> findBySubject(String subject);
 
-    Optional<Permission> findByUserAndCollectionId(String user, Collection collection);
+    Optional<Permission> findBySubjectAndCollection(String subject, Collection collection);
 }

@@ -41,9 +41,9 @@ public class CollectionService {
         Iterable<Collection> collections =
                 repository.findAllById(
                         permissionService
-                                .getAllByCurrentUser()
+                                .getAllBySubject()
                                 .stream()
-                                .map(Permission::getCollectionId)
+                                .map(Permission::getCollection)
                                 .collect(toList()));
 
         List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
@@ -94,8 +94,8 @@ public class CollectionService {
         Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
 
         Permission permission = new Permission();
-        permission.setCollectionId(finalCollection.getId());
-        permission.setUser(permissionService.getCurrentUser());
+        permission.setCollection(finalCollection.getId());
+        permission.setSubject(permissionService.getSubject());
         permission.setAccess(Access.Manage);
         permissionService.authorize(permission, true);
 
