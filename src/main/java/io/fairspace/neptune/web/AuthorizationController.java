@@ -20,6 +20,6 @@ public class AuthorizationController {
 
     @PutMapping("/authorizations")
     public Authorization setAuthorization(@RequestBody Authorization authorization) {
-        return authorizationService.authorize(authorization);
+        return authorizationService.authorize(authorization, false);
     }
 }
