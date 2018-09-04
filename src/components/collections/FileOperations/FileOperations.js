@@ -41,7 +41,7 @@ function FileOperations(props) {
         <CreateDirectoryButton
             aria-label="Create directory"
             onCreate={(name) => handleCreateDirectory(path, name)}>
-            <Icon>add</Icon>{path}
+            <Icon>add</Icon>
         </CreateDirectoryButton>
 
         <UploadButton
