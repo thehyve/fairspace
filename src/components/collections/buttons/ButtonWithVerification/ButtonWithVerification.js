@@ -36,7 +36,7 @@ class ButtonWithVerification extends React.Component{
     }
 
     closeDialog(e) {
-        e.stopPropagation();
+        if(e) e.stopPropagation();
         this.setState({verifying: false});
     }
 
@@ -59,6 +59,7 @@ class ButtonWithVerification extends React.Component{
 
                 <Dialog
                     open={this.state.verifying}
+                    onClick={(e) => e.stopPropagation()}
                     onClose={this.closeDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >

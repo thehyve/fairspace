@@ -100,7 +100,9 @@ class FileStore {
             return Promise.reject("No destination specified to move to");
         }
 
-        return this.client.moveFile(this.getFullPath(source), this.getFullPath(destination))
+        // We have to specify the destination ourselves, as the client adds the fullpath
+        // to the
+        return this.client.moveFile(this.getFullPath(source), this.getFullPath(destination));
     }
 
     /**

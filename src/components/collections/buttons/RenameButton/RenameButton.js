@@ -7,50 +7,54 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 
-class CreateDirectoryButton extends React.Component{
+class RenameButton extends React.Component{
     constructor(props) {
         super(props);
         const {
-            onCreate,
+            currentName,
+            onRename,
             children,
             ...componentProps
         } = props;
 
-        this.onCreate = onCreate;
+        this.currentName = currentName;
+        this.onRename = onRename;
         this.componentProps = componentProps;
 
         this.state = {
-            creating: false,
-            name: ''
+            renaming: false,
+            name: currentName
         };
     }
 
     componentWillReceiveProps(props) {
-        if(props.onCreate)
-            this.onCreate = props.onCreate;
+        this.onRename = props.onRename;
+        this.currentName = props.currentName;
 
         this.setState({
-            creating: false
+            renaming: false,
+            name: this.currentName
         });
     }
 
     openDialog(e) {
         e.stopPropagation();
-        this.setState({creating: true, name: ''});
+        this.setState({renaming: true, name: this.currentName});
     }
 
     closeDialog(e) {
         if(e) e.stopPropagation();
-        this.setState({creating: false});
+        this.setState({renaming: false});
     }
 
-    createDirectory(e) {
+    handleRename(e) {
         e.stopPropagation();
-        if(this.onCreate) {
+
+        if(this.onRename) {
             this
-                .onCreate(this.state.name)
+                .onRename(this.state.name)
                 .then(this.closeDialog.bind(this))
-                .catch(() => { /* Ignore the exception as it is handled by onCreate, but just prevents the dialog of closing */ });
+                .catch(() => { /* Ignore the exception as it is handled by onRename, but just prevents the dialog of closing */ });
         }
     }
 
@@ -68,13 +72,14 @@ class CreateDirectoryButton extends React.Component{
                 </IconButton>
 
                 <Dialog
-                    open={this.state.creating}
+                    open={this.state.renaming}
                     onClick={(e) => e.stopPropagation()}
                     onClose={this.closeDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Create new directory</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Rename {this.currentName}</DialogTitle>
                     <DialogContent>
+                        Enter a new name for {this.currentName}
                         <TextField
                             autoFocus
                             margin="dense"
@@ -90,8 +95,8 @@ class CreateDirectoryButton extends React.Component{
                         <Button onClick={this.closeDialog.bind(this)} color="secondary">
                             Close
                         </Button>
-                        <Button onClick={this.createDirectory.bind(this)} color="primary" disabled={!this.state.name}>
-                            Create
+                        <Button onClick={this.handleRename.bind(this)} color="primary" disabled={!this.state.name || this.state.name === this.currentName}>
+                            Rename
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -100,7 +105,7 @@ class CreateDirectoryButton extends React.Component{
     }
 }
 
-export default CreateDirectoryButton;
+export default RenameButton;
 
 
 

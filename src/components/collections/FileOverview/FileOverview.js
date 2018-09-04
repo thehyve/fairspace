@@ -83,6 +83,7 @@ class FileOverview extends React.Component {
                     selectedPath={this.state.selectedPath}
                     onPathClick={this.props.onPathClick}
                     onPathDoubleClick={this.props.onPathDoubleClick}
+                    onRename={this.props.onPathRename}
                     onDelete={this.props.onPathDelete}/>);
     }
 }

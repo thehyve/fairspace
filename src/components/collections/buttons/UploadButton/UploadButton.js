@@ -39,12 +39,14 @@ class UploadButton extends React.Component{
         });
     }
 
-    openDialog() {
+    openDialog(e) {
+        e.stopPropagation();
         this.filesUploaded = false;
         this.setState({uploading: true});
     }
 
-    closeDialog() {
+    closeDialog(e) {
+        if(e) e.stopPropagation();
         if(this.filesUploaded && this.onDidUpload) {
             this.onDidUpload();
         }
@@ -68,6 +70,7 @@ class UploadButton extends React.Component{
 
                 <Dialog
                     open={this.state.uploading}
+                    onClick={(e) => e.stopPropagation()}
                     onClose={this.closeDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >

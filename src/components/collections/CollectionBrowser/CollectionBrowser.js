@@ -145,6 +145,14 @@ class CollectionBrowser extends React.Component {
             });
     }
 
+    handlePathRename(path, newName) {
+        return this.renameFile(path.basename, newName)
+            .then(this.requireRefresh.bind(this))
+            .catch(err => {
+                ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
+            });
+    }
+
     handleDidCollectionDetailsChange(collectionId, parameters) {
         // Update the currently selected collection
         this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, {metadata: parameters})});
@@ -209,6 +217,10 @@ class CollectionBrowser extends React.Component {
 
     deleteFile(path) {
         return this.fileStore.delete(this._getFullPath(path));
+    }
+
+    renameFile(current, newName) {
+        return this.fileStore.move(this._getFullPath(current), this._getFullPath(newName));
     }
 
     _getFullPath(path) {
@@ -334,6 +346,7 @@ class CollectionBrowser extends React.Component {
                 onPathClick={this.handlePathClick.bind(this)}
                 onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
                 onPathDelete={this.handlePathDelete.bind(this)}
+                onPathRename={this.handlePathRename.bind(this)}
             />
         )
     }
