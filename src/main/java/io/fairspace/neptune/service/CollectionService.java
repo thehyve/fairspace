@@ -41,7 +41,7 @@ public class CollectionService {
         Iterable<Collection> collections =
                 repository.findAllById(
                         authorizationService
-                                .getAll()
+                                .getAllByCurrentUser()
                                 .stream()
                                 .map(Authorization::getCollectionId)
                                 .collect(toList()));

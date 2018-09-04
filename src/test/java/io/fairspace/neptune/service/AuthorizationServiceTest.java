@@ -10,7 +10,6 @@ import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.access.AccessDeniedException;
@@ -35,7 +34,6 @@ public class AuthorizationServiceTest {
 
     private Collection collection1 = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "location", null);
 
-    @InjectMocks
     private AuthorizationService authorizationService;
 
     @Before

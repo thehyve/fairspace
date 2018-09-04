@@ -38,7 +38,7 @@ public class AuthorizationService {
         return authorizationRepository.findByCollectionId(collection);
     }
 
-    public List<Authorization> getAll() {
+    public List<Authorization> getAllByCurrentUser() {
         return authorizationRepository.findByUser(getCurrentUser());
     }
 
