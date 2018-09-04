@@ -39,13 +39,25 @@ container.
 
 ## API
 
+Neptune authenticates Oauth2 and uses permission mechanism to authorize user's actions.
+Every collection has an associated list of user permissions. Currently supported access levels are:
+- Manage
+- Write
+- Read
+- None (default)
+
+
+A creator of a collection automatically gets `Manage` permissions. 
+
 | Command | Description |
 | --- | --- |
-| GET / | Get list of collections |
+| GET / | Get list of collections with at least `Read` access  |
 | POST / | Store a new collection |
 | GET /<id> | Get collection |
 | PATCH /<id> | Change name or description of collections' metadata |
 | DELETE /<id> | Delete a single collection |
+| GET /<id>/authorizations | Get a list of permissions for a specific collection |
+| PUT /authorizations | Adds or modifies a permission |
 
 
 ### JSON format
@@ -56,6 +68,7 @@ container.
 POST / HTTP/1.1
 Host: localhost:8080
 Content-Type: application/json
+Authorization: Bearer <JWT> 
 
 {
   "metadata": 
@@ -73,6 +86,8 @@ Content-Type: application/json
 GET / HTTP/1.1
 Host: localhost:8080
 Accept: application/json
+Authorization: Bearer <JWT> 
+
 
 ```
 
@@ -108,6 +123,8 @@ Accept: application/json
 PATCH /1 HTTP/1.1
 Host: localhost:8080
 Content-Type: application/json
+Authorization: Bearer <JWT> 
+
 
 {
   "metadata": 
@@ -115,5 +132,60 @@ Content-Type: application/json
       "name": "Collection 1",
       "description": "My first collection""
     }
+}
+```
+
+#### Get authorizations for a collection.
+
+```
+GET /123/authorizations?user=user@example.com HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Authorization: Bearer <JWT> 
+
+
+[
+    {
+      "user": "user@example.com",
+      "collectionId": 123,
+      "permission": "Write"
+    },
+    {
+      "user": "user2@example.com",
+      "collectionId": 123,
+      "permission": "Read"
+    }
+]
+```
+
+#### Get user's authorization. Returns `"permission": "None"` if no permission was assigned.
+
+```
+GET /123/authorization HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Authorization: Bearer <JWT> 
+
+
+{
+  "user": "user@example.com",
+  "collectionId": 123,
+  "permission": "Write"
+}
+```
+
+#### Set user's authorization
+
+```
+PUT /authorization HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Authorization: Bearer <JWT> 
+
+
+{
+  "user": "user@example.com",
+  "collectionId": 123,
+  "permission": "Write"
 }
 ```

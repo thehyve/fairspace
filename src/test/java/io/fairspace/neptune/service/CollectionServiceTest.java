@@ -1,7 +1,9 @@
 package io.fairspace.neptune.service;
 
+import io.fairspace.neptune.model.Authorization;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.CollectionMetadata;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
@@ -17,14 +19,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionServiceTest {
@@ -34,14 +35,23 @@ public class CollectionServiceTest {
     private CollectionRepository collectionRepository;
 
     @Mock
+    private AuthorizationService authorizationService;
+
+    @Mock
     private StorageService storageService;
 
     @Mock
     private CollectionMetadataService collectionMetadataService;
 
     @Before
-    public void setUp() throws Exception {
-        service = new CollectionService(collectionRepository, storageService, collectionMetadataService);
+    public void setUp() {
+        service = new CollectionService(collectionRepository, authorizationService, storageService, collectionMetadataService);
+
+        when(authorizationService.getAllByCurrentUser())
+                .thenReturn(asList(
+                        new Authorization(1L, "user1", 1L, Permission.Manage),
+                        new Authorization(2L, "user1", 2L, Permission.Read)));
+
         when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
@@ -50,7 +60,7 @@ public class CollectionServiceTest {
         List<Collection> collections = new ArrayList<>();
         collections.add(new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null));
         collections.add(new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", null));
-        when(collectionRepository.findAll()).thenReturn(collections);
+        when(collectionRepository.findAllById(asList(1L, 2L))).thenReturn(collections);
 
         List<CollectionMetadata> metadata = new ArrayList<>();
         metadata.add(new CollectionMetadata(getUri(1L), "My quotes", "quote item"));
@@ -121,6 +131,7 @@ public class CollectionServiceTest {
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
+        verify(authorizationService).authorize(any());
     }
 
     @Test(expected = InvalidCollectionException.class)
@@ -151,17 +162,17 @@ public class CollectionServiceTest {
         Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
-        service.deleteById(id);
+        service.delete(id);
 
         verify(storageService).deleteCollection(collection);
     }
 
     @Test(expected = CollectionNotFoundException.class)
-    public void testDeleteCollectionNotFound() throws IOException {
+    public void testDeleteCollectionNotFound() {
         Long id = 1L;
         when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
-        service.deleteById(id);
+        service.delete(id);
     }
 
     private <E> List<E> toList(Iterator<E> iterator) {

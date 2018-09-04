@@ -5,11 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
@@ -27,12 +23,12 @@ public class Collection {
     @JsonIgnore
     private CollectionType type = CollectionType.LOCAL_FILE;
 
-    private String typeIdentifier;
+    private String location;
 
     @Transient
     private CollectionMetadata metadata;
 
     public Collection withMetadata(CollectionMetadata metadata) {
-        return new Collection(id, type, typeIdentifier, metadata);
+        return new Collection(id, type, location, metadata);
     }
 }

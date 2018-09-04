@@ -12,6 +12,7 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 import com.nimbusds.jwt.SignedJWT;
+import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.service.CollectionService;
 import net.minidev.json.JSONObject;
 import org.junit.Before;
@@ -23,11 +24,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -42,13 +40,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -80,9 +74,10 @@ public class WebSecurityConfigurationTest {
 
     @Test
     public void testValidAccessToken() throws JOSEException {
-        when(collectionService.findAll()).thenReturn(Collections.emptyList());
+        when(collectionService.findAll()).thenReturn(Collections.singletonList(new Collection()));
         ResponseEntity<String> response = getWithKey(getSignedJWT());
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("[{\"id\":null,\"location\":null,\"metadata\":null}]", response.getBody());
     }
 
     @Test
@@ -150,6 +145,7 @@ public class WebSecurityConfigurationTest {
                 .subject("alice")
                 .issuer("https://test.com")
                 .expirationTime(expires)
+                .claim(UserAuthenticationConverter.AUTHORITIES, Collections.singletonList("authority"))
                 .build();
     }
 

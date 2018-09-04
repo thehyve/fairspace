@@ -1,7 +1,9 @@
 package io.fairspace.neptune.service;
 
+import io.fairspace.neptune.model.Authorization;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.CollectionMetadata;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
@@ -13,11 +15,9 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Merges data from the collection repository and the metadatastore
@@ -25,18 +25,27 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 public class CollectionService {
     private CollectionRepository repository;
+    private AuthorizationService authorizationService;
     private StorageService storageService;
     private CollectionMetadataService collectionMetadataService;
 
     @Autowired
-    public CollectionService(CollectionRepository repository, StorageService storageService, CollectionMetadataService collectionMetadataService) {
+    public CollectionService(CollectionRepository repository, AuthorizationService authorizationService, StorageService storageService, CollectionMetadataService collectionMetadataService) {
         this.repository = repository;
+        this.authorizationService = authorizationService;
         this.storageService = storageService;
         this.collectionMetadataService = collectionMetadataService;
     }
 
     public Iterable<Collection> findAll() {
-        Iterable<Collection> collections = repository.findAll();
+        Iterable<Collection> collections =
+                repository.findAllById(
+                        authorizationService
+                                .getAllByCurrentUser()
+                                .stream()
+                                .map(Authorization::getCollectionId)
+                                .collect(toList()));
+
         List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
 
         // Merge collections with metadata
@@ -51,11 +60,13 @@ public class CollectionService {
                             .map(collection::withMetadata)
                             .orElse(collection);
                 })
-                .collect(Collectors.toList());
+                .collect(toList());
 
     }
 
     public Optional<Collection> findById(Long id) {
+        authorizationService.checkPermission(Permission.Read, id);
+
         // First retrieve collection itself
         Optional<Collection> optionalCollection = repository.findById(id);
 
@@ -72,15 +83,21 @@ public class CollectionService {
     }
 
     public Collection add(Collection collection) throws IOException {
-        if(collection.getMetadata() == null) {
+        if (collection.getMetadata() == null) {
             throw new InvalidCollectionException();
         }
 
         Collection savedCollection = repository.save(collection);
 
-        // Update typeIdentifier based on given id
+        // Update location based on given id
         Long id = savedCollection.getId();
         Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
+
+        Authorization authorization = new Authorization();
+        authorization.setCollectionId(finalCollection.getId());
+        authorization.setUser(authorizationService.getCurrentUser());
+        authorization.setPermission(Permission.Manage);
+        authorizationService.authorize(authorization);
 
         // Update metadata. Ensure that the correct uri is specified
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), collection.getMetadata().getName(), collection.getMetadata().getDescription());
@@ -93,9 +110,11 @@ public class CollectionService {
     }
 
     public Collection update(Long id, Collection patch) {
-        if(patch.getMetadata() == null) {
+        if (patch.getMetadata() == null) {
             throw new InvalidCollectionException();
         }
+
+        authorizationService.checkPermission(Permission.Write, id);
 
         // Updating is currently only possible on the metadata
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), patch.getMetadata().getName(), patch.getMetadata().getDescription());
@@ -103,8 +122,10 @@ public class CollectionService {
         return patch;
     }
 
-    public void deleteById(Long id) {
+    public void delete(Long id) {
         Optional<Collection> collection = repository.findById(id);
+
+        authorizationService.checkPermission(Permission.Manage, id);
 
         collection.map(foundCollection -> {
             // Remove contents of the collection as well
@@ -118,4 +139,5 @@ public class CollectionService {
             return foundCollection;
         }).orElseThrow(CollectionNotFoundException::new);
     }
+
 }

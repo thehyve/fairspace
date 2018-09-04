@@ -43,7 +43,7 @@ public class TitanService implements StorageService {
     }
 
     private String getFullWebdavUrl(Collection collection) {
-        return webdavEndpoint + collection.getTypeIdentifier();
+        return webdavEndpoint + collection.getLocation();
     }
 
     private HttpUriRequest withAuthorization(HttpUriRequest request) {
