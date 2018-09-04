@@ -17,7 +17,7 @@ class MetadataViewer extends React.Component {
 
     static renderValue(v) {
         return (
-            <ListItem>
+            <ListItem key={this.extractDisplayValue(v)}>
                 {this.retrieveDisplayableItem(v)}
             </ListItem>)
     }
@@ -29,7 +29,7 @@ class MetadataViewer extends React.Component {
     }
 
     retrieveDisplayableItem(v) {
-        let displayValue = v['rdfs:label'] || v['@id'] || v['@value'] || '';
+        let displayValue = this.extractDisplayValue(v);
 
         if ('@id' in v) {
             return (<a href={MetadataViewer.navigableLink(v['@id'])}>{displayValue}</a>)
@@ -39,10 +39,14 @@ class MetadataViewer extends React.Component {
     }
 
 
+    extractDisplayValue(v) {
+        return v['rdfs:label'] || v['@id'] || v['@value'] || '';
+    }
+
     renderProperty(p) {
         const items = p.values.map(MetadataViewer.renderValue.bind(this));
         return (
-            <ListItem>
+            <ListItem key={p.label}>
                 <div>
                     <Typography variant="subheading">{p.label}:</Typography>
                     <List dense={true}>{items}</List>
