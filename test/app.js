@@ -62,9 +62,38 @@ describe('Authentication', () => {
             .set('Authorization', 'Bearer ' + invalidSignature)
             .expect(401)
     );
+});
 
+describe('Webdav', () => {
+    beforeEach(() =>
+        server
+            .mkcol('/api/storage/webdav/tmp')
+            .set('Authorization', 'Bearer ' + token)
+    );
 
-})
+    it('can move directories properly within the /api/storage/webdav/ root', () => {
+        server
+            .move('/api/storage/webdav/tmp')
+            .set('Authorization', 'Bearer ' + token)
+            .set('Destination', '/api/storage/webdav/tmp2')
+            .expect(201)
+
+        // Move back again to allow cleanup
+        server
+            .move('/api/storage/webdav/tmp2')
+            .set('Authorization', 'Bearer ' + token)
+            .set('Destination', '/api/storage/webdav/tmp')
+            .expect(201)
+
+    });
+
+    afterEach(() =>
+        server
+            .delete('/api/storage/webdav/tmp')
+            .set('Authorization', 'Bearer ' + token)
+    );
+
+});
 
 
 function mockPublicKeyset() {

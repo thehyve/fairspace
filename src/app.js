@@ -5,6 +5,7 @@ const zipkinMiddleware = require('zipkin-instrumentation-express').expressMiddle
 const HttpLogger = require('zipkin-transport-http').HttpLogger;
 const noopHttpAuthentication = require('./auth/noop-http-webdav-authentication');
 const jwksVerifier = require('./auth/verify-jwt-with-jwks');
+const fixWebdavDestinationMiddleware = require('./fixWebdavDestinationMiddleware');
 
 // Configuration parameters
 const rootPath = process.env.FILES_FOLDER || '/data';
@@ -22,7 +23,7 @@ app.get('/', (req, res) => res.send('Hi, I\'m Titan!').end());
 if(tracingEnabled) app.use(setupTracingMiddleware(zipkinEndointUrl, zipkinSamplingRate));
 if(authEnabled) app.use(setupAuthMiddleware(jwksUrl));
 
-app.use(setupWebdavMiddleware(rootPath));
+setupWebdavMiddleware(rootPath, '/api/storage/webdav');
 
 module.exports = app;
 
@@ -46,12 +47,14 @@ function setupTracingMiddleware(zipkinEndpointUrl, samplingRate) {
     return zipkinMiddleware({tracer});
 }
 
-function setupWebdavMiddleware(rootPath) {
+function setupWebdavMiddleware(physicalRootPath, webdavPath) {
     const server = new webdav.WebDAVServer({
         httpAuthentication: noopHttpAuthentication,
-        rootFileSystem: new webdav.PhysicalFileSystem(rootPath)
+        rootFileSystem: new webdav.PhysicalFileSystem(physicalRootPath)
     });
 
-    return webdav.extensions.express('/api/storage/webdav/', server)
+
+    app.use(fixWebdavDestinationMiddleware(webdavPath));
+    app.use(webdav.extensions.express(webdavPath, server));
 }
 
