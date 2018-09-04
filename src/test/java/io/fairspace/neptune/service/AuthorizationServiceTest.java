@@ -32,7 +32,7 @@ public class AuthorizationServiceTest {
     @Mock
     private CollectionRepository collectionRepository;
 
-    private Collection collection1 = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "location", null);
+    private Collection collection1 = new Collection(1L, "location", "name", "description", null);
 
     private AuthorizationService authorizationService;
 

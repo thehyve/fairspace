@@ -2,18 +2,15 @@ package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.model.Authorization;
 import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.model.CollectionMetadata;
 import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
-import io.fairspace.neptune.web.InvalidCollectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
@@ -46,22 +43,13 @@ public class CollectionService {
                                 .map(Authorization::getCollectionId)
                                 .collect(toList()));
 
-        List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
-
-        // Merge collections with metadata
+        // Add the uri for metadata lookup
         return StreamSupport.stream(collections.spliterator(), false)
                 .map(collection -> {
                     String uri = collectionMetadataService.getUri(collection.getId());
-
-                    return metadata.stream()
-                            .filter(Objects::nonNull)
-                            .filter(m -> uri.equals(m.getUri()))
-                            .findFirst()
-                            .map(collection::withMetadata)
-                            .orElse(collection);
+                    return collection.toBuilder().uri(uri).build();
                 })
                 .collect(toList());
-
     }
 
     public Optional<Collection> findById(Long id) {
@@ -72,26 +60,21 @@ public class CollectionService {
 
         return optionalCollection
                 .map(collection -> {
-                    // If it exists, retrieve metadata
-                    Optional<CollectionMetadata> optionalMetadata = collectionMetadataService.getCollection(collectionMetadataService.getUri(id));
-
-                    return optionalMetadata
-                            .map(collection::withMetadata)
-                            .orElse(collection);
+                    String uri = collectionMetadataService.getUri(collection.getId());
+                    return collection.toBuilder().uri(uri).build();
                 });
 
     }
 
     public Collection add(Collection collection) throws IOException {
-        if (collection.getMetadata() == null) {
-            throw new InvalidCollectionException();
-        }
-
         Collection savedCollection = repository.save(collection);
 
         // Update location based on given id
         Long id = savedCollection.getId();
-        Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
+        Collection finalCollection = repository.save(savedCollection.toBuilder().location(id.toString()).build());
+
+        // Add the uri
+        finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getUri(finalCollection.getId())).build();
 
         Authorization authorization = new Authorization();
         authorization.setCollectionId(finalCollection.getId());
@@ -100,26 +83,38 @@ public class CollectionService {
         authorizationService.authorize(authorization);
 
         // Update metadata. Ensure that the correct uri is specified
-        CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), collection.getMetadata().getName(), collection.getMetadata().getDescription());
-        collectionMetadataService.createCollection(metadataToSave);
+        collectionMetadataService.createCollection(finalCollection);
 
         // Create a place for storing collection contents
-        storageService.addCollection(collection);
+        storageService.addCollection(finalCollection);
 
-        return finalCollection.withMetadata(metadataToSave);
+        return finalCollection;
     }
 
     public Collection update(Long id, Collection patch) {
-        if (patch.getMetadata() == null) {
-            throw new InvalidCollectionException();
-        }
-
         authorizationService.checkPermission(Permission.Write, id);
 
-        // Updating is currently only possible on the metadata
-        CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), patch.getMetadata().getName(), patch.getMetadata().getDescription());
-        collectionMetadataService.patchCollection(metadataToSave);
-        return patch;
+        Optional<Collection> optionalCollection = repository.findById(id);
+
+        return optionalCollection.map(collection -> {
+            // Add properties from outside
+            Collection.CollectionBuilder builder = collection.toBuilder();
+            if(!StringUtils.isEmpty(patch.getName())) {
+                builder.name(patch.getName());
+            }
+
+            if(!StringUtils.isEmpty(patch.getDescription())) {
+                builder.name(patch.getDescription());
+            }
+
+            // Store in the database
+            Collection savedCollection = repository.save(builder.build());
+
+            // Also update the metadata
+            collectionMetadataService.patchCollection(savedCollection);
+
+            return savedCollection;
+        }).orElseThrow(CollectionNotFoundException::new);
     }
 
     public void delete(Long id) {

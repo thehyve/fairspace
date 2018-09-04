@@ -2,15 +2,20 @@ package io.fairspace.neptune.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder(toBuilder = true)
 public class Collection {
     public enum CollectionType {
         LOCAL_FILE
@@ -21,14 +26,13 @@ public class Collection {
     private Long id;
 
     @JsonIgnore
-    private CollectionType type = CollectionType.LOCAL_FILE;
+    private final CollectionType type = CollectionType.LOCAL_FILE;
 
     private String location;
 
-    @Transient
-    private CollectionMetadata metadata;
+    private String name;
+    private String description;
 
-    public Collection withMetadata(CollectionMetadata metadata) {
-        return new Collection(id, type, location, metadata);
-    }
+    @Transient
+    private String uri;
 }
