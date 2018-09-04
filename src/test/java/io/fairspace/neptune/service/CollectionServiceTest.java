@@ -1,9 +1,9 @@
 package io.fairspace.neptune.service;
 
-import io.fairspace.neptune.model.Authorization;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.CollectionMetadata;
-import io.fairspace.neptune.model.Permission;
+import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
@@ -35,7 +35,7 @@ public class CollectionServiceTest {
     private CollectionRepository collectionRepository;
 
     @Mock
-    private AuthorizationService authorizationService;
+    private PermissionService permissionService;
 
     @Mock
     private StorageService storageService;
@@ -45,12 +45,12 @@ public class CollectionServiceTest {
 
     @Before
     public void setUp() {
-        service = new CollectionService(collectionRepository, authorizationService, storageService, collectionMetadataService);
+        service = new CollectionService(collectionRepository, permissionService, storageService, collectionMetadataService);
 
-        when(authorizationService.getAllByCurrentUser())
+        when(permissionService.getAllByCurrentUser())
                 .thenReturn(asList(
-                        new Authorization(1L, "user1", 1L, Permission.Manage),
-                        new Authorization(2L, "user1", 2L, Permission.Read)));
+                        new Permission(1L, "user1", 1L, Access.Manage),
+                        new Permission(2L, "user1", 2L, Access.Read)));
 
         when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
@@ -131,7 +131,7 @@ public class CollectionServiceTest {
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
-        verify(authorizationService).authorize(any());
+        verify(permissionService).authorize(any(), eq(true));
     }
 
     @Test(expected = InvalidCollectionException.class)

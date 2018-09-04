@@ -47,7 +47,7 @@ public class TitanService implements StorageService {
     }
 
     private HttpUriRequest withAuthorization(HttpUriRequest request) {
-        request.addHeader("Authorization", authorizationContainer.getAuthorizationHeader());
+        request.addHeader("Permission", authorizationContainer.getAuthorizationHeader());
         return request;
     }
 }

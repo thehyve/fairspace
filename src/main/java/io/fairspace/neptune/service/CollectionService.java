@@ -1,9 +1,9 @@
 package io.fairspace.neptune.service;
 
-import io.fairspace.neptune.model.Authorization;
+import io.fairspace.neptune.model.Access;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.CollectionMetadata;
-import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
@@ -25,14 +25,14 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class CollectionService {
     private CollectionRepository repository;
-    private AuthorizationService authorizationService;
+    private PermissionService permissionService;
     private StorageService storageService;
     private CollectionMetadataService collectionMetadataService;
 
     @Autowired
-    public CollectionService(CollectionRepository repository, AuthorizationService authorizationService, StorageService storageService, CollectionMetadataService collectionMetadataService) {
+    public CollectionService(CollectionRepository repository, PermissionService permissionService, StorageService storageService, CollectionMetadataService collectionMetadataService) {
         this.repository = repository;
-        this.authorizationService = authorizationService;
+        this.permissionService = permissionService;
         this.storageService = storageService;
         this.collectionMetadataService = collectionMetadataService;
     }
@@ -40,10 +40,10 @@ public class CollectionService {
     public Iterable<Collection> findAll() {
         Iterable<Collection> collections =
                 repository.findAllById(
-                        authorizationService
+                        permissionService
                                 .getAllByCurrentUser()
                                 .stream()
-                                .map(Authorization::getCollectionId)
+                                .map(Permission::getCollectionId)
                                 .collect(toList()));
 
         List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
@@ -65,7 +65,7 @@ public class CollectionService {
     }
 
     public Optional<Collection> findById(Long id) {
-        authorizationService.checkPermission(Permission.Read, id);
+        permissionService.checkPermission(Access.Read, id);
 
         // First retrieve collection itself
         Optional<Collection> optionalCollection = repository.findById(id);
@@ -93,11 +93,11 @@ public class CollectionService {
         Long id = savedCollection.getId();
         Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
 
-        Authorization authorization = new Authorization();
-        authorization.setCollectionId(finalCollection.getId());
-        authorization.setUser(authorizationService.getCurrentUser());
-        authorization.setPermission(Permission.Manage);
-        authorizationService.authorize(authorization, true);
+        Permission permission = new Permission();
+        permission.setCollectionId(finalCollection.getId());
+        permission.setUser(permissionService.getCurrentUser());
+        permission.setAccess(Access.Manage);
+        permissionService.authorize(permission, true);
 
         // Update metadata. Ensure that the correct uri is specified
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), collection.getMetadata().getName(), collection.getMetadata().getDescription());
@@ -114,7 +114,7 @@ public class CollectionService {
             throw new InvalidCollectionException();
         }
 
-        authorizationService.checkPermission(Permission.Write, id);
+        permissionService.checkPermission(Access.Write, id);
 
         // Updating is currently only possible on the metadata
         CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), patch.getMetadata().getName(), patch.getMetadata().getDescription());
@@ -125,7 +125,7 @@ public class CollectionService {
     public void delete(Long id) {
         Optional<Collection> collection = repository.findById(id);
 
-        authorizationService.checkPermission(Permission.Manage, id);
+        permissionService.checkPermission(Access.Manage, id);
 
         collection.map(foundCollection -> {
             // Remove contents of the collection as well
