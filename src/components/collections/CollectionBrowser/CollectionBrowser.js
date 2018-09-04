@@ -12,10 +12,9 @@ import CollectionOverview from "../CollectionOverview/CollectionOverview";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import {Column, Row} from 'simple-flexbox';
-import UploadButton from "../UploadButton/UploadButton";
+import FileOperations from "../FileOperations/FileOperations";
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
-
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -146,22 +145,11 @@ class CollectionBrowser extends React.Component {
         this.requireRefresh();
     }
 
-    handleUpload(files) {
-        if (files && files.length > 0) {
-            this.fileStore
-                .upload(this.state.openedPath, files)
-                .catch(err => {
-                    const errorMessage = "An error occurred while uploading files";
-                    ErrorDialog.showError(err, errorMessage, this.handleUpload.bind(this));
-                });
-        }
-    }
-
     handleDidLoad() {
         this.setState({refreshRequired: false});
     }
 
-    handleDidUpload() {
+    handleDidFileOperation() {
         this.requireRefresh();
     }
 
@@ -237,7 +225,7 @@ class CollectionBrowser extends React.Component {
         // - an infodrawer
 
         let breadCrumbs = this.renderBreadCrumbs(openedCollection, openedPath);
-        let buttons = this.renderButtons(openedCollection, openedPath);
+        let buttons = this.renderButtons(openedCollection, openedPath, selectedPath);
 
         let mainPanel;
         if (this.state.loading) {
@@ -262,9 +250,9 @@ class CollectionBrowser extends React.Component {
                                 {breadCrumbs}
                             </div>
                         </Column>
-                        <Column>
+                        <Row>
                             {buttons}
-                        </Column>
+                        </Row>
                     </Row>
 
                     {mainPanel}
@@ -296,26 +284,18 @@ class CollectionBrowser extends React.Component {
             segments={pathSegments}/>)
     }
 
-    renderButtons(selectedCollection, selectedPath) {
-        return this.renderAddButton(selectedCollection);
-    }
-
-    renderAddButton(selectedCollection) {
-        if (selectedCollection) {
-            return (<UploadButton
-                variant="fab"
-                mini
-                color="secondary"
-                aria-label="Upload"
-                onUpload={this.handleUpload.bind(this)}
-                onDidUpload={this.handleDidUpload.bind(this)}>
-                <Icon>cloud_upload</Icon>
-            </UploadButton>)
+    renderButtons(openedCollection, openedPath, selection) {
+        if(openedCollection) {
+            return <FileOperations
+                        path={openedPath}
+                        selection={selection}
+                        fileStore={this.fileStore}
+                        onDidFileOperation={this.handleDidFileOperation.bind(this)}/>
         } else {
-            return (<Button variant="fab" mini color="secondary" aria-label="Add"
+            return <Button variant="fab" mini color="secondary" aria-label="Add"
                             onClick={this.handleAddCollectionClick.bind(this)}>
-                <Icon>add</Icon>
-            </Button>)
+                        <Icon>add</Icon>
+                    </Button>
         }
     }
 

@@ -2,7 +2,6 @@ import React from 'react';
 import FileList from "../FileList/FileList";
 import ErrorMessage from "../../error/ErrorMessage";
 
-
 class FileOverview extends React.Component {
     constructor(props) {
         super(props);

@@ -14,6 +14,8 @@ CreateWebdavClient.setFetchMethod((input, init) => {
  * Service to perform file operations
  */
 class FileStore {
+    static PATH_SEPARATOR = '/';
+
     constructor(collectionSubDirectory) {
         this.basePath = '/' + collectionSubDirectory;
 
@@ -126,6 +128,15 @@ class FileStore {
      */
     getFullPath(path) {
         return path ? this.basePath + path : this.basePath;
+    }
+
+    /**
+     * Combines multiple parts of the path with the proper separator
+     * @param paths
+     */
+    joinPaths(...paths) {
+        console.log(paths.join(FileStore.PATH_SEPARATOR));
+        return paths.join(FileStore.PATH_SEPARATOR);
     }
 
 }
