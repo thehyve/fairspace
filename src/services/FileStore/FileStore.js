@@ -14,9 +14,6 @@ CreateWebdavClient.setFetchMethod((input, init) => {
  * Service to perform file operations
  */
 class FileStore {
-    static changeHeaders = new Headers({'Content-Type': 'application/json'});
-    static getHeaders = new Headers({'Accept': 'application/json'});
-
     constructor(collectionSubDirectory) {
         this.basePath = '/' + collectionSubDirectory;
 
@@ -36,6 +33,14 @@ class FileStore {
             .getDirectoryContents(fullPath);
     }
 
+    createDirectory(path) {
+        if(!path) {
+            return Promise.reject("No path specified for directory creation");
+        }
+
+        return this.client.createDirectory(this.getFullPath(path))
+    }
+
     /**
      * Uploads the given files into the provided path
      * @param path
@@ -44,7 +49,7 @@ class FileStore {
      */
     upload(path, files) {
         if(!files) {
-            return Promise.reject();
+            return Promise.reject("No files given");
         }
 
         const fullPath = this.getFullPath(path);
@@ -66,6 +71,53 @@ class FileStore {
 
         window.location.href = this.client.getFileDownloadLink(this.getFullPath(path));
     }
+
+    /**
+     * Deletes the file given by path
+     * @param path
+     * @returns Promise<any>
+     */
+    delete(path) {
+        if(!path)
+            return Promise.reject("No path specified for deletion");
+
+        return this.client.deleteFile(this.getFullPath(path))
+    }
+
+    /**
+     * Move the file specified by {source} to {destination}
+     * @param source
+     * @param destination
+     * @returns Promise<any>
+     */
+    move(source, destination) {
+        if (!source) {
+            return Promise.reject("No source specified to move");
+        }
+        if (!destination) {
+            return Promise.reject("No destination specified to move to");
+        }
+
+        return this.client.moveFile(this.getFullPath(source), this.getFullPath(destination))
+    }
+
+    /**
+     * Copy the file specified by {source} to {destination}
+     * @param source
+     * @param destination
+     * @returns Promise<any>
+     */
+    copy(source, destination) {
+        if (!source) {
+            return Promise.reject("No source specified to copy");
+        }
+        if (!destination) {
+            return Promise.reject("No destination specified to copy to");
+        }
+
+        return this.client.copyFile(this.getFullPath(source), this.getFullPath(destination))
+    }
+
 
     /**
      * Converts the path within a collection to a path with the base path
