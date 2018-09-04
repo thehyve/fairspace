@@ -1,7 +1,7 @@
 {
   "id": 2,
   "type": "LOCAL_FILE",
-  "typeIdentifier": "samples",
+  "location": "samples",
   "metadata": {
     "uri": "http://fairspace.com/iri/collections/2",
     "name": "John's samples",

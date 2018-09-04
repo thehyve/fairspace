@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "typeIdentifier": "quotes",
+        "location": "quotes",
         "metadata": {
             "uri": "http://fairspace.com/iri/collections/1",
             "name": "John's quotes",
@@ -10,7 +10,7 @@
     },
     {
         "id": 2,
-        "typeIdentifier": "samples",
+        "location": "samples",
         "metadata": {
             "uri": "http://fairspace.com/iri/collections/2",
             "name": "John's samples",
@@ -19,7 +19,7 @@
     },
     {
         "id": 3,
-        "typeIdentifier": "external",
+        "location": "external",
         "metadata": {
             "uri": "http://fairspace.com/iri/collections/3",
             "name": "External data on AWS S3",
@@ -28,7 +28,7 @@
     },
     {
         "id": 4,
-        "typeIdentifier": "other",
+        "location": "other",
         "metadata": null
     }
 ]

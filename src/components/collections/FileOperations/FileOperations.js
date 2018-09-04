@@ -39,13 +39,15 @@ function FileOperations(props) {
         return fileStore
             .createDirectory(fileStore.joinPaths(path, name))
             .then(onDidFileOperation)
+            .then(() => true)
             .catch(err => {
                 if(err.status === 405) {
                     // Directory already exists
                     ErrorDialog.showError(err, "A directory or file with this name already exists. Please choose another name");
-                    throw err;
+                    return false;
                 } else {
                     ErrorDialog.showError(err, "An error occurred while creating directory", () => handleCreateDirectory(name));
+                    return true;
                 }
             });
     }

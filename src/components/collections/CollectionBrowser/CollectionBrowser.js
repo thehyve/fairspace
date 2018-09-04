@@ -143,14 +143,18 @@ class CollectionBrowser extends React.Component {
             .catch(err => {
                 ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
             });
+
     }
 
     handlePathRename(path, newName) {
         return this.renameFile(path.basename, newName)
             .then(this.requireRefresh.bind(this))
+            .then(() => true)
             .catch(err => {
                 ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
+                return false;
             });
+
     }
 
     handleDidCollectionDetailsChange(collectionId, parameters) {
@@ -206,11 +210,10 @@ class CollectionBrowser extends React.Component {
                 }
             }))
                 .then(() => this.setState({clipboard: null}))
-                .then(this.requireRefresh.bind(this))
                 .catch(err => {
                     ErrorDialog.showError(err, "An error occurred while pasting your contents");
-                });
-
+                })
+                .then(this.requireRefresh.bind(this));
         }
     }
 

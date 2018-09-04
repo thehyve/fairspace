@@ -49,8 +49,7 @@ class CreateDirectoryButton extends React.Component{
         if(this.onCreate) {
             this
                 .onCreate(this.state.name)
-                .then(this.closeDialog.bind(this))
-                .catch(() => { /* Ignore the exception as it is handled by onCreate, but just prevents the dialog of closing */ });
+                .then((shouldClose) => shouldClose && this.closeDialog.bind(this))
         }
     }
 
