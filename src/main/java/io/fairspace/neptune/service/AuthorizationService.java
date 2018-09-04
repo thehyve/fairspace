@@ -50,10 +50,12 @@ public class AuthorizationService {
                 .orElseGet(() -> new Authorization(null, user, collectionId, Permission.None));
     }
 
-    public Authorization authorize(Authorization authorization) {
+    public Authorization authorize(Authorization authorization, boolean isNew) {
         Collection collection = collectionRepository.findById(authorization.getCollectionId()).orElseThrow(CollectionNotFoundException::new);
 
-        checkPermission(Permission.Manage, authorization.getCollectionId());
+        if (!isNew) {
+            checkPermission(Permission.Manage, authorization.getCollectionId());
+        }
 
         return authorizationRepository.findByUserAndCollectionId(authorization.getUser(), collection)
                 .map(existing -> {

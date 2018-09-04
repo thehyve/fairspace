@@ -80,7 +80,7 @@ public class CollectionService {
         authorization.setCollectionId(finalCollection.getId());
         authorization.setUser(authorizationService.getCurrentUser());
         authorization.setPermission(Permission.Manage);
-        authorizationService.authorize(authorization);
+        authorizationService.authorize(authorization, true);
 
         // Update metadata. Ensure that the correct uri is specified
         collectionMetadataService.createCollection(finalCollection);
