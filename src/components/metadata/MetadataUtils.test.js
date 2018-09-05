@@ -43,12 +43,12 @@ const vocabulary = {
 };
 
 const correct_response = [
-    {label: 'Description', values: [{'@value': 'More info'}, {'@value': 'My first collection'}]},
-    {label: 'Name', values: [{'@value': 'Collection 5'}]}, {"label": "Type", "values":
+    {key: 'http://fairspace.io/ontology#description', label: 'Description', values: [{'@value': 'More info'}, {'@value': 'My first collection'}]},
+    {key: 'http://fairspace.io/ontology#name', label: 'Name', values: [{'@value': 'Collection 5'}]}, {"key": "@type", "label": "Type", "values":
             [{"@id": "http://fairspace.io/ontology#Collection", "rdfs:label": "Collection"}]}
     ];
 
 it('combines vocabulary and metadata', () => {
-    combine(vocabulary, metadata1)
+    return combine(vocabulary, metadata1)
         .then(result => expect(result).toEqual(correct_response));
 });
