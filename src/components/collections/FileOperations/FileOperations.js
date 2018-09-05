@@ -8,7 +8,7 @@ import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import Badge from "@material-ui/core/Badge";
 
 function FileOperations(props) {
-    const {fileStore, path, onDidFileOperation, onCut, onCopy, onPaste, numClipboardItems, numSelected} = props;
+    const {fileStore, path, onDidFileOperation, onCut, onCopy, onPaste, numClipboardItems, selection} = props;
 
     function handleCut(e) {
         e.stopPropagation()
@@ -67,13 +67,13 @@ function FileOperations(props) {
         <IconButton
             aria-label="Copy"
             onClick={handleCopy}
-            disabled={numSelected === 0}>
+            disabled={selection.length === 0}>
             <ContentCopy/>
         </IconButton>
         <IconButton
             aria-label="Cut"
             onClick={handleCut}
-            disabled={numSelected === 0}>
+            disabled={selection.length === 0}>
             <ContentCut/>
         </IconButton>
         <IconButton

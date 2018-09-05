@@ -16,6 +16,7 @@ function FileList(props) {
     if (!props.files || props.files.length === 0 || props.files[0] === null) {
         return "No files";
     } else {
+        const selectedFilenames = props.selectedPath ? props.selectedPath.map(path => path.filename) : [];
         return (<Table>
                 <TableHead>
                     <TableRow>
@@ -32,7 +33,7 @@ function FileList(props) {
                             <ClickHandler
                                 component={TableRow}
                                 key={row.filename}
-                                selected={row.filename === props.selectedPath}
+                                selected={selectedFilenames.indexOf(row.filename) > -1}
                                 onSingleClick={() => props.onPathClick(row)}
                                 onDoubleClick={() => props.onPathDoubleClick(row)}>
                                 <TableCell>
