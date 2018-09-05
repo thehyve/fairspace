@@ -41,28 +41,28 @@ public class CollectionMetadataService {
         tripleService.patchTriples(toTriplesForUpdate(collection));
     }
 
-    private Model toTriples(Collection collectionMetadata) {
+    private Model toTriples(Collection collection) {
         Model model = createDefaultModel();
 
-        Resource subject = model.createResource(getUri(collectionMetadata.getId()));
+        Resource subject = model.createResource(getUri(collection.getId()));
         model.add(subject, RDF.type, Fairspace.Collection);
-        model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collectionMetadata.getName(), "CollectionMetadata name is mandatory")));
-        model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collectionMetadata.getDescription()).orElse("")));
+        model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collection.getName(), "CollectionMetadata name is mandatory")));
+        model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
 
         return model;
     }
 
-    private Model toTriplesForUpdate(Collection collectionMetadata) {
+    private Model toTriplesForUpdate(Collection collection) {
         Model model = createDefaultModel();
 
-        Resource subject = model.createResource(getUri(collectionMetadata.getId()));
+        Resource subject = model.createResource(getUri(collection.getId()));
 
-        if (collectionMetadata.getName() != null) {
-            model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collectionMetadata.getName(), "CollectionMetadata name is mandatory")));
+        if (collection.getName() != null) {
+            model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collection.getName(), "CollectionMetadata name is mandatory")));
         }
 
-        if (collectionMetadata.getDescription() != null) {
-            model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collectionMetadata.getDescription()).orElse("")));
+        if (collection.getDescription() != null) {
+            model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
         }
         return model;
     }

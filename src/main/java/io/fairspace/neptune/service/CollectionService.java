@@ -5,6 +5,7 @@ import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,6 +21,7 @@ import static java.util.stream.Collectors.toList;
  * Merges data from the collection repository and the metadatastore
  */
 @Service
+@Slf4j
 public class CollectionService {
     private CollectionRepository repository;
     private PermissionService permissionService;
@@ -75,16 +77,19 @@ public class CollectionService {
         // Add the uri
         finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getUri(finalCollection.getId())).build();
 
-        Permission permission = new Permission();
-        permission.setCollection(finalCollection);
-        permission.setSubject(permissionService.getSubject());
-        permission.setAccess(Access.Manage);
-        permissionService.authorize(permission, true);
+        // Authorize the user
+        permissionService.authorize(finalCollection, Access.Manage, true);
 
-        // Update metadata. Ensure that the correct uri is specified
-        collectionMetadataService.createCollection(finalCollection);
+        // Update metadata. Only log an error if it fails, as the neptune
+        // database is the source of truth
+        try {
+            collectionMetadataService.createCollection(finalCollection);
+        } catch(Exception e) {
+            log.warn("An error occurred while storing collection metadata for collection id" + finalCollection.getId());
+        }
 
         // Create a place for storing collection contents
+        // TODO: Handle error when adding the storage for the collection
         storageService.addCollection(finalCollection);
 
         return finalCollection;
@@ -109,8 +114,13 @@ public class CollectionService {
             // Store in the database
             Collection savedCollection = repository.save(builder.build());
 
-            // Also update the metadata
-            collectionMetadataService.patchCollection(savedCollection);
+            // Update metadata. Only log an error if it fails, as the neptune
+            // database is the source of truth
+            try {
+                collectionMetadataService.patchCollection(savedCollection);
+            } catch(Exception e) {
+                log.warn("An error occurred while storing collection metadata for collection id" + savedCollection.getId());
+            }
 
             return savedCollection;
         }).orElseThrow(CollectionNotFoundException::new);

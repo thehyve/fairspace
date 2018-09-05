@@ -9,6 +9,7 @@ import io.fairspace.neptune.web.InvalidCollectionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -97,7 +98,13 @@ public class CollectionServiceTest {
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
-        verify(permissionService).authorize(any(), eq(true));
+
+        ArgumentMatcher<Collection> collectionMatcher = argument ->
+            collection.getId().equals(argument.getId()) &&
+            collection.getName().equals(argument.getName()) &&
+            collection.getDescription().equals(argument.getDescription());
+
+        verify(permissionService).authorize(argThat(collectionMatcher), eq(Access.Manage), eq(true));
     }
 
     @Test
