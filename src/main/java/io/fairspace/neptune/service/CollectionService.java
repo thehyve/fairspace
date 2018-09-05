@@ -5,8 +5,10 @@ import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
+import io.fairspace.neptune.web.InvalidCollectionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -72,7 +74,12 @@ public class CollectionService {
 
         // Update location based on given id
         Long id = savedCollection.getId();
-        Collection finalCollection = repository.save(savedCollection.toBuilder().location(id.toString()).build());
+        Collection finalCollection;
+        try {
+            finalCollection = repository.save(savedCollection.toBuilder().location(id.toString()).build());
+        } catch(DataIntegrityViolationException e) {
+            throw new InvalidCollectionException(e);
+        }
 
         // Add the uri
         finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getUri(finalCollection.getId())).build();

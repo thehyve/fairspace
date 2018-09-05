@@ -46,7 +46,7 @@ public class CollectionMetadataService {
 
         Resource subject = model.createResource(getUri(collection.getId()));
         model.add(subject, RDF.type, Fairspace.Collection);
-        model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collection.getName(), "CollectionMetadata name is mandatory")));
+        model.add(subject, Fairspace.name, model.createLiteral(collection.getName()));
         model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
 
         return model;
