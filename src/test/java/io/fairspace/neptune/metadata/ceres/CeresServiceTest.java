@@ -10,7 +10,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.cloud.contract.wiremock.WireMockSpring;
 import org.springframework.web.client.RestTemplate;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.junit.Assert.assertFalse;
 
 @RunWith(MockitoJUnitRunner.class)

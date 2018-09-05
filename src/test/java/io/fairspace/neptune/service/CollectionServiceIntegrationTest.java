@@ -1,16 +1,10 @@
 package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.config.upstream.AuthorizationContainer;
-import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.model.Permission;
-import io.fairspace.neptune.repository.CollectionRepository;
-import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,20 +12,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
