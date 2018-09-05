@@ -31,6 +31,9 @@ tracing:
   zipkinUrl: http://jaeger-collector.jaeger:9411
   samplingRate: 1
 
+permissions:
+  collectionPermissionsUrl:
+
 ## Persist data to a persistent volume
 persistence:
   enabled: true

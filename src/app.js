@@ -1,11 +1,14 @@
+
+
 const app = require('express')();
 const webdav = require('webdav-server').v2;
 const zipkin = require('zipkin');
 const zipkinMiddleware = require('zipkin-instrumentation-express').expressMiddleware;
 const HttpLogger = require('zipkin-transport-http').HttpLogger;
-const noopHttpAuthentication = require('./auth/noop-http-webdav-authentication');
+const jwtAuthentication = require('./auth/jwt-authentication');
 const jwksVerifier = require('./auth/verify-jwt-with-jwks');
 const fixWebdavDestinationMiddleware = require('./fixWebdavDestinationMiddleware');
+const NeptunePathPrivilegeManager = require("./auth/NeptunePathPrivilegeManager");
 
 // Configuration parameters
 const rootPath = process.env.FILES_FOLDER || '/data';
@@ -16,6 +19,7 @@ const authEnabled = process.env.AUTH_ENABLED !== 'false';
 const tracingEnabled = process.env.TRACING_ENABLED !== 'false';
 const zipkinEndointUrl = process.env.ZIPKIN_URL || 'http://jaeger-collector.jaeger:9411';
 const zipkinSamplingRate = process.env.ZIPKIN_SAMPLING_RATE || 0.01;
+const permissionsEndpointUrl = process.env.PERMISSIONS_URL || '/api/collections/%s/permissions';
 
 // Respond to / anonymously to allow for health checks
 app.get('/', (req, res) => res.send('Hi, I\'m Titan!').end());
@@ -49,8 +53,10 @@ function setupTracingMiddleware(zipkinEndpointUrl, samplingRate) {
 
 function setupWebdavMiddleware(physicalRootPath, webdavPath) {
     const server = new webdav.WebDAVServer({
-        httpAuthentication: noopHttpAuthentication,
-        rootFileSystem: new webdav.PhysicalFileSystem(physicalRootPath)
+        requireAuthentification: true,
+        httpAuthentication: jwtAuthentication,
+        rootFileSystem: new webdav.PhysicalFileSystem(physicalRootPath),
+        privilegeManager: new NeptunePathPrivilegeManager(permissionsEndpointUrl)
     });
 
 
