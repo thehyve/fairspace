@@ -46,10 +46,7 @@ class Loader extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.subject !== nextProps.subject) {
-            this.subject = nextProps.subject;
             this.loadData();
-        }
     }
 
     render() {
