@@ -70,7 +70,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected ErrorBody handleGenericException(Exception ex) {
         ErrorBody errorBody = new ErrorBody("An internal error occurred.");
-        log.error("An unexpected error occurred.", ex);
+        log.error("An unexpected error occurred: " + ex.getClass().getSimpleName(), ex);
         return errorBody;
     }
 }
