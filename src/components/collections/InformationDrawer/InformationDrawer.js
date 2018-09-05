@@ -24,10 +24,17 @@ function InformationDrawer(props) {
 
                 <Permissions collectionId={props.collection.id}/>
                 <hr/>
+
                 <Metadata
                     subject={props.collection.metadata.uri}
                     metadataStore={props.metadataStore}
                 />
+
+                <hr />
+
+                <Typography variant="title">Paths</Typography>
+                {props.path.map(path => <Typography key={path.filename}>{path.basename}</Typography>)}
+
             </React.Fragment>
         )
     } else {
@@ -49,8 +56,6 @@ function InformationDrawer(props) {
             </IconButton>
 
             {contents}
-
-            {props.path ? 'Path: ' + JSON.stringify(props.path) : 'No path selected'}
 
         </Drawer>
     );
