@@ -28,3 +28,4 @@ spring:
       probability: 0.1
   zipkin:
     base-url: http://jaeger-collector.jaeger:9411/
+
