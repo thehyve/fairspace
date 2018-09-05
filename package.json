@@ -18,6 +18,7 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "express": "^4.16.3",
     "jsonld": "^1.0.4",
+    "mdi-material-ui": "^5.3.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-dropzone": "^5.0.1",

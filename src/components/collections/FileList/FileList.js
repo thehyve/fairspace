@@ -7,6 +7,10 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Icon from "@material-ui/core/Icon";
 import ClickHandler from "../ClickHandler/ClickHandler";
+import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
+import RenameBox from "mdi-material-ui/RenameBox";
+import RenameButton from "../buttons/RenameButton/RenameButton";
+import {Row} from "simple-flexbox";
 
 function FileList(props) {
     if (!props.files || props.files.length === 0 || props.files[0] === null) {
@@ -19,6 +23,7 @@ function FileList(props) {
                         <TableCell>Name</TableCell>
                         <TableCell numeric>size</TableCell>
                         <TableCell numeric>Last Modified</TableCell>
+                        <TableCell></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -40,6 +45,18 @@ function FileList(props) {
                                     {row.size ? row.size : ''}
                                 </TableCell>
                                 <TableCell numeric>{row.lastmod}</TableCell>
+                                <TableCell numeric>
+                                    <Row>
+                                        {props.onRename?
+                                            <RenameButton currentName={row.basename} aria-label={"Rename " + row.basename} onRename={(newName) => props.onRename(row, newName)}>
+                                                <RenameBox />
+                                            </RenameButton> : null}
+                                        {props.onDelete ?
+                                            <ButtonWithVerification aria-label={"Delete " + row.basename} onClick={() => props.onDelete(row)}>
+                                                <Icon>delete</Icon>
+                                            </ButtonWithVerification> : null}
+                                    </Row>
+                                </TableCell>
                             </ClickHandler>
                         );
                     })}

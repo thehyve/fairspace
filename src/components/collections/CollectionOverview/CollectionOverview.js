@@ -59,21 +59,17 @@ class CollectionOverview extends React.Component {
     }
 
     deleteCollection(collection) {
-        if(window.confirm("Are you sure?")) {
-            return this.collectionStore
-                .deleteCollection(collection.id)
-                .then(this.loadContents.bind(this))
-                .catch(err => {
-                    if (this.isUnmounting) {
-                        return;
-                    }
-                    const errorMessage =  "An error occurred while deleting collection";
-                    this.setState({loading: false});
-                    ErrorDialog.showError(err, errorMessage, this.deleteCollection.bind(this));
-                })
-        } else {
-            return Promise.resolve();
-        }
+        return this.collectionStore
+            .deleteCollection(collection.id)
+            .then(this.loadContents.bind(this))
+            .catch(err => {
+                if (this.isUnmounting) {
+                    return;
+                }
+                const errorMessage =  "An error occurred while deleting collection";
+                this.setState({loading: false});
+                ErrorDialog.showError(err, errorMessage, this.deleteCollection.bind(this));
+            })
     }
 
     componentWillReceiveProps(nextProps) {

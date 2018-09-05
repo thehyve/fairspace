@@ -1,7 +1,7 @@
 {
   "id": 3,
   "type": "LOCAL_FILE",
-  "typeIdentifier": "external",
+  "location": "external",
   "metadata": {
     "uri": "http://fairspace.com/iri/collections/3",
     "name": "External data on AWS S3",

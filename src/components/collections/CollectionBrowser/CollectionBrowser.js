@@ -12,10 +12,9 @@ import CollectionOverview from "../CollectionOverview/CollectionOverview";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import {Column, Row} from 'simple-flexbox';
-import UploadButton from "../UploadButton/UploadButton";
+import FileOperations from "../FileOperations/FileOperations";
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
-
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -138,6 +137,26 @@ class CollectionBrowser extends React.Component {
         }
     }
 
+    handlePathDelete(path) {
+        return this.deleteFile(path.basename)
+            .then(this.requireRefresh.bind(this))
+            .catch(err => {
+                ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
+            });
+
+    }
+
+    handlePathRename(path, newName) {
+        return this.renameFile(path.basename, newName)
+            .then(this.requireRefresh.bind(this))
+            .then(() => true)
+            .catch(err => {
+                ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
+                return false;
+            });
+
+    }
+
     handleDidCollectionDetailsChange(collectionId, parameters) {
         // Update the currently selected collection
         this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, {metadata: parameters})});
@@ -146,23 +165,56 @@ class CollectionBrowser extends React.Component {
         this.requireRefresh();
     }
 
-    handleUpload(files) {
-        if (files && files.length > 0) {
-            this.fileStore
-                .upload(this.state.openedPath, files)
-                .catch(err => {
-                    const errorMessage = "An error occurred while uploading files";
-                    ErrorDialog.showError(err, errorMessage, this.handleUpload.bind(this));
-                });
-        }
-    }
-
     handleDidLoad() {
         this.setState({refreshRequired: false});
     }
 
-    handleDidUpload() {
+    handleDidFileOperation() {
         this.requireRefresh();
+    }
+
+    handleCut() {
+        this.setState({
+            clipboard: {
+                action: 'cut',
+                sourceDir: this.state.openedPath,
+                paths: [this.state.selectedPath]
+            }
+        })
+    }
+
+    handleCopy() {
+        this.setState({
+            clipboard: {
+                action: 'copy',
+                sourceDir: this.state.openedPath,
+                paths: [this.state.selectedPath]
+            }
+        })
+    }
+
+    handlePaste() {
+        if(this.state.clipboard && this.state.clipboard.paths) {
+            const {sourceDir, paths, action} = this.state.clipboard;
+
+            Promise.all(paths.map(path => {
+                const sourceFile = this.fileStore.joinPaths(sourceDir || '', path.basename);
+                const destinationFile = this.fileStore.joinPaths(this.state.openedPath || '', path.basename);
+
+                if(action === 'cut') {
+                    return this.fileStore.move(sourceFile, destinationFile);
+                } else if(action === 'copy') {
+                    return this.fileStore.copy(sourceFile, destinationFile);
+                } else {
+                    return Promise.reject("Invalid clipboard action: " + action);
+                }
+            }))
+                .then(() => this.setState({clipboard: null}))
+                .catch(err => {
+                    ErrorDialog.showError(err, "An error occurred while pasting your contents");
+                })
+                .then(this.requireRefresh.bind(this));
+        }
     }
 
     requireRefresh() {
@@ -208,8 +260,19 @@ class CollectionBrowser extends React.Component {
     }
 
     downloadFile(path) {
-        const basePath = this.state.openedPath || '';
-        this.fileStore.download(basePath + '/' + path);
+        this.fileStore.download(this._getFullPath(path));
+    }
+
+    deleteFile(path) {
+        return this.fileStore.delete(this._getFullPath(path));
+    }
+
+    renameFile(current, newName) {
+        return this.fileStore.move(this._getFullPath(current), this._getFullPath(newName));
+    }
+
+    _getFullPath(path) {
+        return this.fileStore.joinPaths(this.state.openedPath || '', path);
     }
 
     // Parse path into array
@@ -237,7 +300,7 @@ class CollectionBrowser extends React.Component {
         // - an infodrawer
 
         let breadCrumbs = this.renderBreadCrumbs(openedCollection, openedPath);
-        let buttons = this.renderButtons(openedCollection, openedPath);
+        let buttons = this.renderButtons(openedCollection, openedPath, selectedPath);
 
         let mainPanel;
         if (this.state.loading) {
@@ -262,9 +325,9 @@ class CollectionBrowser extends React.Component {
                                 {breadCrumbs}
                             </div>
                         </Column>
-                        <Column>
+                        <Row>
                             {buttons}
-                        </Column>
+                        </Row>
                     </Row>
 
                     {mainPanel}
@@ -296,26 +359,21 @@ class CollectionBrowser extends React.Component {
             segments={pathSegments}/>)
     }
 
-    renderButtons(selectedCollection, selectedPath) {
-        return this.renderAddButton(selectedCollection);
-    }
-
-    renderAddButton(selectedCollection) {
-        if (selectedCollection) {
-            return (<UploadButton
-                variant="fab"
-                mini
-                color="secondary"
-                aria-label="Upload"
-                onUpload={this.handleUpload.bind(this)}
-                onDidUpload={this.handleDidUpload.bind(this)}>
-                <Icon>cloud_upload</Icon>
-            </UploadButton>)
+    renderButtons(openedCollection, openedPath, selection) {
+        if(openedCollection) {
+            return <FileOperations
+                        path={openedPath}
+                        selection={selection}
+                        fileStore={this.fileStore}
+                        onCut={this.handleCut.bind(this)}
+                        onCopy={this.handleCopy.bind(this)}
+                        onPaste={this.handlePaste.bind(this)}
+                        onDidFileOperation={this.handleDidFileOperation.bind(this)}/>
         } else {
-            return (<Button variant="fab" mini color="secondary" aria-label="Add"
+            return <Button variant="fab" mini color="secondary" aria-label="Add"
                             onClick={this.handleAddCollectionClick.bind(this)}>
-                <Icon>add</Icon>
-            </Button>)
+                        <Icon>add</Icon>
+                    </Button>
         }
     }
 
@@ -338,6 +396,8 @@ class CollectionBrowser extends React.Component {
                 onFilesDidLoad={this.handleDidLoad.bind(this)}
                 onPathClick={this.handlePathClick.bind(this)}
                 onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
+                onPathDelete={this.handlePathDelete.bind(this)}
+                onPathRename={this.handlePathRename.bind(this)}
             />
         )
     }

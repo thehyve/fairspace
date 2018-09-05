@@ -1,6 +1,6 @@
 {
   "id": 3,
   "type": "LOCAL_FILE",
-  "typeIdentifier": "not-existing",
+  "location": "not-existing",
   "metadata": null
 }

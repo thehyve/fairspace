@@ -14,8 +14,7 @@ CreateWebdavClient.setFetchMethod((input, init) => {
  * Service to perform file operations
  */
 class FileStore {
-    static changeHeaders = new Headers({'Content-Type': 'application/json'});
-    static getHeaders = new Headers({'Accept': 'application/json'});
+    static PATH_SEPARATOR = '/';
 
     constructor(collectionSubDirectory) {
         this.basePath = '/' + collectionSubDirectory;
@@ -24,25 +23,35 @@ class FileStore {
         this.client = CreateWebdavClient(baseUrl)
     }
 
+    /**
+     * List directory contents
+     * @param path
+     * @returns {Promise<T>}
+     */
     list(path) {
         const fullPath = this.getFullPath(path);
 
         return this.client
-            .getDirectoryContents(fullPath)
-            .catch(e => {
-                // If the root directory does not exist, create it
-                if(!path && e.status === 404) {
-                    console.info("Root directory for collection does not exist. Creating it.")
-                    return this.client.createDirectory(fullPath).then(() => [])
-                } else {
-                    throw e;
-                }
-            });
+            .getDirectoryContents(fullPath);
     }
 
+    createDirectory(path) {
+        if(!path) {
+            return Promise.reject("No path specified for directory creation");
+        }
+
+        return this.client.createDirectory(this.getFullPath(path))
+    }
+
+    /**
+     * Uploads the given files into the provided path
+     * @param path
+     * @param files
+     * @returns Promise<any>
+     */
     upload(path, files) {
         if(!files) {
-            return;
+            return Promise.reject("No files given");
         }
 
         const fullPath = this.getFullPath(path);
@@ -53,6 +62,10 @@ class FileStore {
         );
     }
 
+    /**
+     * Downloads the file given by path. Downloading is done by redirecting the user to the file
+     * @param path
+     */
     download(path) {
         if(!path) {
             return;
@@ -62,12 +75,69 @@ class FileStore {
     }
 
     /**
+     * Deletes the file given by path
+     * @param path
+     * @returns Promise<any>
+     */
+    delete(path) {
+        if(!path)
+            return Promise.reject("No path specified for deletion");
+
+        return this.client.deleteFile(this.getFullPath(path))
+    }
+
+    /**
+     * Move the file specified by {source} to {destination}
+     * @param source
+     * @param destination
+     * @returns Promise<any>
+     */
+    move(source, destination) {
+        if (!source) {
+            return Promise.reject("No source specified to move");
+        }
+        if (!destination) {
+            return Promise.reject("No destination specified to move to");
+        }
+
+        // We have to specify the destination ourselves, as the client adds the fullpath
+        // to the
+        return this.client.moveFile(this.getFullPath(source), this.getFullPath(destination));
+    }
+
+    /**
+     * Copy the file specified by {source} to {destination}
+     * @param source
+     * @param destination
+     * @returns Promise<any>
+     */
+    copy(source, destination) {
+        if (!source) {
+            return Promise.reject("No source specified to copy");
+        }
+        if (!destination) {
+            return Promise.reject("No destination specified to copy to");
+        }
+
+        return this.client.copyFile(this.getFullPath(source), this.getFullPath(destination))
+    }
+
+
+    /**
      * Converts the path within a collection to a path with the base path
      * @param path
      * @returns {string|*}
      */
     getFullPath(path) {
         return path ? this.basePath + path : this.basePath;
+    }
+
+    /**
+     * Combines multiple parts of the path with the proper separator
+     * @param paths
+     */
+    joinPaths(...paths) {
+        return paths.join(FileStore.PATH_SEPARATOR);
     }
 
 }

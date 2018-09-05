@@ -2,7 +2,6 @@ import React from 'react';
 import FileList from "../FileList/FileList";
 import ErrorMessage from "../../error/ErrorMessage";
 
-
 class FileOverview extends React.Component {
     constructor(props) {
         super(props);
@@ -83,7 +82,9 @@ class FileOverview extends React.Component {
                     files={this.state.contents}
                     selectedPath={this.state.selectedPath}
                     onPathClick={this.props.onPathClick}
-                    onPathDoubleClick={this.props.onPathDoubleClick} />);
+                    onPathDoubleClick={this.props.onPathDoubleClick}
+                    onRename={this.props.onPathRename}
+                    onDelete={this.props.onPathDelete}/>);
     }
 }
 
