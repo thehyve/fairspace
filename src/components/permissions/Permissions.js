@@ -13,6 +13,9 @@ class Permissions extends React.Component {
         this.collectionId = props.collectionId;
     }
 
+    componentWillReceiveProps(props) {
+        this.collectionId = props.collectionId;
+    }
 
     loadPermissions() {
         return permissionStore.getCollectionPermissions(this.collectionId, null)

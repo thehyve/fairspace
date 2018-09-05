@@ -4,7 +4,7 @@
     "accountName": "/account/name",
     "authorizations": "/account/authorizations",
     "collections": "/api/collections",
-    "collectionPermissions": "/api/collections/%d/authorizations",
+    "collectionPermissions": "/api/collections/%d/permissions",
     "files": "/api/storage/webdav",
     "metadata": "/api/metadata/statements?subject="
   }

@@ -5,6 +5,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
 import Icon from "@material-ui/core/Icon";
 import Dropzone from 'react-dropzone';
 import {Column} from "simple-flexbox";
@@ -30,17 +31,22 @@ class UploadButton extends React.Component{
     }
 
     componentWillReceiveProps(props) {
+        this.onDidUpload = props.onDidUpload;
+        this.onUpload = props.onUpload;
+
         this.setState({
             uploading: false,
         });
     }
 
-    openDialog() {
+    openDialog(e) {
+        e.stopPropagation();
         this.filesUploaded = false;
         this.setState({uploading: true});
     }
 
-    closeDialog() {
+    closeDialog(e) {
+        if(e) e.stopPropagation();
         if(this.filesUploaded && this.onDidUpload) {
             this.onDidUpload();
         }
@@ -58,12 +64,13 @@ class UploadButton extends React.Component{
     render() {
         return (
             <div>
-                <Button {...this.componentProps} onClick={this.openDialog.bind(this)}>
+                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
                     {this.props.children}
-                </Button>
+                </IconButton>
 
                 <Dialog
                     open={this.state.uploading}
+                    onClick={(e) => e.stopPropagation()}
                     onClose={this.closeDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >

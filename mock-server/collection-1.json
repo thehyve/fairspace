@@ -1,7 +1,7 @@
 {
   "id": 1,
   "type": "LOCAL_FILE",
-  "typeIdentifier": "quotes",
+  "location": "quotes",
   "metadata": {
     "uri": "http://fairspace.com/iri/collections/1",
     "name": "John's quotes",

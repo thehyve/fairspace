@@ -61,6 +61,7 @@ class ErrorDialog extends React.Component {
                     onClose={this.handleClose}
                     aria-labelledby="alert-dialog-slide-title"
                     aria-describedby="alert-dialog-slide-description"
+                    key={"error-dialog"}
                 >
                     <DialogTitle id="alert-dialog-slide-title">
                         <Row>
