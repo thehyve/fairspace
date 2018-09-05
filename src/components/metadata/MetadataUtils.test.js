@@ -43,10 +43,28 @@ const vocabulary = {
 };
 
 const correct_response = [
-    {key: 'http://fairspace.io/ontology#description', label: 'Description', values: [{'@value': 'More info'}, {'@value': 'My first collection'}]},
-    {key: 'http://fairspace.io/ontology#name', label: 'Name', values: [{'@value': 'Collection 5'}]}, {"key": "@type", "label": "Type", "values":
-            [{"@id": "http://fairspace.io/ontology#Collection", "rdfs:label": "Collection"}]}
-    ];
+    {
+        key:'http://fairspace.io/ontology#description',
+        label:'Description',
+        values:[
+            {'@value':'More info'},
+            {'@value':'My first collection'}
+        ]
+    },
+    {
+        key:'http://fairspace.io/ontology#name',
+        label:'Name',
+        values:[{'@value':'Collection 5'}]
+    },
+    {
+        "key":"@type",
+        "label":"Type",
+        "values":[{
+                "@id":"http://fairspace.io/ontology#Collection",
+                "rdfs:label":"Collection"
+        }]
+    }
+];
 
 it('combines vocabulary and metadata', () => {
     return combine(vocabulary, metadata1)
