@@ -1,5 +1,6 @@
 const express = require('express');
 const webdav = require('webdav-server').v2;
+const fixWebdavDestinationMiddleware = require('./fixWebdavDestinationMiddleware');
 const port = process.env.PORT || 5000;
 
 // Start a generic server on port 5000 that serves default API
@@ -45,6 +46,7 @@ server.rootFileSystem().addSubTree(server.createExternalContext(), {
     }
 })
 
+app.use(fixWebdavDestinationMiddleware('/api/storage/webdav'));
 app.use(webdav.extensions.express('/api/storage/webdav', server))
 
 app.listen(port, () => console.log('Backend stub listening on port ' + port ))

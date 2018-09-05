@@ -5,17 +5,21 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
+import Typography from "@material-ui/core/Typography";
 import Icon from "@material-ui/core/Icon";
 import ClickHandler from "../ClickHandler/ClickHandler";
 import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
 import RenameBox from "mdi-material-ui/RenameBox";
 import RenameButton from "../buttons/RenameButton/RenameButton";
 import {Row} from "simple-flexbox";
+import DateTime from "../../generic/DateTime/DateTime";
+import Bytes from "../../generic/Bytes/Bytes";
 
 function FileList(props) {
     if (!props.files || props.files.length === 0 || props.files[0] === null) {
         return "No files";
     } else {
+        const selectedFilenames = props.selectedPath ? props.selectedPath.map(path => path.filename) : [];
         return (<Table>
                 <TableHead>
                     <TableRow>
@@ -32,7 +36,7 @@ function FileList(props) {
                             <ClickHandler
                                 component={TableRow}
                                 key={row.filename}
-                                selected={row.filename === props.selectedPath}
+                                selected={selectedFilenames.includes(row.filename)}
                                 onSingleClick={() => props.onPathClick(row)}
                                 onDoubleClick={() => props.onPathDoubleClick(row)}>
                                 <TableCell>
@@ -42,9 +46,15 @@ function FileList(props) {
                                     {row.basename}
                                 </TableCell>
                                 <TableCell numeric>
-                                    {row.size ? row.size : ''}
+                                    <Typography noWrap={true}>
+                                        {row.size ? <Bytes value={row.size} /> : ''}
+                                    </Typography>
                                 </TableCell>
-                                <TableCell numeric>{row.lastmod}</TableCell>
+                                <TableCell numeric>
+                                    <Typography noWrap={true}>
+                                        {row.lastmod ? <DateTime value={new Date(row.lastmod)}/> : null}
+                                    </Typography>
+                                </TableCell>
                                 <TableCell numeric>
                                     <Row>
                                         {props.onRename?

@@ -39,8 +39,8 @@ class Collection extends React.Component{
 
     determineEditValues(collection) {
         return {
-            name: collection.metadata.name  || collection.name || '',
-            description: collection.metadata.description || ''
+            name: collection.name || '',
+            description: collection.description || ''
         }
     }
 
@@ -64,7 +64,7 @@ class Collection extends React.Component{
         this.storeChangedDetails(this.state.collection.id, this.state.editValues)
             .then(() => {
                 if(this.onDidChangeDetails) {
-                    this.onDidChangeDetails(this.state.collection.id, Object.assign({uri: this.state.collection.metadata.uri}, this.state.editValues));
+                    this.onDidChangeDetails(this.state.collection.id, Object.assign({uri: this.state.collection.uri}, this.state.editValues));
                 }
             })
             .catch((e) => {
@@ -98,8 +98,8 @@ class Collection extends React.Component{
                     onMouseEnter={this.handleTextMouseEnter.bind(this)}
                     onMouseLeave={this.handleTextMouseLeave.bind(this)}
                 >
-                    <Typography variant="title">{this.state.collection.metadata.name} {this.state.showEditButton ? (<Icon>edit</Icon>) : ''}</Typography>
-                    <Typography variant="subheading">{this.state.collection.metadata.description}</Typography>
+                    <Typography variant="title">{this.state.collection.name} {this.state.showEditButton ? (<Icon>edit</Icon>) : ''}</Typography>
+                    <Typography variant="subheading">{this.state.collection.description}</Typography>
                 </div>
 
                 <Dialog
@@ -107,7 +107,7 @@ class Collection extends React.Component{
                     onClose={this.closeEditDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Edit collection: {this.state.collection.metadata.name}</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Edit collection: {this.state.collection.name}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
                             You can edit the collection name and description here.

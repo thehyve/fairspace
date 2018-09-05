@@ -15,6 +15,7 @@ import {Column, Row} from 'simple-flexbox';
 import FileOperations from "../FileOperations/FileOperations";
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
+import Clipboard from "./Clipboard";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -27,6 +28,7 @@ class CollectionBrowser extends React.Component {
 
         // Initialize state
         this.state = {
+            clipboard: new Clipboard(this.fileStore),
             loading: false,
             error: false,
 
@@ -63,24 +65,33 @@ class CollectionBrowser extends React.Component {
         }
     }
 
-    openCollectionAndPath(selectedCollectionId, selectedPath) {
+    setFilestore(fileStore) {
+        // Only update the filestore if it actually has changed
+        if (!this.fileStore || fileStore.basePath !== this.fileStore.basePath) {
+            this.fileStore = fileStore;
+            this.setState({clipboard: new Clipboard(fileStore)})
+        }
+    }
+
+    openCollectionAndPath(selectedCollectionId, openedPath) {
         if (selectedCollectionId) {
             // Retrieve collection details
             this.collectionStore
                 .getCollection(selectedCollectionId)
                 .then(collection => {
-                    this.fileStore = this.props.fileStoreFactory.build(collection);
+                    this.setFilestore(this.props.fileStoreFactory.build(collection));
                     this.setState({
                         openedCollection: collection,
                         selectedCollection: collection,
-                        openedPath: selectedPath
+                        openedPath: openedPath,
+                        selectedPath: []
                     });
                 })
                 .catch(e => {
                     this.setState({error: true, loading: false});
                 });
         } else {
-            this.setState({error: false, openedCollection: null, openedPath: selectedPath});
+            this.setState({error: false, openedCollection: null, openedPath: openedPath, selectedPath: []});
         }
     }
 
@@ -122,8 +133,8 @@ class CollectionBrowser extends React.Component {
 
     handlePathClick(path) {
         // If this pathis already selected, deselect
-        if (this.state.selectedPath && this.state.selectedPath.filename === path.filename) {
-            this.deselectPath();
+        if (this.isPathSelected(path)) {
+            this.deselectPath(path);
         } else {
             this.selectPath(path);
         }
@@ -175,46 +186,24 @@ class CollectionBrowser extends React.Component {
 
     handleCut() {
         this.setState({
-            clipboard: {
-                action: 'cut',
-                sourceDir: this.state.openedPath,
-                paths: [this.state.selectedPath]
-            }
+            clipboard: this.state.clipboard.cut(this.state.openedPath, this.state.selectedPath)
         })
     }
 
     handleCopy() {
         this.setState({
-            clipboard: {
-                action: 'copy',
-                sourceDir: this.state.openedPath,
-                paths: [this.state.selectedPath]
-            }
+            clipboard: this.state.clipboard.copy(this.state.openedPath, this.state.selectedPath)
         })
     }
 
     handlePaste() {
-        if(this.state.clipboard && this.state.clipboard.paths) {
-            const {sourceDir, paths, action} = this.state.clipboard;
-
-            Promise.all(paths.map(path => {
-                const sourceFile = this.fileStore.joinPaths(sourceDir || '', path.basename);
-                const destinationFile = this.fileStore.joinPaths(this.state.openedPath || '', path.basename);
-
-                if(action === 'cut') {
-                    return this.fileStore.move(sourceFile, destinationFile);
-                } else if(action === 'copy') {
-                    return this.fileStore.copy(sourceFile, destinationFile);
-                } else {
-                    return Promise.reject("Invalid clipboard action: " + action);
-                }
-            }))
-                .then(() => this.setState({clipboard: null}))
-                .catch(err => {
-                    ErrorDialog.showError(err, "An error occurred while pasting your contents");
-                })
-                .then(this.requireRefresh.bind(this));
-        }
+        this.state.clipboard
+            .paste(this.state.openedPath)
+            .then(() => this.setState({ clipboard: this.state.clipboard.clear() }))
+            .catch(err => {
+                ErrorDialog.showError(err, "An error occurred while pasting your contents");
+            })
+            .then(this.requireRefresh.bind(this));
     }
 
     requireRefresh() {
@@ -241,14 +230,19 @@ class CollectionBrowser extends React.Component {
         this.setState({
             infoDrawerOpened: true,
             selectedCollection: this.state.openedCollection,
-            selectedPath: path
+            selectedPath: [...this.state.selectedPath, path]
         })
     }
 
-    deselectPath() {
-        this.setState({selectedPath: null})
+    deselectPath(path) {
+        this.setState({
+            selectedPath: this.state.selectedPath.filter(el => el.filename !== path.filename)
+        });
     }
 
+    isPathSelected(path) {
+        return this.state.selectedPath.some(el => el.filename === path.filename);
+    }
 
     openCollection(collection) {
         this.props.history.push("/collections/" + collection.id);
@@ -346,12 +340,12 @@ class CollectionBrowser extends React.Component {
         );
     }
 
-    renderBreadCrumbs(selectedCollection, selectedPath) {
+    renderBreadCrumbs(openedCollection, openedPath) {
         let pathSegments = [];
         const toBreadcrumb = segment => ({segment: segment, label: segment})
-        if (selectedCollection) {
-            pathSegments.push({segment: selectedCollection.id, label: selectedCollection.metadata.name});
-            pathSegments.push(...this.parsePath(selectedPath).map(toBreadcrumb));
+        if (openedCollection) {
+            pathSegments.push({segment: openedCollection.id, label: openedCollection.name});
+            pathSegments.push(...this.parsePath(openedPath).map(toBreadcrumb));
         }
 
         return (<BreadCrumbs
@@ -368,7 +362,8 @@ class CollectionBrowser extends React.Component {
                         onCut={this.handleCut.bind(this)}
                         onCopy={this.handleCopy.bind(this)}
                         onPaste={this.handlePaste.bind(this)}
-                        onDidFileOperation={this.handleDidFileOperation.bind(this)}/>
+                        onDidFileOperation={this.handleDidFileOperation.bind(this)}
+                        numClipboardItems={this.state.clipboard.getNumItems()} />
         } else {
             return <Button variant="fab" mini color="secondary" aria-label="Add"
                             onClick={this.handleAddCollectionClick.bind(this)}>
@@ -390,7 +385,7 @@ class CollectionBrowser extends React.Component {
             <FileOverview
                 prefix={"/" + collection.location}
                 path={this.state.openedPath}
-                selectedPath={this.state.selectedPath ? this.state.selectedPath.filename : null}
+                selectedPath={this.state.selectedPath}
                 refreshFiles={this.state.refreshRequired}
                 fileStore={this.fileStore}
                 onFilesDidLoad={this.handleDidLoad.bind(this)}

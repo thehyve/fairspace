@@ -5,9 +5,10 @@ import CreateDirectoryButton from "../buttons/CreateDirectoryButton/CreateDirect
 import Icon from "@material-ui/core/Icon";
 import IconButton from "@material-ui/core/IconButton";
 import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
+import Badge from "@material-ui/core/Badge";
 
 function FileOperations(props) {
-    const {fileStore, path, onDidFileOperation, onCut, onCopy, onPaste} = props;
+    const {fileStore, path, onDidFileOperation, onCut, onCopy, onPaste, numClipboardItems, selection} = props;
 
     function handleCut(e) {
         e.stopPropagation()
@@ -35,7 +36,6 @@ function FileOperations(props) {
     }
 
     function handleCreateDirectory(path, name) {
-        console.log("Create directory within path", path);
         return fileStore
             .createDirectory(fileStore.joinPaths(path, name))
             .then(onDidFileOperation)
@@ -52,23 +52,38 @@ function FileOperations(props) {
             });
     }
 
+    function addBadgeIfNotEmpty(badgeContent, children) {
+        if(badgeContent) {
+            return <Badge badgeContent={badgeContent} color="primary">
+                {children}
+            </Badge>
+        } else {
+            return children;
+        }
+    }
+
     return (<React.Fragment>
         <IconButton
             aria-label="Copy"
-            onClick={handleCopy}>
+            onClick={handleCopy}
+            disabled={selection.length === 0}>
             <ContentCopy/>
         </IconButton>
         <IconButton
             aria-label="Cut"
-            onClick={handleCut}>
+            onClick={handleCut}
+            disabled={selection.length === 0}>
             <ContentCut/>
         </IconButton>
         <IconButton
             aria-label="Paste"
-            onClick={handlePaste}>
-            <ContentPaste/>
+            onClick={handlePaste}
+            disabled={numClipboardItems === 0}>
+            {addBadgeIfNotEmpty(
+                numClipboardItems,
+                <ContentPaste/>
+            )}
         </IconButton>
-
         <CreateDirectoryButton
             aria-label="Create directory"
             onCreate={(name) => handleCreateDirectory(path, name)}>
