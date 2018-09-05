@@ -42,13 +42,13 @@ describe('Collection browser', function () {
 
         // Find one of the collections created with the default name
         // Click on it to open the right panel
-        cy.get('tr').contains("Test workspace-ci's collection").click();
+        cy.get('tr').contains("John Snow's collection").click();
 
         // Wait for the right panel to open
         cy.wait(500);
 
         // Click on the name to edit it
-        cy.get('h2').contains("Test workspace-ci's collection").click();
+        cy.get('h2').contains("John Snow's collection").click();
 
         // Determine a random number to avoid having accidental successes
 
