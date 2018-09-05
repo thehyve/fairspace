@@ -1,5 +1,7 @@
 package io.fairspace.neptune.config;
 
+import io.fairspace.neptune.config.upstream.AuthorizationContainer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,5 +19,15 @@ public class DevProfileConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .and()
                 .csrf().disable();
+    }
+
+    @Bean
+    AuthorizationContainer noopAuthorizationContainer() {
+        return new AuthorizationContainer() {
+            @Override
+            public String getSubject() {
+                return "noauth";
+            }
+        };
     }
 }

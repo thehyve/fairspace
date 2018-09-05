@@ -10,7 +10,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.cloud.contract.wiremock.WireMockSpring;
 import org.springframework.web.client.RestTemplate;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.junit.Assert.assertFalse;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -35,7 +37,7 @@ public class CeresServiceTest {
     }
 
     @Test
-    public void test() {
+    public void testIntegrationWithCeres() {
         Model model = ceresService.retrieveTriples("http://test.nl");
         assertFalse(model.isEmpty());
     }

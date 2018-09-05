@@ -24,7 +24,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,9 +44,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -77,7 +83,7 @@ public class WebSecurityConfigurationTest {
         when(collectionService.findAll()).thenReturn(Collections.singletonList(new Collection()));
         ResponseEntity<String> response = getWithKey(getSignedJWT());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("[{\"id\":null,\"location\":null,\"metadata\":null}]", response.getBody());
+        assertEquals("[{\"id\":null,\"location\":null,\"name\":null,\"description\":null,\"uri\":null}]", response.getBody());
     }
 
     @Test

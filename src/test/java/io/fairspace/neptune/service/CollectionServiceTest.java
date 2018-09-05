@@ -1,28 +1,33 @@
 package io.fairspace.neptune.service;
 
-import io.fairspace.neptune.model.Permission;
-import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.model.CollectionMetadata;
 import io.fairspace.neptune.model.Access;
+import io.fairspace.neptune.model.Collection;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
-import io.fairspace.neptune.web.InvalidCollectionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionServiceTest {
@@ -41,8 +46,8 @@ public class CollectionServiceTest {
     private CollectionMetadataService collectionMetadataService;
 
     private List<Collection> collections = Arrays.asList(
-            new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null),
-            new Collection(2L, Collection.CollectionType.LOCAL_FILE, "samples", null));
+            Collection.builder().id(1L).location("quotes").build(),
+            Collection.builder().id(2L).location("samples").build());
 
     @Before
     public void setUp() {
@@ -58,36 +63,23 @@ public class CollectionServiceTest {
 
     @Test
     public void testFindAll() {
-        List<CollectionMetadata> metadata = new ArrayList<>();
-        metadata.add(new CollectionMetadata(getUri(1L), "My quotes", "quote item"));
-        metadata.add(new CollectionMetadata(getUri(3L), "My dataset", "dataset"));
-        when(collectionMetadataService.getCollections()).thenReturn(metadata);
-
         List<Collection> mergedCollections = toList(service.findAll().iterator());
 
-        // The first item should be merged
-        assertTrue(mergedCollections.contains(collections.get(0).withMetadata(metadata.get(0))));
-
-        // The second item does not have any metadata, and should be added as is
-        assertTrue(mergedCollections.contains(collections.get(1)));
-
-        // The 3rd item should not be present, as there is only metadata
-        assertEquals(2, mergedCollections.size());
+        // Both items should be returned with the proper uri
+        assertTrue(mergedCollections.contains(collections.get(0).toBuilder().uri(getUri(1L)).build()));
+        assertTrue(mergedCollections.contains(collections.get(1).toBuilder().uri(getUri(2L)).build()));
     }
 
     @Test
     public void testFindById() {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
-
-        CollectionMetadata metadata = new CollectionMetadata(getUri(1L), "My quotes", "quote item");
-        when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.of(metadata));
 
         Optional<Collection> mergedCollection = service.findById(id);
 
         assertTrue(mergedCollection.isPresent());
-        assertEquals(collection.withMetadata(metadata), mergedCollection.get());
+        assertEquals(collection.toBuilder().uri(getUri(1L)).build(), mergedCollection.get());
     }
 
     @Test
@@ -98,28 +90,12 @@ public class CollectionServiceTest {
         Optional<Collection> mergedCollection = service.findById(id);
 
         assertTrue(!mergedCollection.isPresent());
-        verify(collectionMetadataService, times(0)).getCollection(anyString());
-    }
-
-    @Test
-    public void testFindByIdWithoutMetadata() {
-        Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
-        when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
-
-        when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.empty());
-
-        Optional<Collection> mergedCollection = service.findById(id);
-
-        assertTrue(mergedCollection.isPresent());
-        assertEquals(collection, mergedCollection.get());
     }
 
     @Test
     public void testAddCollection() throws IOException {
         Long id = 1L;
-        CollectionMetadata metadata = new CollectionMetadata("http://uri", "collection", "description");
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null);
 
         when(collectionRepository.save(any())).thenReturn(collection);
 
@@ -127,35 +103,32 @@ public class CollectionServiceTest {
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
-        verify(permissionService).authorize(any(), eq(true));
-    }
 
-    @Test(expected = InvalidCollectionException.class)
-    public void testAddCollectionWithoutMetadata() throws IOException {
-        Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        ArgumentMatcher<Collection> collectionMatcher = argument ->
+            collection.getId().equals(argument.getId()) &&
+            collection.getName().equals(argument.getName()) &&
+            collection.getDescription().equals(argument.getDescription());
 
-        service.add(collection);
+        verify(permissionService).authorize(argThat(collectionMatcher), eq(Access.Manage), eq(true));
     }
 
     @Test
     public void testAddCollectionReturnsStoredIdAndUri() throws IOException {
-        CollectionMetadata metadata = new CollectionMetadata("http://uri", "collection", "description");
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
-        Collection storedCollection = new Collection(2L, Collection.CollectionType.LOCAL_FILE, "quotes", metadata);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null);
+        Collection storedCollection = new Collection(2L, "quotes", "My quotes", "quote item", null);
 
         when(collectionRepository.save(any())).thenReturn(storedCollection);
 
         Collection added = service.add(collection);
 
         assertEquals(storedCollection.getId(), added.getId());
-        verify(collectionMetadataService).createCollection(new CollectionMetadata("/fairspace/2", "collection", "description"));
+        assertEquals(getUri(added.getId()), added.getUri());
     }
 
     @Test
     public void testDeleteCollection() throws IOException {
         Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         service.delete(id);
