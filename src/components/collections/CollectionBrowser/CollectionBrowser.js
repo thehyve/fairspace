@@ -15,6 +15,7 @@ import {Column, Row} from 'simple-flexbox';
 import FileOperations from "../FileOperations/FileOperations";
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
+import Clipboard from "./Clipboard";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -27,6 +28,7 @@ class CollectionBrowser extends React.Component {
 
         // Initialize state
         this.state = {
+            clipboard: new Clipboard(this.fileStore),
             loading: false,
             error: false,
 
@@ -63,13 +65,18 @@ class CollectionBrowser extends React.Component {
         }
     }
 
+    setFilestore(fileStore) {
+        this.fileStore = fileStore;
+        this.setState({clipboard: new Clipboard(fileStore)})
+    }
+
     openCollectionAndPath(selectedCollectionId, selectedPath) {
         if (selectedCollectionId) {
             // Retrieve collection details
             this.collectionStore
                 .getCollection(selectedCollectionId)
                 .then(collection => {
-                    this.fileStore = this.props.fileStoreFactory.build(collection);
+                    this.setFilestore(this.props.fileStoreFactory.build(collection));
                     this.setState({
                         openedCollection: collection,
                         selectedCollection: collection,
@@ -175,46 +182,24 @@ class CollectionBrowser extends React.Component {
 
     handleCut() {
         this.setState({
-            clipboard: {
-                action: 'cut',
-                sourceDir: this.state.openedPath,
-                paths: [this.state.selectedPath]
-            }
+            clipboard: this.state.clipboard.cut(this.state.openedPath, [this.state.selectedPath])
         })
     }
 
     handleCopy() {
         this.setState({
-            clipboard: {
-                action: 'copy',
-                sourceDir: this.state.openedPath,
-                paths: [this.state.selectedPath]
-            }
+            clipboard: this.state.clipboard.copy(this.state.openedPath, [this.state.selectedPath])
         })
     }
 
     handlePaste() {
-        if(this.state.clipboard && this.state.clipboard.paths) {
-            const {sourceDir, paths, action} = this.state.clipboard;
-
-            Promise.all(paths.map(path => {
-                const sourceFile = this.fileStore.joinPaths(sourceDir || '', path.basename);
-                const destinationFile = this.fileStore.joinPaths(this.state.openedPath || '', path.basename);
-
-                if(action === 'cut') {
-                    return this.fileStore.move(sourceFile, destinationFile);
-                } else if(action === 'copy') {
-                    return this.fileStore.copy(sourceFile, destinationFile);
-                } else {
-                    return Promise.reject("Invalid clipboard action: " + action);
-                }
-            }))
-                .then(() => this.setState({clipboard: null}))
-                .catch(err => {
-                    ErrorDialog.showError(err, "An error occurred while pasting your contents");
-                })
-                .then(this.requireRefresh.bind(this));
-        }
+        this.state.clipboard
+            .paste()
+            .then(() => this.setState({ clipboard: this.state.clipboard.clear() }))
+            .catch(err => {
+                ErrorDialog.showError(err, "An error occurred while pasting your contents");
+            })
+            .then(this.requireRefresh.bind(this));
     }
 
     requireRefresh() {
@@ -368,7 +353,9 @@ class CollectionBrowser extends React.Component {
                         onCut={this.handleCut.bind(this)}
                         onCopy={this.handleCopy.bind(this)}
                         onPaste={this.handlePaste.bind(this)}
-                        onDidFileOperation={this.handleDidFileOperation.bind(this)}/>
+                        onDidFileOperation={this.handleDidFileOperation.bind(this)}
+                        numClipboardItems={this.state.clipboard.getNumItems()}
+                        numSelected={this.state.selectedPath ? 1 : 0}/>
         } else {
             return <Button variant="fab" mini color="secondary" aria-label="Add"
                             onClick={this.handleAddCollectionClick.bind(this)}>
