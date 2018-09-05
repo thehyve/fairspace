@@ -13,7 +13,6 @@ class CollectionStore {
         })
             .then(failOnHttpError("Failure when retrieving a list of collections"))
             .then(response => response.json())
-            .then(collections => collections.map(this._ensureCollectionMetadata))
     }
 
     getCollection(id) {
@@ -24,7 +23,6 @@ class CollectionStore {
         })
             .then(failOnHttpError("Failure when retrieving a collection"))
             .then(response => response.json())
-            .then(this._ensureCollectionMetadata)
     }
 
     addCollection(name, description) {
@@ -32,7 +30,7 @@ class CollectionStore {
             method: 'POST',
             headers: CollectionStore.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({ metadata: {name: name, description: description} })
+            body: JSON.stringify({name: name, description: description})
         }).then(failOnHttpError("Failure while saving a collection"))
     }
 
@@ -41,7 +39,7 @@ class CollectionStore {
             method: 'PATCH',
             headers: CollectionStore.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({ metadata: {name: name, description: description} })
+            body: JSON.stringify({name: name, description: description})
         }).then(failOnHttpError("Failure while updating a collection"))
     }
 
@@ -52,15 +50,6 @@ class CollectionStore {
             credentials: 'same-origin'
         }).then(failOnHttpError("Failure while deleting collection"))
     }
-
-    _ensureCollectionMetadata(collection) {
-        // Ensure proper structure of collections, e.g. that metadata is present
-        if(!collection.metadata) {
-            collection.metadata = { name: '[anonymous collection]' }
-        }
-        return collection;
-    }
-
 }
 
 export default new CollectionStore();

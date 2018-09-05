@@ -6,8 +6,8 @@ function Collection(props) {
 
     return (
         <div>
-            <Typography variant="subheading">{collection.metadata.name}</Typography>
-            {collection.metadata.description}
+            <Typography variant="subheading">{collection.name}</Typography>
+            {collection.description}
         </div>
     );
 }

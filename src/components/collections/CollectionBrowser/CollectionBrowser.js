@@ -344,7 +344,7 @@ class CollectionBrowser extends React.Component {
         let pathSegments = [];
         const toBreadcrumb = segment => ({segment: segment, label: segment})
         if (openedCollection) {
-            pathSegments.push({segment: openedCollection.id, label: openedCollection.metadata.name});
+            pathSegments.push({segment: openedCollection.id, label: openedCollection.name});
             pathSegments.push(...this.parsePath(openedPath).map(toBreadcrumb));
         }
 

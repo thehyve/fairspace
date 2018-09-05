@@ -26,7 +26,7 @@ function InformationDrawer(props) {
                 <hr/>
 
                 <Metadata
-                    subject={props.collection.metadata.uri}
+                    subject={props.collection.uri}
                     metadataStore={props.metadataStore}
                 />
 
