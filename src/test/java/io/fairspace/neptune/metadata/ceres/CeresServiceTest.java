@@ -35,7 +35,7 @@ public class CeresServiceTest {
     }
 
     @Test
-    public void test() {
+    public void testIntegrationWithCeres() {
         Model model = ceresService.retrieveTriples("http://test.nl");
         assertFalse(model.isEmpty());
     }

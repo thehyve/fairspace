@@ -39,7 +39,7 @@ container.
 
 ## API
 
-Neptune authenticates Oauth2 and uses permission mechanism to authorize user's actions.
+Neptune authenticates Oauth2 and uses access mechanism to authorize user's actions.
 Every collection has an associated list of user permissions. Currently supported access levels are:
 - Manage
 - Write
@@ -56,8 +56,8 @@ A creator of a collection automatically gets `Manage` permissions.
 | GET /<id> | Get collection |
 | PATCH /<id> | Change name or description of collections' metadata |
 | DELETE /<id> | Delete a single collection |
-| GET /<id>/authorizations | Get a list of permissions for a specific collection |
-| PUT /authorizations | Adds or modifies a permission |
+| GET /<id>/permissions | Get a list of permissions for a specific collection |
+| PUT /permissions | Adds or modifies a permission |
 
 
 ### JSON format
@@ -148,20 +148,20 @@ Authorization: Bearer <JWT>
     {
       "user": "user@example.com",
       "collectionId": 123,
-      "permission": "Write"
+      "access": "Write"
     },
     {
       "user": "user2@example.com",
       "collectionId": 123,
-      "permission": "Read"
+      "access": "Read"
     }
 ]
 ```
 
-#### Get user's authorization. Returns `"permission": "None"` if no permission was assigned.
+#### Get user's permission. Returns `"access": "None"` if no access was assigned.
 
 ```
-GET /123/authorization HTTP/1.1
+GET /123/permissions HTTP/1.1
 Host: localhost:8080
 Content-Type: application/json
 Authorization: Bearer <JWT> 
@@ -170,14 +170,14 @@ Authorization: Bearer <JWT>
 {
   "user": "user@example.com",
   "collectionId": 123,
-  "permission": "Write"
+  "access": "Write"
 }
 ```
 
-#### Set user's authorization
+#### Set user's permission
 
 ```
-PUT /authorization HTTP/1.1
+PUT /permissions HTTP/1.1
 Host: localhost:8080
 Content-Type: application/json
 Authorization: Bearer <JWT> 
@@ -186,6 +186,6 @@ Authorization: Bearer <JWT>
 {
   "user": "user@example.com",
   "collectionId": 123,
-  "permission": "Write"
+  "access": "Write"
 }
 ```

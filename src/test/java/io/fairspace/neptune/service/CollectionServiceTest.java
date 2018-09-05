@@ -1,8 +1,8 @@
 package io.fairspace.neptune.service;
 
-import io.fairspace.neptune.model.Authorization;
-import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
+import io.fairspace.neptune.model.Collection;
+import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
@@ -13,10 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -34,7 +31,7 @@ public class CollectionServiceTest {
     private CollectionRepository collectionRepository;
 
     @Mock
-    private AuthorizationService authorizationService;
+    private PermissionService permissionService;
 
     @Mock
     private StorageService storageService;
@@ -42,25 +39,24 @@ public class CollectionServiceTest {
     @Mock
     private CollectionMetadataService collectionMetadataService;
 
+    private List<Collection> collections = Arrays.asList(
+            Collection.builder().id(1L).location("quotes").build(),
+            Collection.builder().id(2L).location("samples").build());
+
     @Before
     public void setUp() {
-        service = new CollectionService(collectionRepository, authorizationService, storageService, collectionMetadataService);
+        service = new CollectionService(collectionRepository, permissionService, storageService, collectionMetadataService);
 
-        when(authorizationService.getAllByCurrentUser())
+        when(permissionService.getAllBySubject())
                 .thenReturn(asList(
-                        new Authorization(1L, "user1", 1L, Permission.Manage),
-                        new Authorization(2L, "user1", 2L, Permission.Read)));
+                        new Permission(1L, "user1", collections.get(0), Access.Manage),
+                        new Permission(2L, "user1", collections.get(1), Access.Read)));
 
         when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
     @Test
     public void testFindAll() {
-        List<Collection> collections = new ArrayList<>();
-        collections.add(new Collection(1L, "quotes", "My quotes", "quote item", null));
-        collections.add(new Collection(2L, "samples", "My dataset", "dataset", null));
-        when(collectionRepository.findAllById(asList(1L, 2L))).thenReturn(collections);
-
         List<Collection> mergedCollections = toList(service.findAll().iterator());
 
         // Both items should be returned with the proper uri
@@ -101,7 +97,7 @@ public class CollectionServiceTest {
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
-        verify(authorizationService).authorize(any());
+        verify(permissionService).authorize(any(), eq(true));
     }
 
     @Test

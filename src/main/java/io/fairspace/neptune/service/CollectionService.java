@@ -1,6 +1,6 @@
 package io.fairspace.neptune.service;
 
-import io.fairspace.neptune.model.Authorization;
+import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
@@ -11,8 +11,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 
@@ -22,29 +22,28 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class CollectionService {
     private CollectionRepository repository;
-    private AuthorizationService authorizationService;
+    private PermissionService permissionService;
     private StorageService storageService;
     private CollectionMetadataService collectionMetadataService;
 
     @Autowired
-    public CollectionService(CollectionRepository repository, AuthorizationService authorizationService, StorageService storageService, CollectionMetadataService collectionMetadataService) {
+    public CollectionService(CollectionRepository repository, PermissionService permissionService, StorageService storageService, CollectionMetadataService collectionMetadataService) {
         this.repository = repository;
-        this.authorizationService = authorizationService;
+        this.permissionService = permissionService;
         this.storageService = storageService;
         this.collectionMetadataService = collectionMetadataService;
     }
 
     public Iterable<Collection> findAll() {
-        Iterable<Collection> collections =
-                repository.findAllById(
-                        authorizationService
-                                .getAllByCurrentUser()
-                                .stream()
-                                .map(Authorization::getCollectionId)
-                                .collect(toList()));
+        List<Collection> collections =
+                permissionService
+                        .getAllBySubject()
+                        .stream()
+                        .map(Permission::getCollection)
+                        .collect(toList());
 
         // Add the uri for metadata lookup
-        return StreamSupport.stream(collections.spliterator(), false)
+        return collections.stream()
                 .map(collection -> {
                     String uri = collectionMetadataService.getUri(collection.getId());
                     return collection.toBuilder().uri(uri).build();
@@ -53,7 +52,7 @@ public class CollectionService {
     }
 
     public Optional<Collection> findById(Long id) {
-        authorizationService.checkPermission(Permission.Read, id);
+        permissionService.checkPermission(Access.Read, id);
 
         // First retrieve collection itself
         Optional<Collection> optionalCollection = repository.findById(id);
@@ -76,11 +75,11 @@ public class CollectionService {
         // Add the uri
         finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getUri(finalCollection.getId())).build();
 
-        Authorization authorization = new Authorization();
-        authorization.setCollectionId(finalCollection.getId());
-        authorization.setUser(authorizationService.getCurrentUser());
-        authorization.setPermission(Permission.Manage);
-        authorizationService.authorize(authorization, true);
+        Permission permission = new Permission();
+        permission.setCollection(finalCollection);
+        permission.setSubject(permissionService.getSubject());
+        permission.setAccess(Access.Manage);
+        permissionService.authorize(permission, true);
 
         // Update metadata. Ensure that the correct uri is specified
         collectionMetadataService.createCollection(finalCollection);
@@ -92,7 +91,7 @@ public class CollectionService {
     }
 
     public Collection update(Long id, Collection patch) {
-        authorizationService.checkPermission(Permission.Write, id);
+        permissionService.checkPermission(Access.Write, id);
 
         Optional<Collection> optionalCollection = repository.findById(id);
 
@@ -120,7 +119,7 @@ public class CollectionService {
     public void delete(Long id) {
         Optional<Collection> collection = repository.findById(id);
 
-        authorizationService.checkPermission(Permission.Manage, id);
+        permissionService.checkPermission(Access.Manage, id);
 
         collection.map(foundCollection -> {
             // Remove contents of the collection as well
