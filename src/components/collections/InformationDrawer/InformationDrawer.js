@@ -33,7 +33,7 @@ function InformationDrawer(props) {
                 <hr />
 
                 <Typography variant="title">Paths</Typography>
-                {props.path.map(path => <Typography key={path.filename}>{path.basename}</Typography>)}
+                {props.path ? props.path.map(path => <Typography key={path.filename}>{path.basename}</Typography>) : 'No path selected'}
 
             </React.Fragment>
         )

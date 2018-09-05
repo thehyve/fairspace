@@ -36,7 +36,7 @@ function FileList(props) {
                             <ClickHandler
                                 component={TableRow}
                                 key={row.filename}
-                                selected={selectedFilenames.indexOf(row.filename) > -1}
+                                selected={selectedFilenames.includes(row.filename)}
                                 onSingleClick={() => props.onPathClick(row)}
                                 onDoubleClick={() => props.onPathDoubleClick(row)}>
                                 <TableCell>

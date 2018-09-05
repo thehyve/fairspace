@@ -236,12 +236,12 @@ class CollectionBrowser extends React.Component {
 
     deselectPath(path) {
         this.setState({
-            selectedPath: this.state.selectedPath.filter(el => el !== path)
+            selectedPath: this.state.selectedPath.filter(el => el.filename !== path.filename)
         });
     }
 
     isPathSelected(path) {
-        return this.state.selectedPath.indexOf(path) > -1;
+        return this.state.selectedPath.some(el => el.filename === path.filename);
     }
 
     openCollection(collection) {
