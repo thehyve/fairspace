@@ -25,8 +25,8 @@ class Permissions extends React.Component {
                 <List>
                     {
                         permissions
-                            .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('user')))
-                            .map(p => (<ListItem>{`${p.user} (${p.permission})`}</ListItem>))
+                            .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('subject')))
+                            .map(p => (<ListItem>{`${p.subject} (${p.access})`}</ListItem>))
                     }
                 </List>
             </div>
@@ -34,7 +34,7 @@ class Permissions extends React.Component {
     }
 
     static permissionLevel(p) {
-        return {Manage: 0, Write: 1, Read: 2}[p.permission]
+        return {Manage: 0, Write: 1, Read: 2}[p.access]
     }
 
     render() {
