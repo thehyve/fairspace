@@ -36,7 +36,6 @@ function FileOperations(props) {
     }
 
     function handleCreateDirectory(path, name) {
-        console.log("Create directory within path", path);
         return fileStore
             .createDirectory(fileStore.joinPaths(path, name))
             .then(onDidFileOperation)
