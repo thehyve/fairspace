@@ -4,5 +4,6 @@
   "location": "samples",
   "uri": "http://fairspace.com/iri/collections/2",
   "name": "John's samples",
-  "description": "The big set of samples retrieved from the lab last year"
+  "description": "The big set of samples retrieved from the lab last year",
+  "access": "Manage"
 }

@@ -39,7 +39,10 @@ function CollectionList(props) {
                                 </TableCell>
                                 <TableCell numeric>
                                     {props.onCollectionDelete ?
-                                    <ButtonWithVerification aria-label={"Delete " + collection.name} onClick={() => props.onCollectionDelete(collection)}>
+                                    <ButtonWithVerification
+                                        aria-label={"Delete " + collection.name}
+                                        onClick={() => props.onCollectionDelete(collection)}
+                                        disabled={collection.access !== 'Manage'}>
                                         <Icon>delete</Icon>
                                     </ButtonWithVerification> : null}
                                 </TableCell>

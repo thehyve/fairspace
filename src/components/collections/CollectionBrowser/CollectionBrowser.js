@@ -363,7 +363,8 @@ class CollectionBrowser extends React.Component {
                         onCopy={this.handleCopy.bind(this)}
                         onPaste={this.handlePaste.bind(this)}
                         onDidFileOperation={this.handleDidFileOperation.bind(this)}
-                        numClipboardItems={this.state.clipboard.getNumItems()} />
+                        numClipboardItems={this.state.clipboard.getNumItems()}
+                        disabled={openedCollection.access === 'Read'} />
         } else {
             return <Button variant="fab" mini color="secondary" aria-label="Add"
                             onClick={this.handleAddCollectionClick.bind(this)}>
