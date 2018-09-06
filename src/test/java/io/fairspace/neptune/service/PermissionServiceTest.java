@@ -32,7 +32,7 @@ public class PermissionServiceTest {
     @Mock
     private CollectionRepository collectionRepository;
 
-    private Collection collection1 = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "location", null);
+    private Collection collection1 = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "location", null, null);
 
     private PermissionService permissionService;
 

@@ -8,14 +8,13 @@ import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 
@@ -42,7 +41,7 @@ public class CollectionService {
                 permissionService
                         .getAllBySubject()
                         .stream()
-                        .map(Permission::getCollection)
+                        .map(p -> p.getCollection().withAccess(p.getAccess()))
                         .collect(toList());
 
         List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
@@ -53,7 +52,6 @@ public class CollectionService {
                     String uri = collectionMetadataService.getUri(collection.getId());
 
                     return metadata.stream()
-                            .filter(Objects::nonNull)
                             .filter(m -> uri.equals(m.getUri()))
                             .findFirst()
                             .map(collection::withMetadata)
@@ -63,22 +61,19 @@ public class CollectionService {
 
     }
 
-    public Optional<Collection> findById(Long id) {
-        permissionService.checkPermission(Access.Read, id);
+    public Collection findById(Long collectionId) {
+        Permission permission = permissionService.getSubjectsPermission(collectionId);
+        if (permission.getAccess().compareTo(Access.Read) < 0) {
+            throw new AccessDeniedException("Unauthorized");
+        }
+        Collection collection = permission.getCollection().withAccess(permission.getAccess());
 
-        // First retrieve collection itself
-        Optional<Collection> optionalCollection = repository.findById(id);
+        // If it exists, retrieve metadata
+        Optional<CollectionMetadata> optionalMetadata = collectionMetadataService.getCollection(collectionMetadataService.getUri(collectionId));
 
-        return optionalCollection
-                .map(collection -> {
-                    // If it exists, retrieve metadata
-                    Optional<CollectionMetadata> optionalMetadata = collectionMetadataService.getCollection(collectionMetadataService.getUri(id));
-
-                    return optionalMetadata
-                            .map(collection::withMetadata)
-                            .orElse(collection);
-                });
-
+        return optionalMetadata
+                .map(collection::withMetadata)
+                .orElse(collection);
     }
 
     public Collection add(Collection collection) throws IOException {
@@ -90,7 +85,7 @@ public class CollectionService {
 
         // Update location based on given id
         Long id = savedCollection.getId();
-        Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null));
+        Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null, null));
 
         Permission permission = new Permission();
         permission.setCollection(finalCollection);
@@ -105,7 +100,7 @@ public class CollectionService {
         // Create a place for storing collection contents
         storageService.addCollection(collection);
 
-        return finalCollection.withMetadata(metadataToSave);
+        return finalCollection.withMetadata(metadataToSave).withAccess(Access.Manage);
     }
 
     public Collection update(Long id, Collection patch) {

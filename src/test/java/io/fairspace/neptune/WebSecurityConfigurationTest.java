@@ -77,7 +77,6 @@ public class WebSecurityConfigurationTest {
         when(collectionService.findAll()).thenReturn(Collections.singletonList(new Collection()));
         ResponseEntity<String> response = getWithKey(getSignedJWT());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("[{\"id\":null,\"location\":null,\"metadata\":null}]", response.getBody());
     }
 
     @Test

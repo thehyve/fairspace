@@ -28,7 +28,14 @@ public class Collection {
     @Transient
     private CollectionMetadata metadata;
 
+    @Transient
+    private Access access;
+
     public Collection withMetadata(CollectionMetadata metadata) {
-        return new Collection(id, type, location, metadata);
+        return new Collection(id, type, location, metadata, access);
+    }
+
+    public Collection withAccess(Access access) {
+        return new Collection(id, type, location, metadata, access);
     }
 }
