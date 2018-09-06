@@ -19,7 +19,7 @@ const authEnabled = process.env.AUTH_ENABLED !== 'false';
 const tracingEnabled = process.env.TRACING_ENABLED !== 'false';
 const zipkinEndointUrl = process.env.ZIPKIN_URL || 'http://jaeger-collector.jaeger:9411';
 const zipkinSamplingRate = process.env.ZIPKIN_SAMPLING_RATE || 0.01;
-const permissionsEndpointUrl = process.env.PERMISSIONS_URL || '/api/collections/%s/permissions';
+const permissionsEndpointUrl = process.env.PERMISSIONS_URL;
 
 // Respond to / anonymously to allow for health checks
 app.get('/', (req, res) => res.send('Hi, I\'m Titan!').end());
