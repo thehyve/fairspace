@@ -40,7 +40,7 @@ Content-Type: application/ld+json
      "@type": "Offer",
      "price": "2.95",
      "priceCurrency": "USD",
-  },
+  }
 }
 ```
 

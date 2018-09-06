@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/statements")
 class StatementsController(val repository: ModelRepository) {
 
-    @GetMapping(produces = arrayOf("application/ld+json"))
-    fun get(@RequestParam("subject") subject: String, @RequestParam("predicate") predicate: String?): Model {
+    @GetMapping(produces = ["application/ld+json"])
+    fun get(@RequestParam("subject") subject: String?, @RequestParam("predicate") predicate: String?): Model {
         return repository.list(subject, predicate)
     }
 
-    @PostMapping(consumes = arrayOf("application/ld+json"))
+    @PostMapping(consumes = ["application/ld+json"])
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun post(@RequestBody delta: Model) {
         repository.add(delta)
     }
 
-    @PatchMapping(consumes = arrayOf("application/ld+json"))
+    @PatchMapping(consumes = ["application/ld+json"])
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun patch(@RequestBody delta: Model) {
         try {
