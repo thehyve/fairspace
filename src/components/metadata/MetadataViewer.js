@@ -17,8 +17,8 @@ class MetadataViewer extends React.Component {
 
     static renderValue(v) {
         return (
-            <ListItem key={this.extractDisplayValue(v)}>
-                {this.retrieveDisplayableItem(v)}
+            <ListItem key={MetadataViewer.extractDisplayValue(v)}>
+                {MetadataViewer.retrieveDisplayableItem(v)}
             </ListItem>)
     }
 
@@ -28,8 +28,8 @@ class MetadataViewer extends React.Component {
             : link
     }
 
-    retrieveDisplayableItem(v) {
-        let displayValue = this.extractDisplayValue(v);
+    static retrieveDisplayableItem(v) {
+        let displayValue = MetadataViewer.extractDisplayValue(v);
 
         if ('@id' in v) {
             return (<a href={MetadataViewer.navigableLink(v['@id'])}>{displayValue}</a>)
@@ -39,8 +39,16 @@ class MetadataViewer extends React.Component {
     }
 
 
-    extractDisplayValue(v) {
-        return v['rdfs:label'] || v['@id'] || v['@value'] || '';
+    static extractDisplayValue(v) {
+        return v['rdfs:label'] || MetadataViewer.linkLabel(v['@id']) || v['@value'] || '';
+    }
+
+    static linkLabel(link) {
+        return link && link.startsWith(window.location.origin) ? (
+            link.toString().includes('#')
+                ? link.substring(link.lastIndexOf('#') + 1)
+                : link.substring(link.lastIndexOf('/') + 1)
+        ) : link;
     }
 
     renderProperty(p) {
@@ -56,7 +64,6 @@ class MetadataViewer extends React.Component {
 
     render() {
         return (<List>{this.properties.map(this.renderProperty.bind(this))}</List>)
-
     }
 }
 
