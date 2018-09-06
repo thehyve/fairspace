@@ -38,7 +38,7 @@ public class Collection {
     @Column(nullable = false)
     private String name;
 
-    @Lob
+    @Column(length = 10000)
     private String description;
 
     @Transient
