@@ -18,18 +18,18 @@ module.exports = {
 
         let token = authHeader.split(' ')[1];
         let decoded = jwt.decode(token, {complete: true});
-        let username = decoded.payload.sub;
+        let userId = decoded.payload.sub;
 
-        if (!username) {
+        if (!userId) {
             callback(Errors.AuthenticationPropertyMissing);
             return;
         }
 
         let user = {
-            uid: username,
+            uid: userId,
             isAdministrator: false,
             isDefaultUser: false,
-            username: username
+            username: userId
         };
 
         callback(null, user);

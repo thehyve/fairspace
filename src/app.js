@@ -8,7 +8,7 @@ const HttpLogger = require('zipkin-transport-http').HttpLogger;
 const jwtAuthentication = require('./auth/jwt-authentication');
 const jwksVerifier = require('./auth/verify-jwt-with-jwks');
 const fixWebdavDestinationMiddleware = require('./fixWebdavDestinationMiddleware');
-const NeptunePathPrivilegeManager = require("./auth/NeptunePathPrivilegeManager");
+const PrivilegeManager = require("./auth/NeptunePathPrivilegeManager");
 
 // Configuration parameters
 const rootPath = process.env.FILES_FOLDER || '/data';
@@ -56,7 +56,7 @@ function setupWebdavMiddleware(physicalRootPath, webdavPath) {
         requireAuthentification: true,
         httpAuthentication: jwtAuthentication,
         rootFileSystem: new webdav.PhysicalFileSystem(physicalRootPath),
-        privilegeManager: new NeptunePathPrivilegeManager(permissionsEndpointUrl)
+        privilegeManager: new PrivilegeManager(permissionsEndpointUrl)
     });
 
 
