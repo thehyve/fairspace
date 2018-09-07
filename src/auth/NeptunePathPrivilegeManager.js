@@ -8,14 +8,15 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
         this.permissionsUrl = permissionsUrl;
     }
 
+
     _can(fullPath, user, resource, privilege, callback) {
         if (fullPath.paths.length === 0) {
             return callback(null, ['canReadProperties', 'canReadLocks'].includes(privilege));
         }
 
-        let collectionId = fullPath.paths[0];
+        let collectionLocation = fullPath.paths[0];
 
-        axios.get(util.format(this.permissionsUrl, collectionId),
+        axios.get(util.format(this.permissionsUrl, encodeURIComponent(collectionLocation)),
             {headers: {'authorization': resource.context.headers.headers['authorization']}})
             .then(({data}) => {
                 let permission = data.find(p => p.subject === user.uid) || {access: 'None'};
