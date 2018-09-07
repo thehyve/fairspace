@@ -113,4 +113,9 @@ public class PermissionService {
             throw new AccessDeniedException("Unauthorized");
         }
     }
+
+    public Permission getUserPermissionByLocation(String location) {
+        Collection collection = collectionRepository.findByLocation(location).orElseThrow(CollectionNotFoundException::new);
+        return getSubjectsPermission(collection.getId());
+    }
 }
