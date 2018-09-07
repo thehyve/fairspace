@@ -19,8 +19,7 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
         axios.get(util.format(this.permissionsUrl, encodeURIComponent(collectionLocation)),
             {headers: {'authorization': resource.context.headers.headers['authorization']}})
             .then(({data}) => {
-                let permission = data.find(p => p.subject === user.uid) || {access: 'None'};
-                switch (permission.access) {
+                switch (data.access) {
                     case 'None':
                         callback(null, false);
                         break;

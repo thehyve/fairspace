@@ -1,5 +1,5 @@
 process.env.FILES_FOLDER = __dirname + '/fs';
-process.env.PERMISSIONS_URL = 'http://fairspace.io/api/collections/%s/permissions';
+process.env.PERMISSIONS_URL = 'http://fairspace.io/api/collections/permissions?location=%s';
 
 const supertest = require('supertest');
 const fs = require('fs-extra');
@@ -27,15 +27,46 @@ const app = require('../src/app');
 const server = supertest(app);
 
 
-nock('http://fairspace.io')
-    .get('/api/collections/1/permissions')
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + token
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '1'})
     .times(100)
-    .reply(200, [{collection: 1, subject: 'alice', access: 'Manage'}]);
+    .reply(200, {collection: 1, subject: 'alice', access: 'Manage'});
 
-nock('http://fairspace.io')
-    .get('/api/collections/2/permissions')
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + anotherToken
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '1'})
     .times(100)
-    .reply(200, [{collection: 2, subject: 'alice', access: 'Write'}, {collection: 2, subject: 'bob', access: 'Manage'}]);
+    .reply(200, {collection: 1, subject: 'bob', access: 'None'});
+
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + token
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '2'})
+    .times(100)
+    .reply(200, {collection: 2, subject: 'alice', access: 'Write'});
+
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + anotherToken
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '2'})
+    .times(100)
+    .reply(200, {collection: 2, subject: 'bob', access: 'Manage'});
+
 
 describe('Titan', () => {
     before(() => fs.mkdirSync(process.env.FILES_FOLDER));
