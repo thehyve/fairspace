@@ -42,6 +42,8 @@ spec:
                 value: "{{ .Values.tracing.zipkinUrl }}"
               - name: ZIPKIN_SAMPLING_RATE
                 value: "{{ .Values.tracing.samplingRate }}"
+              - name: PERMISSIONS_URL
+                value: "{{ .Values.permissions.collectionPermissionsUrl }}"
           volumeMounts:
           - name: data
             mountPath: /data

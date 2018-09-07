@@ -55,19 +55,19 @@ function middleware(options) {
                 // See for each key if it can be used to verify the JWT
                 async.some(
                     keyset.keys.map(jwk2pem),
-                    function(key, callback) {
+                    (key, callback) => {
                         // All options provided to this middleware are forwarded
                         // to the jwt middleware, extended with the key
                         const jwtOptions = Object.assign(options, {secret: new Buffer(key)})
                         jwt(jwtOptions)(req, res, (e) => {
-                            if(e != undefined) {
+                            if(e) {
                                 lastError = e;
                                 callback(false);
                             } else {
                                 callback(true);
                             }
                         })
-                    }, function(err, result) {
+                    }, (err, result) => {
                         // if result is true then at least one of keys could be used to verify the JWT
                         if(result) {
                             next()
@@ -80,7 +80,7 @@ function middleware(options) {
                 next(new Error(e));
             });
     }
-};
+}
 
 module.exports = {
     keySetProvider: getKeySet,

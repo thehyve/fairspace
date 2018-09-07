@@ -1,11 +1,13 @@
-process.env.FILES_FOLDER = __dirname;
+process.env.FILES_FOLDER = __dirname + '/fs';
+process.env.PERMISSIONS_URL = 'http://fairspace.io/api/collections/permissions?location=%s';
 
 const supertest = require('supertest');
-const fs = require('fs');
+const fs = require('fs-extra');
 const jwk2pem = require('pem-jwk').jwk2pem;
 const jwt = require("jsonwebtoken");
 const jwks = JSON.parse(fs.readFileSync(__dirname + '/jwks.json'));
 const invalidJWK = JSON.parse(fs.readFileSync(__dirname + '/invalidKey.json'));
+nock = require('nock');
 
 mockPublicKeyset();
 
@@ -13,18 +15,66 @@ mockPublicKeyset();
 const key = jwk2pem(jwks.keys[0]);
 const invalidKey = jwk2pem(invalidJWK);
 
-const token = jwt.sign({foo: 'bar', exp: Math.floor(Date.now() / 1000) + (60 * 60)}, key, {algorithm: 'RS256'});
-const nonExpiringToken = jwt.sign({foo: 'bar'}, key, {algorithm: 'RS256'});
+const token = jwt.sign({foo: 'bar', sub: 'alice', exp: Math.floor(Date.now() / 1000) + (60 * 60)}, key, {algorithm: 'RS256'});
+const anotherToken = jwt.sign({foo: 'bar', sub: 'bob', exp: Math.floor(Date.now() / 1000) + (60 * 60)}, key, {algorithm: 'RS256'});
+const nonExpiringToken = jwt.sign({foo: 'bar', sub: 'alice'}, key, {algorithm: 'RS256'});
 const expiredToken = jwt.sign({foo: 'bar', exp: Math.floor(Date.now() / 1000) - (60 * 60)}, key, {algorithm: 'RS256'});
 const invalidSignature = jwt.sign({foo: 'bar'}, invalidKey, {algorithm: 'RS256'});
+const noSubject = jwt.sign({foo: 'bar', exp: Math.floor(Date.now() / 1000) + (60 * 60)}, key, {algorithm: 'RS256'});
 
 // Start test
 const app = require('../src/app');
 const server = supertest(app);
 
+
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + token
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '1'})
+    .times(100)
+    .reply(200, {collection: 1, subject: 'alice', access: 'Manage'});
+
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + anotherToken
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '1'})
+    .times(100)
+    .reply(200, {collection: 1, subject: 'bob', access: 'None'});
+
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + token
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '2'})
+    .times(100)
+    .reply(200, {collection: 2, subject: 'alice', access: 'Write'});
+
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + anotherToken
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '2'})
+    .times(100)
+    .reply(200, {collection: 2, subject: 'bob', access: 'Manage'});
+
+
 describe('Titan', () => {
+    before(() => fs.mkdirSync(process.env.FILES_FOLDER));
+
+    after(() => fs.removeSync(process.env.FILES_FOLDER));
+
     it('responds to / anonymously', () => server.get('/').expect(200, 'Hi, I\'m Titan!'));
-    it('responds to /api/storage/webdav/ when the file file is present and authorization is provided', () =>
+    it('responds to /api/storage/webdav/ when the directory is present and authorization is provided', () =>
         server
             .propfind('/api/storage/webdav/')
             .set('Authorization', 'Bearer ' + token)
@@ -33,7 +83,11 @@ describe('Titan', () => {
 });
 
 describe('Authentication', () => {
-    it('responds to /api/storage/webdav/ when no authorization without expiry is provided', () =>
+    before(() => fs.mkdirSync(process.env.FILES_FOLDER));
+
+    after(() => fs.removeSync(process.env.FILES_FOLDER));
+
+    it('responds to /api/storage/webdav/ when authorization without expiry is provided', () =>
         server
             .propfind('/api/storage/webdav/')
             .set('Authorization', 'Bearer ' + nonExpiringToken)
@@ -62,38 +116,78 @@ describe('Authentication', () => {
             .set('Authorization', 'Bearer ' + invalidSignature)
             .expect(401)
     );
+    it('responds a 401 to /api/storage/webdav/ when authorization with no subject claim is provided', () =>
+        server
+            .propfind('/api/storage/webdav/')
+            .set('Authorization', 'Bearer ' + noSubject)
+            .expect(401)
+    );
 });
 
 describe('Webdav', () => {
-    beforeEach(() =>
-        server
-            .mkcol('/api/storage/webdav/tmp')
-            .set('Authorization', 'Bearer ' + token)
-            .expect(201)
-    );
+    beforeEach(() => fs.mkdirSync(process.env.FILES_FOLDER));
 
-    it('can move directories properly within the /api/storage/webdav/ root', () =>
+    afterEach(() => fs.removeSync(process.env.FILES_FOLDER));
+
+
+    it('a user can create and delete a top-level directory', () =>
         server
-            .move('/api/storage/webdav/tmp')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer ' + token)
-            .set('Destination', '/api/storage/webdav/tmp2')
             .expect(201)
             .then(() => server
-                .move('/api/storage/webdav/tmp2')
+                .delete('/api/storage/webdav/1')
                 .set('Authorization', 'Bearer ' + token)
-                .set('Destination', '/api/storage/webdav/tmp')
-                .expect(201))
-
-        // Move back again to allow cleanup
+                .expect(200))
     );
 
-    afterEach(() =>
+    it('a user without manage permission cannot delete other\'s top-level directories', () =>
         server
-            .delete('/api/storage/webdav/tmp')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer ' + token)
-            .expect(200)
+            .expect(201)
+            .then(() => server
+                .propfind('/api/storage/webdav/1')
+                .set('Authorization', 'Bearer ' + anotherToken)
+                .expect(401))
     );
 
+    it('a user without read permission cannot read other\'s top-level directories', () =>
+        server
+            .mkcol('/api/storage/webdav/1')
+            .set('Authorization', 'Bearer ' + token)
+            .expect(201)
+            .then(() => server
+                .delete('/api/storage/webdav/1')
+                .set('Authorization', 'Bearer ' + anotherToken)
+                .expect(401))
+    );
+
+    it('a user with read permission can read other\'s top-level directories', () =>
+        server
+            .mkcol('/api/storage/webdav/2')
+            .set('Authorization', 'Bearer ' + anotherToken)
+            .expect(201)
+            .then(() => server
+                .propfind('/api/storage/webdav/2')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(207))
+    );
+
+    it('a user can create and delete subdirectories', () =>
+        server
+            .mkcol('/api/storage/webdav/1')
+            .set('Authorization', 'Bearer ' + token)
+            .expect(201)
+            .then(() =>  server
+                .mkcol('/api/storage/webdav/1/subdir')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(201))
+            .then(() => server
+                .delete('/api/storage/webdav/1/subdir')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(200))
+    );
 });
 
 
