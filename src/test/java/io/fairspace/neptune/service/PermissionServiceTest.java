@@ -2,10 +2,10 @@ package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.config.upstream.AuthorizationContainer;
 import io.fairspace.neptune.model.Access;
-import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.repository.PermissionRepository;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
+import io.fairspace.neptune.repository.PermissionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +17,10 @@ import org.springframework.security.access.AccessDeniedException;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionServiceTest {
@@ -32,7 +35,7 @@ public class PermissionServiceTest {
     @Mock
     private CollectionRepository collectionRepository;
 
-    private Collection collection1 = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "location", null, null);
+    private Collection collection1 = new Collection(1L, "location", "name", "description", null, null);
 
     private PermissionService permissionService;
 
@@ -60,7 +63,7 @@ public class PermissionServiceTest {
 
     @Test(expected = CollectionNotFoundException.class)
     public void testAddingPermissionsForUnknownCollection() {
-        permissionService.authorize(new Permission(null, "user2", new Collection() {{ setId(0L); }}, Access.Write), false);
+        permissionService.authorize(new Permission(null, "user2", Collection.builder().id(0L).build(), Access.Write), false);
     }
 
     @Test

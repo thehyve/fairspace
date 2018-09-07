@@ -1,15 +1,17 @@
 package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.model.Access;
-import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.model.CollectionMetadata;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -22,6 +24,7 @@ import static java.util.stream.Collectors.toList;
  * Merges data from the collection repository and the metadatastore
  */
 @Service
+@Slf4j
 public class CollectionService {
     private CollectionRepository repository;
     private PermissionService permissionService;
@@ -41,7 +44,7 @@ public class CollectionService {
                 permissionService
                         .getAllBySubject()
                         .stream()
-                        .map(p -> p.getCollection().withAccess(p.getAccess()))
+                        .map(p -> p.getCollection().toBuilder().access(p.getAccess()))
                         .collect(toList());
 
         List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
@@ -50,15 +53,9 @@ public class CollectionService {
         return collections.stream()
                 .map(collection -> {
                     String uri = collectionMetadataService.getUri(collection.getId());
-
-                    return metadata.stream()
-                            .filter(m -> uri.equals(m.getUri()))
-                            .findFirst()
-                            .map(collection::withMetadata)
-                            .orElse(collection);
+                    return collection.toBuilder().uri(uri).build();
                 })
                 .collect(toList());
-
     }
 
     public Collection findById(Long collectionId) {
@@ -67,53 +64,72 @@ public class CollectionService {
             throw new AccessDeniedException("Unauthorized");
         }
         Collection collection = permission.getCollection().withAccess(permission.getAccess());
-
-        // If it exists, retrieve metadata
-        Optional<CollectionMetadata> optionalMetadata = collectionMetadataService.getCollection(collectionMetadataService.getUri(collectionId));
-
-        return optionalMetadata
-                .map(collection::withMetadata)
-                .orElse(collection);
+        String uri = collectionMetadataService.getUri(collection.getId());
+        return collection.toBuilder().uri(uri).build();
     }
 
     public Collection add(Collection collection) throws IOException {
-        if (collection.getMetadata() == null) {
-            throw new InvalidCollectionException();
-        }
-
         Collection savedCollection = repository.save(collection);
 
         // Update location based on given id
         Long id = savedCollection.getId();
-        Collection finalCollection = repository.save(new Collection(savedCollection.getId(), savedCollection.getType(), id.toString(), null, null));
+        Collection finalCollection;
+        try {
+            finalCollection = repository.save(savedCollection.toBuilder().location(id.toString()).build());
+        } catch(DataIntegrityViolationException e) {
+            throw new InvalidCollectionException(e);
+        }
 
-        Permission permission = new Permission();
-        permission.setCollection(finalCollection);
-        permission.setSubject(permissionService.getSubject());
-        permission.setAccess(Access.Manage);
-        permissionService.authorize(permission, true);
+        // Add the uri
+        finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getUri(finalCollection.getId())).build();
 
-        // Update metadata. Ensure that the correct uri is specified
-        CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), collection.getMetadata().getName(), collection.getMetadata().getDescription());
-        collectionMetadataService.createCollection(metadataToSave);
+        // Authorize the user
+        permissionService.authorize(finalCollection, Access.Manage, true);
+
+        // Update metadata. Only log an error if it fails, as the neptune
+        // database is the source of truth
+        try {
+            collectionMetadataService.createCollection(finalCollection);
+        } catch(Exception e) {
+            log.warn("An error occurred while storing collection metadata for collection id" + finalCollection.getId());
+        }
 
         // Create a place for storing collection contents
-        storageService.addCollection(collection);
+        // TODO: Handle error when adding the storage for the collection
+        storageService.addCollection(finalCollection);
 
-        return finalCollection.withMetadata(metadataToSave).withAccess(Access.Manage);
+        return finalCollection.toBuilder(Access.Manage);
     }
 
     public Collection update(Long id, Collection patch) {
-        if (patch.getMetadata() == null) {
-            throw new InvalidCollectionException();
-        }
-
         permissionService.checkPermission(Access.Write, id);
 
-        // Updating is currently only possible on the metadata
-        CollectionMetadata metadataToSave = new CollectionMetadata(collectionMetadataService.getUri(id), patch.getMetadata().getName(), patch.getMetadata().getDescription());
-        collectionMetadataService.patchCollection(metadataToSave);
-        return patch;
+        Optional<Collection> optionalCollection = repository.findById(id);
+
+        return optionalCollection.map(collection -> {
+            // Add properties from outside
+            Collection.CollectionBuilder builder = collection.toBuilder();
+            if(!StringUtils.isEmpty(patch.getName())) {
+                builder.name(patch.getName());
+            }
+
+            if(!StringUtils.isEmpty(patch.getDescription())) {
+                builder.name(patch.getDescription());
+            }
+
+            // Store in the database
+            Collection savedCollection = repository.save(builder.build());
+
+            // Update metadata. Only log an error if it fails, as the neptune
+            // database is the source of truth
+            try {
+                collectionMetadataService.patchCollection(savedCollection);
+            } catch(Exception e) {
+                log.warn("An error occurred while storing collection metadata for collection id" + savedCollection.getId());
+            }
+
+            return savedCollection;
+        }).orElseThrow(CollectionNotFoundException::new);
     }
 
     public void delete(Long id) {

@@ -2,10 +2,10 @@ package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.config.upstream.AuthorizationContainer;
 import io.fairspace.neptune.model.Access;
-import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.model.Collection;
-import io.fairspace.neptune.repository.PermissionRepository;
+import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.repository.CollectionRepository;
+import io.fairspace.neptune.repository.PermissionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -45,6 +45,35 @@ public class PermissionService {
                 .orElseGet(() -> new Permission(null, subject, collection, Access.None));
     }
 
+    /**
+     * Authorize the subject currently logged in to have access to the given collection
+     * @param collection
+     * @param access
+     * @param isNew
+     * @return
+     * @see #getSubject()
+     */
+    public Permission authorize(Collection collection, Access access, boolean isNew) {
+        return authorize(getSubject(), collection, access, isNew);
+    }
+
+    /**
+     * Authorize the given subject to have access to the given collection
+     * @param subject
+     * @param collection
+     * @param access
+     * @param isNew
+     * @return
+     */
+    public Permission authorize(String subject, Collection collection, Access access, boolean isNew) {
+        return authorize(
+                Permission.builder()
+                        .subject(subject)
+                        .collection(collection)
+                        .access(access)
+                        .build(), isNew);
+    }
+
     public Permission authorize(Permission permission, boolean isNew) {
         if (!isNew) {
             checkPermission(Access.Manage, permission.getCollection().getId());
@@ -57,8 +86,8 @@ public class PermissionService {
                         return permission;
                     }
 
-                    existing.setAccess(permission.getAccess());
-                    return permissionRepository.save(existing);
+                    Permission newPermission = existing.toBuilder().access(permission.getAccess()).build();
+                    return permissionRepository.save(newPermission);
                 }).orElseGet(() -> {
                     if (permission.getAccess() == Access.None) {
                         return permission;

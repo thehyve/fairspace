@@ -1,7 +1,7 @@
 package io.fairspace.neptune.repository;
 
-import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.model.Collection;
+import io.fairspace.neptune.model.Permission;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

@@ -1,6 +1,7 @@
 package io.fairspace.neptune.web;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -57,19 +58,19 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return new ErrorBody("Invalid collection given");
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    protected ErrorBody handleGenericException(Exception ex) {
-        ErrorBody errorBody = new ErrorBody("An internal error occurred.");
-        log.error("An unexpected error occurred.", ex);
-        return errorBody;
-    }
-
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     protected ErrorBody handleAccessDeniedException(AccessDeniedException ex) {
         ErrorBody errorBody = new ErrorBody(ex.getMessage());
         log.error("Access denied exception occurred.", ex);
+        return errorBody;
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    protected ErrorBody handleGenericException(Exception ex) {
+        ErrorBody errorBody = new ErrorBody("An internal error occurred.");
+        log.error("An unexpected error occurred: " + ex.getClass().getSimpleName(), ex);
         return errorBody;
     }
 }
