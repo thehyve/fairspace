@@ -16,6 +16,7 @@ import FileOperations from "../FileOperations/FileOperations";
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
 import Clipboard from "./Clipboard";
+import PermissionChecker from "../../permissions/PermissionChecker";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -364,7 +365,7 @@ class CollectionBrowser extends React.Component {
                         onPaste={this.handlePaste.bind(this)}
                         onDidFileOperation={this.handleDidFileOperation.bind(this)}
                         numClipboardItems={this.state.clipboard.getNumItems()}
-                        disabled={openedCollection.access === 'Read'} />
+                        disabled={!PermissionChecker.canWrite(openedCollection)} />
         } else {
             return <Button variant="fab" mini color="secondary" aria-label="Add"
                             onClick={this.handleAddCollectionClick.bind(this)}>

@@ -8,6 +8,7 @@ import TableBody from "@material-ui/core/TableBody";
 import Icon from "@material-ui/core/Icon";
 import ClickHandler from "../ClickHandler/ClickHandler"
 import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
+import PermissionChecker from "../../permissions/PermissionChecker";
 
 function CollectionList(props) {
     if(!props.collections || props.collections.length === 0) {
@@ -42,7 +43,7 @@ function CollectionList(props) {
                                     <ButtonWithVerification
                                         aria-label={"Delete " + collection.name}
                                         onClick={() => props.onCollectionDelete(collection)}
-                                        disabled={collection.access !== 'Manage'}>
+                                        disabled={!PermissionChecker.canManage(collection)}>
                                         <Icon>delete</Icon>
                                     </ButtonWithVerification> : null}
                                 </TableCell>
