@@ -24,6 +24,8 @@ titan:
     jwksUrl: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/certs
   tracing:
     samplingRate: 1
+  permissions:
+    collectionPermissionsUrl: https://workspace.ci.test.fairdev.app/api/collections/permissions?location=%s
 
 # Specific settings for Ceres subchart
 ceres:
