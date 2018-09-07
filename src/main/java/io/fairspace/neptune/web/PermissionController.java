@@ -19,8 +19,8 @@ public class PermissionController {
     }
 
     @GetMapping("/permissions")
-    public List<Permission> getAuthorizationsByLocation(@RequestParam String location) {
-        return permissionService.getByLocation(location);
+    public Permission getAuthorizationsByLocation(@RequestParam String location) {
+        return permissionService.getUserPermissionByLocation(location);
     }
 
     @PutMapping("/permissions")

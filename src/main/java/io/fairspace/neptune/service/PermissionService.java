@@ -114,9 +114,8 @@ public class PermissionService {
         }
     }
 
-    public List<Permission> getByLocation(String location) {
+    public Permission getUserPermissionByLocation(String location) {
         Collection collection = collectionRepository.findByLocation(location).orElseThrow(CollectionNotFoundException::new);
-        checkPermission(Access.Read, collection.getId());
-        return permissionRepository.findByCollection(collection);
+        return getSubjectsPermission(collection.getId());
     }
 }
