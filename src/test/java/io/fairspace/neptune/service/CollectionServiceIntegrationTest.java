@@ -58,18 +58,16 @@ public class CollectionServiceIntegrationTest {
         Collection storedCollection = service.add(collection);
 
         // Retrieve again for verification
-        Optional<Collection> foundCollection = service.findById(storedCollection.getId());
+        Collection foundCollection = service.findById(storedCollection.getId());
 
-        assertTrue(foundCollection.isPresent());
-        assertEquals(storedCollection, foundCollection.get());
+        assertEquals(storedCollection, foundCollection);
     }
 
 
     @Test
     public void testCollectionIsVisibleForDefaultUser() {
         // For the default user, the collection is visible
-        Optional<Collection> foundCollection = service.findById(collection.getId());
-        assertTrue(foundCollection.isPresent());
+        service.findById(collection.getId()); // Shouldn't throw an exception
     }
 
     @Test(expected = AccessDeniedException.class)

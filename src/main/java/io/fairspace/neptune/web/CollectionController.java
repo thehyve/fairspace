@@ -30,8 +30,7 @@ public class CollectionController {
 
     @GetMapping("/{id}")
     public Collection getCollection(@PathVariable Long id) {
-        return collectionService.findById(id)
-                .orElseThrow(CollectionNotFoundException::new);
+        return collectionService.findById(id);
     }
 
     @PostMapping

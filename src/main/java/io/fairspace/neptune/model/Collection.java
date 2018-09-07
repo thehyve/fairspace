@@ -43,4 +43,7 @@ public class Collection {
 
     @Transient
     private String uri;
+
+    @Transient
+    private Access access;
 }

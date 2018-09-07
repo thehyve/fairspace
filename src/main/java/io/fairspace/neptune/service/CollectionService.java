@@ -8,6 +8,7 @@ import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -43,10 +44,11 @@ public class CollectionService {
                 permissionService
                         .getAllBySubject()
                         .stream()
-                        .map(Permission::getCollection)
+                        .map(p -> p.getCollection().toBuilder().access(p.getAccess()).build())
                         .collect(toList());
 
-        // Add the uri for metadata lookup
+
+        // Merge collections with metadata
         return collections.stream()
                 .map(collection -> {
                     String uri = collectionMetadataService.getUri(collection.getId());
@@ -55,18 +57,17 @@ public class CollectionService {
                 .collect(toList());
     }
 
-    public Optional<Collection> findById(Long id) {
-        permissionService.checkPermission(Access.Read, id);
+    public Collection findById(Long collectionId) {
+        Permission permission = permissionService.getSubjectsPermission(collectionId);
+        if (permission.getAccess().compareTo(Access.Read) < 0) {
+            throw new AccessDeniedException("Unauthorized");
+        }
 
-        // First retrieve collection itself
-        Optional<Collection> optionalCollection = repository.findById(id);
-
-        return optionalCollection
-                .map(collection -> {
-                    String uri = collectionMetadataService.getUri(collection.getId());
-                    return collection.toBuilder().uri(uri).build();
-                });
-
+        return permission.getCollection()
+                .toBuilder()
+                .uri(collectionMetadataService.getUri(collectionId))
+                .access(permission.getAccess())
+                .build();
     }
 
     public Collection add(Collection collection) throws IOException {
@@ -99,7 +100,7 @@ public class CollectionService {
         // TODO: Handle error when adding the storage for the collection
         storageService.addCollection(finalCollection);
 
-        return finalCollection;
+        return finalCollection.toBuilder().access(Access.Manage).build();
     }
 
     public Collection update(Long id, Collection patch) {
