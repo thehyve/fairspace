@@ -44,10 +44,9 @@ public class CollectionService {
                 permissionService
                         .getAllBySubject()
                         .stream()
-                        .map(p -> p.getCollection().toBuilder().access(p.getAccess()))
+                        .map(p -> p.getCollection().toBuilder().access(p.getAccess()).build())
                         .collect(toList());
 
-        List<CollectionMetadata> metadata = collectionMetadataService.getCollections();
 
         // Merge collections with metadata
         return collections.stream()
@@ -63,9 +62,12 @@ public class CollectionService {
         if (permission.getAccess().compareTo(Access.Read) < 0) {
             throw new AccessDeniedException("Unauthorized");
         }
-        Collection collection = permission.getCollection().withAccess(permission.getAccess());
-        String uri = collectionMetadataService.getUri(collection.getId());
-        return collection.toBuilder().uri(uri).build();
+
+        return permission.getCollection()
+                .toBuilder()
+                .uri(collectionMetadataService.getUri(collectionId))
+                .access(permission.getAccess())
+                .build();
     }
 
     public Collection add(Collection collection) throws IOException {
@@ -98,7 +100,7 @@ public class CollectionService {
         // TODO: Handle error when adding the storage for the collection
         storageService.addCollection(finalCollection);
 
-        return finalCollection.toBuilder(Access.Manage);
+        return finalCollection.toBuilder().access(Access.Manage).build();
     }
 
     public Collection update(Long id, Collection patch) {

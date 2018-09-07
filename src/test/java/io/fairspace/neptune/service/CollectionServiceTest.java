@@ -25,10 +25,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionServiceTest {
@@ -67,21 +65,20 @@ public class CollectionServiceTest {
         List<Collection> mergedCollections = toList(service.findAll().iterator());
 
         // Both items should be returned with the proper uri
-        assertTrue(mergedCollections.contains(collections.get(0).toBuilder().uri(getUri(1L)).build()));
-        assertTrue(mergedCollections.contains(collections.get(1).toBuilder().uri(getUri(2L)).build()));
+        assertTrue(mergedCollections.contains(collections.get(0).toBuilder().uri(getUri(1L)).access(Access.Manage).build()));
+        assertTrue(mergedCollections.contains(collections.get(1).toBuilder().uri(getUri(2L)).access(Access.Read).build()));
     }
 
     @Ignore
     @Test
     public void testFindById() {
         Long id = 1L;
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Read);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
-        Optional<Collection> mergedCollection = service.findById(id);
+        Collection mergedCollection = service.findById(id);
 
-        assertTrue(mergedCollection.isPresent());
-        assertEquals(collection.toBuilder().uri(getUri(1L)).build(), mergedCollection.get());
+        assertEquals(collection.toBuilder().uri(getUri(1L)).build(), mergedCollection);
     }
 
     @Ignore
@@ -91,28 +88,13 @@ public class CollectionServiceTest {
         when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
         service.findById(id);
-
-        verify(collectionMetadataService, times(0)).getCollection(anyString());
     }
 
-    @Ignore
-    @Test
-    public void testFindByIdWithoutMetadata() {
-        Long id = 1L;
-        Collection collection = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "quotes", null, null);
-        when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
-
-        when(collectionMetadataService.getCollection(getUri(id))).thenReturn(Optional.empty());
-
-        Collection mergedCollection = service.findById(id);
-        assertEquals(collection, mergedCollection);
-        assertTrue(!mergedCollection.isPresent());
-    }
 
     @Test
     public void testAddCollection() throws IOException {
         Long id = 1L;
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write);
 
         when(collectionRepository.save(any())).thenReturn(collection);
 
@@ -131,8 +113,8 @@ public class CollectionServiceTest {
 
     @Test
     public void testAddCollectionReturnsStoredIdAndUri() throws IOException {
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null);
-        Collection storedCollection = new Collection(2L, "quotes", "My quotes", "quote item", null);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write);
+        Collection storedCollection = new Collection(2L, "quotes", "My quotes", "quote item", null, Access.Write);
 
         when(collectionRepository.save(any())).thenReturn(storedCollection);
 
