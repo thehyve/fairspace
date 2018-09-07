@@ -18,6 +18,11 @@ public class PermissionController {
         return permissionService.getByCollection(collectionId);
     }
 
+    @GetMapping("/permissions")
+    public List<Permission> getAuthorizationsByLocation(@RequestParam String location) {
+        return permissionService.getByLocation(location);
+    }
+
     @PutMapping("/permissions")
     public Permission setAuthorization(@RequestBody Permission permission) {
         return permissionService.authorize(permission, false);
