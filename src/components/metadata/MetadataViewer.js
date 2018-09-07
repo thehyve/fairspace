@@ -40,15 +40,14 @@ class MetadataViewer extends React.Component {
 
 
     static extractDisplayValue(v) {
-        return v['rdfs:label'] || MetadataViewer.linkLabel(v['@id']) || v['@value'] || '';
+        return v['rdfs:label'] || v['@value'] || MetadataViewer.linkLabel(v['@id']) || '';
     }
 
     static linkLabel(link) {
-        return link && link.startsWith(window.location.origin) ? (
-            link.toString().includes('#')
+        return link &&
+            (link.toString().includes('#')
                 ? link.substring(link.lastIndexOf('#') + 1)
-                : link.substring(link.lastIndexOf('/') + 1)
-        ) : link;
+                : link.substring(link.lastIndexOf('/') + 1))
     }
 
     renderProperty(p) {
