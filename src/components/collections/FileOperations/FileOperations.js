@@ -8,7 +8,7 @@ import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import Badge from "@material-ui/core/Badge";
 
 function FileOperations(props) {
-    const {fileStore, path, onDidFileOperation, onCut, onCopy, onPaste, numClipboardItems, selection} = props;
+    const {fileStore, path, onDidFileOperation, onCut, onCopy, onPaste, numClipboardItems, selection, disabled} = props;
 
     function handleCut(e) {
         e.stopPropagation()
@@ -66,19 +66,19 @@ function FileOperations(props) {
         <IconButton
             aria-label="Copy"
             onClick={handleCopy}
-            disabled={selection.length === 0}>
+            disabled={selection.length === 0 || disabled}>
             <ContentCopy/>
         </IconButton>
         <IconButton
             aria-label="Cut"
             onClick={handleCut}
-            disabled={selection.length === 0}>
+            disabled={selection.length === 0 || disabled}>
             <ContentCut/>
         </IconButton>
         <IconButton
             aria-label="Paste"
             onClick={handlePaste}
-            disabled={numClipboardItems === 0}>
+            disabled={numClipboardItems === 0 || disabled}>
             {addBadgeIfNotEmpty(
                 numClipboardItems,
                 <ContentPaste/>
@@ -86,7 +86,8 @@ function FileOperations(props) {
         </IconButton>
         <CreateDirectoryButton
             aria-label="Create directory"
-            onCreate={(name) => handleCreateDirectory(path, name)}>
+            onCreate={(name) => handleCreateDirectory(path, name)}
+            disabled={disabled}>
             <Icon>create_new_folder</Icon>
         </CreateDirectoryButton>
 
@@ -94,7 +95,8 @@ function FileOperations(props) {
             color="primary"
             aria-label="Upload"
             onUpload={(files) => handleUpload(path, files)}
-            onDidUpload={onDidFileOperation}>
+            onDidUpload={onDidFileOperation}
+            disabled={disabled}>
             <Icon>cloud_upload</Icon>
         </UploadButton>
     </React.Fragment>)

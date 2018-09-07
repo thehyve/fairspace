@@ -4,25 +4,30 @@
         "location": "quotes",
         "uri": "http://fairspace.com/iri/collections/1",
         "name": "John's quotes",
-        "description": "A nice dataset with memorable quotes"
+        "description": "A nice dataset with memorable quotes",
+        "access": "Manage"
     },
     {
         "id": 2,
         "location": "samples",
         "uri": "http://fairspace.com/iri/collections/2",
         "name": "John's samples",
-        "description": "The big set of samples retrieved from the lab last year"
+        "description": "The big set of samples retrieved from the lab last year",
+        "access": "Manage"
     },
     {
         "id": 3,
         "location": "external",
         "uri": "http://fairspace.com/iri/collections/3",
         "name": "External data on AWS S3",
-        "description": "The big set of samples located outside the system"
+        "description": "The big set of samples located outside the system",
+        "access": "Write"
+
     },
     {
         "id": 4,
         "location": "other",
-        "name": "Unknown"
+        "name": "Unknown",
+        "access": "Read"
     }
 ]
