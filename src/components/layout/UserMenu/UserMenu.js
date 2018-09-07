@@ -3,7 +3,12 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from "@material-ui/core/Avatar";
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
 import { withStyles } from '@material-ui/core/styles';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import MenuList from '@material-ui/core/MenuList';
 import FetchUsername from "../../../backend/FetchUsername/FetchUsername";
 
 const styles = {
@@ -29,18 +34,18 @@ class UserMenu extends React.Component {
         this.props = props;
     }
 
-    handleClick(event) {
+    handleClick = event => {
         this.setState({ anchorEl: event.currentTarget });
     };
 
-    handleClose() {
+    handleClose = () => {
         this.setState({ anchorEl: null });
     };
 
-    handleLogout() {
+    handleLogout = () => {
         this.handleClose();
         this.props.onLogout();
-    }
+    };
 
     render() {
         const { anchorEl } = this.state;
@@ -58,7 +63,7 @@ class UserMenu extends React.Component {
                                         aria-owns={anchorEl ? 'user-menu' : null}
                                         aria-haspopup="true"
                                         color="inherit"
-                                        onClick={this.handleClick.bind(this)}
+                                        onClick={this.handleClick}
                                         className={this.classes.row}>
                                     <Avatar alt="{data.username}" src="/images/avatar.png" className={this.classes.avatar}/>
                                     <span>{data.username}</span>
@@ -69,15 +74,25 @@ class UserMenu extends React.Component {
                         }
                     }}
                 </FetchUsername>
-                <Menu
-                    id="user-menu"
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={this.handleClose.bind(this)}
-                >
-                    <MenuItem onClick={this.handleClose.bind(this)}>Profile</MenuItem>
-                    <MenuItem onClick={this.handleLogout.bind(this)}>Logout</MenuItem>
-                </Menu>
+                <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>
+                    {({ TransitionProps, placement }) => (
+                        <Grow
+                            {...TransitionProps}
+                            id="menu-list-grow"
+                            style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                        >
+                            <Paper>
+                                <ClickAwayListener onClickAway={this.handleClose}>
+                                    <MenuList>
+                                        <MenuItem onClick={this.handleClose} disabled>Profile</MenuItem>
+                                        <MenuItem onClick={this.handleClose} disabled>My account</MenuItem>
+                                        <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
+                                    </MenuList>
+                                </ClickAwayListener>
+                            </Paper>
+                        </Grow>
+                    )}
+                </Popper>
             </div>
         );
     }
