@@ -6,14 +6,11 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Transient;
+import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @EqualsAndHashCode
@@ -46,4 +43,10 @@ public class Collection {
 
     @Transient
     private Access access;
+
+    @JsonIgnore
+    @OneToMany
+    @JoinColumn(name = "collection_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<Permission> permissions;
 }
