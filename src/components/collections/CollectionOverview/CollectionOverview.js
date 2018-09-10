@@ -68,7 +68,7 @@ class CollectionOverview extends React.Component {
                 }
                 const errorMessage =  "An error occurred while deleting collection";
                 this.setState({loading: false});
-                ErrorDialog.showError(err, errorMessage, this.deleteCollection.bind(this));
+                ErrorDialog.showError(err, errorMessage, () => this.deleteCollection(collection));
             })
     }
 
