@@ -33,7 +33,7 @@ class StatementsControllerTest {
     @Test
     fun testGet() {
         val subject = TestData.personURI
-        `when`(modelRepository.list(subject, null)).thenReturn(TestData.model)
+        `when`(modelRepository.list(subject, null, null)).thenReturn(TestData.model)
 
         // Happy flow
         this.mockMvc

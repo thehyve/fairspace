@@ -53,7 +53,7 @@ Cache-Control: no-cache
 Accept: application/ld+json
 ```
 
-### To retrieve all statements for a specific subject (add `&predicate=...` to filter by predicate as well)
+### To retrieve all statements for a specific subject (add `&predicate=...&object=...` to filter by predicate and object as well)
 
 ```
 GET /statements?subject=http://somewhere/BillKidd HTTP/1.1
@@ -63,7 +63,7 @@ Accept: application/ld+json
 ```
 
 
-### To delete all statements for a specific subject (add `&predicate=...` to filter by predicate as well)
+### To delete all statements for a specific subject(add `&predicate=...&object=...` to filter by predicate and object as well)
 
 ```
 DELETE /statements?subject=http://somewhere/BillKidd HTTP/1.1

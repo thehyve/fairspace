@@ -7,7 +7,6 @@ import org.apache.jena.query.QueryFactory
 import org.apache.jena.query.ResultSet
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
-import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
 import org.apache.jena.system.Txn
@@ -19,9 +18,9 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
     private val lock = ReentrantReadWriteLock()
     private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)
 
-    fun list(subject: String?, predicate: String? = null): Model =
+    fun list(subject: String?, predicate: String?, obj: String?): Model =
             read {
-                listStatements(subject?.let(::createResource), predicate?.let(::createProperty), null as RDFNode?)
+                listStatements(subject?.let(::createResource), predicate?.let(::createProperty), obj?.let(::createResource))
                         .toModel()
             }
 
@@ -50,8 +49,8 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
 
     fun update(delta: Model) {
         write {
-            delta.listStatements().forEach { stmt ->
-                removeAll(stmt.subject, stmt.predicate, null)
+            delta.listStatements().forEach {
+                removeAll(it.subject, it.predicate, null)
             }
             add(delta)
         }
