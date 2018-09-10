@@ -18,7 +18,7 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
     private val lock = ReentrantReadWriteLock()
     private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)
 
-    fun list(subject: String?, predicate: String?, obj: String?): Model =
+    fun list(subject: String?, predicate: String? = null, obj: String? = null): Model =
             read {
                 listStatements(subject?.let(::createResource), predicate?.let(::createProperty), obj?.let(::createResource))
                         .toModel()

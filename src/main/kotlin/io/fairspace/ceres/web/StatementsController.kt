@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*
 class StatementsController(val repository: ModelRepository) {
 
     @GetMapping(produces = ["application/ld+json"])
-    fun get(@RequestParam("subject") subject: String?, @RequestParam("predicate") predicate: String?): Model {
-        return repository.list(subject, predicate)
+    fun get(@RequestParam("subject") subject: String?, @RequestParam("predicate") predicate: String?, @RequestParam("object") obj: String?): Model {
+        return repository.list(subject, predicate, obj)
     }
 
     @PostMapping(consumes = ["application/ld+json"])
