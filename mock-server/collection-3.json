@@ -4,5 +4,6 @@
   "location": "external",
   "uri": "http://fairspace.com/iri/collections/3",
   "name": "External data on AWS S3",
-  "description": "The big set of samples located outside the system"
+  "description": "The big set of samples located outside the system",
+  "access": "Write"
 }

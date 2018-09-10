@@ -2,5 +2,6 @@
   "id": 3,
   "type": "LOCAL_FILE",
   "location": "not-existing",
-  "name": "Unknown"
+  "name": "Unknown",
+  "access": "Read"
 }
