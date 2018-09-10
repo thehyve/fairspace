@@ -17,8 +17,8 @@ module.exports = {
         }
 
         let token = authHeader.split(' ')[1];
-        let decoded = jwt.decode(token, {complete: true});
-        let userId = decoded.payload.sub;
+        let payload = jwt.decode(token);
+        let userId = payload.sub;
 
         if (!userId) {
             callback(Errors.AuthenticationPropertyMissing);
