@@ -23,8 +23,8 @@ function getKeySet(options) {
     }
 
     // Otherwise retrieve the data and cache it
-    return axios.get(options.url)
-        .then(function (response) {
+    return axios.get(options.url, {timeout: 10000})
+        .then(response => {
             cache.set(options.url, response.data, expirationTimeInSeconds);
             return response.data;
         });
