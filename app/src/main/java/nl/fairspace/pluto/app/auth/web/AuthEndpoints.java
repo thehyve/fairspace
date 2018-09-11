@@ -23,6 +23,7 @@ import nl.fairspace.pluto.app.auth.config.AuthConstants;
 import nl.fairspace.pluto.app.auth.config.SecurityConfig;
 import nl.fairspace.pluto.app.auth.model.OAuthAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,7 @@ import static nl.fairspace.pluto.app.auth.config.AuthConstants.PREVIOUS_REQUEST_
 
 @Controller
 @Slf4j
+@Profile("!noAuth")
 public class AuthEndpoints {
     private static final String DEFAULT_REDIRECT_LOCATION = "/";
 
