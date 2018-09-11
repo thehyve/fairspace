@@ -101,7 +101,7 @@ public class SessionAuthenticationFilter implements Filter {
     private OAuthAuthenticationToken getTokenFromSession(HttpServletRequest request) {
         Object authenticationToken = request.getSession().getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
 
-        if(authenticationToken != null && authenticationToken instanceof OAuthAuthenticationToken) {
+        if(authenticationToken instanceof OAuthAuthenticationToken) {
             return (OAuthAuthenticationToken) authenticationToken;
         } else {
             return null;

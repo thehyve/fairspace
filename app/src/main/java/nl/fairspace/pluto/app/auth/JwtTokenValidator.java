@@ -21,7 +21,7 @@ public class JwtTokenValidator {
     }
 
     public JWTClaimsSet parseAndValidate(String token) {
-        if(token == null || StringUtils.isEmpty(token)) {
+        if(StringUtils.isEmpty(token)) {
             log.debug("Token provided for validation is empty");
             return null;
         }

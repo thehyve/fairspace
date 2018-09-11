@@ -119,7 +119,7 @@ public class OAuthFlow {
     }
 
     private URI getAuthorizeUri() throws URISyntaxException {
-        return new URI(String.format("%s/authorize", getBaseUrl()));
+        return new URI(getBaseUrl() + "/authorize");
     }
 
     private String getBaseUrl() {

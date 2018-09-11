@@ -1,7 +1,6 @@
 package nl.fairspace.pluto.app.auth;
 
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +24,7 @@ public class AuthorizationFailedHandler {
             response.sendRedirect(LOGIN_PATH);
         } else {
             response.addHeader(LOGIN_PATH_HEADER, LOGIN_PATH);
-            response.sendError(HttpStatus.UNAUTHORIZED.value());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
