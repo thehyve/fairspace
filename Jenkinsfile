@@ -14,7 +14,7 @@ pipeline {
       DOCKER_REPO_CREDS = credentials('jenkins-x-docker-repo')
 
       DOCKER_TAG_PREFIX = "$DOCKER_REPO/$ORG/$APP_NAME"
-      VERSION           = "0.2.${env.BUILD_NUMBER}"
+      VERSION           = "0.3.${env.BUILD_NUMBER}"
     }
     stages {
       stage('Build application') {
