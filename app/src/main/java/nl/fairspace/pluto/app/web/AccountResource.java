@@ -2,17 +2,13 @@ package nl.fairspace.pluto.app.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing the current user's account.
@@ -32,17 +28,17 @@ public class AccountResource {
      * @param authentication the HTTP authentication
      * @return a map with authorizations for the current user.
      */
-    @GetMapping("/authorizations")
-    public List<String> getAuthorizations(Authentication authentication) {
-        log.debug("REST authentication to retrieve authorizations");
-        if(authentication == null || authentication.getAuthorities() == null) {
-            return Collections.emptyList();
-        }
-
-        return authentication.getAuthorities().stream()
-                .map(authority -> ((GrantedAuthority) authority).getAuthority())
-                .collect(Collectors.toList());
-    }
+//    @GetMapping("/authorizations")
+//    public List<String> getAuthorizations(Authentication authentication) {
+//        log.debug("REST authentication to retrieve authorizations");
+//        if(authentication == null || authentication.getAuthorities() == null) {
+//            return Collections.emptyList();
+//        }
+//
+//        return authentication.getAuthorities().stream()
+//                .map(authority -> ((GrantedAuthority) authority).getAuthority())
+//                .collect(Collectors.toList());
+//    }
 
     /**
      * GET  /name : returns the name of the user currently logged in

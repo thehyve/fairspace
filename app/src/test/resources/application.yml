@@ -10,20 +10,15 @@ app:
     - /noauthz
     needsAuthorization:
     - /thehyve
+    - /echo-token
 
 security:
   oauth2:
-    client:
-      clientId: web_app
-      clientSecret: web_app
-      user-authorization-uri: https://user.authorization.uri.test
-      access-token-uri: https://access.token.uri.test
-      authentication-scheme: header
-    resource:
-      jwk:
-        key-set-uri: http://localhost:8531/certs
-      user-info-uri: http://localhost:8531/userinfo
-      prefer-token-info: true
+    clientId: web_app
+    clientSecret: web_app
+    jwk-key-set-uri: http://localhost:8531/certs
+
+logging.level.org.springframework.boot.web.servlet: DEBUG
 
 zuul:
   routes:

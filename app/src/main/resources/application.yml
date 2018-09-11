@@ -16,8 +16,7 @@ app:
     - /account/name
     needsAuthorization:
     - /account/authorizations
-    - /storage
-    - /api/metadata
+    - /api/*
 
 spring:
   application:
@@ -30,18 +29,11 @@ spring:
 
 security:
   oauth2:
-    client:
-      clientId: web_app
-      clientSecret: web_app
-      user-authorization-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
-      access-token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
-      authentication-scheme: header
-      scope: openid
-    resource:
-      jwk:
-        key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
-      user-info-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/userinfo
-      prefer-token-info: false
+    token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
+    clientId: web_app
+    clientSecret: web_app
+    scope: openid
+    jwk-key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
 
 zuul:
   routes:
