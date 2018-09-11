@@ -32,7 +32,7 @@ public class WorkspaceResource {
     @Value("${workspace.usersUri}")
     URI usersUri;
 
-    @Autowired
+    @Autowired(required = false)
     OAuthAuthenticationToken token;
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -51,7 +51,11 @@ public class WorkspaceResource {
         // header. Keycloak will not return a valid response if some headers are
         // forwarded (e.g. Host or X-Forwarded-Host)
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
+
+        if(token != null) {
+            headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
+        }
+
         HttpEntity<Object> request = new HttpEntity<>(headers);
 
         // Pass along the full query string

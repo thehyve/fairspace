@@ -18,7 +18,9 @@ security:
     needsAuthorization:
     - /thehyve
     - /echo-token
-logging.level.org.springframework.boot.web.servlet: DEBUG
+
+workspace:
+  usersUri: http://users-uri
 
 zuul:
   routes:
