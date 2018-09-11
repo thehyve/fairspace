@@ -2,22 +2,6 @@ app:
   oauth2:
     base-url: http://localhost:9080
     realm: keycloak
-    logout-url: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
-    redirect-after-logout-url: https://fairspace.com
-    required-authority: user-workspace
-
-  # Specify urls for security configuration. There are
-  urls:
-    permitAll:
-    - /actuator/health
-    - /error
-    - /manifest.json
-    needsAuthentication:
-    - /account/name
-    needsAuthorization:
-    - /account/authorizations
-    - /storage
-    - /api/metadata
 
 spring:
   application:
@@ -30,18 +14,30 @@ spring:
 
 security:
   oauth2:
-    client:
-      clientId: web_app
-      clientSecret: web_app
-      user-authorization-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
-      access-token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
-      authentication-scheme: header
-      scope: openid
-    resource:
-      jwk:
-        key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
-      user-info-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/userinfo
-      prefer-token-info: false
+    auth-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
+    token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
+    jwk-key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
+    logout-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
+    redirect-after-logout-uri: https://fairspace.com
+    clientId: web_app
+    clientSecret: web_app
+    scope: openid
+    required-authority: user-workspace
+
+  # Specify urls for security configuration. There are
+  urls:
+    permitAll:
+    - /actuator/health
+    - /error
+    - /manifest.json
+    - /login
+    - /logout
+    - /authorize
+    needsAuthentication:
+    - /account/name
+    needsAuthorization:
+    - /account/authorizations
+    - /*
 
 zuul:
   routes:
@@ -63,6 +59,7 @@ zuul:
   - /account/**
   - /login
   - /logout
+  - /authorize
   add-host-header: true
   ignored-headers:
     - Access-Control-Allow-Credentials

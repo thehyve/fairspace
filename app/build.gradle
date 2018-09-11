@@ -24,8 +24,8 @@ version = System.getenv('VERSION') ?: '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
-	maven { url "https://nexus.jx.test.fairdev.app/repository/maven-central/" }
-	maven { url "https://nexus.jx.test.fairdev.app/repository/spring-milestone/" }
+	mavenCentral()
+	maven { url "https://repo.spring.io/milestone" }
 }
 
 ext {
@@ -37,16 +37,14 @@ dependencies {
 
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
-	compile('org.springframework.boot:spring-boot-starter-security')
-	compile('org.springframework.cloud:spring-cloud-starter-oauth2')
   compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile('org.springframework.session:spring-session-core')
 	compile('org.springframework.cloud:spring-cloud-starter-sleuth')
 	compile('org.springframework.cloud:spring-cloud-sleuth-zipkin')
+	compile('com.nimbusds:nimbus-jose-jwt:5.7')
+	compile('com.nimbusds:oauth2-oidc-sdk:6.0')
 
-	testCompile('com.nimbusds:nimbus-jose-jwt:5.7')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('org.springframework.security:spring-security-test')
 	testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
 }
 

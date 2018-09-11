@@ -1,4 +1,4 @@
-package nl.fairspace.pluto.app.config.dto;
+package nl.fairspace.pluto.app.auth.config;
 
 import lombok.Data;
 

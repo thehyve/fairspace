@@ -5,8 +5,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,40 +22,40 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@WebAppConfiguration
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext
+@ActiveProfiles("noAuth")
 public class CorsIntegrationTests {
-	@Autowired
-	private WebApplicationContext context;
+	@LocalServerPort
+	private int port;
 
-	private MockMvc mockMvc;
+	@Autowired
+	private TestRestTemplate restTemplate;
 
 	@Before
 	public void setup() {
-		mockMvc = MockMvcBuilders
-				.webAppContextSetup(context)
-				.apply(SecurityMockMvcConfigurers.springSecurity())
-				.build();
 	}
 
 	@Test
-	@WithMockUser(authorities = {"user-workspace"})
 	public void corsHeadersAreSetProperly() throws Exception {
-		MockHttpServletRequestBuilder request = options("/thehyve")
-				.header("Origin", "http://fake-origin")
-				.header("access-control-request-headers", "fake-header")
-				.header("access-control-request-method", "PUT");
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Origin", "http://fake-origin");
+		headers.set("access-control-request-headers", "fake-header");
+		headers.set("access-control-request-method", "PUT");
+
+		HttpEntity<Object> request = new HttpEntity<>(headers);
+		ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + "/thehyve", HttpMethod.OPTIONS, request, String.class);
 
 		// Expect no restrictions on origin, headers and methods and that credentials are allowed
-		mockMvc
-				.perform(request)
-				.andExpect(header().string("Access-Control-Allow-Credentials", "true"))
-				.andExpect(header().string("Access-Control-Allow-Origin", containsString("http://fake-origin")))
-				.andExpect(header().string("Access-Control-Allow-Headers", containsString("fake-header")));
+		assertEquals(200, response.getStatusCodeValue());
+		assertEquals("true", response.getHeaders().get("Access-Control-Allow-Credentials").get(0));
+		assertEquals("http://fake-origin", response.getHeaders().get("Access-Control-Allow-Origin").get(0));
+		assertEquals("fake-header", response.getHeaders().get("Access-Control-Allow-Headers").get(0));
 	}
 
 }

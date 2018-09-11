@@ -1,29 +1,24 @@
-app:
+security:
   oauth2:
-    logout-url: https://test.logout.url/%s
-    redirect-after-logout-url: https://test.redirect.after.logout.url
+    clientId: web_app
+    clientSecret: web_app
+    scope: openid
+    token-uri: http://localhost:8531/certs
+    auth-uri: http://localhost:8531/auth
+    jwk-key-set-uri: http://localhost:8531/certs
+    logout-uri: https://test.logout.url/%s
+    redirect-after-logout-uri: https://test.redirect.after.logout.url
     required-authority: user-workspace
   urls:
     permitAll:
     - /actuator/health
+    - /login
     needsAuthentication:
     - /noauthz
     needsAuthorization:
     - /thehyve
-
-security:
-  oauth2:
-    client:
-      clientId: web_app
-      clientSecret: web_app
-      user-authorization-uri: https://user.authorization.uri.test
-      access-token-uri: https://access.token.uri.test
-      authentication-scheme: header
-    resource:
-      jwk:
-        key-set-uri: http://localhost:8531/certs
-      user-info-uri: http://localhost:8531/userinfo
-      prefer-token-info: true
+    - /echo-token
+logging.level.org.springframework.boot.web.servlet: DEBUG
 
 zuul:
   routes:
