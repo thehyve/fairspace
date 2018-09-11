@@ -8,11 +8,17 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Map;
 
@@ -40,7 +46,7 @@ public class WorkspaceResource {
      * @see <https://www.keycloak.org/docs-api/3.4/rest-api/index.html#_users_resource>
      */
     @GetMapping(value = "/users", produces = "application/json")
-    public String getUsers() {
+    public ResponseEntity<String> getUsers(HttpServletRequest incomingRequest) {
         // Forward the request, without any headers except for the Authorization
         // header. Keycloak will not return a valid response if some headers are
         // forwarded (e.g. Host or X-Forwarded-Host)
@@ -48,6 +54,16 @@ public class WorkspaceResource {
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
         HttpEntity<Object> request = new HttpEntity<>(headers);
 
-        return restTemplate.exchange(usersUri, HttpMethod.GET, request, String.class).getBody();
+        // Pass along the full query string
+        String uri = usersUri.toString() + "?" + incomingRequest.getQueryString();
+
+        // Send the request upstream
+        try {
+            return restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
+        } catch(HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
