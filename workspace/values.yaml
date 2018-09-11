@@ -101,16 +101,29 @@ pluto:
 jupyterhub:
     singleuser:
       image:
-        name: "docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser"
-        tag: "0.0.1"
+        name: "jupyter/datascience-notebook"
+        tag: "137a295ff71b"
       defaultUrl: "/lab"
     hub:
         ingress:
             enabled: false
-        extraEnv:
-            JUPYTER_ENABLE_LAB: 1
         extraConfig: |
             c.KubeSpawner.cmd = ['jupyter-labhub']
+        extraEnv:
+            OAUTH2_AUTHORIZE_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect/auth
+            OAUTH2_TOKEN_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect/token
+        auth:
+            type: custom
+            custom:
+                className: oauthenticator.generic.GenericOAuthenticator
+                config:
+                    client_id: "y0urc1logonc1ient1d"
+                    client_secret: "an0ther1ongs3cretstr1ng"
+                    token_url: https://${host}/auth/realms/${realm}/protocol/openid-connect/token
+                    userdata_url: https://${host}/auth/realms/${realm}/protocol/openid-connect/userinfo
+                    userdata_method: GET
+                    userdata_params: {'state': 'state'}
+                    username_key: preferred_username
     proxy:
         secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
 
