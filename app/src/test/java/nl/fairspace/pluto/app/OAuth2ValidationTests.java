@@ -41,6 +41,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -183,6 +184,15 @@ public class OAuth2ValidationTests {
                 "/noauthz"
         );
         assertEquals(200, response.getStatusCodeValue());
+	}
+
+	@Test
+	public void accessAnonymousEndpoints() throws Exception {
+		for(String path: Arrays.asList("/login", "/actuator/health")) {
+			HttpEntity<Object> request = new HttpEntity(null);
+			ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.GET, request, String.class);
+			assertTrue("Anonymous call to " + path + " does not result in success status", response.getStatusCodeValue() < 400);
+		}
 	}
 
     private ResponseEntity<String> getWithKey(JWT jwt) {

@@ -2,12 +2,13 @@ package nl.fairspace.pluto.app.auth.config;
 
 import nl.fairspace.pluto.app.auth.AuthorizationFailedHandler;
 import nl.fairspace.pluto.app.auth.JwtTokenValidator;
-import nl.fairspace.pluto.app.auth.OAuthTokenRefresher;
+import nl.fairspace.pluto.app.auth.OAuthFlow;
+import nl.fairspace.pluto.app.auth.filters.AnonymousCheckAuthenticationFilter;
 import nl.fairspace.pluto.app.auth.filters.AuthenticatedCheckAuthenticationFilter;
 import nl.fairspace.pluto.app.auth.filters.AuthorizedCheckAuthenticationFilter;
+import nl.fairspace.pluto.app.auth.filters.HandleFailedAuthenticationFilter;
 import nl.fairspace.pluto.app.auth.filters.HeaderAuthenticationFilter;
 import nl.fairspace.pluto.app.auth.filters.SessionAuthenticationFilter;
-import nl.fairspace.pluto.app.config.dto.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -22,19 +23,19 @@ public class AuthFilterConfiguration {
     private JwtTokenValidator jwtTokenValidator;
 
     @Autowired
-    private OAuthTokenRefresher tokenRefresher;
+    private OAuthFlow tokenRefresher;
 
     @Autowired
     private AuthorizationFailedHandler failedHandler;
 
     @Autowired
-    private AppConfig appConfig;
+    private SecurityConfig securityConfig;
 
     @Bean
     public FilterRegistrationBean<SessionAuthenticationFilter> sessionAuthenticationFilter() {
         FilterRegistrationBean<SessionAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
         filterRegBean.setFilter(new SessionAuthenticationFilter(jwtTokenValidator, tokenRefresher));
-        filterRegBean.setOrder(Ordered.LOWEST_PRECEDENCE - 5);
+        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 100);
         return filterRegBean;
     }
 
@@ -42,29 +43,49 @@ public class AuthFilterConfiguration {
     public FilterRegistrationBean<HeaderAuthenticationFilter> headerAuthenticationFilter() {
         FilterRegistrationBean<HeaderAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
         filterRegBean.setFilter(new HeaderAuthenticationFilter(jwtTokenValidator));
-        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 100);
+        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 101);
         return filterRegBean;
     }
 
     @Bean
     public FilterRegistrationBean<AuthenticatedCheckAuthenticationFilter> authenticatedCheckAuthenticationFilter() {
         FilterRegistrationBean<AuthenticatedCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
-        filterRegBean.setFilter(new AuthenticatedCheckAuthenticationFilter(failedHandler));
+        filterRegBean.setFilter(new AuthenticatedCheckAuthenticationFilter());
 
-        filterRegBean.addUrlPatterns(appConfig.getUrls().getNeedsAuthentication());
+        filterRegBean.addUrlPatterns(securityConfig.getUrls().getNeedsAuthentication());
 
-        filterRegBean.setOrder(Ordered.LOWEST_PRECEDENCE - 3);
+        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 102);
         return filterRegBean;
     }
 
     @Bean
     public FilterRegistrationBean<AuthorizedCheckAuthenticationFilter> authorizedCheckAuthenticationFilter() {
         FilterRegistrationBean<AuthorizedCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
-        filterRegBean.setFilter(new AuthorizedCheckAuthenticationFilter(failedHandler, appConfig.getOauth2().getRequiredAuthority()));
+        filterRegBean.setFilter(new AuthorizedCheckAuthenticationFilter(securityConfig.getOauth2().getRequiredAuthority()));
 
-        filterRegBean.addUrlPatterns(appConfig.getUrls().getNeedsAuthorization());
+        filterRegBean.addUrlPatterns(securityConfig.getUrls().getNeedsAuthorization());
 
-        filterRegBean.setOrder(Ordered.LOWEST_PRECEDENCE - 2);
+        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 103);
+        return filterRegBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<AnonymousCheckAuthenticationFilter> anonymousCheckAuthenticationFilter() {
+        FilterRegistrationBean<AnonymousCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
+        filterRegBean.setFilter(new AnonymousCheckAuthenticationFilter());
+
+        filterRegBean.addUrlPatterns(securityConfig.getUrls().getPermitAll());
+
+        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 104);
+        return filterRegBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<HandleFailedAuthenticationFilter> handleFailedAuthenticationFilter() {
+        FilterRegistrationBean<HandleFailedAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
+        filterRegBean.setFilter(new HandleFailedAuthenticationFilter(failedHandler));
+
+        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 200);
         return filterRegBean;
     }
 }

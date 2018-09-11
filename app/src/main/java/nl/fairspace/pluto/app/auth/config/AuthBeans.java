@@ -8,12 +8,16 @@ import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.nimbusds.jwt.proc.JWTProcessor;
-import nl.fairspace.pluto.app.config.dto.SecurityConfig;
+import nl.fairspace.pluto.app.auth.model.OAuthAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 
 import static com.nimbusds.jose.JWSAlgorithm.RS256;
@@ -34,7 +38,7 @@ public class AuthBeans {
         // OAuth 2.0 server's JWK set, published at a well-known URL. The RemoteJWKSet
         // object caches the retrieved keys to speed up subsequent look-ups and can
         // also gracefully handle key-rollover
-        JWKSource keySource = new RemoteJWKSet(config.getJwkKeySetUri().toURL());
+        JWKSource keySource = new RemoteJWKSet(config.getOauth2().getJwkKeySetUri().toURL());
 
         // The expected JWS algorithm of the access tokens (agreed out-of-band)
         JWSAlgorithm expectedJWSAlg = RS256;
@@ -45,5 +49,11 @@ public class AuthBeans {
         jwtProcessor.setJWSKeySelector(keySelector);
 
         return jwtProcessor;
+    }
+
+    @Bean
+    @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
+    OAuthAuthenticationToken authenticationToken(HttpServletRequest request) {
+        return (OAuthAuthenticationToken) request.getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
     }
 }

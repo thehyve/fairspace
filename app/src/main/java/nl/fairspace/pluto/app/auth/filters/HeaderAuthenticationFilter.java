@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_ATTRIBUTE;
+import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 
 @Slf4j
 public class HeaderAuthenticationFilter implements Filter {
@@ -37,7 +37,7 @@ public class HeaderAuthenticationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         // If the authorization is already set, skip this filter
-        if(request.getAttribute(AUTHORIZATION_ATTRIBUTE) != null) {
+        if(request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
             chain.doFilter(request, response);
             return;
         }
@@ -45,7 +45,7 @@ public class HeaderAuthenticationFilter implements Filter {
         // Otherwise, check if the authorization can be found in the header
         OAuthAuthenticationToken authenticationToken = retrieveHeaderAuthorization((HttpServletRequest) request, (HttpServletResponse) response);
         if(authenticationToken != null) {
-            request.setAttribute(AUTHORIZATION_ATTRIBUTE, authenticationToken);
+            request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
         }
 
         chain.doFilter(request, response);

@@ -1,7 +1,6 @@
 package nl.fairspace.pluto.app.auth.filters;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.app.auth.AuthorizationFailedHandler;
 import nl.fairspace.pluto.app.auth.model.OAuthAuthenticationToken;
 
 import javax.servlet.Filter;
@@ -11,19 +10,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_ATTRIBUTE;
+import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE;
+import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 
 @Slf4j
 public abstract class CheckAuthenticationFilter implements Filter {
-    private AuthorizationFailedHandler failedHandler;
-
-    public CheckAuthenticationFilter(AuthorizationFailedHandler failedHandler) {
-        this.failedHandler = failedHandler;
-    }
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -31,11 +24,16 @@ public abstract class CheckAuthenticationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        if(Boolean.TRUE.equals(request.getAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE))) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 
-        if(!isAuthorized(httpServletRequest)) {
-            failedHandler.handleFailedAuthorization(httpServletRequest, (HttpServletResponse) response);
-            return;
+        if(isAuthorized(httpServletRequest)) {
+            // Save authorization check result
+            request.setAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE, Boolean.TRUE);
         }
 
         chain.doFilter(request, response);
@@ -48,7 +46,7 @@ public abstract class CheckAuthenticationFilter implements Filter {
     }
 
     protected OAuthAuthenticationToken getAuthentication(HttpServletRequest request) {
-        Object attribute = request.getAttribute(AUTHORIZATION_ATTRIBUTE);
+        Object attribute = request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
 
         if(attribute instanceof OAuthAuthenticationToken) {
             return (OAuthAuthenticationToken) attribute;

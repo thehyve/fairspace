@@ -1,21 +1,20 @@
 package nl.fairspace.pluto.app.auth.filters;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.app.auth.AuthorizationFailedHandler;
 import nl.fairspace.pluto.app.auth.model.OAuthAuthenticationToken;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.Arrays;
 
+import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORITIES_CLAIM;
+
 @Slf4j
 public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilter {
-    public static final String AUTHORITIES_CLAIM = "authorities";
-
     String requiredAuthority;
 
-    public AuthorizedCheckAuthenticationFilter(AuthorizationFailedHandler failedHandler, String requiredAuthority) {
-        super(failedHandler);
+
+    public AuthorizedCheckAuthenticationFilter(String requiredAuthority) {
         this.requiredAuthority = requiredAuthority;
     }
 
@@ -24,7 +23,8 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
         // If not specified otherwise, specific authorization is needed,
         // check for that in the authorities list
         OAuthAuthenticationToken authentication = getAuthentication(request);
-        if(authentication == null) {
+        if(authentication == null || authentication.getClaimsSet() == null) {
+            log.debug("No token provided or no claimsset provided");
             return false;
         }
 

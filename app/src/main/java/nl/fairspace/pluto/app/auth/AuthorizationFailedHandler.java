@@ -8,10 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static nl.fairspace.pluto.app.auth.config.AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE;
+
 @Component
 @Profile("!noAuth")
 public class AuthorizationFailedHandler {
-
     public static final String ACCEPT_HEADER = "Accept";
     public static final String X_REQUESTED_WITH_HEADER = "X-Requested-With";
     public static final String XHR_VALUE = "XMLHttpRequest";
@@ -20,6 +21,7 @@ public class AuthorizationFailedHandler {
 
     public void handleFailedAuthorization(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (shouldRedirect(request)) {
+            request.getSession().setAttribute(PREVIOUS_REQUEST_SESSION_ATTRIBUTE, request.getRequestURI());
             response.sendRedirect(LOGIN_PATH);
         } else {
             response.addHeader(LOGIN_PATH_HEADER, LOGIN_PATH);

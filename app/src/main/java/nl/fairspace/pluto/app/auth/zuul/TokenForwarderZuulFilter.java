@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_ATTRIBUTE;
+import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 
 @Slf4j
 @Component
@@ -36,7 +36,7 @@ public class TokenForwarderZuulFilter extends ZuulFilter {
         // Retrieve token from the request
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
-        OAuthAuthenticationToken token = (OAuthAuthenticationToken) request.getAttribute(AUTHORIZATION_ATTRIBUTE);
+        OAuthAuthenticationToken token = (OAuthAuthenticationToken) request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
 
         // If no token was provided, some error occurred in the authorization filters
         // The request should not get here

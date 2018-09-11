@@ -4,7 +4,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.app.auth.JwtTokenValidator;
 import nl.fairspace.pluto.app.auth.model.OAuthAuthenticationToken;
-import nl.fairspace.pluto.app.auth.OAuthTokenRefresher;
+import nl.fairspace.pluto.app.auth.OAuthFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.Filter;
@@ -17,17 +17,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_ATTRIBUTE;
+import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
+import static nl.fairspace.pluto.app.auth.config.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
 
 @Slf4j
 public class SessionAuthenticationFilter implements Filter {
-    private static final String PLUTO_AUTH_SESSION_ATTRIBUTE_NAME = "PlutoAuthentication";
-
     private JwtTokenValidator jwtTokenValidator;
-    private OAuthTokenRefresher tokenRefresher;
+    private OAuthFlow tokenRefresher;
 
     @Autowired
-    public SessionAuthenticationFilter(JwtTokenValidator jwtTokenValidator, OAuthTokenRefresher tokenRefresher) {
+    public SessionAuthenticationFilter(JwtTokenValidator jwtTokenValidator, OAuthFlow tokenRefresher) {
         this.jwtTokenValidator = jwtTokenValidator;
         this.tokenRefresher = tokenRefresher;
     }
@@ -41,7 +40,7 @@ public class SessionAuthenticationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         OAuthAuthenticationToken authenticationToken = retrieveSessionAuthentication((HttpServletRequest) request, (HttpServletResponse) response);
         if(authenticationToken != null) {
-            request.setAttribute(AUTHORIZATION_ATTRIBUTE, authenticationToken);
+            request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
         }
 
         chain.doFilter(request, response);
@@ -64,6 +63,7 @@ public class SessionAuthenticationFilter implements Filter {
 
         // If it validates, return
         if(jwtClaimsSet != null) {
+            log.debug("Valid JWT found in the user session");
             return token;
         }
 
@@ -99,7 +99,7 @@ public class SessionAuthenticationFilter implements Filter {
     }
 
     private OAuthAuthenticationToken getTokenFromSession(HttpServletRequest request) {
-        Object authenticationToken = request.getSession().getAttribute(PLUTO_AUTH_SESSION_ATTRIBUTE_NAME);
+        Object authenticationToken = request.getSession().getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
 
         if(authenticationToken != null && authenticationToken instanceof OAuthAuthenticationToken) {
             return (OAuthAuthenticationToken) authenticationToken;
@@ -109,7 +109,7 @@ public class SessionAuthenticationFilter implements Filter {
     }
 
     private void storeTokenInSession(OAuthAuthenticationToken token, HttpServletRequest request) {
-        request.getSession().setAttribute(PLUTO_AUTH_SESSION_ATTRIBUTE_NAME, token);
+        request.getSession().setAttribute(AUTHORIZATION_SESSION_ATTRIBUTE, token);
     }
 
     @Override

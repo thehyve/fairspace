@@ -8,11 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Data
 public class AppConfig {
-    private AppOAuth2Config oauth2;
-    private AppSecurityUrlConfig urls;
-
     private String sessionCookieName = "JSESSIONID";
     private boolean forceHttps = true;
-
 }
 
