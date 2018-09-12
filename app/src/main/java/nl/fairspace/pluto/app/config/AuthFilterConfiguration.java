@@ -16,14 +16,17 @@ import org.springframework.core.Ordered;
 @ComponentScan("io.fairspace.oidc_auth")
 public class AuthFilterConfiguration {
     @Autowired
-    private SecurityConfiguration securityConfig;
+    private OidcConfiguration oidcConfiguration;
+
+    @Autowired
+    private AppSecurityUrlConfig urlConfig;
 
     @Bean
     public FilterRegistrationBean<AuthenticatedCheckAuthenticationFilter> authenticatedCheckAuthenticationFilter() {
         FilterRegistrationBean<AuthenticatedCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
         filterRegBean.setFilter(new AuthenticatedCheckAuthenticationFilter());
 
-        filterRegBean.addUrlPatterns(securityConfig.getUrls().getNeedsAuthentication());
+        filterRegBean.addUrlPatterns(urlConfig.getNeedsAuthentication());
 
         filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 202);
         return filterRegBean;
@@ -32,9 +35,9 @@ public class AuthFilterConfiguration {
     @Bean
     public FilterRegistrationBean<AuthorizedCheckAuthenticationFilter> authorizedCheckAuthenticationFilter() {
         FilterRegistrationBean<AuthorizedCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
-        filterRegBean.setFilter(new AuthorizedCheckAuthenticationFilter(securityConfig.getOauth2().getRequiredAuthority()));
+        filterRegBean.setFilter(new AuthorizedCheckAuthenticationFilter(oidcConfiguration.getRequiredAuthority()));
 
-        filterRegBean.addUrlPatterns(securityConfig.getUrls().getNeedsAuthorization());
+        filterRegBean.addUrlPatterns(urlConfig.getNeedsAuthorization());
 
         filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 203);
         return filterRegBean;
@@ -45,7 +48,7 @@ public class AuthFilterConfiguration {
         FilterRegistrationBean<AnonymousCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
         filterRegBean.setFilter(new AnonymousCheckAuthenticationFilter());
 
-        filterRegBean.addUrlPatterns(securityConfig.getUrls().getPermitAll());
+        filterRegBean.addUrlPatterns(urlConfig.getPermitAll());
 
         filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 204);
         return filterRegBean;

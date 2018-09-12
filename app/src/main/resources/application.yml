@@ -13,7 +13,7 @@ spring:
     base-url: http://jaeger-collector.jaeger:9411/
 
 security:
-  oauth2:
+  oidc:
     auth-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
     token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
     jwk-key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs

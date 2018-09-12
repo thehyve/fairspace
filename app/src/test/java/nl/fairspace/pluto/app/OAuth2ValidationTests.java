@@ -176,9 +176,9 @@ public class OAuth2ValidationTests {
 	}
 
 	@Test
-	public void accessAnonymousEndpoints() throws Exception {
+	public void accessAnonymousEndpoints() {
 		for(String path: Arrays.asList("/login", "/actuator/health")) {
-			HttpEntity<Object> request = new HttpEntity(null);
+			HttpEntity<Object> request = new HttpEntity<Object>(null);
 			ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.GET, request, String.class);
 			assertTrue("Anonymous call to " + path + " does not result in success status", response.getStatusCodeValue() < 400);
 		}
@@ -257,12 +257,7 @@ public class OAuth2ValidationTests {
 	{
 		@Bean
 		WireMockConfigurationCustomizer customizer() {
-			return new WireMockConfigurationCustomizer() {
-				@Override
-				public void customize(WireMockConfiguration config) {
-					config.extensions(new ResponseTemplateTransformer(false));
-				}
-			};
+			return config -> config.extensions(new ResponseTemplateTransformer(false));
 		}
 	}
 }
