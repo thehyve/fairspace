@@ -25,7 +25,7 @@ import static com.nimbusds.jose.JWSAlgorithm.RS256;
 @Slf4j
 public class AuthBeans {
     @Autowired
-    private SecurityConfig securityConfig;
+    private OidcConfig oidcConfig;
 
     @Bean
     JWTProcessor jwtProcessor() throws MalformedURLException {
@@ -37,7 +37,7 @@ public class AuthBeans {
         // OAuth 2.0 server's JWK set, published at a well-known URL. The RemoteJWKSet
         // object caches the retrieved keys to speed up subsequent look-ups and can
         // also gracefully handle key-rollover
-        JWKSource keySource = new RemoteJWKSet(securityConfig.getOauth2().getJwkKeySetUri().toURL());
+        JWKSource keySource = new RemoteJWKSet(oidcConfig.getJwkKeySetUri().toURL());
 
         // The expected JWS algorithm of the access tokens (agreed out-of-band)
         JWSAlgorithm expectedJWSAlg = RS256;

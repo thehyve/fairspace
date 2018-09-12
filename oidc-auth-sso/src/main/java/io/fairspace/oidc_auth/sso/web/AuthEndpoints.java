@@ -2,13 +2,12 @@ package io.fairspace.oidc_auth.sso.web;
 
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.id.State;
+import io.fairspace.oidc_auth.config.OidcConfig;
 import io.fairspace.oidc_auth.sso.OAuthFlow;
 import io.fairspace.oidc_auth.config.AuthConstants;
-import io.fairspace.oidc_auth.config.SecurityConfig;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,8 +28,7 @@ public class AuthEndpoints {
     private static final String DEFAULT_REDIRECT_LOCATION = "/";
 
     @Autowired
-    SecurityConfig configuration;
-
+    OidcConfig configuration;
 
     @Autowired
     OAuthFlow oAuthFlow;
@@ -92,7 +90,7 @@ public class AuthEndpoints {
     }
 
     private String getAuthProviderLogoutUrl() {
-        return String.format(configuration.getOauth2().getLogoutUri(), configuration.getOauth2().getRedirectAfterLogoutUri());
+        return String.format(configuration.getLogoutUri(), configuration.getRedirectAfterLogoutUri());
     }
 
 

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.net.URI;
 
 @Data
-public class OAuth2Config {
+public class OidcConfig {
     private URI tokenUri;
     private URI authUri;
     private URI jwkKeySetUri;
@@ -14,6 +14,4 @@ public class OAuth2Config {
     private String clientId;
     private String clientSecret;
     private String scope;
-    private String requiredAuthority;
-
 }

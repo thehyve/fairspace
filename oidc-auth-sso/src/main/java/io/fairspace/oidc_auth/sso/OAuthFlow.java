@@ -21,7 +21,7 @@ import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import io.fairspace.oidc_auth.JwtTokenValidator;
-import io.fairspace.oidc_auth.config.SecurityConfig;
+import io.fairspace.oidc_auth.config.OidcConfig;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ import java.util.Map;
 @Slf4j
 public class OAuthFlow {
     @Autowired
-    SecurityConfig configuration;
+    OidcConfig configuration;
 
     @Autowired
     JwtTokenValidator jwtTokenValidator;
@@ -52,11 +52,11 @@ public class OAuthFlow {
 
         // Build the request
         return new AuthorizationRequest.Builder(
-                new ResponseType(ResponseType.Value.CODE), new ClientID(configuration.getOauth2().getClientId()))
-                .scope(new Scope(configuration.getOauth2().getScope()))
+                new ResponseType(ResponseType.Value.CODE), new ClientID(configuration.getClientId()))
+                .scope(new Scope(configuration.getScope()))
                 .state(state)
                 .redirectionURI(callback)
-                .endpointURI(configuration.getOauth2().getAuthUri())
+                .endpointURI(configuration.getAuthUri())
                 .build().toURI();
     }
 
@@ -65,7 +65,7 @@ public class OAuthFlow {
         AuthorizationGrant codeGrant = new AuthorizationCodeGrant(authorizationCode, getAuthorizeUri());
 
         // Make the token request
-        TokenRequest request = new TokenRequest(configuration.getOauth2().getTokenUri(), getClientAuthentication(), codeGrant);
+        TokenRequest request = new TokenRequest(configuration.getTokenUri(), getClientAuthentication(), codeGrant);
         TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
 
         // On failure, tell the user
@@ -100,7 +100,7 @@ public class OAuthFlow {
         AuthorizationGrant refreshTokenGrant = new RefreshTokenGrant(refreshToken);
 
         // Make the token request
-        TokenRequest request = new TokenRequest(configuration.getOauth2().getTokenUri(), getClientAuthentication(), refreshTokenGrant);
+        TokenRequest request = new TokenRequest(configuration.getTokenUri(), getClientAuthentication(), refreshTokenGrant);
         TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
 
         if (!response.indicatesSuccess()) {
@@ -137,7 +137,7 @@ public class OAuthFlow {
     }
 
     public ClientAuthentication getClientAuthentication() {
-        return new ClientSecretBasic(new ClientID(configuration.getOauth2().getClientId()), new Secret(configuration.getOauth2().getClientSecret()));
+        return new ClientSecretBasic(new ClientID(configuration.getClientId()), new Secret(configuration.getClientSecret()));
     }
 
 }
