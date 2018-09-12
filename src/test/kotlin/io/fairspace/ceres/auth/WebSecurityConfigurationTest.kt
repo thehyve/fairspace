@@ -1,4 +1,4 @@
-package io.fairspace.ceres
+package io.fairspace.ceres.auth
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.nimbusds.jose.JOSEException
@@ -65,9 +65,9 @@ class WebSecurityConfigurationTest {
     private val random = SecureRandom()
 
     private val defaultExpiryDate = Date(Date().time + 60 * 1000)
-    private val unsignedJWT = PlainJWT(getJwtClaimsSet(defaultExpiryDate))
+    private val unsignedJWT = JWTBuilder().build()
     private val signedJWT: SignedJWT
-            get() = getSignedJWT(defaultExpiryDate)
+            get() = JWTBuilder().signWith(keyId, privateKey!!).build() as SignedJWT
 
     @Before
     @Throws(Exception::class)
