@@ -1,0 +1,15 @@
+allprojects {
+  ext {
+    springVersion = '4.3.5.RELEASE'
+  }
+
+  apply plugin: 'java-library'
+  apply plugin: 'maven'
+
+  group = 'io.fairspace'
+  version = '0.1.0'
+
+  repositories {
+    jcenter()
+  }
+}

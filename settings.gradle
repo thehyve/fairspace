@@ -1,0 +1,6 @@
+rootProject.name = 'oidc-auth'
+
+include 'oidc-auth-core'
+include 'oidc-auth-zuul'
+include 'oidc-auth-sso'
+include 'oidc-auth-bearer-auth'
