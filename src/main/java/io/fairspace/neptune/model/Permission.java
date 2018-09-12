@@ -28,9 +28,10 @@ public class Permission {
     @NotNull
     String subject;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @Column(name = "collection_id")
     Collection collection;
 
     @NotNull
