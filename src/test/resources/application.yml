@@ -1,11 +1,13 @@
 # Security configuration
 security:
-  oauth2:
-    resource:
-      user-info-uri: http://localhost:${wiremock.server.port}/userinfo
-      prefer-token-info: false
-      jwk:
-        key-set-uri: http://localhost:${wiremock.server.port}/certs
+  oidc:
+    jwk-key-set-uri: http://localhost:${wiremock.server.port}/certs
+  urls:
+    permitAll:
+    - /actuator/health
+    needsAuthentication:
+    - /*
+
 jena:
   dataset:
     path: data

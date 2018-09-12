@@ -38,25 +38,26 @@ compileTestKotlin {
 
 repositories {
 	mavenCentral()
+	maven { url = "https://nexus.jx.test.fairdev.app/repository/maven-releases/" }
 }
 
 
 ext {
 	springCloudVersion = 'Finchley.SR1'
+	oidcAuthVersion = '0.1.2'
 }
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('com.fasterxml.jackson.module:jackson-module-kotlin')
-	compile('org.springframework.cloud:spring-cloud-starter-oauth2')
 	compile('org.springframework.cloud:spring-cloud-starter-zipkin')
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	compile("org.jetbrains.kotlin:kotlin-reflect")
 	compile("org.apache.jena:apache-jena-libs:$jena_version")
+	compile("io.fairspace:oidc-auth-bearer-auth:${oidcAuthVersion}")
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('org.springframework.security:spring-security-test')
 	testCompile('com.nimbusds:nimbus-jose-jwt:5.7')
 	testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
 }
