@@ -1,5 +1,5 @@
 security:
-  oauth2:
+  oidc:
     clientId: web_app
     clientSecret: web_app
     scope: openid

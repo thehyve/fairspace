@@ -15,7 +15,7 @@ data:
         realm: {{ .Values.keycloak.realm }}
 
     security:
-      oauth2:
+      oidc:
         redirect-after-logout-url: {{ .Values.keycloak.redirectAfterLogoutUrl }}
         required-authority: {{ .Values.keycloak.requiredAuthority | default (printf "user-%s" (include "pluto.workspace.name" .)) }}
 
