@@ -28,10 +28,9 @@ public class Permission {
     @NotNull
     String subject;
 
-    @ManyToOne(optional = false)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    @Column(name = "collection_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     Collection collection;
 
     @NotNull
