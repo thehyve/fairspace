@@ -41,9 +41,10 @@ titan:
 
 # Security configuration
 security:
-  oauth2:
-    resource:
-      user-info-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/userinfo
-      prefer-token-info: false
-      jwk:
-        key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
+  oidc:
+    jwk-key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
+  urls:
+    permitAll:
+    - /actuator/health
+    needsAuthentication:
+    - /*

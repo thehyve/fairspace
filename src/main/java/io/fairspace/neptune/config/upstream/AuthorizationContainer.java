@@ -1,45 +1,31 @@
 package io.fairspace.neptune.config.upstream;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.jwt.JwtHelper;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 
 @Component
-@Profile("!dev")
 public class AuthorizationContainer {
-    private static final TypeReference<Map<String, Object>> CLAIMS_MAP = new TypeReference<Map<String, Object>>() {};
+    public static final String SUBJECT_CLAIM = "sub";
 
-    @Autowired
-    private HttpServletRequest incomingRequest;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired(required = false)
+    OAuthAuthenticationToken token;
 
     public String getAuthorizationHeader() {
-        return incomingRequest.getHeader("Authorization");
-    }
-
-    public String getJWT() {
-        String header = getAuthorizationHeader();
-        return header.substring(header.indexOf(' ') + 1).trim();
-    }
-
-    public Map<String, Object> getClaims() {
-        try {
-            return objectMapper.readValue(JwtHelper.decode(getJWT()).getClaims(), CLAIMS_MAP);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        if(token == null) {
+            throw new IllegalStateException("Retrieving authorization header is only allowed when a token is present");
         }
+
+        return "Bearer " + token.getAccessToken();
     }
 
     public String getSubject() {
-        return (String) getClaims().get("sub");
+        if(token == null) {
+            throw new IllegalStateException("Retrieving token subject is only allowed when a token is present");
+        }
+        return (String) token.getClaimsSet().get(SUBJECT_CLAIM);
     }
 }

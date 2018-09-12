@@ -27,20 +27,24 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven { url = "https://nexus.jx.test.fairdev.app/repository/maven-releases/" }
 }
 
 
 ext {
     springCloudVersion = 'Finchley.RELEASE'
+    oidcAuthVersion = '0.1.2'
 }
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile('org.springframework.cloud:spring-cloud-starter-oauth2')
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile('org.springframework.cloud:spring-cloud-starter-sleuth')
     compile('org.springframework.cloud:spring-cloud-sleuth-zipkin')
+
+    compile("io.fairspace:oidc-auth-bearer-auth:${oidcAuthVersion}")
+
     compile("org.apache.httpcomponents:httpclient")
     compile "org.apache.jena:apache-jena-libs:$jena_version"
     compile("com.h2database:h2")
@@ -49,7 +53,6 @@ dependencies {
 
     testCompile('com.nimbusds:nimbus-jose-jwt:5.7')
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('org.springframework.security:spring-security-test')
     testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
 }
 

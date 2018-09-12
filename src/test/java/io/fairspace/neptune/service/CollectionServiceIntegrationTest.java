@@ -2,6 +2,7 @@ package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.config.upstream.AuthorizationContainer;
 import io.fairspace.neptune.model.Collection;
+import io.fairspace.neptune.model.UnauthorizedException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class CollectionServiceIntegrationTest {
         service.findById(collection.getId()); // Shouldn't throw an exception
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void testCollectionNotVisibleForOthersByDefault() {
         // For another user, the collection is not visible
         when(authorizationContainer.getSubject()).thenReturn("other-nonexisting-user");

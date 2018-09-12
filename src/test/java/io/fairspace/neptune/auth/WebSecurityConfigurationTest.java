@@ -1,4 +1,4 @@
-package io.fairspace.neptune;
+package io.fairspace.neptune.auth;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -27,9 +27,9 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -81,26 +81,34 @@ public class WebSecurityConfigurationTest {
     @Test
     public void testValidAccessToken() throws JOSEException {
         when(collectionService.findAll()).thenReturn(Collections.singletonList(new Collection()));
-        ResponseEntity<String> response = getWithKey(getSignedJWT());
+        ResponseEntity<String> response = getWithKey(new JWTBuilder().signWith(keyId, privateKey).build());
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    public void testUnsignedAccessToken() {
-        ResponseEntity<String> response = getWithKey(getUnsignedJWT());
+    public void testAnonymousAccess() {
+        when(collectionService.findAll()).thenReturn(Collections.singletonList(new Collection()));
+        ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + "/actuator/health", HttpMethod.GET, new HttpEntity<>(null), String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+
+    @Test
+    public void testUnsignedAccessToken() throws JOSEException {
+        ResponseEntity<String> response = getWithKey(new JWTBuilder().build());
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     @Test
     public void testAccessTokenWithOtherKeyId() throws JOSEException {
-        ResponseEntity<String> response = getWithKey(getSignedJWT(getDefaultExpiryDate(), "test", privateKey));
+        ResponseEntity<String> response = getWithKey(new JWTBuilder().signWith("test", privateKey).build());
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     @Test
     public void testExpiredSignedAccessToken() throws JOSEException {
         Date expiryDate = new Date(new Date().getTime() - 60 * 1000);
-        ResponseEntity<String> response = getWithKey(getSignedJWT(expiryDate));
+        ResponseEntity<String> response = getWithKey(new JWTBuilder().expires(expiryDate).signWith(keyId, privateKey).build());
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
@@ -150,7 +158,7 @@ public class WebSecurityConfigurationTest {
                 .subject("alice")
                 .issuer("https://test.com")
                 .expirationTime(expires)
-                .claim(UserAuthenticationConverter.AUTHORITIES, Collections.singletonList("authority"))
+                .claim("authorities", Collections.singletonList("authority"))
                 .build();
     }
 
