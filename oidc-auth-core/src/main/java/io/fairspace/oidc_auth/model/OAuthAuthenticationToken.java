@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.ParseException;
 import java.util.Collections;
@@ -17,9 +18,10 @@ import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORITIES_CLAIM;
 @EqualsAndHashCode
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Slf4j
 public class OAuthAuthenticationToken {
     public static final String USERNAME_CLAIM = "preferred_username";
-    private static final String FULLNAME_CLAIM = "full name";
+    private static final String FULLNAME_CLAIM = "full_name";
 
     private String accessToken;
     private String refreshToken;
@@ -33,35 +35,48 @@ public class OAuthAuthenticationToken {
         this(accessToken, refreshToken, null);
     }
 
-
     public String getUsername() {
         if(claimsSet == null) {
+            log.warn("No claimsset provided in OAuth token");
             return "";
         }
 
         Object username = claimsSet.get(USERNAME_CLAIM);
 
-        return username == null ? null : username.toString();
+        if(username == null) {
+            log.warn("No username provided in OAuth token");
+            return "";
+        }
+
+        return username.toString();
     }
 
     public String getFullName() {
         if(claimsSet == null) {
+            log.warn("No claimsset provided in OAuth token");
             return "";
         }
 
-        Object fullname = claimsSet.get(USERNAME_CLAIM);
+        Object fullname = claimsSet.get(FULLNAME_CLAIM);
 
-        return fullname == null ? null : fullname.toString();
+        if(fullname == null) {
+            log.warn("No fullname provided in OAuth token");
+            return "";
+        }
+
+        return fullname.toString();
     }
 
     public List<String> getAuthorities() throws ParseException {
         if(claimsSet == null) {
+            log.warn("No claimsset provided in OAuth token");
             return Collections.emptyList();
         }
 
         Object authorities = claimsSet.get(AUTHORITIES_CLAIM);
 
         if(authorities == null) {
+            log.warn("No authorities provided in OAuth token");
             return null;
         }
 

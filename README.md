@@ -61,6 +61,8 @@ in a Spring application. It has 4 different parts:
    
    You can also create your own bean that extends the OidcConfig class.
    
+   Please note, when using only the `bearer-auth` component, only the `jwk-key-set-uri` is required. 
+   
 4. Add filters to actually check the authentication. The library provides 3 filters:
    * Applying the `AuthorizedCheckAuthenticationFilter` will only pass if a valid JWT is provided and it
      contains the authority specified in the constructor.
