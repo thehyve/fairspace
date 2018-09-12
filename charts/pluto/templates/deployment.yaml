@@ -52,12 +52,12 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         env:
-        - name: SECURITY_OAUTH2_CLIENTID
+        - name: SECURITY_OIDC_CLIENTID
           valueFrom:
             secretKeyRef:
               name: {{ template "pluto.keycloak.client.secret" . }}
               key: clientId
-        - name: SECURITY_OAUTH2_CLIENTSECRET
+        - name: SECURITY_OIDC_CLIENTSECRET
           valueFrom:
             secretKeyRef:
               name: {{ template "pluto.keycloak.client.secret" . }}
