@@ -59,14 +59,16 @@ public class WorkspaceResource {
         HttpEntity<Object> request = new HttpEntity<>(headers);
 
         // Pass along the full query string
-        String uri = usersUri.toString() + "?" + incomingRequest.getQueryString();
+        String uri = usersUri + "?" + incomingRequest.getQueryString();
 
         // Send the request upstream
         try {
             return restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
         } catch(HttpClientErrorException e) {
+            log.warn("Client error while retrieving list of users from Auth provider", e);
             return ResponseEntity.status(e.getStatusCode()).build();
         } catch(Exception e) {
+            log.error("An exception occurred while retrieving list of users from Auth provider", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
