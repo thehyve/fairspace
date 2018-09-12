@@ -45,7 +45,6 @@ class UploadButton extends React.Component{
         this.onDidUpload = onDidUpload;
         this.onUpload = onUpload;
         this.componentProps = componentProps;
-        this.classes = props.classes;
 
         this.state = {
             uploading: false,
@@ -119,7 +118,7 @@ class UploadButton extends React.Component{
             return <table width="100%">
                 {Object.keys(this.state.files).map(filename =>
                         <tr>
-                            <td className={this.classes.progressFilename}>
+                            <td className={this.props.classes.progressFilename}>
                                 <span>
                                     {filename}
                                 </span>
@@ -148,7 +147,7 @@ class UploadButton extends React.Component{
                     <DialogContent>
                         <Dropzone
                             onDrop={this.uploadFiles.bind(this)}
-                            className={this.classes.dropZone}>
+                            className={this.props.classes.dropZone}>
 
                             {this.renderDropzoneContent()}
                         </Dropzone>
