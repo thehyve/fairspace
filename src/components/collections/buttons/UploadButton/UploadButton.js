@@ -7,8 +7,30 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "@material-ui/core/Icon";
+import LinearProgress from "@material-ui/core/LinearProgress";
+import {withStyles} from '@material-ui/core/styles';
 import Dropzone from 'react-dropzone';
 import {Column} from "simple-flexbox";
+
+const styles = {
+    dropZone: {
+        width: 400,
+        height: 200,
+        color: 'grey',
+        padding: 20,
+        backgroundColor: '#f8f8f8'
+    },
+    progressFilename: {
+        width: 200,
+        span: {
+            maxWidth: '200px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: 'inline-block',
+            whiteSpace: 'nowrap'
+        }
+    }
+}
 
 class UploadButton extends React.Component{
     constructor(props) {
@@ -26,7 +48,7 @@ class UploadButton extends React.Component{
 
         this.state = {
             uploading: false,
-            directory: '....'
+            files: {}
         };
     }
 
@@ -36,6 +58,7 @@ class UploadButton extends React.Component{
 
         this.setState({
             uploading: false,
+            files: {}
         });
     }
 
@@ -51,13 +74,59 @@ class UploadButton extends React.Component{
             this.onDidUpload();
         }
 
-        this.setState({uploading: false});
+        this.setState({
+            uploading: false,
+            files: {}
+        });
     }
 
     uploadFiles(files) {
         this.filesUploaded = true;
         if(this.onUpload) {
-            this.onUpload(files);
+            this.startUploading(files);
+            this.onUpload(files)
+                .then(this.finishUploading.bind(this));
+        }
+    }
+
+    startUploading(files) {
+        this.setFilesState(files, 'uploading');
+    }
+
+    finishUploading(files) {
+        this.setFilesState(files, 'uploaded');
+    }
+
+    setFilesState(files, state) {
+        // Add these file to a copy of the current map with files
+        let filesMap = Object.assign({}, this.state.files)
+        files.forEach(file => { filesMap[file.name] = state });
+
+        // Set the new state
+        this.setState({files: filesMap})
+
+    }
+
+    renderDropzoneContent() {
+        if(!this.filesUploaded) {
+            return <Column horizontal={'center'}>
+                <Icon>cloud_upload</Icon>
+                <Typography paragraph={true}
+                            noWrap>Drop files here to upload them to the current directory</Typography>
+            </Column>
+        } else {
+            return <table width="100%">
+                {Object.keys(this.state.files).map(filename =>
+                        <tr>
+                            <td className={this.props.classes.progressFilename}>
+                                <span>
+                                    {filename}
+                                </span>
+                            </td>
+                            <td>{this.state.files[filename] === 'uploading' ? <LinearProgress /> : 'Uploaded'}</td>
+                        </tr>
+                )}
+            </table>
         }
     }
 
@@ -74,16 +143,13 @@ class UploadButton extends React.Component{
                     onClose={this.closeDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Upload files to: {this.state.directory}</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Upload files</DialogTitle>
                     <DialogContent>
                         <Dropzone
                             onDrop={this.uploadFiles.bind(this)}
-                            style={{width:'auto', color: 'grey', padding: 80, backgroundColor: '#f8f8f8'}}>
-                            <Column horizontal={'center'}>
-                                <Icon>cloud_upload</Icon>
-                                <Typography paragraph={true}
-                                            noWrap>Drop files here to upload them to {this.state.directory}</Typography>
-                            </Column>
+                            className={this.props.classes.dropZone}>
+
+                            {this.renderDropzoneContent()}
                         </Dropzone>
                     </DialogContent>
                     <DialogActions>
@@ -97,7 +163,7 @@ class UploadButton extends React.Component{
     }
 }
 
-export default UploadButton;
+export default withStyles(styles)(UploadButton);
 
 
 

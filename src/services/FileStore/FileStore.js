@@ -59,7 +59,7 @@ class FileStore {
         return Promise.all(
             files.map(file =>
                 this.client.putFileContents(fullPath + '/' + file.name, file))
-        );
+        ).then(() => files);
     }
 
     /**
