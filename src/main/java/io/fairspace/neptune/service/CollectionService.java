@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
@@ -44,7 +45,7 @@ public class CollectionService {
                 permissionService
                         .getAllBySubject()
                         .stream()
-                        .map(p -> p.getCollection().toBuilder().access(p.getAccess()).build())
+                        .map(this::permisssionToCollection)
                         .collect(toList());
 
 
@@ -55,6 +56,19 @@ public class CollectionService {
                     return collection.toBuilder().uri(uri).build();
                 })
                 .collect(toList());
+    }
+
+    private Collection permisssionToCollection(Permission p) {
+        Objects.requireNonNull(p);
+        Collection c = p.getCollection();
+        Objects.requireNonNull(c);
+        Collection.CollectionBuilder builder = c.toBuilder();
+        Access a = p.getAccess();
+        Objects.requireNonNull(a);
+        builder.access(a);
+        c = builder.build();
+        return c;
+
     }
 
     public Collection findById(Long collectionId) {
