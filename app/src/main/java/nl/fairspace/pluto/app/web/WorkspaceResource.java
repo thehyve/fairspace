@@ -1,10 +1,9 @@
 package nl.fairspace.pluto.app.web;
 
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.app.auth.model.OAuthAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,12 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.springframework.web.util.UriBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
-import java.util.Map;
 
 /**
  * REST controller for managing workspace contents
