@@ -5,26 +5,48 @@ import List from "@material-ui/core/List/List";
 import ListItem from "@material-ui/core/ListItem/ListItem";
 import {compareBy, comparing} from "../../utils/comparators";
 import Typography from "@material-ui/core/Typography";
+import Icon from "@material-ui/core/Icon";
 
-class Permissions extends React.Component {
+class Permissions extends React.Component{
+
     constructor(props) {
         super(props);
-
-        this.collectionId = props.collectionId;
+        this.state = {
+            collectionId: props.collectionId,
+            showEditButton: false
+        };
     }
 
-    componentWillReceiveProps(props) {
-        this.collectionId = props.collectionId;
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+        if (!this.props.collectionId) {
+            this.props.collectionId = false;
+        }
+
+        if (this.props.collectionId !== prevProps.collectionId) {
+            this.setState({
+                collectionId: this.props.collectionId
+            });
+        }
     }
 
-    loadPermissions() {
-        return permissionStore.getCollectionPermissions(this.collectionId, null)
-    }
+    toggleEditButton = () => {
+        return this.setState({showEditButton: !this.state.showEditButton})
+    };
 
-    static renderPermissions(permissions) {
+    loadPermissions = () => {
+        return permissionStore.getCollectionPermissions(this.state.collectionId)
+    };
+
+    renderPermissions = (permissions) => {
         return (
             <div>
-                <Typography variant="subheading">Shared with:</Typography>
+                <Typography variant="subheading"
+                            onMouseEnter={this.toggleEditButton}
+                            onMouseLeave={this.toggleEditButton}>
+                    Shared with:&nbsp;
+                    {this.state.showEditButton ? <Icon style={{fontSize: '.9em'}}>edit</Icon> : ''}
+                </Typography>
                 <List>
                     {
                         permissions
@@ -34,16 +56,12 @@ class Permissions extends React.Component {
                 </List>
             </div>
         )
-    }
-
-    static permissionLevel(p) {
-        return {Manage: 0, Write: 1, Read: 2}[p.access]
-    }
+    };
 
     render() {
         return (<Loader what={'permissions'}
-                        onLoad={this.loadPermissions.bind(this)}
-                        onRender={Permissions.renderPermissions}/>)
+                        onLoad={this.loadPermissions}
+                        onRender={this.renderPermissions}/>)
     }
 }
 
