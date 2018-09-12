@@ -5,11 +5,42 @@ allprojects {
 
   apply plugin: 'java-library'
   apply plugin: 'maven'
+  apply plugin: 'maven-publish'
 
   group = 'io.fairspace'
-  version = '0.1.0'
+  version = System.getenv('VERSION') ?: '0.1.0-SNAPSHOT'
+
+  task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+  }
 
   repositories {
     jcenter()
   }
+
+  publishing {
+    publications {
+      oidcAuthComponent(MavenPublication) {
+        from components.java
+        artifact sourcesJar
+      }
+    }
+    repositories {
+      maven {
+        def releasesRepoUrl = "https://nexus.jx.test.fairdev.app/repository/maven-releases/"
+        def snapshotsRepoUrl = "https://nexus.jx.test.fairdev.app/repository/maven-snapshots/"
+        url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        name = 'nexus'
+
+        credentials {
+          username System.getenv("NEXUS_CREDENTIALS_USR")
+          password System.getenv("NEXUS_CREDENTIALS_PSW")
+        }
+      }
+    }
+  }
 }
+
+
+
