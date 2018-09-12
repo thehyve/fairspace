@@ -21,7 +21,7 @@ import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORITIES_CLAIM;
 @Slf4j
 public class OAuthAuthenticationToken {
     public static final String USERNAME_CLAIM = "preferred_username";
-    private static final String FULLNAME_CLAIM = "full_name";
+    private static final String FULLNAME_CLAIM = "name";
 
     private String accessToken;
     private String refreshToken;
