@@ -3,7 +3,6 @@ package io.fairspace.neptune.service;
 import io.fairspace.neptune.config.upstream.AuthorizationContainer;
 import io.fairspace.neptune.model.Collection;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +12,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class CollectionServiceIntegrationTest {
