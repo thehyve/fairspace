@@ -26,10 +26,12 @@ sourceCompatibility = 1.8
 repositories {
 	mavenCentral()
 	maven { url "https://repo.spring.io/milestone" }
+	maven { url "https://nexus.jx.test.fairdev.app/repository/maven-releases/" }
 }
 
 ext {
 	springCloudVersion = 'Finchley.RC2'
+	oidcAuthVersion = '0.1.1'
 }
 
 dependencies {
@@ -41,8 +43,10 @@ dependencies {
 	compile('org.springframework.session:spring-session-core')
 	compile('org.springframework.cloud:spring-cloud-starter-sleuth')
 	compile('org.springframework.cloud:spring-cloud-sleuth-zipkin')
-	compile('com.nimbusds:nimbus-jose-jwt:5.7')
-	compile('com.nimbusds:oauth2-oidc-sdk:6.0')
+
+	compile("io.fairspace:oidc-auth-sso:${oidcAuthVersion}")
+	compile("io.fairspace:oidc-auth-bearer-auth:${oidcAuthVersion}")
+	compile("io.fairspace:oidc-auth-zuul:${oidcAuthVersion}")
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")

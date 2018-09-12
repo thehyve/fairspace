@@ -1,13 +1,10 @@
-package nl.fairspace.pluto.app.auth.config;
+package nl.fairspace.pluto.app.config;
 
-import lombok.Data;
+import io.fairspace.oidc_auth.config.SecurityConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @ConfigurationProperties(prefix = "security")
 @Configuration
-@Data
-public class SecurityConfig {
-    private OAuth2Config oauth2;
-    private AppSecurityUrlConfig urls;
+public class SecurityConfiguration extends SecurityConfig {
 }
