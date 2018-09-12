@@ -39,6 +39,9 @@ security:
     - /account/authorizations
     - /*
 
+workspace:
+  usersUri: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/users
+
 zuul:
   routes:
     storage:
@@ -57,9 +60,11 @@ zuul:
   ignored-patterns:
   - /actuator/**
   - /account/**
+  - /api/workspace/**
   - /login
   - /logout
   - /authorize
+  - /error
   add-host-header: true
   ignored-headers:
     - Access-Control-Allow-Credentials
