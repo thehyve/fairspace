@@ -43,6 +43,13 @@ public class CollectionService {
         return permissionService
                 .getAllBySubject()
                 .stream()
+                .filter(p -> {
+                    if (p.getCollection() == null) {
+                        log.error("A permission without collection {}", p.getId());
+                        return false;
+                    }
+                    return true;
+                })
                 .map(p -> p.getCollection().toBuilder().access(p.getAccess()).build())
                 .map(collection -> {
                     String uri = collectionMetadataService.getUri(collection.getId());
