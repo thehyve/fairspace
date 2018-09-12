@@ -30,7 +30,7 @@ public class Permission {
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     Collection collection;
 
     @NotNull
