@@ -8,8 +8,29 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "@material-ui/core/Icon";
 import LinearProgress from "@material-ui/core/LinearProgress";
+import {withStyles} from '@material-ui/core/styles';
 import Dropzone from 'react-dropzone';
 import {Column} from "simple-flexbox";
+
+const styles = {
+    dropZone: {
+        width: 400,
+        height: 200,
+        color: 'grey',
+        padding: 20,
+        backgroundColor: '#f8f8f8'
+    },
+    progressFilename: {
+        width: 200,
+        span: {
+            maxWidth: '200px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: 'inline-block',
+            whiteSpace: 'nowrap'
+        }
+    }
+}
 
 class UploadButton extends React.Component{
     constructor(props) {
@@ -24,6 +45,7 @@ class UploadButton extends React.Component{
         this.onDidUpload = onDidUpload;
         this.onUpload = onUpload;
         this.componentProps = componentProps;
+        this.classes = props.classes;
 
         this.state = {
             uploading: false,
@@ -97,8 +119,8 @@ class UploadButton extends React.Component{
             return <table width="100%">
                 {Object.keys(this.state.files).map(filename =>
                         <tr>
-                            <td style={{width: '200px'}}>
-                                <span style={{maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', display: 'inline-block', whiteSpace: 'nowrap' }}>
+                            <td className={this.classes.progressFilename}>
+                                <span>
                                     {filename}
                                 </span>
                             </td>
@@ -126,7 +148,7 @@ class UploadButton extends React.Component{
                     <DialogContent>
                         <Dropzone
                             onDrop={this.uploadFiles.bind(this)}
-                            style={{width:400, height: 200, color: 'grey', padding: 20, backgroundColor: '#f8f8f8'}}>
+                            className={this.classes.dropZone}>
 
                             {this.renderDropzoneContent()}
                         </Dropzone>
@@ -142,7 +164,7 @@ class UploadButton extends React.Component{
     }
 }
 
-export default UploadButton;
+export default withStyles(styles)(UploadButton);
 
 
 
