@@ -1,7 +1,7 @@
 package io.fairspace.oidc_auth.filters;
 
-import lombok.extern.slf4j.Slf4j;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;

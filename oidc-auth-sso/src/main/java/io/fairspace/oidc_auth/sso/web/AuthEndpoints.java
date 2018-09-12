@@ -2,10 +2,10 @@ package io.fairspace.oidc_auth.sso.web;
 
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.id.State;
-import io.fairspace.oidc_auth.config.OidcConfig;
-import io.fairspace.oidc_auth.sso.OAuthFlow;
 import io.fairspace.oidc_auth.config.AuthConstants;
+import io.fairspace.oidc_auth.config.OidcConfig;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.oidc_auth.sso.OAuthFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

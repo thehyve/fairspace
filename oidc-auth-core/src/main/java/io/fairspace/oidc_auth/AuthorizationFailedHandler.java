@@ -1,6 +1,5 @@
 package io.fairspace.oidc_auth;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;

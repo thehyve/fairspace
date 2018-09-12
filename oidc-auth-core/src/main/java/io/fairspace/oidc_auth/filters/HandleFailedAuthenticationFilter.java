@@ -1,7 +1,7 @@
 package io.fairspace.oidc_auth.filters;
 
-import lombok.extern.slf4j.Slf4j;
 import io.fairspace.oidc_auth.AuthorizationFailedHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
