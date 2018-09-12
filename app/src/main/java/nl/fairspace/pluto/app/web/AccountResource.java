@@ -53,7 +53,7 @@ public class AccountResource {
     @GetMapping("/name")
     public Map<String, String> getName() {
         log.debug("REST request to check if the current user is authenticated");
-        return Collections.singletonMap("username", token.getUsername());
+        return Collections.singletonMap("username", token.getFullName());
     }
 
 }
