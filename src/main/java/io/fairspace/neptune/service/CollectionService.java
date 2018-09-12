@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
@@ -40,35 +39,16 @@ public class CollectionService {
         this.collectionMetadataService = collectionMetadataService;
     }
 
-    public Iterable<Collection> findAll() {
-        List<Collection> collections =
-                permissionService
-                        .getAllBySubject()
-                        .stream()
-                        .map(this::permisssionToCollection)
-                        .collect(toList());
-
-
-        // Merge collections with metadata
-        return collections.stream()
+    public List<Collection> findAll() {
+        return permissionService
+                .getAllBySubject()
+                .stream()
+                .map(p -> p.getCollection().toBuilder().access(p.getAccess()).build())
                 .map(collection -> {
                     String uri = collectionMetadataService.getUri(collection.getId());
                     return collection.toBuilder().uri(uri).build();
                 })
                 .collect(toList());
-    }
-
-    private Collection permisssionToCollection(Permission p) {
-        Objects.requireNonNull(p);
-        Collection c = p.getCollection();
-        Objects.requireNonNull(c);
-        Collection.CollectionBuilder builder = c.toBuilder();
-        Access a = p.getAccess();
-        Objects.requireNonNull(a);
-        builder.access(a);
-        c = builder.build();
-        return c;
-
     }
 
     public Collection findById(Long collectionId) {
@@ -92,7 +72,7 @@ public class CollectionService {
         Collection finalCollection;
         try {
             finalCollection = repository.save(savedCollection.toBuilder().location(id.toString()).build());
-        } catch(DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             throw new InvalidCollectionException(e);
         }
 
@@ -106,7 +86,7 @@ public class CollectionService {
         // database is the source of truth
         try {
             collectionMetadataService.createCollection(finalCollection);
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.warn("An error occurred while storing collection metadata for collection id" + finalCollection.getId());
         }
 
@@ -125,11 +105,11 @@ public class CollectionService {
         return optionalCollection.map(collection -> {
             // Add properties from outside
             Collection.CollectionBuilder builder = collection.toBuilder();
-            if(!StringUtils.isEmpty(patch.getName())) {
+            if (!StringUtils.isEmpty(patch.getName())) {
                 builder.name(patch.getName());
             }
 
-            if(!StringUtils.isEmpty(patch.getDescription())) {
+            if (!StringUtils.isEmpty(patch.getDescription())) {
                 builder.name(patch.getDescription());
             }
 
@@ -140,7 +120,7 @@ public class CollectionService {
             // database is the source of truth
             try {
                 collectionMetadataService.patchCollection(savedCollection);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 log.warn("An error occurred while storing collection metadata for collection id" + savedCollection.getId());
             }
 
