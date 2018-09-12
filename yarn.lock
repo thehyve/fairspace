@@ -7689,7 +7689,7 @@ webdav-server@^2.3.22:
     mime-types "^2.1.18"
     xml-js-builder "^1.0.3"
 
-webdav@^1.5.3:
+webdav@1.5.3:
   version "1.5.3"
   resolved "https://registry.yarnpkg.com/webdav/-/webdav-1.5.3.tgz#d30b3e12c248858583cfbe6b8c508867d0d76c0a"
   dependencies:

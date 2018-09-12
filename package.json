@@ -28,7 +28,7 @@
     "react-table": "^6.8.6",
     "react-test-renderer": "^16.4.1",
     "simple-flexbox": "^1.2.0",
-    "webdav": "^1.5.3"
+    "webdav": "1.5.3"
   },
   "scripts": {
     "dev": "concurrently \"yarn server\" \"yarn start\"",
