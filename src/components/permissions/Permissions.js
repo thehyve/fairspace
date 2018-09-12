@@ -24,7 +24,7 @@ class Permissions extends React.Component {
     static renderPermissions(permissions) {
         return (
             <div>
-                <Typography variant="subheading">Shared by:</Typography>
+                <Typography variant="subheading">Shared with:</Typography>
                 <List>
                     {
                         permissions
