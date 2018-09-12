@@ -121,47 +121,6 @@ public class WebSecurityConfigurationTest {
         return restTemplate.exchange("http://localhost:" + port + "/", HttpMethod.GET, request, String.class);
     }
 
-    private SignedJWT getSignedJWT() throws JOSEException {
-        return getSignedJWT(getDefaultExpiryDate());
-    }
-
-    private SignedJWT getSignedJWT(Date expires) throws JOSEException {
-        return getSignedJWT(expires, keyId, privateKey);
-    }
-
-    private SignedJWT getSignedJWT(Date expires, String keyId, RSAPrivateKey privateKey) throws JOSEException {
-        // Create RSA-signer with the private key
-        JWSSigner signer = new RSASSASigner(privateKey);
-
-        JWTClaimsSet claimsSet = getJwtClaimsSet(expires);
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .keyID(keyId)
-                .build();
-
-
-        SignedJWT signedJWT = new SignedJWT(header, claimsSet);
-
-        // Compute the RSA signature
-        signedJWT.sign(signer);
-
-        return signedJWT;
-    }
-
-    private PlainJWT getUnsignedJWT() {
-        JWTClaimsSet claimsSet = getJwtClaimsSet(getDefaultExpiryDate());
-        return new PlainJWT(claimsSet);
-    }
-
-    private JWTClaimsSet getJwtClaimsSet(Date expires) {
-        // Prepare JWT with claims set
-        return new JWTClaimsSet.Builder()
-                .subject("alice")
-                .issuer("https://test.com")
-                .expirationTime(expires)
-                .claim("authorities", Collections.singletonList("authority"))
-                .build();
-    }
-
     private void storeKeypair() throws NoSuchAlgorithmException {
         KeyPair keyPair = generateKeypair();
 
