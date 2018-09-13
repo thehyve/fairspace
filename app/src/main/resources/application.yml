@@ -53,10 +53,13 @@ zuul:
       url: http://ceres/
     collections:
       path: /api/collections/**
-      url: http://neptune/     
+      url: http://neptune/
     ui:
       path: /**
       url: http://mercury/
+    notebooks:
+      path: /notebooks/**
+      url: http://jupyterhub/
   ignored-patterns:
   - /actuator/**
   - /account/**
