@@ -1,4 +1,3 @@
-import * as jsonld from 'jsonld/dist/jsonld';
 import {compareBy, comparing} from "../../utils/comparators";
 
 
@@ -18,7 +17,7 @@ import {compareBy, comparing} from "../../utils/comparators";
  *  }
  */
 function combine(vocabulary, metadata) {
-    return Promise.all([extractLabelsByIdMap(vocabulary), jsonld.expand(metadata)])
+    return Promise.all([extractLabelsByIdMap(vocabulary), metadata])
         .then(([labelsById, expandedMetadata]) => {
             const root = expandedMetadata[0];
             const result = [];
@@ -56,16 +55,13 @@ function combine(vocabulary, metadata) {
  * @returns {*}
  */
 function extractLabelsByIdMap(vocabulary) {
-    return jsonld.expand(vocabulary)
-        .then(expandedVocabulary => {
-            const labelsById = {};
-            expandedVocabulary.forEach(property => {
-                const id = property["@id"];
-                const label = property['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"];
-                labelsById[id] = label;
-            });
-            return labelsById;
+        const labelsById = {};
+        vocabulary.forEach(property => {
+            const id = property["@id"];
+            const label = property['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"];
+            labelsById[id] = label;
         });
+        return labelsById;
 }
 
 export default combine;

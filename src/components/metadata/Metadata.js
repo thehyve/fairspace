@@ -33,7 +33,7 @@ class Metadata extends React.Component {
 
         Promise.all([
             this.metadataStore.getVocabulary(),
-            this.metadataStore.get(this.subject)
+            this.metadataStore.get({subject: this.subject})
         ]).then(([vocabulary, metadata]) => {
             if (this.willUnmount) return;
 

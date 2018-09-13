@@ -6,6 +6,6 @@
     "collections": "/api/collections",
     "collectionPermissions": "/api/collections/%d/permissions",
     "files": "/api/storage/webdav",
-    "metadata": "/api/metadata/statements?subject="
+    "metadata": "/api/metadata/statements"
   }
 }
