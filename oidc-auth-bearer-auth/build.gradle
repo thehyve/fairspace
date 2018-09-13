@@ -16,5 +16,11 @@ dependencies {
     implementation "org.springframework:spring-context:${springVersion}"
     implementation "org.springframework:spring-beans:${springVersion}"
 
+    testCompile "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testCompile "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+    testCompile "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testCompile "org.mockito:mockito-core:${mockitoVersion}"
+    testCompile "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+
     api project(':oidc-auth-core')
 }

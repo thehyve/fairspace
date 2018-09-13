@@ -20,23 +20,18 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
         // If not specified otherwise, specific authorization is needed,
         // check for that in the authorities list
         OAuthAuthenticationToken authentication = getAuthentication(request);
-        if(authentication == null || authentication.getClaimsSet() == null) {
-            log.debug("No token provided or no claimsset provided");
+        if(authentication == null || authentication.getAuthorities() == null) {
+            log.debug("No token provided or no authorities provided");
             return false;
         }
 
-        try {
-            boolean hasAuthority = authentication.getAuthorities().contains(requiredAuthority);
+        boolean hasAuthority = authentication.getAuthorities().contains(requiredAuthority);
 
-            if(!hasAuthority) {
-                log.warn("JWT does not contain the required authority {}", requiredAuthority);
-            }
-
-            return hasAuthority;
-        } catch(ParseException e) {
-            log.warn("Could not parse authorities from JWT token");
-            return false;
+        if(!hasAuthority) {
+            log.warn("JWT does not contain the required authority {}", requiredAuthority);
         }
+
+        return hasAuthority;
 
     }
 }

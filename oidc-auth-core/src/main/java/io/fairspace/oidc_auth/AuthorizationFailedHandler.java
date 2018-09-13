@@ -28,7 +28,8 @@ public class AuthorizationFailedHandler {
 
     private boolean shouldRedirect(HttpServletRequest request) {
         String acceptHeader = request.getHeader(ACCEPT_HEADER);
-        return (acceptHeader != null && acceptHeader.contains("text/html")) ||
-                XHR_VALUE.equals(request.getHeader(X_REQUESTED_WITH_HEADER));
+        return acceptHeader != null &&
+                acceptHeader.contains("text/html") &&
+                !XHR_VALUE.equals(request.getHeader(X_REQUESTED_WITH_HEADER));
     }
 }
