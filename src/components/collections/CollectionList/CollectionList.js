@@ -20,7 +20,7 @@ function CollectionList(props) {
                     <TableRow>
                         <TableCell></TableCell>
                         <TableCell>Name</TableCell>
-                        <TableCell numeric>Owner</TableCell>
+                        <TableCell/>
                     </TableRow>
                 </TableHead>
                 <TableBody>
