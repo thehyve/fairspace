@@ -58,7 +58,7 @@ zuul:
       path: /**
       url: http://mercury/
     notebooks:
-      path: /notebooks/**
+      path: /api/notebooks/**
       url: http://jupyterhub/
   ignored-patterns:
   - /actuator/**
