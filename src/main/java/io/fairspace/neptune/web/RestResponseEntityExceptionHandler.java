@@ -1,9 +1,8 @@
 package io.fairspace.neptune.web;
 
+import io.fairspace.neptune.model.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -58,11 +57,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return new ErrorBody("Invalid collection given");
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    protected ErrorBody handleAccessDeniedException(AccessDeniedException ex) {
+    protected ErrorBody handleAccessDeniedException(UnauthorizedException ex) {
         ErrorBody errorBody = new ErrorBody(ex.getMessage());
-        log.error("Access denied exception occurred.", ex);
+        log.error("Unauthorized denied exception occurred.", ex);
         return errorBody;
     }
 

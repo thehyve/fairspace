@@ -4,12 +4,14 @@ app:
 
 # Spring should handle authentication on incoming requests by validating the oAuth token
 security:
-  oauth2:
-    resource:
-      user-info-uri: http://localhost:${wiremock.server.port}/userinfo
-      prefer-token-info: false
-      jwk:
-        key-set-uri: http://localhost:${wiremock.server.port}/certs
+  oidc:
+    jwk-key-set-uri: http://localhost:${wiremock.server.port}/certs
+  urls:
+    permitAll:
+    - /actuator/health
+    needsAuthentication:
+    - /*
+
 spring:
   datasource:
     url: "jdbc:h2:mem:"

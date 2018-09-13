@@ -4,11 +4,11 @@ import io.fairspace.neptune.config.upstream.AuthorizationContainer;
 import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
+import io.fairspace.neptune.model.UnauthorizedException;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.repository.PermissionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -100,7 +100,7 @@ public class PermissionService {
         try {
             return Objects.requireNonNull(authorizationContainer.getSubject());
         } catch (Exception e) {
-            throw new AccessDeniedException("No valid authorization", e);
+            throw new UnauthorizedException("No valid authorization", e);
         }
     }
 
@@ -110,7 +110,7 @@ public class PermissionService {
 
     void checkPermission(Access required, Long collectionId) {
         if (!hasPermission(required, collectionId)) {
-            throw new AccessDeniedException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
     }
 

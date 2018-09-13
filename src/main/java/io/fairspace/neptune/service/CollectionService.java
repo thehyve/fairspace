@@ -3,12 +3,12 @@ package io.fairspace.neptune.service;
 import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
+import io.fairspace.neptune.model.UnauthorizedException;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -61,7 +61,7 @@ public class CollectionService {
     public Collection findById(Long collectionId) {
         Permission permission = permissionService.getSubjectsPermission(collectionId);
         if (permission.getAccess().compareTo(Access.Read) < 0) {
-            throw new AccessDeniedException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         return permission.getCollection()
