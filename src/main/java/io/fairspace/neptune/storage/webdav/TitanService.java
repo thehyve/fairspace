@@ -29,21 +29,34 @@ public class TitanService implements StorageService {
         this.httpClient = httpClient;
     }
 
+    @Override
     public void addCollection(Collection collection) throws IOException {
-        execute(withAuthorization(new HttpMkCol(getFullWebdavUrl(collection))));
+        execute(new HttpMkCol(getFullWebdavUrl(collection)));
     }
 
+    @Override
     public void deleteCollection(Collection collection) throws IOException {
-        execute(withAuthorization(new HttpDelete(getFullWebdavUrl(collection))));
+        execute(new HttpDelete(getFullWebdavUrl(collection)));
+    }
+
+    @Override
+    public void moveCollection(Collection collection, String destination) throws IOException {
+        HttpMove request = new HttpMove(getFullWebdavUrl(collection));
+        request.addHeader("Destination", getFullWebdavUrl(destination));
+        execute(request);
     }
 
     private void execute(HttpUriRequest request) throws IOException {
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
+        try (CloseableHttpResponse response = httpClient.execute(withAuthorization(request))) {
         }
     }
 
     private String getFullWebdavUrl(Collection collection) {
-        return webdavEndpoint + collection.getLocation();
+        return getFullWebdavUrl(collection.getLocation());
+    }
+
+    private String getFullWebdavUrl(String location) {
+        return webdavEndpoint + location;
     }
 
     private HttpUriRequest withAuthorization(HttpUriRequest request) {
