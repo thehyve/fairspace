@@ -58,8 +58,6 @@ jupyterhub:
             custom:
                 className: oauthenticator.generic.GenericOAuthenticator
                 config:
-                    client_id: "y0urc1logonc1ient1d"
-                    client_secret: "4c4e5e3b-a6ed-45fd-a394-46c4f5eea510"
                     token_url: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/token
                     userdata_url: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/userinfo
                     userdata_method: GET
