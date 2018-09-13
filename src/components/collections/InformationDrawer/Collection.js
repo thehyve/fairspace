@@ -8,6 +8,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
+import ErrorDialog from "../../error/ErrorDialog";
 
 class Collection extends React.Component{
     constructor(props) {
@@ -63,13 +64,14 @@ class Collection extends React.Component{
 
         this.storeChangedDetails(this.state.collection.id, this.state.editValues)
             .then(() => {
+                let collection = Object.assign(this.state.collection, this.state.editValues);
+                this.setState({collection: collection, editValues: {}})
+
                 if(this.onDidChangeDetails) {
-                    this.onDidChangeDetails(this.state.collection.id, Object.assign({uri: this.state.collection.uri}, this.state.editValues));
+                    this.onDidChangeDetails(collection);
                 }
             })
-            .catch((e) => {
-                console.error("An error occurred while updating collection metadata", e);
-            });
+            .catch(e => ErrorDialog.showError(e, "An error occurred while updating collection metadata"));
     }
 
     handleInputChange(event) {

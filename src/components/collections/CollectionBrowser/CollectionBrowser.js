@@ -128,6 +128,13 @@ class CollectionBrowser extends React.Component {
         }
     }
 
+    handleCollectionDelete(collection) {
+        // If this collection is already selected, deselect
+        if (this.state.selectedCollection && this.state.selectedCollection.id === collection.id) {
+            this.deselectCollection();
+        }
+    }
+
     handleCollectionDoubleClick(collection) {
         this.openCollection(collection);
     }
@@ -169,9 +176,9 @@ class CollectionBrowser extends React.Component {
 
     }
 
-    handleDidCollectionDetailsChange(collectionId, parameters) {
+    handleDidCollectionDetailsChange(collection) {
         // Update the currently selected collection
-        this.setState({selectedCollection: Object.assign({}, this.state.selectedCollection, {metadata: parameters})});
+        this.setState({selectedCollection: collection});
 
         // Reload list of collections to ensure the latest version
         this.requireRefresh();
@@ -408,6 +415,7 @@ class CollectionBrowser extends React.Component {
                 onCollectionsDidLoad={this.handleDidLoad.bind(this)}
                 onCollectionClick={this.handleCollectionClick.bind(this)}
                 onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
+                onCollectionDelete={this.handleCollectionDelete.bind(this)}
             />);
     }
 }
