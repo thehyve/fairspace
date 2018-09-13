@@ -116,9 +116,7 @@ public class CollectionService {
                 builder.name(patch.getName());
             }
 
-            if (!StringUtils.isEmpty(patch.getDescription())) {
-                builder.name(patch.getDescription());
-            }
+            builder.description(Optional.ofNullable(patch.getDescription()).orElse(""));
 
             // Store in the database
             Collection savedCollection = repository.save(builder.build());
