@@ -54,44 +54,57 @@ it('shows nothing when there is no metadata found', () => {
     });
 });
 
-const metadata = {
-    "@id": "http://fairspace.com/iri/collections/1",
-    "@type": "http://fairspace.io/ontology#Collection",
-    "description": "My first collection",
-    "name": "Collection 5",
-    "@context": {
-        "name": {
-            "@id": "http://fairspace.io/ontology#name"
-        },
-        "description": {
-            "@id": "http://fairspace.io/ontology#description"
-        }
+const metadata = [
+    {
+        "@id": "http://fairspace.com/iri/collections/1",
+        "@type": [
+            "http://fairspace.io/ontology#Collection"
+        ],
+        "http://fairspace.io/ontology#description": [
+            {
+                "@value": "My first collection"
+            }
+        ],
+        "http://fairspace.io/ontology#name": [
+            {
+                "@value": "Collection 5"
+            }
+        ]
     }
-};
+];
 
-const vocabulary = {
-    "@context": {
-        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "dc": "http://purl.org/dc/elements/1.1/",
-        "schema": "http://schema.org/",
-        "fairspace": "http://fairspace.io/ontology#"
+const vocabulary = [
+    {
+        "@id": "http://fairspace.io/ontology#name",
+        "@type": [
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+        ],
+        "http://www.w3.org/2000/01/rdf-schema#label": [
+            {
+                "@value": "Name"
+            }
+        ]
     },
-    "@graph": [
-        {
-            "@id": "fairspace:name",
-            "@type": "rdf:Property",
-            "rdfs:label": "Name"
-        },
-        {
-            "@id": "fairspace:description",
-            "@type": "rdf:Property",
-            "rdfs:label": "Description"
-        },
-        {
-            "@id": "fairspace:Collection",
-            "@type": "rdf:Class",
-            "rdfs:label": "Collection"
-        }
-    ]
-};
+    {
+        "@id": "http://fairspace.io/ontology#description",
+        "@type": [
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+        ],
+        "http://www.w3.org/2000/01/rdf-schema#label": [
+            {
+                "@value": "Description"
+            }
+        ]
+    },
+    {
+        "@id": "http://fairspace.io/ontology#Collection",
+        "@type": [
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
+        ],
+        "http://www.w3.org/2000/01/rdf-schema#label": [
+            {
+                "@value": "Collection"
+            }
+        ]
+    }
+];
