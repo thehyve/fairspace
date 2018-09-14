@@ -9,56 +9,71 @@ import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
 
-function InformationDrawer(props) {
-    let contents;
+class InformationDrawer extends React.Component {
+    state = {
+        refreshRequired: false
+    }
 
-    if(props.collection) {
-        contents = (
-            <React.Fragment>
+    handleDetailsChange(collection) {
+        this.props.onDidChangeDetails(collection);
+        this.setState({refreshRequired: true});
+    }
+
+    handleMetadataDidLoad() {
+        this.setState({refreshRequired: false});
+    }
+
+    renderCollectionDetails() {
+        if(!this.props.collection) {
+            return <Typography variant="title">No collection</Typography>;
+        }
+
+        return <React.Fragment>
                 <Collection
-                    collection={props.collection}
-                    collectionStore={props.collectionStore}
-                    onDidChangeDetails={props.onDidChangeDetails}
+                    collection={this.props.collection}
+                    collectionStore={this.props.collectionStore}
+                    onDidChangeDetails={this.handleDetailsChange.bind(this)}
                 />
                 <hr/>
 
-                <Permissions collectionId={props.collection.id}/>
+                <Permissions collectionId={this.props.collection.id}/>
                 <hr/>
 
                 <Metadata
-                    subject={props.collection.uri}
-                    metadataStore={props.metadataStore}
+                    refresh={this.state.refreshRequired}
+                    onDidLoad={this.handleMetadataDidLoad.bind(this)}
+                    subject={this.props.collection.uri}
+                    metadataStore={this.props.metadataStore}
                 />
 
-                <hr />
+                <hr/>
 
                 <Typography variant="title">Paths</Typography>
-                {props.path ? props.path.map(path => <Typography key={path.filename}>{path.basename}</Typography>) : 'No path selected'}
-
+                {this.props.path ? this.props.path.map(path => <Typography
+                    key={path.filename}>{path.basename}</Typography>) : 'No path selected'}
             </React.Fragment>
-        )
-    } else {
-        contents = (<Typography variant="title">No collection</Typography>);
     }
 
-    return (
-        <Drawer
-            variant="persistent"
-            anchor="right"
-            open={props.open}
-            classes={{
-                paper: props.classes.infoDrawerPaper,
-            }}
-        >
-            <div className={props.classes.toolbar}/>
-            <IconButton onClick={props.onClose} className={props.classes.closeButton}>
-                <Icon>chevron_right</Icon>
-            </IconButton>
+    render() {
+        return (
+            <Drawer
+                variant="persistent"
+                anchor="right"
+                open={this.props.open}
+                classes={{
+                    paper: this.props.classes.infoDrawerPaper,
+                }}
+            >
+                <div className={this.props.classes.toolbar}/>
+                <IconButton onClick={this.props.onClose} className={this.props.classes.closeButton}>
+                    <Icon>chevron_right</Icon>
+                </IconButton>
 
-            {contents}
+                {this.renderCollectionDetails()}
 
-        </Drawer>
-    );
+            </Drawer>
+        );
+    }
 }
 
 export default withStyles(styles)(InformationDrawer);
