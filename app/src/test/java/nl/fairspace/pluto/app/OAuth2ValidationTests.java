@@ -144,8 +144,7 @@ public class OAuth2ValidationTests {
 		headers.set("X-Requested-With", "XMLHttpRequest");
 		ResponseEntity<String> response = getWithKey(new JWTBuilder().build(), headers);
 
-		assertEquals(302, response.getStatusCodeValue());
-		assertTrue(response.getHeaders().get("Location").get(0).endsWith("/login"));
+		assertEquals(401, response.getStatusCodeValue());
 	}
 
 	@Test
