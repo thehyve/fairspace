@@ -11,6 +11,7 @@ class Metadata extends React.Component {
         this.metadataStore = props.metadataStore;
 
         this.state = {
+
             loading: false,
             error: false,
             errorMessage: null,
@@ -20,6 +21,13 @@ class Metadata extends React.Component {
 
     componentWillMount() {
         this.loadData();
+    }
+
+
+    componentDidUpdate(prevProps) {
+        if(this.props.refresh && this.props.refresh !== prevProps.refresh) {
+            this.loadData();
+        }
     }
 
     loadData() {
@@ -40,6 +48,10 @@ class Metadata extends React.Component {
             combine(vocabulary, metadata)
                 .then(props => {
                     if (this.willUnmount) return;
+
+                    if(this.props.onDidLoad) {
+                        this.props.onDidLoad();
+                    }
 
                     this.setState({properties: props, loading: false});
                 }).catch(err => {
