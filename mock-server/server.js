@@ -17,7 +17,7 @@ app.get('/api/collections', (req, res) => res.sendFile(__dirname + '/collection-
 app.get('/api/collections/:id', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '.json'));
 app.get('/api/collections/:id/permissions', (req, res) => res.sendFile(__dirname + '/collection-' + req.params.id + '-permissions.json'));
 app.patch('/api/collections/:id', (req, res) => res.send());
-app.delete('/api/collections/:id', (req, res) => res.send());
+app.delete('/api/collections/:id', (req, res) => setTimeout(() => res.send(), 3000));
 
 // Metadata API
 app.get('/api/metadata/statements', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));

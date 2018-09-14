@@ -5,7 +5,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 
-class ButtonWithVerification extends React.Component{
+class ButtonWithVerification extends React.Component {
     state = {
         verifying: false
     }
@@ -36,17 +36,15 @@ class ButtonWithVerification extends React.Component{
     }
 
     closeDialog(e) {
-        if(e) e.stopPropagation();
+        if (e) e.stopPropagation();
         this.setState({verifying: false});
     }
 
     handleClick(e) {
-        e.stopPropagation();
+        this.closeDialog(e);
 
-        if(this.onClick) {
-            this.onClick(e)
-                .then(this.closeDialog.bind(this))
-                .catch(() => { /* Ignore the exception as it should be handled by onClick, but just prevents the dialog of closing */ });
+        if (this.onClick) {
+            window.setImmediate(() => this.onClick(e));
         }
     }
 
