@@ -23,6 +23,9 @@ pipeline {
         }
       }
       stage('Release to nexus') {
+        when {
+          branch 'master'
+        }
         steps {
           container(JENKINS_CONTAINER_TAG) {
             sh "gradle publish"
