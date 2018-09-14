@@ -39,6 +39,16 @@ nock('http://fairspace.io', {
 
 nock('http://fairspace.io', {
     reqheaders: {
+        'authorization': 'Bearer ' + token
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: 'newname-1'})
+    .times(100)
+    .reply(200, {collection: 1, subject: 'alice', access: 'Manage'});
+
+nock('http://fairspace.io', {
+    reqheaders: {
         'authorization': 'Bearer ' + anotherToken
     }
 })
@@ -187,6 +197,32 @@ describe('Webdav', () => {
                 .delete('/api/storage/webdav/1/subdir')
                 .set('Authorization', 'Bearer ' + token)
                 .expect(200))
+    );
+
+
+    it('a user can rename a top-level directory with Anticipated-Operation: true', () =>
+        server
+            .mkcol('/api/storage/webdav/1')
+            .set('Authorization', 'Bearer ' + token)
+            .expect(201)
+            .then(() => server
+                .move('/api/storage/webdav/1')
+                .set('Authorization', 'Bearer ' + token)
+                .set('Destination', 'http://fairspace.io/api/storage/webdav/newname-1')
+                .set('Anticipated-Operation', 'true')
+                .expect(201))
+    );
+
+    it('a user cannot rename a top-level directory without Anticipated-Operation: true', () =>
+        server
+            .mkcol('/api/storage/webdav/1')
+            .set('Authorization', 'Bearer ' + token)
+            .expect(201)
+            .then(() => server
+                .move('/api/storage/webdav/1')
+                .set('Authorization', 'Bearer ' + token)
+                .set('Destination', 'http://fairspace.io/api/storage/webdav/newname-1')
+                .expect(401))
     );
 });
 

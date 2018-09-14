@@ -14,6 +14,12 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
             return callback(null, ['canReadProperties', 'canReadLocks'].includes(privilege));
         }
 
+        let wantToMoveCollection = resource.context.request.method === 'MOVE' && fullPath.paths.length === 1;
+        if (wantToMoveCollection && (resource.context.headers.headers['anticipated-operation'] !== 'true')) {
+            callback(null, false);
+            return
+        }
+
         let collectionLocation = fullPath.paths[0];
 
         axios.get(util.format(this.permissionsUrl, encodeURIComponent(collectionLocation)),
