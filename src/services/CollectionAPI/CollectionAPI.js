@@ -1,14 +1,14 @@
 import Config from "../../components/generic/Config/Config";
 import {failOnHttpError} from "../../utils/httputils";
 
-class CollectionStore {
+class CollectionAPI {
     static changeHeaders = new Headers({'Content-Type': 'application/json'});
     static getHeaders = new Headers({'Accept': 'application/json'});
 
     getCollections() {
         return fetch(Config.get().urls.collections, {
             method: 'GET',
-            headers: CollectionStore.getHeaders,
+            headers: CollectionAPI.getHeaders,
             credentials: 'same-origin'
         })
             .then(failOnHttpError("Failure when retrieving a list of collections"))
@@ -18,7 +18,7 @@ class CollectionStore {
     getCollection(id) {
         return fetch(Config.get().urls.collections + "/" + id, {
             method: 'GET',
-            headers: CollectionStore.getHeaders,
+            headers: CollectionAPI.getHeaders,
             credentials: 'same-origin'
         })
             .then(failOnHttpError("Failure when retrieving a collection"))
@@ -28,7 +28,7 @@ class CollectionStore {
     addCollection(name, description) {
         return fetch(Config.get().urls.collections, {
             method: 'POST',
-            headers: CollectionStore.changeHeaders,
+            headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
             body: JSON.stringify({name: name, description: description})
         }).then(failOnHttpError("Failure while saving a collection"))
@@ -37,7 +37,7 @@ class CollectionStore {
     updateCollection(id, name, description) {
         return fetch(Config.get().urls.collections + '/' + id, {
             method: 'PATCH',
-            headers: CollectionStore.changeHeaders,
+            headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
             body: JSON.stringify({name: name, description: description})
         }).then(failOnHttpError("Failure while updating a collection"))
@@ -46,10 +46,10 @@ class CollectionStore {
     deleteCollection(id) {
         return fetch(Config.get().urls.collections + '/' + id, {
             method: 'DELETE',
-            headers: CollectionStore.changeHeaders,
+            headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin'
         }).then(failOnHttpError("Failure while deleting collection"))
     }
 }
 
-export default new CollectionStore();
+export default new CollectionAPI();

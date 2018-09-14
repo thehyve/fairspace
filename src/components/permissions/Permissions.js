@@ -1,6 +1,6 @@
 import React from 'react';
 import Loader from '../generic/Loader/Loader';
-import permissionStore from '../../services/PermissionStore/PermissionStore'
+import permissionStore from '../../services/PermissionAPI/PermissionAPI'
 import List from "@material-ui/core/List/List";
 import ListItem from "@material-ui/core/ListItem/ListItem";
 import {compareBy, comparing} from "../../utils/comparators";
