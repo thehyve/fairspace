@@ -15,7 +15,7 @@ pipeline {
       VERSION           = "0.1.${env.BUILD_NUMBER}"
     }
     stages {
-      stage('Build application') {
+      stage('Build library') {
         steps {
           container(JENKINS_CONTAINER_TAG) {
             sh "gradle clean build test"
