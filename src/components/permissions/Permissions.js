@@ -13,6 +13,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import ShareWithDialog from './ShareWithDialog';
+import ErrorMessage from "../error/ErrorMessage";
 
 class Permissions extends React.Component {
 
@@ -20,7 +21,8 @@ class Permissions extends React.Component {
         super(props);
         this.state = {
             permissions: [],
-            showPermissionDialog: false
+            showPermissionDialog: false,
+            error: false
         };
     }
 
@@ -43,10 +45,14 @@ class Permissions extends React.Component {
     loadPermissions = () => {
         permissionStore
             .getCollectionPermissions(this.props.collectionId)
-            .then(result => this.setState({permissions: result}))
+            .then(result => {
+                this.setState({permissions: result});
+                this.setState({error: false});
+            })
             .catch(e => {
                 this.resetPermissions();
-                // console.error('Error loading permissions', e);
+                this.setState({error: true});
+                console.error('Error loading permissions', e);
             });
     };
 
@@ -88,30 +94,30 @@ class Permissions extends React.Component {
                         </TableCell>
                         <TableCell>
                             <IconButton aria-label="Delete" disabled>
-                                <DeleteIcon />
+                                <DeleteIcon/>
                             </IconButton>
                         </TableCell>
                     </TableRow>
                 )
             });
         return (
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell numeric>User</TableCell>
-                            <TableCell numeric>Access</TableCell>
-                            <TableCell numeric>
-                                <IconButton aria-label="Add" onClick={this.handleOpenPermissionDialog}>
-                                    <AddIcon />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {permissions}
-                    </TableBody>
-                </Table>
-            );
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell numeric>User</TableCell>
+                        <TableCell numeric>Access</TableCell>
+                        <TableCell numeric>
+                            <IconButton aria-label="Add" onClick={this.handleOpenPermissionDialog}>
+                                <AddIcon/>
+                            </IconButton>
+                        </TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {permissions}
+                </TableBody>
+            </Table>
+        );
     };
 
     render() {
@@ -120,7 +126,9 @@ class Permissions extends React.Component {
                 <Typography variant="subheading">Shared with:</Typography>
                 <ShareWithDialog open={this.state.showPermissionDialog}
                                  onClose={this.handleClosePermissionDialog}/>
-                {this.renderUserList()}
+                {this.state.error ?
+                    <ErrorMessage>message={`Error loading collaborators`}</ErrorMessage> : this.renderUserList()}
+
             </div>
         )
     };
