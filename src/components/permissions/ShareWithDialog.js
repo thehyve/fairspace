@@ -1,24 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
-import Select from '@material-ui/core/Select';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
 import {withStyles} from '@material-ui/core/styles';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import {AccessRights} from "./Permissions";
-import Typography from "@material-ui/core/Typography";
+import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect'
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
 
 const styles = theme => ({
     root: {
-        flexGrow: 1
+        width: 400,
+        height: 350
     },
     container: {
         display: 'flex',
@@ -27,6 +26,9 @@ const styles = theme => ({
     formControl: {
         margin: theme.spacing.unit,
     },
+    select: {
+        width: '100%',
+    }
 });
 
 class ShareWithDialog extends React.Component {
@@ -53,35 +55,27 @@ class ShareWithDialog extends React.Component {
                 onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
-                    <div className={classes.container}>
-                        <FormControl className={classes.formControl}>
-                            <TextField
-                                id="user-name"
-                                required
-                                label='User'
-                            />
-                            <FormHelperText>Select a user</FormHelperText>
-                        </FormControl>
-                        <FormControl className={classes.formControl}>
-                            <InputLabel htmlFor="access-right">Access Right</InputLabel>
-                            <Select
+                    <div className={classes.root}>
+                        <MaterialReactSelect options={['']} value={''} classes={classes.root}/>
+                        <FormControl component="fieldset" className={classes.formControl}>
+                            <FormLabel component="legend">Access right</FormLabel>
+                            <RadioGroup
+                                aria-label="Access right"
+                                name="access-right"
+                                className={classes.group}
                                 value={this.state.accessRight}
                                 onChange={this.handleChange}
-                                input={<Input name="access-right" id="access-right"/>}
-                                required
                             >
                                 {Object.keys(AccessRights).map(access => {
-                                    return <MenuItem value={access} key={access}>
-                                        <Typography variant={'body1'}>{AccessRights[access]}</Typography>
-                                    </MenuItem>
+                                    return <FormControlLabel value={access} control={<Radio/>}
+                                                             label={AccessRights[access]}/>
                                 })}
-                            </Select>
-                            <FormHelperText>Select access right for the user.</FormHelperText>
+                            </RadioGroup>
                         </FormControl>
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleClose} color="primary">
+                    <Button onClick={this.handleClose} color="secondary">
                         Cancel
                     </Button>
                     <Button onClick={this.handleClose} color="primary">
