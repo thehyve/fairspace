@@ -9,7 +9,7 @@ public class LocationsTest {
 
     @Test
     public void testLocation() {
-        assertEquals("Blah blah. 1-2 _ _  _____ __ ______ -123", Locations.location("Blah blah. 1-2 / ~  следы от дрели: ", 123L));
+        assertEquals("Blah_blah._1-2______________________-123", Locations.location("Blah blah. 1-2 / ~  следы от дрели: ", 123L));
         String longName = new String(new char[1000]);
         assertEquals(255, Locations.location(longName, 123L).length());
     }
