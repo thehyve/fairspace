@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@material-ui/core": "latest",
+    "@material-ui/icons": "latest",
     "ajv": "^6.5.3",
     "deepmerge": "^2.1.1",
     "enzyme": "^3.3.0",
