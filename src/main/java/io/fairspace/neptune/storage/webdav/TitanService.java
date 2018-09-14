@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 @Service
 @Slf4j
@@ -56,7 +58,11 @@ public class TitanService implements StorageService {
     }
 
     private String getFullWebdavUrl(String location) {
-        return webdavEndpoint + location;
+        try {
+            return webdavEndpoint + URLEncoder.encode(location, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+           throw new RuntimeException(e);
+        }
     }
 
     private HttpUriRequest withAuthorization(HttpUriRequest request) {
