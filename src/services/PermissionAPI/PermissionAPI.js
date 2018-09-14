@@ -2,7 +2,7 @@ import Config from '../../components/generic/Config/Config';
 import {failOnHttpError} from "../../utils/httputils";
 import {format} from 'util';
 
-class PermissionStore {
+class PermissionAPI {
     static getConfig = {
         method: 'GET',
         headers: new Headers({'Accept': 'application/json'}),
@@ -16,10 +16,10 @@ class PermissionStore {
      */
     getCollectionPermissions(collectionId) {
         let url = format(Config.get().urls.collectionPermissions, collectionId);
-        return fetch(url, PermissionStore.getConfig)
+        return fetch(url, PermissionAPI.getConfig)
             .then(failOnHttpError('Error while loading collection permissions'))
             .then(response => response.json())
     }
 }
 
-export default new PermissionStore();
+export default new PermissionAPI();

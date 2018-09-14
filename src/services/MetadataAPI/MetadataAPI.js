@@ -5,7 +5,7 @@ import * as jsonld from 'jsonld/dist/jsonld';
 
 
 
-class MetadataStore {
+class MetadataAPI {
     static getParams = {
         method: 'GET',
         headers: new Headers({'Accept': 'application/ld+json'}),
@@ -14,7 +14,7 @@ class MetadataStore {
 
     get(params) {
         let query = Object.keys(params).map(key => key + '=' + encodeURIComponent(params[key])).join('&');
-        return fetch(Config.get().urls.metadata + '?' + query, MetadataStore.getParams)
+        return fetch(Config.get().urls.metadata + '?' + query, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(jsonld.expand);
@@ -37,4 +37,4 @@ class MetadataStore {
     }
 }
 
-export default new MetadataStore();
+export default new MetadataAPI();

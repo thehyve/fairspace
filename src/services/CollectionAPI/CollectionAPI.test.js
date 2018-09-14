@@ -1,4 +1,4 @@
-import CollectionStore from "./CollectionStore";
+import CollectionAPI from "./CollectionAPI";
 import Config from "../../components/generic/Config/Config";
 
 const mockResponse = (status, statusText, response) => {
@@ -26,6 +26,6 @@ it('retrieves data for collections', () => {
         Promise.resolve(mockResponse(200, 'OK', JSON.stringify([{'name': 'collection1'}]))))
     ;
 
-    CollectionStore.getCollections()
+    CollectionAPI.getCollections()
     expect(window.fetch.mock.calls[0][0]).toEqual("/collections");
 });

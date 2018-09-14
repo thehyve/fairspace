@@ -1,8 +1,8 @@
 import React from 'react';
 import CollectionBrowser from "../../components/collections/CollectionBrowser/CollectionBrowser";
-import metadataStore from "../../services/MetadataStore/MetadataStore";
-import collectionStore from "../../services/CollectionStore/CollectionStore";
-import FileStoreFactory from "../../services/FileStore/FileStoreFactory";
+import metadataStore from "../../services/MetadataAPI/MetadataAPI";
+import collectionStore from "../../services/CollectionAPI/CollectionAPI";
+import FileStoreFactory from "../../services/FileAPI/FileAPIFactory";
 
 function Collections(props) {
     const {match: { params }} = props;

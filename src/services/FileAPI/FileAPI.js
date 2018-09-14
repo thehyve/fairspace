@@ -13,7 +13,7 @@ CreateWebdavClient.setFetchMethod((input, init) => {
 /**
  * Service to perform file operations
  */
-class FileStore {
+class FileAPI {
     static PATH_SEPARATOR = '/';
 
     constructor(collectionSubDirectory) {
@@ -137,9 +137,9 @@ class FileStore {
      * @param paths
      */
     joinPaths(...paths) {
-        return paths.join(FileStore.PATH_SEPARATOR);
+        return paths.join(FileAPI.PATH_SEPARATOR);
     }
 
 }
 
-export default FileStore;
+export default FileAPI;
