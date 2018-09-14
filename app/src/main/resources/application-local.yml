@@ -4,8 +4,10 @@ app:
     base-url: http://192.168.99.100:30881
     realm: curie
 
+logging.level.io.fairspace: DEBUG
+
 security:
-  oauth2:
+  oidc:
     required-authority: user-test
     clientId: test-pluto
     clientSecret: c108557d-9e9a-44e2-bb4d-d6f8cbef5860
