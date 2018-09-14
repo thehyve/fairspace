@@ -47,6 +47,7 @@ public class PermissionService {
 
     /**
      * Authorize the subject currently logged in to have access to the given collection
+     *
      * @param collection
      * @param access
      * @param isNew
@@ -59,6 +60,7 @@ public class PermissionService {
 
     /**
      * Authorize the given subject to have access to the given collection
+     *
      * @param subject
      * @param collection
      * @param access
@@ -115,7 +117,6 @@ public class PermissionService {
     }
 
     public Permission getUserPermissionByLocation(String location) {
-        Collection collection = collectionRepository.findByLocation(location).orElseThrow(CollectionNotFoundException::new);
-        return getSubjectsPermission(collection.getId());
+        return getSubjectsPermission(Locations.extractId(location));
     }
 }

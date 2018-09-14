@@ -14,18 +14,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -93,7 +88,6 @@ public class CollectionServiceTest {
 
     @Test
     public void testAddCollection() throws IOException {
-        Long id = 1L;
         Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write);
 
         when(collectionRepository.save(any())).thenReturn(collection);
@@ -141,6 +135,25 @@ public class CollectionServiceTest {
         when(collectionRepository.findById(id)).thenReturn(Optional.empty());
 
         service.delete(id);
+    }
+
+    @Test
+    public void testPatchCollection() throws IOException {
+        Collection original =
+                new Collection(1L, "oldName-1", "oldName", "oldDescription", null, Access.Write);
+
+        Collection patch =
+                 Collection.builder().name("newName!").description("newDescription").build();
+
+        when(collectionRepository.findById(eq(1L))).thenReturn(Optional.of(original));
+        when(collectionRepository.save(any())).then(invocation -> invocation.getArgument(0));
+
+        service.update(1L, patch);
+
+        verify(permissionService).checkPermission(eq(Access.Write), eq(Long.valueOf(1L)));
+        verify(storageService).moveCollection(argThat(c -> c.getLocation().equals("oldName-1")), eq("newName_-1"));
+        verify(collectionMetadataService).patchCollection(argThat(c -> c.getName().equals("newName!") && c.getDescription().equals("newDescription")));
+
     }
 
     private <E> List<E> toList(Iterator<E> iterator) {

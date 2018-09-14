@@ -71,7 +71,7 @@ public class CollectionService {
         Long id = savedCollection.getId();
         Collection finalCollection;
         try {
-            finalCollection = repository.save(savedCollection.toBuilder().location(id.toString()).build());
+            finalCollection = repository.save(savedCollection.toBuilder().location(Locations.location(savedCollection.getName(), id)).build());
         } catch (DataIntegrityViolationException e) {
             throw new InvalidCollectionException(e);
         }
@@ -105,8 +105,15 @@ public class CollectionService {
         return optionalCollection.map(collection -> {
             // Add properties from outside
             Collection.CollectionBuilder builder = collection.toBuilder();
-            if (!StringUtils.isEmpty(patch.getName())) {
-                builder.name(patch.getName());
+            if (!StringUtils.isEmpty(patch.getName()) && !patch.getName().equals(collection.getName())) {
+                String location = Locations.location(patch.getName(), collection.getId());
+                builder.name(patch.getName()).location(location);
+
+                try {
+                    storageService.moveCollection(collection, location);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
             }
 
             builder.description(Optional.ofNullable(patch.getDescription()).orElse(""));
