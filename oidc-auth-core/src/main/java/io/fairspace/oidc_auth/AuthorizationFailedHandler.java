@@ -1,5 +1,6 @@
 package io.fairspace.oidc_auth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import static io.fairspace.oidc_auth.config.AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE;
 
 @Component
+@Slf4j
 public class AuthorizationFailedHandler {
     public static final String ACCEPT_HEADER = "Accept";
     public static final String X_REQUESTED_WITH_HEADER = "X-Requested-With";
@@ -17,6 +19,8 @@ public class AuthorizationFailedHandler {
     public static final String LOGIN_PATH_HEADER = "X-Login-Path";
 
     public void handleFailedAuthorization(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        log.info("Authentication failed for request {}", request.getRequestURI());
+
         if (shouldRedirect(request)) {
             request.getSession().setAttribute(PREVIOUS_REQUEST_SESSION_ATTRIBUTE, request.getRequestURI());
             response.sendRedirect(LOGIN_PATH);

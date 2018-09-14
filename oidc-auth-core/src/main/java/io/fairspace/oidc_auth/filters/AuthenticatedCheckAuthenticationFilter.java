@@ -11,7 +11,7 @@ public class AuthenticatedCheckAuthenticationFilter extends CheckAuthenticationF
         boolean hasAuthentication = hasAuthentication(request);
 
         if(!hasAuthentication) {
-            log.warn("No valid JWT has been provided");
+            log.debug("No valid JWT has been provided for request {}", request.getRequestURI());
         }
 
         return hasAuthentication;

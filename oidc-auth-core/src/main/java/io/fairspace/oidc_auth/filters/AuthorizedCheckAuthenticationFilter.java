@@ -28,7 +28,7 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
         boolean hasAuthority = authentication.getAuthorities().contains(requiredAuthority);
 
         if(!hasAuthority) {
-            log.warn("JWT does not contain the required authority {}", requiredAuthority);
+            log.debug("JWT does not contain the required authority {} for request {}", requiredAuthority, request.getRequestURI());
         }
 
         return hasAuthority;
