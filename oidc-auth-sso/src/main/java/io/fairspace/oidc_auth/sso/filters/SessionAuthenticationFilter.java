@@ -28,12 +28,12 @@ import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORIZATION_SESSION_
 @Component
 public class SessionAuthenticationFilter implements Filter {
     private JwtTokenValidator jwtTokenValidator;
-    private OAuthFlow tokenRefresher;
+    private OAuthFlow oAuthFlow;
 
     @Autowired
-    public SessionAuthenticationFilter(JwtTokenValidator jwtTokenValidator, OAuthFlow tokenRefresher) {
+    public SessionAuthenticationFilter(JwtTokenValidator jwtTokenValidator, OAuthFlow oAuthFlow) {
         this.jwtTokenValidator = jwtTokenValidator;
-        this.tokenRefresher = tokenRefresher;
+        this.oAuthFlow = oAuthFlow;
     }
 
     @Override
@@ -43,6 +43,12 @@ public class SessionAuthenticationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        // If the authorization is already set, skip this filter
+        if(request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         OAuthAuthenticationToken authenticationToken = retrieveSessionAuthentication((HttpServletRequest) request, (HttpServletResponse) response);
         if(authenticationToken != null) {
             request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
@@ -80,15 +86,16 @@ public class SessionAuthenticationFilter implements Filter {
                 log.debug("A valid refresh token was found in the user session. Try refreshing the access token");
 
                 // Refresh the token
-                OAuthAuthenticationToken refreshedToken = tokenRefresher.refreshToken(token);
+                OAuthAuthenticationToken refreshedToken = oAuthFlow.refreshToken(token);
 
                 // Parse the refreshed token and return the data
                 Map<String, Object> refreshedTokenClaims = jwtTokenValidator.parseAndValidate(refreshedToken.getAccessToken());
 
                 if(refreshedTokenClaims != null) {
                     log.debug("The access token has been refreshed. Storing the new access token in session.");
-                    storeTokenInSession(refreshedToken, request);
-                    return refreshedToken.toBuilder().claimsSet(refreshedTokenClaims).build();
+                    OAuthAuthenticationToken tokenWithClaims = refreshedToken.toBuilder().claimsSet(refreshedTokenClaims).build();
+                    storeTokenInSession(tokenWithClaims, request);
+                    return tokenWithClaims;
                 } else {
                     // If for some reasons the validation failed, the authentication is invalid
                     log.debug("Refreshing the access token has failed.");
@@ -100,7 +107,9 @@ public class SessionAuthenticationFilter implements Filter {
             }
         }
 
-        return token;
+        // In this case, both the accesstoken and the refreshtoken have expired
+        log.debug("A token was found in session, but both the access_token and refresh_token have expired");
+        return null;
     }
 
     private OAuthAuthenticationToken getTokenFromSession(HttpServletRequest request) {

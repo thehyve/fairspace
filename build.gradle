@@ -1,6 +1,8 @@
 allprojects {
   ext {
     springVersion = '4.3.5.RELEASE'
+    junitVersion = '5.3.1'
+    mockitoVersion = '2.22.0'
   }
 
   apply plugin: 'java-library'
@@ -10,13 +12,20 @@ allprojects {
   group = 'io.fairspace'
   version = System.getenv('VERSION') ?: '0.1.0-SNAPSHOT'
 
+  repositories {
+    jcenter()
+  }
+
   task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
   }
 
-  repositories {
-    jcenter()
+  test {
+    useJUnitPlatform()
+    testLogging {
+      events "passed", "skipped", "failed"
+    }
   }
 
   publishing {
@@ -41,6 +50,3 @@ allprojects {
     }
   }
 }
-
-
-

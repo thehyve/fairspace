@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +66,7 @@ public class OAuthAuthenticationToken {
         return fullname.toString();
     }
 
-    public List<String> getAuthorities() throws ParseException {
+    public List<String> getAuthorities() {
         if(claimsSet == null) {
             log.warn("No claimsset provided in OAuth token");
             return Collections.emptyList();
