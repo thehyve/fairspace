@@ -144,9 +144,11 @@ describe('Webdav', () => {
         server
             .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer ' + token)
+            .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
                 .delete('/api/storage/webdav/1')
+                .set('Anticipated-Operation', 'true')
                 .set('Authorization', 'Bearer ' + token)
                 .expect(200))
     );
@@ -155,6 +157,7 @@ describe('Webdav', () => {
         server
             .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer ' + token)
+            .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
                 .propfind('/api/storage/webdav/1')
@@ -166,6 +169,7 @@ describe('Webdav', () => {
         server
             .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer ' + token)
+            .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
                 .delete('/api/storage/webdav/1')
@@ -177,6 +181,7 @@ describe('Webdav', () => {
         server
             .mkcol('/api/storage/webdav/2')
             .set('Authorization', 'Bearer ' + anotherToken)
+            .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
                 .propfind('/api/storage/webdav/2')
@@ -188,6 +193,7 @@ describe('Webdav', () => {
         server
             .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer ' + token)
+            .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() =>  server
                 .mkcol('/api/storage/webdav/1/subdir')
@@ -199,11 +205,29 @@ describe('Webdav', () => {
                 .expect(200))
     );
 
+    it('a user can create and delete files', () =>
+        server
+            .mkcol('/api/storage/webdav/1')
+            .set('Authorization', 'Bearer ' + token)
+            .set('Anticipated-Operation', 'true')
+            .expect(201)
+            .then(() =>  server
+                .put('/api/storage/webdav/1/file.txt')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(201))
+            .then(() => server
+                .delete('/api/storage/webdav/1/file.txt')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(200))
+    );
+
+
 
     it('a user can rename a top-level directory with Anticipated-Operation: true', () =>
         server
             .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer ' + token)
+            .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
                 .move('/api/storage/webdav/1')
@@ -217,6 +241,7 @@ describe('Webdav', () => {
         server
             .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer ' + token)
+            .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
                 .move('/api/storage/webdav/1')

@@ -14,17 +14,20 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
             return callback(null, ['canReadProperties', 'canReadLocks'].includes(privilege));
         }
 
-        let wantToMoveCollection = resource.context.request.method === 'MOVE' && fullPath.paths.length === 1;
-        if (wantToMoveCollection && (resource.context.headers.headers['anticipated-operation'] !== 'true')) {
-            callback(null, false);
-            return
-        }
-
         let collectionLocation = fullPath.paths[0];
 
         axios.get(util.format(this.permissionsUrl, encodeURIComponent(collectionLocation)),
             {headers: {'authorization': resource.context.headers.headers['authorization']}})
             .then(({data}) => {
+                let criticalCollectionOperation = (fullPath.paths.length === 1)
+                    && ['MKCOL', 'MOVE', 'COPY', 'DELETE'].includes(resource.context.request.method)
+                    && privilege.startsWith('canWrite');
+                // Operations with top-level directories should be made via Neptune which sets Anticipated-Operation
+                if (criticalCollectionOperation) {
+                    callback(null, (data.access === 'Manage') && (resource.context.headers.headers['anticipated-operation'] === 'true'));
+                    return
+                }
+
                 switch (data.access) {
                     case 'None':
                         callback(null, false);
@@ -33,9 +36,6 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
                         callback(null, privilege.startsWith('canRead'));
                         break;
                     case 'Write':
-                        let wantToRemoveCollection = resource.context.request.method === 'DELETE' && fullPath.paths.length === 1;
-                        callback(null, !wantToRemoveCollection);
-                        break;
                     case 'Manage':
                         callback(null, true);
                         break;
