@@ -135,29 +135,6 @@ Authorization: Bearer <JWT>
 }
 ```
 
-#### Get authorizations for a collection.
-
-```
-GET /123/authorizations?user=user@example.com HTTP/1.1
-Host: localhost:8080
-Content-Type: application/json
-Authorization: Bearer <JWT> 
-
-
-[
-    {
-      "user": "user@example.com",
-      "collectionId": 123,
-      "access": "Write"
-    },
-    {
-      "user": "user2@example.com",
-      "collectionId": 123,
-      "access": "Read"
-    }
-]
-```
-
 #### Get user's permission. Returns `"access": "None"` if no access was assigned.
 
 ```
