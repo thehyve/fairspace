@@ -14,7 +14,7 @@ pipeline {
       DOCKER_REPO_CREDS = credentials('jenkins-x-docker-repo')
 
       DOCKER_TAG_PREFIX = "$DOCKER_REPO/$ORG/$APP_NAME"
-      VERSION           = "0.1.${env.BUILD_NUMBER}"
+      VERSION           = "0.2.${env.BUILD_NUMBER}"
 
       PATH              = "/opt/rh/devtoolset-3/root/usr/bin:$PATH"
     }
