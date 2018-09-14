@@ -48,7 +48,6 @@ class ShareWithDialog extends React.Component {
 
         return (
             <Dialog
-                contentStyle={{width: 1250, maxWidth: "none"}}
                 open={this.props.open}
                 onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
