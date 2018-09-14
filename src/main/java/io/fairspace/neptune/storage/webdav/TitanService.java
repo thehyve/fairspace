@@ -44,7 +44,7 @@ public class TitanService implements StorageService {
     @Override
     public void moveCollection(Collection collection, String destination) throws IOException {
         HttpMove request = new HttpMove(getFullWebdavUrl(collection));
-        request.addHeader("Destination", getFullWebdavUrl(destination));
+        request.addHeader("Destination", webdavEndpoint + destination);
         execute(request);
     }
 
