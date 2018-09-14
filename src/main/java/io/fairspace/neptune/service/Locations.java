@@ -8,7 +8,7 @@ class Locations {
     private static int MAX_POSIX_PATH_LENGTH = 255;
 
     static String location(String name, Long id) {
-        String sanitizedName = name.replaceAll("[^A-Za-z0-9]", "_");
+        String sanitizedName = name.replaceAll("[^A-Za-z0-9\\.\\-\\u0020]", "_");
         String idString = id.toString();
         if (sanitizedName.length() + idString.length() + 1 > MAX_POSIX_PATH_LENGTH) {
             sanitizedName = sanitizedName.substring(0, MAX_POSIX_PATH_LENGTH - idString.length() - 1);

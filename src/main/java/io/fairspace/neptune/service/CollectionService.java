@@ -106,9 +106,11 @@ public class CollectionService {
             // Add properties from outside
             Collection.CollectionBuilder builder = collection.toBuilder();
             if (!StringUtils.isEmpty(patch.getName()) && !patch.getName().equals(collection.getName())) {
-                builder.name(patch.getName());
+                String location = Locations.location(patch.getName(), collection.getId());
+                builder.name(patch.getName()).location(location);
+
                 try {
-                    storageService.moveCollection(collection, Locations.location(patch.getName(), collection.getId()));
+                    storageService.moveCollection(collection, location);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }

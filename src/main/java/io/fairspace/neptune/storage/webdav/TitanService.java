@@ -43,6 +43,7 @@ public class TitanService implements StorageService {
     public void moveCollection(Collection collection, String destination) throws IOException {
         HttpMove request = new HttpMove(getFullWebdavUrl(collection));
         request.addHeader("Destination", getFullWebdavUrl(destination));
+        request.addHeader("Anticipated-Operation", "true");
         execute(request);
     }
 

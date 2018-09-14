@@ -3,13 +3,15 @@ package io.fairspace.neptune.service;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class LocationsTest {
 
     @Test
     public void testLocation() {
-        assertEquals("Blah_blah_123______________________-123", Locations.location("Blah blah 123 / ~  следы от дрели: ", 123L));
+        assertEquals("Blah blah. 1-2 _ _  _____ __ ______ -123", Locations.location("Blah blah. 1-2 / ~  следы от дрели: ", 123L));
+        String longName = new String(new char[1000]);
+        assertEquals(255, Locations.location(longName, 123L).length());
     }
 
     @Test
