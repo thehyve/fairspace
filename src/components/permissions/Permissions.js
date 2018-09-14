@@ -1,5 +1,5 @@
 import React from 'react';
-import permissionStore from '../../services/PermissionStore/PermissionStore'
+import permissionClient from '../../services/PermissionAPI/PermissionAPI'
 import IconButton from '@material-ui/core/IconButton';
 import {compareBy, comparing} from "../../utils/comparators";
 import Typography from "@material-ui/core/Typography";
@@ -43,7 +43,7 @@ class Permissions extends React.Component {
     };
 
     loadPermissions = () => {
-        permissionStore
+        permissionClient
             .getCollectionPermissions(this.props.collectionId)
             .then(result => {
                 this.setState({permissions: result});
