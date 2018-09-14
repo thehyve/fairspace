@@ -61,6 +61,11 @@ class CollectionOverview extends React.Component {
     deleteCollection(collection) {
         return this.collectionStore
             .deleteCollection(collection.id)
+            .then(() => {
+                if (this.props.onCollectionDelete) {
+                    this.props.onCollectionDelete(collection)
+                }
+            })
             .then(this.loadContents.bind(this))
             .catch(err => {
                 if (this.isUnmounting) {
