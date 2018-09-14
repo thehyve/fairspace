@@ -1,3 +1,7 @@
+app:
+  oauth2:
+    base-url: http://192.168.99.100:30881
+    realm: curie
 
 spring:
   datasource:

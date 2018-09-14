@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 
 @Configuration
-@Profile("!dev")
+@Profile("!noAuth")
 @ComponentScan("io.fairspace.oidc_auth")
 public class WebSecurityConfiguration {
 
