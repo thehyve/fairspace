@@ -1,5 +1,6 @@
 package io.fairspace.oidc_auth;
 
+import com.nimbusds.jose.KeySourceException;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.JWTProcessor;
@@ -37,6 +38,9 @@ public class JwtTokenValidator {
                 log.warn("Provided JWT is valid and could be parsed, but does not result in a claimsset");
                 return null;
             }
+        } catch(KeySourceException e) {
+            log.warn("Exception while retrieving keys for JWT validation: {}", e.getMessage() );
+            return null;
         } catch(Exception e) {
             log.warn("Provided JWT is invalid or not secured: {}", e.getMessage() );
             log.debug("Stacktrace", e);
