@@ -17,7 +17,6 @@ export const AccessRights = {
     Manage: 'Manage',
     Read: 'Read',
     Write: 'Write',
-    None: 'None',
 };
 
 class Permissions extends React.Component {

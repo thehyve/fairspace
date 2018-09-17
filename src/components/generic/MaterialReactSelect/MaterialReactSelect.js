@@ -11,46 +11,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import CancelIcon from '@material-ui/icons/Cancel';
 import {emphasize} from '@material-ui/core/styles/colorManipulator';
 
-const suggestions = [
-    {label: 'Afghanistan'},
-    {label: 'Aland Islands'},
-    {label: 'Albania'},
-    {label: 'Algeria'},
-    {label: 'American Samoa'},
-    {label: 'Andorra'},
-    {label: 'Angola'},
-    {label: 'Anguilla'},
-    {label: 'Antarctica'},
-    {label: 'Antigua and Barbuda'},
-    {label: 'Argentina'},
-    {label: 'Armenia'},
-    {label: 'Aruba'},
-    {label: 'Australia'},
-    {label: 'Austria'},
-    {label: 'Azerbaijan'},
-    {label: 'Bahamas'},
-    {label: 'Bahrain'},
-    {label: 'Bangladesh'},
-    {label: 'Barbados'},
-    {label: 'Belarus'},
-    {label: 'Belgium'},
-    {label: 'Belize'},
-    {label: 'Benin'},
-    {label: 'Bermuda'},
-    {label: 'Bhutan'},
-    {label: 'Bolivia, Plurinational State of'},
-    {label: 'Bonaire, Sint Eustatius and Saba'},
-    {label: 'Bosnia and Herzegovina'},
-    {label: 'Botswana'},
-    {label: 'Bouvet Island'},
-    {label: 'Brazil'},
-    {label: 'British Indian Ocean Territory'},
-    {label: 'Brunei Darussalam'},
-].map(suggestion => ({
-    value: suggestion.label,
-    label: suggestion.label,
-}));
-
 const styles = theme => ({
     root: {
     },
@@ -229,13 +189,13 @@ class MaterialReactSelect extends React.Component {
             <Select
                 classes={classes}
                 styles={selectStyles}
-                options={suggestions}
+                options={this.props.options}
                 components={components}
-                value={this.state.single}
+                value={this.props.value}
                 onChange={this.handleChange('single')}
-                placeholder="Search a country (start with a)"
+                placeholder={this.props.placeholder}
                 textFieldProps={{
-                    label: 'Label',
+                    label:  this.props.label,
                     InputLabelProps: {
                         shrink: true,
                     },
@@ -246,10 +206,15 @@ class MaterialReactSelect extends React.Component {
 }
 
 MaterialReactSelect.propTypes = {
-    options: PropTypes.object,
+    options: PropTypes.array,
     value: PropTypes.object,
-    classes: PropTypes.object.isRequired,
-    theme: PropTypes.object.isRequired,
+    placeholder: PropTypes.string,
+    classes: PropTypes.object,
+};
+
+MaterialReactSelect.defaultProps = {
+    placeholder: 'Please select a value',
+    label: '',
 };
 
 export default withStyles(styles, {withTheme: true})(MaterialReactSelect);

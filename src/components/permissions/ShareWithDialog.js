@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import userClient from '../../services/UserAPI/UserAPI';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -17,18 +18,19 @@ import FormLabel from '@material-ui/core/FormLabel';
 const styles = theme => ({
     root: {
         width: 400,
-        height: 350
+        height: 350,
+        display: 'block',
     },
     container: {
         display: 'flex',
         flexWrap: 'wrap',
     },
     formControl: {
-        margin: theme.spacing.unit,
+        marginTop: 20,
     },
-    select: {
-        width: '100%',
-    }
+    autocomplete: {
+        width: '100%'
+    },
 });
 
 class ShareWithDialog extends React.Component {
@@ -36,7 +38,20 @@ class ShareWithDialog extends React.Component {
         single: null,
         multi: null,
         accessRight: null,
+        userList: [],
     };
+
+    componentDidMount() {
+        userClient.getUsers().then(result => {
+            const userList = result.map( r => {
+                return {
+                    label: `${r.firstName} ${r.lastName}`,
+                    value: `${r.id}`,
+                }
+            });
+            this.setState({userList: userList});
+        })
+    }
 
     handleChange = event => {
         this.setState({accessRight: event.target.value});
@@ -48,6 +63,7 @@ class ShareWithDialog extends React.Component {
 
     render() {
         const {classes} = this.props;
+        const {userList} = this.state;
 
         return (
             <Dialog
@@ -56,18 +72,17 @@ class ShareWithDialog extends React.Component {
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={classes.root}>
-                        <MaterialReactSelect options={['']} value={''} classes={classes.root}/>
-                        <FormControl component="fieldset" className={classes.formControl}>
+                        <MaterialReactSelect options={userList} placeholder={'Please select a user'}/>
+                        <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
                             <RadioGroup
                                 aria-label="Access right"
                                 name="access-right"
                                 className={classes.group}
                                 value={this.state.accessRight}
-                                onChange={this.handleChange}
-                            >
+                                onChange={this.handleChange}>
                                 {Object.keys(AccessRights).map(access => {
-                                    return <FormControlLabel value={access} control={<Radio/>}
+                                    return <FormControlLabel key={access} value={access} control={<Radio/>}
                                                              label={AccessRights[access]}/>
                                 })}
                             </RadioGroup>
