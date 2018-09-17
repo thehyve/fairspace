@@ -34,12 +34,21 @@ const styles = theme => ({
 });
 
 class ShareWithDialog extends React.Component {
+
+    // initial state
     state = {
-        single: null,
-        multi: null,
-        userList: [],
         accessRight: 'Read',
         selectedUser: null,
+        selectedUserLabel: '',
+        userList: [],
+    };
+
+    resetState = () => {
+        this.setState({
+            accessRight: 'Read',
+            selectedUser: null,
+            selectedUserLabel: '',
+        });
     };
 
     componentDidMount() {
@@ -66,11 +75,20 @@ class ShareWithDialog extends React.Component {
         this.props.onClose();
     };
 
+    handleOnEnter = () => {
+        this.resetState();
+    };
+
     handleSubmit = () => {
-        console.log('selectedUser', this.state.selectedUser);
-        console.log('accessRight', this.state.accessRight);
-        // TODO: submit changes to the backend
-        this.props.onClose();
+        if (this.state.selectedUser) {
+            console.info('selectedUser', this.state.selectedUser);
+            console.info('accessRight', this.state.accessRight);
+            this.setState({selectedUserLabel: ''});
+            this.props.onClose();
+            // TODO: submit changes to the backend
+        } else {
+            this.setState({selectedUserLabel: 'You have to select a user'});
+        }
     };
 
     render() {
@@ -80,6 +98,7 @@ class ShareWithDialog extends React.Component {
         return (
             <Dialog
                 open={this.props.open}
+                onEnter={this.handleOnEnter}
                 onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
@@ -87,7 +106,8 @@ class ShareWithDialog extends React.Component {
                         <MaterialReactSelect options={userList}
                                              onChange={this.handleSelectedUserChange}
                                              placeholder={'Please select a user'}
-                                             value={this.state.user}/>
+                                             value={this.state.user}
+                                             label={this.state.selectedUserLabel}/>
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
                             <RadioGroup
