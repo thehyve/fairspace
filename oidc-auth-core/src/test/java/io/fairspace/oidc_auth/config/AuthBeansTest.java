@@ -18,6 +18,7 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,33 +36,29 @@ public class AuthBeansTest {
 
     @Test
     void testExpiryDateInThePast() throws MalformedURLException, BadJWTException {
-        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.jwtProcessor();
-        JWTClaimsSetVerifier claimsSetVerifier = jwtProcessor.getJWTClaimsSetVerifier();
-
-        Date expiry = Date.from(Instant.now().minus(1, ChronoUnit.SECONDS));
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .expirationTime(expiry)
-                .build();
-
-        try {
-            claimsSetVerifier.verify(claimsSet, null);
-            fail("JWT with expiry in the past should not be verified");
-        } catch(BadJWTException e) {
-
-        }
+        JWTClaimsSetVerifier claimsSetVerifier = getJwtClaimsSetVerifier();
+        JWTClaimsSet claimsSet = getJwtClaimsSet(-1);
+        assertThrows(BadJWTException.class, () -> claimsSetVerifier.verify(claimsSet, null));
     }
 
     @Test
     void testExpiryDateInTheFuture() throws MalformedURLException, BadJWTException {
-        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.jwtProcessor();
-        JWTClaimsSetVerifier claimsSetVerifier = jwtProcessor.getJWTClaimsSetVerifier();
-
-        Date expiry = Date.from(Instant.now().plus(1, ChronoUnit.SECONDS));
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .expirationTime(expiry)
-                .build();
+        JWTClaimsSetVerifier claimsSetVerifier = getJwtClaimsSetVerifier();
+        JWTClaimsSet claimsSet = getJwtClaimsSet(1);
 
         claimsSetVerifier.verify(claimsSet, null);
+    }
+
+    private JWTClaimsSet getJwtClaimsSet(int addSeconds) {
+        Date expiry = Date.from(Instant.now().plus(addSeconds, ChronoUnit.SECONDS));
+        return new JWTClaimsSet.Builder()
+                .expirationTime(expiry)
+                .build();
+    }
+
+    private JWTClaimsSetVerifier getJwtClaimsSetVerifier() throws MalformedURLException {
+        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.jwtProcessor();
+        return jwtProcessor.getJWTClaimsSetVerifier();
     }
 
 }
