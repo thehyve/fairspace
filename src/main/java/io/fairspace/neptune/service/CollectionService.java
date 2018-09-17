@@ -1,6 +1,5 @@
 package io.fairspace.neptune.service;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
