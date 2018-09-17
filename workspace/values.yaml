@@ -125,7 +125,7 @@ jupyterhub:
                     userdata_params: {'state': 'state'}
                     username_key: preferred_username
     proxy:
-        secretToken:
+      secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
 
 # Specific settings for Ceres subchart
 ceres:
