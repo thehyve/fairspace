@@ -51,7 +51,6 @@ neptune:
 jupyterhub:
     hub:
         auth:
-            type: custom
             custom:
                 config:
                     client_id: workspace-ci-pluto
