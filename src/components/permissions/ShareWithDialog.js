@@ -37,13 +37,14 @@ class ShareWithDialog extends React.Component {
     state = {
         single: null,
         multi: null,
-        accessRight: null,
         userList: [],
+        accessRight: 'Read',
+        selectedUser: null,
     };
 
     componentDidMount() {
         userClient.getUsers().then(result => {
-            const userList = result.map( r => {
+            const userList = result.map(r => {
                 return {
                     label: `${r.firstName} ${r.lastName}`,
                     value: `${r.id}`,
@@ -53,11 +54,22 @@ class ShareWithDialog extends React.Component {
         })
     }
 
-    handleChange = event => {
+    handleAccessRightChange = event => {
         this.setState({accessRight: event.target.value});
     };
 
+    handleSelectedUserChange = selectedOption => {
+        this.setState({selectedUser: selectedOption});
+    };
+
     handleClose = () => {
+        this.props.onClose();
+    };
+
+    handleSubmit = () => {
+        console.log('selectedUser', this.state.selectedUser);
+        console.log('accessRight', this.state.accessRight);
+        // TODO: submit changes to the backend
         this.props.onClose();
     };
 
@@ -72,7 +84,10 @@ class ShareWithDialog extends React.Component {
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={classes.root}>
-                        <MaterialReactSelect options={userList} placeholder={'Please select a user'}/>
+                        <MaterialReactSelect options={userList}
+                                             onChange={this.handleSelectedUserChange}
+                                             placeholder={'Please select a user'}
+                                             value={this.state.user}/>
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
                             <RadioGroup
@@ -80,7 +95,7 @@ class ShareWithDialog extends React.Component {
                                 name="access-right"
                                 className={classes.group}
                                 value={this.state.accessRight}
-                                onChange={this.handleChange}>
+                                onChange={this.handleAccessRightChange}>
                                 {Object.keys(AccessRights).map(access => {
                                     return <FormControlLabel key={access} value={access} control={<Radio/>}
                                                              label={AccessRights[access]}/>
@@ -93,7 +108,7 @@ class ShareWithDialog extends React.Component {
                     <Button onClick={this.handleClose} color="secondary">
                         Cancel
                     </Button>
-                    <Button onClick={this.handleClose} color="primary">
+                    <Button onClick={this.handleSubmit} color="primary">
                         Submit
                     </Button>
                 </DialogActions>

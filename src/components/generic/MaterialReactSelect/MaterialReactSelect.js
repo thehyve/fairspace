@@ -164,16 +164,6 @@ const components = {
 };
 
 class MaterialReactSelect extends React.Component {
-    state = {
-        single: null,
-        multi: null,
-    };
-
-    handleChange = name => value => {
-        this.setState({
-            [name]: value,
-        });
-    };
 
     render() {
         const {classes, theme} = this.props;
@@ -192,7 +182,7 @@ class MaterialReactSelect extends React.Component {
                 options={this.props.options}
                 components={components}
                 value={this.props.value}
-                onChange={this.handleChange('single')}
+                onChange={this.props.onChange}
                 placeholder={this.props.placeholder}
                 textFieldProps={{
                     label:  this.props.label,
@@ -210,6 +200,7 @@ MaterialReactSelect.propTypes = {
     value: PropTypes.object,
     placeholder: PropTypes.string,
     classes: PropTypes.object,
+    onChange: PropTypes.func,
 };
 
 MaterialReactSelect.defaultProps = {

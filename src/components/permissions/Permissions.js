@@ -14,9 +14,9 @@ import ShareWithDialog from './ShareWithDialog';
 import ErrorMessage from "../error/ErrorMessage";
 
 export const AccessRights = {
-    Manage: 'Manage',
     Read: 'Read',
     Write: 'Write',
+    Manage: 'Manage',
 };
 
 class Permissions extends React.Component {
@@ -83,7 +83,7 @@ class Permissions extends React.Component {
             .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('subject')))
             .map((p, idx) => {
                 return (
-                    <TableRow key={idx}>
+                    <TableRow key={idx} hover>
                         <TableCell component="th" scope="row">{p.subject}</TableCell>
                         <TableCell>{p.access}</TableCell>
                         <TableCell>
@@ -107,9 +107,7 @@ class Permissions extends React.Component {
                         </TableCell>
                     </TableRow>
                 </TableHead>
-                <TableBody>
-                    {permissions}
-                </TableBody>
+                <TableBody>{permissions}</TableBody>
             </Table>
         );
     };
