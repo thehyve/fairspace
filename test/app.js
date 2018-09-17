@@ -78,6 +78,16 @@ nock('http://fairspace.io', {
     .reply(200, {collection: 2, subject: 'bob', access: 'Manage'});
 
 
+nock('http://fairspace.io', {
+    reqheaders: {
+        'authorization': 'Bearer ' + token
+    }
+})
+    .get('/api/collections/permissions')
+    .query({location: '1001'})
+    .times(100)
+    .reply(404);
+
 describe('Titan', () => {
     before(() => fs.mkdirSync(process.env.FILES_FOLDER));
 
@@ -248,6 +258,14 @@ describe('Webdav', () => {
                 .set('Authorization', 'Bearer ' + token)
                 .set('Destination', 'http://fairspace.io/api/storage/webdav/newname-1')
                 .expect(401))
+    );
+
+    it('returns 401 for non-existing collections', () =>
+        server
+            .delete('/api/storage/webdav/1001/')
+            .set('Authorization', 'Bearer ' + token)
+            .set('Anticipated-Operation', 'true')
+            .expect(401)
     );
 });
 

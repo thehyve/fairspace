@@ -43,7 +43,11 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
             })
             .catch(err => {
                 console.error(err);
-                callback(err, false)
+                if (err && err.response && err.response.status === 404) {
+                    callback(null, false)
+                } else {
+                    callback(err, false)
+                }
             });
     }
 }
