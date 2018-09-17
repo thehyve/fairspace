@@ -56,10 +56,23 @@ Cypress.Commands.add("addCollection", () => {
 
 Cypress.Commands.add("deleteLastCollection", () => {
     cy.url().should('contain', '/collections')
-    cy.get('tbody>tr').last()
-        .find("button").click({force: true});
+
+    deleteCollection(cy.get('tbody>tr').last());
 })
 
+Cypress.Commands.add("deleteCollection", (name) => {
+    cy.url().should('contain', '/collections')
+
+    deleteCollection(
+        cy.get('tr')
+            .contains(name)
+            .parentsUntil('tbody'));
+})
+
+Cypress.Commands.add("waitForRightPanel", () => {
+    cy.get('button').contains('chevron_right').should('be.visible');
+    cy.contains("Loading").should("not.exist");
+});
 
 Cypress.Commands.add('upload_file', (selector, fileUrl, type = '') => {
     return cy.fixture(fileUrl, 'base64')
@@ -72,3 +85,14 @@ Cypress.Commands.add('upload_file', (selector, fileUrl, type = '') => {
             return cy.get(selector).trigger('drop', event)
         })
 });
+
+function deleteCollection(row) {
+    // Click the delete button
+    row.find("button").click({force: true});
+
+    // Confirm deletion
+    cy.get("button").contains("Yes").click({force:true});
+
+    // Wait a bit to ensure deletion
+    cy.wait(300);
+}
