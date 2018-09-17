@@ -41,7 +41,7 @@ public class CollectionMetadataServiceTest {
         collectionMetadataService.createCollection(c);
 
         verify(tripleService, times(1))
-                .postTriples(argThat(m -> m.size() == 3
+                .postTriples(argThat(m -> m.size() == 5
                         && m.contains(
                         m.createResource(EXPECTED_URI),
                         RDF.type,
@@ -66,7 +66,7 @@ public class CollectionMetadataServiceTest {
         collectionMetadataService.createCollection(c);
 
         verify(tripleService, times(1))
-                .postTriples(argThat(m -> m.size() == 3
+                .postTriples(argThat(m -> m.size() == 5
                         && m.contains(
                         m.createResource(EXPECTED_URI),
                         RDF.type,

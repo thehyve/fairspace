@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 @Getter
 @EqualsAndHashCode
@@ -36,4 +38,16 @@ public class Collection {
 
     @Transient
     private Access access;
+
+    // Do not create get method, because we need to customize it.
+    @Getter(AccessLevel.NONE)
+    @Setter
+    ZonedDateTime creationDateTime;
+
+    public ZonedDateTime getCreationDateTime () {
+        return creationDateTime == null ? null : creationDateTime.withZoneSameInstant(ZoneOffset.UTC);
+    }
+
+    @Setter
+    String creator;
 }

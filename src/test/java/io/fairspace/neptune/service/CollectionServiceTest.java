@@ -68,7 +68,7 @@ public class CollectionServiceTest {
     @Test
     public void testFindById() {
         Long id = 1L;
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Read);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Read,null,null);
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         Collection mergedCollection = service.findById(id);
@@ -88,7 +88,7 @@ public class CollectionServiceTest {
 
     @Test
     public void testAddCollection() throws IOException {
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write, null,null);
 
         when(collectionRepository.save(any())).thenReturn(collection);
 
@@ -107,8 +107,8 @@ public class CollectionServiceTest {
 
     @Test
     public void testAddCollectionReturnsStoredIdAndUri() throws IOException {
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write);
-        Collection storedCollection = new Collection(2L, "quotes", "My quotes", "quote item", null, Access.Write);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write, null, null );
+        Collection storedCollection = new Collection(2L, "quotes", "My quotes", "quote item", null, Access.Write, null, null );
 
         when(collectionRepository.save(any())).thenReturn(storedCollection);
 
@@ -121,7 +121,7 @@ public class CollectionServiceTest {
     @Test
     public void testDeleteCollection() throws IOException {
         Long id = 1L;
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, null);
+        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, null, null, null );
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         service.delete(id);
@@ -140,7 +140,7 @@ public class CollectionServiceTest {
     @Test
     public void testPatchCollection() throws IOException {
         Collection original =
-                new Collection(1L, "oldName-1", "oldName", "oldDescription", null, Access.Write);
+                new Collection(1L, "oldName-1", "oldName", "oldDescription", null, Access.Write, null, null );
 
         Collection patch =
                  Collection.builder().name("newName!").description("newDescription").build();

@@ -12,6 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,6 +49,9 @@ public class CollectionServiceIntegrationTest {
 
     @Test
     public void testAddCollection() throws IOException {
+
+        ZonedDateTime beforeTest = ZonedDateTime.now(ZoneOffset.UTC);
+
         Collection collection = Collection.builder()
                 .name("new collection")
                 .description("my description")
@@ -58,7 +63,15 @@ public class CollectionServiceIntegrationTest {
         // Retrieve again for verification
         Collection foundCollection = service.findById(storedCollection.getId());
 
+        ZonedDateTime afterTest = ZonedDateTime.now(ZoneOffset.UTC);
+
         assertEquals(storedCollection, foundCollection);
+        assertEquals(storedCollection.getCreator(),"user1");
+        assert(beforeTest.isBefore(storedCollection.getCreationDateTime()) ||
+                beforeTest.equals(storedCollection.getCreationDateTime()) );
+        assert(afterTest.isAfter(storedCollection.getCreationDateTime()) ||
+                afterTest.equals(storedCollection.getCreationDateTime()) );
+
     }
 
 

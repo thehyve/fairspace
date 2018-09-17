@@ -1,5 +1,6 @@
 package io.fairspace.neptune.service;
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
@@ -15,6 +16,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,6 +68,17 @@ public class CollectionService {
     }
 
     public Collection add(Collection collection) throws IOException {
+
+        if ( collection.getCreator() != null ) {
+            throw new UnauthorizedException("Setting a creator value for a new collection is not allowed.");
+        }
+
+        if ( collection.getCreationDateTime() != null ) {
+            throw new UnauthorizedException("Setting a creation datetime value for a new collection is not allowed.");
+        }
+
+        collection.setCreator(permissionService.getSubject());
+        collection.setCreationDateTime(ZonedDateTime.now(ZoneOffset.UTC));
         Collection savedCollection = repository.save(collection);
 
         // Update location based on given id

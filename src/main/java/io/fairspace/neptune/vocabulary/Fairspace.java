@@ -22,4 +22,8 @@ public class Fairspace {
     public static final Property name = property("name");
 
     public static final Property description = property("description");
+
+    public static final Property creator = property ("creator");
+
+    public static final Property creationDateTime = property ("creationDateTime");
 }
