@@ -12,12 +12,26 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import ShareWithDialog from './ShareWithDialog';
 import ErrorMessage from "../error/ErrorMessage";
+import {withStyles} from "@material-ui/core/styles/index";
 
 export const AccessRights = {
     Read: 'Read',
     Write: 'Write',
     Manage: 'Manage',
 };
+
+const styles = theme => ({
+    root: {},
+    collabolatorIcon: {
+        visibility: "hidden",
+        "&:hover": {
+            visibility: "inherit"
+        }
+    },
+    collabolatorIcon: {
+        visibility: "hidden"
+    },
+});
 
 class Permissions extends React.Component {
 
@@ -26,7 +40,8 @@ class Permissions extends React.Component {
         this.state = {
             permissions: [],
             showPermissionDialog: false,
-            error: false
+            error: false,
+            hovered: false
         };
     }
 
@@ -78,16 +93,31 @@ class Permissions extends React.Component {
         return {Manage: 0, Write: 1, Read: 2}[p.access]
     }
 
+    handleListItemMouseover = (value) => {
+        this.setState({hovered: value})
+    };
+
+    handleListItemMouseout = (value) => {
+        if (this.state.hovered === value) {
+            this.setState({hovered: null})
+        }
+    };
+
     renderUserList = () => {
+        const {classes} = this.props;
+
         const permissions = this.state.permissions
             .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('subject')))
             .map((p, idx) => {
+                const secondaryActionClassName = this.state.hovered !== idx ? classes.collabolatorIcon : null;
                 return (
-                    <TableRow key={idx} hover>
+                    <TableRow key={idx} hover className={classes.userList}
+                              onMouseOver={() => this.handleListItemMouseover(idx)}
+                              onMouseOut={() => this.handleListItemMouseout(idx)}>
                         <TableCell component="th" scope="row">{p.subject}</TableCell>
                         <TableCell>{p.access}</TableCell>
                         <TableCell>
-                            <IconButton aria-label="Delete" disabled>
+                            <IconButton aria-label="Delete" className={secondaryActionClassName}>
                                 <DeleteIcon/>
                             </IconButton>
                         </TableCell>
@@ -120,10 +150,9 @@ class Permissions extends React.Component {
                                  onClose={this.handleClosePermissionDialog}/>
                 {this.state.error ?
                     <ErrorMessage>message={`Error loading collaborators`}</ErrorMessage> : this.renderUserList()}
-
             </div>
         )
     };
 }
 
-export default Permissions
+export default withStyles(styles, {withTheme: true})(Permissions);
