@@ -15,6 +15,13 @@ import TableRow from '@material-ui/core/TableRow';
 import ShareWithDialog from './ShareWithDialog';
 import ErrorMessage from "../error/ErrorMessage";
 
+export const AccessRights = {
+    Manage: 'Manage',
+    Read: 'Read',
+    Write: 'Write',
+    None: 'None',
+};
+
 class Permissions extends React.Component {
 
     constructor(props) {
@@ -46,8 +53,10 @@ class Permissions extends React.Component {
         permissionClient
             .getCollectionPermissions(this.props.collectionId)
             .then(result => {
-                this.setState({permissions: result});
-                this.setState({error: false});
+                this.setState({
+                    permissions: result,
+                    error: false
+                });
             })
             .catch(e => {
                 this.resetPermissions();
@@ -74,10 +83,12 @@ class Permissions extends React.Component {
 
     renderAccessRight = (p) => {
         return (
-            <Select value={p.access} disabled>
-                <MenuItem value={'Manage'}><Typography variant={'body1'}>Manage</Typography></MenuItem>
-                <MenuItem value={'Read'}><Typography variant={'body1'}>Read</Typography></MenuItem>
-                <MenuItem value={'Write'}><Typography variant={'body1'}>Write</Typography></MenuItem>
+            <Select value={AccessRights[p.access]} disabled>
+                {Object.keys(AccessRights).map(access => {
+                    return <MenuItem value={access}>
+                        <Typography variant={'body1'}>{AccessRights[access]}</Typography>
+                    </MenuItem>
+                })}
             </Select>
         );
     };

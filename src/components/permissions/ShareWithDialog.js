@@ -13,6 +13,8 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import {AccessRights} from "./Permissions";
+import Typography from "@material-ui/core/Typography";
 
 const styles = theme => ({
     root: {
@@ -31,12 +33,11 @@ class ShareWithDialog extends React.Component {
     state = {
         single: null,
         multi: null,
+        accessRight: null,
     };
 
-    handleChange = name => value => {
-        this.setState({
-            [name]: value,
-        });
+    handleChange = event => {
+        this.setState({accessRight: event.target.value});
     };
 
     handleClose = () => {
@@ -64,17 +65,16 @@ class ShareWithDialog extends React.Component {
                         <FormControl className={classes.formControl}>
                             <InputLabel htmlFor="access-right">Access Right</InputLabel>
                             <Select
-                                value={''}
+                                value={this.state.accessRight}
                                 onChange={this.handleChange}
                                 input={<Input name="access-right" id="access-right"/>}
                                 required
                             >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={10}>Manage</MenuItem>
-                                <MenuItem value={20}>Read</MenuItem>
-                                <MenuItem value={30}>Write</MenuItem>
+                                {Object.keys(AccessRights).map(access => {
+                                    return <MenuItem value={access}>
+                                        <Typography variant={'body1'}>{AccessRights[access]}</Typography>
+                                    </MenuItem>
+                                })}
                             </Select>
                             <FormHelperText>Select access right for the user.</FormHelperText>
                         </FormControl>
