@@ -39,6 +39,7 @@ class UploadButton extends React.Component{
             onDidUpload,
             onUpload,
             children,
+            classes,
             ...componentProps
         } = props;
 
@@ -116,8 +117,9 @@ class UploadButton extends React.Component{
             </Column>
         } else {
             return <table width="100%">
+                <tbody>
                 {Object.keys(this.state.files).map(filename =>
-                        <tr>
+                        <tr key={filename}>
                             <td className={this.props.classes.progressFilename}>
                                 <span>
                                     {filename}
@@ -126,6 +128,7 @@ class UploadButton extends React.Component{
                             <td>{this.state.files[filename] === 'uploading' ? <LinearProgress /> : 'Uploaded'}</td>
                         </tr>
                 )}
+                </tbody>
             </table>
         }
     }
