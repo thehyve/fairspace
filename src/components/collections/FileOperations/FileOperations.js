@@ -31,7 +31,7 @@ function FileOperations(props) {
                     ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(path, files));
                 });
         } else {
-            return Promise.resolve();
+            return Promise.resolve([]);
         }
     }
 
