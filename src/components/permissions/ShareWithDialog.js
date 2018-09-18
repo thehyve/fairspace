@@ -71,7 +71,7 @@ class ShareWithDialog extends React.Component {
                                 required
                             >
                                 {Object.keys(AccessRights).map(access => {
-                                    return <MenuItem value={access}>
+                                    return <MenuItem value={access} key={access}>
                                         <Typography variant={'body1'}>{AccessRights[access]}</Typography>
                                     </MenuItem>
                                 })}

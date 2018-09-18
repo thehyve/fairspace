@@ -5,8 +5,6 @@ import {compareBy, comparing} from "../../utils/comparators";
 import Typography from "@material-ui/core/Typography";
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -81,18 +79,6 @@ class Permissions extends React.Component {
         return {Manage: 0, Write: 1, Read: 2}[p.access]
     }
 
-    renderAccessRight = (p) => {
-        return (
-            <Select value={AccessRights[p.access]} disabled>
-                {Object.keys(AccessRights).map(access => {
-                    return <MenuItem value={access}>
-                        <Typography variant={'body1'}>{AccessRights[access]}</Typography>
-                    </MenuItem>
-                })}
-            </Select>
-        );
-    };
-
     renderUserList = () => {
         const permissions = this.state.permissions
             .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('subject')))
@@ -100,9 +86,7 @@ class Permissions extends React.Component {
                 return (
                     <TableRow key={idx}>
                         <TableCell component="th" scope="row">{p.subject}</TableCell>
-                        <TableCell>
-                            {this.renderAccessRight(p)}
-                        </TableCell>
+                        <TableCell>{p.access}</TableCell>
                         <TableCell>
                             <IconButton aria-label="Delete" disabled>
                                 <DeleteIcon/>
