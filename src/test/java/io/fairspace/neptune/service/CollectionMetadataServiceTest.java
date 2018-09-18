@@ -66,8 +66,8 @@ public class CollectionMetadataServiceTest {
                         m.createLiteral("http://fairspace.io/users/user1"))
                         && m.contains(
                         m.createResource(EXPECTED_URI),
-                        Fairspace.creationDateTime,
-                        m.createLiteral(c.getCreationDateTime().toString()))
+                        Fairspace.dateCreated,
+                        m.createLiteral(c.getDateCreated().toString()))
                 ));
     }
 
@@ -77,7 +77,7 @@ public class CollectionMetadataServiceTest {
                 .id(COLLECTION_ID)
                 .name(COLLECTION_NAME)
                 .creator(CREATOR)
-                .creationDateTime(CREATIONDATETIME)
+                .dateCreated(CREATIONDATETIME)
                 .build();
 
         collectionMetadataService.createCollection(c);
@@ -102,8 +102,8 @@ public class CollectionMetadataServiceTest {
                         m.createLiteral("http://fairspace.io/users/user1"))
                         && m.contains(
                         m.createResource(EXPECTED_URI),
-                        Fairspace.creationDateTime,
-                        m.createLiteral(c.getCreationDateTime().toString()))
+                        Fairspace.dateCreated,
+                        m.createLiteral(c.getDateCreated().toString()))
                 ));
     }
 
@@ -192,7 +192,7 @@ public class CollectionMetadataServiceTest {
                 .uri(COLLECTION_URI)
                 .id(COLLECTION_ID)
                 .creator(CREATOR)
-                .creationDateTime(CREATIONDATETIME)
+                .dateCreated(CREATIONDATETIME)
                 .build();
     }
 

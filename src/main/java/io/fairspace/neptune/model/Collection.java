@@ -44,10 +44,10 @@ public class Collection {
     @Getter(AccessLevel.NONE)
     @Setter
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    ZonedDateTime creationDateTime;
+    ZonedDateTime dateCreated;
 
-    public ZonedDateTime getCreationDateTime () {
-        return creationDateTime == null ? null : creationDateTime.withZoneSameInstant(ZoneOffset.UTC);
+    public ZonedDateTime getDateCreated() {
+        return dateCreated == null ? null : dateCreated.withZoneSameInstant(ZoneOffset.UTC);
     }
 
     @Setter

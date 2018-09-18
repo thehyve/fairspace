@@ -76,7 +76,7 @@ public class CollectionServiceTest {
                 .id(1L)
                 .location("quotes")
                 .access(Access.Read)
-                .creationDateTime(ZonedDateTime.now(ZoneOffset.UTC))
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
                 .build();
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
@@ -135,7 +135,7 @@ public class CollectionServiceTest {
                 .id(2L)
                 .location("quotes")
                 .access(Access.Write)
-                .creationDateTime(ZonedDateTime.now(ZoneOffset.UTC))
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
                 .build();
 
         when(collectionRepository.save(any())).thenReturn(storedCollection);
@@ -155,7 +155,7 @@ public class CollectionServiceTest {
                 .id(1L)
                 .location("quotes")
                 .access(Access.Write)
-                .creationDateTime(ZonedDateTime.now(ZoneOffset.UTC))
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
                 .build();
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
@@ -179,7 +179,7 @@ public class CollectionServiceTest {
                 .description("oldDescription")
                 .id(1L)
                 .location("oldName-1")
-                .creationDateTime(ZonedDateTime.now(ZoneOffset.UTC))
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
                 .build();
 
         Collection patch =

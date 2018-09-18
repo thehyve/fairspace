@@ -67,10 +67,10 @@ public class CollectionServiceIntegrationTest {
 
         assertEquals(storedCollection, foundCollection);
         assertEquals(storedCollection.getCreator(),("http://fairspace.io/users/user1"));
-        assert(beforeTest.isBefore(storedCollection.getCreationDateTime()) ||
-                beforeTest.equals(storedCollection.getCreationDateTime()) );
-        assert(afterTest.isAfter(storedCollection.getCreationDateTime()) ||
-                afterTest.equals(storedCollection.getCreationDateTime()) );
+        assert(beforeTest.isBefore(storedCollection.getDateCreated()) ||
+                beforeTest.equals(storedCollection.getDateCreated()) );
+        assert(afterTest.isAfter(storedCollection.getDateCreated()) ||
+                afterTest.equals(storedCollection.getDateCreated()) );
 
     }
 

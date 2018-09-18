@@ -45,15 +45,15 @@ public class CollectionMetadataService {
     private Model toTriples(Collection collection) {
         Model model = createDefaultModel();
 
-        ZonedDateTime creationDateTime = collection.getCreationDateTime();
-        String creationDateTimeAsString = creationDateTime == null ? "" : creationDateTime.toString();
+        ZonedDateTime dateCreated = collection.getDateCreated();
+        String dateCreatedAsString = dateCreated == null ? "" : dateCreated.toString();
 
         Resource subject = model.createResource(getUri(collection.getId()));
         model.add(subject, RDF.type, Fairspace.Collection);
         model.add(subject, Fairspace.name, model.createLiteral(collection.getName()));
         model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
         model.add(subject, Fairspace.creator, model.createLiteral(Optional.ofNullable(("http://fairspace.io/users/" + collection.getCreator())).orElse("")));
-        model.add(subject, Fairspace.creationDateTime, model.createLiteral(creationDateTimeAsString));
+        model.add(subject, Fairspace.dateCreated, model.createLiteral(dateCreatedAsString));
         return model;
     }
 

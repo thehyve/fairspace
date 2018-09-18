@@ -69,7 +69,7 @@ public class CollectionService {
     public Collection add(Collection collection) throws IOException {
 
         collection.setCreator("http://fairspace.io/users/" + permissionService.getSubject());
-        collection.setCreationDateTime(ZonedDateTime.now(ZoneOffset.UTC));
+        collection.setDateCreated(ZonedDateTime.now(ZoneOffset.UTC));
         Collection savedCollection = repository.save(collection);
 
         // Update location based on given id
