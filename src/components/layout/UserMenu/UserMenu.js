@@ -69,7 +69,7 @@ class UserMenu extends React.Component {
         );
     }
 
-    renderUserButton() {
+    renderUserButton = () => {
         const { pending, error, user } = this.props;
 
         if (pending) {
