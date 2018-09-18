@@ -68,14 +68,6 @@ public class CollectionService {
 
     public Collection add(Collection collection) throws IOException {
 
-        if ( collection.getCreator() != null ) {
-            throw new UnauthorizedException("Setting a creator value for a new collection is not allowed.");
-        }
-
-        if ( collection.getCreationDateTime() != null ) {
-            throw new UnauthorizedException("Setting a creation datetime value for a new collection is not allowed.");
-        }
-
         collection.setCreator("http://fairspace.io/users/" + permissionService.getSubject());
         collection.setCreationDateTime(ZonedDateTime.now(ZoneOffset.UTC));
         Collection savedCollection = repository.save(collection);
