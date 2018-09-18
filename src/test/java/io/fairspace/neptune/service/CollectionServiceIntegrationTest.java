@@ -66,7 +66,7 @@ public class CollectionServiceIntegrationTest {
         ZonedDateTime afterTest = ZonedDateTime.now(ZoneOffset.UTC);
 
         assertEquals(storedCollection, foundCollection);
-        assertEquals(storedCollection.getCreator(),("http://fairspace.io/users/user1"));
+        assertEquals(storedCollection.getCreator(),("user1"));
         assert(beforeTest.isBefore(storedCollection.getDateCreated()) ||
                 beforeTest.equals(storedCollection.getDateCreated()) );
         assert(afterTest.isAfter(storedCollection.getDateCreated()) ||

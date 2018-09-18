@@ -42,7 +42,6 @@ public class Collection {
 
     // Do not create get method, because we need to customize it.
     @Getter(AccessLevel.NONE)
-    @Setter
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     ZonedDateTime dateCreated;
 
@@ -50,7 +49,6 @@ public class Collection {
         return dateCreated == null ? null : dateCreated.withZoneSameInstant(ZoneOffset.UTC);
     }
 
-    @Setter
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     String creator;
 }
