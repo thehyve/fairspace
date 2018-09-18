@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
@@ -46,14 +48,15 @@ public class CollectionMetadataService {
         Model model = createDefaultModel();
 
         ZonedDateTime dateCreated = collection.getDateCreated();
-        String dateCreatedAsString = dateCreated == null ? "" : dateCreated.toString();
 
         Resource subject = model.createResource(getUri(collection.getId()));
         model.add(subject, RDF.type, Fairspace.Collection);
         model.add(subject, Fairspace.name, model.createLiteral(collection.getName()));
         model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
         model.add(subject, Fairspace.creator, model.createLiteral(Optional.ofNullable(("http://fairspace.io/users/" + collection.getCreator())).orElse("")));
-        model.add(subject, Fairspace.dateCreated, model.createLiteral(dateCreatedAsString));
+        if ( dateCreated != null ) {
+            model.add(subject, Fairspace.dateCreated, model.createTypedLiteral(GregorianCalendar.from(dateCreated)));
+        }
         return model;
     }
 

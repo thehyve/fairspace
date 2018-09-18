@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.GregorianCalendar;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -67,7 +68,7 @@ public class CollectionMetadataServiceTest {
                         && m.contains(
                         m.createResource(EXPECTED_URI),
                         Fairspace.dateCreated,
-                        m.createLiteral(c.getDateCreated().toString()))
+                        m.createTypedLiteral(GregorianCalendar.from(c.getDateCreated())))
                 ));
     }
 
@@ -103,8 +104,8 @@ public class CollectionMetadataServiceTest {
                         && m.contains(
                         m.createResource(EXPECTED_URI),
                         Fairspace.dateCreated,
-                        m.createLiteral(c.getDateCreated().toString()))
-                ));
+                        m.createTypedLiteral(GregorianCalendar.from(c.getDateCreated())
+                ))));
     }
 
     @Test(expected = RuntimeException.class)
