@@ -14,6 +14,7 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
+import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
     root: {
@@ -41,13 +42,23 @@ class ShareWithDialog extends React.Component {
         selectedUser: null,
         selectedUserLabel: '',
         userList: [],
+        isEditing: false,
     };
 
     resetState = () => {
+        const {user} = this.props;
+        const {userList} = this.state;
+        let selectedUser = null;
+        if (user) {
+            selectedUser = userList.find(u => {
+                return user.subject === u.value;
+            });
+        }
         this.setState({
-            accessRight: 'Read',
-            selectedUser: null,
+            accessRight: user ? user.access : 'Read',
+            selectedUser: selectedUser,
             selectedUserLabel: '',
+            isEditing: !!user,
         });
     };
 
@@ -81,19 +92,30 @@ class ShareWithDialog extends React.Component {
 
     handleSubmit = () => {
         if (this.state.selectedUser) {
-            console.info('selectedUser', this.state.selectedUser);
-            console.info('accessRight', this.state.accessRight);
             this.setState({selectedUserLabel: ''});
             this.props.onClose();
+            console.log(this.state)
             // TODO: submit changes to the backend
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
         }
     };
 
+    renderUser = () => {
+        const {userList, isEditing, selectedUser} = this.state;
+        return isEditing ?
+            (<div>
+                <Typography variant="subheading" gutterBottom>{selectedUser.label}</Typography>
+            </div>) :
+            (<MaterialReactSelect options={userList}
+                                  onChange={this.handleSelectedUserChange}
+                                  placeholder={'Please select a user'}
+                                  value={this.state.selectedUser}
+                                  label={this.state.selectedUserLabel}/>);
+    };
+
     render() {
         const {classes} = this.props;
-        const {userList} = this.state;
 
         return (
             <Dialog
@@ -103,11 +125,7 @@ class ShareWithDialog extends React.Component {
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={classes.root}>
-                        <MaterialReactSelect options={userList}
-                                             onChange={this.handleSelectedUserChange}
-                                             placeholder={'Please select a user'}
-                                             value={this.state.user}
-                                             label={this.state.selectedUserLabel}/>
+                        {this.renderUser()}
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
                             <RadioGroup

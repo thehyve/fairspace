@@ -3,7 +3,7 @@ import permissionAPI from '../../services/PermissionAPI/PermissionAPI'
 import IconButton from '@material-ui/core/IconButton';
 import {compareBy, comparing} from "../../utils/comparators";
 import Typography from "@material-ui/core/Typography";
-import DeleteIcon from '@material-ui/icons/Delete';
+import MoreIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -13,6 +13,8 @@ import TableRow from '@material-ui/core/TableRow';
 import ShareWithDialog from './ShareWithDialog';
 import ErrorMessage from "../error/ErrorMessage";
 import {withStyles} from "@material-ui/core/styles/index";
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 export const AccessRights = {
     Read: 'Read',
@@ -41,7 +43,9 @@ class Permissions extends React.Component {
             permissions: [],
             showPermissionDialog: false,
             error: false,
-            hovered: false
+            hovered: null,
+            anchorEl: null,
+            selectedUser: null,
         };
     }
 
@@ -85,16 +89,30 @@ class Permissions extends React.Component {
 
     handleClosePermissionDialog = () => {
         this.setState({
-            showPermissionDialog: false
+            showPermissionDialog: false,
+            selectedUser: null
         })
+    };
+
+    handleMoreClick = (user, event) => {
+        this.setState({
+            anchorEl: event.currentTarget,
+            selectedUser: user
+        });
+    };
+
+    handleMoreClose = () => {
+        this.setState({anchorEl: null});
     };
 
     static permissionLevel(p) {
         return {Manage: 0, Write: 1, Read: 2}[p.access]
     }
 
-    handleListItemMouseover = (value) => {
-        this.setState({hovered: value})
+    handleListItemMouseover = (value, event) => {
+        this.setState({
+            hovered: value
+        })
     };
 
     handleListItemMouseout = (value) => {
@@ -103,27 +121,33 @@ class Permissions extends React.Component {
         }
     };
 
-    renderUserList = () => {
+    renderCollaboratorList = (collaborators) => {
         const {classes} = this.props;
+        const {hovered} = this.state;
 
-        const permissions = this.state.permissions
+        return collaborators
             .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('subject')))
             .map((p, idx) => {
-                const secondaryActionClassName = this.state.hovered !== idx ? classes.collabolatorIcon : null;
+                const secondaryActionClassName = hovered !== idx ? classes.collabolatorIcon : null;
                 return (
                     <TableRow key={idx} hover className={classes.userList}
-                              onMouseOver={() => this.handleListItemMouseover(idx)}
+                              onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                               onMouseOut={() => this.handleListItemMouseout(idx)}>
                         <TableCell component="th" scope="row">{p.subject}</TableCell>
                         <TableCell>{p.access}</TableCell>
                         <TableCell>
-                            <IconButton aria-label="Delete" className={secondaryActionClassName}>
-                                <DeleteIcon/>
+                            <IconButton aria-label="Delete" className={secondaryActionClassName}
+                                        onClick={(e) => this.handleMoreClick(p, e)}>
+                                <MoreIcon/>
                             </IconButton>
                         </TableCell>
                     </TableRow>
                 )
             });
+    };
+
+    renderUserList = () => {
+        const {permissions, anchorEl} = this.state;
         return (
             <Table>
                 <TableHead>
@@ -137,7 +161,17 @@ class Permissions extends React.Component {
                         </TableCell>
                     </TableRow>
                 </TableHead>
-                <TableBody>{permissions}</TableBody>
+                <TableBody>
+                    {this.renderCollaboratorList(permissions)}
+                    <Menu
+                        id={`-sub-edit`}
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={this.handleMoreClose}>
+                        <MenuItem onClick={this.handleOpenPermissionDialog}>Change access</MenuItem>
+                        <MenuItem onClick={this.handleMoreClose}>Delete</MenuItem>
+                    </Menu>
+                </TableBody>
             </Table>
         );
     };
@@ -147,7 +181,9 @@ class Permissions extends React.Component {
             <div>
                 <Typography variant="subheading">Shared with:</Typography>
                 <ShareWithDialog open={this.state.showPermissionDialog}
-                                 onClose={this.handleClosePermissionDialog}/>
+                                 onClose={this.handleClosePermissionDialog}
+                                 user={this.state.selectedUser}
+                />
                 {this.state.error ?
                     <ErrorMessage>message={`Error loading collaborators`}</ErrorMessage> : this.renderUserList()}
             </div>
