@@ -28,7 +28,7 @@ it('shows result when subject provided', () => {
         wrapper.update();
     }).then(() => {
         const result = wrapper.find("li");
-        expect(result.length).toEqual(6);
+        expect(result.length).toEqual(7);
     });
 });
 
@@ -75,36 +75,40 @@ const metadata = [
 
 const vocabulary = [
     {
-        "@id": "http://fairspace.io/ontology#name",
-        "@type": [
-            "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-        ],
-        "http://www.w3.org/2000/01/rdf-schema#label": [
-            {
-                "@value": "Name"
-            }
+        "@id": "@type",
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Type' }],
+        "http://www.w3.org/2000/01/rdf-schema#domain": [
+            {"@id": "http://fairspace.io/ontology#Collection"}
         ]
     },
     {
-        "@id": "http://fairspace.io/ontology#description",
-        "@type": [
-            "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-        ],
-        "http://www.w3.org/2000/01/rdf-schema#label": [
-            {
-                "@value": "Description"
-            }
-        ]
+        '@id': 'http://fairspace.io/ontology#name',
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Name' }],
+        'http://www.w3.org/2000/01/rdf-schema#domain': [{ '@id': 'http://fairspace.io/ontology#Collection' }]
     },
     {
-        "@id": "http://fairspace.io/ontology#Collection",
-        "@type": [
-            "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
-        ],
-        "http://www.w3.org/2000/01/rdf-schema#label": [
-            {
-                "@value": "Collection"
-            }
-        ]
+        '@id': 'http://fairspace.io/ontology#description',
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Description' }],
+        'http://www.w3.org/2000/01/rdf-schema#domain': [{ '@id': 'http://fairspace.io/ontology#Collection' }]
+    },
+    {
+        '@id': 'http://schema.org/Creator',
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Creator' }],
+        'http://www.w3.org/2000/01/rdf-schema#domain': []
+    },
+    {
+        '@id': 'http://schema.org/CreatedDate',
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Created date' }],
+        'http://www.w3.org/2000/01/rdf-schema#domain': [{ '@id': 'http://fairspace.io/ontology#Collection' }]
+    },
+    {
+        '@id': 'http://fairspace.io/ontology#Collection',
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class',
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Collection' }]
     }
 ];

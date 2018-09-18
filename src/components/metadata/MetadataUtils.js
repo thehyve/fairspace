@@ -1,10 +1,5 @@
 import {compareBy, comparing} from "../../utils/comparators";
 
-const typeVocabularyEntry = {
-    '@id': '@type',
-    'rdfs:label': 'Type'
-}
-
 /**
  * Expands the json-ld format of the vocabulary and metadata and
  * combines them to make a list of objects with the label and value as keys.
@@ -38,24 +33,24 @@ function combine(vocabulary, expandedMetadata) {
 
     // Lookup labels
     // TODO: Refactor to only do this once
-    const labelsById = extractLabelsByIdMap(vocabulary);
+    const vocabularyById = groupVocabularyById(vocabulary);
 
     // Determine properties allowed for the given type
     // TODO: Refactor to use some way of caching this information
     const typePredicates = determinePredicatesForType(vocabulary, metadataItem['@type']);
 
     // Actually convert the metadata into a list of properties
-    return convertMetadataIntoPropertyList(expandedMetadata[0], labelsById, typePredicates);
+    return convertMetadataIntoPropertyList(expandedMetadata[0], vocabularyById, typePredicates);
 }
 
 /**
  * Converts a JSON-LD structure into a list of properties and values
  * @param metadata Expanded JSON-LD metadata about a single subject. The subject must have a '@type' property
- * @param labelsMap Map of predicate-uris to labels
+ * @param vocabularyMap Map of predicate-uris to predicates
  * @param predicates List of predicates that should be included
  * @returns {Array}
  */
-function convertMetadataIntoPropertyList(metadata, labelsMap, predicates = []) {
+function convertMetadataIntoPropertyList(metadata, vocabularyMap, predicates = []) {
     const prefilledProperties = [];
 
     // Add the metadata already available
@@ -65,27 +60,33 @@ function convertMetadataIntoPropertyList(metadata, labelsMap, predicates = []) {
             continue;
         }
 
-        // Lookup the label in the vocabulary
-        const label = labelsMap[predicateUri];
+        // Skip this predicate if it is not in the vocabulary
+        const vocabularyEntry = vocabularyMap[predicateUri];
+
+        if(!vocabularyEntry) {
+            continue;
+        }
 
         // Ensure that we have a list of values for the predicate
-        const values = asArray(metadata[predicateUri]);
+        let values = asArray(metadata[predicateUri]);
 
-        // If we have a label for this predicate in the vocabulary,
-        // then add the property to the list
-        if (label) {
-            prefilledProperties.push(generatePropertyEntry(predicateUri, label, values));
-        } else if (predicateUri === "@type") {
-            // @type needs special attention: it is specified as a literal string
-            // but should be treated as an object
-            prefilledProperties.push(generatePropertyEntry(predicateUri, typeVocabularyEntry['rdfs:label'], convertTypeEntries(values, labelsMap)));
+        // @type needs special attention: it is specified as a literal string
+        // but should be treated as an object
+        if (predicateUri === "@type") {
+            values = convertTypeEntries(values, vocabularyMap);
         }
+
+        prefilledProperties.push(generatePropertyEntry(predicateUri, values, vocabularyEntry));
     }
 
     // Also add an entry for fields not yet entered
     const additionalProperties = predicates
         .filter(predicate => !Object.keys(metadata).includes(predicate['@id']))
-        .map(predicate => generatePropertyEntry(predicate['@id'], predicate['rdfs:label'], []));
+        .map(predicate => {
+            const predicateUri = predicate['@id'];
+            const vocabularyEntry = vocabularyMap[predicateUri];
+            return generatePropertyEntry(predicateUri, [], vocabularyEntry)
+        });
 
     return [
         ...prefilledProperties.sort(comparing(compareBy('label'))),
@@ -93,18 +94,24 @@ function convertMetadataIntoPropertyList(metadata, labelsMap, predicates = []) {
     ];
 }
 
-function generatePropertyEntry(predicate, label, values) {
+function generatePropertyEntry(predicate, values, vocabularyEntry) {
+    const label = vocabularyEntry['@label'];
+    const range = vocabularyEntry['http://www.w3.org/2000/01/rdf-schema#range'] ? vocabularyEntry['http://www.w3.org/2000/01/rdf-schema#range'][0] : '';
+    const allowMultiple = vocabularyEntry['http://fairspace.io/ontology#allowMultiple'] ? vocabularyEntry['http://fairspace.io/ontology#allowMultiple'][0] : false;
+
     return {
         key: predicate,
         label: label,
-        values: values.sort(comparing(compareBy('rdfs:label'), compareBy('@id'), compareBy('@value')))
+        values: values.sort(comparing(compareBy('rdfs:label'), compareBy('@id'), compareBy('@value'))),
+        range: range,
+        allowMultiple: allowMultiple
     };
 }
 
 
-function convertTypeEntries(values, labelsMap) {
+function convertTypeEntries(values, vocabularyMap) {
     return values
-        .map(type => ({"@id": type, "rdfs:label": labelsMap[type]}))
+        .map(type => ({"@id": type, "rdfs:label": vocabularyMap[type]['@label']}))
 }
 
 /**
@@ -125,20 +132,18 @@ function asArray(value) {
 }
 
 /**
- * Maps the @id to the label.
+ * Groups the vocabulary by resource id
  *
  * @param vocabulary json-ld format where labels are specified.
  * @returns {*}
  */
-function extractLabelsByIdMap(vocabulary) {
-    const labelsById = {};
+function groupVocabularyById(vocabulary) {
+    const vocabularyById = {};
     vocabulary.forEach(property => {
-        const id = property["@id"];
-        const label = property['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"];
-        labelsById[id] = label;
+        vocabularyById[property['@id']] = {...property, '@label': property['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"]};
     });
 
-    return labelsById;
+    return vocabularyById;
 }
 
 /**
@@ -147,13 +152,14 @@ function extractLabelsByIdMap(vocabulary) {
  * @param type
  */
 function determinePredicatesForType(vocabulary, type) {
+    const typeArray = asArray(type);
     const isProperty = entry => entry['@type'] === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
-    const isInDomain = entry => asArray(entry['http://www.w3.org/2000/01/rdf-schema#domain']).find(domainEntry => domainEntry['@id'] === type);
+    const isInDomain = entry => {
+        const domain = asArray(entry['http://www.w3.org/2000/01/rdf-schema#domain'])
+        return domain.find(domainEntry => typeArray.includes(domainEntry['@id']));
+    }
 
-    const vocabularyPredicates = vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
-
-    // The type is allowed for everything
-    return [...vocabularyPredicates, typeVocabularyEntry];
+    return vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
 }
 
 

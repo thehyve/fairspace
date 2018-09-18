@@ -2,6 +2,14 @@ import combine from './MetadataUtils';
 
 const vocabulary = [
     {
+        "@id": "@type",
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Type' }],
+        "http://www.w3.org/2000/01/rdf-schema#domain": [
+            {"@id": "http://fairspace.io/ontology#Collection"}
+        ]
+    },
+    {
         '@id': 'http://fairspace.io/ontology#name',
         '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
         'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Name' }],
@@ -16,7 +24,8 @@ const vocabulary = [
     {
         '@id': 'http://schema.org/Creator',
         '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
-        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Creator' }]
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Creator' }],
+        'http://www.w3.org/2000/01/rdf-schema#domain': [{'@id': 'http://fairspace.io/ontology#Dataset'}]
     },
     {
         '@id': 'http://schema.org/CreatedDate',
@@ -28,10 +37,15 @@ const vocabulary = [
         '@id': 'http://fairspace.io/ontology#Collection',
         '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class',
         'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Collection' }]
+    },
+    {
+        '@id': 'http://fairspace.io/ontology#Dataset',
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class',
+        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Dataset' }]
     }
 ];
 
-describe('combination of vocabulary and metadata', () =>{
+describe('combination of vocabulary and metadata', () => {
     it('returns an empty array when no properties are set', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
@@ -48,6 +62,7 @@ describe('combination of vocabulary and metadata', () =>{
         }];
 
         let result = combine(vocabulary, metadata);
+
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("@type");
         expect(result[0].label).toEqual("Type");
@@ -69,7 +84,6 @@ describe('combination of vocabulary and metadata', () =>{
         expect(result).toEqual([]);
     });
 
-
     it('returns values in vocabulary properly', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
@@ -87,6 +101,51 @@ describe('combination of vocabulary and metadata', () =>{
 
         expect(result[2].values.length).toEqual(0);
         expect(result[3].values.length).toEqual(0);
+    });
+
+    it('return values if multiple types have been specified', () => {
+        const metadata = [{
+            '@id': 'http://fairspace.com/iri/collections/1',
+            '@type': ['http://fairspace.io/ontology#Collection', 'http://fairspace.io/ontology#Dataset'],
+            'http://fairspace.io/ontology#name': { '@value': 'Collection 1' },
+            'http://schema.org/Creator': { '@value': 'John Snow' }
+        }];
+
+        let result = combine(vocabulary, metadata);
+
+        expect(result.length).toEqual(5);
+        expect(result[0].key).toEqual("http://schema.org/Creator");
+        expect(result[0].label).toEqual("Creator");
+        expect(result[0].values.length).toEqual(1);
+        expect(result[0].values[0]['@value']).toEqual('John Snow');
+        expect(result[1].key).toEqual("http://fairspace.io/ontology#name");
+        expect(result[1].label).toEqual("Name");
+        expect(result[1].values.length).toEqual(1);
+        expect(result[1].values[0]['@value']).toEqual('Collection 1');
+    });
+
+    it('looks up labels in vocabulary properly', () => {
+        const metadata = [{
+            '@id': 'http://fairspace.com/iri/collections/1',
+            '@type': 'http://fairspace.io/ontology#Collection',
+            'http://fairspace.io/ontology#description': [
+                {
+                    '@value': 'My first collection'
+                },
+                {
+                    '@value': 'Some more info'
+                }
+            ]
+        }];
+
+        let result = combine(vocabulary, metadata);
+
+        expect(result.length).toEqual(4);
+        expect(result[0].key).toEqual("http://fairspace.io/ontology#description");
+        expect(result[0].label).toEqual('Description');
+        expect(result[1].label).toEqual('Type');
+        expect(result[2].label).toEqual('Created date');
+        expect(result[3].label).toEqual('Name');
     });
 
     it('returns multiple values for one predicate in vocabulary properly', () => {
