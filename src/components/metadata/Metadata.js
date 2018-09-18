@@ -45,18 +45,13 @@ class Metadata extends React.Component {
         ]).then(([vocabulary, metadata]) => {
             if (this.willUnmount) return;
 
-            combine(vocabulary, metadata)
-                .then(props => {
-                    if (this.willUnmount) return;
+            const combinedProperties = combine(vocabulary, metadata)
 
-                    if(this.props.onDidLoad) {
-                        this.props.onDidLoad();
-                    }
+            if(this.props.onDidLoad) {
+                this.props.onDidLoad();
+            }
 
-                    this.setState({properties: props, loading: false});
-                }).catch(err => {
-                console.error("Error occurred while combining vocabulary and metadata.", err);
-            });
+            this.setState({properties: combinedProperties, loading: false});
         }).catch(e => {
             if (this.willUnmount) return;
 
