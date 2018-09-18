@@ -48,7 +48,7 @@ public class CollectionService {
                 .map(p -> p.getCollection()
                         .toBuilder()
                         .access(p.getAccess())
-                        .uri(collectionMetadataService.getUri(p.getCollection().getId()))
+                        .uri(collectionMetadataService.getCollectionUri(p.getCollection().getId()))
                         .build())
                 .collect(toList());
     }
@@ -61,7 +61,7 @@ public class CollectionService {
 
         return permission.getCollection()
                 .toBuilder()
-                .uri(collectionMetadataService.getUri(collectionId))
+                .uri(collectionMetadataService.getCollectionUri(collectionId))
                 .access(permission.getAccess())
                 .build();
     }
@@ -84,7 +84,7 @@ public class CollectionService {
         }
 
         // Add the uri
-        finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getUri(finalCollection.getId())).build();
+        finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getCollectionUri(finalCollection.getId())).build();
 
         // Authorize the user
         permissionService.authorize(finalCollection, Access.Manage, true);

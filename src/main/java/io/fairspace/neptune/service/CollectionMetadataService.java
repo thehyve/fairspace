@@ -24,6 +24,7 @@ public class CollectionMetadataService {
             String.format(
                     "CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o . ?s a <%s> . }",
                     Fairspace.Collection);
+    private static final String USER_URI_FORMAT = "%s/iri/users/%s";
 
     private String metadataBaseUrl;
     private TripleService tripleService;
@@ -48,12 +49,14 @@ public class CollectionMetadataService {
         Model model = createDefaultModel();
 
         ZonedDateTime dateCreated = collection.getDateCreated();
+        String neptuneCreator = collection.getCreator();
+        String userUri = neptuneCreator == null ? "" : getUserUri(collection.getCreator());
 
-        Resource subject = model.createResource(getUri(collection.getId()));
+        Resource subject = model.createResource(getCollectionUri(collection.getId()));
         model.add(subject, RDF.type, Fairspace.Collection);
         model.add(subject, Fairspace.name, model.createLiteral(collection.getName()));
         model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
-        model.add(subject, Fairspace.creator, model.createLiteral(Optional.ofNullable(("http://fairspace.io/users/" + collection.getCreator())).orElse("")));
+        model.add(subject, Fairspace.creator, model.createLiteral(userUri));
         if ( dateCreated != null ) {
             model.add(subject, Fairspace.dateCreated, model.createTypedLiteral(GregorianCalendar.from(dateCreated)));
         }
@@ -63,7 +66,7 @@ public class CollectionMetadataService {
     private Model toTriplesForUpdate(Collection collection) {
         Model model = createDefaultModel();
 
-        Resource subject = model.createResource(getUri(collection.getId()));
+        Resource subject = model.createResource(getCollectionUri(collection.getId()));
 
         if (collection.getName() != null) {
             model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collection.getName(), "CollectionMetadata name is mandatory")));
@@ -75,7 +78,11 @@ public class CollectionMetadataService {
         return model;
     }
 
-    public String getUri(Long id) {
+    public String getCollectionUri(Long id) {
         return String.format(COLLECTION_URI_FORMAT, this.metadataBaseUrl, id);
+    }
+
+    public String getUserUri(String username) {
+        return String.format(USER_URI_FORMAT, this.metadataBaseUrl, username);
     }
 }

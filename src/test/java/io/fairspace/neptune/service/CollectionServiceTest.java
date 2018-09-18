@@ -54,7 +54,7 @@ public class CollectionServiceTest {
                         new Permission(1L, "user1", collections.get(0), Access.Manage),
                         new Permission(2L, "user1", collections.get(1), Access.Read)));
 
-        when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
+        when(collectionMetadataService.getCollectionUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
     @Test
