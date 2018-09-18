@@ -24,16 +24,24 @@ describe('Collection browser', function () {
 
         // Count the current number of collections
         let rowCount = 0;
-        cy.get('tbody>tr').its('length').then(length => rowCount = length);
 
-        cy.addCollection();
+        cy.get('tbody>tr').its('length')
+            .then(length => rowCount = length)
 
-        // Verify the number of rows has increased
-        cy.get('tbody>tr').should('length.above', rowCount);
+            // Add a collection only after counting
+            .then(cy.addCollection)
 
-        // Remove the last entry again
-        cy.deleteLastCollection();
+            // Verify the number of rows has increased
+            .then(() => cy.get('tbody>tr').should('length.above', rowCount))
 
+            // Recount the number of rows
+            .then(() => cy.get('tbody>tr').its('length'))
+            .then((length) => rowCount = length)
+
+            // Remove the last entry again
+            .then(cy.deleteLastCollection)
+
+            .then(() => cy.get('tbody>tr').should('length.below', rowCount));
     });
 
     it('should store changes in collection details', function () {
@@ -45,15 +53,18 @@ describe('Collection browser', function () {
         cy.get('tr').contains("John Snow's collection").click();
 
         // Wait for the right panel to open
-        cy.wait(500);
+        cy.waitForRightPanel();
 
         // Click on the name to edit it
-        cy.get('h2').contains("John Snow's collection").click();
+        cy.get('h2').contains("John Snow's collection").click({force:true});
 
         // Determine a random number to avoid having accidental successes
-
         let changedName = 'changed ' + uniqueId;
         let changedDescription = 'description ' + uniqueId;
+
+        cy.wait(100);
+
+        cy.get('input[name=name]').should('be.visible');
 
         // Alter the name
         cy.get('input[name=name]').clear().type(changedName);
@@ -72,10 +83,7 @@ describe('Collection browser', function () {
             .should('contain', changedDescription);
 
         // Delete the collection again
-        cy.get('tr')
-            .contains(changedName)
-            .parentsUntil('tbody')
-            .find("button").click({force: true});
+        cy.deleteCollection(changedName);
 
     });
 });

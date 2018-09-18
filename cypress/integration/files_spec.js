@@ -9,7 +9,6 @@ describe('File list and upload', function () {
     after(() => {
         cy.listCollections();
         cy.deleteLastCollection();
-
         cy.logout()
     })
 

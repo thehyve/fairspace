@@ -15,8 +15,15 @@ describe('e2e tests checking metadata for Fairspace', function () {
         // and click on the GSE8581 study
         cy.contains("GSE8581").click();
 
+        // Wait for the right panel to open
+        cy.waitForRightPanel();
+
         // Wait for the metadata to be loaded and expect the metadata of the patient to be there
-        cy.contains("https://workspace.ci.test.fairdev.app/iri/patients/GSM210004");
+        // The patient should link to its own metadata page
+        cy.get("a")
+            .contains("GSM210004")
+            .should('have.attr', 'href')
+            .and('eq', 'https://workspace.ci.test.fairdev.app/metadata/patients/GSM210004');
     });
 
 
