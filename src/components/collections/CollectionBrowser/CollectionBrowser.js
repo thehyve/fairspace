@@ -1,10 +1,10 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
+import { connect } from 'react-redux';
 import classNames from 'classnames';
 import Typography from "@material-ui/core/Typography";
 import {withStyles} from '@material-ui/core/styles';
 import InformationDrawer from "../InformationDrawer/InformationDrawer";
-import Config from "../../generic/Config/Config";
 import styles from "./CollectionBrowser.styles";
 import BreadCrumbs from "../BreadCrumbs/BreadCrumbs";
 import FileOverview from "../FileOverview/FileOverview";
@@ -21,7 +21,6 @@ import PermissionChecker from "../../permissions/PermissionChecker";
 class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
-        this.props = props;
 
         this.metadataStore = props.metadataStore;
         this.collectionStore = props.collectionStore;
@@ -101,7 +100,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleAddCollectionClick() {
-        const name = Config.get().user.username + "'s collection";
+        const name = this.props.user.username + "'s collection";
         const description = "Beyond the horizon";
 
         // Create the bucket in storage
@@ -420,7 +419,13 @@ class CollectionBrowser extends React.Component {
     }
 }
 
-export default withStyles(styles)(withRouter(CollectionBrowser));
+const mapStateToProps = state => {
+    return {
+        user: state.account.user.item
+    }
+}
+
+export default connect(mapStateToProps)(withStyles(styles)(withRouter(CollectionBrowser)));
 
 
 

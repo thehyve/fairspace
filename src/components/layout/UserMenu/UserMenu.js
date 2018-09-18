@@ -1,6 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
-import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from "@material-ui/core/Avatar";
 import Grow from '@material-ui/core/Grow';
@@ -9,7 +9,6 @@ import Popper from '@material-ui/core/Popper';
 import { withStyles } from '@material-ui/core/styles';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList';
-import FetchUsername from "../../../backend/FetchUsername/FetchUsername";
 
 const styles = {
     row: {
@@ -27,12 +26,6 @@ class UserMenu extends React.Component {
     state = {
         anchorEl: null,
     };
-
-    constructor(props) {
-        super(props);
-        this.classes = props.classes;
-        this.props = props;
-    }
 
     handleClick = event => {
         this.setState({ anchorEl: event.currentTarget });
@@ -52,28 +45,7 @@ class UserMenu extends React.Component {
 
         return (
             <div>
-                <FetchUsername>
-                    {({isFetching, data, error}) => {
-                        if (isFetching) {
-                            return "Unknown";
-                        }
-                        if (data) {
-                            return (
-                                <Button
-                                        aria-owns={anchorEl ? 'user-menu' : null}
-                                        aria-haspopup="true"
-                                        color="inherit"
-                                        onClick={this.handleClick}
-                                        className={this.classes.row}>
-                                    <Avatar alt="{data.username}" src="/images/avatar.png" className={this.classes.avatar}/>
-                                    <span>{data.username}</span>
-                                </Button>)
-                        }
-                        if (error) {
-                            return "Error";
-                        }
-                    }}
-                </FetchUsername>
+                {this.renderUserButton()}
                 <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>
                     {({ TransitionProps, placement }) => (
                         <Grow
@@ -96,6 +68,37 @@ class UserMenu extends React.Component {
             </div>
         );
     }
+
+    renderUserButton() {
+        const { pending, error, user } = this.props;
+
+        if (pending) {
+            return "Unknown";
+        }
+        if (error) {
+            return "Error";
+        }
+        if (user) {
+            return (
+                <Button
+                    aria-owns={this.state.anchorEl ? 'user-menu' : null}
+                    aria-haspopup="true"
+                    color="inherit"
+                    onClick={this.handleClick}
+                    className={this.props.classes.row}>
+                    <Avatar alt="{data.username}" src="/images/avatar.png" className={this.props.classes.avatar}/>
+                    <span>{user.username}</span>
+                </Button>)
+        }
+    }
 }
 
-export default withStyles(styles)(UserMenu)
+const mapStateToProps = ({account: { user }}) => {
+    return {
+        pending: user.pending,
+        error: user.error,
+        user: user.item
+    }
+}
+
+export default connect(mapStateToProps)(withStyles(styles)(UserMenu));

@@ -14,6 +14,9 @@ import Collections from "../../pages/Collections/Collections";
 import Notebooks from "../../pages/Notebooks/Notebooks";
 import Metadata from "../../pages/Metadata/Metadata";
 import ErrorDialog from "../error/ErrorDialog";
+import {fetchAuthorizations, fetchUser} from "../../actions/account";
+import store from "../../store/configureStore"
+import {Provider} from "react-redux";
 
 class App extends React.Component {
     cancellable = {
@@ -24,17 +27,19 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.classes = props.classes;
-
+        
         this.state = {configLoaded: false};
     }
 
     componentDidMount() {
         // Wait for the configuration to be loaded
         Config.init()
-            .then(() =>
+            .then(() => {
+                store.dispatch(fetchUser());
+                store.dispatch(fetchAuthorizations());
+
                 this.cancellable.setState && this.cancellable.setState({configLoaded: true})
-            );
+            });
     }
 
     componentWillUnmount() {
@@ -44,38 +49,41 @@ class App extends React.Component {
     // If an error is to be shown, it should be underneath the
     // AppBar. This method take care of it
     transformError(errorContent) {
-        return (<main className={this.classes.content}>
-            <div className={this.classes.toolbar}/>
+        return (<main className={this.props.classes.content}>
+            <div className={this.props.classes.toolbar}/>
             {errorContent}
         </main>)
     }
 
     render() {
         if(this.state.configLoaded) {
+            const classes = this.props.classes;
             // The app itself consists of a topbar, a drawer and the actual page
             // The topbar is shown even if the user has no proper authorization
             return (
-                <div className={this.classes.root}>
-                    <ErrorDialog>
-                    <TopBar classes={this.classes}></TopBar>
-                    <Router>
-                        <AuthorizationCheck transformError={this.transformError.bind(this)}>
-                            <MenuDrawer classes={this.classes}></MenuDrawer>
-                            <main className={this.classes.content}>
-                                <div className={this.classes.toolbar}/>
+                <div className={classes.root}>
+                    <Provider store={store}>
+                        <ErrorDialog>
+                            <TopBar classes={classes}></TopBar>
+                            <Router>
+                                <AuthorizationCheck transformError={this.transformError.bind(this)}>
+                                    <MenuDrawer classes={classes}></MenuDrawer>
+                                    <main className={classes.content}>
+                                        <div className={classes.toolbar}/>
 
-                                <Route exact path="/" component={Home}/>
-                                <Route path="/collections/:collection?/:path(.*)?" component={Collections}/>
-                                <Route path="/notebooks" component={Notebooks}/>
-                                <Route path="/metadata/:type(projects|patients|samples|consents)/:id" component={Metadata}/>
+                                        <Route exact path="/" component={Home}/>
+                                        <Route path="/collections/:collection?/:path(.*)?" component={Collections}/>
+                                        <Route path="/notebooks" component={Notebooks}/>
+                                        <Route path="/metadata/:type(projects|patients|samples|consents)/:id" component={Metadata}/>
 
-                                {/* Handle auth urls that should go to the server */}
-                                <Route path="/login" render={() => {window.location.href = '/login';}}/>
-                                <Route path="/logout" render={() => {window.location.href = '/logout';}}/>
-                            </main>
-                        </AuthorizationCheck>
-                    </Router>
-                    </ErrorDialog>
+                                        {/* Handle auth urls that should go to the server */}
+                                        <Route path="/login" render={() => {window.location.href = '/login';}}/>
+                                        <Route path="/logout" render={() => {window.location.href = '/logout';}}/>
+                                    </main>
+                                </AuthorizationCheck>
+                            </Router>
+                        </ErrorDialog>
+                    </Provider>
                 </div>
             );
         } else {

@@ -22,11 +22,15 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-dropzone": "^5.0.1",
+    "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
     "react-split-pane": "^0.1.82",
     "react-table": "^6.8.6",
     "react-test-renderer": "^16.4.1",
+    "redux": "^4.0.0",
+    "redux-promise-middleware": "^5.1.1",
+    "redux-thunk": "^2.3.0",
     "simple-flexbox": "^1.2.0",
     "webdav": "1.5.3"
   },
@@ -43,6 +47,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "concurrently": "^3.5.0",
+    "redux-logger": "^3.0.6",
     "webdav-server": "^2.3.22"
   }
 }
