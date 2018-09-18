@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 @UtilityClass
 public class Fairspace {
     public static final String defaultUri = "http://fairspace.io/ontology#";
+    public static final String schemaOrgUri = "http://schema.org/";
 
     private static Resource resource(String local) {
         return ResourceFactory.createResource(defaultUri + local);
@@ -27,7 +28,7 @@ public class Fairspace {
 
     public static final Property description = property("description");
 
-    public static final Property creator = property("https://schema.org/","creator");
+    public static final Property creator = property(schemaOrgUri,"creator");
 
-    public static final Property dateCreated = property("https://schema.org/", "dateCreated");
+    public static final Property dateCreated = property(schemaOrgUri, "dateCreated");
 }
