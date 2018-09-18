@@ -1,9 +1,12 @@
 package io.fairspace.neptune.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 @Getter
 @EqualsAndHashCode
@@ -36,4 +39,16 @@ public class Collection {
 
     @Transient
     private Access access;
+
+    // Do not create get method, because we need to customize it.
+    @Getter(AccessLevel.NONE)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    ZonedDateTime dateCreated;
+
+    public ZonedDateTime getDateCreated() {
+        return dateCreated == null ? null : dateCreated.withZoneSameInstant(ZoneOffset.UTC);
+    }
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    String creator;
 }

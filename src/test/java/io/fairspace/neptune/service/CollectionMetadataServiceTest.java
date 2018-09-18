@@ -10,6 +10,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.GregorianCalendar;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
@@ -22,7 +27,10 @@ public class CollectionMetadataServiceTest {
     private static final String COLLECTION_DESCRIPTION = "desc";
     private static final Long COLLECTION_ID = 126L;
     private static final String BASE_URL = "http://base.io";
-    private static final String EXPECTED_URI = BASE_URL + "/iri/collections/" + COLLECTION_ID;
+    private static final String EXPECTED_COLLECTION_URI = BASE_URL + "/iri/collections/" + COLLECTION_ID;
+    private static final String CREATOR = "user1";
+    private static final String EXPECTED_USER_URI = BASE_URL + "/iri/users/" + CREATOR;
+    private static final ZonedDateTime CREATIONDATETIME = ZonedDateTime.now(ZoneOffset.UTC);
 
     @Mock
     private TripleService tripleService;
@@ -35,25 +43,34 @@ public class CollectionMetadataServiceTest {
     }
 
     @Test
-    public void collectionsWithAllPropertiesShouldBeAccepted() {
+    public void collectionsWithAllPropertiesShouldBeAccepted() throws IOException {
         Collection c = getCollection();
 
         collectionMetadataService.createCollection(c);
 
         verify(tripleService, times(1))
-                .postTriples(argThat(m -> m.size() == 3
+                .postTriples(argThat(m -> m.size() == 5
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         RDF.type,
                         Fairspace.Collection)
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.name,
                         m.createLiteral(c.getName()))
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.description,
-                        m.createLiteral(c.getDescription()))));
+                        m.createLiteral(c.getDescription()))
+                        && m.contains(
+                        m.createResource(EXPECTED_COLLECTION_URI),
+                        Fairspace.creator,
+                        m.createLiteral(EXPECTED_USER_URI))
+                        && m.contains(
+                        m.createResource(EXPECTED_COLLECTION_URI),
+                        Fairspace.dateCreated,
+                        m.createTypedLiteral(GregorianCalendar.from(c.getDateCreated())))
+                ));
     }
 
     @Test
@@ -61,24 +78,35 @@ public class CollectionMetadataServiceTest {
         Collection c = Collection.builder()
                 .id(COLLECTION_ID)
                 .name(COLLECTION_NAME)
+                .creator(CREATOR)
+                .dateCreated(CREATIONDATETIME)
                 .build();
 
         collectionMetadataService.createCollection(c);
 
         verify(tripleService, times(1))
-                .postTriples(argThat(m -> m.size() == 3
+                .postTriples(argThat(m -> m.size() == 5
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         RDF.type,
                         Fairspace.Collection)
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.name,
                         m.createLiteral(c.getName()))
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.description,
-                        m.createLiteral(""))));
+                        m.createLiteral(""))
+                        && m.contains(
+                        m.createResource(EXPECTED_COLLECTION_URI),
+                        Fairspace.creator,
+                        m.createLiteral(EXPECTED_USER_URI))
+                        && m.contains(
+                        m.createResource(EXPECTED_COLLECTION_URI),
+                        Fairspace.dateCreated,
+                        m.createTypedLiteral(GregorianCalendar.from(c.getDateCreated())
+                ))));
     }
 
     @Test(expected = RuntimeException.class)
@@ -103,7 +131,7 @@ public class CollectionMetadataServiceTest {
         verify(tripleService, times(1))
                 .patchTriples(argThat(m -> m.size() == 1
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.name,
                         m.createLiteral(c.getName()))));
     }
@@ -120,7 +148,7 @@ public class CollectionMetadataServiceTest {
         verify(tripleService, times(1))
                 .patchTriples(argThat(m -> m.size() == 1
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.description,
                         m.createLiteral(c.getDescription()))));
     }
@@ -134,11 +162,11 @@ public class CollectionMetadataServiceTest {
         verify(tripleService, times(1))
                 .patchTriples(argThat(m -> m.size() == 2
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.name,
                         m.createLiteral(c.getName()))
                         && m.contains(
-                        m.createResource(EXPECTED_URI),
+                        m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.description,
                         m.createLiteral(c.getDescription()))));
     }
@@ -156,7 +184,7 @@ public class CollectionMetadataServiceTest {
 
     @Test
     public void testGetUri() {
-        assertEquals("http://base.io/iri/collections/12", collectionMetadataService.getUri(12L));
+        assertEquals("http://base.io/iri/collections/12", collectionMetadataService.getCollectionUri(12L));
     }
 
     private Collection getCollection() {
@@ -165,6 +193,8 @@ public class CollectionMetadataServiceTest {
                 .description(COLLECTION_DESCRIPTION)
                 .uri(COLLECTION_URI)
                 .id(COLLECTION_ID)
+                .creator(CREATOR)
+                .dateCreated(CREATIONDATETIME)
                 .build();
     }
 

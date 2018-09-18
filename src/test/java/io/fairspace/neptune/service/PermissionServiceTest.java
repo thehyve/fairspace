@@ -35,7 +35,7 @@ public class PermissionServiceTest {
     @Mock
     private CollectionRepository collectionRepository;
 
-    private Collection collection1 = new Collection(1L, "location", "name", "description", null, null);
+    private Collection collection1 = new Collection(1L, "location", "name", "description", null, null, null, null );
 
     private PermissionService permissionService;
 

@@ -15,6 +15,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +48,7 @@ public class CollectionService {
                 .map(p -> p.getCollection()
                         .toBuilder()
                         .access(p.getAccess())
-                        .uri(collectionMetadataService.getUri(p.getCollection().getId()))
+                        .uri(collectionMetadataService.getCollectionUri(p.getCollection().getId()))
                         .build())
                 .collect(toList());
     }
@@ -59,13 +61,18 @@ public class CollectionService {
 
         return permission.getCollection()
                 .toBuilder()
-                .uri(collectionMetadataService.getUri(collectionId))
+                .uri(collectionMetadataService.getCollectionUri(collectionId))
                 .access(permission.getAccess())
                 .build();
     }
 
     public Collection add(Collection collection) throws IOException {
-        Collection savedCollection = repository.save(collection);
+
+        Collection savedCollection = repository.save(collection
+                .toBuilder()
+                .creator(permissionService.getSubject())
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
+                .build());
 
         // Update location based on given id
         Long id = savedCollection.getId();
@@ -77,7 +84,7 @@ public class CollectionService {
         }
 
         // Add the uri
-        finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getUri(finalCollection.getId())).build();
+        finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getCollectionUri(finalCollection.getId())).build();
 
         // Authorize the user
         permissionService.authorize(finalCollection, Access.Manage, true);

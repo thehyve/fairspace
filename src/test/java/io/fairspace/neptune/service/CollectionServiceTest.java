@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static java.util.Arrays.asList;
@@ -52,7 +54,7 @@ public class CollectionServiceTest {
                         new Permission(1L, "user1", collections.get(0), Access.Manage),
                         new Permission(2L, "user1", collections.get(1), Access.Read)));
 
-        when(collectionMetadataService.getUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
+        when(collectionMetadataService.getCollectionUri(anyLong())).thenAnswer(invocation -> getUri(invocation.getArgument(0)));
     }
 
     @Test
@@ -68,7 +70,14 @@ public class CollectionServiceTest {
     @Test
     public void testFindById() {
         Long id = 1L;
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Read);
+        Collection collection = Collection.builder()
+                .name("My Quotes")
+                .description("quote item")
+                .id(1L)
+                .location("quotes")
+                .access(Access.Read)
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
+                .build();
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         Collection mergedCollection = service.findById(id);
@@ -88,7 +97,13 @@ public class CollectionServiceTest {
 
     @Test
     public void testAddCollection() throws IOException {
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write);
+        Collection collection = Collection.builder()
+                .name("My Quotes")
+                .description("quote item")
+                .id(1L)
+                .location("quotes")
+                .access(Access.Write)
+                .build();
 
         when(collectionRepository.save(any())).thenReturn(collection);
 
@@ -107,8 +122,21 @@ public class CollectionServiceTest {
 
     @Test
     public void testAddCollectionReturnsStoredIdAndUri() throws IOException {
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, Access.Write);
-        Collection storedCollection = new Collection(2L, "quotes", "My quotes", "quote item", null, Access.Write);
+        Collection collection = Collection.builder()
+                .name("My Quotes")
+                .description("quote item")
+                .id(1L)
+                .location("quotes")
+                .access(Access.Write)
+                .build();
+        Collection storedCollection = Collection.builder()
+                .name("My Quotes")
+                .description("quote item")
+                .id(2L)
+                .location("quotes")
+                .access(Access.Write)
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
+                .build();
 
         when(collectionRepository.save(any())).thenReturn(storedCollection);
 
@@ -121,7 +149,14 @@ public class CollectionServiceTest {
     @Test
     public void testDeleteCollection() throws IOException {
         Long id = 1L;
-        Collection collection = new Collection(1L, "quotes", "My quotes", "quote item", null, null);
+        Collection collection = Collection.builder()
+                .name("My Quotes")
+                .description("quote item")
+                .id(1L)
+                .location("quotes")
+                .access(Access.Write)
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
+                .build();
         when(collectionRepository.findById(id)).thenReturn(Optional.of(collection));
 
         service.delete(id);
@@ -139,8 +174,13 @@ public class CollectionServiceTest {
 
     @Test
     public void testPatchCollection() throws IOException {
-        Collection original =
-                new Collection(1L, "oldName-1", "oldName", "oldDescription", null, Access.Write);
+        Collection original = Collection.builder()
+                .name("oldName")
+                .description("oldDescription")
+                .id(1L)
+                .location("oldName-1")
+                .dateCreated(ZonedDateTime.now(ZoneOffset.UTC))
+                .build();
 
         Collection patch =
                  Collection.builder().name("newName!").description("newDescription").build();
