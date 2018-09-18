@@ -50,7 +50,7 @@ public class CollectionMetadataService {
 
         ZonedDateTime dateCreated = collection.getDateCreated();
         String neptuneCreator = collection.getCreator();
-        String userUri = neptuneCreator == null ? "" : getUserUri(collection.getCreator());
+        String userUri = neptuneCreator == null ? "" : getUserUri(neptuneCreator);
 
         Resource subject = model.createResource(getCollectionUri(collection.getId()));
         model.add(subject, RDF.type, Fairspace.Collection);
