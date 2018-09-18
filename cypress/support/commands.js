@@ -54,18 +54,13 @@ Cypress.Commands.add("addCollection", () => {
     cy.contains("Loading").should('not.exist');
 })
 
-Cypress.Commands.add("deleteLastCollection", () => {
-    cy.url().should('contain', '/collections')
-
-    deleteCollection(cy.get('tbody>tr').last());
-})
-
-Cypress.Commands.add("deleteCollection", (name) => {
+Cypress.Commands.add("deleteLastCollectionByName", (name) => {
     cy.url().should('contain', '/collections')
 
     deleteCollection(
         cy.get('tr')
             .contains(name)
+            .last()
             .parentsUntil('tbody'));
 })
 

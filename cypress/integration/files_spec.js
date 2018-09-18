@@ -1,4 +1,6 @@
 describe('File list and upload', function () {
+    const collectionName = "John Snow's collection";
+
     before(() => {
         cy.login(Cypress.config("user_name"), Cypress.config("password"));
 
@@ -8,7 +10,7 @@ describe('File list and upload', function () {
 
     after(() => {
         cy.listCollections();
-        cy.deleteLastCollection();
+        cy.deleteLastCollectionByName(collectionName);
         cy.logout()
     })
 

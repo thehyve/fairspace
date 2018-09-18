@@ -1,5 +1,6 @@
 describe('Collection browser', function () {
     let uniqueId = 0;
+    const collectionName = "John Snow's collection";
 
     before(() => {
         cy.login(Cypress.config("user_name"), Cypress.config("password"));
@@ -39,7 +40,7 @@ describe('Collection browser', function () {
             .then((length) => rowCount = length)
 
             // Remove the last entry again
-            .then(cy.deleteLastCollection)
+            .then(() => cy.deleteLastCollectionByName(collectionName))
 
             .then(() => cy.get('tbody>tr').should('length.below', rowCount));
     });
@@ -50,13 +51,13 @@ describe('Collection browser', function () {
 
         // Find one of the collections created with the default name
         // Click on it to open the right panel
-        cy.get('tr').contains("John Snow's collection").click();
+        cy.get('tr').contains(collectionName).click();
 
         // Wait for the right panel to open
         cy.waitForRightPanel();
 
         // Click on the name to edit it
-        cy.get('h2').contains("John Snow's collection").click({force:true});
+        cy.get('h2').contains(collectionName).click({force:true});
 
         // Determine a random number to avoid having accidental successes
         let changedName = 'changed ' + uniqueId;
@@ -83,7 +84,7 @@ describe('Collection browser', function () {
             .should('contain', changedDescription);
 
         // Delete the collection again
-        cy.deleteCollection(changedName);
+        cy.deleteLastCollectionByName(changedName);
 
     });
 });
