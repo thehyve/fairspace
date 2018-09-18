@@ -48,6 +48,7 @@
     "babel-preset-env": "^1.7.0",
     "concurrently": "^3.5.0",
     "redux-logger": "^3.0.6",
+    "redux-mock-store": "^1.5.3",
     "webdav-server": "^2.3.22"
   }
 }

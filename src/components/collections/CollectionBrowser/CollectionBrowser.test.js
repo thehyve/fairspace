@@ -1,25 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CollectionBrowser from "./CollectionBrowser";
-import InformationDrawer from "../InformationDrawer/InformationDrawer";
-import {shallow, mount} from "enzyme";
+import {mount} from "enzyme";
 import Button from "@material-ui/core/Button";
-import Config from "../../generic/Config/Config";
-import configFile from "../../../config";
-import MemoryRouter from "react-router-dom/MemoryRouter";
+import {MemoryRouter} from "react-router-dom";
+import configureStore from 'redux-mock-store'
 
-beforeAll(() => {
-    Config.setConfig(Object.assign(configFile, {
-        "user": {
-            "username": "John"
-        }
-    }));
+const middlewares = []
+const mockStore = configureStore(middlewares)
 
-    return Config.init();
-});
-
-
-let mockCollectionStore, mockFileStore, mockMetadataStore, mockFileStoreFactory;
+let mockCollectionStore, mockFileStore, mockMetadataStore, mockFileStoreFactory, store;
 let collectionBrowser;
 
 function flushPromises() {
@@ -45,9 +35,12 @@ beforeEach(() => {
         addCollection: jest.fn(() => Promise.resolve([])),
     }
 
+    store = mockStore({ account: { user: { item: { username: 'test' }} }});
+
     collectionBrowser = (
         <MemoryRouter>
             <CollectionBrowser
+                store={store}
                 collectionStore={mockCollectionStore}
                 metadataStore={mockMetadataStore}
                 fileStoreFactory={mockFileStoreFactory}
