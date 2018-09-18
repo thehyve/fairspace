@@ -10,6 +10,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
@@ -23,6 +27,8 @@ public class CollectionMetadataServiceTest {
     private static final Long COLLECTION_ID = 126L;
     private static final String BASE_URL = "http://base.io";
     private static final String EXPECTED_URI = BASE_URL + "/iri/collections/" + COLLECTION_ID;
+    private static final String CREATOR = "user1";
+    private static final ZonedDateTime CREATIONDATETIME = ZonedDateTime.now(ZoneOffset.UTC);
 
     @Mock
     private TripleService tripleService;
@@ -35,7 +41,7 @@ public class CollectionMetadataServiceTest {
     }
 
     @Test
-    public void collectionsWithAllPropertiesShouldBeAccepted() {
+    public void collectionsWithAllPropertiesShouldBeAccepted() throws IOException {
         Collection c = getCollection();
 
         collectionMetadataService.createCollection(c);
@@ -53,7 +59,16 @@ public class CollectionMetadataServiceTest {
                         && m.contains(
                         m.createResource(EXPECTED_URI),
                         Fairspace.description,
-                        m.createLiteral(c.getDescription()))));
+                        m.createLiteral(c.getDescription()))
+                        && m.contains(
+                        m.createResource(EXPECTED_URI),
+                        Fairspace.creator,
+                        m.createLiteral("http://fairspace.io/users/user1"))
+                        && m.contains(
+                        m.createResource(EXPECTED_URI),
+                        Fairspace.creationDateTime,
+                        m.createLiteral(c.getCreationDateTime().toString()))
+                ));
     }
 
     @Test
@@ -61,6 +76,8 @@ public class CollectionMetadataServiceTest {
         Collection c = Collection.builder()
                 .id(COLLECTION_ID)
                 .name(COLLECTION_NAME)
+                .creator(CREATOR)
+                .creationDateTime(CREATIONDATETIME)
                 .build();
 
         collectionMetadataService.createCollection(c);
@@ -78,7 +95,16 @@ public class CollectionMetadataServiceTest {
                         && m.contains(
                         m.createResource(EXPECTED_URI),
                         Fairspace.description,
-                        m.createLiteral(""))));
+                        m.createLiteral(""))
+                        && m.contains(
+                        m.createResource(EXPECTED_URI),
+                        Fairspace.creator,
+                        m.createLiteral("http://fairspace.io/users/user1"))
+                        && m.contains(
+                        m.createResource(EXPECTED_URI),
+                        Fairspace.creationDateTime,
+                        m.createLiteral(c.getCreationDateTime().toString()))
+                ));
     }
 
     @Test(expected = RuntimeException.class)
@@ -165,6 +191,8 @@ public class CollectionMetadataServiceTest {
                 .description(COLLECTION_DESCRIPTION)
                 .uri(COLLECTION_URI)
                 .id(COLLECTION_ID)
+                .creator(CREATOR)
+                .creationDateTime(CREATIONDATETIME)
                 .build();
     }
 
