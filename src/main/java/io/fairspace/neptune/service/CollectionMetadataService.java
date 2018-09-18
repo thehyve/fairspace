@@ -52,7 +52,7 @@ public class CollectionMetadataService {
         model.add(subject, RDF.type, Fairspace.Collection);
         model.add(subject, Fairspace.name, model.createLiteral(collection.getName()));
         model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
-        model.add(subject, Fairspace.creator, model.createLiteral(Optional.ofNullable(collection.getCreator()).orElse("")));
+        model.add(subject, Fairspace.creator, model.createLiteral(Optional.ofNullable(("http://fairspace.io/users/" + collection.getCreator())).orElse("")));
         model.add(subject, Fairspace.creationDateTime, model.createLiteral(creationDateTimeAsString));
         return model;
     }
