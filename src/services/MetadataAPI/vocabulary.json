@@ -10,47 +10,71 @@
     {
       "@id": "fairspace:name",
       "@type": "rdf:Property",
-      "rdfs:label": "Name"
+      "rdfs:label": "Name",
+      "rdfs:domain": {"@id": "fairspace:Collection"},
+      "rdfs:range": {"@id": "fairspace:singleLineString"},
+      "fairspace:allowMultiple": false
     },
     {
       "@id": "fairspace:description",
       "@type": "rdf:Property",
-      "rdfs:label": "Description"
+      "rdfs:label": "Description",
+      "rdfs:domain": {"@id": "fairspace:Collection"},
+      "rdfs:range": {"@id": "fairspace:multiLineString"},
+      "fairspace:allowMultiple": false
+    },
+    {
+      "@id": "fairspace:derivesFrom",
+      "@type": "rdf:Property",
+      "rdfs:label": "Derives from",
+      "rdfs:domain": {"@id": "schema:Material"},
+      "rdfs:range": {"@id": "schema:Person"},
+      "fairspace:allowMultiple": false
+    },
+    {
+      "@id": "fairspace:provides",
+      "@type": "rdf:Property",
+      "rdfs:label": "Provides",
+      "rdfs:domain": {"@id": "schema:Person"},
+      "rdfs:range": {"@id": "schema:Material"},
+      "fairspace:allowMultiple": true
+    },
+    {
+      "@id": "fairspace:isConsentOf",
+      "@type": "rdf:Property",
+      "rdfs:label": "Is consent of",
+      "rdfs:domain": {"@id": "fairspace:Consent"},
+      "rdfs:range": {"@id": "schema:Person"},
+      "fairspace:allowMultiple": false
+    },
+    {
+      "@id": "fairspace:gaveConsent",
+      "@type": "rdf:Property",
+      "rdfs:label": "Gave consent",
+      "rdfs:domain": {"@id": "fairspace:Consent"},
+      "rdfs:range": {"@id": "schema:Person"},
+      "fairspace:allowMultiple": true
+    },
+    {
+      "@id": "fairspace:belongsTo",
+      "@type": "rdf:Property",
+      "rdfs:label": "BelongsTo",
+      "rdfs:domain": {"@id": "schema:Person"},
+      "rdfs:range": {"@id": "fairspace:Collection"},
+      "fairspace:allowMultiple": true
+    },
+    {
+      "@id": "schema:about",
+      "@type": "rdf:Property",
+      "rdfs:label": "Is about",
+      "rdfs:domain": {"@id": "fairspace:Collection"},
+      "rdfs:range": {"@id": "schema:Person"},
+      "fairspace:allowMultiple": true
     },
     {
       "@id": "fairspace:Collection",
       "@type": "rdf:Class",
       "rdfs:label": "Collection"
-    },
-    {
-      "@id": "fairspace:derivesFrom",
-      "@type": "rdf:Property",
-      "rdfs:label": "Derives from"
-    },
-    {
-      "@id": "fairspace:provides",
-      "@type": "rdf:Property",
-      "rdfs:label": "Provides"
-    },
-    {
-      "@id": "fairspace:isConsentOf",
-      "@type": "rdf:Property",
-      "rdfs:label": "Is consent of"
-    },
-    {
-      "@id": "fairspace:gaveConsent",
-      "@type": "rdf:Property",
-      "rdfs:label": "Gave consent"
-    },
-    {
-      "@id": "fairspace:belongsTo",
-      "@type": "rdf:Property",
-      "rdfs:label": "BelongsTo"
-    },
-    {
-      "@id": "schema:about",
-      "@type": "rdf:Property",
-      "rdfs:label": "Is about"
     },
     {
       "@id": "schema:Dataset",
@@ -66,6 +90,11 @@
       "@id": "schema:Material",
       "@type": "rdf:Class",
       "rdfs:label": "Material"
+    },
+    {
+      "@id": "fairspace:Consent",
+      "@type": "rdf:Class",
+      "rdfs:label": "Consent"
     }
   ]
 }
