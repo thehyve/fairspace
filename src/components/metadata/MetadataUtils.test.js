@@ -11,7 +11,7 @@ const vocabulary = [
     },
     {
         '@id': 'http://fairspace.io/ontology#name',
-        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
+        '@type': ['http://www.w3.org/1999/02/22-rdf-syntax-ns#Property'],
         'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Name' }],
         'http://www.w3.org/2000/01/rdf-schema#domain': [{ '@id': 'http://fairspace.io/ontology#Collection' }]
     },

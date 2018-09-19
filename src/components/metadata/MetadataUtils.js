@@ -19,7 +19,7 @@ import {compareBy, comparing} from "../../utils/comparators";
  *  }
  */
 function combine(vocabulary, expandedMetadata) {
-    if(!Array.isArray(expandedMetadata) || expandedMetadata.length != 1) {
+    if(!Array.isArray(expandedMetadata) || expandedMetadata.length !== 1) {
         console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
         return [];
     }
@@ -138,12 +138,22 @@ function asArray(value) {
  * @returns {*}
  */
 function groupVocabularyById(vocabulary) {
-    const vocabularyById = {};
-    vocabulary.forEach(property => {
-        vocabularyById[property['@id']] = {...property, '@label': property['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"]};
-    });
+    return vocabulary.reduce((vocabularyById, entry) => {
+        vocabularyById[entry['@id']] = expandWithLabel(entry);
+        return vocabularyById;
+    }, {});
+}
 
-    return vocabularyById;
+/**
+ * Expands the given vocabularyEntry with a '@label' entry
+ * @param vocabularyEntry
+ * @returns {{"@label": *}}
+ */
+function expandWithLabel(vocabularyEntry) {
+    return {
+        ...vocabularyEntry,
+        '@label': vocabularyEntry['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"]
+    }
 }
 
 /**
@@ -153,7 +163,9 @@ function groupVocabularyById(vocabulary) {
  */
 function determinePredicatesForType(vocabulary, type) {
     const typeArray = asArray(type);
-    const isProperty = entry => entry['@type'] === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
+    const isProperty = entry =>
+        asArray(entry['@type']).includes('http://www.w3.org/1999/02/22-rdf-syntax-ns#Property');
+
     const isInDomain = entry => {
         const domain = asArray(entry['http://www.w3.org/2000/01/rdf-schema#domain'])
         return domain.find(domainEntry => typeArray.includes(domainEntry['@id']));

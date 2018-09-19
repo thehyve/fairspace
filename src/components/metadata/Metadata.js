@@ -5,6 +5,10 @@ import combine from "./MetadataUtils";
 import Typography from "@material-ui/core/Typography";
 
 class Metadata extends React.Component {
+    static defaultProps = {
+        onDidLoad: () => {}
+    }
+
     constructor(props) {
         super(props);
         this.subject = props.subject;
@@ -47,10 +51,7 @@ class Metadata extends React.Component {
 
             const combinedProperties = combine(vocabulary, metadata)
 
-            if(this.props.onDidLoad) {
-                this.props.onDidLoad();
-            }
-
+            this.props.onDidLoad();
             this.setState({properties: combinedProperties, loading: false});
         }).catch(e => {
             if (this.willUnmount) return;
