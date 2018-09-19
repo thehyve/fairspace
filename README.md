@@ -135,7 +135,7 @@ Authorization: Bearer <JWT>
 }
 ```
 
-#### Get user's permission. Returns `"access": "None"` if no access was assigned.
+#### Get user's permission. Returns `"access": "None"` if no access was assigned. The `subject` field corresponds to the `sub` claim from the JWT token.
 
 ```
 GET /123/permissions HTTP/1.1
@@ -145,8 +145,8 @@ Authorization: Bearer <JWT>
 
 
 {
-  "user": "user@example.com",
-  "collectionId": 123,
+  "subject": "6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+  "collection": 123,
   "access": "Write"
 }
 ```
@@ -161,8 +161,8 @@ Authorization: Bearer <JWT>
 
 
 {
-  "user": "user@example.com",
-  "collectionId": 123,
+  "subject": "6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+  "collection": 123,
   "access": "Write"
 }
 ```
