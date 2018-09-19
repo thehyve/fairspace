@@ -24,7 +24,7 @@ app.get('/api/metadata/statements', (req, res) => res.sendFile(__dirname + '/met
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(__dirname + '/users.json'));
-app.get('/api/workspace/config', (req, res) => res.send({}));
+app.get('/api/workspace/config', (req, res) => res.sendFile(__dirname + '/workspace-config.json'));
 
 // Add webdav server on /files
 const server = new webdav.WebDAVServer();
