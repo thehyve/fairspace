@@ -1,5 +1,5 @@
 import Config from "../../components/generic/Config/Config";
-import vocabulary from './vocabulary'
+import vocabulary from './vocabulary.json'
 import {failOnHttpError} from "../../utils/httputils";
 import * as jsonld from 'jsonld/dist/jsonld';
 import Vocabulary from "./Vocabulary";
