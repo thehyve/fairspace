@@ -22,8 +22,9 @@ app.delete('/api/collections/:id', (req, res) => setTimeout(() => res.send(), 30
 // Metadata API
 app.get('/api/metadata/statements', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));
 
-// User API
+// Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(__dirname + '/users.json'));
+app.get('/api/workspace/config', (req, res) => res.sendFile(__dirname + '/workspace-config.json'));
 
 // Add webdav server on /files
 const server = new webdav.WebDAVServer();
