@@ -15,6 +15,7 @@ import ErrorMessage from "../error/ErrorMessage";
 import {withStyles} from "@material-ui/core/styles/index";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import AlertDialog from "../generic/AlertDialog/AlertDialog";
 
 export const AccessRights = {
     Read: 'Read',
@@ -42,6 +43,7 @@ class Permissions extends React.Component {
         this.state = {
             permissions: [],
             showPermissionDialog: false,
+            showConfirmDeleteDialog: false,
             error: false,
             hovered: null,
             anchorEl: null,
@@ -84,25 +86,46 @@ class Permissions extends React.Component {
     handleOpenPermissionDialog = () => {
         this.setState({
             showPermissionDialog: true,
+            anchorEl: null,
         })
     };
 
     handleClosePermissionDialog = () => {
         this.setState({
             showPermissionDialog: false,
-            selectedUser: null
+            selectedUser: null,
         })
     };
 
     handleMoreClick = (user, event) => {
         this.setState({
             anchorEl: event.currentTarget,
-            selectedUser: user
+            selectedUser: user,
         });
     };
 
     handleMoreClose = () => {
         this.setState({anchorEl: null});
+    };
+
+    handleDeleteCollaborator = () => {
+        permissionClient.removeUserFromCollectionPermission(this.state.selectedUser.subject, this.state.collectionId)
+            .then((response) => {
+                console.info(response)
+            });
+    };
+
+    handleOpenConfirmDeleteDialog = () => {
+        this.setState({
+            anchorEl: null,
+            showConfirmDeleteDialog: true
+        });
+    };
+
+    handleCloseConfirmDeleteDialog = () => {
+        this.setState({
+            showConfirmDeleteDialog: false,
+        });
     };
 
     static permissionLevel(p) {
@@ -169,7 +192,7 @@ class Permissions extends React.Component {
                         open={Boolean(anchorEl)}
                         onClose={this.handleMoreClose}>
                         <MenuItem onClick={this.handleOpenPermissionDialog}>Change access</MenuItem>
-                        <MenuItem onClick={this.handleMoreClose}>Delete</MenuItem>
+                        <MenuItem onClick={this.handleOpenConfirmDeleteDialog}>Delete</MenuItem>
                     </Menu>
                 </TableBody>
             </Table>
@@ -177,12 +200,21 @@ class Permissions extends React.Component {
     };
 
     render() {
+        const {selectedUser} = this.state;
         return (
             <div>
                 <Typography variant="subheading">Shared with:</Typography>
                 <ShareWithDialog open={this.state.showPermissionDialog}
                                  onClose={this.handleClosePermissionDialog}
                                  user={this.state.selectedUser}
+                                 collectionId={this.props.collectionId}
+                />
+                <AlertDialog open={this.state.showConfirmDeleteDialog}
+                             title={'Confirmation'}
+                             content={`Are you sure you want to remove ${selectedUser ? selectedUser.subject : 'user'} as collaborator?`}
+                             onAgree={this.handleDeleteCollaborator}
+                             onDisagree={this.handleCloseConfirmDeleteDialog}
+                             onClose={this.handleCloseConfirmDeleteDialog}
                 />
                 {this.state.error ?
                     <ErrorMessage>message={`Error loading collaborators`}</ErrorMessage> : this.renderUserList()}

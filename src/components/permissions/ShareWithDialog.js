@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import userClient from '../../services/UserAPI/UserAPI';
+import permissionClient from '../../services/PermissionAPI/PermissionAPI';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -91,11 +92,17 @@ class ShareWithDialog extends React.Component {
     };
 
     handleSubmit = () => {
-        if (this.state.selectedUser) {
-            this.setState({selectedUserLabel: ''});
-            this.props.onClose();
-            console.log(this.state)
-            // TODO: submit changes to the backend
+        const {selectedUser, accessRight} = this.state;
+        const {collectionId} = this.props;
+        if (selectedUser) {
+            permissionClient.alterCollectionPermission(selectedUser.value, collectionId, accessRight)
+                .then(response => {
+                    this.setState({selectedUserLabel: ''});
+                    this.props.onClose();
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
         }
