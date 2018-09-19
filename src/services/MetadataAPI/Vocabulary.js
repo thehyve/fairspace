@@ -10,9 +10,6 @@ class Vocabulary {
 
         // Cache a version of the vocabulary by id, to do easy lookups
         this.vocabularyById = this._groupVocabularyById();
-
-        // Create an empty cache to store the allowed predicates for a given type
-        this.predicateForTypeCache = {}
     }
 
     /**
@@ -148,10 +145,6 @@ class Vocabulary {
      * @param type
      */
     _determinePredicatesForType(type) {
-        if(this.predicateForTypeCache[type]) {
-            return this.predicateForTypeCache[type];
-        }
-
         const isProperty = entry =>
             entry['@type'].includes('http://www.w3.org/1999/02/22-rdf-syntax-ns#Property');
 
@@ -160,7 +153,7 @@ class Vocabulary {
         }
 
         const predicates = this.vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
-        return this.predicateForTypeCache[type] = predicates;
+        return predicates;
     }
 
     /**
