@@ -104,8 +104,8 @@ pluto:
 jupyterhub:
     singleuser:
       image:
-        name: "jupyter/datascience-notebook"
-        tag: "137a295ff71b"
+        name: jupyterhub-singleuser
+        tag: latest
       defaultUrl: "/lab"
     hub:
         ingress:
