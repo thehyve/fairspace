@@ -92,7 +92,7 @@ class Vocabulary {
             prefilledProperties.push(Vocabulary._generatePropertyEntry(predicateUri, values, vocabularyEntry));
         }
 
-        return prefilledProperties.sort(comparing(compareBy('label')));
+        return prefilledProperties.sort(compareBy('label'));
     }
 
     /**
@@ -111,7 +111,7 @@ class Vocabulary {
                 return Vocabulary._generatePropertyEntry(predicateUri, [], vocabularyEntry)
             });
 
-        return additionalProperties.sort(comparing(compareBy('label')));
+        return additionalProperties.sort(compareBy('label'));
     }
 
     /**
@@ -133,10 +133,11 @@ class Vocabulary {
      * @param type
      */
     _determinePredicatesForTypes(types) {
-        return types
-            .map(type => this._determinePredicatesForType(type))
-            .reduce((fullList, typeList) => fullList.concat(typeList), [])
-            .filter((value, index, self) => self.indexOf(value) === index);
+        return Array.from(new Set(
+            types
+                .map(type => this._determinePredicatesForType(type))
+                .reduce((fullList, typeList) => fullList.concat(typeList), [])
+        ));
     }
 
     /**
