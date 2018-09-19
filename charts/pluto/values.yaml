@@ -61,6 +61,10 @@ backends:
   storage:
   collections:
 
+# External services
+services:
+  jupyter:
+
 # Enable tracing
 tracing:
   enabled: true
