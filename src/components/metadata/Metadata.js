@@ -1,10 +1,13 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
-import combine from "./MetadataUtils";
 import Typography from "@material-ui/core/Typography";
 
 class Metadata extends React.Component {
+    static defaultProps = {
+        onDidLoad: () => {}
+    }
+
     constructor(props) {
         super(props);
         this.subject = props.subject;
@@ -45,18 +48,10 @@ class Metadata extends React.Component {
         ]).then(([vocabulary, metadata]) => {
             if (this.willUnmount) return;
 
-            combine(vocabulary, metadata)
-                .then(props => {
-                    if (this.willUnmount) return;
+            const combinedProperties = vocabulary.combine(metadata)
 
-                    if(this.props.onDidLoad) {
-                        this.props.onDidLoad();
-                    }
-
-                    this.setState({properties: props, loading: false});
-                }).catch(err => {
-                console.error("Error occurred while combining vocabulary and metadata.", err);
-            });
+            this.props.onDidLoad();
+            this.setState({properties: combinedProperties, loading: false});
         }).catch(e => {
             if (this.willUnmount) return;
 

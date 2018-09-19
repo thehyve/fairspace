@@ -2,8 +2,7 @@ import Config from "../../components/generic/Config/Config";
 import vocabulary from './vocabulary'
 import {failOnHttpError} from "../../utils/httputils";
 import * as jsonld from 'jsonld/dist/jsonld';
-
-
+import Vocabulary from "./Vocabulary";
 
 class MetadataAPI {
     static getParams = {
@@ -11,6 +10,13 @@ class MetadataAPI {
         headers: new Headers({'Accept': 'application/ld+json'}),
         credentials: 'same-origin'
     };
+
+    constructor() {
+        // Initialize the vocabulary
+        this.vocabularyPromise =
+            jsonld.expand(vocabulary)
+                .then(expandedVocabulary => new Vocabulary(expandedVocabulary))
+    }
 
     get(params) {
         let query = Object.keys(params).map(key => key + '=' + encodeURIComponent(params[key])).join('&');
@@ -21,7 +27,7 @@ class MetadataAPI {
     }
 
     getVocabulary() {
-        return jsonld.expand(vocabulary)
+        return this.vocabularyPromise;
     }
 
     getSubjectsByType(type) {
