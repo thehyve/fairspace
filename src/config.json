@@ -7,5 +7,9 @@
     "collectionPermissions": "/api/collections/%d/permissions",
     "files": "/api/storage/webdav",
     "metadata": "/api/metadata/statements"
-  }
+  },
+  "externalConfigurationFiles": [
+    "/api/workspace/config"
+  ]
+
 }
