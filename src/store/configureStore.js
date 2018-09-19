@@ -5,7 +5,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 /*
-Expected state:
+Below you can find the structure of the state that is in the store. It is
+shown here for future reference and easy lookup.
 
 {
     cache: {
