@@ -3,6 +3,9 @@ app:
     base-url: http://localhost:9080
     realm: keycloak
 
+frontend:
+  urls: {}
+
 spring:
   application:
     name: Pluto

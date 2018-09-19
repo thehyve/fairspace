@@ -2,6 +2,7 @@ package nl.fairspace.pluto.app.web;
 
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
+import nl.fairspace.pluto.app.config.dto.FrontendConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.util.Map;
 
 /**
  * REST controller for managing workspace contents
@@ -31,7 +33,20 @@ public class WorkspaceResource {
     @Autowired(required = false)
     OAuthAuthenticationToken token;
 
+    @Autowired
+    FrontendConfig frontendConfig;
+
     private final RestTemplate restTemplate = new RestTemplate();
+
+    /**
+     * GET  /config: returns a map with configuration options relevant for the frontend
+     *
+     * @return a map with configuration options relevant for the frontend
+     */
+    @GetMapping(value = "/config", produces = "application/json")
+    public FrontendConfig getConfiguration(HttpServletRequest incomingRequest) {
+        return frontendConfig;
+    }
 
     /**
      * GET  /users: returns a map with information about all users

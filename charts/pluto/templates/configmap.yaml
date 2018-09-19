@@ -14,6 +14,10 @@ data:
         base-url: {{ .Values.keycloak.baseUrl }}
         realm: {{ .Values.keycloak.realm }}
 
+    frontend:
+      urls:
+        jupyter: {{ .Values.services.jupyter }}
+
     security:
       oidc:
         redirect-after-logout-url: {{ .Values.keycloak.redirectAfterLogoutUrl }}
