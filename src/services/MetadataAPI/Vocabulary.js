@@ -39,8 +39,8 @@ class Vocabulary {
         }
 
         const metadataItem = expandedMetadata[0];
-        if (!metadataItem['@type']) {
-            console.warn("Can not combine metadata without a type");
+        if (!Array.isArray(metadataItem['@type'])) {
+            console.warn("Can not combine metadata without a type or that is not expanded");
             return [];
 
         }
@@ -79,12 +79,17 @@ class Vocabulary {
             }
 
             // Ensure that we have a list of values for the predicate
-            let values = Vocabulary._asArray(metadata[predicateUri]);
+            if(!Array.isArray(metadata[predicateUri])) {
+                console.warn("Metadata should be provided in expanded form");
+                continue;
+            }
+
+            let values = metadata[predicateUri];
 
             // @type needs special attention: it is specified as a literal string
             // but should be treated as an object
             if (predicateUri === "@type") {
-                values = Vocabulary._convertTypeEntries(values, this.vocabularyById);
+                values = this.convertTypeEntries(values);
             }
 
             prefilledProperties.push(Vocabulary._generatePropertyEntry(predicateUri, values, vocabularyEntry));
@@ -120,7 +125,7 @@ class Vocabulary {
      */
     _groupVocabularyById() {
         return this.vocabulary.reduce((vocabularyById, entry) => {
-            vocabularyById[entry['@id']] = Vocabulary.expandWithLabel(entry);
+            vocabularyById[entry['@id']] = entry;
             return vocabularyById;
         }, {});
     }
@@ -131,9 +136,7 @@ class Vocabulary {
      * @param type
      */
     _determinePredicatesForTypes(types) {
-        const typeArray = Vocabulary._asArray(types);
-
-        return typeArray
+        return types
             .map(type => this._determinePredicatesForType(type))
             .reduce((fullList, typeList) => fullList.concat(typeList), [])
             .filter((value, index, self) => self.indexOf(value) === index);
@@ -150,11 +153,10 @@ class Vocabulary {
         }
 
         const isProperty = entry =>
-            Vocabulary._asArray(entry['@type']).includes('http://www.w3.org/1999/02/22-rdf-syntax-ns#Property');
+            entry['@type'].includes('http://www.w3.org/1999/02/22-rdf-syntax-ns#Property');
 
         const isInDomain = entry => {
-            const domain = Vocabulary._asArray(entry['http://www.w3.org/2000/01/rdf-schema#domain'])
-            return domain.find(domainEntry => domainEntry['@id'] === type);
+            return entry['http://www.w3.org/2000/01/rdf-schema#domain'].find(domainEntry => domainEntry['@id'] === type);
         }
 
         const predicates = this.vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
@@ -170,9 +172,9 @@ class Vocabulary {
      * @private
      */
     static _generatePropertyEntry(predicate, values, vocabularyEntry) {
-        const label = vocabularyEntry['@label'];
-        const range = vocabularyEntry['http://www.w3.org/2000/01/rdf-schema#range'] ? vocabularyEntry['http://www.w3.org/2000/01/rdf-schema#range'][0] : '';
-        const allowMultiple = vocabularyEntry['http://fairspace.io/ontology#allowMultiple'] ? vocabularyEntry['http://fairspace.io/ontology#allowMultiple'][0] : false;
+        const label = Vocabulary._getLabel(vocabularyEntry);
+        const range = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#range');
+        const allowMultiple = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://fairspace.io/ontology#allowMultiple', false);
 
         return {
             key: predicate,
@@ -183,40 +185,22 @@ class Vocabulary {
         };
     }
 
-    static _convertTypeEntries(values, vocabularyMap) {
+    convertTypeEntries(values) {
         return values
-            .map(type => ({"@id": type, "rdfs:label": vocabularyMap[type]['@label']}))
+            .map(type => ({
+                "@id": type,
+                "rdfs:label": Vocabulary._getLabel(this.vocabularyById[type])
+            }))
     }
 
-    /**
-     * Ensures the given input is an array. If not, the input will be added to a singletonlist
-     * @param value
-     * @returns {*}
-     */
-    static _asArray(value) {
-        if(value === undefined) {
-            return [];
-        }
-
-        if(Array.isArray(value)) {
-            return value;
-        } else {
-            return [value];
-        }
+    static _getFirstPredicateValue(vocabularyEntry, predicate, defaultValue) {
+        return vocabularyEntry[predicate] ? vocabularyEntry[predicate][0] : defaultValue;
     }
 
-    /**
-     * Expands the given vocabularyEntry with a '@label' entry
-     * @param vocabularyEntry
-     * @returns {{"@label": *}}
-     */
-    static expandWithLabel(vocabularyEntry) {
-        return {
-            ...vocabularyEntry,
-            '@label': vocabularyEntry['http://www.w3.org/2000/01/rdf-schema#label'][0]["@value"]
-        }
+    static _getLabel(vocabularyEntry) {
+        const predicateValue = this._getFirstPredicateValue(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#label');
+        return predicateValue ? predicateValue["@value"] : '';
     }
-
 }
 
 export default Vocabulary;

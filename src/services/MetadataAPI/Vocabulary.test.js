@@ -59,7 +59,7 @@ describe('combination of vocabulary and metadata', () => {
     it('returns the type in a proper format', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            '@type': 'http://fairspace.io/ontology#Collection'
+            '@type': ['http://fairspace.io/ontology#Collection']
         }];
 
         let result = vocabulary.combine(metadata);
@@ -88,8 +88,8 @@ describe('combination of vocabulary and metadata', () => {
     it('returns values in vocabulary properly', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            '@type': 'http://fairspace.io/ontology#Collection',
-            'http://fairspace.io/ontology#name': { '@value': 'Collection 1' }
+            '@type': ['http://fairspace.io/ontology#Collection'],
+            'http://fairspace.io/ontology#name': [{ '@value': 'Collection 1' }]
         }];
 
         let result = vocabulary.combine(metadata);
@@ -108,8 +108,8 @@ describe('combination of vocabulary and metadata', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
             '@type': ['http://fairspace.io/ontology#Collection', 'http://fairspace.io/ontology#Dataset'],
-            'http://fairspace.io/ontology#name': { '@value': 'Collection 1' },
-            'http://schema.org/Creator': { '@value': 'John Snow' }
+            'http://fairspace.io/ontology#name': [{ '@value': 'Collection 1' }],
+            'http://schema.org/Creator': [{ '@value': 'John Snow' }]
         }];
 
         let result = vocabulary.combine(metadata);
@@ -128,7 +128,7 @@ describe('combination of vocabulary and metadata', () => {
     it('looks up labels in vocabulary properly', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            '@type': 'http://fairspace.io/ontology#Collection',
+            '@type': ['http://fairspace.io/ontology#Collection'],
             'http://fairspace.io/ontology#description': [
                 {
                     '@value': 'My first collection'
@@ -152,7 +152,7 @@ describe('combination of vocabulary and metadata', () => {
     it('returns multiple values for one predicate in vocabulary properly', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            '@type': 'http://fairspace.io/ontology#Collection',
+            '@type': ['http://fairspace.io/ontology#Collection'],
             'http://fairspace.io/ontology#description': [
                 {
                     '@value': 'My first collection'
@@ -177,7 +177,7 @@ describe('combination of vocabulary and metadata', () => {
     it('sorts properties in ascending order by label', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            '@type': 'http://fairspace.io/ontology#Collection',
+            '@type': ['http://fairspace.io/ontology#Collection'],
             'http://fairspace.io/ontology#name': [
                 {
                     '@value': 'My first collection'
@@ -202,7 +202,7 @@ describe('combination of vocabulary and metadata', () => {
     it('only returns properties in the vocabulary', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            '@type': 'http://fairspace.io/ontology#Collection',
+            '@type': ['http://fairspace.io/ontology#Collection'],
             'http://fairspace.io/ontology#non-existing': [
                 {
                     '@value': 'My first collection'
@@ -219,7 +219,7 @@ describe('combination of vocabulary and metadata', () => {
     it('adds all properties allowed for the specific type', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            '@type': 'http://fairspace.io/ontology#Collection',
+            '@type': ['http://fairspace.io/ontology#Collection'],
             'http://fairspace.io/ontology#name': [
                 {
                     '@value': 'My first collection'
@@ -236,7 +236,7 @@ describe('combination of vocabulary and metadata', () => {
     it('does not return properties not allowed for a specific type', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            '@type': 'http://fairspace.io/ontology#Collection',
+            '@type': ['http://fairspace.io/ontology#Collection'],
             'http://schema.org/Creator': [
                 {
                     '@value': 'Ygritte'
