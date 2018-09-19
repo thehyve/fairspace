@@ -49,14 +49,15 @@ public class CollectionMetadataService {
         Model model = createDefaultModel();
 
         ZonedDateTime dateCreated = collection.getDateCreated();
-        String neptuneCreator = collection.getCreator();
-        String userUri = neptuneCreator == null ? "" : getUserUri(neptuneCreator);
 
         Resource subject = model.createResource(getCollectionUri(collection.getId()));
         model.add(subject, RDF.type, Fairspace.Collection);
         model.add(subject, Fairspace.name, model.createLiteral(collection.getName()));
         model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
-        model.add(subject, Fairspace.creator, model.createLiteral(userUri));
+        if (collection.getCreator() != null) {
+            model.add(subject, Fairspace.creator, model.createResource(getUserUri(collection.getCreator())));
+        }
+
         if ( dateCreated != null ) {
             model.add(subject, Fairspace.dateCreated, model.createTypedLiteral(GregorianCalendar.from(dateCreated)));
         }

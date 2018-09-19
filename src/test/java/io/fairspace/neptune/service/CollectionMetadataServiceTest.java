@@ -65,7 +65,7 @@ public class CollectionMetadataServiceTest {
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.creator,
-                        m.createLiteral(EXPECTED_USER_URI))
+                        m.createResource(EXPECTED_USER_URI))
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.dateCreated,
@@ -101,7 +101,7 @@ public class CollectionMetadataServiceTest {
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.creator,
-                        m.createLiteral(EXPECTED_USER_URI))
+                        m.createResource(EXPECTED_USER_URI))
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
                         Fairspace.dateCreated,
