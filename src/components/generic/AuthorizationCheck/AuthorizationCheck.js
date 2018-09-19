@@ -19,7 +19,7 @@ function AuthorizationCheck(props) {
      */
     function hasAuthorization() {
         const {authorizations, authorization} = props;
-        if(authorizations && Array.isArray(authorizations)) {
+        if(Array.isArray(authorizations)) {
             // If no authorization is given as property, the only check is for a status 200 response
             // If the authorization is specified, we want the array to actually contain the authorization
             if (!authorization || authorizations.includes(authorization)) {
