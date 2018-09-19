@@ -18,6 +18,8 @@ pluto:
     realm: ci
   tracing:
     samplingRate: 1
+  services:
+    jupyter: https://jupyter.workspace.ci.test.fairdev.app
 
 titan:
   auth:

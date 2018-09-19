@@ -97,6 +97,9 @@ pluto:
     realm:
     redirectAfterLogoutUrl: https://fairspace.com
 
+  services:
+    jupyter:
+
 # Specific settings for JupyterHub subchart
 jupyterhub:
     singleuser:
