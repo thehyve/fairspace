@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import Fetch from "../../../backend/Fetch/Fetch";
-import Config from "../Config/Config";
+import { connect } from 'react-redux';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
+import {withRouter} from "react-router-dom";
 
 /**
  * This component performs an authorization check for the current user
@@ -11,35 +11,18 @@ import Typography from "@material-ui/core/Typography";
  *
  * @see config.json
  */
-class AuthorizationCheck extends React.Component {
-    static propTypes = {
-        /**
-         * Optional value to indicate the actual authorization to check for. If not specified, the check will only
-         * verify whether the server responds with a success message on the authorization endpoint.
-         */
-        authorization: PropTypes.string,
-
-        /**
-         * Optional transformation method to convert the error message into correct HTML. Defaults to identity
-         */
-        transformError: PropTypes.func
-    }
-
-    constructor(props) {
-        super(props);
-        this.props = props;
-    }
-
+function AuthorizationCheck(props) {
     /**
      * Check whether the given array contains the authorization that is asked for
      * @param data
      * @returns {boolean}
      */
-    hasAuthorization(data) {
-        if (data && Array.isArray(data)) {
+    function hasAuthorization() {
+        const {authorizations, authorization} = props;
+        if(Array.isArray(authorizations)) {
             // If no authorization is given as property, the only check is for a status 200 response
             // If the authorization is specified, we want the array to actually contain the authorization
-            if (!this.props.authorization || data.includes(this.props.authorization)) {
+            if (!authorization || authorizations.includes(authorization)) {
                 return true;
             }
         }
@@ -48,25 +31,14 @@ class AuthorizationCheck extends React.Component {
     }
 
     /**
-     * Handle data fetched from the backend
-     * @param fetch
+     * Renders an error message
      * @returns {*}
      */
-    handleFetchedData(fetch) {
-        const {isFetching, data} = fetch;
-
-        if (isFetching) {
-            return <CircularProgress/>
-        }
-
-        if(this.hasAuthorization(data)) {
-            return this.props.children;
-        }
-
+    function renderError() {
         // An error occurred or no authorization
-        const showError = this.props.transformError ? this.props.transformError : (error) => error;
+        const showError = props.transformError ? props.transformError : (error) => error;
 
-        return showError(<div>
+        return showError(<div style={{minHeight: 300}}>
             <Typography variant="headline" component="h2">
                 Error
             </Typography>
@@ -77,11 +49,43 @@ class AuthorizationCheck extends React.Component {
         </div>)
     }
 
-    render() {
-        return (<Fetch url={Config.get().urls.authorizations}>
-                {this.handleFetchedData.bind(this)}
-            </Fetch>)
+    if(props.pending) {
+        return <CircularProgress/>
+    } else if(props.error || !hasAuthorization()) {
+        return renderError();
+    } else {
+        return props.children;
     }
 }
 
-export default AuthorizationCheck
+AuthorizationCheck.propTypes = {
+    /**
+     * List of authorization for the current user
+     */
+    authorizations: PropTypes.array,
+
+    /**
+     * Optional value to indicate the actual authorization to check for. If not specified, the check will only
+     * verify whether the server responds with a success message on the authorization endpoint.
+     */
+    authorization: PropTypes.string,
+
+    /**
+     * Optional transformation method to convert the error message into correct HTML. Defaults to identity
+     */
+    transformError: PropTypes.func
+}
+
+
+const mapStateToProps = ({account: { authorizations }}) => {
+    return {
+        pending: authorizations.pending,
+        error: authorizations.error,
+        authorizations: authorizations.items
+    }
+}
+
+// Please note that withRouter is needed here to make the routing
+// work properly with react-redux.
+// See https://reacttraining.com/react-router/web/guides/redux-integration
+export default withRouter(connect(mapStateToProps)(AuthorizationCheck));

@@ -1,34 +1,47 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import AuthorizationCheck from './AuthorizationCheck';
-import Config from '../Config/Config';
-import configFile from "../../../config";
+import {MemoryRouter} from "react-router-dom";
+import configureStore from 'redux-mock-store'
+import {mount} from "enzyme";
 
-beforeAll(() => {
-    Config.setConfig(Object.assign(configFile, {
-        "externalConfigurationFiles": [],
-    }));
-
-    return Config.init();
-});
+const middlewares = []
+const mockStore = configureStore(middlewares)
 
 it('renders without crashing', () => {
+  const store = mockStore({account: { user: {}, authorizations: {} }});
+  const element = <MemoryRouter><AuthorizationCheck store={store}>Children</AuthorizationCheck></MemoryRouter>;
+
   const div = document.createElement('div');
-  ReactDOM.render(<AuthorizationCheck />, div);
+
+  ReactDOM.render(element, div);
   ReactDOM.unmountComponentAtNode(div);
 });
 
 it('renders content if no authorization is specified', () => {
-    const check = new AuthorizationCheck({});
-    expect(check.hasAuthorization([])).toEqual(true);
+    const store = mockStore({account: { user: {}, authorizations: {items: []} }});
+    const element = <MemoryRouter><AuthorizationCheck store={store}>Children</AuthorizationCheck></MemoryRouter>;
+
+    const wrapper = mount(element)
+
+    expect(wrapper.text()).toEqual('Children')
 });
 
 it('renders content if existing authorization is specified', () => {
-    const check = new AuthorizationCheck({authorization: 'test-authorization'});
-    expect(check.hasAuthorization(['test-authorization'])).toEqual(true);
+    const store = mockStore({account: { user: {}, authorizations: {items: ['authorization']} }});
+    const element = <MemoryRouter><AuthorizationCheck authorization='authorization' store={store}>Children</AuthorizationCheck></MemoryRouter>;
+
+    const wrapper = mount(element)
+
+    expect(wrapper.text()).toEqual('Children')
 });
 
 it('does not render content if existing authorization is specified', () => {
-    const check = new AuthorizationCheck({authorization: 'not-existing'});
-    expect(check.hasAuthorization(['test-authorization'])).toEqual(false);
+    const store = mockStore({account: { user: {}, authorizations: {items: ['authorization']} }});
+    const element = <MemoryRouter><AuthorizationCheck authorization='non-existing' store={store}>Children</AuthorizationCheck></MemoryRouter>;
+
+    const wrapper = mount(element)
+
+    expect(wrapper.text()).not.toEqual('Children')
+    expect(wrapper.text()).toContain('Error')
 });
