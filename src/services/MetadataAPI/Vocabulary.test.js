@@ -1,6 +1,6 @@
-import combine from './MetadataUtils';
+import Vocabulary from './Vocabulary';
 
-const vocabulary = [
+const vocabularyJsonLd = [
     {
         "@id": "@type",
         '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
@@ -44,6 +44,7 @@ const vocabulary = [
         'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Dataset' }]
     }
 ];
+const vocabulary = new Vocabulary(vocabularyJsonLd);
 
 describe('combination of vocabulary and metadata', () => {
     it('returns an empty array when no properties are set', () => {
@@ -51,7 +52,7 @@ describe('combination of vocabulary and metadata', () => {
             '@id': 'http://fairspace.com/iri/collections/1',
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
         expect(result).toEqual([]);
     });
 
@@ -61,7 +62,7 @@ describe('combination of vocabulary and metadata', () => {
             '@type': 'http://fairspace.io/ontology#Collection'
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
 
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("@type");
@@ -80,7 +81,7 @@ describe('combination of vocabulary and metadata', () => {
             'http://fairspace.io/ontology#name': { '@value': 'Collection 1' }
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
         expect(result).toEqual([]);
     });
 
@@ -91,7 +92,7 @@ describe('combination of vocabulary and metadata', () => {
             'http://fairspace.io/ontology#name': { '@value': 'Collection 1' }
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
 
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("http://fairspace.io/ontology#name");
@@ -111,7 +112,7 @@ describe('combination of vocabulary and metadata', () => {
             'http://schema.org/Creator': { '@value': 'John Snow' }
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
 
         expect(result.length).toEqual(5);
         expect(result[0].key).toEqual("http://schema.org/Creator");
@@ -138,7 +139,7 @@ describe('combination of vocabulary and metadata', () => {
             ]
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
 
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("http://fairspace.io/ontology#description");
@@ -162,7 +163,7 @@ describe('combination of vocabulary and metadata', () => {
             ]
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("http://fairspace.io/ontology#description");
         expect(result[0].values.length).toEqual(2);
@@ -189,7 +190,7 @@ describe('combination of vocabulary and metadata', () => {
             ]
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("http://schema.org/CreatedDate");
         expect(result[1].key).toEqual("http://fairspace.io/ontology#name");
@@ -209,7 +210,7 @@ describe('combination of vocabulary and metadata', () => {
             ]
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
         expect(result.length).toEqual(4);
         expect(result.map(property => property.key)).not.toContain('http://fairspace.io/ontology#non-existing');
 
@@ -226,7 +227,7 @@ describe('combination of vocabulary and metadata', () => {
             ]
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("http://fairspace.io/ontology#name");
         expect(result[1].key).toEqual("@type");
@@ -243,7 +244,7 @@ describe('combination of vocabulary and metadata', () => {
             ]
         }];
 
-        let result = combine(vocabulary, metadata);
+        let result = vocabulary.combine(metadata);
         expect(result.length).toEqual(4);
         expect(result.map(property => property.key)).not.toContain('http://schema.org/Creator');
     });

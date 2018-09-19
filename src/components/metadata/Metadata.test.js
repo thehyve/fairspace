@@ -1,6 +1,7 @@
 import Metadata from "./Metadata"
 import React from 'react';
 import {mount} from "enzyme";
+import Vocabulary from "../../services/MetadataAPI/Vocabulary";
 
 function flushPromises() {
     return new Promise(resolve => setImmediate(resolve));
@@ -12,12 +13,12 @@ let mockNoMetadataStore;
 
 beforeEach(() => {
     mockMetadataStore = {
-        getVocabulary: jest.fn(() => Promise.resolve(vocabulary)),
+        getVocabulary: jest.fn(() => Promise.resolve(new Vocabulary(vocabulary))),
         get: jest.fn(() => Promise.resolve(metadata))
     };
 
     mockNoMetadataStore = {
-        getVocabulary: jest.fn(() => Promise.resolve(vocabulary)),
+        getVocabulary: jest.fn(() => Promise.resolve(new Vocabulary(vocabulary))),
         get: jest.fn(() => Promise.resolve([]))
     }
 });

@@ -1,7 +1,6 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
-import combine from "./MetadataUtils";
 import Typography from "@material-ui/core/Typography";
 
 class Metadata extends React.Component {
@@ -49,7 +48,7 @@ class Metadata extends React.Component {
         ]).then(([vocabulary, metadata]) => {
             if (this.willUnmount) return;
 
-            const combinedProperties = combine(vocabulary, metadata)
+            const combinedProperties = vocabulary.combine(metadata)
 
             this.props.onDidLoad();
             this.setState({properties: combinedProperties, loading: false});
