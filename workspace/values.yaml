@@ -101,7 +101,7 @@ pluto:
 jupyterhub:
     singleuser:
       image:
-        name: jupyterhub-singleuser
+        name: fairspace/jupyterhub-singleuser
         tag: latest
       defaultUrl: "/lab"
     hub:

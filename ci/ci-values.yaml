@@ -49,6 +49,10 @@ neptune:
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
+    singleuser:
+        image:
+            name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
+            tag: latest
     hub:
         auth:
             custom:
