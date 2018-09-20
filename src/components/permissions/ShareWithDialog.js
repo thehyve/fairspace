@@ -16,7 +16,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-import ErrorMessage from "../error/ErrorMessage";
+import ErrorDialog from "../error/ErrorDialog";
 
 const styles = theme => ({
     root: {
@@ -97,15 +97,15 @@ class ShareWithDialog extends React.Component {
     handleSubmit = () => {
         const {selectedUser, accessRight} = this.state;
         const {collectionId} = this.props;
+        this.props.onClose();
         if (selectedUser) {
             permissionClient.alterCollectionPermission(selectedUser.value, collectionId, accessRight)
                 .then(response => {
                     this.setState({selectedUserLabel: ''});
-                    this.props.onClose();
                 })
                 .catch(error => {
                     this.setState({error: error});
-                    console.error(error);
+                    ErrorDialog.showError(error, 'An error occurred while altering the permission.');
                 });
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
@@ -136,7 +136,6 @@ class ShareWithDialog extends React.Component {
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={classes.root}>
-                        { error ? <ErrorMessage>message={error}</ErrorMessage> : ''}
                         {this.renderUser()}
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
