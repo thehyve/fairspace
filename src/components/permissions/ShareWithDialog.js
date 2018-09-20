@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import userClient from '../../services/UserAPI/UserAPI';
-import permissionClient from '../../services/PermissionAPI/PermissionAPI';
+import permissionAPI from '../../services/PermissionAPI/PermissionAPI';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -99,7 +99,7 @@ class ShareWithDialog extends React.Component {
         const {collectionId} = this.props;
         if (selectedUser) {
             this.props.onClose();
-            permissionClient.alterCollectionPermission(selectedUser.value, collectionId, accessRight)
+            permissionAPI.alterCollectionPermission(selectedUser.value, collectionId, accessRight)
                 .then(response => {
                     this.setState({selectedUserLabel: ''});
                 })

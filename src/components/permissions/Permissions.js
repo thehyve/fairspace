@@ -110,9 +110,9 @@ class Permissions extends React.Component {
     handleDeleteCollaborator = () => {
         const {selectedUser} = this.state;
         if (selectedUser) {
-            permissionClient.removeUserFromCollectionPermission(selectedUser.subject, this.state.collectionId)
-                .then((response) => {
-                    console.info(response);
+            permissionAPI
+                .removeUserFromCollectionPermission(selectedUser.subject, this.state.collectionId)
+                .then(() => {
                     this.loadPermissions(); // reload permissions
                 });
         }
