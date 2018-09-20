@@ -24,7 +24,7 @@ class Vocabulary {
      *      key: "fairspace:description",
      *      label: "Description",
      *      values: [
-     *          { "@id": "http://fairspace.com/collections/1", "rdfs:label": "My collection" },
+     *          { "@id": "http://fairspace.com/collections/1", label: "My collection" },
      *          { "@value": "Literal value"}
      *      ]
      *  }
@@ -173,7 +173,7 @@ class Vocabulary {
         return {
             key: predicate,
             label: label,
-            values: values.sort(comparing(compareBy('rdfs:label'), compareBy('@id'), compareBy('@value'))),
+            values: values.sort(comparing(compareBy('label'), compareBy('@id'), compareBy('@value'))),
             range: range,
             allowMultiple: allowMultiple
         };
@@ -183,7 +183,7 @@ class Vocabulary {
         return values
             .map(type => ({
                 "@id": type,
-                "rdfs:label": Vocabulary._getLabel(this.vocabularyById[type])
+                label: Vocabulary._getLabel(this.vocabularyById[type])
             }))
     }
 

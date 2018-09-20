@@ -69,7 +69,7 @@ describe('combination of vocabulary and metadata', () => {
         expect(result[0].label).toEqual("Type");
         expect(result[0].values.length).toEqual(1);
         expect(result[0].values[0]['@id']).toEqual('http://fairspace.io/ontology#Collection');
-        expect(result[0].values[0]['rdfs:label']).toEqual('Collection');
+        expect(result[0].values[0]['label']).toEqual('Collection');
         expect(result[1].values.length).toEqual(0);
         expect(result[2].values.length).toEqual(0);
         expect(result[3].values.length).toEqual(0);
