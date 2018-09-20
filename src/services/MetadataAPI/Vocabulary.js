@@ -81,13 +81,11 @@ class Vocabulary {
                 continue;
             }
 
-            let values = metadata[predicateUri];
-
-            // @type needs special attention: it is specified as a literal string
-            // but should be treated as an object
-            if (predicateUri === "@type") {
-                values = this.convertTypeEntries(values);
-            }
+            let values = (predicateUri === "@type")
+                // @type needs special attention: it is specified as a literal string
+                // but should be treated as an object
+                ? this.convertTypeEntries(metadata[predicateUri])
+                : metadata[predicateUri].map(i => ({id: i['@id'], value: i['@value']}));
 
             prefilledProperties.push(Vocabulary._generatePropertyEntry(predicateUri, values, vocabularyEntry));
         }
@@ -173,7 +171,7 @@ class Vocabulary {
         return {
             key: predicate,
             label: label,
-            values: values.sort(comparing(compareBy('label'), compareBy('@id'), compareBy('@value'))),
+            values: values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value'))),
             range: range,
             allowMultiple: allowMultiple
         };
@@ -182,7 +180,7 @@ class Vocabulary {
     convertTypeEntries(values) {
         return values
             .map(type => ({
-                "@id": type,
+                id: type,
                 label: Vocabulary._getLabel(this.vocabularyById[type])
             }))
     }
