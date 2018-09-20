@@ -33,7 +33,7 @@ class PermissionAPI {
     }
 
     removeUserFromCollectionPermission(userId, collectionId) {
-        this.alterCollectionPermission(userId, collectionId, 'None');
+        return this.alterCollectionPermission(userId, collectionId, 'None')
     }
 }
 

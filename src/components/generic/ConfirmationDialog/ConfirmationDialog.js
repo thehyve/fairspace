@@ -7,7 +7,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import PropTypes from 'prop-types';
 
-class AlertDialog extends React.Component {
+class ConfirmationDialog extends React.Component {
 
     handleDisagree = () => {
         this.props.onDisagree();
@@ -49,19 +49,19 @@ class AlertDialog extends React.Component {
     }
 }
 
-AlertDialog.propTypes = {
+ConfirmationDialog.propTypes = {
     open: PropTypes.bool,
     title: PropTypes.string,
     content: PropTypes.string,
-    onAgree: PropTypes.func,
-    onDisagree: PropTypes.func,
+    onYes: PropTypes.func,
+    onNo: PropTypes.func,
     onClose: PropTypes.func,
 };
 
-AlertDialog.defaultProps = {
+ConfirmationDialog.defaultProps = {
     open: false,
     title: '',
     content: '',
 };
 
-export default AlertDialog;
+export default ConfirmationDialog;

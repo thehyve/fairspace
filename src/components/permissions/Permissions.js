@@ -15,7 +15,8 @@ import ErrorMessage from "../error/ErrorMessage";
 import {withStyles} from "@material-ui/core/styles/index";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import AlertDialog from "../generic/AlertDialog/AlertDialog";
+import ConfirmationDialog from "../generic/ConfirmationDialog/ConfirmationDialog";
+import ErrorDialog from "../error/ErrorDialog";
 
 export const AccessRights = {
     Read: 'Read',
@@ -82,14 +83,14 @@ class Permissions extends React.Component {
             });
     };
 
-    handleOpenPermissionDialog = () => {
+    handleAlterPermission = () => {
         this.setState({
             showPermissionDialog: true,
             anchorEl: null,
         })
     };
 
-    handleClosePermissionDialog = () => {
+    handleShareWithDialogClose = () => {
         this.setState({
             showPermissionDialog: false,
             selectedUser: null,
@@ -110,15 +111,19 @@ class Permissions extends React.Component {
     handleDeleteCollaborator = () => {
         const {selectedUser} = this.state;
         if (selectedUser) {
+            this.handleCloseConfirmDeleteDialog();
             permissionAPI
                 .removeUserFromCollectionPermission(selectedUser.subject, this.state.collectionId)
                 .then(() => {
                     this.loadPermissions(); // reload permissions
+                })
+                .catch(error => {
+                    ErrorDialog.showError(error, 'An error occurred while altering the permission.');
                 });
         }
     };
 
-    handleOpenConfirmDeleteDialog = () => {
+    handleRemoveCollaborator = () => {
         this.setState({
             anchorEl: null,
             showConfirmDeleteDialog: true
@@ -181,7 +186,7 @@ class Permissions extends React.Component {
                         <TableCell numeric>User</TableCell>
                         <TableCell numeric>Access</TableCell>
                         <TableCell numeric>
-                            <IconButton aria-label="Add" onClick={this.handleOpenPermissionDialog}>
+                            <IconButton aria-label="Add" onClick={this.handleAlterPermission}>
                                 <AddIcon/>
                             </IconButton>
                         </TableCell>
@@ -190,12 +195,11 @@ class Permissions extends React.Component {
                 <TableBody>
                     {this.renderCollaboratorList(permissions)}
                     <Menu
-                        id={`-sub-edit`}
                         anchorEl={anchorEl}
                         open={Boolean(anchorEl)}
                         onClose={this.handleMoreClose}>
-                        <MenuItem onClick={this.handleOpenPermissionDialog}>Change access</MenuItem>
-                        <MenuItem onClick={this.handleOpenConfirmDeleteDialog}>Delete</MenuItem>
+                        <MenuItem onClick={this.handleAlterPermission}>Change access</MenuItem>
+                        <MenuItem onClick={this.handleRemoveCollaborator}>Delete</MenuItem>
                     </Menu>
                 </TableBody>
             </Table>
@@ -208,16 +212,16 @@ class Permissions extends React.Component {
             <div>
                 <Typography variant="subheading">Shared with:</Typography>
                 <ShareWithDialog open={this.state.showPermissionDialog}
-                                 onClose={this.handleClosePermissionDialog}
+                                 onClose={this.handleShareWithDialogClose}
                                  user={this.state.selectedUser}
                                  collectionId={this.props.collectionId}
                 />
-                <AlertDialog open={this.state.showConfirmDeleteDialog}
-                             title={'Confirmation'}
-                             content={`Are you sure you want to remove ${selectedUser ? selectedUser.subject : 'user'} as collaborator?`}
-                             onAgree={this.handleDeleteCollaborator}
-                             onDisagree={this.handleCloseConfirmDeleteDialog}
-                             onClose={this.handleCloseConfirmDeleteDialog}
+                <ConfirmationDialog open={this.state.showConfirmDeleteDialog}
+                                    title={'Confirmation'}
+                                    content={`Are you sure you want to remove ${selectedUser ? selectedUser.subject : 'user'} as collaborator?`}
+                                    onAgree={this.handleDeleteCollaborator}
+                                    onDisagree={this.handleCloseConfirmDeleteDialog}
+                                    onClose={this.handleCloseConfirmDeleteDialog}
                 />
                 {this.state.error ?
                     <ErrorMessage>message={`Error loading collaborators`}</ErrorMessage> : this.renderUserList()}
