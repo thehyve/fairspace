@@ -9,8 +9,8 @@ nameOverride:
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  repository: docker-registry.jx.test.fairdev.app/fairspace/workspace
+  tag: 0.1.331
   pullPolicy: IfNotPresent
 
 resources: {}
@@ -105,7 +105,7 @@ jupyterhub:
     singleuser:
       image:
         name: "jupyter/datascience-notebook"
-        tag: "137a295ff71b"
+        tag: 0.1.331
       defaultUrl: "/lab"
     hub:
         ingress:
