@@ -16,6 +16,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
+import ErrorMessage from "../error/ErrorMessage";
 
 const styles = theme => ({
     root: {
@@ -44,6 +45,7 @@ class ShareWithDialog extends React.Component {
         selectedUserLabel: '',
         userList: [],
         isEditing: false,
+        error: null,
     };
 
     resetState = () => {
@@ -60,6 +62,7 @@ class ShareWithDialog extends React.Component {
             selectedUser: selectedUser,
             selectedUserLabel: '',
             isEditing: !!user,
+            error: null,
         });
     };
 
@@ -101,6 +104,7 @@ class ShareWithDialog extends React.Component {
                     this.props.onClose();
                 })
                 .catch(error => {
+                    this.setState({error: error});
                     console.error(error);
                 });
         } else {
@@ -123,7 +127,7 @@ class ShareWithDialog extends React.Component {
 
     render() {
         const {classes} = this.props;
-
+        const {error} = this.state;
         return (
             <Dialog
                 open={this.props.open}
@@ -132,6 +136,7 @@ class ShareWithDialog extends React.Component {
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={classes.root}>
+                        { error ? <ErrorMessage>message={error}</ErrorMessage> : ''}
                         {this.renderUser()}
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>

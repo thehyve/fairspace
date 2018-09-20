@@ -79,7 +79,6 @@ class Permissions extends React.Component {
             .catch(e => {
                 this.resetPermissions();
                 this.setState({error: true});
-                console.error('Error loading permissions', e);
             });
     };
 
@@ -109,10 +108,14 @@ class Permissions extends React.Component {
     };
 
     handleDeleteCollaborator = () => {
-        permissionClient.removeUserFromCollectionPermission(this.state.selectedUser.subject, this.state.collectionId)
-            .then((response) => {
-                console.info(response)
-            });
+        const {selectedUser} = this.state;
+        if (selectedUser) {
+            permissionClient.removeUserFromCollectionPermission(selectedUser.subject, this.state.collectionId)
+                .then((response) => {
+                    console.info(response);
+                    this.loadPermissions(); // reload permissions
+                });
+        }
     };
 
     handleOpenConfirmDeleteDialog = () => {
