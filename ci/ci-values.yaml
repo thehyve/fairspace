@@ -55,6 +55,10 @@ jupyterhub:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
             tag: latest
+    lifecycleHooks:
+      postStart:
+        exec:
+          command: ["mount", "-t", "davfs", "https://workspace.ci.test.fairdev.app/api/storage/webdav/", "/home/jovyan/workspace"]
     hub:
         auth:
             custom:
