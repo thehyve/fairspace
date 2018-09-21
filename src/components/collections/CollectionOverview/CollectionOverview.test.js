@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom';
 import {shallow} from "enzyme";
 import CollectionOverview from "./CollectionOverview";
 
-let mockCollectionStore, overview;
+let mockCollectionAPI, overview;
 
 function flushPromises() {
     return new Promise(resolve => setImmediate(resolve));
 }
 
 beforeEach(() => {
-    mockCollectionStore = {
+    mockCollectionAPI = {
         getCollections: jest.fn(() => Promise.resolve()),
         getCollection: jest.fn(() => Promise.resolve([])),
         addCollection: jest.fn(() => Promise.resolve([])),
@@ -18,7 +18,7 @@ beforeEach(() => {
 
     overview = (
         <CollectionOverview
-            collectionStore={mockCollectionStore}
+            collectionAPI={mockCollectionAPI}
         />
     )
 
@@ -33,5 +33,5 @@ it('renders without crashing', () => {
 it('calls the getCollections API on load', () => {
     const wrapper = shallow(overview);
 
-    expect(mockCollectionStore.getCollections.mock.calls.length).toEqual(1);
+    expect(mockCollectionAPI.getCollections.mock.calls.length).toEqual(1);
 });

@@ -6,7 +6,7 @@ class FileOverview extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
-        this.fileStore = props.fileStore;
+        this.fileAPI = props.fileAPI;
         this.prefix = props.prefix;
         this.onFilesDidLoad = props.onFilesDidLoad;
 
@@ -28,7 +28,7 @@ class FileOverview extends React.Component {
 
     loadContents(path) {
         this.setState({loading: true});
-        this.fileStore.list(path)
+        this.fileAPI.list(path)
             .then(json => this.setState({loading: false, contents: json}))
             .then(json => {
                 if(this.onFilesDidLoad) {

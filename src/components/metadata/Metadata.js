@@ -11,7 +11,7 @@ class Metadata extends React.Component {
     constructor(props) {
         super(props);
         this.subject = props.subject;
-        this.metadataStore = props.metadataStore;
+        this.metadataAPI = props.metadataAPI;
 
         this.state = {
 
@@ -43,8 +43,8 @@ class Metadata extends React.Component {
         this.setState({loading: true, error: false});
 
         Promise.all([
-            this.metadataStore.getVocabulary(),
-            this.metadataStore.get({subject: this.subject})
+            this.metadataAPI.getVocabulary(),
+            this.metadataAPI.get({subject: this.subject})
         ]).then(([vocabulary, metadata]) => {
             if (this.willUnmount) return;
 

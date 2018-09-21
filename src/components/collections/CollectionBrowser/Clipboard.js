@@ -2,8 +2,8 @@ class Clipboard {
     static CUT = 'cut';
     static COPY = 'copy';
 
-    constructor(fileStore) {
-        this.fileStore = fileStore;
+    constructor(fileAPI) {
+        this.fileAPI = fileAPI;
         this.clear();
     }
 
@@ -57,15 +57,15 @@ class Clipboard {
         }
 
         return Promise.all(this.paths.map(path => {
-            const sourceFile = this.fileStore.joinPaths(this.sourceDir || '', path.basename);
-            const destinationFile = this.fileStore.joinPaths(destinationDir || '', path.basename);
-            return this.fileStore.move(sourceFile, destinationFile);
+            const sourceFile = this.fileAPI.joinPaths(this.sourceDir || '', path.basename);
+            const destinationFile = this.fileAPI.joinPaths(destinationDir || '', path.basename);
+            return this.fileAPI.move(sourceFile, destinationFile);
         }))
     }
 
     _copyPaths(destinationDir) {
         return Promise.all(this.paths.map(path => {
-            const sourceFile = this.fileStore.joinPaths(this.sourceDir || '', path.basename);
+            const sourceFile = this.fileAPI.joinPaths(this.sourceDir || '', path.basename);
             let destinationFilename = path.basename;
 
             // Copying files to the current directory involves renaming
@@ -73,9 +73,9 @@ class Clipboard {
                 destinationFilename = this._addCounterToFilename(destinationFilename);
             }
 
-            const destinationFile = this.fileStore.joinPaths(destinationDir || '', destinationFilename);
+            const destinationFile = this.fileAPI.joinPaths(destinationDir || '', destinationFilename);
 
-            return this.fileStore.copy(sourceFile, destinationFile);
+            return this.fileAPI.copy(sourceFile, destinationFile);
         }))
     }
 
