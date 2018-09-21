@@ -1,6 +1,8 @@
 package nl.fairspace.pluto.app.web;
 
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import lombok.extern.slf4j.Slf4j;
+import nl.fairspace.pluto.app.model.UserInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +16,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.FIRSTNAME_CLAIM;
+import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.LASTNAME_CLAIM;
+import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.SUBJECT_CLAIM;
+
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
 @RequestMapping("/account")
 @Profile("!noAuth")
+@Slf4j
 public class AccountResource {
-    private final Logger log = LoggerFactory.getLogger(AccountResource.class);
-
     @Autowired(required = false)
     OAuthAuthenticationToken token;
 
@@ -38,6 +43,7 @@ public class AccountResource {
     public List<String> getAuthorizations() throws ParseException {
         log.debug("REST authentication to retrieve authorizations");
         if(token == null) {
+            log.warn("No token found in account/authorizations call");
             return Collections.emptyList();
         }
 
@@ -49,11 +55,21 @@ public class AccountResource {
      *
      * @return the login if the user is authenticated
      */
-    @GetMapping("/name")
-    public Map<String, String> getName() {
+    @GetMapping("/user")
+    public UserInfo getUser() {
         log.debug("REST request to check if the current user is authenticated");
-        String fullName = token == null ? "" : token.getFullName();
-        return Collections.singletonMap("username", fullName);
+        if(token == null) {
+            log.warn("No token found in account/user call");
+            return new UserInfo();
+        } else {
+            return new UserInfo(
+                    token.getStringClaim(SUBJECT_CLAIM),
+                    token.getUsername(),
+                    token.getFullName(),
+                    token.getStringClaim(FIRSTNAME_CLAIM),
+                    token.getStringClaim(LASTNAME_CLAIM)
+            );
+        }
     }
 
 }
