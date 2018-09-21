@@ -79,6 +79,7 @@ class UserMenu extends React.Component {
             return "Error";
         }
         if (user) {
+            const fullName = user.firstName + ' ' + user.lastName;
             return (
                 <Button
                     aria-owns={this.state.anchorEl ? 'user-menu' : null}
@@ -86,8 +87,8 @@ class UserMenu extends React.Component {
                     color="inherit"
                     onClick={this.handleClick}
                     className={this.props.classes.row}>
-                    <Avatar alt="{data.username}" src="/images/avatar.png" className={this.props.classes.avatar}/>
-                    <span>{user.username}</span>
+                    <Avatar alt='{fullName}' src="/images/avatar.png" className={this.props.classes.avatar}/>
+                    <span>{fullName}</span>
                 </Button>)
         }
     }
@@ -99,6 +100,6 @@ const mapStateToProps = ({account: { user }}) => {
         error: user.error,
         user: user.item
     }
-}
+};
 
 export default connect(mapStateToProps)(withStyles(styles)(UserMenu));
