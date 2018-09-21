@@ -124,7 +124,7 @@ jupyterhub:
                     userdata_url:
                     userdata_method: GET
                     userdata_params: {'state': 'state'}
-                    username_key: username
+                    username_key: sub
         extraConfig: |
           c.KubeSpawner.environment = {'TEST': 'test'}
           c.KubeSpawner.cmd = ['jupyter-labhub']
