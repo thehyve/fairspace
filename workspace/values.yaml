@@ -110,8 +110,6 @@ jupyterhub:
     hub:
         ingress:
             enabled: false
-        extraConfig: |
-            c.KubeSpawner.cmd = ['jupyter-labhub']
         extraEnv:
             OAUTH2_AUTHORIZE_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect/auth
             OAUTH2_TOKEN_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect/token
@@ -128,6 +126,7 @@ jupyterhub:
                     userdata_params: {'state': 'state'}
                     username_key: preferred_username
         extraConfig: |
+          c.KubeSpawner.cmd = ['jupyter-labhub']
           import os
           from oauthenticator.generic import GenericOAuthenticator
           base = GenericOAuthenticator.authenticate
