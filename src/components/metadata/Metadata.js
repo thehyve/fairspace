@@ -79,7 +79,7 @@ class Metadata extends React.Component {
         } else if (this.state.properties.length === 0) {
             return (<div>No metadata found</div>)
         } else {
-            return (<MetadataViewer properties={this.state.properties}/>)
+            return (<MetadataViewer subject={this.subject} metadataAPI={this.metadataAPI} properties={this.state.properties}/>)
         }
     }
 

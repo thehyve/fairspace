@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ReferringProperty = ({property, entry}) => {
+const ReferringValue = ({property, entry}) => {
     function navigableLink(link) {
         return link.startsWith(window.location.origin)
             ? link.replace('/iri/collections/', '/collections/').replace('/iri/', '/metadata/')
@@ -27,4 +27,4 @@ const ReferringProperty = ({property, entry}) => {
     }
 }
 
-export default ReferringProperty;
+export default ReferringValue;
