@@ -3,24 +3,7 @@ process.env.PERMISSIONS_URL = 'http://fairspace.io/api/collections/permissions?l
 
 const supertest = require('supertest');
 const fs = require('fs-extra');
-const jwk2pem = require('pem-jwk').jwk2pem;
-const jwt = require("jsonwebtoken");
-const jwks = JSON.parse(fs.readFileSync(__dirname + '/jwks.json'));
-const invalidJWK = JSON.parse(fs.readFileSync(__dirname + '/invalidKey.json'));
 nock = require('nock');
-
-mockPublicKeyset();
-
-// Create valid authorization tokens
-const key = jwk2pem(jwks.keys[0]);
-const invalidKey = jwk2pem(invalidJWK);
-
-const token = jwt.sign({foo: 'bar', sub: 'alice', exp: Math.floor(Date.now() / 1000) + (60 * 60)}, key, {algorithm: 'RS256'});
-const anotherToken = jwt.sign({foo: 'bar', sub: 'bob', exp: Math.floor(Date.now() / 1000) + (60 * 60)}, key, {algorithm: 'RS256'});
-const nonExpiringToken = jwt.sign({foo: 'bar', sub: 'alice'}, key, {algorithm: 'RS256'});
-const expiredToken = jwt.sign({foo: 'bar', exp: Math.floor(Date.now() / 1000) - (60 * 60)}, key, {algorithm: 'RS256'});
-const invalidSignature = jwt.sign({foo: 'bar'}, invalidKey, {algorithm: 'RS256'});
-const noSubject = jwt.sign({foo: 'bar', exp: Math.floor(Date.now() / 1000) + (60 * 60)}, key, {algorithm: 'RS256'});
 
 // Start test
 const app = require('../src/app');
@@ -29,7 +12,7 @@ const server = supertest(app);
 
 nock('http://fairspace.io', {
     reqheaders: {
-        'authorization': 'Bearer ' + token
+        'authorization': 'Bearer Alice'
     }
 })
     .get('/api/collections/permissions')
@@ -39,7 +22,7 @@ nock('http://fairspace.io', {
 
 nock('http://fairspace.io', {
     reqheaders: {
-        'authorization': 'Bearer ' + token
+        'authorization': 'Bearer Alice'
     }
 })
     .get('/api/collections/permissions')
@@ -49,7 +32,7 @@ nock('http://fairspace.io', {
 
 nock('http://fairspace.io', {
     reqheaders: {
-        'authorization': 'Bearer ' + anotherToken
+        'authorization': 'Bearer Bob'
     }
 })
     .get('/api/collections/permissions')
@@ -59,7 +42,7 @@ nock('http://fairspace.io', {
 
 nock('http://fairspace.io', {
     reqheaders: {
-        'authorization': 'Bearer ' + token
+        'authorization': 'Bearer Alice'
     }
 })
     .get('/api/collections/permissions')
@@ -69,7 +52,7 @@ nock('http://fairspace.io', {
 
 nock('http://fairspace.io', {
     reqheaders: {
-        'authorization': 'Bearer ' + anotherToken
+        'authorization': 'Bearer Bob'
     }
 })
     .get('/api/collections/permissions')
@@ -80,7 +63,7 @@ nock('http://fairspace.io', {
 
 nock('http://fairspace.io', {
     reqheaders: {
-        'authorization': 'Bearer ' + token
+        'authorization': 'Bearer Alice'
     }
 })
     .get('/api/collections/permissions')
@@ -93,11 +76,10 @@ describe('Titan', () => {
 
     after(() => fs.removeSync(process.env.FILES_FOLDER));
 
-    it('responds to / anonymously', () => server.get('/').expect(200, 'Hi, I\'m Titan!'));
-    it('responds to /api/storage/webdav/ when the directory is present and authorization is provided', () =>
+    it('responds to / when the directory is present and authorization is provided', () =>
         server
-            .propfind('/api/storage/webdav/')
-            .set('Authorization', 'Bearer ' + token)
+            .propfind('/')
+            .set('Authorization', 'Bearer Alice')
             .expect(207)
     );
 });
@@ -107,39 +89,34 @@ describe('Authentication', () => {
 
     after(() => fs.removeSync(process.env.FILES_FOLDER));
 
-    it('responds to /api/storage/webdav/ when authorization without expiry is provided', () =>
+    it('responds to / when authorization with a valid JWT is provided', () =>
         server
-            .propfind('/api/storage/webdav/')
-            .set('Authorization', 'Bearer ' + nonExpiringToken)
+            .propfind('/')
+            .set('Authorization', 'Bearer Alice')
             .expect(207)
     );
-    it('responds a 401 to /api/storage/webdav/ when no authorization is provided', () =>
+    it('responds to / when authorization with any Bearer is provided', () =>
         server
-            .propfind('/api/storage/webdav/')
+            .propfind('/')
+            .set('Authorization', 'Bearer JWT')
+            .expect(207)
+    );
+    it('responds a 401 to / when an unknown authorization is provided', () =>
+        server
+            .propfind('/')
+            .set('Authorization', 'Unknown token')
             .expect(401)
     );
-    it('responds a 401 to /api/storage/webdav/ when invalid authorization is provided', () =>
+    it('responds to / when Basic authorization is provided', () =>
         server
-            .propfind('/api/storage/webdav/')
-            .set('Authorization', 'Bearer invalidtoken')
-            .expect(401)
+            .propfind('/')
+            .set('Authorization', 'Basic dXNlcjpqd3Q=')
+            .expect(207)
     );
-    it('responds a 401 to /api/storage/webdav/ when invalid authorization is provided', () =>
+
+    it('responds a 401 to / when no authorization is provided', () =>
         server
-            .propfind('/api/storage/webdav/')
-            .set('Authorization', 'Bearer ' + expiredToken)
-            .expect(401)
-    );
-    it('responds a 401 to /api/storage/webdav/ when authorization with invalid signature is provided', () =>
-        server
-            .propfind('/api/storage/webdav/')
-            .set('Authorization', 'Bearer ' + invalidSignature)
-            .expect(401)
-    );
-    it('responds a 401 to /api/storage/webdav/ when authorization with no subject claim is provided', () =>
-        server
-            .propfind('/api/storage/webdav/')
-            .set('Authorization', 'Bearer ' + noSubject)
+            .propfind('/')
             .expect(401)
     );
 });
@@ -152,82 +129,82 @@ describe('Webdav', () => {
 
     it('a user can create and delete a top-level directory', () =>
         server
-            .mkcol('/api/storage/webdav/1')
-            .set('Authorization', 'Bearer ' + token)
+            .mkcol('/1')
+            .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .delete('/api/storage/webdav/1')
+                .delete('/1')
                 .set('Anticipated-Operation', 'true')
-                .set('Authorization', 'Bearer ' + token)
+                .set('Authorization', 'Bearer Alice')
                 .expect(200))
     );
 
     it('a user without manage permission cannot delete other\'s top-level directories', () =>
         server
-            .mkcol('/api/storage/webdav/1')
-            .set('Authorization', 'Bearer ' + token)
+            .mkcol('/1')
+            .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .propfind('/api/storage/webdav/1')
-                .set('Authorization', 'Bearer ' + anotherToken)
+                .propfind('/1')
+                .set('Authorization', 'Bearer Bob')
                 .expect(401))
     );
 
     it('a user without read permission cannot read other\'s top-level directories', () =>
         server
-            .mkcol('/api/storage/webdav/1')
-            .set('Authorization', 'Bearer ' + token)
+            .mkcol('/1')
+            .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .delete('/api/storage/webdav/1')
-                .set('Authorization', 'Bearer ' + anotherToken)
+                .delete('/1')
+                .set('Authorization', 'Bearer Bob')
                 .expect(401))
     );
 
     it('a user with read permission can read other\'s top-level directories', () =>
         server
-            .mkcol('/api/storage/webdav/2')
-            .set('Authorization', 'Bearer ' + anotherToken)
+            .mkcol('/2')
+            .set('Authorization', 'Bearer Bob')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .propfind('/api/storage/webdav/2')
-                .set('Authorization', 'Bearer ' + token)
+                .propfind('/2')
+                .set('Authorization', 'Bearer Alice')
                 .expect(207))
     );
 
     it('a user can create and delete subdirectories', () =>
         server
-            .mkcol('/api/storage/webdav/1')
-            .set('Authorization', 'Bearer ' + token)
+            .mkcol('/1')
+            .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() =>  server
-                .mkcol('/api/storage/webdav/1/subdir')
-                .set('Authorization', 'Bearer ' + token)
+                .mkcol('/1/subdir')
+                .set('Authorization', 'Bearer Alice')
                 .expect(201))
             .then(() => server
-                .delete('/api/storage/webdav/1/subdir')
-                .set('Authorization', 'Bearer ' + token)
+                .delete('/1/subdir')
+                .set('Authorization', 'Bearer Alice')
                 .expect(200))
     );
 
     it('a user can create and delete files', () =>
         server
-            .mkcol('/api/storage/webdav/1')
-            .set('Authorization', 'Bearer ' + token)
+            .mkcol('/1')
+            .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() =>  server
-                .put('/api/storage/webdav/1/file.txt')
-                .set('Authorization', 'Bearer ' + token)
+                .put('/1/file.txt')
+                .set('Authorization', 'Bearer Alice')
                 .expect(201))
             .then(() => server
-                .delete('/api/storage/webdav/1/file.txt')
-                .set('Authorization', 'Bearer ' + token)
+                .delete('/1/file.txt')
+                .set('Authorization', 'Bearer Alice')
                 .expect(200))
     );
 
@@ -235,53 +212,36 @@ describe('Webdav', () => {
 
     it('a user can rename a top-level directory with Anticipated-Operation: true', () =>
         server
-            .mkcol('/api/storage/webdav/1')
-            .set('Authorization', 'Bearer ' + token)
+            .mkcol('/1')
+            .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .move('/api/storage/webdav/1')
-                .set('Authorization', 'Bearer ' + token)
-                .set('Destination', 'http://fairspace.io/api/storage/webdav/newname-1')
+                .move('/1')
+                .set('Authorization', 'Bearer Alice')
+                .set('Destination', 'http://fairspace.io/newname-1')
                 .set('Anticipated-Operation', 'true')
                 .expect(201))
     );
 
     it('a user cannot rename a top-level directory without Anticipated-Operation: true', () =>
         server
-            .mkcol('/api/storage/webdav/1')
-            .set('Authorization', 'Bearer ' + token)
+            .mkcol('/1')
+            .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .move('/api/storage/webdav/1')
-                .set('Authorization', 'Bearer ' + token)
-                .set('Destination', 'http://fairspace.io/api/storage/webdav/newname-1')
+                .move('/1')
+                .set('Authorization', 'Bearer Alice')
+                .set('Destination', 'http://fairspace.io/newname-1')
                 .expect(401))
     );
 
     it('returns 401 for non-existing collections', () =>
         server
-            .delete('/api/storage/webdav/1001/')
-            .set('Authorization', 'Bearer ' + token)
+            .delete('/1001/')
+            .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(401)
     );
 });
-
-
-function mockPublicKeyset() {
-    const publicKeyset = {
-        keys: jwks.keys.map(key => ({
-            "kty": key.kty,
-            "e": key.e,
-            "use": key.use,
-            "kid": key.kid,
-            "alg": key.alg,
-            "n": key.n
-        }))
-    };
-
-    // Mock keyset provider
-    require('../src/auth/verify-jwt-with-jwks').keySetProvider = () => Promise.resolve(publicKeyset);
-}

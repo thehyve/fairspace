@@ -6,14 +6,11 @@ const zipkin = require('zipkin');
 const zipkinMiddleware = require('zipkin-instrumentation-express').expressMiddleware;
 const HttpLogger = require('zipkin-transport-http').HttpLogger;
 const jwtAuthentication = require('./auth/jwt-authentication');
-const jwksVerifier = require('./auth/verify-jwt-with-jwks');
-const fixWebdavDestinationMiddleware = require('./fixWebdavDestinationMiddleware');
 const PrivilegeManager = require("./auth/NeptunePathPrivilegeManager");
 
 // Configuration parameters
 const rootPath = process.env.FILES_FOLDER || '/data';
 
-const jwksUrl = process.env.JWKS_URL;
 const authEnabled = process.env.AUTH_ENABLED !== 'false';
 
 const tracingEnabled = process.env.TRACING_ENABLED !== 'false';
@@ -21,19 +18,11 @@ const zipkinEndointUrl = process.env.ZIPKIN_URL || 'http://jaeger-collector.jaeg
 const zipkinSamplingRate = process.env.ZIPKIN_SAMPLING_RATE || 0.01;
 const permissionsEndpointUrl = process.env.PERMISSIONS_URL;
 
-// Respond to / anonymously to allow for health checks
-app.get('/', (req, res) => res.send('Hi, I\'m Titan!').end());
-
 if(tracingEnabled) app.use(setupTracingMiddleware(zipkinEndointUrl, zipkinSamplingRate));
-if(authEnabled) app.use(setupAuthMiddleware(jwksUrl));
 
-setupWebdavMiddleware(rootPath, '/api/storage/webdav');
+setupWebdavMiddleware(rootPath);
 
 module.exports = app;
-
-function setupAuthMiddleware(jwksUrl) {
-    return jwksVerifier.middleware({url: jwksUrl})
-}
 
 function setupTracingMiddleware(zipkinEndpointUrl, samplingRate) {
     console.log("Use tracing middleware to send traces to " + zipkinEndpointUrl);
@@ -51,16 +40,15 @@ function setupTracingMiddleware(zipkinEndpointUrl, samplingRate) {
     return zipkinMiddleware({tracer});
 }
 
-function setupWebdavMiddleware(physicalRootPath, webdavPath) {
+function setupWebdavMiddleware(physicalRootPath) {
     const server = new webdav.WebDAVServer({
-        requireAuthentification: true,
+        requireAuthentification: authEnabled,
         httpAuthentication: jwtAuthentication,
         rootFileSystem: new webdav.PhysicalFileSystem(physicalRootPath),
         privilegeManager: new PrivilegeManager(permissionsEndpointUrl)
     });
 
 
-    app.use(fixWebdavDestinationMiddleware(webdavPath));
-    app.use(webdav.extensions.express(webdavPath, server));
+    app.use(webdav.extensions.express('/', server));
 }
 

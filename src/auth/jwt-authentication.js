@@ -1,35 +1,40 @@
 let Errors = require("webdav-server").v2.Errors;
-let jwt = require('jsonwebtoken');
+
+const defaultUser = {
+    uid: '',
+    username: '',
+    isAdministrator: false,
+    isDefaultUser: true
+};
 
 module.exports = {
-    askForAuthentication: () => [],
+    askForAuthentication: () => ({'WWW-Authenticate': 'Basic realm=\"realm\"'}),
     getUser: (ctx, callback) => {
         let authHeader = ctx.headers.find('Authorization');
 
         if (!authHeader) {
-            callback(Errors.MissingAuthorisationHeader);
+            callback(null, defaultUser);
             return;
         }
 
-        if (!authHeader.startsWith('Bearer ')) {
+        let token;
+
+        if (authHeader.startsWith('Basic ')) {
+            // take JWT from the password field
+            token = Buffer.from(/^Basic \s*([a-zA-Z0-9]+=*)\s*$/.exec(authHeader)[1], 'base64').toString().split(':', 2)[1];
+        } else if (authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
+        } else {
             callback(Errors.WrongHeaderFormat);
             return;
         }
 
-        let token = authHeader.split(' ')[1];
-        let payload = jwt.decode(token);
-        let userId = payload.sub;
-
-        if (!userId) {
-            callback(Errors.AuthenticationPropertyMissing);
-            return;
-        }
-
         let user = {
-            uid: userId,
+            uid: token,
+            username: token,
+            password: token,
             isAdministrator: false,
-            isDefaultUser: false,
-            username: userId
+            isDefaultUser: false
         };
 
         callback(null, user);

@@ -17,7 +17,7 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
         let collectionLocation = fullPath.paths[0];
 
         axios.get(util.format(this.permissionsUrl, encodeURIComponent(collectionLocation)),
-            {headers: {'authorization': resource.context.headers.headers['authorization']}})
+            {headers: {'authorization': 'Bearer ' + user.password}})
             .then(({data}) => {
                 let criticalCollectionOperation = (fullPath.paths.length === 1)
                     && ['MKCOL', 'MOVE', 'COPY', 'DELETE'].includes(resource.context.request.method)
