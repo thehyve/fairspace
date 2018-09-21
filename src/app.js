@@ -1,5 +1,3 @@
-
-
 const app = require('express')();
 const webdav = require('webdav-server').v2;
 const zipkin = require('zipkin');
