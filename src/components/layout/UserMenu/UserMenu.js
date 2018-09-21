@@ -79,7 +79,6 @@ class UserMenu extends React.Component {
             return "Error";
         }
         if (user) {
-            const fullName = user.firstName + ' ' + user.lastName;
             return (
                 <Button
                     aria-owns={this.state.anchorEl ? 'user-menu' : null}
@@ -87,8 +86,8 @@ class UserMenu extends React.Component {
                     color="inherit"
                     onClick={this.handleClick}
                     className={this.props.classes.row}>
-                    <Avatar alt='{fullName}' src="/images/avatar.png" className={this.props.classes.avatar}/>
-                    <span>{fullName}</span>
+                    <Avatar alt='{user.fullName}' src="/images/avatar.png" className={this.props.classes.avatar}/>
+                    <span>{user.fullName}</span>
                 </Button>)
         }
     }

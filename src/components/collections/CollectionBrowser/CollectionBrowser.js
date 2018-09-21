@@ -100,8 +100,8 @@ class CollectionBrowser extends React.Component {
     }
 
     handleAddCollectionClick() {
-        const {firstName, lastName} = this.props;
-        const name = `${firstName} ${lastName}'s collection`;
+        const {user} = this.props;
+        const name = `${user.fullName}'s collection`;
         const description = "Beyond the horizon";
 
         // Create the bucket in storage
