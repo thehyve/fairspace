@@ -133,7 +133,9 @@ jupyterhub:
           base = GenericOAuthenticator.authenticate
           def authenticate(self, handler, data=None):
             result = base(self, handler, data)
-            c.Spawner.environment['AUTH_TOKEN'] = result['auth_state']['access_token']
+            token = result['auth_state']['access_token']
+            print(f'Token: {token}')
+            c.Spawner.environment = {'AUTH_TOKEN': token}
             return result
           GenericOAuthenticator.authenticate = authenticate
     proxy:
