@@ -1,6 +1,13 @@
 const infoDrawerWidth = 360;
 
 const styles = theme => ({
+    root: {
+        marginTop: 50
+    },
+    heading: {
+        fontSize: theme.typography.pxToRem(15),
+        fontWeight: theme.typography.fontWeightRegular,
+    },
     infoDrawerPaper: {
         width: infoDrawerWidth,
         padding: theme.spacing.unit * 3

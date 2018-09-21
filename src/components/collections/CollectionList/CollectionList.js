@@ -1,5 +1,5 @@
 import React from 'react';
-import Collection from "./Collection";
+import CollectionItem from "./CollectionItem";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
@@ -36,7 +36,7 @@ function CollectionList(props) {
                                     <Icon>folder_open</Icon>
                                 </TableCell>
                                 <TableCell component="th" scope="row">
-                                    <Collection collection={collection}/>
+                                    <CollectionItem collection={collection}/>
                                 </TableCell>
                                 <TableCell numeric>
                                     {props.onCollectionDelete ?

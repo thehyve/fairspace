@@ -8,11 +8,15 @@ import Icon from "@material-ui/core/Icon";
 import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 class InformationDrawer extends React.Component {
     state = {
         refreshRequired: false
-    }
+    };
 
     handleDetailsChange(collection) {
         this.props.onDidChangeDetails(collection);
@@ -24,34 +28,58 @@ class InformationDrawer extends React.Component {
     }
 
     renderCollectionDetails() {
-        if(!this.props.collection) {
+        if (!this.props.collection) {
             return <Typography variant="title">No collection</Typography>;
         }
-
-        return <React.Fragment>
-                <Collection
-                    collection={this.props.collection}
-                    collectionAPI={this.props.collectionAPI}
-                    onDidChangeDetails={this.handleDetailsChange.bind(this)}
-                />
-                <hr/>
-
-                <Permissions collectionId={this.props.collection.id}/>
-                <hr/>
-
-                <Metadata
-                    refresh={this.state.refreshRequired}
-                    onDidLoad={this.handleMetadataDidLoad.bind(this)}
-                    subject={this.props.collection.uri}
-                    metadataAPI={this.props.metadataAPI}
-                />
-
-                <hr/>
-
-                <Typography variant="title">Paths</Typography>
-                {this.props.path ? this.props.path.map(path => <Typography
-                    key={path.filename}>{path.basename}</Typography>) : 'No path selected'}
+        const { classes, collection } = this.props;
+        return (
+            <React.Fragment>
+                <div className={classes.root}>
+                    <ExpansionPanel defaultExpanded>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography className={classes.heading}>Collection Details</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <Collection
+                                collection={this.props.collection}
+                                collectionAPI={this.props.collectionAPI}
+                                onDidChangeDetails={this.handleDetailsChange.bind(this)}
+                            />
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <ExpansionPanel defaultExpanded>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography className={classes.heading}>Shared with</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <Permissions collectionId={collection.id} creator={collection.creator}/>
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <ExpansionPanel defaultExpanded>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography className={classes.heading}>Metadata</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <Metadata
+                                refresh={this.state.refreshRequired}
+                                onDidLoad={this.handleMetadataDidLoad.bind(this)}
+                                subject={this.props.collection.uri}
+                                metadataAPI={this.props.metadataAPI}
+                            />
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <ExpansionPanel defaultExpanded>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography className={classes.heading}>Path</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            {this.props.path ? this.props.path.map(path => <Typography
+                                key={path.filename}>{path.basename}</Typography>) : 'No path selected'}
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                </div>
             </React.Fragment>
+        );
     }
 
     render() {
@@ -66,7 +94,7 @@ class InformationDrawer extends React.Component {
             >
                 <div className={this.props.classes.toolbar}/>
                 <IconButton onClick={this.props.onClose} className={this.props.classes.closeButton}>
-                    <Icon>chevron_right</Icon>
+                    <Icon>close</Icon>
                 </IconButton>
 
                 {this.renderCollectionDetails()}
