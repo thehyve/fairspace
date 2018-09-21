@@ -1,90 +1,163 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import userAPI from '../../services/UserAPI/UserAPI';
+import permissionAPI from '../../services/PermissionAPI/PermissionAPI';
 import Button from '@material-ui/core/Button';
-import Select from '@material-ui/core/Select';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
 import {withStyles} from '@material-ui/core/styles';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import {AccessRights} from "./Permissions";
-import Typography from "@material-ui/core/Typography";
+import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect'
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
+import Typography from '@material-ui/core/Typography';
+import ErrorDialog from "../error/ErrorDialog";
 
 const styles = theme => ({
     root: {
-        flexGrow: 1
+        width: 400,
+        height: 350,
+        display: 'block',
     },
     container: {
         display: 'flex',
         flexWrap: 'wrap',
     },
     formControl: {
-        margin: theme.spacing.unit,
+        marginTop: 20,
+    },
+    autocomplete: {
+        width: '100%'
     },
 });
 
 class ShareWithDialog extends React.Component {
+
+    // initial state
     state = {
-        single: null,
-        multi: null,
-        accessRight: null,
+        accessRight: 'Read',
+        selectedUser: null,
+        selectedUserLabel: '',
+        userList: [],
+        isEditing: false,
+        error: null,
     };
 
-    handleChange = event => {
+    resetState = () => {
+        const {user} = this.props;
+        const {userList} = this.state;
+        let selectedUser = null;
+        if (user) {
+            selectedUser = userList.find(u => {
+                return user.subject === u.value;
+            });
+        }
+        this.setState({
+            accessRight: user ? user.access : 'Read',
+            selectedUser: selectedUser,
+            selectedUserLabel: '',
+            isEditing: !!user,
+            error: null,
+        });
+    };
+
+    componentDidMount() {
+        userAPI.getUsers().then(result => {
+            const userList = result.map(r => {
+                return {
+                    label: `${r.firstName} ${r.lastName}`,
+                    value: `${r.id}`,
+                }
+            });
+            this.setState({userList: userList});
+        })
+    }
+
+    handleAccessRightChange = event => {
         this.setState({accessRight: event.target.value});
+    };
+
+    handleSelectedUserChange = selectedOption => {
+        this.setState({selectedUser: selectedOption});
     };
 
     handleClose = () => {
         this.props.onClose();
     };
 
+    handleOnEnter = () => {
+        this.resetState();
+    };
+
+    handleSubmit = () => {
+        const {selectedUser, accessRight} = this.state;
+        const {collectionId} = this.props;
+        if (selectedUser) {
+            this.props.onClose();
+            permissionAPI.alterCollectionPermission(selectedUser.value, collectionId, accessRight)
+                .then(response => {
+                    this.setState({selectedUserLabel: ''});
+                })
+                .catch(error => {
+                    this.setState({error: error});
+                    ErrorDialog.showError(error, 'An error occurred while altering the permission.');
+                });
+        } else {
+            this.setState({selectedUserLabel: 'You have to select a user'});
+        }
+    };
+
+    renderUser = () => {
+        const {userList, isEditing, selectedUser} = this.state;
+        return isEditing ?
+            (<div>
+                <Typography variant="subheading" gutterBottom>{selectedUser.label}</Typography>
+            </div>) :
+            (<MaterialReactSelect options={userList}
+                                  onChange={this.handleSelectedUserChange}
+                                  placeholder={'Please select a user'}
+                                  value={this.state.selectedUser}
+                                  label={this.state.selectedUserLabel}/>);
+    };
+
     render() {
         const {classes} = this.props;
-
+        const {error} = this.state;
         return (
             <Dialog
                 open={this.props.open}
+                onEnter={this.handleOnEnter}
                 onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
-                    <div className={classes.container}>
+                    <div className={classes.root}>
+                        {this.renderUser()}
                         <FormControl className={classes.formControl}>
-                            <TextField
-                                id="user-name"
-                                required
-                                label='User'
-                            />
-                            <FormHelperText>Select a user</FormHelperText>
-                        </FormControl>
-                        <FormControl className={classes.formControl}>
-                            <InputLabel htmlFor="access-right">Access Right</InputLabel>
-                            <Select
+                            <FormLabel component="legend">Access right</FormLabel>
+                            <RadioGroup
+                                aria-label="Access right"
+                                name="access-right"
+                                className={classes.group}
                                 value={this.state.accessRight}
-                                onChange={this.handleChange}
-                                input={<Input name="access-right" id="access-right"/>}
-                                required
-                            >
+                                onChange={this.handleAccessRightChange}>
                                 {Object.keys(AccessRights).map(access => {
-                                    return <MenuItem value={access} key={access}>
-                                        <Typography variant={'body1'}>{AccessRights[access]}</Typography>
-                                    </MenuItem>
+                                    return <FormControlLabel key={access} value={access} control={<Radio/>}
+                                                             label={AccessRights[access]}/>
                                 })}
-                            </Select>
-                            <FormHelperText>Select access right for the user.</FormHelperText>
+                            </RadioGroup>
                         </FormControl>
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleClose} color="primary">
+                    <Button onClick={this.handleClose} color="secondary">
                         Cancel
                     </Button>
-                    <Button onClick={this.handleClose} color="primary">
+                    <Button onClick={this.handleSubmit} color="primary">
                         Submit
                     </Button>
                 </DialogActions>
