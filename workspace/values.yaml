@@ -126,7 +126,7 @@ jupyterhub:
                     userdata_params: {'state': 'state'}
                     username_key: preferred_username
         extraConfig: |
-          c.Spawner.environment += {'TEST': 'test'}
+          c.Spawner.environment = {'TEST': 'test'}
           c.KubeSpawner.cmd = ['jupyter-labhub']
           from oauthenticator.generic import GenericOAuthenticator
           base = GenericOAuthenticator.authenticate
@@ -135,7 +135,7 @@ jupyterhub:
             token = result['auth_state']['access_token']
             if token is None:
               token = 'NONE'
-            c.Spawner.environment += {'AUTH_TOKEN': token}
+            c.Spawner.environment = {'AUTH_TOKEN': token}
             return result
           GenericOAuthenticator.authenticate = authenticate
     proxy:
