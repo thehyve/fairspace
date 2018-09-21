@@ -2,68 +2,42 @@ import React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Typography from "@material-ui/core/Typography";
+import StringProperty from "./properties/StringProperty";
+import ReferringProperty from "./properties/ReferringProperty";
 
 
 /**
  * This component will always display correct metadata. If any error occurs it is handled by Metadata
  */
-class MetadataViewer extends React.Component {
+const MetadataViewer = props => {
+    function renderProperty(property) {
+        const items = property.values.map(entry => renderEntry(property, entry));
 
-    constructor(props) {
-        super(props);
-        this.props = props;
-        this.properties = props.properties;
+        return <ListItem key={property.key}>
+            <Typography variant="subheading">{property.label}</Typography>
+            <List dense={true}>{items}</List>
+        </ListItem>
     }
 
-    static renderValue(v) {
-        return (
-            <ListItem key={MetadataViewer.extractDisplayValue(v)}>
-                {MetadataViewer.retrieveDisplayableItem(v)}
-            </ListItem>)
+    function renderEntry(property, entry) {
+        const Component = getValueComponentForProperty(property);
+        return <ListItem key={entry.id || entry.value}>
+                <Component property={property} entry={entry} onChange={console.log}/>
+            </ListItem>
     }
 
-    static navigableLink(link) {
-        return link.startsWith(window.location.origin)
-            ? link.replace('/iri/collections/', '/collections/').replace('/iri/', '/metadata/')
-            : link
-    }
-
-    static retrieveDisplayableItem(v) {
-        let displayValue = MetadataViewer.extractDisplayValue(v);
-
-        if (v.id) {
-            return (<a href={MetadataViewer.navigableLink(v.id)}>{displayValue}</a>)
-        } else {
-            return displayValue;
+    function getValueComponentForProperty(property) {
+        switch(property.range) {
+            case 'http://www.w3.org/TR/xmlschema11-2/#string':
+                return StringProperty;
+            default:
+                return ReferringProperty;
         }
     }
 
-
-    static extractDisplayValue(v) {
-        return v.label || v.value || MetadataViewer.linkLabel(v.id) || '';
-    }
-
-    static linkLabel(link) {
-        return link &&
-            (link.toString().includes('#')
-                ? link.substring(link.lastIndexOf('#') + 1)
-                : link.substring(link.lastIndexOf('/') + 1))
-    }
-
-    renderProperty(p) {
-        const items = p.values.map(MetadataViewer.renderValue.bind(this));
-        return (
-            <ListItem key={p.label}>
-                <div>
-                    <Typography variant="subheading">{p.label}:</Typography>
-                    <List dense={true}>{items}</List>
-                </div>
-            </ListItem>);
-    }
-
-    render() {
-        return (<List>{this.properties.map(this.renderProperty.bind(this))}</List>)
-    }
+    return <List>
+        {props.properties.map(renderProperty)}
+        </List>
 }
 
 export default MetadataViewer

@@ -13,13 +13,13 @@ it('displays properties properly', () => {
     }).then(() => {
         const result = wrapper.find("li");
         expect(result.length).toEqual(7);
-        expect(wrapper.text()).toEqual("Description:More infoMy first collectionName:Collection 5Type:Collection");
+        expect(wrapper.text()).toEqual("DescriptionMore infoMy first collectionNameCollection 5TypeCollection");
     });
 });
 
 
 const properties = [
-    {label: 'Description', values: [{value: 'More info'}, {value: 'My first collection'}]},
-    {label: 'Name', values: [{value: 'Collection 5'}]}, {label: "Type", values:
-            [{id: "http://fairspace.io/ontology#Collection", label: "Collection"}]}
+    {key: 'description', label: 'Description', values: [{value: 'More info'}, {value: 'My first collection'}]},
+    {key: 'name', label: 'Name', values: [{value: 'Collection 5'}]},
+    {key: 'type', label: "Type", values: [{id: "http://fairspace.io/ontology#Collection", label: "Collection"}]}
 ];

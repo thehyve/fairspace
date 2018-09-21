@@ -165,15 +165,17 @@ class Vocabulary {
      */
     static _generatePropertyEntry(predicate, values, vocabularyEntry) {
         const label = Vocabulary._getLabel(vocabularyEntry);
-        const range = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#range');
+        const range = Vocabulary._getFirstPredicateId(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#range');
         const allowMultiple = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://fairspace.io/ontology#allowMultiple', false);
+        const multiLine = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://fairspace.io/ontology#multiLine', false);
 
         return {
             key: predicate,
             label: label,
             values: values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value'))),
             range: range,
-            allowMultiple: allowMultiple
+            allowMultiple: allowMultiple,
+            multiLine: multiLine
         };
     }
 
@@ -186,12 +188,21 @@ class Vocabulary {
     }
 
     static _getFirstPredicateValue(vocabularyEntry, predicate, defaultValue) {
-        return vocabularyEntry[predicate] ? vocabularyEntry[predicate][0] : defaultValue;
+        return this._getFirstPredicateProperty(vocabularyEntry, predicate, '@value', defaultValue);
     }
 
+    static _getFirstPredicateId(vocabularyEntry, predicate, defaultValue) {
+        return this._getFirstPredicateProperty(vocabularyEntry, predicate, '@id', defaultValue);
+    }
+
+    static _getFirstPredicateProperty(vocabularyEntry, predicate, property, defaultValue) {
+        return vocabularyEntry[predicate] && vocabularyEntry[predicate][0] ? vocabularyEntry[predicate][0][property] : defaultValue;
+    }
+
+
+
     static _getLabel(vocabularyEntry) {
-        const predicateValue = this._getFirstPredicateValue(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#label');
-        return predicateValue ? predicateValue["@value"] : '';
+        return this._getFirstPredicateValue(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#label', '');
     }
 }
 
