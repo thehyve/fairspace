@@ -37,36 +37,28 @@ public class OAuthAuthenticationToken {
         this(accessToken, refreshToken, null);
     }
 
-    public String getUsername() {
+    public String getStringClaim(String claim) {
         if(claimsSet == null) {
             log.warn("No claimsset provided in OAuth token");
             return "";
         }
 
-        Object username = claimsSet.get(USERNAME_CLAIM);
+        Object claimValue = claimsSet.get(claim);
 
-        if(username == null) {
-            log.warn("No username provided in OAuth token");
+        if(claimValue == null) {
+            log.warn("Claim {} not found in claimsset", claim);
             return "";
         }
 
-        return username.toString();
+        return claimValue.toString();
+    }
+
+    public String getUsername() {
+        return getStringClaim(USERNAME_CLAIM);
     }
 
     public String getFullName() {
-        if(claimsSet == null) {
-            log.warn("No claimsset provided in OAuth token");
-            return "";
-        }
-
-        Object fullname = claimsSet.get(FULLNAME_CLAIM);
-
-        if(fullname == null) {
-            log.warn("No fullname provided in OAuth token");
-            return "";
-        }
-
-        return fullname.toString();
+        return getStringClaim(FULLNAME_CLAIM);
     }
 
     public List<String> getAuthorities() {
