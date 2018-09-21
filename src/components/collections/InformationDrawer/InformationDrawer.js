@@ -31,7 +31,7 @@ class InformationDrawer extends React.Component {
         return <React.Fragment>
                 <Collection
                     collection={this.props.collection}
-                    collectionStore={this.props.collectionStore}
+                    collectionAPI={this.props.collectionAPI}
                     onDidChangeDetails={this.handleDetailsChange.bind(this)}
                 />
                 <hr/>
@@ -43,7 +43,7 @@ class InformationDrawer extends React.Component {
                     refresh={this.state.refreshRequired}
                     onDidLoad={this.handleMetadataDidLoad.bind(this)}
                     subject={this.props.collection.uri}
-                    metadataStore={this.props.metadataStore}
+                    metadataAPI={this.props.metadataAPI}
                 />
 
                 <hr/>

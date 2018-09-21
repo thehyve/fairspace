@@ -7,24 +7,24 @@ function flushPromises() {
     return new Promise(resolve => setImmediate(resolve));
 }
 
-let mockMetadataStore;
+let mockMetadataAPI;
 
-let mockNoMetadataStore;
+let mockNoMetadataAPI;
 
 beforeEach(() => {
-    mockMetadataStore = {
+    mockMetadataAPI = {
         getVocabulary: jest.fn(() => Promise.resolve(new Vocabulary(vocabulary))),
         get: jest.fn(() => Promise.resolve(metadata))
     };
 
-    mockNoMetadataStore = {
+    mockNoMetadataAPI = {
         getVocabulary: jest.fn(() => Promise.resolve(new Vocabulary(vocabulary))),
         get: jest.fn(() => Promise.resolve([]))
     }
 });
 
 it('shows result when subject provided', () => {
-    const wrapper = mount(<Metadata subject={"http://fairspace.com/iri/collections/1"} metadataStore={mockMetadataStore} />);
+    const wrapper = mount(<Metadata subject={"http://fairspace.com/iri/collections/1"} metadataAPI={mockMetadataAPI} />);
     return flushPromises().then(() => {
         wrapper.update();
     }).then(() => {
@@ -34,7 +34,7 @@ it('shows result when subject provided', () => {
 });
 
 it('shows error when no subject provided', () => {
-    const wrapper = mount(<Metadata subject={""} metadataStore={mockNoMetadataStore} />);
+    const wrapper = mount(<Metadata subject={""} metadataAPI={mockNoMetadataAPI} />);
     return flushPromises().then(() => {
         wrapper.update();
     }).then(() => {
@@ -45,7 +45,7 @@ it('shows error when no subject provided', () => {
 });
 
 it('shows nothing when there is no metadata found', () => {
-    const wrapper = mount(<Metadata subject={"test"} metadataStore={mockNoMetadataStore}/>);
+    const wrapper = mount(<Metadata subject={"test"} metadataAPI={mockNoMetadataAPI}/>);
     return flushPromises().then(() => {
         wrapper.update();
     }).then(() => {

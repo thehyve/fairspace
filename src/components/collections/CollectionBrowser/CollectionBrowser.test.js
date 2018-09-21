@@ -9,7 +9,7 @@ import configureStore from 'redux-mock-store'
 const middlewares = []
 const mockStore = configureStore(middlewares)
 
-let mockCollectionStore, mockFileStore, mockMetadataStore, mockFileStoreFactory, store;
+let mockCollectionAPI, mockFileAPI, mockMetadataAPI, mockFileAPIFactory, store;
 let collectionBrowser;
 
 function flushPromises() {
@@ -17,19 +17,19 @@ function flushPromises() {
 }
 
 beforeEach(() => {
-    mockFileStoreFactory = {
-        build: () => mockFileStore
+    mockFileAPIFactory = {
+        build: () => mockFileAPI
     };
 
-    mockMetadataStore = {}
+    mockMetadataAPI = {}
 
-    mockFileStore = {
+    mockFileAPI = {
         list: jest.fn(() => Promise.resolve()),
         upload: jest.fn(() => Promise.resolve()),
         download: jest.fn()
     };
 
-    mockCollectionStore = {
+    mockCollectionAPI = {
         getCollections: jest.fn(() => Promise.resolve()),
         getCollection: jest.fn(() => Promise.resolve([])),
         addCollection: jest.fn(() => Promise.resolve([])),
@@ -41,9 +41,9 @@ beforeEach(() => {
         <MemoryRouter>
             <CollectionBrowser
                 store={store}
-                collectionStore={mockCollectionStore}
-                metadataStore={mockMetadataStore}
-                fileStoreFactory={mockFileStoreFactory}
+                collectionAPI={mockCollectionAPI}
+                metadataAPI={mockMetadataAPI}
+                fileAPIFactory={mockFileAPIFactory}
             />
         </MemoryRouter>
     )
@@ -68,5 +68,5 @@ it('creates a new collection on button click', () => {
     button.at(1).simulate('click');
 
     // Expect the collection to be created in storage
-    expect(mockCollectionStore.addCollection.mock.calls.length).toEqual(1);
+    expect(mockCollectionAPI.addCollection.mock.calls.length).toEqual(1);
 });
