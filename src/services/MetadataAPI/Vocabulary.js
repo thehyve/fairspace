@@ -21,11 +21,11 @@ class Vocabulary {
      * @param expandedMetadata Metadata in expanded json-ld format with actual metadata about one subject
      * @returns A promise resolving in an array with metadata. Each element will look like this:
      * {
-     *      key: "fairspace:description",
+     *      key: "http://fairspace.io/ontology#description",
      *      label: "Description",
      *      values: [
-     *          { "@id": "http://fairspace.com/collections/1", "rdfs:label": "My collection" },
-     *          { "@value": "Literal value"}
+     *          { id: "http://fairspace.com/collections/1", label: "My collection" },
+     *          { value: "Literal value"}
      *      ]
      *  }
      */
@@ -81,13 +81,11 @@ class Vocabulary {
                 continue;
             }
 
-            let values = metadata[predicateUri];
-
-            // @type needs special attention: it is specified as a literal string
-            // but should be treated as an object
-            if (predicateUri === "@type") {
-                values = this.convertTypeEntries(values);
-            }
+            let values = (predicateUri === "@type")
+                // @type needs special attention: it is specified as a literal string
+                // but should be treated as an object
+                ? this.convertTypeEntries(metadata[predicateUri])
+                : metadata[predicateUri].map(i => ({id: i['@id'], value: i['@value']}));
 
             prefilledProperties.push(Vocabulary._generatePropertyEntry(predicateUri, values, vocabularyEntry));
         }
@@ -173,7 +171,7 @@ class Vocabulary {
         return {
             key: predicate,
             label: label,
-            values: values.sort(comparing(compareBy('rdfs:label'), compareBy('@id'), compareBy('@value'))),
+            values: values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value'))),
             range: range,
             allowMultiple: allowMultiple
         };
@@ -182,8 +180,8 @@ class Vocabulary {
     convertTypeEntries(values) {
         return values
             .map(type => ({
-                "@id": type,
-                "rdfs:label": Vocabulary._getLabel(this.vocabularyById[type])
+                id: type,
+                label: Vocabulary._getLabel(this.vocabularyById[type])
             }))
     }
 

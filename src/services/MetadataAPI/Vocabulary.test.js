@@ -68,8 +68,8 @@ describe('combination of vocabulary and metadata', () => {
         expect(result[0].key).toEqual("@type");
         expect(result[0].label).toEqual("Type");
         expect(result[0].values.length).toEqual(1);
-        expect(result[0].values[0]['@id']).toEqual('http://fairspace.io/ontology#Collection');
-        expect(result[0].values[0]['rdfs:label']).toEqual('Collection');
+        expect(result[0].values[0].id).toEqual('http://fairspace.io/ontology#Collection');
+        expect(result[0].values[0].label).toEqual('Collection');
         expect(result[1].values.length).toEqual(0);
         expect(result[2].values.length).toEqual(0);
         expect(result[3].values.length).toEqual(0);
@@ -98,7 +98,7 @@ describe('combination of vocabulary and metadata', () => {
         expect(result[0].key).toEqual("http://fairspace.io/ontology#name");
         expect(result[0].label).toEqual("Name");
         expect(result[0].values.length).toEqual(1);
-        expect(result[0].values[0]['@value']).toEqual('Collection 1');
+        expect(result[0].values[0].value).toEqual('Collection 1');
 
         expect(result[2].values.length).toEqual(0);
         expect(result[3].values.length).toEqual(0);
@@ -118,11 +118,11 @@ describe('combination of vocabulary and metadata', () => {
         expect(result[0].key).toEqual("http://schema.org/Creator");
         expect(result[0].label).toEqual("Creator");
         expect(result[0].values.length).toEqual(1);
-        expect(result[0].values[0]['@value']).toEqual('John Snow');
+        expect(result[0].values[0].value).toEqual('John Snow');
         expect(result[1].key).toEqual("http://fairspace.io/ontology#name");
         expect(result[1].label).toEqual("Name");
         expect(result[1].values.length).toEqual(1);
-        expect(result[1].values[0]['@value']).toEqual('Collection 1');
+        expect(result[1].values[0].value).toEqual('Collection 1');
     });
 
     it('looks up labels in vocabulary properly', () => {
@@ -167,8 +167,8 @@ describe('combination of vocabulary and metadata', () => {
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("http://fairspace.io/ontology#description");
         expect(result[0].values.length).toEqual(2);
-        expect(result[0].values[0]['@value']).toEqual('My first collection');
-        expect(result[0].values[1]['@value']).toEqual('Some more info');
+        expect(result[0].values[0].value).toEqual('My first collection');
+        expect(result[0].values[1].value).toEqual('Some more info');
 
         expect(result[2].values.length).toEqual(0);
         expect(result[3].values.length).toEqual(0);

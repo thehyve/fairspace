@@ -19,7 +19,7 @@ it('displays properties properly', () => {
 
 
 const properties = [
-    {label: 'Description', values: [{'@value': 'More info'}, {'@value': 'My first collection'}]},
-    {label: 'Name', values: [{'@value': 'Collection 5'}]}, {label: "Type", values:
-            [{"@id": "http://fairspace.io/ontology#Collection", "rdfs:label": "Collection"}]}
+    {label: 'Description', values: [{value: 'More info'}, {value: 'My first collection'}]},
+    {label: 'Name', values: [{value: 'Collection 5'}]}, {label: "Type", values:
+            [{id: "http://fairspace.io/ontology#Collection", label: "Collection"}]}
 ];
