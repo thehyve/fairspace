@@ -21,11 +21,11 @@ class Vocabulary {
      * @param expandedMetadata Metadata in expanded json-ld format with actual metadata about one subject
      * @returns A promise resolving in an array with metadata. Each element will look like this:
      * {
-     *      key: "fairspace:description",
+     *      key: "http://fairspace.io/ontology#description",
      *      label: "Description",
      *      values: [
-     *          { "@id": "http://fairspace.com/collections/1", label: "My collection" },
-     *          { "@value": "Literal value"}
+     *          { id: "http://fairspace.com/collections/1", label: "My collection" },
+     *          { value: "Literal value"}
      *      ]
      *  }
      */
