@@ -7,7 +7,7 @@ class CollectionOverview extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
-        this.collectionStore = props.collectionStore;
+        this.collectionAPI = props.collectionAPI;
         this.onCollectionsDidLoad = props.onCollectionsDidLoad;
 
         // Initialize state
@@ -34,7 +34,7 @@ class CollectionOverview extends React.Component {
 
         this.setState({loading: true});
 
-        return this.collectionStore
+        return this.collectionAPI
             .getCollections()
             .then(collections => {
                 if (this.isUnmounting) {
@@ -59,7 +59,7 @@ class CollectionOverview extends React.Component {
     }
 
     deleteCollection(collection) {
-        return this.collectionStore
+        return this.collectionAPI
             .deleteCollection(collection.id)
             .then(() => {
                 if (this.props.onCollectionDelete) {

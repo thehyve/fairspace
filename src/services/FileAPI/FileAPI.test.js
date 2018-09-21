@@ -22,16 +22,16 @@ beforeAll(() => {
 });
 
 it('uses the collection name in the webdav path', () => {
-    const fileStore = new FileAPI('subdir')
-    expect(fileStore.getFullPath('/filename')).toEqual('/subdir/filename');
-    expect(fileStore.getFullPath()).toEqual('/subdir');
+    const fileAPI = new FileAPI('subdir')
+    expect(fileAPI.getFullPath('/filename')).toEqual('/subdir/filename');
+    expect(fileAPI.getFullPath()).toEqual('/subdir');
 })
 
 if('uploads multiple files', () => {
-    const fileStore = new FileAPI('subdir')
-    fileStore.client = {putFileContents: jest.fn(() => Promise.resolve())};
+    const fileAPI = new FileAPI('subdir')
+    fileAPI.client = {putFileContents: jest.fn(() => Promise.resolve())};
 
-    const result = fileStore.upload([{name: 'filea.txt'}, {name: 'fileb.txt'}, {name: 'filec.txt'}]);
+    const result = fileAPI.upload([{name: 'filea.txt'}, {name: 'fileb.txt'}, {name: 'filec.txt'}]);
     expect(result).resolves;
-    expect(fileStore.client.putFileContents.mock.calls.length).toEqual(3);
+    expect(fileAPI.client.putFileContents.mock.calls.length).toEqual(3);
 });

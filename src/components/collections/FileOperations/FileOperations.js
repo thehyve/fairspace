@@ -8,7 +8,7 @@ import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import Badge from "@material-ui/core/Badge";
 
 function FileOperations(props) {
-    const {fileStore, path, onDidFileOperation, onCut, onCopy, onPaste, numClipboardItems, selection, disabled} = props;
+    const {fileAPI, path, onDidFileOperation, onCut, onCopy, onPaste, numClipboardItems, selection, disabled} = props;
 
     function handleCut(e) {
         e.stopPropagation()
@@ -25,7 +25,7 @@ function FileOperations(props) {
 
     function handleUpload(path, files) {
         if (files && files.length > 0) {
-            return fileStore
+            return fileAPI
                 .upload(path, files)
                 .catch(err => {
                     ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(path, files));
@@ -36,8 +36,8 @@ function FileOperations(props) {
     }
 
     function handleCreateDirectory(path, name) {
-        return fileStore
-            .createDirectory(fileStore.joinPaths(path, name))
+        return fileAPI
+            .createDirectory(fileAPI.joinPaths(path, name))
             .then(onDidFileOperation)
             .then(() => true)
             .catch(err => {

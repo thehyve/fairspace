@@ -22,13 +22,13 @@ class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
 
-        this.metadataStore = props.metadataStore;
-        this.collectionStore = props.collectionStore;
-        this.fileStore = null;
+        this.metadataAPI = props.metadataAPI;
+        this.collectionAPI = props.collectionAPI;
+        this.fileAPI = null;
 
         // Initialize state
         this.state = {
-            clipboard: new Clipboard(this.fileStore),
+            clipboard: new Clipboard(this.fileAPI),
             loading: false,
             error: false,
 
@@ -65,21 +65,21 @@ class CollectionBrowser extends React.Component {
         }
     }
 
-    setFilestore(fileStore) {
-        // Only update the filestore if it actually has changed
-        if (!this.fileStore || fileStore.basePath !== this.fileStore.basePath) {
-            this.fileStore = fileStore;
-            this.setState({clipboard: new Clipboard(fileStore)})
+    setFileAPI(fileAPI) {
+        // Only update the fileAPI if it actually has changed
+        if (!this.fileAPI || fileAPI.basePath !== this.fileAPI.basePath) {
+            this.fileAPI = fileAPI;
+            this.setState({clipboard: new Clipboard(fileAPI)})
         }
     }
 
     openCollectionAndPath(selectedCollectionId, openedPath) {
         if (selectedCollectionId) {
             // Retrieve collection details
-            this.collectionStore
+            this.collectionAPI
                 .getCollection(selectedCollectionId)
                 .then(collection => {
-                    this.setFilestore(this.props.fileStoreFactory.build(collection));
+                    this.setFileAPI(this.props.fileAPIFactory.build(collection));
                     this.setState({
                         openedCollection: collection,
                         selectedCollection: collection,
@@ -105,7 +105,7 @@ class CollectionBrowser extends React.Component {
         const description = "Beyond the horizon";
 
         // Create the bucket in storage
-        this.collectionStore
+        this.collectionAPI
             .addCollection(name, description)
             .then(this.requireRefresh.bind(this))
             .catch(err => {
@@ -262,19 +262,19 @@ class CollectionBrowser extends React.Component {
     }
 
     downloadFile(path) {
-        this.fileStore.download(this._getFullPath(path));
+        this.fileAPI.download(this._getFullPath(path));
     }
 
     deleteFile(path) {
-        return this.fileStore.delete(this._getFullPath(path));
+        return this.fileAPI.delete(this._getFullPath(path));
     }
 
     renameFile(current, newName) {
-        return this.fileStore.move(this._getFullPath(current), this._getFullPath(newName));
+        return this.fileAPI.move(this._getFullPath(current), this._getFullPath(newName));
     }
 
     _getFullPath(path) {
-        return this.fileStore.joinPaths(this.state.openedPath || '', path);
+        return this.fileAPI.joinPaths(this.state.openedPath || '', path);
     }
 
     // Parse path into array
@@ -340,8 +340,8 @@ class CollectionBrowser extends React.Component {
                     path={selectedPath}
                     onClose={this.handleCloseInfoDrawer.bind(this)}
                     onDidChangeDetails={this.handleDidCollectionDetailsChange.bind(this)}
-                    collectionStore={this.collectionStore}
-                    metadataStore={this.metadataStore}
+                    collectionAPI={this.collectionAPI}
+                    metadataAPI={this.metadataAPI}
                 >
                 </InformationDrawer>
             </div>
@@ -366,7 +366,7 @@ class CollectionBrowser extends React.Component {
             return <FileOperations
                         path={openedPath}
                         selection={selection}
-                        fileStore={this.fileStore}
+                        fileAPI={this.fileAPI}
                         onCut={this.handleCut.bind(this)}
                         onCopy={this.handleCopy.bind(this)}
                         onPaste={this.handlePaste.bind(this)}
@@ -396,7 +396,7 @@ class CollectionBrowser extends React.Component {
                 path={this.state.openedPath}
                 selectedPath={this.state.selectedPath}
                 refreshFiles={this.state.refreshRequired}
-                fileStore={this.fileStore}
+                fileAPI={this.fileAPI}
                 onFilesDidLoad={this.handleDidLoad.bind(this)}
                 onPathClick={this.handlePathClick.bind(this)}
                 onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
@@ -409,7 +409,7 @@ class CollectionBrowser extends React.Component {
     renderCollectionList() {
         return (
             <CollectionOverview
-                collectionStore={this.collectionStore}
+                collectionAPI={this.collectionAPI}
                 selectedCollection={this.state.selectedCollection}
                 refreshCollections={this.state.refreshRequired}
                 onCollectionsDidLoad={this.handleDidLoad.bind(this)}
