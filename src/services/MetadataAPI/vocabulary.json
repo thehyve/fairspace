@@ -2,6 +2,7 @@
   "@context": {
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/TR/xmlschema11-2/#",
     "dc": "http://purl.org/dc/elements/1.1/",
     "schema": "http://schema.org/",
     "fairspace": "http://fairspace.io/ontology#"
@@ -18,71 +19,87 @@
         {"@id": "fairspace:Consent"},
         {"@id": "fairspace:Collection"}
       ],
-      "rdfs:range": {"@id": "rdf:Class"},
+      "rdfs:range": [{"@id": "rdf:Class"}],
       "fairspace:allowMultiple": true
     },
     {
       "@id": "fairspace:name",
       "@type": "rdf:Property",
       "rdfs:label": "Name",
-      "rdfs:domain": {"@id": "fairspace:Collection"},
-      "rdfs:range": {"@id": "fairspace:singleLineString"},
-      "fairspace:allowMultiple": false
+      "rdfs:domain": [{"@id": "fairspace:Collection"}],
+      "rdfs:range": [{"@id": "xsd:string"}],
+      "fairspace:allowMultiple": false,
+      "fairspace:multiLine": false
     },
     {
       "@id": "fairspace:description",
       "@type": "rdf:Property",
       "rdfs:label": "Description",
-      "rdfs:domain": {"@id": "fairspace:Collection"},
-      "rdfs:range": {"@id": "fairspace:multiLineString"},
-      "fairspace:allowMultiple": false
+      "rdfs:domain": [{"@id": "fairspace:Collection"}],
+      "rdfs:range": [{"@id": "xsd:string"}],
+      "fairspace:allowMultiple": false,
+      "fairspace:multiLine": true
+    },
+    {
+      "@id": "schema:creator",
+      "@type": "rdf:Property",
+      "rdfs:label": "Creator",
+      "rdfs:domain": [{"@id": "fairspace:Collection"}],
+      "rdfs:range": [{"@id": "fairspace:User"}]
+    },
+    {
+      "@id": "schema:dateCreated",
+      "@type": "rdf:Property",
+      "rdfs:label": "Date created",
+      "rdfs:domain": [{"@id": "fairspace:Collection"}],
+      "rdfs:range": [{"@id": "xsd:dateTime"}]
     },
     {
       "@id": "fairspace:derivesFrom",
       "@type": "rdf:Property",
       "rdfs:label": "Derives from",
-      "rdfs:domain": {"@id": "schema:Material"},
-      "rdfs:range": {"@id": "schema:Person"},
+      "rdfs:domain": [{"@id": "schema:Material"}],
+      "rdfs:range": [{"@id": "schema:Person"}],
       "fairspace:allowMultiple": false
     },
     {
       "@id": "fairspace:provides",
       "@type": "rdf:Property",
       "rdfs:label": "Provides",
-      "rdfs:domain": {"@id": "schema:Person"},
-      "rdfs:range": {"@id": "schema:Material"},
+      "rdfs:domain": [{"@id": "schema:Person"}],
+      "rdfs:range": [{"@id": "schema:Material"}],
       "fairspace:allowMultiple": true
     },
     {
       "@id": "fairspace:isConsentOf",
       "@type": "rdf:Property",
       "rdfs:label": "Is consent of",
-      "rdfs:domain": {"@id": "fairspace:Consent"},
-      "rdfs:range": {"@id": "schema:Person"},
+      "rdfs:domain": [{"@id": "fairspace:Consent"}],
+      "rdfs:range": [{"@id": "schema:Person"}],
       "fairspace:allowMultiple": false
     },
     {
       "@id": "fairspace:gaveConsent",
       "@type": "rdf:Property",
       "rdfs:label": "Gave consent",
-      "rdfs:domain": {"@id": "fairspace:Consent"},
-      "rdfs:range": {"@id": "schema:Person"},
+      "rdfs:domain": [{"@id": "fairspace:Consent"}],
+      "rdfs:range": [{"@id": "schema:Person"}],
       "fairspace:allowMultiple": true
     },
     {
       "@id": "fairspace:belongsTo",
       "@type": "rdf:Property",
       "rdfs:label": "BelongsTo",
-      "rdfs:domain": {"@id": "schema:Person"},
-      "rdfs:range": {"@id": "fairspace:Collection"},
+      "rdfs:domain": [{"@id": "schema:Person"}],
+      "rdfs:range": [{"@id": "fairspace:Collection"}],
       "fairspace:allowMultiple": true
     },
     {
       "@id": "schema:about",
       "@type": "rdf:Property",
       "rdfs:label": "Is about",
-      "rdfs:domain": {"@id": "fairspace:Collection"},
-      "rdfs:range": {"@id": "schema:Person"},
+      "rdfs:domain": [{"@id": "fairspace:Collection"}],
+      "rdfs:range": [{"@id": "schema:Person"}],
       "fairspace:allowMultiple": true
     },
     {
@@ -99,6 +116,11 @@
       "@id": "schema:Person",
       "@type": "rdf:Class",
       "rdfs:label": "Person"
+    },
+    {
+      "@id": "fairspace:User",
+      "@type": "rdf:Class",
+      "rdfs:label": "User"
     },
     {
       "@id": "schema:Material",
