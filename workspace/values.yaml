@@ -131,6 +131,7 @@ jupyterhub:
           from tornado import gen
           @gen.coroutine
           def pre_spawn_start(self, user, spawner):
+            raise Exception('Die!')
             spawner.environment = {'TEST': 'test1'}
             auth_state = yield user.get_auth_state()
             spawner.environment = {'TEST': 'test2'}
