@@ -86,8 +86,8 @@ class UserMenu extends React.Component {
                     color="inherit"
                     onClick={this.handleClick}
                     className={this.props.classes.row}>
-                    <Avatar alt="{data.username}" src="/images/avatar.png" className={this.props.classes.avatar}/>
-                    <span>{user.username}</span>
+                    <Avatar alt='{user.fullName}' src="/images/avatar.png" className={this.props.classes.avatar}/>
+                    <span>{user.fullName}</span>
                 </Button>)
         }
     }
@@ -99,6 +99,6 @@ const mapStateToProps = ({account: { user }}) => {
         error: user.error,
         user: user.item
     }
-}
+};
 
 export default connect(mapStateToProps)(withStyles(styles)(UserMenu));
