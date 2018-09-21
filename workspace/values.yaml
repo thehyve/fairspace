@@ -127,11 +127,10 @@ jupyterhub:
                     username_key: preferred_username
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
-          import os
           from oauthenticator.generic import GenericOAuthenticator
           base = GenericOAuthenticator.authenticate
-          def authenticate(self, handler, data=None):
-            result = base(self, handler, data)
+          async def authenticate(self, handler, data=None):
+            result = await base(self, handler, data)
             token = result['auth_state']['access_token']
             if token is None:
               token = 'NONE'
