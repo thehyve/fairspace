@@ -1,22 +1,22 @@
 [
     {
         "collectionId": 1,
-        "subject": "user2",
+        "subject": "user2-id",
         "access": "Write"
     },
     {
         "collectionId": 1,
-        "subject": "user4",
+        "subject": "user4-id",
         "access": "Read"
     },
     {
         "collectionId": 1,
-        "subject": "user3",
+        "subject": "user3-id",
         "access": "Read"
     },
     {
         "collectionId": 1,
-        "subject": "user1",
+        "subject": "user1-id",
         "access": "Manage"
     }
 ]
