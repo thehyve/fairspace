@@ -7,6 +7,7 @@ const StringProperty = ({property, entry, onChange}) =>
         value={entry.value}
         onChange={e => onChange(e.target.value)}
         margin="normal"
+        style={{marginTop: 0}}
     />
 
 export default StringProperty;

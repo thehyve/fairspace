@@ -13,8 +13,8 @@ const MetadataViewer = props => {
     function renderProperty(property) {
         const items = property.values.map(entry => renderEntry(property, entry));
 
-        return <ListItem key={property.key}>
-            <Typography variant="subheading">{property.label}</Typography>
+        return <ListItem key={property.key} style={{display: 'block'}}>
+            <Typography variant="body2">{property.label}</Typography>
             <List dense={true}>{items}</List>
         </ListItem>
     }
