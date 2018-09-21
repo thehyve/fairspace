@@ -68,7 +68,6 @@ class ShareWithDialog extends React.Component {
 
     componentDidMount() {
         userAPI.getUsers().then(result => {
-            console.log('result', result)
             const userList = result.map(r => {
                 return {
                     label: `${r.firstName} ${r.lastName}`,
