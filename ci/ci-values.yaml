@@ -19,7 +19,7 @@ pluto:
   tracing:
     samplingRate: 1
   services:
-    jupyter: https://jupyter.workspace.ci.test.fairdev.app
+    jupyter: https://jupyterhub.workspace.ci.test.fairdev.app
 
 titan:
   auth:
