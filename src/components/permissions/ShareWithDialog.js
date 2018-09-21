@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import userClient from '../../services/UserAPI/UserAPI';
+import userAPI from '../../services/UserAPI/UserAPI';
 import permissionAPI from '../../services/PermissionAPI/PermissionAPI';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -67,7 +67,8 @@ class ShareWithDialog extends React.Component {
     };
 
     componentDidMount() {
-        userClient.getUsers().then(result => {
+        userAPI.getUsers().then(result => {
+            console.log('result', result)
             const userList = result.map(r => {
                 return {
                     label: `${r.firstName} ${r.lastName}`,
