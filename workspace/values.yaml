@@ -129,7 +129,7 @@ jupyterhub:
                     username_key: preferred_username
         extraConfig: |
           import os
-          import oauthenticator.generic.GenericOAuthenticator
+          from oauthenticator.generic import GenericOAuthenticator
           base = GenericOAuthenticator.authenticate
           def authenticate(self, handler, data=None):
             result = base(self, handler, data)
