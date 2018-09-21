@@ -1,7 +1,7 @@
 {
   "urls": {
     "logout": "/logout",
-    "userInfo": "/account/name",
+    "userInfo": "/account/user",
     "authorizations": "/account/authorizations",
     "collections": "/api/collections",
     "collectionPermissions": "/api/collections/%d/permissions",

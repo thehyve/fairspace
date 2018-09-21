@@ -8,7 +8,7 @@ const app = express();
 app.get('/api/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
 
 // Account API
-app.get('/account/name', (req, res) => res.sendFile(__dirname + '/user.json'));
+app.get('/account/user', (req, res) => res.sendFile(__dirname + '/user.json'));
 app.get('/account/authorizations', (req, res) => res.send(["user-workspace1", "ROLE_USER"]));
 
 // Collections API
