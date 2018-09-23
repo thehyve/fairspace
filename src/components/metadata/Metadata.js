@@ -1,6 +1,7 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
+import Typography from "@material-ui/core/Typography";
 
 class Metadata extends React.Component {
     static defaultProps = {
@@ -85,6 +86,7 @@ class Metadata extends React.Component {
     render() {
         return (
         <div>
+            <Typography variant="subheading">Metadata:</Typography>
             {this.renderBody()}
         </div>
         )
