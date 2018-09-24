@@ -128,18 +128,16 @@ jupyterhub:
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
           from oauthenticator.generic import GenericOAuthenticator
-          from tornado import gen
           base = GenericOAuthenticator.authenticate
-          @gen.coroutine
-          def authenticate(self, handler, data=None):
-            result = yield base(self, handler, data)
+          async def authenticate(self, handler, data=None):
+            result = await base(self, handler, data)
             c.KubeSpawner.environment = {'TEST': 'test'}
             token = result['auth_state']['access_token']
             if token is None:
               token = 'NONE'
             c.KubeSpawner.environment = {'AUTH_TOKEN': token}
             return result
-          GenericOAuthenticator.authenticate = authenticate                  
+          GenericOAuthenticator.authenticate = authenticate
     proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
 
