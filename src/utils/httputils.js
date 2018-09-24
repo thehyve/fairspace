@@ -6,4 +6,3 @@ export function failOnHttpError(message) {
         return response;
     }
 }
-

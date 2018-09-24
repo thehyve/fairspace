@@ -1,78 +1,81 @@
-import Metadata from "./Metadata"
+import ConnectedMetadata from "./Metadata"
+import { Metadata } from "./Metadata"
 import React from 'react';
 import {mount} from "enzyme";
 import Vocabulary from "../../services/MetadataAPI/Vocabulary";
+import mockStore from "../../store/mockStore"
+import MetadataViewer from "./MetadataViewer";
 
-function flushPromises() {
-    return new Promise(resolve => setImmediate(resolve));
-}
+it('shows result when subject provided and data is loaded', () => {
+    const store = mockStore({ cache: {
+        metadataBySubject: {
+            "http://fairspace.com/iri/collections/1": {
+                items: [
+                    {}
+                ]
+            }
+        },
+        vocabulary: {
+            item: new Vocabulary(vocabulary)
+        }
+    }});
 
-let mockMetadataAPI;
+    const wrapper = mount(<ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} store={store} />);
 
-let mockNoMetadataAPI;
-
-beforeEach(() => {
-    mockMetadataAPI = {
-        getVocabulary: jest.fn(() => Promise.resolve(new Vocabulary(vocabulary))),
-        get: jest.fn(() => Promise.resolve(metadata))
-    };
-
-    mockNoMetadataAPI = {
-        getVocabulary: jest.fn(() => Promise.resolve(new Vocabulary(vocabulary))),
-        get: jest.fn(() => Promise.resolve([]))
-    }
+    expect(wrapper.find(MetadataViewer).length).toEqual(1);
 });
 
-it('shows result when subject provided', () => {
-    const wrapper = mount(<Metadata subject={"http://fairspace.com/iri/collections/1"} metadataAPI={mockMetadataAPI} />);
-    return flushPromises().then(() => {
-        wrapper.update();
-    }).then(() => {
-        const result = wrapper.find("li");
-        expect(result.length).toEqual(7);
-    });
+it('shows a message if no metadata was found', () => {
+    const store = mockStore({ cache: {
+            metadataBySubject: {
+                "http://fairspace.com/iri/collections/1": {
+                    items: []
+                }
+            },
+            vocabulary: {
+                item: new Vocabulary(vocabulary)
+            }
+        }});
+
+    const wrapper = mount(<ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} store={store} />);
+
+    expect(wrapper.text()).toEqual("Metadata:No metadata found");
 });
 
 it('shows error when no subject provided', () => {
-    const wrapper = mount(<Metadata subject={""} metadataAPI={mockNoMetadataAPI} />);
-    return flushPromises().then(() => {
-        wrapper.update();
-    }).then(() => {
-        const result = wrapper.find("li");
-        expect(result.length).toEqual(0);
-        expect(wrapper.text()).toEqual("Metadata:error_outlineAn error occurred while loading metadata");
-    });
+    const store = mockStore({ cache: {
+            metadataBySubject: {
+                "http://fairspace.com/iri/collections/1": {
+                    items: []
+                }
+            },
+            vocabulary: {
+                item: new Vocabulary(vocabulary)
+            }
+        }});
+
+    const wrapper = mount(<ConnectedMetadata subject={""} store={store} />);
+
+    expect(wrapper.text()).toEqual("Metadata:error_outlineAn error occurred while loading metadata");
 });
 
-it('shows nothing when there is no metadata found', () => {
-    const wrapper = mount(<Metadata subject={"test"} metadataAPI={mockNoMetadataAPI}/>);
-    return flushPromises().then(() => {
-        wrapper.update();
-    }).then(() => {
-        const result = wrapper.find("li");
-        expect(result.length).toEqual(0);
-        expect(wrapper.text()).toEqual("Metadata:No metadata found");
-    });
-});
+it('tries to load the metadata and the vocabulary', () => {
+    const store = mockStore({ cache: {
+            metadataBySubject: {
+                "http://fairspace.com/iri/collections/1": {
+                    items: []
+                }
+            },
+            vocabulary: {
+                item: new Vocabulary(vocabulary)
+            }
+        }});
 
-const metadata = [
-    {
-        "@id": "http://fairspace.com/iri/collections/1",
-        "@type": [
-            "http://fairspace.io/ontology#Collection"
-        ],
-        "http://fairspace.io/ontology#description": [
-            {
-                "@value": "My first collection"
-            }
-        ],
-        "http://fairspace.io/ontology#name": [
-            {
-                "@value": "Collection 5"
-            }
-        ]
-    }
-];
+    const dispatch = jest.fn();
+    const wrapper = mount(<Metadata subject={"John"} store={store} dispatch={dispatch}/>);
+
+    expect(dispatch.mock.calls.length).toEqual(2);
+});
 
 const vocabulary = [
     {
