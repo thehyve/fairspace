@@ -5,6 +5,7 @@ import {mount} from "enzyme";
 import Button from "@material-ui/core/Button";
 import {MemoryRouter} from "react-router-dom";
 import configureStore from 'redux-mock-store'
+import {Provider} from "react-redux";
 
 const middlewares = []
 const mockStore = configureStore(middlewares)
@@ -39,12 +40,13 @@ beforeEach(() => {
 
     collectionBrowser = (
         <MemoryRouter>
-            <CollectionBrowser
-                store={store}
-                collectionAPI={mockCollectionAPI}
-                metadataAPI={mockMetadataAPI}
-                fileAPIFactory={mockFileAPIFactory}
-            />
+            <Provider store={store}>
+                <CollectionBrowser
+                    collectionAPI={mockCollectionAPI}
+                    metadataAPI={mockMetadataAPI}
+                    fileAPIFactory={mockFileAPIFactory}
+                />
+            </Provider>
         </MemoryRouter>
     )
 

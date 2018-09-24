@@ -8,62 +8,62 @@ import Icon from "@material-ui/core/Icon";
 import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
-import {invalidateMetadata} from "../../../actions/metadata";
+import {fetchMetadataBySubjectIfNeeded, invalidateMetadata} from "../../../actions/metadata";
+import {connect} from 'react-redux';
 
-class InformationDrawer extends React.Component {
-    handleDetailsChange(collection) {
-        this.props.onDidChangeDetails(collection);
-        this.props.dispatch(invalidateMetadata(this.props.collection.uri));
+function InformationDrawer(props) {
+    function handleDetailsChange(collection) {
+        props.onDidChangeDetails(collection);
+        props.dispatch(invalidateMetadata(this.props.collection.uri));
+        props.dispatch(fetchMetadataBySubjectIfNeeded(this.props.collection.uri));
     }
 
-    renderCollectionDetails() {
-        if(!this.props.collection) {
+    function renderCollectionDetails() {
+        if(!props.collection) {
             return <Typography variant="title">No collection</Typography>;
         }
 
         return <React.Fragment>
                 <Collection
-                    collection={this.props.collection}
-                    collectionAPI={this.props.collectionAPI}
-                    onDidChangeDetails={this.handleDetailsChange.bind(this)}
+                    collection={props.collection}
+                    collectionAPI={props.collectionAPI}
+                    onDidChangeDetails={handleDetailsChange}
                 />
                 <hr/>
 
-                <Permissions collectionId={this.props.collection.id}/>
+                <Permissions collectionId={props.collection.id}/>
                 <hr/>
 
-                <Metadata subject={this.props.collection.uri} />
+                <Metadata subject={props.collection.uri} />
 
                 <hr/>
 
                 <Typography variant="title">Paths</Typography>
-                {this.props.path ? this.props.path.map(path => <Typography
+                {props.path ? props.path.map(path => <Typography
                     key={path.filename}>{path.basename}</Typography>) : 'No path selected'}
             </React.Fragment>
     }
 
-    render() {
-        return (
-            <Drawer
-                variant="persistent"
-                anchor="right"
-                open={this.props.open}
-                classes={{
-                    paper: this.props.classes.infoDrawerPaper,
-                }}
-            >
-                <div className={this.props.classes.toolbar}/>
-                <IconButton onClick={this.props.onClose} className={this.props.classes.closeButton}>
-                    <Icon>chevron_right</Icon>
-                </IconButton>
+    return (
+        <Drawer
+            variant="persistent"
+            anchor="right"
+            open={props.open}
+            classes={{
+                paper: props.classes.infoDrawerPaper,
+            }}
+        >
+            <div className={props.classes.toolbar}/>
+            <IconButton onClick={props.onClose} className={props.classes.closeButton}>
+                <Icon>chevron_right</Icon>
+            </IconButton>
 
-                {this.renderCollectionDetails()}
+            {renderCollectionDetails()}
 
-            </Drawer>
-        );
-    }
+        </Drawer>
+    );
 }
 
-export default withStyles(styles)(InformationDrawer);
+export default connect()(withStyles(styles)(InformationDrawer));
 
 
