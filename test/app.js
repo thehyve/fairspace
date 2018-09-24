@@ -76,9 +76,11 @@ describe('Titan', () => {
 
     after(() => fs.removeSync(process.env.FILES_FOLDER));
 
-    it('responds to / when the directory is present and authorization is provided', () =>
+    it('responds to / anonymously', () => server.get('/').expect(200, 'Hi, I\'m Titan!'));
+
+    it('responds to /api/storage/webdav when the directory is present and authorization is provided', () =>
         server
-            .propfind('/')
+            .propfind('/api/storage/webdav/')
             .set('Authorization', 'Bearer Alice')
             .expect(207)
     );
@@ -89,34 +91,34 @@ describe('Authentication', () => {
 
     after(() => fs.removeSync(process.env.FILES_FOLDER));
 
-    it('responds to / when authorization with a valid JWT is provided', () =>
+    it('responds to /api/storage/webdav/ when authorization with a valid JWT is provided', () =>
         server
-            .propfind('/')
+            .propfind('/api/storage/webdav/')
             .set('Authorization', 'Bearer Alice')
             .expect(207)
     );
-    it('responds to / when authorization with any Bearer is provided', () =>
+    it('responds to /api/storage/webdav/ when authorization with any Bearer is provided', () =>
         server
-            .propfind('/')
+            .propfind('/api/storage/webdav/')
             .set('Authorization', 'Bearer JWT')
             .expect(207)
     );
-    it('responds a 401 to / when an unknown authorization is provided', () =>
+    it('responds a 401 to /api/storage/webdav/ when an unknown authorization is provided', () =>
         server
-            .propfind('/')
+            .propfind('/api/storage/webdav/')
             .set('Authorization', 'Unknown token')
             .expect(401)
     );
-    it('responds to / when Basic authorization is provided', () =>
+    it('responds to /api/storage/webdav/ when Basic authorization is provided', () =>
         server
-            .propfind('/')
+            .propfind('/api/storage/webdav/')
             .set('Authorization', 'Basic dXNlcjpqd3Q=')
             .expect(207)
     );
 
-    it('responds a 401 to / when no authorization is provided', () =>
+    it('responds a 401 to /api/storage/webdav/ when no authorization is provided', () =>
         server
-            .propfind('/')
+            .propfind('/api/storage/webdav/')
             .expect(401)
     );
 });
@@ -129,12 +131,12 @@ describe('Webdav', () => {
 
     it('a user can create and delete a top-level directory', () =>
         server
-            .mkcol('/1')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .delete('/1')
+                .delete('/api/storage/webdav/1')
                 .set('Anticipated-Operation', 'true')
                 .set('Authorization', 'Bearer Alice')
                 .expect(200))
@@ -142,68 +144,68 @@ describe('Webdav', () => {
 
     it('a user without manage permission cannot delete other\'s top-level directories', () =>
         server
-            .mkcol('/1')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .propfind('/1')
+                .propfind('/api/storage/webdav/1')
                 .set('Authorization', 'Bearer Bob')
                 .expect(401))
     );
 
     it('a user without read permission cannot read other\'s top-level directories', () =>
         server
-            .mkcol('/1')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .delete('/1')
+                .delete('/api/storage/webdav/1')
                 .set('Authorization', 'Bearer Bob')
                 .expect(401))
     );
 
     it('a user with read permission can read other\'s top-level directories', () =>
         server
-            .mkcol('/2')
+            .mkcol('/api/storage/webdav/2')
             .set('Authorization', 'Bearer Bob')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .propfind('/2')
+                .propfind('/api/storage/webdav/2')
                 .set('Authorization', 'Bearer Alice')
                 .expect(207))
     );
 
     it('a user can create and delete subdirectories', () =>
         server
-            .mkcol('/1')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() =>  server
-                .mkcol('/1/subdir')
+                .mkcol('/api/storage/webdav/1/subdir')
                 .set('Authorization', 'Bearer Alice')
                 .expect(201))
             .then(() => server
-                .delete('/1/subdir')
+                .delete('/api/storage/webdav/1/subdir')
                 .set('Authorization', 'Bearer Alice')
                 .expect(200))
     );
 
     it('a user can create and delete files', () =>
         server
-            .mkcol('/1')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() =>  server
-                .put('/1/file.txt')
+                .put('/api/storage/webdav/1/file.txt')
                 .set('Authorization', 'Bearer Alice')
                 .expect(201))
             .then(() => server
-                .delete('/1/file.txt')
+                .delete('/api/storage/webdav/1/file.txt')
                 .set('Authorization', 'Bearer Alice')
                 .expect(200))
     );
@@ -212,12 +214,12 @@ describe('Webdav', () => {
 
     it('a user can rename a top-level directory with Anticipated-Operation: true', () =>
         server
-            .mkcol('/1')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .move('/1')
+                .move('/api/storage/webdav/1')
                 .set('Authorization', 'Bearer Alice')
                 .set('Destination', 'http://fairspace.io/newname-1')
                 .set('Anticipated-Operation', 'true')
@@ -226,12 +228,12 @@ describe('Webdav', () => {
 
     it('a user cannot rename a top-level directory without Anticipated-Operation: true', () =>
         server
-            .mkcol('/1')
+            .mkcol('/api/storage/webdav/1')
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(201)
             .then(() => server
-                .move('/1')
+                .move('/api/storage/webdav/1')
                 .set('Authorization', 'Bearer Alice')
                 .set('Destination', 'http://fairspace.io/newname-1')
                 .expect(401))
@@ -239,7 +241,7 @@ describe('Webdav', () => {
 
     it('returns 401 for non-existing collections', () =>
         server
-            .delete('/1001/')
+            .delete('/api/storage/webdav/1001/')
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(401)
