@@ -1,8 +1,17 @@
 const defaultState = {};
 
-const jsonLdBySubject = (state = defaultState, action) => {
+const metadataBySubject = (state = defaultState, action) => {
     switch (action.type) {
-        case "METADATA_PENDING":
+        case "METADATA_COMBINATION_FULFILLED":
+            return {
+                ...state,
+                [action.meta.subject]: {
+                    pending: false,
+                    error: false,
+                    items: action.payload
+                }
+            }
+        case "METADATA_COMBINATION_PENDING":
             return {
                 ...state,
                 [action.meta.subject]: {
@@ -11,16 +20,7 @@ const jsonLdBySubject = (state = defaultState, action) => {
                     items: {}
                 }
             }
-        case "METADATA_FULFILLED":
-            return {
-                ...state,
-                [action.meta.subject]: {
-                    ...state[action.meta.subject],
-                    pending: false,
-                    items: action.payload
-                }
-            }
-        case "METADATA_REJECTED":
+        case "METADATA_COMBINATION_REJECTED":
             return {
                 ...state,
                 [action.meta.subject]: {
@@ -39,4 +39,4 @@ const jsonLdBySubject = (state = defaultState, action) => {
     }
 };
 
-export default jsonLdBySubject;
+export default metadataBySubject;

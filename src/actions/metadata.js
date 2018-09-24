@@ -6,29 +6,51 @@ export const invalidateMetadata = (subject) => ({
     subject: subject
 })
 
-export const fetchMetadataBySubjectIfNeeded = (subject) => {
+export const updateMetadata = createPromiseAction((subject, predicate, values) => ({
+    type: "UPDATE_METADATA",
+    payload: this.props.metadataAPI
+        .update(subject, predicate, values),
+    meta: {
+        subject: subject,
+        predicate: predicate
+    }
+}))
+
+export const fetchCombinedMetadataIfNeeded = (subject) => {
     return (dispatch, getState) => {
-        if (shouldFetchMetadata(getState(), subject)) {
-            return dispatch(fetchMetadataBySubject(subject))
+        if (shouldCombineMetadata(getState(), subject)) {
+            return dispatch(combineMetadataForSubject(subject))
         } else {
-            // Let the calling code know there's nothing to wait for.
-            return Promise.resolve()
+            return Promise.resolve();
         }
     }
 }
 
-export const fetchMetadataVocabularyIfNeeded = () => {
+const fetchJsonLdBySubjectIfNeeded = (subject) => {
     return (dispatch, getState) => {
-        if (shouldFetchVocabulary(getState())) {
+        const state = getState();
+        if (shouldFetchMetadata(state, subject)) {
+            return dispatch(fetchJsonLdBySubject(subject))
+        } else {
+            // Let the calling code know there's nothing to wait for.
+            return Promise.resolve({value: state.cache.jsonLdBySubject[subject].items})
+        }
+    }
+
+}
+const fetchMetadataVocabularyIfNeeded = () => {
+    return (dispatch, getState) => {
+        const state = getState();
+        if (shouldFetchVocabulary(state)) {
             return dispatch(fetchVocabulary())
         } else {
             // Let the calling code know there's nothing to wait for.
-            return Promise.resolve()
+            return Promise.resolve({value: state.cache.vocabulary.item})
         }
     }
 }
 
-const fetchMetadataBySubject = createPromiseAction((subject) => ({
+const fetchJsonLdBySubject = createPromiseAction((subject) => ({
     type: "METADATA",
     payload: MetadataAPI.get({subject: subject}),
     meta: {
@@ -36,13 +58,24 @@ const fetchMetadataBySubject = createPromiseAction((subject) => ({
     }
 }));
 
+const combineMetadataForSubject = createPromiseAction((subject, dispatch) => ({
+    type: "METADATA_COMBINATION",
+    payload: Promise.all([
+                dispatch(fetchJsonLdBySubjectIfNeeded(subject)),
+                dispatch(fetchMetadataVocabularyIfNeeded())
+            ]).then(([jsonLd, vocabulary]) => {
+                return vocabulary.value.combine(jsonLd.value);
+            }),
+    meta: { subject: subject }
+}))
+
 const fetchVocabulary = createPromiseAction(() => ({
     type: "METADATA_VOCABULARY",
     payload: MetadataAPI.getVocabulary()
 }));
 
 const shouldFetchMetadata = (state, subject) => {
-    const metadata = state && state.cache && state.cache.metadataBySubject ? state.cache.metadataBySubject[subject] : undefined;
+    const metadata = state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined;
     if (!metadata) {
         return true
     } else if (metadata.pending) {
@@ -50,6 +83,10 @@ const shouldFetchMetadata = (state, subject) => {
     } else {
         return !!metadata.error
     }
+}
+
+const shouldCombineMetadata = (state, subject) => {
+    return !state || !state.metadataBySubject || !state.metadataBySubject[subject];
 }
 
 const shouldFetchVocabulary = (state) => {

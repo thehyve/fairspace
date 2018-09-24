@@ -1,8 +1,8 @@
 import {combineReducers} from 'redux'
-import metadataBySubject from './metadataBySubject'
+import jsonLdBySubject from './jsonLdBySubject'
 import vocabulary from "./vocabulary";
 
 export default combineReducers({
-    metadataBySubject,
+    jsonLdBySubject,
     vocabulary
 })

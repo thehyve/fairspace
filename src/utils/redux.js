@@ -9,7 +9,7 @@
 export function createPromiseAction(actionClosure){
     return (...params) => dispatch =>
         dispatch(
-            actionClosure(...params)
+            actionClosure(...params, dispatch)
         ).catch(e => {
                 // In general, the error will be handled by the component that works with
                 // the data. However, to avoid problems with uncaught exceptions, these

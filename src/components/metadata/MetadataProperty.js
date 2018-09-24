@@ -6,6 +6,7 @@ import StringValue from "./values/StringValue";
 import ReferringValue from "./values/ReferringValue";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import ErrorDialog from "../error/ErrorDialog";
+import {connect} from 'react-redux';
 
 /**
  * Shows the property and values for the property
@@ -41,6 +42,8 @@ class MetadataProperty extends React.Component {
                     return el;
                 }
             })
+
+
 
             this.setState({saving: true});
 
@@ -93,4 +96,10 @@ class MetadataProperty extends React.Component {
 
 }
 
-export default MetadataProperty
+const mapStateToProps = (state, ownProps) => {
+    return {
+        // saving: state.metadata[ownProps.subject][ownProps.property].pending
+    }
+}
+
+export default connect(mapStateToProps)(MetadataProperty)

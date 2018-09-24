@@ -8,7 +8,7 @@ import MetadataViewer from "./MetadataViewer";
 
 it('shows result when subject provided and data is loaded', () => {
     const store = mockStore({ cache: {
-        metadataBySubject: {
+        jsonLdBySubject: {
             "http://fairspace.com/iri/collections/1": {
                 items: [
                     {}
@@ -27,7 +27,7 @@ it('shows result when subject provided and data is loaded', () => {
 
 it('shows a message if no metadata was found', () => {
     const store = mockStore({ cache: {
-            metadataBySubject: {
+            jsonLdBySubject: {
                 "http://fairspace.com/iri/collections/1": {
                     items: []
                 }
@@ -44,7 +44,7 @@ it('shows a message if no metadata was found', () => {
 
 it('shows error when no subject provided', () => {
     const store = mockStore({ cache: {
-            metadataBySubject: {
+            jsonLdBySubject: {
                 "http://fairspace.com/iri/collections/1": {
                     items: []
                 }
@@ -61,7 +61,7 @@ it('shows error when no subject provided', () => {
 
 it('tries to load the metadata and the vocabulary', () => {
     const store = mockStore({ cache: {
-            metadataBySubject: {
+            jsonLdBySubject: {
                 "http://fairspace.com/iri/collections/1": {
                     items: []
                 }
