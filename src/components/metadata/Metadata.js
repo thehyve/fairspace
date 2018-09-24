@@ -6,10 +6,6 @@ import {fetchMetadataBySubjectIfNeeded, fetchMetadataVocabularyIfNeeded} from ".
 import {connect} from 'react-redux'
 
 export class Metadata extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         this.load();
     }

@@ -1,5 +1,3 @@
-const defaultState = null;
-
 const vocabulary = (state = null, action) => {
     switch (action.type) {
         case "METADATA_VOCABULARY_PENDING":
