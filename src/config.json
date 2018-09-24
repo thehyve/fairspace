@@ -4,9 +4,11 @@
     "userInfo": "/account/user",
     "authorizations": "/account/authorizations",
     "collections": "/api/collections",
-    "collectionPermissions": "/api/collections/%d/permissions",
+    "permissionsByCollectionId": "/api/collections/%d/permissions",
+    "permissions": "/api/collections/permissions",
     "files": "/api/storage/webdav",
-    "metadata": "/api/metadata/statements"
+    "metadata": "/api/metadata/statements",
+    "users": "/api/workspace/users"
   },
   "externalConfigurationFiles": [
     "/api/workspace/config"
