@@ -24,7 +24,8 @@ class PermissionAPI {
     }
 
     alterCollectionPermission(userId, collectionId, access) {
-        return fetch(Config.get().urls.collections, {
+        let url = format(Config.get().urls.collectionPermissions, collectionId);
+        return fetch(url, {
             method: 'PUT',
             headers: PermissionAPI.changeHeaders,
             credentials: 'same-origin',
