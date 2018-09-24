@@ -91,7 +91,6 @@ class Collection extends React.Component{
         this.setState({editing: true});
     }
 
-
     render() {
         return (
             <div>
@@ -100,8 +99,9 @@ class Collection extends React.Component{
                     onMouseEnter={this.handleTextMouseEnter.bind(this)}
                     onMouseLeave={this.handleTextMouseLeave.bind(this)}
                 >
-                    <Typography variant="title">{this.state.collection.name} {this.state.showEditButton ? (<Icon>edit</Icon>) : ''}</Typography>
-                    <Typography variant="subheading">{this.state.collection.description}</Typography>
+                    <Typography variant="headline" component='h2'>{this.state.collection.name} {this.state.showEditButton ? (<Icon>edit</Icon>) : ''}</Typography>
+                    <Typography gutterBottom variant='subheading' color="textSecondary">Owner: {this.state.collection.creator}</Typography>
+                    <Typography component='p'>{this.state.collection.description}</Typography>
                 </div>
 
                 <Dialog

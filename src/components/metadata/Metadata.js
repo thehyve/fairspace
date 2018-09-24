@@ -6,7 +6,7 @@ import Typography from "@material-ui/core/Typography";
 class Metadata extends React.Component {
     static defaultProps = {
         onDidLoad: () => {}
-    }
+    };
 
     constructor(props) {
         super(props);

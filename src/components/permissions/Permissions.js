@@ -1,5 +1,6 @@
 import React from 'react';
 import permissionAPI from '../../services/PermissionAPI/PermissionAPI'
+import { connect } from 'react-redux';
 import IconButton from '@material-ui/core/IconButton';
 import {compareBy, comparing} from "../../utils/comparators";
 import Typography from "@material-ui/core/Typography";
@@ -49,6 +50,7 @@ class Permissions extends React.Component {
             hovered: null,
             anchorEl: null,
             selectedUser: null,
+            currentUser: null
         };
     }
 
@@ -59,7 +61,8 @@ class Permissions extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.collectionId !== prevProps.collectionId) {
+        const {collectionId} = this.props;
+        if (collectionId !== prevProps.collectionId) {
             this.loadPermissions();
         }
     }
@@ -69,11 +72,13 @@ class Permissions extends React.Component {
     };
 
     loadPermissions = () => {
+        const {creator} = this.props;
+        console.log(this.props);
         permissionAPI
             .getCollectionPermissions(this.props.collectionId)
             .then(result => {
                 this.setState({
-                    permissions: result,
+                    permissions: result.filter(item => item.subject !== creator),
                     error: false
                 });
             })
@@ -210,7 +215,6 @@ class Permissions extends React.Component {
         const {selectedUser} = this.state;
         return (
             <div>
-                <Typography variant="subheading">Shared with:</Typography>
                 <ShareWithDialog open={this.state.showPermissionDialog}
                                  onClose={this.handleShareWithDialogClose}
                                  user={this.state.selectedUser}
@@ -230,4 +234,10 @@ class Permissions extends React.Component {
     };
 }
 
-export default withStyles(styles, {withTheme: true})(Permissions);
+const mapStateToProps = ({account: { user }}) => {
+    return {
+        currentUser: user.item
+    }
+};
+
+export default connect(mapStateToProps)(withStyles(styles, {withTheme: true})(Permissions));
