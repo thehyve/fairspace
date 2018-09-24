@@ -21,7 +21,8 @@ module.exports = {
 
         if (authHeader.startsWith('Basic ')) {
             // take JWT from the password field
-            token = Buffer.from(/^Basic \s*([a-zA-Z0-9]+=*)\s*$/.exec(authHeader)[1], 'base64').toString().split(':', 2)[1];
+            let credentials = Buffer.from(/^Basic \s*([a-zA-Z0-9]+=*)\s*$/.exec(authHeader)[1], 'base64').toString();
+            token = credentials.split(':', 2)[1];
         } else if (authHeader.startsWith('Bearer ')) {
             token = authHeader.split(' ')[1];
         } else {
