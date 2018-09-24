@@ -8,19 +8,12 @@ import Icon from "@material-ui/core/Icon";
 import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
+import {invalidateMetadata} from "../../../actions/metadata";
 
 class InformationDrawer extends React.Component {
-    state = {
-        refreshRequired: false
-    }
-
     handleDetailsChange(collection) {
         this.props.onDidChangeDetails(collection);
-        this.setState({refreshRequired: true});
-    }
-
-    handleMetadataDidLoad() {
-        this.setState({refreshRequired: false});
+        this.props.dispatch(invalidateMetadata(this.props.collection.uri));
     }
 
     renderCollectionDetails() {
@@ -39,12 +32,7 @@ class InformationDrawer extends React.Component {
                 <Permissions collectionId={this.props.collection.id}/>
                 <hr/>
 
-                <Metadata
-                    refresh={this.state.refreshRequired}
-                    onDidLoad={this.handleMetadataDidLoad.bind(this)}
-                    subject={this.props.collection.uri}
-                    metadataAPI={this.props.metadataAPI}
-                />
+                <Metadata subject={this.props.collection.uri} />
 
                 <hr/>
 
