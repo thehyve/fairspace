@@ -8,7 +8,6 @@ const metadataBySubject = (state = defaultState, action) => {
                 [action.meta.subject]: {
                     pending: true,
                     error: false,
-                    didInvalidate: false,
                     items: {}
                 }
             }
@@ -18,7 +17,6 @@ const metadataBySubject = (state = defaultState, action) => {
                 [action.meta.subject]: {
                     ...state[action.meta.subject],
                     pending: false,
-                    didInvalidate: false,
                     items: action.payload
                 }
             }
@@ -28,17 +26,13 @@ const metadataBySubject = (state = defaultState, action) => {
                 [action.meta.subject]: {
                     ...state[action.meta.subject],
                     pending: false,
-                    didInvalidate: false,
                     error: action.payload || true
                 }
             }
         case "INVALIDATE_METADATA":
             return {
                 ...state,
-                [action.subject]: {
-                    ...state[action.subject],
-                    didInvalidate: true
-                }
+                [action.subject]: null
             }
         default:
             return state;

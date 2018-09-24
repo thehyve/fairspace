@@ -48,7 +48,7 @@ const shouldFetchMetadata = (state, subject) => {
     } else if (metadata.pending) {
         return false
     } else {
-        return metadata.didInvalidate
+        return !!metadata.error
     }
 }
 
@@ -59,6 +59,6 @@ const shouldFetchVocabulary = (state) => {
     } else if (vocabulary.pending) {
         return false
     } else {
-        return vocabulary.didInvalidate
+        return !!vocabulary.error
     }
 }

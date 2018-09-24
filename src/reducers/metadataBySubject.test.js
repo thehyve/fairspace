@@ -56,6 +56,6 @@ describe('metadata invalidation', () => {
         const newState = reducer(previousState, action)
 
         expect(newState['previous-subject']).toEqual('test');
-        expect(newState['my-subject'].didInvalidate).toEqual(true);
+        expect(newState['my-subject']).toBeNull();
     })
 })

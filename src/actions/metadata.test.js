@@ -48,10 +48,10 @@ describe('fetch metadata', () => {
 
     })
 
-    it('should fetch data if data is invalidated', () => {
+    it('should fetch data if an error occured previously', () => {
         const store = mockStore({ cache: { metadataBySubject: {
             [subject]: {
-                didInvalidate: true,
+                error: true,
                 items: ['some-data']
             }
         }}});
@@ -74,7 +74,7 @@ describe('fetch metadata', () => {
         const store = mockStore({ cache: { metadataBySubject: {
                     [subject]: {
                         pending: true,
-                        didInvalidate: true
+                        error: true
                     }
                 }}});
 
