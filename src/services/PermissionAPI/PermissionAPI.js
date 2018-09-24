@@ -13,7 +13,7 @@ class PermissionAPI {
      * @returns A Promise returning an array of user permissions, not including users with None permissions.
      */
     getCollectionPermissions(collectionId) {
-        let url = format(Config.get().urls.collectionPermissions, collectionId);
+        let url = format(Config.get().urls.permissionsByCollectionId, collectionId);
         return fetch(url, {
             method: 'GET',
             header: PermissionAPI.getHeaders,
@@ -24,8 +24,7 @@ class PermissionAPI {
     }
 
     alterCollectionPermission(userId, collectionId, access) {
-        let url = format(Config.get().urls.collectionPermissions, collectionId);
-        return fetch(url, {
+        return fetch(Config.get().urls.permissions, {
             method: 'PUT',
             headers: PermissionAPI.changeHeaders,
             credentials: 'same-origin',
