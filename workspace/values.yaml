@@ -139,6 +139,7 @@ jupyterhub:
           async def pre_spawn_start(self, user, spawner):
               global access_token
               spawner.environment['ACCESS_TOKEN'] = access_token
+              spawner.environment['TEST'] = 'test'
               await base_pre_spawn_start(self, user, spawner)
           GenericOAuthenticator.authenticate = authenticate
           GenericOAuthenticator.pre_spawn_start = pre_spawn_start
