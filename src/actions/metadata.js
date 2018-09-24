@@ -42,7 +42,7 @@ const fetchVocabulary = createPromiseAction(() => ({
 }));
 
 const shouldFetchMetadata = (state, subject) => {
-    const metadata = state.cache.metadataBySubject[subject]
+    const metadata = state && state.cache && state.cache.metadataBySubject ? state.cache.metadataBySubject[subject] : undefined;
     if (!metadata) {
         return true
     } else if (metadata.pending) {
@@ -53,7 +53,7 @@ const shouldFetchMetadata = (state, subject) => {
 }
 
 const shouldFetchVocabulary = (state) => {
-    const vocabulary = state.cache.vocabulary
+    const vocabulary = state && state.cache ? state.cache.vocabulary : undefined
     if (!vocabulary) {
         return true
     } else if (vocabulary.pending) {

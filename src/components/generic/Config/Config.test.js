@@ -1,14 +1,5 @@
 import Config from "./Config";
-
-const mockResponse = (status, statusText, response) => {
-    return new window.Response(response, {
-        status: status,
-        statusText: statusText,
-        headers: {
-            'Content-type': 'application/json'
-        }
-    });
-};
+import mockResponse from "../../../utils/mockResponse";
 
 const initialConfig = {
     "urls": {
