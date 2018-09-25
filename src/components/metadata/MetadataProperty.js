@@ -4,14 +4,16 @@ import ListItem from '@material-ui/core/ListItem';
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from '@material-ui/icons/Delete';
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import {connect} from 'react-redux';
 import {updateMetadata} from "../../actions/metadata";
 import ValueComponentFactory from "./values/ValueComponentFactory";
+import ListItemText from "@material-ui/core/ListItemText";
 
 /**
  * Shows the property and values for the property
  */
-function MetadataProperty({subject, property, dispatch}) {
+function MetadataProperty({subject, property, dispatch, classes}) {
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
     // will save a given value (if it has changed) along with the other
@@ -52,21 +54,40 @@ function MetadataProperty({subject, property, dispatch}) {
 
     // Render the given entry as a list item
     const renderEntry = (entry, idx, PropertyValueComponent) => {
-        return <ListItem key={idx}>
-                <PropertyValueComponent property={property} entry={entry} onSave={handleSave(idx)}/>
-                <IconButton aria-label="Delete" onClick={handleDelete(idx)}><DeleteIcon/></IconButton>
+        return <ListItem
+            key={idx}
+        >
+                <ListItemText>
+                    <PropertyValueComponent
+                        property={property}
+                        entry={entry}
+                        onSave={handleSave(idx)}
+                    />
+                </ListItemText>
+                <ListItemSecondaryAction>
+                    <IconButton
+                        aria-label="Delete"
+                        onClick={handleDelete(idx)}>
+                        <DeleteIcon/>
+                    </IconButton>
+                </ListItemSecondaryAction>
             </ListItem>
     }
 
     const ValueAddComponent = ValueComponentFactory.addComponent(property);
     const ValueEditComponent = ValueComponentFactory.editComponent(property);
 
-    return <ListItem key={property.key} style={{display: 'block'}}>
-        <Typography variant="body2">{property.label}</Typography>
+    return <ListItem disableGutters key={property.key} style={{display: 'block'}}>
+        <Typography variant="body2" component='p'>{property.label}</Typography>
         <List dense>
             {property.values.map((entry, idx) => renderEntry(entry, idx, ValueEditComponent))}
             <ListItem key={property.values.length}>
-                <ValueAddComponent property={property} placeholder="Add new" onSave={handleAdd}/>
+                <ListItemText>
+                    <ValueAddComponent
+                        property={property}
+                        placeholder="Add new"
+                        onSave={handleAdd}/>
+                </ListItemText>
             </ListItem>
         </List>
     </ListItem>

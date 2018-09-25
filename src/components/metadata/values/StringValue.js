@@ -22,7 +22,7 @@ class StringValue extends React.Component {
             onChange={this.handleChange.bind(this)}
             onBlur={() => this.props.onSave({value: this.state.value})}
             margin="normal"
-            style={Object.assign(style || {}, {marginTop: 0})}
+            style={Object.assign(style || {}, {marginTop: 0, width: '100%'})}
         />
     }
 }

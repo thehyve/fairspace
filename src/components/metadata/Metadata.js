@@ -1,7 +1,6 @@
 import React from 'react';
 import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
-import Typography from "@material-ui/core/Typography";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadata";
 import {connect} from 'react-redux'
 
@@ -24,8 +23,8 @@ export class Metadata extends React.Component {
         }
     }
 
-    renderBody() {
-        const {subject, metadata, error, loading} = this.props;
+    render() {
+        const {subject, metadata, error, loading, dispatch, ...otherProps} = this.props;
 
         if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
@@ -34,17 +33,8 @@ export class Metadata extends React.Component {
         } else if (!metadata || metadata.length === 0) {
             return (<div>No metadata found</div>)
         } else {
-            return (<MetadataViewer subject={subject} properties={metadata}/>)
+            return (<MetadataViewer {...otherProps} subject={subject} properties={metadata}/>)
         }
-    }
-
-    render() {
-        return (
-            <div>
-                <Typography variant="subheading">Metadata:</Typography>
-                {this.renderBody()}
-            </div>
-        )
     }
 }
 

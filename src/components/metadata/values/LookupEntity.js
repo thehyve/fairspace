@@ -15,9 +15,11 @@ const suggestions = [
 ];
 
 function LookupEntity(props) {
-    return <MaterialReactSelect options={suggestions}
-                                 onChange={props.onSave}
-                                 placeholder={'Add new...'}/>
+    return <div style={{width: '100%'}}>
+        <MaterialReactSelect options={suggestions}
+                             onChange={props.onSave}
+                             placeholder={'Add new...'}/>
+    </div>
 }
 
 LookupEntity.propTypes = {

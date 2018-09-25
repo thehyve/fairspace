@@ -12,8 +12,10 @@ const MetadataViewer = props => {
                 key={property.key}
                 property={property} />
 
-    return <List>
-        {props.properties.map(renderProperty)}
+    const {properties, subject, ...otherProps} = props;
+
+    return <List dense {...props}>
+        {properties.map(renderProperty)}
         </List>
 }
 
