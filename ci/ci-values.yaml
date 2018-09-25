@@ -60,9 +60,12 @@ jupyterhub:
 #        exec:
 #          command: ["pmount", "-t", "davfs", "https://workspace.ci.test.fairdev.app/api/storage/webdav/", "/home/jovyan/workspace"]
     hub:
+        image:
+            name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
+            tag: latest
         extraEnv:
-             OAUTH2_AUTHORIZE_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/auth
-             OAUTH2_TOKEN_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/token
+            OAUTH2_AUTHORIZE_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/auth
+            OAUTH2_TOKEN_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/token
         auth:
             custom:
                 config:
