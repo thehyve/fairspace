@@ -21,6 +21,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Builder(toBuilder = true)
 public class Permission {
