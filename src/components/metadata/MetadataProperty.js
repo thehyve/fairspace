@@ -35,18 +35,18 @@ function MetadataProperty({subject, property, dispatch}) {
     }
 
     // Render the given entry as a list item
-    const renderEntry = (entry, Component) => {
+    const renderEntry = (entry, PropertyValueComponent) => {
         return <ListItem key={entry.index}>
-                <Component property={property} entry={entry} onBlur={saveValue(entry.index)}/>
+                <PropertyValueComponent property={property} entry={entry} onBlur={saveValue(entry.index)}/>
             </ListItem>
     }
 
-    const component = ValueComponentFactory.build(property);
+    const valueComponent = ValueComponentFactory.build(property);
 
     return <ListItem key={property.key} style={{display: 'block'}}>
         <Typography variant="body2">{property.label}</Typography>
-        <List dense={true}>
-            {property.values.map(entry => renderEntry(entry, component))}
+        <List dense>
+            {property.values.map(entry => renderEntry(entry, valueComponent))}
         </List>
     </ListItem>
 }
