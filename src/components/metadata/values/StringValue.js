@@ -4,7 +4,8 @@ import TextField from "@material-ui/core/TextField";
 class StringValue extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {value: props.entry.value};
+        const initialValue = props.entry ? props.entry.value || '' : '';
+        this.state = {value: initialValue};
     }
 
     handleChange(e) {
@@ -12,15 +13,16 @@ class StringValue extends React.Component {
     }
 
     render() {
-        const {property} = this.props;
+        const {entry, property, style, onSave, ...otherProps} = this.props;
 
         return <TextField
+            {...otherProps}
             multiline={property.multiLine}
             value={this.state.value}
             onChange={this.handleChange.bind(this)}
             onBlur={() => this.props.onSave(this.state.value)}
             margin="normal"
-            style={{marginTop: 0}}
+            style={Object.assign(style || {}, {marginTop: 0})}
         />
     }
 }

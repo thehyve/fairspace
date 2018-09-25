@@ -36,6 +36,15 @@ function MetadataProperty({subject, property, dispatch}) {
         }
     }
 
+    const handleAdd = (newValue) => {
+        if(newValue) {
+            const updatedValues = [...property.values, {value: newValue}]
+            return dispatch(updateMetadata(subject, property.key, updatedValues))
+        } else {
+            return Promise.resolve();
+        }
+    }
+
     const handleDelete = index => () => {
         const updatedValues = property.values.filter((el, idx) => idx !== index)
         return dispatch(updateMetadata(subject, property.key, updatedValues))
@@ -49,12 +58,16 @@ function MetadataProperty({subject, property, dispatch}) {
             </ListItem>
     }
 
-    const valueComponent = ValueComponentFactory.build(property);
+    const ValueAddComponent = ValueComponentFactory.addComponent(property);
+    const ValueEditComponent = ValueComponentFactory.editComponent(property);
 
     return <ListItem key={property.key} style={{display: 'block'}}>
         <Typography variant="body2">{property.label}</Typography>
         <List dense>
-            {property.values.map((entry, idx) => renderEntry(entry, idx, valueComponent))}
+            {property.values.map((entry, idx) => renderEntry(entry, idx, ValueEditComponent))}
+            <ListItem key={property.values.length}>
+                <ValueAddComponent property={property} placeholder="Add new" onSave={handleAdd}/>
+            </ListItem>
         </List>
     </ListItem>
 }
