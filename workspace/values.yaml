@@ -107,6 +107,7 @@ jupyterhub:
         custom:
             className: oauthenticator.openid.OpenIDConnectOAuthenticator
             config:
+                enable_auth_state: True
                 client_id:
                 client_secret:
     singleuser:
@@ -119,6 +120,7 @@ jupyterhub:
             enabled: false
         extraEnv:
             OPENID_CONNECT_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect
+            JUPYTERHUB_CRYPT_KEY:
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
     proxy:
