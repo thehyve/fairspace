@@ -72,6 +72,21 @@ function MetadataProperty({subject, property, dispatch, classes}) {
             </ListItem>
     }
 
+    // Do not show an add component if no multiples are allowed
+    // and there is already a value
+    const canAdd = property.allowMultiple || property.values.length == 0
+
+    const renderAddComponent = () =>
+        <ListItem key={property.values.length}>
+            <ListItemText>
+                <ValueAddComponent
+                    property={property}
+                    placeholder="Add new"
+                    onSave={handleAdd}/>
+            </ListItemText>
+        </ListItem>
+
+
     const ValueAddComponent = ValueComponentFactory.addComponent(property);
     const ValueEditComponent = ValueComponentFactory.editComponent(property);
 
@@ -79,14 +94,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
         <Typography variant="body2" component='p'>{property.label}</Typography>
         <List dense>
             {property.values.map((entry, idx) => renderEntry(entry, idx, ValueEditComponent))}
-            <ListItem key={property.values.length}>
-                <ListItemText>
-                    <ValueAddComponent
-                        property={property}
-                        placeholder="Add new"
-                        onSave={handleAdd}/>
-                </ListItemText>
-            </ListItem>
+            {canAdd ? renderAddComponent() : null}
         </List>
     </ListItem>
 }
