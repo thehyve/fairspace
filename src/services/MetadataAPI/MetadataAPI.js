@@ -65,11 +65,10 @@ class MetadataAPI {
     }
 
     toJsonLd(subject, predicate, values) {
-        // TODO: Please note that this method currently only handles literal values
         return [
             {
                 '@id': subject,
-                [predicate]: values.map(value => ({'@value': value.value}))
+                [predicate]: values.map(value => ({'@id': value.id, '@value': value.value}))
             }
         ]
     }

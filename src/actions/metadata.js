@@ -46,7 +46,6 @@ export const fetchJsonLdBySubjectIfNeeded = (subject) => {
             return Promise.resolve({value: state.cache.jsonLdBySubject[subject].items})
         }
     }
-
 }
 
 const fetchMetadataVocabularyIfNeeded = () => {

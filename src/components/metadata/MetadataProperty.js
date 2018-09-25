@@ -2,6 +2,8 @@ import React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from '@material-ui/icons/Delete';
 import {connect} from 'react-redux';
 import {updateMetadata} from "../../actions/metadata";
 import ValueComponentFactory from "./values/ValueComponentFactory";
@@ -34,10 +36,16 @@ function MetadataProperty({subject, property, dispatch}) {
         }
     }
 
+    const handleDelete = index => () => {
+        const updatedValues = property.values.filter((el, idx) => idx !== index)
+        return dispatch(updateMetadata(subject, property.key, updatedValues))
+    }
+
     // Render the given entry as a list item
     const renderEntry = (entry, idx, PropertyValueComponent) => {
         return <ListItem key={idx}>
                 <PropertyValueComponent property={property} entry={entry} onSave={handleSave(idx)}/>
+                <IconButton aria-label="Delete" onClick={handleDelete(idx)}><DeleteIcon/></IconButton>
             </ListItem>
     }
 
