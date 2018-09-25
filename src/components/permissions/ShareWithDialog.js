@@ -48,17 +48,18 @@ class ShareWithDialog extends React.Component {
         selectedUser: null,
         selectedUserLabel: '',
         userList: [],
+        userOptions: [],
         isEditing: false,
         error: null,
     };
 
     resetState = () => {
-        const {user} = this.props;
+        const {user, collaborators} = this.props;
         const {userList} = this.state;
         let selectedUser = null;
         if (user) {
             selectedUser = userList.find(u => {
-                return user.subject === u.value;
+                return user.subject === u.id;
             });
         }
         this.setState({
@@ -66,19 +67,21 @@ class ShareWithDialog extends React.Component {
             selectedUser: selectedUser,
             selectedUserLabel: '',
             isEditing: !!user,
+            userOptions: userList.map(r => {
+                return {
+                    label: `${r.firstName} ${r.lastName}`,
+                    value: `${r.id}`,
+                    disabled: collaborators.find(c => c.subject === r.id)
+                }
+            }),
             error: null,
         });
     };
 
     componentDidMount() {
+        const {collaborators} = this.props;
         userAPI.getUsers().then(result => {
-            const userList = result.map(r => {
-                return {
-                    label: `${r.firstName} ${r.lastName}`,
-                    value: `${r.id}`,
-                }
-            });
-            this.setState({userList: userList});
+            this.setState({userList: result});
         })
     }
 
@@ -117,12 +120,13 @@ class ShareWithDialog extends React.Component {
     };
 
     renderUser = () => {
-        const {userList, isEditing, selectedUser} = this.state;
+        const {userOptions, isEditing, selectedUser} = this.state;
         return isEditing ?
             (<div>
-                <Typography variant="subheading" gutterBottom>{selectedUser.label}</Typography>
+                <Typography variant="subheading"
+                            gutterBottom>{`${selectedUser.firstName} ${selectedUser.lastName}`}</Typography>
             </div>) :
-            (<MaterialReactSelect options={userList}
+            (<MaterialReactSelect options={userOptions}
                                   onChange={this.handleSelectedUserChange}
                                   placeholder={'Please select a user'}
                                   value={this.state.selectedUser}

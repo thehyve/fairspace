@@ -38,7 +38,7 @@ const styles = theme => ({
     collaboratorList: {
         width: '100%'
     },
-    buttonList : {
+    buttonList: {
         marginTop: '1em'
     }
 });
@@ -216,13 +216,14 @@ class Permissions extends React.Component {
 
     render() {
         const {classes} = this.props;
-        const {selectedUser} = this.state;
+        const {selectedUser, permissions} = this.state;
         return (
             <div className={classes.collaboratorList}>
                 <ShareWithDialog open={this.state.showPermissionDialog}
                                  onClose={this.handleShareWithDialogClose}
                                  user={this.state.selectedUser}
                                  collectionId={this.props.collectionId}
+                                 collaborators={permissions}
                 />
                 <ConfirmationDialog open={this.state.showConfirmDeleteDialog}
                                     title={'Confirmation'}

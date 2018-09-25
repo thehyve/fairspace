@@ -12,8 +12,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import {emphasize} from '@material-ui/core/styles/colorManipulator';
 
 const styles = theme => ({
-    root: {
-    },
+    root: {},
     input: {
         display: 'flex',
         padding: 0,
@@ -100,7 +99,8 @@ function Option(props) {
                 fontWeight: props.isSelected ? 500 : 400,
             }}
             {...props.innerProps}
-        >
+            disabled={!!props.data.disabled}
+            onClick={props.data.disabled ? blockEvent : props.innerProps.onClick}>
             {props.children}
         </MenuItem>
     );
@@ -128,6 +128,19 @@ function SingleValue(props) {
 
 function ValueContainer(props) {
     return <div className={props.selectProps.classes.valueContainer}>{props.children}</div>;
+}
+
+function blockEvent(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if ((event.target.tagName !== 'A') || !('href' in event.target)) {
+        return;
+    }
+    if (event.target.target) {
+        window.open(event.target.href, event.target.target);
+    } else {
+        window.location.href = event.target.href;
+    }
 }
 
 function MultiValue(props) {
@@ -185,7 +198,7 @@ class MaterialReactSelect extends React.Component {
                 onChange={this.props.onChange}
                 placeholder={this.props.placeholder}
                 textFieldProps={{
-                    label:  this.props.label,
+                    label: this.props.label,
                     InputLabelProps: {
                         shrink: true,
                     },
