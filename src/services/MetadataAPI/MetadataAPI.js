@@ -54,7 +54,6 @@ class MetadataAPI {
 
     getEntitiesByType(type) {
         return this.get({predicate: 'http://www.w3.org/2000/01/rdf-schema#type', object: type})
-            .then(items => items.map(it => it['@id']).sort())
     }
 
     getPropertiesByDomain(type) {

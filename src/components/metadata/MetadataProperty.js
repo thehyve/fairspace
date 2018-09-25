@@ -39,7 +39,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
     }
 
     const handleAdd = (newEntry) => {
-        if(newEntry) {
+        if(newEntry.value || newEntry.id) {
             const updatedValues = [...property.values, newEntry]
             return dispatch(updateMetadata(subject, property.key, updatedValues))
         } else {
