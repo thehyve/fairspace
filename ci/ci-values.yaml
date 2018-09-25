@@ -55,10 +55,6 @@ jupyterhub:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
             tag: latest
-#    lifecycleHooks:
-#      postStart:
-#        exec:
-#          command: ["pmount", "-t", "davfs", "https://workspace.ci.test.fairdev.app/api/storage/webdav/", "/home/jovyan/workspace"]
     hub:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
@@ -66,7 +62,9 @@ jupyterhub:
         extraEnv:
             OPENID_CONNECT_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect
         auth:
+            type: custom
             custom:
+                className: oauthenticator.openid.OpenIDConnectOAuthenticator
                 config:
                     client_id: workspace-ci-pluto
                     client_secret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
