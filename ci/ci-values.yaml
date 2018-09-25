@@ -64,14 +64,11 @@ jupyterhub:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
             tag: latest
         extraEnv:
-            OAUTH2_AUTHORIZE_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/auth
-            OAUTH2_TOKEN_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/token
+            OPENID_CONNECT_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect
         auth:
             custom:
                 config:
                     client_id: workspace-ci-pluto
                     client_secret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
-                    token_url: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/token
-                    userdata_url: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/userinfo
     proxy:
         secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"

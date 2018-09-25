@@ -111,38 +111,16 @@ jupyterhub:
         ingress:
             enabled: false
         extraEnv:
-            OAUTH2_AUTHORIZE_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect/auth
-            OAUTH2_TOKEN_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect/token
+            OPENID_CONNECT_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect
         auth:
             type: custom
             custom:
-                className: oauthenticator.generic.GenericOAuthenticator
+                className: oauthenticator.openid.OpenIDConnectOAuthenticator
                 config:
                     client_id:
                     client_secret:
-                    token_url:
-                    userdata_url:
-                    userdata_method: GET
-                    userdata_params: {'state': 'state'}
-                    username_key: preferred_username
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
-          from oauthenticator.generic import GenericOAuthenticator
-          base_authenticate = GenericOAuthenticator.authenticate
-          base_pre_spawn_start = GenericOAuthenticator.pre_spawn_start
-          access_token = '?'
-          async def authenticate(self, handler, data=None):
-              global access_token
-              result = await base_authenticate(self, handler, data)
-              access_token = result['auth_state']['access_token']
-              return result
-          async def pre_spawn_start(self, user, spawner):
-              global access_token
-              spawner.environment['ACCESS_TOKEN'] = access_token
-              spawner.environment['TEST'] = 'test'
-              await base_pre_spawn_start(self, user, spawner)
-          GenericOAuthenticator.authenticate = authenticate
-          GenericOAuthenticator.pre_spawn_start = pre_spawn_start
     proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
 
