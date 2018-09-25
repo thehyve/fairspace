@@ -26,6 +26,16 @@ export const fetchCombinedMetadataIfNeeded = (subject) => {
     }
 }
 
+export const fetchEntitiesIfNeeded = (type) => {
+    return (dispatch, getState) => {
+        if (shouldFetchEntities(getState(), type)) {
+            return dispatch(fetchEntitiesByType(type))
+        } else {
+            return Promise.resolve();
+        }
+    }
+}
+
 export const fetchJsonLdBySubjectIfNeeded = (subject) => {
     return (dispatch, getState) => {
         const state = getState();
@@ -75,6 +85,14 @@ const fetchVocabulary = createPromiseAction(() => ({
     payload: MetadataAPI.getVocabulary()
 }));
 
+const fetchEntitiesByType = createPromiseAction((type) => ({
+    type: "METADATA_ENTITIES",
+    payload: MetadataAPI.getEntitiesByType(type),
+    meta: {
+        type: type
+    }
+}));
+
 const shouldFetchMetadata = (state, subject) => {
     const metadata = state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined;
     if (!metadata) {
@@ -98,5 +116,16 @@ const shouldFetchVocabulary = (state) => {
         return false
     } else {
         return vocabulary.invalidated
+    }
+}
+
+const shouldFetchEntities = (state, type) => {
+    const entities = state && state.cache && state.cache.entitiesByType ? state.cache.entitiesByType[type] : undefined;
+    if (!entities) {
+        return true
+    } else if (entities.pending) {
+        return false
+    } else {
+        return entities.invalidated
     }
 }
