@@ -12,7 +12,7 @@ it('shows result when subject provided and data is loaded', () => {
         metadataBySubject: {
             "http://fairspace.com/iri/collections/1": {
                 items: [
-                    {index: 0, key: 'test', values: []}
+                    {key: 'test', values: []}
                 ]
             }
         },

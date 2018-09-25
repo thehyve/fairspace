@@ -22,7 +22,7 @@ it('displays properties properly', () => {
 
 
 const properties = [
-    {key: 'description', label: 'Description', values: [{index: 0, value: 'More info'}, {index: 1, value: 'My first collection'}]},
-    {key: 'name', label: 'Name', values: [{index: 0, value: 'Collection 5'}]},
-    {key: 'type', label: "Type", values: [{id: "http://fairspace.io/ontology#Collection", index: 0, label: "Collection"}]}
+    {key: 'description', label: 'Description', values: [{value: 'More info'}, {value: 'My first collection'}]},
+    {key: 'name', label: 'Name', values: [{value: 'Collection 5'}]},
+    {key: 'type', label: "Type", values: [{id: "http://fairspace.io/ontology#Collection", label: "Collection"}]}
 ];

@@ -22,7 +22,7 @@ it('handles updates correctly', () => {
         key: 'description',
         range: 'http://www.w3.org/TR/xmlschema11-2/#string',
         label: 'Description',
-        values: [{index: 0, value: 'More info'}, {index: 1, value: 'My first collection'}]
+        values: [{value: 'More info'}, {value: 'My first collection'}]
     };
     const store = mockStore({})
 
@@ -46,7 +46,7 @@ it('does not update when input does not change', () => {
         key: 'description',
         range: 'http://www.w3.org/TR/xmlschema11-2/#string',
         label: 'Description',
-        values: [{index: 0, value: 'More info'}, {index: 1, value: 'My first collection'}]
+        values: [{value: 'More info'}, {value: 'My first collection'}]
     };
     const store = mockStore({})
     const wrapper = mount(<MetadataProperty store={store} property={property} subject={subject} />);

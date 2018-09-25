@@ -181,7 +181,7 @@ class Vocabulary {
         return {
             key: predicate,
             label: label,
-            values: Vocabulary._extendValuesWithIndex(sortedValues),
+            values: sortedValues,
             range: range,
             allowMultiple: allowMultiple,
             multiLine: multiLine
@@ -204,9 +204,6 @@ class Vocabulary {
         return this._getFirstPredicateValue(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#label', '');
     }
 
-    static _extendValuesWithIndex(values) {
-        return values ? values.map((value, index) => Object.assign({}, value, {index: index})) : [];
-    }
 }
 
 export default Vocabulary;

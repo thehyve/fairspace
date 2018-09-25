@@ -17,12 +17,12 @@ function MetadataProperty({subject, property, dispatch}) {
     // E.g. saveValue(1) will return a function `value => { ... }` that
     // can be used as a callback for the component for index 1
     const saveValue = index => newValue => {
-        const currentEntry = property.values.find(el => el.index === index);
+        const currentEntry = property.values[index];
 
         if(currentEntry.value !== newValue) {
-            const updatedValues = property.values.map(el => {
-                if(el.index === index) {
-                    return {index: index, value: newValue}
+            const updatedValues = property.values.map((el, idx) => {
+                if(idx === index) {
+                    return {value: newValue}
                 } else {
                     return el;
                 }
@@ -35,9 +35,9 @@ function MetadataProperty({subject, property, dispatch}) {
     }
 
     // Render the given entry as a list item
-    const renderEntry = (entry, PropertyValueComponent) => {
-        return <ListItem key={entry.index}>
-                <PropertyValueComponent property={property} entry={entry} onBlur={saveValue(entry.index)}/>
+    const renderEntry = (entry, idx, PropertyValueComponent) => {
+        return <ListItem key={idx}>
+                <PropertyValueComponent property={property} entry={entry} onBlur={saveValue(idx)}/>
             </ListItem>
     }
 
@@ -46,7 +46,7 @@ function MetadataProperty({subject, property, dispatch}) {
     return <ListItem key={property.key} style={{display: 'block'}}>
         <Typography variant="body2">{property.label}</Typography>
         <List dense>
-            {property.values.map(entry => renderEntry(entry, valueComponent))}
+            {property.values.map((entry, idx) => renderEntry(entry, idx, valueComponent))}
         </List>
     </ListItem>
 }
