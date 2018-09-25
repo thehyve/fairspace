@@ -1,9 +1,11 @@
 import React from 'react';
 import permissionAPI from '../../services/PermissionAPI/PermissionAPI'
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
+import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import {compareBy, comparing} from "../../utils/comparators";
 import MoreIcon from '@material-ui/icons/MoreVert';
+import AddIcon from '@material-ui/icons/Add';
 import ShareWithDialog from './ShareWithDialog';
 import ErrorMessage from "../error/ErrorMessage";
 import {withStyles} from "@material-ui/core/styles/index";
@@ -35,7 +37,15 @@ const styles = theme => ({
     },
     collaboratorList: {
         width: '100%'
-    }
+    },
+    buttonList : {
+        marginTop: '10px'
+    },
+    fab: {
+        position: 'absolute',
+        bottom: theme.spacing.unit * 2,
+        right: theme.spacing.unit * 2,
+    },
 });
 
 class Permissions extends React.Component {
@@ -187,8 +197,9 @@ class Permissions extends React.Component {
 
     renderUserList = () => {
         const {permissions, anchorEl} = this.state;
+        const {classes} = this.props;
         return (
-            <List>
+            <List dense>
                 {this.renderCollaboratorList(permissions)}
                 <Menu
                     anchorEl={anchorEl}
@@ -197,6 +208,13 @@ class Permissions extends React.Component {
                     <MenuItem onClick={this.handleAlterPermission}>Change access</MenuItem>
                     <MenuItem onClick={this.handleRemoveCollaborator}>Delete</MenuItem>
                 </Menu>
+                <ListItem className={classes.buttonList}>
+                    <ListItemSecondaryAction>
+                        <Button variant='fab' aria-label="Add" onClick={this.handleAlterPermission} mini>
+                            <AddIcon/>
+                        </Button>
+                    </ListItemSecondaryAction>
+                </ListItem>
             </List>
         );
     };
