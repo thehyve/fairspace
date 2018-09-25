@@ -14,9 +14,9 @@ function MetadataProperty({subject, property, dispatch}) {
     // Calling it with an index provides you with a function that
     // will save a given value (if it has changed) along with the other
     // unchanged values.
-    // E.g. saveValue(1) will return a function `value => { ... }` that
+    // E.g. handleSave(1) will return a function `value => { ... }` that
     // can be used as a callback for the component for index 1
-    const saveValue = index => newValue => {
+    const handleSave = index => newValue => {
         const currentEntry = property.values[index];
 
         if(currentEntry.value !== newValue) {
@@ -37,7 +37,7 @@ function MetadataProperty({subject, property, dispatch}) {
     // Render the given entry as a list item
     const renderEntry = (entry, idx, PropertyValueComponent) => {
         return <ListItem key={idx}>
-                <PropertyValueComponent property={property} entry={entry} onBlur={saveValue(idx)}/>
+                <PropertyValueComponent property={property} entry={entry} onSave={handleSave(idx)}/>
             </ListItem>
     }
 
