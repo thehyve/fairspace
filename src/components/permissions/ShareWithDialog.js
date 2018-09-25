@@ -24,6 +24,10 @@ const styles = theme => ({
         height: 350,
         display: 'block',
     },
+    rootEdit: {
+        width: 400,
+        display: 'block',
+    },
     container: {
         display: 'flex',
         flexWrap: 'wrap',
@@ -127,7 +131,7 @@ class ShareWithDialog extends React.Component {
 
     render() {
         const {classes} = this.props;
-        const {error} = this.state;
+        const {isEditing} = this.state;
         return (
             <Dialog
                 open={this.props.open}
@@ -135,7 +139,7 @@ class ShareWithDialog extends React.Component {
                 onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
-                    <div className={classes.root}>
+                    <div className={isEditing ? classes.rootEdit : classes.root}>
                         {this.renderUser()}
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
