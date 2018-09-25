@@ -6,6 +6,19 @@ import Vocabulary from "../../services/MetadataAPI/Vocabulary";
 import mockStore from "../../store/mockStore"
 import MetadataViewer from "./MetadataViewer";
 import {Provider} from "react-redux";
+import Config from "../generic/Config/Config";
+
+beforeAll(() => {
+    window.fetch = jest.fn(() => Promise.resolve({ok: true}))
+
+    Config.setConfig({
+        "urls": {
+            "metadata": "/metadata"
+        }
+    });
+
+    return Config.init();
+});
 
 it('shows result when subject provided and data is loaded', () => {
     const store = mockStore({
@@ -47,7 +60,7 @@ it('shows a message if no metadata was found', () => {
 
     const wrapper = mount(<ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} store={store} />);
 
-    expect(wrapper.text()).toEqual("Metadata:No metadata found");
+    expect(wrapper.text()).toEqual("No metadata found");
 });
 
 it('shows error when no subject provided', () => {
@@ -62,7 +75,7 @@ it('shows error when no subject provided', () => {
     });
     const wrapper = mount(<ConnectedMetadata subject={""} store={store} />);
 
-    expect(wrapper.text()).toEqual("Metadata:error_outlineAn error occurred while loading metadata");
+    expect(wrapper.text()).toEqual("error_outlineAn error occurred while loading metadata");
 });
 
 it('tries to load the metadata and the vocabulary', () => {

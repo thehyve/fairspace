@@ -1,7 +1,7 @@
 import React from 'react';
 import List from '@material-ui/core/List';
 import MetadataProperty from "./MetadataProperty";
-import withStyles from "@material-ui/core/es/styles/withStyles";
+import {withStyles} from '@material-ui/core/styles';
 
 const styles = {
     root: {

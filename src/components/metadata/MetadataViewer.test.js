@@ -19,8 +19,7 @@ it('displays properties properly', () => {
         // There should be 10 list items:
         // 3 names of the fields
         // 4 values
-        // 3 input boxes for new entries
-        expect(result.length).toEqual(10);
+        expect(result.length).toEqual(7);
         expect(wrapper.text()).toEqual("DescriptionMore infoMy first collectionNameCollection 5TypeCollection");
     });
 });
