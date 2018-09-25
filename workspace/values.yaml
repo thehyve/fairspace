@@ -102,6 +102,13 @@ pluto:
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
+    auth:
+        type: custom
+        custom:
+            className: oauthenticator.openid.OpenIDConnectOAuthenticator
+            config:
+                client_id:
+                client_secret:
     singleuser:
       image:
         name: fairspace/jupyterhub-singleuser
@@ -112,13 +119,6 @@ jupyterhub:
             enabled: false
         extraEnv:
             OPENID_CONNECT_URL: https://${host}/auth/realms/${realm}/protocol/openid-connect
-        auth:
-            type: custom
-            custom:
-                className: oauthenticator.openid.OpenIDConnectOAuthenticator
-                config:
-                    client_id:
-                    client_secret:
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
     proxy:
