@@ -1,21 +1,21 @@
 [
     {
-        "collectionId": 1,
+        "collectionId": 500,
         "subject": "user2-id",
         "access": "Write"
     },
     {
-        "collectionId": 1,
+        "collectionId": 500,
         "subject": "user4-id",
         "access": "Manage"
     },
     {
-        "collectionId": 1,
+        "collectionId": 500,
         "subject": "user3-id",
         "access": "Read"
     },
     {
-        "collectionId": 1,
+        "collectionId": 500,
         "subject": "user1-id",
         "access": "Manage"
     }
