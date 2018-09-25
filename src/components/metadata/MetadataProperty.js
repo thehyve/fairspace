@@ -18,13 +18,13 @@ function MetadataProperty({subject, property, dispatch}) {
     // unchanged values.
     // E.g. handleSave(1) will return a function `value => { ... }` that
     // can be used as a callback for the component for index 1
-    const handleSave = index => newValue => {
+    const handleSave = index => newEntry => {
         const currentEntry = property.values[index];
 
-        if(currentEntry.value !== newValue) {
+        if(currentEntry.value !== newEntry.value) {
             const updatedValues = property.values.map((el, idx) => {
                 if(idx === index) {
-                    return {value: newValue}
+                    return newEntry
                 } else {
                     return el;
                 }
@@ -36,9 +36,9 @@ function MetadataProperty({subject, property, dispatch}) {
         }
     }
 
-    const handleAdd = (newValue) => {
-        if(newValue) {
-            const updatedValues = [...property.values, {value: newValue}]
+    const handleAdd = (newEntry) => {
+        if(newEntry) {
+            const updatedValues = [...property.values, newEntry]
             return dispatch(updateMetadata(subject, property.key, updatedValues))
         } else {
             return Promise.resolve();

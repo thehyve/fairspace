@@ -20,7 +20,7 @@ class StringValue extends React.Component {
             multiline={property.multiLine}
             value={this.state.value}
             onChange={this.handleChange.bind(this)}
-            onBlur={() => this.props.onSave(this.state.value)}
+            onBlur={() => this.props.onSave({value: this.state.value})}
             margin="normal"
             style={Object.assign(style || {}, {marginTop: 0})}
         />
