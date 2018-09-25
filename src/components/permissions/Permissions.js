@@ -3,14 +3,7 @@ import permissionAPI from '../../services/PermissionAPI/PermissionAPI'
 import { connect } from 'react-redux';
 import IconButton from '@material-ui/core/IconButton';
 import {compareBy, comparing} from "../../utils/comparators";
-import Typography from "@material-ui/core/Typography";
 import MoreIcon from '@material-ui/icons/MoreVert';
-import AddIcon from '@material-ui/icons/Add';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 import ShareWithDialog from './ShareWithDialog';
 import ErrorMessage from "../error/ErrorMessage";
 import {withStyles} from "@material-ui/core/styles/index";
@@ -18,6 +11,10 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ConfirmationDialog from "../generic/ConfirmationDialog/ConfirmationDialog";
 import ErrorDialog from "../error/ErrorDialog";
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
 
 export const AccessRights = {
     Read: 'Read',
@@ -27,15 +24,18 @@ export const AccessRights = {
 
 const styles = theme => ({
     root: {},
-    collabolatorIcon: {
+    collaboratorIcon: {
         visibility: "hidden",
         "&:hover": {
             visibility: "inherit"
         }
     },
-    collabolatorIcon: {
+    collaboratorIcon: {
         visibility: "hidden"
     },
+    collaboratorList: {
+        width: '100%'
+    }
 });
 
 class Permissions extends React.Component {
@@ -157,64 +157,55 @@ class Permissions extends React.Component {
         }
     };
 
-    renderCollaboratorList = (collaborators) => {
+    renderCollaboratorList(collaborators) {
         const {classes} = this.props;
         const {hovered} = this.state;
 
         return collaborators
             .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('subject')))
             .map((p, idx) => {
-                const secondaryActionClassName = hovered !== idx ? classes.collabolatorIcon : null;
-                return (
-                    <TableRow key={idx} hover className={classes.userList}
-                              onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                              onMouseOut={() => this.handleListItemMouseout(idx)}>
-                        <TableCell component="th" scope="row">{p.subject}</TableCell>
-                        <TableCell>{p.access}</TableCell>
-                        <TableCell>
-                            <IconButton aria-label="Delete" className={secondaryActionClassName}
-                                        onClick={(e) => this.handleMoreClick(p, e)}>
-                                <MoreIcon/>
-                            </IconButton>
-                        </TableCell>
-                    </TableRow>
-                )
+                const secondaryActionClassName = hovered !== idx ? classes.collaboratorIcon : null;
+                return (<ListItem
+                    key={idx}
+                    button
+                    onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
+                    onMouseOut={() => this.handleListItemMouseout(idx)}
+                >
+                    <ListItemText primary={p.subject} secondary={p.access}/>
+                    <ListItemSecondaryAction
+                        onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
+                        onMouseOut={() => this.handleListItemMouseout(idx)}
+                    >
+                        <IconButton aria-label="Delete" className={secondaryActionClassName}
+                                    onClick={(e) => this.handleMoreClick(p, e)}>
+                            <MoreIcon/>
+                        </IconButton>
+                    </ListItemSecondaryAction>
+                </ListItem>);
             });
-    };
+    }
 
     renderUserList = () => {
         const {permissions, anchorEl} = this.state;
         return (
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell numeric>User</TableCell>
-                        <TableCell numeric>Access</TableCell>
-                        <TableCell numeric>
-                            <IconButton aria-label="Add" onClick={this.handleAlterPermission}>
-                                <AddIcon/>
-                            </IconButton>
-                        </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {this.renderCollaboratorList(permissions)}
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={this.handleMoreClose}>
-                        <MenuItem onClick={this.handleAlterPermission}>Change access</MenuItem>
-                        <MenuItem onClick={this.handleRemoveCollaborator}>Delete</MenuItem>
-                    </Menu>
-                </TableBody>
-            </Table>
+            <List>
+                {this.renderCollaboratorList(permissions)}
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={this.handleMoreClose}>
+                    <MenuItem onClick={this.handleAlterPermission}>Change access</MenuItem>
+                    <MenuItem onClick={this.handleRemoveCollaborator}>Delete</MenuItem>
+                </Menu>
+            </List>
         );
     };
 
     render() {
+        const {classes} = this.props;
         const {selectedUser} = this.state;
         return (
-            <div>
+            <div className={classes.collaboratorList}>
                 <ShareWithDialog open={this.state.showPermissionDialog}
                                  onClose={this.handleShareWithDialogClose}
                                  user={this.state.selectedUser}
@@ -234,7 +225,7 @@ class Permissions extends React.Component {
     };
 }
 
-const mapStateToProps = ({account: { user }}) => {
+const mapStateToProps = ({account: {user}}) => {
     return {
         currentUser: user.item
     }
