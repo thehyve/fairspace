@@ -84,7 +84,7 @@ class Vocabulary {
             let values = (predicateUri === "@type")
                 // @type needs special attention: it is specified as a literal string
                 // but should be treated as an object
-                ? this.convertTypeEntries(metadata[predicateUri])
+                ? this._convertTypeEntries(metadata[predicateUri])
                 : metadata[predicateUri].map(i => ({id: i['@id'], value: i['@value']}));
 
             prefilledProperties.push(Vocabulary._generatePropertyEntry(predicateUri, values, vocabularyEntry));
@@ -155,6 +155,14 @@ class Vocabulary {
         return predicates;
     }
 
+    _convertTypeEntries(values) {
+        return values
+            .map(type => ({
+                id: type,
+                label: Vocabulary._getLabel(this.vocabularyById[type])
+            }))
+    }
+
     /**
      * Generates a list entry for a single property, with the values specified
      * @param predicate
@@ -168,23 +176,16 @@ class Vocabulary {
         const range = Vocabulary._getFirstPredicateId(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#range');
         const allowMultiple = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://fairspace.io/ontology#allowMultiple', false);
         const multiLine = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://fairspace.io/ontology#multiLine', false);
+        const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
         return {
             key: predicate,
             label: label,
-            values: values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value'))),
+            values: Vocabulary._extendValuesWithIndex(sortedValues),
             range: range,
             allowMultiple: allowMultiple,
             multiLine: multiLine
         };
-    }
-
-    convertTypeEntries(values) {
-        return values
-            .map(type => ({
-                id: type,
-                label: Vocabulary._getLabel(this.vocabularyById[type])
-            }))
     }
 
     static _getFirstPredicateValue(vocabularyEntry, predicate, defaultValue) {
@@ -199,10 +200,12 @@ class Vocabulary {
         return vocabularyEntry[predicate] && vocabularyEntry[predicate][0] ? vocabularyEntry[predicate][0][property] : defaultValue;
     }
 
-
-
     static _getLabel(vocabularyEntry) {
         return this._getFirstPredicateValue(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#label', '');
+    }
+
+    static _extendValuesWithIndex(values) {
+        return values ? values.map((value, index) => Object.assign({}, value, {index: index})) : [];
     }
 }
 

@@ -8,6 +8,7 @@ const metadataBySubject = (state = defaultState, action) => {
                 [action.meta.subject]: {
                     pending: false,
                     error: false,
+                    invalidated: false,
                     items: action.payload
                 }
             }
@@ -29,10 +30,31 @@ const metadataBySubject = (state = defaultState, action) => {
                     error: action.payload || true
                 }
             }
+        case "UPDATE_METADATA_FULFILLED":
+            return {
+                ...state,
+                [action.meta.subject]: {
+                    ...state[action.meta.subject],
+                    items: state[action.meta.subject].items.map(el => {
+                        if(el.key !== action.meta.predicate) {
+                            return el;
+                        }
+
+                        return {
+                            ...el,
+                            values: action.meta.values
+                        }
+                    }),
+                    invalidated: true
+                }
+            }
         case "INVALIDATE_METADATA":
             return {
                 ...state,
-                [action.subject]: null
+                [action.meta.subject]: {
+                    ...state[action.meta.subject],
+                    invalidated: true
+                }
             }
         default:
             return state;

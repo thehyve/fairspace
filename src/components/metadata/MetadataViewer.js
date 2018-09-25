@@ -9,7 +9,6 @@ const MetadataViewer = props => {
     const renderProperty =
             property => <MetadataProperty
                 subject={props.subject}
-                metadataAPI={props.metadataAPI}
                 key={property.key}
                 property={property} />
 

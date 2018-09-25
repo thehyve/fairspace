@@ -8,6 +8,7 @@ const jsonLdBySubject = (state = defaultState, action) => {
                 [action.meta.subject]: {
                     pending: true,
                     error: false,
+                    invalidated: false,
                     items: {}
                 }
             }
@@ -29,10 +30,14 @@ const jsonLdBySubject = (state = defaultState, action) => {
                     error: action.payload || true
                 }
             }
+        case "UPDATE_METADATA_FULFILLED":
         case "INVALIDATE_METADATA":
             return {
                 ...state,
-                [action.subject]: null
+                [action.meta.subject]: {
+                    ...state[action.meta.subject],
+                    invalidated: true
+                }
             }
         default:
             return state;

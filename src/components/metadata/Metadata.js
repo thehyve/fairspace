@@ -25,7 +25,7 @@ export class Metadata extends React.Component {
     }
 
     renderBody() {
-        const {metadata, error, loading} = this.props;
+        const {subject, metadata, error, loading} = this.props;
 
         if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
@@ -34,7 +34,7 @@ export class Metadata extends React.Component {
         } else if (!metadata || metadata.length === 0) {
             return (<div>No metadata found</div>)
         } else {
-            return (<MetadataViewer properties={metadata}/>)
+            return (<MetadataViewer subject={subject} properties={metadata}/>)
         }
     }
 

@@ -3,16 +3,16 @@ import MetadataAPI from "../services/MetadataAPI/MetadataAPI"
 
 export const invalidateMetadata = (subject) => ({
     type: "INVALIDATE_METADATA",
-    subject: subject
+    meta: {subject: subject}
 })
 
 export const updateMetadata = createPromiseAction((subject, predicate, values) => ({
     type: "UPDATE_METADATA",
-    payload: this.props.metadataAPI
-        .update(subject, predicate, values),
+    payload: MetadataAPI.update(subject, predicate, values),
     meta: {
         subject: subject,
-        predicate: predicate
+        predicate: predicate,
+        values: values
     }
 }))
 
@@ -26,7 +26,7 @@ export const fetchCombinedMetadataIfNeeded = (subject) => {
     }
 }
 
-const fetchJsonLdBySubjectIfNeeded = (subject) => {
+export const fetchJsonLdBySubjectIfNeeded = (subject) => {
     return (dispatch, getState) => {
         const state = getState();
         if (shouldFetchMetadata(state, subject)) {
@@ -38,6 +38,7 @@ const fetchJsonLdBySubjectIfNeeded = (subject) => {
     }
 
 }
+
 const fetchMetadataVocabularyIfNeeded = () => {
     return (dispatch, getState) => {
         const state = getState();
@@ -81,7 +82,7 @@ const shouldFetchMetadata = (state, subject) => {
     } else if (metadata.pending) {
         return false
     } else {
-        return !!metadata.error
+        return metadata.invalidated
     }
 }
 
@@ -96,6 +97,6 @@ const shouldFetchVocabulary = (state) => {
     } else if (vocabulary.pending) {
         return false
     } else {
-        return !!vocabulary.error
+        return vocabulary.invalidated
     }
 }
