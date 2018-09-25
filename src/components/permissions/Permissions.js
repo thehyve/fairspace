@@ -39,13 +39,8 @@ const styles = theme => ({
         width: '100%'
     },
     buttonList : {
-        marginTop: '10px'
-    },
-    fab: {
-        position: 'absolute',
-        bottom: theme.spacing.unit * 2,
-        right: theme.spacing.unit * 2,
-    },
+        marginTop: '1em'
+    }
 });
 
 class Permissions extends React.Component {
