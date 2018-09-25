@@ -65,7 +65,7 @@ Cypress.Commands.add("deleteLastCollectionByName", (name) => {
 })
 
 Cypress.Commands.add("waitForRightPanel", () => {
-    cy.get('button').contains('chevron_right').should('be.visible');
+    cy.get('button').contains('close').should('be.visible');
     cy.contains("Loading").should("not.exist");
 });
 
