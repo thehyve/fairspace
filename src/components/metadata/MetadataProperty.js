@@ -54,9 +54,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
 
     // Render the given entry as a list item
     const renderEntry = (entry, idx, PropertyValueComponent) => {
-        return <ListItem
-            key={idx}
-        >
+        return <ListItem key={idx}>
                 <ListItemText>
                     <PropertyValueComponent
                         property={property}
