@@ -21,7 +21,13 @@ app.patch('/api/collections/:id', (req, res) => res.send());
 app.delete('/api/collections/:id', (req, res) => setTimeout(() => res.send(), 3000));
 
 // Metadata API
-app.get('/api/metadata/statements', (req, res) => res.sendFile(mockDataDir + '/metadata/metadata-1.json'));
+app.get('/api/metadata/statements', (req, res) => {
+    if(req.query.subject) {
+        res.sendFile(mockDataDir + '/metadata/metadata-1.json')
+    } else {
+        res.sendFile(mockDataDir + '/metadata/persons.json')
+    }
+});
 app.patch('/api/metadata/statements', (req, res) => res.send());
 
 // Workspace API

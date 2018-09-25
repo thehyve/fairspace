@@ -1,0 +1,32 @@
+{
+    "@context": {
+        "ws": "http://localhost:3000/iri/",
+        "schema": "http://schema.org/"
+    },
+    "@graph": [
+        {
+            "@id": "ws:patients/GSM212810",
+            "@type": "schema:Person"
+        },
+        {
+            "@id": "ws:patients/GSM212811",
+            "@type": "schema:Person"
+        },
+        {
+            "@id": "ws:patients/GSM211008",
+            "@type": "schema:Person"
+        },
+        {
+            "@id": "ws:patients/THEHYVE-4",
+            "@type": "schema:Person"
+        },
+        {
+            "@id": "ws:patients/THEHYVE-7",
+            "@type": "schema:Person"
+        },
+        {
+            "@id": "ws:patients/FAIRSPACE-123",
+            "@type": "schema:Person"
+        }
+    ]
+}
