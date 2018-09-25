@@ -131,7 +131,7 @@ class ShareWithDialog extends React.Component {
 
     render() {
         const {classes} = this.props;
-        const {isEditing} = this.state;
+        const {isEditing, selectedUser} = this.state;
         return (
             <Dialog
                 open={this.props.open}
@@ -161,7 +161,7 @@ class ShareWithDialog extends React.Component {
                     <Button onClick={this.handleClose} color="secondary">
                         Cancel
                     </Button>
-                    <Button onClick={this.handleSubmit} color="primary">
+                    <Button onClick={this.handleSubmit} color="primary" disabled={!selectedUser}>
                         Submit
                     </Button>
                 </DialogActions>
