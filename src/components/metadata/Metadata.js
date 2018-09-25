@@ -2,7 +2,7 @@ import React from 'react';
 import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
 import Typography from "@material-ui/core/Typography";
-import {fetchMetadataBySubjectIfNeeded, fetchMetadataVocabularyIfNeeded} from "../../actions/metadata";
+import {fetchCombinedMetadataIfNeeded} from "../../actions/metadata";
 import {connect} from 'react-redux'
 
 export class Metadata extends React.Component {
@@ -20,21 +20,21 @@ export class Metadata extends React.Component {
         const {dispatch, subject} = this.props;
 
         if(subject) {
-            dispatch(fetchMetadataBySubjectIfNeeded(subject))
-            dispatch(fetchMetadataVocabularyIfNeeded())
+            dispatch(fetchCombinedMetadataIfNeeded(subject))
         }
     }
 
     renderBody() {
-        if (this.props.error) {
+        const {subject, metadata, error, loading} = this.props;
+
+        if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
-        } else if (this.props.loading) {
+        } else if (loading) {
             return (<div>Loading...</div>)
-        } else if (!this.props.metadata || this.props.metadata.length === 0) {
+        } else if (!metadata || metadata.length === 0) {
             return (<div>No metadata found</div>)
         } else {
-            const combinedProperties = this.props.vocabulary.combine(this.props.metadata)
-            return (<MetadataViewer properties={combinedProperties}/>)
+            return (<MetadataViewer subject={subject} properties={metadata}/>)
         }
     }
 
@@ -49,7 +49,7 @@ export class Metadata extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {metadataBySubject, vocabulary} = state.cache;
+    const {metadataBySubject, cache: { vocabulary }} = state;
     const metadata = metadataBySubject[ownProps.subject];
 
     // If there is no metadata by subject (not even pending)
@@ -63,8 +63,7 @@ const mapStateToProps = (state, ownProps) => {
     return {
         loading: metadata.pending || vocabulary.pending,
         error: metadata.error || vocabulary.error,
-        metadata: metadata.items,
-        vocabulary: vocabulary.item
+        metadata: metadata.items
     }
 }
 

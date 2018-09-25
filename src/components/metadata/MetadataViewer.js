@@ -1,69 +1,20 @@
 import React from 'react';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Typography from "@material-ui/core/Typography";
-
+import MetadataProperty from "./MetadataProperty";
 
 /**
  * This component will always display correct metadata. If any error occurs it is handled by Metadata
  */
-class MetadataViewer extends React.Component {
+const MetadataViewer = props => {
+    const renderProperty =
+            property => <MetadataProperty
+                subject={props.subject}
+                key={property.key}
+                property={property} />
 
-    constructor(props) {
-        super(props);
-        this.props = props;
-        this.properties = props.properties;
-    }
-
-    static renderValue(v) {
-        return (
-            <ListItem key={MetadataViewer.extractDisplayValue(v)}>
-                {MetadataViewer.retrieveDisplayableItem(v)}
-            </ListItem>)
-    }
-
-    static navigableLink(link) {
-        return link.startsWith(window.location.origin)
-            ? link.replace('/iri/collections/', '/collections/').replace('/iri/', '/metadata/')
-            : link
-    }
-
-    static retrieveDisplayableItem(v) {
-        let displayValue = MetadataViewer.extractDisplayValue(v);
-
-        if (v.id) {
-            return (<a href={MetadataViewer.navigableLink(v.id)}>{displayValue}</a>)
-        } else {
-            return displayValue;
-        }
-    }
-
-
-    static extractDisplayValue(v) {
-        return v.label || v.value || MetadataViewer.linkLabel(v.id) || '';
-    }
-
-    static linkLabel(link) {
-        return link &&
-            (link.toString().includes('#')
-                ? link.substring(link.lastIndexOf('#') + 1)
-                : link.substring(link.lastIndexOf('/') + 1))
-    }
-
-    renderProperty(p) {
-        const items = p.values.map(MetadataViewer.renderValue.bind(this));
-        return (
-            <ListItem key={p.label}>
-                <div>
-                    <Typography variant="subheading">{p.label}:</Typography>
-                    <List dense={true}>{items}</List>
-                </div>
-            </ListItem>);
-    }
-
-    render() {
-        return (<List>{this.properties.map(this.renderProperty.bind(this))}</List>)
-    }
+    return <List>
+        {props.properties.map(renderProperty)}
+        </List>
 }
 
 export default MetadataViewer

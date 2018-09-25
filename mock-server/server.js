@@ -21,6 +21,7 @@ app.delete('/api/collections/:id', (req, res) => setTimeout(() => res.send(), 30
 
 // Metadata API
 app.get('/api/metadata/statements', (req, res) => res.sendFile(__dirname + '/metadata-1.json'));
+app.patch('/api/metadata/statements', (req, res) => res.send());
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(__dirname + '/users.json'));

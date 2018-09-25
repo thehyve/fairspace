@@ -1,5 +1,5 @@
 import mockStore from "../store/mockStore";
-import {fetchMetadataBySubjectIfNeeded} from "./metadata";
+import {fetchJsonLdBySubjectIfNeeded} from "./metadata";
 import Config from "../components/generic/Config/Config";
 import configFile from "../config";
 import mockResponse from "../utils/mockResponse";
@@ -22,7 +22,7 @@ describe('fetch metadata', () => {
         window.fetch = jest.fn(() =>
             Promise.resolve(mockResponse(200, 'OK', JSON.stringify([{'name': 'collection1'}]))))
 
-        return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
+        return store.dispatch(fetchJsonLdBySubjectIfNeeded(subject))
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(2);
@@ -34,13 +34,13 @@ describe('fetch metadata', () => {
     })
 
     it('should not fetch data if data present', () => {
-        const store = mockStore({ cache: { metadataBySubject: {
+        const store = mockStore({ cache: { jsonLdBySubject: {
                     [subject]: {
                         items: ['some-data']
                     }
                 }}});
 
-        return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
+        return store.dispatch(fetchJsonLdBySubjectIfNeeded(subject))
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(0);
@@ -48,10 +48,10 @@ describe('fetch metadata', () => {
 
     })
 
-    it('should fetch data if an error occured previously', () => {
-        const store = mockStore({ cache: { metadataBySubject: {
+    it('should fetch data if an the data was invalidated', () => {
+        const store = mockStore({ cache: { jsonLdBySubject: {
             [subject]: {
-                error: true,
+                invalidated: true,
                 items: ['some-data']
             }
         }}});
@@ -59,7 +59,7 @@ describe('fetch metadata', () => {
         window.fetch = jest.fn(() =>
             Promise.resolve(mockResponse(200, 'OK', JSON.stringify([{'name': 'collection1'}]))))
 
-        return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
+        return store.dispatch(fetchJsonLdBySubjectIfNeeded(subject))
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(2);
@@ -71,14 +71,14 @@ describe('fetch metadata', () => {
     })
 
     it('should not fetch data if already fetching', () => {
-        const store = mockStore({ cache: { metadataBySubject: {
+        const store = mockStore({ cache: { jsonLdBySubject: {
                     [subject]: {
                         pending: true,
-                        error: true
+                        invalidated: true
                     }
                 }}});
 
-        return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
+        return store.dispatch(fetchJsonLdBySubjectIfNeeded(subject))
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(0);

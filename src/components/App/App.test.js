@@ -5,6 +5,11 @@ import Config from "../generic/Config/Config";
 import configFile from "../../config";
 
 beforeAll(() => {
+    window.fetch = jest.fn(() => Promise.resolve({
+        ok: true,
+        json: () => {}
+    }));
+
     Config.setConfig(Object.assign(configFile, {
         "externalConfigurationFiles": [],
     }));

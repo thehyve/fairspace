@@ -1,4 +1,4 @@
-import reducer from "./metadataBySubject"
+import reducer from "./jsonLdBySubject"
 
 describe('metadata retrieval', () => {
     it('should store pending state per subject', () => {
@@ -50,12 +50,12 @@ describe('metadata invalidation', () => {
         const previousState = {'previous-subject': 'test'};
         const action = {
             type: 'INVALIDATE_METADATA',
-            subject: 'my-subject'
+            meta: {subject: 'my-subject'}
         };
 
         const newState = reducer(previousState, action)
 
         expect(newState['previous-subject']).toEqual('test');
-        expect(newState['my-subject']).toBeNull();
+        expect(newState['my-subject'].invalidated).toBeTruthy();
     })
 })
