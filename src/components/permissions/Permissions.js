@@ -89,10 +89,11 @@ class Permissions extends React.Component {
             });
     };
 
-    handleAlterPermission = () => {
+    handleAlterPermission = (user) => {
         this.setState({
             showPermissionDialog: true,
             anchorEl: null,
+            selectedUser: user
         })
     };
 
@@ -187,7 +188,7 @@ class Permissions extends React.Component {
     }
 
     renderUserList = () => {
-        const {permissions, anchorEl} = this.state;
+        const {permissions, anchorEl, selectedUser} = this.state;
         const {classes} = this.props;
         return (
             <List dense>
@@ -196,12 +197,12 @@ class Permissions extends React.Component {
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={this.handleMoreClose}>
-                    <MenuItem onClick={this.handleAlterPermission}>Change access</MenuItem>
+                    <MenuItem onClick={() => this.handleAlterPermission(selectedUser)}>Change access</MenuItem>
                     <MenuItem onClick={this.handleRemoveCollaborator}>Delete</MenuItem>
                 </Menu>
                 <ListItem className={classes.buttonList}>
                     <ListItemSecondaryAction>
-                        <Button variant='fab' aria-label="Add" onClick={this.handleAlterPermission} mini>
+                        <Button variant='fab' aria-label="Add" onClick={() => this.handleAlterPermission()} mini>
                             <AddIcon/>
                         </Button>
                     </ListItemSecondaryAction>

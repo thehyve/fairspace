@@ -50,7 +50,6 @@ class ShareWithDialog extends React.Component {
         selectedUserLabel: '',
         userList: [],
         userOptions: [],
-        isEditing: false,
         error: null,
     };
 
@@ -67,7 +66,6 @@ class ShareWithDialog extends React.Component {
             accessRight: user ? user.access : 'Read',
             selectedUser: selectedUser,
             selectedUserLabel: '',
-            isEditing: !!user,
             userOptions: userList.map(r => {
                 return {
                     label: `${r.firstName} ${r.lastName}`,
@@ -120,8 +118,8 @@ class ShareWithDialog extends React.Component {
     };
 
     renderUser = () => {
-        const {userOptions, isEditing, selectedUser} = this.state;
-        return isEditing ?
+        const {userOptions, selectedUser} = this.state;
+        return selectedUser ?
             (<div>
                 <Typography variant="subheading"
                             gutterBottom>{`${selectedUser.firstName} ${selectedUser.lastName}`}</Typography>
@@ -135,7 +133,7 @@ class ShareWithDialog extends React.Component {
 
     render() {
         const {classes} = this.props;
-        const {isEditing, selectedUser} = this.state;
+        const {selectedUser, accessRight} = this.state;
         return (
             <Dialog
                 open={this.props.open}
@@ -143,7 +141,7 @@ class ShareWithDialog extends React.Component {
                 onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
-                    <div className={isEditing ? classes.rootEdit : classes.root}>
+                    <div className={selectedUser ? classes.rootEdit : classes.root}>
                         {this.renderUser()}
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
@@ -151,7 +149,7 @@ class ShareWithDialog extends React.Component {
                                 aria-label="Access right"
                                 name="access-right"
                                 className={classes.group}
-                                value={this.state.accessRight}
+                                value={accessRight}
                                 onChange={this.handleAccessRightChange}>
                                 {Object.keys(AccessRights).map(access => {
                                     return <FormControlLabel key={access} value={access} control={<Radio/>}
