@@ -94,4 +94,20 @@ public class PermissionControllerIntegrationTest {
         assertEquals(permission.getAccess(), storedCollection.getAccess());
         assertEquals(collectionId, storedCollection.getCollection());
     }
+
+    @Test
+    public void testPermissionStorageWithoutCollection() {
+        // Setup
+        doReturn(permission).when(permissionService).authorize("a", 40L, Access.Read, false);
+
+        // Test
+        String path = "/permissions";
+        String json = "{\"subject\": \"a\", \"access\": \"Read\"}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> httpEntity = new HttpEntity<>(json, headers);
+        ResponseEntity<io.fairspace.neptune.web.dto.Permission> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.PUT, httpEntity, io.fairspace.neptune.web.dto.Permission.class);
+
+        assertEquals(400, response.getStatusCodeValue());
+    }
 }

@@ -5,6 +5,7 @@ import io.fairspace.neptune.web.dto.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class PermissionController {
     }
 
     @PutMapping("/permissions")
-    public Permission setAuthorization(@RequestBody Permission permission) {
+    public Permission setAuthorization(@Valid @RequestBody Permission permission) {
         io.fairspace.neptune.model.Permission storedPermission =
                 permissionService.authorize(permission.getSubject(), permission.getCollection(), permission.getAccess(), false);
         return Permission.fromModel(storedPermission);
