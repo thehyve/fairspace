@@ -80,7 +80,6 @@ class ShareWithDialog extends React.Component {
     };
 
     componentDidMount() {
-        const {collaborators} = this.props;
         userAPI.getUsers().then(result => {
             this.setState({userList: result});
         })
