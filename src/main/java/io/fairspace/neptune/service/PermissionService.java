@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PermissionService {
@@ -58,6 +59,27 @@ public class PermissionService {
         return authorize(getSubject(), collection, access, isNew);
     }
 
+    /**
+     * Authorize the given subject to have access to the given collection
+     *
+     * @param subject
+     * @param collectionId
+     * @param access
+     * @param isNew
+     * @return
+     */
+    public Permission authorize(String subject, Long collectionId, Access access, boolean isNew) {
+        Collection collection = collectionRepository.findById(collectionId).orElseThrow(CollectionNotFoundException::new);
+        
+
+        return
+                authorize(
+                    Permission.builder()
+                        .subject(subject)
+                        .collection(collection)
+                        .access(access)
+                        .build(), isNew);
+    }
     /**
      * Authorize the given subject to have access to the given collection
      *
