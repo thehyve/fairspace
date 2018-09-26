@@ -31,8 +31,8 @@ describe('e2e tests checking metadata for Fairspace', function () {
         // Go to a metadata page about a patient
         cy.visit("/metadata/patients/GSM210004");
 
-        // Wait for the page to show 'Type:' (which indicates that metadata has been loaded
-        cy.contains("Type:");
+        // Wait for the page to show 'Type' (which indicates that metadata has been loaded
+        cy.contains("Type");
 
         // Expect the id and type to be shown on the page,
         cy.contains("Id: GSM210004");
