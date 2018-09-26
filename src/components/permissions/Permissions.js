@@ -32,9 +32,6 @@ const styles = theme => ({
             visibility: "inherit"
         }
     },
-    collaboratorIcon: {
-        visibility: "hidden"
-    },
     collaboratorList: {
         width: '100%'
     },
