@@ -53,6 +53,9 @@ public class PermissionServiceTest {
         when(permissionRepository.findBySubjectAndCollection("creator", collection1))
                 .thenReturn(Optional.of(new Permission(1L, "creator", collection1, Access.Manage)));
 
+        when(permissionRepository.findBySubjectAndCollection("user2", collection1))
+                .thenReturn(Optional.of(new Permission(1L, "user2", collection1, Access.Write)));
+
         when(permissionRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
     }
 
@@ -80,7 +83,7 @@ public class PermissionServiceTest {
     @Test
     public void testAddingPermissionsForKnownCollection() {
         as("creator", () -> {
-            permissionService.authorize(new Permission(null, "user2", collection1, Access.Write), true);
+            permissionService.authorize(new Permission(null, "creator", collection1, Access.Write), true);
             verify(permissionRepository).save(any());
         });
     }
@@ -88,7 +91,7 @@ public class PermissionServiceTest {
     @Test
     public void testSettingNoneAccess() {
         as("creator", () -> {
-            permissionService.authorize(new Permission(null, "creator", collection1, Access.None), false);
+            permissionService.authorize(new Permission(null, "user2", collection1, Access.None), false);
             verify(permissionRepository).delete(any());
         });
     }
@@ -96,8 +99,15 @@ public class PermissionServiceTest {
     @Test(expected = UnauthorizedException.class)
     public void testGrantingAccessWithoutPermission() {
         as("trespasser", () ->
-                permissionService.authorize(new Permission(null, "trespasser", collection1, Access.Manage), false));
+                permissionService.authorize(new Permission(null, "user2", collection1, Access.Manage), false));
     }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testGrantingOwnPermissions() {
+        as("creator", () ->
+                permissionService.authorize(new Permission(null, "creator", collection1, Access.Manage), false));
+    }
+
 
     private void as(String user, Runnable action) {
         when(authorizationContainer.getSubject()).thenReturn(user);

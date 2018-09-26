@@ -70,7 +70,6 @@ public class PermissionService {
      */
     public Permission authorize(String subject, Long collectionId, Access access, boolean isNew) {
         Collection collection = collectionRepository.findById(collectionId).orElseThrow(CollectionNotFoundException::new);
-        
 
         return
                 authorize(
@@ -101,6 +100,10 @@ public class PermissionService {
     public Permission authorize(Permission permission, boolean isNew) {
         if (!isNew) {
             checkPermission(Access.Manage, permission.getCollection().getId());
+
+            if(permission.getSubject().equals(authorizationContainer.getSubject())) {
+                throw new UnauthorizedException("User is not allowed to change its own permissions");
+            }
         }
 
         return permissionRepository.findBySubjectAndCollection(permission.getSubject(), permission.getCollection())
