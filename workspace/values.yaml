@@ -123,6 +123,7 @@ jupyterhub:
             JUPYTERHUB_CRYPT_KEY:
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
+          c.KubeSpawner.singleuser_privileged = True
     proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
 
