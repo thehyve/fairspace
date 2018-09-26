@@ -52,10 +52,16 @@ spec:
             httpGet:
               path: /
               port: 3000
+              httpHeaders:
+              - name: Probe
+                value: Liveness
           readinessProbe:
             httpGet:
               path: /
               port: 3000
+              httpHeaders:
+              - name: Probe
+                value: Readiness
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
