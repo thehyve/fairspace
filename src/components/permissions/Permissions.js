@@ -75,7 +75,6 @@ class Permissions extends React.Component {
 
     loadPermissions = () => {
         const {creator} = this.props;
-        console.log(this.props);
         permissionAPI
             .getCollectionPermissions(this.props.collectionId)
             .then(result => {
@@ -120,7 +119,7 @@ class Permissions extends React.Component {
         if (selectedUser) {
             this.handleCloseConfirmDeleteDialog();
             permissionAPI
-                .removeUserFromCollectionPermission(selectedUser.subject, this.state.collectionId)
+                .removeUserFromCollectionPermission(selectedUser.subject, this.props.collectionId)
                 .then(() => {
                     this.loadPermissions(); // reload permissions
                 })
