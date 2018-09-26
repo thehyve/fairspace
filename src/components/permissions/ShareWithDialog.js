@@ -72,7 +72,7 @@ class ShareWithDialog extends React.Component {
                 return {
                     label: `${r.firstName} ${r.lastName}`,
                     value: `${r.id}`,
-                    disabled: collaborators.find(c => c.subject === r.id || r.id === currentUser.id)
+                    disabled: collaborators.find(c => c.subject === r.id) || r.id === currentUser.id
                 }
             }),
             error: null,
