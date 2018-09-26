@@ -18,7 +18,7 @@ const zipkinSamplingRate = process.env.ZIPKIN_SAMPLING_RATE || 0.01;
 const permissionsEndpointUrl = process.env.PERMISSIONS_URL;
 
 // Respond to / anonymously to allow for health checks
-app.get('/', (req, res) => res.send('Hi, I\'m Titan!').end());
+app.get('/', (req, res, next) => req.get('probe') ? res.send('Hi, I\'m Titan!').end() : next());
 
 if(tracingEnabled) app.use(setupTracingMiddleware(zipkinEndointUrl, zipkinSamplingRate));
 
@@ -50,9 +50,8 @@ function setupWebdavMiddleware(physicalRootPath, webdavPath) {
         privilegeManager: new PrivilegeManager(permissionsEndpointUrl)
     });
 
-
-
     app.use(fixWebdavDestinationMiddleware(webdavPath));
     app.use(webdav.extensions.express(webdavPath, server));
+    app.use(webdav.extensions.express('/', server));
 }
 

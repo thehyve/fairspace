@@ -76,7 +76,11 @@ describe('Titan', () => {
 
     after(() => fs.removeSync(process.env.FILES_FOLDER));
 
-    it('responds to / anonymously', () => server.get('/').expect(200, 'Hi, I\'m Titan!'));
+    it('responds to probe requests', () =>
+        server
+            .get('/')
+            .set('probe', 'Liveness')
+            .expect(200, 'Hi, I\'m Titan!'));
 
     it('responds to /api/storage/webdav when the directory is present and authorization is provided', () =>
         server
@@ -123,7 +127,7 @@ describe('Authentication', () => {
     );
 });
 
-describe('Webdav', () => {
+describe('Webdav with /api/storage/webdav/ prefix', () => {
     beforeEach(() => fs.mkdirSync(process.env.FILES_FOLDER));
 
     afterEach(() => fs.removeSync(process.env.FILES_FOLDER));
@@ -245,5 +249,26 @@ describe('Webdav', () => {
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(401)
+    );
+});
+
+
+describe('Webdav with no prefix', () => {
+    beforeEach(() => fs.mkdirSync(process.env.FILES_FOLDER));
+
+    afterEach(() => fs.removeSync(process.env.FILES_FOLDER));
+
+
+    it('a user can create and delete a top-level directory', () =>
+        server
+            .mkcol('/1')
+            .set('Authorization', 'Bearer Alice')
+            .set('Anticipated-Operation', 'true')
+            .expect(201)
+            .then(() => server
+                .delete('/1')
+                .set('Anticipated-Operation', 'true')
+                .set('Authorization', 'Bearer Alice')
+                .expect(200))
     );
 });
