@@ -119,7 +119,7 @@
       "@id": "fairspace:isConsentOf",
       "@type": "rdf:Property",
       "rdfs:label": "Is consent of",
-      "rdfs:domain": [{"@id": "fairspace:Consent"}],
+      "rdfs:domain": [{"@id": "fairspace:PersonConsent"}],
       "rdfs:range": [{"@id": "schema:Person"}],
       "fairspace:allowMultiple": false
     },
@@ -127,8 +127,8 @@
       "@id": "fairspace:gaveConsent",
       "@type": "rdf:Property",
       "rdfs:label": "Gave consent",
-      "rdfs:domain": [{"@id": "fairspace:PersonConsent"}],
-      "rdfs:range": [{"@id": "schema:Person"}],
+      "rdfs:domain": [{"@id": "schema:Person"}],
+      "rdfs:range": [{"@id":  "fairspace:PersonConsent"}],
       "fairspace:allowMultiple": true
     },
     {
