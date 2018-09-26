@@ -9,6 +9,7 @@ import {connect} from 'react-redux';
 import {updateMetadata} from "../../actions/metadata";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ListItemText from "@material-ui/core/ListItemText";
+import ErrorDialog from "../error/ErrorDialog";
 
 /**
  * Shows the property and values for the property
@@ -33,6 +34,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
             })
 
             return dispatch(updateMetadata(subject, property.key, updatedValues))
+                .catch(e => ErrorDialog.showError(e, "Error while saving metadata"));
         } else {
             return Promise.resolve();
         }
@@ -42,6 +44,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
         if(newEntry.value || newEntry.id) {
             const updatedValues = [...property.values, newEntry]
             return dispatch(updateMetadata(subject, property.key, updatedValues))
+                .catch(e => ErrorDialog.showError(e, "Error while adding metadata"));
         } else {
             return Promise.resolve();
         }
@@ -50,6 +53,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
     const handleDelete = index => () => {
         const updatedValues = property.values.filter((el, idx) => idx !== index)
         return dispatch(updateMetadata(subject, property.key, updatedValues))
+            .catch(e => ErrorDialog.showError(e, "Error while deleting metadata"));
     }
 
     // Render the given entry as a list item
@@ -74,7 +78,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
 
     // Do not show an add component if no multiples are allowed
     // and there is already a value
-    const canAdd = property.allowMultiple || property.values.length == 0
+    const canAdd = property.allowMultiple || property.values.length === 0
 
     const renderAddComponent = () =>
         <ListItem key={property.values.length}>

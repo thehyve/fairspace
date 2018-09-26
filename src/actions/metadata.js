@@ -1,4 +1,4 @@
-import {createPromiseAction} from "../utils/redux";
+import {createErrorHandlingPromiseAction} from "../utils/redux";
 import MetadataAPI from "../services/MetadataAPI/MetadataAPI"
 
 export const invalidateMetadata = (subject) => ({
@@ -6,7 +6,7 @@ export const invalidateMetadata = (subject) => ({
     meta: {subject: subject}
 })
 
-export const updateMetadata = createPromiseAction((subject, predicate, values) => ({
+export const updateMetadata = (subject, predicate, values) => ({
     type: "UPDATE_METADATA",
     payload: MetadataAPI.update(subject, predicate, values),
     meta: {
@@ -14,7 +14,7 @@ export const updateMetadata = createPromiseAction((subject, predicate, values) =
         predicate: predicate,
         values: values
     }
-}))
+})
 
 export const fetchCombinedMetadataIfNeeded = (subject) => {
     return (dispatch, getState) => {
@@ -60,7 +60,7 @@ const fetchMetadataVocabularyIfNeeded = () => {
     }
 }
 
-const fetchJsonLdBySubject = createPromiseAction((subject) => ({
+const fetchJsonLdBySubject = createErrorHandlingPromiseAction((subject) => ({
     type: "METADATA",
     payload: MetadataAPI.get({subject: subject}),
     meta: {
@@ -68,7 +68,7 @@ const fetchJsonLdBySubject = createPromiseAction((subject) => ({
     }
 }));
 
-const combineMetadataForSubject = createPromiseAction((subject, dispatch) => ({
+const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dispatch) => ({
     type: "METADATA_COMBINATION",
     payload: Promise.all([
                 dispatch(fetchJsonLdBySubjectIfNeeded(subject)),
@@ -79,12 +79,12 @@ const combineMetadataForSubject = createPromiseAction((subject, dispatch) => ({
     meta: { subject: subject }
 }))
 
-const fetchVocabulary = createPromiseAction(() => ({
+const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
     type: "METADATA_VOCABULARY",
     payload: MetadataAPI.getVocabulary()
 }));
 
-const fetchEntitiesByType = createPromiseAction((type) => ({
+const fetchEntitiesByType = createErrorHandlingPromiseAction((type) => ({
     type: "METADATA_ENTITIES",
     payload: MetadataAPI.getEntitiesByType(type),
     meta: {

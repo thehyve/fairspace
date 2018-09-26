@@ -1,12 +1,16 @@
 
 /**
  * Creates a redux action that executes a promise.
+ *
+ * Please note that any error ocurring in the promise execution will be swallowed and
+ * logged to the component. In case of an error there will also be a <type>_REJECTED action
+ *
  * The redux-promise-middleware is being used to handle the promise
  * and will emit the corresponding actions: <type>_PENDING, <type>_FULFILLED, <type>_REJECTED
  * @param actionClosure
  * @returns {function(): function(*): (*|Promise<T>)}
  */
-export function createPromiseAction(actionClosure){
+export function createErrorHandlingPromiseAction(actionClosure){
     return (...params) => dispatch =>
         dispatch(
             actionClosure(...params, dispatch)
