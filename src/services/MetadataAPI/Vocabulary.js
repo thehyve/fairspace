@@ -1,4 +1,12 @@
 import {compareBy, comparing} from "../../utils/comparators";
+import {
+    ALLOW_MULTIPLE_URI,
+    DOMAIN_URI,
+    LABEL_URI,
+    MULTILINE_PROPERTY_URI,
+    PROPERTY_URI,
+    RANGE_URI
+} from "./MetadataAPI";
 
 class Vocabulary {
     /**
@@ -145,10 +153,10 @@ class Vocabulary {
      */
     _determinePredicatesForType(type) {
         const isProperty = entry =>
-            entry['@type'].includes('http://www.w3.org/1999/02/22-rdf-syntax-ns#Property');
+            entry['@type'].includes(PROPERTY_URI);
 
         const isInDomain = entry => {
-            return entry['http://www.w3.org/2000/01/rdf-schema#domain'].find(domainEntry => domainEntry['@id'] === type);
+            return entry[DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
         }
 
         const predicates = this.vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
@@ -173,9 +181,9 @@ class Vocabulary {
      */
     static _generatePropertyEntry(predicate, values, vocabularyEntry) {
         const label = Vocabulary._getLabel(vocabularyEntry);
-        const range = Vocabulary._getFirstPredicateId(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#range');
-        const allowMultiple = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://fairspace.io/ontology#allowMultiple', false);
-        const multiLine = Vocabulary._getFirstPredicateValue(vocabularyEntry, 'http://fairspace.io/ontology#multiLine', false);
+        const range = Vocabulary._getFirstPredicateId(vocabularyEntry, RANGE_URI);
+        const allowMultiple = Vocabulary._getFirstPredicateValue(vocabularyEntry, ALLOW_MULTIPLE_URI, false);
+        const multiLine = Vocabulary._getFirstPredicateValue(vocabularyEntry, MULTILINE_PROPERTY_URI, false);
         const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
         return {
@@ -201,7 +209,7 @@ class Vocabulary {
     }
 
     static _getLabel(vocabularyEntry) {
-        return this._getFirstPredicateValue(vocabularyEntry, 'http://www.w3.org/2000/01/rdf-schema#label', '');
+        return this._getFirstPredicateValue(vocabularyEntry, LABEL_URI, '');
     }
 
 }

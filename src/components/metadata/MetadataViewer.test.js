@@ -15,6 +15,10 @@ it('displays properties properly', () => {
         wrapper.update();
     }).then(() => {
         const result = wrapper.find("li");
+
+        // There should be 10 list items:
+        // 3 names of the fields
+        // 4 values
         expect(result.length).toEqual(7);
         expect(wrapper.text()).toEqual("DescriptionMore infoMy first collectionNameCollection 5TypeCollection");
     });
