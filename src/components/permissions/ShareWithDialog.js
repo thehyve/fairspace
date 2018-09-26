@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 import userAPI from '../../services/UserAPI/UserAPI';
 import permissionAPI from '../../services/PermissionAPI/PermissionAPI';
 import Button from '@material-ui/core/Button';
@@ -54,7 +55,7 @@ class ShareWithDialog extends React.Component {
     };
 
     resetState = () => {
-        const {user, collaborators} = this.props;
+        const {user, collaborators, currentUser} = this.props;
         const {userList} = this.state;
         let selectedUser = null;
         if (user) {
@@ -71,7 +72,7 @@ class ShareWithDialog extends React.Component {
                 return {
                     label: `${r.firstName} ${r.lastName}`,
                     value: `${r.id}`,
-                    disabled: collaborators.find(c => c.subject === r.id)
+                    disabled: collaborators.find(c => c.subject === r.id || r.id === currentUser.id)
                 }
             }),
             error: null,
@@ -179,4 +180,10 @@ ShareWithDialog.propTypes = {
     theme: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, {withTheme: true})(ShareWithDialog);
+const mapStateToProps = ({account: {user}}) => {
+    return {
+        currentUser: user.item
+    }
+};
+
+export default connect(mapStateToProps)(withStyles(styles, {withTheme: true})(ShareWithDialog));
