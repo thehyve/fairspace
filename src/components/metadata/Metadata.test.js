@@ -7,6 +7,7 @@ import mockStore from "../../store/mockStore"
 import MetadataViewer from "./MetadataViewer";
 import {Provider} from "react-redux";
 import Config from "../generic/Config/Config";
+import {CLASS_URI, DOMAIN_URI, LABEL_URI, PROPERTY_URI} from "../../services/MetadataAPI/MetadataAPI";
 
 beforeAll(() => {
     window.fetch = jest.fn(() => Promise.resolve({ok: true}))
@@ -99,39 +100,39 @@ it('tries to load the metadata and the vocabulary', () => {
 const vocabulary = [
     {
         "@id": "@type",
-        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
-        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Type' }],
-        "http://www.w3.org/2000/01/rdf-schema#domain": [
+        '@type': PROPERTY_URI,
+        [LABEL_URI]: [{ '@value': 'Type' }],
+        [DOMAIN_URI]: [
             {"@id": "http://fairspace.io/ontology#Collection"}
         ]
     },
     {
         '@id': 'http://fairspace.io/ontology#name',
-        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
-        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Name' }],
-        'http://www.w3.org/2000/01/rdf-schema#domain': [{ '@id': 'http://fairspace.io/ontology#Collection' }]
+        '@type': PROPERTY_URI,
+        [LABEL_URI]: [{ '@value': 'Name' }],
+        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }]
     },
     {
         '@id': 'http://fairspace.io/ontology#description',
-        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
-        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Description' }],
-        'http://www.w3.org/2000/01/rdf-schema#domain': [{ '@id': 'http://fairspace.io/ontology#Collection' }]
+        '@type': PROPERTY_URI,
+        [LABEL_URI]: [{ '@value': 'Description' }],
+        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }]
     },
     {
         '@id': 'http://schema.org/Creator',
-        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
-        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Creator' }],
-        'http://www.w3.org/2000/01/rdf-schema#domain': []
+        '@type': PROPERTY_URI,
+        [LABEL_URI]: [{ '@value': 'Creator' }],
+        [DOMAIN_URI]: []
     },
     {
         '@id': 'http://schema.org/CreatedDate',
-        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
-        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Created date' }],
-        'http://www.w3.org/2000/01/rdf-schema#domain': [{ '@id': 'http://fairspace.io/ontology#Collection' }]
+        '@type': PROPERTY_URI,
+        [LABEL_URI]: [{ '@value': 'Created date' }],
+        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }]
     },
     {
         '@id': 'http://fairspace.io/ontology#Collection',
-        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class',
-        'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Collection' }]
+        '@type': CLASS_URI,
+        [LABEL_URI]: [{ '@value': 'Collection' }]
     }
 ];

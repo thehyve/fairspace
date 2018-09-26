@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import MaterialReactSelect from "../../generic/MaterialReactSelect/MaterialReactSelect";
 import {connect} from 'react-redux';
 import {fetchEntitiesIfNeeded} from "../../../actions/metadata";
+import {LABEL_URI} from "../../../services/MetadataAPI/MetadataAPI";
 
 function LookupEntity({entities, property, onSave, dispatch}) {
     // Ensure that the entities for lookup have been retrieved
@@ -13,8 +14,8 @@ function LookupEntity({entities, property, onSave, dispatch}) {
         const id = entity['@id'];
         let label
 
-        if(entity['http://www.w3.org/2000/01/rdf-schema#label']) {
-            label = entity['http://www.w3.org/2000/01/rdf-schema#label'][0]
+        if(entity[LABEL_URI]) {
+            label = entity[LABEL_URI][0]
         } else {
             label = id.substring(id.lastIndexOf('/')+1);
         }

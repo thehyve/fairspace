@@ -7,11 +7,12 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import IconButton from "@material-ui/core/IconButton";
 import ValueComponentFactory from "./values/ValueComponentFactory";
+import {STRING_URI} from "../../services/MetadataAPI/MetadataAPI";
 
 const subject = 'https://thehyve.nl';
 const defaultProperty = {
     key: 'description',
-    range: 'http://www.w3.org/TR/xmlschema11-2/#string',
+    range: STRING_URI,
     label: 'Description',
     values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
     allowMultiple: true
@@ -146,15 +147,9 @@ describe('MetadataProperty changes', () => {
     });
 
     it('handles deletion correctly', () => {
-        const property = {
-            key: 'description',
-            range: 'http://www.w3.org/TR/xmlschema11-2/#string',
-            label: 'Description',
-            values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}]
-        };
         const store = mockStore({})
 
-        const wrapper = mount(<MetadataProperty store={store} property={property} subject={subject} />);
+        const wrapper = mount(<MetadataProperty store={store} property={defaultProperty} subject={subject} />);
 
         const secondButton = wrapper.find(IconButton).at(1);
         secondButton.simulate('click');
