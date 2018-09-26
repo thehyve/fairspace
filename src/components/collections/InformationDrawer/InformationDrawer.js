@@ -23,16 +23,16 @@ function InformationDrawer(props) {
     }
 
     function renderCollectionDetails() {
-        if(!props.collection) {
+        if (!props.collection) {
             return <Typography variant="title">No collection</Typography>;
         }
 
-        const { classes, collection } = props;
+        const {classes, collection} = props;
 
         return <React.Fragment>
             <div className={classes.root}>
                 <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                         <Typography className={classes.heading}>Collection Details</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
@@ -44,15 +44,15 @@ function InformationDrawer(props) {
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                         <Typography className={classes.heading}>Shared with</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <Permissions collectionId={collection.id} creator={collection.creator}/>
+                        <Permissions collection={collection}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                         <Typography className={classes.heading}>Metadata</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
@@ -63,7 +63,7 @@ function InformationDrawer(props) {
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                         <Typography className={classes.heading}>Path</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
