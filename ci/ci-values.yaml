@@ -59,11 +59,11 @@ jupyterhub:
     singleuser:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
-            tag: latest
+            tag: 0.1.23
     hub:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
-            tag: latest
+            tag: 0.1.4
         extraEnv:
             OPENID_CONNECT_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect
             JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
