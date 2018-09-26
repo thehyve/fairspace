@@ -106,7 +106,7 @@ class ShareWithDialog extends React.Component {
         const {collectionId} = this.props;
         if (selectedUser) {
             this.props.onClose();
-            permissionAPI.alterCollectionPermission(selectedUser.value, collectionId, accessRight)
+            permissionAPI.alterCollectionPermission(selectedUser.id, collectionId, accessRight)
                 .then(response => {
                     this.setState({selectedUserLabel: ''});
                 })
