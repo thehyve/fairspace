@@ -69,17 +69,14 @@ public class PermissionService {
      * @return
      */
     public Permission authorize(String subject, Long collectionId, Access access, boolean isNew) {
-        Optional<Collection> collection = collectionRepository.findById(collectionId);
-
-        if(!collection.isPresent()) {
-            throw new CollectionNotFoundException();
-        }
+        Collection collection = collectionRepository.findById(collectionId).orElseThrow(CollectionNotFoundException::new);
+        
 
         return
                 authorize(
                     Permission.builder()
                         .subject(subject)
-                        .collection(collection.get())
+                        .collection(collection)
                         .access(access)
                         .build(), isNew);
     }
