@@ -19,7 +19,7 @@ it('renders without crashing', () => {
 });
 
 it('renders content if no authorization is specified', () => {
-    const store = mockStore({account: { user: {}, authorizations: {items: []} }});
+    const store = mockStore({account: { user: {}, authorizations: {data: []} }});
     const element = <MemoryRouter><AuthorizationCheck store={store}>Children</AuthorizationCheck></MemoryRouter>;
 
     const wrapper = mount(element)
@@ -28,7 +28,7 @@ it('renders content if no authorization is specified', () => {
 });
 
 it('renders content if existing authorization is specified', () => {
-    const store = mockStore({account: { user: {}, authorizations: {items: ['authorization']} }});
+    const store = mockStore({account: { user: {}, authorizations: {data: ['authorization']} }});
     const element = <MemoryRouter><AuthorizationCheck authorization='authorization' store={store}>Children</AuthorizationCheck></MemoryRouter>;
 
     const wrapper = mount(element)
@@ -37,7 +37,7 @@ it('renders content if existing authorization is specified', () => {
 });
 
 it('does not render content if existing authorization is specified', () => {
-    const store = mockStore({account: { user: {}, authorizations: {items: ['authorization']} }});
+    const store = mockStore({account: { user: {}, authorizations: {data: ['authorization']} }});
     const element = <MemoryRouter><AuthorizationCheck authorization='non-existing' store={store}>Children</AuthorizationCheck></MemoryRouter>;
 
     const wrapper = mount(element)

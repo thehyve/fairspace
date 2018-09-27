@@ -181,7 +181,7 @@ ShareWithDialog.propTypes = {
 
 const mapStateToProps = ({account: {user}}) => {
     return {
-        currentUser: user.item
+        currentUser: user.data
     }
 };
 

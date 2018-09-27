@@ -53,7 +53,7 @@ const mapStateToProps = (state, ownProps) => {
     return {
         loading: metadata.pending || vocabulary.pending,
         error: metadata.error || vocabulary.error,
-        metadata: metadata.items
+        metadata: metadata.data
     }
 }
 

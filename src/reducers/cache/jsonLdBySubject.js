@@ -1,47 +1,22 @@
-const defaultState = {};
+import {createFetchPromiseReducer} from "../../utils/redux";
 
+const defaultState = {};
+const jsonLdFetchReducer = createFetchPromiseReducer("METADATA", defaultState, action => action.meta.subject);
 const jsonLdBySubject = (state = defaultState, action) => {
-    switch (action.type) {
-        case "METADATA_PENDING":
-            return {
-                ...state,
-                [action.meta.subject]: {
-                    pending: true,
-                    error: false,
-                    invalidated: false,
-                    items: {}
-                }
-            }
-        case "METADATA_FULFILLED":
-            return {
-                ...state,
-                [action.meta.subject]: {
-                    ...state[action.meta.subject],
-                    pending: false,
-                    items: action.payload
-                }
-            }
-        case "METADATA_REJECTED":
-            return {
-                ...state,
-                [action.meta.subject]: {
-                    ...state[action.meta.subject],
-                    pending: false,
-                    error: action.payload || true
-                }
-            }
+    const reducedState = jsonLdFetchReducer(state, action);
+
+    switch(action.type) {
         case "UPDATE_METADATA_FULFILLED":
-        case "INVALIDATE_METADATA":
             return {
-                ...state,
+                ...reducedState,
                 [action.meta.subject]: {
-                    ...state[action.meta.subject],
+                    ...reducedState[action.meta.subject],
                     invalidated: true
                 }
             }
         default:
-            return state;
+            return reducedState
     }
-};
+}
 
 export default jsonLdBySubject;

@@ -237,7 +237,7 @@ class Permissions extends React.Component {
 
 const mapStateToProps = ({account: {user}}) => {
     return {
-        currentUser: user.item
+        currentUser: user.data
     }
 };
 

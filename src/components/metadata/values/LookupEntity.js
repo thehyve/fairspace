@@ -47,7 +47,7 @@ const mapStateToProps = (state, ownProps) => {
         const entities = state.cache.entitiesByType[ownProps.property.range];
 
         if (entities && !entities.pending && !entities.error) {
-            return {entities: entities.items}
+            return {entities: entities.data}
         }
     }
 

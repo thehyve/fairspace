@@ -26,7 +26,7 @@ describe('metadata retrieval', () => {
 
         expect(newState['previous-subject']).toEqual('test');
         expect(newState['my-subject'].pending).toEqual(false);
-        expect(newState['my-subject'].items).toEqual('new-metadata');
+        expect(newState['my-subject'].data).toEqual('new-metadata');
     })
 
     it('should store errors per subject', () => {

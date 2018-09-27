@@ -25,7 +25,7 @@ it('shows result when subject provided and data is loaded', () => {
     const store = mockStore({
         metadataBySubject: {
             "http://fairspace.com/iri/collections/1": {
-                items: [
+                data: [
                     {key: 'test', values: []}
                 ]
             }
@@ -33,7 +33,7 @@ it('shows result when subject provided and data is loaded', () => {
         cache: {
             vocabulary:
                 {
-                    item: new Vocabulary(vocabulary)
+                    data: new Vocabulary(vocabulary)
                 }
         }
     });
@@ -47,13 +47,13 @@ it('shows a message if no metadata was found', () => {
     const store = mockStore({
         metadataBySubject: {
             "http://fairspace.com/iri/collections/1": {
-                items: []
+                data: []
             }
         },
         cache: {
             vocabulary:
                 {
-                    item: new Vocabulary(vocabulary)
+                    data: new Vocabulary(vocabulary)
                 }
         }
     });
@@ -70,7 +70,7 @@ it('shows error when no subject provided', () => {
         cache: {
             vocabulary:
                 {
-                    item: new Vocabulary(vocabulary)
+                    data: new Vocabulary(vocabulary)
                 }
         }
     });
@@ -83,11 +83,11 @@ it('tries to load the metadata and the vocabulary', () => {
     const store = mockStore({ cache: {
             jsonLdBySubject: {
                 "http://fairspace.com/iri/collections/1": {
-                    items: []
+                    data: []
                 }
             },
             vocabulary: {
-                item: new Vocabulary(vocabulary)
+                data: new Vocabulary(vocabulary)
             }
         }});
 
