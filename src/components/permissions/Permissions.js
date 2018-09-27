@@ -53,7 +53,7 @@ class Permissions extends React.Component {
             hovered: null,
             anchorEl: null,
             selectedUser: null,
-            currentUser: null,
+            currentLoggedUser: null,
             canManage: false,
         };
     }
@@ -256,7 +256,7 @@ class Permissions extends React.Component {
 
 const mapStateToProps = ({account: {user}}) => {
     return {
-        currentUser: user.item
+        currentLoggedUser: user.item
     }
 };
 
