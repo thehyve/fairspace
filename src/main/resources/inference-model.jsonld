@@ -6,21 +6,9 @@
     },
     "@graph": [
         {
-            "@id": "schema:about"
-        },
-        {
-            "@id": "fairspace:provides"
-        },
-        {
-            "@id": "fairspace:gaveConsent"
-        },
-        {
-            "@id": "fairspace:belongsTo"
-        },
-        {
             "@id": "fairspace:derivesFrom",
             "owl:inverseOf": {
-                "@id": "fairspace:provides"
+                "@id": "fairspace:providesMaterial"
             }
         },
         {
@@ -30,9 +18,21 @@
             }
         },
         {
-            "@id": "schema:about",
+            "@id": "fairspace:isProjectConsent",
             "owl:inverseOf": {
-                "@id": "fairspace:belongsTo"
+                "@id": "fairspace:hasPersonConsent"
+            }
+        },
+        {
+            "@id": "fairspace:hasCollection",
+            "owl:inverseOf": {
+                "@id": "fairspace:hasPersonConsent"
+            }
+        },
+        {
+            "@id": "fairspace:partOf",
+            "owl:inverseOf": {
+                "@id": "fairspace:hasPersonConsent"
             }
         }
     ]
