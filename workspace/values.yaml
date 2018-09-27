@@ -152,7 +152,7 @@ neptune:
 # Specific settings for Titan subchart
 titan:
     auth:
-      jwksUrl:
+      tokenUrl:
     persistence:
       enabled: true
       accessMode: ReadWriteOnce
