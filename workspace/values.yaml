@@ -153,6 +153,7 @@ neptune:
 titan:
     auth:
       tokenUrl:
+      clientId:
     persistence:
       enabled: true
       accessMode: ReadWriteOnce

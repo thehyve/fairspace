@@ -24,6 +24,7 @@ pluto:
 titan:
   auth:
     tokenUrl: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/token
+    clientId: workspace-ci-pluto
   tracing:
     samplingRate: 1
   permissions:
