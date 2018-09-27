@@ -5,8 +5,7 @@ class StringValue extends React.Component {
     constructor(props) {
         super(props);
 
-        const initialValue = (props.entry || {}).value || ''
-        this.state = {value: initialValue};
+        this.state = {value: props.entry.value};
     }
 
     handleChange(e) {
@@ -27,5 +26,9 @@ class StringValue extends React.Component {
         />
     }
 }
+
+StringValue.defaultProps = {
+    entry: {value: ''}
+};
 
 export default StringValue;
