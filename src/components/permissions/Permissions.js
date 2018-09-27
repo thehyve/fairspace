@@ -17,6 +17,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
+import PermissionChecker from "./PermissionChecker";
 
 export const AccessRights = {
     Read: 'Read',
@@ -52,19 +53,21 @@ class Permissions extends React.Component {
             hovered: null,
             anchorEl: null,
             selectedUser: null,
-            currentUser: null
+            currentLoggedUser: null,
+            canManage: false,
         };
     }
 
     componentDidMount() {
-        if (this.props.collectionId) {
+        const {collection} = this.props;
+        if (collection) {
             this.loadPermissions();
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {collectionId} = this.props;
-        if (collectionId !== prevProps.collectionId) {
+        const {collection} = this.props;
+        if (collection.id !== prevProps.collection.id) {
             this.loadPermissions();
         }
     }
@@ -74,12 +77,15 @@ class Permissions extends React.Component {
     };
 
     loadPermissions = () => {
-        const {creator} = this.props;
+        const {collection} = this.props;
+        this.setState({
+            canManage: PermissionChecker.canManage(collection)
+        });
         permissionAPI
-            .getCollectionPermissions(this.props.collectionId)
+            .getCollectionPermissions(this.props.collection.id)
             .then(result => {
                 this.setState({
-                    permissions: result.filter(item => item.subject !== creator),
+                    permissions: result.filter(item => item.subject !== collection.creator),
                     error: false
                 });
             })
@@ -120,7 +126,7 @@ class Permissions extends React.Component {
         if (selectedUser) {
             this.handleCloseConfirmDeleteDialog();
             permissionAPI
-                .removeUserFromCollectionPermission(selectedUser.subject, this.props.collectionId)
+                .removeUserFromCollectionPermission(selectedUser.subject, this.props.collection.id)
                 .then(() => {
                     this.loadPermissions(); // reload permissions
                 })
@@ -159,14 +165,27 @@ class Permissions extends React.Component {
         }
     };
 
-    renderCollaboratorList(collaborators) {
+    renderAlterPermissionButtons(idx, collaborator) {
         const {classes} = this.props;
-        const {hovered} = this.state;
+        const {hovered, canManage} = this.state;
+        const secondaryActionClassName = hovered !== idx ? classes.collaboratorIcon : null;
+        return canManage ? (
+            <ListItemSecondaryAction
+                onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
+                onMouseOut={() => this.handleListItemMouseout(idx)}
+            >
+                <IconButton aria-label="Delete" className={secondaryActionClassName}
+                            onClick={(e) => this.handleMoreClick(collaborator, e)}>
+                    <MoreIcon/>
+                </IconButton>
+            </ListItemSecondaryAction>
+        ) : '';
+    }
 
+    renderCollaboratorList(collaborators) {
         return collaborators
             .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('subject')))
             .map((p, idx) => {
-                const secondaryActionClassName = hovered !== idx ? classes.collaboratorIcon : null;
                 return (<ListItem
                     key={idx}
                     button
@@ -174,22 +193,27 @@ class Permissions extends React.Component {
                     onMouseOut={() => this.handleListItemMouseout(idx)}
                 >
                     <ListItemText primary={p.subject} secondary={p.access}/>
-                    <ListItemSecondaryAction
-                        onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                        onMouseOut={() => this.handleListItemMouseout(idx)}
-                    >
-                        <IconButton aria-label="Delete" className={secondaryActionClassName}
-                                    onClick={(e) => this.handleMoreClick(p, e)}>
-                            <MoreIcon/>
-                        </IconButton>
-                    </ListItemSecondaryAction>
+                    {this.renderAlterPermissionButtons(idx, p)}
                 </ListItem>);
             });
     }
 
+    renderAddCollaboratorButton() {
+        const {classes} = this.props;
+        const {canManage} = this.state;
+        return canManage ? (
+            <ListItem className={classes.buttonList}>
+                <ListItemSecondaryAction>
+                    <Button variant='fab' aria-label="Add" onClick={() => this.handleAlterPermission()} mini>
+                        <AddIcon/>
+                    </Button>
+                </ListItemSecondaryAction>
+            </ListItem>
+        ) : '';
+    }
+
     renderUserList = () => {
         const {permissions, anchorEl, selectedUser} = this.state;
-        const {classes} = this.props;
         return (
             <List dense>
                 {this.renderCollaboratorList(permissions)}
@@ -200,26 +224,20 @@ class Permissions extends React.Component {
                     <MenuItem onClick={() => this.handleAlterPermission(selectedUser)}>Change access</MenuItem>
                     <MenuItem onClick={this.handleRemoveCollaborator}>Delete</MenuItem>
                 </Menu>
-                <ListItem className={classes.buttonList}>
-                    <ListItemSecondaryAction>
-                        <Button variant='fab' aria-label="Add" onClick={() => this.handleAlterPermission()} mini>
-                            <AddIcon/>
-                        </Button>
-                    </ListItemSecondaryAction>
-                </ListItem>
+                {this.renderAddCollaboratorButton()}
             </List>
         );
     };
 
     render() {
-        const {classes} = this.props;
+        const {classes, collection} = this.props;
         const {selectedUser, permissions} = this.state;
         return (
             <div className={classes.collaboratorList}>
                 <ShareWithDialog open={this.state.showPermissionDialog}
                                  onClose={this.handleShareWithDialogClose}
                                  user={this.state.selectedUser}
-                                 collectionId={this.props.collectionId}
+                                 collectionId={collection.id}
                                  collaborators={permissions}
                 />
                 <ConfirmationDialog open={this.state.showConfirmDeleteDialog}
@@ -238,7 +256,7 @@ class Permissions extends React.Component {
 
 const mapStateToProps = ({account: {user}}) => {
     return {
-        currentUser: user.item
+        currentLoggedUser: user.item
     }
 };
 
