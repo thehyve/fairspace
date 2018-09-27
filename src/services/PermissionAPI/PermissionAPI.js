@@ -13,7 +13,6 @@ class PermissionAPI {
      * @returns A Promise returning an array of user permissions, not including users with None permissions.
      */
     getCollectionPermissions(collectionId) {
-        console.log('here ..')
         let url = format(Config.get().urls.permissionsByCollectionId, collectionId);
         return fetch(url, {
             method: 'GET',
