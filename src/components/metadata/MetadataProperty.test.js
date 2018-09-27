@@ -66,7 +66,7 @@ describe('MetadataProperty elements', () => {
         // Assert contents of the single component
         const ExpectedComponent = ValueComponentFactory.addComponent(property);
         const inputComponent = listItems.at(0).dive().find(ExpectedComponent);
-        expect(inputComponent.prop('entry')).toBeUndefined()
+        expect(inputComponent.prop('entry')).toEqual({value: ""})
     })
 
     it('does not show an add element if one value has been provided already', () => {
