@@ -9,14 +9,56 @@
   },
   "@graph": [
     {
+      "@id": "fairspace:Collection",
+      "@type": "rdf:Class",
+      "rdfs:label": "Collection"
+    },
+    {
+      "@id": "schema:Dataset",
+      "@type": "rdf:Class",
+      "rdfs:label": "Dataset"
+    },
+    {
+      "@id": "schema:Person",
+      "@type": "rdf:Class",
+      "rdfs:label": "Person"
+    },
+    {
+      "@id": "fairspace:User",
+      "@type": "rdf:Class",
+      "rdfs:label": "User"
+    },
+    {
+      "@id": "schema:Material",
+      "@type": "rdf:Class",
+      "rdfs:label": "Material"
+    },
+    {
+      "@id": "fairspace:PersonConsent",
+      "@type": "rdf:Class",
+      "rdfs:label": "Person Consent"
+    },
+    {
+      "@id": "fairspace:ResearchProject",
+      "@type": "rdf:Class",
+      "rdfs:label": "Research Project"
+    },
+
+    {
+      "@id": "fairspace:File",
+      "@type": "rdf:Class",
+      "rdfs:label": "File"
+    },
+    {
       "@id": "@type",
       "@type": "rdf:Property",
       "rdfs:label": "Type",
       "rdfs:domain": [
-        {"@id": "fairspace:Collection"},
         {"@id": "schema:Person"},
         {"@id": "schema:Material"},
-        {"@id": "fairspace:Consent"},
+        {"@id": "fairspace:PersonConsent"},
+        {"@id": "fairspace:ResearchProject"},
+        {"@id": "fairspace:File"},
         {"@id": "fairspace:Collection"}
       ],
       "rdfs:range": [{"@id": "rdf:Class"}],
@@ -26,7 +68,10 @@
       "@id": "fairspace:name",
       "@type": "rdf:Property",
       "rdfs:label": "Name",
-      "rdfs:domain": [{"@id": "fairspace:Collection"}],
+      "rdfs:domain": [
+        {"@id": "fairspace:Collection"},
+        {"@id": "schema:Person"}
+      ],
       "rdfs:range": [{"@id": "xsd:string"}],
       "fairspace:allowMultiple": false,
       "fairspace:multiLine": false
@@ -63,9 +108,9 @@
       "fairspace:allowMultiple": false
     },
     {
-      "@id": "fairspace:provides",
+      "@id": "fairspace:providesMaterial",
       "@type": "rdf:Property",
-      "rdfs:label": "Provides",
+      "rdfs:label": "Provides material",
       "rdfs:domain": [{"@id": "schema:Person"}],
       "rdfs:range": [{"@id": "schema:Material"}],
       "fairspace:allowMultiple": true
@@ -74,7 +119,7 @@
       "@id": "fairspace:isConsentOf",
       "@type": "rdf:Property",
       "rdfs:label": "Is consent of",
-      "rdfs:domain": [{"@id": "fairspace:Consent"}],
+      "rdfs:domain": [{"@id": "fairspace:PersonConsent"}],
       "rdfs:range": [{"@id": "schema:Person"}],
       "fairspace:allowMultiple": false
     },
@@ -82,55 +127,93 @@
       "@id": "fairspace:gaveConsent",
       "@type": "rdf:Property",
       "rdfs:label": "Gave consent",
-      "rdfs:domain": [{"@id": "fairspace:Consent"}],
+      "rdfs:domain": [{"@id": "schema:Person"}],
+      "rdfs:range": [{"@id":  "fairspace:PersonConsent"}],
+      "fairspace:allowMultiple": true
+    },
+    {
+      "@id": "fairspace:hasData",
+      "@type": "rdf:Property",
+      "rdfs:label": "Has data",
+      "rdfs:domain": [
+        {"@id": "schema:Person"}, 
+        {"@id": "schema:Material"}
+      ],
+      "rdfs:range": [
+        {"@id": "fairspace:Collection"},
+        {"@id": "fairspace:File"}
+      ],
+      "fairspace:allowMultiple": true
+    },
+    {
+      "@id": "fairspace:aboutPerson",
+      "@type": "rdf:Property",
+      "rdfs:label": "Is about person",
+      "rdfs:domain": [
+        {"@id": "fairspace:Collection"},
+        {"@id": "fairspace:File"}
+      ],
       "rdfs:range": [{"@id": "schema:Person"}],
       "fairspace:allowMultiple": true
     },
     {
-      "@id": "fairspace:belongsTo",
+      "@id": "fairspace:aboutMaterial",
       "@type": "rdf:Property",
-      "rdfs:label": "BelongsTo",
-      "rdfs:domain": [{"@id": "schema:Person"}],
+      "rdfs:label": "Is about material",
+      "rdfs:domain": [
+        {"@id": "fairspace:Collection"},
+        {"@id": "fairspace:File"}
+      ],
+      "rdfs:range": [{"@id": "schema:Material"}],
+      "fairspace:allowMultiple": true
+    },
+    {
+      "@id": "fairspace:hasPart",
+      "@type": "rdf:Property",
+      "rdfs:label": "Contains file",
+      "rdfs:domain": [{"@id": "fairspace:Collection"}],
+      "rdfs:range": [{"@id": "fairspace:File"}],
+      "fairspace:allowMultiple": true
+    },
+    {
+      "@id": "fairspace:partOf",
+      "@type": "rdf:Property",
+      "rdfs:label": "Part of collection",
+      "rdfs:domain": [{"@id": "fairspace:File"}],
+      "rdfs:range": [{"@id": "fairspace:Collection"}],
+      "fairspace:allowMultiple": false
+    },
+    {
+      "@id": "fairspace:hasCollection",
+      "@type": "rdf:Property",
+      "rdfs:label": "Associated collections",
+      "rdfs:domain": [{"@id": "fairspace:ResearchProject"}],
       "rdfs:range": [{"@id": "fairspace:Collection"}],
       "fairspace:allowMultiple": true
     },
     {
-      "@id": "schema:about",
+      "@id": "fairspace:partOfProject",
       "@type": "rdf:Property",
-      "rdfs:label": "Is about",
+      "rdfs:label": "Part of project",
       "rdfs:domain": [{"@id": "fairspace:Collection"}],
-      "rdfs:range": [{"@id": "schema:Person"}],
+      "rdfs:range": [{"@id": "fairspace:ResearchProject"}],
+      "fairspace:allowMultiple": false
+    },
+    {
+      "@id": "fairspace:isProjectConsent",
+      "@type": "rdf:Property",
+      "rdfs:label": "Consent for specific project",
+      "rdfs:domain": [{"@id": "fairspace:PersonConsent"}],
+      "rdfs:range": [{"@id": "fairspace:ResearchProject"}],
       "fairspace:allowMultiple": true
     },
     {
-      "@id": "fairspace:Collection",
-      "@type": "rdf:Class",
-      "rdfs:label": "Collection"
-    },
-    {
-      "@id": "schema:Dataset",
-      "@type": "rdf:Class",
-      "rdfs:label": "Dataset"
-    },
-    {
-      "@id": "schema:Person",
-      "@type": "rdf:Class",
-      "rdfs:label": "Person"
-    },
-    {
-      "@id": "fairspace:User",
-      "@type": "rdf:Class",
-      "rdfs:label": "User"
-    },
-    {
-      "@id": "schema:Material",
-      "@type": "rdf:Class",
-      "rdfs:label": "Material"
-    },
-    {
-      "@id": "fairspace:Consent",
-      "@type": "rdf:Class",
-      "rdfs:label": "Consent"
+      "@id": "fairspace:hasPersonConsent",
+      "@type": "rdf:Property",
+      "rdfs:label": "Person consent",
+      "rdfs:domain": [{"@id": "fairspace:ResearchProject"}],
+      "rdfs:range": [{"@id": "fairspace:PersonConsent"}],
+      "fairspace:allowMultiple": true
     }
   ]
 }
