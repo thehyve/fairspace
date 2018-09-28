@@ -1,40 +1,17 @@
-import {
-    PERMISSIONS_FULFILLED,
-    PERMISSIONS_PENDING,
-    PERMISSIONS_REJECTED
-} from "../actions/actionTypes";
+import {ALTER_PERMISSION, PERMISSIONS} from "../actions/actionTypes";
+import {promiseReducerFactory} from "../utils/redux";
+import combineReducers from "redux/src/combineReducers";
 
-const defaultState = {
+const defaultStateItem = {
+    data: [],
     pending: false,
-    error: false,
-    items: [],
-    showPermissionDialog: false,
-    showConfirmDeleteDialog: false
+    error: false
 };
 
-const permissions = (state = defaultState, action) => {
-    switch (action.type) {
-        case PERMISSIONS_PENDING:
-            return {
-                ...state,
-                pending: true,
-                error: false
-            };
-        case PERMISSIONS_FULFILLED:
-            return {
-                ...state,
-                pending: false,
-                items: action.payload
-            };
-        case PERMISSIONS_REJECTED:
-            return {
-                ...state,
-                pending: false,
-                error: action.payload || true
-            };
-        default:
-            return state;
-    }
-};
+const permissionsReducer = promiseReducerFactory(PERMISSIONS, defaultStateItem);
+const alterPermissionReducer =  promiseReducerFactory(ALTER_PERMISSION, defaultStateItem);
 
-export default permissions;
+export default combineReducers({
+    fetch: permissionsReducer,
+    alter: alterPermissionReducer
+})

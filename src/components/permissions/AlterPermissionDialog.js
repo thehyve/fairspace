@@ -100,17 +100,10 @@ class ShareWithDialog extends React.Component {
 
     handleSubmit = () => {
         const {selectedUser, accessRight} = this.state;
-        const {collectionId} = this.props;
+        const {collectionId, onAlterPermission} = this.props;
         if (selectedUser) {
-            this.props.onClose();
-            permissionAPI.alterCollectionPermission(selectedUser.value, collectionId, accessRight)
-                .then(response => {
-                    this.setState({selectedUserLabel: ''});
-                })
-                .catch(error => {
-                    this.setState({error: error});
-                    ErrorDialog.showError(error, 'An error occurred while altering the permission.');
-                });
+            this.handleClose();
+            onAlterPermission(selectedUser.value, collectionId, accessRight);
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
         }
@@ -137,8 +130,6 @@ class ShareWithDialog extends React.Component {
                                      placeholder={'Please select a user'}
                                      value={selectedUser}
                                      label={selectedUserLabel}/>);
-
-
     };
 
     render() {
@@ -192,10 +183,4 @@ ShareWithDialog.propTypes = {
     collaborators: PropTypes.array,
 };
 
-const mapStateToProps = ({account: {user}}) => {
-    return {
-        currentLoggedUser: user.data
-    }
-};
-
-export default connect(mapStateToProps)(withStyles(styles, {withTheme: true})(ShareWithDialog));
+export default withStyles(styles, {withTheme: true})(ShareWithDialog);
