@@ -43,37 +43,28 @@ const styles = theme => ({
 
 class ShareWithDialog extends React.Component {
 
-    // initial state
-    state = {
-        accessRight: 'Read',
-        selectedUser: null,
-        selectedUserLabel: '',
-        userList: [],
-        userOptions: [],
-        isEditing: false,
-        error: null,
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            accessRight: 'Read',
+            selectedUser: null,
+            selectedUserLabel: '',
+            userList: [],
+            error: null,
+        };
+    }
 
     resetState = () => {
-        const {user, collaborators, currentUser} = this.props;
+        const {user, currentLoggedUser, collaborators} = this.props;
         const {userList} = this.state;
-        let selectedUser = null;
-        if (user) {
-            selectedUser = userList.find(u => {
-                return user.subject === u.id;
-            });
-        }
+
         this.setState({
             accessRight: user ? user.access : 'Read',
-            selectedUser: selectedUser,
+            selectedUser: user ? userList.find(u => user.subject === u.value) : null,
             selectedUserLabel: '',
-            isEditing: !!user,
-            userOptions: userList.map(r => {
-                return {
-                    label: `${r.firstName} ${r.lastName}`,
-                    value: `${r.id}`,
-                    disabled: collaborators.find(c => c.subject === r.id) || r.id === currentUser.id
-                }
+            userList: userList.map(r => {
+                r.disabled = collaborators.find(c => c.subject === r.id) || r.id === currentLoggedUser.id;
+                return r;
             }),
             error: null,
         });
@@ -81,7 +72,13 @@ class ShareWithDialog extends React.Component {
 
     componentDidMount() {
         userAPI.getUsers().then(result => {
-            this.setState({userList: result});
+            const options = result.map(r => {
+                let newUser = Object.assign({}, r);
+                newUser.label = `${r.firstName} ${r.lastName}`;
+                newUser.value = `${r.id}`;
+                return newUser;
+            });
+            this.setState({userList: options});
         })
     }
 
@@ -119,23 +116,34 @@ class ShareWithDialog extends React.Component {
         }
     };
 
+    getUser = (user) => {
+        return this.state.userList.find(u => u.value === user.subject);
+    };
+
     renderUser = () => {
-        const {userOptions, isEditing, selectedUser} = this.state;
-        return isEditing ?
-            (<div>
+        const {user} = this.props;
+        const {userList, selectedUser, selectedUserLabel} = this.state;
+
+        if (user) {
+            const selectedUserOption = this.getUser(user);
+            return (<div>
                 <Typography variant="subheading"
-                            gutterBottom>{`${selectedUser.firstName} ${selectedUser.lastName}`}</Typography>
-            </div>) :
-            (<MaterialReactSelect options={userOptions}
-                                  onChange={this.handleSelectedUserChange}
-                                  placeholder={'Please select a user'}
-                                  value={this.state.selectedUser}
-                                  label={this.state.selectedUserLabel}/>);
+                            gutterBottom>{`${selectedUserOption.label}`}</Typography>
+            </div>)
+        }
+
+        return (<MaterialReactSelect options={userList}
+                                     onChange={this.handleSelectedUserChange}
+                                     placeholder={'Please select a user'}
+                                     value={selectedUser}
+                                     label={selectedUserLabel}/>);
+
+
     };
 
     render() {
-        const {classes} = this.props;
-        const {isEditing, selectedUser} = this.state;
+        const {classes, user} = this.props;
+        const {selectedUser, accessRight} = this.state;
         return (
             <Dialog
                 open={this.props.open}
@@ -143,7 +151,7 @@ class ShareWithDialog extends React.Component {
                 onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
-                    <div className={isEditing ? classes.rootEdit : classes.root}>
+                    <div className={user ? classes.rootEdit : classes.root}>
                         {this.renderUser()}
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
@@ -151,7 +159,7 @@ class ShareWithDialog extends React.Component {
                                 aria-label="Access right"
                                 name="access-right"
                                 className={classes.group}
-                                value={this.state.accessRight}
+                                value={accessRight}
                                 onChange={this.handleAccessRightChange}>
                                 {Object.keys(AccessRights).map(access => {
                                     return <FormControlLabel key={access} value={access} control={<Radio/>}
@@ -177,11 +185,16 @@ class ShareWithDialog extends React.Component {
 ShareWithDialog.propTypes = {
     classes: PropTypes.object.isRequired,
     theme: PropTypes.object.isRequired,
+    user: PropTypes.object,
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    collectionId: PropTypes.number,
+    collaborators: PropTypes.array,
 };
 
 const mapStateToProps = ({account: {user}}) => {
     return {
-        currentUser: user.data
+        currentLoggedUser: user.data
     }
 };
 
