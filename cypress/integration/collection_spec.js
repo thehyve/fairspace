@@ -73,9 +73,10 @@ describe('Collection browser', function () {
         cy.get('button').contains('Save').click();
 
         // The collection details should be updated immediately
-        cy.get('ul>li')
-            .should('contain', changedName)
-            .should('contain', changedDescription);
+        cy.contains('Collection Details')
+            .parent().parent().parent()
+            .find('h2').should('contain', changedName)
+            .parent().find('p').should('contain', changedDescription);
 
         // The collection details  should be present after reloading
         cy.listCollections();
