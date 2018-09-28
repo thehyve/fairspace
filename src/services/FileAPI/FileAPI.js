@@ -140,6 +140,71 @@ class FileAPI {
         return paths.join(FileAPI.PATH_SEPARATOR);
     }
 
+    /**
+     * Move one or more files from a sourcedir to a destinationdir
+     * @param sourceDir
+     * @param filenames
+     * @param destinationDir
+     * @returns {*}
+     */
+    movePaths(sourceDir, filenames, destinationDir) {
+        // Moving files to the current directory is a noop
+        if(destinationDir === sourceDir) {
+            return Promise.resolve();
+        }
+
+        return Promise.all(filenames.map(filename => {
+            const sourceFile = this.joinPaths(sourceDir || '', filename);
+            const destinationFile = this.joinPaths(destinationDir || '', filename);
+            return this.move(sourceFile, destinationFile);
+        }))
+    }
+
+    /**
+     * Copies one or more files from a sourcedir to a destinationdir
+     * @param sourceDir
+     * @param filenames
+     * @param destinationDir
+     * @returns {*}
+     */
+    copyPaths(sourceDir, filenames, destinationDir) {
+        return Promise.all(filenames.map(filename => {
+            const sourceFile = this.joinPaths(sourceDir || '', filename);
+            let destinationFilename = filename;
+
+            // Copying files to the current directory involves renaming
+            if(destinationDir === sourceDir) {
+                destinationFilename = FileAPI._addCounterToFilename(destinationFilename);
+            }
+
+            const destinationFile = this.joinPaths(destinationDir || '', destinationFilename);
+
+            return this.copy(sourceFile, destinationFile);
+        }))
+    }
+
+    static _addCounterToFilename(filename) {
+        // Parse the filename
+        const dotPosition = filename.lastIndexOf('.');
+        let basename = filename.substring(0, dotPosition);
+        const extension = filename.substring(dotPosition + 1);
+
+        // By default the counter is set to 2
+        let counter = 2;
+
+        // Verify if the filename already contains a counter
+        // If so, update the counter in the filename
+        const counterMatch = / \((\d+)\)$/;
+        const matches = basename.match(counterMatch);
+        if(matches) {
+            basename = basename.substring(0, basename.length - matches[0].length);
+            counter = parseInt(matches[1], 10) + 1;
+        }
+
+        return `${basename} (${counter}).${extension}`;
+    }
+
+
 }
 
 export default FileAPI;

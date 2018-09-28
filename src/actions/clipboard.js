@@ -1,15 +1,19 @@
 import FileAPIFactory from "../services/FileAPI/FileAPIFactory";
 
-export const cut = (sourcedir, paths) => ({
-    type: "CLIPBOARD_CUT",
-    sourcedir: sourcedir,
-    paths: paths
+export const clear = () => ({
+    type: "CLIPBOARD_CLEAR"
 })
 
-export const copy = (sourcedir, paths) => ({
+export const cut = (sourcedir, filenames) => ({
+    type: "CLIPBOARD_CUT",
+    sourcedir: sourcedir,
+    filenames: filenames
+})
+
+export const copy = (sourcedir, filenames) => ({
     type: "CLIPBOARD_COPY",
     sourcedir: sourcedir,
-    paths: paths
+    filenames: filenames
 })
 
 export const paste = (destinationDir) =>
@@ -24,7 +28,7 @@ export const paste = (destinationDir) =>
         }
     }
 
-const canPaste = (clipboard) => clipboard.type && clipboard.paths.length > 0
+const canPaste = (clipboard) => clipboard.type && clipboard.filenames.length > 0
 
 const pasteAction = (clipboard, currentCollection, destinationDir) => ({
     type: "CLIPBOARD_PASTE",
@@ -35,8 +39,8 @@ const doPaste = (clipboard, currentCollection, destinationDir) => {
     const fileAPI = FileAPIFactory.build(currentCollection);
 
     if(clipboard.type == 'CUT') {
-        return fileAPI.move(clipboard.sourcedir, clipboard.paths, destinationDir);
+        return fileAPI.movePaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
     } else {
-        return fileAPI.copy(clipboard.sourcedir, clipboard.paths, destinationDir);
+        return fileAPI.copyPaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
     }
 }

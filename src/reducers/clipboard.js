@@ -1,7 +1,7 @@
 const defaultState = {
     type: null,
     sourcedir: null,
-    paths: [],
+    filenames: [],
     pending: false,
     error: false
 };
@@ -13,14 +13,14 @@ const clipboard = (state = defaultState, action) => {
                 ...state,
                 type: 'CUT',
                 sourcedir: action.sourcedir,
-                paths: action.paths
+                filenames: action.filenames
             };
         case "CLIPBOARD_COPY":
             return {
                 ...state,
                 type: 'COPY',
                 sourcedir: action.sourcedir,
-                paths: action.paths
+                filenames: action.filenames
             };
         case "CLIPBOARD_PASTE_PENDING":
             return {
@@ -28,12 +28,13 @@ const clipboard = (state = defaultState, action) => {
                 pending: true
             };
         case "CLIPBOARD_PASTE_FULFILLED":
+        case "CLIPBOARD_CLEAR":
             return {
                 ...state,
                 pending: false,
                 type: null,
                 sourcedir: null,
-                paths: []
+                filenames: []
             };
         case "CLIPBOARD_PASTE_REJECTED":
             return {
