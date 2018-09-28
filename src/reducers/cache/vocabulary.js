@@ -1,3 +1,3 @@
-import {createFetchPromiseReducer} from "../../utils/redux";
+import {promiseReducerFactory} from "../../utils/redux";
 
-export default createFetchPromiseReducer("METADATA_VOCABULARY", null)
+export default promiseReducerFactory("METADATA_VOCABULARY", null)

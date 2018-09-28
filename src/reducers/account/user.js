@@ -1,3 +1,3 @@
-import {createFetchPromiseReducer} from "../../utils/redux";
+import {promiseReducerFactory} from "../../utils/redux";
 
-export default createFetchPromiseReducer("USER")
+export default promiseReducerFactory("USER")

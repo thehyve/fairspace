@@ -1,3 +1,3 @@
-import {createFetchPromiseReducer} from "../../utils/redux";
+import {promiseReducerFactory} from "../../utils/redux";
 
-export default createFetchPromiseReducer("METADATA_ENTITIES", {}, action => action.meta.type);
+export default promiseReducerFactory("METADATA_ENTITIES", {}, action => action.meta.type);

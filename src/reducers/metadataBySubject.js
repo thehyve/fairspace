@@ -1,8 +1,8 @@
-import {createFetchPromiseReducer} from "../utils/redux";
+import {promiseReducerFactory} from "../utils/redux";
 import reduceReducers from "reduce-reducers";
 
 const defaultState = {};
-const metadataCombinationReducer = createFetchPromiseReducer("METADATA_COMBINATION", defaultState, action => action.meta.subject);
+const metadataCombinationReducer = promiseReducerFactory("METADATA_COMBINATION", defaultState, action => action.meta.subject);
 const metadataUpdateReducer = (state = defaultState, action) => {
     switch(action.type) {
         case "UPDATE_METADATA_FULFILLED":

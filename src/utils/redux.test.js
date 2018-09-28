@@ -1,4 +1,4 @@
-import {createErrorHandlingPromiseAction, createFetchPromiseReducer} from './redux'
+import {createErrorHandlingPromiseAction, promiseReducerFactory} from './redux'
 
 const mockDispatch = (action => Promise.resolve(action))
 
@@ -21,7 +21,7 @@ describe('Error handling promise action', () => {
 
 describe('Fetch promise reducer', () => {
     const defaultState = {somestate: {complexObject: 3}}
-    const rootHandler = createFetchPromiseReducer("TEST", defaultState);
+    const rootHandler = promiseReducerFactory("TEST", defaultState);
 
     it('initializes without current state', () => {
         const action = {type: 'TEST_PENDING'}
@@ -87,7 +87,7 @@ describe('Fetch promise reducer', () => {
     });
 
     describe('key handling', () => {
-        const withKeyHandler = createFetchPromiseReducer("TEST", defaultState, (action) => action.key);
+        const withKeyHandler = promiseReducerFactory("TEST", defaultState, (action) => action.key);
 
         it('stores data for different keys properly', () => {
             const action = {type: 'TEST_FULFILLED', payload: 'test-results', key: 'cache-key'}

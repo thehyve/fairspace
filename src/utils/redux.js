@@ -47,7 +47,7 @@ export function createErrorHandlingPromiseAction(actionClosure){
  * @param getKeyFromAction A method to retrieve the key to store data under, based on the action
  * @returns {Function}
  */
-export const createFetchPromiseReducer = (type, defaultState = {}, getKeyFromAction = () => undefined) => (state = defaultState, action) => {
+export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction = () => undefined) => (state = defaultState, action) => {
     const mergeState = (newState, key) => {
         if(key) {
             return {
