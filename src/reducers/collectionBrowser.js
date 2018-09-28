@@ -5,7 +5,7 @@ const defaultState = {
     openedCollectionId: null,
     openedPath: null,
 
-    infoDrawerOpened: false
+    infoDrawerOpened: false,
 };
 
 const collectionBrowser = (state = defaultState, action) => {

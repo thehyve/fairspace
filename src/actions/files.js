@@ -1,7 +1,7 @@
 import {createErrorHandlingPromiseAction} from "../utils/redux";
 import FileAPIFactory from "../services/FileAPI/FileAPIFactory";
 
-export const invalidateCollections = (collection, path) => ({
+export const invalidateFiles = (collection, path) => ({
     type: "INVALIDATE_FILES",
     meta: {
         collection,
@@ -33,7 +33,6 @@ const shouldFetchFiles = (state, collection, path) => {
 }
 
 const fetchFiles = createErrorHandlingPromiseAction((collection, path) => {
-    console.log(collection);
     return {
         type: "FILES",
         payload: FileAPIFactory.build(collection).list(path),
