@@ -1,22 +1,23 @@
 import {createFetchPromiseReducer} from "../../utils/redux";
+import reduceReducers from 'reduce-reducers';
 
 const defaultState = {};
-const jsonLdFetchReducer = createFetchPromiseReducer("METADATA", defaultState, action => action.meta.subject);
-const jsonLdBySubject = (state = defaultState, action) => {
-    const reducedState = jsonLdFetchReducer(state, action);
 
+const jsonLdFetchReducer = createFetchPromiseReducer("METADATA", defaultState, action => action.meta.subject);
+
+const updateMetadataReducer = (state = defaultState, action) => {
     switch(action.type) {
         case "UPDATE_METADATA_FULFILLED":
             return {
-                ...reducedState,
+                ...state,
                 [action.meta.subject]: {
-                    ...reducedState[action.meta.subject],
+                    ...state[action.meta.subject],
                     invalidated: true
                 }
             }
         default:
-            return reducedState
+            return state
     }
 }
 
-export default jsonLdBySubject;
+export default reduceReducers(jsonLdFetchReducer, updateMetadataReducer, defaultState);
