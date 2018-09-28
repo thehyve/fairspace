@@ -36,7 +36,7 @@ beforeEach(() => {
         addCollection: jest.fn(() => Promise.resolve([])),
     }
 
-    store = mockStore({ account: { user: { item: { username: 'test' }} }});
+    store = mockStore({ account: { user: { data: { username: 'test' }} }});
 
     collectionBrowser = (
         <MemoryRouter>

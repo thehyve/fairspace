@@ -81,7 +81,7 @@ const mapStateToProps = ({account: { authorizations }}) => {
     return {
         pending: authorizations.pending,
         error: authorizations.error,
-        authorizations: authorizations.items
+        authorizations: authorizations.data || []
     }
 }
 

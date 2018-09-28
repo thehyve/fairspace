@@ -36,7 +36,7 @@ describe('fetch metadata', () => {
     it('should not fetch data if data present', () => {
         const store = mockStore({ cache: { jsonLdBySubject: {
                     [subject]: {
-                        items: ['some-data']
+                        data: ['some-data']
                     }
                 }}});
 
@@ -52,7 +52,7 @@ describe('fetch metadata', () => {
         const store = mockStore({ cache: { jsonLdBySubject: {
             [subject]: {
                 invalidated: true,
-                items: ['some-data']
+                data: ['some-data']
             }
         }}});
 

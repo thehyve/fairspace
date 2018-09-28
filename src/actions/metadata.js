@@ -43,7 +43,7 @@ export const fetchJsonLdBySubjectIfNeeded = (subject) => {
             return dispatch(fetchJsonLdBySubject(subject))
         } else {
             // Let the calling code know there's nothing to wait for.
-            return Promise.resolve({value: state.cache.jsonLdBySubject[subject].items})
+            return Promise.resolve({value: state.cache.jsonLdBySubject[subject].data})
         }
     }
 }
@@ -55,7 +55,7 @@ const fetchMetadataVocabularyIfNeeded = () => {
             return dispatch(fetchVocabulary())
         } else {
             // Let the calling code know there's nothing to wait for.
-            return Promise.resolve({value: state.cache.vocabulary.item})
+            return Promise.resolve({value: state.cache.vocabulary.data})
         }
     }
 }

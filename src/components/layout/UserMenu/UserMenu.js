@@ -97,7 +97,7 @@ const mapStateToProps = ({account: { user }}) => {
     return {
         pending: user.pending,
         error: user.error,
-        user: user.item
+        user: user.data
     }
 };
 

@@ -26,7 +26,7 @@ describe('metadata retrieval', () => {
 
         expect(newState['previous-subject']).toEqual('test');
         expect(newState['my-subject'].pending).toEqual(false);
-        expect(newState['my-subject'].items).toEqual('new-metadata');
+        expect(newState['my-subject'].data).toEqual('new-metadata');
     })
 
     it('should store errors per subject', () => {
@@ -46,7 +46,7 @@ describe('metadata retrieval', () => {
 });
 
 describe('metadata invalidation', () => {
-    it('should invalidate subject metadata', () => {
+    it('should invalidate subject metadata upon invalidation action', () => {
         const previousState = {'previous-subject': 'test'};
         const action = {
             type: 'INVALIDATE_METADATA',
@@ -58,4 +58,18 @@ describe('metadata invalidation', () => {
         expect(newState['previous-subject']).toEqual('test');
         expect(newState['my-subject'].invalidated).toBeTruthy();
     })
+
+    it('should invalidate subject metadata when metadata is updated', () => {
+        const previousState = {'previous-subject': 'test'};
+        const action = {
+            type: 'UPDATE_METADATA_FULFILLED',
+            meta: {subject: 'my-subject'}
+        };
+
+        const newState = reducer(previousState, action)
+
+        expect(newState['previous-subject']).toEqual('test');
+        expect(newState['my-subject'].invalidated).toBeTruthy();
+    })
+
 })

@@ -422,7 +422,7 @@ class CollectionBrowser extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.account.user.item
+        user: state.account.user.data
     }
 }
 
