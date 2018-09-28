@@ -53,7 +53,7 @@ export const createFetchPromiseReducer = (type, defaultState = {}, getKeyFromAct
             return {
                 ...state,
                 [key]: {
-                    ...state,
+                    ...state[key],
                     ...newState
                 }
             }
