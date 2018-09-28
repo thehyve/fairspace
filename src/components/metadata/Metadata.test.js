@@ -10,7 +10,7 @@ import Config from "../generic/Config/Config";
 import {CLASS_URI, DOMAIN_URI, LABEL_URI, PROPERTY_URI} from "../../services/MetadataAPI/MetadataAPI";
 
 beforeAll(() => {
-    window.fetch = jest.fn(() => Promise.resolve({ok: true}))
+    window.fetch = jest.fn(() => Promise.resolve({ok: true, json: () => ({})}))
 
     Config.setConfig({
         "urls": {
