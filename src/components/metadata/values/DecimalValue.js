@@ -7,7 +7,7 @@ function DecimalValue(props) {
     return <BaseInputValue
         {...props}
         type={"number"}
-        transformValue={v => parseFloat(v)}
+        transformValue={parseFloat}
         inputProps={{step: DEFAULT_STEP_SIZE}}
     />
 }
