@@ -55,6 +55,17 @@ export const applyDisableFilter = (options, collaborators, currentLoggedUser, ow
     });
 };
 
+/**
+ * Get user label by user object
+ * @param user
+ * @param options
+ * @returns {string}
+ */
+export const getUserLabelByUser = (user, options) => {
+    const found = options.find(option => option.value === user.subject);
+    return found ? found.label : '';
+};
+
 const mapStateToProps = ({permissions, users}) => {
     return {
         alterPermission: permissions.alter,

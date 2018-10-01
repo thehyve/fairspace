@@ -15,7 +15,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-import {applyDisableFilter} from "./AlterPermission";
+import {applyDisableFilter, getUserLabel, getUserLabelByUser} from "./AlterPermission";
 
 const styles = theme => ({
     root: {
@@ -94,23 +94,18 @@ class ShareWithDialog extends React.Component {
         }
     };
 
-    getUser = (user) => {
-        return this.state.userList.find(u => u.value === user.subject);
-    };
-
     renderUser = () => {
         const {user, options, noOptionMessage} = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
-
-        if (user) { // if there's user passed from the props
-            const selectedUserOption = this.getUser(user);
+        if (user) { // only render the label if user is passed into this component
             return (<div>
                 <Typography variant="subheading"
-                            gutterBottom>{`${selectedUserOption.label}`}</Typography>
+                            gutterBottom>{getUserLabelByUser(user, options)}</Typography>
             </div>)
         }
 
-        return (<MaterialReactSelect options={[]}
+        // otherwise render select user component
+        return (<MaterialReactSelect options={options}
                                      onChange={this.handleSelectedUserChange}
                                      placeholder={'Please select a user'}
                                      value={selectedUser}

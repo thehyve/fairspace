@@ -1,11 +1,11 @@
-import {applyDisableFilter, getNoOptionMessage, transformUserToOptions} from "./AlterPermission";
+import {applyDisableFilter, getNoOptionMessage, getUserLabelByUser, transformUserToOptions} from "./AlterPermission";
 
 describe('AlterPermission', () => {
-    describe.skip('transformUserToOptions', () => {
+    describe('transformUserToOptions', () => {
         const mockUsers = {
             data: [
-                {id:1, firstName: 'Mariah', lastName: 'Carey'},
-                {id:2, firstName: 'Michael', lastName: 'Jackson'}
+                {id: 1, firstName: 'Mariah', lastName: 'Carey'},
+                {id: 2, firstName: 'Michael', lastName: 'Jackson'}
             ]
         };
         it('should return empty array when there is no data', () => {
@@ -77,7 +77,7 @@ describe('AlterPermission', () => {
                 // current logged user
                 {label: 'Michael Jackson', value: 'user2-id', disabled: true}, // should be true because he's a
                 // collaborator
-                {label: 'Jlo', value: 'user3-id',  disabled: true}, // should be true because she's the owner
+                {label: 'Jlo', value: 'user3-id', disabled: true}, // should be true because she's the owner
                 {label: 'Sarah Palin', value: 'user4-id', disabled: true}, // should be true because she's a
                 // collaborator
                 {label: 'Donald Trump', value: 'user5-id', disabled: false},
@@ -89,5 +89,30 @@ describe('AlterPermission', () => {
             expect(test[3].disabled).toBeTruthy();
             expect(test[4].disabled).toBeFalsy();
         });
-    })
+    });
+
+    describe('getUserLabelByUser', () => {
+        const user = {
+            'collectionId': 500,
+            'subject': 'user2-id',
+            'access': 'Write'
+        };
+        const options = [
+            {label: 'Michael Jackson', value: 'user2-id'},
+            {label: 'Jlo', value: 'user3-id'},
+            {label: 'Sarah Palin', value: 'user4-id'},
+        ];
+
+        it('should return user label', () => {
+            const expected = 'Michael Jackson';
+            expect(getUserLabelByUser(user, options)).toBe(expected);
+        });
+
+        it('should return empty string if user not found in the options', () => {
+            user.subject = 'xxx-id';
+            expect(getUserLabelByUser(user, options)).toBe('');
+        });
+
+        })
+
 });

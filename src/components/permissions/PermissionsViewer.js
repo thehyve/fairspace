@@ -1,7 +1,6 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import {compareBy, comparing} from "../../utils/comparators";
 import MoreIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import ErrorMessage from "../error/ErrorMessage";
@@ -16,7 +15,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PermissionChecker from "./PermissionChecker";
-import Permissions from "./Permissions";
+import {sortAndFilterPermissions} from "./Permissions";
 import AlterPermission from "./AlterPermission";
 
 const styles = theme => ({
@@ -66,11 +65,11 @@ class PermissionsViewer extends React.Component {
     }
 
     loadPermissions = () => {
-        const {collection, onFetchPermissions} = this.props;
+        const {collection, fetchPermissions} = this.props;
         this.setState({
             canManage: PermissionChecker.canManage(collection)
         });
-        onFetchPermissions(collection.id);
+        fetchPermissions(collection.id);
     };
 
     handleAlterPermission = (user) => {
@@ -101,16 +100,18 @@ class PermissionsViewer extends React.Component {
 
     handleDeleteCollaborator = () => {
         const {selectedUser} = this.state;
-        const {collection, onAlterPermission, alterPermission} = this.props;
+        const {collection, alterPermission, alteredPermission} = this.props;
         if (selectedUser) {
-            onAlterPermission(selectedUser.subject, collection.id, 'None').then(d => {
-                if (alterPermission.error) {
+            alterPermission(selectedUser.subject, collection.id, 'None').then(d => {
+                if (alteredPermission.error) {
                     this.handleCloseConfirmDeleteDialog();
-                    ErrorDialog.showError(alterPermission.error, 'An error occurred while altering the permission.');
-                } else if (alterPermission.pending) {
-                    console.log('Pending alter permission')
-                } else if (alterPermission.data) {
-                    console.log('success', alterPermission.data);
+                    ErrorDialog.showError(alteredPermission.error, 'An error occurred while altering the permission.');
+                } else if (alteredPermission.pending) {
+                    console.log('Pending alter permission');
+                    // TODO: Handle on alter pending
+                } else if (alteredPermission.data) {
+                    console.log('success', alteredPermission.data);
+                    // TODO: Handle on alter success
                     this.handleCloseConfirmDeleteDialog();
                 }
             });
@@ -155,6 +156,7 @@ class PermissionsViewer extends React.Component {
                 onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                 onMouseOut={() => this.handleListItemMouseout(idx)}
             >
+                {null}
                 <IconButton aria-label="Delete" className={secondaryActionClassName}
                             onClick={(e) => this.handleMoreClick(collaborator, e)}>
                     <MoreIcon/>
@@ -163,10 +165,9 @@ class PermissionsViewer extends React.Component {
         ) : '';
     }
 
-    renderCollaboratorList(permissions) {
-        let filteredPermissions = permissions.filter(item => item.subject !== this.props.collection.creator);
-        return filteredPermissions
-            .sort(comparing(compareBy(Permissions.permissionLevel), compareBy('subject')))
+    renderCollaboratorList() {
+        const {collection:{creator}, permissions} = this.props;
+        return sortAndFilterPermissions(permissions, creator)
             .map((p, idx) => {
                 return (<ListItem
                     key={idx}
