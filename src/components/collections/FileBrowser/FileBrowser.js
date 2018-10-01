@@ -17,7 +17,7 @@ import PermissionChecker from "../../permissions/PermissionChecker";
 class FileBrowser extends React.Component {
     componentDidMount() {
         this.props.dispatch(fetchCollectionsIfNeeded())
-        this.props.dispatch(selectCollection(this.props.openedCollection))
+        this.props.dispatch(selectCollection(this.props.openedCollection.id))
 
         // If the collection has not been fetched yet,
         // do not bother fetching the files
@@ -28,7 +28,7 @@ class FileBrowser extends React.Component {
 
     componentDidUpdate(prevProps) {
         if(prevProps.openedCollection.id !== this.props.openedCollection.id) {
-            this.props.dispatch(selectCollection(this.props.openedCollection))
+            this.props.dispatch(selectCollection(this.props.openedCollection.id))
         }
 
         const hasCollectionDetails = this.props.openedCollection.id;

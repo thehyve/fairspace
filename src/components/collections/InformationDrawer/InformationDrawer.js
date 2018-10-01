@@ -95,6 +95,23 @@ function InformationDrawer(props) {
     );
 }
 
-export default connect()(withStyles(styles)(InformationDrawer));
+const mapStateToProps = (state) => {
+    const collections = state.cache.collections;
+    const collectionBrowser = state.collectionBrowser;
+
+    const getCollection = (collectionId) => {
+        if (!collections.data || collections.data.length === 0) {
+            return {}
+        }
+
+        return collections.data.find(collection => collection.id === collectionId) || {}
+    }
+
+    return {
+        collection: getCollection(collectionBrowser.selectedCollectionId)
+    }
+}
+
+export default connect(mapStateToProps)(withStyles(styles)(InformationDrawer));
 
 

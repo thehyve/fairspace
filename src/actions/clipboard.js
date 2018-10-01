@@ -42,7 +42,7 @@ const pasteAction = (clipboard, collection, destinationDir) => ({
 const doPaste = (clipboard, currentCollection, destinationDir) => {
     const fileAPI = FileAPIFactory.build(currentCollection);
 
-    if(clipboard.type == 'CUT') {
+    if(clipboard.type === 'CUT') {
         return fileAPI.movePaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
     } else {
         return fileAPI.copyPaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
