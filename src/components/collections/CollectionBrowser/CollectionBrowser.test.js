@@ -16,30 +16,17 @@ function flushPromises() {
 }
 
 beforeEach(() => {
-    mockFileAPIFactory = {
-        build: () => mockFileAPI
-    };
-
-    mockMetadataAPI = {}
-
-    mockFileAPI = {
-        list: jest.fn(() => Promise.resolve()),
-        upload: jest.fn(() => Promise.resolve()),
-        download: jest.fn()
-    };
-
-    mockCollectionAPI = {
-        getCollections: jest.fn(() => Promise.resolve()),
-        getCollection: jest.fn(() => Promise.resolve([])),
-        addCollection: jest.fn(() => Promise.resolve([])),
-    }
-
+    window.fetch = jest.fn(() => Promise.resolve())
+    
     store = mockStore({
         account: {
             user: { data: { username: 'test' }}
         },
         cache: {
-            collections: {}
+            collections: {
+                pending: false,
+                data: []
+            }
         },
         collectionBrowser: {}
     });
@@ -47,11 +34,7 @@ beforeEach(() => {
     collectionBrowser = (
         <MemoryRouter>
             <Provider store={store}>
-                <CollectionBrowser
-                    collectionAPI={mockCollectionAPI}
-                    metadataAPI={mockMetadataAPI}
-                    fileAPIFactory={mockFileAPIFactory}
-                />
+                <CollectionBrowser/>
             </Provider>
         </MemoryRouter>
     )
@@ -74,15 +57,15 @@ it('renders without crashing', () => {
 
 it('creates a new collection on button click', () => {
     const wrapper = mount(collectionBrowser);
+    expect(store.getActions().length).toEqual(0);
 
     // Setup proper state
-    wrapper.setState({loading: false});
     let button = wrapper.find(Button);
-    expect(button.length).toEqual(2);
+    expect(button.length).toEqual(3);
 
     // Click on button
-    button.at(1).simulate('click');
+    button.at(2).simulate('click');
 
     // Expect the collection to be created in storage
-    expect(mockCollectionAPI.addCollection.mock.calls.length).toEqual(1);
+    expect(store.getActions().length).toEqual(1);
 });
