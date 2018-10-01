@@ -110,7 +110,7 @@ class ShareWithDialog extends React.Component {
             </div>)
         }
 
-        return (<MaterialReactSelect options={options}
+        return (<MaterialReactSelect options={[]}
                                      onChange={this.handleSelectedUserChange}
                                      placeholder={'Please select a user'}
                                      value={selectedUser}
@@ -122,10 +122,7 @@ class ShareWithDialog extends React.Component {
         const {classes, user} = this.props;
         const {selectedUser, accessRight} = this.state;
         return (
-            <Dialog
-                open={this.props.open}
-                onEnter={this.handleOnEnter}
-                onClose={this.handleClose}>
+            <Dialog open={this.props.open} onEnter={this.handleOnEnter} onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={user ? classes.rootEdit : classes.root}>

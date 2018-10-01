@@ -49,9 +49,8 @@ export const getNoOptionMessage = (users) => {
 export const applyDisableFilter = (options, collaborators, currentLoggedUser, owner) => {
     return options.map(r => {
         r.disabled =
-            collaborators.find(c => c.subject === r.id) ||
-            r.id === currentLoggedUser.id ||
-            r.id === owner;
+            collaborators.find(c => c.subject === r.value) ? true : r.value === currentLoggedUser.id ||
+            r.value === owner;
         return r;
     });
 };
