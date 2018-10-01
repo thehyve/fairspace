@@ -14,7 +14,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                         pending: true,
                         error: false,
                         invalidated: false,
-                        items: {}
+                        data: {}
                     }
                 }
             }
@@ -28,7 +28,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     [path]: {
                         ...state[collectionId][path],
                         pending: false,
-                        items: action.payload
+                        data: action.payload
                     }
                 }
             }
@@ -47,6 +47,10 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                 }
             }
         case "INVALIDATE_FILES":
+        case "RENAME_FILE_FULFILLED":
+        case "DELETE_FILE_FULFILLED":
+        case "CREATE_DIRECTORY_FULFILLED":
+        case "UPLOAD_FILES_FULFILLED":
             collectionId = action.meta.collection.id;
             path = action.meta.path;
             return {
@@ -55,7 +59,24 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     ...state[collectionId],
                     [path]: {
                         ...state[collectionId][path],
-                        invalidated: false
+                        invalidated: true
+                    }
+                }
+            }
+        case "CLIPBOARD_PASTE_FULFILLED":
+            collectionId = action.meta.collection.id;
+            const {sourceDir, destinationDir} = action.meta;
+            return {
+                ...state,
+                [collectionId]: {
+                    ...state[collectionId],
+                    [sourceDir]: {
+                        ...state[collectionId][sourceDir],
+                        invalidated: true
+                    },
+                    [destinationDir]: {
+                        ...state[collectionId][destinationDir],
+                        invalidated: true
                     }
                 }
             }

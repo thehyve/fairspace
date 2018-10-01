@@ -15,7 +15,7 @@ class CollectionOverview extends React.Component {
             loading: false,
             error: false,
             collections: [],
-            selectedCollection: props.selectedCollection
+            selectedCollection: props.selectedCollectionId
         };
     }
 
@@ -83,7 +83,7 @@ class CollectionOverview extends React.Component {
         }
 
         this.setState({
-            selectedCollection: nextProps.selectedCollection
+            selectedCollectionId: nextProps.selectedCollectionId
         });
     }
 

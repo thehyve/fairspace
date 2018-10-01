@@ -7,22 +7,21 @@ export const clear = () => ({
 export const cut = (sourcedir, filenames) => ({
     type: "CLIPBOARD_CUT",
     sourcedir: sourcedir,
-    filenames: filenames
+    filenames: filenames.map(extractBasename)
 })
 
 export const copy = (sourcedir, filenames) => ({
     type: "CLIPBOARD_COPY",
     sourcedir: sourcedir,
-    filenames: filenames
+    filenames: filenames.map(extractBasename)
 })
 
-export const paste = (destinationDir) =>
+export const paste = (openedCollection, destinationDir) =>
     (dispatch, getState) => {
-        const {clipboard, collectionBrowser, cache: { collections }} = getState();
-        const currentCollection = collections.data[collectionBrowser.openedCollectionId];
+        const {clipboard} = getState();
 
         if(canPaste(clipboard)) {
-            return dispatch(pasteAction(clipboard, currentCollection, destinationDir))
+            return dispatch(pasteAction(clipboard, openedCollection, destinationDir))
         } else {
             return Promise.resolve();
         }
@@ -30,9 +29,14 @@ export const paste = (destinationDir) =>
 
 const canPaste = (clipboard) => clipboard.type && clipboard.filenames.length > 0
 
-const pasteAction = (clipboard, currentCollection, destinationDir) => ({
+const pasteAction = (clipboard, collection, destinationDir) => ({
     type: "CLIPBOARD_PASTE",
-    payload: doPaste(clipboard, currentCollection, destinationDir)
+    payload: doPaste(clipboard, collection, destinationDir),
+    meta: {
+        collection,
+        destinationDir,
+        sourceDir: clipboard.sourcedir
+    }
 });
 
 const doPaste = (clipboard, currentCollection, destinationDir) => {
@@ -44,3 +48,5 @@ const doPaste = (clipboard, currentCollection, destinationDir) => {
         return fileAPI.copyPaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
     }
 }
+
+const extractBasename = filename => filename.indexOf('/') > -1 ? filename.substring(filename.lastIndexOf('/')+1) : filename;

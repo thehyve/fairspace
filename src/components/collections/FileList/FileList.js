@@ -7,7 +7,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Typography from "@material-ui/core/Typography";
 import Icon from "@material-ui/core/Icon";
-import ClickHandler from "../ClickHandler/ClickHandler";
+import ClickHandler from "../../generic/ClickHandler/ClickHandler";
 import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
 import RenameBox from "mdi-material-ui/RenameBox";
 import RenameButton from "../buttons/RenameButton/RenameButton";
@@ -19,7 +19,7 @@ function FileList(props) {
     if (!props.files || props.files.length === 0 || props.files[0] === null) {
         return "No files";
     } else {
-        const selectedFilenames = props.selectedPath ? props.selectedPath.map(path => path.filename) : [];
+        const selectedFilenames = props.selectedPath || [];
         return (<Table>
                 <TableHead>
                     <TableRow>

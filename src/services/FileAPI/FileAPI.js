@@ -25,7 +25,7 @@ class FileAPI {
 
     /**
      * List directory contents
-     * @param path
+     * @param path      Full path within the collection
      * @returns {Promise<T>}
      */
     list(path) {
@@ -35,6 +35,11 @@ class FileAPI {
             .getDirectoryContents(fullPath);
     }
 
+    /**
+     * Creates a new directory within the current collection
+     * @param path      Full path within the collection
+     * @returns {*}
+     */
     createDirectory(path) {
         if(!path) {
             return Promise.reject("No path specified for directory creation");
@@ -137,7 +142,9 @@ class FileAPI {
      * @param paths
      */
     joinPaths(...paths) {
-        return paths.join(FileAPI.PATH_SEPARATOR);
+        return paths
+            .map(p => p ? p : '')   // For falsy values, use an empty string
+            .join(FileAPI.PATH_SEPARATOR);
     }
 
     /**

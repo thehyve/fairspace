@@ -9,6 +9,42 @@ export const invalidateFiles = (collection, path) => ({
     }
 })
 
+export const renameFile = (collection, path, currentFilename, newFilename) => {
+    const fileApi = getFileApi(collection);
+    return {
+        type: "RENAME_FILE",
+        payload: fileApi.move(fileApi.joinPaths(path, currentFilename), fileApi.joinPaths(path, newFilename)),
+        meta: {collection, path, currentFilename, newFilename}
+    }
+}
+
+export const deleteFile = (collection, path, basename) => {
+    const fileApi = getFileApi(collection);
+    return {
+        type: "DELETE_FILE",
+        payload: fileApi.delete(fileApi.joinPaths(path, basename)),
+        meta: {collection, path, basename}
+    }
+}
+
+export const uploadFiles = (collection, path, files) => {
+    const fileApi = getFileApi(collection);
+    return {
+        type: "UPLOAD_FILES",
+        payload: fileApi.upload(path, files),
+        meta: {collection, path, files}
+    }
+}
+
+export const createDirectory = (collection, path, directoryname) => {
+    const fileApi = getFileApi(collection);
+    return {
+        type: "CREATE_DIRECTORY",
+        payload: fileApi.createDirectory(fileApi.joinPaths(path, directoryname)),
+        meta: {collection, path, directoryname}
+    }
+}
+
 export const fetchFilesIfNeeded = (collection, path) => {
     return (dispatch, getState) => {
         if (shouldFetchFiles(getState(), collection, path)) {
@@ -35,7 +71,7 @@ const shouldFetchFiles = (state, collection, path) => {
 const fetchFiles = createErrorHandlingPromiseAction((collection, path) => {
     return {
         type: "FILES",
-        payload: FileAPIFactory.build(collection).list(path),
+        payload: getFileApi(collection).list(path),
         meta: {
             collection: collection,
             path: path
@@ -43,3 +79,4 @@ const fetchFiles = createErrorHandlingPromiseAction((collection, path) => {
     }
 });
 
+const getFileApi = (collection) => FileAPIFactory.build(collection);

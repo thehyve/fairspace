@@ -4,11 +4,9 @@ import CollectionBrowser from "./CollectionBrowser";
 import {mount} from "enzyme";
 import Button from "@material-ui/core/Button";
 import {MemoryRouter} from "react-router-dom";
-import configureStore from 'redux-mock-store'
 import {Provider} from "react-redux";
-
-const middlewares = []
-const mockStore = configureStore(middlewares)
+import mockStore from "../../../store/mockStore"
+import Config from "../../generic/Config/Config";
 
 let mockCollectionAPI, mockFileAPI, mockMetadataAPI, mockFileAPIFactory, store;
 let collectionBrowser;
@@ -36,7 +34,15 @@ beforeEach(() => {
         addCollection: jest.fn(() => Promise.resolve([])),
     }
 
-    store = mockStore({ account: { user: { data: { username: 'test' }} }});
+    store = mockStore({
+        account: {
+            user: { data: { username: 'test' }}
+        },
+        cache: {
+            collections: {}
+        },
+        collectionBrowser: {}
+    });
 
     collectionBrowser = (
         <MemoryRouter>
@@ -49,6 +55,14 @@ beforeEach(() => {
             </Provider>
         </MemoryRouter>
     )
+
+    Config.setConfig({
+        "urls": {
+            "collections": "/collections"
+        }
+    });
+
+    return Config.init();
 
 });
 
