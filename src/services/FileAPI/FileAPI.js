@@ -143,7 +143,7 @@ class FileAPI {
      */
     joinPaths(...paths) {
         return paths
-            .map(p => p ? p : '')   // For falsy values, use an empty string
+            .map(p => p && p !== '/' ? p : '')   // For falsy values, or '/', use an empty string
             .join(FileAPI.PATH_SEPARATOR);
     }
 

@@ -20,10 +20,11 @@ export const renameFile = (collection, path, currentFilename, newFilename) => {
 
 export const deleteFile = (collection, path, basename) => {
     const fileApi = getFileApi(collection);
+    const filename = fileApi.joinPaths(path, basename);
     return {
         type: "DELETE_FILE",
-        payload: fileApi.delete(fileApi.joinPaths(path, basename)),
-        meta: {collection, path, basename}
+        payload: fileApi.delete(filename),
+        meta: {collection, path, basename, fullpath: fileApi.getFullPath(filename)}
     }
 }
 

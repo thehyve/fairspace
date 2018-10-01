@@ -2,50 +2,53 @@ import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 import Typography from "@material-ui/core/Typography";
-import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";
 import {Column, Row} from 'simple-flexbox';
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
-
-import {deselectPath, openInfoDrawer, selectCollection, selectPath} from "../../../actions/collectionbrowser";
+import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";
 import FileList from "../FileList/FileList";
-import {deleteFile, fetchFilesIfNeeded, renameFile} from "../../../actions/files";
-import {fetchCollectionsIfNeeded} from "../../../actions/collections";
 import FileOperations from "../FileOperations/FileOperations";
 import PermissionChecker from "../../permissions/PermissionChecker";
+import * as collectionBrowserActions from "../../../actions/collectionbrowser";
+import * as fileActions from "../../../actions/files";
+import * as collectionActions from "../../../actions/collections";
 
 class FileBrowser extends React.Component {
     componentDidMount() {
-        this.props.dispatch(fetchCollectionsIfNeeded())
-        this.props.dispatch(selectCollection(this.props.openedCollection.id))
+        const {fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath} = this.props
+        fetchCollectionsIfNeeded()
+        selectCollection(this.props.openedCollection.id)
 
         // If the collection has not been fetched yet,
         // do not bother fetching the files
-        if(this.props.openedCollection.id) {
-            this.props.dispatch(fetchFilesIfNeeded(this.props.openedCollection, this.props.openedPath))
+        if(openedCollection.id) {
+            fetchFilesIfNeeded(openedCollection, openedPath)
         }
     }
 
     componentDidUpdate(prevProps) {
-        if(prevProps.openedCollection.id !== this.props.openedCollection.id) {
-            this.props.dispatch(selectCollection(this.props.openedCollection.id))
+        const {selectCollection, fetchFilesIfNeeded, openedCollection, openedPath} = this.props
+        if(prevProps.openedCollection.id !== openedCollection.id) {
+            selectCollection(openedCollection.id)
         }
 
-        const hasCollectionDetails = this.props.openedCollection.id;
-        const hasNewOpenedCollection = prevProps.openedCollection.id !== this.props.openedCollection.id;
-        const hasNewOpenedPath = prevProps.openedPath !== this.props.openedPath;
+        const hasCollectionDetails = openedCollection.id;
+        const hasNewOpenedCollection = prevProps.openedCollection.id !== openedCollection.id;
+        const hasNewOpenedPath = prevProps.openedPath !== openedPath;
 
         if(hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
-            this.props.dispatch(fetchFilesIfNeeded(this.props.openedCollection, this.props.openedPath))
+            fetchFilesIfNeeded(openedCollection, openedPath)
         }
     }
 
     handlePathClick(path) {
+        const {selectPath, deselectPath} = this.props;
+
         // If this pathis already selected, deselect
         if (this.isPathSelected(path.filename)) {
-            this.props.dispatch(deselectPath(path.filename))
+            deselectPath(path.filename)
         } else {
-            this.props.dispatch(selectPath(path.filename))
+            selectPath(path.filename)
         }
     }
 
@@ -58,8 +61,9 @@ class FileBrowser extends React.Component {
     }
 
     handlePathDelete(path) {
-        return this.props.dispatch(deleteFile(this.props.openedCollection, this.props.openedPath, path.basename))
-            .then(() => this.props.dispatch(fetchFilesIfNeeded(this.props.openedCollection, this.props.openedPath)))
+        const {deleteFile, fetchFilesIfNeeded, openedCollection, openedPath} = this.props;
+        return deleteFile(openedCollection, openedPath, path.basename)
+            .then(() => fetchFilesIfNeeded(openedCollection, openedPath))
             .catch(err => {
                 ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
             });
@@ -67,17 +71,17 @@ class FileBrowser extends React.Component {
     }
 
     handlePathRename(path, newName) {
-        return this.props.dispatch(renameFile(this.props.openedCollection, this.props.openedPath, path.basename, newName))
-            .then(() => this.props.dispatch(fetchFilesIfNeeded(this.props.openedCollection, this.props.openedPath)))
+        const {renameFile, fetchFilesIfNeeded, openedCollection, openedPath} = this.props;
+        return renameFile(openedCollection, openedPath, path.basename, newName)
+            .then(() => fetchFilesIfNeeded(openedCollection, openedPath))
             .catch(err => {
                 ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
                 return false;
             });
-
     }
 
     openDrawer() {
-        this.props.dispatch(openInfoDrawer())
+        this.props.openInfoDrawer()
     }
 
     isPathSelected(path) {
@@ -95,14 +99,6 @@ class FileBrowser extends React.Component {
 
     downloadFile(path) {
         this.fileAPI.download(this._getFullPath(path));
-    }
-
-    deleteFile(path) {
-        return this.fileAPI.delete(this._getFullPath(path));
-    }
-
-    renameFile(current, newName) {
-        return this.fileAPI.move(this._getFullPath(current), this._getFullPath(newName));
     }
 
     _getFullPath(path) {
@@ -231,7 +227,13 @@ const mapStateToProps = (state, ownProps) => {
     }
 }
 
-export default connect(mapStateToProps)(withRouter(FileBrowser));
+const mapDispatchToProps = {
+    ...collectionActions,
+    ...fileActions,
+    ...collectionBrowserActions
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(FileBrowser));
 
 
 

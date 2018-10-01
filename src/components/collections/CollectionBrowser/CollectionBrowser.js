@@ -2,37 +2,28 @@ import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 import Typography from "@material-ui/core/Typography";
-import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import {Column, Row} from 'simple-flexbox';
+import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
-import {deselectCollection, selectCollection} from "../../../actions/collectionbrowser";
-import {addCollection, deleteCollection, fetchCollectionsIfNeeded} from "../../../actions/collections";
 import CollectionList from "../CollectionList/CollectionList";
+import * as collectionBrowserActions from "../../../actions/collectionbrowser";
+import * as collectionActions from "../../../actions/collections";
 
 class CollectionBrowser extends React.Component {
     componentDidMount() {
-        this.props.dispatch(fetchCollectionsIfNeeded())
-        if (this.props.openedCollectionId) {
-            this.props.dispatch(selectCollection(this.props.openedCollectionId));
-        }
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.openedCollectionId) {
-            this.props.dispatch(selectCollection(this.props.openedCollectionId));
-        }
+        this.props.fetchCollectionsIfNeeded()
     }
 
     handleAddCollectionClick() {
-        const {user} = this.props;
+        const {user, addCollection, fetchCollectionsIfNeeded} = this.props;
         const name = `${user.fullName}'s collection`;
         const description = "Beyond the horizon";
 
-        this.props.dispatch(addCollection(name, description))
-            .then(() => this.props.dispatch(fetchCollectionsIfNeeded()))
+        addCollection(name, description)
+            .then(fetchCollectionsIfNeeded)
             .catch(err =>
                 ErrorDialog.showError(
                     err,
@@ -42,17 +33,19 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionClick(collection) {
+        const {selectedCollectionId, selectCollection, deselectCollection} = this.props;
         // If this collection is already selected, deselect
-        if (this.props.selectedCollectionId && this.props.selectedCollectionId === collection.id) {
-            this.props.dispatch(deselectCollection())
+        if (selectedCollectionId && selectedCollectionId === collection.id) {
+            deselectCollection()
         } else {
-            this.props.dispatch(selectCollection(collection.id))
+            selectCollection(collection.id)
         }
     }
 
     handleCollectionDelete(collection) {
-        this.props.dispatch(deleteCollection(collection.id))
-            .then(() => this.props.dispatch(fetchCollectionsIfNeeded()))
+        const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
+        deleteCollection(collection.id)
+            .then(fetchCollectionsIfNeeded())
             .catch(err =>
                 ErrorDialog.showError(
                     err,
@@ -133,18 +126,21 @@ class CollectionBrowser extends React.Component {
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
-    return {
-        user: state.account.user.data,
-        loading: state.cache.collections.pending,
-        error: state.cache.collections.error,
-        collections: state.cache.collections.data,
+const mapStateToProps = (state, ownProps) => ({
+    user: state.account.user.data,
+    loading: state.cache.collections.pending,
+    error: state.cache.collections.error,
+    collections: state.cache.collections.data,
 
-        selectedCollectionId: state.collectionBrowser.selectedCollectionId,
-    }
+    selectedCollectionId: state.collectionBrowser.selectedCollectionId,
+})
+
+const mapDispatchToProps = {
+    ...collectionActions,
+    ...collectionBrowserActions
 }
 
-export default connect(mapStateToProps)(withRouter(CollectionBrowser));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CollectionBrowser));
 
 
 

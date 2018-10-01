@@ -9,12 +9,13 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import ErrorDialog from "../../error/ErrorDialog";
+import {connect} from 'react-redux'
+import * as collectionActions from '../../../actions/collections'
 
 class Collection extends React.Component{
     constructor(props) {
         super(props);
         this.onDidChangeDetails = props.onDidChangeDetails;
-        this.collectionAPI = props.collectionAPI;
 
         this.state = {
             collection: props.collection,
@@ -51,7 +52,7 @@ class Collection extends React.Component{
 
     storeChangedDetails(collectionId, parameters) {
         // Update information about the name and collection
-        return this.collectionAPI.updateCollection(collectionId, parameters.name, parameters.description);
+        return this.props.updateCollection(collectionId, parameters.name, parameters.description)
     }
 
     handleCancel() {
@@ -65,7 +66,6 @@ class Collection extends React.Component{
         this.storeChangedDetails(this.state.collection.id, this.state.editValues)
             .then(() => {
                 let collection = Object.assign(this.state.collection, this.state.editValues);
-                this.setState({collection: collection, editValues: {}})
 
                 if(this.onDidChangeDetails) {
                     this.onDidChangeDetails(collection);
@@ -152,7 +152,12 @@ class Collection extends React.Component{
     }
 }
 
-export default Collection;
+const mapStateToProps = null
+const mapDispatchToProps = {
+    ...collectionActions
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Collection);
 
 
 

@@ -12,14 +12,15 @@ import styles from './InformationDrawer.styles';
 import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
-import {fetchCombinedMetadataIfNeeded, invalidateMetadata} from "../../../actions/metadata";
+import * as metadataActions from "../../../actions/metadata";
 import {connect} from 'react-redux';
 
 function InformationDrawer(props) {
     function handleDetailsChange(collection) {
-        props.onDidChangeDetails(collection);
-        props.dispatch(invalidateMetadata(collection.uri));
-        props.dispatch(fetchCombinedMetadataIfNeeded(collection.uri));
+        const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = props;
+
+        invalidateMetadata(collection.uri);
+        fetchCombinedMetadataIfNeeded(collection.uri);
     }
 
     function renderCollectionDetails() {
@@ -112,6 +113,10 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(withStyles(styles)(InformationDrawer));
+const mapDispatchToProps = {
+    ...metadataActions
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer));
 
 

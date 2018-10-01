@@ -7,27 +7,31 @@ import IconButton from "@material-ui/core/IconButton";
 import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import Badge from "@material-ui/core/Badge";
 import {connect} from 'react-redux'
-import {copy, cut, paste} from "../../../actions/clipboard";
-import {createDirectory, uploadFiles, fetchFilesIfNeeded} from "../../../actions/files";
+import * as clipboardActions from "../../../actions/clipboard";
+import * as fileActions from "../../../actions/files";
 
 function FileOperations(props) {
-    const {numClipboardItems, disabled, openedPath, selectedPath, openedCollection, dispatch} = props;
+    const {
+        numClipboardItems, disabled,
+        openedPath, selectedPath, openedCollection,
+        fetchFilesIfNeeded, uploadFiles, createDirectory,
+        cut, copy, paste} = props;
 
     function refreshFiles() {
-        dispatch(fetchFilesIfNeeded(openedCollection, openedPath))
+        fetchFilesIfNeeded(openedCollection, openedPath)
     }
 
     function handleCut(e) {
         e.stopPropagation()
-        dispatch(cut(openedPath, selectedPath))
+        cut(openedPath, selectedPath)
     }
     function handleCopy(e) {
         e.stopPropagation()
-        dispatch(copy(openedPath, selectedPath))
+        copy(openedPath, selectedPath)
     }
     function handlePaste(e) {
         e.stopPropagation()
-        dispatch(paste(openedCollection, openedPath))
+        paste(openedCollection, openedPath)
             .then(refreshFiles)
             .catch(err => {
                 ErrorDialog.showError(err, "An error occurred while pasting your contents");
@@ -36,7 +40,7 @@ function FileOperations(props) {
 
     function handleUpload(files) {
         if (files && files.length > 0) {
-            return dispatch(uploadFiles(openedCollection, openedPath, files))
+            return uploadFiles(openedCollection, openedPath, files)
                 .then(() => files)
                 .catch(err => {
                     ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(files));
@@ -47,7 +51,7 @@ function FileOperations(props) {
     }
 
     function handleCreateDirectory(name) {
-        return dispatch(createDirectory(openedCollection, openedPath, name))
+        return createDirectory(openedCollection, openedPath, name)
             .then(refreshFiles)
             .catch(err => {
                 if(err.status === 405) {
@@ -116,4 +120,9 @@ const mapStateToProps = (state) => ({
     numClipboardItems: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
 })
 
-export default connect(mapStateToProps)(FileOperations);
+const mapDispatchToProps = {
+    ...fileActions,
+    ...clipboardActions
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(FileOperations);
