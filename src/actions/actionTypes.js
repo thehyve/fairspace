@@ -44,3 +44,4 @@ export const METADATA_ENTITIES      = "METADATA_ENTITIES";
 // Permissions
 export const PERMISSIONS = 'PERMISSIONS';
 export const ALTER_PERMISSION = 'ALTER_PERMISSION';
+export const USERS = 'USERS';

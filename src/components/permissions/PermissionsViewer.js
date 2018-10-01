@@ -194,12 +194,11 @@ class PermissionsViewer extends React.Component {
         ) : '';
     }
 
-    renderUserList = () => {
+    renderUserList = (permissions) => {
         const {anchorEl, selectedUser} = this.state;
-        const {permissions} = this.props;
         return (
             <List dense>
-                {this.renderCollaboratorList(permissions.data)}
+                {this.renderCollaboratorList(permissions)}
                 <Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
@@ -213,15 +212,14 @@ class PermissionsViewer extends React.Component {
     };
 
     render() {
-
-        const {classes, collection, permissions, alterPermission, currentLoggedUser} = this.props;
+        const {classes, collection, permissions, currentLoggedUser} = this.props;
         const {selectedUser, showPermissionDialog, showConfirmDeleteDialog} = this.state;
 
         if (permissions.error) {
             return (<ErrorMessage>message={`Error loading permissions`}</ErrorMessage>)
         } else if (permissions.pending) {
             return (<CircularProgress/>);
-        } else if (!permissions || permissions.data.length === 0) {
+        } else if (!permissions || !permissions.data) {
             return (<div>No permission found</div>)
         } else {
             return (
@@ -229,7 +227,7 @@ class PermissionsViewer extends React.Component {
                     <AlterPermission open={showPermissionDialog}
                                      onClose={this.handleShareWithDialogClose}
                                      user={selectedUser}
-                                     collectionId={collection.id}
+                                     collection={collection}
                                      collaborators={permissions.data}
                                      currentLoggedUser={currentLoggedUser}
                     />
@@ -240,7 +238,7 @@ class PermissionsViewer extends React.Component {
                                         onDisagree={this.handleCloseConfirmDeleteDialog}
                                         onClose={this.handleCloseConfirmDeleteDialog}
                     />
-                    {this.renderUserList()}
+                    {this.renderUserList(permissions.data)}
                 </div>
             );
         }

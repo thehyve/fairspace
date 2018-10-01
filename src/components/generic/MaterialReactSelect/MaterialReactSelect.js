@@ -196,6 +196,7 @@ class MaterialReactSelect extends React.Component {
                 components={components}
                 value={this.props.value}
                 onChange={this.props.onChange}
+                noOptionsMessage={this.props.noOptionsMessage}
                 placeholder={this.props.placeholder}
                 textFieldProps={{
                     label: this.props.label,
@@ -214,7 +215,8 @@ MaterialReactSelect.propTypes = {
     placeholder: PropTypes.string,
     classes: PropTypes.object,
     onChange: PropTypes.func,
-    required: PropTypes.bool
+    required: PropTypes.bool,
+    noOptionsMessage: PropTypes.func
 };
 
 MaterialReactSelect.defaultProps = {

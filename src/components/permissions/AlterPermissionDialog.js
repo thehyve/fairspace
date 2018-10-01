@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 import userAPI from '../../services/UserAPI/UserAPI';
-import permissionAPI from '../../services/PermissionAPI/PermissionAPI';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -17,7 +15,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-import ErrorDialog from "../error/ErrorDialog";
+import {applyDisableFilter} from "./AlterPermission";
 
 const styles = theme => ({
     root: {
@@ -55,31 +53,18 @@ class ShareWithDialog extends React.Component {
     }
 
     resetState = () => {
-        const {user, currentLoggedUser, collaborators} = this.props;
-        const {userList} = this.state;
-
+        const {user, currentLoggedUser, collaborators, collection, options} = this.props;
         this.setState({
             accessRight: user ? user.access : 'Read',
-            selectedUser: user ? userList.find(u => user.subject === u.value) : null,
+            selectedUser: user ? options.find(u => user.subject === u.value) : null,
             selectedUserLabel: '',
-            userList: userList.map(r => {
-                r.disabled = collaborators.find(c => c.subject === r.id) || r.id === currentLoggedUser.id;
-                return r;
-            }),
+            userList: applyDisableFilter(options, collaborators, currentLoggedUser, collection.owner),
             error: null,
         });
     };
 
     componentDidMount() {
-        userAPI.getUsers().then(result => {
-            const options = result.map(r => {
-                let newUser = Object.assign({}, r);
-                newUser.label = `${r.firstName} ${r.lastName}`;
-                newUser.value = `${r.id}`;
-                return newUser;
-            });
-            this.setState({userList: options});
-        })
+        this.props.fetchUsers();
     }
 
     handleAccessRightChange = event => {
@@ -100,10 +85,10 @@ class ShareWithDialog extends React.Component {
 
     handleSubmit = () => {
         const {selectedUser, accessRight} = this.state;
-        const {collectionId, onAlterPermission} = this.props;
+        const {collection, alterPermission} = this.props;
         if (selectedUser) {
             this.handleClose();
-            onAlterPermission(selectedUser.value, collectionId, accessRight);
+            alterPermission(selectedUser.value, collection.id, accessRight);
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
         }
@@ -114,10 +99,10 @@ class ShareWithDialog extends React.Component {
     };
 
     renderUser = () => {
-        const {user} = this.props;
-        const {userList, selectedUser, selectedUserLabel} = this.state;
+        const {user, options, noOptionMessage} = this.props;
+        const {selectedUser, selectedUserLabel} = this.state;
 
-        if (user) {
+        if (user) { // if there's user passed from the props
             const selectedUserOption = this.getUser(user);
             return (<div>
                 <Typography variant="subheading"
@@ -125,10 +110,11 @@ class ShareWithDialog extends React.Component {
             </div>)
         }
 
-        return (<MaterialReactSelect options={userList}
+        return (<MaterialReactSelect options={options}
                                      onChange={this.handleSelectedUserChange}
                                      placeholder={'Please select a user'}
                                      value={selectedUser}
+                                     noOptionsMessage={noOptionMessage}
                                      label={selectedUserLabel}/>);
     };
 
@@ -179,7 +165,7 @@ ShareWithDialog.propTypes = {
     user: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    collectionId: PropTypes.number,
+    collection: PropTypes.object,
     collaborators: PropTypes.array,
 };
 

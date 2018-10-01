@@ -17,7 +17,7 @@ const mapStateToProps = ({permissions, account: {user}}) => {
 };
 const mapDispatchToProps = dispatch => {
     return {
-        onAlterPermission: (userId, collectionId, access) => {
+        alterPermission: (userId, collectionId, access) => {
             return dispatch(alterPermission(userId, collectionId, access))
         },
         onFetchPermissions: (collectionId) => {

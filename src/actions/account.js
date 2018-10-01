@@ -2,6 +2,11 @@ import AccountAPI from '../services/AccountAPI/AccountAPI'
 import {createErrorHandlingPromiseAction} from "../utils/redux";
 import {AUTHORIZATIONS, USER} from "./actionTypes";
 
+export const fetchUsers = createErrorHandlingPromiseAction(() => ({
+    type: "USERS",
+    payload: AccountAPI.getUser()
+}));
+
 export const fetchUser = createErrorHandlingPromiseAction(() => ({
     type: USER,
     payload: AccountAPI.getUser()
