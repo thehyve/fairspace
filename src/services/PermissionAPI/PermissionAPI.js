@@ -24,12 +24,17 @@ class PermissionAPI {
     }
 
     alterCollectionPermission(userId, collectionId, access) {
+        if (!userId || !collectionId || !access) {
+            return Promise.reject("No userId, collectionId or access given");
+        }
         return fetch(Config.get().urls.permissions, {
             method: 'PUT',
             headers: PermissionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({subject: userId, collection: collectionId,  access: access})
-        }).then(failOnHttpError("Failure while alter a collection's permission"))
+            body: JSON.stringify({subject: userId, collection: collectionId, access: access})
+        })
+            .then(failOnHttpError("Failure while alter a collection's permission"))
+            .then(response => response.json());
     }
 
     removeUserFromCollectionPermission(userId, collectionId) {
