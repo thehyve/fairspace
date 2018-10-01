@@ -13,8 +13,10 @@ const styles = {
  * This component will always display correct metadata. If any error occurs it is handled by Metadata
  */
 const MetadataViewer = props => {
+
     const renderProperty =
             property => <MetadataProperty
+                editable={props.editable}
                 subject={props.subject}
                 key={property.key}
                 property={property} />

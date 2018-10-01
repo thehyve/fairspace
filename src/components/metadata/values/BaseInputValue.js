@@ -20,15 +20,19 @@ class StringValue extends React.Component {
     render() {
         const {entry, property, style, onSave, transformValue, ...otherProps} = this.props;
 
-        return <TextField
-            {...otherProps}
-            multiline={property.multiLine}
-            value={this.state.value}
-            onChange={this.handleChange.bind(this)}
-            onBlur={this.handleSave.bind(this)}
-            margin="normal"
-            style={{...style, marginTop: 0, width: '100%'}}
-        />
+        if(property.editable) {
+            return <TextField
+                {...otherProps}
+                multiline={property.multiLine}
+                value={this.state.value}
+                onChange={this.handleChange.bind(this)}
+                onBlur={this.handleSave.bind(this)}
+                margin="normal"
+                style={{...style, marginTop: 0, width: '100%'}}
+            />
+        } else {
+            return <span>{this.state.value}</span>
+        }
     }
 }
 

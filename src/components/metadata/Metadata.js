@@ -3,8 +3,14 @@ import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadata";
 import {connect} from 'react-redux'
+import permissionAPI from "../../services/PermissionAPI/PermissionAPI";
+import ErrorDialog from "../error/ErrorDialog";
 
 export class Metadata extends React.Component {
+    state = {
+        editable: true
+    }
+
     componentDidMount() {
         this.load();
     }
@@ -16,10 +22,27 @@ export class Metadata extends React.Component {
     }
 
     load() {
-        const {dispatch, subject} = this.props;
+        const {collection, dispatch, subject} = this.props;
 
         if(subject) {
             dispatch(fetchCombinedMetadataIfNeeded(subject))
+        }
+
+        if(collection) {
+            permissionAPI
+                .getCollectionPermissions(collection.id)
+                .then(result => {
+                    const permissions = result.filter(item => item.subject !== collection.creator);
+                    const editable = permissions.some(p => {
+                        return p.access === 'Write' || p.access === 'Manage';
+                    });
+                    this.setState({
+                        editable: editable
+                    });
+                })
+                .catch(error => {
+                    ErrorDialog.showError(error, 'An error occurred while loading permissions.');
+                });
         }
     }
 
@@ -33,7 +56,10 @@ export class Metadata extends React.Component {
         } else if (!metadata || metadata.length === 0) {
             return (<div>No metadata found</div>)
         } else {
-            return (<MetadataViewer {...otherProps} subject={subject} properties={metadata}/>)
+            return (<MetadataViewer {...otherProps}
+                                    editable={false}
+                                    subject={subject}
+                                    properties={metadata}/>)
         }
     }
 }
