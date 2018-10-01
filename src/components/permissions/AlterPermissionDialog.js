@@ -87,8 +87,8 @@ class ShareWithDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
         const {collection, alterPermission} = this.props;
         if (selectedUser) {
-            this.handleClose();
             alterPermission(selectedUser.value, collection.id, accessRight);
+            this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
         }

@@ -26,20 +26,22 @@ export const permissionLevel = (p) => {
  */
 export const sortAndFilterPermissions = (permissions, creator) => {
     if (permissions && permissions.data) {
-        return permissions.data.filter(item => item.subject !== creator)
+        return permissions.data
+            .filter(item => item.subject !== creator)
             .sort(comparing(compareBy(permissionLevel), compareBy('subject')));
     } else {
         return [];
     }
 };
 
-const mapStateToProps = ({permissions, account: {user}}) => {
+const mapStateToProps = ({permissions: {fetch, alter}, account: {user}}) => {
     return {
         currentLoggedUser: user.data,
-        permissions: permissions.fetch,
-        alteredPermission: permissions.alter
+        permissions: fetch,
+        alteredPermission: alter
     };
 };
+
 const mapDispatchToProps = dispatch => {
     return {
         alterPermission: (userId, collectionId, access) => {

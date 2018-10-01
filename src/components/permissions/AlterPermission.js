@@ -66,9 +66,9 @@ export const getUserLabelByUser = (user, options) => {
     return found ? found.label : '';
 };
 
-const mapStateToProps = ({permissions, users}) => {
+const mapStateToProps = ({permissions: {alter}, users}) => {
     return {
-        alterPermission: permissions.alter,
+        alteredPermission: alter,
         users: users,
         options: transformUserToOptions(users),
         noOptionMessage: () => getNoOptionMessage(users)
