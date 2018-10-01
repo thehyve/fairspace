@@ -124,6 +124,7 @@ jupyterhub:
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
           c.KubeSpawner.singleuser_privileged = True
+          c.Authenticator.auto_login = True
     proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
 
