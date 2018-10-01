@@ -12,12 +12,13 @@ import PermissionChecker from "../../permissions/PermissionChecker";
 import * as collectionBrowserActions from "../../../actions/collectionbrowser";
 import * as fileActions from "../../../actions/files";
 import * as collectionActions from "../../../actions/collections";
+import FileAPIFactory from "../../../services/FileAPI/FileAPIFactory";
 
 class FileBrowser extends React.Component {
     componentDidMount() {
         const {fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath} = this.props
         fetchCollectionsIfNeeded()
-        selectCollection(this.props.openedCollection.id)
+        selectCollection(openedCollection.id)
 
         // If the collection has not been fetched yet,
         // do not bother fetching the files
@@ -80,10 +81,6 @@ class FileBrowser extends React.Component {
             });
     }
 
-    openDrawer() {
-        this.props.openInfoDrawer()
-    }
-
     isPathSelected(path) {
         return this.props.selectedPath.some(el => el === path);
     }
@@ -98,11 +95,8 @@ class FileBrowser extends React.Component {
     }
 
     downloadFile(path) {
-        this.fileAPI.download(this._getFullPath(path));
-    }
-
-    _getFullPath(path) {
-        return this.fileAPI.joinPaths(this.props.openedPath || '', path);
+        const fileAPI = FileAPIFactory.build(this.props.openedCollection)
+        fileAPI.download(fileAPI.joinPaths(this.props.openedPath || '', path));
     }
 
     render() {

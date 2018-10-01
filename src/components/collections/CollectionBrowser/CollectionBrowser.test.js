@@ -8,16 +8,11 @@ import {Provider} from "react-redux";
 import mockStore from "../../../store/mockStore"
 import Config from "../../generic/Config/Config";
 
-let mockCollectionAPI, mockFileAPI, mockMetadataAPI, mockFileAPIFactory, store;
-let collectionBrowser;
-
-function flushPromises() {
-    return new Promise(resolve => setImmediate(resolve));
-}
+let store, collectionBrowser;
 
 beforeEach(() => {
     window.fetch = jest.fn(() => Promise.resolve())
-    
+
     store = mockStore({
         account: {
             user: { data: { username: 'test' }}
