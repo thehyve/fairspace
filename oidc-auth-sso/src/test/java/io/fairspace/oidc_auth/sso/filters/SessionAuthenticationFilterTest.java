@@ -54,6 +54,7 @@ public class SessionAuthenticationFilterTest {
 
     Map<String,Object> claims;
     OAuthAuthenticationToken token = new OAuthAuthenticationToken("test-token", "refresh-token");
+    OAuthAuthenticationToken tokenWithClaims;
     OAuthAuthenticationToken refreshedToken = new OAuthAuthenticationToken("refreshed-test-token", "refreshed-refresh-token");
 
     @BeforeEach
@@ -62,6 +63,8 @@ public class SessionAuthenticationFilterTest {
 
         claims = new HashMap<>();
         claims.put("authorities", Collections.singletonList("test"));
+
+        tokenWithClaims = token.toBuilder().claimsSet(claims).build();
     }
 
     @Test
@@ -72,7 +75,7 @@ public class SessionAuthenticationFilterTest {
         doReturn(claims).when(tokenValidator).parseAndValidate("test-token");
         filter.doFilter(request, response, filterChain);
 
-        verify(request).setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, token);
+        verify(request).setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, tokenWithClaims);
         verify(filterChain).doFilter(request, response);
     }
 

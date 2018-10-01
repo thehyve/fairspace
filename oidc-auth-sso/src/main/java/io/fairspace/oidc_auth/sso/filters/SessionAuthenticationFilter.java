@@ -75,7 +75,7 @@ public class SessionAuthenticationFilter implements Filter {
         // If it validates, return
         if(claims != null) {
             log.debug("Valid JWT found in the user session");
-            return token;
+            return token.toBuilder().claimsSet(claims).build();
         }
 
         // If it does not validate, but we have a valid refresh token, perform a refresh
