@@ -59,6 +59,7 @@ function InformationDrawer(props) {
                     <ExpansionPanelDetails>
                         <Metadata
                             subject={collection.uri}
+                            collection={collection}
                             style={{width: '100%'}}
                         />
                     </ExpansionPanelDetails>

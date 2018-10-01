@@ -14,7 +14,7 @@ import ErrorDialog from "../error/ErrorDialog";
 /**
  * Shows the property and values for the property
  */
-function MetadataProperty({subject, property, dispatch, classes}) {
+function MetadataProperty({editable, subject, property, dispatch, classes}) {
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
     // will save a given value (if it has changed) along with the other
@@ -24,9 +24,9 @@ function MetadataProperty({subject, property, dispatch, classes}) {
     const handleSave = index => newEntry => {
         const currentEntry = property.values[index];
 
-        if(currentEntry.value !== newEntry.value) {
+        if (currentEntry.value !== newEntry.value) {
             const updatedValues = property.values.map((el, idx) => {
-                if(idx === index) {
+                if (idx === index) {
                     return newEntry
                 } else {
                     return el;
@@ -41,7 +41,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
     }
 
     const handleAdd = (newEntry) => {
-        if(newEntry.value || newEntry.id) {
+        if (newEntry.value || newEntry.id) {
             const updatedValues = [...property.values, newEntry]
             return dispatch(updateMetadata(subject, property.key, updatedValues))
                 .catch(e => ErrorDialog.showError(e, "Error while adding metadata"));
@@ -58,7 +58,8 @@ function MetadataProperty({subject, property, dispatch, classes}) {
 
     // Render the given entry as a list item
     const renderEntry = (entry, idx, PropertyValueComponent) => {
-        return <ListItem key={idx}>
+        if (editable) {
+            return <ListItem key={idx}>
                 <ListItemText>
                     <PropertyValueComponent
                         property={property}
@@ -73,12 +74,24 @@ function MetadataProperty({subject, property, dispatch, classes}) {
                         <DeleteIcon/>
                     </IconButton>
                 </ListItemSecondaryAction>
-            </ListItem>
+            </ListItem>;
+        } else {
+            return <ListItem key={idx}>
+                <ListItemText>
+                    <PropertyValueComponent
+                        property={property}
+                        entry={entry}
+                        onSave={handleSave(idx)}
+                    />
+                </ListItemText>
+            </ListItem>;
+        }
+
     }
 
     // Do not show an add component if no multiples are allowed
     // and there is already a value
-    const canAdd = property.allowMultiple || property.values.length === 0
+    const canAdd = editable && (property.allowMultiple || property.values.length === 0)
 
     const renderAddComponent = () =>
         <ListItem key={property.values.length}>
@@ -91,6 +104,7 @@ function MetadataProperty({subject, property, dispatch, classes}) {
         </ListItem>
 
 
+    property.editable = editable;
     const ValueAddComponent = ValueComponentFactory.addComponent(property);
     const ValueEditComponent = ValueComponentFactory.editComponent(property);
 
