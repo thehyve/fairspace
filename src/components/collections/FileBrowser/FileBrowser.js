@@ -13,6 +13,7 @@ import * as collectionBrowserActions from "../../../actions/collectionbrowser";
 import * as fileActions from "../../../actions/files";
 import * as collectionActions from "../../../actions/collections";
 import FileAPIFactory from "../../../services/FileAPI/FileAPIFactory";
+import {parsePath} from "../../../utils/fileutils";
 
 class FileBrowser extends React.Component {
     componentDidMount() {
@@ -82,7 +83,7 @@ class FileBrowser extends React.Component {
     }
 
     isPathSelected(path) {
-        return this.props.selectedPath.some(el => el === path);
+        return this.props.selectedPaths.some(el => el === path);
     }
 
     openCollection(collection) {
@@ -100,7 +101,7 @@ class FileBrowser extends React.Component {
     }
 
     render() {
-        const {loading, error, openedCollection, openedPath, selectedPath} = this.props;
+        const {loading, error, openedCollection, openedPath, selectedPaths} = this.props;
 
         // The screen consists of 3 parts:
         // - a list of breadcrumbs
@@ -115,7 +116,7 @@ class FileBrowser extends React.Component {
         } else if (loading) {
             mainPanel = this.renderLoading()
         } else {
-            buttons = this.renderButtons(openedCollection, openedPath, selectedPath);
+            buttons = this.renderButtons(openedCollection, openedPath, selectedPaths);
             mainPanel = this.renderFiles();
         }
 
@@ -148,7 +149,7 @@ class FileBrowser extends React.Component {
 
         if(openedPath) {
             const toBreadcrumb = segment => ({segment: segment, label: segment})
-            const pathParts = FileBrowser._parsePath(openedPath)
+            const pathParts = parsePath(openedPath)
                 segments.push(...pathParts.map(toBreadcrumb));
         }
 
@@ -173,23 +174,13 @@ class FileBrowser extends React.Component {
     renderFiles() {
         return <FileList
             files={this.props.files}
-            selectedPath={this.props.selectedPath}
+            selectedPaths={this.props.selectedPaths}
             onPathClick={this.handlePathClick.bind(this)}
             onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
             onRename={this.handlePathRename.bind(this)}
             onDelete={this.handlePathDelete.bind(this)}/>
     }
 
-    // Parse path into array
-    static _parsePath(path) {
-        if (!path)
-            return [];
-
-        if (path[0] === '/')
-            path = path.slice(1);
-
-        return path ? path.split('/') : [];
-    }
 
 }
 
@@ -216,7 +207,7 @@ const mapStateToProps = (state, ownProps) => {
         error: files.error || collections.error,
         files: files.data,
 
-        selectedPath: collectionBrowser.selectedPath,
+        selectedPaths: collectionBrowser.selectedPaths,
         openedCollection: openedCollectionId ? getCollection(openedCollectionId) : {}
     }
 }

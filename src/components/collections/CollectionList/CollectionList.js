@@ -29,9 +29,9 @@ function CollectionList({collections, selectedCollectionId, onCollectionClick, o
                             <ClickHandler
                                     component={TableRow}
                                     key={collection.id}
-                                    selected={selectedCollectionId && collection.id === selectedCollectionId}
-                                      onSingleClick={() => onCollectionClick(collection)}
-                                      onDoubleClick={() => onCollectionDoubleClick(collection)}>
+                                    selected={selectedCollectionId && (collection.id === selectedCollectionId)}
+                                    onSingleClick={() => onCollectionClick(collection)}
+                                    onDoubleClick={() => onCollectionDoubleClick(collection)}>
                                 <TableCell>
                                     <Icon>folder_open</Icon>
                                 </TableCell>

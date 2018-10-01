@@ -13,7 +13,7 @@ import * as fileActions from "../../../actions/files";
 function FileOperations(props) {
     const {
         numClipboardItems, disabled,
-        openedPath, selectedPath, openedCollection,
+        openedPath, selectedPaths, openedCollection,
         fetchFilesIfNeeded, uploadFiles, createDirectory,
         cut, copy, paste} = props;
 
@@ -23,11 +23,11 @@ function FileOperations(props) {
 
     function handleCut(e) {
         e.stopPropagation()
-        cut(openedPath, selectedPath)
+        cut(openedPath, selectedPaths)
     }
     function handleCopy(e) {
         e.stopPropagation()
-        copy(openedPath, selectedPath)
+        copy(openedPath, selectedPaths)
     }
     function handlePaste(e) {
         e.stopPropagation()
@@ -79,13 +79,13 @@ function FileOperations(props) {
         <IconButton
             aria-label="Copy"
             onClick={handleCopy}
-            disabled={selectedPath.length === 0 || disabled}>
+            disabled={selectedPaths.length === 0 || disabled}>
             <ContentCopy/>
         </IconButton>
         <IconButton
             aria-label="Cut"
             onClick={handleCut}
-            disabled={selectedPath.length === 0 || disabled}>
+            disabled={selectedPaths.length === 0 || disabled}>
             <ContentCut/>
         </IconButton>
         <IconButton
@@ -116,7 +116,7 @@ function FileOperations(props) {
 }
 
 const mapStateToProps = (state) => ({
-    selectedPath: state.collectionBrowser.selectedPath,
+    selectedPaths: state.collectionBrowser.selectedPaths,
     numClipboardItems: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
 })
 

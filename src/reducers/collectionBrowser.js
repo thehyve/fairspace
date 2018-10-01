@@ -1,6 +1,6 @@
 const defaultState = {
     selectedCollectionId: null,
-    selectedPath: [],
+    selectedPaths: [],
 
     openedCollectionId: null,
     openedPath: null,
@@ -11,7 +11,7 @@ const defaultState = {
 const deselectPath = (state, path) => {
     return {
         ...state,
-        selectedPath: (state.selectedPath || []).filter(el => el !== path)
+        selectedPaths: (state.selectedPaths || []).filter(el => el !== path)
     };
 }
 
@@ -33,7 +33,7 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 infoDrawerOpened: true,
-                selectedPath: (state.selectedPath || []).concat(action.path)
+                selectedPaths: (state.selectedPaths || []).concat(action.path)
             };
         case "DESELECT_PATH":
             return deselectPath(state, action.path);

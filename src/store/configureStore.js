@@ -56,7 +56,7 @@ shown here for future reference and easy lookup.
     }
     collections: {
         selectedCollectionId: 4,
-        selectedPath: '/subdirectory/file.txt',
+        selectedPaths: '/subdirectory/file.txt',
 
         openedCollectionId: 4,
         openedPath: '/subdirectory',

@@ -16,12 +16,12 @@ export const copy = (sourcedir, filenames) => ({
     filenames: filenames.map(extractBasename)
 })
 
-export const paste = (openedCollection, destinationDir) =>
+export const paste = (collection, destinationDir) =>
     (dispatch, getState) => {
         const {clipboard} = getState();
 
         if(canPaste(clipboard)) {
-            return dispatch(pasteAction(clipboard, openedCollection, destinationDir))
+            return dispatch(pasteAction(clipboard, collection, destinationDir))
         } else {
             return Promise.resolve();
         }
@@ -39,8 +39,8 @@ const pasteAction = (clipboard, collection, destinationDir) => ({
     }
 });
 
-const doPaste = (clipboard, currentCollection, destinationDir) => {
-    const fileAPI = FileAPIFactory.build(currentCollection);
+const doPaste = (clipboard, collection, destinationDir) => {
+    const fileAPI = FileAPIFactory.build(collection);
 
     if(clipboard.type === 'CUT') {
         return fileAPI.movePaths(clipboard.sourcedir, clipboard.filenames, destinationDir);

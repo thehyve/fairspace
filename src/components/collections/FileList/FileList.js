@@ -19,7 +19,7 @@ function FileList(props) {
     if (!props.files || props.files.length === 0 || props.files[0] === null) {
         return "No files";
     } else {
-        const selectedFilenames = props.selectedPath || [];
+        const selectedFilenames = props.selectedPaths || [];
         return (<Table>
                 <TableHead>
                     <TableRow>
