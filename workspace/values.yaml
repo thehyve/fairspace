@@ -117,11 +117,16 @@ jupyterhub:
         name: fairspace/jupyterhub-singleuser
         tag: latest
       defaultUrl: "/lab"
+      lifecycleHooks:
+        postStart:
+          exec:
+            command: ["/home/jovyan/.mountws.sh"]
     hub:
         ingress:
             enabled: false
         extraEnv:
-            JUPYTERHUB_CRYPT_KEY:
+          WORKSPACE_URL:
+          JUPYTERHUB_CRYPT_KEY:
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
           c.KubeSpawner.singleuser_privileged = True
