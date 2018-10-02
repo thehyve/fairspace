@@ -120,7 +120,7 @@ jupyterhub:
       lifecycleHooks:
         postStart:
           exec:
-            command: ["/home/jovyan/.mountws.sh"]
+            command: ["/bin/sh", "-c", "/home/jovyan/automount.sh"]
     hub:
         ingress:
             enabled: false
