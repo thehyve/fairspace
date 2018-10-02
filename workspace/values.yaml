@@ -119,10 +119,10 @@ jupyterhub:
       defaultUrl: "/lab"
       extraEnv:
         WORKSPACE_URL:
-#      lifecycleHooks:
-#        postStart:
-#          exec:
-#            command: ["/bin/sh", "-c", "/automount.sh"]
+      lifecycleHooks:
+        postStart:
+          exec:
+            command: ["/bin/sh", "-c", "/automount.sh"]
     hub:
         ingress:
             enabled: false
