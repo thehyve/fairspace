@@ -51,26 +51,27 @@ class PermissionsViewer extends React.Component {
     }
 
     componentDidMount() {
-        const {collection} = this.props;
+        const {collection, fetchPermissions} = this.props;
         if (collection) {
-            this.loadPermissions();
+            this.setState({
+                canManage: PermissionChecker.canManage(collection)
+            });
+            fetchPermissions(collection.id);
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {collection} = this.props;
+        const {collection, alteredPermission, fetchPermissions} = this.props;
         if (collection.id !== prevProps.collection.id) {
-            this.loadPermissions();
+            this.setState({
+                canManage: PermissionChecker.canManage(collection)
+            });
+            fetchPermissions(collection.id);
+        }
+        if (alteredPermission.data !== prevProps.alteredPermission.data) {
+            fetchPermissions(collection.id);
         }
     }
-
-    loadPermissions = () => {
-        const {collection, fetchPermissions} = this.props;
-        this.setState({
-            canManage: PermissionChecker.canManage(collection)
-        });
-        fetchPermissions(collection.id);
-    };
 
     handleAlterPermission = (user) => {
         this.setState({
@@ -131,11 +132,7 @@ class PermissionsViewer extends React.Component {
         });
     };
 
-    static permissionLevel(p) {
-        return {Manage: 0, Write: 1, Read: 2}[p.access]
-    }
-
-    handleListItemMouseover = (value, event) => {
+    handleListItemMouseover = (value) => {
         this.setState({
             hovered: value
         })
