@@ -8,36 +8,25 @@ const defaultUser = {
 };
 
 module.exports = {
-    askForAuthentication: () => ({'WWW-Authenticate': 'Basic realm=\"realm\"'}),
+    askForAuthentication: () => ({}),
     getUser: (ctx, callback) => {
         let authHeader = ctx.headers.find('Authorization');
 
         if (!authHeader) {
             callback(null, defaultUser);
-            return;
-        }
-
-        let token;
-
-        if (authHeader.startsWith('Basic ')) {
-            // take JWT from the password field
-            let credentials = Buffer.from(/^Basic \s*([a-zA-Z0-9]+=*)\s*$/.exec(authHeader)[1], 'base64').toString();
-            token = credentials.split(':', 2)[1];
         } else if (authHeader.startsWith('Bearer ')) {
-            token = authHeader.split(' ')[1];
+            let token = authHeader.split(' ')[1];
+            let user = {
+                uid: token,
+                username: token,
+                password: token,
+                isAdministrator: false,
+                isDefaultUser: false
+            };
+
+            callback(null, user);
         } else {
             callback(Errors.WrongHeaderFormat);
-            return;
         }
-
-        let user = {
-            uid: token,
-            username: token,
-            password: token,
-            isAdministrator: false,
-            isDefaultUser: false
-        };
-
-        callback(null, user);
     }
 };

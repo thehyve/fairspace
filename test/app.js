@@ -101,25 +101,21 @@ describe('Authentication', () => {
             .set('Authorization', 'Bearer Alice')
             .expect(207)
     );
+
     it('responds to /api/storage/webdav/ when authorization with any Bearer is provided', () =>
         server
             .propfind('/api/storage/webdav/')
             .set('Authorization', 'Bearer JWT')
             .expect(207)
     );
+
     it('responds a 401 to /api/storage/webdav/ when an unknown authorization is provided', () =>
         server
             .propfind('/api/storage/webdav/')
             .set('Authorization', 'Unknown token')
-            .expect(401)
+            .
+            expect(401)
     );
-    it('responds to /api/storage/webdav/ when Basic authorization is provided', () =>
-        server
-            .propfind('/api/storage/webdav/')
-            .set('Authorization', 'Basic dXNlcjpqd3Q=')
-            .expect(207)
-    );
-
     it('responds a 401 to /api/storage/webdav/ when no authorization is provided', () =>
         server
             .propfind('/api/storage/webdav/')
@@ -249,26 +245,5 @@ describe('Webdav with /api/storage/webdav/ prefix', () => {
             .set('Authorization', 'Bearer Alice')
             .set('Anticipated-Operation', 'true')
             .expect(401)
-    );
-});
-
-
-describe('Webdav with no prefix', () => {
-    beforeEach(() => fs.mkdirSync(process.env.FILES_FOLDER));
-
-    afterEach(() => fs.removeSync(process.env.FILES_FOLDER));
-
-
-    it('a user can create and delete a top-level directory', () =>
-        server
-            .mkcol('/1')
-            .set('Authorization', 'Bearer Alice')
-            .set('Anticipated-Operation', 'true')
-            .expect(201)
-            .then(() => server
-                .delete('/1')
-                .set('Anticipated-Operation', 'true')
-                .set('Authorization', 'Bearer Alice')
-                .expect(200))
     );
 });

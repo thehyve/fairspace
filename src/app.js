@@ -52,6 +52,5 @@ function setupWebdavMiddleware(physicalRootPath, webdavPath) {
 
     app.use(fixWebdavDestinationMiddleware(webdavPath));
     app.use(webdav.extensions.express(webdavPath, server));
-    app.use(webdav.extensions.express('/', server));
 }
 
