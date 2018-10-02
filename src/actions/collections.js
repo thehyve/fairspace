@@ -1,4 +1,4 @@
-import {createErrorHandlingPromiseAction} from "../utils/redux";
+import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import CollectionAPI from "../services/CollectionAPI/CollectionAPI"
 import {ADD_COLLECTION, COLLECTIONS, DELETE_COLLECTION, UPDATE_COLLECTION} from "./actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
@@ -7,15 +7,10 @@ export const invalidateCollections = () => ({
     type: actionTypes.invalidate(COLLECTIONS)
 })
 
-export const fetchCollectionsIfNeeded = () => {
-    return (dispatch, getState) => {
-        if (shouldFetchCollections(getState())) {
-            return dispatch(fetchCollections())
-        } else {
-            return Promise.resolve();
-        }
-    }
-}
+export const fetchCollectionsIfNeeded = () => dispatchIfNeeded(
+    fetchCollections,
+    state => state && state.cache ? state.cache.collections : undefined
+)
 
 export const addCollection = (name, description) => ({
     type: ADD_COLLECTION,
@@ -35,17 +30,6 @@ export const deleteCollection = id => ({
     payload: CollectionAPI.deleteCollection(id),
 })
 
-const shouldFetchCollections = (state) => {
-    const collections = state && state.cache ? state.cache.collections : undefined;
-
-    if (!collections) {
-        return true
-    } else if (collections.pending) {
-        return false
-    } else {
-        return collections.invalidated
-    }
-}
 
 const fetchCollections = createErrorHandlingPromiseAction(() => ({
     type: COLLECTIONS,
