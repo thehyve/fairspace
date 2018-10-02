@@ -14,7 +14,7 @@ import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
 import * as metadataActions from "../../../actions/metadata";
 import {connect} from 'react-redux';
-import permissionChecker from '../permissions/PermissionChecker';
+import permissionChecker from '../../permissions/PermissionChecker';
 
 function InformationDrawer(props) {
     function handleDetailsChange(collection) {

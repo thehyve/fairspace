@@ -39,13 +39,12 @@ it('shows result when subject provided and data is loaded', () => {
     });
 
     const collection = {
-        uri: "http://fairspace.com/iri/collections/1",
-        access: 'Manage'
+        uri: "http://fairspace.com/iri/collections/1"
     }
 
     const wrapper = mount(
         <Provider store={store}>
-            <ConnectedMetadata collection={collection} subject={collection.uri}/>
+            <ConnectedMetadata editable={true} subject={collection.uri}/>
         </Provider>);
 
     expect(wrapper.find(MetadataViewer).length).toEqual(1);
