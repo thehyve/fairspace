@@ -40,5 +40,6 @@ const getInputComponent = property => {
 
 export default {
     editComponent: (property) => getInputComponent(property) || ReferringValue,
-    addComponent: (property) => getInputComponent(property) || LookupEntity
+    addComponent: (property) => getInputComponent(property) || LookupEntity,
+    readOnlyComponent: () => ReferringValue
 }

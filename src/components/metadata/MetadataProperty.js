@@ -24,7 +24,7 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
     const handleSave = index => newEntry => {
         const currentEntry = property.values[index];
 
-        if(currentEntry.value !== newEntry.value) {
+        if (currentEntry.value !== newEntry.value) {
             const updatedValues = property.values.map((el, idx) => {
                 if (idx === index) {
                     return newEntry
@@ -68,13 +68,13 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
             </ListItemText>
             {
                 editable ?
-                <ListItemSecondaryAction>
-                    <IconButton
-                        aria-label="Delete"
-                        onClick={handleDelete(idx)}>
-                        <DeleteIcon/>
-                    </IconButton>
-                </ListItemSecondaryAction> : null
+                    <ListItemSecondaryAction>
+                        <IconButton
+                            aria-label="Delete"
+                            onClick={handleDelete(idx)}>
+                            <DeleteIcon/>
+                        </IconButton>
+                    </ListItemSecondaryAction> : null
             }
         </ListItem>;
     }
@@ -94,12 +94,13 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
         </ListItem>
 
     const ValueAddComponent = ValueComponentFactory.addComponent(property);
-    const ValueEditComponent = ValueComponentFactory.editComponent(property);
+    const ValueComponent = editable ?
+        ValueComponentFactory.editComponent(property) : ValueComponentFactory.readOnlyComponent();
 
     return <ListItem disableGutters key={property.key} style={{display: 'block'}}>
         <Typography variant="body2" component='p'>{property.label}</Typography>
         <List dense>
-            {property.values.map((entry, idx) => renderEntry(entry, idx, ValueEditComponent))}
+            {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent))}
             {canAdd ? renderAddComponent() : null}
         </List>
     </ListItem>
