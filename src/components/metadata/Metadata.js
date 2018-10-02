@@ -3,7 +3,6 @@ import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadata";
 import {connect} from 'react-redux';
-import permissionChecker from '../permissions/PermissionChecker'
 
 export class Metadata extends React.Component {
 
@@ -26,7 +25,8 @@ export class Metadata extends React.Component {
     }
 
     render() {
-        const {subject, metadata, error, loading, collection, ...otherProps} = this.props;
+        // putting dispatch here to avoid it being passed down to children
+        const {subject, metadata, error, loading, editable, dispatch, ...otherProps} = this.props;
 
         if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
@@ -36,7 +36,7 @@ export class Metadata extends React.Component {
             return (<div>No metadata found</div>)
         } else {
             return (<MetadataViewer {...otherProps}
-                                    editable={permissionChecker.canManage(collection)}
+                                    editable={editable}
                                     subject={subject}
                                     properties={metadata}/>)
         }
