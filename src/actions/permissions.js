@@ -7,8 +7,8 @@ export const fetchPermissions = createErrorHandlingPromiseAction((collectionId) 
         payload: PermissionAPI.getCollectionPermissions(collectionId)
 }));
 
-export const alterPermission = createErrorHandlingPromiseAction((userId, collectionId, access) => ({
+export const alterPermission = (userId, collectionId, access) => ({
     type: ALTER_PERMISSION,
     payload: PermissionAPI.alterCollectionPermission(userId,  collectionId, access)
-}));
+});
 
