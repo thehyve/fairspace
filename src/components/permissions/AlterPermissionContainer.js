@@ -46,11 +46,11 @@ export const getNoOptionMessage = (users) => {
  * @param currentLoggedUser
  * @param owner
  */
-export const applyDisableFilter = (options, collaborators, currentLoggedUser, owner) => {
+export const applyDisableFilter = (options, collaborators, currentLoggedUser, ownerId) => {
     return options.map(r => {
         r.disabled =
             collaborators.find(c => c.subject === r.value) ? true : r.value === currentLoggedUser.id ||
-            r.value === owner;
+            r.value === ownerId;
         return r;
     });
 };

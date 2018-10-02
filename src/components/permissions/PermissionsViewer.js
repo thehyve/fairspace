@@ -16,7 +16,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PermissionChecker from "./PermissionChecker";
 import {sortAndFilterPermissions} from "./Permissions";
-import AlterPermission from "./AlterPermission";
+import AlterPermission from "./AlterPermissionContainer";
 
 const styles = theme => ({
     root: {},

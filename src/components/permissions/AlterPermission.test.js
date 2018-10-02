@@ -1,6 +1,11 @@
-import {applyDisableFilter, getNoOptionMessage, getUserLabelByUser, transformUserToOptions} from "./AlterPermission";
+import {
+    applyDisableFilter,
+    getNoOptionMessage,
+    getUserLabelByUser,
+    transformUserToOptions
+} from "./AlterPermissionContainer";
 
-describe('AlterPermission', () => {
+describe('AlterPermissionContainer', () => {
     describe('transformUserToOptions', () => {
         const mockUsers = {
             data: [
@@ -113,6 +118,6 @@ describe('AlterPermission', () => {
             expect(getUserLabelByUser(user, options)).toBe('');
         });
 
-        })
+    })
 
 });

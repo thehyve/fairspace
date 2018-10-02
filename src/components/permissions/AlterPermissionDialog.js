@@ -15,7 +15,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-import {applyDisableFilter, getUserLabel, getUserLabelByUser} from "./AlterPermission";
+import {applyDisableFilter, getUserLabelByUser} from "./AlterPermissionContainer";
 
 const styles = theme => ({
     root: {
@@ -39,7 +39,7 @@ const styles = theme => ({
     },
 });
 
-class ShareWithDialog extends React.Component {
+class AlterPermissionDialog extends React.Component {
 
     constructor(props) {
         super(props);
@@ -151,7 +151,7 @@ class ShareWithDialog extends React.Component {
     }
 }
 
-ShareWithDialog.propTypes = {
+AlterPermissionDialog.propTypes = {
     classes: PropTypes.object.isRequired,
     theme: PropTypes.object.isRequired,
     user: PropTypes.object,
@@ -161,4 +161,4 @@ ShareWithDialog.propTypes = {
     collaborators: PropTypes.array,
 };
 
-export default withStyles(styles, {withTheme: true})(ShareWithDialog);
+export default withStyles(styles, {withTheme: true})(AlterPermissionDialog);
