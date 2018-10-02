@@ -14,6 +14,7 @@ import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
 import * as metadataActions from "../../../actions/metadata";
 import {connect} from 'react-redux';
+import permissionChecker from '../permissions/PermissionChecker';
 
 function InformationDrawer(props) {
     function handleDetailsChange(collection) {
@@ -59,7 +60,7 @@ function InformationDrawer(props) {
                     <ExpansionPanelDetails>
                         <Metadata
                             subject={collection.uri}
-                            collection={collection}
+                            editable={permissionChecker.canManage(collection)}
                             style={{width: '100%'}}
                         />
                     </ExpansionPanelDetails>
