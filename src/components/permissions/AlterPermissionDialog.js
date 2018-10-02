@@ -7,7 +7,6 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import {withStyles} from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
-import {AccessRights} from "./PermissionsContainer";
 import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect'
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -15,7 +14,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 
-const styles = theme => ({
+export const styles = theme => ({
     root: {
         width: 400,
         height: 350,
@@ -49,7 +48,7 @@ const styles = theme => ({
  */
 const applyDisableFilter = (options, collaborators, currentLoggedUser) => {
     return options.map(option => {
-        const isAlreadySelected = collaborators.find(c => c.subject === option.value);
+        const isAlreadySelected = collaborators.find(c => c.subject === option.value) !== undefined;
         const isCurrentUser = option.value === currentLoggedUser.id;
         option.disabled = isAlreadySelected || isCurrentUser;
         return option;
@@ -71,7 +70,13 @@ const getUserLabelByUser = (user, options) => {
     return label;
 };
 
-class AlterPermissionDialog extends React.Component {
+const AccessRights = {
+    Read: 'Read',
+    Write: 'Write',
+    Manage: 'Manage',
+};
+
+export class AlterPermissionDialog extends React.Component {
 
     constructor(props) {
         super(props);
@@ -79,7 +84,6 @@ class AlterPermissionDialog extends React.Component {
             accessRight: 'Read',
             selectedUser: null,
             selectedUserLabel: '',
-            userList: [],
             error: null,
         };
     }
@@ -90,7 +94,6 @@ class AlterPermissionDialog extends React.Component {
             accessRight: user ? user.access : 'Read',
             selectedUser: user ? options.find(u => user.subject === u.value) : null,
             selectedUserLabel: '',
-            userList: applyDisableFilter(options, collaborators, currentLoggedUser),
             error: null,
         });
     };
@@ -127,7 +130,7 @@ class AlterPermissionDialog extends React.Component {
     };
 
     renderUser = () => {
-        const {user, options, noOptionMessage} = this.props;
+        const {user, options, noOptionMessage, collaborators, currentLoggedUser} = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
         if (user) { // only render the label if user is passed into this component
             return (<div>
@@ -136,12 +139,14 @@ class AlterPermissionDialog extends React.Component {
             </div>)
         }
 
+        const transformedOptions = options && applyDisableFilter(options, collaborators, currentLoggedUser);
+
         // otherwise render select user component
-        return (<MaterialReactSelect options={options}
+        return (<MaterialReactSelect options={transformedOptions}
                                      onChange={this.handleSelectedUserChange}
                                      placeholder={'Please select a user'}
                                      value={selectedUser}
-                                     noOptionsMessage={noOptionMessage}
+                                     noOptionsMessage={() => noOptionMessage}
                                      label={selectedUserLabel}/>);
     };
 
@@ -184,8 +189,8 @@ class AlterPermissionDialog extends React.Component {
 }
 
 AlterPermissionDialog.propTypes = {
-    classes: PropTypes.object.isRequired,
-    theme: PropTypes.object.isRequired,
+    classes: PropTypes.func.isRequired,
+    theme: PropTypes.object,
     user: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,

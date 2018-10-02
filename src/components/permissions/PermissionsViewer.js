@@ -8,15 +8,14 @@ import {withStyles} from "@material-ui/core/styles/index";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ConfirmationDialog from "../generic/ConfirmationDialog/ConfirmationDialog";
-import ErrorDialog from "../error/ErrorDialog";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PermissionChecker from "./PermissionChecker";
-import {sortAndFilterPermissions} from "./PermissionsContainer";
 import AlterPermission from "./AlterPermissionContainer";
+import {compareBy} from "../../utils/comparators";
 
 const styles = theme => ({
     root: {},
@@ -34,7 +33,33 @@ const styles = theme => ({
     }
 });
 
-class PermissionsViewer extends React.Component {
+
+/**
+ * Get permission level
+ * @param p
+ * @returns {*}
+ */
+const permissionLevel = (p) => {
+    return {Manage: 0, Write: 1, Read: 2}[p.access]
+};
+
+/**
+ * Sort and filter permissions
+ * @param permissions
+ * @param creator
+ * @returns {*}
+ */
+const sortAndFilterPermissions = (permissions, creator) => {
+    if (permissions && permissions.data) {
+        return permissions.data
+            .filter(item => item.subject !== creator)
+            .sort(comparing(compareBy(permissionLevel), compareBy('subject')));
+    } else {
+        return [];
+    }
+};
+
+export class PermissionsViewer extends React.Component {
 
     constructor(props) {
         super(props);
@@ -101,21 +126,10 @@ class PermissionsViewer extends React.Component {
 
     handleDeleteCollaborator = () => {
         const {selectedUser} = this.state;
-        const {collection, alterPermission, alteredPermission} = this.props;
+        const {collection, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser.subject, collection.id, 'None').then(d => {
-                if (alteredPermission.error) {
-                    this.handleCloseConfirmDeleteDialog();
-                    ErrorDialog.showError(alteredPermission.error, 'An error occurred while altering the permission.');
-                } else if (alteredPermission.pending) {
-                    console.log('Pending alter permission');
-                    // TODO: Handle on alter pending
-                } else if (alteredPermission.data) {
-                    console.log('success', alteredPermission.data);
-                    // TODO: Handle on alter success
-                    this.handleCloseConfirmDeleteDialog();
-                }
-            });
+            alterPermission(selectedUser.subject, collection.id, 'None');
+            this.handleCloseConfirmDeleteDialog();
         }
     };
 

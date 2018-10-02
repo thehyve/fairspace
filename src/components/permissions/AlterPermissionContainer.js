@@ -40,8 +40,6 @@ const mapStateToProps = ({permissions: {alter}, users}) => {
     return {
         alteredPermission: alter,
         users: users,
-        options: transformUserToOptions(users),
-        noOptionMessage: () => getNoOptionMessage(users)
     };
 };
 

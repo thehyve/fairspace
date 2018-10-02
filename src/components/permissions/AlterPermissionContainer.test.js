@@ -1,3 +1,4 @@
+// TODO: REFACTOR TO THE VIEWER COMPONENT
 import {
     getNoOptionMessage,
     transformUserToOptions
