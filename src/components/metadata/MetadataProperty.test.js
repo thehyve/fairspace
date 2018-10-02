@@ -45,10 +45,10 @@ describe('MetadataProperty elements', () => {
 
     it('shows an add element if multiple values are allowed', () => {
         const store = mockStore({})
-        const wrapper = shallow(<MetadataProperty store={store} property={defaultProperty} subject={subject} />);
+        const wrapper = shallow(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
-        expect(listItems.length).toEqual(3);
+        expect(listItems.length).toEqual(4);
     });
 
     it('shows an add element if there is no value yet, and it is editable', () => {
