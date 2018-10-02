@@ -86,7 +86,6 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
                 </ListItemText>
             </ListItem>;
         }
-
     }
 
     // Do not show an add component if no multiples are allowed
