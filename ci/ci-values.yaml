@@ -62,7 +62,7 @@ jupyterhub:
     singleuser:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
-            tag: 0.1.33
+            tag: 0.1.34
     hub:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
