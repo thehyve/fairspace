@@ -2,52 +2,31 @@ import React from 'react';
 import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadata";
-import {connect} from 'react-redux'
-import permissionAPI from "../../services/PermissionAPI/PermissionAPI";
-import ErrorDialog from "../error/ErrorDialog";
+import {connect} from 'react-redux';
+import permissionChecker from '../permissions/PermissionChecker'
 
 export class Metadata extends React.Component {
-    state = {
-        editable: true
-    }
 
     componentDidMount() {
         this.load();
     }
 
     componentDidUpdate(prevProps) {
-        if(this.props.subject !== prevProps.subject) {
+        if (this.props.subject !== prevProps.subject) {
             this.load();
         }
     }
 
     load() {
-        const {collection, dispatch, subject} = this.props;
+        const {dispatch, subject} = this.props;
 
-        if(subject) {
+        if (subject) {
             dispatch(fetchCombinedMetadataIfNeeded(subject))
-        }
-
-        if(collection) {
-            permissionAPI
-                .getCollectionPermissions(collection.id)
-                .then(result => {
-                    const permissions = result.filter(item => item.subject !== collection.creator);
-                    const editable = permissions.some(p => {
-                        return p.access === 'Write' || p.access === 'Manage';
-                    });
-                    this.setState({
-                        editable: editable
-                    });
-                })
-                .catch(error => {
-                    ErrorDialog.showError(error, 'An error occurred while loading permissions.');
-                });
         }
     }
 
     render() {
-        const {subject, metadata, error, loading, dispatch, ...otherProps} = this.props;
+        const {subject, metadata, error, loading, collection, ...otherProps} = this.props;
 
         if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
@@ -57,7 +36,7 @@ export class Metadata extends React.Component {
             return (<div>No metadata found</div>)
         } else {
             return (<MetadataViewer {...otherProps}
-                                    editable={false}
+                                    editable={permissionChecker.canManage(collection)}
                                     subject={subject}
                                     properties={metadata}/>)
         }
@@ -65,7 +44,7 @@ export class Metadata extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {metadataBySubject, cache: { vocabulary }} = state;
+    const {metadataBySubject, cache: {vocabulary}} = state;
     const metadata = metadataBySubject[ownProps.subject];
 
     // If there is no metadata by subject (not even pending)
