@@ -119,10 +119,6 @@ jupyterhub:
       defaultUrl: "/lab"
       extraEnv:
         WORKSPACE_URL:
-      lifecycleHooks:
-        postStart:
-          exec:
-            command: ["nohup", "/automount.sh"]
     hub:
         ingress:
             enabled: false
