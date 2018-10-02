@@ -117,10 +117,10 @@ jupyterhub:
         name: fairspace/jupyterhub-singleuser
         tag: latest
       defaultUrl: "/lab"
-      lifecycleHooks:
-        postStart:
-          exec:
-            command: ["/bin/sh", "-c", "/home/jovyan/automount.sh"]
+#      lifecycleHooks:
+#        postStart:
+#          exec:
+#            command: ["/bin/sh", "-c", "/home/jovyan/automount.sh"]
     hub:
         ingress:
             enabled: false
