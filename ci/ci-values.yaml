@@ -57,6 +57,8 @@ jupyterhub:
             config:
                 client_id: workspace-ci-pluto
                 client_secret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+                openid_url: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect/
+                session_url: https://workspace.ci.test.fairdev.app/account/tokens
     singleuser:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
@@ -64,9 +66,8 @@ jupyterhub:
     hub:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
-            tag: 0.1.4
+            tag: 0.1.5
         extraEnv:
-            OPENID_CONNECT_URL: https://keycloak.hyperspace.ci.test.fairdev.app/auth/realms/ci/protocol/openid-connect
             JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
     proxy:
         secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
