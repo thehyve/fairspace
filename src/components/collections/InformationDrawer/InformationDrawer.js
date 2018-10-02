@@ -12,14 +12,15 @@ import styles from './InformationDrawer.styles';
 import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
-import {fetchCombinedMetadataIfNeeded, invalidateMetadata} from "../../../actions/metadata";
+import * as metadataActions from "../../../actions/metadata";
 import {connect} from 'react-redux';
 
 function InformationDrawer(props) {
     function handleDetailsChange(collection) {
-        props.onDidChangeDetails(collection);
-        props.dispatch(invalidateMetadata(collection.uri));
-        props.dispatch(fetchCombinedMetadataIfNeeded(collection.uri));
+        const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = props;
+
+        invalidateMetadata(collection.uri);
+        fetchCombinedMetadataIfNeeded(collection.uri);
     }
 
     function renderCollectionDetails() {
@@ -95,6 +96,27 @@ function InformationDrawer(props) {
     );
 }
 
-export default connect()(withStyles(styles)(InformationDrawer));
+const mapStateToProps = (state) => {
+    const collections = state.cache.collections;
+    const collectionBrowser = state.collectionBrowser;
+
+    const getCollection = (collectionId) => {
+        if (!collections.data || collections.data.length === 0) {
+            return {}
+        }
+
+        return collections.data.find(collection => collection.id === collectionId) || {}
+    }
+
+    return {
+        collection: getCollection(collectionBrowser.selectedCollectionId)
+    }
+}
+
+const mapDispatchToProps = {
+    ...metadataActions
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer));
 
 

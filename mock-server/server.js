@@ -38,7 +38,7 @@ app.get('/api/workspace/config', (req, res) => res.sendFile(mockDataDir + '/work
 const server = new webdav.WebDAVServer();
 
 server.rootFileSystem().addSubTree(server.createExternalContext(), {
-    'quotes': {
+    'Jan_Smit_s_collection-500': {
         'file1.txt': webdav.ResourceType.File,
         'file2.txt': webdav.ResourceType.File
     },

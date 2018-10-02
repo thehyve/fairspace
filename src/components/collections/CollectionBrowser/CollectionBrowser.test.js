@@ -4,51 +4,43 @@ import CollectionBrowser from "./CollectionBrowser";
 import {mount} from "enzyme";
 import Button from "@material-ui/core/Button";
 import {MemoryRouter} from "react-router-dom";
-import configureStore from 'redux-mock-store'
 import {Provider} from "react-redux";
+import mockStore from "../../../store/mockStore"
+import Config from "../../generic/Config/Config";
 
-const middlewares = []
-const mockStore = configureStore(middlewares)
-
-let mockCollectionAPI, mockFileAPI, mockMetadataAPI, mockFileAPIFactory, store;
-let collectionBrowser;
-
-function flushPromises() {
-    return new Promise(resolve => setImmediate(resolve));
-}
+let store, collectionBrowser;
 
 beforeEach(() => {
-    mockFileAPIFactory = {
-        build: () => mockFileAPI
-    };
+    window.fetch = jest.fn(() => Promise.resolve())
 
-    mockMetadataAPI = {}
-
-    mockFileAPI = {
-        list: jest.fn(() => Promise.resolve()),
-        upload: jest.fn(() => Promise.resolve()),
-        download: jest.fn()
-    };
-
-    mockCollectionAPI = {
-        getCollections: jest.fn(() => Promise.resolve()),
-        getCollection: jest.fn(() => Promise.resolve([])),
-        addCollection: jest.fn(() => Promise.resolve([])),
-    }
-
-    store = mockStore({ account: { user: { data: { username: 'test' }} }});
+    store = mockStore({
+        account: {
+            user: { data: { username: 'test' }}
+        },
+        cache: {
+            collections: {
+                pending: false,
+                data: []
+            }
+        },
+        collectionBrowser: {}
+    });
 
     collectionBrowser = (
         <MemoryRouter>
             <Provider store={store}>
-                <CollectionBrowser
-                    collectionAPI={mockCollectionAPI}
-                    metadataAPI={mockMetadataAPI}
-                    fileAPIFactory={mockFileAPIFactory}
-                />
+                <CollectionBrowser/>
             </Provider>
         </MemoryRouter>
     )
+
+    Config.setConfig({
+        "urls": {
+            "collections": "/collections"
+        }
+    });
+
+    return Config.init();
 
 });
 
@@ -60,15 +52,15 @@ it('renders without crashing', () => {
 
 it('creates a new collection on button click', () => {
     const wrapper = mount(collectionBrowser);
+    expect(store.getActions().length).toEqual(0);
 
     // Setup proper state
-    wrapper.setState({loading: false});
     let button = wrapper.find(Button);
-    expect(button.length).toEqual(2);
+    expect(button.length).toEqual(3);
 
     // Click on button
-    button.at(1).simulate('click');
+    button.at(2).simulate('click');
 
     // Expect the collection to be created in storage
-    expect(mockCollectionAPI.addCollection.mock.calls.length).toEqual(1);
+    expect(store.getActions().length).toEqual(1);
 });

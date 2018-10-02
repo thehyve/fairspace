@@ -4,7 +4,7 @@ import Link from 'react-router-dom/Link';
 import {withStyles} from '@material-ui/core/styles';
 import Icon from '@material-ui/core/Icon';
 
-const defaultHomeUrl = '/collections';
+const defaultHomeUrl = '/';
 
 function getBreadCrumbLink(text, path, linkClass) {
     return (<Button component={Link} to={path} key={path} variant='text' className={linkClass}>{text}</Button>);
@@ -25,6 +25,10 @@ function jsxJoin (array, str) {
     return returnArray
 }
 
+function stripTrailingSlash(path) {
+    return path.replace(/\/$/, "");
+}
+
 function BreadCrumbs(props) {
     let homeUrl = props.homeUrl || defaultHomeUrl;
 
@@ -33,10 +37,12 @@ function BreadCrumbs(props) {
     ];
 
     if(props.segments) {
-        let currentPath = homeUrl;
+        let currentPath = stripTrailingSlash(homeUrl);
         for(let segment of props.segments) {
-            currentPath += '/' + segment.segment;
-            breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, props.classes.link))
+            if(segment.segment && segment.label) {
+                currentPath += stripTrailingSlash('/' + segment.segment);
+                breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, props.classes.link))
+            }
         }
     }
 
@@ -45,4 +51,6 @@ function BreadCrumbs(props) {
         );
 }
 
-export default withStyles({link: { minWidth: 'auto' }})(BreadCrumbs);
+const styles = {link: { minWidth: 'auto' }};
+
+export default withStyles(styles)(BreadCrumbs);

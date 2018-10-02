@@ -6,12 +6,12 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Icon from "@material-ui/core/Icon";
-import ClickHandler from "../ClickHandler/ClickHandler"
+import ClickHandler from "../../generic/ClickHandler/ClickHandler"
 import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
 import PermissionChecker from "../../permissions/PermissionChecker";
 
-function CollectionList(props) {
-    if(!props.collections || props.collections.length === 0) {
+function CollectionList({collections, selectedCollectionId, onCollectionClick, onCollectionDoubleClick, onCollectionDelete}) {
+    if(!collections || collections.length === 0) {
         return "No collections";
     } else {
         return (
@@ -24,14 +24,14 @@ function CollectionList(props) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {props.collections.map(collection => {
+                    {collections.map(collection => {
                         return (
                             <ClickHandler
                                     component={TableRow}
                                     key={collection.id}
-                                    selected={props.selectedCollection && collection.id === props.selectedCollection.id}
-                                      onSingleClick={() => props.onCollectionClick(collection)}
-                                      onDoubleClick={() => props.onCollectionDoubleClick(collection)}>
+                                    selected={selectedCollectionId && (collection.id === selectedCollectionId)}
+                                    onSingleClick={() => onCollectionClick(collection)}
+                                    onDoubleClick={() => onCollectionDoubleClick(collection)}>
                                 <TableCell>
                                     <Icon>folder_open</Icon>
                                 </TableCell>
@@ -39,10 +39,10 @@ function CollectionList(props) {
                                     <CollectionItem collection={collection}/>
                                 </TableCell>
                                 <TableCell numeric>
-                                    {props.onCollectionDelete ?
+                                    {onCollectionDelete ?
                                     <ButtonWithVerification
                                         aria-label={"Delete " + collection.name}
-                                        onClick={() => props.onCollectionDelete(collection)}
+                                        onClick={() => onCollectionDelete(collection)}
                                         disabled={!PermissionChecker.canManage(collection)}>
                                         <Icon>delete</Icon>
                                     </ButtonWithVerification> : null}

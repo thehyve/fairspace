@@ -6,40 +6,53 @@ import Icon from "@material-ui/core/Icon";
 import IconButton from "@material-ui/core/IconButton";
 import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import Badge from "@material-ui/core/Badge";
+import {connect} from 'react-redux'
+import * as clipboardActions from "../../../actions/clipboard";
+import * as fileActions from "../../../actions/files";
 
 function FileOperations(props) {
-    const {fileAPI, path, onDidFileOperation, onCut, onCopy, onPaste, numClipboardItems, selection, disabled} = props;
+    const {
+        numClipboardItems, disabled,
+        openedPath, selectedPaths, openedCollection,
+        fetchFilesIfNeeded, uploadFiles, createDirectory,
+        cut, copy, paste} = props;
+
+    function refreshFiles() {
+        fetchFilesIfNeeded(openedCollection, openedPath)
+    }
 
     function handleCut(e) {
         e.stopPropagation()
-        onCut()
+        cut(openedPath, selectedPaths)
     }
     function handleCopy(e) {
         e.stopPropagation()
-        onCopy()
+        copy(openedPath, selectedPaths)
     }
     function handlePaste(e) {
         e.stopPropagation()
-        onPaste();
+        paste(openedCollection, openedPath)
+            .then(refreshFiles)
+            .catch(err => {
+                ErrorDialog.showError(err, "An error occurred while pasting your contents");
+            })
     }
 
-    function handleUpload(path, files) {
+    function handleUpload(files) {
         if (files && files.length > 0) {
-            return fileAPI
-                .upload(path, files)
+            return uploadFiles(openedCollection, openedPath, files)
+                .then(() => files)
                 .catch(err => {
-                    ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(path, files));
+                    ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(files));
                 });
         } else {
             return Promise.resolve([]);
         }
     }
 
-    function handleCreateDirectory(path, name) {
-        return fileAPI
-            .createDirectory(fileAPI.joinPaths(path, name))
-            .then(onDidFileOperation)
-            .then(() => true)
+    function handleCreateDirectory(name) {
+        return createDirectory(openedCollection, openedPath, name)
+            .then(refreshFiles)
             .catch(err => {
                 if(err.status === 405) {
                     // Directory already exists
@@ -66,13 +79,13 @@ function FileOperations(props) {
         <IconButton
             aria-label="Copy"
             onClick={handleCopy}
-            disabled={selection.length === 0 || disabled}>
+            disabled={selectedPaths.length === 0 || disabled}>
             <ContentCopy/>
         </IconButton>
         <IconButton
             aria-label="Cut"
             onClick={handleCut}
-            disabled={selection.length === 0 || disabled}>
+            disabled={selectedPaths.length === 0 || disabled}>
             <ContentCut/>
         </IconButton>
         <IconButton
@@ -86,7 +99,7 @@ function FileOperations(props) {
         </IconButton>
         <CreateDirectoryButton
             aria-label="Create directory"
-            onCreate={(name) => handleCreateDirectory(path, name)}
+            onCreate={(name) => handleCreateDirectory(name)}
             disabled={disabled}>
             <Icon>create_new_folder</Icon>
         </CreateDirectoryButton>
@@ -94,12 +107,22 @@ function FileOperations(props) {
         <UploadButton
             color="primary"
             aria-label="Upload"
-            onUpload={(files) => handleUpload(path, files)}
-            onDidUpload={onDidFileOperation}
+            onUpload={(files) => handleUpload(files)}
+            onDidUpload={refreshFiles}
             disabled={disabled}>
             <Icon>cloud_upload</Icon>
         </UploadButton>
     </React.Fragment>)
 }
 
-export default FileOperations;
+const mapStateToProps = (state) => ({
+    selectedPaths: state.collectionBrowser.selectedPaths,
+    numClipboardItems: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
+})
+
+const mapDispatchToProps = {
+    ...fileActions,
+    ...clipboardActions
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(FileOperations);

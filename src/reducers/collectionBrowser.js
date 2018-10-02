@@ -1,6 +1,18 @@
+import {
+    CLOSE_INFODRAWER,
+    DELETE_COLLECTION,
+    DELETE_FILE,
+    DESELECT_COLLECTION,
+    DESELECT_PATH,
+    OPEN_INFODRAWER,
+    SELECT_COLLECTION,
+    SELECT_PATH
+} from "../actions/actionTypes";
+import * as actionTypes from "../utils/redux-action-types";
+
 const defaultState = {
     selectedCollectionId: null,
-    selectedPath: [],
+    selectedPaths: [],
 
     openedCollectionId: null,
     openedPath: null,
@@ -8,43 +20,48 @@ const defaultState = {
     infoDrawerOpened: false,
 };
 
+const deselectPath = (state, path) => {
+    return {
+        ...state,
+        selectedPaths: (state.selectedPaths || []).filter(el => el !== path)
+    };
+}
+
 const collectionBrowser = (state = defaultState, action) => {
     switch (action.type) {
-        case "SELECT_COLLECTION":
+        case SELECT_COLLECTION:
             return {
                 ...state,
                 infoDrawerOpened: true,
                 selectedCollectionId: action.collectionId
             };
-        case "DESELECT_COLLECTION":
+        case DESELECT_COLLECTION:
             return {
                 ...state,
                 infoDrawerOpened: false,
                 selectedCollectionId: null
             };
-        case "SELECT_PATH":
+        case SELECT_PATH:
             return {
                 ...state,
                 infoDrawerOpened: true,
-                selectedPath: (state.selectedPath || []).concat(action.path)
+                selectedPaths: (state.selectedPaths || []).concat(action.path)
             };
-        case "DESELECT_PATH":
-            return {
-                ...state,
-                selectedPath: (state.selectedPath || []).filter(el => el !== action.path)
-            };
-
-        case "DELETE_COLLECTION":
+        case DESELECT_PATH:
+            return deselectPath(state, action.path);
+        case actionTypes.fulfilled(DELETE_COLLECTION):
             return {
                 ...state,
                 selectedCollectionId: state.selectedCollectionId === action.collectionId ? null : state.selectedCollectionId
             }
-        case "OPEN_INFODRAWER":
+        case actionTypes.fulfilled(DELETE_FILE):
+            return deselectPath(state, action.meta.fullpath);
+        case OPEN_INFODRAWER:
             return {
                 ...state,
                 infoDrawerOpened: true
             };
-        case "CLOSE_INFODRAWER":
+        case CLOSE_INFODRAWER:
             return {
                 ...state,
                 infoDrawerOpened: false

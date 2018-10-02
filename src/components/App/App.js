@@ -17,6 +17,7 @@ import ErrorDialog from "../error/ErrorDialog";
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
 import store from "../../store/configureStore"
 import {Provider} from "react-redux";
+import Files from "../../pages/Files/Files";
 
 class App extends React.Component {
     cancellable = {
@@ -72,7 +73,8 @@ class App extends React.Component {
                                         <div className={classes.toolbar}/>
 
                                         <Route exact path="/" component={Home}/>
-                                        <Route path="/collections/:collection?/:path(.*)?" component={Collections}/>
+                                        <Route exact path="/collections" component={Collections}/>
+                                        <Route path="/collections/:collection/:path(.*)?" component={Files}/>
                                         <Route path="/notebooks" component={Notebooks}/>
                                         <Route path="/metadata/:type(projects|patients|samples|consents)/:id" component={Metadata}/>
 

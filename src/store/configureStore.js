@@ -55,10 +55,10 @@ shown here for future reference and easy lookup.
         }
     }
     collections: {
-        selectedCollection: 4,
-        selectedPath: '/subdirectory/file.txt',
+        selectedCollectionId: 4,
+        selectedPaths: '/subdirectory/file.txt',
 
-        openedCollection: 4,
+        openedCollectionId: 4,
         openedPath: '/subdirectory',
     },
     account: {

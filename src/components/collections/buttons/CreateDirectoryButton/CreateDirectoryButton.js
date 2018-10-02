@@ -61,7 +61,7 @@ class CreateDirectoryButton extends React.Component{
 
     render() {
         return (
-            <div>
+            <div style={{display: 'inline'}}>
                 <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
                     {this.props.children}
                 </IconButton>
