@@ -8,7 +8,7 @@ import {fetchUsers} from "../../actions/users";
  * @param users
  * @returns {Array}
  */
-export const transformUserToOptions = (users) => {
+const transformUserToOptions = (users) => {
     if (users.data) {
         return users.data ? users.data.map(r => {
             let newUser = Object.assign({}, r);
@@ -24,7 +24,7 @@ export const transformUserToOptions = (users) => {
  * @param users
  * @returns {string}
  */
-export const getNoOptionMessage = (users) => {
+const getNoOptionMessage = (users) => {
     let noOptionMessage = 'No options';
     if (users) {
         if (users.pending) {
@@ -34,36 +34,6 @@ export const getNoOptionMessage = (users) => {
         }
     }
     return noOptionMessage;
-};
-
-/**
- * Disable options if a user is :
- *  - already a collaborator,
- *  - current logged user, or
- *  - owner of the collection
- * @param options
- * @param collaborators
- * @param currentLoggedUser
- * @param owner
- */
-export const applyDisableFilter = (options, collaborators, currentLoggedUser, ownerId) => {
-    return options.map(r => {
-        r.disabled =
-            collaborators.find(c => c.subject === r.value) ? true : r.value === currentLoggedUser.id ||
-            r.value === ownerId;
-        return r;
-    });
-};
-
-/**
- * Get user label by user object
- * @param user
- * @param options
- * @returns {string}
- */
-export const getUserLabelByUser = (user, options) => {
-    const found = options.find(option => option.value === user.subject);
-    return found ? found.label : '';
 };
 
 const mapStateToProps = ({permissions: {alter}, users}) => {

@@ -15,7 +15,6 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-import {applyDisableFilter, getUserLabelByUser} from "./AlterPermissionContainer";
 
 const styles = theme => ({
     root: {
@@ -39,6 +38,40 @@ const styles = theme => ({
     },
 });
 
+/**
+ * Disable options if a user is :
+ *  - already a collaborator,
+ *  - current logged user, or
+ *  - owner of the collection
+ * @param options
+ * @param collaborators
+ * @param currentLoggedUser
+ * @returns {*}
+ */
+const applyDisableFilter = (options, collaborators, currentLoggedUser) => {
+    return options.map(option => {
+        const isAlreadySelected = collaborators.find(c => c.subject === option.value);
+        const isCurrentUser = option.value === currentLoggedUser.id;
+        option.disabled = isAlreadySelected || isCurrentUser;
+        return option;
+    });
+};
+
+/**
+ * Get user label by user object
+ * @param user
+ * @param options
+ * @returns {string}
+ */
+const getUserLabelByUser = (user, options) => {
+    let label = '';
+    if (options) {
+        const found = options.find(option => option.value === user.subject);
+        label = found && found.label;
+    }
+    return label;
+};
+
 class AlterPermissionDialog extends React.Component {
 
     constructor(props) {
@@ -53,12 +86,12 @@ class AlterPermissionDialog extends React.Component {
     }
 
     resetState = () => {
-        const {user, currentLoggedUser, collaborators, collection, options} = this.props;
+        const {user, currentLoggedUser, collaborators, options} = this.props;
         this.setState({
             accessRight: user ? user.access : 'Read',
             selectedUser: user ? options.find(u => user.subject === u.value) : null,
             selectedUserLabel: '',
-            userList: applyDisableFilter(options, collaborators, currentLoggedUser, collection.owner),
+            userList: applyDisableFilter(options, collaborators, currentLoggedUser),
             error: null,
         });
     };
