@@ -45,9 +45,7 @@ describe('PermissionsContainer', () => {
         ];
 
         it('should sort permission by access right order', () => {
-            expect(test[0].subject).toEqual(expected[0].subject);
-            expect(test[1].subject).toEqual(expected[1].subject);
-            expect(test[2].subject).toEqual(expected[2].subject);
+            expect(test).toEqual(expected);
         });
 
         it('should exclude collection owner as collaborators', () => {
