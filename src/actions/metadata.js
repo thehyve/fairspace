@@ -1,13 +1,15 @@
 import {createErrorHandlingPromiseAction} from "../utils/redux";
 import MetadataAPI from "../services/MetadataAPI/MetadataAPI"
+import {METADATA, METADATA_COMBINATION, METADATA_ENTITIES, METADATA_VOCABULARY, UPDATE_METADATA} from "./actionTypes";
+import * as actionTypes from "../utils/redux-action-types";
 
 export const invalidateMetadata = (subject) => ({
-    type: "INVALIDATE_METADATA",
+    type: actionTypes.invalidate(METADATA),
     meta: {subject: subject}
 })
 
 export const updateMetadata = (subject, predicate, values) => ({
-    type: "UPDATE_METADATA",
+    type: UPDATE_METADATA,
     payload: MetadataAPI.update(subject, predicate, values),
     meta: {
         subject: subject,
@@ -61,7 +63,7 @@ const fetchMetadataVocabularyIfNeeded = () => {
 }
 
 const fetchJsonLdBySubject = createErrorHandlingPromiseAction((subject) => ({
-    type: "METADATA",
+    type: METADATA,
     payload: MetadataAPI.get({subject: subject}),
     meta: {
         subject: subject
@@ -69,7 +71,7 @@ const fetchJsonLdBySubject = createErrorHandlingPromiseAction((subject) => ({
 }));
 
 const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dispatch) => ({
-    type: "METADATA_COMBINATION",
+    type: METADATA_COMBINATION,
     payload: Promise.all([
                 dispatch(fetchJsonLdBySubjectIfNeeded(subject)),
                 dispatch(fetchMetadataVocabularyIfNeeded())
@@ -80,12 +82,12 @@ const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dis
 }))
 
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
-    type: "METADATA_VOCABULARY",
+    type: METADATA_VOCABULARY,
     payload: MetadataAPI.getVocabulary()
 }));
 
 const fetchEntitiesByType = createErrorHandlingPromiseAction((type) => ({
-    type: "METADATA_ENTITIES",
+    type: METADATA_ENTITIES,
     payload: MetadataAPI.getEntitiesByType(type),
     meta: {
         type: type

@@ -1,9 +1,33 @@
+import {
+    CLIPBOARD_PASTE,
+    CREATE_DIRECTORY,
+    DELETE_FILE,
+    FILES,
+    RENAME_FILE,
+    UPLOAD_FILES
+} from "../../actions/actionTypes";
+import * as actionTypes from "../../utils/redux-action-types";
+
 const defaultState = {};
+
+const invalidateFiles = (state, collectionId, ...paths) => {
+    const newPathsState = paths.map(path => ({
+        [path]: {
+            ...state[collectionId][path],
+            invalidated: true
+        }
+    }));
+
+    return {
+        ...state,
+        [collectionId]: Object.assign({}, state[collectionId], ...newPathsState)
+    }
+}
 
 const filesByCollectionAndPath = (state = defaultState, action) => {
     let collectionId, path;
     switch (action.type) {
-        case "FILES_PENDING":
+        case actionTypes.pending(FILES):
             collectionId = action.meta.collection.id;
             path = action.meta.path;
             return {
@@ -18,7 +42,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             }
-        case "FILES_FULFILLED":
+        case actionTypes.fulfilled(FILES):
             collectionId = action.meta.collection.id;
             path = action.meta.path;
             return {
@@ -32,7 +56,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             }
-        case "FILES_REJECTED":
+        case actionTypes.rejected(FILES):
             collectionId = action.meta.collection.id;
             path = action.meta.path;
             return {
@@ -46,40 +70,15 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             }
-        case "INVALIDATE_FILES":
-        case "RENAME_FILE_FULFILLED":
-        case "DELETE_FILE_FULFILLED":
-        case "CREATE_DIRECTORY_FULFILLED":
-        case "UPLOAD_FILES_FULFILLED":
-            collectionId = action.meta.collection.id;
-            path = action.meta.path;
-            return {
-                ...state,
-                [collectionId]: {
-                    ...state[collectionId],
-                    [path]: {
-                        ...state[collectionId][path],
-                        invalidated: true
-                    }
-                }
-            }
-        case "CLIPBOARD_PASTE_FULFILLED":
-            collectionId = action.meta.collection.id;
+        case actionTypes.invalidate(FILES):
+        case actionTypes.fulfilled(RENAME_FILE):
+        case actionTypes.fulfilled(DELETE_FILE):
+        case actionTypes.fulfilled(CREATE_DIRECTORY):
+        case actionTypes.fulfilled(UPLOAD_FILES):
+            return invalidateFiles(state, action.meta.collection.id, action.meta.path);
+        case actionTypes.fulfilled(CLIPBOARD_PASTE):
             const {sourceDir, destinationDir} = action.meta;
-            return {
-                ...state,
-                [collectionId]: {
-                    ...state[collectionId],
-                    [sourceDir]: {
-                        ...state[collectionId][sourceDir],
-                        invalidated: true
-                    },
-                    [destinationDir]: {
-                        ...state[collectionId][destinationDir],
-                        invalidated: true
-                    }
-                }
-            }
+            return invalidateFiles(state, action.meta.collection.id, sourceDir, destinationDir);
         default:
             return state;
     }

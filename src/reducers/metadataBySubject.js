@@ -1,11 +1,13 @@
 import {promiseReducerFactory} from "../utils/redux";
 import reduceReducers from "reduce-reducers";
+import {METADATA_COMBINATION, UPDATE_METADATA} from "../actions/actionTypes";
+import * as actionTypes from "../utils/redux-action-types";
 
 const defaultState = {};
-const metadataCombinationReducer = promiseReducerFactory("METADATA_COMBINATION", defaultState, action => action.meta.subject);
+const metadataCombinationReducer = promiseReducerFactory(METADATA_COMBINATION, defaultState, action => action.meta.subject);
 const metadataUpdateReducer = (state = defaultState, action) => {
     switch(action.type) {
-        case "UPDATE_METADATA_FULFILLED":
+        case actionTypes.fulfilled(UPDATE_METADATA):
             return {
                 ...state,
                 [action.meta.subject]: {
