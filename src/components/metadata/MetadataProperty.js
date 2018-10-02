@@ -58,34 +58,25 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
 
     // Render the given entry as a list item
     const renderEntry = (entry, idx, PropertyValueComponent) => {
-        if (editable) {
-            return <ListItem key={idx}>
-                <ListItemText>
-                    <PropertyValueComponent
-                        property={property}
-                        entry={entry}
-                        onSave={handleSave(idx)}
-                    />
-                </ListItemText>
+        return <ListItem key={idx}>
+            <ListItemText>
+                <PropertyValueComponent
+                    property={property}
+                    entry={entry}
+                    onSave={handleSave(idx)}
+                />
+            </ListItemText>
+            {
+                editable ?
                 <ListItemSecondaryAction>
                     <IconButton
                         aria-label="Delete"
                         onClick={handleDelete(idx)}>
                         <DeleteIcon/>
                     </IconButton>
-                </ListItemSecondaryAction>
-            </ListItem>;
-        } else {
-            return <ListItem key={idx}>
-                <ListItemText>
-                    <PropertyValueComponent
-                        property={property}
-                        entry={entry}
-                        onSave={handleSave(idx)}
-                    />
-                </ListItemText>
-            </ListItem>;
-        }
+                </ListItemSecondaryAction> : null
+            }
+        </ListItem>;
     }
 
     // Do not show an add component if no multiples are allowed
