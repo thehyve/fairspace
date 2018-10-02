@@ -48,17 +48,17 @@ describe('MetadataProperty elements', () => {
         const wrapper = shallow(<MetadataProperty store={store} property={defaultProperty} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
-        expect(listItems.length).toEqual(4);
-    })
+        expect(listItems.length).toEqual(3);
+    });
 
-    it('shows an add element if there is no value yet', () => {
+    it('shows an add element if there is no value yet, and it is editable', () => {
         const property = {
             ...defaultProperty,
             values: []
         }
 
         const store = mockStore({})
-        const wrapper = shallow(<MetadataProperty store={store} property={property} subject={subject} />);
+        const wrapper = shallow(<MetadataProperty editable={true} store={store} property={property} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
@@ -67,7 +67,20 @@ describe('MetadataProperty elements', () => {
         const ExpectedComponent = ValueComponentFactory.addComponent(property);
         const inputComponent = listItems.at(0).dive().find(ExpectedComponent);
         expect(inputComponent.prop('entry')).toEqual({value: ""})
-    })
+    });
+
+    it('shows no add element if there is no value yet, but it is uneditable', () => {
+        const property = {
+            ...defaultProperty,
+            values: []
+        }
+
+        const store = mockStore({})
+        const wrapper = shallow(<MetadataProperty editable={false} store={store} property={property} subject={subject} />);
+
+        const listItems = wrapper.dive().find(List).find(ListItem);
+        expect(listItems.length).toEqual(0);
+    });
 
     it('does not show an add element if one value has been provided already', () => {
         const property = {
@@ -93,7 +106,7 @@ describe('MetadataProperty changes', () => {
     it('handles addition correctly', () => {
         const store = mockStore({})
 
-        const wrapper = mount(<MetadataProperty store={store} property={defaultProperty} subject={subject} />);
+        const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
 
         const input = wrapper.find('input').last();
         input.simulate('focus');
@@ -113,7 +126,7 @@ describe('MetadataProperty changes', () => {
     it('handles updates correctly', () => {
         const store = mockStore({})
 
-        const wrapper = mount(<MetadataProperty store={store} property={defaultProperty} subject={subject} />);
+        const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
 
         const input = wrapper.find('input').first();
         input.simulate('focus');
@@ -133,7 +146,7 @@ describe('MetadataProperty changes', () => {
 
     it('does not actually update when input does not change', () => {
         const store = mockStore({})
-        const wrapper = mount(<MetadataProperty store={store} property={defaultProperty} subject={subject} />);
+        const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
 
         const input = wrapper.find('input').first();
         input.simulate('focus');
@@ -149,7 +162,7 @@ describe('MetadataProperty changes', () => {
     it('handles deletion correctly', () => {
         const store = mockStore({})
 
-        const wrapper = mount(<MetadataProperty store={store} property={defaultProperty} subject={subject} />);
+        const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
 
         const secondButton = wrapper.find(IconButton).at(1);
         secondButton.simulate('click');
