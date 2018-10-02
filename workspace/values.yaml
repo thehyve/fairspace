@@ -125,7 +125,7 @@ jupyterhub:
         extraEnv:
           JUPYTERHUB_CRYPT_KEY:
         extraConfig: |
-          c.KubeSpawner.cmd = ['jupyter-labhub']
+          c.KubeSpawner.cmd = ['/start']
           c.KubeSpawner.singleuser_privileged = True
           c.Authenticator.auto_login = True
     proxy:
