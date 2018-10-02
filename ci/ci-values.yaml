@@ -62,7 +62,7 @@ jupyterhub:
     singleuser:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
-            tag: 0.1.34
+            tag: 0.1.35
         extraEnv:
           WORKSPACE_URL: https://workspace.ci.test.fairdev.app
     hub:
