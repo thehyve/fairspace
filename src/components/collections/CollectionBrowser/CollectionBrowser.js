@@ -4,13 +4,13 @@ import {connect} from 'react-redux';
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
-import {Column, Row} from 'simple-flexbox';
 import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
 import CollectionList from "../CollectionList/CollectionList";
 import * as collectionBrowserActions from "../../../actions/collectionbrowser";
 import * as collectionActions from "../../../actions/collections";
+import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
 
 class CollectionBrowser extends React.Component {
     componentDidMount() {
@@ -61,38 +61,14 @@ class CollectionBrowser extends React.Component {
     render() {
         const {loading, error} = this.props;
 
-        let mainPanel;
         if (error) {
-            return this.renderError(error);
-        } else if (loading) {
-            mainPanel = this.renderLoading()
-        } else {
-            mainPanel = this.renderCollectionList();
+            return <ErrorMessage message={error} />
         }
 
-        // The screen consists of 2 parts:
-        // - a list of breadcrumbs and buttons
-        // - an overview of items (mainPanel)
-
-        let buttons = this.renderButtons();
-
-        // Markup and title
-        return (
-            <div>
-                <Row>
-                    <Column flexGrow={1} vertical='center' horizontal='start'>
-                        <div>
-                            {this.renderBreadcrumbs()}
-                        </div>
-                    </Column>
-                    <Row>
-                        {buttons}
-                    </Row>
-                </Row>
-
-                {mainPanel}
-            </div>
-        );
+        return <GenericCollectionsScreen
+            breadCrumbs={this.renderBreadcrumbs()}
+            buttons={this.renderButtons()}
+            main={loading ? this.renderLoading() : this.renderCollectionList()} />
     }
 
     renderBreadcrumbs() {
@@ -105,10 +81,6 @@ class CollectionBrowser extends React.Component {
                         onClick={this.handleAddCollectionClick.bind(this)}>
                     <Icon>add</Icon>
                 </Button>
-    }
-
-    renderError(errorMessage) {
-        return (<ErrorMessage message={errorMessage} />);
     }
 
     renderLoading() {

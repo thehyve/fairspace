@@ -2,7 +2,6 @@ import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 import Typography from "@material-ui/core/Typography";
-import {Column, Row} from 'simple-flexbox';
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
 import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";
@@ -14,6 +13,7 @@ import * as fileActions from "../../../actions/files";
 import * as collectionActions from "../../../actions/collections";
 import FileAPIFactory from "../../../services/FileAPI/FileAPIFactory";
 import {parsePath} from "../../../utils/fileutils";
+import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
 
 class FileBrowser extends React.Component {
     componentDidMount() {
@@ -101,42 +101,16 @@ class FileBrowser extends React.Component {
     }
 
     render() {
-        const {loading, error, openedCollection, openedPath, selectedPaths} = this.props;
-
-        // The screen consists of 3 parts:
-        // - a list of breadcrumbs
-        // - an overview of items (mainPanel)
-        // - an infodrawer
-
-        let buttons = null;
-        let mainPanel;
+        const {loading, error} = this.props;
 
         if (error) {
             return this.renderError(error);
-        } else if (loading) {
-            mainPanel = this.renderLoading()
-        } else {
-            buttons = this.renderButtons(openedCollection, openedPath, selectedPaths);
-            mainPanel = this.renderFiles();
         }
 
-        // Markup and title
-        return (
-            <div>
-                <Row>
-                    <Column flexGrow={1} vertical='center' horizontal='start'>
-                        <div>
-                            {this.renderBreadcrumbs()}
-                        </div>
-                    </Column>
-                    <Row>
-                        <div>{buttons}</div>
-                    </Row>
-                </Row>
-
-                {mainPanel}
-            </div>
-        );
+        return <GenericCollectionsScreen
+            breadCrumbs={this.renderBreadcrumbs()}
+            buttons={loading ? null : this.renderButtons()}
+            main={loading ? this.renderLoading() : this.renderFiles()} />
     }
 
     renderBreadcrumbs() {
@@ -156,7 +130,8 @@ class FileBrowser extends React.Component {
         return <BreadCrumbs segments={segments}/>;
     }
 
-    renderButtons(openedCollection, openedPath, selection) {
+    renderButtons() {
+        const {openedCollection, openedPath} = this.props
         return <FileOperations
                     openedCollection={openedCollection}
                     openedPath={openedPath}
