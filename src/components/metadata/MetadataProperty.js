@@ -24,7 +24,7 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
     const handleSave = index => newEntry => {
         const currentEntry = property.values[index];
 
-        if (currentEntry.value !== newEntry.value) {
+        if(currentEntry.value !== newEntry.value) {
             const updatedValues = property.values.map((el, idx) => {
                 if (idx === index) {
                     return newEntry
