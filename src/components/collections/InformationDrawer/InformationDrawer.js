@@ -11,9 +11,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import styles from './InformationDrawer.styles';
 import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
-import Permissions from '../../permissions/Permissions'
-import {fetchCombinedMetadataIfNeeded, invalidateMetadata} from "../../../actions/metadata";
+import * as metadataActions from "../../../actions/metadata";
 import {connect} from 'react-redux';
+import PermissionsContainer from "../../permissions/PermissionsContainer";
 import permissionChecker from '../../permissions/PermissionChecker';
 
 function InformationDrawer(props) {

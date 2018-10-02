@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import userAPI from '../../services/UserAPI/UserAPI';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
