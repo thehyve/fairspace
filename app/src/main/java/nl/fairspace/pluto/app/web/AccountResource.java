@@ -3,19 +3,23 @@ package nl.fairspace.pluto.app.web;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.app.model.UserInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.FIRSTNAME_CLAIM;
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.LASTNAME_CLAIM;
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.SUBJECT_CLAIM;
@@ -70,6 +74,38 @@ public class AccountResource {
                     token.getStringClaim(LASTNAME_CLAIM)
             );
         }
+    }
+
+    /**
+     * POST /tokens: exchanges an existing accesstoken and refreshtoken for a sessionid
+     *
+     * The sessionid can then be used to authenticate calls. Pluto will store the oAuth tokens
+     * and refresh the token if needed
+     *
+     * @return
+     */
+    @PostMapping(value = "/tokens", consumes = "application/json")
+    public Map<String, String> exchangeTokens(@RequestBody ExchangeTokenParams tokenParams, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+
+        log.debug("REST request to exchange tokens");
+
+        // Generate new token object and store it in session
+        OAuthAuthenticationToken token = new OAuthAuthenticationToken(tokenParams.getAccessToken(), tokenParams.getRefreshToken());
+        session.setAttribute(AUTHORIZATION_SESSION_ATTRIBUTE, token);
+
+        // Return the session id explicitly
+        return Collections.singletonMap("sessionId", base64Encode(session.getId()));
+    }
+
+    /**
+     * Encode the value using Base64.
+     * @param value the String to Base64 encode
+     * @return the Base64 encoded value
+     */
+    private String base64Encode(String value) {
+        byte[] encodedCookieBytes = Base64.getEncoder().encode(value.getBytes());
+        return new String(encodedCookieBytes);
     }
 
 }

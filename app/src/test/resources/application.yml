@@ -18,6 +18,7 @@ security:
     permitAll:
     - /actuator/health
     - /login
+    - /account/tokens
     needsAuthentication:
     - /noauthz
     needsAuthorization:
