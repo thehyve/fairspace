@@ -1,6 +1,6 @@
-import {sortAndFilterPermissions} from "./Permissions";
+import {sortAndFilterPermissions} from "./PermissionsContainer";
 
-describe('Permissions', () => {
+describe('PermissionsContainer', () => {
     describe('sortAndFilterPermissions', () => {
         const mockCollaborators = [
             {

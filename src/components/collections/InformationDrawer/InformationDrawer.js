@@ -12,7 +12,7 @@ import styles from './InformationDrawer.styles';
 import Collection from "./Collection";
 import Metadata from "../../metadata/Metadata";
 import Permissions from '../../permissions/Permissions'
-import * as metadataActions from "../../../actions/metadata";
+import {fetchCombinedMetadataIfNeeded, invalidateMetadata} from "../../../actions/metadata";
 import {connect} from 'react-redux';
 import permissionChecker from '../../permissions/PermissionChecker';
 
@@ -50,7 +50,7 @@ function InformationDrawer(props) {
                         <Typography className={classes.heading}>Shared with</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <Permissions collection={collection}/>
+                        <PermissionsContainer collection={collection}/>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel defaultExpanded>

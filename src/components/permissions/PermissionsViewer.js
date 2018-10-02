@@ -15,7 +15,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PermissionChecker from "./PermissionChecker";
-import {sortAndFilterPermissions} from "./Permissions";
+import {sortAndFilterPermissions} from "./PermissionsContainer";
 import AlterPermission from "./AlterPermissionContainer";
 
 const styles = theme => ({

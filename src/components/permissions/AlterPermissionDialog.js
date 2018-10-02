@@ -8,7 +8,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import {withStyles} from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
-import {AccessRights} from "./Permissions";
+import {AccessRights} from "./PermissionsContainer";
 import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect'
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
