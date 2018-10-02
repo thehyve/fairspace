@@ -117,6 +117,8 @@ jupyterhub:
         name: fairspace/jupyterhub-singleuser
         tag: latest
       defaultUrl: "/lab"
+      extraEnv:
+        WORKSPACE_URL:
       lifecycleHooks:
         postStart:
           exec:
@@ -125,12 +127,10 @@ jupyterhub:
         ingress:
             enabled: false
         extraEnv:
-          WORKSPACE_URL:
           JUPYTERHUB_CRYPT_KEY:
         extraConfig: |
           c.KubeSpawner.cmd = ['jupyter-labhub']
           c.KubeSpawner.singleuser_privileged = True
-          c.KubeSpawner.env_keep = ['WORKSPACE_URL']
           c.Authenticator.auto_login = True
     proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
