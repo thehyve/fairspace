@@ -93,8 +93,6 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
             </ListItemText>
         </ListItem>
 
-
-    property.editable = editable;
     const ValueAddComponent = ValueComponentFactory.addComponent(property);
     const ValueEditComponent = ValueComponentFactory.editComponent(property);
 
