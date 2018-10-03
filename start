@@ -1,0 +1,21 @@
+#! /bin/bash
+
+mkdir -p ~/collections
+
+echo "
+events { worker_connections 1024; }
+
+http {
+    server {
+        listen 80;
+        location /api/storage/webdav/ {
+            proxy_pass         $WORKSPACE_URL;
+            proxy_redirect     off;
+            proxy_set_header   Cookie JSESSIONID=$SESSION_ID;
+        }
+    }
+}
+" > ~/.nginx.conf
+
+sudo nginx -c ~/.nginx.conf
+wdfs http://localhost/api/storage/webdav/ ~/collections/ & jupyter-labhub
