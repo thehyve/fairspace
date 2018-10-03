@@ -16,7 +16,7 @@ describe('AlterPermissionDialog', () => {
             {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
         ]
     };
-    const mockCollaborators = [
+    const mockCollaborators = { data: [
         {
             'collectionId': 500,
             'subject': 'user2-id',
@@ -27,7 +27,7 @@ describe('AlterPermissionDialog', () => {
             'subject': 'user4-id',
             'access': 'Manage'
         }
-    ];
+    ]};
     const mockCurrentLoggedUser = {
         id: 'user1-id'
     };

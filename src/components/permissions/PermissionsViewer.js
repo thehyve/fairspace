@@ -246,7 +246,6 @@ export class PermissionsViewer extends React.Component {
                                      onClose={this.handleShareWithDialogClose}
                                      user={selectedUser}
                                      collection={collection}
-                                     collaborators={permissions.data}
                                      currentLoggedUser={currentLoggedUser}
                     />
                     <ConfirmationDialog open={showConfirmDeleteDialog}
