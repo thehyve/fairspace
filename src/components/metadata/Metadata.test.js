@@ -1,5 +1,5 @@
 import ConnectedMetadata from "./Metadata"
-import { Metadata } from "./Metadata"
+import {Metadata} from "./Metadata"
 import React from 'react';
 import {mount} from "enzyme";
 import Vocabulary from "../../services/MetadataAPI/Vocabulary";
@@ -38,7 +38,14 @@ it('shows result when subject provided and data is loaded', () => {
         }
     });
 
-    const wrapper = mount(<Provider store={store}><ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} /></Provider>);
+    const collection = {
+        uri: "http://fairspace.com/iri/collections/1"
+    }
+
+    const wrapper = mount(
+        <Provider store={store}>
+            <ConnectedMetadata editable={true} subject={collection.uri}/>
+        </Provider>);
 
     expect(wrapper.find(MetadataViewer).length).toEqual(1);
 });
@@ -59,7 +66,7 @@ it('shows a message if no metadata was found', () => {
     });
 
 
-    const wrapper = mount(<ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} store={store} />);
+    const wrapper = mount(<ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} store={store}/>);
 
     expect(wrapper.text()).toEqual("No metadata found");
 });
@@ -74,13 +81,14 @@ it('shows error when no subject provided', () => {
                 }
         }
     });
-    const wrapper = mount(<ConnectedMetadata subject={""} store={store} />);
+    const wrapper = mount(<ConnectedMetadata subject={""} store={store}/>);
 
     expect(wrapper.text()).toEqual("error_outlineAn error occurred while loading metadata");
 });
 
 it('tries to load the metadata and the vocabulary', () => {
-    const store = mockStore({ cache: {
+    const store = mockStore({
+        cache: {
             jsonLdBySubject: {
                 "http://fairspace.com/iri/collections/1": {
                     data: []
@@ -89,7 +97,8 @@ it('tries to load the metadata and the vocabulary', () => {
             vocabulary: {
                 data: new Vocabulary(vocabulary)
             }
-        }});
+        }
+    });
 
     const dispatch = jest.fn();
     const wrapper = mount(<Metadata subject={"John"} store={store} dispatch={dispatch}/>);
@@ -101,7 +110,7 @@ const vocabulary = [
     {
         "@id": "@type",
         '@type': PROPERTY_URI,
-        [LABEL_URI]: [{ '@value': 'Type' }],
+        [LABEL_URI]: [{'@value': 'Type'}],
         [DOMAIN_URI]: [
             {"@id": "http://fairspace.io/ontology#Collection"}
         ]
@@ -109,30 +118,30 @@ const vocabulary = [
     {
         '@id': 'http://fairspace.io/ontology#name',
         '@type': PROPERTY_URI,
-        [LABEL_URI]: [{ '@value': 'Name' }],
-        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }]
+        [LABEL_URI]: [{'@value': 'Name'}],
+        [DOMAIN_URI]: [{'@id': 'http://fairspace.io/ontology#Collection'}]
     },
     {
         '@id': 'http://fairspace.io/ontology#description',
         '@type': PROPERTY_URI,
-        [LABEL_URI]: [{ '@value': 'Description' }],
-        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }]
+        [LABEL_URI]: [{'@value': 'Description'}],
+        [DOMAIN_URI]: [{'@id': 'http://fairspace.io/ontology#Collection'}]
     },
     {
         '@id': 'http://schema.org/Creator',
         '@type': PROPERTY_URI,
-        [LABEL_URI]: [{ '@value': 'Creator' }],
+        [LABEL_URI]: [{'@value': 'Creator'}],
         [DOMAIN_URI]: []
     },
     {
         '@id': 'http://schema.org/CreatedDate',
         '@type': PROPERTY_URI,
-        [LABEL_URI]: [{ '@value': 'Created date' }],
-        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }]
+        [LABEL_URI]: [{'@value': 'Created date'}],
+        [DOMAIN_URI]: [{'@id': 'http://fairspace.io/ontology#Collection'}]
     },
     {
         '@id': 'http://fairspace.io/ontology#Collection',
         '@type': CLASS_URI,
-        [LABEL_URI]: [{ '@value': 'Collection' }]
+        [LABEL_URI]: [{'@value': 'Collection'}]
     }
 ];
