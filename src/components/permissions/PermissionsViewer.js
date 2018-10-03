@@ -16,6 +16,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PermissionChecker from "./PermissionChecker";
 import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
+import ErrorDialog from "../error/ErrorDialog";
 
 const styles = theme => ({
     root: {},
@@ -95,6 +96,11 @@ export class PermissionsViewer extends React.Component {
         }
         if (alteredPermission.data !== prevProps.alteredPermission.data) {
             fetchPermissions(collection.id);
+        } else if (prevProps.alteredPermission !== alteredPermission && alteredPermission.error) {
+            const {alteredPermission} = this.props;
+            if (prevProps.alteredPermission !== alteredPermission && alteredPermission.error) {
+                ErrorDialog.showError(true, 'An error occurred while altering the permission.');
+            }
         }
     }
 

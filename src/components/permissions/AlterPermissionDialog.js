@@ -110,7 +110,7 @@ const getNoOptionMessage = (users) => {
  * @returns {{value}}
  */
 const convertUserToOptionValue = (user) => {
-    return {value: user.subject}
+    return user ? {value: user.subject} : null;
 };
 
 const AccessRights = {
@@ -132,10 +132,10 @@ export class AlterPermissionDialog extends React.Component {
     }
 
     resetState = () => {
-        const {user, users} = this.props;
+        const {user} = this.props;
         this.setState({
             accessRight: user ? user.access : 'Read',
-            selectedUser: user && convertUserToOptionValue(user),
+            selectedUser: user ? convertUserToOptionValue(user) : null,
             selectedUserLabel: '',
             error: null,
         });
@@ -199,6 +199,7 @@ export class AlterPermissionDialog extends React.Component {
     render() {
         const {classes, user} = this.props;
         const {selectedUser, accessRight} = this.state;
+
         return (
             <Dialog open={this.props.open} onEnter={this.handleOnEnter} onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
