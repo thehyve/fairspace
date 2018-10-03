@@ -95,7 +95,7 @@ describe('MetadataProperty elements', () => {
         expect(listItems.length).toEqual(0);
     });
 
-    it('does not show an add element if one value has been provided already', () => {
+    it('does not show an add element if one value has been provided already, and it is editable', () => {
         const property = {
             ...defaultProperty,
             values: [{value: 'More info'}],
@@ -103,7 +103,7 @@ describe('MetadataProperty elements', () => {
         }
 
         const store = mockStore({})
-        const wrapper = shallow(<MetadataProperty store={store} property={property} subject={subject} />);
+        const wrapper = shallow(<MetadataProperty editable={true} store={store} property={property} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
@@ -112,7 +112,21 @@ describe('MetadataProperty elements', () => {
         const ExpectedComponent = ValueComponentFactory.editComponent(property);
         const inputComponent = listItems.at(0).dive().find(ExpectedComponent);
         expect(inputComponent.prop('entry').value).toEqual('More info');
-    })
+    });
+
+    it('does not show an add element if multiples values are provided, but it is not editable', () => {
+        const property = {
+            ...defaultProperty,
+            values: [{value: 'More info'}, {value: 'another info'}],
+            allowMultiple: true
+        }
+
+        const store = mockStore({})
+        const wrapper = shallow(<MetadataProperty editable={false} store={store} property={property} subject={subject} />);
+
+        const listItems = wrapper.dive().find(List).find(ListItem);
+        expect(listItems.length).toEqual(2);
+    });
 });
 
 describe('MetadataProperty changes', () => {
