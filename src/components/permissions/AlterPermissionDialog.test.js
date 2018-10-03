@@ -134,4 +134,6 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('WithStyles(MaterialReactSelect)')).toHaveLength(0);
         expect(wrapper.find('WithStyles(Typography)').childAt(0).text()).toEqual('Michael Jackson');
     });
+
+    // TODO: Add more tests on behaviour changes
 });
