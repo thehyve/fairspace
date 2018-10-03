@@ -1,7 +1,6 @@
 import {connect} from 'react-redux';
 import PermissionsViewer from "./PermissionsViewer";
 import {alterPermission, fetchPermissions} from "../../actions/permissions";
-import {compareBy, comparing} from "../../utils/comparators";
 
 const mapStateToProps = ({permissions: {fetch, alter}, account: {user}}) => {
     return {
