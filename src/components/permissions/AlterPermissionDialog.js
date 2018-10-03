@@ -135,7 +135,7 @@ export class AlterPermissionDialog extends React.Component {
         const {user, users} = this.props;
         this.setState({
             accessRight: user ? user.access : 'Read',
-            selectedUser: convertUserToOptionValue(user),
+            selectedUser: user && convertUserToOptionValue(user),
             selectedUserLabel: '',
             error: null,
         });
