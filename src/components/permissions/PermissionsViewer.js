@@ -15,7 +15,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PermissionChecker from "./PermissionChecker";
 import AlterPermission from "./AlterPermissionContainer";
-import {compareBy} from "../../utils/comparators";
+import {compareBy, comparing} from "../../utils/comparators";
 
 const styles = theme => ({
     root: {},

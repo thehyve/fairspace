@@ -9,8 +9,11 @@ describe('AlterPermissionDialog', () => {
     const mockfetchUsersFn = jest.fn();
     const mockUsers = {
         data: [
-            {id: 1, firstName: 'Mariah', lastName: 'Carey'},
-            {id: 2, firstName: 'Michael', lastName: 'Jackson'}
+            {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
+            {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
+            {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars'},
+            {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain'},
+            {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
         ]
     };
     const mockCollaborators = [
@@ -24,13 +27,6 @@ describe('AlterPermissionDialog', () => {
             'subject': 'user4-id',
             'access': 'Manage'
         }
-    ];
-    const mockOptions = [
-        {label: 'Mariah Carey', value: 'user1-id'},
-        {label: 'Michael Jackson', value: 'user2-id'},
-        {label: 'Jlo', value: 'user3-id'},
-        {label: 'Sarah Palin', value: 'user4-id'},
-        {label: 'Donald Trump', value: 'user5-id'},
     ];
     const mockCurrentLoggedUser = {
         id: 'user1-id'
@@ -71,17 +67,17 @@ describe('AlterPermissionDialog', () => {
             },
             {
                 "disabled":false,
-                "label":"Jlo",
+                "label":"Bruno Mars",
                 "value":"user3-id"
             },
             {
                 "disabled":true,
-                "label":"Sarah Palin",
+                "label":"Kurt Cobain",
                 "value":"user4-id"
             },
             {
                 "disabled":false,
-                "label":"Donald Trump",
+                "label":"Ariana Grande",
                 "value":"user5-id"
             }
         ];
@@ -97,7 +93,6 @@ describe('AlterPermissionDialog', () => {
             fetchUsers={mockfetchUsersFn}
             alterPermission={mockAlterPermissionFn}
             users={mockUsers}
-            options={mockOptions}
         />);
 
         // initial state if it's open or not
@@ -135,7 +130,6 @@ describe('AlterPermissionDialog', () => {
             fetchUsers={mockfetchUsersFn}
             alterPermission={mockAlterPermissionFn}
             users={mockUsers}
-            options={mockOptions}
         />);
         expect(wrapper.find('WithStyles(MaterialReactSelect)')).toHaveLength(0);
         expect(wrapper.find('WithStyles(Typography)').childAt(0).text()).toEqual('Michael Jackson');

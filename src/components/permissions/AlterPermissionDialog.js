@@ -70,6 +70,40 @@ const getUserLabelByUser = (user, options) => {
     return label;
 };
 
+/**
+ * Transform result to become react-select friendly array [{label: string, value: string}]
+ * @param users
+ * @returns {Array}
+ */
+const transformUserToOptions = (users, collaborators, currentUser) => {
+    if (users.data) {
+        const tmp = users.data.map(r => {
+            return {
+                label: `${r.firstName} ${r.lastName}`,
+                value: r.id
+            };
+        });
+        return applyDisableFilter(tmp, collaborators, currentUser);
+    }
+};
+
+/**
+ * Get no options message based on users
+ * @param users
+ * @returns {string}
+ */
+const getNoOptionMessage = (users) => {
+    let noOptionMessage = 'No options';
+    if (users) {
+        if (users.pending) {
+            noOptionMessage = 'Loading ..';
+        } else if (users.error) {
+            noOptionMessage = 'Error: Cannot fetch users.';
+        }
+    }
+    return noOptionMessage;
+};
+
 const AccessRights = {
     Read: 'Read',
     Write: 'Write',
@@ -89,10 +123,11 @@ export class AlterPermissionDialog extends React.Component {
     }
 
     resetState = () => {
-        const {user, currentLoggedUser, collaborators, options} = this.props;
+        const {user, users} = this.props;
         this.setState({
             accessRight: user ? user.access : 'Read',
-            selectedUser: user ? options.find(u => user.subject === u.value) : null,
+            // selectedUser: user ? options.find(u => user.subject === u.value) : null,
+            selectedUser: user, // TODO
             selectedUserLabel: '',
             error: null,
         });
@@ -130,23 +165,26 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     renderUser = () => {
-        const {user, options, noOptionMessage, collaborators, currentLoggedUser} = this.props;
+        const {user, users, collaborators, currentLoggedUser} = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
-        if (user) { // only render the label if user is passed into this component
-            return (<div>
-                <Typography variant="subheading"
-                            gutterBottom>{getUserLabelByUser(user, options)}</Typography>
-            </div>)
+        let options = [];
+
+        if (users.data) {
+            options = transformUserToOptions(users, collaborators, currentLoggedUser);
+            if (user) { // only render the label if user is passed into this component
+                return (<div>
+                    <Typography variant="subheading"
+                                gutterBottom>{getUserLabelByUser(user, options)}</Typography>
+                </div>)
+            }
         }
 
-        const transformedOptions = options && applyDisableFilter(options, collaborators, currentLoggedUser);
-
         // otherwise render select user component
-        return (<MaterialReactSelect options={transformedOptions}
+        return (<MaterialReactSelect options={options}
                                      onChange={this.handleSelectedUserChange}
                                      placeholder={'Please select a user'}
                                      value={selectedUser}
-                                     noOptionsMessage={() => noOptionMessage}
+                                     noOptionsMessage={() => (getNoOptionMessage(users))}
                                      label={selectedUserLabel}/>);
     };
 
