@@ -1,4 +1,4 @@
-import {createErrorHandlingPromiseAction, promiseReducerFactory} from './redux'
+import {createErrorHandlingPromiseAction, dispatchIfNeeded, promiseReducerFactory, shouldUpdate} from './redux'
 
 const mockDispatch = (action => Promise.resolve(action))
 
@@ -117,4 +117,69 @@ describe('Fetch promise reducer', () => {
 
         });
     })
+});
+
+describe('Should update', () => {
+    it('is false if data is fetched', () => {
+        expect(shouldUpdate({pending: false, error: false, invalidated: false, data: 'data'})).toEqual(false);
+    });
+
+    it('is false if data is fetched but is empty', () => {
+        expect(shouldUpdate({pending: false, error: false, invalidated: false, data: false})).toEqual(false);
+    });
+
+    it('is true if undefined is passed', () => {
+        expect(shouldUpdate()).toEqual(true);
+    });
+
+    it('is true if data is invalidated', () => {
+        expect(shouldUpdate({invalidated: true})).toEqual(true);
+    });
+
+    it('is false if data is invalidated but is already pending', () => {
+        expect(shouldUpdate({invalidated: true, pending: true})).toEqual(false);
+    });
+});
+
+describe('Dispatch If Needed', () => {
+    it('dispatches if should update returns true', () => {
+        const actionCreator = dispatchIfNeeded(
+            () => "testaction",
+            () => ({invalidated: true})
+        )
+
+        const mockDispatch = jest.fn(() => 'result');
+        const result = actionCreator(mockDispatch, () => false);
+
+        expect(mockDispatch.mock.calls.length).toEqual(1);
+        expect(mockDispatch.mock.calls[0][0]).toEqual('testaction');
+        expect(result).toEqual('result');
+    });
+    it('looks at the current state for determining update', () => {
+        const actionCreator = dispatchIfNeeded(
+            () => "testaction",
+            (state) => state
+        )
+
+        const mockDispatch = jest.fn(() => 'result');
+        const result = actionCreator(mockDispatch, () => ({invalidated: true}));
+
+        expect(mockDispatch.mock.calls.length).toEqual(1);
+        expect(mockDispatch.mock.calls[0][0]).toEqual('testaction');
+        expect(result).toEqual('result');
+    });
+    it('resolves with the current value if no update is needed', () => {
+        const actionCreator = dispatchIfNeeded(
+            () => "testaction",
+            () => ({data: 'current-data'})
+        )
+
+        const mockDispatch = jest.fn(() => 'result');
+        const result = actionCreator(mockDispatch, () => undefined);
+
+        expect(mockDispatch.mock.calls.length).toEqual(0);
+
+        return expect(result).resolves.toEqual({value: 'current-data'});
+    });
+
 });

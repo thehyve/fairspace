@@ -1,4 +1,4 @@
-import {createErrorHandlingPromiseAction} from "../utils/redux";
+import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import FileAPIFactory from "../services/FileAPI/FileAPIFactory";
 import {CREATE_DIRECTORY, DELETE_FILE, FILES, RENAME_FILE, UPLOAD_FILES} from "./actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
@@ -48,28 +48,13 @@ export const createDirectory = (collection, path, directoryname) => {
     }
 }
 
-export const fetchFilesIfNeeded = (collection, path) => {
-    return (dispatch, getState) => {
-        if (shouldFetchFiles(getState(), collection, path)) {
-            return dispatch(fetchFiles(collection, path))
-        } else {
-            return Promise.resolve();
-        }
+export const fetchFilesIfNeeded = (collection, path) => dispatchIfNeeded(
+    () => fetchFiles(collection, path),
+    state => {
+        const filesPerCollection = state.cache.filesByCollectionAndPath[collection.id] || {}
+        return filesPerCollection[path]
     }
-}
-
-const shouldFetchFiles = (state, collection, path) => {
-    const filesPerCollection = state.cache.filesByCollectionAndPath[collection.id] || {};
-    const files = filesPerCollection[path];
-
-    if (!files) {
-        return true
-    } else if (files.pending) {
-        return false
-    } else {
-        return files.invalidated
-    }
-}
+)
 
 const fetchFiles = createErrorHandlingPromiseAction((collection, path) => {
     return {

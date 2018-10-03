@@ -108,4 +108,44 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
     }
 }
 
+/**
+ * Determines whether the data for a given property in state should be updated
+ *
+ * Expects the property to have the format
+ * {
+ *      pending: <boolean>
+ *      invalidated: <boolean>,
+ *      ...
+ * }
+ *
+ * @param stateProperty
+ * @returns {boolean} True if the data should be updated, i.e. there is no data, or pending = false and invalidated = true
+ */
+export const shouldUpdate = stateProperty =>{
+    if (!stateProperty) {
+        return true
+    } else if (stateProperty.pending) {
+        return false
+    } else {
+        return stateProperty.invalidated
+    }
+}
 
+/**
+ * Dispatches an action if a property in state should be updated.
+ * @param actionCreator             Function to create the action to be dispatched if needed
+ * @param statePropertyExtractor    Function to extract the relevant property from state.
+ *                                  Property in state should be either falsy or an object with keys pending and invalidated
+ * @returns {Function}              Action to be dispatched, using the redux-thunk middleware
+ * @see shouldUpdate
+ */
+export const dispatchIfNeeded = (actionCreator, statePropertyExtractor) => {
+    return (dispatch, getState) => {
+        const stateProperty = statePropertyExtractor(getState());
+        if (shouldUpdate(stateProperty)) {
+            return dispatch(actionCreator())
+        } else {
+            return Promise.resolve({value: stateProperty.data});
+        }
+    }
+}

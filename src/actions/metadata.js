@@ -1,4 +1,4 @@
-import {createErrorHandlingPromiseAction} from "../utils/redux";
+import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import MetadataAPI from "../services/MetadataAPI/MetadataAPI"
 import {METADATA, METADATA_COMBINATION, METADATA_ENTITIES, METADATA_VOCABULARY, UPDATE_METADATA} from "./actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
@@ -18,49 +18,26 @@ export const updateMetadata = (subject, predicate, values) => ({
     }
 })
 
-export const fetchCombinedMetadataIfNeeded = (subject) => {
-    return (dispatch, getState) => {
-        if (shouldCombineMetadata(getState(), subject)) {
-            return dispatch(combineMetadataForSubject(subject))
-        } else {
-            return Promise.resolve();
-        }
-    }
-}
+export const fetchCombinedMetadataIfNeeded = (subject) => dispatchIfNeeded(
+    () => combineMetadataForSubject(subject),
+    state => state && state.metadataBySubject ? state.metadataBySubject[subject] : undefined
+)
 
-export const fetchEntitiesIfNeeded = (type) => {
-    return (dispatch, getState) => {
-        if (shouldFetchEntities(getState(), type)) {
-            return dispatch(fetchEntitiesByType(type))
-        } else {
-            return Promise.resolve();
-        }
-    }
-}
+export const fetchEntitiesIfNeeded = (type) => dispatchIfNeeded(
+    () => fetchEntitiesByType(type),
+    state => state && state.cache && state.cache.entitiesByType ? state.cache.entitiesByType[type] : undefined
+)
 
-export const fetchJsonLdBySubjectIfNeeded = (subject) => {
-    return (dispatch, getState) => {
-        const state = getState();
-        if (shouldFetchMetadata(state, subject)) {
-            return dispatch(fetchJsonLdBySubject(subject))
-        } else {
-            // Let the calling code know there's nothing to wait for.
-            return Promise.resolve({value: state.cache.jsonLdBySubject[subject].data})
-        }
-    }
-}
+export const fetchJsonLdBySubjectIfNeeded = (subject) => dispatchIfNeeded(
+    () => fetchJsonLdBySubject(subject),
+    state => state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined
+)
 
-const fetchMetadataVocabularyIfNeeded = () => {
-    return (dispatch, getState) => {
-        const state = getState();
-        if (shouldFetchVocabulary(state)) {
-            return dispatch(fetchVocabulary())
-        } else {
-            // Let the calling code know there's nothing to wait for.
-            return Promise.resolve({value: state.cache.vocabulary.data})
-        }
-    }
-}
+export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
+    fetchVocabulary,
+    state => state && state.cache ? state.cache.vocabulary : undefined
+)
+
 
 const fetchJsonLdBySubject = createErrorHandlingPromiseAction((subject) => ({
     type: METADATA,
@@ -93,40 +70,3 @@ const fetchEntitiesByType = createErrorHandlingPromiseAction((type) => ({
         type: type
     }
 }));
-
-const shouldFetchMetadata = (state, subject) => {
-    const metadata = state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined;
-    if (!metadata) {
-        return true
-    } else if (metadata.pending) {
-        return false
-    } else {
-        return metadata.invalidated
-    }
-}
-
-const shouldCombineMetadata = (state, subject) => {
-    return !state || !state.metadataBySubject || !state.metadataBySubject[subject];
-}
-
-const shouldFetchVocabulary = (state) => {
-    const vocabulary = state && state.cache ? state.cache.vocabulary : undefined
-    if (!vocabulary) {
-        return true
-    } else if (vocabulary.pending) {
-        return false
-    } else {
-        return vocabulary.invalidated
-    }
-}
-
-const shouldFetchEntities = (state, type) => {
-    const entities = state && state.cache && state.cache.entitiesByType ? state.cache.entitiesByType[type] : undefined;
-    if (!entities) {
-        return true
-    } else if (entities.pending) {
-        return false
-    } else {
-        return entities.invalidated
-    }
-}
