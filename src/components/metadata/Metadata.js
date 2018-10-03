@@ -2,16 +2,15 @@ import React from 'react';
 import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadata";
-import {connect} from 'react-redux';
+import {connect} from 'react-redux'
 
 export class Metadata extends React.Component {
-
     componentDidMount() {
         this.load();
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.subject !== prevProps.subject) {
+        if(this.props.subject !== prevProps.subject) {
             this.load();
         }
     }
@@ -19,14 +18,13 @@ export class Metadata extends React.Component {
     load() {
         const {dispatch, subject} = this.props;
 
-        if (subject) {
+        if(subject) {
             dispatch(fetchCombinedMetadataIfNeeded(subject))
         }
     }
 
     render() {
-        // putting dispatch here to avoid it being passed down to children
-        const {subject, metadata, error, loading, editable, dispatch, ...otherProps} = this.props;
+        const {subject, metadata, error, loading, dispatch, ...otherProps} = this.props;
 
         if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
@@ -35,16 +33,13 @@ export class Metadata extends React.Component {
         } else if (!metadata || metadata.length === 0) {
             return (<div>No metadata found</div>)
         } else {
-            return (<MetadataViewer {...otherProps}
-                                    editable={editable}
-                                    subject={subject}
-                                    properties={metadata}/>)
+            return (<MetadataViewer {...otherProps} subject={subject} properties={metadata}/>)
         }
     }
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {metadataBySubject, cache: {vocabulary}} = state;
+    const {metadataBySubject, cache: { vocabulary }} = state;
     const metadata = metadataBySubject[ownProps.subject];
 
     // If there is no metadata by subject (not even pending)
