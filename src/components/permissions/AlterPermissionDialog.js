@@ -104,6 +104,15 @@ const getNoOptionMessage = (users) => {
     return noOptionMessage;
 };
 
+/**
+ * Convert user to option value
+ * @param user
+ * @returns {{value}}
+ */
+const convertUserToOptionValue = (user) => {
+    return {value: user.subject}
+};
+
 const AccessRights = {
     Read: 'Read',
     Write: 'Write',
@@ -126,8 +135,7 @@ export class AlterPermissionDialog extends React.Component {
         const {user, users} = this.props;
         this.setState({
             accessRight: user ? user.access : 'Read',
-            // selectedUser: user ? options.find(u => user.subject === u.value) : null,
-            selectedUser: user, // TODO
+            selectedUser: convertUserToOptionValue(user),
             selectedUserLabel: '',
             error: null,
         });
