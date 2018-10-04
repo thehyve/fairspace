@@ -21,7 +21,7 @@ class InferenceTest {
     private val subject = modelForInference.createResource(NS + "subject")
 
     private val derivesFrom = modelForInference.createProperty(NS, "derivesFrom")
-    private val provides = modelForInference.createProperty(NS, "provides")
+    private val provides = modelForInference.createProperty(NS, "providesMaterial`")
 
     private val repo = ModelRepository(DatasetFactory.create(), {
         val inferenceModel = FileManager.get().loadModel("inference-model.jsonld")
