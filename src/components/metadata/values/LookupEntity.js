@@ -20,14 +20,27 @@ function LookupEntity({entities, property, onSave, dispatch}) {
             label = id.substring(id.lastIndexOf('/')+1);
         }
 
-        return {
-            id,
-            label
+        const option = {
+            disabled: property.values.map(v => v.id).includes(id),
+            id: id,
+            label: label
         }
+
+        return option;
     });
 
+    options.sort((a, b) => {
+        if(a.disabled > b.disabled) {
+            return 1;
+        } else if(a.disabled < b.disabled) {
+            return -1;
+        } else return 0;
+    })
+
     // Prevent saving any labels used for UI
-    const handleSave = selected => onSave({id: selected.id})
+    const handleSave = selected => {
+        onSave({id: selected.id})
+    }
 
     return <div style={{width: '100%'}}>
         <MaterialReactSelect options={options}
@@ -45,7 +58,6 @@ LookupEntity.propTypes = {
 const mapStateToProps = (state, ownProps) => {
     if(state.cache && state.cache.entitiesByType) {
         const entities = state.cache.entitiesByType[ownProps.property.range];
-
         if (entities && !entities.pending && !entities.error) {
             return {entities: entities.data}
         }
