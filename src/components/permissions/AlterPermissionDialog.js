@@ -177,8 +177,8 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, selectedUserLabel} = this.state;
         let options = [];
 
-        if (users.data) {
-            options = transformUserToOptions(users, collaborators, currentLoggedUser);
+        if (users.data && collaborators.data) {
+            options = transformUserToOptions(users, collaborators.data, currentLoggedUser);
             if (user) { // only render the label if user is passed into this component
                 return (<div>
                     <Typography variant="subheading"
@@ -242,7 +242,6 @@ AlterPermissionDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
     collectionId: PropTypes.number,
-    collaborators: PropTypes.array,
 };
 
 export default withStyles(styles, {withTheme: true})(AlterPermissionDialog);

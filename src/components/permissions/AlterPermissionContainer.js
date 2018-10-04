@@ -3,10 +3,11 @@ import AlterPermissionDialog from "./AlterPermissionDialog";
 import {alterPermission} from "../../actions/permissions";
 import {fetchUsers} from "../../actions/users";
 
-const mapStateToProps = ({permissions: {alter}, users}) => {
+const mapStateToProps = ({permissions: {alter, fetch}, users}) => {
     return {
         alteredPermission: alter,
         users: users,
+        collaborators: fetch
     };
 };
 

@@ -13,6 +13,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import PermissionChecker from "./PermissionChecker";
 import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
@@ -71,6 +72,7 @@ export class PermissionsViewer extends React.Component {
             anchorEl: null,
             selectedUser: null,
             currentLoggedUser: null,
+            canManage: false,
         };
     }
 
@@ -237,7 +239,6 @@ export class PermissionsViewer extends React.Component {
                                      onClose={this.handleShareWithDialogClose}
                                      user={selectedUser}
                                      collectionId={collectionId}
-                                     collaborators={permissions.data}
                                      currentLoggedUser={currentLoggedUser}
                     />
                     <ConfirmationDialog open={showConfirmDeleteDialog}
