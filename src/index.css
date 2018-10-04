@@ -2,9 +2,14 @@
     --mercury-white: #f2f2f2;
     --mercury-black: #262626;
 
-    --mercury-theme-dark: #009688;
-    --mercury-theme: #4cb5ab;
-    --mercury-theme-light: #99d5cf;
+    --mercury-primary-dark: #303F9F;
+    --mercury-primary: #3F51B5;
+    --mercury-primary-light: #C5CAE9;
+
+    --mercury-accent: #E91E63;
+    --mercury-primary-text: #212121;
+    --mercury-secondary-text: #757575;
+    --mercury-divider-color: #BDBDBD;
 }
 
 body {
