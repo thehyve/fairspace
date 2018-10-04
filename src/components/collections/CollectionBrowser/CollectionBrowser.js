@@ -45,7 +45,7 @@ class CollectionBrowser extends React.Component {
     handleCollectionDelete(collection) {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
         deleteCollection(collection.id)
-            .then(fetchCollectionsIfNeeded())
+            .then(fetchCollectionsIfNeeded)
             .catch(err =>
                 ErrorDialog.showError(
                     err,
