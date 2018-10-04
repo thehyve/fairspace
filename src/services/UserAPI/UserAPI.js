@@ -10,7 +10,7 @@ class UserAPI {
 
     getUsers() {
         return fetch(Config.get().urls.users, UserAPI.getConfig)
-            .then(failOnHttpError('Error while loading collection permissions'))
+            .then(failOnHttpError('Error while loading users'))
             .then(response => response.json())
     }
 }
