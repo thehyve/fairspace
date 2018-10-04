@@ -1,10 +1,10 @@
 /* style for hover over a collection/file in the collection/file list */
 tbody tr:hover {
-    background-color: var(--mercury-primary-light) !important;
+    background-color: var(--mercury-primary-lighter) !important;
     cursor: pointer !important;
 }
 
 /* style for the selected collection/file in the collection/file list */
 tbody tr[class*='MuiTableRow-selected'] {
-    background-color: var(--mercury-primary) !important;
+    background-color: var(--mercury-primary-light) !important;
 }
