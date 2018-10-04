@@ -1,13 +1,10 @@
 :root {
-    --mercury-blue: #77C0FF;
-    --mercury-white: #F2F2F2;
-    --mercury-black: #LALALA;
-    --mercury-emerald: #009688;
-    --mercury-green: #5AB963;
-    --mercury-budgreen: #8BC34A;
-    --mercury-lime: #CDDC39;
-    --mercury-yellow: #FFEB3B;
-    --mercury-honey: #FFC107;
+    --mercury-white: #f2f2f2;
+    --mercury-black: #262626;
+
+    --mercury-theme-dark: #009688;
+    --mercury-theme: #4cb5ab;
+    --mercury-theme-light: #99d5cf;
 }
 
 body {
