@@ -14,6 +14,7 @@
     "@material-ui/core": "latest",
     "@material-ui/icons": "latest",
     "ajv": "^6.5.3",
+    "body-parser": "^1.18.3",
     "classnames": "^2.2.6",
     "deepmerge": "^2.1.1",
     "enzyme": "^3.3.0",
@@ -37,7 +38,7 @@
     "redux-promise-middleware": "^5.1.1",
     "redux-thunk": "^2.3.0",
     "simple-flexbox": "^1.2.0",
-    "webdav": "1.5.3"
+    "webdav": "^1.6.0"
   },
   "scripts": {
     "dev": "concurrently \"yarn server\" \"yarn start\"",

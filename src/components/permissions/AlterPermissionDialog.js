@@ -1,8 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import userAPI from '../../services/UserAPI/UserAPI';
-import permissionAPI from '../../services/PermissionAPI/PermissionAPI';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -10,16 +7,14 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import {withStyles} from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
-import {AccessRights} from "./Permissions";
 import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect'
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-import ErrorDialog from "../error/ErrorDialog";
 
-const styles = theme => ({
+export const styles = theme => ({
     root: {
         width: 400,
         height: 350,
@@ -41,7 +36,90 @@ const styles = theme => ({
     },
 });
 
-class ShareWithDialog extends React.Component {
+/**
+ * Disable options if a user is :
+ *  - already a collaborator,
+ *  - current logged user, or
+ *  - owner of the collection
+ * @param options
+ * @param collaborators
+ * @param currentLoggedUser
+ * @returns {*}
+ */
+const applyDisableFilter = (options, collaborators, currentLoggedUser) => {
+    return options.map(option => {
+        const isAlreadySelected = collaborators.find(c => c.subject === option.value) !== undefined;
+        const isCurrentUser = option.value === currentLoggedUser.id;
+        option.disabled = isAlreadySelected || isCurrentUser;
+        return option;
+    });
+};
+
+/**
+ * Get user label by user object
+ * @param user
+ * @param options
+ * @returns {string}
+ */
+const getUserLabelByUser = (user, options) => {
+    let label = '';
+    if (options) {
+        const found = options.find(option => option.value === user.subject);
+        label = found && found.label;
+    }
+    return label;
+};
+
+/**
+ * Transform result to become react-select friendly array [{label: string, value: string}]
+ * @param users
+ * @returns {Array}
+ */
+const transformUserToOptions = (users, collaborators, currentUser) => {
+    if (users.data) {
+        const tmp = users.data.map(r => {
+            return {
+                label: `${r.firstName} ${r.lastName}`,
+                value: r.id
+            };
+        });
+        return applyDisableFilter(tmp, collaborators, currentUser);
+    }
+};
+
+/**
+ * Get no options message based on users
+ * @param users
+ * @returns {string}
+ */
+const getNoOptionMessage = (users) => {
+    let noOptionMessage = 'No options';
+    if (users) {
+        if (users.pending) {
+            noOptionMessage = 'Loading ..';
+        } else if (users.error) {
+            noOptionMessage = 'Error: Cannot fetch users.';
+        }
+    }
+    return noOptionMessage;
+};
+
+/**
+ * Convert user to option value
+ * @param user
+ * @returns {{value}}
+ */
+const convertUserToOptionValue = (user) => {
+    return user ? {value: user.subject} : null;
+};
+
+const AccessRights = {
+    Read: 'Read',
+    Write: 'Write',
+    Manage: 'Manage',
+};
+
+export class AlterPermissionDialog extends React.Component {
 
     constructor(props) {
         super(props);
@@ -49,37 +127,22 @@ class ShareWithDialog extends React.Component {
             accessRight: 'Read',
             selectedUser: null,
             selectedUserLabel: '',
-            userList: [],
             error: null,
         };
     }
 
     resetState = () => {
-        const {user, currentLoggedUser, collaborators} = this.props;
-        const {userList} = this.state;
-
+        const {user} = this.props;
         this.setState({
             accessRight: user ? user.access : 'Read',
-            selectedUser: user ? userList.find(u => user.subject === u.value) : null,
+            selectedUser: user ? convertUserToOptionValue(user) : null,
             selectedUserLabel: '',
-            userList: userList.map(r => {
-                r.disabled = collaborators.find(c => c.subject === r.id) || r.id === currentLoggedUser.id;
-                return r;
-            }),
             error: null,
         });
     };
 
     componentDidMount() {
-        userAPI.getUsers().then(result => {
-            const options = result.map(r => {
-                let newUser = Object.assign({}, r);
-                newUser.label = `${r.firstName} ${r.lastName}`;
-                newUser.value = `${r.id}`;
-                return newUser;
-            });
-            this.setState({userList: options});
-        })
+        this.props.fetchUsers();
     }
 
     handleAccessRightChange = event => {
@@ -100,55 +163,45 @@ class ShareWithDialog extends React.Component {
 
     handleSubmit = () => {
         const {selectedUser, accessRight} = this.state;
-        const {collectionId} = this.props;
+        const {collectionId, alterPermission} = this.props;
         if (selectedUser) {
-            this.props.onClose();
-            permissionAPI.alterCollectionPermission(selectedUser.value, collectionId, accessRight)
-                .then(response => {
-                    this.setState({selectedUserLabel: ''});
-                })
-                .catch(error => {
-                    this.setState({error: error});
-                    ErrorDialog.showError(error, 'An error occurred while altering the permission.');
-                });
+            alterPermission(selectedUser.value, collectionId, accessRight);
+            this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
         }
     };
 
-    getUser = (user) => {
-        return this.state.userList.find(u => u.value === user.subject);
-    };
-
     renderUser = () => {
-        const {user} = this.props;
-        const {userList, selectedUser, selectedUserLabel} = this.state;
+        const {user, users, collaborators, currentLoggedUser} = this.props;
+        const {selectedUser, selectedUserLabel} = this.state;
+        let options = [];
 
-        if (user) {
-            const selectedUserOption = this.getUser(user);
-            return (<div>
-                <Typography variant="subheading"
-                            gutterBottom>{`${selectedUserOption.label}`}</Typography>
-            </div>)
+        if (users.data && collaborators.data) {
+            options = transformUserToOptions(users, collaborators.data, currentLoggedUser);
+            if (user) { // only render the label if user is passed into this component
+                return (<div>
+                    <Typography variant="subheading"
+                                gutterBottom>{getUserLabelByUser(user, options)}</Typography>
+                </div>)
+            }
         }
 
-        return (<MaterialReactSelect options={userList}
+        // otherwise render select user component
+        return (<MaterialReactSelect options={options}
                                      onChange={this.handleSelectedUserChange}
                                      placeholder={'Please select a user'}
                                      value={selectedUser}
+                                     noOptionsMessage={() => (getNoOptionMessage(users))}
                                      label={selectedUserLabel}/>);
-
-
     };
 
     render() {
         const {classes, user} = this.props;
         const {selectedUser, accessRight} = this.state;
+
         return (
-            <Dialog
-                open={this.props.open}
-                onEnter={this.handleOnEnter}
-                onClose={this.handleClose}>
+            <Dialog open={this.props.open} onEnter={this.handleOnEnter} onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={user ? classes.rootEdit : classes.root}>
@@ -182,20 +235,13 @@ class ShareWithDialog extends React.Component {
     }
 }
 
-ShareWithDialog.propTypes = {
-    classes: PropTypes.object.isRequired,
-    theme: PropTypes.object.isRequired,
+AlterPermissionDialog.propTypes = {
+    classes: PropTypes.func.isRequired,
+    theme: PropTypes.object,
     user: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,
     collectionId: PropTypes.number,
-    collaborators: PropTypes.array,
 };
 
-const mapStateToProps = ({account: {user}}) => {
-    return {
-        currentLoggedUser: user.data
-    }
-};
-
-export default connect(mapStateToProps)(withStyles(styles, {withTheme: true})(ShareWithDialog));
+export default withStyles(styles, {withTheme: true})(AlterPermissionDialog);

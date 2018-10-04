@@ -1,11 +1,16 @@
 const express = require('express');
 const webdav = require('webdav-server').v2;
+const bodyParser = require('body-parser');
 const fixWebdavDestinationMiddleware = require('./fixWebdavDestinationMiddleware');
 const port = process.env.PORT || 5000;
 const mockDataDir = __dirname + '/mock-data';
 
 // Start a generic server on port 5000 that serves default API
 const app = express();
+
+// parse application/json
+app.use(bodyParser.json());
+
 app.get('/api/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
 
 // Account API
@@ -19,7 +24,11 @@ app.get('/api/collections/:id', (req, res) => res.sendFile(mockDataDir + '/colle
 app.get('/api/collections/:id/permissions', (req, res) => res.sendFile(mockDataDir + '/collections/collection-' + req.params.id + '-permissions.json'));
 app.patch('/api/collections/:id', (req, res) => res.send());
 app.delete('/api/collections/:id', (req, res) => setTimeout(() => res.send(), 3000));
-
+app.put('/api/collections/permissions', (req, res) => res.send({
+    access: req.body.access,
+    collection: req.body.collection,
+    subject: req.body.subject
+}));
 // Metadata API
 app.get('/api/metadata/statements', (req, res) => {
     if(req.query.subject) {
@@ -55,9 +64,9 @@ server.rootFileSystem().addSubTree(server.createExternalContext(), {
             }
         }
     }
-})
+});
 
 app.use(fixWebdavDestinationMiddleware('/api/storage/webdav'));
-app.use(webdav.extensions.express('/api/storage/webdav', server))
+app.use(webdav.extensions.express('/api/storage/webdav', server));
 
-app.listen(port, () => console.log('Backend stub listening on port ' + port ))
+app.listen(port, () => console.log('Backend stub listening on port ' + port ));
