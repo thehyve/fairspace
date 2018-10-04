@@ -16,7 +16,6 @@ describe('PermissionViewer' , () => {
             collection={[]}
             fetchPermissions={jest.fn()}
         />);
-        console.log(wrapper.debug())
     });
 
     //TODO: ADD MORE TESTS
