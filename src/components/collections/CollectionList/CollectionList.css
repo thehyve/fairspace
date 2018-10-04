@@ -4,3 +4,7 @@ tbody tr:hover {
     cursor: pointer !important;
 }
 
+/* style for the selected collection/file in the collection/file list */
+tbody tr[class*='MuiTableRow-selected'] {
+    background-color: var(--mercury-green) !important;
+}
