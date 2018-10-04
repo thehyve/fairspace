@@ -55,16 +55,25 @@ class MetadataAPI {
      * @returns {*}
      */
     update(subject, predicate, values) {
-        if(!subject || !predicate || !values) {
+        if (!subject || !predicate || !values) {
             return Promise.reject("No subject, predicate or values given");
         }
 
-        return fetch(Config.get().urls.metadata, {
-            method: 'PATCH',
-            headers: new Headers({'Content-type': 'application/ld+json'}),
-            credentials: 'same-origin',
-            body: JSON.stringify(this.toJsonLd(subject, predicate, values))
-        }).then(failOnHttpError("Failure when updating metadata"));
+        let request = (values.length === 0)
+            ? fetch(Config.get().urls.metadata
+                + '?subject=' + encodeURIComponent(subject)
+                + '&predicate=' + encodeURIComponent(predicate), {
+                method: 'DELETE',
+                credentials: 'same-origin'
+            })
+            : fetch(Config.get().urls.metadata, {
+                method: 'PATCH',
+                headers: new Headers({'Content-type': 'application/ld+json'}),
+                credentials: 'same-origin',
+                body: JSON.stringify(this.toJsonLd(subject, predicate, values))
+            });
+
+        return request.then(failOnHttpError("Failure when updating metadata"));
     }
 
     getVocabulary() {
