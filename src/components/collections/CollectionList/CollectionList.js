@@ -9,6 +9,7 @@ import Icon from "@material-ui/core/Icon";
 import ClickHandler from "../../generic/ClickHandler/ClickHandler"
 import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
 import PermissionChecker from "../../permissions/PermissionChecker";
+import './CollectionList.css';
 
 function CollectionList({collections, selectedCollectionId, onCollectionClick, onCollectionDoubleClick, onCollectionDelete}) {
     if(!collections || collections.length === 0) {

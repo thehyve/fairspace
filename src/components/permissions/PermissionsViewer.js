@@ -13,7 +13,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import PermissionChecker from "./PermissionChecker";
 import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";

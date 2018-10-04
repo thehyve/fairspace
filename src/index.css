@@ -1,5 +1,20 @@
+:root {
+    --mercury-white: #f2f2f2;
+    --mercury-black: #262626;
+
+    --mercury-primary-dark: #005cad;
+    --mercury-primary: #0074D9;
+    --mercury-primary-light: #66abe8;
+    --mercury-primary-lighter: #b2d5f3;
+
+    --mercury-accent: #E91E63;
+    --mercury-primary-text: #212121;
+    --mercury-secondary-text: #757575;
+    --mercury-divider-color: #BDBDBD;
+}
+
 body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
 }
