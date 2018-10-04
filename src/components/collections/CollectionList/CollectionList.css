@@ -1,0 +1,6 @@
+/* style for hover over a collection/file in the collection/file list */
+tbody tr:hover {
+    background-color: var(--mercury-budgreen) !important;
+    cursor: pointer !important;
+}
+

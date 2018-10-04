@@ -1,5 +1,17 @@
+:root {
+    --mercury-blue: #77C0FF;
+    --mercury-white: #F2F2F2;
+    --mercury-black: #LALALA;
+    --mercury-emerald: #009688;
+    --mercury-green: #5AB963;
+    --mercury-budgreen: #8BC34A;
+    --mercury-lime: #CDDC39;
+    --mercury-yellow: #FFEB3B;
+    --mercury-honey: #FFC107;
+}
+
 body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
 }
