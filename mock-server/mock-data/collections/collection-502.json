@@ -4,7 +4,7 @@
   "name": "Private Bioinformatic laboratirum's collection",
   "description": "Beyond the horizon",
   "uri": "https://workspace.ci.test.fairdev.app/iri/collections/502",
-  "access": "Read",
+  "access": "Manage",
   "dateCreated": "2018-09-21T16:11:08.745742Z",
   "creator": "user3-id"
 }

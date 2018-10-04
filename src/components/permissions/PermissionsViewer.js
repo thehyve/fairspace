@@ -51,13 +51,27 @@ const permissionLevel = (p) => {
  * @returns {*}
  */
 const sortAndFilterPermissions = (permissions, creator) => {
-    if (permissions && permissions.data) {
-        return permissions.data
+    if (permissions) {
+        return permissions
             .filter(item => item.subject !== creator)
             .sort(comparing(compareBy(permissionLevel), compareBy('subject')));
     } else {
         return [];
     }
+};
+
+/**
+ * Check if collaborator can alter permission. User can alter permission if:
+ * - has manage access to a collection
+ * - permission is not his/hers
+ * @param canManage
+ * @param permission
+ * @param currentLoggedUser
+ * @returns {*|boolean}
+ */
+const canAlterPermission = (canManage, permission, currentLoggedUser) => {
+    const isSomeoneElsePermission = currentLoggedUser.id !== permission.subject;
+    return canManage && isSomeoneElsePermission;
 };
 
 export class PermissionsViewer extends React.Component {
@@ -159,15 +173,14 @@ export class PermissionsViewer extends React.Component {
     };
 
     renderAlterPermissionButtons(idx, collaborator) {
-        const {classes, canManage} = this.props;
+        const {classes, canManage, currentLoggedUser} = this.props;
         const {hovered} = this.state;
         const secondaryActionClassName = hovered !== idx ? classes.collaboratorIcon : null;
-        return canManage ? (
+        return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
             <ListItemSecondaryAction
                 onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                 onMouseOut={() => this.handleListItemMouseout(idx)}
             >
-                {null}
                 <IconButton aria-label="Delete" className={secondaryActionClassName}
                             onClick={(e) => this.handleMoreClick(collaborator, e)}>
                     <MoreIcon/>
@@ -176,8 +189,8 @@ export class PermissionsViewer extends React.Component {
         ) : '';
     }
 
-    renderCollaboratorList() {
-        const {creator, permissions, canManage} = this.props;
+    renderCollaboratorList(permissions) {
+        const {creator, canManage} = this.props;
         return sortAndFilterPermissions(permissions, creator)
             .map((p, idx) => {
                 return (<ListItem
