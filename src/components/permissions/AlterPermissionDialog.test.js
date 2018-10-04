@@ -31,16 +31,7 @@ describe('AlterPermissionDialog', () => {
     const mockCurrentLoggedUser = {
         id: 'user1-id'
     };
-    const mockCollection = {
-        "id": 500,
-        "location": "Jan_Smit_s_collection-500",
-        "name": "Jan Smit's collection 1",
-        "description": "Jan Smit's collection, beyond the horizon 01",
-        "uri": "https://workspace.ci.test.fairdev.app/iri/collections/500",
-        "access": "Manage",
-        "dateCreated": "2018-09-19T15:48:23.016165Z",
-        "creator": "user4-id"
-    };
+    const mockCollectionId = 500;
     const mockUser = {
         'collectionId': 500,
         'subject': 'user2-id',
@@ -86,7 +77,7 @@ describe('AlterPermissionDialog', () => {
             open={false}
             classes={styles}
             user={null}
-            collection={mockCollection}
+            collectionId={mockCollectionId}
             collaborators={mockCollaborators}
             currentLoggedUser={mockCurrentLoggedUser}
 
@@ -123,7 +114,7 @@ describe('AlterPermissionDialog', () => {
             open={false}
             classes={styles}
             user={mockUser}
-            collection={mockCollection}
+            collectionId={mockCollectionId}
             collaborators={mockCollaborators}
             currentLoggedUser={mockCurrentLoggedUser}
 

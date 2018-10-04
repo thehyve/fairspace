@@ -50,7 +50,11 @@ function InformationDrawer(props) {
                         <Typography className={classes.heading}>Shared with</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <PermissionsContainer collection={collection}/>
+                        <PermissionsContainer
+                            creator={collection.creator}
+                            collectionId={collection.id}
+                            canManage={permissionChecker.canManage(collection)}
+                        />
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <ExpansionPanel defaultExpanded>

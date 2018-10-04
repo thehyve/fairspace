@@ -163,9 +163,9 @@ export class AlterPermissionDialog extends React.Component {
 
     handleSubmit = () => {
         const {selectedUser, accessRight} = this.state;
-        const {collection, alterPermission} = this.props;
+        const {collectionId, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser.value, collection.id, accessRight);
+            alterPermission(selectedUser.value, collectionId, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
@@ -241,7 +241,7 @@ AlterPermissionDialog.propTypes = {
     user: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    collection: PropTypes.object,
+    collectionId: PropTypes.number,
     collaborators: PropTypes.array,
 };
 

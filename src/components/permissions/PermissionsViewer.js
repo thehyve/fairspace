@@ -13,7 +13,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import PermissionChecker from "./PermissionChecker";
 import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
@@ -72,30 +71,23 @@ export class PermissionsViewer extends React.Component {
             anchorEl: null,
             selectedUser: null,
             currentLoggedUser: null,
-            canManage: false,
         };
     }
 
     componentDidMount() {
-        const {collection, fetchPermissions} = this.props;
-        if (collection) {
-            this.setState({
-                canManage: PermissionChecker.canManage(collection)
-            });
-            fetchPermissions(collection.id);
+        const {collectionId, fetchPermissions} = this.props;
+        if (collectionId) {
+            fetchPermissions(collectionId);
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {collection, alteredPermission, fetchPermissions} = this.props;
-        if (collection.id !== prevProps.collection.id) {
-            this.setState({
-                canManage: PermissionChecker.canManage(collection)
-            });
-            fetchPermissions(collection.id);
+        const {collectionId, alteredPermission, fetchPermissions} = this.props;
+        if (collectionId && (collectionId !== prevProps.collectionId)) {
+            fetchPermissions(collectionId);
         }
         if (alteredPermission.data !== prevProps.alteredPermission.data) {
-            fetchPermissions(collection.id);
+            fetchPermissions(collectionId);
         } else if (prevProps.alteredPermission !== alteredPermission && alteredPermission.error) {
             const {alteredPermission} = this.props;
             if (prevProps.alteredPermission !== alteredPermission && alteredPermission.error) {
@@ -132,9 +124,9 @@ export class PermissionsViewer extends React.Component {
 
     handleDeleteCollaborator = () => {
         const {selectedUser} = this.state;
-        const {collection, alterPermission} = this.props;
+        const {collectionId, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser.subject, collection.id, 'None');
+            alterPermission(selectedUser.subject, collectionId, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
@@ -165,8 +157,8 @@ export class PermissionsViewer extends React.Component {
     };
 
     renderAlterPermissionButtons(idx, collaborator) {
-        const {classes} = this.props;
-        const {hovered, canManage} = this.state;
+        const {classes, canManage} = this.props;
+        const {hovered} = this.state;
         const secondaryActionClassName = hovered !== idx ? classes.collaboratorIcon : null;
         return canManage ? (
             <ListItemSecondaryAction
@@ -183,12 +175,12 @@ export class PermissionsViewer extends React.Component {
     }
 
     renderCollaboratorList() {
-        const {collection:{creator}, permissions} = this.props;
+        const {creator, permissions, canManage} = this.props;
         return sortAndFilterPermissions(permissions, creator)
             .map((p, idx) => {
                 return (<ListItem
                     key={idx}
-                    button
+                    button={canManage}
                     onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                     onMouseOut={() => this.handleListItemMouseout(idx)}
                 >
@@ -199,8 +191,7 @@ export class PermissionsViewer extends React.Component {
     }
 
     renderAddCollaboratorButton() {
-        const {classes} = this.props;
-        const {canManage} = this.state;
+        const {classes, canManage} = this.props;
         return canManage ? (
             <ListItem className={classes.buttonList}>
                 <ListItemSecondaryAction>
@@ -230,7 +221,7 @@ export class PermissionsViewer extends React.Component {
     };
 
     render() {
-        const {classes, collection, permissions, currentLoggedUser} = this.props;
+        const {classes, collectionId, permissions, currentLoggedUser} = this.props;
         const {selectedUser, showPermissionDialog, showConfirmDeleteDialog} = this.state;
 
         if (permissions.error) {
@@ -245,7 +236,7 @@ export class PermissionsViewer extends React.Component {
                     <AlterPermission open={showPermissionDialog}
                                      onClose={this.handleShareWithDialogClose}
                                      user={selectedUser}
-                                     collection={collection}
+                                     collectionId={collectionId}
                                      collaborators={permissions.data}
                                      currentLoggedUser={currentLoggedUser}
                     />
