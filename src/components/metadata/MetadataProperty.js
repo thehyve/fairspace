@@ -42,7 +42,8 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
 
     const handleAdd = (newEntry) => {
         if (newEntry.value || newEntry.id) {
-            const updatedValues = [...property.values, newEntry]
+            const updatedValues = [...property.values, newEntry];
+
             return dispatch(updateMetadata(subject, property.key, updatedValues))
                 .catch(e => ErrorDialog.showError(e, "Error while adding metadata"));
         } else {
