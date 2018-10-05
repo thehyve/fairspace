@@ -47,7 +47,7 @@ function InformationDrawer(props) {
                 </ExpansionPanel>
                 <ExpansionPanel defaultExpanded>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                        <Typography className={classes.heading}>Shared with</Typography>
+                        <Typography className={classes.heading}>Collaborators:</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
                         <PermissionsContainer
