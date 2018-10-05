@@ -47,7 +47,7 @@ function FileList(props) {
                                 </TableCell>
                                 <TableCell numeric>
                                     <Typography noWrap={true}>
-                                        {row.size ? <Bytes value={row.size} /> : ''}
+                                        {row.type === 'file' ? <Bytes value={row.size} /> : ''}
                                     </Typography>
                                 </TableCell>
                                 <TableCell numeric>
