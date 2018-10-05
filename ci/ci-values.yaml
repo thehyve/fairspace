@@ -62,13 +62,13 @@ jupyterhub:
     singleuser:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
-            tag: 0.1.37
+            tag: 0.1.40
         extraEnv:
           WORKSPACE_URL: https://workspace.ci.test.fairdev.app
     hub:
         image:
             name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
-            tag: 0.1.7
+            tag: 0.1.10
         extraEnv:
             JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
     proxy:
