@@ -194,7 +194,7 @@ describe('PermissionViewer', () => {
         });
 
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find('[aria-label="Alter Permission"]').length).toEqual(2)
+            expect(wrapper.find('[aria-label="Alter Permission"]').length).toEqual(3)
         });
 
         it('should render add button', () => {
