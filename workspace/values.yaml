@@ -74,13 +74,15 @@ workspace:
                 dns01Provider: clouddns
 
     testuser:
-         password: fairspace123
+        password: fairspace123
+    coordinator:
+        password: fairspace123
 
     # Scripts for setting up keycloak for a workspace
     configurationScripts:
         dockerRepository: docker-registry.jx.test.fairdev.app
         image: fairspace/keycloak-configuration
-        configurationScriptsTag: 0.0.20
+        configurationScriptsTag: 0.0.23
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto
