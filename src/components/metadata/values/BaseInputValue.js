@@ -1,7 +1,7 @@
 import React from 'react'
 import TextField from "@material-ui/core/TextField";
 
-class StringValue extends React.Component {
+class BaseInputValue extends React.Component {
     constructor(props) {
         super(props);
 
@@ -32,9 +32,9 @@ class StringValue extends React.Component {
     }
 }
 
-StringValue.defaultProps = {
+BaseInputValue.defaultProps = {
     entry: {value: ''},
     transformValue: v => v
 };
 
-export default StringValue;
+export default BaseInputValue;

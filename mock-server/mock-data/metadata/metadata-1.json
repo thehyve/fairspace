@@ -11,7 +11,8 @@
         "isConsentOf": "fs:isConsentOf",
         "dataset": "sdo:Dataset",
         "person": "sdo:Person",
-        "material": "sdo:Material"
+        "material": "sdo:Material",
+        "dateCreated": "sdo:dateCreated"
     },
     "@graph": [
         {
@@ -22,6 +23,7 @@
             ],
             "description": "An example collection with testdata from GSE8581",
             "name": "GSE8581",
+            "dateCreated": "2018-10-05T12:35:51.099Z",
             "about": [
                 {
                     "@id": "ws:patients/GSM212810"
