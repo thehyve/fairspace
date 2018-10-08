@@ -13,9 +13,9 @@
         "id": 501,
         "location": "Jan_Smit_s_collection-501",
         "name": "Jan Smit's collection 2",
-        "description": "Jan Smit's collection, beyond the horizon 02",
+        "description": "Jan Smit's collection, but he only can read",
         "uri": "https://workspace.ci.test.fairdev.app/iri/collections/503",
-        "access": "Manage",
+        "access": "Read",
         "dateCreated": "2018-09-19T15:48:23.016165Z",
         "creator": "user4-id"
     },

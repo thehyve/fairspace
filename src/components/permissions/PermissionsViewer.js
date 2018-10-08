@@ -17,7 +17,7 @@ import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
 
-const styles = theme => ({
+export const styles = theme => ({
     root: {},
     collaboratorIcon: {
         visibility: "hidden",
@@ -49,10 +49,9 @@ const permissionLevel = (p) => {
  * @param creator
  * @returns {*}
  */
-const sortAndFilterPermissions = (permissions, creator) => {
+const sortPermissions = (permissions, creator) => {
     if (permissions) {
         return permissions
-            .filter(item => item.subject !== creator)
             .sort(comparing(compareBy(permissionLevel), compareBy('subject')));
     } else {
         return [];
@@ -180,7 +179,7 @@ export class PermissionsViewer extends React.Component {
                 onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                 onMouseOut={() => this.handleListItemMouseout(idx)}
             >
-                <IconButton aria-label="Delete" className={secondaryActionClassName}
+                <IconButton aria-label="Alter Permission" className={secondaryActionClassName}
                             onClick={(e) => this.handleMoreClick(collaborator, e)}>
                     <MoreIcon/>
                 </IconButton>
@@ -189,12 +188,12 @@ export class PermissionsViewer extends React.Component {
     }
 
     renderCollaboratorList(permissions) {
-        const {creator, canManage} = this.props;
-        return sortAndFilterPermissions(permissions, creator)
+        const {creator, canManage, currentLoggedUser} = this.props;
+        return sortPermissions(permissions, creator)
             .map((p, idx) => {
                 return (<ListItem
                     key={idx}
-                    button={canManage}
+                    button={canAlterPermission(canManage, p, currentLoggedUser)}
                     onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                     onMouseOut={() => this.handleListItemMouseout(idx)}
                 >

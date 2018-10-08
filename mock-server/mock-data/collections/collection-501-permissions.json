@@ -1,16 +1,16 @@
 [
     {
-        "collectionId": 502,
-        "subject": "user4-id",
-        "access": "Manage"
+        "collectionId": 501,
+        "subject": "user2-id",
+        "access": "Write"
     },
     {
-        "collectionId": 502,
+        "collectionId": 501,
         "subject": "user3-id",
         "access": "Manage"
     },
     {
-        "collectionId": 502,
+        "collectionId": 501,
         "subject": "user1-id",
         "access": "Read"
     }

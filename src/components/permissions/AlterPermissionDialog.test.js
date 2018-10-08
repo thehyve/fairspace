@@ -1,6 +1,8 @@
 import React from 'react';
 import {createShallow} from '@material-ui/core/test-utils';
 import {AlterPermissionDialog, styles} from "./AlterPermissionDialog";
+import mockStore from "../../store/mockStore";
+import {Provider} from "react-redux";
 
 describe('AlterPermissionDialog', () => {
 
@@ -16,18 +18,20 @@ describe('AlterPermissionDialog', () => {
             {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
         ]
     };
-    const mockCollaborators = { data: [
-        {
-            'collectionId': 500,
-            'subject': 'user2-id',
-            'access': 'Write'
-        },
-        {
-            'collectionId': 500,
-            'subject': 'user4-id',
-            'access': 'Manage'
-        }
-    ]};
+    const mockCollaborators = {
+        data: [
+            {
+                'collectionId': 500,
+                'subject': 'user2-id',
+                'access': 'Write'
+            },
+            {
+                'collectionId': 500,
+                'subject': 'user4-id',
+                'access': 'Manage'
+            }
+        ]
+    };
     const mockCurrentLoggedUser = {
         id: 'user1-id'
     };
@@ -41,35 +45,35 @@ describe('AlterPermissionDialog', () => {
     let wrapper;
 
     beforeAll(() => {
-        shallow = createShallow({ dive: true });
+        shallow = createShallow({dive: true});
     });
 
     it('should render initial state of the dialog correctly', () => {
         const expectedOptions = [
             {
-                "disabled":true,
-                "label":"Mariah Carey",
-                "value":"user1-id"
+                "disabled": true,
+                "label": "Mariah Carey",
+                "value": "user1-id"
             },
             {
-                "disabled":true,
-                "label":"Michael Jackson",
-                "value":"user2-id"
+                "disabled": true,
+                "label": "Michael Jackson",
+                "value": "user2-id"
             },
             {
-                "disabled":false,
-                "label":"Bruno Mars",
-                "value":"user3-id"
+                "disabled": false,
+                "label": "Bruno Mars",
+                "value": "user3-id"
             },
             {
-                "disabled":true,
-                "label":"Kurt Cobain",
-                "value":"user4-id"
+                "disabled": true,
+                "label": "Kurt Cobain",
+                "value": "user4-id"
             },
             {
-                "disabled":false,
-                "label":"Ariana Grande",
-                "value":"user5-id"
+                "disabled": false,
+                "label": "Ariana Grande",
+                "value": "user5-id"
             }
         ];
 
@@ -110,20 +114,30 @@ describe('AlterPermissionDialog', () => {
     });
 
     it('should not render user selector and render selected user fullname instead when user is provided', () => {
-        wrapper = shallow(<AlterPermissionDialog
-            open={false}
-            classes={styles}
-            user={mockUser}
-            collectionId={mockCollectionId}
-            collaborators={mockCollaborators}
-            currentLoggedUser={mockCurrentLoggedUser}
+        const store = mockStore({});
+        wrapper = shallow(
+            <Provider store={store}>
+                <AlterPermissionDialog
+                    open={false}
+                    classes={styles}
+                    user={mockUser}
+                    collectionId={mockCollectionId}
+                    collaborators={mockCollaborators}
+                    currentLoggedUser={mockCurrentLoggedUser}
 
-            fetchUsers={mockfetchUsersFn}
-            alterPermission={mockAlterPermissionFn}
-            users={mockUsers}
-        />);
+                    fetchUsers={mockfetchUsersFn}
+                    alterPermission={mockAlterPermissionFn}
+                    users={mockUsers}
+                />
+            </Provider>
+        );
+
+        // select a user
+        wrapper.setState({selectedUser: mockUser});
+
         expect(wrapper.find('WithStyles(MaterialReactSelect)')).toHaveLength(0);
         expect(wrapper.find('WithStyles(Typography)').childAt(0).text()).toEqual('Michael Jackson');
+        expect(wrapper.find('WithStyles(Button)').at(1).prop('disabled')).toBeFalsy(); // submit button enabled
     });
 
     // TODO: Add more tests on behaviour changes
