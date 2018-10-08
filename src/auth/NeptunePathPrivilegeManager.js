@@ -41,14 +41,15 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
                         callback(null, true);
                         break;
                 }
-            }).catch(err => {
-            console.error(err);
-            if (err && err.response && err.response.status === 404) {
-                callback(null, false)
-            } else {
-                callback(err, false)
-            }
-        });
+            })
+            .catch(err => {
+                console.error(err);
+                if (err && err.response && err.response.status === 404) {
+                    callback(null, false)
+                } else {
+                    callback(err, false)
+                }
+            });
     }
 
     _retrieveAccess(collectionLocation, user) {
