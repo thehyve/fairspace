@@ -17,8 +17,7 @@ nock('http://fairspace.io', {
 })
     .get('/api/collections/permissions')
     .query({location: '1'})
-    .times(100)
-    .reply(200, {collection: 1, subject: 'alice', access: 'Manage'});
+    .reply(200, {collection: 1, subject: 'alice', access: 'Manage'}, {'Cache-Control': 'max-age=60'});
 
 nock('http://fairspace.io', {
     reqheaders: {
@@ -27,8 +26,7 @@ nock('http://fairspace.io', {
 })
     .get('/api/collections/permissions')
     .query({location: 'newname-1'})
-    .times(100)
-    .reply(200, {collection: 1, subject: 'alice', access: 'Manage'});
+    .reply(200, {collection: 1, subject: 'alice', access: 'Manage'}, {'Cache-Control': 'max-age=60'});
 
 nock('http://fairspace.io', {
     reqheaders: {
@@ -37,8 +35,7 @@ nock('http://fairspace.io', {
 })
     .get('/api/collections/permissions')
     .query({location: '1'})
-    .times(100)
-    .reply(200, {collection: 1, subject: 'bob', access: 'None'});
+    .reply(200, {collection: 1, subject: 'bob', access: 'None'}, {'Cache-Control': 'max-age=60'});
 
 nock('http://fairspace.io', {
     reqheaders: {
