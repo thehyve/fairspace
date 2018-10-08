@@ -9,7 +9,7 @@
   },
   "@graph": [
     {
-      "@id": "fairspace:Collection",
+      "@id": "fairspace:",
       "@type": "rdf:Class",
       "rdfs:label": "Collection"
     },
@@ -136,7 +136,7 @@
       "@type": "rdf:Property",
       "rdfs:label": "Has data",
       "rdfs:domain": [
-        {"@id": "schema:Person"}, 
+        {"@id": "schema:Person"},
         {"@id": "schema:Material"}
       ],
       "rdfs:range": [
