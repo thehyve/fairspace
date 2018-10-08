@@ -26,20 +26,18 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
                 // Operations with top-level directories should be made via Neptune which sets Anticipated-Operation
                 if (criticalCollectionOperation) {
                     callback(null, (access === 'Manage') && (resource.context.headers.headers['anticipated-operation'] === 'true'));
-                    return
-                }
-
-                switch (access) {
-                    case 'None':
-                        callback(null, false);
-                        break;
-                    case 'Read':
-                        callback(null, privilege.startsWith('canRead'));
-                        break;
-                    case 'Write':
-                    case 'Manage':
-                        callback(null, true);
-                        break;
+                } else {
+                    switch (access) {
+                        case 'Read':
+                            callback(null, privilege.startsWith('canRead'));
+                            break;
+                        case 'Write':
+                        case 'Manage':
+                            callback(null, true);
+                            break;
+                        default:
+                            callback(null, false);
+                    }
                 }
             })
             .catch(err => {
