@@ -1,7 +1,7 @@
 import React from 'react'
 import Switch from "@material-ui/core/Switch";
 
-class StringValue extends React.Component {
+class SwitchValue extends React.Component {
     constructor(props) {
         super(props);
 
@@ -24,8 +24,8 @@ class StringValue extends React.Component {
     }
 }
 
-StringValue.defaultProps = {
+SwitchValue.defaultProps = {
     entry: {value: ''}
 };
 
-export default StringValue;
+export default SwitchValue;
