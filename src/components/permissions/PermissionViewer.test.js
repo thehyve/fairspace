@@ -166,8 +166,6 @@ describe('PermissionViewer', () => {
                 alterPermission={mockAlterPermissionFn}
                 fetchPermissions={mockFecthPermissionsFn}
             />);
-            // debug
-            console.log(wrapper.debug());
         });
 
         it('should render all collaborators', () => {
