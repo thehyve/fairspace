@@ -197,7 +197,7 @@ export class PermissionsViewer extends React.Component {
                     onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                     onMouseOut={() => this.handleListItemMouseout(idx)}
                 >
-                    <ListItemText primary={p.subject} secondary={p.access}/>
+                    <ListItemText primary={`${p.firstName} ${p.lastName}`} secondary={p.access}/>
                     {this.renderAlterPermissionButtons(idx, p)}
                 </ListItem>);
             });
@@ -236,7 +236,6 @@ export class PermissionsViewer extends React.Component {
     render() {
         const {classes, collectionId, permissions, currentLoggedUser} = this.props;
         const {selectedUser, showPermissionDialog, showConfirmDeleteDialog} = this.state;
-
         if (permissions.error) {
             return (<ErrorMessage>message={`Error loading permissions`}</ErrorMessage>)
         } else if (permissions.pending) {

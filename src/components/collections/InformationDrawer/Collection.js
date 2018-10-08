@@ -12,7 +12,7 @@ import ErrorDialog from "../../error/ErrorDialog";
 import {connect} from 'react-redux'
 import * as collectionActions from '../../../actions/collections'
 
-class Collection extends React.Component{
+class Collection extends React.Component {
     constructor(props) {
         super(props);
         this.onDidChangeDetails = props.onDidChangeDetails;
@@ -67,7 +67,7 @@ class Collection extends React.Component{
             .then(() => {
                 let collection = Object.assign(this.state.collection, this.state.editValues);
 
-                if(this.onDidChangeDetails) {
+                if (this.onDidChangeDetails) {
                     this.onDidChangeDetails(collection);
                 }
             })
@@ -83,6 +83,7 @@ class Collection extends React.Component{
     handleTextMouseEnter() {
         this.setState({showEditButton: true});
     }
+
     handleTextMouseLeave() {
         this.setState({showEditButton: false});
     }
@@ -99,8 +100,11 @@ class Collection extends React.Component{
                     onMouseEnter={this.handleTextMouseEnter.bind(this)}
                     onMouseLeave={this.handleTextMouseLeave.bind(this)}
                 >
-                    <Typography variant="headline" component='h2'>{this.state.collection.name} {this.state.showEditButton ? (<Icon>edit</Icon>) : ''}</Typography>
-                    <Typography gutterBottom variant='subheading' color="textSecondary">Owner: {this.state.collection.creator}</Typography>
+                    <Typography variant="headline"
+                                component='h2'>{this.state.collection.name} {this.state.showEditButton ? (
+                        <Icon>edit</Icon>) : ''}</Typography>
+                    <Typography gutterBottom variant='subheading'
+                                color="textSecondary">Owner: {this.props.creator}</Typography>
                     <Typography component='p'>{this.state.collection.description}</Typography>
                 </div>
 
@@ -152,10 +156,22 @@ class Collection extends React.Component{
     }
 }
 
-const mapStateToProps = null
+const getCreator = (collection, users) => {
+    if (collection && users && users.data) {
+        const user = users.data.find(user => user.id === collection.creator);
+        return  user && `${user.firstName} ${user.lastName}`;
+    }
+};
+
+const mapStateToProps = (state, ownProps) => {
+    return {
+        creator: getCreator(ownProps.collection, state.cache.users)
+    }
+};
+
 const mapDispatchToProps = {
     ...collectionActions
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Collection);
 

@@ -9,22 +9,30 @@ describe('PermissionViewer', () => {
             {
                 'collectionId': 500,
                 'subject': 'user2-id',
-                'access': 'Write'
+                'access': 'Write',
+                'firstName': 'Michael',
+                'lastName': 'Jackson'
             },
             {
                 'collectionId': 500,
                 'subject': 'user3-id',
-                'access': 'Read'
+                'access': 'Read',
+                'firstName': 'Bruno',
+                'lastName': 'Mars'
             },
             {
                 'collectionId': 500,
                 'subject': 'user1-id',
-                'access': 'Manage'
+                'access': 'Manage',
+                'firstName': 'Mariah',
+                'lastName': 'Carey'
             },
             {
                 'collectionId': 500,
                 'subject': 'user4-id',
-                'access': 'Manage'
+                'access': 'Manage',
+                'firstName': 'Kurt',
+                'lastName': 'Cobain'
             }
         ]
     };
@@ -69,19 +77,19 @@ describe('PermissionViewer', () => {
 
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'user1-id',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'user4-id',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
-                primary: 'user2-id',
+                primary: 'Michael Jackson',
                 secondary: 'Write'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(3).props('primary')).toEqual({
-                primary: 'user3-id',
+                primary: 'Bruno Mars',
                 secondary: 'Read'
             });
         });
@@ -121,19 +129,19 @@ describe('PermissionViewer', () => {
 
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'user1-id',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'user4-id',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
-                primary: 'user2-id',
+                primary: 'Michael Jackson',
                 secondary: 'Write'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(3).props('primary')).toEqual({
-                primary: 'user3-id',
+                primary: 'Bruno Mars',
                 secondary: 'Read'
             });
         });
@@ -174,19 +182,19 @@ describe('PermissionViewer', () => {
 
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'user1-id',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'user4-id',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
-                primary: 'user2-id',
+                primary: 'Michael Jackson',
                 secondary: 'Write'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(3).props('primary')).toEqual({
-                primary: 'user3-id',
+                primary: 'Bruno Mars',
                 secondary: 'Read'
             });
         });
