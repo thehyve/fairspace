@@ -6,7 +6,6 @@ app:
   metadata:
     base-url: http://fairspace.com
 
-# Configuration for sql database which stores predicates and labels
 spring:
   application:
     name: Neptune
@@ -15,6 +14,7 @@ spring:
       probability: 1.0
   zipkin:
     base-url: http://jaeger-collector.jaeger:9411/
+  # Configuration for sql database which stores predicates and labels
   datasource:
     url: "jdbc:postgresql://demo-postgresql:5432/postgres"
     username: "postgres"
@@ -48,3 +48,7 @@ security:
     - /actuator/health
     needsAuthentication:
     - /*
+
+permissions:
+  # in seconds
+  cachePeriod: 60

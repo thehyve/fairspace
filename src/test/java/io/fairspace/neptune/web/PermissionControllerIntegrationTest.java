@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -72,6 +73,8 @@ public class PermissionControllerIntegrationTest {
         io.fairspace.neptune.web.dto.Permission expectedCollection =
                 new io.fairspace.neptune.web.dto.Permission(permission.getSubject(), collectionId, permission.getAccess());
         assertEquals(expectedCollection, collectionList.get(0));
+
+        assertEquals("max-age=60", response.getHeaders().getFirst("Cache-Control"));
     }
 
     @Test
