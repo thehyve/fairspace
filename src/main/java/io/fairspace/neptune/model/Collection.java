@@ -16,14 +16,14 @@ import java.time.ZonedDateTime;
 @Builder(toBuilder = true)
 public class Collection {
     public enum CollectionType {
-        LOCAL_FILE
+        LOCAL_FILE,
+        S3_BUCKET
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @JsonIgnore
     private final CollectionType type = CollectionType.LOCAL_FILE;
 
     private String location;
