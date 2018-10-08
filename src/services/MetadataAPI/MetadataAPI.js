@@ -1,5 +1,6 @@
 import Config from "../../components/generic/Config/Config";
 import vocabulary from './vocabulary.json'
+import getEntitiesByTypesSparql from './get-entities-by-types.sparql'
 import {failOnHttpError} from "../../utils/httputils";
 import * as jsonld from 'jsonld/dist/jsonld';
 import Vocabulary from "./Vocabulary";
@@ -39,7 +40,7 @@ class MetadataAPI {
 
     get(params) {
         let query = Object.keys(params).map(key => key + '=' + encodeURIComponent(params[key])).join('&');
-        return fetch(Config.get().urls.metadata + '?' + query, MetadataAPI.getParams)
+        return fetch(Config.get().urls.metadata.statements + '?' + query, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(jsonld.expand);
@@ -60,13 +61,13 @@ class MetadataAPI {
         }
 
         let request = (values.length === 0)
-            ? fetch(Config.get().urls.metadata
+            ? fetch(Config.get().urls.metadata.statements
                 + '?subject=' + encodeURIComponent(subject)
                 + '&predicate=' + encodeURIComponent(predicate), {
                 method: 'DELETE',
                 credentials: 'same-origin'
             })
-            : fetch(Config.get().urls.metadata, {
+            : fetch(Config.get().urls.metadata.statements, {
                 method: 'PATCH',
                 headers: new Headers({'Content-type': 'application/ld+json'}),
                 credentials: 'same-origin',
@@ -80,8 +81,42 @@ class MetadataAPI {
         return this.vocabularyPromise;
     }
 
+    /**
+     * Returns all entities in the metadata store for the given type
+     *
+     * More specifically this method returns all entities x for which a
+     * triple exist <x> <@type> <type> exists.
+     *
+     * @param type  URI of the Class that the entities should be a type of
+     * @returns Promise<jsonld> A promise with an expanded version of the JSON-LD structure, describing the entities.
+     *                          The entities will have an ID, type and optionally an rdfs:label
+     */
     getEntitiesByType(type) {
-        return this.get({predicate: TYPE_URI, object: type})
+        return this.getEntitiesByTypes([type])
+    }
+
+    /**
+     * Returns all entities in the metadata store for the given list of types
+     *
+     * More specifically this method returns all entities x for which a
+     * triple exist <x> <@type> <t> exists where t is in the given list of types
+     *
+     * @param type  URI of the Class that the entities should be a type of
+     * @returns Promise<jsonld> A promise with an expanded version of the JSON-LD structure, describing the entities.
+     *                          The entities will have an ID, type and optionally an rdfs:label
+     */
+    getEntitiesByTypes(types) {
+        const query = getEntitiesByTypesSparql.replace('%types', types.join(', '));
+
+        return fetch(Config.get().urls.metadata.query + '?' + query, {
+            method: 'POST',
+            headers: new Headers({'Accept': 'application/ld+json', 'Content-type': 'application/sparql-query'}),
+            credentials: 'same-origin',
+            body: query
+        })
+            .then(failOnHttpError("Failure when retrieving entities"))
+            .then(response => response.json())
+            .then(jsonld.expand);
     }
 
     getPropertiesByDomain(type) {

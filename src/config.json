@@ -7,7 +7,10 @@
     "permissionsByCollectionId": "/api/collections/%d/permissions",
     "permissions": "/api/collections/permissions",
     "files": "/api/storage/webdav",
-    "metadata": "/api/metadata/statements",
+    "metadata": {
+      "statements": "/api/metadata/statements",
+      "query": "/api/metadata/query"
+    },
     "users": "/api/workspace/users"
   },
   "externalConfigurationFiles": [
