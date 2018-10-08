@@ -34,7 +34,7 @@ function CollectionList({collections, selectedCollectionId, onCollectionClick, o
                                     onSingleClick={() => onCollectionClick(collection)}
                                     onDoubleClick={() => onCollectionDoubleClick(collection)}>
                                 <TableCell>
-                                    <Icon>folder_open</Icon>
+                                    <Icon>{collection.type === 'S3_BUCKET' ? 'cloud_open' : 'folder_open'}</Icon>
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     <CollectionItem collection={collection}/>
