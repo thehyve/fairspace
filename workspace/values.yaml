@@ -82,7 +82,7 @@ workspace:
     configurationScripts:
         dockerRepository: docker-registry.jx.test.fairdev.app
         image: fairspace/keycloak-configuration
-        configurationScriptsTag: 0.0.23
+        configurationScriptsTag: 0.0.25
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto
