@@ -14,7 +14,10 @@ const mockResponse = (status, statusText, response) => {
 beforeAll(() => {
     Config.setConfig({
         "urls": {
-            "metadata": "/metadata"
+            "metadata": {
+                statements: "/metadata",
+                query: "/query"
+            }
         }
     });
 
@@ -46,4 +49,17 @@ it('stores metadata as jsonld', () => {
             ]
         }
     ]));
+})
+
+it('retrieves metadata entities using a sparql query', () => {
+    window.fetch = jest.fn(() =>
+        Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))))
+    ;
+
+    const type = 'http://my-special-entity-type';
+    MetadataAPI.getEntitiesByType(type);
+    expect(window.fetch.mock.calls[0][0]).toEqual("/query");
+    expect(window.fetch.mock.calls[0][1].method).toEqual('POST');
+    expect(window.fetch.mock.calls[0][1].body).toContain('PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>');
+    expect(window.fetch.mock.calls[0][1].body).toContain(type);
 })

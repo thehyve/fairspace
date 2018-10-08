@@ -1,6 +1,5 @@
 import Config from "../../components/generic/Config/Config";
 import vocabulary from './vocabulary.json'
-import getEntitiesByTypesSparql from './get-entities-by-types.sparql'
 import {failOnHttpError} from "../../utils/httputils";
 import * as jsonld from 'jsonld/dist/jsonld';
 import Vocabulary from "./Vocabulary";
@@ -22,6 +21,16 @@ export const DECIMAL_URI = 'http://www.w3.org/TR/xmlschema11-2/#decimal';
 
 export const ALLOW_MULTIPLE_URI = 'http://fairspace.io/ontology#allowMultiple';
 export const MULTILINE_PROPERTY_URI = 'http://fairspace.io/ontology#multiLine';
+
+const GET_ENTITIES_SPARQL = `
+    PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    CONSTRUCT {?s rdf:type ?t . ?s rdfs:label ?l}
+    WHERE {
+        { ?s rdf:type ?t FILTER(?t in (%types))}
+        OPTIONAL { ?s rdfs:label ?l}
+    }
+`
 
 class MetadataAPI {
 
@@ -106,9 +115,9 @@ class MetadataAPI {
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
     getEntitiesByTypes(types) {
-        const query = getEntitiesByTypesSparql.replace('%types', types.join(', '));
+        const query = GET_ENTITIES_SPARQL.replace('%types', types.join(', '));
 
-        return fetch(Config.get().urls.metadata.query + '?' + query, {
+        return fetch(Config.get().urls.metadata.query, {
             method: 'POST',
             headers: new Headers({'Accept': 'application/ld+json', 'Content-type': 'application/sparql-query'}),
             credentials: 'same-origin',
