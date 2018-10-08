@@ -21,7 +21,8 @@
     {
       "@id": "schema:Person",
       "@type": "rdf:Class",
-      "rdfs:label": "Person"
+      "rdfs:label": "Person",
+      "fairspace:fairspaceEntity": true
     },
     {
       "@id": "fairspace:User",
@@ -31,17 +32,20 @@
     {
       "@id": "schema:Material",
       "@type": "rdf:Class",
-      "rdfs:label": "Material"
+      "rdfs:label": "Material",
+      "fairspace:fairspaceEntity": true
     },
     {
       "@id": "fairspace:PersonConsent",
       "@type": "rdf:Class",
-      "rdfs:label": "Person Consent"
+      "rdfs:label": "Person Consent",
+      "fairspace:fairspaceEntity": true
     },
     {
       "@id": "fairspace:ResearchProject",
       "@type": "rdf:Class",
-      "rdfs:label": "Research Project"
+      "rdfs:label": "Research Project",
+      "fairspace:fairspaceEntity": true
     },
 
     {
