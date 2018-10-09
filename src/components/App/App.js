@@ -43,7 +43,7 @@ class App extends React.Component {
                 store.dispatch(fetchUser());
                 store.dispatch(fetchAuthorizations());
                 store.dispatch(fetchWorkspace());
-                this.cancellable.setState({configLoaded: true});
+                this.cancellable.setState && this.cancellable.setState({configLoaded: true});
             });
     }
 
