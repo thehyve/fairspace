@@ -1,5 +1,5 @@
-import UserAPI from '../services/UserAPI/UserAPI'
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
+import WorkspaceAPI from '../services/WorkspaceAPI/WorkspaceAPI'
 import {USERS} from "./actionTypes";
 
 export const fetchUsersIfNeeded = () => dispatchIfNeeded(
@@ -9,5 +9,5 @@ export const fetchUsersIfNeeded = () => dispatchIfNeeded(
 
 export const fetchUsers = createErrorHandlingPromiseAction(() => ({
     type: USERS,
-    payload: UserAPI.getUsers(),
+    payload: WorkspaceAPI.getUsers(),
 }));

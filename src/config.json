@@ -11,7 +11,8 @@
       "statements": "/api/metadata/statements",
       "query": "/api/metadata/query"
     },
-    "users": "/api/workspace/users"
+    "users": "/api/workspace/users",
+    "workspace": "/api/workspace/details"
   },
   "externalConfigurationFiles": [
     "/api/workspace/config"

@@ -44,6 +44,8 @@ app.post('/api/metadata/query', (req, res) => res.sendFile(mockDataDir + '/metad
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(mockDataDir + '/workspace/users.json'));
 app.get('/api/workspace/config', (req, res) => res.sendFile(mockDataDir + '/workspace/workspace-config.json'));
+app.get('/api/workspace/details', (req, res) => res.sendFile(mockDataDir + '/workspace/workspace-details.json'));
+
 
 // Add webdav server on /files
 const server = new webdav.WebDAVServer();

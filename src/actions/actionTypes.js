@@ -46,3 +46,6 @@ export const METADATA_ALL_ENTITIES  = "METADATA_ALL_ENTITIES";
 export const PERMISSIONS = 'PERMISSIONS';
 export const ALTER_PERMISSION = 'ALTER_PERMISSION';
 export const USERS = 'USERS';
+
+// Workspace
+export const WORKSPACE = 'WORKSPACE';

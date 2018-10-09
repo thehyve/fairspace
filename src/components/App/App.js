@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
-import './App.css';
 import styles from './App.styles';
 import TopBar from "../layout/TopBar/TopBar";
+import Footer from '../layout/Footer/Footer';
 import MenuDrawer from "../layout/MenuDrawer/MenuDrawer";
 import AuthorizationCheck from "../generic/AuthorizationCheck/AuthorizationCheck";
 import Config from "../generic/Config/Config";
@@ -16,7 +16,8 @@ import MetadataEntityPage from "../../pages/Metadata/MetadataEntityPage";
 import MetadataOverviewPage from "../../pages/Metadata/MetadataOverviewPage";
 import ErrorDialog from "../error/ErrorDialog";
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
-import store from "../../store/configureStore"
+import {fetchWorkspace} from "../../actions/workspace";
+import store from "../../store/configureStore";
 import {Provider} from "react-redux";
 import Files from "../../pages/Files/Files";
 import {logout} from "./logout";
@@ -30,8 +31,9 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        
-        this.state = {configLoaded: false};
+        this.state = {
+            configLoaded: false
+        };
     }
 
     componentDidMount() {
@@ -40,8 +42,8 @@ class App extends React.Component {
             .then(() => {
                 store.dispatch(fetchUser());
                 store.dispatch(fetchAuthorizations());
-
-                this.cancellable.setState && this.cancellable.setState({configLoaded: true})
+                store.dispatch(fetchWorkspace());
+                this.cancellable.setState({configLoaded: true});
             });
     }
 
@@ -59,7 +61,7 @@ class App extends React.Component {
     }
 
     render() {
-        if(this.state.configLoaded) {
+        if (this.state.configLoaded) {
             const classes = this.props.classes;
             // The app itself consists of a topbar, a drawer and the actual page
             // The topbar is shown even if the user has no proper authorization
@@ -78,6 +80,7 @@ class App extends React.Component {
                                         <Route exact path="/collections" component={Collections}/>
                                         <Route path="/collections/:collection/:path(.*)?" component={Files}/>
                                         <Route path="/notebooks" component={Notebooks}/>
+
                                         <Route exact path="/metadata" component={MetadataOverviewPage}/>
                                         <Route path="/metadata/:type(projects|patients|samples|consents)/:id" component={MetadataEntityPage}/>
 
@@ -87,6 +90,7 @@ class App extends React.Component {
                                     </main>
                                 </AuthorizationCheck>
                             </Router>
+                            <Footer></Footer>
                         </ErrorDialog>
                     </Provider>
                 </div>
