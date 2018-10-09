@@ -18,6 +18,7 @@ import {fetchAuthorizations, fetchUser} from "../../actions/account";
 import store from "../../store/configureStore"
 import {Provider} from "react-redux";
 import Files from "../../pages/Files/Files";
+import {logout} from "./logout";
 
 class App extends React.Component {
     cancellable = {
@@ -80,7 +81,7 @@ class App extends React.Component {
 
                                         {/* Handle auth urls that should go to the server */}
                                         <Route path="/login" render={() => {window.location.href = '/login';}}/>
-                                        <Route path="/logout" render={() => {window.location.href = '/logout';}}/>
+                                        <Route path="/logout" render={logout}/>
                                     </main>
                                 </AuthorizationCheck>
                             </Router>

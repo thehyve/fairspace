@@ -5,13 +5,10 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Config from "../../generic/Config/Config";
 import UserMenu from "../UserMenu/UserMenu";
+import {logout} from "../../App/logout";
 
 function TopBar(props) {
     const { classes } = props;
-
-    const handleLogout = () => {
-        window.location.href = Config.get().urls.logout
-    }
 
     return (
         <AppBar position="absolute" className={classes.appBar}>
@@ -19,7 +16,7 @@ function TopBar(props) {
                 <Typography variant="title" color="inherit" noWrap className={classes.flex}>
                     Workspace name
                 </Typography>
-                <UserMenu onLogout={handleLogout}></UserMenu>
+                <UserMenu onLogout={logout}></UserMenu>
             </Toolbar>
         </AppBar>
     );
