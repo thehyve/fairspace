@@ -9,7 +9,7 @@
   },
   "@graph": [
     {
-      "@id": "fairspace:",
+      "@id": "fairspace:Collection",
       "@type": "rdf:Class",
       "rdfs:label": "Collection"
     },
