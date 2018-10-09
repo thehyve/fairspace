@@ -1,23 +1,25 @@
 import React from 'react';
-import './Footer.css';
 import {connect} from 'react-redux';
+import styles from './Footer.styles';
+import {withStyles} from '@material-ui/core/styles';
 
 export class Footer extends React.Component {
 
     render() {
         return (
-            <div className={'footer'}>{this.props.workspaceName} {this.props.workspaceVersion}</div>
+            <div className={this.props.classes.footer}>{this.props.name} {this.props.version}</div>
         )
     };
 }
 
 function mapStateToProps(state) {
+    const data = state.workspace.data;
     return {
-        workspaceName: state.workspace.name,
-        workspaceVersion: state.workspace.version
+        name: data ? data.name : '',
+        version: data ? data.version : ''
     };
 }
 
-export default connect(mapStateToProps)(Footer);
+export default connect(mapStateToProps)(withStyles(styles)(Footer));
 
 

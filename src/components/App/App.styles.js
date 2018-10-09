@@ -1,5 +1,6 @@
 const menuDrawerWidth = 240;
 
+
 const styles = theme => ({
     root: {
         flexGrow: 1,
@@ -10,11 +11,13 @@ const styles = theme => ({
         display: 'flex',
     },
     appBar: {
-        zIndex: theme.zIndex.drawer + 1,
+        zIndex: theme.zIndex.drawer + 1
     },
     menuDrawerPaper: {
         position: 'relative',
         width: menuDrawerWidth,
+        height: '100vh',
+        zIndex: theme.zIndex.drawer
     },
     content: {
         flexGrow: 1,

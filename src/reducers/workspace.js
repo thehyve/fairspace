@@ -1,20 +1,6 @@
-const defaultState = {
-    name: '',
-    version: ''
-};
+import {promiseReducerFactory} from "../utils/redux";
+import {WORKSPACE} from "../actions/actionTypes";
 
-const workspace = (state = defaultState, action) => {
-    switch (action.type) {
-        case 'WORKSPACE_FULFILLED':
-            return {
-                ...state,
-                name: action.payload.name,
-                version: action.payload.version
-            };
-        default:
-            return state;
-    }
-}
+const defaultState = {};
 
-
-export default workspace;
+export default promiseReducerFactory(WORKSPACE, defaultState);

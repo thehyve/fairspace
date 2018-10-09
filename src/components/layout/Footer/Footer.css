@@ -1,9 +1,0 @@
-.footer {
-    background-color: var(--mercury-primary-dark);
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    color: var(--mercury-white);
-    text-align: center;
-}
