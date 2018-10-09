@@ -11,6 +11,7 @@ import Icon from "@material-ui/core/Icon";
 import ErrorDialog from "../../error/ErrorDialog";
 import {connect} from 'react-redux'
 import * as collectionActions from '../../../actions/collections'
+import {getFullname, getUserById} from "../utils/usersUtils";
 
 class Collection extends React.Component {
     constructor(props) {
@@ -104,7 +105,7 @@ class Collection extends React.Component {
                                 component='h2'>{this.state.collection.name} {this.state.showEditButton ? (
                         <Icon>edit</Icon>) : ''}</Typography>
                     <Typography gutterBottom variant='subheading'
-                                color="textSecondary">Owner: {this.props.creator}</Typography>
+                                color="textSecondary">Owner: {this.props.creatorFullname}</Typography>
                     <Typography component='p'>{this.state.collection.description}</Typography>
                 </div>
 
@@ -156,16 +157,10 @@ class Collection extends React.Component {
     }
 }
 
-const getCreator = (collection, users) => {
-    if (collection && users && users.data) {
-        const user = users.data.find(user => user.id === collection.creator);
-        return  user && `${user.firstName} ${user.lastName}`;
-    }
-};
-
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = ({cache: {users}}, {collection: {creator}}) => {
+    const user = getUserById(users.data, creator);
     return {
-        creator: getCreator(ownProps.collection, state.cache.users)
+        creatorFullname: getFullname(user)
     }
 };
 

@@ -16,6 +16,7 @@ import {connect} from 'react-redux';
 import PermissionsContainer from "../../permissions/PermissionsContainer";
 import permissionChecker from '../../permissions/PermissionChecker';
 import {fetchUsersIfNeeded} from "../../../actions/users";
+import {getCollectionById} from "../utils/collectionUtils";
 
 export class InformationDrawer extends React.Component {
 
@@ -56,7 +57,6 @@ export class InformationDrawer extends React.Component {
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
                         <PermissionsContainer
-                            creator={collection.creator}
                             collectionId={collection.id}
                             canManage={permissionChecker.canManage(collection)}
                         />
@@ -107,20 +107,8 @@ export class InformationDrawer extends React.Component {
     }
 }
 
-const getCollection = state => {
-    const collections = state.cache.collections;
-    const collectionId = state.collectionBrowser.selectedCollectionId;
-
-    if (collections.data || collections.data.length !== 0) {
-        return collections.data.find(collection => collection.id === collectionId)
-    }
-};
-
-const mapStateToProps = (state) => {
-    const collection = getCollection(state);
-    return {
-        collection: collection
-    }
+const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId}}) => {
+    return {collection: getCollectionById(collections.data, selectedCollectionId)}
 };
 
 const mapDispatchToProps = {

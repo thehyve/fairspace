@@ -10,6 +10,10 @@ const mapStateToProps = ({permissions: {alter, fetch}, cache}) => {
     };
 };
 
-const mapDispatchToProps = dispatch => alterPermission;
+const mapDispatchToProps = dispatch => {
+    return {
+        alterPermission: (userId, collectionId, access) => dispatch(alterPermission(userId, collectionId, access))
+    }
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(AlterPermissionDialog);

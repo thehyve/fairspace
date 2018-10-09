@@ -16,6 +16,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
+import {getFullname} from "../collections/utils/usersUtils";
 
 export const styles = theme => ({
     root: {},
@@ -46,10 +47,9 @@ const permissionLevel = (p) => {
 /**
  * Sort and filter permissions
  * @param permissions
- * @param creator
  * @returns {*}
  */
-const sortPermissions = (permissions, creator) => {
+const sortPermissions = (permissions) => {
     if (permissions) {
         return permissions
             .sort(comparing(compareBy(permissionLevel), compareBy('subject')));
@@ -188,8 +188,8 @@ export class PermissionsViewer extends React.Component {
     }
 
     renderCollaboratorList(permissions) {
-        const {creator, canManage, currentLoggedUser} = this.props;
-        return sortPermissions(permissions, creator)
+        const {canManage, currentLoggedUser} = this.props;
+        return sortPermissions(permissions)
             .map((p, idx) => {
                 return (<ListItem
                     key={idx}
@@ -197,7 +197,7 @@ export class PermissionsViewer extends React.Component {
                     onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                     onMouseOut={() => this.handleListItemMouseout(idx)}
                 >
-                    <ListItemText primary={`${p.firstName} ${p.lastName}`} secondary={p.access}/>
+                    <ListItemText primary={getFullname(p)} secondary={p.access}/>
                     {this.renderAlterPermissionButtons(idx, p)}
                 </ListItem>);
             });
