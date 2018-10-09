@@ -16,7 +16,7 @@ import {connect} from 'react-redux';
 import PermissionsContainer from "../../permissions/PermissionsContainer";
 import permissionChecker from '../../permissions/PermissionChecker';
 import {fetchUsersIfNeeded} from "../../../actions/users";
-import {getCollectionById} from "../utils/collectionUtils";
+import {findById} from "../../../utils/arrayutils";
 
 export class InformationDrawer extends React.Component {
 
@@ -108,7 +108,7 @@ export class InformationDrawer extends React.Component {
 }
 
 const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId}}) => {
-    return {collection: getCollectionById(collections.data, selectedCollectionId)}
+    return {collection: findById(collections.data, selectedCollectionId)}
 };
 
 const mapDispatchToProps = {

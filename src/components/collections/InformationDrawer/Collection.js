@@ -11,7 +11,8 @@ import Icon from "@material-ui/core/Icon";
 import ErrorDialog from "../../error/ErrorDialog";
 import {connect} from 'react-redux'
 import * as collectionActions from '../../../actions/collections'
-import {getFullname, getUserById} from "../utils/usersUtils";
+import {findById} from "../../../utils/arrayutils";
+import {getFullname} from "../utils/userUtils";
 
 class Collection extends React.Component {
     constructor(props) {
@@ -158,7 +159,7 @@ class Collection extends React.Component {
 }
 
 const mapStateToProps = ({cache: {users}}, {collection: {creator}}) => {
-    const user = getUserById(users.data, creator);
+    const user = findById(users.data, creator);
     return {
         creatorFullname: getFullname(user)
     }
