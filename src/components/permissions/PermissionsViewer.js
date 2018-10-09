@@ -16,7 +16,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
-import {getFullname} from "../collections/utils/userUtils";
+import {getDisplayName} from "../collections/utils/userUtils";
 
 export const styles = theme => ({
     root: {},
@@ -197,7 +197,7 @@ export class PermissionsViewer extends React.Component {
                     onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                     onMouseOut={() => this.handleListItemMouseout(idx)}
                 >
-                    <ListItemText primary={getFullname(p)} secondary={p.access}/>
+                    <ListItemText primary={getDisplayName(p)} secondary={p.access}/>
                     {this.renderAlterPermissionButtons(idx, p)}
                 </ListItem>);
             });
