@@ -141,10 +141,6 @@ export class AlterPermissionDialog extends React.Component {
         });
     };
 
-    componentDidMount() {
-        this.props.fetchUsers();
-    }
-
     handleAccessRightChange = event => {
         this.setState({accessRight: event.target.value});
     };

@@ -15,21 +15,27 @@ import * as metadataActions from "../../../actions/metadata";
 import {connect} from 'react-redux';
 import PermissionsContainer from "../../permissions/PermissionsContainer";
 import permissionChecker from '../../permissions/PermissionChecker';
+import {fetchUsersIfNeeded} from "../../../actions/users";
+import {findById} from "../../../utils/arrayutils";
 
-function InformationDrawer(props) {
-    function handleDetailsChange(collection) {
-        const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = props;
+export class InformationDrawer extends React.Component {
 
-        invalidateMetadata(collection.uri);
-        fetchCombinedMetadataIfNeeded(collection.uri);
+    componentDidMount() {
+        this.props.fetchUsersIfNeeded()
     }
 
-    function renderCollectionDetails() {
-        if (!props.collection) {
+    handleDetailsChange = (collection) => {
+        const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = this.props;
+        invalidateMetadata(collection.uri);
+        fetchCombinedMetadataIfNeeded(collection.uri);
+    };
+
+    renderCollectionDetails = () => {
+        const {classes, collection, collectionAPI} = this.props;
+
+        if (!collection) {
             return <Typography variant="title">No collection</Typography>;
         }
-
-        const {classes, collection} = props;
 
         return <React.Fragment>
             <div className={classes.root}>
@@ -40,8 +46,8 @@ function InformationDrawer(props) {
                     <ExpansionPanelDetails>
                         <Collection
                             collection={collection}
-                            collectionAPI={props.collectionAPI}
-                            onDidChangeDetails={handleDetailsChange}
+                            collectionAPI={collectionAPI}
+                            onDidChangeDetails={this.handleDetailsChange}
                         />
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
@@ -51,7 +57,6 @@ function InformationDrawer(props) {
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
                         <PermissionsContainer
-                            creator={collection.creator}
                             collectionId={collection.id}
                             canManage={permissionChecker.canManage(collection)}
                         />
@@ -74,54 +79,42 @@ function InformationDrawer(props) {
                         <Typography className={classes.heading}>Path</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        {props.path ? props.path.map(path => <Typography
+                        {this.props.path ? this.props.path.map(path => <Typography
                             key={path.filename}>{path.basename}</Typography>) : 'No path selected'}
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
             </div>
         </React.Fragment>
-    }
+    };
 
-    return (
-        <Drawer
+    render() {
+        const {open, classes, onClose} = this.props;
+        return <Drawer
             variant="persistent"
             anchor="right"
-            open={props.open}
+            open={open}
             classes={{
-                paper: props.classes.infoDrawerPaper,
+                paper: classes.infoDrawerPaper,
             }}
         >
-            <div className={props.classes.toolbar}/>
-            <IconButton onClick={props.onClose} className={props.classes.closeButton}>
+            <div className={classes.toolbar}/>
+            <IconButton onClick={onClose} className={classes.closeButton}>
                 <Icon>close</Icon>
             </IconButton>
-
-            {renderCollectionDetails()}
-
+            {this.renderCollectionDetails()}
         </Drawer>
-    );
-}
 
-const mapStateToProps = (state) => {
-    const collections = state.cache.collections;
-    const collectionBrowser = state.collectionBrowser;
-
-    const getCollection = (collectionId) => {
-        if (!collections.data || collections.data.length === 0) {
-            return {}
-        }
-
-        return collections.data.find(collection => collection.id === collectionId) || {}
-    }
-
-    return {
-        collection: getCollection(collectionBrowser.selectedCollectionId)
     }
 }
+
+const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId}}) => {
+    return {collection: findById(collections.data, selectedCollectionId)}
+};
 
 const mapDispatchToProps = {
-    ...metadataActions
-}
+    ...metadataActions,
+    fetchUsersIfNeeded
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer));
 
