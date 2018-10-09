@@ -38,6 +38,8 @@ app.get('/api/metadata/statements', (req, res) => {
     }
 });
 app.patch('/api/metadata/statements', (req, res) => res.send());
+app.delete('/api/metadata/statements', (req, res) => res.send());
+app.post('/api/metadata/query', (req, res) => res.sendFile(mockDataDir + '/metadata/all-entities.json'));
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(mockDataDir + '/workspace/users.json'));
