@@ -2,7 +2,8 @@
     "@context": {
         "ws": "http://localhost:3000/iri/",
         "schema": "http://schema.org/",
-        "fairspace": "http://fairspace.io/ontology#"
+        "fairspace": "http://fairspace.io/ontology#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
     },
     "@graph": [
         {
@@ -11,7 +12,8 @@
         },
         {
             "@id": "ws:patients/GSM212811",
-            "@type": "schema:Person"
+            "@type": "schema:Person",
+            "rdfs:label": "Very Important Person"
         },
         {
             "@id": "ws:patients/GSM211008",

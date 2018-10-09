@@ -3,9 +3,9 @@ import Typography from "@material-ui/core/Typography";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import metadataAPI from "../../services/MetadataAPI/MetadataAPI";
-import MetadataComponent from '../../components/metadata/Metadata';
+import Metadata from '../../components/metadata/Metadata';
 
-function Metadata(props) {
+function MetadataEntityPage(props) {
     const {match: { params }} = props;
 
     return (
@@ -15,7 +15,8 @@ function Metadata(props) {
                 <ListItem>Id: {params.id}</ListItem>
             </List>
 
-            <MetadataComponent
+            <Metadata
+                editable={true}
                 metadataAPI={metadataAPI}
                 subject={`${window.location.origin}/iri/${params.type}/${params.id}`}
             />
@@ -23,7 +24,7 @@ function Metadata(props) {
     );
 }
 
-export default (Metadata);
+export default (MetadataEntityPage);
 
 
 

@@ -1,6 +1,13 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import MetadataAPI from "../services/MetadataAPI/MetadataAPI"
-import {METADATA, METADATA_COMBINATION, METADATA_ENTITIES, METADATA_VOCABULARY, UPDATE_METADATA} from "./actionTypes";
+import {
+    METADATA,
+    METADATA_ALL_ENTITIES,
+    METADATA_COMBINATION,
+    METADATA_ENTITIES,
+    METADATA_VOCABULARY,
+    UPDATE_METADATA
+} from "./actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
 
 export const invalidateMetadata = (subject) => ({
@@ -27,6 +34,12 @@ export const fetchEntitiesIfNeeded = (type) => dispatchIfNeeded(
     () => fetchEntitiesByType(type),
     state => state && state.cache && state.cache.entitiesByType ? state.cache.entitiesByType[type] : undefined
 )
+
+export const fetchAllEntitiesIfNeeded = () => dispatchIfNeeded(
+    () => fetchAllEntities(),
+    state => state && state.cache ? state.cache.allEntities : undefined
+)
+
 
 export const fetchJsonLdBySubjectIfNeeded = (subject) => dispatchIfNeeded(
     () => fetchJsonLdBySubject(subject),
@@ -70,3 +83,15 @@ const fetchEntitiesByType = createErrorHandlingPromiseAction((type) => ({
         type: type
     }
 }));
+
+const fetchAllEntities = createErrorHandlingPromiseAction((dispatch) => ({
+    type: METADATA_ALL_ENTITIES,
+    payload: dispatch(fetchMetadataVocabularyIfNeeded())
+                .then(({value: vocabulary}) =>
+                    MetadataAPI.getEntitiesByTypes(
+                        vocabulary.getFairspaceClasses()
+                            .map(entry => entry['@id'])
+                    )
+                )
+}));
+
