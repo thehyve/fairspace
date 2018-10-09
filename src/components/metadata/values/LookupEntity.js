@@ -15,7 +15,7 @@ function LookupEntity({entities, property, onSave, dispatch}) {
         const label = getLabel(entity)
 
         const option = {
-            disabled: property.values.map(v => v.id).includes(id),
+            disabled: property.values.some(v => v.id === id),
             id: id,
             label: label
         }

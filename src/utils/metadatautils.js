@@ -17,10 +17,11 @@ export function getLabel(entity) {
     ) {
         return entity[LABEL_URI][0]['@value'];
     } else {
-        return entity['@id'] &&
-            (entity['@id'].toString().includes('#')
-                ? entity['@id'].substring(entity['@id'].lastIndexOf('#') + 1)
-                : entity['@id'].substring(entity['@id'].lastIndexOf('/') + 1))
+        let id = entity['@id'];
+        return id &&
+            (id.includes('#')
+                ? id.substring(id.lastIndexOf('#') + 1)
+                : id.substring(id.lastIndexOf('/') + 1))
     }
 }
 

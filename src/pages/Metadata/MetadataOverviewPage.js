@@ -5,7 +5,7 @@ import MetadataEntities from "../../components/metadata/MetadataEntities";
 import SearchBar from "../../components/generic/SearchBar/SearchBar";
 import {withStyles} from '@material-ui/core/styles';
 
-const MetadataOverview = ({classes}) => (
+const MetadataOverviewPage = ({classes}) => (
     <div>
         <Typography variant={"title"} paragraph>{'Metadata'}</Typography>
 
@@ -33,7 +33,7 @@ const style = (theme) => ({
     }
 });
 
-export default withStyles(style)(MetadataOverview);
+export default withStyles(style)(MetadataOverviewPage);
 
 
 
