@@ -1,4 +1,4 @@
-import {getFullname} from "./usersUtils";
+import {getFullname} from "./userUtils";
 
 describe('usersUtils', () => {
 
