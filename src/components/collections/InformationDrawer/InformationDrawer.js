@@ -15,7 +15,7 @@ import * as metadataActions from "../../../actions/metadata";
 import {connect} from 'react-redux';
 import PermissionsContainer from "../../permissions/PermissionsContainer";
 import permissionChecker from '../../permissions/PermissionChecker';
-import {fetchUsersIfNeeded} from "../../../actions/users";
+import {fetchUsersIfNeeded} from "../../../actions/workspace";
 import {findById} from "../../../utils/arrayutils";
 
 export class InformationDrawer extends React.Component {
