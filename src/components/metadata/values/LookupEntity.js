@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import MaterialReactSelect from "../../generic/MaterialReactSelect/MaterialReactSelect";
 import {connect} from 'react-redux';
 import {fetchEntitiesIfNeeded} from "../../../actions/metadata";
-import {LABEL_URI} from "../../../services/MetadataAPI/MetadataAPI";
+import {getLabel} from "../../../utils/metadatautils";
 
 function LookupEntity({entities, property, onSave, dispatch}) {
     // Ensure that the entities for lookup have been retrieved
@@ -12,16 +12,10 @@ function LookupEntity({entities, property, onSave, dispatch}) {
     // Transform the entities to ensure a label is present
     const options = entities.map(entity => {
         const id = entity['@id'];
-        let label
-
-        if(entity[LABEL_URI]) {
-            label = entity[LABEL_URI][0]
-        } else {
-            label = id.substring(id.lastIndexOf('/')+1);
-        }
+        const label = getLabel(entity)
 
         const option = {
-            disabled: property.values.map(v => v.id).includes(id),
+            disabled: property.values.some(v => v.id === id),
             id: id,
             label: label
         }

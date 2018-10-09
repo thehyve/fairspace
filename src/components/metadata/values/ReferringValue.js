@@ -1,12 +1,7 @@
 import React from 'react'
+import {navigableLink} from "../../../utils/metadatautils";
 
 const ReferringValue = ({property, entry}) => {
-    function navigableLink(link) {
-        return link.startsWith(window.location.origin)
-            ? link.replace('/iri/collections/', '/collections/').replace('/iri/', '/metadata/')
-            : link
-    }
-
     function extractDisplayValue(value) {
         return value.label || value.value || linkLabel(value.id) || '';
     }
