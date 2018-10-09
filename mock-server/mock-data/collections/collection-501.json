@@ -5,6 +5,7 @@
   "description": "Jan Smit's collection, but he only can read",
   "uri": "https://workspace.ci.test.fairdev.app/iri/collections/503",
   "access": "Read",
+  "type": "S3_BUCKET",
   "dateCreated": "2018-09-19T15:48:23.016165Z",
   "creator": "user4-id"
 }

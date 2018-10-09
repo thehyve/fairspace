@@ -11,7 +11,22 @@ import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWith
 import PermissionChecker from "../../permissions/PermissionChecker";
 import './CollectionList.css';
 
+export const COLLECTION_ICONS = {
+    'LOCAL_STORAGE': 'folder_open',
+    'S3_BUCKET': 'cloud_open'
+}
+
+export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
+
 function CollectionList({collections, selectedCollectionId, onCollectionClick, onCollectionDoubleClick, onCollectionDelete}) {
+    function getCollectionIcon(collection) {
+        if(collection.type && COLLECTION_ICONS.hasOwnProperty(collection.type)) {
+            return COLLECTION_ICONS[collection.type];
+        } else {
+            return COLLECTION_ICONS[DEFAULT_COLLECTION_TYPE];
+        }
+    }
+
     if(!collections || collections.length === 0) {
         return "No collections";
     } else {
@@ -34,7 +49,7 @@ function CollectionList({collections, selectedCollectionId, onCollectionClick, o
                                     onSingleClick={() => onCollectionClick(collection)}
                                     onDoubleClick={() => onCollectionDoubleClick(collection)}>
                                 <TableCell>
-                                    <Icon>folder_open</Icon>
+                                    <Icon>{getCollectionIcon(collection)}</Icon>
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     <CollectionItem collection={collection}/>
