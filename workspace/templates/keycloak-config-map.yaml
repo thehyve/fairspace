@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{.Release.Name}}-keycloak-config-map"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+data:
+  redirect.urls: |-
+    {{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}/*
+    {{ template "workspace.scheme" . }}://{{ template "jupyterhub.hostname" $ }}/*
+    {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}/*
+

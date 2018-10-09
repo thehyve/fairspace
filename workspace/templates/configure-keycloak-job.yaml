@@ -56,11 +56,18 @@ spec:
               secretKeyRef:
                 name: "{{ .Release.Name }}-oauth-client"
                 key: clientSecret
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/config
         command:
         - "/opt/jboss/scripts/setup-keycloak-workspace.sh"
         - "{{ template "keycloak.baseUrl" . }}/auth"
         - "{{.Values.hyperspace.keycloak.username}}"
         - "{{.Values.hyperspace.keycloak.realm}}"
         - "{{ template "workspace.name" . }}"
-        - "{{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}"
-        - "{{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}"
+        - "/opt/config/redirect.urls"
+        - "&& sleep 300"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: "{{.Release.Name}}-keycloak-config-map"
