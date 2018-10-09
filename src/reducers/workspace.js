@@ -1,6 +1,3 @@
-import {WORKSPACE} from "../actions/actionTypes";
-import {promiseReducerFactory} from "../utils/redux";
-
 const defaultState = {
     name: '',
     version: ''
@@ -18,8 +15,6 @@ const workspace = (state = defaultState, action) => {
             return state;
     }
 }
-
-// export default promiseReducerFactory(WORKSPACE, defaultState);
 
 
 export default workspace;
