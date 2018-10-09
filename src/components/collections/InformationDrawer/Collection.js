@@ -32,7 +32,7 @@ class Collection extends React.Component{
     handleChangeDetails(name, description) {
         this.closeEditDialog();
 
-        if ((name !== this.state.colllection.name || description !== this.state.description) && name !== '') {
+        if ((name !== this.state.collection.name || description !== this.state.collection.description) && name !== '') {
             this.props.updateCollection(this.state.collection.id, name, description)
                 .then(() => {
                     let collection = Object.assign(this.state.collection, {name: name, description: description});

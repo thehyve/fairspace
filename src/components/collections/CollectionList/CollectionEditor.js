@@ -11,21 +11,18 @@ class CollectionEditor extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            title: props.title,
-            name: props.name || '',
-            description: props.description || '',
-            editing: props.editing
-        };
+            this.state = {};
     }
 
-    componentWillReceiveProps(props) {
-        this.setState({
-            title: props.title,
-            name: props.name || '',
-            description: props.description || '',
-            editing: props.editing
-        });
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.editing !== this.props.editing) {
+            this.setState({
+                title: this.props.title,
+                name: this.props.name || '',
+                description: this.props.description || '',
+                editing: this.props.editing
+            });
+        }
     }
 
     close() {
@@ -40,6 +37,10 @@ class CollectionEditor extends React.Component {
     }
 
     handleSave() {
+        if(!this.state.name) {
+            return;
+        }
+
         this.close();
         if (this.props.onSave) {
             this.props.onSave(this.state.name, this.state.description);
@@ -69,6 +70,7 @@ class CollectionEditor extends React.Component {
                         name='name'
                         onChange={this.handleInputChange.bind(this)}
                         fullWidth
+                        required={true}
                     />
                     <TextField
                         autoFocus
