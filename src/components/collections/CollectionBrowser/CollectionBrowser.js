@@ -11,25 +11,21 @@ import CollectionList from "../CollectionList/CollectionList";
 import * as collectionBrowserActions from "../../../actions/collectionbrowser";
 import * as collectionActions from "../../../actions/collections";
 import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
+import CollectionEditor from "../CollectionList/CollectionEditor";
 
 class CollectionBrowser extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {addingCollection: false}
+    }
+
     componentDidMount() {
         this.props.fetchCollectionsIfNeeded()
     }
 
     handleAddCollectionClick() {
-        const {user, addCollection, fetchCollectionsIfNeeded} = this.props;
-        const name = `${user.fullName}'s collection`;
-        const description = "Beyond the horizon";
-
-        addCollection(name, description)
-            .then(fetchCollectionsIfNeeded)
-            .catch(err =>
-                ErrorDialog.showError(
-                    err,
-                    "An error occurred while creating a collection",
-                    this.handleAddCollectionClick.bind(this)
-                ))
+        this.setState({addingCollection: true})
     }
 
     handleCollectionClick(collection) {
@@ -89,12 +85,40 @@ class CollectionBrowser extends React.Component {
 
     renderCollectionList() {
         return (
-            <CollectionList collections={this.props.collections}
-                            selectedCollectionId={this.props.selectedCollectionId}
-                            onCollectionClick={this.handleCollectionClick.bind(this)}
-                            onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
-                            onCollectionDelete={this.handleCollectionDelete.bind(this)}
-            />);
+            <div>
+                <CollectionList collections={this.props.collections}
+                                selectedCollectionId={this.props.selectedCollectionId}
+                                onCollectionClick={this.handleCollectionClick.bind(this)}
+                                onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
+                                onCollectionDelete={this.handleCollectionDelete.bind(this)}
+                />
+                <CollectionEditor
+                    title={'Add collection'}
+                    name={this.props.user.fullName + '\'s collection'}
+                    editing={this.state.addingCollection}
+                    onSave={this.handleAddCollection.bind(this)}
+                    onCancel={this.handleCancelAddCollection.bind(this)}
+                />
+            </div>
+        );
+
+    }
+
+    handleAddCollection(name, description) {
+        this.setState({addingCollection: false});
+
+        this.props.addCollection(name, description)
+            .then(this.props.fetchCollectionsIfNeeded)
+            .catch(err =>
+                ErrorDialog.showError(
+                    err,
+                    "An error occurred while creating a collection",
+                    this.handleAddCollectionClick.bind(this)
+                ))
+    }
+
+    handleCancelAddCollection() {
+        this.setState({addingCollection: false});
     }
 }
 
@@ -105,12 +129,12 @@ const mapStateToProps = (state, ownProps) => ({
     collections: state.cache.collections.data,
 
     selectedCollectionId: state.collectionBrowser.selectedCollectionId,
-})
+});
 
 const mapDispatchToProps = {
     ...collectionActions,
     ...collectionBrowserActions
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CollectionBrowser));
 
