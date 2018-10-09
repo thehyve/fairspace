@@ -12,12 +12,13 @@ import {BrowserRouter as Router, Route} from "react-router-dom";
 import Home from "../../pages/Home/Home";
 import Collections from "../../pages/Collections/Collections";
 import Notebooks from "../../pages/Notebooks/Notebooks";
-import Metadata from "../../pages/Metadata/Metadata";
+import MetadataEntityPage from "../../pages/Metadata/MetadataEntityPage";
 import ErrorDialog from "../error/ErrorDialog";
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
 import store from "../../store/configureStore"
 import {Provider} from "react-redux";
 import Files from "../../pages/Files/Files";
+import MetadataOverview from "../../pages/Metadata/MetadataOverview";
 
 class App extends React.Component {
     cancellable = {
@@ -76,7 +77,8 @@ class App extends React.Component {
                                         <Route exact path="/collections" component={Collections}/>
                                         <Route path="/collections/:collection/:path(.*)?" component={Files}/>
                                         <Route path="/notebooks" component={Notebooks}/>
-                                        <Route path="/metadata/:type(projects|patients|samples|consents)/:id" component={Metadata}/>
+                                        <Route exact path="/metadata" component={MetadataOverview}/>
+                                        <Route path="/metadata/:type(projects|patients|samples|consents)/:id" component={MetadataEntityPage}/>
 
                                         {/* Handle auth urls that should go to the server */}
                                         <Route path="/login" render={() => {window.location.href = '/login';}}/>

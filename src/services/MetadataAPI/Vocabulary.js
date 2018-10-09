@@ -1,7 +1,9 @@
 import {compareBy, comparing} from "../../utils/comparators";
 import {
     ALLOW_MULTIPLE_URI,
+    CLASS_URI,
     DOMAIN_URI,
+    FAIRSPACE_ENTITY_URI,
     LABEL_URI,
     MULTILINE_PROPERTY_URI,
     PROPERTY_URI,
@@ -58,6 +60,22 @@ class Vocabulary {
         const emptyProperties = this._determineAdditionalEmptyProperties(expandedMetadata[0], typePredicates);
 
         return [...properties, ...emptyProperties];
+    }
+
+    /**
+     * Looks up an entity in the vocabulary
+     * @param id
+     */
+    getById(id) {
+        return this.vocabularyById[id] || { "@id": id };
+    }
+
+    /**
+     * Returns a list of classes marked as fairspace entities
+     */
+    getFairspaceClasses() {
+        return this.vocabulary
+            .filter(entry => entry['@type'].includes(CLASS_URI) && entry[FAIRSPACE_ENTITY_URI])
     }
 
     /**

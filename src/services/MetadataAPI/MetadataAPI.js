@@ -21,6 +21,7 @@ export const DECIMAL_URI = 'http://www.w3.org/TR/xmlschema11-2/#decimal';
 
 export const ALLOW_MULTIPLE_URI = 'http://fairspace.io/ontology#allowMultiple';
 export const MULTILINE_PROPERTY_URI = 'http://fairspace.io/ontology#multiLine';
+export const FAIRSPACE_ENTITY_URI = 'http://fairspace.io/ontology#fairspaceEntity';
 
 const GET_ENTITIES_SPARQL = `
     PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
