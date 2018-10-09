@@ -14,5 +14,5 @@ export const getUserById = (users, userId) => {
  */
 export const getFullname = user => {
     const hasProperties =  user.hasOwnProperty('firstName') && user.hasOwnProperty('lastName');
-    return hasProperties && `${user.firstName} ${user.lastName}`;
+    return hasProperties ? `${user.firstName} ${user.lastName}` : '';
 };
