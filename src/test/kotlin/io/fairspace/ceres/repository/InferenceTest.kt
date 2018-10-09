@@ -21,7 +21,7 @@ class InferenceTest {
     private val subject = modelForInference.createResource(NS + "subject")
 
     private val derivesFrom = modelForInference.createProperty(NS, "derivesFrom")
-    private val provides = modelForInference.createProperty(NS, "providesMaterial`")
+    private val provides = modelForInference.createProperty(NS, "providesMaterial")
 
     private val repo = ModelRepository(DatasetFactory.create(), {
         val inferenceModel = FileManager.get().loadModel("inference-model.jsonld")
@@ -41,7 +41,7 @@ class InferenceTest {
         modelForInference.add(sample, derivesFrom, subject)
 
         repo.add(modelForInference)
-        val inferred = repo.list(null, null)
+        val inferred = repo.list(subject.uri, null)
 
         assertTrue(inferred.contains(subject, provides, sample))
     }
