@@ -21,9 +21,9 @@ it('renders without crashing with elements', () => {
 
 it('renders separate icon for s3 buckets', () => {
     const collections = [
-        {type: 'LOCAL_STORAGE', name: 'Test1', id: '1'},
-        {type: 'S3_BUCKET', name: 'Test2', id: '2'},
-        {name: 'Test3', id: '3'}
+        {type: 'LOCAL_STORAGE', name: 'Test1', id: '1', dateCreated: new Date().toUTCString()},
+        {type: 'S3_BUCKET', name: 'Test2', id: '2', dateCreated: new Date().toUTCString()},
+        {name: 'Test3', id: '3', dateCreated: new Date().toUTCString()}
     ]
 
     const props = {
@@ -42,7 +42,7 @@ it('renders separate icon for s3 buckets', () => {
 });
 
 it('renders Access column', () => {
-    const collections = [{access: 'Read'}];
+    const collections = [{access: 'Read', dateCreated: new Date().toUTCString()}];
     const wrapper = shallow(<CollectionList collections={collections}/>);
     const cells = wrapper.dive().find(TableCell);
     expect(cells.length).toEqual(10);
@@ -57,6 +57,6 @@ it('renders Created column', () => {
     const cells = wrapper.dive().find(TableCell);
     expect(cells.length).toEqual(10);
     expect(cells.at(2).childAt(0).text()).toEqual('Created');
-    expect(cells.at(7).childAt(0).childAt(0).text()).toEqual(DateTime(date));
+    expect(cells.at(7).childAt(0).childAt(0).text()).toEqual(DateTime({value: date}));
 });
 
