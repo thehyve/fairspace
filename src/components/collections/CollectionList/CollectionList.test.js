@@ -4,6 +4,7 @@ import CollectionList from "./CollectionList";
 import {COLLECTION_ICONS} from "./CollectionList"
 import {shallow} from "enzyme";
 import Icon from "@material-ui/core/Icon";
+import {TableCell} from "@material-ui/core";
 
 it('renders without crashing', () => {
     const div = document.createElement('div');
@@ -38,3 +39,23 @@ it('renders separate icon for s3 buckets', () => {
     expect(icons.get(1).props.children).toEqual(COLLECTION_ICONS['S3_BUCKET']);
     expect(icons.get(2).props.children).toEqual(COLLECTION_ICONS['LOCAL_STORAGE']);
 });
+
+it('renders Access column', () => {
+    const collections = [{access: 'Read'}];
+    const wrapper = shallow(<CollectionList collections={collections}/>);
+    const cells = wrapper.dive().find(TableCell);
+    expect(cells.length).toEqual(10);
+    expect(cells.at(3).childAt(0).text()).toEqual('Access');
+    expect(cells.at(8).childAt(0).text()).toEqual('Read');
+});
+
+it('renders Created column', () => {
+    const date = new Date();
+    const collections = [{dateCreated: date.toUTCString()}];
+    const wrapper = shallow(<CollectionList collections={collections}/>);
+    const cells = wrapper.dive().find(TableCell);
+    expect(cells.length).toEqual(10);
+    expect(cells.at(2).childAt(0).text()).toEqual('Created');
+    expect(cells.at(7).childAt(0).childAt(0).text()).toEqual(date.toLocaleString());
+});
+
