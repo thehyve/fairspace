@@ -4,18 +4,18 @@ dependencies:
   version: 0.7.0
 - name: pluto
   repository: https://chartmuseum.jx.test.fairdev.app/
-  version: 0.2.79
+  version: 0.2.81
 - name: mercury
   repository: https://chartmuseum.jx.test.fairdev.app/
-  version: 0.2.102
+  version: 0.2.155
 - name: titan
   repository: https://chartmuseum.jx.test.fairdev.app/
-  version: 0.2.30
+  version: 0.2.37
 - name: ceres
   repository: https://chartmuseum.jx.test.fairdev.app/
-  version: 0.2.66
+  version: 0.2.75
 - name: neptune
   repository: https://chartmuseum.jx.test.fairdev.app/
-  version: 0.4.30
+  version: 0.4.36
 digest: sha256:0fb9754accbbad59f78865ae57fad6ea6b8831292b176a043b8894f2b05cd0b8
-generated: 2018-09-20T12:07:16.684985494+02:00
+generated: 2018-10-10T09:25:17.790631376Z
