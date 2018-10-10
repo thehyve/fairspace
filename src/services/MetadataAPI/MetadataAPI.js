@@ -116,7 +116,7 @@ class MetadataAPI {
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
     getEntitiesByTypes(types) {
-        const query = GET_ENTITIES_SPARQL.replace('%types', types.join(', '));
+        const query = GET_ENTITIES_SPARQL.replace('%types', types.map(type => `<${type}>`).join(', '));
 
         return fetch(Config.get().urls.metadata.query, {
             method: 'POST',
