@@ -80,7 +80,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderLoading() {
-        return (<Typography variant="body2" paragraph={true} noWrap>Loading...</Typography>);
+        return (<Typography variant="body1" paragraph={true} noWrap>Loading...</Typography>);
     }
 
     renderCollectionList() {

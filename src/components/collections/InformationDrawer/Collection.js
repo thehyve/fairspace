@@ -67,10 +67,10 @@ class Collection extends React.Component {
                     onMouseEnter={this.handleTextMouseEnter.bind(this)}
                     onMouseLeave={this.handleTextMouseLeave.bind(this)}
                 >
-                    <Typography variant="headline"
+                    <Typography variant="h5"
                                 component='h2'>{this.state.collection.name} {this.state.showEditButton ? (
                         <Icon>edit</Icon>) : ''}</Typography>
-                    <Typography gutterBottom variant='subheading'
+                    <Typography gutterBottom variant='subtitle1'
                                 color="textSecondary">Owner: {this.props.creatorFullname}</Typography>
                     <Typography component='p'>{this.state.collection.description}</Typography>
                 </div>

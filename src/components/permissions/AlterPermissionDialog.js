@@ -177,7 +177,7 @@ export class AlterPermissionDialog extends React.Component {
             options = transformUserToOptions(users, collaborators.data, currentLoggedUser);
             if (user) { // only render the label if user is passed into this component
                 return (<div>
-                    <Typography variant="subheading"
+                    <Typography variant="subtitle1"
                                 gutterBottom>{getUserLabelByUser(user, options)}</Typography>
                 </div>)
             }

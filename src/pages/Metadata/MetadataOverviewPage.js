@@ -7,7 +7,7 @@ import {withStyles} from '@material-ui/core/styles';
 
 const MetadataOverviewPage = ({classes}) => (
     <div>
-        <Typography variant={"title"} paragraph>{'Metadata'}</Typography>
+        <Typography variant={"h6"} paragraph>{'Metadata'}</Typography>
 
         <Paper className={classes.searchBar}>
             <SearchBar

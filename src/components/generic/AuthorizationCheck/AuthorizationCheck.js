@@ -39,7 +39,7 @@ function AuthorizationCheck(props) {
         const showError = props.transformError ? props.transformError : (error) => error;
 
         return showError(<div style={{minHeight: 300}}>
-            <Typography variant="headline" component="h2">
+            <Typography variant="h5" component="h2">
                 Error
             </Typography>
             <Typography component="p">

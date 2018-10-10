@@ -99,7 +99,7 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
         ValueComponentFactory.editComponent(property) : ValueComponentFactory.readOnlyComponent();
 
     return <ListItem disableGutters key={property.key} style={{display: 'block'}}>
-        <Typography variant="body2" component='p'>{property.label}</Typography>
+        <Typography variant="body1" component='p'>{property.label}</Typography>
         <List dense>
             {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent))}
             {canAdd ? renderAddComponent() : null}

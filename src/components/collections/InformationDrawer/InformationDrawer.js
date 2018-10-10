@@ -34,7 +34,7 @@ export class InformationDrawer extends React.Component {
         const {classes, collection, collectionAPI} = this.props;
 
         if (!collection) {
-            return <Typography variant="title">No collection</Typography>;
+            return <Typography variant="h6">No collection</Typography>;
         }
 
         return <React.Fragment>

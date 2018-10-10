@@ -12,7 +12,7 @@ function TopBar(props) {
     return (
         <AppBar position="absolute" className={classes.appBar}>
             <Toolbar>
-                <Typography variant="title" color="inherit" noWrap className={classes.flex}>
+                <Typography variant="h6" color="inherit" noWrap className={classes.flex}>
                     Workspace name
                 </Typography>
                 <UserMenu onLogout={logout}></UserMenu>
