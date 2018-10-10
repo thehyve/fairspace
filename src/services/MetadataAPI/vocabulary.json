@@ -140,7 +140,7 @@
       "@type": "rdf:Property",
       "rdfs:label": "Has data",
       "rdfs:domain": [
-        {"@id": "schema:Person"}, 
+        {"@id": "schema:Person"},
         {"@id": "schema:Material"}
       ],
       "rdfs:range": [

@@ -58,8 +58,14 @@ it('creates a new collection on button click', () => {
     let button = wrapper.find(Button);
     expect(button.length).toEqual(3);
 
-    // Click on button
+    // Click on Add button
     button.at(2).simulate('click');
+
+    button = wrapper.find(Button);
+    expect(button.length).toEqual(5);
+
+    // Click on Save button
+    button.at(4).simulate('click');
 
     // Expect the collection to be created in storage
     expect(store.getActions().length).toEqual(1);
