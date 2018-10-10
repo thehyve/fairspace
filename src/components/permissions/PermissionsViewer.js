@@ -14,7 +14,7 @@ import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
 import {getDisplayName} from "../collections/utils/userUtils";
 import MoreActions from "../generic/MoreActions/MoreActions";
-import MoreAction from "../generic/MoreActions/MoreAction";
+import ActionItem from "../generic/MoreActions/ActionItem";
 
 export const styles = theme => ({
     root: {},
@@ -176,8 +176,8 @@ export class PermissionsViewer extends React.Component {
                 <MoreActions
                     onClick={(e) => this.handleMoreClick(collaborator, e)}
                     className={secondaryActionClassName}>
-                    <MoreAction onClick={() => this.handleAlterPermission(selectedUser)}>Change access</MoreAction>
-                    <MoreAction onClick={this.handleRemoveCollaborator}>Delete</MoreAction>
+                    <ActionItem onClick={() => this.handleAlterPermission(selectedUser)}>Change access</ActionItem>
+                    <ActionItem onClick={this.handleRemoveCollaborator}>Delete</ActionItem>
                 </MoreActions>
             </ListItemSecondaryAction>
         ) : '';
