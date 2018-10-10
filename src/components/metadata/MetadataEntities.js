@@ -9,6 +9,7 @@ import TableBody from "@material-ui/core/TableBody/TableBody";
 import {getLabel, navigableLink} from "../../utils/metadatautils";
 import {fetchAllEntitiesIfNeeded} from "../../actions/metadata";
 import Typography from "@material-ui/core/Typography";
+import ErrorMessage from "../error/ErrorMessage";
 
 function MetadataEntities({loading, error, entities, load, vocabulary}) {
     load();
@@ -16,7 +17,7 @@ function MetadataEntities({loading, error, entities, load, vocabulary}) {
     if(loading) {
         return <Typography>Loading...</Typography>
     } else if(error) {
-        return <Typography>Error: {error}</Typography>
+        return <ErrorMessage message={error.message} />
     }
 
     return (
@@ -51,7 +52,7 @@ function MetadataEntities({loading, error, entities, load, vocabulary}) {
 
 MetadataEntities.propTypes = {
     loading: PropTypes.bool,
-    error: PropTypes.bool,
+    error: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
     entities: PropTypes.array,
     load: PropTypes.func.isRequired
 }
