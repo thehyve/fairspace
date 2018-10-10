@@ -24,9 +24,15 @@ it('renders separate icon for s3 buckets', () => {
         {name: 'Test3', id: '3'}
     ]
 
-    const wrapper = shallow(<CollectionList collections={collections}/>);
+    const props = {
+        classes: {
+            tableRow: "CollectionList-tableRow-200",
+            tableRowSelected: "CollectionList-tableRowSelected-201"
+        }
+    }
+    const wrapper = shallow(<CollectionList collections={collections} {...props}/>);
 
-    const icons = wrapper.find(Icon);
+    const icons = wrapper.dive().find(Icon);
     expect(icons.length).toEqual(3);
     expect(icons.get(0).props.children).toEqual(COLLECTION_ICONS['LOCAL_STORAGE']);
     expect(icons.get(1).props.children).toEqual(COLLECTION_ICONS['S3_BUCKET']);

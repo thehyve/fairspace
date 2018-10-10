@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
-import './App.css';
 import styles from './App.styles';
 import TopBar from "../layout/TopBar/TopBar";
+import Footer from '../layout/Footer/Footer';
 import MenuDrawer from "../layout/MenuDrawer/MenuDrawer";
 import AuthorizationCheck from "../generic/AuthorizationCheck/AuthorizationCheck";
 import Config from "../generic/Config/Config";
@@ -16,12 +16,32 @@ import MetadataEntityPage from "../../pages/Metadata/MetadataEntityPage";
 import MetadataOverviewPage from "../../pages/Metadata/MetadataOverviewPage";
 import ErrorDialog from "../error/ErrorDialog";
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
-import store from "../../store/configureStore"
+import {fetchWorkspace} from "../../actions/workspace";
+import store from "../../store/configureStore";
 import {Provider} from "react-redux";
 import Files from "../../pages/Files/Files";
 import {logout} from "./logout";
+import {MuiThemeProvider, createMuiTheme, withTheme} from '@material-ui/core/styles';
+
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+            light: '#ff9a92',
+            main: '#e56964',
+            dark: '#ae393a',
+            contrastText: '#fff'
+        },
+        secondary: {
+            light: '#98ccdf',
+            main: '#689bad',
+            dark: '#396d7e',
+            contrastText: '#fff'
+        }
+    }
+});
 
 class App extends React.Component {
+
     cancellable = {
         // it's important that this is one level down, so we can drop the
         // reference to the entire object by setting it to undefined.
@@ -30,8 +50,9 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        
-        this.state = {configLoaded: false};
+        this.state = {
+            configLoaded: false
+        };
     }
 
     componentDidMount() {
@@ -40,8 +61,8 @@ class App extends React.Component {
             .then(() => {
                 store.dispatch(fetchUser());
                 store.dispatch(fetchAuthorizations());
-
-                this.cancellable.setState && this.cancellable.setState({configLoaded: true})
+                store.dispatch(fetchWorkspace());
+                this.cancellable.setState && this.cancellable.setState({configLoaded: true});
             });
     }
 
@@ -59,37 +80,44 @@ class App extends React.Component {
     }
 
     render() {
-        if(this.state.configLoaded) {
+        if (this.state.configLoaded) {
             const classes = this.props.classes;
             // The app itself consists of a topbar, a drawer and the actual page
             // The topbar is shown even if the user has no proper authorization
             return (
-                <div className={classes.root}>
-                    <Provider store={store}>
-                        <ErrorDialog>
-                            <TopBar classes={classes}></TopBar>
-                            <Router>
-                                <AuthorizationCheck transformError={this.transformError.bind(this)}>
-                                    <MenuDrawer classes={classes}></MenuDrawer>
-                                    <main className={classes.content}>
-                                        <div className={classes.toolbar}/>
+                <MuiThemeProvider theme={theme}>
+                    <div className={classes.root}>
+                        <Provider store={store}>
+                            <ErrorDialog>
+                                <TopBar classes={classes}></TopBar>
+                                <Router>
+                                    <AuthorizationCheck transformError={this.transformError.bind(this)}>
+                                        <MenuDrawer classes={classes}></MenuDrawer>
+                                        <main className={classes.content}>
+                                            <div className={classes.toolbar}/>
 
-                                        <Route exact path="/" component={Home}/>
-                                        <Route exact path="/collections" component={Collections}/>
-                                        <Route path="/collections/:collection/:path(.*)?" component={Files}/>
-                                        <Route path="/notebooks" component={Notebooks}/>
-                                        <Route exact path="/metadata" component={MetadataOverviewPage}/>
-                                        <Route path="/metadata/:type(projects|patients|samples|consents)/:id" component={MetadataEntityPage}/>
+                                            <Route exact path="/" component={Home}/>
+                                            <Route exact path="/collections" component={Collections}/>
+                                            <Route path="/collections/:collection/:path(.*)?" component={Files}/>
+                                            <Route path="/notebooks" component={Notebooks}/>
 
-                                        {/* Handle auth urls that should go to the server */}
-                                        <Route path="/login" render={() => {window.location.href = '/login';}}/>
-                                        <Route path="/logout" render={logout}/>
-                                    </main>
-                                </AuthorizationCheck>
-                            </Router>
-                        </ErrorDialog>
-                    </Provider>
-                </div>
+                                            <Route exact path="/metadata" component={MetadataOverviewPage}/>
+                                            <Route path="/metadata/:type(projects|patients|samples|consents)/:id"
+                                                   component={MetadataEntityPage}/>
+
+                                            {/* Handle auth urls that should go to the server */}
+                                            <Route path="/login" render={() => {
+                                                window.location.href = '/login';
+                                            }}/>
+                                            <Route path="/logout" render={logout}/>
+                                        </main>
+                                    </AuthorizationCheck>
+                                </Router>
+                                <Footer></Footer>
+                            </ErrorDialog>
+                        </Provider>
+                    </div>
+                </MuiThemeProvider>
             );
         } else {
             return (<div>Loading...</div>);
@@ -101,4 +129,4 @@ App.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(App);
+export default withTheme()(withStyles(styles)(App));

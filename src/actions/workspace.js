@@ -1,6 +1,11 @@
-import UserAPI from '../services/UserAPI/UserAPI'
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import {USERS} from "./actionTypes";
+import {USERS, WORKSPACE} from "./actionTypes";
+import WorkspaceAPI from "../services/WorkspaceAPI/WorkspaceAPI";
+
+export const fetchWorkspace = createErrorHandlingPromiseAction(() => ({
+    type: WORKSPACE,
+    payload: WorkspaceAPI.getWorkspace(),
+}));
 
 export const fetchUsersIfNeeded = () => dispatchIfNeeded(
     fetchUsers,
@@ -9,5 +14,5 @@ export const fetchUsersIfNeeded = () => dispatchIfNeeded(
 
 export const fetchUsers = createErrorHandlingPromiseAction(() => ({
     type: USERS,
-    payload: UserAPI.getUsers(),
+    payload: WorkspaceAPI.getUsers(),
 }));

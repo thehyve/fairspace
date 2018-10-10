@@ -5,6 +5,7 @@ import cache from './cache'
 import metadataBySubject from "./metadataBySubject";
 import collectionBrowser from "./collectionBrowser";
 import clipboard from "./clipboard";
+import workspace from './workspace';
 
 export default combineReducers({
     account,
@@ -12,5 +13,6 @@ export default combineReducers({
     cache,
     metadataBySubject,
     collectionBrowser,
+    workspace,
     clipboard
 })

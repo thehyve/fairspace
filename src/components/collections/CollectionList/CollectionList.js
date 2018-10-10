@@ -9,7 +9,8 @@ import Icon from "@material-ui/core/Icon";
 import ClickHandler from "../../generic/ClickHandler/ClickHandler"
 import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
 import PermissionChecker from "../../permissions/PermissionChecker";
-import './CollectionList.css';
+import styles from './CollectionList.styles';
+import {withStyles} from '@material-ui/core/styles';
 
 export const COLLECTION_ICONS = {
     'LOCAL_STORAGE': 'folder_open',
@@ -18,58 +19,70 @@ export const COLLECTION_ICONS = {
 
 export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
-function CollectionList({collections, selectedCollectionId, onCollectionClick, onCollectionDoubleClick, onCollectionDelete}) {
-    function getCollectionIcon(collection) {
-        if(collection.type && COLLECTION_ICONS.hasOwnProperty(collection.type)) {
+
+class CollectionList extends React.Component {
+
+    getCollectionIcon(collection) {
+        if (collection.type && COLLECTION_ICONS.hasOwnProperty(collection.type)) {
             return COLLECTION_ICONS[collection.type];
         } else {
             return COLLECTION_ICONS[DEFAULT_COLLECTION_TYPE];
         }
     }
 
-    if(!collections || collections.length === 0) {
-        return "No collections";
-    } else {
-        return (
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell/>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {collections.map(collection => {
-                        return (
-                            <ClickHandler
+    render() {
+        const {
+            collections, selectedCollectionId,
+            onCollectionClick, onCollectionDoubleClick, onCollectionDelete
+        } = this.props;
+
+        if (!collections || collections.length === 0) {
+            return "No collections";
+        } else {
+            return (
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell></TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell/>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {collections.map(collection => {
+                            const selected = selectedCollectionId && (collection.id === selectedCollectionId);
+                            const classes = this.props.classes;
+                            return (
+                                <ClickHandler
                                     component={TableRow}
+                                    className={selected ? classes.tableRowSelected : classes.tableRow}
                                     key={collection.id}
-                                    selected={selectedCollectionId && (collection.id === selectedCollectionId)}
+                                    selected={selected}
                                     onSingleClick={() => onCollectionClick(collection)}
                                     onDoubleClick={() => onCollectionDoubleClick(collection)}>
-                                <TableCell>
-                                    <Icon>{getCollectionIcon(collection)}</Icon>
-                                </TableCell>
-                                <TableCell component="th" scope="row">
-                                    <CollectionItem collection={collection}/>
-                                </TableCell>
-                                <TableCell numeric>
-                                    {onCollectionDelete ?
-                                    <ButtonWithVerification
-                                        aria-label={"Delete " + collection.name}
-                                        onClick={() => onCollectionDelete(collection)}
-                                        disabled={!PermissionChecker.canManage(collection)}>
-                                        <Icon>delete</Icon>
-                                    </ButtonWithVerification> : null}
-                                </TableCell>
-                            </ClickHandler>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-        );
+                                    <TableCell>
+                                        <Icon>{this.getCollectionIcon(collection)}</Icon>
+                                    </TableCell>
+                                    <TableCell component="th" scope="row">
+                                        <CollectionItem collection={collection}/>
+                                    </TableCell>
+                                    <TableCell numeric>
+                                        {onCollectionDelete ?
+                                            <ButtonWithVerification
+                                                aria-label={"Delete " + collection.name}
+                                                onClick={() => onCollectionDelete(collection)}
+                                                disabled={!PermissionChecker.canManage(collection)}>
+                                                <Icon>delete</Icon>
+                                            </ButtonWithVerification> : null}
+                                    </TableCell>
+                                </ClickHandler>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            );
+        }
     }
 }
 
-export default CollectionList;
+export default withStyles(styles)(CollectionList);
