@@ -21,25 +21,19 @@ import store from "../../store/configureStore";
 import {Provider} from "react-redux";
 import Files from "../../pages/Files/Files";
 import {logout} from "./logout";
+
+// theme
 import {MuiThemeProvider, createMuiTheme, withTheme} from '@material-ui/core/styles';
+import pink from '@material-ui/core/colors/pink';
+import indigo from '@material-ui/core/colors/indigo';
 
 const theme = createMuiTheme({
     typography: {
         useNextVariants: true,
     },
     palette: {
-        primary: {
-            light: '#ff9a92',
-            main: '#e56964',
-            dark: '#ae393a',
-            contrastText: '#fff'
-        },
-        secondary: {
-            light: '#98ccdf',
-            main: '#689bad',
-            dark: '#396d7e',
-            contrastText: '#fff'
-        }
+        primary: indigo,
+        secondary: pink
     }
 });
 

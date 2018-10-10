@@ -14,13 +14,18 @@ import RenameButton from "../buttons/RenameButton/RenameButton";
 import {Row} from "simple-flexbox";
 import DateTime from "../../generic/DateTime/DateTime";
 import Bytes from "../../generic/Bytes/Bytes";
+import styles from './FileList.styles';
+import {withStyles} from '@material-ui/core/styles';
 
-function FileList(props) {
-    if (!props.files || props.files.length === 0 || props.files[0] === null) {
-        return "No files";
-    } else {
-        const selectedFilenames = props.selectedPaths || [];
-        return (<Table>
+class FileList extends React.Component {
+    render() {
+        const props = this.props;
+
+        if (!props.files || props.files.length === 0 || props.files[0] === null) {
+            return "No files";
+        } else {
+            const selectedFilenames = props.selectedPaths || [];
+            return (<Table>
                 <TableHead>
                     <TableRow>
                         <TableCell></TableCell>
@@ -32,11 +37,14 @@ function FileList(props) {
                 </TableHead>
                 <TableBody>
                     {props.files.map(row => {
+                        const selected = selectedFilenames.includes(row.filename);
+                        const classes = props.classes;
                         return (
                             <ClickHandler
                                 component={TableRow}
                                 key={row.filename}
-                                selected={selectedFilenames.includes(row.filename)}
+                                selected={selected}
+                                className={selected ? classes.tableRowSelected : classes.tableRow}
                                 onSingleClick={() => props.onPathClick(row)}
                                 onDoubleClick={() => props.onPathDoubleClick(row)}>
                                 <TableCell>
@@ -47,7 +55,7 @@ function FileList(props) {
                                 </TableCell>
                                 <TableCell numeric>
                                     <Typography noWrap={true}>
-                                        {row.type === 'file' ? <Bytes value={row.size} /> : ''}
+                                        {row.type === 'file' ? <Bytes value={row.size}/> : ''}
                                     </Typography>
                                 </TableCell>
                                 <TableCell numeric>
@@ -57,12 +65,15 @@ function FileList(props) {
                                 </TableCell>
                                 <TableCell numeric>
                                     <Row>
-                                        {props.onRename?
-                                            <RenameButton currentName={row.basename} aria-label={"Rename " + row.basename} onRename={(newName) => props.onRename(row, newName)}>
-                                                <RenameBox />
+                                        {props.onRename ?
+                                            <RenameButton currentName={row.basename}
+                                                          aria-label={"Rename " + row.basename}
+                                                          onRename={(newName) => props.onRename(row, newName)}>
+                                                <RenameBox/>
                                             </RenameButton> : null}
                                         {props.onDelete ?
-                                            <ButtonWithVerification aria-label={"Delete " + row.basename} onClick={() => props.onDelete(row)}>
+                                            <ButtonWithVerification aria-label={"Delete " + row.basename}
+                                                                    onClick={() => props.onDelete(row)}>
                                                 <Icon>delete</Icon>
                                             </ButtonWithVerification> : null}
                                     </Row>
@@ -72,7 +83,8 @@ function FileList(props) {
                     })}
                 </TableBody>
             </Table>)
+        }
     }
 }
 
-export default FileList;
+export default withStyles(styles)(FileList)
