@@ -40,7 +40,7 @@ release: clean
 tag:
 ifeq ($(OS),Darwin)
 	sed -i "" -e "s/version:.*/version: $(RELEASE_VERSION)/" Chart.yaml
-git statuelse ifeq ($(OS),Linux)
+else ifeq ($(OS),Linux)
 	sed -i -e "s/version:.*/version: $(RELEASE_VERSION)/" Chart.yaml
 else
 	echo "platfrom $(OS) not supported to release from"
