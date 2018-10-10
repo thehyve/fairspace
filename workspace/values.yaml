@@ -9,8 +9,8 @@ nameOverride:
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  repository: docker-registry.jx.test.fairdev.app/fairspace/workspace
+  tag: 0.1.493
   pullPolicy: IfNotPresent
 
 resources: {}
@@ -117,14 +117,14 @@ jupyterhub:
     singleuser:
       image:
         name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
-        tag: latest
+        tag: 0.1.493
       defaultUrl: "/lab"
       extraEnv:
         WORKSPACE_URL:
     hub:
       image:
         name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
-        tag: latest
+        tag: 0.1.493
       ingress:
         enabled: false
       extraEnv:
