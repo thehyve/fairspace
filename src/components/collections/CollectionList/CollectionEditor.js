@@ -64,7 +64,7 @@ class CollectionEditor extends React.Component {
                 <DialogTitle id='form-dialog-title'>{this.state.title}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        You can edit the collection name and description here.
+                        You can edit the collection details here.
                     </DialogContentText>
                     <TextField
                         autoFocus
@@ -96,8 +96,8 @@ class CollectionEditor extends React.Component {
                                 value={this.state.type}
                                 onChange={this.handleInputChange.bind(this)}
                             >
-                                <MenuItem value={'LOCAL_FILE'}>Local Filesystem</MenuItem>
-                                <MenuItem value={'S3_BUCKET'}>S3 Mount</MenuItem>
+                                <MenuItem value={'LOCAL_FILE'}>On Premise</MenuItem>
+                                <MenuItem value={'S3_BUCKET'}>S3 Bucket</MenuItem>
                             </Select>
                         </FormControl>
                         : null}
