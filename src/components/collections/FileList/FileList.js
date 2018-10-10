@@ -55,7 +55,7 @@ class FileList extends React.Component {
                                 </TableCell>
                                 <TableCell numeric>
                                     <Typography noWrap={true}>
-                                        {row.type === 'file' ? <Bytes value={row.size} /> : ''}
+                                        {row.type === 'file' ? <Bytes value={row.size}/> : ''}
                                     </Typography>
                                 </TableCell>
                                 <TableCell numeric>
@@ -65,12 +65,15 @@ class FileList extends React.Component {
                                 </TableCell>
                                 <TableCell numeric>
                                     <Row>
-                                        {props.onRename?
-                                            <RenameButton currentName={row.basename} aria-label={"Rename " + row.basename} onRename={(newName) => props.onRename(row, newName)}>
-                                                <RenameBox />
+                                        {props.onRename ?
+                                            <RenameButton currentName={row.basename}
+                                                          aria-label={"Rename " + row.basename}
+                                                          onRename={(newName) => props.onRename(row, newName)}>
+                                                <RenameBox/>
                                             </RenameButton> : null}
                                         {props.onDelete ?
-                                            <ButtonWithVerification aria-label={"Delete " + row.basename} onClick={() => props.onDelete(row)}>
+                                            <ButtonWithVerification aria-label={"Delete " + row.basename}
+                                                                    onClick={() => props.onDelete(row)}>
                                                 <Icon>delete</Icon>
                                             </ButtonWithVerification> : null}
                                     </Row>
