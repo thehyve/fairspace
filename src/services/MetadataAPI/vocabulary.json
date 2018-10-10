@@ -1,223 +1,508 @@
 {
-  "@context": {
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "xsd": "http://www.w3.org/TR/xmlschema11-2/#",
-    "dc": "http://purl.org/dc/elements/1.1/",
-    "schema": "http://schema.org/",
-    "fairspace": "http://fairspace.io/ontology#"
-  },
-  "@graph": [
-    {
-      "@id": "fairspace:Collection",
-      "@type": "rdf:Class",
-      "rdfs:label": "Collection"
+    "@context": {
+        "dbpedia": "http://dbpedia.org/ontology#",
+        "dc": "http://purl.org/dc/elements/1.1/",
+        "foaf": "http://xmlns.com/foaf/0.1/#",
+        "fs": "http://fairspace.io/ontology# ",
+        "obo": "http://purl.obolibrary.org/obo/#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "schema": "http://schema.org/",
+        "xsd": "http://www.w3.org/TR/xmlschema11-2/#"
     },
-    {
-      "@id": "schema:Dataset",
-      "@type": "rdf:Class",
-      "rdfs:label": "Dataset"
-    },
-    {
-      "@id": "schema:Person",
-      "@type": "rdf:Class",
-      "rdfs:label": "Person",
-      "fairspace:fairspaceEntity": true
-    },
-    {
-      "@id": "fairspace:User",
-      "@type": "rdf:Class",
-      "rdfs:label": "User"
-    },
-    {
-      "@id": "schema:Material",
-      "@type": "rdf:Class",
-      "rdfs:label": "Material",
-      "fairspace:fairspaceEntity": true
-    },
-    {
-      "@id": "fairspace:PersonConsent",
-      "@type": "rdf:Class",
-      "rdfs:label": "Person Consent",
-      "fairspace:fairspaceEntity": true
-    },
-    {
-      "@id": "fairspace:ResearchProject",
-      "@type": "rdf:Class",
-      "rdfs:label": "Research Project",
-      "fairspace:fairspaceEntity": true
-    },
-
-    {
-      "@id": "fairspace:File",
-      "@type": "rdf:Class",
-      "rdfs:label": "File"
-    },
-    {
-      "@id": "@type",
-      "@type": "rdf:Property",
-      "rdfs:label": "Type",
-      "rdfs:domain": [
-        {"@id": "schema:Person"},
-        {"@id": "schema:Material"},
-        {"@id": "fairspace:PersonConsent"},
-        {"@id": "fairspace:ResearchProject"},
-        {"@id": "fairspace:File"},
-        {"@id": "fairspace:Collection"}
-      ],
-      "rdfs:range": [{"@id": "rdf:Class"}],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:name",
-      "@type": "rdf:Property",
-      "rdfs:label": "Name",
-      "rdfs:domain": [
-        {"@id": "fairspace:Collection"},
-        {"@id": "schema:Person"}
-      ],
-      "rdfs:range": [{"@id": "xsd:string"}],
-      "fairspace:allowMultiple": false,
-      "fairspace:multiLine": false
-    },
-    {
-      "@id": "fairspace:description",
-      "@type": "rdf:Property",
-      "rdfs:label": "Description",
-      "rdfs:domain": [{"@id": "fairspace:Collection"}],
-      "rdfs:range": [{"@id": "xsd:string"}],
-      "fairspace:allowMultiple": false,
-      "fairspace:multiLine": true
-    },
-    {
-      "@id": "schema:creator",
-      "@type": "rdf:Property",
-      "rdfs:label": "Creator",
-      "rdfs:domain": [{"@id": "fairspace:Collection"}],
-      "rdfs:range": [{"@id": "fairspace:User"}]
-    },
-    {
-      "@id": "schema:dateCreated",
-      "@type": "rdf:Property",
-      "rdfs:label": "Date created",
-      "rdfs:domain": [{"@id": "fairspace:Collection"}],
-      "rdfs:range": [{"@id": "xsd:dateTime"}]
-    },
-    {
-      "@id": "fairspace:derivesFrom",
-      "@type": "rdf:Property",
-      "rdfs:label": "Derives from",
-      "rdfs:domain": [{"@id": "schema:Material"}],
-      "rdfs:range": [{"@id": "schema:Person"}],
-      "fairspace:allowMultiple": false
-    },
-    {
-      "@id": "fairspace:providesMaterial",
-      "@type": "rdf:Property",
-      "rdfs:label": "Provides material",
-      "rdfs:domain": [{"@id": "schema:Person"}],
-      "rdfs:range": [{"@id": "schema:Material"}],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:isConsentOf",
-      "@type": "rdf:Property",
-      "rdfs:label": "Is consent of",
-      "rdfs:domain": [{"@id": "fairspace:PersonConsent"}],
-      "rdfs:range": [{"@id": "schema:Person"}],
-      "fairspace:allowMultiple": false
-    },
-    {
-      "@id": "fairspace:gaveConsent",
-      "@type": "rdf:Property",
-      "rdfs:label": "Gave consent",
-      "rdfs:domain": [{"@id": "schema:Person"}],
-      "rdfs:range": [{"@id":  "fairspace:PersonConsent"}],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:hasData",
-      "@type": "rdf:Property",
-      "rdfs:label": "Has data",
-      "rdfs:domain": [
-        {"@id": "schema:Person"},
-        {"@id": "schema:Material"}
-      ],
-      "rdfs:range": [
-        {"@id": "fairspace:Collection"},
-        {"@id": "fairspace:File"}
-      ],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:aboutPerson",
-      "@type": "rdf:Property",
-      "rdfs:label": "Is about person",
-      "rdfs:domain": [
-        {"@id": "fairspace:Collection"},
-        {"@id": "fairspace:File"}
-      ],
-      "rdfs:range": [{"@id": "schema:Person"}],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:aboutMaterial",
-      "@type": "rdf:Property",
-      "rdfs:label": "Is about material",
-      "rdfs:domain": [
-        {"@id": "fairspace:Collection"},
-        {"@id": "fairspace:File"}
-      ],
-      "rdfs:range": [{"@id": "schema:Material"}],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:hasPart",
-      "@type": "rdf:Property",
-      "rdfs:label": "Contains file",
-      "rdfs:domain": [{"@id": "fairspace:Collection"}],
-      "rdfs:range": [{"@id": "fairspace:File"}],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:partOf",
-      "@type": "rdf:Property",
-      "rdfs:label": "Part of collection",
-      "rdfs:domain": [{"@id": "fairspace:File"}],
-      "rdfs:range": [{"@id": "fairspace:Collection"}],
-      "fairspace:allowMultiple": false
-    },
-    {
-      "@id": "fairspace:hasCollection",
-      "@type": "rdf:Property",
-      "rdfs:label": "Associated collections",
-      "rdfs:domain": [{"@id": "fairspace:ResearchProject"}],
-      "rdfs:range": [{"@id": "fairspace:Collection"}],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:partOfProject",
-      "@type": "rdf:Property",
-      "rdfs:label": "Part of project",
-      "rdfs:domain": [{"@id": "fairspace:Collection"}],
-      "rdfs:range": [{"@id": "fairspace:ResearchProject"}],
-      "fairspace:allowMultiple": false
-    },
-    {
-      "@id": "fairspace:isProjectConsent",
-      "@type": "rdf:Property",
-      "rdfs:label": "Consent for specific project",
-      "rdfs:domain": [{"@id": "fairspace:PersonConsent"}],
-      "rdfs:range": [{"@id": "fairspace:ResearchProject"}],
-      "fairspace:allowMultiple": true
-    },
-    {
-      "@id": "fairspace:hasPersonConsent",
-      "@type": "rdf:Property",
-      "rdfs:label": "Person consent",
-      "rdfs:domain": [{"@id": "fairspace:ResearchProject"}],
-      "rdfs:range": [{"@id": "fairspace:PersonConsent"}],
-      "fairspace:allowMultiple": true
-    }
-  ]
+    "@graph": [
+        {
+            "@id": "foaf:Person",
+            "@type": "rdf:Class",
+            "rdfs:comment": "A person that is subject of research.",
+            "rdfs:label": "Person"
+        },
+        {
+            "@id": "schema:Material",
+            "@type": "rdf:Class",
+            "rdfs:comment": "A material or a sample provided by person.",
+            "rdfs:label": "Material"
+        },
+        {
+            "@id": "fs:PersonConsent",
+            "@type": "rdf:Class",
+            "rdfs:comment": "A research consent given by person. ",
+            "rdfs:label": "Person Consent"
+        },
+        {
+            "@id": "fs:ResearchProject",
+            "@type": "rdf:Class",
+            "rdfs:comment": "A research project.",
+            "rdfs:label": "Research Project"
+        },
+        {
+            "@id": "fs:File",
+            "@type": "rdf:Class",
+            "rdfs:comment": "A single file.",
+            "rdfs:label": "File"
+        },
+        {
+            "@id": "fs:Collection",
+            "@type": "rdf:Class",
+            "rdfs:comment": "A specific collection in Fairspace.",
+            "rdfs:label": "Collection"
+        },
+        {
+            "@id": "fs:User",
+            "@type": "rdf:Class",
+            "rdfs:comment": "A user of the fairspace application.",
+            "rdfs:label": "User"
+        },
+        {
+            "@id": "foaf:GenderMale",
+            "@type": "foaf:Gender",
+            "rdfs:label": "Male"
+        },
+        {
+            "@id": "foaf:GenderFemale",
+            "@type": "foaf:Gender",
+            "rdfs:label": "Female"
+        },
+        {
+            "@id": "foaf:GenderOther",
+            "@type": "foaf:Gender",
+            "rdfs:label": "Other"
+        },
+        {
+            "@id": "@type",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:machineOnly": true,
+            "rdfs:label": "Type"
+        },
+        {
+            "@id": "rdfs:label",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:multiLine": false,
+            "rdfs:comment": "Human readable name.",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ],
+            "rdfs:label": "Name",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "rdfs:comment",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:multiLine": true,
+            "rdfs:comment": "Collection description.",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ],
+            "rdfs:label": "Description",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "schema:creator",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:machineOnly": true,
+            "rdfs:comment": "User that created this collection.",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                }
+            ],
+            "rdfs:label": "Creator",
+            "rdfs:range": [
+                {
+                    "@id": "fs:User"
+                }
+            ]
+        },
+        {
+            "@id": "schema:dateCreated",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:machineOnly": true,
+            "rdfs:comment": "Time at point of creation",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                }
+            ],
+            "rdfs:label": "Date created",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:dateTime"
+                }
+            ]
+        },
+        {
+            "@id": "fs:derivesFrom",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": "fs:providesMaterial",
+            "rdfs:comment": "Person that provided this sample.",
+            "rdfs:domain": [
+                {
+                    "@id": "schema:Material"
+                }
+            ],
+            "rdfs:label": "Derives from",
+            "rdfs:range": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ]
+        },
+        {
+            "@id": "fs:providesMaterial",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:derivesFrom",
+            "rdfs:comment": "Samples provided by this person",
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ],
+            "rdfs:label": "Provides material",
+            "rdfs:range": [
+                {
+                    "@id": "schema:Material"
+                }
+            ]
+        },
+        {
+            "@id": "fs:isConsentOf",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": "fs:gaveConsent",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:PersonConsent"
+                }
+            ],
+            "rdfs:label": "Is consent of",
+            "rdfs:range": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ]
+        },
+        {
+            "@id": "fs:gaveConsent",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:isConsentOf",
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ],
+            "rdfs:label": "Gave consent",
+            "rdfs:range": [
+                {
+                    "@id": "fs:PersonConsent"
+                }
+            ]
+        },
+        {
+            "@id": "fs:hasData",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                },
+                {
+                    "@id": "schema:Material"
+                }
+            ],
+            "rdfs:label": "Has data",
+            "rdfs:range": [
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:File"
+                }
+            ]
+        },
+        {
+            "@id": "fs:aboutPerson",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:File"
+                }
+            ],
+            "rdfs:label": "Is about person",
+            "rdfs:range": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ]
+        },
+        {
+            "@id": "fs:aboutMaterial",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:File"
+                }
+            ],
+            "rdfs:label": "Is about material",
+            "rdfs:range": [
+                {
+                    "@id": "schema:Material"
+                }
+            ]
+        },
+        {
+            "@id": "fs:hasPart",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:partOf",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                }
+            ],
+            "rdfs:label": "Contains file",
+            "rdfs:range": [
+                {
+                    "@id": "fs:File"
+                }
+            ]
+        },
+        {
+            "@id": "fs:partOf",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": "fs:hasPart",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:File"
+                }
+            ],
+            "rdfs:label": "Part of collection",
+            "rdfs:range": [
+                {
+                    "@id": "fs:Collection"
+                }
+            ]
+        },
+        {
+            "@id": "fs:hasCollection",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:partOfProject",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ],
+            "rdfs:label": "Associated collections",
+            "rdfs:range": [
+                {
+                    "@id": "fs:Collection"
+                }
+            ]
+        },
+        {
+            "@id": "fs:partOfProject",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": "fs:hasCollection",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                }
+            ],
+            "rdfs:label": "Part of project",
+            "rdfs:range": [
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ]
+        },
+        {
+            "@id": "fs:isProjectConsent",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:hasPersonConsent",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:PersonConsent"
+                }
+            ],
+            "rdfs:label": "Consent for specific project",
+            "rdfs:range": [
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ]
+        },
+        {
+            "@id": "fs:hasPersonConsent",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:isProjectConsent",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ],
+            "rdfs:label": "Person consent",
+            "rdfs:range": [
+                {
+                    "@id": "fs:PersonConsent"
+                }
+            ]
+        },
+        {
+            "@id": "fs:projectCode",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:domain": [
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ],
+            "rdfs:label": "Project Code",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:investigationNature ",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "rdfs:comment": "choose between: basic research, biomedical research, clinical trial, medical diagnosis",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ],
+            "rdfs:label": "Investigation Nature",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:projectManager",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "rdfs:domain": [
+                {
+                    "@id": "fs:ResearchProject"
+                }
+            ],
+            "rdfs:label": "Project Manager",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "foaf:gender",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:multiLine": false,
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ],
+            "rdfs:label": "Gender",
+            "rdfs:range": [
+                {
+                    "@id": "foaf:Gender"
+                }
+            ]
+        },
+        {
+            "@id": "foaf:name",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:multiLine": false,
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ],
+            "rdfs:label": "Name",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "foaf:myersBriggs",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:multiLine": false,
+            "rdfs:comment": "A Myers Briggs (MBTI) personality classification. ",
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ],
+            "rdfs:label": "MBTI",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "obo:FMA_50707 ",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:multiLine": false,
+            "rdfs:comment": "Spatial association relationship which describes the containment, adjacency and anatomical coordinates of physical anatomical entities. Examples: anatomical containment, anatomical adjacency, anatomical coordinate.",
+            "rdfs:domain": [
+                {
+                    "@id": "schema:Material"
+                }
+            ],
+            "rdfs:label": "Anatomical location",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        }
+    ]
 }
