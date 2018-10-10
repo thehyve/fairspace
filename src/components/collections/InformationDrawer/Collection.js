@@ -31,7 +31,7 @@ class Collection extends React.Component {
         this.setState({editing: false});
     }
 
-    handleChangeDetails(name, description) {
+    handleChangeDetails(name, description, type) {
         this.closeEditDialog();
 
         if ((name !== this.state.collection.name || description !== this.state.collection.description) && name !== '') {

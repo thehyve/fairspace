@@ -98,16 +98,17 @@ class CollectionBrowser extends React.Component {
                     editing={this.state.addingCollection}
                     onSave={this.handleAddCollection.bind(this)}
                     onCancel={this.handleCancelAddCollection.bind(this)}
+                    editType={true}
                 />
             </div>
         );
 
     }
 
-    handleAddCollection(name, description) {
+    handleAddCollection(name, description, type) {
         this.setState({addingCollection: false});
 
-        this.props.addCollection(name, description)
+        this.props.addCollection(name, description, type)
             .then(this.props.fetchCollectionsIfNeeded)
             .catch(err =>
                 ErrorDialog.showError(

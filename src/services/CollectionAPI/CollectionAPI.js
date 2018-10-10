@@ -25,12 +25,12 @@ class CollectionAPI {
             .then(response => response.json())
     }
 
-    addCollection(name, description) {
+    addCollection(name, description, type) {
         return fetch(Config.get().urls.collections, {
             method: 'POST',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({name: name, description: description})
+            body: JSON.stringify({name: name, description: description, type: type})
         }).then(failOnHttpError("Failure while saving a collection"))
     }
 
