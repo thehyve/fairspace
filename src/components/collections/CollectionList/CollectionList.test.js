@@ -5,6 +5,7 @@ import {COLLECTION_ICONS} from "./CollectionList"
 import {shallow} from "enzyme";
 import Icon from "@material-ui/core/Icon";
 import {TableCell} from "@material-ui/core";
+import DateTime from "../../generic/DateTime/DateTime";
 
 it('renders without crashing', () => {
     const div = document.createElement('div');
@@ -56,6 +57,6 @@ it('renders Created column', () => {
     const cells = wrapper.dive().find(TableCell);
     expect(cells.length).toEqual(10);
     expect(cells.at(2).childAt(0).text()).toEqual('Created');
-    expect(cells.at(7).childAt(0).childAt(0).text()).toEqual(date.toLocaleString());
+    expect(cells.at(7).childAt(0).childAt(0).text()).toEqual(DateTime(date));
 });
 
