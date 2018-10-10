@@ -24,6 +24,9 @@ import {logout} from "./logout";
 import {MuiThemeProvider, createMuiTheme, withTheme} from '@material-ui/core/styles';
 
 const theme = createMuiTheme({
+    typography: {
+        useNextVariants: true,
+    },
     palette: {
         primary: {
             light: '#ff9a92',
