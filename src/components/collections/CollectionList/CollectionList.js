@@ -11,6 +11,8 @@ import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWith
 import PermissionChecker from "../../permissions/PermissionChecker";
 import styles from './CollectionList.styles';
 import {withStyles} from '@material-ui/core/styles';
+import DateTime from "../../generic/DateTime/DateTime";
+import Typography from "@material-ui/core/Typography/Typography";
 
 export const COLLECTION_ICONS = {
     'LOCAL_STORAGE': 'folder_open',
@@ -22,7 +24,7 @@ export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
 class CollectionList extends React.Component {
 
-    getCollectionIcon(collection) {
+    static getCollectionIcon(collection) {
         if (collection.type && COLLECTION_ICONS.hasOwnProperty(collection.type)) {
             return COLLECTION_ICONS[collection.type];
         } else {
@@ -43,8 +45,10 @@ class CollectionList extends React.Component {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell></TableCell>
+                            <TableCell padding={'dense'}></TableCell>
                             <TableCell>Name</TableCell>
+                            <TableCell>Created</TableCell>
+                            <TableCell>Access</TableCell>
                             <TableCell/>
                         </TableRow>
                     </TableHead>
@@ -60,12 +64,18 @@ class CollectionList extends React.Component {
                                     selected={selected}
                                     onSingleClick={() => onCollectionClick(collection)}
                                     onDoubleClick={() => onCollectionDoubleClick(collection)}>
-                                    <TableCell>
-                                        <Icon>{this.getCollectionIcon(collection)}</Icon>
+                                    <TableCell padding={'dense'}>
+                                        <Icon>{CollectionList.getCollectionIcon(collection)}</Icon>
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <CollectionItem collection={collection}/>
                                     </TableCell>
+                                    <TableCell>
+                                        <Typography noWrap={true} variant="subtitle2">
+                                            {DateTime(collection.dateCreated)}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>{collection.access}</TableCell>
                                     <TableCell numeric>
                                         {onCollectionDelete ?
                                             <ButtonWithVerification
