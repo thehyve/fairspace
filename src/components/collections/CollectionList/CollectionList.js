@@ -11,6 +11,7 @@ import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWith
 import PermissionChecker from "../../permissions/PermissionChecker";
 import styles from './CollectionList.styles';
 import {withStyles} from '@material-ui/core/styles';
+import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
 
 export const COLLECTION_ICONS = {
@@ -29,10 +30,6 @@ class CollectionList extends React.Component {
         } else {
             return COLLECTION_ICONS[DEFAULT_COLLECTION_TYPE];
         }
-    }
-
-    static getCreationDate(collection) {
-        return new Date(collection.dateCreated).toLocaleString();
     }
 
     render() {
@@ -74,7 +71,9 @@ class CollectionList extends React.Component {
                                         <CollectionItem collection={collection}/>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography noWrap={true}>{CollectionList.getCreationDate(collection)}</Typography>
+                                        <Typography noWrap={true} variant="subtitle2">
+                                            {DateTime(collection.dateCreated)}
+                                        </Typography>
                                     </TableCell>
                                     <TableCell>{collection.access}</TableCell>
                                     <TableCell numeric>
