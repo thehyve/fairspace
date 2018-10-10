@@ -116,22 +116,28 @@ jupyterhub:
                 session_url:
     singleuser:
       image:
-        name: fairspace/jupyterhub-singleuser
+        name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
         tag: latest
       defaultUrl: "/lab"
       extraEnv:
         WORKSPACE_URL:
     hub:
-        ingress:
-            enabled: false
-        extraEnv:
-          JUPYTERHUB_CRYPT_KEY:
-        extraConfig: |
-          c.KubeSpawner.cmd = ['/start']
-          c.KubeSpawner.singleuser_privileged = True
-          c.Authenticator.auto_login = True
+      image:
+        name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
+        tag: latest
+      ingress:
+        enabled: false
+      extraEnv:
+        JUPYTERHUB_CRYPT_KEY:
+      extraConfig: |
+        c.KubeSpawner.cmd = ['/start']
+        c.KubeSpawner.singleuser_privileged = True
+        c.Authenticator.auto_login = True
     proxy:
-      secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
+      # The JupyterHub chart requires this value to be set here with the same
+      # length as the actual values
+      # Ensure to override this value with a 64-character hex string when installing
+      secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
 
 # Specific settings for Ceres subchart
 ceres:
