@@ -15,6 +15,9 @@ import ErrorDialog from "../error/ErrorDialog";
  * Shows the property and values for the property
  */
 function MetadataProperty({editable, subject, property, dispatch, classes}) {
+    // the dataCreated property is not editable
+    editable = !property.key.includes('dateCreated');
+
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
     // will save a given value (if it has changed) along with the other
@@ -82,7 +85,7 @@ function MetadataProperty({editable, subject, property, dispatch, classes}) {
 
     // Do not show an add component if no multiples are allowed
     // and there is already a value
-    const canAdd = editable && (property.allowMultiple || property.values.length === 0)
+    const canAdd = editable && (property.allowMultiple || property.values.length === 0);
 
     const renderAddComponent = () =>
         <ListItem key={property.values.length}>
