@@ -44,6 +44,6 @@ export function navigableLink(link) {
 }
 
 
-export function isDateCreatedProperty(property) {
-    return  property.key.includes('dateCreated');
+export function isDateTimeProperty(property) {
+    return  property.range === 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
 }

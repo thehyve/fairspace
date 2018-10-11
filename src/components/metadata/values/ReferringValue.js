@@ -1,12 +1,12 @@
 import React from 'react'
 import {navigableLink} from "../../../utils/metadatautils";
 import DateTime from "../../generic/DateTime/DateTime";
-import {isDateCreatedProperty} from '../../../utils/metadatautils';
+import {isDateTimeProperty} from '../../../utils/metadatautils';
 
 const ReferringValue = ({property, entry}) => {
     function extractDisplayValue(value) {
         let extractedVal = value.label || value.value || linkLabel(value.id) || '';
-        extractedVal = isDateCreatedProperty(property) ? DateTime(extractedVal) : extractedVal;
+        extractedVal = isDateTimeProperty(property) ? DateTime({value: extractedVal}) : extractedVal;
         return extractedVal;
     }
 
