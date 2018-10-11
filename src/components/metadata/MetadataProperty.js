@@ -16,7 +16,7 @@ import ErrorDialog from "../error/ErrorDialog";
  */
 function MetadataProperty({editable, subject, property, dispatch, classes}) {
     // the dataCreated property is not editable
-    editable = !property.key.includes('dateCreated');
+    editable = editable && !property.key.includes('dateCreated');
 
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
