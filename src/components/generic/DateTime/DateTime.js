@@ -8,7 +8,7 @@ const options = {
 const dateFormatter = new Intl.DateTimeFormat('en-US', options);
 
 function DateTime(props) {
-    return dateFormatter.format(props.value);
+    return dateFormatter.format(new Date(props.value));
 }
 
 export default DateTime;
