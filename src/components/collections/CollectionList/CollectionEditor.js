@@ -6,6 +6,10 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Select from "@material-ui/core/Select/Select";
+import MenuItem from "@material-ui/core/MenuItem/MenuItem";
+import FormControl from "@material-ui/core/FormControl/FormControl";
+import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 
 class CollectionEditor extends React.Component {
     constructor(props) {
@@ -20,6 +24,7 @@ class CollectionEditor extends React.Component {
                 title: this.props.title,
                 name: this.props.name || '',
                 description: this.props.description || '',
+                type: this.props.type || 'LOCAL_FILE',
                 editing: this.props.editing
             });
         }
@@ -43,7 +48,7 @@ class CollectionEditor extends React.Component {
 
         this.close();
         if (this.props.onSave) {
-            this.props.onSave(this.state.name, this.state.description);
+            this.props.onSave(this.state.name, this.state.description, this.state.type);
         }
     }
 
@@ -59,7 +64,7 @@ class CollectionEditor extends React.Component {
                 <DialogTitle id='form-dialog-title'>{this.state.title}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        You can edit the collection name and description here.
+                        You can edit the collection details here.
                     </DialogContentText>
                     <TextField
                         autoFocus
@@ -83,6 +88,20 @@ class CollectionEditor extends React.Component {
                         onChange={this.handleInputChange.bind(this)}
                         fullWidth
                     />
+                    {this.props.editType ?
+                        <FormControl>
+                            <InputLabel>Type</InputLabel>
+                            <Select
+                                name={'type'}
+                                value={this.state.type}
+                                onChange={this.handleInputChange.bind(this)}
+                            >
+                                <MenuItem value={'LOCAL_FILE'}>On Premise</MenuItem>
+                                <MenuItem value={'S3_BUCKET'}>S3 Bucket</MenuItem>
+                            </Select>
+                        </FormControl>
+                        : null}
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.handleCancel.bind(this)} color='secondary'>

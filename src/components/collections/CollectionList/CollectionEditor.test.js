@@ -3,13 +3,13 @@ import React from "react";
 import CollectionEditor from "./CollectionEditor";
 import Button from "@material-ui/core/Button/Button";
 import {shallow} from "enzyme";
-import TextField from "@material-ui/core/TextField/TextField";
-import {DialogTitle} from "@material-ui/core";
+import {DialogTitle, Select, TextField} from "@material-ui/core";
 
 let collectionEditor;
 let cancelClicked;
 let receivedName;
 let receivedDescription;
+let receivedType;
 
 beforeEach(() => {
     collectionEditor = (<CollectionEditor
@@ -17,16 +17,20 @@ beforeEach(() => {
         title={'title'}
         name={'name'}
         description={'description'}
+        type={'S3_MOUNT'}
         onCancel={() => {
             cancelClicked = true
         }}
-        onSave={(name, description) => {
+        onSave={(name, description, type) => {
             receivedName = name;
             receivedDescription = description;
+            receivedType = type;
         }}
+        editType={true}
     />);
 
     cancelClicked = false;
+    receivedName = receivedDescription = receivedType = '';
 });
 
 it('renders without crashing', () => {
@@ -52,13 +56,17 @@ it('applies properties properly', () => {
     expect(button.at(0).childAt(0).text()).toEqual('Cancel');
     expect(button.at(1).childAt(0).text()).toEqual('Save');
 
+    let select = wrapper.find(Select);
+    expect(select.length).toEqual(1);
+    expect(select.at(0).prop('value')).toEqual('S3_MOUNT');
+    expect(select.at(0).prop('children').length).toEqual(2);
+
     cancelClicked = false;
     button.at(0).simulate('click');
     expect(cancelClicked).toEqual(true);
 
-    receivedName = '';
-    receivedDescription = '';
     button.at(1).simulate('click');
     expect(receivedName).toEqual('name');
     expect(receivedDescription).toEqual('description');
+    expect(receivedType).toEqual('S3_MOUNT');
 });
