@@ -247,8 +247,8 @@ export class PermissionsViewer extends React.Component {
 
     renderConfirmationDialog = () => {
         const {selectedUser, showConfirmDeleteDialog} = this.state;
-        const userText = selectedUser ? getDisplayName(selectedUser) : 'this user';
-        const content = `Are you sure you want to remove "${userText}" as collaborator?`;
+        const userText = selectedUser && getDisplayName(selectedUser);
+        const content = `Are you sure you want to remove "${userText}" from the collaborator list?`;
         return (
             <ConfirmationDialog open={showConfirmDeleteDialog}
                                 title={'Confirmation'}
