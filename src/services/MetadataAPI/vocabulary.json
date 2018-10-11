@@ -8,6 +8,7 @@
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "schema": "http://schema.org/",
+        "ws": "current-workspace",
         "xsd": "http://www.w3.org/TR/xmlschema11-2/#"
     },
     "@graph": [
@@ -79,7 +80,6 @@
             "@id": "rdfs:label",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
-            "fs:multiLine": false,
             "rdfs:comment": "Human readable name.",
             "rdfs:domain": [
                 {
@@ -227,6 +227,7 @@
             "@id": "fs:hasData",
             "@type": "rdf:Property",
             "fs:allowMultiple": true,
+            "rdfs:comment": "Collections or files for this real entity.",
             "rdfs:domain": [
                 {
                     "@id": "foaf:Person"
@@ -438,7 +439,6 @@
             "@id": "foaf:gender",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
-            "fs:multiLine": false,
             "rdfs:domain": [
                 {
                     "@id": "foaf:Person"
@@ -455,7 +455,6 @@
             "@id": "foaf:name",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
-            "fs:multiLine": false,
             "rdfs:domain": [
                 {
                     "@id": "foaf:Person"
@@ -472,7 +471,6 @@
             "@id": "foaf:myersBriggs",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
-            "fs:multiLine": false,
             "rdfs:comment": "A Myers Briggs (MBTI) personality classification. ",
             "rdfs:domain": [
                 {
@@ -490,7 +488,6 @@
             "@id": "obo:FMA_50707 ",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
-            "fs:multiLine": false,
             "rdfs:comment": "Spatial association relationship which describes the containment, adjacency and anatomical coordinates of physical anatomical entities. Examples: anatomical containment, anatomical adjacency, anatomical coordinate.",
             "rdfs:domain": [
                 {
