@@ -233,9 +233,35 @@ export class PermissionsViewer extends React.Component {
         );
     };
 
+    renderPermissionDialog = () => {
+        const {collectionId, currentLoggedUser} = this.props;
+        const {selectedUser, showPermissionDialog} = this.state;
+        return (
+            <AlterPermission open={showPermissionDialog}
+                             onClose={this.handleShareWithDialogClose}
+                             user={selectedUser}
+                             collectionId={collectionId}
+                             currentLoggedUser={currentLoggedUser}/>
+        );
+    };
+
+    renderConfirmationDialog = () => {
+        const {selectedUser, showConfirmDeleteDialog} = this.state;
+        const userText = selectedUser ? getDisplayName(selectedUser) : 'this user';
+        const content = `Are you sure you want to remove "${userText}" as collaborator?`;
+        return (
+            <ConfirmationDialog open={showConfirmDeleteDialog}
+                                title={'Confirmation'}
+                                content={content}
+                                onAgree={this.handleDeleteCollaborator}
+                                onDisagree={this.handleCloseConfirmDeleteDialog}
+                                onClose={this.handleCloseConfirmDeleteDialog}
+            />
+        );
+    };
+
     render() {
-        const {classes, collectionId, permissions, currentLoggedUser} = this.props;
-        const {selectedUser, showPermissionDialog, showConfirmDeleteDialog} = this.state;
+        const {classes, permissions, } = this.props;
         if (permissions.error) {
             return (<ErrorMessage>message={`Error loading permissions`}</ErrorMessage>)
         } else if (permissions.pending) {
@@ -245,19 +271,8 @@ export class PermissionsViewer extends React.Component {
         } else {
             return (
                 <div className={classes.collaboratorList}>
-                    <AlterPermission open={showPermissionDialog}
-                                     onClose={this.handleShareWithDialogClose}
-                                     user={selectedUser}
-                                     collectionId={collectionId}
-                                     currentLoggedUser={currentLoggedUser}
-                    />
-                    <ConfirmationDialog open={showConfirmDeleteDialog}
-                                        title={'Confirmation'}
-                                        content={`Are you sure you want to remove ${selectedUser ? selectedUser.subject : 'user'} as collaborator?`}
-                                        onAgree={this.handleDeleteCollaborator}
-                                        onDisagree={this.handleCloseConfirmDeleteDialog}
-                                        onClose={this.handleCloseConfirmDeleteDialog}
-                    />
+                    {this.renderPermissionDialog()}
+                    {this.renderConfirmationDialog()}
                     {this.renderUserList(permissions.data)}
                 </div>
             );
