@@ -17,7 +17,7 @@ import {isDateCreatedProperty} from "../../utils/metadatautils";
  */
 function MetadataProperty({editable, subject, property, dispatch, classes}) {
     // the dataCreated property is not editable
-    editable = editable && !isDateCreatedProperty(property);;
+    editable = editable && !isDateCreatedProperty(property);
 
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
