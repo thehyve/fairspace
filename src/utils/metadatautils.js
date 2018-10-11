@@ -42,3 +42,8 @@ export function navigableLink(link) {
             .replace('/iri/', '/metadata/')
         : link
 }
+
+
+export function isDateCreatedProperty(property) {
+    return  property.key.includes('dateCreated');
+}
