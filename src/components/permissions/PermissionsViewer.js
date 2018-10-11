@@ -101,7 +101,7 @@ export class PermissionsViewer extends React.Component {
             fetchPermissions(collectionId);
         }
         if (alteredPermission.data !== prevProps.alteredPermission.data) {
-            fetchPermissions(collectionId);
+            fetchPermissions(collectionId, true);
         } else if (prevProps.alteredPermission !== alteredPermission && alteredPermission.error) {
             const {alteredPermission} = this.props;
             if (prevProps.alteredPermission !== alteredPermission && alteredPermission.error) {
