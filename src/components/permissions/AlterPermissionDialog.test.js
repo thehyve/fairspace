@@ -139,6 +139,4 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('WithStyles(Typography)').childAt(0).text()).toEqual('Michael Jackson');
         expect(wrapper.find('WithStyles(Button)').at(1).prop('disabled')).toBeFalsy(); // submit button enabled
     });
-
-    // TODO: Add more tests on behaviour changes
 });

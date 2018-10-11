@@ -1,12 +1,8 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MoreIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import ErrorMessage from "../error/ErrorMessage";
 import {withStyles} from "@material-ui/core/styles/index";
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import ConfirmationDialog from "../generic/ConfirmationDialog/ConfirmationDialog";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -17,6 +13,8 @@ import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
 import {getDisplayName} from "../collections/utils/userUtils";
+import MoreActions from "../generic/MoreActions/MoreActions";
+import ActionItem from "../generic/MoreActions/ActionItem";
 
 export const styles = theme => ({
     root: {},
@@ -132,10 +130,6 @@ export class PermissionsViewer extends React.Component {
         });
     };
 
-    handleMoreClose = () => {
-        this.setState({anchorEl: null});
-    };
-
     handleDeleteCollaborator = () => {
         const {selectedUser} = this.state;
         const {collectionId, alterPermission} = this.props;
@@ -172,17 +166,19 @@ export class PermissionsViewer extends React.Component {
 
     renderAlterPermissionButtons(idx, collaborator) {
         const {classes, canManage, currentLoggedUser} = this.props;
-        const {hovered} = this.state;
+        const {hovered, selectedUser} = this.state;
         const secondaryActionClassName = hovered !== idx ? classes.collaboratorIcon : null;
         return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
             <ListItemSecondaryAction
                 onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                 onMouseOut={() => this.handleListItemMouseout(idx)}
             >
-                <IconButton aria-label="Alter Permission" className={secondaryActionClassName}
-                            onClick={(e) => this.handleMoreClick(collaborator, e)}>
-                    <MoreIcon/>
-                </IconButton>
+                <MoreActions
+                    onClick={(e) => this.handleMoreClick(collaborator, e)}
+                    className={secondaryActionClassName}>
+                    <ActionItem onClick={() => this.handleAlterPermission(selectedUser)}>Change access</ActionItem>
+                    <ActionItem onClick={this.handleRemoveCollaborator}>Delete</ActionItem>
+                </MoreActions>
             </ListItemSecondaryAction>
         ) : '';
     }
@@ -221,13 +217,6 @@ export class PermissionsViewer extends React.Component {
         return (
             <List dense>
                 {this.renderCollaboratorList(permissions)}
-                <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={this.handleMoreClose}>
-                    <MenuItem onClick={() => this.handleAlterPermission(selectedUser)}>Change access</MenuItem>
-                    <MenuItem onClick={this.handleRemoveCollaborator}>Delete</MenuItem>
-                </Menu>
                 {this.renderAddCollaboratorButton()}
             </List>
         );

@@ -70,7 +70,6 @@ describe('PermissionViewer', () => {
                 fetchPermissions={mockFecthPermissionsFn}
             />);
         });
-
         it('should render all collaborators', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
@@ -95,7 +94,7 @@ describe('PermissionViewer', () => {
         });
 
         it('should enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find('[aria-label="Alter Permission"]').length).toEqual(3)
+            expect(wrapper.find('MoreActions').length).toEqual(3)
         });
         it('should render add button', () => {
             expect(wrapper.find('[aria-label="Add"]').length).toEqual(1)
@@ -147,7 +146,7 @@ describe('PermissionViewer', () => {
         });
 
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find('[aria-label="Alter Permission"]').length).toEqual(0)
+            expect(wrapper.find('MoreActions').length).toEqual(0)
         });
 
         it('should NOT render add button', () => {
@@ -200,7 +199,7 @@ describe('PermissionViewer', () => {
         });
 
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find('[aria-label="Alter Permission"]').length).toEqual(3)
+            expect(wrapper.find('MoreActions').length).toEqual(3)
         });
 
         it('should render add button', () => {

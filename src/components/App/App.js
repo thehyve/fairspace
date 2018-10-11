@@ -86,10 +86,10 @@ class App extends React.Component {
                     <div className={classes.root}>
                         <Provider store={store}>
                             <ErrorDialog>
-                                <TopBar classes={classes}></TopBar>
+                                <TopBar classes={classes}/>
                                 <Router>
                                     <AuthorizationCheck transformError={this.transformError.bind(this)}>
-                                        <MenuDrawer classes={classes}></MenuDrawer>
+                                        <MenuDrawer classes={classes}/>
                                         <main className={classes.content}>
                                             <div className={classes.toolbar}/>
 
@@ -110,7 +110,7 @@ class App extends React.Component {
                                         </main>
                                     </AuthorizationCheck>
                                 </Router>
-                                <Footer></Footer>
+                                <Footer/>
                             </ErrorDialog>
                         </Provider>
                     </div>
