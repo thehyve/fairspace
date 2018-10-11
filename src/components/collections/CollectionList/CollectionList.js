@@ -72,7 +72,7 @@ class CollectionList extends React.Component {
                                     </TableCell>
                                     <TableCell>
                                         <Typography noWrap={true} variant="subtitle2">
-                                            {DateTime({value: collection.dateCreated})}
+                                            <DateTime value={collection.dateCreated}/>
                                         </Typography>
                                     </TableCell>
                                     <TableCell>{collection.access}</TableCell>

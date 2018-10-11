@@ -10,14 +10,14 @@ import {updateMetadata} from "../../actions/metadata";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ListItemText from "@material-ui/core/ListItemText";
 import ErrorDialog from "../error/ErrorDialog";
-import {isDateCreatedProperty} from "../../utils/metadatautils";
+import {isDateTimeProperty} from "../../utils/metadatautils";
 
 /**
  * Shows the property and values for the property
  */
 function MetadataProperty({editable, subject, property, dispatch, classes}) {
     // the dataCreated property is not editable
-    editable = editable && !isDateCreatedProperty(property);
+    editable = editable && !isDateTimeProperty(property);
 
     // Function to save a certain value.
     // Calling it with an index provides you with a function that

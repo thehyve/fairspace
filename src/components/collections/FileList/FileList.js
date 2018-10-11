@@ -60,7 +60,7 @@ class FileList extends React.Component {
                                 </TableCell>
                                 <TableCell numeric>
                                     <Typography noWrap={true}>
-                                        {row.lastmod ? <DateTime value={new Date(row.lastmod)}/> : null}
+                                        {row.lastmod ? <DateTime value={row.lastmod}/> : null}
                                     </Typography>
                                 </TableCell>
                                 <TableCell numeric>
