@@ -53,6 +53,9 @@ before_script:
   - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
   - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
   - export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
+  - sudo apt-get install g++-4.9
 
 jobs:
   include:
