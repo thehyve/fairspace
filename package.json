@@ -2,14 +2,6 @@
   "name": "mercury",
   "version": "0.0.0-RELEASEVERSION",
   "private": true,
-  "proxy": {
-    "/api": {
-      "target": "http://localhost:5000"
-    },
-    "/account": {
-      "target": "http://localhost:5000"
-    }
-  },
   "dependencies": {
     "@material-ui/core": "latest",
     "@material-ui/icons": "latest",
@@ -20,6 +12,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "express": "^4.16.3",
+    "http-proxy-middleware": "^0.19.0",
     "jsonld": "^1.0.4",
     "mdi-material-ui": "^5.3.0",
     "prop-types": "^15.6.2",
