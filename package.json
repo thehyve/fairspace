@@ -28,7 +28,7 @@
     "react-dropzone": "^5.0.1",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "1.1.4",
+    "react-scripts": "^2.0.0",
     "react-select": "^2.0.0",
     "react-split-pane": "^0.1.82",
     "react-table": "^6.8.6",
@@ -44,7 +44,6 @@
     "dev": "concurrently \"yarn server\" \"yarn start\"",
     "server": "node mock-server/server.js",
     "start": "react-scripts start",
-    "prepare-build": "./node_modules/.bin/babel ./node_modules/webdav/dist --out-dir ./node_modules/webdav/dist --presets env",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
@@ -56,5 +55,11 @@
     "redux-logger": "^3.0.6",
     "redux-mock-store": "^1.5.3",
     "webdav-server": "^2.3.22"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
