@@ -65,7 +65,9 @@ class CollectionList extends React.Component {
                                     onSingleClick={() => onCollectionClick(collection)}
                                     onDoubleClick={() => onCollectionDoubleClick(collection)}>
                                     <TableCell padding={'dense'}>
-                                        <Icon>{CollectionList.getCollectionIcon(collection)}</Icon>
+                                        <Icon fontSize="small">
+                                            {CollectionList.getCollectionIcon(collection)}
+                                        </Icon>
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <CollectionItem collection={collection}/>
