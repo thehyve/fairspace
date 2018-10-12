@@ -17,12 +17,6 @@ import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
 
 export const styles = theme => ({
-    collaboratorIcon: {
-        visibility: "hidden",
-        "&:hover": {
-            visibility: "inherit"
-        }
-    },
     collaboratorList: {
         width: '100%'
     },
@@ -120,23 +114,18 @@ export class PermissionsViewer extends React.Component {
         })
     };
 
-    handleMoreClick = (user, event) => {
-        this.setState({
-            selectedUser: user,
-        });
-    };
-
     handleDeleteCollaborator = () => {
-        const {selectedUser} = this.state;
         const {collectionId, alterPermission} = this.props;
+        const {selectedUser} = this.state;
         if (selectedUser) {
             alterPermission(selectedUser.subject, collectionId, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
 
-    handleRemoveCollaborator = () => {
+    handleRemoveCollaborator = (collaborator) => {
         this.setState({
+            selectedUser: collaborator,
             showConfirmDeleteDialog: true
         });
     };
@@ -161,14 +150,17 @@ export class PermissionsViewer extends React.Component {
 
     renderAlterPermissionButtons(idx, collaborator) {
         const {canManage, currentLoggedUser} = this.props;
-        const {selectedUser} = this.state;
+        const {hovered} = this.state;
         return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
-            <ListItemSecondaryAction>
-                <MoreActions
-                    onClick={(e) => this.handleMoreClick(collaborator, e)}
-                >
-                    <ActionItem onClick={() => this.handleAlterPermission(selectedUser)}>Change access</ActionItem>
-                    <ActionItem onClick={this.handleRemoveCollaborator}>Delete</ActionItem>
+            <ListItemSecondaryAction
+                onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
+                onMouseOut={() => this.handleListItemMouseout(idx)}
+            >
+                <MoreActions visibility={hovered !== idx ? 'hidden' : 'visible'}>
+                    <ActionItem onClick={() => this.handleAlterPermission(collaborator)}>
+                        Change access
+                    </ActionItem>
+                    <ActionItem onClick={() => this.handleRemoveCollaborator(collaborator)}>Delete</ActionItem>
                 </MoreActions>
             </ListItemSecondaryAction>
         ) : '';
@@ -180,7 +172,6 @@ export class PermissionsViewer extends React.Component {
             .map((p, idx) => {
                 return (<ListItem
                     key={idx}
-                    button={canAlterPermission(canManage, p, currentLoggedUser)}
                     onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                     onMouseOut={() => this.handleListItemMouseout(idx)}
                 >
@@ -240,7 +231,7 @@ export class PermissionsViewer extends React.Component {
     };
 
     render() {
-        const {classes, permissions, } = this.props;
+        const {classes, permissions,} = this.props;
         if (permissions.error) {
             return (<ErrorMessage message={'Error loading permissions'}/>)
         } else if (permissions.pending) {

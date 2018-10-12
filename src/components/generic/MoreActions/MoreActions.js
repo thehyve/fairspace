@@ -25,12 +25,10 @@ class MoreActions extends React.Component {
     };
 
     render() {
-        const {ariaLabel, className} = this.props;
+        const {ariaLabel, visibility} = this.props;
         return (
-            <div>
-                <IconButton aria-label={ariaLabel}
-                            className={className}
-                            onClick={this.handleClick}>
+            <div >
+                <IconButton aria-label={ariaLabel} style={{visibility: visibility}} onClick={this.handleClick}>
                     <MoreIcon/>
                 </IconButton>
                 <MoreActionsMenu
@@ -42,8 +40,15 @@ class MoreActions extends React.Component {
     }
 }
 
+MoreActions.defaultProps = {
+    ariaLabel: 'More actions',
+    visibility: 'visible'
+};
+
 MoreActions.propTypes = {
+    ariaLabel: PropTypes.string,
     onClick: PropTypes.func,
+    visibility: PropTypes.string,
 };
 
 export default MoreActions;
