@@ -27,7 +27,7 @@ class MoreActions extends React.Component {
     render() {
         const {ariaLabel, visibility} = this.props;
         return (
-            <div >
+            <div>
                 <IconButton aria-label={ariaLabel} style={{visibility: visibility}} onClick={this.handleClick}>
                     <MoreIcon/>
                 </IconButton>

@@ -150,13 +150,12 @@ export class PermissionsViewer extends React.Component {
 
     renderAlterPermissionButtons(idx, collaborator) {
         const {canManage, currentLoggedUser} = this.props;
-        const {hovered} = this.state;
         return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
             <ListItemSecondaryAction
                 onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                 onMouseOut={() => this.handleListItemMouseout(idx)}
             >
-                <MoreActions visibility={hovered !== idx ? 'hidden' : 'visible'}>
+                <MoreActions visibility={this.state.hovered !== idx ? 'hidden' : 'visible'}>
                     <ActionItem onClick={() => this.handleAlterPermission(collaborator)}>
                         Change access
                     </ActionItem>
@@ -167,7 +166,6 @@ export class PermissionsViewer extends React.Component {
     }
 
     renderCollaboratorList(permissions) {
-        const {canManage, currentLoggedUser} = this.props;
         return sortPermissions(permissions)
             .map((p, idx) => {
                 return (<ListItem
@@ -231,7 +229,7 @@ export class PermissionsViewer extends React.Component {
     };
 
     render() {
-        const {classes, permissions,} = this.props;
+        const {classes, permissions} = this.props;
         if (permissions.error) {
             return (<ErrorMessage message={'Error loading permissions'}/>)
         } else if (permissions.pending) {
