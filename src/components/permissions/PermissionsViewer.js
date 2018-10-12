@@ -17,7 +17,6 @@ import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
 
 export const styles = theme => ({
-    root: {},
     collaboratorIcon: {
         visibility: "hidden",
         "&:hover": {
@@ -79,7 +78,6 @@ export class PermissionsViewer extends React.Component {
             showConfirmDeleteDialog: false,
             error: false,
             hovered: null,
-            anchorEl: null,
             selectedUser: null,
             currentLoggedUser: null,
             canManage: false,
@@ -111,7 +109,6 @@ export class PermissionsViewer extends React.Component {
     handleAlterPermission = (user) => {
         this.setState({
             showPermissionDialog: true,
-            anchorEl: null,
             selectedUser: user
         })
     };
@@ -125,7 +122,6 @@ export class PermissionsViewer extends React.Component {
 
     handleMoreClick = (user, event) => {
         this.setState({
-            anchorEl: event.currentTarget,
             selectedUser: user,
         });
     };
@@ -141,7 +137,6 @@ export class PermissionsViewer extends React.Component {
 
     handleRemoveCollaborator = () => {
         this.setState({
-            anchorEl: null,
             showConfirmDeleteDialog: true
         });
     };
@@ -165,17 +160,13 @@ export class PermissionsViewer extends React.Component {
     };
 
     renderAlterPermissionButtons(idx, collaborator) {
-        const {classes, canManage, currentLoggedUser} = this.props;
-        const {hovered, selectedUser} = this.state;
-        const secondaryActionClassName = hovered !== idx ? classes.collaboratorIcon : null;
+        const {canManage, currentLoggedUser} = this.props;
+        const {selectedUser} = this.state;
         return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
-            <ListItemSecondaryAction
-                onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                onMouseOut={() => this.handleListItemMouseout(idx)}
-            >
+            <ListItemSecondaryAction>
                 <MoreActions
                     onClick={(e) => this.handleMoreClick(collaborator, e)}
-                    className={secondaryActionClassName}>
+                >
                     <ActionItem onClick={() => this.handleAlterPermission(selectedUser)}>Change access</ActionItem>
                     <ActionItem onClick={this.handleRemoveCollaborator}>Delete</ActionItem>
                 </MoreActions>
