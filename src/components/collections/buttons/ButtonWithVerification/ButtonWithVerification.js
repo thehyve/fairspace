@@ -51,7 +51,7 @@ class ButtonWithVerification extends React.Component {
     render() {
         return (
             <div>
-                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
+                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)} style={this.props.style}>
                     {this.props.children}
                 </IconButton>
 

@@ -13,6 +13,8 @@ import styles from './CollectionList.styles';
 import {withStyles} from '@material-ui/core/styles';
 import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import ClearIcon from '@material-ui/icons/Clear';
 
 export const COLLECTION_ICONS = {
     'LOCAL_STORAGE': 'folder_open',
@@ -24,6 +26,10 @@ export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
 class CollectionList extends React.Component {
 
+    state = {
+        hovered: null,
+    };
+
     static getCollectionIcon(collection) {
         if (collection.type && COLLECTION_ICONS.hasOwnProperty(collection.type)) {
             return COLLECTION_ICONS[collection.type];
@@ -31,6 +37,18 @@ class CollectionList extends React.Component {
             return COLLECTION_ICONS[DEFAULT_COLLECTION_TYPE];
         }
     }
+
+    handleListItemMouseover = (value, e) => {
+        this.setState({
+            hovered: value
+        })
+    };
+
+    handleListItemMouseout = (value, e) => {
+        if (this.state.hovered === value) {
+            this.setState({hovered: null})
+        }
+    };
 
     render() {
         const {
@@ -53,11 +71,13 @@ class CollectionList extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {collections.map(collection => {
+                        {collections.map((collection, idx) => {
                             const selected = selectedCollectionId && (collection.id === selectedCollectionId);
                             const classes = this.props.classes;
                             return (
                                 <ClickHandler
+                                    onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
+                                    onMouseOut={(e) => this.handleListItemMouseout(idx, e)}
                                     component={TableRow}
                                     className={selected ? classes.tableRowSelected : classes.tableRow}
                                     key={collection.id}
@@ -81,6 +101,9 @@ class CollectionList extends React.Component {
                                     <TableCell numeric>
                                         {onCollectionDelete ?
                                             <ButtonWithVerification
+                                                style={{
+                                                    visibility: this.state.hovered !== idx ? 'hidden' : 'visible'
+                                                }}
                                                 aria-label={"Delete " + collection.name}
                                                 onClick={() => onCollectionDelete(collection)}
                                                 disabled={!PermissionChecker.canManage(collection)}>
