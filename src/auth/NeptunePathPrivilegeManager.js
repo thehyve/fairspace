@@ -41,7 +41,7 @@ class NeptunePathPrivilegeManager extends PrivilegeManager {
                 }
             })
             .catch(err => {
-                console.error(err);
+                console.error("Retrieving access for collection with location " + collectionLocation + " failed:", err.message);
                 if (err && err.response && err.response.status === 404) {
                     callback(null, false)
                 } else {
