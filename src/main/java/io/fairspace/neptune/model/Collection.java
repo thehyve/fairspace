@@ -1,6 +1,5 @@
 package io.fairspace.neptune.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -24,7 +23,7 @@ public class Collection {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private final CollectionType type = CollectionType.LOCAL_FILE;
+    private CollectionType type = CollectionType.LOCAL_FILE;
 
     private String location;
 
