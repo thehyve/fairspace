@@ -213,7 +213,6 @@ export class PermissionsViewer extends React.Component {
     }
 
     renderUserList = (permissions) => {
-        const {anchorEl, selectedUser} = this.state;
         return (
             <List dense>
                 {this.renderCollaboratorList(permissions)}
