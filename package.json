@@ -1,6 +1,6 @@
 {
   "name": "mercury",
-  "version": "0.1.0",
+  "version": "0.0.0-RELEASEVERSION",
   "private": true,
   "proxy": {
     "/api": {
