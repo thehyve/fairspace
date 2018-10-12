@@ -1,0 +1,84 @@
+language: node_js
+
+node_js:
+  - "node"
+
+os:
+  - linux
+
+env:
+  global:
+     - APPNAME="titan"
+     - ORG="fairspace"
+     - DOCKER_REPO="fairspace.azurecr.io"
+     - CHART_REPO=" https://fairspace.github.io/helm-repo"
+     - RELEASE_BRANCH="master"
+     - SNAPSHOT_BRANCH="dev"
+     - DOCKER_USERNAME="fairspace"
+     - GITHUB_USERNAME="fairspace-ci"
+     - HELM_VERSION="2.11.0"
+
+# Azure Docker repository credentials:
+# DOCKER_PASSWORD=....
+     - secure: "MWKGp6Tn8aagchLjE7VtLOqxANHHDHjL9l2VKmmwXdvqK7aNYRC4ms02FyotfNksZKABeTBU6gsQ3BePW1d7JRCtlPTrcJ25ODj1DcRy1pdhz7h+45Pse4xwX8ikFCLo3WJCRHkaYwQnfETZgA6i4HgG7zS/99c7WgHPB/MHCNbCdxezqnVRmYdhluLfBNTEbaeXVctVQyn+xvaedjU7gb2+4HDTBQeD/IXnW/R5nL66YX2BNuvbZOoutASYWjKtVE+3mXh35nl68wRSTNOpJHLAfNeOgTdf+uTvaYnre5RmKKwk4dmFCVodFPX20wqwMuTHXrLG+83nsvPi7Pp9+6FROvlZxhYNteCznTZ4MTBbWMTr2o7Nq7rkY7PmGY6jCd81xPZe+2EAD7xXXGcrHaNO/rdieSm+FerBP53bohn9LkTTwW3R/Shs1HOJ19LCAVazwnKpF4q2Ms9x9qDWCVDcJtJnSNkYz5bFbsd6jk/dLieb+dIcCXxNi5oYvEs5Q3dhpTtIc0ZpKfb3pEtoOYZAe1LELq/D2+XpEPp+YO39YQ4bK9bOuHV5MqtA+GgUS99kBjXyrzaVXfF27IVoc7DSGgHm+1UF0ywxpVx5zHeZeOfdw9u8URokaz7qP8NKlQKS4GKQHPotdpY4FS5turhS73TMc9dOQ/3UwnEXyjo="
+# Github credentials:
+# GITHUB_PASSWORD=....
+     - secure: "Y9CKTHXuwA5yljO9SPK/t955D30tFzkW0Rq/c7tWmB3v8eoeRYrzHRhE2MFcUSZ5rATdjVZ8Jt0INeeS2KCmtqwhnKSUMghUhFAzqaIe/yabr9bWfUed29cq9GtJQEu8nlZgrxcpxCAT28dyYMRG2AUYCqGNImsVhXrSy6zcTW8kDaZE9mLyhURBSoCayr92cN6vaX2sT5L4Re1fTbSnyD4RlROOqpiRvMGWTdKq+McmSK17IRZEhElH/CrzsVl+xVC81X5zJsVbgHzENKSYHLZHbjGQx12f/dRL68zEvoN9yndrX0rDaj5jQ0P2/HWes4WKQlJFQIG+g52NsMkdypHhe3vSO08RHj2FGv2CzTsOGcYKPf1FWwOe0XN9NlJbbUhICesmtfqm0WgdZANi47n7LZFWop7de2dwD7+TP2RyJvQxUbG6uxhsVE8zXZLgGNSW0b04VkUfaxMzYRXa3fsv3KqOdwt/ztEQahYnERBiewvrUO/2epZbdV1d7K3peYYIVprrB6S7u+y89ij7vO5nx97sab0b8Qn4EJ47uezUQjbaNi4UGR8KbzCZ/SasfbHg8XmvhcK6miHKuhUM+NGU1wpuL9GPMjEqxGKfira83uQNAfL6OQN6Evd28TchOhmDGBFr+uLhdnPD5zB/rQ57QXiHtrSZ/PTKPgk11QE="
+
+sudo: required
+
+services:
+  - docker
+
+cache:
+  directories:
+  - node_modules
+  - $HOME/downloads
+
+notifications:
+  hipchat:
+    on_pull_requests: false
+    rooms:
+      - secure: "ZCsFGDF9FGF58WLLYCbbaIm4673PaHFviaYowYnU3Gm5AgDUARRSlW914oZEd5fr0y6+1MRBfzZ3c+Y9VvUDW/oh8wbPPMVxUfgvr1bZI7np4gnOV2VfHoqa2NStdN6J0O0gyuVJ+v+25H1aSfse95UAPdSkcMuPvH1Xo8BwgeD8+GLzNnnYxORY2QwJkcRWgfauj/oZSfI/P5LFkt5hbnWukKvQIlCbRzqkhHjShMLIs72OJjnClLK5x9oK4aowlIh9/wDiNJazr/Yw4oWskscnU1KLRzcYCAr8QpY+yMmdbNd1HusaAZb7h+86I6Xl8OU6w4jFClDtn7JwLUN1gSDQAPP50jYYQQ6NGoRDxqtlTr7y2vSIKCuunBieR/Xif5IA/cZop2cPG10hrKrBNCqjTLdVm/6V44duWckGtUPNJ3ln/v1OKLDGPvCimUGEqK+TRc07jzyJ8rl/9Hab6wy/kQHHjqpQeHaYn1wHRiGZ4BaGhEJy5eqm34rzw8RSluMlc9mRm0C3a6lQ35HJ2FDE0C+R4JBvildJ9/ouJ7UU6Y4uNZkGmgXW+7X6cizPIHDVC3wxUzhDYxlgFDyDfjKaJhw2TKmHEhT2Dto/NHqFj0BtW6YxZ3DxNBCUCOXCUkSflFLXqDTiHgNJhVMRIeenTWdpjhRT/LkKqu/Lq1k="
+    template:
+      - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
+    format: html
+    notify: true
+
+before_script:
+  - '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && export VERSION_POSTFIX="-SNAPSHOT" || true'
+  - '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && export SHOULD_RELEASE=1 || true'
+  - '[[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && export SHOULD_RELEASE=1 || true'
+  - export CURRENTVERSION="$(cat VERSION)"
+  - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
+  - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
+  - export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
+
+jobs:
+  include:
+  - stage: Build
+    name: App and Docker image
+    script:
+    - ./ci/nodejs/tag.sh
+    - ./ci/nodejs/build.sh
+    - ./ci/docker/build.sh
+    - '[[ $SHOULD_RELEASE ]] && ./ci/docker/release.sh || true'
+  - stage: Build
+    name: Helm chart
+    install:
+    - ./ci/helm/install_helm.sh
+    - export PATH="$(pwd)/linux-amd64/:$PATH"
+    - helm init --client-only
+    script:
+    - ./ci/helm/tag.sh
+    - ./ci/helm/build.sh
+    - '[[ $SHOULD_RELEASE ]] && ./ci/helm/release.sh || true'
+  - # For release branch, update git with the new tag and update version
+    if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+    stage: Versioning
+    name: Set tag and update version
+    script:
+    - ./ci/nodejs/tag.sh
+    - ./ci/helm/tag.sh
+    - ./ci/versioning/add_tag_to_git.sh
+    - ./ci/versioning/set_next_version.sh

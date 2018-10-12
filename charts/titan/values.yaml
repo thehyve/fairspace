@@ -7,7 +7,7 @@ rollingUpdate:
   maxUnavailable: 100%
 image:
   repository: titan
-  tag: dev
+  tag: RELEASEVERSION
   pullPolicy: IfNotPresent
 service:
   name: titan
