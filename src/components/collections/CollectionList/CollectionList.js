@@ -13,8 +13,6 @@ import styles from './CollectionList.styles';
 import {withStyles} from '@material-ui/core/styles';
 import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import ClearIcon from '@material-ui/icons/Clear';
 
 export const COLLECTION_ICONS = {
     'LOCAL_STORAGE': 'folder_open',
@@ -105,6 +103,8 @@ class CollectionList extends React.Component {
                                                     visibility: this.state.hovered !== idx ? 'hidden' : 'visible'
                                                 }}
                                                 aria-label={"Delete " + collection.name}
+                                                // TODO: TAKE A LOOK THIS ONE.
+                                                // Verification does not work anymore
                                                 onClick={() => onCollectionDelete(collection)}
                                                 disabled={!PermissionChecker.canManage(collection)}>
                                                 <Icon>delete</Icon>

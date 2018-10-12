@@ -42,7 +42,6 @@ class ButtonWithVerification extends React.Component {
 
     handleClick(e) {
         this.closeDialog(e);
-
         if (this.onClick) {
             window.setImmediate(() => this.onClick(e));
         }
