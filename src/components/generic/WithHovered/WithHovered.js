@@ -26,7 +26,7 @@ const withHovered = (WrappedComponent) => {
 
         render() {
             return <WrappedComponent {...this.props} onItemMouseOver={this.handleOnItemMouseOver}
-                                     onItemMouseOut={this.handleOnItemMouseOut}
+                                     onItemMouseOut={this.handleOnItemMouseOut} hovered={this.state.hovered}
             />;
         }
     }

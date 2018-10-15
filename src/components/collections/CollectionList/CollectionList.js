@@ -19,7 +19,7 @@ import {compose} from "redux";
 export const COLLECTION_ICONS = {
     'LOCAL_STORAGE': 'folder_open',
     'S3_BUCKET': 'cloud_open'
-}
+};
 
 export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
@@ -58,7 +58,6 @@ class CollectionList extends React.Component {
                         {collections.map((collection, idx) => {
                             const selected = selectedCollectionId && (collection.id === selectedCollectionId);
                             const classes = this.props.classes;
-                            console.log(this.props)
                             return (
                                     <ClickHandler
                                         component={TableRow}
