@@ -76,7 +76,7 @@ export class CollectionList extends React.Component {
                                             <CollectionItem collection={collection}/>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography noWrap={true} variant="subtitle2">
+                                            <Typography noWrap>
                                                 <DateTime value={collection.dateCreated}/>
                                             </Typography>
                                         </TableCell>
