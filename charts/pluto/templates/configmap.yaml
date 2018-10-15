@@ -19,7 +19,7 @@ data:
         jupyter: {{ .Values.services.jupyter }}
 
     workspace:
-      name: {{ template "workspace.name" $ | default .Release.Name }}
+      name: {{ .Release.Name }}
       version: {{ .Values.workspace.version }}
 
     security:
