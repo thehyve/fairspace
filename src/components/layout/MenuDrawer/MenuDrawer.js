@@ -7,7 +7,6 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import Icon from "@material-ui/core/Icon";
 import {Link} from "react-router-dom";
-import Config from "../../generic/Config/Config";
 
 function MenuDrawer(props) {
     const { classes } = props;
@@ -34,7 +33,7 @@ function MenuDrawer(props) {
                         </ListItemIcon>
                         <ListItemText primary="Collections" />
                     </ListItem>
-                    <ListItem component={'a'} href={Config.get().urls.jupyter} button>
+                    <ListItem component={Link} to={"/notebooks"} button>
                         <ListItemIcon>
                             <Icon>bar_chart</Icon>
                         </ListItemIcon>
