@@ -12,7 +12,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import AlterPermission from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
-import {getDisplayName} from "../collections/utils/userUtils";
+import {getDisplayName} from "../../utils/userUtils";
 import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
 import withHovered from "../generic/WithHovered/WithHovered";

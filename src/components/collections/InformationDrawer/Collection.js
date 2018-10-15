@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import * as collectionActions from '../../../actions/collections'
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
-import {getDisplayName} from "../utils/userUtils";
+import {getDisplayName} from "../../../utils/userUtils";
 
 class Collection extends React.Component {
     constructor(props) {
