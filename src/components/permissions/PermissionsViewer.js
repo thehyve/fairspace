@@ -158,8 +158,8 @@ export class PermissionsViewer extends React.Component {
             .map((p, idx) => {
                 return (<ListItem
                     key={idx}
-                    onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                    onMouseOut={() => this.handleListItemMouseout(idx)}
+                    onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
+                    onMouseOut={() => this.props.onItemMouseOut(idx)}
                 >
                     <ListItemText primary={getDisplayName(p)} secondary={p.access}/>
                     {this.renderAlterPermissionButtons(idx, p)}
