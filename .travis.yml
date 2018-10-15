@@ -29,7 +29,7 @@ notifications:
   hipchat:
     on_pull_requests: false
     rooms:
-      secure: flUIQiOTRDkWGQnC8bijRjP90lxKyjZnEJZWlIj26ekN4NEXpsPD7pm9WcjeTbTXJb4Kbor76qPhVInbyyBTdbUCgLkTlWDqRerS4JDDQRGgZy+hO5DWwv/+X08+h9RfS+kV9vBmKuanX4Duhpa/2SVgK5tow3gDZgRXhg4KkcLsoHOA4wwSQTeJZpKE7u3nueDrJUUhKMb+gB2LIQQ9XCRN0K5Vio70PiXST0LPsn4HKNAzdosj5OhHGUg5TFmDiEMxEdBueVvuJ9pl5l0VBMUrFD0lPJj7pbzAJ8bKNwPJlA4eIwJ18LhCdmKXTARxK4loNDqHBlzJX0jtwUTrhpe6nXK09e/9/NZQdU2ocHvfqp5IZqmSyLcIiQUMGwGehS2CTJFQbynkzrWlrvWqZsOJvDQ6HtPzSGfG5KMNzARtGLy1VbhFF/lfKSrLO+iBWNab3WNCJlKGFMWsccyC2+FLYQ24fAlyKrsq5GdAQDxkrpyMzPO8Aui+FPtPS47ss6qRLtYISk12mmpQ8CcJcSS/RcwojiD2Hu2KvlLDX+dqkIAj86FpqbPSV9dDY5AuZ+y5WRxgSMeim+T0pvHJOhKrMasetV13w8cN9DUURQbbDKLDAz7RpbOBWZfDMyDvT8QfY6QGBQkvkI6IrjN9gE7qrTAZFcviXPbNf5Avd9w=
+      secure: "V9Hc+iJV8RjuSUK+qogJByVl7DYC4LOhH/+k4mL+hC4ey27FEH6fPyHbokd2sA1FXWSrFkJ0lW2HD4xDtMLgbvhkmZesxpQTKnnNJazLnBcIkbhmK6tXoHcszIddzpIYo7/j+7B2OI7Jhmsm2kArcbHmFZdpAfMmxn0AShXpRaHxBABcw/SYKuxhXK6XA6ouJWZTyIP9zEnmn1E4URCvsryCNQ5AtgvvGdb7XgbDURWWlgCbhGp4auDD9pMUQ+yVQUqgcd02MG7NxMIxdzyT93ckrPXyaKEBBNmBVpN7xCrJ77R2vJW7gdgRoIEpe7DLeaq/fWWOH9xvS99JEK9IUHyqO9+oQDH3xqZprNsmybP7dMsKFsaALzZoDG7ZPJYAjqceamIGpyeQgK6nq+IiMljdAY4qf3773IJnqHspydMEvOnRWknlS8XPiiA7GAUr9xoF916IornLT52DkuSfUrLoZv8faLhs8zq0ek7trNvZY9lBzuVn1xos1tL8ve+DFUAKaXx/6Wq+kMvkp2pJOAmG711xkP3y/YRPRUFyFh96nQe4ztHt/MppEpOpbYf9x/GVJ0XJFGFymes6C4tawEUIgjhnJVzNMTX6FegfIhvkEvfPGig1KfXhH77/uNy2gWeOCCHlTCgkgMrSi5WdOA9JJ+A0gjWTxK0kYcBM/fI="
     template:
     - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} -
       <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
