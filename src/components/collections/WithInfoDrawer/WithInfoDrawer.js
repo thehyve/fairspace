@@ -4,7 +4,7 @@ import InformationDrawer from "../InformationDrawer/InformationDrawer";
 import WithRightDrawer from "../../generic/WithRightDrawer/WithRightDrawer";
 import {closeInfoDrawer} from "../../../actions/collectionbrowser";
 
-const WithInfoDrawer = ({closeInfoDrawer, classes, infoDrawerOpened, children}) =>
+const WithInfoDrawer = ({closeInfoDrawer, infoDrawerOpened, children}) =>
     <WithRightDrawer
         drawerContents={<InformationDrawer/>}
         mainContents={children}
