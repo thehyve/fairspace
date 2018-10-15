@@ -3,6 +3,7 @@ package nl.fairspace.pluto.app.web;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.app.config.dto.FrontendConfig;
+import nl.fairspace.pluto.app.config.dto.WorkspaceDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -35,6 +36,9 @@ public class WorkspaceResource {
 
     @Autowired
     FrontendConfig frontendConfig;
+
+    @Autowired
+    WorkspaceDetails workspaceDetails;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -83,4 +87,15 @@ public class WorkspaceResource {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    /**
+     * GET  /details: returns a map with workspace details (name, version)
+     *
+     * @return a map with workspace details
+     */
+    @GetMapping(value = "/details", produces = "application/json")
+    public WorkspaceDetails getDetails() {
+        return workspaceDetails;
+    }
+
 }

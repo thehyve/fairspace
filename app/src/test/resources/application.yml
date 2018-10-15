@@ -27,6 +27,8 @@ security:
 
 workspace:
   usersUri: http://users-uri
+  name:
+  version:
 
 zuul:
   routes:
