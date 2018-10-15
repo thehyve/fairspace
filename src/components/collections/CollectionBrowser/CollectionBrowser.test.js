@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CollectionBrowser from "./CollectionBrowser";
-import {mount} from "enzyme";
+import {mount, shallow} from "enzyme";
 import Button from "@material-ui/core/Button";
 import {MemoryRouter} from "react-router-dom";
 import {Provider} from "react-redux";
@@ -9,22 +9,24 @@ import mockStore from "../../../store/mockStore"
 import Config from "../../generic/Config/Config";
 
 let store, collectionBrowser;
+const defaultState = {
+    account: {
+        user: {
+            data: { username: 'test' }
+        }
+    },
+    cache: {
+        collections: {
+            data: []
+        }
+    },
+    collectionBrowser: {}
+}
 
 beforeEach(() => {
     window.fetch = jest.fn(() => Promise.resolve())
 
-    store = mockStore({
-        account: {
-            user: { data: { username: 'test' }}
-        },
-        cache: {
-            collections: {
-                pending: false,
-                data: []
-            }
-        },
-        collectionBrowser: {}
-    });
+    store = mockStore(defaultState);
 
     collectionBrowser = (
         <MemoryRouter>
@@ -69,4 +71,73 @@ it('creates a new collection on button click', () => {
 
     // Expect the collection to be created in storage
     expect(store.getActions().length).toEqual(1);
+});
+
+describe('loading state', () => {
+    it('is loading as long as the user is pending', () => {
+        store = mockStore({
+            ...defaultState,
+            account: {
+                user: {
+                    ... defaultState.account.user,
+                    pending: true
+                }
+            },
+        });
+
+        const node = shallow(<CollectionBrowser store={store} />);
+
+        expect(node.prop('loading')).toEqual(true);
+    });
+
+    it('is loading as long as the collections are pending', () => {
+        store = mockStore({
+            ...defaultState,
+            cache: {
+                collections: {
+                    ... defaultState.cache.collections,
+                    pending: true
+                }
+            },
+        });
+
+        const node = shallow(<CollectionBrowser store={store} />);
+
+        expect(node.prop('loading')).toEqual(true);
+    });
+});
+
+describe('error state', () => {
+    it('is in error state when user fetching failed', () => {
+        store = mockStore({
+            ...defaultState,
+            account: {
+                user: {
+                    ... defaultState.account.user,
+                    error: new Error('Test')
+                }
+            },
+        });
+
+        const node = shallow(<CollectionBrowser store={store} />);
+
+        expect(node.prop('error')).toEqual(new Error('Test'));
+    });
+
+    it('is in error state when the collections fetching failed', () => {
+        store = mockStore({
+            ...defaultState,
+            cache: {
+                collections: {
+                    ... defaultState.cache.collections,
+                    error: new Error('Test')
+                }
+            },
+        });
+
+        const node = shallow(<CollectionBrowser store={store} />);
+
+        expect(node.prop('error')).toEqual(new Error('Test'));
+    });
+
 });
