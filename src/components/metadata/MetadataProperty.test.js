@@ -2,7 +2,7 @@ import MetadataProperty from "./MetadataProperty"
 import React from 'react';
 import {mount, shallow} from "enzyme";
 import mockStore from "../../store/mockStore"
-import Config from "../generic/Config/Config";
+import Config from "../../services/Config/Config";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ClearIcon from '@material-ui/icons/Clear';

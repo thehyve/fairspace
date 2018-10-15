@@ -6,7 +6,7 @@ import Button from "@material-ui/core/Button";
 import {MemoryRouter} from "react-router-dom";
 import {Provider} from "react-redux";
 import mockStore from "../../../store/mockStore"
-import Config from "../../generic/Config/Config";
+import Config from "../../../services/Config/Config";
 
 let store, collectionBrowser;
 const defaultState = {

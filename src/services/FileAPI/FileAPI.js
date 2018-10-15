@@ -1,4 +1,4 @@
-import Config from "../../components/generic/Config/Config";
+import Config from "../Config/Config";
 import CreateWebdavClient from "webdav";
 
 // Ensure that the window fetch method is used for webdav calls

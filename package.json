@@ -11,7 +11,7 @@
     }
   },
   "dependencies": {
-    "@material-ui/core": "latest",
+    "@material-ui/core": "^3.2.1",
     "@material-ui/icons": "latest",
     "ajv": "^6.5.3",
     "body-parser": "^1.18.3",

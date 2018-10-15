@@ -6,14 +6,14 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Icon from "@material-ui/core/Icon";
-import ClickHandler from "../../generic/ClickHandler/ClickHandler"
+import ClickHandler from "../../../containers/ClickHandler/ClickHandler"
 import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
 import PermissionChecker from "../../permissions/PermissionChecker";
 import styles from './CollectionList.styles';
 import {withStyles} from '@material-ui/core/styles';
 import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
-import withHovered from "../../generic/WithHovered/WithHovered";
+import withHovered from "../../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 
 export const COLLECTION_ICONS = {

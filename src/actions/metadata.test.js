@@ -1,6 +1,6 @@
 import mockStore from "../store/mockStore";
 import {fetchJsonLdBySubjectIfNeeded} from "./metadata";
-import Config from "../components/generic/Config/Config";
+import Config from "../services/Config/Config";
 import configFile from "../config";
 import mockResponse from "../utils/mockResponse";
 
