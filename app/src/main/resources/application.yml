@@ -46,8 +46,8 @@ security:
 
 workspace:
   usersUri: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/users
-  name: Workspace name
-  version: 1.2.3-SNAPSHOT
+  name: Workspace
+  version: 0.0.0
 
 zuul:
   routes:

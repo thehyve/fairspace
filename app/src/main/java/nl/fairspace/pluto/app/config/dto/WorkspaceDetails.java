@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-@ConfigurationProperties(prefix = "frontend")
+@ConfigurationProperties(prefix = "workspace")
 @Component
 @Data
 @JsonIgnoreProperties("$$beanFactory")
