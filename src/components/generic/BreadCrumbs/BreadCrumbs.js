@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import Link from 'react-router-dom/Link';
 import {withStyles} from '@material-ui/core/styles';
 import Icon from '@material-ui/core/Icon';
+import PropTypes from 'prop-types';
 
 const defaultHomeUrl = '/';
 
@@ -49,6 +50,15 @@ function BreadCrumbs(props) {
     return (
             jsxJoin(breadcrumbs, ' > ')
         );
+}
+
+BreadCrumbs.propTypes = {
+    homeUrl: PropTypes.string,
+    segments: PropTypes.arrayOf(
+        PropTypes.shape({
+            segment: PropTypes.string.isRequired,
+            label: PropTypes.string.isRequired
+        }))
 }
 
 const styles = {link: { minWidth: 'auto' }};
