@@ -24,10 +24,6 @@ export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
 class CollectionList extends React.Component {
 
-    state = {
-        hovered: null,
-    };
-
     static getCollectionIcon(collection) {
         if (collection.type && COLLECTION_ICONS.hasOwnProperty(collection.type)) {
             return COLLECTION_ICONS[collection.type];
@@ -35,18 +31,6 @@ class CollectionList extends React.Component {
             return COLLECTION_ICONS[DEFAULT_COLLECTION_TYPE];
         }
     }
-
-    handleListItemMouseover = (value, e) => {
-        this.setState({
-            hovered: value
-        })
-    };
-
-    handleListItemMouseout = (value, e) => {
-        if (this.state.hovered === value) {
-            this.setState({hovered: null})
-        }
-    };
 
     render() {
         const {
@@ -69,13 +53,11 @@ class CollectionList extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {collections.map((collection, idx) => {
+                        {collections.map(collection => {
                             const selected = selectedCollectionId && (collection.id === selectedCollectionId);
                             const classes = this.props.classes;
                             return (
                                 <ClickHandler
-                                    onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                                    onMouseOut={(e) => this.handleListItemMouseout(idx, e)}
                                     component={TableRow}
                                     className={selected ? classes.tableRowSelected : classes.tableRow}
                                     key={collection.id}
@@ -83,9 +65,7 @@ class CollectionList extends React.Component {
                                     onSingleClick={() => onCollectionClick(collection)}
                                     onDoubleClick={() => onCollectionDoubleClick(collection)}>
                                     <TableCell padding={'dense'}>
-                                        <Icon fontSize="small">
-                                            {CollectionList.getCollectionIcon(collection)}
-                                        </Icon>
+                                        <Icon>{CollectionList.getCollectionIcon(collection)}</Icon>
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <CollectionItem collection={collection}/>
@@ -99,12 +79,7 @@ class CollectionList extends React.Component {
                                     <TableCell numeric>
                                         {onCollectionDelete ?
                                             <ButtonWithVerification
-                                                style={{
-                                                    visibility: this.state.hovered !== idx ? 'hidden' : 'visible'
-                                                }}
                                                 aria-label={"Delete " + collection.name}
-                                                // TODO: TAKE A LOOK THIS ONE.
-                                                // Verification does not work anymore
                                                 onClick={() => onCollectionDelete(collection)}
                                                 disabled={!PermissionChecker.canManage(collection)}>
                                                 <Icon>delete</Icon>

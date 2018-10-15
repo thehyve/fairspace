@@ -1,13 +1,13 @@
 const styles = theme => ({
     tableRow: {
         '&:hover': {
-            backgroundColor: theme.palette.primary[50],
+            backgroundColor: theme.palette.primary[100],
             cursor: 'pointer'
         }
     },
     tableRowSelected: {
         '&&': {
-            backgroundColor: theme.palette.primary[100]
+            backgroundColor: theme.palette.primary[300]
         }
     }
 });

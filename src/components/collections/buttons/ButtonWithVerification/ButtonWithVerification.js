@@ -42,6 +42,7 @@ class ButtonWithVerification extends React.Component {
 
     handleClick(e) {
         this.closeDialog(e);
+
         if (this.onClick) {
             window.setImmediate(() => this.onClick(e));
         }
@@ -50,7 +51,7 @@ class ButtonWithVerification extends React.Component {
     render() {
         return (
             <div>
-                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)} style={this.props.style}>
+                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
                     {this.props.children}
                 </IconButton>
 
