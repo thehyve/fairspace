@@ -177,7 +177,6 @@ const mapStateToProps = (state, ownProps) => {
     }
 
     return {
-        user: state.account.user.item,
         loading: files.pending || collections.pending || collections.data.length === 0,
         error: files.error || collections.error,
         files: files.data,
