@@ -212,7 +212,7 @@ public class OAuth2ValidationTests {
 
 	private KeyPair generateKeypair() throws NoSuchAlgorithmException {
 		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-		generator.initialize(1024, random);
+		generator.initialize(2048, random);
 		return generator.generateKeyPair();
 	}
 
