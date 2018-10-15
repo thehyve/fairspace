@@ -8,13 +8,12 @@ import IconButton from "@material-ui/core/IconButton";
 class ButtonWithVerification extends React.Component {
     state = {
         verifying: false
-    }
+    };
 
     constructor(props) {
         super(props);
         const {
             onClick,
-            children,
             dialogText,
             ...componentProps
         } = props;
@@ -24,7 +23,7 @@ class ButtonWithVerification extends React.Component {
         this.componentProps = componentProps;
     }
 
-    componentWillReceiveProps(props) {
+    componentDidMount() {
         this.setState({
             verifying: false
         });
@@ -42,7 +41,6 @@ class ButtonWithVerification extends React.Component {
 
     handleClick(e) {
         this.closeDialog(e);
-
         if (this.onClick) {
             window.setImmediate(() => this.onClick(e));
         }
@@ -50,11 +48,10 @@ class ButtonWithVerification extends React.Component {
 
     render() {
         return (
-            <div>
+            <div style={{visibility: this.props.visibility}}>
                 <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
                     {this.props.children}
                 </IconButton>
-
                 <Dialog
                     open={this.state.verifying}
                     onClick={(e) => e.stopPropagation()}
