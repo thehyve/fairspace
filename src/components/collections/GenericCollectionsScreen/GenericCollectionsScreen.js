@@ -20,9 +20,9 @@ const GenericCollectionsScreen = (props) => (
 )
 
 GenericCollectionsScreen.propTypes = {
-    breadCrumbs: PropTypes.node.required,
+    breadCrumbs: PropTypes.node.isRequired,
     buttons: PropTypes.node,
-    main: PropTypes.node.required
+    main: PropTypes.node.isRequired
 }
 
 export default GenericCollectionsScreen
