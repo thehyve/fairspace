@@ -174,7 +174,7 @@ class Vocabulary {
             entry['@type'].includes(PROPERTY_URI);
 
         const isInDomain = entry => {
-            return entry[DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
+            return entry[DOMAIN_URI] && entry[DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
         }
 
         const predicates = this.vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
