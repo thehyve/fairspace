@@ -125,8 +125,8 @@ class CollectionBrowser extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
     user: state.account.user.data,
-    loading: state.cache.collections.pending,
-    error: state.cache.collections.error,
+    loading: state.cache.collections.pending || state.account.user.pending,
+    error: state.cache.collections.error || state.account.user.error,
     collections: state.cache.collections.data,
 
     selectedCollectionId: state.collectionBrowser.selectedCollectionId,
