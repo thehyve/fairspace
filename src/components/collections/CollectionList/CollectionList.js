@@ -15,7 +15,6 @@ import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
 import withHovered from "../../generic/WithHovered/WithHovered";
 import {compose} from "redux";
-import {createShallow} from '@material-ui/core/test-utils';
 
 export const COLLECTION_ICONS = {
     'LOCAL_STORAGE': 'folder_open',
