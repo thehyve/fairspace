@@ -18,6 +18,10 @@ data:
       urls:
         jupyter: {{ .Values.services.jupyter }}
 
+    workspace:
+      name: {{ .Values.workspace.name }}
+      version: {{ .Values.workspace.version }}
+
     security:
       oidc:
         redirect-after-logout-url: {{ .Values.keycloak.redirectAfterLogoutUrl }}
