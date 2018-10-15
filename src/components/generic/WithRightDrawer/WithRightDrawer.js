@@ -7,7 +7,7 @@ import Drawer from "@material-ui/core/Drawer/Drawer";
 import IconButton from "@material-ui/core/IconButton/IconButton";
 import Icon from "@material-ui/core/Icon/Icon";
 
-function WithRightDrawer({classes, drawerOpened, onCloseDrawer, mainContents, drawerContents}) {
+function WithRightDrawer({classes, mainContents, drawerContents, collapsible, drawerOpened, onCloseDrawer}) {
     return (
         <div>
             <main className={classNames(
@@ -20,15 +20,19 @@ function WithRightDrawer({classes, drawerOpened, onCloseDrawer, mainContents, dr
             <Drawer
                 variant="persistent"
                 anchor="right"
-                open={drawerOpened}
+                open={drawerOpened || !collapsible}
                 classes={{
                     paper: classes.infoDrawerPaper,
                 }}
             >
-                <div className={classes.toolbar}/>
-                <IconButton onClick={onCloseDrawer} className={classes.closeButton}>
-                    <Icon>close</Icon>
-                </IconButton>
+
+                {collapsible ?
+                    <div>
+                        <div className={classes.toolbar}/>
+                        <IconButton onClick={onCloseDrawer} className={classes.closeButton}>
+                            <Icon>close</Icon>
+                        </IconButton>
+                    </div> : null }
 
                 <div className={classes.drawerContents}>
                     {drawerContents}
@@ -41,13 +45,15 @@ function WithRightDrawer({classes, drawerOpened, onCloseDrawer, mainContents, dr
 WithRightDrawer.propTypes = {
     classes: PropTypes.object.isRequired,
     drawerOpened: PropTypes.bool,
-    onCloseDrawer: PropTypes.func.isRequired,
+    collapsible: PropTypes.bool,
+    onCloseDrawer: PropTypes.func,
     mainContents: PropTypes.node,
     drawerContents: PropTypes.node
 }
 
 WithRightDrawer.defaultProps = {
-    drawerOpened: false,
+    collapsible: true,
+    drawerOpened: true,
     onCloseDrawer: () => {}
 }
 
