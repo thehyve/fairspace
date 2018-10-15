@@ -17,13 +17,6 @@ import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
 
 export const styles = theme => ({
-    root: {},
-    collaboratorIcon: {
-        visibility: "hidden",
-        "&:hover": {
-            visibility: "inherit"
-        }
-    },
     collaboratorList: {
         width: '100%'
     },
@@ -79,7 +72,6 @@ export class PermissionsViewer extends React.Component {
             showConfirmDeleteDialog: false,
             error: false,
             hovered: null,
-            anchorEl: null,
             selectedUser: null,
             currentLoggedUser: null,
             canManage: false,
@@ -111,7 +103,6 @@ export class PermissionsViewer extends React.Component {
     handleAlterPermission = (user) => {
         this.setState({
             showPermissionDialog: true,
-            anchorEl: null,
             selectedUser: user
         })
     };
@@ -123,25 +114,18 @@ export class PermissionsViewer extends React.Component {
         })
     };
 
-    handleMoreClick = (user, event) => {
-        this.setState({
-            anchorEl: event.currentTarget,
-            selectedUser: user,
-        });
-    };
-
     handleDeleteCollaborator = () => {
-        const {selectedUser} = this.state;
         const {collectionId, alterPermission} = this.props;
+        const {selectedUser} = this.state;
         if (selectedUser) {
             alterPermission(selectedUser.subject, collectionId, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
 
-    handleRemoveCollaborator = () => {
+    handleRemoveCollaborator = (collaborator) => {
         this.setState({
-            anchorEl: null,
+            selectedUser: collaborator,
             showConfirmDeleteDialog: true
         });
     };
@@ -165,31 +149,27 @@ export class PermissionsViewer extends React.Component {
     };
 
     renderAlterPermissionButtons(idx, collaborator) {
-        const {classes, canManage, currentLoggedUser} = this.props;
-        const {hovered, selectedUser} = this.state;
-        const secondaryActionClassName = hovered !== idx ? classes.collaboratorIcon : null;
+        const {canManage, currentLoggedUser} = this.props;
         return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
             <ListItemSecondaryAction
                 onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                 onMouseOut={() => this.handleListItemMouseout(idx)}
             >
-                <MoreActions
-                    onClick={(e) => this.handleMoreClick(collaborator, e)}
-                    className={secondaryActionClassName}>
-                    <ActionItem onClick={() => this.handleAlterPermission(selectedUser)}>Change access</ActionItem>
-                    <ActionItem onClick={this.handleRemoveCollaborator}>Delete</ActionItem>
+                <MoreActions visibility={this.state.hovered !== idx ? 'hidden' : 'visible'}>
+                    <ActionItem onClick={() => this.handleAlterPermission(collaborator)}>
+                        Change access
+                    </ActionItem>
+                    <ActionItem onClick={() => this.handleRemoveCollaborator(collaborator)}>Delete</ActionItem>
                 </MoreActions>
             </ListItemSecondaryAction>
         ) : '';
     }
 
     renderCollaboratorList(permissions) {
-        const {canManage, currentLoggedUser} = this.props;
         return sortPermissions(permissions)
             .map((p, idx) => {
                 return (<ListItem
                     key={idx}
-                    button={canAlterPermission(canManage, p, currentLoggedUser)}
                     onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
                     onMouseOut={() => this.handleListItemMouseout(idx)}
                 >
@@ -249,7 +229,7 @@ export class PermissionsViewer extends React.Component {
     };
 
     render() {
-        const {classes, permissions, } = this.props;
+        const {classes, permissions} = this.props;
         if (permissions.error) {
             return (<ErrorMessage message={'Error loading permissions'}/>)
         } else if (permissions.pending) {
