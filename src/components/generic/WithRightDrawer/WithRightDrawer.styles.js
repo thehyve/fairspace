@@ -1,7 +1,8 @@
 const drawerWidth = 360
 const styles = theme => ({
     drawerContents: {
-        marginTop: 50
+        marginTop: 50,
+        marginBottom: 100
     },
     content: {
         flexGrow: 1,
