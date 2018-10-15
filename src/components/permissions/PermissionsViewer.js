@@ -15,6 +15,8 @@ import ErrorDialog from "../error/ErrorDialog";
 import {getDisplayName} from "../collections/utils/userUtils";
 import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
+import withHovered from "../generic/WithHovered/WithHovered";
+import {compose} from "redux";
 
 export const styles = theme => ({
     collaboratorList: {
@@ -71,7 +73,6 @@ export class PermissionsViewer extends React.Component {
             showPermissionDialog: false,
             showConfirmDeleteDialog: false,
             error: false,
-            hovered: null,
             selectedUser: null,
             currentLoggedUser: null,
             canManage: false,
@@ -135,27 +136,14 @@ export class PermissionsViewer extends React.Component {
             showConfirmDeleteDialog: false,
         });
     };
-
-    handleListItemMouseover = (value) => {
-        this.setState({
-            hovered: value
-        })
-    };
-
-    handleListItemMouseout = (value) => {
-        if (this.state.hovered === value) {
-            this.setState({hovered: null})
-        }
-    };
-
     renderAlterPermissionButtons(idx, collaborator) {
         const {canManage, currentLoggedUser} = this.props;
         return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
             <ListItemSecondaryAction
-                onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                onMouseOut={() => this.handleListItemMouseout(idx)}
+                onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
+                onMouseOut={() => this.props.onItemMouseOut(idx)}
             >
-                <MoreActions visibility={this.state.hovered !== idx ? 'hidden' : 'visible'}>
+                <MoreActions visibility={this.props.hovered !== idx ? 'hidden' : 'visible'}>
                     <ActionItem onClick={() => this.handleAlterPermission(collaborator)}>
                         Change access
                     </ActionItem>
@@ -170,8 +158,8 @@ export class PermissionsViewer extends React.Component {
             .map((p, idx) => {
                 return (<ListItem
                     key={idx}
-                    onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                    onMouseOut={() => this.handleListItemMouseout(idx)}
+                    onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
+                    onMouseOut={() => this.props.onItemMouseOut(idx)}
                 >
                     <ListItemText primary={getDisplayName(p)} secondary={p.access}/>
                     {this.renderAlterPermissionButtons(idx, p)}
@@ -248,4 +236,7 @@ export class PermissionsViewer extends React.Component {
     };
 }
 
-export default withStyles(styles, {withTheme: true})(PermissionsViewer);
+export default compose(
+    withStyles(styles, {withTheme: true}),
+    withHovered,
+)(PermissionsViewer);

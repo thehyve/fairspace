@@ -51,6 +51,8 @@ class ClickHandler extends React.Component {
         const Component = componentProp || 'div';
 
         return <Component
+            onMouseOver={this.props.onMouseOver}
+            onMouseOut={this.props.onMouseOut}
             onClick={() => this.handleClicks()}
             {...componentProps}
         >{this.props.children}</Component>
