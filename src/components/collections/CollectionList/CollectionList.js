@@ -15,6 +15,7 @@ import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
 import withHovered from "../../generic/WithHovered/WithHovered";
 import {compose} from "redux";
+import {createShallow} from '@material-ui/core/test-utils';
 
 export const COLLECTION_ICONS = {
     'LOCAL_STORAGE': 'folder_open',
@@ -24,7 +25,7 @@ export const COLLECTION_ICONS = {
 export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
 
-class CollectionList extends React.Component {
+export class CollectionList extends React.Component {
 
     static getCollectionIcon(collection) {
         if (collection.type && COLLECTION_ICONS.hasOwnProperty(collection.type)) {
