@@ -122,7 +122,7 @@ class FileBrowser extends React.Component {
         }
 
         let segments = [
-            {segment: openedCollection.id.toString(), label: openedCollection.name}
+            {segment: '' + openedCollection.id, label: openedCollection.name}
         ];
 
         if(openedPath) {
