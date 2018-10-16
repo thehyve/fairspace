@@ -10,15 +10,13 @@ import {updateMetadata} from "../../actions/metadata";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ListItemText from "@material-ui/core/ListItemText";
 import ErrorDialog from "../error/ErrorDialog";
+import withHovered from "../../containers/WithHovered/WithHovered";
+import {compose} from "redux";
 
 /**
  * Shows the property and values for the property
  */
-class MetadataProperty extends React.Component {
-
-    state = {
-        hovered: null,
-    };
+function MetadataProperty ({editable, subject, property, dispatch, onItemMouseOut, onItemMouseOver, hovered}) {
 
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
@@ -26,8 +24,7 @@ class MetadataProperty extends React.Component {
     // unchanged values.
     // E.g. handleSave(1) will return a function `value => { ... }` that
     // can be used as a callback for the component for index 1
-    handleSave = index => newEntry => {
-        const {property, subject, dispatch} = this.props;
+    const handleSave = index => newEntry => {
         const currentEntry = property.values[index];
         if (currentEntry.value !== newEntry.value) {
             const updatedValues = property.values.map((el, idx) => {
@@ -44,8 +41,7 @@ class MetadataProperty extends React.Component {
         }
     };
 
-    handleAdd = (newEntry) => {
-        const {property, subject, dispatch} = this.props;
+    const handleAdd = (newEntry) => {
         if (newEntry.value || newEntry.id) {
             const updatedValues = [...property.values, newEntry];
 
@@ -56,53 +52,39 @@ class MetadataProperty extends React.Component {
         }
     };
 
-    handleDelete = index => () => {
-        const {property, subject, dispatch} = this.props;
+    const handleDelete = index => () => {
         const updatedValues = property.values.filter((el, idx) => idx !== index);
         return dispatch(updateMetadata(subject, property.key, updatedValues))
             .catch(e => ErrorDialog.showError(e, "Error while deleting metadata"));
     };
 
-    handleListItemMouseover = (value) => {
-        this.setState({
-            hovered: value
-        })
-    };
-
-    handleListItemMouseout = (value) => {
-        if (this.state.hovered === value) {
-            this.setState({hovered: null})
-        }
-    };
-
     // Render the given entry as a list item
-    renderEntry = (entry, idx, PropertyValueComponent) => {
-        const {property, editable} = this.props;
+    const renderEntry = (entry, idx, PropertyValueComponent) => {
         return (
             <ListItem key={idx}
-                      onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                      onMouseOut={() => this.handleListItemMouseout(idx)}
+                      onMouseOver={(e) => onItemMouseOver(idx, e)}
+                      onMouseOut={() => onItemMouseOver(idx)}
             >
                 <ListItemText>
                     <PropertyValueComponent
                         property={property}
                         entry={entry}
-                        onSave={this.handleSave(idx)}
+                        onSave={handleSave(idx)}
                     />
                 </ListItemText>
                 {
                     editable ?
                         <ListItemSecondaryAction
-                            onMouseOver={(e) => this.handleListItemMouseover(idx, e)}
-                            onMouseOut={() => this.handleListItemMouseout(idx)}
+                            onMouseOver={(e) => onItemMouseOver(idx, e)}
+                            onMouseOut={() => onItemMouseOut(idx)}
                         >
                             <IconButton
                                 style={{
-                                    visibility: this.state.hovered !== idx ? 'hidden' : 'visible'
+                                    visibility: hovered !== idx ? 'hidden' : 'visible'
                                 }}
                                 size='small'
                                 aria-label="Delete"
-                                onClick={this.handleDelete(idx)}>
+                                onClick={handleDelete(idx)}>
                                 <ClearIcon/>
                             </IconButton>
                         </ListItemSecondaryAction> : null
@@ -110,8 +92,7 @@ class MetadataProperty extends React.Component {
             </ListItem>);
     };
 
-    renderAddComponent = () => {
-        const {property} = this.props;
+    const renderAddComponent = () => {
         const ValueAddComponent = ValueComponentFactory.addComponent(property);
         return (
             <ListItem key={property.values.length}>
@@ -119,29 +100,25 @@ class MetadataProperty extends React.Component {
                     <ValueAddComponent
                         property={property}
                         placeholder="Add new"
-                        onSave={this.handleAdd}/>
+                        onSave={handleAdd}/>
                 </ListItemText>
             </ListItem>
         )
     };
 
-    render() {
-        const {editable, property} = this.props;
-        // Do not show an add component if no multiples are allowed
-        // and there is already a value
-        const canAdd = editable && (property.allowMultiple || property.values.length === 0);
-        const ValueComponent = editable ?
-            ValueComponentFactory.editComponent(property) : ValueComponentFactory.readOnlyComponent();
+    // Do not show an add component if no multiples are allowed
+    // and there is already a value
+    const canAdd = editable && (property.allowMultiple || property.values.length === 0);
+    const ValueComponent = editable ?
+        ValueComponentFactory.editComponent(property) : ValueComponentFactory.readOnlyComponent();
 
-        return (<ListItem disableGutters key={property.key} style={{display: 'block'}}>
-            <Typography variant="body1" component='p'>{property.label}</Typography>
-            <List dense>
-                {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent))}
-                {canAdd ? this.renderAddComponent() : null}
-            </List>
-        </ListItem>)
-    }
-
+    return (<ListItem disableGutters key={property.key} style={{display: 'block'}}>
+        <Typography variant="body1" component='p'>{property.label}</Typography>
+        <List dense>
+            {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent))}
+            {canAdd ? renderAddComponent() : null}
+        </List>
+    </ListItem>)
 }
 
-export default connect()(MetadataProperty)
+export default compose (connect(), withHovered)(MetadataProperty)
