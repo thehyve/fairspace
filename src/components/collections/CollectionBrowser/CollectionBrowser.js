@@ -62,14 +62,9 @@ class CollectionBrowser extends React.Component {
         }
 
         return <GenericCollectionsScreen
-            breadCrumbs={this.renderBreadcrumbs()}
+            breadCrumbs={<BreadCrumbs/>}
             buttons={this.renderButtons()}
             main={loading ? this.renderLoading() : this.renderCollectionList()} />
-    }
-
-    renderBreadcrumbs() {
-        const segments = [{segment: 'collections', label: 'Collections'}]
-        return <BreadCrumbs segments={segments}/>;
     }
 
     renderButtons() {

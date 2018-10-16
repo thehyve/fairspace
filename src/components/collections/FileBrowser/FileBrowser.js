@@ -117,7 +117,6 @@ class FileBrowser extends React.Component {
         const {openedCollection, openedPath} = this.props;
 
         let segments = [
-            {segment: 'collections', label: 'Collections'},
             {segment: openedCollection.id, label: openedCollection.name}
         ];
 

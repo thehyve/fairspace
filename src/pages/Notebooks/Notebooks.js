@@ -6,7 +6,7 @@ import asPage from "../../containers/asPage/asPage";
 
 const Notebooks = () => (
     <React.Fragment>
-        <BreadCrumbs segments={[{segment: 'notebooks', label: 'Notebooks'}]}/>
+        <BreadCrumbs />
 
         <Typography><a target="_blank" href={Config.get().urls.jupyter}>Open JupyterLab</a></Typography>
     </React.Fragment>
