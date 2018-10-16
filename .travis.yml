@@ -69,7 +69,5 @@ jobs:
     stage: Versioning
     name: Set tag and update version
     script:
-    - "./ci/gradle/tag.sh"
-    - "./ci/helm/tag.sh"
     - "./ci/versioning/add_tag_to_git.sh"
     - "./ci/versioning/set_next_version.sh"
