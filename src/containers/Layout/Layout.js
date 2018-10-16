@@ -4,7 +4,6 @@ import {withStyles} from '@material-ui/core/styles';
 import styles from './Layout.styles';
 import TopBar from "../../components/layout/TopBar/TopBar";
 import Footer from '../../components/layout/Footer/Footer';
-import MenuDrawer from "../../components/layout/MenuDrawer/MenuDrawer";
 import AuthorizationCheck from "../AuthorizationCheck/AuthorizationCheck";
 import Routes from "../Routes/Routes";
 

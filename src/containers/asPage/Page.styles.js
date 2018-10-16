@@ -1,5 +1,3 @@
-const menuDrawerWidth = 240;
-
 const styles = theme => ({
     content: {
         flexGrow: 1,

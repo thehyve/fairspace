@@ -1,5 +1,4 @@
 import React from 'react';
-import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import MetadataEntities from "../../components/metadata/MetadataEntities";
 import SearchBar from "../../components/generic/SearchBar/SearchBar";
