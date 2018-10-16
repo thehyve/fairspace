@@ -37,7 +37,7 @@ before_install:
 - helm init --client-only
 
 before_script:
-  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT"; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT" ALLOW_SNAPSHOTS=1; fi'
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
   - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
 
@@ -57,6 +57,7 @@ jobs:
       script:
       - ./ci/helm/tag.sh
       - ./ci/helm/add_repos.sh
+      - 'if [[ $ALLOW_SNAPSHOTS ]]; then ./ci/helm/allow_snapshot_dependencies.sh; fi'
       - ./ci/helm/build.sh
       - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
       - 'if [[ $SHOULD_RELEASE ]]; then helm repo update; fi'
