@@ -1,0 +1,17 @@
+language: node_js
+
+node_js:
+  - "node"
+
+cache:
+  directories:
+  - $HOME/node_modules
+
+jobs:
+  include:
+  - stage: Test
+    name: Run E2E tests
+    install:
+    - npm install cypress
+    script:
+    - node_modules/.bin/cypress run
