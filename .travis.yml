@@ -1,0 +1,74 @@
+language: java
+jdk:
+- oraclejdk8
+os:
+- linux
+env:
+  global:
+  - APPNAME="neptune"
+  - ORG="fairspace"
+  - BUILD_GRADLE_FILE="app/build.gradle"
+  - DOCKER_REPO="fairspace.azurecr.io"
+  - CHART_REPO=" https://fairspace.github.io/helm-repo"
+  - RELEASE_BRANCH="master"
+  - SNAPSHOT_BRANCH="dev"
+  - DOCKER_USERNAME="fairspace"
+  - GITHUB_USERNAME="fairspace-ci"
+  - HELM_VERSION="2.11.0"
+  # DOCKER_PASSWORD = ...
+  - secure: "CY3z8tGLv/aaTH/Wav8KghjVE1OdK37Steu4O0kQPrKW/tdPJEceafZo/9GImTSZGTm1UNiyHAzURLSarHR33mUc/bamMSzzImzx9yb0wU8sveRUu65ZW9HK81zTGTSdEUg8sSs+zeC13SWOMIYpBExV52lpUg4A6SUGOMhVDmFzeIRS84D7eoJ60Fe8D+6y1xTYHeMzm/bdB8pGyOGAJqlOSXs5ggbrR8t096RR2vzSqf8mfn/WkIBWuC/gClw3IV2w6RDXdJ5BnEqIq4faTB4w2bcUvuoDYUGP7hzhPboaw5gDXgW1QMzImuKdAnFENrr+XIRNbqOTGALrRjGe5UdkCZ88GJb3J7QH9ALDL3XtQIBYWBQ/Rh9Fc3+xD/ISgZi/PxCpbpSo5YnlAfE+NzBmsbhU+YH9Q3yxkyUJzKQMuKB7m/o73aIYXQREu9IIOgDyNN6WYyud8VVZFqt7aj5LLlhWdrL/Ox8ycz+4BaY2GYO7H/bxnUMsMdXlZ+8kIxU0nLrpSaar9z4r9LjlEOf3TuoFkNAJX3WOeIoBUMUJBLiCwBQf9d8f6S1VHuOzLX1ZPfjo2+SPYfqhV54nRwc6qKj4V/un/f49z+eU6wMbOvG5nmwi9RajaSSJ2N8v0IYdK9TzGtP51PbEeNtsw/u2RP7SnR7g/AbsDQUizZY="
+  # PASSWORD = ...
+  - secure: secure: "Q1CA+IRCvRMxtLFAdIolxDceOPgNl7vHvYhUkKOYbvghBz0ewVyuIDGyUkOrvjCCZR6e3v/qofJ1sQZowo7n+Ko+qhlkGxt8QOhk8YYUHcqDuW7EK6tSyWWbNvcgNoi8sdBt9K5bxW5PskGAx4td5e6SKaSONwC07pPKh0N3yvX8ZpN/KdzXnK+xVlLh3dNIgWgkHftG16XLIoxptUhlSlq4Om7SxU/2LLiltzvKVCcGk5jhpEaXUXMeRIQNXN5rGjqcf4q3BXocI1E0KLn0hNqchjY0a8p7MGdRmulZv79bpGnxAcLaXJzQx2EEuOVgCISfm7pECENXEPeHOzGgi4+mj4AiEMwWTWLhu7DCvaZuwViWoBIke3+8Yu+sEoWefePYWZRRRzSpnaaG+++FDud8HI199bgcZi2HIF1jTxPWwrBQ7L7zXe5WMX2mC36IREx35OYiaym3V91KNw9vvTiLQ60SnfafYDG2tSjgXpsKyqBqIIOKORx+BfFmGP2y/awgLOzctfdKTjNiVmfrsAkklHCudMrK+WbEowsoHNfpAYhkugvSzgYylMY/aZVZcfOxojfZvJVgpYZqUk9OXocAY6/5hkqZ0K/hRplHimBIadRAh7dWZ4F0qRfphfczRAQKA9g+Pp2hPRg/u4cBHG5TKy/lUcb0UCOkl/Yk2Q4="
+sudo: required
+services:
+- docker
+cache:
+  directories:
+  - "$HOME/.gradle"
+  - "$HOME/downloads"
+notifications:
+  hipchat:
+    on_pull_requests: false
+    rooms:
+      secure: "JCv8jwGjvJH0cVf8zggspoMb5/LiAiDk9fDnNgDpF3cu6+1J1AyU6uc0MYcyPQC2JbmH8psclE2iQEsp2Gv8zVSiqV10VhzmZw/U0or3RP5hgYRGP61yRbQswvDKxr3IJLiJyor4g4ncvCQRyF4+rMWcC/U+w4s0AopAjRpG8E0cOwulz9xGUZgUsQsiVATgLpSk6ZZNuy8uyatNaWN3Lq5hctkB8rg7IqGRdI2MvzhH5+xaZ6KDKOB+iSorbMxL3WtI8RIFEPForDJf7GAc8WeMVIQPHFNMYJCe/amPa9r8oaVcyPiGhVq7YvmMqkDrkVSUrsCez9OKiD71OdIq4hZ0zlHMY3IcpGE/g7ZzNTUiurjmkCF3Sm6J+uuCV+u4GgrxtzivjgxHOwY3wVaoYy2fWF8JbyTvHggTGvP/SsP16B8Fi49ObO/z7PGeiZBXsWcMSgqNbZwLIqePlZFghE806GijKx8GIoKG9x0cbZ1pcoAqTGAfgjFko5ahAWWG2/oYB7QXeOBa0iWYJ0/ythT76OygDCwevEY9TmUgQaOIlFK7XQGPnuiDnk5+CAdoU1lXHdz6mPl68mJ7iJLGXp9wpdPGFdmzNRTe9DVo2DI0fVqNq3u6S3dL0xnoWGF6v83ZRhSssi8I6VVWSqvtL8kKyofntp4ImAdZXoYzWnI="
+    template:
+    - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} -
+      <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
+    format: html
+    notify: true
+before_script:
+- '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && export VERSION_POSTFIX="-SNAPSHOT"
+  || true'
+- '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false"
+  ]] && export SHOULD_RELEASE=1 || true'
+- '[[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false"
+  ]] && export SHOULD_RELEASE=1 || true'
+- export CURRENTVERSION="$(cat VERSION)"
+- export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
+- export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
+- export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
+jobs:
+  include:
+  - stage: Build
+    name: App and Docker image
+    script:
+    - "./ci/gradle/tag.sh"
+    - "./ci/gradle/build.sh"
+    - "./ci/docker/build.sh"
+    - "[[ $SHOULD_RELEASE ]] && ./ci/docker/release.sh || true"
+  - stage: Build
+    name: Helm chart
+    install:
+    - "./ci/helm/install_helm.sh"
+    - export PATH="$(pwd)/linux-amd64/:$PATH"
+    - helm init --client-only
+    script:
+    - "./ci/helm/tag.sh"
+    - "./ci/helm/build.sh"
+    - "[[ $SHOULD_RELEASE ]] && ./ci/helm/release.sh || true"
+  - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+    stage: Versioning
+    name: Set tag and update version
+    script:
+    - "./ci/versioning/add_tag_to_git.sh"
+    - "./ci/versioning/set_next_version.sh"

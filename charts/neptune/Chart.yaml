@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: "1.0"
 description: Service for working with triples. Currently leveraging Ceres and postgres.
 name: neptune
-version: 0.1.1
+version: 0.0.0-RELEASEVERSION
