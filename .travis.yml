@@ -1,0 +1,70 @@
+language: java
+
+env:
+  global:
+     - APPNAME="workspace"
+     - ORG="fairspace"
+     - DOCKER_REPO="fairspace.azurecr.io"
+     - CHART_REPO=" https://fairspace.github.io/helm-repo"
+     - RELEASE_BRANCH="master"
+     - SNAPSHOT_BRANCH="dev"
+     - DOCKER_USERNAME="fairspace"
+     - GITHUB_USERNAME="fairspace-ci"
+     - HELM_VERSION="2.10.0"
+     - KUBECTL_VERSION="1.12.0"
+
+# Github credentials:
+# GITHUB_PASSWORD=....
+     - secure: "l8Eug1n9WfHuNkrqrw0pLsxei2RsU1V+r3dty5YMDavWabBBkb5mEC9gQQ1LpPeHsLAFXxs6SXnahmZN6p9gj+yhWBnARXis7KFalMnXOyfa7PFAGmjT+rodtHy3B5CZLxcuN9wKFgDFtgrMc9xgsPN3fZEmloJKkmfGjHuGlNd0KACJFdZ16Y1pYl5AOoo0M6psyl+V1/13PSRPFxl88sOMfeyK3DbPUzF18zJ4EwQHxChJQr2oycvJl4ZhjoZ/6ivkaADySLZj0snXAbG5Rzch9lqwb/JkKbwAygXVwikCcT6YhQs5MjEbSQ1ZON0Pm2lPCH4IfP24dpraNlCn61YqGJR37WcWcGRlf+jlnjslJuJbynFlfqzzc1Blwm8DVV3hj4TfxwKSA5pba2ZHPR8TuV41pmfdLi4kOB0FZr+x8t0SdL2qHIPkCtQZ1/k/MCaTwUvS4SuURfeDI2b5Kbr7Eaoez0jdyE6jBRUhFP6Vehx22ZO5xbCsQ0pLXZdOSG8gRqHdp9b59mJgTZrx/Lycjrfy7VJzCM+n6MN4YHw8Vc5c5SHlH8XuJbUQkyjZdEFsGASHtzmq+LmZHIJ+GIbXxK9GWLXjG/3cePMXMrIuis9kHstpo1GLWHcOLVkQeZHyY8eo1iJrKKejT8LJ7/E2SzZwpZYl+9sCgKTr3e0="
+
+cache:
+  directories:
+  - $HOME/downloads
+
+notifications:
+  hipchat:
+    on_pull_requests: false
+    rooms:
+      - secure: "rTnDQvuOaOy65rCsCtVkUzSIV3zThn3psFfg31Tm3G4BZlqlTAYCyiSJRClXFlWDcuMJGt+/BCFJsTnsKcTphfJ+a9/UeCveax92vCiLhC7Jae0z/wHKxkCwgeKOvwe5xPLAZbrNBPjWN82AwfZE+w0XkMb7gp8rYj9Nl09rDtOa63PF3uD7L+01WUaa/ch9V2VdLuAXt9BBE4LtClZs2596B+F32KTP4g5TKFLA8y4CUcDa2ggFoeQqswAbqdrcCrWLlSWvjzTfowlCqzPKKh3ei1bhj93Dv6jNpcmJU40Co2YGGkz//kCOCM8oMIx2byP5Ter36ZRT483LWbxDiiRVDX7ii1rosq7U1GbVcZx7wt6dXRLmiMqtSEam/acnwEYmTqmCGbcnWCAx7APeXym2SX643riAjGzJQr6TwqkcxtovT3Fmm7v+o3fJXILMaR+CX/rDlfHb3U/FD3PjtzDEy+4avBVA4JPU3DIfdCPrJ3DFRfPzviTCoDsAWcNOypRHfHMJ9Dbh0N3uXHD6TnQfqUHiB7dRgpdSFAjvpGYneL+TzgY/PP4j7O/GqdY6YvUtSbBeg1r3Bw4a7tv4KCA8YvjIRwt21K64Tcz9cubmnOwytI2GZTWN2/2pXucmnABa9EBHpYO2XfQ/5FnfVf48qWrtqGeqpG9XBrrNhNM="
+    template:
+      - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
+    format: html
+    notify: true
+
+before_install:
+- ./ci/helm/install_helm.sh
+- export PATH="$(pwd)/linux-amd64/:$PATH"
+- helm init --client-only
+
+before_script:
+  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT"; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
+
+  - export CURRENTVERSION="$(cat VERSION)"
+  - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
+  - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
+  - export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
+
+jobs:
+  include:
+    - stage: Build
+      name: Helm chart
+      install:
+      - ./ci/k8s/install_kubectl.sh
+      - export PATH="$HOME/downloads/v${KUBECTL_VERSION}:$PATH"
+      - ./ci/k8s/config_kubectl.sh
+      script:
+      - ./ci/helm/tag.sh
+      - ./ci/helm/build.sh
+      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
+      - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then travis_retry travis_wait ./ci/helm/deploy.sh demo; fi'
+      - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then travis_retry travis_wait ./ci/helm/deploy.sh ci; fi'
+    - # For release branch, update git with the new tag and update version
+      if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+      stage: Versioning
+      name: Set tag and update version
+      script:
+        - ./ci/helm/tag.sh
+        - ./ci/versioning/add_tag_to_git.sh
+        - ./ci/versioning/set_next_version.sh

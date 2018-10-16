@@ -1,0 +1,15 @@
+hyperspace:
+  keycloak:
+    realm: demo
+  ingress:
+    domain: hyperspace.demo.fairspace.app
+    tls:
+      certificate:
+        dns01Provider: azuredns
+
+# Set password to prevent having a new password at every upgrade
+keycloak:
+  keycloak:
+    password: keycloak-demo-123
+  postgresql:
+    postgresPassword: "mf5-Y5Q5E5_P33eB"
