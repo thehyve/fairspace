@@ -10,9 +10,7 @@ const GenericCollectionsScreen = (props) => (
                     {props.breadCrumbs}
                 </div>
             </Column>
-            <Row>
-                {props.buttons}
-            </Row>
+            {props.buttons ? <Row>{props.buttons}</Row> : null}
         </Row>
 
         {props.main}
