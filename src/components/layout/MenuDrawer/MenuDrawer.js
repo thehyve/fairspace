@@ -8,7 +8,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import Icon from "@material-ui/core/Icon";
-import {Link, NavLink, withRouter} from "react-router-dom";
+import {NavLink, withRouter} from "react-router-dom";
 import {withStyles} from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -25,7 +25,6 @@ class MenuDrawer extends React.Component {
     };
 
     render() {
-        console.log(this.props.match);
         const {classes} = this.props;
         const {open} = this.state;
         return (
