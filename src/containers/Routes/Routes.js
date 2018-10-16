@@ -17,7 +17,7 @@ const Routes = () => {
                 <Route path="/notebooks" component={Notebooks}/>
 
                 <Route exact path="/metadata" component={MetadataOverviewPage}/>
-                <Route path="/metadata/:type(projects|patients|samples|consents)/:id"
+                <Route path="/metadata/:type(projects|persons|samples|consents)/:id"
                        component={MetadataEntityPage}/>
 
                 {/* Handle auth urls that should go to the server */}
