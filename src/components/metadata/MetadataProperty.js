@@ -10,7 +10,7 @@ import {updateMetadata} from "../../actions/metadata";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ListItemText from "@material-ui/core/ListItemText";
 import ErrorDialog from "../error/ErrorDialog";
-import withHovered from "../generic/WithHovered/WithHovered";
+import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 
 /**

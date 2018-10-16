@@ -3,7 +3,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import UserMenu from "../UserMenu/UserMenu";
-import {logout} from "../../App/logout";
+import {logout} from "../../../containers/App/logout";
 
 function TopBar(props) {
     const { classes } = props;

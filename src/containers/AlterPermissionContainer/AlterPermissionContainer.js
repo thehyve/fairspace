@@ -1,5 +1,5 @@
 import {connect} from 'react-redux';
-import AlterPermissionDialog from "./AlterPermissionDialog";
+import AlterPermissionDialog from "../../components/permissions/AlterPermissionDialog";
 import {alterPermission} from "../../actions/permissions";
 
 const mapStateToProps = ({permissions: {alter, fetch}, cache}) => {

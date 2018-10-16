@@ -7,7 +7,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Typography from "@material-ui/core/Typography";
 import Icon from "@material-ui/core/Icon";
-import ClickHandler from "../../generic/ClickHandler/ClickHandler";
+import ClickHandler from "../../../containers/ClickHandler/ClickHandler";
 import ButtonWithVerification from "../buttons/ButtonWithVerification/ButtonWithVerification";
 import RenameBox from "mdi-material-ui/RenameBox";
 import RenameButton from "../buttons/RenameButton/RenameButton";

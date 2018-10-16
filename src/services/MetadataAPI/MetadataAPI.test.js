@@ -1,5 +1,5 @@
 import MetadataAPI from "./MetadataAPI";
-import Config from "../../components/generic/Config/Config";
+import Config from "../Config/Config";
 
 const mockResponse = (status, statusText, response) => {
     return new window.Response(response, {

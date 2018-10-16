@@ -1,6 +1,6 @@
 import React from 'react';
 import Typography from "@material-ui/core/Typography";
-import Config from "../../components/generic/Config/Config";
+import Config from "../../services/Config/Config";
 import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 
 function Notebooks(props) {

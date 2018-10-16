@@ -1,5 +1,5 @@
 import Config from "./Config";
-import mockResponse from "../../../utils/mockResponse";
+import mockResponse from "../../utils/mockResponse";
 
 const initialConfig = {
     "urls": {

@@ -9,13 +9,13 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import AlterPermission from "./AlterPermissionContainer";
+import AlterPermission from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
-import {getDisplayName} from "../collections/utils/userUtils";
+import {getDisplayName} from "../../utils/userUtils";
 import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
-import withHovered from "../generic/WithHovered/WithHovered";
+import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 
 export const styles = theme => ({
