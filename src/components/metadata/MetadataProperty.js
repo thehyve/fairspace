@@ -16,7 +16,7 @@ import {compose} from "redux";
 /**
  * Shows the property and values for the property
  */
-function MetadataProperty ({editable, subject, property, dispatch, onItemMouseOut, onItemMouseOver, hovered}) {
+function MetadataProperty ({editable, subject, property, updateMetadata, onItemMouseOut, onItemMouseOver, hovered}) {
 
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
@@ -34,7 +34,7 @@ function MetadataProperty ({editable, subject, property, dispatch, onItemMouseOu
                     return el;
                 }
             });
-            return dispatch(updateMetadata(subject, property.key, updatedValues))
+            return updateMetadata(subject, property.key, updatedValues)
                 .catch(e => ErrorDialog.showError(e, "Error while saving metadata"));
         } else {
             return Promise.resolve();
@@ -45,7 +45,7 @@ function MetadataProperty ({editable, subject, property, dispatch, onItemMouseOu
         if (newEntry.value || newEntry.id) {
             const updatedValues = [...property.values, newEntry];
 
-            return dispatch(updateMetadata(subject, property.key, updatedValues))
+            return updateMetadata(subject, property.key, updatedValues)
                 .catch(e => ErrorDialog.showError(e, "Error while adding metadata"));
         } else {
             return Promise.resolve();
@@ -54,7 +54,7 @@ function MetadataProperty ({editable, subject, property, dispatch, onItemMouseOu
 
     const handleDelete = index => () => {
         const updatedValues = property.values.filter((el, idx) => idx !== index);
-        return dispatch(updateMetadata(subject, property.key, updatedValues))
+        return updateMetadata(subject, property.key, updatedValues)
             .catch(e => ErrorDialog.showError(e, "Error while deleting metadata"));
     };
 
@@ -121,4 +121,8 @@ function MetadataProperty ({editable, subject, property, dispatch, onItemMouseOu
     </ListItem>)
 }
 
-export default compose (connect(), withHovered)(MetadataProperty)
+const mapDispatchToProps = {
+    updateMetadata
+}
+
+export default compose (connect(null, mapDispatchToProps), withHovered)(MetadataProperty)
