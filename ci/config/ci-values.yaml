@@ -11,6 +11,9 @@ hyperspace:
 workspace:
   ingress:
     domain: workspace.ci.fairway.app
+    tls:
+      certificate:
+        dns01Provider: azuredns
 
 pluto:
   keycloak:
