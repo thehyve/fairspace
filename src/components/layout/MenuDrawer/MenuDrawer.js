@@ -8,7 +8,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import Icon from "@material-ui/core/Icon";
-import {Link} from "react-router-dom";
+import {NavLink, withRouter} from "react-router-dom";
 import {withStyles} from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -41,20 +41,20 @@ class MenuDrawer extends React.Component {
                 </div>
                 <Divider/>
                 <div>
-                    <List>
-                        <ListItem component={Link} to="/" button>
+                    <List className={classes.menuItemList}>
+                        <ListItem component={NavLink} exact to="/" button>
                             <ListItemIcon>
                                 <Icon>home</Icon>
                             </ListItemIcon>
                             <ListItemText primary="Home"/>
                         </ListItem>
-                        <ListItem component={Link} to="/collections" button>
+                        <ListItem component={NavLink} to="/collections" button>
                             <ListItemIcon>
                                 <Icon>folder_open</Icon>
                             </ListItemIcon>
                             <ListItemText primary="Collections"/>
                         </ListItem>
-                        <ListItem component={Link} to={"/notebooks"} button>
+                        <ListItem component={NavLink} to={"/notebooks"} button>
                             <ListItemIcon>
                                 <Icon>bar_chart</Icon>
                             </ListItemIcon>
@@ -66,7 +66,7 @@ class MenuDrawer extends React.Component {
                             </ListItemIcon>
                             <ListItemText primary="Workflows"/>
                         </ListItem>
-                        <ListItem component={Link} to="/metadata" button>
+                        <ListItem component={NavLink} to="/metadata" button>
                             <ListItemIcon>
                                 <Icon>assignment</Icon>
                             </ListItemIcon>
@@ -94,6 +94,6 @@ class MenuDrawer extends React.Component {
     }
 }
 
-export default withStyles(styles, {withTheme: true})(MenuDrawer);
+export default withStyles(styles)(withRouter(MenuDrawer));
 
 

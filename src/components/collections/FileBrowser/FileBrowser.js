@@ -92,7 +92,8 @@ class FileBrowser extends React.Component {
 
     openDir(path) {
         const basePath = this.props.openedPath || '';
-        this.props.history.push("/collections/" + this.props.openedCollection.id + basePath + '/' + path);
+        const separator = basePath.endsWith('/') ? '' : '/'
+        this.props.history.push("/collections/" + this.props.openedCollection.id + basePath + separator + path);
     }
 
     downloadFile(path) {
@@ -114,10 +115,14 @@ class FileBrowser extends React.Component {
     }
 
     renderBreadcrumbs() {
-        const {openedCollection, openedPath} = this.props;
+        const {openedCollection, openedPath, loading} = this.props;
+
+        if(loading) {
+            return <BreadCrumbs/>
+        }
 
         let segments = [
-            {segment: openedCollection.id, label: openedCollection.name}
+            {segment: openedCollection.id.toString(), label: openedCollection.name}
         ];
 
         if(openedPath) {

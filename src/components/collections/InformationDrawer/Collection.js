@@ -90,8 +90,10 @@ class Collection extends React.Component {
 
 const mapStateToProps = ({cache: {users}}, {collection: {creator}}) => {
     const user = findById(users.data, creator);
+    const loading = users.pending || !creator;
     return {
-        creatorFullname: getDisplayName(user)
+        loading: loading,
+        creatorFullname: loading ? '' : getDisplayName(user)
     }
 };
 
