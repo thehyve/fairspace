@@ -59,6 +59,7 @@ jobs:
       - ./ci/helm/add_repos.sh
       - ./ci/helm/build.sh
       - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
+      - 'if [[ $SHOULD_RELEASE ]]; then helm repo update; fi'
       - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then travis_retry travis_wait ./ci/helm/deploy.sh demo; fi'
       - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then travis_retry travis_wait ./ci/helm/deploy.sh ci; fi'
     - # For release branch, update git with the new tag and update version
