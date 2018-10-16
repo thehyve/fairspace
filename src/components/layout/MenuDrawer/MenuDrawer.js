@@ -17,7 +17,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 class MenuDrawer extends React.Component {
 
     state = {
-        open: false,
+        open: true,
     };
 
     toggleDrawer = () => {
