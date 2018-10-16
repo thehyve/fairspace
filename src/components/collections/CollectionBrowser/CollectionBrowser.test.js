@@ -57,17 +57,19 @@ it('creates a new collection on button click', () => {
     expect(store.getActions().length).toEqual(0);
 
     // Setup proper state
-    let button = wrapper.find(Button);
-    expect(button.length).toEqual(3);
-
+    const addButton = wrapper
+        .find(Button)
+        .filter('[aria-label="Add"]')
+        .first();
     // Click on Add button
-    button.at(2).simulate('click');
+    addButton.simulate('click');
 
-    button = wrapper.find(Button);
-    expect(button.length).toEqual(5);
-
-    // Click on Save button
-    button.at(4).simulate('click');
+    // Click save in the dialog
+    const saveButton = wrapper
+        .find(Button)
+        .filter('[aria-label="Save"]')
+        .first();
+    saveButton.simulate('click');
 
     // Expect the collection to be created in storage
     expect(store.getActions().length).toEqual(1);
