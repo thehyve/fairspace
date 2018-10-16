@@ -7,7 +7,7 @@ env:
   global:
   - APPNAME="neptune"
   - ORG="fairspace"
-  - BUILD_GRADLE_FILE="app/build.gradle"
+  - BUILD_GRADLE_FILE="build.gradle"
   - DOCKER_REPO="fairspace.azurecr.io"
   - CHART_REPO=" https://fairspace.github.io/helm-repo"
   - RELEASE_BRANCH="VRE-259-jenkins-to-travis"
