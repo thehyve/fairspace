@@ -2,15 +2,13 @@ import React from 'react';
 import {connect} from 'react-redux';
 import styles from './Footer.styles';
 import {withStyles} from '@material-ui/core/styles';
+import Typography from "@material-ui/core/Typography";
 
-export class Footer extends React.Component {
-
-    render() {
-        return (
-            <div className={this.props.classes.footer}>{this.props.name} {this.props.version}</div>
-        )
-    };
-}
+const Footer = ({classes, name, version}) => (
+    <footer className={classes.footer}>
+        <Typography variant="body2" className={classes.text}>{name} {version}</Typography>
+    </footer>
+)
 
 function mapStateToProps(state) {
     const data = state.workspace.data;
