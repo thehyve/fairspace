@@ -40,9 +40,12 @@ overrides:
     client:
       secretNamePostfix:
 
-# Reference to the workspace
+# Reference to the workspace for informational purposes
+# These values default to the release name and chart version
+# The name is also used in the default setting for requiredAuthority and clientId
 workspace:
   name:
+  version:
 
 # Keycloak configuration for authentication
 keycloak:

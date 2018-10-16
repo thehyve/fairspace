@@ -69,3 +69,9 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 |---|---|---|
 | `backends.mercury` | URL where mercury can be found. It will be proxied on /ui/ | `http://mercury` |
 | `backends.neptune` | URL where neptune can be found. | `http://neptune` |
+
+#### Informational parameters
+| Parameter  | Description  | Default |
+|---|---|---|
+| `workspace.name`   | Name of the workspace. Is returned by the `/api/workspace/details` call |  |
+| `workspace.version`   | Version of the workspace. Is returned by the `/api/workspace/details` call |  |
