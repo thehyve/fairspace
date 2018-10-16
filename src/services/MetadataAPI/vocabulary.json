@@ -15,25 +15,29 @@
             "@id": "foaf:Person",
             "@type": "rdf:Class",
             "rdfs:comment": "A person that is subject of research.",
-            "rdfs:label": "Person"
+            "rdfs:label": "Person",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "schema:Material",
             "@type": "rdf:Class",
             "rdfs:comment": "A material or a sample provided by person.",
-            "rdfs:label": "Material"
+            "rdfs:label": "Material",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "fs:PersonConsent",
             "@type": "rdf:Class",
             "rdfs:comment": "A research consent given by person. ",
-            "rdfs:label": "Person Consent"
+            "rdfs:label": "Person Consent",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "fs:ResearchProject",
             "@type": "rdf:Class",
             "rdfs:comment": "A research project.",
-            "rdfs:label": "Research Project"
+            "rdfs:label": "Research Project",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "fs:File",
@@ -45,7 +49,8 @@
             "@id": "fs:Collection",
             "@type": "rdf:Class",
             "rdfs:comment": "A specific collection in Fairspace.",
-            "rdfs:label": "Collection"
+            "rdfs:label": "Collection",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "fs:User",
