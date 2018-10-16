@@ -1,6 +1,7 @@
 import React from 'react';
 import FileBrowser from "../../components/collections/FileBrowser/FileBrowser";
 import WithInfoDrawer from "../../components/collections/WithInfoDrawer/WithInfoDrawer";
+import asPage from "../../containers/asPage/asPage";
 
 function Files(props) {
     const {match: { params }} = props;
@@ -15,7 +16,7 @@ function Files(props) {
     );
 }
 
-export default (Files);
+export default asPage(Files);
 
 
 
