@@ -1,6 +1,5 @@
 import MetadataProperty from "./MetadataProperty"
 import React from 'react';
-import {mount, shallow} from "enzyme";
 import mockStore from "../../store/mockStore"
 import Config from "../generic/Config/Config";
 import List from '@material-ui/core/List';
@@ -9,6 +8,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import IconButton from "@material-ui/core/IconButton";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import {STRING_URI} from "../../services/MetadataAPI/MetadataAPI";
+import {createShallow, createMount} from '@material-ui/core/test-utils';
 
 const subject = 'https://thehyve.nl';
 const defaultProperty = {
@@ -18,10 +18,11 @@ const defaultProperty = {
     values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
     allowMultiple: true
 };
+const shallow = createShallow({dive: true});
+const mount = createMount();
 
 beforeEach(() => {
     window.fetch = jest.fn(() => Promise.resolve({ok: true}));
-
     Config.setConfig({
         "urls": {
             "metadata": "/metadata"
@@ -137,7 +138,6 @@ describe('MetadataProperty changes', () => {
         input.simulate('blur');
 
         wrapper.unmount();
-
         const actions = store.getActions();
         expect(actions.length).toEqual(1);
         expect(actions[0].meta.subject).toEqual('https://thehyve.nl');
@@ -145,6 +145,7 @@ describe('MetadataProperty changes', () => {
         expect(actions[0].meta.values.slice(0, 3)).toEqual(defaultProperty.values);
         expect(actions[0].meta.values[3].value).toEqual('New more info');
     });
+
 
     it('handles updates correctly', () => {
         const store = mockStore({});
