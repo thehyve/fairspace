@@ -11,9 +11,13 @@
 # Package chart
 helm package charts/${APPNAME}
 
+# Get Chart version number
+CHARTVERSION=$(sed -n 's/^version: //p' charts/${APPNAME}/Chart.yaml)
+echo Chart version number is $CHARTVERSION
+
 # Add chart to helm repo
 git clone https://github.com/fairspace/helm-repo helm-repo
-mv "$APPNAME-$(sed -n 's/^version: //p' Chart.yaml).tgz" helm-repo
+mv "${APPNAME}-${CHARTVERSION}.tgz" helm-repo
 
 cd helm-repo
 helm repo index --merge index.yaml .
