@@ -73,6 +73,11 @@ const styles = theme => ({
         backgroundColor: theme.palette.background.default,
         padding: theme.spacing.unit * 3,
     },
+    menuItemList: {
+        '& .active, & .active:hover': {
+            backgroundColor: theme.palette.action.selected
+        }
+    }
 });
 
 export default styles;
