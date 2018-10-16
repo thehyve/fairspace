@@ -5,13 +5,15 @@ import ListItem from "@material-ui/core/ListItem";
 import metadataAPI from "../../services/MetadataAPI/MetadataAPI";
 import Metadata from '../../components/metadata/Metadata';
 import asPage from "../../containers/asPage/asPage";
+import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 
 function MetadataEntityPage(props) {
     const {match: { params }} = props;
 
     return (
         <div>
-            <Typography noWrap>{'Metadata'}</Typography>
+            <BreadCrumbs />
+
             <List>
                 <ListItem>Id: {params.id}</ListItem>
             </List>

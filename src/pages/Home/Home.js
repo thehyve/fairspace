@@ -3,12 +3,16 @@ import Typography from "@material-ui/core/Typography";
 import WithRightDrawer from "../../components/generic/WithRightDrawer/WithRightDrawer";
 import RecentActivity from "../../components/generic/RecentActivity/RecentActivity";
 import asPage from "../../containers/asPage/asPage";
+import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 
 function Home(props) {
     return (
         <WithRightDrawer
             collapsible={false}
-            mainContents={<Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography>}
+            mainContents={<React.Fragment>
+                <BreadCrumbs />
+                <Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography>
+            </React.Fragment>}
             drawerContents={<RecentActivity />} />
     );
 }
