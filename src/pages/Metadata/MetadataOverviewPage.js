@@ -4,6 +4,7 @@ import Paper from "@material-ui/core/Paper";
 import MetadataEntities from "../../components/metadata/MetadataEntities";
 import SearchBar from "../../components/generic/SearchBar/SearchBar";
 import {withStyles} from '@material-ui/core/styles';
+import asPage from "../../containers/asPage/asPage";
 
 const MetadataOverviewPage = ({classes}) => (
     <div>
@@ -33,7 +34,7 @@ const style = (theme) => ({
     }
 });
 
-export default withStyles(style)(MetadataOverviewPage);
+export default asPage(withStyles(style)(MetadataOverviewPage));
 
 
 

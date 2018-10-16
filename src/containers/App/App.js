@@ -1,41 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import styles from './App.styles';
-import TopBar from "../../components/layout/TopBar/TopBar";
-import Footer from '../../components/layout/Footer/Footer';
-import MenuDrawer from "../../components/layout/MenuDrawer/MenuDrawer";
-import AuthorizationCheck from "../AuthorizationCheck/AuthorizationCheck";
-import Config from "../../services/Config/Config";
-
-import {BrowserRouter as Router, Route} from "react-router-dom";
-import Home from "../../pages/Home/Home";
-import Collections from "../../pages/Collections/Collections";
-import Notebooks from "../../pages/Notebooks/Notebooks";
-import MetadataEntityPage from "../../pages/Metadata/MetadataEntityPage";
-import MetadataOverviewPage from "../../pages/Metadata/MetadataOverviewPage";
-import ErrorDialog from "../../components/error/ErrorDialog";
+import {Provider} from "react-redux";
+import {BrowserRouter as Router} from "react-router-dom";
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
 import {fetchWorkspace} from "../../actions/workspace";
+import ErrorDialog from "../../components/error/ErrorDialog";
 import store from "../../store/configureStore";
-import {Provider} from "react-redux";
-import Files from "../../pages/Files/Files";
-import {logout} from "./logout";
+import Config from "../../services/Config/Config";
 
 // theme
-import {MuiThemeProvider, createMuiTheme, withTheme} from '@material-ui/core/styles';
-import pink from '@material-ui/core/colors/pink';
-import indigo from '@material-ui/core/colors/indigo';
-
-const theme = createMuiTheme({
-    typography: {
-        useNextVariants: true,
-    },
-    palette: {
-        primary: indigo,
-        secondary: pink
-    }
-});
+import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
+import styles from './App.styles';
+import theme from './App.theme';
+import Layout from "../Layout/Layout";
 
 class App extends React.Component {
 
@@ -79,38 +56,15 @@ class App extends React.Component {
     render() {
         if (this.state.configLoaded) {
             const classes = this.props.classes;
-            // The app itself consists of a topbar, a drawer and the actual page
-            // The topbar is shown even if the user has no proper authorization
+
             return (
                 <MuiThemeProvider theme={theme}>
                     <div className={classes.root}>
                         <Provider store={store}>
                             <ErrorDialog>
-                                <TopBar classes={classes}/>
                                 <Router>
-                                    <AuthorizationCheck transformError={this.transformError.bind(this)}>
-                                        <MenuDrawer classes={classes}/>
-                                        <main className={classes.content}>
-                                            <div className={classes.toolbar}/>
-
-                                            <Route exact path="/" component={Home}/>
-                                            <Route exact path="/collections" component={Collections}/>
-                                            <Route path="/collections/:collection/:path(.*)?" component={Files}/>
-                                            <Route path="/notebooks" component={Notebooks}/>
-
-                                            <Route exact path="/metadata" component={MetadataOverviewPage}/>
-                                            <Route path="/metadata/:type(projects|patients|samples|consents)/:id"
-                                                   component={MetadataEntityPage}/>
-
-                                            {/* Handle auth urls that should go to the server */}
-                                            <Route path="/login" render={() => {
-                                                window.location.href = '/login';
-                                            }}/>
-                                            <Route path="/logout" render={logout}/>
-                                        </main>
-                                    </AuthorizationCheck>
+                                    <Layout />
                                 </Router>
-                                <Footer/>
                             </ErrorDialog>
                         </Provider>
                     </div>
@@ -126,4 +80,4 @@ App.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withTheme()(withStyles(styles)(App));
+export default withStyles(styles)(App);

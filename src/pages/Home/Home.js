@@ -2,6 +2,7 @@ import React from 'react';
 import Typography from "@material-ui/core/Typography";
 import WithRightDrawer from "../../components/generic/WithRightDrawer/WithRightDrawer";
 import RecentActivity from "../../components/generic/RecentActivity/RecentActivity";
+import asPage from "../../containers/asPage/asPage";
 
 function Home(props) {
     return (
@@ -12,7 +13,7 @@ function Home(props) {
     );
 }
 
-export default (Home);
+export default asPage(Home);
 
 
 
