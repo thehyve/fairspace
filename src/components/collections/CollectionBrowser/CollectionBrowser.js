@@ -81,8 +81,7 @@ class CollectionBrowser extends React.Component {
     renderCollectionList() {
         return (
             <div>
-                <CollectionList collections={this.props.collections}
-                                selectedCollectionId={this.props.selectedCollectionId}
+                <CollectionList selectedCollectionId={this.props.selectedCollectionId}
                                 onCollectionClick={this.handleCollectionClick.bind(this)}
                                 onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
                                 onCollectionDelete={this.handleCollectionDelete.bind(this)}

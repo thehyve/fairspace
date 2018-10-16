@@ -15,6 +15,8 @@ import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
 import withHovered from "../../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
+import {connect} from 'react-redux';
+import {getDisplayName} from "../../../utils/userUtils";
 
 export const COLLECTION_ICONS = {
     'LOCAL_STORAGE': 'folder_open',
@@ -50,6 +52,7 @@ export class CollectionList extends React.Component {
                             <TableCell padding={'dense'}/>
                             <TableCell>Name</TableCell>
                             <TableCell>Created</TableCell>
+                            <TableCell>Creator</TableCell>
                             <TableCell>Access</TableCell>
                             <TableCell/>
                         </TableRow>
@@ -59,39 +62,44 @@ export class CollectionList extends React.Component {
                             const selected = selectedCollectionId && (collection.id === selectedCollectionId);
                             const classes = this.props.classes;
                             return (
-                                    <ClickHandler
-                                        component={TableRow}
-                                        className={selected ? classes.tableRowSelected : classes.tableRow}
-                                        key={collection.id}
-                                        selected={selected}
-                                        onSingleClick={() => onCollectionClick(collection)}
-                                        onDoubleClick={() => onCollectionDoubleClick(collection)}
-                                        onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
-                                        onMouseOut={() => this.props.onItemMouseOut(idx)}
-                                    >
-                                        <TableCell padding={'dense'}>
-                                            <Icon>{CollectionList.getCollectionIcon(collection)}</Icon>
-                                        </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            <CollectionItem collection={collection}/>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography noWrap>
-                                                <DateTime value={collection.dateCreated}/>
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>{collection.access}</TableCell>
-                                        <TableCell numeric>
-                                            {onCollectionDelete ?
-                                                <ButtonWithVerification
-                                                    visibility={this.props.hovered !== idx ? 'hidden' : 'visible'}
-                                                    aria-label={"Delete " + collection.name}
-                                                    onClick={() => onCollectionDelete(collection)}
-                                                    disabled={!PermissionChecker.canManage(collection)}>
-                                                    <Icon>delete</Icon>
-                                                </ButtonWithVerification> : null}
-                                        </TableCell>
-                                    </ClickHandler>
+                                <ClickHandler
+                                    component={TableRow}
+                                    className={selected ? classes.tableRowSelected : classes.tableRow}
+                                    key={collection.id}
+                                    selected={selected}
+                                    onSingleClick={() => onCollectionClick(collection)}
+                                    onDoubleClick={() => onCollectionDoubleClick(collection)}
+                                    onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
+                                    onMouseOut={() => this.props.onItemMouseOut(idx)}
+                                >
+                                    <TableCell padding={'dense'}>
+                                        <Icon>{CollectionList.getCollectionIcon(collection)}</Icon>
+                                    </TableCell>
+                                    <TableCell component="th" scope="row">
+                                        <CollectionItem collection={collection}/>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography noWrap>
+                                            <DateTime value={collection.dateCreated}/>
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography noWrap>
+                                            {getDisplayName(collection.creator)}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>{collection.access}</TableCell>
+                                    <TableCell numeric>
+                                        {onCollectionDelete ?
+                                            <ButtonWithVerification
+                                                visibility={this.props.hovered !== idx ? 'hidden' : 'visible'}
+                                                aria-label={"Delete " + collection.name}
+                                                onClick={() => onCollectionDelete(collection)}
+                                                disabled={!PermissionChecker.canManage(collection)}>
+                                                <Icon>delete</Icon>
+                                            </ButtonWithVerification> : null}
+                                    </TableCell>
+                                </ClickHandler>
                             );
                         })}
                     </TableBody>
@@ -101,7 +109,25 @@ export class CollectionList extends React.Component {
     }
 }
 
+const getCreators = (collections, users) => {
+    if (collections && users) {
+        if (collections.data && users.data) {
+             collections.data.map(collection => {
+                const user = users.data.find(user => user.id === collection.creator) || {};
+                return user ? collection.creator = user : collection.creator;
+            });
+            return collections.data;
+        }
+    }
+    return collections.data;
+};
+
+const mapStateToProps = ({cache: {collections, users}}) => ({
+    collections: getCreators(collections, users)
+});
+
 export default compose(
+    connect(mapStateToProps),
     withStyles(styles),
     withHovered
 )(CollectionList);

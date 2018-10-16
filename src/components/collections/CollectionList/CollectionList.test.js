@@ -45,14 +45,23 @@ describe('CollectionList', () => {
         expect(icons.get(2).props.children).toEqual(COLLECTION_ICONS['LOCAL_STORAGE']);
     });
 
+    it('renders Creator column', () => {
+        const collections = [{access: 'Read', dateCreated: new Date().toUTCString()}];
+        const wrapper = shallow(<CollectionList collections={collections} classes={styles}/>);
+        const cells = wrapper.dive().find(TableCell);
+        expect(cells.length).toEqual(12);
+        expect(cells.at(3).childAt(0).text()).toEqual('Creator');
+        // expect(cells.at(10).childAt(0).text()).toEqual('Read');
+    });
+
 
     it('renders Access column', () => {
         const collections = [{access: 'Read', dateCreated: new Date().toUTCString()}];
         const wrapper = shallow(<CollectionList collections={collections} classes={styles}/>);
         const cells = wrapper.dive().find(TableCell);
-        expect(cells.length).toEqual(10);
-        expect(cells.at(3).childAt(0).text()).toEqual('Access');
-        expect(cells.at(8).childAt(0).text()).toEqual('Read');
+        expect(cells.length).toEqual(12);
+        expect(cells.at(4).childAt(0).text()).toEqual('Access');
+        expect(cells.at(10).childAt(0).text()).toEqual('Read');
     });
 
     it('renders Created column', () => {
@@ -60,8 +69,8 @@ describe('CollectionList', () => {
         const collections = [{dateCreated: date.toUTCString()}];
         const wrapper = shallow(<CollectionList collections={collections} classes={styles}/>);
         const cells = wrapper.dive().find(TableCell);
-        expect(cells.length).toEqual(10);
+        expect(cells.length).toEqual(12);
         expect(cells.at(2).childAt(0).text()).toEqual('Created');
-        expect(cells.at(7).childAt(0).childAt(0).html()).toEqual(DateTime({value: date}));
+        expect(cells.at(8).childAt(0).childAt(0).html()).toEqual(DateTime({value: date}));
     });
 })
