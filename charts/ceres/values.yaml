@@ -7,7 +7,7 @@ rollingUpdate:
   maxUnavailable: 100%
 image:
   repository: ceres
-  tag: dev
+  tag: RELEASEVERSION
   pullPolicy: IfNotPresent
 
 service:
