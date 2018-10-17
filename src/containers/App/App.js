@@ -5,7 +5,7 @@ import {BrowserRouter as Router} from "react-router-dom";
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
 import {fetchWorkspace} from "../../actions/workspace";
 import ErrorDialog from "../../components/error/ErrorDialog";
-import store from "../../store/configureStore";
+import configureStore from "../../store/configureStore";
 import Config from "../../services/Config/Config";
 
 // theme
@@ -30,12 +30,15 @@ class App extends React.Component {
     }
 
     componentDidMount() {
+        // Setup store
+        this.store = configureStore();
+
         // Wait for the configuration to be loaded
         Config.init()
             .then(() => {
-                store.dispatch(fetchUser());
-                store.dispatch(fetchAuthorizations());
-                store.dispatch(fetchWorkspace());
+                this.store.dispatch(fetchUser());
+                this.store.dispatch(fetchAuthorizations());
+                this.store.dispatch(fetchWorkspace());
                 this.cancellable.setState && this.cancellable.setState({configLoaded: true});
             });
     }
@@ -60,7 +63,7 @@ class App extends React.Component {
             return (
                 <MuiThemeProvider theme={theme}>
                     <div className={classes.root}>
-                        <Provider store={store}>
+                        <Provider store={this.store}>
                             <ErrorDialog>
                                 <Router>
                                     <Layout />

@@ -1,10 +1,13 @@
 import {applyMiddleware, createStore} from "redux";
 import {createLogger} from "redux-logger";
-import rootReducer from "../reducers";
 import promiseMiddleware from "redux-promise-middleware";
 import thunk from 'redux-thunk';
+import rootReducer from "../reducers";
+import menuStateInLocalStorage from "./menuStateInLocalStorage";
+import initializeState from "./initializeState";
 
-export default createStore(
+export default () => createStore(
     rootReducer,
-    applyMiddleware(thunk, promiseMiddleware(), createLogger())
+    initializeState(),
+    applyMiddleware(thunk, promiseMiddleware(), createLogger(), menuStateInLocalStorage)
 );
