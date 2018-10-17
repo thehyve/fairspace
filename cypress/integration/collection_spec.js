@@ -19,8 +19,11 @@ describe('Collection browser', function () {
 
     it('should successfully add and remove a collection', function () {
         const collectionName = 'New collection ' + uniqueId;
+        const ensureCollectionName = 'Ensure at least a collection';
 
+        // List collections and ensure at least one collection
         cy.listCollections();
+        cy.addCollection(ensureCollectionName);
 
         // Count the current number of collections
         let rowCount = 0;
@@ -43,8 +46,10 @@ describe('Collection browser', function () {
 
             // Remove the last entry again
             .then(() => cy.deleteLastCollectionByName(collectionName))
+            .then(() => cy.deleteLastCollectionByName(ensureCollectionName))
 
             .then(() => cy.get('tbody>tr').should('length.below', rowCount));
+
     });
 
     it('should store changes in collection details', function () {
@@ -90,6 +95,5 @@ describe('Collection browser', function () {
 
         // Delete the collection again
         cy.deleteLastCollectionByName(changedName);
-
     });
 });

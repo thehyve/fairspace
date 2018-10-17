@@ -26,8 +26,8 @@
 
 Cypress.Commands.add("listCollections", () => {
     cy.visit("/collections");
+    cy.get("main").contains("Collections");
     cy.contains("Loading").should('not.exist');
-    cy.get("tbody").should('exist');
 })
 
 Cypress.Commands.add("addCollection", (name, description) => {
