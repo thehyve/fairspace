@@ -61,7 +61,7 @@ jobs:
     - ./ci/npm/tag.sh
     - ./ci/npm/build.sh
     - ./ci/docker/build.sh
-    - '[[ $SHOULD_RELEASE ]] && ./ci/docker/release.sh || true'
+    - 'if [[ $SHOULD_RELEASE ]] ; then ./ci/docker/release.sh ; fi'
   - stage: Build
     name: Helm chart
     install:
@@ -71,7 +71,7 @@ jobs:
     script:
     - ./ci/helm/tag.sh
     - ./ci/helm/build.sh
-    - '[[ $SHOULD_RELEASE ]] && ./ci/helm/release.sh || true'
+    - 'if [[ $SHOULD_RELEASE ]] ; then ./ci/helm/release.sh ; fi'
   - # For release branch, update git with the new tag and update version
     if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
     stage: Versioning
