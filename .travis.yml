@@ -73,6 +73,7 @@ jobs:
     - "./ci/versioning/add_tag_to_git.sh"
     - "./ci/versioning/set_next_version.sh"
   - if: type != "pull_request"
-    stage: Trigger Downstream
+    stage: Trigger downstream
+    name: Trigger workspace build
     script:
       - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN
