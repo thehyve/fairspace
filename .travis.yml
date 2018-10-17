@@ -73,5 +73,6 @@ jobs:
   - if: type != "pull_request"
     stage: Trigger downstream
     name: Trigger workspace build
+    install: skip
     script:
       - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN
