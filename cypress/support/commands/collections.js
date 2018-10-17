@@ -67,6 +67,10 @@ Cypress.Commands.add("waitForRightPanel", () => {
     cy.contains("Loading").should("not.exist");
 });
 
+Cypress.Commands.add("closeRightPanel", () => {
+    cy.get('button').contains('close').click();
+});
+
 Cypress.Commands.add('upload_file', (selector, fileUrl, type = '') => {
     return cy.fixture(fileUrl, 'base64')
         .then(Cypress.Blob.base64StringToBlob)
