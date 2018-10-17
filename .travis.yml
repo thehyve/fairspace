@@ -1,0 +1,92 @@
+language: node_js
+
+node_js:
+  - "node"
+
+env:
+  global:
+     - APPNAME="mercury"
+     - ORG="fairspace"
+     - DOCKER_REPO="fairspace.azurecr.io"
+     - ARTIFACT_BUILD_FILE="package.json"
+     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
+     - CHART_REPO=" https://fairspace.github.io/helm-repo"
+     - RELEASE_BRANCH="master"
+     - SNAPSHOT_BRANCH="dev"
+     - DOCKER_USERNAME="fairspace"
+     - GITHUB_USERNAME="fairspace-ci"
+     - HELM_VERSION="2.11.0"
+
+# Azure Docker repository credentials:
+# DOCKER_PASSWORD=....
+     - secure: "NW13xpXS0N0cPEkiUWgfENM9c8bxa7Fu8xyeV6wyMhbJOPpaZfGxqOaasI8JKNoN0jntPqxRJE29nG7Kqyjj+Cy5/rGLBi/12Nba8gMEJyTFGrAQDwgbfYOJJk9gggVUc57SHuBWiD2jw+rd0S0uN1amns2K2LF/Llzm7pLZAPeVBa47RFgkutBfzfututOCinrWHcoHOvaFD5JlonCEg5xLYy1d5jS62yZ9Iz8CCMA/j+D7YTcIWeCq8NMm/P2GX55i9Z/9iuViMvi03VkSTk5tY03kFQIb5OfDZ5wQjW7+NevJGQ/ZrrDHxTNmcFVSUocjYWD4McIgWVUoerkVaDK1jAa0aBqM5rPX9VokolhZFO9GVAh4oLPbDjCCcbDzke8SQpLGMJZWAdvTXRIlDQM9MZIvouUrrFbvn/ZsaOYtcXL+lJiWQNv+10JLoSBD3Yt+eqAVhCPwd49P7zLz51MpIqJJ3PJbIeCMrNGZ/x9YCM5dvqn9ZMHiwRcrlTrLNJbyXO15klj/qMKSy8Hb1MV1DEwNW/i5z1zMqJD1jOCgCYpLDT3J3U01hR5WU+VyKoXeBlYpkgBjJ34c/ThHT/ZNtelh6yXyWe00heHa1MlQvSSpyNOC7r8MSJgtGn2B+mWz+Cm7QtwZTgsenrI6+JtfS0VzOTYJs9ZNc8X8qZE="
+# Github credentials:
+# GITHUB_PASSWORD=....
+     - secure: "Dj3Cai11RkRQjnVkL7KgSbffXprkWtiVJRX9SvMA992Gi8ifPmU4DTjrPnoJHfLIcTZtxYLm/RtFy/+x0/cntseiTBcipJ2saHSgjK3+NA6s8YKzscKkB7pHJjajylcegQXJhOdkWyRT2qbCPha1ZfWQdt0nYs2IqYpFkF7oqnGOOVWjFtepQvjdaKCu9qj+UkN8oCNwnck7eff3qX/M2Kw51ZPfz8jRVD4ifITjum0idxEq6GsOW6qF3FYZ6vprYq/HyMN80aMPBA8qSmsVsExn4fjk+fVSyfmaZpwKJ67VX+V4WfAkPRnLvED5sDwzUkdVjAdDlRrNXBj7n0GYidclaj6QvJoL93a4t/5akWk+aKJruiWf3vB9N9gfpLcysds73WpQEt2MtNZCeDd06z2F0s8XW6MS0NE9sYOHkkAHs+ePNArI0Onx0EZ6XhDM1HlYdH4oPlAYwCtM2z+iwachtY8rKoc18Eby+XPu9o3aKOJ0GHJqfV9CMhouWLI0N96RV11LxTi9+8xkpC0uRW3696FfnsHgvyqUNiBa29L5yIDYSq1ge5vx8/fedIIDp+1WDbjYnwA08BIQTEQdMH6qxUnEFOdUpAGbfDE2kd5XzPFt9ZMIyu1X7Tpf4lVThVd+K3qrvi8YjR8B6TXDfhxzmbZOrFyVcrSmNTxhEk4="
+
+notifications:
+  hipchat:
+    on_pull_requests: false
+    rooms:
+      - secure: "VMTJPCI3I6xnTrwBg751Qy1FGfyX8gU6eVUCSUNwoeA0mh9ZYeZ9XweYTdLzdDaDpTtggWCCW2N+in7UXvACMqliHOhsR6YrmrYjYMoQypL4kClwKH4Rg8BUETxCObQJb1U/JLuzElEXuXIDZyy/PgMva1vv0cNftfwxYzzH5vEH+a3c/1vO7K5MKuJNseRXngcNTK5S9MwCiwY8ZaWfeY4gZap4bJHAhQMTyg1f8Z0vJHsCx8bSzeov5HtCz4/J1YTisWpUad12uSvb/4ROdTIzzz0HlENXXRjjwZ6AjDDN91kXOvzpCDC4UnNcLqMzZrWfIAJlXYWWWm1LRTgde+oFtvHy49CrUiEyKHhijd80eHAOMFdolVXbkkabNgj2lxS3v0KoYq5XrOxHBnSmFG7PaXaysvOmcZy4cnBn9UZt5eHuAbdGdiMr4f3MdRpYM0cYoY1jR0LbA4eYOBdEPPYjs1uqSKcytEM5kJJybKQ4Rz9jstoZK45N4D1/Y3UvpuKleRro74ctKAwtBlBjQb8tuPrEZCDz4Lix4zO03rplvjFD33TpfV6sScmntbz6h5Vtib0B/O3btJl+jR5zwkTFpLg3cXEdWjxijKJvBbnOMxVCNudCPVz3t8PuXEL83e7T4elEN0rsrRU7q4m5TnuqI7hfTzKiIy0bTQvJLcQ="
+    template:
+      - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
+    format: html
+    notify: true
+
+before_install:
+- git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
+
+before_script:
+  - '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && export VERSION_POSTFIX="-SNAPSHOT" || true'
+  - '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && export SHOULD_RELEASE=1 || true'
+  - '[[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && export SHOULD_RELEASE=1 || true'
+  - export CURRENTVERSION="$(cat VERSION)"
+  - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
+  - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
+  - export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
+
+jobs:
+  include:
+  - stage: Build
+    name: App and Docker image
+    services:
+    - docker
+
+    cache:
+      directories:
+      - $HOME/.cache/yarn
+    install:
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo apt-get update -y
+    - sudo apt-get -y install g++-4.9
+    script:
+    - ./ci/yarn/tag.sh
+    - ./ci/yarn/build.sh
+    - ./ci/docker/build.sh
+    - '[[ $SHOULD_RELEASE ]] && ./ci/docker/release.sh || true'
+  - stage: Build
+    name: Helm chart
+    install:
+    - ./ci/helm/install_helm.sh
+    - export PATH="$(pwd)/linux-amd64/:$PATH"
+    - helm init --client-only
+    script:
+    - ./ci/helm/tag.sh
+    - ./ci/helm/build.sh
+    - '[[ $SHOULD_RELEASE ]] && ./ci/helm/release.sh || true'
+  - # For release branch, update git with the new tag and update version
+    if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+    stage: Versioning
+    name: Set tag and update version
+    script:
+    - ./ci/yarn/tag.sh
+    - ./ci/helm/tag.sh
+    - ./ci/versioning/add_tag_to_git.sh
+    - ./ci/versioning/set_next_version.sh
+  - if: branch = env(SNAPSHOT_BRANCH) AND type != "pull_request"
+    stage: Trigger downstream
+    name: Trigger workspace build
+    install: skip
+    script:
+    - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN
