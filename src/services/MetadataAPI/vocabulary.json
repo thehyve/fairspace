@@ -391,7 +391,7 @@
             ]
         },
         {
-            "@id": "fs:investigationNature ",
+            "@id": "fs:investigationNature",
             "@type": "rdf:Property",
             "fs:allowMultiple": true,
             "rdfs:comment": "choose between: basic research, biomedical research, clinical trial, medical diagnosis",
