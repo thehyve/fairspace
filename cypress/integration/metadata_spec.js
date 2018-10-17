@@ -1,42 +1,45 @@
-describe('e2e tests checking metadata for Fairspace', function () {
+describe('Metadata in fairspace', function () {
     before(() => {
         cy.login(Cypress.config("user_name"), Cypress.config("password"));
+        cy.ensureMetadataPresent();
     })
 
     after(() => {
         cy.logout()
     })
 
-    it('successfully see metadata about patient that is linked to a collection', function () {
-        // Go to collections page
-        cy.contains("Collections").click();
-
-        // Wait for the list of collections to be loaded
-        // and click on the GSE8581 study
-        cy.contains("GSE8581").click();
-
-        // Wait for the right panel to open
-        cy.waitForRightPanel();
-
-        // Wait for the metadata to be loaded and expect the metadata of the patient to be there
-        // The patient should link to its own metadata page
-        cy.get("a")
-            .contains("GSM210004")
-            .should('have.attr', 'href')
-            .and('eq', 'https://workspace.ci.test.fairdev.app/metadata/patients/GSM210004');
-    });
-
-
-    it('successfully see metadata about patients', function () {
+    it('should show metadata about a person', function () {
         // Go to a metadata page about a patient
-        cy.visit("/metadata/patients/GSM210004");
+        cy.visit("/metadata/persons/E2E-TEST");
 
-        // Wait for the page to show 'Type' (which indicates that metadata has been loaded
-        cy.contains("Type");
+        // Wait for the page to show 'Metadata' (which indicates that metadata has been loaded)
+        cy.get("main").contains("Metadata");
 
-        // Expect the id and type to be shown on the page,
-        cy.contains("Id: GSM210004");
-        cy.get("a").contains("Person");
+        // Expect the id to be shown on the page,
+        cy.contains("Id: E2E-TEST");
+
+        // Expect at least a name field with the correct value
+        cy.contains("Name")
+            .should('have.attr', 'id')
+            .then(id =>
+                cy.get('[aria-labelledby="' + id + '"]')
+                    .find('input')
+                    .should('have.value', 'Person 1')
+            );
     });
 
+    it('should link between entities', function () {
+        // Go to a metadata page about a patient
+        cy.visit("/metadata/persons/E2E-TEST");
+
+        // Wait for the page to show 'Metadata' (which indicates that metadata has been loaded)
+        cy.get("main").contains("Metadata");
+
+        // Expect at least a name field with the correct value
+        cy.contains("Provides material")
+            .parent("li")
+            .find("a").first()
+            .contains("E2E-TEST-material")
+            .should('have.attr', 'href', Cypress.config("baseUrl") + '/metadata/samples/E2E-TEST-material')
+    });
 });

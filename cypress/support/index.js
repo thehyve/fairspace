@@ -15,6 +15,7 @@
 
 import './commands/auth'
 import './commands/collections'
+import './commands/metadata'
 
 Cypress.Cookies.defaults({
     whitelist: [ "JSESSIONID" ]
