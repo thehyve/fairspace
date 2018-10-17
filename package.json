@@ -1,6 +1,6 @@
 {
   "name": "titan",
-  "version": "0.0.0",
+  "version": "0.0.0-RELEASEVERSION",
   "private": true,
   "scripts": {
     "start": "node $NODE_DEBUG_OPTION  ./bin/www",
