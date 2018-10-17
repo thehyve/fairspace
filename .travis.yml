@@ -61,8 +61,8 @@ jobs:
     - sudo apt-get update -y
     - sudo apt-get -y install g++-4.9
     script:
-    - ./ci/nodejs/tag.sh
-    - ./ci/nodejs/build.sh
+    - ./ci/yarn/tag.sh
+    - ./ci/yarn/build.sh
     - ./ci/docker/build.sh
     - '[[ $SHOULD_RELEASE ]] && ./ci/docker/release.sh || true'
   - stage: Build
@@ -80,7 +80,7 @@ jobs:
     stage: Versioning
     name: Set tag and update version
     script:
-    - ./ci/nodejs/tag.sh
+    - ./ci/yarn/tag.sh
     - ./ci/helm/tag.sh
     - ./ci/versioning/add_tag_to_git.sh
     - ./ci/versioning/set_next_version.sh
