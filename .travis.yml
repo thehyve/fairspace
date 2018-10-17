@@ -7,7 +7,7 @@ env:
   global:
   - APPNAME="ceres"
   - ORG="fairspace"
-  - BUILD_GRADLE_FILE="build.gradle"
+  - ARTIFACT_BUILD_FILE="build.gradle"
   - DOCKER_REPO="fairspace.azurecr.io"
   - CHART_REPO=" https://fairspace.github.io/helm-repo"
   - RELEASE_BRANCH="master"
