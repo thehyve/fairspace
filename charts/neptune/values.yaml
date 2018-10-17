@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: neptune
-  tag: 0.4
+  tag: RELEASEVERSION
   pullPolicy: IfNotPresent
 
 service:
