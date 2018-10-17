@@ -8,6 +8,8 @@ env:
      - APPNAME="mercury"
      - ORG="fairspace"
      - DOCKER_REPO="fairspace.azurecr.io"
+     - ARTIFACT_BUILD_FILE="package.json"
+     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
      - CHART_REPO=" https://fairspace.github.io/helm-repo"
      - RELEASE_BRANCH="master"
      - SNAPSHOT_BRANCH="dev"
@@ -22,14 +24,6 @@ env:
 # GITHUB_PASSWORD=....
      - secure: "Dj3Cai11RkRQjnVkL7KgSbffXprkWtiVJRX9SvMA992Gi8ifPmU4DTjrPnoJHfLIcTZtxYLm/RtFy/+x0/cntseiTBcipJ2saHSgjK3+NA6s8YKzscKkB7pHJjajylcegQXJhOdkWyRT2qbCPha1ZfWQdt0nYs2IqYpFkF7oqnGOOVWjFtepQvjdaKCu9qj+UkN8oCNwnck7eff3qX/M2Kw51ZPfz8jRVD4ifITjum0idxEq6GsOW6qF3FYZ6vprYq/HyMN80aMPBA8qSmsVsExn4fjk+fVSyfmaZpwKJ67VX+V4WfAkPRnLvED5sDwzUkdVjAdDlRrNXBj7n0GYidclaj6QvJoL93a4t/5akWk+aKJruiWf3vB9N9gfpLcysds73WpQEt2MtNZCeDd06z2F0s8XW6MS0NE9sYOHkkAHs+ePNArI0Onx0EZ6XhDM1HlYdH4oPlAYwCtM2z+iwachtY8rKoc18Eby+XPu9o3aKOJ0GHJqfV9CMhouWLI0N96RV11LxTi9+8xkpC0uRW3696FfnsHgvyqUNiBa29L5yIDYSq1ge5vx8/fedIIDp+1WDbjYnwA08BIQTEQdMH6qxUnEFOdUpAGbfDE2kd5XzPFt9ZMIyu1X7Tpf4lVThVd+K3qrvi8YjR8B6TXDfhxzmbZOrFyVcrSmNTxhEk4="
 
-services:
-  - docker
-
-cache:
-  directories:
-  - $HOME/.cache/yarn
-  - $HOME/downloads
-
 notifications:
   hipchat:
     on_pull_requests: false
@@ -39,6 +33,9 @@ notifications:
       - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
     format: html
     notify: true
+
+before_install:
+- git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
 
 before_script:
   - '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && export VERSION_POSTFIX="-SNAPSHOT" || true'
@@ -53,13 +50,19 @@ jobs:
   include:
   - stage: Build
     name: App and Docker image
+    services:
+    - docker
+
+    cache:
+      directories:
+      - $HOME/.cache/yarn
     install:
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
     - sudo apt-get update -y
     - sudo apt-get -y install g++-4.9
     script:
-    - ./ci/nodejs/tag.sh
-    - ./ci/nodejs/build.sh
+    - ./ci/yarn/tag.sh
+    - ./ci/yarn/build.sh
     - ./ci/docker/build.sh
     - '[[ $SHOULD_RELEASE ]] && ./ci/docker/release.sh || true'
   - stage: Build
@@ -77,7 +80,13 @@ jobs:
     stage: Versioning
     name: Set tag and update version
     script:
-    - ./ci/nodejs/tag.sh
+    - ./ci/yarn/tag.sh
     - ./ci/helm/tag.sh
     - ./ci/versioning/add_tag_to_git.sh
     - ./ci/versioning/set_next_version.sh
+  - if: branch = env(SNAPSHOT_BRANCH) AND type != "pull_request"
+    stage: Trigger downstream
+    name: Trigger workspace build
+    install: skip
+    script:
+    - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN
