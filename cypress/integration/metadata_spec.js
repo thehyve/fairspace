@@ -20,12 +20,9 @@ describe('Metadata in fairspace', function () {
 
         // Expect at least a name field with the correct value
         cy.contains("Name")
-            .should('have.attr', 'id')
-            .then(id =>
-                cy.get('[aria-labelledby="' + id + '"]')
-                    .find('input')
-                    .should('have.value', 'Person 1')
-            );
+            .parent("li")
+            .find('input').first()
+            .should('have.value', 'Person 1');
     });
 
     it('should link between entities', function () {
