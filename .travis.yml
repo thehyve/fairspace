@@ -20,13 +20,7 @@ env:
   - secure: "HIv/qU0nGjBEwafbPGfWkS9sknOsJIcrUKLq4QBDBefNoCF3fTKq72hFzmyO0iizlzxuD5TZEZbbUnTiw3AuwO7qjhegIPcpeCLC/pOAOax10eIQVOW0ZKMRekQDt4nYm2aOmniycbwpR5BZv3pvul9ZSKrLvJ/Yk1Qsb+FIsLyjgPQVa8HTs8pfuKYkWXNgs9sBRaeeJ8AkWwq19RBrbnu0A7c5U9UNQz9NDxzT+Q/JQpuKTesL6d5UeoAWjjfqk/ysuztWiYYzU7uOAtaRllGL2SMQFSou0sS+DVAV3s9C/ScvVfffxcIJr/mdoHXENv34e99o1Svqt5a+p5mmaRrBiWsoYZz/fBk5k2yoa+WDO1fHBvv/5o67oc7JzD0aDjPsobuTWxpcVYCxQeTBziu/faEIVQ6AqKgd7WNRsZKavaE7wasTktdXzbTkDZKWJqzJpXIOmkkG5+6A+rrJNGALejxiuya2BhFGowet9LnyVtvqngr88QugDYxJFO1eYQHjekfJxwAB3CKDVDkZobEITNEt42H4xK92FVcFSJ4vC2oyqOG/ZuEequO9nJ27tdkhLEhNY6RIqFlcsLjHzWpLcZDAYdm6Vfk/arF1wEF94fSungJHq+T/UCoSDCHzylDcji56dYzeOha+6HhY7BgkKFv2VrqT82XSqx8gLww="
   # GITHUB_PASSWORD = ...
   - secure: "pDMIBUcis36A8Ych42Bfr1bMZDf6Il+dU38+HOKzU0e/MiYsUsD7dpazhqh/zD2qaNrHnPIwIdvfOYGHunsOtZAxhLSFYBcfrLEDX5AkYwUVVIAgXo0+aLVtktiPy730qdtDxfl481RD21nLbA8KGh8vxOUClfSiWAAnzc9wf75idRY5WLhBWPmHcYEItliKrbjBI0HkwlD+/z8p4Nm9lNnetC5odFbCLhFHRZiLIfdM2gNdJhStLM35ZMQteAywbLUO1nmzlj7wfhCt5tPXcIkrjHhIB/hjc718vmKBxtXWPcI7V0o+4+4omTXw72xR8JkdvpWQljhYEy8Nr07F3ATkZXY2jMXQMQk/FjzZRpzXX6NdF+HQY1xfCZPbNXLgFhtVA35BWzy+9ZeggZ52DpqeQnyHxEYoPR/11JxejucYnAgsLhnaoWs9cpJpYuEMoFpHWaRBBln/Lg76GXOb8G8sB6h0hi+SGaFKJj4ImOrc6qLJjqX3G4rbDgdfAnxvyuuwXkrMLkIvxHpcuTNj7pCtA29XF9KBbynS2W0QM2QZwvq+q/5FV+DPP5qlwpDWVGtY0eQ0bDICLPW6P2ssA7R326CFR0kjXEKMDawoav1LY4u9GQ+T3w0ByNx7jbCWHF/AtDC6VFAkr3TInk/fUMhMuPAYkRIPq2becCWSR88="
-sudo: required
-services:
-- docker
-cache:
-  directories:
-  - "$HOME/.gradle"
-  - "$HOME/downloads"
+
 notifications:
   hipchat:
     on_pull_requests: false
@@ -52,15 +46,21 @@ before_script:
 - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
 - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
 - export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
+
 jobs:
   include:
   - stage: Build
     name: App and Docker image
+    services:
+    - docker
+    cache:
+      directories:
+      - "$HOME/.gradle"
     script:
-    - "./ci/gradle/tag.sh"
-    - "./ci/gradle/build.sh"
-    - "./ci/docker/build.sh"
-    - "[[ $SHOULD_RELEASE ]] && ./ci/docker/release.sh || true"
+    - ./ci/gradle/tag.sh
+    - ./ci/gradle/build.sh
+    - ./ci/docker/build.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/docker/release.sh; fi'
   - stage: Build
     name: Helm chart
     install:
@@ -68,12 +68,18 @@ jobs:
     - export PATH="$(pwd)/linux-amd64/:$PATH"
     - helm init --client-only
     script:
-    - "./ci/helm/tag.sh"
-    - "./ci/helm/build.sh"
-    - "[[ $SHOULD_RELEASE ]] && ./ci/helm/release.sh || true"
+    - ./ci/helm/tag.sh
+    - ./ci/helm/build.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
   - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
     stage: Versioning
     name: Set tag and update version
     script:
     - "./ci/versioning/add_tag_to_git.sh"
     - "./ci/versioning/set_next_version.sh"
+  - if: branch = env(SNAPSHOT_BRANCH) AND type != "pull_request"
+    stage: Trigger downstream
+    name: Trigger workspace build
+    install: skip
+    script:
+    - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN
