@@ -6,7 +6,7 @@ import Vocabulary from "../../services/MetadataAPI/Vocabulary";
 import mockStore from "../../store/mockStore"
 import MetadataViewer from "./MetadataViewer";
 import {Provider} from "react-redux";
-import Config from "../generic/Config/Config";
+import Config from "../../services/Config/Config";
 import {CLASS_URI, DOMAIN_URI, LABEL_URI, PROPERTY_URI} from "../../services/MetadataAPI/MetadataAPI";
 
 beforeAll(() => {

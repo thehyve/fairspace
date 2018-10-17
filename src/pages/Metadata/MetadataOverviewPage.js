@@ -1,13 +1,14 @@
 import React from 'react';
-import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import MetadataEntities from "../../components/metadata/MetadataEntities";
 import SearchBar from "../../components/generic/SearchBar/SearchBar";
 import {withStyles} from '@material-ui/core/styles';
+import asPage from "../../containers/asPage/asPage";
+import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 
 const MetadataOverviewPage = ({classes}) => (
     <div>
-        <Typography variant={"h6"} paragraph>{'Metadata'}</Typography>
+        <BreadCrumbs />
 
         <Paper className={classes.searchBar}>
             <SearchBar
@@ -33,7 +34,7 @@ const style = (theme) => ({
     }
 });
 
-export default withStyles(style)(MetadataOverviewPage);
+export default asPage(withStyles(style)(MetadataOverviewPage));
 
 
 

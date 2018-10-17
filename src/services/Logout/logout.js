@@ -1,4 +1,4 @@
-import Config from "../generic/Config/Config";
+import Config from "../Config/Config";
 
 export function logout() {
     fetch(Config.get().urls.jupyter + '/hub/logout', {credentials: 'include'})

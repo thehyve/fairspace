@@ -232,7 +232,7 @@ export class AlterPermissionDialog extends React.Component {
 }
 
 AlterPermissionDialog.propTypes = {
-    classes: PropTypes.func.isRequired,
+    classes: PropTypes.object.isRequired,
     theme: PropTypes.object,
     user: PropTypes.object,
     open: PropTypes.bool,

@@ -1,14 +1,14 @@
 import MetadataProperty from "./MetadataProperty"
 import React from 'react';
-import {mount, shallow} from "enzyme";
 import mockStore from "../../store/mockStore"
-import Config from "../generic/Config/Config";
+import Config from "../../services/Config/Config";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import DeleteIcon from '@material-ui/icons/Delete';
+import ClearIcon from '@material-ui/icons/Clear';
 import IconButton from "@material-ui/core/IconButton";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import {STRING_URI} from "../../services/MetadataAPI/MetadataAPI";
+import {createShallow, createMount} from '@material-ui/core/test-utils';
 
 const subject = 'https://thehyve.nl';
 const defaultProperty = {
@@ -18,10 +18,11 @@ const defaultProperty = {
     values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
     allowMultiple: true
 };
+const shallow = createShallow({dive: true});
+const mount = createMount();
 
 beforeEach(() => {
     window.fetch = jest.fn(() => Promise.resolve({ok: true}));
-
     Config.setConfig({
         "urls": {
             "metadata": "/metadata"
@@ -50,7 +51,7 @@ describe('MetadataProperty elements', () => {
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(4);
-        const deletIcons = wrapper.dive().find(List).find(DeleteIcon);
+        const deletIcons = wrapper.dive().find(List).find(ClearIcon);
         expect(deletIcons.length).toEqual(3);
     });
 
@@ -60,7 +61,7 @@ describe('MetadataProperty elements', () => {
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(3);
-        const deletIcons = wrapper.dive().find(List).find(DeleteIcon);
+        const deletIcons = wrapper.dive().find(List).find(ClearIcon);
         expect(deletIcons.length).toEqual(0);
     });
 
@@ -119,11 +120,9 @@ describe('MetadataProperty elements', () => {
             ...defaultProperty,
             values: [{value: 'More info'}, {value: 'another info'}],
             allowMultiple: true
-        }
-
-        const store = mockStore({})
+        };
+        const store = mockStore({});
         const wrapper = shallow(<MetadataProperty editable={false} store={store} property={property} subject={subject} />);
-
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(2);
     });
@@ -131,17 +130,14 @@ describe('MetadataProperty elements', () => {
 
 describe('MetadataProperty changes', () => {
     it('handles addition correctly', () => {
-        const store = mockStore({})
-
+        const store = mockStore({});
         const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
-
         const input = wrapper.find('input').last();
         input.simulate('focus');
         input.simulate('change', { target: { value: 'New more info' }});
         input.simulate('blur');
 
         wrapper.unmount();
-
         const actions = store.getActions();
         expect(actions.length).toEqual(1);
         expect(actions[0].meta.subject).toEqual('https://thehyve.nl');
@@ -150,8 +146,9 @@ describe('MetadataProperty changes', () => {
         expect(actions[0].meta.values[3].value).toEqual('New more info');
     });
 
+
     it('handles updates correctly', () => {
-        const store = mockStore({})
+        const store = mockStore({});
 
         const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
 

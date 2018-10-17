@@ -3,16 +3,17 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import UserMenu from "../UserMenu/UserMenu";
-import {logout} from "../../App/logout";
+import {logout} from "../../../services/Logout/logout";
+import {connect} from "react-redux";
 
 function TopBar(props) {
-    const { classes } = props;
+    const { classes, workspaceName } = props;
 
     return (
         <AppBar position="absolute" className={classes.appBar}>
             <Toolbar>
                 <Typography variant="h6" color="inherit" noWrap className={classes.flex}>
-                    Workspace name
+                    {workspaceName}
                 </Typography>
                 <UserMenu onLogout={logout}></UserMenu>
             </Toolbar>
@@ -20,6 +21,13 @@ function TopBar(props) {
     );
 }
 
-export default TopBar;
+function mapStateToProps(state) {
+    const data = state.workspace.data;
+    return {
+        workspaceName: data ? data.name : ''
+    };
+}
+
+export default connect(mapStateToProps)(TopBar);
 
 

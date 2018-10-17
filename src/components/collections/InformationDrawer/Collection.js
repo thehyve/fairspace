@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import * as collectionActions from '../../../actions/collections'
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
-import {getDisplayName} from "../utils/userUtils";
+import {getDisplayName} from "../../../utils/userUtils";
 
 class Collection extends React.Component {
     constructor(props) {
@@ -90,8 +90,10 @@ class Collection extends React.Component {
 
 const mapStateToProps = ({cache: {users}}, {collection: {creator}}) => {
     const user = findById(users.data, creator);
+    const loading = users.pending || !creator;
     return {
-        creatorFullname: getDisplayName(user)
+        loading: loading,
+        creatorFullname: loading ? '' : getDisplayName(user)
     }
 };
 

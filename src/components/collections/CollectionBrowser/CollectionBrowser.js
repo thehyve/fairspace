@@ -62,14 +62,9 @@ class CollectionBrowser extends React.Component {
         }
 
         return <GenericCollectionsScreen
-            breadCrumbs={this.renderBreadcrumbs()}
+            breadCrumbs={<BreadCrumbs/>}
             buttons={this.renderButtons()}
             main={loading ? this.renderLoading() : this.renderCollectionList()} />
-    }
-
-    renderBreadcrumbs() {
-        const segments = [{segment: 'collections', label: 'Collections'}]
-        return <BreadCrumbs segments={segments}/>;
     }
 
     renderButtons() {
@@ -125,8 +120,8 @@ class CollectionBrowser extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
     user: state.account.user.data,
-    loading: state.cache.collections.pending,
-    error: state.cache.collections.error,
+    loading: state.cache.collections.pending || state.account.user.pending,
+    error: state.cache.collections.error || state.account.user.error,
     collections: state.cache.collections.data,
 
     selectedCollectionId: state.collectionBrowser.selectedCollectionId,

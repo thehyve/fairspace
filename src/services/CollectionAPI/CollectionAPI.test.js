@@ -1,5 +1,5 @@
 import CollectionAPI from "./CollectionAPI";
-import Config from "../../components/generic/Config/Config";
+import Config from "../Config/Config";
 import mockResponse from "../../utils/mockResponse";
 
 beforeAll(() => {

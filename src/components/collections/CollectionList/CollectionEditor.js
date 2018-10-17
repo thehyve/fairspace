@@ -12,11 +12,9 @@ import FormControl from "@material-ui/core/FormControl/FormControl";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 
 class CollectionEditor extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {};
-    }
+    state = {
+        editing: false
+    };
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.editing !== this.props.editing) {
@@ -25,7 +23,7 @@ class CollectionEditor extends React.Component {
                 name: this.props.name || '',
                 description: this.props.description || '',
                 type: this.props.type || 'LOCAL_FILE',
-                editing: this.props.editing
+                editing: !!this.props.editing
             });
         }
     }
@@ -104,10 +102,10 @@ class CollectionEditor extends React.Component {
 
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleCancel.bind(this)} color='secondary'>
+                    <Button onClick={this.handleCancel.bind(this)} aria-label='Cancel' color='secondary'>
                         Cancel
                     </Button>
-                    <Button onClick={this.handleSave.bind(this)} color='primary'>
+                    <Button onClick={this.handleSave.bind(this)} aria-label='Save' color='primary'>
                         Save
                     </Button>
                 </DialogActions>

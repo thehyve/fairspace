@@ -3,7 +3,7 @@
         "dbpedia": "http://dbpedia.org/ontology#",
         "dc": "http://purl.org/dc/elements/1.1/",
         "foaf": "http://xmlns.com/foaf/0.1/#",
-        "fs": "http://fairspace.io/ontology# ",
+        "fs": "http://fairspace.io/ontology#",
         "obo": "http://purl.obolibrary.org/obo/#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
@@ -15,25 +15,29 @@
             "@id": "foaf:Person",
             "@type": "rdf:Class",
             "rdfs:comment": "A person that is subject of research.",
-            "rdfs:label": "Person"
+            "rdfs:label": "Person",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "schema:Material",
             "@type": "rdf:Class",
             "rdfs:comment": "A material or a sample provided by person.",
-            "rdfs:label": "Material"
+            "rdfs:label": "Material",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "fs:PersonConsent",
             "@type": "rdf:Class",
             "rdfs:comment": "A research consent given by person. ",
-            "rdfs:label": "Person Consent"
+            "rdfs:label": "Person Consent",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "fs:ResearchProject",
             "@type": "rdf:Class",
             "rdfs:comment": "A research project.",
-            "rdfs:label": "Research Project"
+            "rdfs:label": "Research Project",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "fs:File",
@@ -45,7 +49,8 @@
             "@id": "fs:Collection",
             "@type": "rdf:Class",
             "rdfs:comment": "A specific collection in Fairspace.",
-            "rdfs:label": "Collection"
+            "rdfs:label": "Collection",
+            "fs:fairspaceEntity": true
         },
         {
             "@id": "fs:User",
@@ -468,7 +473,7 @@
             ]
         },
         {
-            "@id": "obo:FMA_50707 ",
+            "@id": "obo:FMA_50707",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
             "rdfs:comment": "Spatial association relationship which describes the containment, adjacency and anatomical coordinates of physical anatomical entities. Examples: anatomical containment, anatomical adjacency, anatomical coordinate.",

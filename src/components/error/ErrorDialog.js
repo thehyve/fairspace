@@ -18,7 +18,7 @@ function Transition(props) {
  * This component is displayed when an error has occurred.
  */
 class ErrorDialog extends React.Component {
-    static  instance;
+    static instance;
 
     constructor(props) {
         super(props);
@@ -91,7 +91,8 @@ class ErrorDialog extends React.Component {
                     </DialogActions>
                 </Dialog>
         );
-        return this.props.children.concat([dialog]);
+
+        return [this.props.children, dialog];
     }
 }
 

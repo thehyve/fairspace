@@ -1,4 +1,4 @@
-import Config from "../../components/generic/Config/Config";
+import Config from "../Config/Config";
 import {failOnHttpError} from "../../utils/httputils";
 
 class CollectionAPI {
