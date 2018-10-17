@@ -59,7 +59,7 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
     };
 
     // Render the given entry as a list item
-    const renderEntry = (entry, idx, PropertyValueComponent) => {
+    const renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
         return (
             <ListItem key={idx}
                       onMouseOver={(e) => onItemMouseOver(idx, e)}
@@ -70,6 +70,7 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
                         property={property}
                         entry={entry}
                         onSave={handleSave(idx)}
+                        aria-labelledby={labelledBy}
                     />
                 </ListItemText>
                 {
@@ -92,7 +93,7 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
             </ListItem>);
     };
 
-    const renderAddComponent = () => {
+    const renderAddComponent = (labelledBy) => {
         const ValueAddComponent = ValueComponentFactory.addComponent(property);
         return (
             <ListItem key={property.values.length}>
@@ -100,7 +101,9 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
                     <ValueAddComponent
                         property={property}
                         placeholder="Add new"
-                        onSave={handleAdd}/>
+                        onSave={handleAdd}
+                        aria-labelledby={labelledBy}
+                    />
                 </ListItemText>
             </ListItem>
         )
@@ -109,14 +112,15 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
     // Do not show an add component if no multiples are allowed
     // and there is already a value
     const canAdd = editable && (property.allowMultiple || property.values.length === 0);
+    const labelId = 'label-' + property.key
     const ValueComponent = editable ?
         ValueComponentFactory.editComponent(property) : ValueComponentFactory.readOnlyComponent();
 
     return (<ListItem disableGutters key={property.key} style={{display: 'block'}}>
-        <Typography variant="body1" component='p'>{property.label}</Typography>
+        <Typography variant="body1" component='label' id={labelId}>{property.label}</Typography>
         <List dense>
-            {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent))}
-            {canAdd ? renderAddComponent() : null}
+            {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent, labelId))}
+            {canAdd ? renderAddComponent(labelId) : null}
         </List>
     </ListItem>)
 }
