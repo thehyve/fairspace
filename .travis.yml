@@ -4,6 +4,9 @@ env:
   global:
      - APPNAME="workspace"
      - ORG="fairspace"
+     - ARTIFACT_BUILD_FILE=""
+     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
+     - DEPLOYMENT_CONFIG_DIR="./ci-deployment"
      - DOCKER_REPO="fairspace.azurecr.io"
      - CHART_REPO=" https://fairspace.github.io/helm-repo"
      - RELEASE_BRANCH="master"
@@ -32,9 +35,12 @@ notifications:
     notify: true
 
 before_install:
-- ./ci/helm/install_helm.sh
-- export PATH="$(pwd)/linux-amd64/:$PATH"
-- helm init --client-only
+  - export KUBE_CONFIG_ENC_KEY=$encrypted_5162cfbd2a53_key
+  - export KUBE_CONFIG_ENC_IV=$encrypted_5162cfbd2a53_iv
+  - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
+  - ./ci/helm/install_helm.sh
+  - export PATH="$(pwd)/linux-amd64/:$PATH"
+  - helm init --client-only
 
 before_script:
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT" ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
