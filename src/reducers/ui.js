@@ -5,7 +5,7 @@ const LOCAL_STORAGE_MENU_KEY = 'FAIRSPACE_MENU_EXPANDED';
 // Set the default value based on the value from local storage
 // Localstorage stores values as strings. As the default is true
 // we only check whether the value is explicitly set to 'false'
-const localStorageValue = localStorage.getItem(LOCAL_STORAGE_MENU_KEY);
+const localStorageValue = window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY);
 const defaultState = {
     menuExpanded: localStorageValue === 'false' ? false : true
 };
@@ -15,7 +15,7 @@ const ui = (state = defaultState, action) => {
         case TOGGLE_MENU:
             // Store information in local storage
             const newMenuExpandedState = !state.menuExpanded;
-            localStorage.setItem(LOCAL_STORAGE_MENU_KEY, newMenuExpandedState);
+            window.localStorage.setItem(LOCAL_STORAGE_MENU_KEY, newMenuExpandedState);
 
             return {
                 ...state,
