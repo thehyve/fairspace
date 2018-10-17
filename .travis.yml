@@ -53,7 +53,7 @@ jobs:
     - ./ci/gradle/tag.sh
     - ./ci/gradle/build.sh
     - ./ci/docker/build.sh
-    - 'if [[ $SHOULD_RELEASE ]]; then./ci/docker/release.sh; fi'
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/docker/release.sh; fi'
   - stage: Build
     name: Helm chart
     install:
