@@ -4,18 +4,18 @@ dependencies:
   repository: https://jupyterhub.github.io/helm-chart/
 - name: pluto
   version: v0.x.x
-  repository: https://chartmuseum.jx.test.fairdev.app/
+  repository: https://fairspace.github.io/helm-repo/
 - name: mercury
   version: v0.x.x
-  repository: https://chartmuseum.jx.test.fairdev.app/
+  repository: https://fairspace.github.io/helm-repo/
 - name: titan
   version: v0.x.x
-  repository: https://chartmuseum.jx.test.fairdev.app/
+  repository: https://fairspace.github.io/helm-repo/
 - name: ceres
   version: v0.x.x
-  repository: https://chartmuseum.jx.test.fairdev.app/
+  repository: https://fairspace.github.io/helm-repo/
 - name: neptune
   version: v0.x.x
-  repository: https://chartmuseum.jx.test.fairdev.app/
+  repository: https://fairspace.github.io/helm-repo/
 
 
