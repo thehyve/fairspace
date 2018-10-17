@@ -50,10 +50,10 @@ jobs:
       directories:
       - "$HOME/.gradle"
     script:
-    - "./ci/gradle/tag.sh"
-    - "./ci/gradle/build.sh"
-    - "./ci/docker/build.sh"
-    - "if [[ $SHOULD_RELEASE ]]; then./ci/docker/release.sh; fi"
+    - ./ci/gradle/tag.sh
+    - ./ci/gradle/build.sh
+    - ./ci/docker/build.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then./ci/docker/release.sh; fi'
   - stage: Build
     name: Helm chart
     install:
@@ -61,9 +61,9 @@ jobs:
     - export PATH="$(pwd)/linux-amd64/:$PATH"
     - helm init --client-only
     script:
-    - "./ci/helm/tag.sh"
-    - "./ci/helm/build.sh"
-    - "if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi"
+    - ./ci/helm/tag.sh
+    - ./ci/helm/build.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
   - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
     stage: Versioning
     name: Set tag and update version
