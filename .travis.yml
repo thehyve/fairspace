@@ -8,6 +8,8 @@ env:
      - APPNAME="mercury"
      - ORG="fairspace"
      - DOCKER_REPO="fairspace.azurecr.io"
+     - ARTIFACT_BUILD_FILE="package.json"
+     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
      - CHART_REPO=" https://fairspace.github.io/helm-repo"
      - RELEASE_BRANCH="master"
      - SNAPSHOT_BRANCH="dev"
@@ -28,7 +30,6 @@ services:
 cache:
   directories:
   - $HOME/.cache/yarn
-  - $HOME/downloads
 
 notifications:
   hipchat:
@@ -39,6 +40,9 @@ notifications:
       - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
     format: html
     notify: true
+
+before_install:
+- git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
 
 before_script:
   - '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && export VERSION_POSTFIX="-SNAPSHOT" || true'
