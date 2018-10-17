@@ -27,16 +27,6 @@ env:
 # GITHUB_PASSWORD=....
      - secure: "Y9CKTHXuwA5yljO9SPK/t955D30tFzkW0Rq/c7tWmB3v8eoeRYrzHRhE2MFcUSZ5rATdjVZ8Jt0INeeS2KCmtqwhnKSUMghUhFAzqaIe/yabr9bWfUed29cq9GtJQEu8nlZgrxcpxCAT28dyYMRG2AUYCqGNImsVhXrSy6zcTW8kDaZE9mLyhURBSoCayr92cN6vaX2sT5L4Re1fTbSnyD4RlROOqpiRvMGWTdKq+McmSK17IRZEhElH/CrzsVl+xVC81X5zJsVbgHzENKSYHLZHbjGQx12f/dRL68zEvoN9yndrX0rDaj5jQ0P2/HWes4WKQlJFQIG+g52NsMkdypHhe3vSO08RHj2FGv2CzTsOGcYKPf1FWwOe0XN9NlJbbUhICesmtfqm0WgdZANi47n7LZFWop7de2dwD7+TP2RyJvQxUbG6uxhsVE8zXZLgGNSW0b04VkUfaxMzYRXa3fsv3KqOdwt/ztEQahYnERBiewvrUO/2epZbdV1d7K3peYYIVprrB6S7u+y89ij7vO5nx97sab0b8Qn4EJ47uezUQjbaNi4UGR8KbzCZ/SasfbHg8XmvhcK6miHKuhUM+NGU1wpuL9GPMjEqxGKfira83uQNAfL6OQN6Evd28TchOhmDGBFr+uLhdnPD5zB/rQ57QXiHtrSZ/PTKPgk11QE="
 
-sudo: required
-
-services:
-  - docker
-
-cache:
-  directories:
-  - node_modules
-  - $HOME/downloads
-
 notifications:
   hipchat:
     on_pull_requests: false
@@ -63,6 +53,11 @@ jobs:
   include:
   - stage: Build
     name: App and Docker image
+    services:
+    - docker
+    cache:
+      directories:
+      - node_modules
     script:
     - ./ci/nodejs/tag.sh
     - ./ci/nodejs/build.sh
@@ -87,3 +82,9 @@ jobs:
     - ./ci/helm/tag.sh
     - ./ci/versioning/add_tag_to_git.sh
     - ./ci/versioning/set_next_version.sh
+  - if: branch = env(SNAPSHOT_BRANCH) AND type != "pull_request"
+    stage: Trigger downstream
+    name: Trigger workspace build
+    install: skip
+    script:
+    - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN
