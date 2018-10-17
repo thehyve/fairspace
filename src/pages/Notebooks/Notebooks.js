@@ -8,7 +8,9 @@ const Notebooks = () => (
     <React.Fragment>
         <BreadCrumbs />
 
-        <Typography><a target="_blank" href={Config.get().urls.jupyter}>Open JupyterLab</a></Typography>
+        <Typography>
+            <a target="_blank" rel="noopener noreferrer" href={Config.get().urls.jupyter}>Open JupyterLab</a>
+        </Typography>
     </React.Fragment>
 );
 
