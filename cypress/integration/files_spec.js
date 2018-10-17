@@ -1,5 +1,5 @@
 describe('File list and upload', function () {
-    const collectionName = "John Snow's collection";
+    const collectionName = "First User's collection";
 
     before(() => {
         cy.login(Cypress.config("user_name"), Cypress.config("password"));

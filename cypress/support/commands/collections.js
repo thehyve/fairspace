@@ -24,32 +24,30 @@
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.add("login", (username, password) => {
-    cy.clearCookie("JSESSIONID")
-    cy.visit('');
-    cy.url().should('include', '/auth/realms');
-    cy.get('input[name=username]').type(username);
-    cy.get('input[name=password').type(password + '{enter}');
-})
-
-Cypress.Commands.add("logout", () => {
-    cy.clearCookie("JSESSIONID")
-    cy.visit('');
-})
-
 Cypress.Commands.add("listCollections", () => {
     cy.visit("/collections");
     cy.contains("Loading").should('not.exist');
     cy.get("tbody").should('exist');
 })
 
-Cypress.Commands.add("addCollection", () => {
+Cypress.Commands.add("addCollection", (name, description) => {
     cy.url().should('contain', '/collections')
 
     // Add a collection
     cy.get('button').contains("add").click({force: true});
 
-    // Recount after loading
+    // Enter parameters if given
+    if(name) {
+        cy.get('input[name=name]').clear().type(name);
+    }
+    if(description) {
+        cy.get('textarea[name=description]').clear().type(changedDescription);
+    }
+
+    // Click save
+    cy.get('button').contains('Save').click();
+
+    // Wait until the collections have been loaded
     cy.wait(500)
     cy.contains("Loading").should('not.exist');
 })

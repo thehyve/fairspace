@@ -1,6 +1,5 @@
 describe('Collection browser', function () {
     let uniqueId = 0;
-    const collectionName = "John Snow's collection";
 
     before(() => {
         cy.login(Cypress.config("user_name"), Cypress.config("password"));
@@ -16,11 +15,11 @@ describe('Collection browser', function () {
 
     it('should show a list of collections', function () {
         cy.listCollections();
-
-        cy.get('tbody').find('tr').should('length.above', 0);
     });
 
     it('should successfully add and remove a collection', function () {
+        const collectionName = 'New collection ' + uniqueId;
+
         cy.listCollections();
 
         // Count the current number of collections
@@ -30,10 +29,13 @@ describe('Collection browser', function () {
             .then(length => rowCount = length)
 
             // Add a collection only after counting
-            .then(cy.addCollection)
+            .then(() => cy.addCollection('New collection ' + uniqueId))
 
             // Verify the number of rows has increased
             .then(() => cy.get('tbody>tr').should('length.above', rowCount))
+
+            // Verify the new name is in the list
+            .then(() => cy.get('tr').should('contain', collectionName))
 
             // Recount the number of rows
             .then(() => cy.get('tbody>tr').its('length'))
@@ -46,8 +48,10 @@ describe('Collection browser', function () {
     });
 
     it('should store changes in collection details', function () {
+        const collectionName = 'Update collection ' + uniqueId;
+
         cy.listCollections();
-        cy.addCollection();
+        cy.addCollection(collectionName);
 
         // Find one of the collections created with the default name
         // Click on it to open the right panel
