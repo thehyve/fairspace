@@ -16,6 +16,8 @@ workspace:
         dns01Provider: azuredns
 
 pluto:
+  image:
+    pullPolicy: Always
   keycloak:
     baseUrl: https://keycloak.hyperspace.ci.fairway.app
     realm: ci
@@ -25,6 +27,8 @@ pluto:
     jupyter: https://jupyterhub.workspace.ci.fairway.app
 
 titan:
+  image:
+    pullPolicy: Always
   auth:
     tokenUrl: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/token
     clientId: workspace-ci-pluto
@@ -35,6 +39,8 @@ titan:
 
 # Specific settings for Ceres subchart
 ceres:
+  image:
+    pullPolicy: Always
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.ci.fairway.app
@@ -44,6 +50,8 @@ ceres:
 
 # Specific settings for Neptune subchart
 neptune:
+  image:
+    pullPolicy: Always
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.ci.fairway.app
@@ -52,6 +60,11 @@ neptune:
       samplingRate: 1
     metadata:
       baseUrl: https://workspace.ci.fairway.app
+
+# Specific settings for Mercury subchart
+mercury:
+  image:
+    pullPolicy: Always
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
