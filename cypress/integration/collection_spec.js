@@ -1,14 +1,6 @@
 describe('Collection browser', function () {
     let uniqueId = 0;
 
-    before(() => {
-        cy.login(Cypress.config("user_name"), Cypress.config("password"));
-    })
-
-    after(() => {
-        cy.logout()
-    })
-
     beforeEach(() => {
         uniqueId = Math.round(100000 + (Math.random() * 900000));
     });
@@ -19,11 +11,9 @@ describe('Collection browser', function () {
 
     it('should successfully add and remove a collection', function () {
         const collectionName = 'New collection ' + uniqueId;
-        const ensureCollectionName = 'Ensure collection ' + uniqueId;
 
-        // List collections and ensure at least one collection
+        // List collections
         cy.listCollections();
-        cy.addCollection(ensureCollectionName);
 
         // Count the current number of collections
         let rowCount = 0;
@@ -47,9 +37,8 @@ describe('Collection browser', function () {
             // Remove the last entry again
             .then(() => cy.deleteLastCollectionByName(collectionName))
 
+            // Verify the number  of rows decreased
             .then(() => cy.get('tbody>tr').should('length.below', rowCount))
-
-            .then(() => cy.deleteLastCollectionByName(ensureCollectionName));
 
     });
 
@@ -93,8 +82,5 @@ describe('Collection browser', function () {
         cy.get('tr')
             .should('contain', changedName)
             .should('contain', changedDescription);
-
-        // Delete the collection again
-        cy.deleteLastCollectionByName(changedName);
     });
 });

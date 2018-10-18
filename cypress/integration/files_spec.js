@@ -1,23 +1,9 @@
 describe('File list and upload', function () {
-    let collectionName;
-
-    before(() => {
-        cy.login(Cypress.config("user_name"), Cypress.config("password"));
-
-        const uniqueId = Math.round(100000 + (Math.random() * 900000));
-        collectionName = "Files-" + uniqueId;
-
-        cy.listCollections();
-        cy.addCollection(collectionName);
-    })
-
-    after(() => {
-        cy.listCollections();
-        cy.deleteLastCollectionByName(collectionName);
-        cy.logout()
-    })
+    const collectionName = 'TestCollection';
 
     it('should allow uploading and downloading files', function () {
+        cy.listCollections();
+
         // Go into the last collection
         cy.contains('tr', collectionName)
             .click().click();

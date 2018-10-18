@@ -1,11 +1,6 @@
 describe('Metadata in fairspace', function () {
     before(() => {
-        cy.login(Cypress.config("user_name"), Cypress.config("password"));
         cy.ensureMetadataPresent();
-    })
-
-    after(() => {
-        cy.logout()
     })
 
     it('should show metadata about a person', function () {

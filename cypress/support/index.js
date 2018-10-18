@@ -20,3 +20,27 @@ import './commands/metadata'
 Cypress.Cookies.defaults({
     whitelist: [ "JSESSIONID" ]
 });
+
+before(() => {
+    // Login
+    cy.login(Cypress.config("user_name"), Cypress.config("password"));
+
+    // Remove all old collections
+    cy.request('/api/collections')
+        .then(data => {
+            expect(data.status).to.equal(200);
+
+            return Promise.all(data.body.map(collection => cy.request('DELETE', '/api/collections/' + collection.id)));
+        });
+
+    // Ensure at least a single collection
+    cy.fixture('empty-collection.json')
+        .then(data =>
+            cy.request({
+                method: 'POST',
+                url: '/api/collections',
+                body: JSON.stringify(data),
+                headers: {'Content-type': 'application/json'}
+            })
+        );
+})
