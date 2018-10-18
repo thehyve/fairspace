@@ -9,6 +9,9 @@
  *  - id when no names, email and username
  */
 export const getDisplayName = user => {
+    if(!user) {
+        return '';
+    }
 
     const hasFirstName = user.hasOwnProperty('firstName') && user.firstName;
     const hasLastName = user.hasOwnProperty('lastName') && user.lastName;
