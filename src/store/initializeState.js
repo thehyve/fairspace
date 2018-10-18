@@ -9,7 +9,7 @@ const initializeState = () => {
 
     return {
         ui: {
-            menuExpanded: menuExpanded === 'false' ? false : true
+            menuExpanded: menuExpanded !== 'false'
         }
     };
 }
