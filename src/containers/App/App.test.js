@@ -10,6 +10,11 @@ beforeAll(() => {
         json: () => {}
     }));
 
+    window.localStorage = {
+        getItem: jest.fn(() => null),
+        setItem: jest.fn()
+    }
+
     Config.setConfig(Object.assign(configFile, {
         "externalConfigurationFiles": [],
     }));

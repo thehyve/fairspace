@@ -2,98 +2,41 @@ import React from 'react';
 import classNames from 'classnames';
 import styles from "./MenuDrawer.styles";
 import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
-import Icon from "@material-ui/core/Icon";
-import {NavLink, withRouter} from "react-router-dom";
 import {withStyles} from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import {toggleMenuExpansion} from "../../../actions/ui";
+import Menu from "./Menu";
+import {compose} from "redux";
+import {connect} from "react-redux";
 
-class MenuDrawer extends React.Component {
+const MenuDrawer = ({open, toggleMenuExpansion, classes}) => (
+    <Drawer
+        variant="permanent"
+        classes={{
+            paper: classNames(classes.drawerPaper, !open ? classes.drawerPaperClose : classes.drawerPaperOpen),
+        }}
+    >
+        <div className={classes.toolbar}>
+            <IconButton onClick={toggleMenuExpansion}>
+                {!open ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
+            </IconButton>
+        </div>
+        <Divider/>
+        <Menu />
+    </Drawer>
+);
 
-    state = {
-        open: true,
-    };
+const mapStateToProps = (state) => ({
+    open: state.ui.menuExpanded
+})
 
-    toggleDrawer = () => {
-        this.setState({open: !this.state.open});
-    };
-
-    render() {
-        const {classes} = this.props;
-        const {open} = this.state;
-        return (
-            <Drawer
-                variant="permanent"
-                classes={{
-                    paper: classNames(classes.drawerPaper, !open ? classes.drawerPaperClose : classes.drawerPaperOpen),
-                }}
-            >
-                <div className={classes.toolbar}>
-                    <IconButton onClick={this.toggleDrawer}>
-                        {!open ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
-                    </IconButton>
-                </div>
-                <Divider/>
-                <div>
-                    <List className={classes.menuItemList}>
-                        <ListItem component={NavLink} exact to="/" button>
-                            <ListItemIcon>
-                                <Icon>home</Icon>
-                            </ListItemIcon>
-                            <ListItemText primary="Home"/>
-                        </ListItem>
-                        <ListItem component={NavLink} to="/collections" button>
-                            <ListItemIcon>
-                                <Icon>folder_open</Icon>
-                            </ListItemIcon>
-                            <ListItemText primary="Collections"/>
-                        </ListItem>
-                        <ListItem component={NavLink} to={"/notebooks"} button>
-                            <ListItemIcon>
-                                <Icon>bar_chart</Icon>
-                            </ListItemIcon>
-                            <ListItemText primary="Notebooks"/>
-                        </ListItem>
-                        <ListItem button>
-                            <ListItemIcon>
-                                <Icon>transform</Icon>
-                            </ListItemIcon>
-                            <ListItemText primary="Workflows"/>
-                        </ListItem>
-                        <ListItem component={NavLink} to="/metadata" button>
-                            <ListItemIcon>
-                                <Icon>assignment</Icon>
-                            </ListItemIcon>
-                            <ListItemText primary="Metadata"/>
-                        </ListItem>
-                    </List>
-                    <Divider/>
-                    <List>
-                        <ListItem button>
-                            <ListItemIcon>
-                                <Icon>share</Icon>
-                            </ListItemIcon>
-                            <ListItemText primary="Dataverse"/>
-                        </ListItem>
-                        <ListItem button>
-                            <ListItemIcon>
-                                <Icon>public</Icon>
-                            </ListItemIcon>
-                            <ListItemText primary="cBioportal"/>
-                        </ListItem>
-                    </List>
-                </div>
-            </Drawer>
-        );
-    }
+const mapDispatchToProps = {
+    toggleMenuExpansion
 }
 
-export default withStyles(styles)(withRouter(MenuDrawer));
+export default compose(withStyles(styles), connect(mapStateToProps, mapDispatchToProps))(MenuDrawer);
 
 
