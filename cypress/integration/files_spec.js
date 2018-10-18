@@ -5,7 +5,7 @@ describe('File list and upload', function () {
         cy.login(Cypress.config("user_name"), Cypress.config("password"));
 
         const uniqueId = Math.round(100000 + (Math.random() * 900000));
-        collectionName = "Collection for files" + uniqueId;
+        collectionName = "Files-" + uniqueId;
 
         cy.listCollections();
         cy.addCollection(collectionName);
@@ -19,7 +19,8 @@ describe('File list and upload', function () {
 
     it('should allow uploading and downloading files', function () {
         // Go into the last collection
-        cy.get('tr').contains(collectionName).click().click();
+        cy.contains('tr', collectionName)
+            .click().click();
 
         // Close right panel to avoid it being in the way
         cy.closeRightPanel();
