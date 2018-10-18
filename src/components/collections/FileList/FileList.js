@@ -16,6 +16,10 @@ import DateTime from "../../generic/DateTime/DateTime";
 import Bytes from "../../generic/Bytes/Bytes";
 import styles from './FileList.styles';
 import {withStyles} from '@material-ui/core/styles';
+import withHovered from "../../../containers/WithHovered/WithHovered";
+import {compose} from "redux";
+import MoreActions from "../../generic/MoreActions/MoreActions";
+import ActionItem from "../../generic/MoreActions/ActionItem";
 
 class FileList extends React.Component {
     render() {
@@ -36,7 +40,7 @@ class FileList extends React.Component {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {props.files.map(row => {
+                    {props.files.map((row, idx) => {
                         const selected = selectedFilenames.includes(row.filename);
                         const classes = props.classes;
                         return (
@@ -46,7 +50,10 @@ class FileList extends React.Component {
                                 selected={selected}
                                 className={selected ? classes.tableRowSelected : classes.tableRow}
                                 onSingleClick={() => props.onPathClick(row)}
-                                onDoubleClick={() => props.onPathDoubleClick(row)}>
+                                onDoubleClick={() => props.onPathDoubleClick(row)}
+                                onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
+                                onMouseOut={() => this.props.onItemMouseOut(idx)}
+                            >
                                 <TableCell>
                                     <Icon>{row.type === 'directory' ? 'folder_open' : 'note_open'}</Icon>
                                 </TableCell>
@@ -64,7 +71,7 @@ class FileList extends React.Component {
                                     </Typography>
                                 </TableCell>
                                 <TableCell numeric>
-                                    <Row>
+                                    <Row style={{visibility: this.props.hovered !== idx ? 'hidden' : 'visible'}}>
                                         {props.onRename ?
                                             <RenameButton currentName={row.basename}
                                                           aria-label={"Rename " + row.basename}
@@ -87,4 +94,8 @@ class FileList extends React.Component {
     }
 }
 
-export default withStyles(styles)(FileList)
+export default compose(
+    withStyles(styles),
+    withHovered,
+)(FileList)
+
