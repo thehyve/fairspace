@@ -1,13 +1,7 @@
 {
   "chromeWebSecurity": false,
   "video": false,
-  "baseUrl": "https://workspace.ci.test.fairdev.app/",
+  "baseUrl": "https://workspace.ci.fairway.app/",
   "user_name": "test-workspace-ci",
-  "password": "fairspace123",
-
-  "reporter": "junit",
-  "reporterOptions": {
-    "mochaFile": "results/janus-output.xml",
-    "toConsole": true
-  }
+  "password": "fairspace123"
 }

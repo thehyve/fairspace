@@ -24,49 +24,51 @@
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.add("login", (username, password) => {
-    cy.clearCookie("JSESSIONID")
-    cy.visit('');
-    cy.url().should('include', '/auth/realms');
-    cy.get('input[name=username]').type(username);
-    cy.get('input[name=password').type(password + '{enter}');
-})
-
-Cypress.Commands.add("logout", () => {
-    cy.clearCookie("JSESSIONID")
-    cy.visit('');
-})
-
 Cypress.Commands.add("listCollections", () => {
     cy.visit("/collections");
+    cy.contains('main', 'Collections').should('exist');
     cy.contains("Loading").should('not.exist');
-    cy.get("tbody").should('exist');
 })
 
-Cypress.Commands.add("addCollection", () => {
+Cypress.Commands.add("addCollection", (name, description) => {
     cy.url().should('contain', '/collections')
 
     // Add a collection
-    cy.get('button').contains("add").click({force: true});
+    cy.contains('button', 'add').click({force: true});
 
-    // Recount after loading
-    cy.wait(500)
+    // Enter parameters if given
+    if(name) {
+        cy.get('input[name=name]').clear();
+        cy.get('input[name=name]').type(name);
+    }
+    if(description) {
+        cy.get('textarea[name=description]').clear();
+        cy.get('textarea[name=description]').type(changedDescription);
+    }
+
+    // Click save
+    cy.contains('button', 'Save').click();
+
+    // Wait until the collections have been loaded
     cy.contains("Loading").should('not.exist');
-})
+    cy.contains('tr', name).should('exist');
+});
 
 Cypress.Commands.add("deleteLastCollectionByName", (name) => {
     cy.url().should('contain', '/collections')
 
-    deleteCollection(
-        cy.get('tr')
-            .contains(name)
-            .last()
-            .parentsUntil('tbody'));
+    cy.contains('tr', name)
+        .should('exist')
+        .then(deleteCollection);
 })
 
 Cypress.Commands.add("waitForRightPanel", () => {
     cy.get('button').contains('close').should('be.visible');
     cy.contains("Loading").should("not.exist");
+});
+
+Cypress.Commands.add("closeRightPanel", () => {
+    cy.get('button').contains('close').click();
 });
 
 Cypress.Commands.add('upload_file', (selector, fileUrl, type = '') => {
@@ -82,12 +84,26 @@ Cypress.Commands.add('upload_file', (selector, fileUrl, type = '') => {
 });
 
 function deleteCollection(row) {
-    // Click the delete button
-    row.find("button").click({force: true});
+    cy.wrap(row).within($row =>
+        cy
+            .get('button')
+
+            // Make button visible
+            .then(button => {
+                button.attr('visibility', 'visible');
+                button.parent().css('visibility', 'visible');
+
+                return cy.wait(10);
+            })
+
+            // Click the button
+            .then(() => cy.get("button").click({force:true}))
+    );
+
 
     // Confirm deletion
-    cy.get("button").contains("Yes").click({force:true});
+    cy.contains('button', 'Yes').click({force:true})
 
     // Wait a bit to ensure deletion
-    cy.wait(300);
+    cy.wait(200);
 }

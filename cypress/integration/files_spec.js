@@ -1,22 +1,16 @@
 describe('File list and upload', function () {
-    const collectionName = "John Snow's collection";
-
-    before(() => {
-        cy.login(Cypress.config("user_name"), Cypress.config("password"));
-
-        cy.listCollections();
-        cy.addCollection();
-    })
-
-    after(() => {
-        cy.listCollections();
-        cy.deleteLastCollectionByName(collectionName);
-        cy.logout()
-    })
+    const collectionName = 'TestCollection';
 
     it('should allow uploading and downloading files', function () {
+        cy.listCollections();
+
         // Go into the last collection
-        cy.get('tr').last().click().click();
+        cy.contains('tr', collectionName)
+            .click().click();
+
+        // Close right panel to avoid it being in the way
+        cy.closeRightPanel();
+        cy.wait(300);
 
         // Wait for the upload button and upload the file
         cy.get("button[aria-label=Upload]").click();
