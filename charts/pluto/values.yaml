@@ -7,7 +7,7 @@ rollingUpdate:
   maxSurge: 25%
 image:
   repository: pluto
-  tag: latest
+  tag: RELEASEVERSION
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
