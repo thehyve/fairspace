@@ -9,8 +9,6 @@ env:
   - ORG="fairspace"
   - ARTIFACT_BUILD_FILE="app/build.gradle"
   - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
-  - DOCKER_REPO="fairspace.azurecr.io"
-  - CHART_REPO=" https://fairspace.github.io/helm-repo"
   - RELEASE_BRANCH="master"
   - SNAPSHOT_BRANCH="dev"
   - DOCKER_USERNAME="fairspace"
