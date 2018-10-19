@@ -39,7 +39,8 @@ before_install:
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - source ./ci/setup_env.sh
   - source ./ci/helm/install_helm.sh
-  - 'if [[ $SHOULD_RELEASE ]]; then ./ci/az/install.sh && ./ci/az/login.sh; fi'
+  - ./ci/az/install.sh
+  - ./ci/az/login.sh
 
 before_script:
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
@@ -57,9 +58,9 @@ jobs:
       - ./ci/helm/tag.sh
       - ./ci/helm/add_repos.sh
       - 'if [[ $ALLOW_SNAPSHOTS ]]; then ./ci/helm/allow_snapshot_dependencies.sh; fi'
-      - helm repo list && ./ci/helm/build.sh
-      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/az/login.sh && ./ci/helm/release.sh && helm repo update; fi'
-      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/az/login.sh && travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
+      - ./ci/helm/build.sh
+      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh && helm repo update; fi'
+      - 'if [[ $SHOULD_RELEASE ]]; then travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
       stage: Versioning
