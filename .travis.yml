@@ -1,0 +1,84 @@
+language: node_js
+
+node_js:
+  - "node"
+
+env:
+  global:
+     - APPNAME="mercury"
+     - ORG="fairspace"
+     - ARTIFACT_BUILD_FILE="package.json"
+     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
+     - RELEASE_BRANCH="master"
+     - SNAPSHOT_BRANCH="dev"
+     - DOCKER_USERNAME="fairspace"
+     - GITHUB_USERNAME="fairspace-ci"
+     - HELM_VERSION="2.11.0"
+# Azure Docker repository credentials:
+# DOCKER_PASSWORD=....
+     - secure: "pO4GT3yzKIK80m0HbtGoSOJ+reqkXaPJ5GK+Pep8g0eokqeBnhgsW2pBYRU9a8JeZWNP+njDFKgfLgqANYxXr4IK/R9DsBDi1zDWAhyDv7/NMC9koOB/I4/IRd3QElh3KwFPWDZZQUgu7qcUCPpLMl+/hr8rtptUgrQkY1iPMFxFZTfk8EUq+7T3GdLFsvLNCjPWO0ohXpO4TndZD3hxHSXUbZ8YtvjDVRRFQbaRAOxI5fQEYk2fIJpIAsTHGPMUJOfzTsquQJdX/wNkJRgNM3tnQH0ncNg4CUcrNWgR9OiObjcfIdDK9/LEvwhV/oLyrYIBBZ997LDjkXhQnrjOuej0rQJgWuKYqb/9vOel4a1YG0aU0r0982iOdu+oABJNwQ/ckm751ueGYtPtN1eEAx0WaPjIWSUmxHOp43bggEFyZcQqaJiSqntZ9fpVwyTQIYfTwarTRmZf4THIj0AtmljH0I8JjalU2Ol3Q32pyfn5fcB6OGvhO2eQvTzugSF8plcHvVx5d96or6eHWhQwz9O7sbyyCCP5NZqFP7ASlufV4xa/QWS6s8fFqH1ilb+3F1xbIxykPWru5s0TiML9yDw/UnY4MI6qINP8KbhHXuGYzwZenqXaMn0zSN9leKEcGLbLdC/+bAF9UzgIcLI5QFJPHYc9bRstEcGrZFOJZdQ="
+# Github credentials:
+# GITHUB_PASSWORD=....
+     - secure: "Dj3Cai11RkRQjnVkL7KgSbffXprkWtiVJRX9SvMA992Gi8ifPmU4DTjrPnoJHfLIcTZtxYLm/RtFy/+x0/cntseiTBcipJ2saHSgjK3+NA6s8YKzscKkB7pHJjajylcegQXJhOdkWyRT2qbCPha1ZfWQdt0nYs2IqYpFkF7oqnGOOVWjFtepQvjdaKCu9qj+UkN8oCNwnck7eff3qX/M2Kw51ZPfz8jRVD4ifITjum0idxEq6GsOW6qF3FYZ6vprYq/HyMN80aMPBA8qSmsVsExn4fjk+fVSyfmaZpwKJ67VX+V4WfAkPRnLvED5sDwzUkdVjAdDlRrNXBj7n0GYidclaj6QvJoL93a4t/5akWk+aKJruiWf3vB9N9gfpLcysds73WpQEt2MtNZCeDd06z2F0s8XW6MS0NE9sYOHkkAHs+ePNArI0Onx0EZ6XhDM1HlYdH4oPlAYwCtM2z+iwachtY8rKoc18Eby+XPu9o3aKOJ0GHJqfV9CMhouWLI0N96RV11LxTi9+8xkpC0uRW3696FfnsHgvyqUNiBa29L5yIDYSq1ge5vx8/fedIIDp+1WDbjYnwA08BIQTEQdMH6qxUnEFOdUpAGbfDE2kd5XzPFt9ZMIyu1X7Tpf4lVThVd+K3qrvi8YjR8B6TXDfhxzmbZOrFyVcrSmNTxhEk4="
+
+     # Azure credentials
+     - secure: "TawTplYKUTS6dUE/ZFuAJ47L/tzUGJQmocQmnZlRklqPo+K47m+H6i9RVG/TT4B5i5hg1dxaCBUfl59EBccMPSTEHDK8wNrHzjMIaQZ2a8eOowRqyN7w/Aw8Y3mWZyxrazPoSeHTVe7b1qeiKCpU9+aKcmAeWVM5pRDSeDODw+4uq/OgscQjZClZJNpQVmFC8S3SmgGCBeGm482guPypQyzc+nSUh9shLMM3q1+NDMD+jJuqF8aoaJGw1w1THtpzxf9NEzEXUUhN6Qb3EZGzTWM7WGQsCHcFGh9mbTZztXnbdg3sclGaBRjL8M4Do8daEPZichPsfd/SkLSmRfLMEUJX89QChJ3/4vG5EaZW2JKEKlHd7w0rIYkE9s2u8eSo9YHsSe/xIAaDP4/PoEhKhUeBZye8WjCwPr13uOlAB0VXdhfYVXzXshTMlj0JJU0wGVcX3wilfMKYGEy7eHn4I9sQg+BJ5L5x20ARvTZboZRNul2bUIfOBCtFTYG0m0eY2BzjhOk5C+4lDmt4J/h4LijPhHaTkZ9lpE/KBhc0ouv7hRAK64bXBuw3VxRF3i0diiuC2p5qRonu8l0mhrcnAMYSBhL7i+wg5oViMzaHnpAVrvzJ5SKvPZ4+3xFs0GOh/8IoJZJPXTTlnNg58KGlrF9hY4xXwI11u4tvQ7xdBEM="
+
+notifications:
+  hipchat:
+    on_pull_requests: false
+    rooms:
+      - secure: "VMTJPCI3I6xnTrwBg751Qy1FGfyX8gU6eVUCSUNwoeA0mh9ZYeZ9XweYTdLzdDaDpTtggWCCW2N+in7UXvACMqliHOhsR6YrmrYjYMoQypL4kClwKH4Rg8BUETxCObQJb1U/JLuzElEXuXIDZyy/PgMva1vv0cNftfwxYzzH5vEH+a3c/1vO7K5MKuJNseRXngcNTK5S9MwCiwY8ZaWfeY4gZap4bJHAhQMTyg1f8Z0vJHsCx8bSzeov5HtCz4/J1YTisWpUad12uSvb/4ROdTIzzz0HlENXXRjjwZ6AjDDN91kXOvzpCDC4UnNcLqMzZrWfIAJlXYWWWm1LRTgde+oFtvHy49CrUiEyKHhijd80eHAOMFdolVXbkkabNgj2lxS3v0KoYq5XrOxHBnSmFG7PaXaysvOmcZy4cnBn9UZt5eHuAbdGdiMr4f3MdRpYM0cYoY1jR0LbA4eYOBdEPPYjs1uqSKcytEM5kJJybKQ4Rz9jstoZK45N4D1/Y3UvpuKleRro74ctKAwtBlBjQb8tuPrEZCDz4Lix4zO03rplvjFD33TpfV6sScmntbz6h5Vtib0B/O3btJl+jR5zwkTFpLg3cXEdWjxijKJvBbnOMxVCNudCPVz3t8PuXEL83e7T4elEN0rsrRU7q4m5TnuqI7hfTzKiIy0bTQvJLcQ="
+    template:
+      - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
+    format: html
+    notify: true
+
+before_install:
+  - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
+  - source ./ci/setup_env.sh
+
+jobs:
+  include:
+  - stage: Build
+    name: App and Docker image
+    services:
+    - docker
+
+    cache:
+      directories:
+      - $HOME/.cache/yarn
+    install:
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo apt-get update -y
+    - sudo apt-get -y install g++-4.9
+    script:
+    - ./ci/yarn/tag.sh
+    - ./ci/yarn/build.sh
+    - ./ci/docker/build.sh
+    - 'if [[ $SHOULD_RELEASE ]] ; then ./ci/docker/release.sh ; fi'
+  - stage: Build
+    name: Helm chart
+    install:
+      - source ./ci/helm/install_helm.sh
+      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/az/install.sh && ./ci/az/login.sh; fi'
+    script:
+    - ./ci/helm/tag.sh
+    - ./ci/helm/add_pod_annotations.sh
+    - ./ci/helm/build.sh
+    - 'if [[ $SHOULD_RELEASE ]] ; then ./ci/helm/release.sh ; fi '
+  - # For release branch, update git with the new tag and update version
+    if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+    stage: Versioning
+    name: Set tag and update version
+    script:
+    - ./ci/yarn/tag.sh
+    - ./ci/helm/tag.sh
+    - ./ci/versioning/add_tag_to_git.sh
+    - ./ci/versioning/set_next_version.sh
+  - if: branch = env(SNAPSHOT_BRANCH) AND type != "pull_request"
+    stage: Trigger downstream
+    name: Trigger workspace build
+    install: skip
+    script:
+    - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN

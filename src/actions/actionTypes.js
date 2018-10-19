@@ -49,3 +49,6 @@ export const USERS = 'USERS';
 
 // Workspace
 export const WORKSPACE = 'WORKSPACE';
+
+// UI
+export const TOGGLE_MENU = 'TOGGLE_MENU';

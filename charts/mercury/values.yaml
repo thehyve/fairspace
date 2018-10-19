@@ -4,7 +4,7 @@
 replicaCount: 1
 image:
   repository: mercury
-  tag: dev
+  tag: RELEASEVERSION
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
