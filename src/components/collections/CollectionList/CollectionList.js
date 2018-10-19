@@ -15,7 +15,6 @@ import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
 import withHovered from "../../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
-import {connect} from 'react-redux';
 import {getDisplayName} from "../../../utils/userUtils";
 
 export const COLLECTION_ICONS = {
@@ -85,7 +84,7 @@ export class CollectionList extends React.Component {
                                     </TableCell>
                                     <TableCell>
                                         <Typography noWrap>
-                                            {getDisplayName(collection.creator)}
+                                            {getDisplayName(collection.creatorObj)}
                                         </Typography>
                                     </TableCell>
                                     <TableCell>{collection.access}</TableCell>
@@ -109,25 +108,7 @@ export class CollectionList extends React.Component {
     }
 }
 
-const getCreators = (collections, users) => {
-    if (collections && users) {
-        if (collections.data && users.data) {
-             collections.data.map(collection => {
-                const user = users.data.find(user => user.id === collection.creator) || {};
-                return user ? collection.creator = user : collection.creator;
-            });
-            return collections.data;
-        }
-    }
-    return collections.data;
-};
-
-const mapStateToProps = ({cache: {collections, users}}) => ({
-    collections: getCreators(collections, users)
-});
-
 export default compose(
-    connect(mapStateToProps),
     withStyles(styles),
     withHovered
 )(CollectionList);
