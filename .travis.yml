@@ -9,8 +9,6 @@ env:
   - ORG="fairspace"
   - ARTIFACT_BUILD_FILE="build.gradle"
   - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
-  - DOCKER_REPO="fairspace.azurecr.io"
-  - CHART_REPO=" https://fairspace.github.io/helm-repo"
   - RELEASE_BRANCH="master"
   - SNAPSHOT_BRANCH="dev"
   - DOCKER_USERNAME="fairspace"
@@ -20,6 +18,8 @@ env:
   - secure: "RTwxV0W5ZR22+DXlziPn43hKEvs0hIE3jyOVtrAOylxjy8oxAPJzAadUOuttxBQqIm9+l9prxs6vMyvJJiv+fLkyY65K9MCwMVjKZHZFL2ne+xE/Z/p+EglcX/mQKW7OHX8J/YzS6whzyC/iKHR/MPmhxJnrsWW2mmExHwI9QdSy2KLhQRlxYI7yiX1s2rT0ue3qbRJnTkhYZOd2wbYyAWYOSFdXFuyMAek9f2jzDxUZtxCysnBmWYND7a4QgPnf9lb3yOvF31mUaJa+azrFTThVpbB7bAsTjCiV4tbw7J1LTtzCVkgGWy9eOBglTeWJU4zuszgwkuhVrV2s4hvpMIJxw+jSvLqACQ5EOg0IDhS7EwwZ9nvWahKNx8QD4IsdaeexbKquB2139yEs+akRJzmPjXyZNPD3KTQqdH4zKpLDf3dboBbKFoQDmQsGmUgBe2SLNsUSQ3p5l3+YFsjbbsrevls4t0SR5FCUoOQWP1v7qpGeEOdiNA1VqSIxUoT4IbzphTCmAwQFFsKHhDytkf8OiTkXxp0veSTNXlQ7yqlobfLPKKCwjyN1+FzjcE0F5VTOw6gduso58PJnQrEoUN8Pom+J/7Uiu7RMPXp7PZ4VGY66xrxF/gHPePjnsDhYhlG82l2OwIoaIJ/DdV4PKysWhJW8selAWs/CWriqReA="
   # GITHUB_PASSWORD = ...
   - secure: "Q1CA+IRCvRMxtLFAdIolxDceOPgNl7vHvYhUkKOYbvghBz0ewVyuIDGyUkOrvjCCZR6e3v/qofJ1sQZowo7n+Ko+qhlkGxt8QOhk8YYUHcqDuW7EK6tSyWWbNvcgNoi8sdBt9K5bxW5PskGAx4td5e6SKaSONwC07pPKh0N3yvX8ZpN/KdzXnK+xVlLh3dNIgWgkHftG16XLIoxptUhlSlq4Om7SxU/2LLiltzvKVCcGk5jhpEaXUXMeRIQNXN5rGjqcf4q3BXocI1E0KLn0hNqchjY0a8p7MGdRmulZv79bpGnxAcLaXJzQx2EEuOVgCISfm7pECENXEPeHOzGgi4+mj4AiEMwWTWLhu7DCvaZuwViWoBIke3+8Yu+sEoWefePYWZRRRzSpnaaG+++FDud8HI199bgcZi2HIF1jTxPWwrBQ7L7zXe5WMX2mC36IREx35OYiaym3V91KNw9vvTiLQ60SnfafYDG2tSjgXpsKyqBqIIOKORx+BfFmGP2y/awgLOzctfdKTjNiVmfrsAkklHCudMrK+WbEowsoHNfpAYhkugvSzgYylMY/aZVZcfOxojfZvJVgpYZqUk9OXocAY6/5hkqZ0K/hRplHimBIadRAh7dWZ4F0qRfphfczRAQKA9g+Pp2hPRg/u4cBHG5TKy/lUcb0UCOkl/Yk2Q4="
+  # Azure credentials
+  - secure: "vAwJDqtrF06C0RuRb54c7h+TZyz5YBjFi+OM2MEMw/eWB+4ZAmgzBo2QBJvUYvJX0T8/zfflHx8aHlZRE7R8QC+mDccNQmBDnabxZBqZOfp9xk6FaNd6EuQ8VDUOMucUkB2oQj3LVGRpXde+HwgoNVbRdQ3F1/M+ZA7QQnDAArGrvHtoEDfv7IkOA+5u8WI8hs0ftLd+bKreB4iTTp7r0SBHGzwqhNK4eYHFiitOQXq9RsXuJ4NaXCOSbSRP7OtNZRdzK0vrYm80yYcylTpz+Y82ROKbb9avJjAswNQJyXDr/E88qtROmc5RJKnPXCRlgnfMxEfYjp1sHxak/fyIJoz/m3OMVOVmgA01oBqxeO2znRovOweBncfS7+F/kOw6zJADh4fuWumM+a9BkJ0P0x9kpTDaQoOsEg8TanjcLYgQCxG9qN5bmnksnv58fIiwOlFso7dY1NFuNPtG1fyn4c+e0WyyStXmeFiou9Pc9PooAfFt8iqUbdtTrYVa84bp0UWhERUUg7gVF/eYhXHO3DupyPyLXogBqIij7iCmXK6SsfOdufF1hdewbSi/BtnNqJ47sRKZY3sGxGhDtq9FO+iIOPX/pqqNCWphP9RJmySuiyyM4ln0IFzXB39BTDs+KAtmbWg+x8agR6zKLVMBXvts4K3P/NnVaqgKy/ZSqgg="
 notifications:
   hipchat:
     on_pull_requests: false
@@ -32,9 +32,7 @@ notifications:
     notify: true
 
 before_install:
-- git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
-
-before_script:
+  - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - source ./ci/setup_env.sh
 
 jobs:
@@ -54,9 +52,8 @@ jobs:
   - stage: Build
     name: Helm chart
     install:
-    - "./ci/helm/install_helm.sh"
-    - export PATH="$(pwd)/linux-amd64/:$PATH"
-    - helm init --client-only
+    - source ./ci/helm/install_helm.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/az/install.sh && ./ci/az/login.sh; fi'
     script:
     - ./ci/helm/tag.sh
     - ./ci/helm/add_pod_annotations.sh
