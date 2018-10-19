@@ -18,8 +18,6 @@ import styles from './FileList.styles';
 import {withStyles} from '@material-ui/core/styles';
 import withHovered from "../../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
-import MoreActions from "../../generic/MoreActions/MoreActions";
-import ActionItem from "../../generic/MoreActions/ActionItem";
 
 class FileList extends React.Component {
     render() {
