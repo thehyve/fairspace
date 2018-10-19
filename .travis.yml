@@ -11,8 +11,6 @@ env:
      - SNAPSHOT_BRANCH="dev"
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
-     - HELM_VERSION="2.10.0"
-     - KUBECTL_VERSION="1.12.0"
 
 # Github credentials:
 # GITHUB_PASSWORD=....
