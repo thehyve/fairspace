@@ -7,8 +7,6 @@ env:
      - ARTIFACT_BUILD_FILE=""
      - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
      - DEPLOYMENT_CONFIG_DIR="./ci-deployment"
-     - DOCKER_REPO="fairspace.azurecr.io"
-     - CHART_REPO=" https://fairspace.github.io/helm-repo"
      - RELEASE_BRANCH="master"
      - SNAPSHOT_BRANCH="dev"
      - DOCKER_USERNAME="fairspace"
@@ -35,6 +33,7 @@ notifications:
     notify: true
 
 before_install:
+  - source ./ci/setup_env.sh
   - export KUBE_CONFIG_ENC_KEY=$encrypted_5162cfbd2a53_key
   - export KUBE_CONFIG_ENC_IV=$encrypted_5162cfbd2a53_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
@@ -43,7 +42,6 @@ before_install:
   - helm init --client-only
 
 before_script:
-  - source ./ci/setup_env.sh
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
   - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo; fi'
 
