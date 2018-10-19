@@ -31,11 +31,11 @@ const MenuDrawer = ({open, toggleMenuExpansion, classes}) => (
 
 const mapStateToProps = (state) => ({
     open: state.ui.menuExpanded
-})
+});
 
 const mapDispatchToProps = {
     toggleMenuExpansion
-}
+};
 
 export default compose(withStyles(styles), connect(mapStateToProps, mapDispatchToProps))(MenuDrawer);
 
