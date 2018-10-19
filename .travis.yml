@@ -37,13 +37,7 @@ before_install:
 - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
 
 before_script:
-  - '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && export VERSION_POSTFIX="-SNAPSHOT" || true'
-  - '[[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && export SHOULD_RELEASE=1 || true'
-  - '[[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && export SHOULD_RELEASE=1 || true'
-  - export CURRENTVERSION="$(cat VERSION)"
-  - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
-  - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
-  - export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
+  - source ./ci/setup_env.sh
 
 jobs:
   include:
@@ -72,6 +66,7 @@ jobs:
     - helm init --client-only
     script:
     - ./ci/helm/tag.sh
+    - ./ci/helm/add_pod_annotations.sh
     - ./ci/helm/build.sh
     - 'if [[ $SHOULD_RELEASE ]] ; then ./ci/helm/release.sh ; fi '
   - # For release branch, update git with the new tag and update version
