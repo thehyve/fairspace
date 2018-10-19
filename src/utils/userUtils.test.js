@@ -56,9 +56,4 @@ describe('usersUtils', () => {
         });
     });
 
-    describe('getUsers', () => {
-
-    });
 });
-
-
