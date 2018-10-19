@@ -7,10 +7,8 @@ env:
   global:
      - APPNAME="mercury"
      - ORG="fairspace"
-     - DOCKER_REPO="fairspace.azurecr.io"
      - ARTIFACT_BUILD_FILE="package.json"
      - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
-     - CHART_REPO=" https://fairspace.github.io/helm-repo"
      - RELEASE_BRANCH="master"
      - SNAPSHOT_BRANCH="dev"
      - DOCKER_USERNAME="fairspace"
