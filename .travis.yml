@@ -26,6 +26,9 @@ env:
 # GITHUB_PASSWORD=....
      - secure: "Y9CKTHXuwA5yljO9SPK/t955D30tFzkW0Rq/c7tWmB3v8eoeRYrzHRhE2MFcUSZ5rATdjVZ8Jt0INeeS2KCmtqwhnKSUMghUhFAzqaIe/yabr9bWfUed29cq9GtJQEu8nlZgrxcpxCAT28dyYMRG2AUYCqGNImsVhXrSy6zcTW8kDaZE9mLyhURBSoCayr92cN6vaX2sT5L4Re1fTbSnyD4RlROOqpiRvMGWTdKq+McmSK17IRZEhElH/CrzsVl+xVC81X5zJsVbgHzENKSYHLZHbjGQx12f/dRL68zEvoN9yndrX0rDaj5jQ0P2/HWes4WKQlJFQIG+g52NsMkdypHhe3vSO08RHj2FGv2CzTsOGcYKPf1FWwOe0XN9NlJbbUhICesmtfqm0WgdZANi47n7LZFWop7de2dwD7+TP2RyJvQxUbG6uxhsVE8zXZLgGNSW0b04VkUfaxMzYRXa3fsv3KqOdwt/ztEQahYnERBiewvrUO/2epZbdV1d7K3peYYIVprrB6S7u+y89ij7vO5nx97sab0b8Qn4EJ47uezUQjbaNi4UGR8KbzCZ/SasfbHg8XmvhcK6miHKuhUM+NGU1wpuL9GPMjEqxGKfira83uQNAfL6OQN6Evd28TchOhmDGBFr+uLhdnPD5zB/rQ57QXiHtrSZ/PTKPgk11QE="
 
+     # Azure credentials
+     - secure: "c3Fdle41AYYlzTUJ/B1dxGKk2QGg1ez3VL07bA20za7dOtjTifhK7eqDgLsjBQMp79oQRQkJAJNlmzHL07pyrQofsw3ofRgOj/cw9BY6SBNFNWhYjZai/hjLrUkQlH3dmSRLMYm6QL/vvL8vSk221uMRuKtrs6YLxR1dai/nxoMl0j74XLxtOa1XZ19hSKattaItYmegdDOHtXq0DQvGA6USVdqcZxMd4yrrgpSjmwe5xXgf3RaO1JhroINedspbWMT8ry2QQkr0GNn5FxqHhCz/73NEW3a0qPkFOwS6UBTe4oLpsG435D7TgTZ2ibbJDkYUPk0GyOOfERHmr6crkNKMNCqbxIVljXMDwoLPlezxuhBe7vcS3WTZmcYz+jB0MxniGFRaVWvICxcgDu4aKOGQM+EFIpxlXezOTXrh4AZPW0k0MmVtnnDck/84AI2G2rWb3JDd5oV5JCRBXwIvy7bzV3hwiW4KurvdIaMdSSXEvCcatof/qUnlmSV2fITdFcZlyReHsr8wKSTjNNGFUlYlgF6gFdY77BVkf7/gUNbgGLV0KmMQREddOt2oBfcAYMKs17H8K8qXT7fRP7Lczuu+Azc/N0cT5kvYP9H1qkEc3WXUg0yM6kyCJU17DALuTxxAbJa5XM2ZQLW/2bTwoee9KpG5ZURNmiOa8vxglow="
+
 notifications:
   hipchat:
     on_pull_requests: false
@@ -38,9 +41,7 @@ notifications:
 
 before_install:
 - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
-
-before_script:
-  - source ./ci/setup_env.sh
+- source ./ci/setup_env.sh
 
 jobs:
   include:
@@ -59,9 +60,8 @@ jobs:
   - stage: Build
     name: Helm chart
     install:
-    - ./ci/helm/install_helm.sh
-    - export PATH="$(pwd)/linux-amd64/:$PATH"
-    - helm init --client-only
+    - source ./ci/helm/install_helm.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/az/install.sh && ./ci/az/login.sh; fi'
     script:
     - ./ci/helm/tag.sh
     - ./ci/helm/add_pod_annotations.sh
