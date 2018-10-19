@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
-import {fetchWorkspace} from "../../actions/workspace";
+import {fetchUsers, fetchWorkspace} from "../../actions/workspace";
 import ErrorDialog from "../../components/error/ErrorDialog";
 import configureStore from "../../store/configureStore";
 import Config from "../../services/Config/Config";
@@ -37,6 +37,7 @@ class App extends React.Component {
         Config.init()
             .then(() => {
                 this.store.dispatch(fetchUser());
+                this.store.dispatch(fetchUsers());
                 this.store.dispatch(fetchAuthorizations());
                 this.store.dispatch(fetchWorkspace());
                 this.cancellable.setState && this.cancellable.setState({configLoaded: true});

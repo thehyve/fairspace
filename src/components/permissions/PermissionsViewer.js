@@ -17,6 +17,7 @@ import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
 import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
+import {findById} from "../../utils/arrayutils";
 
 export const styles = theme => ({
     collaboratorList: {
@@ -161,7 +162,7 @@ export class PermissionsViewer extends React.Component {
                     onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
                     onMouseOut={() => this.props.onItemMouseOut(idx)}
                 >
-                    <ListItemText primary={getDisplayName(p)} secondary={p.access}/>
+                    <ListItemText primary={getDisplayName(p.user)} secondary={p.access}/>
                     {this.renderAlterPermissionButtons(idx, p)}
                 </ListItem>);
             });
@@ -181,6 +182,8 @@ export class PermissionsViewer extends React.Component {
     }
 
     renderUserList = (permissions) => {
+        const {users} = this.props;
+        permissions.map(p => p.user = findById(users, p.subject));
         return (
             <List dense>
                 {this.renderCollaboratorList(permissions)}
@@ -203,8 +206,8 @@ export class PermissionsViewer extends React.Component {
 
     renderConfirmationDialog = () => {
         const {selectedUser, showConfirmDeleteDialog} = this.state;
-        const userText = selectedUser && getDisplayName(selectedUser);
-        const content = `Are you sure you want to remove "${userText}" from the collaborator list?`;
+        const fullName = selectedUser && getDisplayName(selectedUser.user);
+        const content = `Are you sure you want to remove "${fullName}" from the collaborator list?`;
         return (
             <ConfirmationDialog open={showConfirmDeleteDialog}
                                 title={'Confirmation'}
