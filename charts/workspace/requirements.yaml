@@ -3,19 +3,19 @@ dependencies:
   version: "0.7"
   repository: https://jupyterhub.github.io/helm-chart/
 - name: pluto
-  version: v0.x.x
+  version: v0.x.x-SNAPSHOT
   repository: https://fairspace.github.io/helm-repo/
 - name: mercury
-  version: v0.x.x
+  version: v0.x.x-SNAPSHOT
   repository: https://fairspace.github.io/helm-repo/
 - name: titan
-  version: v0.x.x
+  version: v0.x.x-SNAPSHOT
   repository: https://fairspace.github.io/helm-repo/
 - name: ceres
-  version: v0.x.x
+  version: v0.x.x-SNAPSHOT
   repository: https://fairspace.github.io/helm-repo/
 - name: neptune
-  version: v0.x.x
+  version: v0.x.x-SNAPSHOT
   repository: https://fairspace.github.io/helm-repo/
 
 

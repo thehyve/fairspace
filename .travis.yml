@@ -43,15 +43,9 @@ before_install:
   - helm init --client-only
 
 before_script:
-  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT" ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
+  - source ./ci/setup_env.sh
+  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
   - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
-
-  - export CURRENTVERSION="$(cat VERSION)"
-  - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
-  - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
-  - export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
 
 jobs:
   include:
@@ -67,7 +61,7 @@ jobs:
       - 'if [[ $ALLOW_SNAPSHOTS ]]; then ./ci/helm/allow_snapshot_dependencies.sh; fi'
       - ./ci/helm/build.sh
       - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
-      - 'if [[ $SHOULD_RELEASE ]]; then helm repo update; fi'
+      - 'if [[ $SHOULD_RELEASE ]]; then sleep 10; helm repo update; fi'
       - 'if [[ $SHOULD_RELEASE ]]; then travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
