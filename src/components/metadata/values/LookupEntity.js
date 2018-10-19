@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {fetchEntitiesIfNeeded} from "../../../actions/metadata";
 import {getLabel} from "../../../utils/metadatautils";
 
-function LookupEntity({entities, property, onSave, dispatch}) {
+function LookupEntity({entities, property, onSave, dispatch, ...otherProps}) {
     // Ensure that the entities for lookup have been retrieved
     dispatch(fetchEntitiesIfNeeded(property.range));
 
@@ -37,9 +37,9 @@ function LookupEntity({entities, property, onSave, dispatch}) {
     }
 
     return <div style={{width: '100%'}}>
-        <MaterialReactSelect options={options}
-                             onChange={handleSave}
-                             placeholder={'Add new...'}/>
+        <MaterialReactSelect {...otherProps}
+                             options={options}
+                             onChange={handleSave} />
     </div>
 }
 
