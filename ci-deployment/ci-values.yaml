@@ -13,7 +13,7 @@ workspace:
     domain: workspace.ci.fairway.app
     tls:
       certificate:
-        dns01Provider: azuredns
+        dns01Provider: azuredns-ci
 
 pluto:
   image:

@@ -13,7 +13,7 @@ workspace:
     domain: workspace.demo.fairspace.app
     tls:
       certificate:
-        dns01Provider: azuredns
+        dns01Provider: azuredns-demo
 
 # Specific settings for Pluto subchart
 pluto:
