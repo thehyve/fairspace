@@ -64,6 +64,7 @@ jobs:
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
       stage: Versioning
+      install: skip
       name: Set tag and update version
       script:
         - ./ci/helm/tag.sh
