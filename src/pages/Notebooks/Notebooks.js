@@ -3,18 +3,57 @@ import Typography from "@material-ui/core/Typography";
 import Config from "../../services/Config/Config";
 import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 import asPage from "../../containers/asPage/asPage";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardMedia from "@material-ui/core/CardMedia";
+import CardActions from "@material-ui/core/CardActions";
+import Button from "@material-ui/core/Button";
+import {withStyles} from "@material-ui/core";
 
-const Notebooks = () => (
+const styles = {
+    card: {
+        maxWidth: 345,
+    },
+    media: {
+        height: 140,
+        backgroundSize: 'contain'
+    },
+};
+
+const Notebooks = ({classes}) => (
     <React.Fragment>
         <BreadCrumbs />
 
-        <Typography>
-            <a target="_blank" rel="noopener noreferrer" href={Config.get().urls.jupyter}>Open JupyterLab</a>
-        </Typography>
+        <Card className={classes.card}>
+            <CardActionArea>
+                <CardMedia
+                    className={classes.media}
+                    image="/images/jupyter.svg"
+                    title="JupyterHub"
+                />
+                <CardContent>
+                    <Typography gutterBottom variant="h5" component="h2">
+                        Jupyter Notebook
+                    </Typography>
+                    <Typography component="p">
+                        The Jupyter Notebook is an open-source web application that allows
+                        you to create and share documents that contain live code, equations,
+                        visualizations and narrative text.
+                    </Typography>
+                </CardContent>
+            </CardActionArea>
+            <CardActions>
+                <Button size="small" color="primary" href={Config.get().urls.jupyter}>
+                    Open
+                </Button>
+            </CardActions>
+        </Card>
+
     </React.Fragment>
 );
 
-export default asPage(Notebooks);
+export default asPage(withStyles(styles)(Notebooks));
 
 
 
