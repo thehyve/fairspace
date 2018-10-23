@@ -95,7 +95,9 @@ class CollectionEditor extends React.Component {
                                 onChange={this.handleInputChange.bind(this)}
                             >
                                 <MenuItem value={'LOCAL_FILE'}>On Premise</MenuItem>
-                                <MenuItem value={'S3_BUCKET'}>S3 Bucket</MenuItem>
+                                <MenuItem value={'AZURE_BLOB_STORAGE'}>Azure Blob Storage</MenuItem>
+                                <MenuItem value={'S3_BUCKET'}>Amazon S3 Bucket</MenuItem>
+                                <MenuItem value={'GOOGLE_CLOUD_BUCKET'}>Google Cloud Bucket</MenuItem>
                             </Select>
                         </FormControl>
                         : null}
