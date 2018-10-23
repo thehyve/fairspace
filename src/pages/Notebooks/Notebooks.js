@@ -11,15 +11,16 @@ import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core";
 
-const styles = {
+const styles = theme => ({
     card: {
         maxWidth: 345,
     },
     media: {
         height: 140,
-        backgroundSize: 'contain'
+        backgroundSize: 'contain',
+        margin: theme.spacing.unit
     },
-};
+});
 
 const Notebooks = ({classes}) => (
     <React.Fragment>
