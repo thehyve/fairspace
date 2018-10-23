@@ -43,8 +43,8 @@ allprojects {
         name = 'nexus'
 
         credentials {
-          username System.getenv("NEXUS_CREDENTIALS_USR")
-          password System.getenv("NEXUS_CREDENTIALS_PSW")
+          username System.getenv("NEXUS_USERNAME")
+          password System.getenv("NEXUS_PASSWORD")
         }
       }
     }
