@@ -10,7 +10,7 @@ function TopBar(props) {
     const { classes, workspaceName } = props;
 
     return (
-        <AppBar position="absolute" className={classes.appBar}>
+        <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
                 <Typography variant="h6" color="inherit" noWrap className={classes.flex}>
                     {workspaceName}
