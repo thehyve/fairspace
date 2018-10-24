@@ -38,9 +38,6 @@ before_install:
   - export KUBE_CONFIG_ENC_IV=$encrypted_5162cfbd2a53_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - source ./ci/setup_env.sh
-  - source ./ci/helm/install_helm.sh
-  - ./ci/az/install.sh
-  - ./ci/az/login.sh
 
 before_script:
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
@@ -51,6 +48,9 @@ jobs:
     - stage: Build
       name: Helm chart
       install:
+      - source ./ci/helm/install_helm.sh
+      - ./ci/az/install.sh
+      - ./ci/az/login.sh
       - ./ci/k8s/install_kubectl.sh
       - export PATH="$HOME/downloads/v${KUBECTL_VERSION}:$PATH"
       - ./ci/k8s/config_kubectl.sh
