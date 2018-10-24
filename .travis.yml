@@ -60,7 +60,7 @@ jobs:
       - 'if [[ $ALLOW_SNAPSHOTS ]]; then ./ci/helm/allow_snapshot_dependencies.sh; fi'
       - ./ci/helm/build.sh
       - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh && helm repo update; fi'
-      - 'if [[ $SHOULD_RELEASE ]]; then travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
+      - 'if [[ $SHOULD_RELEASE ]]; then travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
       stage: Versioning
