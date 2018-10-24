@@ -110,7 +110,7 @@ class CollectionBrowser extends React.Component {
         const {loading, error} = this.props;
 
         if (error) {
-            return <ErrorMessage message={error}/>
+            return <ErrorMessage message={"An error occurred while loading collections"}/>
         }
 
         return <GenericCollectionsScreen

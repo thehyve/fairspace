@@ -222,7 +222,7 @@ export class PermissionsViewer extends React.Component {
     render() {
         const {classes, permissions} = this.props;
         if (permissions.error) {
-            return (<ErrorMessage message={'Error loading permissions'}/>)
+            return (<ErrorMessage message={'An error occurred loading permissions'}/>)
         } else if (permissions.pending) {
             return (<CircularProgress/>);
         } else if (!permissions || !permissions.data) {
