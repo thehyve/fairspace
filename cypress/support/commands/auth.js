@@ -25,7 +25,8 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 Cypress.Commands.add("login", (username, password) => {
-    cy.clearCookie("JSESSIONID")
+    clearCookies();
+
     cy.visit('');
     cy.url().should('include', '/auth/realms');
     cy.get('input[name=username]').type(username);
@@ -33,6 +34,19 @@ Cypress.Commands.add("login", (username, password) => {
 })
 
 Cypress.Commands.add("logout", () => {
-    cy.clearCookie("JSESSIONID")
+    clearCookies();
     cy.visit('');
 })
+
+const clearCookies = () => {
+    // We have to clear the cookies both in keycloak and in
+    // our own system. However, Cypress only allows us to clear
+    // cookies for a single host at a time
+    cy.visit(Cypress.env('KEYCLOAK_URL'));
+    cy.clearCookies();
+    cy.clearCookie('JSESSIONID');
+
+    cy.visit(Cypress.config('baseUrl'));
+    cy.clearCookies();
+    cy.clearCookie('JSESSIONID');
+}

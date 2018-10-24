@@ -73,18 +73,7 @@ describe('File browser', function () {
         const collectionName = "Copy and move files " + uniqueId;
 
         // Prepare uploaded file
-        cy.addCollectionFast({name: collectionName})
-            .then(response => {
-                expect(response.status).to.equal(201);
-                const url = response.headers['location'];
-                return url.substr(url.lastIndexOf('/') + 1);
-            })
-            .then(collectionId => cy.request('/api/collections/' + collectionId))
-            .then(response => {
-                expect(response.status).to.equal(200);
-                return response.body;
-            })
-            .then(collection => cy.uploadFileFast(collection.id, '', 'metadata.json'))
+        cy.prepareCollectionWithFile(collectionName, 'metadata.json');
 
         // Go to the collection
         cy.listCollections();
