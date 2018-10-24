@@ -54,6 +54,18 @@ Cypress.Commands.add("addCollection", (name, description) => {
     cy.contains('tr', name).should('exist');
 });
 
+Cypress.Commands.add("addCollectionFast", (overrides = {}) => {
+    cy.fixture('empty-collection.json')
+        .then(data =>
+            cy.request({
+                method: 'POST',
+                url: '/api/collections',
+                body: JSON.stringify({...data,...overrides}),
+                headers: {'Content-type': 'application/json'}
+            })
+        );
+});
+
 Cypress.Commands.add("deleteLastCollectionByName", (name) => {
     cy.url().should('contain', '/collections')
 

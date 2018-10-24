@@ -34,13 +34,5 @@ before(() => {
         });
 
     // Ensure at least a single collection
-    cy.fixture('empty-collection.json')
-        .then(data =>
-            cy.request({
-                method: 'POST',
-                url: '/api/collections',
-                body: JSON.stringify(data),
-                headers: {'Content-type': 'application/json'}
-            })
-        );
+    cy.addCollectionFast();
 })
