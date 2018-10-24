@@ -63,12 +63,12 @@ Cypress.Commands.add("deleteLastCollectionByName", (name) => {
 })
 
 Cypress.Commands.add("waitForRightPanel", () => {
-    cy.get('button').contains('close').should('be.visible');
+    cy.contains('button', 'close').should('be.visible');
     cy.contains("Loading").should("not.exist");
 });
 
 Cypress.Commands.add("closeRightPanel", () => {
-    cy.get('button').contains('close').click();
+    cy.contains('button', 'close').click({force: true});
 });
 
 Cypress.Commands.add('upload_file', (selector, fileUrl, type = '') => {
