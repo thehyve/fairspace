@@ -45,8 +45,8 @@ describe('Collection browser', function () {
     it('should store changes in collection details', function () {
         const collectionName = 'Update collection ' + uniqueId;
 
+        cy.addCollectionFast({ name: collectionName });
         cy.listCollections();
-        cy.addCollection(collectionName);
 
         // Find one of the collections created with the default name
         // Click on it to open the right panel
