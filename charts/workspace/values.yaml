@@ -94,7 +94,7 @@ jupyterhub:
                 session_url:
     singleuser:
       image:
-        name:fairspace.azurecr.io/fairspace/jupyterhub-singleuser
+        name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
         tag: latest
       defaultUrl: "/lab"
       extraEnv:
