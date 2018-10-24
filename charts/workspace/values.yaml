@@ -95,14 +95,14 @@ jupyterhub:
     singleuser:
       image:
         name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
-        tag: latest
+        tag: 0.3.0
       defaultUrl: "/lab"
       extraEnv:
         WORKSPACE_URL:
     hub:
       image:
         name: fairspace.azurecr.io/fairspace/jupyterhub-hub
-        tag: latest
+        tag: 0.3.0
       ingress:
         enabled: false
       extraEnv:
