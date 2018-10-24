@@ -13,9 +13,11 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+import './commands/generic'
 import './commands/auth'
 import './commands/collections'
 import './commands/metadata'
+import './commands/files'
 
 Cypress.Cookies.defaults({
     whitelist: [ "JSESSIONID" ]
