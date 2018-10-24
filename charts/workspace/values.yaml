@@ -55,9 +55,9 @@ workspace:
 
     # Scripts for setting up keycloak for a workspace
     configurationScripts:
-        dockerRepository: docker-registry.jx.test.fairdev.app
+        dockerRepository: fairspace.azurecr.io
         image: fairspace/keycloak-configuration
-        configurationScriptsTag: 0.0.25
+        configurationScriptsTag: 0.1.0
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto
@@ -94,14 +94,14 @@ jupyterhub:
                 session_url:
     singleuser:
       image:
-        name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-singleuser
+        name:fairspace.azurecr.io/fairspace/jupyterhub-singleuser
         tag: latest
       defaultUrl: "/lab"
       extraEnv:
         WORKSPACE_URL:
     hub:
       image:
-        name: docker-registry.jx.test.fairdev.app/fairspace/jupyterhub-hub
+        name: fairspace.azurecr.io/fairspace/jupyterhub-hub
         tag: latest
       ingress:
         enabled: false
