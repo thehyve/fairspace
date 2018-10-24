@@ -143,7 +143,7 @@ class FileBrowser extends React.Component {
     }
 
     renderError(errorMessage) {
-        return (<ErrorMessage message={"Error while loading files"} />);
+        return (<ErrorMessage message={"An error occurred while loading files"} />);
     }
 
     renderLoading() {

@@ -17,7 +17,7 @@ function MetadataEntities({loading, error, entities, load, vocabulary}) {
     if(loading) {
         return <Typography>Loading...</Typography>
     } else if(error) {
-        return <ErrorMessage message={error.message} />
+        return <ErrorMessage message={"An error occurred while loading metadata"} />
     }
 
     return (
