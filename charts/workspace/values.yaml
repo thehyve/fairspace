@@ -78,7 +78,7 @@ pluto:
     jupyter:
 
   workspace:
-    version: 0.0.0-RELEASEVERSION
+    version: 0.5.1
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
