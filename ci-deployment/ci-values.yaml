@@ -1,0 +1,87 @@
+# Hyperspace that this workspace is connected to
+hyperspace:
+  domain: hyperspace.ci.fairway.app
+  keycloak:
+    username: keycloak
+    password: keycloak-ci-123
+    realm: ci
+    clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+
+# Settings for the workspace
+workspace:
+  ingress:
+    domain: workspace.ci.fairway.app
+    tls:
+      certificate:
+        dns01Provider: azuredns-ci
+
+pluto:
+  image:
+    pullPolicy: Always
+  keycloak:
+    baseUrl: https://keycloak.hyperspace.ci.fairway.app
+    realm: ci
+  tracing:
+    samplingRate: 1
+  services:
+    jupyter: https://jupyterhub.workspace.ci.fairway.app
+
+titan:
+  image:
+    pullPolicy: Always
+  auth:
+    tokenUrl: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/token
+    clientId: workspace-ci-pluto
+  tracing:
+    samplingRate: 1
+  permissions:
+    collectionPermissionsUrl: https://workspace.ci.fairway.app/api/collections/permissions?location=%s
+
+# Specific settings for Ceres subchart
+ceres:
+  image:
+    pullPolicy: Always
+  app:
+    oauth2:
+      baseUrl: https://keycloak.hyperspace.ci.fairway.app
+      realm: ci
+    tracing:
+      samplingRate: 1
+
+# Specific settings for Neptune subchart
+neptune:
+  image:
+    pullPolicy: Always
+  app:
+    oauth2:
+      baseUrl: https://keycloak.hyperspace.ci.fairway.app
+      realm: ci
+    tracing:
+      samplingRate: 1
+    metadata:
+      baseUrl: https://workspace.ci.fairway.app
+
+# Specific settings for Mercury subchart
+mercury:
+  image:
+    pullPolicy: Always
+
+# Specific settings for JupyterHub subchart
+jupyterhub:
+  rbac:
+    enabled: false
+  auth:
+      custom:
+          config:
+              client_id: workspace-ci-pluto
+              client_secret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+              openid_url: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/
+              session_url: https://workspace.ci.fairway.app/account/tokens
+  singleuser:
+      extraEnv:
+        WORKSPACE_URL: https://workspace.ci.fairway.app
+  hub:
+      extraEnv:
+          JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
+  proxy:
+      secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"

@@ -66,7 +66,6 @@ spec:
         - "{{.Values.hyperspace.keycloak.realm}}"
         - "{{ template "workspace.name" . }}"
         - "/opt/config/redirect.urls"
-        - "&& sleep 300"
       volumes:
       - name: config-volume
         configMap:
