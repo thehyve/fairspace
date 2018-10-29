@@ -84,7 +84,8 @@ class OpenIDConnectOAuthenticator(OAuthenticator):
         params = dict(
             redirect_uri=self.get_callback_url(handler),
             code=code,
-            grant_type='authorization_code'
+            grant_type='authorization_code',
+            scope='offline_access'
         )
         params.update(self.extra_params)
 
