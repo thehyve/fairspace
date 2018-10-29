@@ -5,8 +5,12 @@ Cypress.Commands.add("clickButtonOnHover", (row, buttonSelector = 'button') =>
 
             // Make button visible
             .then(button => {
-                button.attr('visibility', 'visible');
-                button.parent().css('visibility', 'visible');
+                button
+                    .attr('visibility', 'visible')
+                    .css('visibility', 'visible');
+                button.parent()
+                    .css('visibility', 'visible')
+                    .attr('visibility', 'visible');
 
                 return cy.wait(10);
             })

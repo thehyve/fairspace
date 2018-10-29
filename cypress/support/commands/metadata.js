@@ -31,7 +31,7 @@ Cypress.Commands.add("ensureMetadataPresent", () => {
             data['@context']['ws'] = workspaceUrl + '/iri/';
 
             cy.request({
-                method: 'POST',
+                method: 'PATCH',
                 url: '/api/metadata/statements',
                 body: JSON.stringify(data),
                 headers: {'Content-type': 'application/ld+json'}
