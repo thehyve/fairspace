@@ -24,7 +24,7 @@
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.add("login", (username, password) => {
+Cypress.Commands.add("login", (username = Cypress.config('user_name'), password = Cypress.config("password")) => {
     clearCookies();
 
     cy.visit('');

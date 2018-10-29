@@ -55,7 +55,7 @@ describe('Collection collaborators', function () {
         cy.request(fileUrl).its('status').should('equal', 200);
 
         // Login again as the first user
-        cy.login(Cypress.config('user_name'), Cypress.config("password"));
+        cy.login();
         cy.listCollections();
 
         // Now remove the collaborator
@@ -83,7 +83,7 @@ describe('Collection collaborators', function () {
         cy.request({url: fileUrl, failOnStatusCode: false}).its('status').should('equal', 401);
 
         // Login again as the first user
-        cy.login(Cypress.config('user_name'), Cypress.config("password"));
+        cy.login();
 
     });
 
