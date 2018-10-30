@@ -34,8 +34,8 @@ titan:
     clientId: workspace-ci-pluto
   tracing:
     samplingRate: 1
-  permissions:
-    collectionPermissionsUrl: https://workspace.ci.fairway.app/api/collections/permissions?location=%s
+  collections:
+    permissionsUrl: https://workspace.ci.fairway.app/api/collections/permissions?location=%s
 
 # Specific settings for Ceres subchart
 ceres:

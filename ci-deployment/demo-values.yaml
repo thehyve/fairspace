@@ -32,8 +32,8 @@ titan:
     clientId: workspace-demo-pluto
   tracing:
     enabled: false
-  permissions:
-    collectionPermissionsUrl: https://workspace.demo.fairspace.app/api/collections/permissions?location=%s
+  collections:
+    permissionsUrl: https://workspace.demo.fairspace.app/api/collections/permissions?location=%s
 
 # Specific settings for Ceres subchart
 ceres:
