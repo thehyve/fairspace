@@ -1,6 +1,7 @@
 package io.fairspace.neptune.web;
 
 import io.fairspace.neptune.model.Collection;
+import io.fairspace.neptune.service.CollectionMetadataService;
 import io.fairspace.neptune.service.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +12,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/")
@@ -23,9 +27,17 @@ public class CollectionController {
     @Autowired
     private CollectionService collectionService;
 
+    @Autowired
+    private CollectionMetadataService collectionMetadataService;
+
     @GetMapping
     public Iterable<Collection> getCollections() {
         return collectionService.findAll();
+    }
+
+    @GetMapping(value = "/uri", produces = "application/json")
+    public Map<String, String> getUriByLocation(@RequestParam String location) {
+        return Collections.singletonMap("uri", collectionMetadataService.getCollectionUriByLocation(location));
     }
 
     @GetMapping("/{id}")

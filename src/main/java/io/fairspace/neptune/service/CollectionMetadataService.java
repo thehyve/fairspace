@@ -74,10 +74,30 @@ public class CollectionMetadataService {
         return model;
     }
 
-    public String getCollectionUri(Long id) {
-        return String.format(COLLECTION_URI_FORMAT, this.metadataBaseUrl, id);
+    /**
+     * Returns the Collection URI as used for metadata
+     * @param collectionId
+     * @return
+     */
+    public String getCollectionUri(Long collectionId) {
+        return String.format(COLLECTION_URI_FORMAT, this.metadataBaseUrl, collectionId);
     }
 
+    /**
+     * Returns the Collection URI as used for metadata, based on the collection's location
+     * @param location
+     * @return
+     */
+    public String getCollectionUriByLocation(String location) {
+        return getCollectionUri(Locations.extractId(location));
+
+    }
+
+    /**
+     * Returns the User URI as used for metadata
+     * @param username
+     * @return
+     */
     public String getUserUri(String username) {
         return String.format(USER_URI_FORMAT, this.metadataBaseUrl, username);
     }
