@@ -42,7 +42,7 @@ Cypress.Commands.add("uploadFileFast", (collectionId, path = '', filename = 'myf
             // Find collection details
             cy.request('/api/collections/' + collectionId)
                 .then(response => {
-                    expect(response.status).to.equal(200);
+                    expect(response.status).to.be.within(200, 299);
 
                     const fileUrl = '/api/storage/webdav/' + response.body.location + path + '/' + filename;
 
@@ -53,7 +53,7 @@ Cypress.Commands.add("uploadFileFast", (collectionId, path = '', filename = 'myf
                         body: data,
                         headers: {'Content-length': data.length}
                     }).then(response => {
-                        expect(response.status).to.equal(201);
+                        expect(response.status).to.be.within(200, 299);
                         return fileUrl;
                     })
                 })
@@ -65,13 +65,13 @@ Cypress.Commands.add("prepareCollectionWithFile", (collectionName, filename = 'm
     // Prepare uploaded file
     return cy.addCollectionFast({name: collectionName})
         .then(response => {
-            expect(response.status).to.equal(201);
+            expect(response.status).to.be.within(200, 299);
             const url = response.headers['location'];
             return url.substr(url.lastIndexOf('/') + 1);
         })
         .then(collectionId => cy.request('/api/collections/' + collectionId))
         .then(response => {
-            expect(response.status).to.equal(200);
+            expect(response.status).to.be.within(200, 299);
             return response.body;
         })
         .then(collection => cy.uploadFileFast(collection.id, '', filename))

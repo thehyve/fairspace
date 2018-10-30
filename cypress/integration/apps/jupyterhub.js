@@ -5,7 +5,7 @@ describe('JupyterHub', function () {
         openJupyter();
 
         // Wait for the launcher to be visible
-        cy.get(".p-TabBar-tabLabel").contains("Launcher").should('exist');
+        cy.contains(".p-TabBar-tabLabel", "Launcher").should('exist');
     });
 
     it('should show the collections present in fairspace', () => {
@@ -113,6 +113,11 @@ describe('JupyterHub', function () {
         cy.contains("Your server is starting up", { timeout: maxJupyterStartupTime }).should("not.exist");
         cy.get('#jupyterlab-splash').should('exist');
         cy.get('#jupyterlab-splash').should('not.exist');
+
+        // Wait for the launcher to be visible
+        // Use increased timeout to allow Jupyter to start properly
+        cy.contains(".p-TabBar-tabLabel", "Launcher", {timeout: 10000}).should('exist');
+
     }
 
 });
