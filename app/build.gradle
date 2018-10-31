@@ -27,11 +27,12 @@ repositories {
 	jcenter()
 	maven { url "https://repo.spring.io/milestone" }
 	maven { url "https://nexus.jx.test.fairdev.app/repository/maven-releases/" }
+	maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
 }
 
 ext {
 	springCloudVersion = 'Finchley.RC2'
-	oidcAuthVersion = '0.1.10'
+	oidcAuthVersion = '0.1.0'
 }
 
 dependencies {
