@@ -45,8 +45,8 @@ describe('Collection browser', function () {
     it('should store changes in collection details', function () {
         const collectionName = 'Update collection ' + uniqueId;
 
+        cy.addCollectionFast({ name: collectionName });
         cy.listCollections();
-        cy.addCollection(collectionName);
 
         // Find one of the collections created with the default name
         // Click on it to open the right panel
@@ -56,7 +56,7 @@ describe('Collection browser', function () {
         cy.waitForRightPanel();
 
         // Click on the name to edit it
-        cy.get('h2').contains(collectionName).click({force:true});
+        cy.contains('h2', collectionName).click({force:true});
 
         // Determine a random number to avoid having accidental successes
         let changedName = 'changed ' + uniqueId;
@@ -72,10 +72,9 @@ describe('Collection browser', function () {
         cy.get('button').contains('Save').click();
 
         // The collection details should be updated immediately
-        cy.contains('Collection Details')
-            .parent().parent().parent()
-            .find('h2').should('contain', changedName)
-            .parent().find('p').should('contain', changedDescription);
+        cy.contains('h2', collectionName).should('not.exist');
+        cy.contains('h2', changedName).should('exist');
+        cy.contains('p', changedDescription).should('exist');
 
         // The collection details  should be present after reloading
         cy.listCollections();
