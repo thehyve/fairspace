@@ -1,6 +1,10 @@
 # Default values for vre.
 # This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+
+# The fairspace container images are in a private repository
+# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+# on how to store and specify the credentials for it
+fairspaceImagePullSecret:
 
 # Set specific workspace name. Defaults to release name
 # Please note that if this is set, also set it for pluto in `pluto.workspace.name`
@@ -14,6 +18,7 @@ hyperspace:
     domain:
     locationOverrides:
         keycloak:
+        rabbitmqhostname: hyperspace-rabbitmq.hyperspace.svc.cluster.local
 
     # TODO: determine better way to handle keycloak credentials
     # Keycloak credentials are needed to setup the workspace (e.g. users, clients)
@@ -30,6 +35,9 @@ hyperspace:
         realm:
         clientSecret:
 
+    rabbitmq:
+      username:
+      password:
 
 # Setup ingress for workspace components
 workspace:
@@ -55,9 +63,11 @@ workspace:
 
     # Scripts for setting up keycloak for a workspace
     configurationScripts:
-        dockerRepository: fairspace.azurecr.io
-        image: fairspace/keycloak-configuration
-        configurationScriptsTag: 0.1.0
+      keycloak:
+        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.0
+        pullPolicy: IfNotPresent
+      rabbitmq:
+        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0-SNAPSHOT
         pullPolicy: IfNotPresent
 
 # Specific settings for pluto
@@ -74,80 +84,97 @@ pluto:
     realm:
     redirectAfterLogoutUrl: https://fairspace.com
 
+  rabbitmq:
+    username:
+    password:
+
   services:
     jupyter:
 
   workspace:
     version: 0.0.0-RELEASEVERSION
 
-# Specific settings for JupyterHub subchart
-jupyterhub:
-    auth:
-        type: custom
-        custom:
-            className: oauthenticator.openid.OpenIDConnectOAuthenticator
-            config:
-                enable_auth_state: True
-                client_id:
-                client_secret:
-                openid_url:
-                session_url:
-    singleuser:
-      image:
-        name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
-        tag: 0.3.0
-      defaultUrl: "/lab"
-      extraEnv:
-        WORKSPACE_URL:
-    hub:
-      image:
-        name: fairspace.azurecr.io/fairspace/jupyterhub-hub
-        tag: 0.3.1-SNAPSHOT
-      ingress:
-        enabled: false
-      extraEnv:
-        JUPYTERHUB_CRYPT_KEY:
-      extraConfig: |
-        c.KubeSpawner.cmd = ['/start']
-        c.KubeSpawner.singleuser_privileged = True
-        c.Authenticator.auto_login = True
-    proxy:
-      # The JupyterHub chart requires this value to be set here with the same
-      # length as the actual values
-      # Ensure to override this value with a 64-character hex string when installing
-      secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
-
 # Specific settings for Ceres subchart
 ceres:
-    persistence:
-      enabled: true
-      accessMode: ReadWriteOnce
-      size: 512Mi
-      subPath: "ceres-db"
-      mountPath: /data/ceres
-    app:
-      oauth2:
-        baseUrl:
-        realm:
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 512Mi
+    subPath: "ceres-db"
+    mountPath: /data/ceres
+
+  rabbitmq:
+    username:
+    password:
+
+  app:
+    oauth2:
+      baseUrl:
+      realm:
 
 # Specific settings for Neptune subchart
 neptune:
-    app:
-      oauth2:
-        baseUrl:
-        realm:
-      metadata:
-        baseUrl:
+  rabbitmq:
+    username:
+    password:
+
+  app:
+    oauth2:
+      baseUrl:
+      realm:
+    metadata:
+      baseUrl:
 
 # Specific settings for Titan subchart
 titan:
-    auth:
-      tokenUrl:
-      clientId:
-    persistence:
-      enabled: true
-      accessMode: ReadWriteOnce
-      size: 512Mi
-      subPath: "titan"
-      mountPath: /data
+  rabbitmq:
+    username:
+    password:
+  auth:
+    tokenUrl:
+    clientId:
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 512Mi
+    subPath: "titan"
+    mountPath: /data
+
+
+# Specific settings for JupyterHub subchart
+jupyterhub:
+  auth:
+    type: custom
+    custom:
+      className: oauthenticator.openid.OpenIDConnectOAuthenticator
+      config:
+        enable_auth_state: True
+        client_id:
+        client_secret:
+        openid_url:
+        session_url:
+  singleuser:
+    image:
+      name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
+      tag: 0.3.0
+    defaultUrl: "/lab"
+    extraEnv:
+      WORKSPACE_URL:
+  hub:
+    image:
+      name: fairspace.azurecr.io/fairspace/jupyterhub-hub
+      tag: 0.3.1-SNAPSHOT
+    ingress:
+      enabled: false
+    extraEnv:
+      JUPYTERHUB_CRYPT_KEY:
+    extraConfig: |
+      c.KubeSpawner.cmd = ['/start']
+      c.KubeSpawner.singleuser_privileged = True
+      c.Authenticator.auto_login = True
+  proxy:
+    # The JupyterHub chart requires this value to be set here with the same
+    # length as the actual values
+    # Ensure to override this value with a 64-character hex string when installing
+    secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
 

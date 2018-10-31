@@ -6,6 +6,9 @@ hyperspace:
     password: keycloak-ci-123
     realm: ci
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+  rabbitmq:
+    username: rabbitmq
+    password: "X6SXtXV3Jzg4gyVR"
 
 # Settings for the workspace
 workspace:
@@ -21,6 +24,8 @@ pluto:
   keycloak:
     baseUrl: https://keycloak.hyperspace.ci.fairway.app
     realm: ci
+  rabbitmq:
+    password: "PaF6ZMbDZmgrztJY"
   tracing:
     samplingRate: 1
   services:
@@ -32,6 +37,8 @@ titan:
   auth:
     tokenUrl: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/token
     clientId: workspace-ci-pluto
+  rabbitmq:
+    password: "L3bE8yGJp7um2PVk"
   tracing:
     samplingRate: 1
   permissions:
@@ -41,6 +48,8 @@ titan:
 ceres:
   image:
     pullPolicy: Always
+  rabbitmq:
+    password: "hx6SQUBe99EBr8dM"
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.ci.fairway.app
@@ -52,6 +61,8 @@ ceres:
 neptune:
   image:
     pullPolicy: Always
+  rabbitmq:
+    password: "4uXa4BFkHTuNxFAF"
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.ci.fairway.app
