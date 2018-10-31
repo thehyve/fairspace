@@ -102,7 +102,7 @@ jupyterhub:
     hub:
       image:
         name: fairspace.azurecr.io/fairspace/jupyterhub-hub
-        tag: 0.3.1
+        tag: 0.3.1-SNAPSHOT
       ingress:
         enabled: false
       extraEnv:
