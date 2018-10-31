@@ -22,6 +22,10 @@ spec:
       labels:
         app: {{ template "titan.name" . }}
         release: {{ .Release.Name }}
+      {{- if .Values.podAnnotations }}
+      annotations:
+      {{ toYaml .Values.podAnnotations | indent 8 }}
+      {{- end }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
