@@ -255,7 +255,7 @@ describe('Webdav with /api/storage/webdav/ prefix', () => {
                 .set('Authorization', 'Bearer Alice')
                 .expect(207)
                 .expect(res => {
-                    if(!res.res.text.includes('<D:displayname>1</D:displayname>')) {
+                    if(!res.res.text.includes('/api/storage/webdav/1')) {
                         throw new Error('Should be visible to Alice')
                     }
 
@@ -265,7 +265,7 @@ describe('Webdav with /api/storage/webdav/ prefix', () => {
                 .set('Authorization', 'Bearer Bob')
                 .expect(207)
                 .expect(res => {
-                    if(res.res.text.includes('<D:displayname>1</D:displayname>')) {
+                    if(res.res.text.includes('/api/storage/webdav/1')) {
                         throw new Error('Shouldn\'t be visible to Bob')
                     }
                 }))
