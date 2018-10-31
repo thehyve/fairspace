@@ -243,4 +243,31 @@ describe('Webdav with /api/storage/webdav/ prefix', () => {
             .set('Anticipated-Operation', 'true')
             .expect(401)
     );
+
+    it('hides unavailable collections', () =>
+        server
+            .mkcol('/api/storage/webdav/1')
+            .set('Authorization', 'Bearer Alice')
+            .set('Anticipated-Operation', 'true')
+            .expect(201)
+            .then(() => server
+                .propfind('/api/storage/webdav/')
+                .set('Authorization', 'Bearer Alice')
+                .expect(207)
+                .expect(res => {
+                    if(!res.res.text.includes('<D:displayname>1</D:displayname>')) {
+                        throw new Error('Should be visible to Alice')
+                    }
+
+                }))
+            .then(() => server
+                .propfind('/api/storage/webdav/')
+                .set('Authorization', 'Bearer Bob')
+                .expect(207)
+                .expect(res => {
+                    if(res.res.text.includes('<D:displayname>1</D:displayname>')) {
+                        throw new Error('Shouldn\'t be visible to Bob')
+                    }
+                }))
+    );
 });
