@@ -15,9 +15,7 @@ class RestrictedFileSystem extends PhysicalFileSystem {
                         let visibleCollections = files.filter((file, index) => access[index] !== 'None');
                         callback(null, visibleCollections);
                     })
-                    .catch(err => {
-                        callback(Errors.ResourceNotFound, files)
-                    });
+                    .catch(err => callback(Errors.ResourceNotFound, files));
             } else {
                 callback(e, files)
             }
