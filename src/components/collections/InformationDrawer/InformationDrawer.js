@@ -13,6 +13,7 @@ import {connect} from 'react-redux';
 import PermissionsContainer from "../../permissions/PermissionsContainer";
 import permissionChecker from '../../permissions/PermissionChecker';
 import {findById} from "../../../utils/arrayutils";
+import PathMetadata from "../../metadata/PathMetadata";
 
 export class InformationDrawer extends React.Component {
 
@@ -55,32 +56,67 @@ export class InformationDrawer extends React.Component {
             </ExpansionPanel>
             <ExpansionPanel defaultExpanded>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                    <Typography className={classes.heading}>Metadata</Typography>
+                    <Typography className={classes.heading}>Collection metadata</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                     <Metadata
                         subject={collection.uri}
-                        editable={permissionChecker.canManage(collection)}
+                        editable={permissionChecker.canManage(collection) && this.props.paths.length === 0}
                         style={{width: '100%'}}
                     />
                 </ExpansionPanelDetails>
             </ExpansionPanel>
-            <ExpansionPanel defaultExpanded>
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                    <Typography className={classes.heading}>Path</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                    {this.props.path ? this.props.path.map(path => <Typography
-                        key={path.filename}>{path.basename}</Typography>) : 'No path selected'}
-                </ExpansionPanelDetails>
-            </ExpansionPanel>
+            {
+                this.props.paths.map(path => (
+                    <ExpansionPanel defaultExpanded>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                            <Typography className={classes.heading}>Metadata for {relativePath(path)}</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <PathMetadata
+                                path={path}
+                                editable={permissionChecker.canManage(collection) && path !== this.props.paths[this.props.paths.length - 1]}
+                                style={{width: '100%'}}
+                            />
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    ))
+            }
         </React.Fragment>
     };
+
+
 }
 
-const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId}}) => {
-    return {collection: findById(collections.data, selectedCollectionId)}
+const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId, selectedPaths, openedPath}}) => {
+    if (openedPath) {
+        console.log('Opened', openedPath)
+    }
+    return {collection: findById(collections.data, selectedCollectionId), openedPath, paths: pathsToDisplay(selectedPaths)}
 };
+
+const pathsToDisplay = (selectedPaths) => {
+    switch (selectedPaths.length) {
+        case 0:
+          return [];
+        case 1:
+            let paths = [];
+            let path = '';
+            selectedPaths[0].split('/').forEach(p => {
+                if (p.length) {
+                    path += '/' + p;
+                    paths.push(path)
+                }
+            });
+            return paths.slice(1);
+        default:
+            let first = selectedPaths[0];
+            let parent = first.substring(0, first.lastIndexOf('/'));
+            return pathsToDisplay([parent])
+    }
+}
+
+const relativePath = (path)  => path.split('/').slice(2).join('/');
 
 const mapDispatchToProps = {
     ...metadataActions,

@@ -144,6 +144,17 @@ class MetadataAPI {
             }
         ]
     }
+
+    getSubjectByPath(path) {
+        return fetch(Config.get().urls.metadata.pid + '?name=' + encodeURIComponent(path), {
+            method: 'GET',
+            headers: new Headers({'Accept': 'application/json'}),
+            credentials: 'same-origin'
+        })
+            .then(failOnHttpError("Failure when retrieving metadata"))
+            .then(response => response.json())
+            .then(data => data.id);
+    }
 }
 
 export default new MetadataAPI();

@@ -9,7 +9,8 @@
     "files": "/api/storage/webdav",
     "metadata": {
       "statements": "/api/metadata/statements",
-      "query": "/api/metadata/query"
+      "query": "/api/metadata/query",
+      "pid": "/api/metadata/pid"
     },
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"

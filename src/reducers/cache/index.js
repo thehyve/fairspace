@@ -6,6 +6,7 @@ import collections from "./collections";
 import filesByCollectionAndPath from "./filesByCollectionAndPath";
 import users from "./users";
 import allEntities from "./allEntities";
+import subjectByPath from "./subjectByPath";
 
 export default combineReducers({
     jsonLdBySubject,
@@ -14,5 +15,6 @@ export default combineReducers({
     allEntities,
     vocabulary,
     collections,
-    filesByCollectionAndPath
+    filesByCollectionAndPath,
+    subjectByPath
 })
