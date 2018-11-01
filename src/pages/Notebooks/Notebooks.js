@@ -45,7 +45,7 @@ const Notebooks = ({classes}) => (
                 </CardContent>
             </CardActionArea>
             <CardActions>
-                <a href={Config.get().urls.jupyter} target="_blank" rel="opener">
+                <a href={Config.get().urls.jupyter} target="_blank" rel="noopener noreferrer">
                     <Button size="small" color="primary">
                         Open
                     </Button>
