@@ -1,4 +1,4 @@
-package io.fairspace.ceres.repository
+package io.fairspace.ceres.metadata.repository
 
 import io.fairspace.ceres.TestData
 import org.apache.jena.query.Dataset

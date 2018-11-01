@@ -1,4 +1,4 @@
-package io.fairspace.ceres.web
+package io.fairspace.ceres.metadata.web
 
 import org.apache.jena.shared.NotFoundException
 import org.slf4j.LoggerFactory
