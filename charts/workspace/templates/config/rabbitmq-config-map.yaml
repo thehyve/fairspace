@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{.Release.Name}}-rabbitmq-config-map"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+data:
+  rabbitmq.conf: |-
+    [default]
+    hostname = {{ .Values.hyperspace.locationOverrides.rabbitmqhostname }}
+    username = {{ .Values.hyperspace.rabbitmq.username }}
+    password = {{ .Values.hyperspace.rabbitmq.password }}
+  commands.txt: |-
+    declare vhost name={{ template "workspace.name" . }}
+    declare user name={{ template "rabbitmq.pluto.username" . }} password={{.Values.pluto.rabbitmq.password}} tags=
+    declare user name={{ template "rabbitmq.neptune.username" . }} password={{.Values.neptune.rabbitmq.password}} tags=
+    declare user name={{ template "rabbitmq.titan.username" . }} password={{.Values.titan.rabbitmq.password}} tags=
+    declare user name={{ template "rabbitmq.ceres.username" . }} password={{.Values.ceres.rabbitmq.password}} tags=
+    declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.pluto.username" . }} configure=.* read=.* write=.*
+    declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.neptune.username" . }} configure=.* read=.* write=.*
+    declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.titan.username" . }} configure=.* read=.* write=.*
+    declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.ceres.username" . }} configure=.* read=.* write=.*

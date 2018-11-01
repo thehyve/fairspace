@@ -6,6 +6,9 @@ hyperspace:
     password: keycloak-demo-123
     realm: demo
     clientSecret: db67da94-fa31-47cd-8c42-0ed295790841
+  rabbitmq:
+    username: rabbitmq
+    password: "gtzb28355LFqxbar"
 
 # Settings for the workspace
 workspace:
@@ -20,6 +23,8 @@ pluto:
   keycloak:
     baseUrl: https://keycloak.hyperspace.demo.fairspace.app
     realm: demo
+  rabbitmq:
+    password: "FF63EUD3pyrCSeuV"
   tracing:
     enabled: false
   services:
@@ -30,6 +35,8 @@ titan:
   auth:
     tokenUrl: https://keycloak.hyperspace.demo.fairspace.app/auth/realms/demo/protocol/openid-connect/token
     clientId: workspace-demo-pluto
+  rabbitmq:
+    password: "UMEfm4fYvq3dAHZP"
   tracing:
     enabled: false
   permissions:
@@ -37,6 +44,8 @@ titan:
 
 # Specific settings for Ceres subchart
 ceres:
+  rabbitmq:
+    password: "vv8FjVQm6qsNtGUA"
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.demo.fairspace.app
@@ -46,6 +55,8 @@ ceres:
 
 # Specific settings for Neptune subchart
 neptune:
+  rabbitmq:
+    password: "Yn5NvUhRVye2GVP8"
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.demo.fairspace.app

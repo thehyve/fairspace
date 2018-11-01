@@ -111,6 +111,15 @@ Storage external hostname (through pluto to hydra)
 {{- printf "storage.%s" .Values.workspace.ingress.domain -}}
 {{- end -}}
 
-
-
-
+{{- define "rabbitmq.pluto.username" -}}
+{{- .Values.pluto.rabbitmq.username | default (printf "%s-pluto" .Release.Name) -}}
+{{- end -}}
+{{- define "rabbitmq.neptune.username" -}}
+{{- .Values.neptune.rabbitmq.username | default (printf "%s-neptune" .Release.Name) -}}
+{{- end -}}
+{{- define "rabbitmq.ceres.username" -}}
+{{- .Values.ceres.rabbitmq.username | default (printf "%s-ceres" .Release.Name) -}}
+{{- end -}}
+{{- define "rabbitmq.titan.username" -}}
+{{- .Values.titan.rabbitmq.username | default (printf "%s-titan" .Release.Name) -}}
+{{- end -}}
