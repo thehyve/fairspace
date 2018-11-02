@@ -1,5 +1,5 @@
 import {fetchSubjectByPathIfNeeded} from "../../actions/metadata";
-import connect from "react-redux/es/connect/connect";
+import {connect} from 'react-redux';
 import ErrorMessage from "../error/ErrorMessage";
 import React from "react";
 import Metadata from "./Metadata";
