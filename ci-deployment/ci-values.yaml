@@ -1,6 +1,8 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
   domain: hyperspace.ci.fairway.app
+  locationOverrides:
+    rabbitmqhostname: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
   keycloak:
     username: keycloak
     password: keycloak-ci-123

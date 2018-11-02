@@ -1,6 +1,8 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
   domain: hyperspace.demo.fairspace.app
+  locationOverrides:
+    rabbitmqhostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
   keycloak:
     username: keycloak
     password: keycloak-demo-123
