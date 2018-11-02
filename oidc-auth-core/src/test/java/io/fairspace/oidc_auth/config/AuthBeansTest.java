@@ -49,6 +49,16 @@ public class AuthBeansTest {
         claimsSetVerifier.verify(claimsSet, null);
     }
 
+    @Test
+    void testZeroExpiryDate() throws MalformedURLException, BadJWTException {
+        JWTClaimsSetVerifier claimsSetVerifier = getJwtClaimsSetVerifier();
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .expirationTime(new Date(0))
+                .build();
+
+        claimsSetVerifier.verify(claimsSet, null);
+    }
+
     private JWTClaimsSet getJwtClaimsSet(int addSeconds) {
         Date expiry = Date.from(Instant.now().plus(addSeconds, ChronoUnit.SECONDS));
         return new JWTClaimsSet.Builder()
