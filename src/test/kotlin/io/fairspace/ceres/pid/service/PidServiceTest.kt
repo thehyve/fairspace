@@ -5,7 +5,6 @@ import io.fairspace.ceres.pid.TestData.path1
 import io.fairspace.ceres.pid.model.Path
 import io.fairspace.ceres.pid.repository.PidRepository
 import junit.framework.Assert.assertEquals
-import org.apache.jena.sparql.function.library.uuid
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
