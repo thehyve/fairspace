@@ -2,7 +2,7 @@ package io.fairspace.ceres.pid.repository
 
 
 import io.fairspace.ceres.pid.TestData
-import io.fairspace.ceres.pid.model.Path
+import io.fairspace.ceres.pid.model.Pid
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -24,15 +24,15 @@ class PidRepositoryTest {
     @Autowired
     lateinit var pidRepository: PidRepository
 
-    lateinit var saved_path1: Path
-    lateinit var saved_path2: Path
-    lateinit var saved_path3: Path
+    lateinit var saved_pid1: Pid
+    lateinit var saved_pid2: Pid
+    lateinit var saved_pid3: Pid
 
     @Before
     fun setUp() {
-       saved_path1 = pidRepository.save(TestData.path1)
-       saved_path2 = pidRepository.save(TestData.path2)
-       saved_path3 = pidRepository.save(TestData.path3)
+       saved_pid1 = pidRepository.save(TestData.path1)
+       saved_pid2 = pidRepository.save(TestData.path2)
+       saved_pid3 = pidRepository.save(TestData.path3)
     }
 
     @Test
@@ -42,14 +42,14 @@ class PidRepositoryTest {
 
     @Test
     fun can_find_entity_by_uuid() {
-        val foundPath = pidRepository.findById(saved_path1.uuid)
+        val foundPath = pidRepository.findById(saved_pid1.uuid)
         assert(foundPath.isPresent())
-        assertEquals(foundPath.get().uuid,saved_path1.uuid)
+        assertEquals(foundPath.get().uuid,saved_pid1.uuid)
     }
 
     @Test
     fun entity_uuid_has_been_changed_on_save() {
-        val foundPath = pidRepository.findById(saved_path1.uuid)
+        val foundPath = pidRepository.findById(saved_pid1.uuid)
         assert(foundPath.isPresent())
         assertNotEquals(foundPath.get().uuid,TestData.path1.uuid)
     }
@@ -57,14 +57,14 @@ class PidRepositoryTest {
     @Test
     fun can_find_entity_by_uri() {
         val foundPath = pidRepository.findByUri(TestData.path1.uri)
-        assert(foundPath != null && foundPath.uuid.equals(saved_path1.uuid) )
+        assert(foundPath != null && foundPath.uuid.equals(saved_pid1.uuid) )
     }
 
     @Test
     fun can_delete_entity() {
-        assert(pidRepository.findById(saved_path3.uuid).isPresent())
-        pidRepository.deleteById(saved_path3.uuid)
-        assertFalse(pidRepository.findById(saved_path3.uuid).isPresent())
+        assert(pidRepository.findById(saved_pid3.uuid).isPresent())
+        pidRepository.deleteById(saved_pid3.uuid)
+        assertFalse(pidRepository.findById(saved_pid3.uuid).isPresent())
     }
 
     @Test
@@ -72,12 +72,12 @@ class PidRepositoryTest {
         val test_uri = "https://workspace.test.fairway.app/iri/collections/789/foo/bat"
         val test_uuid = UUID.fromString("af4bec86-5297-4521-89d7-13ca579f6fb2")
 
-        val testPath: Path = Path( uuid = test_uuid, uri = test_uri )
+        val testPid: Pid = Pid( uuid = test_uuid, uri = test_uri )
 
         assertNull(pidRepository.findByUri(test_uri))
-        val addedPath = pidRepository.save(testPath)
-        val foundPath: Path? = pidRepository.findByUri(test_uri)
-        assertNotNull(foundPath)
-        assertEquals(addedPath!!.uuid,foundPath!!.uuid)
+        val addedPath = pidRepository.save(testPid)
+        val foundPid: Pid? = pidRepository.findByUri(test_uri)
+        assertNotNull(foundPid)
+        assertEquals(addedPath!!.uuid,foundPid!!.uuid)
     }
 }

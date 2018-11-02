@@ -4,7 +4,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-data class Path (
+data class Pid (
     @Id
     @GeneratedValue (strategy = GenerationType.AUTO)
     val uuid: UUID,

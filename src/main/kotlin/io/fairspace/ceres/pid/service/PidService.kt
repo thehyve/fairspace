@@ -1,6 +1,6 @@
 package io.fairspace.ceres.pid.service
 
-import io.fairspace.ceres.pid.model.Path
+import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.repository.PidRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -8,18 +8,18 @@ import java.util.*
 @Service
 class PidService(val repository: PidRepository) {
 
-    fun findById (id: UUID) : Path =
+    fun findById (id: UUID) : Pid =
             repository.findById(id).orElseThrow({NotFoundException(id.toString())})
 
-    fun findByUri (uri: String) : Path =
+    fun findByUri (uri: String) : Pid =
         repository.findByUri(uri) ?: throw NotFoundException(uri)
 
 
-    fun add ( path: Path, errorAlreadyExists: Boolean = false) : Path {
-        if ( errorAlreadyExists && repository.existsById(path.uuid)) {
-            throw Exception("Path for UUID ${path.uuid} already exists")
+    fun add (pid: Pid, errorAlreadyExists: Boolean = false) : Pid {
+        if ( errorAlreadyExists && repository.existsById(pid.uuid)) {
+            throw Exception("Pid for UUID ${pid.uuid} already exists")
         }
-        return repository.save(path)
+        return repository.save(pid)
     }
 
     fun delete (id : UUID) {
@@ -27,8 +27,8 @@ class PidService(val repository: PidRepository) {
     }
 
     fun delete (uri: String) {
-        val foundPath : Path = findByUri(uri)
-        repository.delete(foundPath)
+        val foundPid : Pid = findByUri(uri)
+        repository.delete(foundPid)
     }
 
 }

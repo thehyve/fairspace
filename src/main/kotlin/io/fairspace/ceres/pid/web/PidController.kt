@@ -1,6 +1,6 @@
 package io.fairspace.ceres.pid.web
 
-import io.fairspace.ceres.pid.model.Path
+import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.service.PidService
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -21,13 +21,13 @@ class PidController(val pidService: PidService) {
     }
 
     @PostMapping( produces = [ "application/json"] )
-    fun post (@RequestBody path : Path) {
-        pidService.add(path, errorAlreadyExists = true )
+    fun post (@RequestBody pid : Pid) {
+        pidService.add(pid, errorAlreadyExists = true )
     }
 
     @PatchMapping ( produces = [ "application/json"])
-    fun patch ( @RequestBody path : Path ) {
-        pidService.add(path, errorAlreadyExists = false )
+    fun patch ( @RequestBody pid : Pid ) {
+        pidService.add(pid, errorAlreadyExists = false )
     }
 
     @DeleteMapping ( params = ["id"])
