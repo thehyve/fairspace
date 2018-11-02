@@ -35,7 +35,7 @@ class PidController(val pidService: PidService) {
         pidService.add(pid, errorAlreadyExists = false )
     }
 
-    @PatchMapping ( produces = [ "application/json"])
+    @PatchMapping ("prefixed", produces = [ "application/json"])
     fun patchByPrefix (
                 @RequestParam("prefix") prefix: String,
                 @RequestParam("newprefix") newPrefix: String
