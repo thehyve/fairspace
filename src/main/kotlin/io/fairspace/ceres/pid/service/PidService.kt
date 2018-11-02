@@ -9,17 +9,28 @@ import java.util.*
 class PidService(val repository: PidRepository) {
 
     fun findById (id: UUID) : Pid =
-            repository.findById(id).orElseThrow({NotFoundException(id.toString())})
+            repository.findById(id).orElseThrow({MappingNotFoundException(id.toString())})
 
     fun findByValue (value: String) : Pid =
-        repository.findByValue(value) ?: throw NotFoundException(value)
+        repository.findByValue(value) ?: throw MappingNotFoundException(value)
 
+    fun existsByValue(value: String): Boolean {
+        try {
+            findByValue(value)
+        }
+        catch (mnfe: MappingNotFoundException) {
+            return false
+        }
+        return true
+    }
 
     fun add (pid: Pid, errorAlreadyExists: Boolean = false) : Pid {
-        if ( errorAlreadyExists && repository.existsById(pid.uuid)) {
-            throw Exception("Pid for UUID ${pid.uuid} already exists")
+        if ( errorAlreadyExists && existsByValue(pid.value)) {
+            throw ValueAlreadyExistsException("value: ${pid.value}")
         }
-        return repository.save(pid)
+        else {
+            return repository.save(pid)
+        }
     }
 
     fun delete (id : UUID) {

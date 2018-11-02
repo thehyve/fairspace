@@ -1,6 +1,7 @@
 package io.fairspace.ceres.metadata.web
 
-import org.apache.jena.shared.NotFoundException
+import io.fairspace.ceres.pid.service.MappingNotFoundException
+import io.fairspace.ceres.pid.service.ValueAlreadyExistsException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -17,10 +18,16 @@ import org.springframework.web.bind.annotation.ResponseStatus
 class CeresExceptionHandler {
     val log = LoggerFactory.getLogger(CeresExceptionHandler::class.java);
 
-    @ExceptionHandler(NotFoundException::class)
+    @ExceptionHandler(MappingNotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    protected fun handleNotFoundException(ex: NotFoundException): ErrorBody {
-        return ErrorBody("Requested information could not be found")
+    protected fun handleMappingNotFoundException(ex: MappingNotFoundException): ErrorBody {
+        return ErrorBody("Requested mapping could not be found")
+    }
+
+    @ExceptionHandler(ValueAlreadyExistsException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    protected fun handleMappingAlreadyExistsException(ex: ValueAlreadyExistsException): ErrorBody {
+        return ErrorBody("Mapping already exists: ${ex}")
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)

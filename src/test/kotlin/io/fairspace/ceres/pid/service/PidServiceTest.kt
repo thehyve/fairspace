@@ -5,6 +5,7 @@ import io.fairspace.ceres.pid.TestData.path1
 import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.repository.PidRepository
 import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertFalse
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -55,6 +56,16 @@ class PidServiceTest {
     fun can_find_entity_by_value() {
         val foundPath = pidService.findByValue(TestData.path1.value)
         assertEquals(foundPath.uuid, saved_pid1.uuid)
+    }
+
+    @Test
+    fun entity_exists_by_value() {
+        assert(pidService.existsByValue(TestData.path1.value))
+    }
+
+    @Test
+    fun nonexistent_entity_does_not_exist() {
+        assertFalse(pidService.existsByValue(TestData.nonExistingValue))
     }
 
     @Test
