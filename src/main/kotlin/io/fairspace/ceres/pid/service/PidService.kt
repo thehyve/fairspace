@@ -14,6 +14,9 @@ class PidService(val repository: PidRepository) {
     fun findByValue (value: String) : Pid =
         repository.findByValue(value) ?: throw MappingNotFoundException(value)
 
+    fun findByPrefix (prefix: String): List<Pid> =
+        repository.findAll().filter { p -> p.value.startsWith(prefix) }.toList()
+
     fun existsByValue(value: String): Boolean {
         try {
             findByValue(value)
@@ -33,6 +36,19 @@ class PidService(val repository: PidRepository) {
         }
     }
 
+    fun updateByPrefix (oldPrefix: String, newPrefix: String) : List<Pid> {
+        var result: MutableList<Pid> = mutableListOf()
+        for ( pid : Pid in findByPrefix(oldPrefix)) {
+            val newValue: String = pid.value.replaceFirst(oldPrefix,newPrefix)
+            if ( newValue.equals(pid.value)) {
+                throw Exception("Internal error: unable to change prefix for value ${pid.value}")
+            }
+            pid.value = newValue
+            result.add(repository.save(pid))
+        }
+        return result
+    }
+
     fun delete (id : UUID) {
         repository.deleteById(id)
     }
@@ -40,6 +56,12 @@ class PidService(val repository: PidRepository) {
     fun delete (value: String) {
         val foundPid : Pid = findByValue(value)
         repository.delete(foundPid)
+    }
+
+    fun deleteByPrefix (prefix: String) {
+        for ( pid : Pid in findByPrefix(prefix)) {
+            repository.delete(pid)
+        }
     }
 
 }

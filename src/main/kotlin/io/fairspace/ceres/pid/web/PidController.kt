@@ -20,6 +20,11 @@ class PidController(val pidService: PidService) {
         pidService.findByValue(value)
     }
 
+    @GetMapping( "prefixed" , produces = [ "application/json"], params = ["prefix"])
+    fun getPrefixed (@RequestParam("prefix" ) prefix: String ) {
+        pidService.findByPrefix(prefix)
+    }
+
     @PostMapping( produces = [ "application/json"] )
     fun post (@RequestBody pid : Pid) {
         pidService.add(pid, errorAlreadyExists = true )
@@ -30,6 +35,14 @@ class PidController(val pidService: PidService) {
         pidService.add(pid, errorAlreadyExists = false )
     }
 
+    @PatchMapping ( produces = [ "application/json"])
+    fun patchByPrefix (
+                @RequestParam("prefix") prefix: String,
+                @RequestParam("newprefix") newPrefix: String
+                ) {
+        pidService.updateByPrefix(prefix,newPrefix)
+    }
+
     @DeleteMapping ( params = ["id"])
     fun delete ( @RequestParam ("id") id: UUID ) {
         pidService.delete(id)
@@ -38,6 +51,11 @@ class PidController(val pidService: PidService) {
     @DeleteMapping ( params = ["value"])
     fun delete ( @RequestParam ("value") value: String ) {
         pidService.delete(value)
+    }
+
+    @DeleteMapping ( "prefixed", params = ["prefix"])
+    fun deletePrefixed ( @RequestParam ("prefix") prefix: String ) {
+        pidService.deleteByPrefix(prefix)
     }
 
 }

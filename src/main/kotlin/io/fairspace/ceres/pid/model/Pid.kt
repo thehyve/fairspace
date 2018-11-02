@@ -10,5 +10,5 @@ data class Pid (
     val uuid: UUID,
 
     @Column(nullable=false)
-    val value: String
+    var value: String
 )

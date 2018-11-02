@@ -28,34 +28,42 @@ class PidServiceTest {
 
     lateinit var pidService: PidService
 
-    lateinit var saved_pid1: Pid
-    lateinit var saved_pid2: Pid
-    lateinit var saved_pid3: Pid
+    lateinit var savedPid1: Pid
+    lateinit var savedPid2: Pid
+    lateinit var savedPid3: Pid
 
     @Before
     fun setUp() {
         pidService = PidService(pidRepository)
-        saved_pid1 = pidService.add(TestData.path1)
-        saved_pid2 = pidService.add(TestData.path2)
-        saved_pid3 = pidService.add(TestData.path3)
+        savedPid1 = pidService.add(TestData.path1)
+        savedPid2 = pidService.add(TestData.path2)
+        savedPid3 = pidService.add(TestData.path3)
     }
 
     @Test
     fun can_find_entity_by_uuid() {
-        val foundPath = pidService.findById(saved_pid1.uuid)
-            assert(foundPath.uuid.equals(saved_pid1.uuid))
+        val foundPath = pidService.findById(savedPid1.uuid)
+            assert(foundPath.uuid.equals(savedPid1.uuid))
     }
 
     @Test
     fun entity_uuid_has_been_changed_on_save() {
-        val foundPath = pidService.findById(saved_pid1.uuid)
+        val foundPath = pidService.findById(savedPid1.uuid)
         Assert.assertNotEquals(foundPath.uuid,path1.uuid)
     }
 
     @Test
     fun can_find_entity_by_value() {
         val foundPath = pidService.findByValue(TestData.path1.value)
-        assertEquals(foundPath.uuid, saved_pid1.uuid)
+        assertEquals(foundPath.uuid, savedPid1.uuid)
+    }
+
+    @Test
+    fun can_find_entity_by_prefix() {
+        val pids: List<Pid> = pidService.findByPrefix(TestData.commonPrefix)
+        assert(pids.size == 2)
+        assert(pids.contains(savedPid1))
+        assert(pids.contains(savedPid2))
     }
 
     @Test
@@ -70,10 +78,53 @@ class PidServiceTest {
 
     @Test
     fun can_delete_entity() {
-        assert(pidRepository.findById(saved_pid3.uuid).isPresent())
-        pidService.delete(saved_pid3.uuid)
-        Assert.assertFalse(pidRepository.findById(saved_pid3.uuid).isPresent())
+        assert(pidRepository.findById(savedPid3.uuid).isPresent())
+        pidService.delete(savedPid3.uuid)
+        Assert.assertFalse(pidRepository.findById(savedPid3.uuid).isPresent())
     }
+
+    @Test
+    fun can_delete_entity_by_prefix() {
+        val pid4 : Pid = Pid ( uuid = UUID.randomUUID(), value = TestData.deleteTestValue1 )
+        val pid5 : Pid = Pid ( uuid = UUID.randomUUID(), value = TestData.deleteTestValue2 )
+        val savedPid4 = pidRepository.save(pid4)
+        val savedPid5 = pidRepository.save(pid5)
+        assert(pidRepository.findById(savedPid1.uuid).isPresent())
+        assert(pidRepository.findById(savedPid2.uuid).isPresent())
+        assert(pidRepository.findById(savedPid4.uuid).isPresent())
+        assert(pidRepository.findById(savedPid5.uuid).isPresent())
+        pidService.deleteByPrefix(TestData.deleteTestPrefix)
+        assert(pidRepository.findById(savedPid1.uuid).isPresent())
+        assert(pidRepository.findById(savedPid2.uuid).isPresent())
+        Assert.assertFalse(pidRepository.findById(savedPid4.uuid).isPresent())
+        Assert.assertFalse(pidRepository.findById(savedPid5.uuid).isPresent())
+    }
+
+    @Test
+    fun can_update_entity_by_prefix() {
+        val pid4 : Pid = Pid ( uuid = UUID.randomUUID(), value = TestData.updateTestOldValue1 )
+        val pid5 : Pid = Pid ( uuid = UUID.randomUUID(), value = TestData.updateTestOldValue2 )
+        val savedPid4 = pidRepository.save(pid4)
+        val savedPid5 = pidRepository.save(pid5)
+        // Pid 4 and 5 should be updated. Pid 1 and 2 should be unchanged after the update.
+        assert(pidRepository.findById(savedPid1.uuid).isPresent())
+        assert(pidRepository.findById(savedPid2.uuid).isPresent())
+        assert(pidRepository.findById(savedPid4.uuid).isPresent())
+        assert(pidRepository.findById(savedPid5.uuid).isPresent())
+        assertEquals(TestData.file1, pidRepository.findById(savedPid1.uuid).get().value)
+        assertEquals(TestData.file2, pidRepository.findById(savedPid2.uuid).get().value)
+        assertEquals(TestData.updateTestOldValue1,pidRepository.findById(savedPid4.uuid).get().value)
+        assertEquals(TestData.updateTestOldValue2,pidRepository.findById(savedPid5.uuid).get().value)
+        pidService.updateByPrefix(TestData.updateTestOldPrefix, TestData.updateTestNewPrefix)
+        assert(pidRepository.findById(savedPid1.uuid).isPresent())
+        assert(pidRepository.findById(savedPid2.uuid).isPresent())
+        assert(pidRepository.findById(savedPid4.uuid).isPresent())
+        assert(pidRepository.findById(savedPid5.uuid).isPresent())
+        assertEquals(TestData.file1, pidRepository.findById(savedPid1.uuid).get().value)
+        assertEquals(TestData.file2, pidRepository.findById(savedPid2.uuid).get().value)
+        assertEquals(TestData.updateTestNewValue1,pidRepository.findById(savedPid4.uuid).get().value)
+        assertEquals(TestData.updateTestNewValue2,pidRepository.findById(savedPid5.uuid).get().value)
+     }
 
     @Test
     fun can_save_entity () {
