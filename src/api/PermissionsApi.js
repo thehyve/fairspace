@@ -2,8 +2,7 @@ let util = require('util');
 let axios = require('axios');
 let Cache = require('ttl');
 
-
-class Permissions {
+class PermissionsApi {
     constructor(permissionsUrl) {
         this.permissionsUrl = permissionsUrl;
         this.cache = new Cache({capacity: 1024})
@@ -31,4 +30,4 @@ class Permissions {
     }
 }
 
-module.exports = Permissions;
+module.exports = PermissionsApi;

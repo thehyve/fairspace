@@ -1,11 +1,9 @@
 /**
- * This express.js middleware emits events for file operations
+ * This WebdavServer afterRequest handler emits events for file operations
  * over AMQP
- * @returns {function(Request, Response, Function): *}
+ * @returns {function(Args, Function): *}
  */
-module.exports = function EventMiddleware(rabbot, exchangeName) {
-    console.log("Event Middleware creation");
-
+module.exports = function EventEmitter(rabbot, exchangeName) {
     const publish = event => rabbot.publish(exchangeName, event);
     const readEvent = req => ({
         routingKey: 'read',
@@ -15,28 +13,78 @@ module.exports = function EventMiddleware(rabbot, exchangeName) {
         }
     })
 
-    const uploadEvent = req => ({
-        routingKey: 'upload',
-            type: "io.fairspace.titan.uploadEvent",
-            body: {
+    const downloadEvent = (req, res) => ({
+        routingKey: 'download',
+        type: "io.fairspace.titan.download",
+        body: {
             path: req.path,
-                contentLength: req.headers['content-length']
+            contentLength: res.get('content-length')
         }
     })
 
-    const middleware = (req, res, next) => {
-        console.log("Middleware called");
-        if(req.method === 'PUT') {
-            console.log("Emitting event: PUT")
-            publish(uploadEvent(req));
-        } else if(req.method === 'PROPFIND') {
-            console.log("Emitting event: PROPFIND")
-            publish(readEvent(req));
+
+    const uploadEvent = req => ({
+        routingKey: 'upload',
+        type: "io.fairspace.titan.upload",
+        body: {
+            path: req.path,
+            contentLength: req.headers['content-length']
+        }
+    });
+
+    const mkdirEvent = req => ({
+        routingKey: 'mkdir',
+        type: "io.fairspace.titan.mkDir",
+        body: {
+            path: req.path,
+        }
+    })
+
+    const deleteEvent = req => ({
+        routingKey: 'delete',
+        type: "io.fairspace.titan.delete",
+        body: {
+            path: req.path,
+        }
+    })
+
+    const copyEvent = req => ({
+        routingKey: 'copy',
+        type: "io.fairspace.titan.copy",
+        body: {
+            source: req.path,
+            destination: req.headers['destination']
+        }
+    })
+
+    const moveEvent = req => ({
+        routingKey: 'move',
+        type: "io.fairspace.titan.move",
+        body: {
+            source: req.path,
+            destination: req.headers['destination']
+        }
+    })
+
+    const methodToEventsMap = {
+        GET: downloadEvent,
+        PUT: uploadEvent,
+        MKCOL: mkdirEvent,
+        PROPFIND: readEvent,
+        COPY: copyEvent,
+        MOVE: moveEvent,
+        DELETE: deleteEvent
+    }
+
+    const handler = (args, next) => {
+        if(methodToEventsMap.hasOwnProperty(args.request.method)) {
+            console.debug("Emitting event for", args.request.method, "on", args.request.path)
+            publish(methodToEventsMap[args.request.method](args.request, args.response));
         }
 
         return next();
     };
 
-    return middleware;
+    return handler;
 };
 

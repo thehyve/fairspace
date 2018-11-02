@@ -1,8 +1,18 @@
-const eventMiddleware = require('../events/EventMiddleware');
+const eventEmitter = require('../events/EventEmitter');
 const rabbot = require('rabbot');
 
-module.exports = function setupEventMiddleware(app, connectionSettings, exchangeName) {
-    console.log("Emitting events to RabbitMQ on host " + connectionSettings.server);
+/**
+ * Setup method for emitting events to RabbitMQ
+ *
+ * This method does not register an express.js middleware, as the webdav server
+ * does not continue executing the express.js middleware. For that reason, the emitter
+ * is attached to the webdavserver itself
+ * @param server
+ * @param connectionSettings
+ * @param exchangeName
+ */
+module.exports = function setupEventEmitter(server, connectionSettings, exchangeName) {
+    console.log("Emitting events to RabbitMQ on host " + connectionSettings.host);
 
     rabbot.configure({
         connection: connectionSettings,
@@ -11,6 +21,6 @@ module.exports = function setupEventMiddleware(app, connectionSettings, exchange
         ]
     }).then(() => {
         console.log("Connection with RabbitMQ has been established")
-        app.use(eventMiddleware(rabbot, exchangeName));
+        server.afterRequest(eventEmitter(rabbot, exchangeName));
     })
 };
