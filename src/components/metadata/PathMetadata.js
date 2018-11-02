@@ -38,15 +38,13 @@ export class PathMetadata extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {subjectByPath} = state;
+    const subjectByPath = state.cache.subjectByPath;
     const subject = subjectByPath && subjectByPath[ownProps.path];
 
     // If there is no subject by path (not even pending)
     // some error occurred.
     if (!subject) {
-        return {
-            error: true
-        }
+        return { }
     }
 
     return {

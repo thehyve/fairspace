@@ -146,6 +146,8 @@ class MetadataAPI {
     }
 
     getSubjectByPath(path) {
+        let url = Config.get().urls.metadata.pid + '?name=' + encodeURIComponent(path);
+        console.log(url)
         return fetch(Config.get().urls.metadata.pid + '?name=' + encodeURIComponent(path), {
             method: 'GET',
             headers: new Headers({'Accept': 'application/json'}),
@@ -153,7 +155,7 @@ class MetadataAPI {
         })
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
-            .then(data => data.id);
+            .then(data => data.id)
     }
 }
 

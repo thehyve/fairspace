@@ -98,7 +98,7 @@ const fetchAllEntities = createErrorHandlingPromiseAction((dispatch) => ({
 
 export const fetchSubjectByPathIfNeeded = (path) => dispatchIfNeeded(
     () => getUriByPath(path),
-    state => state && state.subjectByPath && state.subjectByPath[path]
+    state => state && state.cache && state.cache.subjectByPath && state.cache.subjectByPath[path]
 );
 
 const getUriByPath = createErrorHandlingPromiseAction((path) => ({
