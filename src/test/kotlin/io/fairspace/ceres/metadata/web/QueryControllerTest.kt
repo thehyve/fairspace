@@ -1,8 +1,7 @@
 package io.fairspace.ceres.metadata.web
 
-import io.fairspace.ceres.TestData
+import io.fairspace.ceres.metadata.TestData
 import io.fairspace.ceres.metadata.repository.ModelRepository
-import io.fairspace.ceres.pid.repository.PidRepository
 import io.fairspace.ceres.metadata.repository.parse
 import io.fairspace.ceres.metadata.web.converters.ResultSetConverter
 import org.apache.jena.riot.RDFFormat

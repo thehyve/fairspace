@@ -1,6 +1,6 @@
 package io.fairspace.ceres.metadata.repository
 
-import io.fairspace.ceres.TestData
+import io.fairspace.ceres.metadata.TestData
 import org.apache.jena.query.Dataset
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.rdf.model.Model
