@@ -1,5 +1,3 @@
-logging.level.org.springframework.beans: DEBUG
-
 # OAuth2 base configuration
 app:
   oauth2:
