@@ -11,8 +11,8 @@ class PidService(val repository: PidRepository) {
     fun findById (id: UUID) : Pid =
             repository.findById(id).orElseThrow({NotFoundException(id.toString())})
 
-    fun findByUri (uri: String) : Pid =
-        repository.findByUri(uri) ?: throw NotFoundException(uri)
+    fun findByValue (value: String) : Pid =
+        repository.findByValue(value) ?: throw NotFoundException(value)
 
 
     fun add (pid: Pid, errorAlreadyExists: Boolean = false) : Pid {
@@ -26,8 +26,8 @@ class PidService(val repository: PidRepository) {
         repository.deleteById(id)
     }
 
-    fun delete (uri: String) {
-        val foundPid : Pid = findByUri(uri)
+    fun delete (value: String) {
+        val foundPid : Pid = findByValue(value)
         repository.delete(foundPid)
     }
 

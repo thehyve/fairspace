@@ -15,9 +15,9 @@ class PidController(val pidService: PidService) {
         pidService.findById(id)
     }
 
-    @GetMapping( produces = [ "application/json"], params = ["uri"])
-    fun get (@RequestParam("id", required = false ) uri: String ) {
-        pidService.findByUri(uri)
+    @GetMapping( produces = [ "application/json"], params = ["value"])
+    fun get (@RequestParam("value", required = false ) value: String ) {
+        pidService.findByValue(value)
     }
 
     @PostMapping( produces = [ "application/json"] )
@@ -32,12 +32,12 @@ class PidController(val pidService: PidService) {
 
     @DeleteMapping ( params = ["id"])
     fun delete ( @RequestParam ("id") id: UUID ) {
-        pidService.delete(id);
+        pidService.delete(id)
     }
 
-    @DeleteMapping ( params = ["uri"])
-    fun delete ( @RequestParam ("uri") uri: String ) {
-        pidService.delete(uri);
+    @DeleteMapping ( params = ["value"])
+    fun delete ( @RequestParam ("value") value: String ) {
+        pidService.delete(value)
     }
 
 }

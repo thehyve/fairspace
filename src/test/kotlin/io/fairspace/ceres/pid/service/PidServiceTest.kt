@@ -52,8 +52,8 @@ class PidServiceTest {
     }
 
     @Test
-    fun can_find_entity_by_uri() {
-        val foundPath = pidService.findByUri(TestData.path1.uri)
+    fun can_find_entity_by_value() {
+        val foundPath = pidService.findByValue(TestData.path1.value)
         assertEquals(foundPath.uuid, saved_pid1.uuid)
     }
 
@@ -66,14 +66,14 @@ class PidServiceTest {
 
     @Test
     fun can_save_entity () {
-        val test_uri = "https://workspace.test.fairway.app/iri/collections/789/foo/bat"
-        val test_uuid = UUID.fromString("af4bec86-5297-4521-89d7-13ca579f6fb2")
+        val testValue = "https://workspace.test.fairway.app/iri/collections/789/foo/bat"
+        val testId = UUID.fromString("af4bec86-5297-4521-89d7-13ca579f6fb2")
 
-        val testPid: Pid = Pid( uuid = test_uuid, uri = test_uri )
+        val testPid: Pid = Pid( uuid = testId, value = testValue )
 
-        Assert.assertNull(pidRepository.findByUri(test_uri))
+        Assert.assertNull(pidRepository.findByValue(testValue))
         val addedPath = pidService.add(testPid)
-        val foundPid: Pid? = pidRepository.findByUri(test_uri)
+        val foundPid: Pid? = pidRepository.findByValue(testValue)
         Assert.assertNotNull(foundPid)
         assert(addedPath!!.uuid.equals(foundPid!!.uuid))
     }

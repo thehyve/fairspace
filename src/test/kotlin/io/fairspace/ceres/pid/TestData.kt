@@ -10,9 +10,9 @@ object TestData {
    val file1: String = "https://workspace.test.fairway.app/iri/collections/123/foo/bar"
    val file2: String = "https://workspace.test.fairway.app/iri/collections/123/foo/baz"
    val file3: String = "https://workspace.test.fairway.app/iri/collections/456/foo/bar"
-   val path1 = Pid( uuid = uuid1 , uri = file1 )
-   val path2 = Pid( uuid = uuid2 , uri = file2 )
-   val path3 = Pid( uuid = uuid3 , uri = file3 )
+   val path1 = Pid( uuid = uuid1 , value = file1 )
+   val path2 = Pid( uuid = uuid2 , value = file2 )
+   val path3 = Pid( uuid = uuid3 , value = file3 )
 
 
 }

@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import java.util.*
 
 interface PidRepository: CrudRepository<Pid, UUID> {
-    fun findByUri (uri: String): Pid?
+    fun findByValue (value: String): Pid?
 }
 
