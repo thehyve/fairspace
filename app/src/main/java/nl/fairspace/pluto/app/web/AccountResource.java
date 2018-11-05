@@ -89,6 +89,7 @@ public class AccountResource {
         HttpSession session = request.getSession();
 
         log.debug("REST request to exchange tokens");
+        log.trace("Tokens stored: {}", tokenParams);
 
         // Generate new token object and store it in session
         OAuthAuthenticationToken token = new OAuthAuthenticationToken(tokenParams.getAccessToken(), tokenParams.getRefreshToken());
