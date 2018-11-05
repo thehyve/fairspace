@@ -1,6 +1,8 @@
 package io.fairspace.neptune.web;
 
+import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.service.CollectionMetadataService;
+import io.fairspace.neptune.service.CollectionService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -37,6 +40,9 @@ public class CollectionControllerIntegrationTest {
     @MockBean
     private CollectionMetadataService collectionMetadataService;
 
+    @MockBean
+    private CollectionService collectionService;
+
     @Test
     public void testUriRetrieval() {
         // Setup
@@ -56,6 +62,38 @@ public class CollectionControllerIntegrationTest {
 
         response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.GET, null, uriMapReference);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void testFindAll() {
+        Collection collection = Collection.builder().id(1L).build();
+
+        // Setup
+        ParameterizedTypeReference<List<Collection>> collectionListReference = new ParameterizedTypeReference<List<Collection>>() {};
+
+        doReturn(Collections.singletonList(collection)).when(collectionService).findAll();
+        String path = "/";
+        ResponseEntity<List<Collection>> response;
+
+        // Test
+        response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.GET, null, collectionListReference);
+        assertEquals(Collections.singletonList(collection), response.getBody());
+    }
+
+    @Test
+    public void testFindByLocation() {
+        Collection collection = Collection.builder().id(1L).build();
+
+        // Setup
+        ParameterizedTypeReference<List<Collection>> collectionListReference = new ParameterizedTypeReference<List<Collection>>() {};
+
+        doReturn(collection).when(collectionService).findByLocation("loc");
+        String path = "/";
+        ResponseEntity<List<Collection>> response;
+
+        // Test
+        response = restTemplate.exchange("http://localhost:" + port + path + "?location=loc", HttpMethod.GET, null, collectionListReference);
+        assertEquals(Collections.singletonList(collection), response.getBody());
     }
 
 }

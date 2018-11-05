@@ -4,6 +4,7 @@ import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.service.CollectionMetadataService;
 import io.fairspace.neptune.service.CollectionService;
 import io.fairspace.neptune.service.PermissionService;
+import io.fairspace.neptune.web.dto.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -41,8 +42,12 @@ public class CollectionController {
     }
 
     @GetMapping
-    public Iterable<Collection> getCollections() {
-        return collectionService.findAll();
+    public ResponseEntity<Iterable<Collection>> getCollections(@RequestParam(required=false) String location) {
+        if(location == null) {
+            return ResponseEntity.ok(collectionService.findAll());
+        } else {
+            return caching.withCacheControl(Collections.singletonList(collectionService.findByLocation(location)));
+        }
     }
 
     @GetMapping(value = "/uri", produces = "application/json")

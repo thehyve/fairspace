@@ -74,11 +74,16 @@ public class CollectionServiceIntegrationTest {
 
     }
 
-
     @Test
     public void testCollectionIsVisibleForDefaultUser() {
         // For the default user, the collection is visible
         service.findById(collection.getId()); // Shouldn't throw an exception
+    }
+
+    @Test
+    public void testCollectionCanBeFoundByLocation() {
+        Collection byLocation = service.findByLocation(collection.getLocation());
+        assertEquals(byLocation, collection);
     }
 
     @Test(expected = UnauthorizedException.class)

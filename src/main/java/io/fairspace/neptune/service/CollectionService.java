@@ -66,6 +66,10 @@ public class CollectionService {
                 .build();
     }
 
+    public Collection findByLocation(String location) {
+        return findById(Locations.extractId(location));
+    }
+
     public Collection add(Collection collection) throws IOException {
 
         Collection savedCollection = repository.save(collection
