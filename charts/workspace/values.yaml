@@ -85,6 +85,8 @@ pluto:
     redirectAfterLogoutUrl: https://fairspace.com
 
   rabbitmq:
+    hostname:
+    vhost:
     username:
     password:
 
@@ -104,6 +106,8 @@ ceres:
     mountPath: /data/ceres
 
   rabbitmq:
+    hostname:
+    vhost:
     username:
     password:
 
@@ -117,6 +121,8 @@ ceres:
 # Specific settings for Neptune subchart
 neptune:
   rabbitmq:
+    hostname:
+    vhost:
     username:
     password:
 
@@ -130,6 +136,8 @@ neptune:
 # Specific settings for Titan subchart
 titan:
   rabbitmq:
+    hostname:
+    vhost:
     username:
     password:
   auth:
