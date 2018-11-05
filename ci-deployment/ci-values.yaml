@@ -107,7 +107,7 @@ jupyterhub:
         c.KubeSpawner.singleuser_privileged = True
         c.Authenticator.auto_login = True
         c.JupyterHub.log_level = 'DEBUG'
-        c.Spawner.debug = True
-        c.KubeSpawner.debug = True
+        c.Authenticator.debug = True
+        c.OpenIDConnectOAuthenticator.debug = True
   proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
