@@ -36,8 +36,8 @@ spec:
               containerPort: 80
               protocol: TCP
           env:
-              - name: CONFIG_FILE
-                value: "/config/config.json"
+            - name: CONFIG_FILE
+              value: "/config/config.json"
           volumeMounts:
           - name: data
             mountPath: {{ .Values.persistence.rootPath }}
