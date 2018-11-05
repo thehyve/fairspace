@@ -1,6 +1,9 @@
 module.exports = {
-  "rootPath": __dirname + "/fs",
-  "urls": {
-    "collections": "http://fairspace.io/api/collections/permissions?location=%s"
-  }
+    "rootPath": __dirname + "/fs",
+    "rabbitmq": {
+        "enabled": false
+    },
+    "urls": {
+        "collections": "http://fairspace.io/api/collections/permissions?location=%s"
+    }
 }

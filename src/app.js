@@ -16,7 +16,10 @@ const defaultConfig = {
         "zipkinUrl": "",
         "samplingRate": 0.01
     },
-    "rabbitmq": {},
+    "rabbitmq": {
+        "enabled": true,
+        "exchange": "storage"
+    },
     "urls":{
         "collections": ""
     }
@@ -28,13 +31,6 @@ if(process.env.CONFIG_FILE) {
     configuration = {...defaultConfig, ...require(process.env.CONFIG_FILE)}
 } else {
     configuration = defaultConfig;
-}
-
-const connectionSettings = {
-    name: 'default',
-    user: 'client',
-    pass: 'client',
-    host: 'localhost'
 }
 
 // Respond to / anonymously to allow for health checks

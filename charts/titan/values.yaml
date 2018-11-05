@@ -33,6 +33,13 @@ tracing:
 collections:
   collectionUrl:
 
+rabbitmq:
+  exchange: storage
+  hostname:
+  vhost:
+  username:
+  password:
+
 ## Persist data to a persistent volume
 persistence:
   enabled: true

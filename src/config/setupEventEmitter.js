@@ -12,6 +12,11 @@ const rabbot = require('rabbot');
  * @param exchangeName
  */
 module.exports = function setupEventEmitter(server, settings) {
+    if(!settings.enabled) {
+        console.log("Not emitting events due to configuration settings");
+        return;
+    }
+
     console.log("Emitting events to RabbitMQ on host " + settings.host);
 
     rabbot.configure({

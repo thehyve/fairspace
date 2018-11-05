@@ -78,7 +78,7 @@ module.exports = function EventEmitter(rabbot, exchangeName) {
 
     const handler = (args, next) => {
         if(methodToEventsMap.hasOwnProperty(args.request.method)) {
-            console.debug("Emitting event for", args.request.method, "on", args.request.path)
+            console.debug("Emitting event for", args.request.method, "on", args.request.path);
             publish(methodToEventsMap[args.request.method](args.request, args.response));
         }
 
