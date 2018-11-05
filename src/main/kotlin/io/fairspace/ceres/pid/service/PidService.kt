@@ -15,7 +15,7 @@ class PidService(val repository: PidRepository) {
         repository.findByValue(value) ?: throw MappingNotFoundException(value)
 
     fun findByPrefix (prefix: String): List<Pid> =
-        repository.findAll().filter { p -> p.value.startsWith(prefix) }.toList()
+            repository.findByValueStartingWith(prefix).toList()
 
     fun existsByValue(value: String): Boolean {
         try {
@@ -58,10 +58,7 @@ class PidService(val repository: PidRepository) {
         repository.delete(foundPid)
     }
 
-    fun deleteByPrefix (prefix: String) {
-        for ( pid : Pid in findByPrefix(prefix)) {
-            repository.delete(pid)
-        }
-    }
+    fun deleteByPrefix (prefix: String) =
+        repository.deleteByValueStartingWith(prefix)
 
 }
