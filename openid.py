@@ -26,7 +26,9 @@ class OpenIDConnectEnvMixin(OAuth2Mixin):
 
 
 class OpenIDConnectLoginHandler(OAuthLoginHandler, OpenIDConnectEnvMixin):
-    pass
+    @property
+    def scope(self):
+        return self.authenticator.scope
 
 
 class OpenIDConnectOAuthenticator(OAuthenticator):
@@ -68,6 +70,8 @@ class OpenIDConnectOAuthenticator(OAuthenticator):
         config=True,
         help="Disable TLS verification on http request"
     )
+
+    scope = 'offline_access'
 
     def _connect_url(self):
         if self.openid_url.endswith('/'):
@@ -118,6 +122,8 @@ class OpenIDConnectOAuthenticator(OAuthenticator):
         refresh_token = resp_json.get('refresh_token', None)
         token_type = resp_json['token_type']
         scope = (resp_json.get('scope', '')).split(' ')
+
+        self.log.debug("Authentication tokens received:  %s", resp_json)
 
         # Determine who the logged in user is
         headers = {
