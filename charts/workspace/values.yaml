@@ -111,6 +111,8 @@ ceres:
     oauth2:
       baseUrl:
       realm:
+    metadata:
+      baseUrl:
 
 # Specific settings for Neptune subchart
 neptune:
