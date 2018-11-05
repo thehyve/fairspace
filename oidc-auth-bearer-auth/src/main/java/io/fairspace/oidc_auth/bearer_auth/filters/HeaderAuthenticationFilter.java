@@ -49,6 +49,9 @@ public class HeaderAuthenticationFilter implements Filter {
 
         // Otherwise, check if the authorization can be found in the header
         OAuthAuthenticationToken authenticationToken = retrieveHeaderAuthorization((HttpServletRequest) request, (HttpServletResponse) response);
+
+        log.trace("Retrieved authentication token from request: {}", authenticationToken);
+
         if(authenticationToken != null) {
             request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
         }

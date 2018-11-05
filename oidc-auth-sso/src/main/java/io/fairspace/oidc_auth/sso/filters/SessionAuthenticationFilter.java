@@ -69,6 +69,8 @@ public class SessionAuthenticationFilter implements Filter {
             return null;
         }
 
+        log.trace("Retrieved authentication token from session: {}", token);
+
         // Validate the token. If it validates, a claimsset will be returned
         Map<String, Object> claims = jwtTokenValidator.parseAndValidate(token.getAccessToken());
 
@@ -87,6 +89,8 @@ public class SessionAuthenticationFilter implements Filter {
 
                 // Refresh the token
                 OAuthAuthenticationToken refreshedToken = oAuthFlow.refreshToken(token);
+
+                log.trace("Refreshed authentication token: {}", refreshedToken);
 
                 if(refreshedToken != null) {
                     // Parse the refreshed token and return the data
@@ -115,6 +119,7 @@ public class SessionAuthenticationFilter implements Filter {
     }
 
     private OAuthAuthenticationToken getTokenFromSession(HttpServletRequest request) {
+        log.trace("Retrieving oAuth token from session with id {}", request.getSession().getId());
         Object authenticationToken = request.getSession().getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
 
         if(authenticationToken instanceof OAuthAuthenticationToken) {

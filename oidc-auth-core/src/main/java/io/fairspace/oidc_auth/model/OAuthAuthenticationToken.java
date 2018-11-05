@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
@@ -17,6 +18,7 @@ import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORITIES_CLAIM;
 @EqualsAndHashCode
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@ToString(exclude = "claimsSet")
 @Slf4j
 public class OAuthAuthenticationToken {
     public static final String USERNAME_CLAIM = "preferred_username";
@@ -78,6 +80,4 @@ public class OAuthAuthenticationToken {
 
         return list.stream().map(o -> o.toString()).collect(Collectors.toList());
     }
-
-
 }
