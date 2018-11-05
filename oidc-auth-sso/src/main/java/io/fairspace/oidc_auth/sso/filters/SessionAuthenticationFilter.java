@@ -88,19 +88,21 @@ public class SessionAuthenticationFilter implements Filter {
                 // Refresh the token
                 OAuthAuthenticationToken refreshedToken = oAuthFlow.refreshToken(token);
 
-                // Parse the refreshed token and return the data
-                Map<String, Object> refreshedTokenClaims = jwtTokenValidator.parseAndValidate(refreshedToken.getAccessToken());
+                if(refreshedToken != null) {
+                    // Parse the refreshed token and return the data
+                    Map<String, Object> refreshedTokenClaims = jwtTokenValidator.parseAndValidate(refreshedToken.getAccessToken());
 
-                if(refreshedTokenClaims != null) {
-                    log.debug("The access token has been refreshed. Storing the new access token in session.");
-                    OAuthAuthenticationToken tokenWithClaims = refreshedToken.toBuilder().claimsSet(refreshedTokenClaims).build();
-                    storeTokenInSession(tokenWithClaims, request);
-                    return tokenWithClaims;
-                } else {
-                    // If for some reasons the validation failed, the authentication is invalid
-                    log.debug("Refreshing the access token has failed.");
-                    return null;
+                    if(refreshedTokenClaims != null) {
+                        log.debug("The access token has been refreshed. Storing the new access token in session.");
+                        OAuthAuthenticationToken tokenWithClaims = refreshedToken.toBuilder().claimsSet(refreshedTokenClaims).build();
+                        storeTokenInSession(tokenWithClaims, request);
+                        return tokenWithClaims;
+                    }
                 }
+
+                // If for some reasons the validation failed, the authentication is invalid
+                log.debug("Refreshing the access token has failed.");
+                return null;
             } catch(Exception e) {
                 log.error("An error occurred while refreshing oAuth token", e);
                 return null;

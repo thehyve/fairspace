@@ -103,7 +103,10 @@ public class OAuthFlow {
         TokenRequest request = new TokenRequest(configuration.getTokenUri(), getClientAuthentication(), refreshTokenGrant);
         TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
 
-        if (!response.indicatesSuccess()) {
+        if (response.indicatesSuccess()) {
+            AccessTokenResponse successResponse = response.toSuccessResponse();
+            return new OAuthAuthenticationToken(successResponse.getTokens().getAccessToken().getValue(), successResponse.getTokens().getRefreshToken().getValue());
+        } else {
             // We got an error response...
             ErrorObject errorObject = response.toErrorResponse().getErrorObject();
             log.error(
@@ -113,9 +116,7 @@ public class OAuthFlow {
                     errorObject.getDescription());
         }
 
-        AccessTokenResponse successResponse = response.toSuccessResponse();
-
-        return new OAuthAuthenticationToken(successResponse.getTokens().getAccessToken().getValue(), successResponse.getTokens().getRefreshToken().getValue());
+        return null;
     }
 
     private URI getAuthorizeUri() throws URISyntaxException {
