@@ -36,22 +36,14 @@ spec:
               containerPort: 80
               protocol: TCP
           env:
-              - name: AUTH_ENABLED
-                value: "{{ .Values.auth.enabled }}"
-              - name: JWKS_URL
-                value: "{{ .Values.auth.jwksUrl }}"
-              - name: TRACING_ENABLED
-                value: "{{ .Values.tracing.enabled }}"
-              - name: ZIPKIN_URL
-                value: "{{ .Values.tracing.zipkinUrl }}"
-              - name: ZIPKIN_SAMPLING_RATE
-                value: "{{ .Values.tracing.samplingRate }}"
-              - name: PERMISSIONS_URL
-                value: "{{ .Values.permissions.collectionPermissionsUrl }}"
+              - name: CONFIG_FILE
+                value: "/config/config.json"
           volumeMounts:
           - name: data
-            mountPath: /data
+            mountPath: {{ .Values.persistence.rootPath }}
             subPath: {{ .Values.persistence.subPath }}
+          - name: config-volume
+            mountPath: /config
           livenessProbe:
             httpGet:
               path: /
@@ -88,3 +80,6 @@ spec:
         {{- else }}
         emptyDir: {}
         {{- end }}
+      - name: config-volume
+        configMap:
+        name: {{ template "titan.fullname" . }}-config
