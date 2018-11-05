@@ -16,6 +16,8 @@ data:
       oauth2:
         base-url: {{ .Values.app.oauth2.baseUrl }}
         realm: {{ .Values.app.oauth2.realm }}
+      metadata:
+        base-url: {{ .Values.app.metadata.baseUrl }}
 
     # Tracing configuration
     spring:
