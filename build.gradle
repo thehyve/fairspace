@@ -27,13 +27,13 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    maven { url = "https://nexus.jx.test.fairdev.app/repository/maven-releases/" }
+    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
+    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-snapshots/" }
 }
-
 
 ext {
     springCloudVersion = 'Finchley.RELEASE'
-    oidcAuthVersion = '0.1.6'
+    oidcAuthVersion = '0.1.1-SNAPSHOT'
 }
 
 dependencies {

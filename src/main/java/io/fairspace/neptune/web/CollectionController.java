@@ -2,7 +2,9 @@ package io.fairspace.neptune.web;
 
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.service.CollectionService;
+import io.fairspace.neptune.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +22,16 @@ import java.net.URISyntaxException;
 @RestController
 @RequestMapping("/")
 public class CollectionController {
-    @Autowired
+    private final Caching caching;
     private CollectionService collectionService;
+
+    public CollectionController(
+            @Value("${cachingPeriod.collection:60}") int cachePeriod,
+            CollectionService collectionService
+    ) {
+        this.collectionService = collectionService;
+        this.caching = new Caching(cachePeriod);
+    }
 
     @GetMapping
     public Iterable<Collection> getCollections() {
@@ -29,8 +39,8 @@ public class CollectionController {
     }
 
     @GetMapping("/{id}")
-    public Collection getCollection(@PathVariable Long id) {
-        return collectionService.findById(id);
+    public ResponseEntity<Collection> getCollection(@PathVariable Long id) {
+        return caching.withCacheControl(collectionService.findById(id));
     }
 
     @PostMapping
