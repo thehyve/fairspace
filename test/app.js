@@ -1,6 +1,5 @@
-process.env.FILES_FOLDER = __dirname + '/fs';
-process.env.PERMISSIONS_URL = 'http://fairspace.io/api/collections/permissions?location=%s';
-
+process.env.CONFIG_FILE = __dirname + '/test-config.js';
+const testConfig = require(process.env.CONFIG_FILE);
 const supertest = require('supertest');
 const fs = require('fs-extra');
 nock = require('nock');
@@ -69,9 +68,9 @@ nock('http://fairspace.io', {
     .reply(404);
 
 describe('Titan', () => {
-    before(() => fs.mkdirSync(process.env.FILES_FOLDER));
+    before(() => fs.mkdirSync(testConfig.rootPath));
 
-    after(() => fs.removeSync(process.env.FILES_FOLDER));
+    after(() => fs.removeSync(testConfig.rootPath));
 
     it('responds to probe requests', () =>
         server
@@ -88,9 +87,9 @@ describe('Titan', () => {
 });
 
 describe('Authentication', () => {
-    before(() => fs.mkdirSync(process.env.FILES_FOLDER));
+    before(() => fs.mkdirSync(testConfig.rootPath));
 
-    after(() => fs.removeSync(process.env.FILES_FOLDER));
+    after(() => fs.removeSync(testConfig.rootPath));
 
     it('responds to /api/storage/webdav/ when authorization with a valid JWT is provided', () =>
         server
@@ -121,9 +120,9 @@ describe('Authentication', () => {
 });
 
 describe('Webdav with /api/storage/webdav/ prefix', () => {
-    beforeEach(() => fs.mkdirSync(process.env.FILES_FOLDER));
+    beforeEach(() => fs.mkdirSync(testConfig.rootPath));
 
-    afterEach(() => fs.removeSync(process.env.FILES_FOLDER));
+    afterEach(() => fs.removeSync(testConfig.rootPath));
 
 
     it('a user can create and delete a top-level directory', () =>
