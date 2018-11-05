@@ -58,6 +58,8 @@ ceres:
       realm: ci
     tracing:
       samplingRate: 1
+    metadata:
+      baseUrl: https://workspace.ci.fairway.app
 
 # Specific settings for Neptune subchart
 neptune:

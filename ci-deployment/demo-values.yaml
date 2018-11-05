@@ -54,6 +54,8 @@ ceres:
       realm: demo
     tracing:
       enabled: false
+    metadata:
+      baseUrl: https://workspace.demo.fairspace.app
 
 # Specific settings for Neptune subchart
 neptune:
