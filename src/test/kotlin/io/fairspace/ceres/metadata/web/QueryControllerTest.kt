@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @RunWith(SpringRunner::class)
-@WebMvcTest(secure = false, controllers = arrayOf(QueryController::class))
+@WebMvcTest(secure = false, controllers = [QueryController::class])
 class QueryControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
