@@ -98,5 +98,12 @@ jupyterhub:
   hub:
       extraEnv:
           JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
+      extraConfig: |
+        c.KubeSpawner.cmd = ['/start']
+        c.KubeSpawner.singleuser_privileged = True
+        c.Authenticator.auto_login = True
+        c.JupyterHub.log_level = 'DEBUG'
+        c.Spawner.debug = True
+        c.KubeSpawner.debug = True
   proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
