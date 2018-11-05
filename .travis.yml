@@ -8,7 +8,7 @@ env:
   - APPNAME="jupyterhub-hub"
   - ORG="fairspace"
   - RELEASE_BRANCH="master"
-  - SNAPSHOT_BRANCH="VRE-291-Jenkins-to-Travis"
+  - SNAPSHOT_BRANCH="dev"
   - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
   - DOCKER_USERNAME="fairspace"
   # DOCKER_PASSWORD = ...
