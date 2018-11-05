@@ -14,77 +14,133 @@
         {
             "@id": "foaf:Person",
             "@type": "rdf:Class",
+            "fs:fairspaceEntity": true,
             "rdfs:comment": "A person that is subject of research.",
-            "rdfs:label": "Person",
-            "fs:fairspaceEntity": true
+            "rdfs:label": "Person"
         },
         {
             "@id": "schema:Material",
             "@type": "rdf:Class",
+            "fs:fairspaceEntity": true,
             "rdfs:comment": "A material or a sample provided by person.",
-            "rdfs:label": "Material",
-            "fs:fairspaceEntity": true
+            "rdfs:label": "Material"
         },
         {
             "@id": "fs:PersonConsent",
             "@type": "rdf:Class",
+            "fs:fairspaceEntity": true,
             "rdfs:comment": "A research consent given by person. ",
-            "rdfs:label": "Person Consent",
-            "fs:fairspaceEntity": true
+            "rdfs:label": "Person Consent"
         },
         {
             "@id": "fs:ResearchProject",
             "@type": "rdf:Class",
+            "fs:fairspaceEntity": true,
             "rdfs:comment": "A research project.",
-            "rdfs:label": "Research Project",
-            "fs:fairspaceEntity": true
+            "rdfs:label": "Research Project"
         },
         {
             "@id": "fs:File",
             "@type": "rdf:Class",
+            "fs:fairspaceEntity": false,
             "rdfs:comment": "A single file.",
             "rdfs:label": "File"
         },
         {
             "@id": "fs:Collection",
             "@type": "rdf:Class",
+            "fs:fairspaceEntity": true,
             "rdfs:comment": "A specific collection in Fairspace.",
-            "rdfs:label": "Collection",
-            "fs:fairspaceEntity": true
+            "rdfs:label": "Collection"
         },
         {
             "@id": "fs:User",
             "@type": "rdf:Class",
+            "fs:fairspaceEntity": false,
             "rdfs:comment": "A user of the fairspace application.",
             "rdfs:label": "User"
-        },
-        {
-            "@id": "foaf:GenderMale",
-            "@type": "foaf:Gender",
-            "rdfs:label": "Male"
-        },
-        {
-            "@id": "foaf:GenderFemale",
-            "@type": "foaf:Gender",
-            "rdfs:label": "Female"
-        },
-        {
-            "@id": "foaf:GenderOther",
-            "@type": "foaf:Gender",
-            "rdfs:label": "Other"
         },
         {
             "@id": "@type",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
             "fs:machineOnly": true,
-            "rdfs:label": "Type"
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                },
+                {
+                    "@id": "schema:Material"
+                },
+                {
+                    "@id": "fs:PersonConsent"
+                },
+                {
+                    "@id": "fs:ResearchProject"
+                },
+                {
+                    "@id": "fs:File"
+                },
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:User"
+                }
+            ],
+            "rdfs:label": "Type",
+            "rdfs:range": [
+                {
+                    "@id": "foaf:Person"
+                },
+                {
+                    "@id": "schema:Material"
+                },
+                {
+                    "@id": "fs:PersonConsent"
+                },
+                {
+                    "@id": "fs:ResearchProject"
+                },
+                {
+                    "@id": "fs:File"
+                },
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:User"
+                }
+            ]
         },
         {
             "@id": "rdfs:label",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
             "rdfs:comment": "Human readable name.",
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                },
+                {
+                    "@id": "schema:Material"
+                },
+                {
+                    "@id": "fs:PersonConsent"
+                },
+                {
+                    "@id": "fs:ResearchProject"
+                },
+                {
+                    "@id": "fs:File"
+                },
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:User"
+                }
+            ],
             "rdfs:label": "Name",
             "rdfs:range": [
                 {
@@ -98,6 +154,29 @@
             "fs:allowMultiple": false,
             "fs:multiLine": true,
             "rdfs:comment": "Human friendly description.",
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                },
+                {
+                    "@id": "schema:Material"
+                },
+                {
+                    "@id": "fs:PersonConsent"
+                },
+                {
+                    "@id": "fs:ResearchProject"
+                },
+                {
+                    "@id": "fs:File"
+                },
+                {
+                    "@id": "fs:Collection"
+                },
+                {
+                    "@id": "fs:User"
+                }
+            ],
             "rdfs:label": "Description",
             "rdfs:range": [
                 {
@@ -391,7 +470,7 @@
             ]
         },
         {
-            "@id": "fs:investigationNature",
+            "@id": "fs:investigationNature ",
             "@type": "rdf:Property",
             "fs:allowMultiple": true,
             "rdfs:comment": "choose between: basic research, biomedical research, clinical trial, medical diagnosis",
@@ -435,7 +514,7 @@
             "rdfs:label": "Gender",
             "rdfs:range": [
                 {
-                    "@id": "foaf:Gender"
+                    "@id": "xsd:string"
                 }
             ]
         },
@@ -473,7 +552,7 @@
             ]
         },
         {
-            "@id": "obo:FMA_50707",
+            "@id": "obo:FMA_50707 ",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
             "rdfs:comment": "Spatial association relationship which describes the containment, adjacency and anatomical coordinates of physical anatomical entities. Examples: anatomical containment, anatomical adjacency, anatomical coordinate.",
