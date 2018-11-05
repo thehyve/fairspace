@@ -23,7 +23,6 @@ resources:
 # Authentication parameters
 auth:
   enabled: true
-  jwksUrl:
 
 # Tracing parameters
 tracing:
@@ -31,12 +30,14 @@ tracing:
   zipkinUrl: http://jaeger-collector.jaeger:9411
   samplingRate: 1
 
-permissions:
-  collectionPermissionsUrl:
+collections:
+  collectionUrl:
 
 ## Persist data to a persistent volume
 persistence:
   enabled: true
+
+  rootPath: /data
 
   ## A manually managed Persistent Volume and Claim
   ## Requires persistence.enabled: true

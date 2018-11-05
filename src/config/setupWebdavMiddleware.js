@@ -6,7 +6,7 @@ const PrivilegeManager = require('../auth/NeptunePathPrivilegeManager');
 
 module.exports = function setupWebdavMiddleware(app, params, permissions, serverConfigurer) {
     const server = new webdav.WebDAVServer({
-        requireAuthentification: params.authEnabled,
+        requireAuthentification: params.auth.enabled,
         httpAuthentication: jwtAuthentication,
         rootFileSystem: new AuthAwareFileSystem(params.rootPath, permissions),
         privilegeManager: new PrivilegeManager(permissions)
@@ -14,6 +14,6 @@ module.exports = function setupWebdavMiddleware(app, params, permissions, server
 
     serverConfigurer(server);
 
-    app.use(fixWebdavDestinationMiddleware(params.webdavPath));
-    return app.use(webdav.extensions.express(params.webdavPath, server));
+    app.use(fixWebdavDestinationMiddleware(params.basePath));
+    return app.use(webdav.extensions.express(params.basePath, server));
 }

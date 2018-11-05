@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "titan.fullname" . }}-config
+  labels:
+    app: {{ template "titan.name" . }}
+    chart: {{ template "titan.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  config.json: {
+    "rootPath": "{{ .Values.persistence.rootPath }}",
+    "basePath":"/api/storage/webdav",
+    "auth": {
+      "enabled": {{ .Values.auth.enabled }}
+    },
+    "tracing": {
+      "enabled": {{ .Values.tracing.enabled }},
+      "zipkinUrl": "{{ .Values.tracing.zipkinUrl }}",
+      "samplingRate": {{ .Values.tracing.samplingRate }}
+    },
+    "urls":{
+      "collections": "{{ .Values.collections.collectionUrl | default (printf "http://%s-neptune.%s.svc.cluster.local/permissions?location=%s" .Release.Name .Release.Namespace)}}"
+    }
+  }
+
