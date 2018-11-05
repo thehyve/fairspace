@@ -5,6 +5,30 @@ const setupEventEmitter = require('./config/setupEventEmitter');
 const PermissionsApi = require('./api/PermissionsApi');
 
 // Configuration parameters
+const DEFAULT_PARAMS = {
+    rootPath: '/data',
+    basePath: '/api/storage/webdav',
+    authEnabled: true,
+    tracing: {
+        enabled: true,
+        zipkinUrl: 'http://jaeger-collector.jaeger:9411',
+        samplingRate: 0.01
+    },
+    rabbitmq: {
+        name: 'default',
+        exchange: 'storage'
+    },
+    urls: {
+        collections: ''
+    }
+}
+
+let params = DEFAULT_PARAMS;
+
+if(process.env.CONFIG_FILE) {
+    params = {...params, ...require(process.env.CONFIG_FILE)}
+}
+
 const rootPath = process.env.FILES_FOLDER || '/data';
 const basePath = '/api/storage/webdav';
 const authEnabled = process.env.AUTH_ENABLED !== 'false';
@@ -23,12 +47,10 @@ const connectionSettings = {
 // Respond to / anonymously to allow for health checks
 app.get('/', (req, res, next) => req.get('probe') ? res.send('Hi, I\'m Titan!').end() : next());
 
-if(tracingEnabled) {
-    setupTracingMiddleware(app, zipkinEndointUrl, zipkinSamplingRate);
+if(params.tracing.enabled) {
+    setupTracingMiddleware(app, params.tracing.zipkinUrl, params.tracing.samplingRate);
 }
-const permissionsApi = authEnabled ? new PermissionsApi(permissionsEndpointUrl) : { retrieveAccess: () => Promise.resolve('Manage') }
-setupWebdavMiddleware(app, rootPath, basePath, authEnabled, permissionsApi, server => setupEventEmitter(server, connectionSettings, 'storage'));
-
-app.use((req, res, next) => { console.log('Run'); next(); });
+const permissionsApi = params.authEnabled ? new PermissionsApi(params.urls.collections) : { retrieveAccess: () => Promise.resolve('Manage') }
+setupWebdavMiddleware(app, params, permissionsApi, server => setupEventEmitter(server, params.rabbitmq));
 
 module.exports = app;
