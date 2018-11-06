@@ -164,7 +164,7 @@ jupyterhub:
         openid_url:
         session_url:
     scopes:
-      - offline_access
+      - "offline_access"
   singleuser:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
