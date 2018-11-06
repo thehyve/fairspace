@@ -2,7 +2,7 @@ const app = require('express')();
 const setupTracingMiddleware = require('./config/setupTracingMiddleware');
 const setupWebdavMiddleware = require('./config/setupWebdavMiddleware');
 const setupEventEmitter = require('./config/setupEventEmitter');
-const setupPermissionsApi = require('./config/setupPermissionsApi');
+const setupCollectionApi = require('./config/setupCollectionApi');
 
 // Configuration parameters
 const defaultConfig = {
@@ -37,7 +37,7 @@ if(process.env.CONFIG_FILE) {
 app.get('/', (req, res, next) => req.get('probe') ? res.send('Hi, I\'m Titan!').end() : next());
 
 if(configuration.tracing.enabled) setupTracingMiddleware(app, configuration.tracing);
-const permissionsApi = setupPermissionsApi(configuration);
+const permissionsApi = setupCollectionApi(configuration);
 setupWebdavMiddleware(app, configuration, permissionsApi, server => setupEventEmitter(server, configuration.rabbitmq));
 
 module.exports = app;

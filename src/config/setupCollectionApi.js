@@ -1,6 +1,6 @@
-const PermissionsApi = require('../api/PermissionsApi');
+const CollectionApi = require('../api/CollectionApi');
 
 module.exports = configuration =>
     configuration.auth.enabled ?
-        new PermissionsApi(configuration.urls.collections) :
+        new CollectionApi(configuration.urls.collections) :
         { retrieveAccess: () => Promise.resolve('Manage') }

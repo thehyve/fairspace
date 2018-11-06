@@ -27,7 +27,7 @@ data:
       "exchange": "{{ .Values.rabbitmq.exchange }}"
     },
     "urls":{
-      "collections": "{{ .Values.collections.collectionUrl | default (printf "http://%s-neptune.%s.svc.cluster.local/permissions?location=%s" .Release.Name .Release.Namespace)}}"
+      "collections": "{{ .Values.collections.collectionUrl | default (printf "http://%s-neptune.%s.svc.cluster.local/?location=%s" .Release.Name .Release.Namespace)}}"
     }
   }
 
