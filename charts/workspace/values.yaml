@@ -163,6 +163,8 @@ jupyterhub:
         client_secret:
         openid_url:
         session_url:
+    scopes:
+      - offline_access
   singleuser:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
@@ -173,7 +175,7 @@ jupyterhub:
   hub:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-hub
-      tag: 0.3.1
+      tag: 0.3.2
     ingress:
       enabled: false
     extraEnv:
