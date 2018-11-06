@@ -8,10 +8,11 @@ const rabbot = require('rabbot');
  * does not continue executing the express.js middleware. For that reason, the emitter
  * is attached to the webdavserver itself
  * @param server
+ * @param collectionApi
  * @param settings
  * @param exchangeName
  */
-module.exports = function setupEventEmitter(server, settings) {
+module.exports = function setupEventEmitter(server, collectionApi, settings) {
     if(!settings.enabled) {
         console.log("Not emitting events due to configuration settings");
         return;
@@ -26,6 +27,8 @@ module.exports = function setupEventEmitter(server, settings) {
         ]
     }).then(() => {
         console.log("Connection with RabbitMQ has been established")
-        server.afterRequest(eventEmitter(rabbot, settings.exchange));
+        server.afterRequest(eventEmitter(rabbot, collectionApi, settings.exchange));
+    }).catch(e => {
+        console.error("Connection with RabbitMQ failed:", e);
     })
 };

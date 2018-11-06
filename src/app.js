@@ -1,4 +1,5 @@
 const app = require('express')();
+const deepmerge = require('deepmerge');
 const setupTracingMiddleware = require('./config/setupTracingMiddleware');
 const setupWebdavMiddleware = require('./config/setupWebdavMiddleware');
 const setupEventEmitter = require('./config/setupEventEmitter');
@@ -28,7 +29,7 @@ const defaultConfig = {
 // Read external configuration file
 let configuration;
 if(process.env.CONFIG_FILE) {
-    configuration = {...defaultConfig, ...require(process.env.CONFIG_FILE)}
+    configuration = deepmerge(defaultConfig, require(process.env.CONFIG_FILE))
 } else {
     configuration = defaultConfig;
 }
@@ -37,7 +38,7 @@ if(process.env.CONFIG_FILE) {
 app.get('/', (req, res, next) => req.get('probe') ? res.send('Hi, I\'m Titan!').end() : next());
 
 if(configuration.tracing.enabled) setupTracingMiddleware(app, configuration.tracing);
-const permissionsApi = setupCollectionApi(configuration);
-setupWebdavMiddleware(app, configuration, permissionsApi, server => setupEventEmitter(server, configuration.rabbitmq));
+const collectionApi = setupCollectionApi(configuration);
+setupWebdavMiddleware(app, configuration, collectionApi, server => setupEventEmitter(server, collectionApi, configuration.rabbitmq));
 
 module.exports = app;

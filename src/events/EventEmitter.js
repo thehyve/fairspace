@@ -3,8 +3,20 @@
  * over AMQP
  * @returns {function(Args, Function): *}
  */
-module.exports = function EventEmitter(rabbot, exchangeName) {
+module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
     const publish = event => rabbot.publish(exchangeName, event);
+
+    const getCollection = (req, user) => {
+        const paths = req.path.split('/');
+
+        if(paths.length == 0 || !paths[1]) {
+            console.warn("Emitting event for request without correct path: ", req.path);
+            return Promise.resolve({});
+        }
+
+        return collectionApi.retrieveCollection(paths[1], user.password)
+    }
+
     const readEvent = req => ({
         routingKey: 'read',
         type: "io.fairspace.titan.readDir",
@@ -79,10 +91,17 @@ module.exports = function EventEmitter(rabbot, exchangeName) {
     const handler = (args, next) => {
         if(methodToEventsMap.hasOwnProperty(args.request.method)) {
             console.debug("Emitting event for", args.request.method, "on", args.request.path);
-            publish(methodToEventsMap[args.request.method](args.request, args.response));
+            return getCollection(args.request, args.user)
+                .then(collection => {
+                    const event = methodToEventsMap[args.request.method](args.request, args.response)
+                    event.body.collection = collection;
+                    return event;
+                })
+                .then(publish)
+                .then(next);
+        } else {
+            return Promise.resolve().then(next());
         }
-
-        return next();
     };
 
     return handler;
