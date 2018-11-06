@@ -4,6 +4,6 @@ module.exports = {
         "enabled": false
     },
     "urls": {
-        "collections": "http://fairspace.io/api/collections/permissions?location=%s"
+        "collections": "http://fairspace.io/api/collections?location=%s"
     }
 }
