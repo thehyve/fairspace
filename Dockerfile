@@ -1,6 +1,12 @@
-FROM jupyter/datascience-notebook:137a295ff71b
+FROM jupyter/datascience-notebook:61d8aaedaeaf
 
 USER root
+
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python2 get-pip.py
+RUN python2 -m pip install ipykernel
+RUN python2 -m ipykernel install
+
 RUN apt-get update
 RUN apt-get install -y apt-utils
 RUN apt-get install -y git autoconf automake checkinstall libfuse-dev libneon27 libneon27-dev python-fuse pkg-config vim net-tools nginx
