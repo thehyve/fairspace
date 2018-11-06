@@ -5,8 +5,8 @@ import org.springframework.data.repository.CrudRepository
 import java.util.*
 
 interface PidRepository: CrudRepository<Pid, UUID> {
-    fun findByValue (value: String): Pid?
-    fun findByValueStartingWith(prefix: String): Iterable<Pid>
-    fun deleteByValueStartingWith(prefix: String)
+    fun findByValue (value: String): Optional<Pid>
+    fun findByValueStartingWith (prefix: String): Iterable<Pid>
+    fun deleteByValueStartingWith (prefix: String)
 }
 

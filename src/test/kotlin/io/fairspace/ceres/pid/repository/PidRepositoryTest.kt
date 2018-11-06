@@ -17,7 +17,7 @@ import java.util.*
 @RunWith(SpringRunner::class)
 @SpringBootTest
 @DirtiesContext
-class PidRepositoryTest {
+open class PidRepositoryTest {
 
     @Autowired
     lateinit var pidRepository: PidRepository

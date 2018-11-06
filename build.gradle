@@ -61,8 +61,9 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-reflect")
 	compile("org.apache.jena:apache-jena-libs:$jena_version")
 	compile("io.fairspace:oidc-auth-bearer-auth:${oidcAuthVersion}")
+	compile('org.postgresql:postgresql')
 	compile("com.h2database:h2")
-
+	compile("org.apache.commons:commons-collections4:4.2")
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('com.nimbusds:nimbus-jose-jwt:5.7')

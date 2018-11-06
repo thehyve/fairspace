@@ -8,14 +8,27 @@ import java.util.*
 @Service
 class PidService(val repository: PidRepository) {
 
-    fun findById (id: UUID) : Pid =
-            repository.findById(id).orElseThrow({MappingNotFoundException(id.toString())})
-
-    fun findByValue (value: String) : Pid =
-        repository.findByValue(value) ?: throw MappingNotFoundException(value)
+    fun findById (id: UUID) : Pid {
+        val pid : Optional<Pid> = repository.findById(id)
+        if (pid.isPresent()) {
+            return pid.get()
+        }
+        else {
+            throw MappingNotFoundException(id.toString())
+        }
+    }
+    fun findByValue (value: String) : Pid {
+        val pid : Optional<Pid> = repository.findByValue(value)
+        if (pid.isPresent()) {
+            return pid.get()
+        }
+        else {
+            throw MappingNotFoundException(value)
+        }
+    }
 
     fun findByPrefix (prefix: String): List<Pid> =
-            repository.findByValueStartingWith(prefix).toList()
+        repository.findByValueStartingWith(prefix).toList()
 
     fun existsByValue(value: String): Boolean {
         try {
@@ -39,10 +52,10 @@ class PidService(val repository: PidRepository) {
     fun updateByPrefix (oldPrefix: String, newPrefix: String) : List<Pid> {
         var result: MutableList<Pid> = mutableListOf()
         for ( pid : Pid in findByPrefix(oldPrefix)) {
-            val newValue: String = pid.value.replaceFirst(oldPrefix,newPrefix)
-            if ( newValue.equals(pid.value)) {
+            if ( pid.value.indexOf(oldPrefix) != 0) {
                 throw Exception("Internal error: unable to change prefix for value ${pid.value}")
             }
+            val newValue: String = pid.value.replaceFirst(oldPrefix,newPrefix)
             pid.value = newValue
             result.add(repository.save(pid))
         }
