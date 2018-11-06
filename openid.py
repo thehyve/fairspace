@@ -26,9 +26,7 @@ class OpenIDConnectEnvMixin(OAuth2Mixin):
 
 
 class OpenIDConnectLoginHandler(OAuthLoginHandler, OpenIDConnectEnvMixin):
-    @property
-    def scope(self):
-        return self.authenticator.scope
+    pass
 
 
 class OpenIDConnectOAuthenticator(OAuthenticator):
@@ -70,8 +68,6 @@ class OpenIDConnectOAuthenticator(OAuthenticator):
         config=True,
         help="Disable TLS verification on http request"
     )
-
-    scope = 'offline_access'
 
     def _connect_url(self):
         if self.openid_url.endswith('/'):
