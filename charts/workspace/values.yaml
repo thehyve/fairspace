@@ -163,6 +163,8 @@ jupyterhub:
         client_secret:
         openid_url:
         session_url:
+    scopes:
+      - offline_access
   singleuser:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
@@ -182,7 +184,6 @@ jupyterhub:
       c.KubeSpawner.cmd = ['/start']
       c.KubeSpawner.singleuser_privileged = True
       c.Authenticator.auto_login = True
-      c.OAuthenticator.scope = ['offline_access']
   proxy:
     # The JupyterHub chart requires this value to be set here with the same
     # length as the actual values
