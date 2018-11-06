@@ -35,21 +35,21 @@ class PidServiceTest {
      }
 
     @Test
-    fun can_find_entity_by_uuid() {
+    fun canFindEntityByUUID() {
         `when`(pidRepository.findById(TestData.path1.uuid)).thenReturn(Optional.of(TestData.path1))
         val foundPath = pidService.findById(TestData.path1.uuid)
             assert(foundPath.uuid.equals(TestData.path1.uuid))
     }
 
     @Test
-    fun can_find_entity_by_value() {
+    fun canFindEntityByValue() {
         `when`(pidRepository.findByValue(TestData.path1.value)).thenReturn(Optional.of(TestData.path1))
         val foundPath = pidService.findByValue(TestData.path1.value)
         assertEquals(foundPath.uuid, TestData.path1.uuid)
     }
 
     @Test
-    fun can_find_entity_by_prefix() {
+    fun canFindEntityByPrefix() {
         `when`(pidRepository.findByValueStartingWith(TestData.commonPrefix)).thenReturn(listOf(TestData.path1,TestData.path2))
         val pids: List<Pid> = pidService.findByPrefix(TestData.commonPrefix)
         verify(pidRepository,times(1)).findByValueStartingWith(TestData.commonPrefix)
@@ -58,33 +58,33 @@ class PidServiceTest {
     }
 
     @Test
-    fun entity_exists_by_value() {
+    fun entityExistsByValue() {
         `when`(pidRepository.findByValue(TestData.path1.value)).thenReturn(Optional.of(TestData.path1))
         assert(pidService.existsByValue(TestData.path1.value))
     }
 
     @Test
-    fun nonexistent_entity_does_not_exist() {
+    fun nonexistentEntityDoesNotExist() {
         `when`(pidRepository.findByValue(TestData.nonExistingValue)).thenReturn(Optional.empty())
         assertFalse(pidService.existsByValue(TestData.nonExistingValue))
     }
 
     @Test
-    fun can_delete_entity() {
+    fun canDeleteEntity() {
        `when`(pidRepository.deleteById(TestData.path1.uuid)).then { null }
         pidService.delete(TestData.path1.uuid)
         verify(pidRepository,times(1)).deleteById(TestData.path1.uuid)
     }
 
     @Test
-    fun can_delete_entity_by_prefix() {
+    fun canDeleteEntityByPrefix() {
         `when`(pidRepository.deleteByValueStartingWith(deleteTestPrefix)).then { null }
         pidService.deleteByPrefix(TestData.deleteTestPrefix)
         verify(pidRepository,times(1)).deleteByValueStartingWith(deleteTestPrefix)
     }
 
     @Test
-    fun can_update_entity_by_prefix() {
+    fun canUpdateEntityByPrefix() {
         `when`(pidRepository.findByValueStartingWith(TestData.commonPrefix)).thenReturn(listOf(TestData.path1))
         `when`(pidRepository.save(TestData.path1)).thenReturn(TestData.path1)
         val results: List<Pid> = pidService.updateByPrefix(TestData.commonPrefix, TestData.updateTestNewPrefix)
@@ -94,7 +94,7 @@ class PidServiceTest {
      }
 
     @Test
-    fun can_save_entity () {
+    fun canSaveEntity () {
         val testValue = "https://workspace.test.fairway.app/iri/collections/789/foo/bat"
         val testId = UUID.fromString("af4bec86-5297-4521-89d7-13ca579f6fb2")
         val testPid = Pid( uuid = testId, value = testValue )
