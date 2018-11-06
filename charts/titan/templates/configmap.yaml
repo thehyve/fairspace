@@ -8,26 +8,27 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  config.json: {
-    "rootPath": "{{ .Values.persistence.rootPath }}",
-    "basePath":"/api/storage/webdav",
-    "auth": {
-      "enabled": {{ .Values.auth.enabled }}
-    },
-    "tracing": {
-      "enabled": {{ .Values.tracing.enabled }},
-      "zipkinUrl": "{{ .Values.tracing.zipkinUrl }}",
-      "samplingRate": {{ .Values.tracing.samplingRate }}
-    },
-    "rabbitmq": {
-      "host": "{{ .Values.rabbitmq.hostname }}",
-      "vhost": "{{ .Values.rabbitmq.vhost | default .Release.Name }}",
-      "user": "{{ .Values.rabbitmq.username | default (printf "%s-titan" .Release.Name) }}",
-      "pass": "{{ .Values.rabbitmq.password }}",
-      "exchange": "{{ .Values.rabbitmq.exchange }}"
-    },
-    "urls":{
-      "collections": "{{ .Values.collections.collectionUrl | default (printf "http://%s-neptune.%s.svc.cluster.local/?location=%s" .Release.Name .Release.Namespace)}}"
+  config.json: |-
+    {
+      "rootPath": "{{ .Values.persistence.rootPath }}",
+      "basePath":"/api/storage/webdav",
+      "auth": {
+        "enabled": {{ .Values.auth.enabled }}
+      },
+      "tracing": {
+        "enabled": {{ .Values.tracing.enabled }},
+        "zipkinUrl": "{{ .Values.tracing.zipkinUrl }}",
+        "samplingRate": {{ .Values.tracing.samplingRate }}
+      },
+      "rabbitmq": {
+        "host": "{{ .Values.rabbitmq.hostname }}",
+        "vhost": "{{ .Values.rabbitmq.vhost | default .Release.Name }}",
+        "user": "{{ .Values.rabbitmq.username | default (printf "%s-titan" .Release.Name) }}",
+        "pass": "{{ .Values.rabbitmq.password }}",
+        "exchange": "{{ .Values.rabbitmq.exchange }}"
+      },
+      "urls":{
+        "collections": "{{ .Values.collections.collectionUrl | default (printf "http://%s-neptune.%s.svc.cluster.local/?location=%s" .Release.Name .Release.Namespace)}}"
+      }
     }
-  }
 
