@@ -1,34 +1,42 @@
 package io.fairspace.ceres.pid.service
 
 import io.fairspace.ceres.pid.model.Pid
+import io.fairspace.ceres.pid.model.PidDTO
 import io.fairspace.ceres.pid.repository.PidRepository
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class PidService(val repository: PidRepository) {
 
-    fun findById (id: UUID) : Pid {
-        val pid : Optional<Pid> = repository.findById(id)
+    companion object {
+        @Value("\${app.metadata.base-url}")
+        lateinit var urlPrefix: String
+    }
+
+    fun findById (id: String) : PidDTO {
+        val pid : Optional<Pid> = repository.findById(idToUUID(id))
         if (pid.isPresent()) {
-            return pid.get()
+            return pidToPidDTO(pid.get())
         }
         else {
             throw MappingNotFoundException(id.toString())
         }
     }
-    fun findByValue (value: String) : Pid {
+
+    fun findByValue (value: String) : PidDTO {
         val pid : Optional<Pid> = repository.findByValue(value)
         if (pid.isPresent()) {
-            return pid.get()
+            return pidToPidDTO(pid.get())
         }
         else {
             throw MappingNotFoundException(value)
         }
     }
 
-    fun findByPrefix (prefix: String): List<Pid> =
-        repository.findByValueStartingWith(prefix).toList()
+    fun findByPrefix (prefix: String): List<PidDTO> =
+        repository.findByValueStartingWith(prefix).toList().map { pid -> pidToPidDTO(pid) }
 
     fun existsByValue(value: String): Boolean {
         try {
@@ -40,7 +48,8 @@ class PidService(val repository: PidRepository) {
         return true
     }
 
-    fun add (pid: Pid, errorAlreadyExists: Boolean = false) : Pid {
+    fun add (pidDTO: PidDTO, errorAlreadyExists: Boolean = false) : Pid {
+        val pid = pidDTOtoPid(pidDTO)
         if ( errorAlreadyExists && existsByValue(pid.value)) {
             throw ValueAlreadyExistsException("value: ${pid.value}")
         }
@@ -51,7 +60,8 @@ class PidService(val repository: PidRepository) {
 
     fun updateByPrefix (oldPrefix: String, newPrefix: String) : List<Pid> {
         var result: MutableList<Pid> = mutableListOf()
-        for ( pid : Pid in findByPrefix(oldPrefix)) {
+        for ( pidDTO : PidDTO in findByPrefix(oldPrefix)) {
+            val pid = pidDTOtoPid(pidDTO)
             if ( pid.value.indexOf(oldPrefix) != 0) {
                 throw Exception("Internal error: unable to change prefix for value ${pid.value}")
             }
@@ -62,16 +72,43 @@ class PidService(val repository: PidRepository) {
         return result
     }
 
-    fun delete (id : UUID) {
-        repository.deleteById(id)
+    fun deleteById (id: String) {
+        repository.deleteById(idToUUID(id))
     }
 
-    fun delete (value: String) {
-        val foundPid : Pid = findByValue(value)
+    fun deleteByValue  (value: String) {
+        val foundPid : Pid = pidDTOtoPid (findByValue(value))
         repository.delete(foundPid)
     }
 
     fun deleteByPrefix (prefix: String) =
         repository.deleteByValueStartingWith(prefix)
+
+    fun pidToPidDTO (pid: Pid) : PidDTO {
+      return PidDTO ( id = uuidToId(pid.uuid), value = pid.value )
+    }
+
+    fun pidDTOtoPid ( pidDTO: PidDTO ): Pid {
+      return Pid ( uuid = idToUUID(pidDTO.id), value = pidDTO.value )
+    }
+
+    fun idToUUID (input: String) : UUID {
+        if (input.startsWith(PidService.urlPrefix)) {
+            val uuidString: String = input.replaceFirst(PidService.urlPrefix,"")
+            try {
+                return UUID.fromString(uuidString)
+            }
+            catch ( _ : IllegalArgumentException) {
+                throw InvalidPersistentIdentifierException(input)
+            }
+        }
+        else {
+            throw InvalidPersistentIdentifierException(input)
+        }
+    }
+
+   fun uuidToId (input: UUID) : String {
+        return PidService.urlPrefix + input
+    }
 
 }
