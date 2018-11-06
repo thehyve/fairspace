@@ -82,4 +82,4 @@ spec:
         {{- end }}
       - name: config-volume
         configMap:
-        name: {{ template "titan.fullname" . }}-config
+          name: {{ template "titan.fullname" . }}-config
