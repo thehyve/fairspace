@@ -168,7 +168,7 @@ jupyterhub:
   singleuser:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
-      tag: 0.3.1
+      tag: 0.3.0
     defaultUrl: "/lab"
     extraEnv:
       WORKSPACE_URL:

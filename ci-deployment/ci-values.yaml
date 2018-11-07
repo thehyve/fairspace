@@ -104,6 +104,3 @@ jupyterhub:
           JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
   proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
-  prePuller:
-    hook:
-      enabled: true
