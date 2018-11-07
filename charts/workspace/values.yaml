@@ -180,10 +180,11 @@ jupyterhub:
       enabled: false
     extraEnv:
       JUPYTERHUB_CRYPT_KEY:
-    extraConfig: |
-      c.KubeSpawner.cmd = ['/start']
-      c.KubeSpawner.singleuser_privileged = True
-      c.Authenticator.auto_login = True
+    extraConfig:
+      customConfig: |
+        c.KubeSpawner.cmd = ['/start']
+        c.KubeSpawner.singleuser_privileged = True
+        c.Authenticator.auto_login = True
   proxy:
     # The JupyterHub chart requires this value to be set here with the same
     # length as the actual values
