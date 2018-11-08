@@ -56,8 +56,8 @@ public class CollectionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection> getCollection(@PathVariable Long id) {
-        return caching.withCacheControl(collectionService.findById(id));
+    public Collection getCollection(@PathVariable Long id) {
+        return collectionService.findById(id);
     }
 
     @PostMapping
