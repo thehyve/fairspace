@@ -20,8 +20,15 @@ data:
         "zipkinUrl": "{{ .Values.tracing.zipkinUrl }}",
         "samplingRate": {{ .Values.tracing.samplingRate }}
       },
+      "rabbitmq": {
+        "host": "{{ .Values.rabbitmq.hostname }}",
+        "vhost": "{{ .Values.rabbitmq.vhost | default .Release.Name }}",
+        "user": "{{ .Values.rabbitmq.username | default (printf "%s-titan" .Release.Name) }}",
+        "pass": "{{ .Values.rabbitmq.password }}",
+        "exchange": "{{ .Values.rabbitmq.exchange }}"
+      },
       "urls":{
-        "collections": "{{ .Values.collections.collectionUrl | default (printf "http://%s-neptune.%s.svc.cluster.local/permissions?location=%%s" .Release.Name .Release.Namespace)}}"
+        "collections": "{{ .Values.collections.collectionUrl | default (printf "http://%s-neptune.%s.svc.cluster.local/?location=%%s" .Release.Name .Release.Namespace)}}"
       }
     }
 
