@@ -3,6 +3,7 @@ package io.fairspace.ceres.pid.service
 import io.fairspace.ceres.pid.TestData
 import io.fairspace.ceres.pid.TestData.deleteTestPrefix
 import io.fairspace.ceres.pid.model.Pid
+import io.fairspace.ceres.pid.model.PidDTO
 import io.fairspace.ceres.pid.repository.PidRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -15,8 +16,6 @@ import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.*
 
-
-
 @RunWith(MockitoJUnitRunner::class)
 
 class PidServiceTest {
@@ -25,33 +24,30 @@ class PidServiceTest {
 
     lateinit var pidService: PidService
 
-    lateinit var savedPid1: Pid
-    lateinit var savedPid2: Pid
-    lateinit var savedPid3: Pid
-
     @Before
     fun setUp() {
         pidService = PidService(pidRepository)
+        PidService.urlPrefix = "http://fairspace.com"
      }
 
     @Test
     fun canFindEntityByUUID() {
         `when`(pidRepository.findById(TestData.path1.uuid)).thenReturn(Optional.of(TestData.path1))
-        val foundPath = pidService.findById(TestData.path1.uuid)
-            assert(foundPath.uuid.equals(TestData.path1.uuid))
+        val foundPath = pidService.findById(pidService.uuidToId(TestData.path1.uuid))
+        assertEquals(foundPath.id,pidService.pidToPidDTO(TestData.path1).id)
     }
 
     @Test
     fun canFindEntityByValue() {
         `when`(pidRepository.findByValue(TestData.path1.value)).thenReturn(Optional.of(TestData.path1))
         val foundPath = pidService.findByValue(TestData.path1.value)
-        assertEquals(foundPath.uuid, TestData.path1.uuid)
+        assertEquals(foundPath.id, pidService.pidToPidDTO(TestData.path1).id)
     }
 
     @Test
     fun canFindEntityByPrefix() {
         `when`(pidRepository.findByValueStartingWith(TestData.commonPrefix)).thenReturn(listOf(TestData.path1,TestData.path2))
-        val pids: List<Pid> = pidService.findByPrefix(TestData.commonPrefix)
+        val pids: List<Pid> = pidService.findByPrefix(TestData.commonPrefix).map { pidDTO -> pidService.pidDTOtoPid(pidDTO) }
         verify(pidRepository,times(1)).findByValueStartingWith(TestData.commonPrefix)
         assert(pids.contains(TestData.path1))
         assert(pids.contains(TestData.path2))
@@ -72,7 +68,7 @@ class PidServiceTest {
     @Test
     fun canDeleteEntity() {
        `when`(pidRepository.deleteById(TestData.path1.uuid)).then { null }
-        pidService.delete(TestData.path1.uuid)
+        pidService.deleteById(pidService.uuidToId(TestData.path1.uuid))
         verify(pidRepository,times(1)).deleteById(TestData.path1.uuid)
     }
 
@@ -86,7 +82,7 @@ class PidServiceTest {
     @Test
     fun canUpdateEntityByPrefix() {
         `when`(pidRepository.findByValueStartingWith(TestData.commonPrefix)).thenReturn(listOf(TestData.path1))
-        `when`(pidRepository.save(TestData.path1)).thenReturn(TestData.path1)
+        `when`(pidRepository.save(Mockito.any<Pid>())).thenReturn(TestData.path1)
         val results: List<Pid> = pidService.updateByPrefix(TestData.commonPrefix, TestData.updateTestNewPrefix)
         verify(pidRepository,times(1)).findByValueStartingWith(TestData.commonPrefix)
         verify(pidRepository,times(1)).save(Mockito.any())
@@ -96,10 +92,12 @@ class PidServiceTest {
     @Test
     fun canSaveEntity () {
         val testValue = "https://workspace.test.fairway.app/iri/collections/789/foo/bat"
-        val testId = UUID.fromString("af4bec86-5297-4521-89d7-13ca579f6fb2")
-        val testPid = Pid( uuid = testId, value = testValue )
-        `when`(pidRepository.save(testPid)).thenReturn(testPid)
-        pidService.add(testPid)
-        verify(pidRepository, times(1)).save(testPid)
+        val testUUID = UUID.fromString("af4bec86-5297-4521-89d7-13ca579f6fb2")
+        val testId = pidService.uuidToId(testUUID)
+        val pidDTO = PidDTO( id = testId, value = testValue )
+        val pid = Pid(value=testValue, uuid= testUUID)
+        `when`(pidRepository.save(Mockito.any<Pid>())).thenReturn(pid)
+        pidService.add(pidDTO)
+        verify(pidRepository, times(1)).save(Mockito.any())
     }
 }

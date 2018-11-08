@@ -19,3 +19,7 @@ spring:
   test:
     mockmvc:
       print: log_debug
+
+app:
+  metadata:
+    base-url: http://fairspace.com

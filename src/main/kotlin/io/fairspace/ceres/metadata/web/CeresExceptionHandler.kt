@@ -1,5 +1,6 @@
 package io.fairspace.ceres.metadata.web
 
+import io.fairspace.ceres.pid.service.InvalidPersistentIdentifierException
 import io.fairspace.ceres.pid.service.MappingNotFoundException
 import io.fairspace.ceres.pid.service.ValueAlreadyExistsException
 import org.slf4j.LoggerFactory
@@ -52,6 +53,12 @@ class CeresExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun handleMissingParameterException(ex: MissingServletRequestParameterException): ErrorBody {
         return ErrorBody("Missing request parameter " + ex.parameterName)
+    }
+
+    @ExceptionHandler(InvalidPersistentIdentifierException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun invalidPersistentIdentifierException(ex: InvalidPersistentIdentifierException): ErrorBody {
+        return ErrorBody("Invalid persistent identifier: ${ex}")
     }
 
     @ExceptionHandler(Exception::class)
