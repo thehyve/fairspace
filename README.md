@@ -14,6 +14,37 @@ using gradle: `gradle bootRun`.
 Configuration is done using Spring Boot, so you can use any of the methods from [Spring boot externalized configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html)
 to alter the configuration. For available properties, see `resources/application.yaml`
 
+## RabbitMQ
+Ceres is configured to listen to events from RabbitMQ. Disabling rabbitMQ can be done by setting
+the following properties in the configuration:
+
+```yaml
+app.rabbitmq.enabled: false
+spring.autoconfigure.exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+```
+
+You can configure RabbitMQ using the [default Spring settings](https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html#common-application-properties):
+
+```yaml
+spring.rabbitmq.host:
+spring.rabbitmq.username:
+spring.rabbitmq.password:
+spring.rabbitmq.virtual-host:
+```
+
+The topology can be defined in the application.yaml properties:
+
+```yaml
+    topology:
+      storage:
+        exchange: "storage"
+        queues:
+          create: "storage.ceres.create"
+          move:   "storage.ceres.move"
+          copy:   "storage.ceres.copy"
+          delete: "storage.ceres.delete"
+```
+
 
 ## How to use
 

@@ -5,7 +5,16 @@ app:
     realm: keycloak
   metadata:
     base-url: http://fairspace.com
-
+  rabbitmq:
+    enabled: true
+    topology:
+      storage:
+        exchange: "storage"
+        queues:
+          create: "storage.ceres.create"
+          move:   "storage.ceres.move"
+          copy:   "storage.ceres.copy"
+          delete: "storage.ceres.delete"
 
 # Security configuration
 security:
