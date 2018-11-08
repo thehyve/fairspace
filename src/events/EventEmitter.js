@@ -14,7 +14,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
             return Promise.resolve({});
         }
 
-        return collectionApi.retrieveCollection(paths[1], user.password)
+        return collectionApi.retrieveCollection(paths[1], user)
     }
 
     const readEvent = req => ({
@@ -64,7 +64,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
         routingKey: 'copy',
         type: "io.fairspace.titan.copy",
         body: {
-            source: req.path,
+            path: req.path,
             destination: req.headers['destination']
         }
     })
@@ -73,7 +73,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
         routingKey: 'move',
         type: "io.fairspace.titan.move",
         body: {
-            source: req.path,
+            path: req.path,
             destination: req.headers['destination']
         }
     })
@@ -92,13 +92,20 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
         if(methodToEventsMap.hasOwnProperty(args.request.method)) {
             console.debug("Emitting event for", args.request.method, "on", args.request.path);
             return getCollection(args.request, args.user)
+                .catch(e => {
+                    console.error("Error while retrieving collection for path", args.request.path, ":", e);
+                    return {}
+                })
                 .then(collection => {
                     const event = methodToEventsMap[args.request.method](args.request, args.response)
                     event.body.collection = collection;
                     return event;
                 })
                 .then(publish)
-                .then(next);
+                .then(next)
+                .catch(e => {
+                    console.error("Error while publishing event to RabbitMQ:", e);
+                });
         } else {
             return Promise.resolve().then(next());
         }
