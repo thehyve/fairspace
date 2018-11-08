@@ -10,8 +10,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
         const paths = req.path.split('/');
 
         if(paths.length == 0 || !paths[1]) {
-            console.warn("Emitting event for request without correct path: ", req.path);
-            return Promise.resolve({});
+            throw Error("No correct path specified to retrieve a collection");
         }
 
         return collectionApi.retrieveCollection(paths[1], user)
@@ -93,8 +92,8 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
             console.debug("Emitting event for", args.request.method, "on", args.request.path);
             return getCollection(args.request, args.user)
                 .catch(e => {
-                    console.error("Error while retrieving collection for path", args.request.path, ":", e);
-                    return {}
+                    console.error("Error while retrieving collection for path", args.request.path, ":", e.message);
+                    return null
                 })
                 .then(collection => {
                     const event = methodToEventsMap[args.request.method](args.request, args.response)

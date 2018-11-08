@@ -30,10 +30,18 @@ describe('EventEmitter', () => {
     it('should include the collection in events', () =>
         emitter(constructWebdavArgs('PUT'), nextMock)
             .then(() => {
-                assert.deepEqual(collectionApiMock.retrieveCollection.args[0], ['subdir', 'token'])
+                assert.deepEqual(collectionApiMock.retrieveCollection.args[0], ['subdir', {'password':'token'}])
                 assert.equal(rabbotMock.publish.args[0][1].body.collection.name, 'test')
             })
     )
+
+    it('should include null if collection retrieval fails', () => {
+        collectionApiMock.retrieveCollection = sinon.stub().rejects(new Error("Error message"))
+        emitter(constructWebdavArgs('PUT'), nextMock)
+            .then(() => {
+                assert.equal(rabbotMock.publish.args[0][1].body.collection, null)
+            })
+    })
 
     it('should also call next on invalid HTTP methods', () =>
         emitter(constructWebdavArgs('UNKNOWN-VERB'), nextMock)
