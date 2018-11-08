@@ -33,21 +33,21 @@ class PidServiceTest {
     @Test
     fun canFindEntityByUUID() {
         `when`(pidRepository.findById(TestData.path1.uuid)).thenReturn(Optional.of(TestData.path1))
-        val foundPath = pidService.findById(pidService.uuidToId(TestData.path1.uuid))
-        assertEquals(foundPath.id,pidService.pidToPidDTO(TestData.path1).id)
+        val foundPath = pidService.findById(uuidToId(TestData.path1.uuid))
+        assertEquals(foundPath.id,pidToPidDTO(TestData.path1).id)
     }
 
     @Test
     fun canFindEntityByValue() {
         `when`(pidRepository.findByValue(TestData.path1.value)).thenReturn(Optional.of(TestData.path1))
         val foundPath = pidService.findByValue(TestData.path1.value)
-        assertEquals(foundPath.id, pidService.pidToPidDTO(TestData.path1).id)
+        assertEquals(foundPath.id, pidToPidDTO(TestData.path1).id)
     }
 
     @Test
     fun canFindEntityByPrefix() {
         `when`(pidRepository.findByValueStartingWith(TestData.commonPrefix)).thenReturn(listOf(TestData.path1,TestData.path2))
-        val pids: List<Pid> = pidService.findByPrefix(TestData.commonPrefix).map { pidDTO -> pidService.pidDTOtoPid(pidDTO) }
+        val pids: List<Pid> = pidService.findByPrefix(TestData.commonPrefix).map { pidDTO -> pidDTOtoPid(pidDTO) }
         verify(pidRepository,times(1)).findByValueStartingWith(TestData.commonPrefix)
         assert(pids.contains(TestData.path1))
         assert(pids.contains(TestData.path2))
@@ -68,7 +68,7 @@ class PidServiceTest {
     @Test
     fun canDeleteEntity() {
        `when`(pidRepository.deleteById(TestData.path1.uuid)).then { null }
-        pidService.deleteById(pidService.uuidToId(TestData.path1.uuid))
+        pidService.deleteById(uuidToId(TestData.path1.uuid))
         verify(pidRepository,times(1)).deleteById(TestData.path1.uuid)
     }
 
@@ -93,7 +93,7 @@ class PidServiceTest {
     fun canSaveEntity () {
         val testValue = "https://workspace.test.fairway.app/iri/collections/789/foo/bat"
         val testUUID = UUID.fromString("af4bec86-5297-4521-89d7-13ca579f6fb2")
-        val testId = pidService.uuidToId(testUUID)
+        val testId = uuidToId(testUUID)
         val pidDTO = PidDTO( id = testId, value = testValue )
         val pid = Pid(value=testValue, uuid= testUUID)
         `when`(pidRepository.save(Mockito.any<Pid>())).thenReturn(pid)
