@@ -48,7 +48,3 @@ security:
     - /actuator/health
     needsAuthentication:
     - /*
-
-permissions:
-  # in seconds
-  cachePeriod: 60

@@ -3,7 +3,10 @@ package io.fairspace.neptune.web;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.service.CollectionMetadataService;
 import io.fairspace.neptune.service.CollectionService;
+import io.fairspace.neptune.service.PermissionService;
+import io.fairspace.neptune.web.dto.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,15 +27,27 @@ import java.util.Map;
 @RestController
 @RequestMapping("/")
 public class CollectionController {
-    @Autowired
+    private final Caching caching;
     private CollectionService collectionService;
-
-    @Autowired
     private CollectionMetadataService collectionMetadataService;
 
+    public CollectionController(
+            @Value("${cachingPeriod.collection:60}") int cachePeriod,
+            CollectionService collectionService,
+            CollectionMetadataService collectionMetadataService
+    ) {
+        this.collectionService = collectionService;
+        this.collectionMetadataService = collectionMetadataService;
+        this.caching = new Caching(cachePeriod);
+    }
+
     @GetMapping
-    public Iterable<Collection> getCollections() {
-        return collectionService.findAll();
+    public ResponseEntity<Iterable<Collection>> getCollections(@RequestParam(required=false) String location) {
+        if(location == null) {
+            return ResponseEntity.ok(collectionService.findAll());
+        } else {
+            return caching.withCacheControl(Collections.singletonList(collectionService.findByLocation(location)));
+        }
     }
 
     @GetMapping(value = "/uri", produces = "application/json")
