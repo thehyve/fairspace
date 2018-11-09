@@ -1,7 +1,5 @@
 package io.fairspace.ceres.events.model
 
-import java.net.URI
-
 data class Collection(
     val id: Long = 0,
     val type: String = "",

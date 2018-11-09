@@ -6,7 +6,6 @@ import io.fairspace.ceres.events.model.StorageEvent
 import io.fairspace.ceres.metadata.repository.ModelRepository
 import io.fairspace.ceres.metadata.service.MetadataService
 import io.fairspace.ceres.metadata.vocabulary.Fairspace
-import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.model.PidDTO
 import io.fairspace.ceres.pid.service.PidService
 import junit.framework.TestCase.assertTrue
