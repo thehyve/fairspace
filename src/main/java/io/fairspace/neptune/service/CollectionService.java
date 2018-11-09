@@ -56,7 +56,11 @@ public class CollectionService {
     public Collection findById(Long collectionId) {
         Permission permission = permissionService.getSubjectsPermission(collectionId);
         if (permission.getAccess().compareTo(Access.Read) < 0) {
-            throw new UnauthorizedException("Unauthorized");
+            return Collection.builder()
+                    .id(collectionId)
+                    .access(permission.getAccess())
+                    .type(null)
+                    .build();
         }
 
         return permission.getCollection()
