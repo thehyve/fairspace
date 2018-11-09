@@ -17,7 +17,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.io.File
-import java.net.URI
 
 @Component
 @ConditionalOnProperty("app.rabbitmq.enabled")
@@ -76,9 +75,9 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         // We need a uri for each one of them in the destination as well
         val mapping = mutableMapOf<String, String>()
         sourceIdentifiers.forEach {
-            val pathInDestination = it.value.replace(source, destination);
-            val newIdentifier = pidService.findOrCreateValue(pathInDestination)
-            mapping.put(it.id, newIdentifier.id)
+            val pathInDestination = it.value.replace(source, destination)
+            val newIdentifier = pidService.findOrCreateByValue(pathInDestination)
+            mapping[it.id] = newIdentifier.id
         }
 
         // Now, retrieve the metadata for the original URIs and replace the original URIs
@@ -108,23 +107,28 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
     /**
      * Stores the relation between the path and its parent in metadata
      */
-    private fun storeParentRelation(path: String, type: PathType, collection: Collection) {
-        val currentUri = pidService.findOrCreateValue(path)
+    private fun storeParentRelation(path: String, type: PathType, collection: Collection?) {
+        val currentIdentifier = pidService.findOrCreateByValue(path)
         val parentUri = getParentUri(path, collection)
-        val type = if(type == PathType.FILE) Fairspace.file else Fairspace.directory
+        val metadataType = if(type == PathType.FILE) Fairspace.file else Fairspace.directory
 
-        storePartOfRelation(parentUri, currentUri, type)
+        if(parentUri == null) {
+            log.warn("No parent uri found for path {}. Not storing parent relation", path)
+            return
+        }
+
+        storePartOfRelation(parentUri, currentIdentifier.id, metadataType)
     }
 
 
     /**
      * Stores a partOf relation between the currentUri and the parentUri
      */
-    private fun storePartOfRelation(parentUri: URI?, currentUri: URI?, type: String) {
+    private fun storePartOfRelation(parentUri: String, currentUri: String, type: String) {
         val model = ModelFactory.createDefaultModel().apply {
-            createResource(parentUri.toString())
+            createResource(currentUri)
                     .addProperty(RDF.type, createResource(type))
-                    .addProperty(createProperty(Fairspace.partOf), createResource(parentUri.toString()))
+                    .addProperty(createProperty(Fairspace.partOf), createResource(parentUri))
         }
 
         // If any relation already exists, replace it
@@ -137,14 +141,14 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
      * @param collection
      */
     private fun getParentUri(path: String, collection: Collection?): String? {
-        val pathParts = path.split("/");
+        val pathParts = path.split("/")
 
         // First part is empty (because of the leading /)
         // Second part is the collection location
-        if(pathParts.size == 3) {
-            return collection?.uri
+        return if(pathParts.size == 3) {
+            collection?.uri
         } else {
-            return pidService.findOrCreateByValue(File(path).parent).uri
+            pidService.findOrCreateByValue(File(path).parent).id
         }
     }
 
@@ -157,11 +161,11 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         model.listStatements().forEach {
             // Determine the statement  with replaced entities
             val newSubject = model.createResource(mapping.getOrDefault(it.subject.uri, it.subject.uri))
-            var newObject: Resource
-
-            if(it.`object`.isResource()) {
+            val newObject = if(it.`object`.isResource()) {
                 val objectResource = it.`object`.asResource()
-                newObject = model.createResource(mapping.getOrDefault(objectResource.uri, objectResource.uri))
+                model.createResource(mapping.getOrDefault(objectResource.uri, objectResource.uri))
+            } else {
+                it.`object`
             }
 
             newModel.add(StatementImpl(newSubject, it.predicate, newObject))

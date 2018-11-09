@@ -4,12 +4,12 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-data class Pid (
-    @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
-    val uuid: UUID,
+data class Pid(
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        val uuid: UUID,
 
-    @Column(nullable=false)
-    var value: String
+        @Column(nullable = false, unique = true)
+        var value: String
 
 )
