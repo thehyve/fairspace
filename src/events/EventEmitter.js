@@ -20,7 +20,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
 
     const readEvent = req => ({
         routingKey: 'read',
-        type: "io.fairspace.titan.readDir",
+        type: "io.fairspace.titan.read",
         body: {}
     })
 
