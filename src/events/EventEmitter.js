@@ -12,7 +12,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
         const paths = req.path.split('/');
 
         if(paths.length == 0 || !paths[1]) {
-            throw Error("No correct path specified to retrieve a collection");
+            return Promise.reject(Error("No correct path specified to retrieve a collection"));
         }
 
         return collectionApi.retrieveCollection(paths[1], user)
