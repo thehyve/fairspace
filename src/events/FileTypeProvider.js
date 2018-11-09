@@ -5,9 +5,9 @@ const fs = require('fs')
  * over AMQP
  * @returns {function(Args, Function): *}
  */
-const TYPE_DIRECTORY = 'directory';
-const TYPE_FILE = 'file';
-const TYPE_UNKNOWN = 'unknown';
+const TYPE_DIRECTORY = 'DIRECTORY';
+const TYPE_FILE = 'FILE';
+const TYPE_UNKNOWN = 'UNKNOWN';
 
 const stat = (path) =>
     new Promise((resolve, reject) => {

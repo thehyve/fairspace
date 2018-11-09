@@ -58,7 +58,7 @@ describe('EventEmitter', () => {
         fileTypeProviderMock.type = sinon.stub().rejects(new Error("Error message"))
         emitter(constructWebdavArgs('PUT'), nextMock)
             .then(() => {
-                assert.equal(rabbotMock.publish.args[0][1].body.type, 'unknown')
+                assert.equal(rabbotMock.publish.args[0][1].body.type, 'UNKNOWN')
             })
     })
 
