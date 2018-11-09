@@ -223,7 +223,7 @@ class Vocabulary {
     }
 
     static _getFirstPredicateProperty(vocabularyEntry, predicate, property, defaultValue) {
-        return vocabularyEntry[predicate] && vocabularyEntry[predicate][0] ? vocabularyEntry[predicate][0][property] : defaultValue;
+        return vocabularyEntry && vocabularyEntry[predicate] && vocabularyEntry[predicate][0] ? vocabularyEntry[predicate][0][property] : defaultValue;
     }
 
     static _getLabel(vocabularyEntry) {
