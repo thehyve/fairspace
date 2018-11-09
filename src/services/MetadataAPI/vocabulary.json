@@ -2,9 +2,12 @@
     "@context": {
         "dbpedia": "http://dbpedia.org/ontology#",
         "dc": "http://purl.org/dc/elements/1.1/",
+        "fihr": "http://hl7.org/fhir/STU3/#",
         "foaf": "http://xmlns.com/foaf/0.1/#",
         "fs": "http://fairspace.io/ontology#",
+        "icdo3": "http://fairspace.io/ontology#",
         "obo": "http://purl.obolibrary.org/obo/#",
+        "osiris": "http://fairspace.io/ontology#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "schema": "http://schema.org/",
@@ -14,27 +17,23 @@
         {
             "@id": "foaf:Person",
             "@type": "rdf:Class",
+            "fs:classInfix": "persons",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "A person that is subject of research.",
             "rdfs:label": "Person"
         },
         {
-            "@id": "schema:Material",
-            "@type": "rdf:Class",
-            "fs:fairspaceEntity": true,
-            "rdfs:comment": "A material or a sample provided by person.",
-            "rdfs:label": "Material"
-        },
-        {
             "@id": "fs:PersonConsent",
             "@type": "rdf:Class",
+            "fs:classInfix": "person-consents",
             "fs:fairspaceEntity": true,
-            "rdfs:comment": "A research consent given by person.",
+            "rdfs:comment": "A research consent given by person. ",
             "rdfs:label": "Person Consent"
         },
         {
             "@id": "fs:ResearchProject",
             "@type": "rdf:Class",
+            "fs:classInfix": "research-projects",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "A research project.",
             "rdfs:label": "Research Project"
@@ -42,6 +41,7 @@
         {
             "@id": "fs:File",
             "@type": "rdf:Class",
+            "fs:classInfix": "files",
             "fs:fairspaceEntity": false,
             "rdfs:comment": "A single file.",
             "rdfs:label": "File"
@@ -49,6 +49,7 @@
         {
             "@id": "fs:Collection",
             "@type": "rdf:Class",
+            "fs:classInfix": "collections",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "A specific collection in Fairspace.",
             "rdfs:label": "Collection"
@@ -56,62 +57,34 @@
         {
             "@id": "fs:User",
             "@type": "rdf:Class",
+            "fs:classInfix": "users",
             "fs:fairspaceEntity": false,
             "rdfs:comment": "A user of the fairspace application.",
             "rdfs:label": "User"
         },
         {
-            "@id": "@type",
-            "@type": "rdf:Property",
-            "fs:allowMultiple": false,
-            "fs:machineOnly": true,
-            "rdfs:domain": [
-                {
-                    "@id": "foaf:Person"
-                },
-                {
-                    "@id": "schema:Material"
-                },
-                {
-                    "@id": "fs:PersonConsent"
-                },
-                {
-                    "@id": "fs:ResearchProject"
-                },
-                {
-                    "@id": "fs:File"
-                },
-                {
-                    "@id": "fs:Collection"
-                },
-                {
-                    "@id": "fs:User"
-                }
-            ],
-            "rdfs:label": "Type",
-            "rdfs:range": [
-                {
-                    "@id": "foaf:Person"
-                },
-                {
-                    "@id": "schema:Material"
-                },
-                {
-                    "@id": "fs:PersonConsent"
-                },
-                {
-                    "@id": "fs:ResearchProject"
-                },
-                {
-                    "@id": "fs:File"
-                },
-                {
-                    "@id": "fs:Collection"
-                },
-                {
-                    "@id": "fs:User"
-                }
-            ]
+            "@id": "osiris:TumorPathologyEvent",
+            "@type": "rdf:Class",
+            "fs:classInfix": "tumor-pathology-events",
+            "fs:fairspaceEntity": true,
+            "rdfs:comment": "A specific tumor event.",
+            "rdfs:label": "Tumor Pathology Event"
+        },
+        {
+            "@id": "osiris:BiologicalSample",
+            "@type": "rdf:Class",
+            "fs:classInfix": "biological-samples",
+            "fs:fairspaceEntity": true,
+            "rdfs:comment": "Sample provided by a patient.",
+            "rdfs:label": "Biological Sample"
+        },
+        {
+            "@id": "fs:Analysis",
+            "@type": "rdf:Class",
+            "fs:classInfix": "analyses",
+            "fs:fairspaceEntity": true,
+            "rdfs:comment": "A specific analysis that produced data.",
+            "rdfs:label": "Analysis"
         },
         {
             "@id": "rdfs:label",
@@ -123,9 +96,6 @@
                     "@id": "foaf:Person"
                 },
                 {
-                    "@id": "schema:Material"
-                },
-                {
                     "@id": "fs:PersonConsent"
                 },
                 {
@@ -139,6 +109,15 @@
                 },
                 {
                     "@id": "fs:User"
+                },
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                },
+                {
+                    "@id": "osiris:BiologicalSample"
+                },
+                {
+                    "@id": "fs:Analysis"
                 }
             ],
             "rdfs:label": "Name",
@@ -159,9 +138,6 @@
                     "@id": "foaf:Person"
                 },
                 {
-                    "@id": "schema:Material"
-                },
-                {
                     "@id": "fs:PersonConsent"
                 },
                 {
@@ -175,6 +151,15 @@
                 },
                 {
                     "@id": "fs:User"
+                },
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                },
+                {
+                    "@id": "osiris:BiologicalSample"
+                },
+                {
+                    "@id": "fs:Analysis"
                 }
             ],
             "rdfs:label": "Description",
@@ -228,7 +213,7 @@
             "rdfs:comment": "Person that provided this sample.",
             "rdfs:domain": [
                 {
-                    "@id": "schema:Material"
+                    "@id": "osiris:BiologicalSample"
                 }
             ],
             "rdfs:label": "Derives from",
@@ -252,7 +237,7 @@
             "rdfs:label": "Provides material",
             "rdfs:range": [
                 {
-                    "@id": "schema:Material"
+                    "@id": "osiris:BiologicalSample"
                 }
             ]
         },
@@ -300,7 +285,7 @@
                     "@id": "foaf:Person"
                 },
                 {
-                    "@id": "schema:Material"
+                    "@id": "osiris:BiologicalSample"
                 }
             ],
             "rdfs:label": "Has data",
@@ -347,7 +332,7 @@
             "rdfs:label": "Is about material",
             "rdfs:range": [
                 {
-                    "@id": "schema:Material"
+                    "@id": "osiris:BiologicalSample"
                 }
             ]
         },
@@ -355,6 +340,7 @@
             "@id": "fs:hasPart",
             "@type": "rdf:Property",
             "fs:allowMultiple": true,
+            "fs:machineOnly": true,
             "owl:inverseOf": "fs:partOf",
             "rdfs:domain": [
                 {
@@ -372,6 +358,7 @@
             "@id": "fs:partOf",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
+            "fs:machineOnly": true,
             "owl:inverseOf": "fs:hasPart",
             "rdfs:domain": [
                 {
@@ -470,7 +457,7 @@
             ]
         },
         {
-            "@id": "fs:investigationNature",
+            "@id": "fs:investigationNature ",
             "@type": "rdf:Property",
             "fs:allowMultiple": true,
             "rdfs:comment": "choose between: basic research, biomedical research, clinical trial, medical diagnosis",
@@ -503,9 +490,10 @@
             ]
         },
         {
-            "@id": "foaf:gender",
+            "@id": "fhir:AdministrativeGender",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
+            "rdfs:comment": "The gender of the patient",
             "rdfs:domain": [
                 {
                     "@id": "foaf:Person"
@@ -519,15 +507,33 @@
             ]
         },
         {
-            "@id": "foaf:name",
+            "@id": "fs:ageOfDeath",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
+            "rdfs:comment": "The age at which this person has died",
             "rdfs:domain": [
                 {
                     "@id": "foaf:Person"
                 }
             ],
-            "rdfs:label": "Name",
+            "rdfs:label": "Age of death",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:date"
+                }
+            ]
+        },
+        {
+            "@id": "fs:patientIdentifier",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The identifier of the patient",
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ],
+            "rdfs:label": "Patient Identifier",
             "rdfs:range": [
                 {
                     "@id": "xsd:string"
@@ -535,16 +541,16 @@
             ]
         },
         {
-            "@id": "foaf:myersBriggs",
+            "@id": "osiris:EventType",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
-            "rdfs:comment": "A Myers Briggs (MBTI) personality classification.",
+            "rdfs:comment": "The type of tumor event (primary tumor, local relapse, metastatic relapse)",
             "rdfs:domain": [
                 {
-                    "@id": "foaf:Person"
+                    "@id": "osiris:TumorPathologyEvent"
                 }
             ],
-            "rdfs:label": "MBTI",
+            "rdfs:label": "Neoplasm Event",
             "rdfs:range": [
                 {
                     "@id": "xsd:string"
@@ -552,19 +558,589 @@
             ]
         },
         {
-            "@id": "obo:FMA_50707",
+            "@id": "osiris:EventStartDate",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
-            "rdfs:comment": "Spatial association relationship which describes the containment, adjacency and anatomical coordinates of physical anatomical entities. Examples: anatomical containment, anatomical adjacency, anatomical coordinate.",
+            "rdfs:comment": "The start date of the tumor event",
             "rdfs:domain": [
                 {
-                    "@id": "schema:Material"
+                    "@id": "osiris:TumorPathologyEvent"
                 }
             ],
-            "rdfs:label": "Anatomical location",
+            "rdfs:label": "Neoplasm Event Start Date",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:date"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:EventEndDate",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The end date of the tumor event",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Neoplasm Event End Date",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:date"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:HistologicalGradeType",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The grade type of the tumor",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Neoplasm Grade Type",
             "rdfs:range": [
                 {
                     "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:HistologicalGradeValue",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The grade value of the tumor",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Neoplasm Grade Value",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:diagnosisDate",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The date of tumor diagnosis",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Neoplasm diagnosis date",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:date"
+                }
+            ]
+        },
+        {
+            "@id": "icdo3:Topography",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The topography of the tumor (ICD-O-3)",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Neoplasm Topography",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "icdo3:Morphology",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The morphology of the tumor (ICD-O-3)",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Neoplasm Morphology",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:Laterality",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The laterality of the tumor (right, left, bilateral, not applicable)",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Neoplasm Laterality",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:SampleExternalAccession",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The biological sample identifier",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Sample External Accession",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:collectDate",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The collect date of the biological sample",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Collect Date",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:date"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:SampleNature",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The biological sample nature (frozen tissue, FFPE, blood, etc\u2026)",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Sample Nature",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:SampleOrigin",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The biological sample origin (tumor or healthy)",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Sample Origin",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:StorageTemperature",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The storage temperature",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Storage Temperature",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:tumorCellularity",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The percentage of tumor cells in the biological sample (pathological measure)",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Tumor Cellularity",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:integer"
+                }
+            ]
+        },
+        {
+            "@id": "fs:analysisCode",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The analysis run identifier",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Analysis code",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:AnalysisType",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The type of analysis",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Analysis type",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:AnalysisDate",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "The analysis date",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Analysis date",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:date"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:TechnicalProtocol",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "Protocol used for the experiment",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Technical protocol",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:PlatformName",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "Technological platform name (provider followed by the platform name)",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Platform name",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:analyticPipelineCode",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "Identifier of the pipeline used into the analysis (unique in the center)",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Analytic pipeline code",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:AlgorithmicCellularity",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "Calculated percentage of tumor cells in sample",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Algorithmic cellularity",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:integer"
+                }
+            ]
+        },
+        {
+            "@id": "osiris:AlgorithmicPloidy",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "Calculated number of sets of chromosomes in a cell of the sample",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Algorithmic ploidy",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:NumberOfBreakPoints",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "Calculated number of break points in genomic profile",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Number of break points",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:integer"
+                }
+            ]
+        },
+        {
+            "@id": "fs:isAnalysedBy",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:analysisOfEvent",
+            "rdfs:comment": "Analyses associated with this tumor pathology event",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Event is analysed by",
+            "rdfs:range": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ]
+        },
+        {
+            "@id": "fs:analysisOfEvent",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": "fs:isAnalysedBy",
+            "rdfs:comment": "Event associated with this analysis",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Analysis of tumor event",
+            "rdfs:range": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ]
+        },
+        {
+            "@id": "fs:authorizes",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:isAuthorizedBy",
+            "rdfs:comment": "The samples that is authorized with this consent",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:PersonConsent"
+                }
+            ],
+            "rdfs:label": "Consent authorizes",
+            "rdfs:range": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ]
+        },
+        {
+            "@id": "fs:isAuthorizedBy",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": "fs:authorizes",
+            "rdfs:comment": "The relevent consent",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Sample is authorized by",
+            "rdfs:range": [
+                {
+                    "@id": "fs:PersonConsent"
+                }
+            ]
+        },
+        {
+            "@id": "fs:hasEvent",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:eventSubject",
+            "rdfs:comment": "Tumor pathology events for this patient",
+            "rdfs:domain": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ],
+            "rdfs:label": "Event",
+            "rdfs:range": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ]
+        },
+        {
+            "@id": "fs:eventSubject",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": "fs:hasEvent",
+            "rdfs:comment": "The patient associated with this event",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Event subject",
+            "rdfs:range": [
+                {
+                    "@id": "foaf:Person"
+                }
+            ]
+        },
+        {
+            "@id": "fs:associatedAnalysis",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": "fs:associatedFiles",
+            "rdfs:comment": "The files associated to the analysis",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:File"
+                }
+            ],
+            "rdfs:label": "Analysed by ",
+            "rdfs:range": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ]
+        },
+        {
+            "@id": "fs:associatedFiles",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:associatedAnalysis",
+            "rdfs:comment": "The analysis linked to the files",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Analysis"
+                }
+            ],
+            "rdfs:label": "Analysis files",
+            "rdfs:range": [
+                {
+                    "@id": "fs:File"
+                }
+            ]
+        },
+        {
+            "@id": "fs:isParentOf",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": "fs:isChildOf",
+            "rdfs:comment": "The biological sample has child samples extracted (ex : tissue -> x DNA extraction)",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Sample has children",
+            "rdfs:range": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ]
+        },
+        {
+            "@id": "fs:isChildOf",
+            "@type": "rdf:Property",
+            "owl:inverseOf": "fs:isParentOf",
+            "rdfs:comment": "The biological sample has been extracted from this parent sample",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ],
+            "rdfs:label": "Sample is child sample of",
+            "rdfs:range": [
+                {
+                    "@id": "osiris:BiologicalSample"
+                }
+            ]
+        },
+        {
+            "@id": "fs:isLinkedTo",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "rdfs:comment": "The tumor events could be linked to others as a chain (ex: a primary tumor event could be linked to a local relapse and then a metastatic relapse)",
+            "rdfs:domain": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
+                }
+            ],
+            "rdfs:label": "Event parentage",
+            "rdfs:range": [
+                {
+                    "@id": "osiris:TumorPathologyEvent"
                 }
             ]
         }
