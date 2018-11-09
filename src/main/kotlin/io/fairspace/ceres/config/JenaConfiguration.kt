@@ -23,6 +23,4 @@ class JenaConfiguration {
         return ReasonerRegistry.getOWLReasoner().bindSchema(inferenceModel)
     }
 
-    @Bean
-    fun modelRepository() = ModelRepository(dataset(), reasoner())
 }

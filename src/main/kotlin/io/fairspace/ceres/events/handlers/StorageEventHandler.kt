@@ -9,7 +9,6 @@ import io.fairspace.ceres.metadata.vocabulary.Fairspace
 import io.fairspace.ceres.pid.service.PidService
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
-import org.apache.jena.rdf.model.Resource
 import org.apache.jena.rdf.model.impl.StatementImpl
 import org.apache.jena.vocabulary.RDF
 import org.slf4j.LoggerFactory
@@ -25,17 +24,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.create}"])
     fun receiveCreateMessage(message: StorageEvent) {
-        // Filter the creation of unknown paths
-        if(message.type == PathType.UNKNOWN) {
-            log.debug("Message received for creating an unknown type of storage: {}", message.path)
-            return
-        }
-
-        // Filter the creation of root (collection) directories
-        if(message.path.split("/").size < 3) {
-            log.debug("Message received for creating a top-level directory or file {} (most probably a new collection). This message will not be processed", message.path)
-            return
-        }
+        if (isInvalidMessage(message)) return
 
         log.debug("Create message received from RabbitMQ: {}", message)
 
@@ -45,6 +34,8 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.move}"])
     fun receiveMoveMessage(message: StorageEvent) {
+        if (isInvalidMessage(message)) return
+
         log.debug("Move message received from RabbitMQ: {}", message)
         val source = message.path
         val destination = message.destination!!
@@ -63,6 +54,8 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.copy}"])
     fun receiveCopyMessage(message: StorageEvent) {
+        if (isInvalidMessage(message)) return
+
         log.debug("Copy message received from RabbitMQ: {}", message)
 
         val source = message.path
@@ -75,7 +68,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         // We need a uri for each one of them in the destination as well
         val mapping = mutableMapOf<String, String>()
         sourceIdentifiers.forEach {
-            val pathInDestination = it.value.replace(source, destination)
+            val pathInDestination = it.value.replaceFirst(source, destination)
             val newIdentifier = pidService.findOrCreateByValue(pathInDestination)
             mapping[it.id] = newIdentifier.id
         }
@@ -98,11 +91,35 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.delete}"])
     fun receiveDeleteMessage(message: StorageEvent) {
+        if (isInvalidMessage(message)) return
+
         log.debug("Delete message received from RabbitMQ: {}", message)
 
         // Delete the mappings for this path (and underlying paths)
         pidService.deleteByPrefix(message.path)
     }
+
+    /**
+     * Checks whether the current message is invalid
+     * A message can be invalid either because of an unknown type of because it handles a top-level directory.
+     */
+    private fun isInvalidMessage(message: StorageEvent): Boolean {
+        // Filter the creation of unknown paths
+        if (message.type == PathType.UNKNOWN) {
+            log.debug("Message received for creating an unknown resource type: {}", message.path)
+            return true
+        }
+
+        // Filter the creation of root (collection) directories
+        if (message.path.split("/").size < 3) {
+            log.debug("Message received for creating a top-level directory or file {} (most probably a new collection). This message will not be processed", message.path)
+            return true
+        }
+
+        return false
+    }
+
+
 
     /**
      * Stores the relation between the path and its parent in metadata
@@ -155,7 +172,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
     /**
      * Creates a model where subjects and objects are replaced by another uri
      */
-    private fun replaceEntities(model: Model, mapping: Map<String, String>): Model {
+    fun replaceEntities(model: Model, mapping: Map<String, String>): Model {
         val newModel = ModelFactory.createDefaultModel()
 
         model.listStatements().forEach {
