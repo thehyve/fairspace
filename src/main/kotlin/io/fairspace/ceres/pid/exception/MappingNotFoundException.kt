@@ -1,5 +1,3 @@
 package io.fairspace.ceres.pid.exception
 
-class MappingNotFoundException(s: String) : RuntimeException(s) {
-
-}
+class MappingNotFoundException(s: String) : RuntimeException(s)

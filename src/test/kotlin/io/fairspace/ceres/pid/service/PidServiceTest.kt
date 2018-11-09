@@ -3,8 +3,8 @@ package io.fairspace.ceres.pid.service
 import io.fairspace.ceres.pid.exception.MappingNotFoundException
 import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.repository.PidRepository
-import junit.framework.Assert.assertTrue
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,7 +54,7 @@ class PidServiceTest {
         doReturn(Optional.of(Pid(uuid, value)))
                 .`when`(pidRepository).findByValue(value)
 
-        assertTrue(pidService.findByValue(value).id!!.endsWith(uuid.toString()))
+        assertTrue(pidService.findByValue(value).id.endsWith(uuid.toString()))
     }
 
     @Test(expected = MappingNotFoundException::class)
