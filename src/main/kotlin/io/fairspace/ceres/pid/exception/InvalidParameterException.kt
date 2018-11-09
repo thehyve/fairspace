@@ -1,5 +1,3 @@
 package io.fairspace.ceres.pid.exception
 
-class InvalidParameterException(s: String) : RuntimeException(s) {
-
-}
+class InvalidParameterException(s: String) : RuntimeException(s)
