@@ -1,8 +1,5 @@
-package io.fairspace.ceres.metadata.web
+package io.fairspace.ceres.web
 
-import io.fairspace.ceres.pid.service.InvalidPersistentIdentifierException
-import io.fairspace.ceres.pid.service.MappingNotFoundException
-import io.fairspace.ceres.pid.service.ValueAlreadyExistsException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -18,18 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @ResponseBody
 class CeresExceptionHandler {
     val log = LoggerFactory.getLogger(CeresExceptionHandler::class.java);
-
-    @ExceptionHandler(MappingNotFoundException::class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    protected fun handleMappingNotFoundException(ex: MappingNotFoundException): ErrorBody {
-        return ErrorBody("Requested mapping could not be found")
-    }
-
-    @ExceptionHandler(ValueAlreadyExistsException::class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    protected fun handleMappingAlreadyExistsException(ex: ValueAlreadyExistsException): ErrorBody {
-        return ErrorBody("Mapping already exists: ${ex}")
-    }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -53,12 +38,6 @@ class CeresExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun handleMissingParameterException(ex: MissingServletRequestParameterException): ErrorBody {
         return ErrorBody("Missing request parameter " + ex.parameterName)
-    }
-
-    @ExceptionHandler(InvalidPersistentIdentifierException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun invalidPersistentIdentifierException(ex: InvalidPersistentIdentifierException): ErrorBody {
-        return ErrorBody("Invalid persistent identifier: ${ex}")
     }
 
     @ExceptionHandler(Exception::class)

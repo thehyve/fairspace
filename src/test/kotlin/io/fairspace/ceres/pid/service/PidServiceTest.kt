@@ -1,23 +1,20 @@
 package io.fairspace.ceres.pid.service
 
-import io.fairspace.ceres.pid.TestData
-import io.fairspace.ceres.pid.TestData.deleteTestPrefix
+import io.fairspace.ceres.pid.exception.MappingNotFoundException
 import io.fairspace.ceres.pid.model.Pid
-import io.fairspace.ceres.pid.model.PidDTO
 import io.fairspace.ceres.pid.repository.PidRepository
+import junit.framework.Assert.assertTrue
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertFalse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
-
 class PidServiceTest {
     @Mock
     lateinit var pidRepository: PidRepository
@@ -26,78 +23,100 @@ class PidServiceTest {
 
     @Before
     fun setUp() {
-        pidService = PidService(pidRepository)
-        PidService.urlPrefix = "http://fairspace.com"
+        pidService = PidService(pidRepository, PidConverter("http://service-test/"))
      }
 
     @Test
     fun canFindEntityByUUID() {
-        `when`(pidRepository.findById(TestData.path1.uuid)).thenReturn(Optional.of(TestData.path1))
-        val foundPath = pidService.findById(uuidToId(TestData.path1.uuid))
-        assertEquals(foundPath.id,pidToPidDTO(TestData.path1).id)
+        val foundUUID = UUID.randomUUID()
+
+        doReturn(Optional.of(Pid(foundUUID, "/found")))
+                .`when`(pidRepository).findById(foundUUID)
+
+        assertEquals(pidService.findById("http://service-test/" + foundUUID).value, "/found")
+    }
+
+    @Test(expected = MappingNotFoundException::class)
+    fun throwsExceptionIfMappingNotFound() {
+        val notFoundUUID = UUID.randomUUID()
+
+        doReturn(Optional.empty<Pid>())
+                .`when`(pidRepository).findById(notFoundUUID)
+
+        pidService.findById("http://service-test/" + notFoundUUID)
     }
 
     @Test
     fun canFindEntityByValue() {
-        `when`(pidRepository.findByValue(TestData.path1.value)).thenReturn(Optional.of(TestData.path1))
-        val foundPath = pidService.findByValue(TestData.path1.value)
-        assertEquals(foundPath.id, pidToPidDTO(TestData.path1).id)
+        val uuid =UUID.randomUUID()
+        val value = "/test"
+
+        doReturn(Optional.of(Pid(uuid, value)))
+                .`when`(pidRepository).findByValue(value)
+
+        assertTrue(pidService.findByValue(value).id!!.endsWith(uuid.toString()))
+    }
+
+    @Test(expected = MappingNotFoundException::class)
+    fun throwsExceptionIfMappingNotFoundForValue() {
+        val value = "/test"
+
+        doReturn(Optional.empty<Pid>())
+                .`when`(pidRepository).findByValue(value)
+
+        pidService.findByValue(value)
     }
 
     @Test
-    fun canFindEntityByPrefix() {
-        `when`(pidRepository.findByValueStartingWith(TestData.commonPrefix)).thenReturn(listOf(TestData.path1,TestData.path2))
-        val pids: List<Pid> = pidService.findByPrefix(TestData.commonPrefix).map { pidDTO -> pidDTOtoPid(pidDTO) }
-        verify(pidRepository,times(1)).findByValueStartingWith(TestData.commonPrefix)
-        assert(pids.contains(TestData.path1))
-        assert(pids.contains(TestData.path2))
+    fun updateByPrefixUpdatesAll() {
+        val uuid1 = UUID.randomUUID()
+        val uuid2 = UUID.randomUUID()
+        val uuid3 = UUID.randomUUID()
+        val uuid4 = UUID.randomUUID()
+
+        val input = listOf(
+                Pid(uuid1, "/input-prefix/abcdef"),
+                Pid(uuid2, "/input-prefix/input-prefix/input-prefix/input-prefix/"),
+                Pid(uuid3, "/input-prefix/"),
+                Pid(uuid4, "/input-prefix/very-long-another-input-prefix")
+        )
+
+        val expectedOutput = listOf(
+                Pid(uuid1, "/output-prefix/abcdef"),
+                Pid(uuid2, "/output-prefix/input-prefix/input-prefix/input-prefix/"),
+                Pid(uuid3, "/output-prefix/"),
+                Pid(uuid4, "/output-prefix/very-long-another-input-prefix")
+        )
+
+
+        doReturn(input).`when`(pidRepository).findByValueStartingWith("/input-prefix/")
+
+        pidService.updateByPrefix("/input-prefix/", "/output-prefix/")
+
+        verify(pidRepository).saveAll(expectedOutput)
     }
 
     @Test
-    fun entityExistsByValue() {
-        `when`(pidRepository.findByValue(TestData.path1.value)).thenReturn(Optional.of(TestData.path1))
-        assert(pidService.existsByValue(TestData.path1.value))
+    fun testFindOrCreateByValueWithExistingMapping() {
+        val existingPid = Pid(UUID.randomUUID(), "stored-value");
+        doReturn(Optional.of(existingPid)).`when`(pidRepository).findByValue("value")
+
+        val output = pidService.findOrCreateByValue("value")
+
+        assertEquals("stored-value", output.value)
+        verify(pidRepository, times(0)).save(ArgumentMatchers.any())
     }
 
     @Test
-    fun nonexistentEntityDoesNotExist() {
-        `when`(pidRepository.findByValue(TestData.nonExistingValue)).thenReturn(Optional.empty())
-        assertFalse(pidService.existsByValue(TestData.nonExistingValue))
+    fun testFindOrCreateByValueWithNewMapping() {
+        val newPid = Pid(UUID.randomUUID(), "stored-value");
+        doReturn(Optional.empty<Pid>()).`when`(pidRepository).findByValue("new-value")
+        doReturn(newPid).`when`(pidRepository).save(any())
+
+        val output = pidService.findOrCreateByValue("new-value")
+
+        assertEquals("stored-value", output.value)
+        verify(pidRepository).save(ArgumentMatchers.argThat { it.value == "new-value" })
     }
 
-    @Test
-    fun canDeleteEntity() {
-       `when`(pidRepository.deleteById(TestData.path1.uuid)).then { null }
-        pidService.deleteById(uuidToId(TestData.path1.uuid))
-        verify(pidRepository,times(1)).deleteById(TestData.path1.uuid)
-    }
-
-    @Test
-    fun canDeleteEntityByPrefix() {
-        `when`(pidRepository.deleteByValueStartingWith(deleteTestPrefix)).then { null }
-        pidService.deleteByPrefix(TestData.deleteTestPrefix)
-        verify(pidRepository,times(1)).deleteByValueStartingWith(deleteTestPrefix)
-    }
-
-    @Test
-    fun canUpdateEntityByPrefix() {
-        `when`(pidRepository.findByValueStartingWith(TestData.commonPrefix)).thenReturn(listOf(TestData.path1))
-        `when`(pidRepository.save(Mockito.any<Pid>())).thenReturn(TestData.path1)
-        val results: List<Pid> = pidService.updateByPrefix(TestData.commonPrefix, TestData.updateTestNewPrefix)
-        verify(pidRepository,times(1)).findByValueStartingWith(TestData.commonPrefix)
-        verify(pidRepository,times(1)).save(Mockito.any())
-        assert(results.size == 1 )
-     }
-
-    @Test
-    fun canSaveEntity () {
-        val testValue = "https://workspace.test.fairway.app/iri/collections/789/foo/bat"
-        val testUUID = UUID.fromString("af4bec86-5297-4521-89d7-13ca579f6fb2")
-        val testId = uuidToId(testUUID)
-        val pidDTO = PidDTO( id = testId, value = testValue )
-        val pid = Pid(value=testValue, uuid= testUUID)
-        `when`(pidRepository.save(Mockito.any<Pid>())).thenReturn(pid)
-        pidService.add(pidDTO)
-        verify(pidRepository, times(1)).save(Mockito.any())
-    }
 }

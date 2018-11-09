@@ -1,4 +1,4 @@
-package io.fairspace.ceres.metadata.web
+package io.fairspace.ceres.web
 
 class ErrorBody(val message: String) {
 }
