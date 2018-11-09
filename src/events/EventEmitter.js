@@ -79,21 +79,21 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
         DELETE: deleteEvent
     }
 
-    const handler = (args, next) => {
-        if(methodToEventsMap.hasOwnProperty(args.request.method)) {
-            console.debug("Emitting event for", args.request.method, "on", args.request.path);
+    const handler = (ctx, next) => {
+        if(methodToEventsMap.hasOwnProperty(ctx.request.method)) {
+            console.debug("Emitting event for", ctx.request.method, "on", ctx.request.path);
 
             // Add collection information to the event
-            const addCollection = getCollection(args.request, args.user)
+            const addCollection = getCollection(ctx.request, ctx.user)
                 .catch(e => {
-                    console.error("Error while retrieving collection for path", args.request.path, ":", e.message);
+                    console.error("Error while retrieving collection for path", ctx.request.path, ":", e.message);
                     return null
                 });
 
             // Add path and type to the event
-            const addPath = fileTypeProvider.type(args.request.path)
+            const addPath = fileTypeProvider.type(ctx, ctx.request.path)
                 .catch(e => {
-                    console.error("Error while retrieving file information for path", args.request.path, ":", e.message);
+                    console.error("Error while retrieving file information for path", ctx.request.path, ":", e.message);
                     return FileTypeProvider.TYPE_UNKNOWN
                 });
 
@@ -101,11 +101,11 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
             return Promise.all([addCollection, addPath])
                 .then(([collection, type]) => {
                     // Generate base event
-                    const event = methodToEventsMap[args.request.method](args.request, args.response)
+                    const event = methodToEventsMap[ctx.request.method](ctx.request, ctx.response)
 
                     // Append the information
                     event.body.collection = collection;
-                    event.body.path = args.request.path;
+                    event.body.path = ctx.request.path;
                     event.body.type = type;
 
                     return event;

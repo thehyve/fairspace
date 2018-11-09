@@ -9,32 +9,33 @@ const TYPE_DIRECTORY = 'DIRECTORY';
 const TYPE_FILE = 'FILE';
 const TYPE_UNKNOWN = 'UNKNOWN';
 
-const stat = (path) =>
-    new Promise((resolve, reject) => {
-        fs.lstat(basePath + path, (error, stats) => {
-            if(error) {
-                reject(error)
-            } else {
-                resolve(stats)
-            }
-        })
-    })
-
-const type = (path) =>
-    stat(path)
-        .then(stats => {
-            if(stats.isDirectory()) return TYPE_DIRECTORY;
-            if(stats.isFile()) return TYPE_FILE;
-            return TYPE_UNKNOWN;
-        })
-
 module.exports = {
     TYPE_DIRECTORY: TYPE_DIRECTORY,
     TYPE_FILE: TYPE_FILE,
     TYPE_UNKNOWN: TYPE_UNKNOWN,
 
-    provider: (basePath) => ({
-        stat: stat,
-        type: type
-    })
+    webdav: (rootFileSystem) => {
+        const typeAsPromise = (ctx, path) =>
+            new Promise((resolve, reject) => {
+                rootFileSystem.type(ctx, path, (e, type) => {
+                    if(e) {
+                        reject(e)
+                    } else {
+                        resolve(type)
+                    }
+                })
+            })
+
+        const type = (ctx, path) =>
+            typeAsPromise(ctx, path)
+                .then(type => {
+                    if(type.isDirectory) return TYPE_DIRECTORY;
+                    if(type.isFile) return TYPE_FILE;
+                    return TYPE_UNKNOWN;
+                })
+
+        return {
+            type: type
+        }
+    }
 }

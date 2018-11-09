@@ -49,7 +49,7 @@ describe('EventEmitter', () => {
     it('should include the path type in events', () =>
         emitter(constructWebdavArgs('PUT'), nextMock)
             .then(() => {
-                assert.deepEqual(fileTypeProviderMock.type.args[0][0], '/subdir')
+                assert.deepEqual(fileTypeProviderMock.type.args[0][1], '/subdir')
                 assert.equal(rabbotMock.publish.args[0][1].body.type, 'test-type')
             })
     )

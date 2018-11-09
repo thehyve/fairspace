@@ -1,5 +1,6 @@
 const eventEmitter = require('../events/EventEmitter');
 const rabbot = require('rabbot');
+const WebdavFileTypeProvider = require('../events/FileTypeProvider').webdav
 
 /**
  * Setup method for emitting events to RabbitMQ
@@ -18,6 +19,9 @@ module.exports = function setupEventEmitter(server, collectionApi, settings) {
         return;
     }
 
+    // Configure filetype provider
+    const fileTypeProvider = WebdavFileTypeProvider(server.rootFileSystem());
+
     console.log("Emitting events to RabbitMQ on host " + settings.host);
 
     rabbot.configure({
@@ -27,7 +31,7 @@ module.exports = function setupEventEmitter(server, collectionApi, settings) {
         ]
     }).then(() => {
         console.log("Connection with RabbitMQ has been established")
-        server.afterRequest(eventEmitter(rabbot, collectionApi, settings.exchange));
+        server.afterRequest(eventEmitter(rabbot, collectionApi, fileTypeProvider, settings.exchange));
     }).catch(e => {
         console.error("Connection with RabbitMQ failed:", e);
     })
