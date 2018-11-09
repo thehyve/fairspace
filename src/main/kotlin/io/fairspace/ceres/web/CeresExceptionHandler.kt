@@ -1,6 +1,5 @@
 package io.fairspace.ceres.web
 
-import org.apache.jena.shared.NotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -16,12 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @ResponseBody
 class CeresExceptionHandler {
     val log = LoggerFactory.getLogger(CeresExceptionHandler::class.java);
-
-    @ExceptionHandler(NotFoundException::class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    protected fun handleNotFoundException(ex: NotFoundException): ErrorBody {
-        return ErrorBody("Requested information could not be found")
-    }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

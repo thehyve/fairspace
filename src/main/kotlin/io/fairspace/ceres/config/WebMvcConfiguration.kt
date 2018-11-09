@@ -1,7 +1,7 @@
 package io.fairspace.ceres.config
 
-import io.fairspace.ceres.web.converters.JsonLdModelConverter
-import io.fairspace.ceres.web.converters.ResultSetConverter
+import io.fairspace.ceres.metadata.web.converters.JsonLdModelConverter
+import io.fairspace.ceres.metadata.web.converters.ResultSetConverter
 import org.apache.jena.query.ResultSet
 import org.apache.jena.rdf.model.Model
 import org.springframework.context.annotation.Configuration
