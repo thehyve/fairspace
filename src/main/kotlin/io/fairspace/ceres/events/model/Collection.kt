@@ -8,10 +8,6 @@ data class Collection(
     val location: String = "",
     val name: String = "",
     val description: String? = null,
-    val uri: URI = CollectionConstants.DEFAULT_URI,
+    val uri: String = "",
     val access: String = "None"
 )
-
-object CollectionConstants {
-    val DEFAULT_URI = URI("http://fairspace.io")
-}
