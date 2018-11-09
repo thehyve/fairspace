@@ -6,8 +6,7 @@ const EventEmitter = require('../../src/events/EventEmitter')
 describe('EventEmitter', () => {
     const methods = ['PUT', 'GET', 'PROPFIND', 'COPY', 'MOVE', 'DELETE'];
     const exchangeName ='test-exchange';
-    let rabbotMock, collectionApiMock, nextMock;
-
+    let rabbotMock, collectionApiMock, fileTypeProviderMock, nextMock;
 
     beforeEach(() => {
         nextMock = sinon.spy();
@@ -19,7 +18,11 @@ describe('EventEmitter', () => {
             retrieveCollection: sinon.stub().resolves({ name: 'test'})
         }
 
-        emitter = EventEmitter(rabbotMock, collectionApiMock, exchangeName);
+        fileTypeProviderMock = {
+            type: sinon.stub().resolves('test-type')
+        }
+
+        emitter = EventEmitter(rabbotMock, collectionApiMock, fileTypeProviderMock, exchangeName);
     })
 
     it('should emit events to the right exchange', () =>
@@ -40,6 +43,22 @@ describe('EventEmitter', () => {
         emitter(constructWebdavArgs('PUT'), nextMock)
             .then(() => {
                 assert.equal(rabbotMock.publish.args[0][1].body.collection, null)
+            })
+    })
+
+    it('should include the path type in events', () =>
+        emitter(constructWebdavArgs('PUT'), nextMock)
+            .then(() => {
+                assert.deepEqual(fileTypeProviderMock.type.args[0][0], '/subdir')
+                assert.equal(rabbotMock.publish.args[0][1].body.type, 'test-type')
+            })
+    )
+
+    it('should include unknown type if file stat fails', () => {
+        fileTypeProviderMock.type = sinon.stub().rejects(new Error("Error message"))
+        emitter(constructWebdavArgs('PUT'), nextMock)
+            .then(() => {
+                assert.equal(rabbotMock.publish.args[0][1].body.type, 'unknown')
             })
     })
 

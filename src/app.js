@@ -4,6 +4,7 @@ const setupTracingMiddleware = require('./config/setupTracingMiddleware');
 const setupWebdavMiddleware = require('./config/setupWebdavMiddleware');
 const setupEventEmitter = require('./config/setupEventEmitter');
 const setupCollectionApi = require('./config/setupCollectionApi');
+const FileTypeProvider = require('./events/FileTypeProvider').provider;
 
 // Configuration parameters
 const defaultConfig = {
@@ -38,7 +39,10 @@ if(process.env.CONFIG_FILE) {
 app.get('/', (req, res, next) => req.get('probe') ? res.send('Hi, I\'m Titan!').end() : next());
 
 if(configuration.tracing.enabled) setupTracingMiddleware(app, configuration.tracing);
+
 const collectionApi = setupCollectionApi(configuration);
-setupWebdavMiddleware(app, configuration, collectionApi, server => setupEventEmitter(server, collectionApi, configuration.rabbitmq));
+const fileTypeProvider = FileTypeProvider(configuration.rootPath);
+const eventEmitterSetupClosure = server => setupEventEmitter(server, collectionApi, fileTypeProvider, configuration.rabbitmq)
+setupWebdavMiddleware(app, configuration, collectionApi, eventEmitterSetupClosure);
 
 module.exports = app;
