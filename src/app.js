@@ -38,7 +38,9 @@ if(process.env.CONFIG_FILE) {
 app.get('/', (req, res, next) => req.get('probe') ? res.send('Hi, I\'m Titan!').end() : next());
 
 if(configuration.tracing.enabled) setupTracingMiddleware(app, configuration.tracing);
+
 const collectionApi = setupCollectionApi(configuration);
-setupWebdavMiddleware(app, configuration, collectionApi, server => setupEventEmitter(server, collectionApi, configuration.rabbitmq));
+const eventEmitterSetupClosure = server => setupEventEmitter(server, collectionApi, configuration.rabbitmq)
+setupWebdavMiddleware(app, configuration, collectionApi, eventEmitterSetupClosure);
 
 module.exports = app;

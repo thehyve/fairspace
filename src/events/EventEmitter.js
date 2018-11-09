@@ -1,9 +1,11 @@
+const FileTypeProvider = require('./FileTypeProvider')
+
 /**
  * This WebdavServer afterRequest handler emits events for file operations
  * over AMQP
  * @returns {function(Args, Function): *}
  */
-module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
+module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, exchangeName) {
     const publish = event => rabbot.publish(exchangeName, event);
 
     const getCollection = (req, user) => {
@@ -19,16 +21,13 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
     const readEvent = req => ({
         routingKey: 'read',
         type: "io.fairspace.titan.readDir",
-        body: {
-            path: req.path
-        }
+        body: {}
     })
 
     const downloadEvent = (req, res) => ({
         routingKey: 'download',
         type: "io.fairspace.titan.download",
         body: {
-            path: req.path,
             contentLength: res.get('content-length')
         }
     })
@@ -38,7 +37,6 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
         routingKey: 'upload',
         type: "io.fairspace.titan.upload",
         body: {
-            path: req.path,
             contentLength: req.headers['content-length']
         }
     });
@@ -46,24 +44,19 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
     const mkdirEvent = req => ({
         routingKey: 'mkdir',
         type: "io.fairspace.titan.mkDir",
-        body: {
-            path: req.path,
-        }
+        body: {}
     })
 
     const deleteEvent = req => ({
         routingKey: 'delete',
         type: "io.fairspace.titan.delete",
-        body: {
-            path: req.path,
-        }
+        body: {}
     })
 
     const copyEvent = req => ({
         routingKey: 'copy',
         type: "io.fairspace.titan.copy",
         body: {
-            path: req.path,
             destination: req.headers['destination']
         }
     })
@@ -72,7 +65,6 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
         routingKey: 'move',
         type: "io.fairspace.titan.move",
         body: {
-            path: req.path,
             destination: req.headers['destination']
         }
     })
@@ -87,17 +79,35 @@ module.exports = function EventEmitter(rabbot, collectionApi, exchangeName) {
         DELETE: deleteEvent
     }
 
-    const handler = (args, next) => {
-        if(methodToEventsMap.hasOwnProperty(args.request.method)) {
-            console.debug("Emitting event for", args.request.method, "on", args.request.path);
-            return getCollection(args.request, args.user)
+    const handler = (ctx, next) => {
+        if(methodToEventsMap.hasOwnProperty(ctx.request.method)) {
+            console.debug("Emitting event for", ctx.request.method, "on", ctx.request.path);
+
+            // Add collection information to the event
+            const addCollection = getCollection(ctx.request, ctx.user)
                 .catch(e => {
-                    console.error("Error while retrieving collection for path", args.request.path, ":", e.message);
+                    console.error("Error while retrieving collection for path", ctx.request.path, ":", e.message);
                     return null
-                })
-                .then(collection => {
-                    const event = methodToEventsMap[args.request.method](args.request, args.response)
+                });
+
+            // Add path and type to the event
+            const addPath = fileTypeProvider.type(ctx, ctx.request.path)
+                .catch(e => {
+                    console.error("Error while retrieving file information for path", ctx.request.path, ":", e.message);
+                    return FileTypeProvider.TYPE_UNKNOWN
+                });
+
+            // Wait for both information sources before sending the event
+            return Promise.all([addCollection, addPath])
+                .then(([collection, type]) => {
+                    // Generate base event
+                    const event = methodToEventsMap[ctx.request.method](ctx.request, ctx.response)
+
+                    // Append the information
                     event.body.collection = collection;
+                    event.body.path = ctx.request.path;
+                    event.body.type = type;
+
                     return event;
                 })
                 .then(publish)
