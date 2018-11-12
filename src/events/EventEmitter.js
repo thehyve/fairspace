@@ -12,15 +12,33 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
         const paths = req.path.split('/');
 
         if(paths.length == 0 || !paths[1]) {
-            throw Error("No correct path specified to retrieve a collection");
+            return Promise.reject(Error("No correct path specified to retrieve a collection"));
         }
 
         return collectionApi.retrieveCollection(paths[1], user)
     }
 
+    const getDestination = req => {
+        const destination = req.headers['destination']
+
+        if(!destination) {
+            return null;
+        }
+
+        // Check whether the destination contains a scheme and host/port
+        // If so, remove it
+        const startIndex = destination.indexOf('://');
+        if(startIndex !== -1) {
+            // Remove scheme and the hostname + port
+            return destination.substring(destination.indexOf('/', startIndex + '://'.length))
+        } else {
+            return destination;
+        }
+    }
+
     const readEvent = req => ({
         routingKey: 'read',
-        type: "io.fairspace.titan.readDir",
+        type: "io.fairspace.titan.read",
         body: {}
     })
 
@@ -57,7 +75,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
         routingKey: 'copy',
         type: "io.fairspace.titan.copy",
         body: {
-            destination: req.headers['destination']
+            destination: getDestination(req)
         }
     })
 
@@ -65,7 +83,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
         routingKey: 'move',
         type: "io.fairspace.titan.move",
         body: {
-            destination: req.headers['destination']
+            destination: getDestination(req)
         }
     })
 
