@@ -21,9 +21,9 @@ class PidController(val pidService: PidService) {
     }
 
     @PostMapping(produces = ["application/json"])
-    fun post(@RequestBody pid: PidDTO) {
+    fun post(@RequestBody pid: PidDTO): PidDTO =
         pidService.findOrCreateByValue(pid.value)
-    }
+
 
     @DeleteMapping
     fun delete(@RequestParam("id") id: String?,
