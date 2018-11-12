@@ -16,7 +16,8 @@ beforeAll(() => {
         "urls": {
             "metadata": {
                 statements: "/metadata",
-                query: "/query"
+                query: "/query",
+                pid: "/pid"
             }
         }
     });
@@ -62,4 +63,19 @@ it('retrieves metadata entities using a sparql query', () => {
     expect(window.fetch.mock.calls[0][1].method).toEqual('POST');
     expect(window.fetch.mock.calls[0][1].body).toContain('PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>');
     expect(window.fetch.mock.calls[0][1].body).toContain(type);
+})
+
+
+
+it('fetches pid with provided parameters', () => {
+    window.fetch = jest.fn(() =>
+        Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))))
+    ;
+
+    MetadataAPI.getSubjectByPath('/aaa/bbb/ccc');
+
+    expect(window.fetch.mock.calls[0][0]).toEqual("/pid");
+    expect(window.fetch.mock.calls[0][1].method).toEqual('POST');
+    expect(window.fetch.mock.calls[0][1].body).toEqual('{"value":"/aaa/bbb/ccc"}');
+    expect(window.fetch.mock.calls[0][1].headers.map['content-type']).toEqual('application/json');
 })

@@ -146,11 +146,11 @@ class MetadataAPI {
     }
 
     getSubjectByPath(path) {
-        let url = Config.get().urls.metadata.pid + '?name=' + encodeURIComponent(path);
-        console.log(url)
-        return fetch(Config.get().urls.metadata.pid + '?name=' + encodeURIComponent(path), {
-            method: 'GET',
-            headers: new Headers({'Accept': 'application/json'}),
+        console.log(JSON.stringify({value: path}));
+        return fetch(Config.get().urls.metadata.pid, {
+            method: 'POST',
+            body: JSON.stringify({value: path}),
+            headers: new Headers({'Content-Type': 'application/json', 'Accept': 'application/json'}),
             credentials: 'same-origin'
         })
             .then(failOnHttpError("Failure when retrieving metadata"))
