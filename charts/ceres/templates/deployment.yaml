@@ -63,6 +63,10 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+    {{- with .Values.imagePullSecrets }}
+        imagePullSecrets:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       volumes:
       - name: config-volume
         configMap:
