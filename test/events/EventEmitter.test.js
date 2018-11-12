@@ -62,6 +62,37 @@ describe('EventEmitter', () => {
             })
     })
 
+    it('should include the destination for MOVE events', () => {
+        const args = constructWebdavArgs('MOVE');
+        args.request.headers.destination = '/newdir';
+
+        emitter(args, nextMock)
+            .then(() => {
+                assert.equal(rabbotMock.publish.args[0][1].body.destination, '/subdir')
+            })
+    })
+
+    it('should include the destination for COPY events', () => {
+        const args = constructWebdavArgs('COPY');
+        args.request.headers.destination = '/newdir';
+
+        emitter(args, nextMock)
+            .then(() => {
+                assert.equal(rabbotMock.publish.args[0][1].body.destination, '/subdir')
+            })
+    })
+
+    it('should strip the hostname from the destination header if present', () => {
+        const args = constructWebdavArgs('COPY');
+        args.request.headers.destination = 'http://fake-site:102/newdir';
+
+        emitter(args, nextMock)
+            .then(() => {
+                assert.equal(rabbotMock.publish.args[0][1].body.destination, '/subdir')
+            })
+    })
+
+
     it('should also call next on invalid HTTP methods', () =>
         emitter(constructWebdavArgs('UNKNOWN-VERB'), nextMock)
             .then(() => {

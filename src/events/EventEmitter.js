@@ -21,6 +21,10 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
     const getDestination = req => {
         const destination = req.headers['destination']
 
+        if(!destination) {
+            return null;
+        }
+
         // Check whether the destination contains a scheme and host/port
         // If so, remove it
         const startIndex = destination.indexOf('://');
