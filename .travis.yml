@@ -32,6 +32,9 @@ jobs:
     script:
     - ./ci/docker/build.sh
     - 'if [[ $SHOULD_RELEASE ]]; then ./ci/docker/release.sh; fi'
+    - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}-base:${VERSION}"
+    - docker build . -f Dockerfile.base --tag "${CONTAINER_NAME}"
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/docker/release.sh; fi'
   - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
     stage: Versioning
     name: Set tag and update version
