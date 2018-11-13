@@ -70,3 +70,10 @@ app:
     zipkinUrl: http://jaeger-collector.jaeger:9411/
   metadata:
     baseUrl: http://fairspace.com
+
+rabbitmq:
+  hostname:
+  vhost:
+  username:
+  password:
+
