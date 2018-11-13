@@ -63,7 +63,7 @@ spec:
               name: {{ template "pluto.keycloak.client.secret" . }}
               key: clientSecret
       {{- with .Values.imagePullSecrets }}
-        imagePullSecrets:
+      imagePullSecrets:
 {{ toYaml . | indent 8 }}
       {{- end }}
       volumes:
