@@ -1,6 +1,8 @@
 app:
   metadata:
     base-url: http://fairspace.com
+  rabbitmq:
+    enabled: false
 
 # Spring should handle authentication on incoming requests by validating the oAuth token
 security:
@@ -22,6 +24,8 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
 
 ceres:
   url: http://localhost:${wiremock.server.port}/ceres

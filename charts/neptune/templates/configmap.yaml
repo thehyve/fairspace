@@ -27,5 +27,9 @@ data:
         url: "jdbc:postgresql://{{ .Release.Name }}-{{ .Values.postgresql.nameOverride }}:5432/{{ .Values.postgresql.postgresDatabase }}"
         username: "{{ .Values.postgresql.postgresUser }}"
         password: "{{ .Values.postgresql.postgresPassword }}"
-
+      rabbitmq:
+        host: {{ .Values.rabbitmq.hostname }}
+        username: {{ .Values.rabbitmq.username | default (printf "%s-neptune" .Release.Name) }}
+        password: {{ .Values.rabbitmq.password }}
+        virtualHost: {{ .Values.rabbitmq.vhost | default .Release.Name }}
 

@@ -1,4 +1,4 @@
-package io.fairspace.neptune.web.dto;
+package io.fairspace.neptune.model.dto;
 
 import io.fairspace.neptune.model.Access;
 import lombok.AllArgsConstructor;

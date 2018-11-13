@@ -30,6 +30,29 @@ Link the images together
 
 See [charts readme](/charts/neptune/README.md)
 
+## RabbitMQ
+Neptune is configured to emit events to RabbitMQ. Disabling rabbitMQ can be done by setting
+the following properties in the configuration:
+ ```yaml
+app.rabbitmq.enabled: false
+spring.autoconfigure.exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+```
+ You can configure RabbitMQ using the [default Spring settings](https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html#common-application-properties):
+ ```yaml
+spring.rabbitmq.host:
+spring.rabbitmq.username:
+spring.rabbitmq.password:
+spring.rabbitmq.virtual-host:
+```
+ The topology can be defined in the application.yaml properties:
+ ```yaml
+  app:
+    rabbitmq:
+      topology:
+        collections:
+          exchange: "collections"
+```
+
 ## Developers
 
 If you want to develop on Neptune, it is recommended to activate the dev Spring profile. This is also needed for Gradle as

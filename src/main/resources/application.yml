@@ -5,6 +5,11 @@ app:
     realm: keycloak
   metadata:
     base-url: http://fairspace.com
+  rabbitmq:
+    enabled: true
+    topology:
+      collections:
+        exchange: "collections"
 
 spring:
   application:

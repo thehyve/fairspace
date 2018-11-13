@@ -14,6 +14,10 @@ spring:
   h2:
     console:
       enabled: true
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
 
 ceres:
   url: "http://localhost:8001"
