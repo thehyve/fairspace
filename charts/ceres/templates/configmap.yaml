@@ -26,6 +26,11 @@ data:
           probability: {{ .Values.app.tracing.samplingRate }}
       zipkin:
         base-url: {{ .Values.app.tracing.zipkinUrl }}
+      rabbitmq:
+        host: {{ .Values.rabbitmq.hostname }}
+        username: {{ .Values.rabbitmq.username | default (printf "%s-ceres" .Release.Name) }}
+        password: {{ .Values.rabbitmq.password }}
+        virtualHost: {{ .Values.rabbitmq.vhost | default .Release.Name }}
 
     # Where to store the dataset
     jena:
