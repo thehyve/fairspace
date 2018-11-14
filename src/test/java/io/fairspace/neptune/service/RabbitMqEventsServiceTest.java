@@ -3,6 +3,7 @@ package io.fairspace.neptune.service;
 import io.fairspace.neptune.config.upstream.AuthorizationContainer;
 import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
+import io.fairspace.neptune.model.KeycloakUser;
 import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.model.events.PermissionAddedEvent;
 import io.fairspace.neptune.model.events.User;
@@ -13,6 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
+import java.io.IOException;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -32,6 +36,9 @@ public class RabbitMqEventsServiceTest {
     @Mock
     private Exchange collectionsExchange;
 
+    @Mock
+    private UsersService usersService;
+
     RabbitMqEventsService service;
 
     Collection collection = Collection.builder().id(7L).name("my-collection").build();
@@ -45,8 +52,8 @@ public class RabbitMqEventsServiceTest {
         when(authorizationContainer.getUsername()).thenReturn("test-username");
         when(collectionsExchange.getName()).thenReturn("exchange-name");
 
-        user = new User("test-subject", "test-username", "test-fullname");
-        service = new RabbitMqEventsService(rabbitTemplate, authorizationContainer, collectionsExchange);
+        user = new User("test-subject", "test-username", "test-fullname", "test-email");
+        service = new RabbitMqEventsService(rabbitTemplate, authorizationContainer, usersService, collectionsExchange);
     }
 
     @Test
@@ -73,6 +80,52 @@ public class RabbitMqEventsServiceTest {
                 )
         );
     }
+
+
+    @Test
+    public void testSubjectProperties() throws IOException {
+        KeycloakUser subject = new KeycloakUser("subject-id", "subject", "John", "Snow", "john@snow.com");
+        when(usersService.getUserById("receiver-subject")).thenReturn(Optional.of(subject));
+
+        service.permissionAdded(permission, true);
+
+        verify(rabbitTemplate).convertAndSend(
+                eq("exchange-name"),
+                anyString(),
+                argThat((PermissionAddedEvent argument) ->
+                        argument.getSubject().getId().equals("subject-id") &&
+                                argument.getSubject().getDisplayName().equals("John Snow") &&
+                                argument.getSubject().getEmail().equals("john@snow.com")
+                )
+        );
+    }
+
+    @Test
+    public void testMessageWithoutSubject() throws IOException {
+        when(usersService.getUserById("receiver-subject")).thenReturn(Optional.empty());
+
+        service.permissionAdded(permission, true);
+
+        verify(rabbitTemplate).convertAndSend(
+                eq("exchange-name"),
+                anyString(),
+                argThat((PermissionAddedEvent argument) -> argument.getSubject() == null)
+        );
+    }
+
+    @Test
+    public void testMessageWithExceptionWhileRetrievingSubject() throws IOException {
+        when(usersService.getUserById("receiver-subject")).thenThrow(new IOException("test"));
+
+        service.permissionAdded(permission, true);
+
+        verify(rabbitTemplate).convertAndSend(
+                eq("exchange-name"),
+                anyString(),
+                argThat((PermissionAddedEvent argument) -> argument.getSubject() == null)
+        );
+    }
+
 
     @Test
     public void testCollectionId() {

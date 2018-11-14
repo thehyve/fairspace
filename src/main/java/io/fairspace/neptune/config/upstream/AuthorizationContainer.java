@@ -11,6 +11,7 @@ public class AuthorizationContainer {
     public static final String SUBJECT_CLAIM = "sub";
     public static final String USERNAME_CLAIM = "preferred_username";
     public static final String FULLNAME_CLAIM = "name";
+    public static final String EMAIL_CLAIM = "email";
 
     @Autowired(required = false)
     OAuthAuthenticationToken token;
@@ -33,6 +34,10 @@ public class AuthorizationContainer {
 
     public String getFullname() {
         return getStringClaim(FULLNAME_CLAIM);
+    }
+
+    public String getEmail() {
+        return getStringClaim(EMAIL_CLAIM);
     }
 
     public String getStringClaim(String claim) {

@@ -8,8 +8,8 @@ import lombok.Data;
 public class PermissionAddedEvent extends PermissionEvent {
     private boolean permissionForNewCollection;
 
-    public PermissionAddedEvent(User user, Permission permission, Collection collection, boolean permissionForNewCollection) {
-        super(user, permission, collection);
+    public PermissionAddedEvent(User user, User subject, Permission permission, Collection collection, boolean permissionForNewCollection) {
+        super(user, subject, permission, collection);
         this.permissionForNewCollection = permissionForNewCollection;
     }
 }

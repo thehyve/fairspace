@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class PermissionDeletedEvent extends PermissionEvent {
-    public PermissionDeletedEvent(User user, Permission permission, Collection collection) {
-        super(user, permission, collection);
+    public PermissionDeletedEvent(User user, User subject, Permission permission, Collection collection) {
+        super(user, subject, permission, collection);
     }
 }

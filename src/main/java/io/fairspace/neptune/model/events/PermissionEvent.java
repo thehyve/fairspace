@@ -9,6 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public abstract class PermissionEvent {
     private User user;
+    private User subject;
     private Permission permission;
     private Collection collection;
 }

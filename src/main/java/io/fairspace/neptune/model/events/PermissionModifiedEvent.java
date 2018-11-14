@@ -9,8 +9,8 @@ import lombok.Data;
 public class PermissionModifiedEvent extends PermissionEvent {
     private Access oldAccess;
 
-    public PermissionModifiedEvent(User user, Permission permission, Collection collection, Access oldAccess) {
-        super(user, permission, collection);
+    public PermissionModifiedEvent(User user, User subject, Permission permission, Collection collection, Access oldAccess) {
+        super(user, subject, permission, collection);
         this.oldAccess = oldAccess;
     }
 }
