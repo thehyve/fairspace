@@ -1,6 +1,7 @@
 package io.fairspace.neptune.service;
 
 import io.fairspace.neptune.config.upstream.AuthorizationContainer;
+import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.UnauthorizedException;
 import org.junit.Before;
@@ -15,8 +16,7 @@ import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -74,18 +74,29 @@ public class CollectionServiceIntegrationTest {
 
     }
 
-
     @Test
     public void testCollectionIsVisibleForDefaultUser() {
         // For the default user, the collection is visible
         service.findById(collection.getId()); // Shouldn't throw an exception
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
+    public void testCollectionCanBeFoundByLocation() {
+        Collection byLocation = service.findByLocation(collection.getLocation());
+        assertEquals(byLocation, collection);
+    }
+
+    @Test
     public void testCollectionNotVisibleForOthersByDefault() {
         // For another user, the collection is not visible
         when(authorizationContainer.getSubject()).thenReturn("other-nonexisting-user");
-        service.findById(collection.getId());
+        Collection c = service.findById(collection.getId());
+        assertEquals(Access.None, c.getAccess());
+        assertEquals(collection.getId(), c.getId());
+        assertNull(c.getName());
+        assertNull(c.getDescription());
+        assertNull(c.getUri());
+        assertNull(c.getType());
     }
 
     @Test

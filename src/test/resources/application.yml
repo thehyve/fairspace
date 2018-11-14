@@ -30,7 +30,3 @@ ceres:
 titan:
   url: http://localhost:${wiremock.server.port}/titan
 
-permissions:
-  # in seconds
-  cachePeriod: 60
-

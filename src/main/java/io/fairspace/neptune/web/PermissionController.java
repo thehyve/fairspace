@@ -16,22 +16,27 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/")
 public class PermissionController {
-    @Autowired
     private PermissionService permissionService;
+    private Caching caching;
 
-    @Value("${permissions.cachePeriod}")
-    private String cachePeriod;
+    public PermissionController(
+            @Value("${cachingPeriod.permission:60}") int cachePeriod,
+            PermissionService permissionService
+    ) {
+        this.permissionService = permissionService;
+        this.caching = new Caching(cachePeriod);
+    }
 
     @GetMapping("/{collectionId}/permissions")
     public ResponseEntity<List<Permission>> getCollectionAuthorizations(@PathVariable Long collectionId) {
-        return withCacheControl(permissionService.getByCollection(collectionId).stream()
+        return caching.withCacheControl(permissionService.getByCollection(collectionId).stream()
                         .map(Permission::fromModel)
                         .collect(Collectors.toList()));
     }
 
     @GetMapping("/permissions")
     public ResponseEntity<Permission> getAuthorizationsByLocation(@RequestParam String location) {
-        return withCacheControl(Permission.fromModel(permissionService.getUserPermissionByLocation(location)));
+        return caching.withCacheControl(Permission.fromModel(permissionService.getUserPermissionByLocation(location)));
     }
 
     @PutMapping("/permissions")
@@ -41,9 +46,5 @@ public class PermissionController {
         return Permission.fromModel(storedPermission);
     }
 
-    private <T> ResponseEntity<T> withCacheControl(T body) {
-        return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(Integer.parseInt(cachePeriod), TimeUnit.SECONDS))
-                .body(body);
-    }
+
 }
