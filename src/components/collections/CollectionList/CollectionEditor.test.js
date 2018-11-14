@@ -59,7 +59,6 @@ it('applies properties properly', () => {
     let select = wrapper.find(Select);
     expect(select.length).toEqual(1);
     expect(select.at(0).prop('value')).toEqual('S3_MOUNT');
-    expect(select.at(0).prop('children').length).toEqual(2);
 
     cancelClicked = false;
     button.at(0).simulate('click');

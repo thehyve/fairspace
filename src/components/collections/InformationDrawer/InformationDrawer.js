@@ -12,14 +12,9 @@ import * as metadataActions from "../../../actions/metadata";
 import {connect} from 'react-redux';
 import PermissionsContainer from "../../permissions/PermissionsContainer";
 import permissionChecker from '../../permissions/PermissionChecker';
-import {fetchUsersIfNeeded} from "../../../actions/workspace";
 import {findById} from "../../../utils/arrayutils";
 
 export class InformationDrawer extends React.Component {
-
-    componentDidMount() {
-        this.props.fetchUsersIfNeeded()
-    }
 
     handleDetailsChange = (collection) => {
         const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = this.props;
@@ -89,7 +84,6 @@ const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedColl
 
 const mapDispatchToProps = {
     ...metadataActions,
-    fetchUsersIfNeeded
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer));

@@ -2,7 +2,7 @@ import React from 'react';
 import {createShallow} from '@material-ui/core/test-utils';
 import {PermissionsViewer, styles} from "./PermissionsViewer";
 
-describe('PermissionViewer', () => {
+describe('PermissionsViewer', () => {
 
     const mockCollaborators = {
         data: [
@@ -39,7 +39,13 @@ describe('PermissionViewer', () => {
     const mockCurrentLoggedUserCreatorCanManage = {id: 'user4-id'};
     const mockCurrentLoggedUserNotCreatorCanManage = {id: 'user1-id'};
     const mockCurrentLoggedUserNotCreatorCannotManage = {id: 'user3-id'};
-
+    const mockUsers = [
+            {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
+            {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
+            {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars'},
+            {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain'},
+            {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
+        ];
     const mockCreator = 'user4-id';
     const mockFecthPermissionsFn = jest.fn();
     const mockAlterPermissionFn = jest.fn();
@@ -65,6 +71,7 @@ describe('PermissionViewer', () => {
 
                 classes={styles}
                 permissions={mockCollaborators}
+                users={mockUsers}
                 currentLoggedUser={mockCurrentLoggedUserCreatorCanManage}
                 alterPermission={mockAlterPermissionFn}
                 fetchPermissions={mockFecthPermissionsFn}
@@ -116,6 +123,7 @@ describe('PermissionViewer', () => {
 
                 classes={styles}
                 permissions={mockCollaborators}
+                users={mockUsers}
                 currentLoggedUser={mockCurrentLoggedUserNotCreatorCannotManage}
                 alterPermission={mockAlterPermissionFn}
                 fetchPermissions={mockFecthPermissionsFn}
@@ -169,6 +177,7 @@ describe('PermissionViewer', () => {
 
                 classes={styles}
                 permissions={mockCollaborators}
+                users={mockUsers}
                 currentLoggedUser={mockCurrentLoggedUserNotCreatorCanManage}
                 alterPermission={mockAlterPermissionFn}
                 fetchPermissions={mockFecthPermissionsFn}

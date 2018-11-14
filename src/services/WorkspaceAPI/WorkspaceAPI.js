@@ -9,7 +9,7 @@ class WorkspaceAPI {
     };
 
     getUsers() {
-        return fetch(Config.get().urls.users, Config)
+        return fetch(Config.get().urls.users, WorkspaceAPI.getConfig)
             .then(failOnHttpError('Error while loading users'))
             .then(response => {
                 return response.json()

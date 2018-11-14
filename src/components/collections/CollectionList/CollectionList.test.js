@@ -28,14 +28,14 @@ describe('CollectionList', () => {
             {type: 'LOCAL_STORAGE', name: 'Test1', id: '1', dateCreated: new Date().toUTCString()},
             {type: 'S3_BUCKET', name: 'Test2', id: '2', dateCreated: new Date().toUTCString()},
             {name: 'Test3', id: '3', dateCreated: new Date().toUTCString()}
-        ]
+        ];
 
         const props = {
             classes: {
                 tableRow: "CollectionList-tableRow-200",
                 tableRowSelected: "CollectionList-tableRowSelected-201"
             }
-        }
+        };
         const wrapper = shallow(<CollectionList collections={collections} {...props}/>);
 
         const icons = wrapper.dive().find(Icon);
@@ -45,14 +45,22 @@ describe('CollectionList', () => {
         expect(icons.get(2).props.children).toEqual(COLLECTION_ICONS['LOCAL_STORAGE']);
     });
 
+    it('renders Creator column', () => {
+        const collections = [{creatorObj:{firstName:'Mariah', lastName:'Carey'}}];
+        const wrapper = shallow(<CollectionList collections={collections} classes={styles}/>);
+        const cells = wrapper.dive().find(TableCell);
+        expect(cells.length).toEqual(12);
+        expect(cells.at(3).childAt(0).text()).toEqual('Creator');
+        expect(cells.at(9).childAt(0).childAt(0).text()).toEqual('Mariah Carey');
+    });
 
     it('renders Access column', () => {
         const collections = [{access: 'Read', dateCreated: new Date().toUTCString()}];
         const wrapper = shallow(<CollectionList collections={collections} classes={styles}/>);
         const cells = wrapper.dive().find(TableCell);
-        expect(cells.length).toEqual(10);
-        expect(cells.at(3).childAt(0).text()).toEqual('Access');
-        expect(cells.at(8).childAt(0).text()).toEqual('Read');
+        expect(cells.length).toEqual(12);
+        expect(cells.at(4).childAt(0).text()).toEqual('Access');
+        expect(cells.at(10).childAt(0).text()).toEqual('Read');
     });
 
     it('renders Created column', () => {
@@ -60,8 +68,8 @@ describe('CollectionList', () => {
         const collections = [{dateCreated: date.toUTCString()}];
         const wrapper = shallow(<CollectionList collections={collections} classes={styles}/>);
         const cells = wrapper.dive().find(TableCell);
-        expect(cells.length).toEqual(10);
+        expect(cells.length).toEqual(12);
         expect(cells.at(2).childAt(0).text()).toEqual('Created');
-        expect(cells.at(7).childAt(0).childAt(0).html()).toEqual(DateTime({value: date}));
+        expect(cells.at(8).childAt(0).childAt(0).html()).toEqual(DateTime({value: date}));
     });
-})
+});

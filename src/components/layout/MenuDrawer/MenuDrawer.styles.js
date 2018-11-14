@@ -4,7 +4,6 @@ const drawerWidth = 240;
 const styles = theme => ({
     root: {
         flexGrow: 1,
-        height: 440,
         zIndex: 1,
         overflow: 'hidden',
         position: 'relative',
@@ -37,7 +36,7 @@ const styles = theme => ({
         whiteSpace: 'nowrap',
         width: drawerWidth,
         marginTop: '65px',
-        height: '100vh',
+        height: '92vh',
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,

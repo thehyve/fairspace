@@ -12,11 +12,11 @@ import * as collectionBrowserActions from "../../../actions/collectionbrowser";
 import * as collectionActions from "../../../actions/collections";
 import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
 import CollectionEditor from "../CollectionList/CollectionEditor";
+import {findById} from "../../../utils/arrayutils";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
-
         this.state = {addingCollection: false}
     }
 
@@ -54,24 +54,11 @@ class CollectionBrowser extends React.Component {
         this.props.history.push("/collections/" + collection.id);
     }
 
-    render() {
-        const {loading, error} = this.props;
-
-        if (error) {
-            return <ErrorMessage message={error} />
-        }
-
-        return <GenericCollectionsScreen
-            breadCrumbs={<BreadCrumbs/>}
-            buttons={this.renderButtons()}
-            main={loading ? this.renderLoading() : this.renderCollectionList()} />
-    }
-
     renderButtons() {
         return <Button variant="fab" mini color="secondary" aria-label="Add"
-                        onClick={this.handleAddCollectionClick.bind(this)}>
-                    <Icon>add</Icon>
-                </Button>
+                       onClick={this.handleAddCollectionClick.bind(this)}>
+            <Icon>add</Icon>
+        </Button>
     }
 
     renderLoading() {
@@ -79,6 +66,8 @@ class CollectionBrowser extends React.Component {
     }
 
     renderCollectionList() {
+        const {users, collections} = this.props;
+        collections.map(col => col.creatorObj = findById(users, col.creator));
         return (
             <div>
                 <CollectionList collections={this.props.collections}
@@ -116,14 +105,28 @@ class CollectionBrowser extends React.Component {
     handleCancelAddCollection() {
         this.setState({addingCollection: false});
     }
+
+    render() {
+        const {loading, error} = this.props;
+
+        if (error) {
+            return <ErrorMessage message={"An error occurred while loading collections"}/>
+        }
+
+        return <GenericCollectionsScreen
+            breadCrumbs={<BreadCrumbs/>}
+            buttons={this.renderButtons()}
+            main={loading ? this.renderLoading() : this.renderCollectionList()}/>
+    }
+
 }
 
 const mapStateToProps = (state, ownProps) => ({
     user: state.account.user.data,
-    loading: state.cache.collections.pending || state.account.user.pending,
-    error: state.cache.collections.error || state.account.user.error,
+    loading: state.cache.collections.pending || state.account.user.pending || state.cache.users.pending,
+    error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
     collections: state.cache.collections.data,
-
+    users: state.cache.users.data,
     selectedCollectionId: state.collectionBrowser.selectedCollectionId,
 });
 
@@ -133,6 +136,3 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CollectionBrowser));
-
-
-

@@ -18,8 +18,7 @@
         {
             "@id": "ws:collections/1",
             "@type": [
-                "fs:Collection",
-                "sdo:Dataset"
+                "fs:Collection"
             ],
             "description": "An example collection with testdata from GSE8581",
             "name": "GSE8581",
