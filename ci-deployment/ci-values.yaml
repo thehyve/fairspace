@@ -98,8 +98,10 @@ jupyterhub:
               openid_url: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/
               session_url: https://workspace.ci.fairway.app/account/tokens
   singleuser:
-      extraEnv:
-        WORKSPACE_URL: https://workspace.ci.fairway.app
+    image:
+      name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser-base
+    extraEnv:
+      WORKSPACE_URL: https://workspace.ci.fairway.app
   hub:
       extraEnv:
           JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
