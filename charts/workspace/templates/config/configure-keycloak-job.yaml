@@ -1,4 +1,4 @@
-{{- $scripts := .Values.workspace.configurationScripts -}}
+{{- $scripts := .Values.workspace.configurationScripts.keycloak -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -21,9 +21,13 @@ spec:
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     spec:
       restartPolicy: Never
+      {{- if .Values.fairspaceImagePullSecret }}
+      imagePullSecrets:
+          - name: {{ .Values.fairspaceImagePullSecret }}
+      {{- end }}
       containers:
       - name: configure-keycloak-job
-        image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.configurationScriptsTag }}"
+        image: "{{ $scripts.image }}"
         imagePullPolicy: {{ $scripts.pullPolicy }}
         env:
           - name: KEYCLOAK_PASSWORD

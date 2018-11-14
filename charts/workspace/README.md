@@ -230,6 +230,43 @@ See [Mercury README](https://github.com/fairspace/mercury/blob/master/README.md)
 Setting for minio should be in the section `minio`.
 See [Minio README](https://github.com/kubernetes/charts/blob/master/stable/minio/README.md) for more information on the specific settings
 
+## Image pull secrets
+When pulling docker images from a private repository, k8s needs credentials to do so. This can be configured using [image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry).
+To use the secret for installing a workspace, follow these steps:
+- [Create a image pull secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-in-the-cluster-that-holds-your-authorization-token) with the credentials to login. Please note
+  that this secret is bound to a namespace, and as such should be added to each namespace separately.
+- Specify the image pull secret as follows for fairspace services:
+    ```yaml
+      imagePullSecrets:
+      - name: <secret-name>
+    ```
+    This configuration should be added for each fairspace service (mercury, pluto, titan, neptune, ceres), so for example:
+    ```yaml
+      mercury:
+        imagePullSecrets:
+        - name: <secret-name>
+    ```
+- Add [credentials for jupyterhub](https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/jupyterhub/values.yaml#L55) separately:
+  ```yaml
+    jupyterhub:
+      hub:
+        imagePullSecret:
+          enabled: true
+          registry: fairspace.azurecr.io
+          username: ...
+          email: ...
+          password: ...
+      singleuser:
+        imagePullSecret:
+          enabled: true
+          registry: fairspace.azurecr.io
+          username: ...
+          email: ...
+          password: ...
+  ```
+  Please note that the version of the helm chart currently in use (0.7) does not allow for setting the imagePullSecret for the `hub`. That has to 
+  be set manually.  
+
 ## Upgrading installations
 Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades 
 of the chart, as the random values may be computed again. 

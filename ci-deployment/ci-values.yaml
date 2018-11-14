@@ -1,11 +1,16 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
   domain: hyperspace.ci.fairway.app
+  locationOverrides:
+    rabbitmqhostname: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
   keycloak:
     username: keycloak
     password: keycloak-ci-123
     realm: ci
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+  rabbitmq:
+    username: rabbitmq
+    password: "X6SXtXV3Jzg4gyVR"
 
 # Settings for the workspace
 workspace:
@@ -21,6 +26,9 @@ pluto:
   keycloak:
     baseUrl: https://keycloak.hyperspace.ci.fairway.app
     realm: ci
+  rabbitmq:
+    hostname: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
+    password: "PaF6ZMbDZmgrztJY"
   tracing:
     samplingRate: 1
   services:
@@ -32,6 +40,9 @@ titan:
   auth:
     tokenUrl: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/token
     clientId: workspace-ci-pluto
+  rabbitmq:
+    hostname: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
+    password: "L3bE8yGJp7um2PVk"
   tracing:
     samplingRate: 1
   permissions:
@@ -41,17 +52,26 @@ titan:
 ceres:
   image:
     pullPolicy: Always
+  rabbitmq:
+    hostname: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
+    password: "hx6SQUBe99EBr8dM"
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.ci.fairway.app
       realm: ci
     tracing:
       samplingRate: 1
+    metadata:
+      # Please note: this URL must end with a /
+      baseUrl: https://workspace.ci.fairway.app/
 
 # Specific settings for Neptune subchart
 neptune:
   image:
     pullPolicy: Always
+  rabbitmq:
+    hostname: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
+    password: "4uXa4BFkHTuNxFAF"
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.ci.fairway.app
@@ -78,8 +98,10 @@ jupyterhub:
               openid_url: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/
               session_url: https://workspace.ci.fairway.app/account/tokens
   singleuser:
-      extraEnv:
-        WORKSPACE_URL: https://workspace.ci.fairway.app
+    image:
+      name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser-base
+    extraEnv:
+      WORKSPACE_URL: https://workspace.ci.fairway.app
   hub:
       extraEnv:
           JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026

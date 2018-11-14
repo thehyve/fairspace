@@ -1,11 +1,16 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
   domain: hyperspace.demo.fairspace.app
+  locationOverrides:
+    rabbitmqhostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
   keycloak:
     username: keycloak
     password: keycloak-demo-123
     realm: demo
     clientSecret: db67da94-fa31-47cd-8c42-0ed295790841
+  rabbitmq:
+    username: rabbitmq
+    password: "gtzb28355LFqxbar"
 
 # Settings for the workspace
 workspace:
@@ -20,6 +25,9 @@ pluto:
   keycloak:
     baseUrl: https://keycloak.hyperspace.demo.fairspace.app
     realm: demo
+  rabbitmq:
+    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
+    password: "FF63EUD3pyrCSeuV"
   tracing:
     enabled: false
   services:
@@ -30,6 +38,9 @@ titan:
   auth:
     tokenUrl: https://keycloak.hyperspace.demo.fairspace.app/auth/realms/demo/protocol/openid-connect/token
     clientId: workspace-demo-pluto
+  rabbitmq:
+    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
+    password: "UMEfm4fYvq3dAHZP"
   tracing:
     enabled: false
   permissions:
@@ -37,15 +48,23 @@ titan:
 
 # Specific settings for Ceres subchart
 ceres:
+  rabbitmq:
+    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
+    password: "vv8FjVQm6qsNtGUA"
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.demo.fairspace.app
       realm: demo
     tracing:
       enabled: false
+    metadata:
+      baseUrl: https://workspace.demo.fairspace.app
 
 # Specific settings for Neptune subchart
 neptune:
+  rabbitmq:
+    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
+    password: "Yn5NvUhRVye2GVP8"
   app:
     oauth2:
       baseUrl: https://keycloak.hyperspace.demo.fairspace.app
