@@ -6,12 +6,15 @@ import TableHead from "@material-ui/core/TableHead/TableHead";
 import TableRow from "@material-ui/core/TableRow/TableRow";
 import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableBody from "@material-ui/core/TableBody/TableBody";
-import {getLabel, navigableLink} from "../../utils/metadatautils";
-import {fetchAllEntitiesIfNeeded} from "../../actions/metadata";
+import {getLabel, getSingleValue, navigableLink} from "../../utils/metadatautils";
+import {createMetadataEntity, fetchAllEntitiesIfNeeded} from "../../actions/metadata";
 import Typography from "@material-ui/core/Typography";
 import ErrorMessage from "../error/ErrorMessage";
+import {Column, Row} from "simple-flexbox";
+import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
+import ErrorDialog from "../error/ErrorDialog";
 
-function MetadataEntities({loading, error, entities, load, vocabulary}) {
+function MetadataEntities({loading, error, entities, load, vocabulary, types, create}) {
     load();
 
     if(loading) {
@@ -21,32 +24,40 @@ function MetadataEntities({loading, error, entities, load, vocabulary}) {
     }
 
     return (
-        <Table>
-            <TableHead>
-                <TableRow>
-                    <TableCell>Label</TableCell>
-                    <TableCell>Type</TableCell>
-                    <TableCell>URI</TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {entities ? entities.map(entity => (
-                    <TableRow key={entity['@id']}>
-                        <TableCell>{getLabel(entity)}</TableCell>
-                        <TableCell>
-                            {entity['@type'].map(type => (
-                                <a href={navigableLink(type)} key={type}>
-                                    {getLabel(vocabulary.getById(type))}
-                                </a>
-                            ))}
-                        </TableCell>
-                        <TableCell>
-                            <a href={navigableLink(entity['@id'])}>{entity['@id']}</a>
-                        </TableCell>
+        <div>
+            <Row>
+                <Column flexGrow={1} vertical='center' horizontal='start'/>
+                <Column>
+                    <NewMetadataEntityDialog onCreate={create}/>
+                </Column>
+            </Row>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Label</TableCell>
+                        <TableCell>Type</TableCell>
+                        <TableCell>URI</TableCell>
                     </TableRow>
-                )) : null}
-            </TableBody>
-        </Table>
+                </TableHead>
+                <TableBody>
+                    {entities ? entities.map(entity => (
+                        <TableRow key={entity['@id']}>
+                            <TableCell>{getLabel(entity)}</TableCell>
+                            <TableCell>
+                                {entity['@type'].map(type => (
+                                    <a href={navigableLink(type)} key={type}>
+                                        {getLabel(vocabulary.getById(type))}
+                                    </a>
+                                ))}
+                            </TableCell>
+                            <TableCell>
+                                <a href={navigableLink(entity['@id'])}>{entity['@id']}</a>
+                            </TableCell>
+                        </TableRow>
+                    )) : null}
+                </TableBody>
+            </Table>
+        </div>
     );
 }
 
@@ -54,7 +65,8 @@ MetadataEntities.propTypes = {
     loading: PropTypes.bool,
     error: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
     entities: PropTypes.array,
-    load: PropTypes.func.isRequired
+    load: PropTypes.func.isRequired,
+    create: PropTypes.func.isRequired
 }
 
 const mapStateToProps = (state) => ({
@@ -65,7 +77,13 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    load: () => dispatch(fetchAllEntitiesIfNeeded())
-})
+    load: () => dispatch(fetchAllEntitiesIfNeeded()),
+    create: (type, id) => {
+        dispatch(createMetadataEntity(type, id))
+            .then(() => window.location.href = navigableLink(
+                window.location.origin + '/iri/' + getSingleValue(type, 'http://fairspace.io/ontology#classInfix') + '/' + id))
+            .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
+    }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntities);

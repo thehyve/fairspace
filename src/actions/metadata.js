@@ -5,10 +5,12 @@ import {
     METADATA_ALL_ENTITIES,
     METADATA_COMBINATION,
     METADATA_ENTITIES,
+    METADATA_NEW_ENTITY,
     METADATA_VOCABULARY,
     UPDATE_METADATA
 } from "./actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
+import {getSingleValue} from "../utils/metadatautils";
 
 export const invalidateMetadata = (subject) => ({
     type: actionTypes.invalidate(METADATA),
@@ -24,6 +26,24 @@ export const updateMetadata = (subject, predicate, values) => ({
         values: values
     }
 })
+
+export const createMetadataEntity = (type, id) => {
+    const subject = window.location.origin + '/iri/' + getSingleValue(type, 'http://fairspace.io/ontology#classInfix') + '/' + id;
+    return {
+        type: METADATA_NEW_ENTITY,
+        payload: MetadataAPI.get({subject: subject})
+            .then(meta => {
+                if (meta.length) {
+                    throw Error('Metadata entity already exists: ' + subject)
+                }
+                return MetadataAPI.update(subject, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', [{id: type['@id']}])
+            }) ,
+        meta: {
+            subject: subject,
+            type: type['@id']
+        }
+    }
+};
 
 export const fetchCombinedMetadataIfNeeded = (subject) => dispatchIfNeeded(
     () => combineMetadataForSubject(subject),

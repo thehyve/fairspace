@@ -9,6 +9,7 @@ import {
     PROPERTY_URI,
     RANGE_URI
 } from "./MetadataAPI";
+import {getSingleValue} from "../../utils/metadatautils";
 
 class Vocabulary {
     /**
@@ -75,7 +76,7 @@ class Vocabulary {
      */
     getFairspaceClasses() {
         return this.vocabulary
-            .filter(entry => entry['@type'].includes(CLASS_URI) && entry[FAIRSPACE_ENTITY_URI])
+            .filter(entry => entry['@type'].includes(CLASS_URI) && getSingleValue(entry, FAIRSPACE_ENTITY_URI))
     }
 
     /**
