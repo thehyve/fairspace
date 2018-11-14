@@ -4,8 +4,10 @@ import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.dto.Permission;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=true)
 public class PermissionModifiedEvent extends PermissionEvent {
     private Access oldAccess;
 
