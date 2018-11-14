@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -21,27 +22,11 @@ public class UsersService {
     private final String usersEndpoint;
 
     @Autowired
-    public UsersService(RestTemplate restTemplate,
+    public UsersService(RestTemplate authorizedRestTemplate,
                         @Value("${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/users") String usersEndpoint
     ) {
-        this.restTemplate = restTemplate;
+        this.restTemplate = authorizedRestTemplate;
         this.usersEndpoint = usersEndpoint;
-    }
-
-    public List<KeycloakUser> getUsers() throws IOException {
-        // TODO: Implement caching
-        try {
-            return restTemplate.exchange(
-                    usersEndpoint,
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<List<KeycloakUser>>(){}
-                    ).getBody();
-        } catch (Exception e) {
-            log.error(String.format("An exception occurred while retrieving users from user provider: %s", e.getMessage()));
-            log.debug("Stacktrace", e);
-            throw e;
-        }
     }
 
     /**
@@ -50,10 +35,29 @@ public class UsersService {
      * @return
      * @throws IOException
      */
+    @Cacheable("users")
     public Optional<KeycloakUser> getUserById(String id) throws IOException {
-        return getUsers().stream()
-                .filter(keycloakUser -> keycloakUser.getId().equals(id))
-                .findFirst();
+        if(id == null) {
+            return Optional.empty();
+        }
+
+        try {
+            log.info("Retrieving user information by id: {}", id);
+            return Optional.of(restTemplate.exchange(
+                    usersEndpoint + "/" + id,
+                    HttpMethod.GET,
+                    null,
+                    KeycloakUser.class
+            ).getBody());
+        } catch(HttpClientErrorException e) {
+            log.info("No user found for id {}", id);
+            log.debug("Stacktrace", e);
+            return Optional.empty();
+        } catch (Exception e) {
+            log.error("An exception occurred while retrieving user from user provider: {}", e.getMessage());
+            log.debug("Stacktrace", e);
+            throw e;
+        }
     }
 
 }

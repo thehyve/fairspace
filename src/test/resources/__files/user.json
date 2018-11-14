@@ -1,0 +1,25 @@
+{
+  "id":"ce5b827a-9e61-4c32-9b8b-2351561c1b9c",
+  "createdTimestamp":1542105600032,
+  "username":"potus",
+  "enabled":true,
+  "totp":false,
+  "emailVerified":false,
+  "firstName":"Donald",
+  "lastName":"Trump",
+  "email":"potus@whitehouse.gov",
+  "disableableCredentialTypes":[
+    "password"
+  ],
+  "requiredActions":[
+
+  ],
+  "notBefore":0,
+  "access":{
+    "manageGroupMembership":true,
+    "view":true,
+    "mapRoles":true,
+    "impersonate":true,
+    "manage":true
+  }
+}

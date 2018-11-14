@@ -24,6 +24,8 @@ spring:
   profiles:
     active:
       - dev
+  cache:
+    type: simple
   jpa:
     properties:
       hibernate:

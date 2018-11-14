@@ -37,7 +37,7 @@ public class UpstreamConnectionsConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    RestTemplate ceresRestTemplate() {
+    RestTemplate authorizedRestTemplate() {
         RestTemplate restTemplate = new RestTemplate(authorizedRequestFactory());
         extendMessageConverters(restTemplate.getMessageConverters());
         return restTemplate;
