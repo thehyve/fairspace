@@ -89,10 +89,12 @@ public class AccountResource {
         HttpSession session = request.getSession();
 
         log.debug("REST request to exchange tokens");
+        log.trace("Tokens stored: {}", tokenParams);
 
         // Generate new token object and store it in session
         OAuthAuthenticationToken token = new OAuthAuthenticationToken(tokenParams.getAccessToken(), tokenParams.getRefreshToken());
         session.setAttribute(AUTHORIZATION_SESSION_ATTRIBUTE, token);
+        session.setMaxInactiveInterval(-1);
 
         // Return the session id explicitly
         return Collections.singletonMap("sessionId", base64Encode(session.getId()));
