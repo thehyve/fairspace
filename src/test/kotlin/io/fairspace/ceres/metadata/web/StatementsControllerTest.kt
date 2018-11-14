@@ -1,9 +1,9 @@
-package io.fairspace.ceres.web
+package io.fairspace.ceres.metadata.web
 
-import io.fairspace.ceres.TestData
-import io.fairspace.ceres.repository.ModelRepository
-import io.fairspace.ceres.repository.parse
-import io.fairspace.ceres.repository.toString
+import io.fairspace.ceres.metadata.TestData
+import io.fairspace.ceres.metadata.repository.ModelRepository
+import io.fairspace.ceres.metadata.repository.parse
+import io.fairspace.ceres.metadata.repository.toString
 import org.apache.jena.riot.RDFFormat
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @RunWith(SpringRunner::class)
-@WebMvcTest(secure = false)
+@WebMvcTest(secure = false, controllers = [StatementsController::class])
 class StatementsControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc

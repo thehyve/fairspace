@@ -1,4 +1,4 @@
-package io.fairspace.ceres.repository
+package io.fairspace.ceres.metadata.repository
 
 import org.apache.jena.query.Dataset
 import org.apache.jena.query.Query.*
@@ -10,10 +10,12 @@ import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
 import org.apache.jena.system.Txn
+import org.springframework.stereotype.Component
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
+@Component
 class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
     private val lock = ReentrantReadWriteLock()
     private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)

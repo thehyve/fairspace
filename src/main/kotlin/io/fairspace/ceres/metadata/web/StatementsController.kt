@@ -1,6 +1,6 @@
-package io.fairspace.ceres.web
+package io.fairspace.ceres.metadata.web
 
-import io.fairspace.ceres.repository.ModelRepository
+import io.fairspace.ceres.metadata.repository.ModelRepository
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.shared.NotFoundException
 import org.springframework.http.HttpStatus

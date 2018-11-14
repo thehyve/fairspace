@@ -10,9 +10,8 @@ import com.nimbusds.jose.jwk.KeyUse
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTClaimsSet
-import com.nimbusds.jwt.PlainJWT
 import com.nimbusds.jwt.SignedJWT
-import io.fairspace.ceres.repository.ModelRepository
+import io.fairspace.ceres.metadata.repository.ModelRepository
 import net.minidev.json.JSONObject
 import org.apache.jena.query.Dataset
 import org.apache.jena.rdf.model.ModelFactory

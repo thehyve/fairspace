@@ -1,6 +1,6 @@
 package io.fairspace.ceres.config
 
-import io.fairspace.ceres.repository.ModelRepository
+import io.fairspace.ceres.metadata.repository.ModelRepository
 import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.reasoner.ReasonerRegistry
 import org.apache.jena.tdb2.TDB2Factory
@@ -23,6 +23,4 @@ class JenaConfiguration {
         return ReasonerRegistry.getOWLReasoner().bindSchema(inferenceModel)
     }
 
-    @Bean
-    fun modelRepository() = ModelRepository(dataset(), reasoner())
 }

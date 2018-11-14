@@ -1,4 +1,4 @@
-package io.fairspace.ceres.web.converters
+package io.fairspace.ceres.metadata.web.converters
 
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory

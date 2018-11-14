@@ -3,7 +3,19 @@ app:
   oauth2:
     base-url: http://localhost:9080
     realm: keycloak
-
+  metadata:
+    # Please note that the metadata base url should end with a slash
+    base-url: http://fairspace.com/
+  rabbitmq:
+    enabled: true
+    topology:
+      storage:
+        exchange: "storage"
+        queues:
+          create: "storage.ceres.create"
+          move:   "storage.ceres.move"
+          copy:   "storage.ceres.copy"
+          delete: "storage.ceres.delete"
 
 # Security configuration
 security:

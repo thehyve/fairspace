@@ -7,7 +7,10 @@ jena:
 spring:
   zipkin:
     enabled: false
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
 
 server:
   port: 8001
-

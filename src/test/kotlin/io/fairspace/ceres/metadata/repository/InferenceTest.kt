@@ -1,4 +1,4 @@
-package io.fairspace.ceres.repository
+package io.fairspace.ceres.metadata.repository
 
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.rdf.model.ModelFactory

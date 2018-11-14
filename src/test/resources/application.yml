@@ -19,3 +19,11 @@ spring:
   test:
     mockmvc:
       print: log_debug
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+
+app:
+  metadata:
+    base-url: http://fairspace.com
+  rabbitmq:
+    enabled: false
