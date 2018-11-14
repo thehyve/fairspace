@@ -62,7 +62,8 @@ ceres:
     tracing:
       samplingRate: 1
     metadata:
-      baseUrl: https://workspace.ci.fairway.app
+      # Please note: this URL must end with a /
+      baseUrl: https://workspace.ci.fairway.app/
 
 # Specific settings for Neptune subchart
 neptune:
