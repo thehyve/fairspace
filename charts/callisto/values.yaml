@@ -1,0 +1,37 @@
+# Default values for callisto.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: callisto
+  tag: RELEASEVERSION
+  pullPolicy: IfNotPresent
+
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1024Mi
+  requests:
+    cpu: 400m
+    memory: 768Mi
+terminationGracePeriodSeconds: 10
+
+# Enable tracing
+tracing:
+  enabled: true
+  baseUrl: http://jaeger-collector.jaeger:9411
+
+rabbitmq:
+  hostname:
+  vhost:
+  username:
+  password:
+
+mail:
+  host:
+  port: 25
+  username:
+  password:
