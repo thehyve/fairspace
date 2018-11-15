@@ -88,29 +88,20 @@ export class InformationDrawer extends React.Component {
 
 }
 
-const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId, selectedPaths, openedPath}}) => {
-    return {collection: findById(collections.data, selectedCollectionId), openedPath: openedPath, paths: pathsToDisplay(selectedPaths)}
+const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId, openedPath, selectedPaths}}) => {
+    return {
+        collection: findById(collections.data, selectedCollectionId),
+        paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath)
+    }
 };
 
-const pathsToDisplay = (selectedPaths) => {
-    switch (selectedPaths.length) {
-        case 0:
-          return [];
-        case 1:
-            let paths = [];
-            let path = '';
-            selectedPaths[0].split('/').forEach(p => {
-                if (p.length) {
-                    path += '/' + p;
-                    paths.push(path)
-                }
-            });
-            return paths.slice(1);
-        default:
-            let first = selectedPaths[0];
-            let parent = first.substring(0, first.lastIndexOf('/'));
-            return pathsToDisplay([parent])
+function pathHierarchy(fullPath) {
+    let paths = [];
+    while (fullPath && fullPath.lastIndexOf('/') > 0) {
+        paths.push(fullPath);
+        fullPath = fullPath.substring(0, fullPath.lastIndexOf('/') )
     }
+    return paths.reverse();
 }
 
 const relativePath = (path)  => path.split('/').slice(2).join('/');
