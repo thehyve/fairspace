@@ -95,7 +95,6 @@ class FileBrowser extends React.Component {
         const separator = basePath.endsWith('/') ? '' : '/';
         const fullPath = "/collections/" + this.props.openedCollection.id + basePath + separator + path;
         this.props.history.push(fullPath);
-        this.props.openPath(fullPath)
     }
 
     downloadFile(path) {
@@ -174,13 +173,9 @@ const mapStateToProps = (state, ownProps) => {
 
     const collectionBrowser = state.collectionBrowser;
 
-    const getCollection = (collectionId) => {
-        if(!collections.data || collections.data.length === 0) {
-            return {}
-        }
+    const getCollection = collectionId =>
+        collections.data && collections.data.find(collection => collection.id === collectionId) || {};
 
-        return collections.data.find(collection => collection.id === collectionId) || {}
-    }
 
     return {
         loading: files.pending || collections.pending || collections.data.length === 0,

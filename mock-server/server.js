@@ -48,7 +48,6 @@ app.get('/api/workspace/details', (req, res) => res.sendFile(mockDataDir + '/wor
 
 
 app.post('/api/metadata/pid', (req, res) => {
-    console.log(req.body)
     res.send({id:'http://fairspace.com' + req.body.value})
 });
 

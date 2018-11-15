@@ -146,7 +146,6 @@ class MetadataAPI {
     }
 
     getSubjectByPath(path) {
-        console.log(JSON.stringify({value: path}));
         return fetch(Config.get().urls.metadata.pid, {
             method: 'POST',
             body: JSON.stringify({value: path}),

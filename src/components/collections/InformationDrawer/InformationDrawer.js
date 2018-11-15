@@ -89,10 +89,7 @@ export class InformationDrawer extends React.Component {
 }
 
 const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId, selectedPaths, openedPath}}) => {
-    if (openedPath) {
-        console.log('Opened', openedPath)
-    }
-    return {collection: findById(collections.data, selectedCollectionId), openedPath, paths: pathsToDisplay(selectedPaths)}
+    return {collection: findById(collections.data, selectedCollectionId), openedPath: openedPath, paths: pathsToDisplay(selectedPaths)}
 };
 
 const pathsToDisplay = (selectedPaths) => {
