@@ -16,7 +16,7 @@ const WebdavFileTypeProvider = require('../events/FileTypeProvider').webdav
 module.exports = function setupEventEmitter(server, collectionApi, settings) {
     if(!settings.enabled) {
         console.log("Not emitting events due to configuration settings");
-        return;
+        return Promise.resolve();
     }
 
     // Configure filetype provider
