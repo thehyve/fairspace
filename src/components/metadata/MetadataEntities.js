@@ -6,7 +6,7 @@ import TableHead from "@material-ui/core/TableHead/TableHead";
 import TableRow from "@material-ui/core/TableRow/TableRow";
 import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableBody from "@material-ui/core/TableBody/TableBody";
-import {getLabel, getSingleValue, navigableLink} from "../../utils/metadatautils";
+import {getLabel, navigableLink} from "../../utils/metadatautils";
 import {createMetadataEntity, fetchAllEntitiesIfNeeded} from "../../actions/metadata";
 import Typography from "@material-ui/core/Typography";
 import ErrorMessage from "../error/ErrorMessage";
