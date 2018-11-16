@@ -75,7 +75,7 @@ export class InformationDrawer extends React.Component {
                         <ExpansionPanelDetails>
                             <PathMetadata
                                 path={path}
-                                editable={permissionChecker.canManage(collection) && path !== this.props.paths[this.props.paths.length - 1]}
+                                editable={permissionChecker.canManage(collection) && path === this.props.paths[this.props.paths.length - 1]}
                                 style={{width: '100%'}}
                             />
                         </ExpansionPanelDetails>
