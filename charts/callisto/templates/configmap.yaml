@@ -9,6 +9,9 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
+    app:
+      mail:
+        from: {{ .Values.app.mail.from }}
     spring:
       zipkin:
         enabled: {{ .Values.tracing.enabled }}

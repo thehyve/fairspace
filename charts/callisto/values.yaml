@@ -30,6 +30,9 @@ rabbitmq:
   username:
   password:
 
+app:
+  mail:
+    from: info@fairspace.com
 
 # Please note that mail settings are copied into the application.yaml configuration
 # file for spring. This means you can add any mail settings accepted by Spring mail
