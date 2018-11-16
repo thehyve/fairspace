@@ -23,3 +23,4 @@ data:
     declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.neptune.username" . }} configure=.* read=.* write=.*
     declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.titan.username" . }} configure=.* read=.* write=.*
     declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.ceres.username" . }} configure=.* read=.* write=.*
+    declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.callisto.username" . }} configure=.* read=.* write=.*
