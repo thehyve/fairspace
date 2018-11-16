@@ -4,8 +4,8 @@ app:
     base-url: http://localhost:9080
     realm: keycloak
   metadata:
-    # Please note that the metadata base url should end with a slash
     base-url: http://fairspace.com/
+    infix: iri/files
   rabbitmq:
     enabled: true
     topology:

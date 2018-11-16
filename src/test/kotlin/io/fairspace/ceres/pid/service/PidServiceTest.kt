@@ -23,7 +23,7 @@ class PidServiceTest {
 
     @Before
     fun setUp() {
-        pidService = PidService(pidRepository, PidConverter("http://service-test/"))
+        pidService = PidService(pidRepository, PidConverter("http://service-test/", "iri/files"))
      }
 
     @Test
@@ -33,7 +33,7 @@ class PidServiceTest {
         doReturn(Optional.of(Pid(foundUUID, "/found")))
                 .`when`(pidRepository).findById(foundUUID)
 
-        assertEquals(pidService.findById("http://service-test/" + foundUUID).value, "/found")
+        assertEquals(pidService.findById("http://service-test/iri/files/" + foundUUID).value, "/found")
     }
 
     @Test(expected = MappingNotFoundException::class)
@@ -43,7 +43,7 @@ class PidServiceTest {
         doReturn(Optional.empty<Pid>())
                 .`when`(pidRepository).findById(notFoundUUID)
 
-        pidService.findById("http://service-test/" + notFoundUUID)
+        pidService.findById("http://service-test/iri/files/" + notFoundUUID)
     }
 
     @Test
