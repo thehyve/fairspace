@@ -150,6 +150,19 @@ titan:
     subPath: "titan"
     mountPath: /data
 
+# Specific settings for Callisto subchart
+callisto:
+  rabbitmq:
+    hostname:
+    vhost:
+    username:
+    password:
+
+  mail:
+    host:
+    port:
+    username:
+    password:
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
