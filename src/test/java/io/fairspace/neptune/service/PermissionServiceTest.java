@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
@@ -24,8 +25,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionServiceTest {
-
-
     @Mock
     private AuthorizationContainer authorizationContainer;
 
@@ -35,13 +34,16 @@ public class PermissionServiceTest {
     @Mock
     private CollectionRepository collectionRepository;
 
+    @Mock
+    private EventsService eventsService;
+
     private Collection collection1 = new Collection(1L, Collection.CollectionType.LOCAL_FILE, "location", "name", "description", null, null, null, null );
 
     private PermissionService permissionService;
 
     @Before
     public void setUp() {
-        permissionService = new PermissionService(permissionRepository, collectionRepository, authorizationContainer);
+        permissionService = new PermissionService(permissionRepository, collectionRepository, eventsService, authorizationContainer);
 
 
         when(collectionRepository.findById(0L))
@@ -83,8 +85,18 @@ public class PermissionServiceTest {
     @Test
     public void testAddingPermissionsForKnownCollection() {
         as("creator", () -> {
+            permissionService.authorize(new Permission(null, "user3", collection1, Access.Write), true);
+            verify(permissionRepository).save(any());
+            verify(eventsService).permissionAdded(argThat(argument -> argument.getAccess() == Access.Write), eq(true));
+        });
+    }
+
+    @Test
+    public void testModifyingPermissionsForKnownCollection() {
+        as("creator", () -> {
             permissionService.authorize(new Permission(null, "creator", collection1, Access.Write), true);
             verify(permissionRepository).save(any());
+            verify(eventsService).permissionModified(argThat(argument -> argument.getAccess() == Access.Write), eq(Access.Manage));
         });
     }
 
@@ -93,6 +105,7 @@ public class PermissionServiceTest {
         as("creator", () -> {
             permissionService.authorize(new Permission(null, "user2", collection1, Access.None), false);
             verify(permissionRepository).delete(any());
+            verify(eventsService).permissionDeleted(any());
         });
     }
 

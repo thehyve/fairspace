@@ -16,14 +16,21 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionServiceTest {
@@ -39,6 +46,9 @@ public class CollectionServiceTest {
     private StorageService storageService;
 
     @Mock
+    private EventsService eventsService;
+
+    @Mock
     private CollectionMetadataService collectionMetadataService;
 
     private List<Collection> collections = Arrays.asList(
@@ -47,7 +57,7 @@ public class CollectionServiceTest {
 
     @Before
     public void setUp() {
-        service = new CollectionService(collectionRepository, permissionService, storageService, collectionMetadataService);
+        service = new CollectionService(collectionRepository, permissionService, storageService, collectionMetadataService, eventsService);
 
         when(permissionService.getAllBySubject())
                 .thenReturn(asList(
@@ -111,6 +121,7 @@ public class CollectionServiceTest {
 
         verify(collectionMetadataService).createCollection(any());
         verify(storageService).addCollection(any());
+        verify(eventsService).collectionAdded(any());
 
         ArgumentMatcher<Collection> collectionMatcher = argument ->
             collection.getId().equals(argument.getId()) &&
@@ -162,6 +173,7 @@ public class CollectionServiceTest {
         service.delete(id);
 
         verify(storageService).deleteCollection(collection);
+        verify(eventsService).collectionDeleted(any());
     }
 
     @Test(expected = CollectionNotFoundException.class)
@@ -194,6 +206,10 @@ public class CollectionServiceTest {
         verify(storageService).moveCollection(argThat(c -> c.getLocation().equals("oldName-1")), eq("newName_-1"));
         verify(collectionMetadataService).patchCollection(argThat(c -> c.getName().equals("newName!") && c.getDescription().equals("newDescription")));
 
+        verify(eventsService).collectionModified(
+                argThat(argument -> argument.getName().equals("newName!")),
+                argThat(argument -> argument.getName().equals("oldName"))
+        );
     }
 
     private <E> List<E> toList(Iterator<E> iterator) {

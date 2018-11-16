@@ -56,3 +56,9 @@ postgresql:
 tracing:
   enabled: true
   baseUrl: http://jaeger-collector.jaeger:9411
+
+rabbitmq:
+  hostname:
+  vhost:
+  username:
+  password:

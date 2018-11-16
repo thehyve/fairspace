@@ -14,6 +14,8 @@ class AuthorizedClientHttpRequestFactory extends HttpComponentsClientHttpRequest
     @Autowired
     private HttpServletRequest incomingRequest;
 
+
+
     @Override
     public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
         ClientHttpRequest request = super.createRequest(uri, httpMethod);

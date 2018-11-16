@@ -63,14 +63,14 @@ public class PermissionControllerIntegrationTest {
 
         // Test
         String path = "/" + collectionId + "/permissions";
-        ParameterizedTypeReference<List<io.fairspace.neptune.web.dto.Permission>> permissionListReference = new ParameterizedTypeReference<List<io.fairspace.neptune.web.dto.Permission>>() {};
-        ResponseEntity<List<io.fairspace.neptune.web.dto.Permission>> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.GET, null, permissionListReference);
-        List<io.fairspace.neptune.web.dto.Permission> collectionList = response.getBody();
+        ParameterizedTypeReference<List<io.fairspace.neptune.model.dto.Permission>> permissionListReference = new ParameterizedTypeReference<List<io.fairspace.neptune.model.dto.Permission>>() {};
+        ResponseEntity<List<io.fairspace.neptune.model.dto.Permission>> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.GET, null, permissionListReference);
+        List<io.fairspace.neptune.model.dto.Permission> collectionList = response.getBody();
 
         // Verify response
         assertEquals(1, collectionList.size());
-        io.fairspace.neptune.web.dto.Permission expectedCollection =
-                new io.fairspace.neptune.web.dto.Permission(permission.getSubject(), collectionId, permission.getAccess());
+        io.fairspace.neptune.model.dto.Permission expectedCollection =
+                new io.fairspace.neptune.model.dto.Permission(permission.getSubject(), collectionId, permission.getAccess());
         assertEquals(expectedCollection, collectionList.get(0));
 
         assertEquals("max-age=60", response.getHeaders().getFirst("Cache-Control"));
@@ -87,8 +87,8 @@ public class PermissionControllerIntegrationTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> httpEntity = new HttpEntity<>(json, headers);
-        ResponseEntity<io.fairspace.neptune.web.dto.Permission> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.PUT, httpEntity, io.fairspace.neptune.web.dto.Permission.class);
-        io.fairspace.neptune.web.dto.Permission storedCollection = response.getBody();
+        ResponseEntity<io.fairspace.neptune.model.dto.Permission> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.PUT, httpEntity, io.fairspace.neptune.model.dto.Permission.class);
+        io.fairspace.neptune.model.dto.Permission storedCollection = response.getBody();
 
         // Verification
         verify(permissionService).authorize("a", 40L, Access.Read, false);
@@ -108,7 +108,7 @@ public class PermissionControllerIntegrationTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> httpEntity = new HttpEntity<>(json, headers);
-        ResponseEntity<io.fairspace.neptune.web.dto.Permission> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.PUT, httpEntity, io.fairspace.neptune.web.dto.Permission.class);
+        ResponseEntity<io.fairspace.neptune.model.dto.Permission> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.PUT, httpEntity, io.fairspace.neptune.model.dto.Permission.class);
 
         assertEquals(400, response.getStatusCodeValue());
     }

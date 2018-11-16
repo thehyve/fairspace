@@ -44,7 +44,6 @@ public class CeresService implements TripleService {
         }
     }
 
-
     @Override
     public void postTriples(Model triples) {
         if (triples.isEmpty()) {

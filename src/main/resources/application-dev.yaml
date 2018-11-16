@@ -1,7 +1,7 @@
 app:
   oauth2:
-    base-url: http://192.168.99.100:30881
-    realm: curie
+    base-url: http://192.168.99.100:31000
+    realm: minikube
 
 spring:
   datasource:
@@ -14,6 +14,10 @@ spring:
   h2:
     console:
       enabled: true
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
 
 ceres:
   url: "http://localhost:8001"
@@ -23,3 +27,5 @@ titan:
 
 server:
   port: 8082
+
+logging.level.org.springframework.cache: TRACE

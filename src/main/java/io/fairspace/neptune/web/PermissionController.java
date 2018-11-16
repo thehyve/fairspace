@@ -1,16 +1,13 @@
 package io.fairspace.neptune.web;
 
 import io.fairspace.neptune.service.PermissionService;
-import io.fairspace.neptune.web.dto.Permission;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.fairspace.neptune.model.dto.Permission;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController

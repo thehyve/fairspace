@@ -3,7 +3,6 @@ package io.fairspace.neptune.service;
 import io.fairspace.neptune.model.Access;
 import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.Permission;
-import io.fairspace.neptune.model.UnauthorizedException;
 import io.fairspace.neptune.repository.CollectionRepository;
 import io.fairspace.neptune.web.CollectionNotFoundException;
 import io.fairspace.neptune.web.InvalidCollectionException;
@@ -32,13 +31,15 @@ public class CollectionService {
     private PermissionService permissionService;
     private StorageService storageService;
     private CollectionMetadataService collectionMetadataService;
+    private EventsService eventsService;
 
     @Autowired
-    public CollectionService(CollectionRepository repository, PermissionService permissionService, StorageService storageService, CollectionMetadataService collectionMetadataService) {
+    public CollectionService(CollectionRepository repository, PermissionService permissionService, StorageService storageService, CollectionMetadataService collectionMetadataService, EventsService eventsService) {
         this.repository = repository;
         this.permissionService = permissionService;
         this.storageService = storageService;
         this.collectionMetadataService = collectionMetadataService;
+        this.eventsService = eventsService;
     }
 
     public List<Collection> findAll() {
@@ -94,6 +95,9 @@ public class CollectionService {
         // Add the uri
         finalCollection = finalCollection.toBuilder().uri(collectionMetadataService.getCollectionUri(finalCollection.getId())).build();
 
+        // Emit an event about the creation of the collection
+        eventsService.collectionAdded(finalCollection);
+
         // Authorize the user
         permissionService.authorize(finalCollection, Access.Manage, true);
 
@@ -136,6 +140,9 @@ public class CollectionService {
             // Store in the database
             Collection savedCollection = repository.save(builder.build());
 
+            // Emit an event about the modification of the collection parameters
+            eventsService.collectionModified(savedCollection, collection);
+
             // Update metadata. Only log an error if it fails, as the neptune
             // database is the source of truth
             try {
@@ -161,6 +168,9 @@ public class CollectionService {
                 throw new UncheckedIOException(e);
             }
             repository.deleteById(id);
+
+            // Emit an event about the modification of the collection parameters
+            eventsService.collectionDeleted(foundCollection);
 
             return foundCollection;
         }).orElseThrow(CollectionNotFoundException::new);

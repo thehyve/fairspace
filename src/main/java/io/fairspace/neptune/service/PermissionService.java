@@ -13,18 +13,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class PermissionService {
     private final PermissionRepository permissionRepository;
     private final CollectionRepository collectionRepository;
+    private final EventsService eventsService;
     private final AuthorizationContainer authorizationContainer;
 
     @Autowired
-    public PermissionService(PermissionRepository permissionRepository, CollectionRepository collectionRepository, AuthorizationContainer authorizationContainer) {
+    public PermissionService(PermissionRepository permissionRepository, CollectionRepository collectionRepository, EventsService eventsService, AuthorizationContainer authorizationContainer) {
         this.permissionRepository = permissionRepository;
         this.collectionRepository = collectionRepository;
+        this.eventsService = eventsService;
         this.authorizationContainer = authorizationContainer;
     }
 
@@ -110,16 +111,21 @@ public class PermissionService {
                 .map(existing -> {
                     if (permission.getAccess() == Access.None) {
                         permissionRepository.delete(existing);
+                        eventsService.permissionDeleted(existing);
                         return permission;
                     }
 
                     Permission newPermission = existing.toBuilder().access(permission.getAccess()).build();
-                    return permissionRepository.save(newPermission);
+                    Permission saved = permissionRepository.save(newPermission);
+                    eventsService.permissionModified(saved, existing.getAccess());
+                    return saved;
                 }).orElseGet(() -> {
                     if (permission.getAccess() == Access.None) {
                         return permission;
                     }
-                    return permissionRepository.save(permission);
+                    Permission saved = permissionRepository.save(permission);
+                    eventsService.permissionAdded(saved, isNew);
+                    return saved;
                 });
     }
 
