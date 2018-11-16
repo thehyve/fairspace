@@ -94,7 +94,7 @@ pluto:
     jupyter:
 
   workspace:
-    version: 0.0.0-RELEASEVERSION
+    version: 0.5.2
 
 # Specific settings for Ceres subchart
 ceres:
