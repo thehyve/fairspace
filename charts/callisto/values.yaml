@@ -12,11 +12,11 @@ image:
 
 resources:
   limits:
-    cpu: 500m
-    memory: 1024Mi
+    cpu: 200m
+    memory: 512Mi
   requests:
-    cpu: 400m
-    memory: 768Mi
+    cpu: 100m
+    memory: 384Mi
 terminationGracePeriodSeconds: 10
 
 # Enable tracing
