@@ -70,7 +70,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         sourceIdentifiers.forEach {
             val pathInDestination = it.value.replaceFirst(source, destination)
             val newIdentifier = pidService.findOrCreateByValue(pathInDestination)
-            mapping[it.id] = newIdentifier.id
+            mapping[it.id!!] = newIdentifier.id!!
         }
 
         // Now, retrieve the metadata for the original URIs and replace the original URIs
@@ -134,7 +134,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
             return
         }
 
-        storePartOfRelation(parentUri, currentIdentifier.id, metadataType)
+        storePartOfRelation(parentUri, currentIdentifier.id!!, metadataType)
     }
 
 

@@ -54,7 +54,7 @@ class PidServiceTest {
         doReturn(Optional.of(Pid(uuid, value)))
                 .`when`(pidRepository).findByValue(value)
 
-        assertTrue(pidService.findByValue(value).id.endsWith(uuid.toString()))
+        assertTrue(pidService.findByValue(value).id!!.endsWith(uuid.toString()))
     }
 
     @Test(expected = MappingNotFoundException::class)
