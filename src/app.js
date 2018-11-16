@@ -40,7 +40,13 @@ app.get('/', (req, res, next) => req.get('probe') ? res.send('Hi, I\'m Titan!').
 if(configuration.tracing.enabled) setupTracingMiddleware(app, configuration.tracing);
 
 const collectionApi = setupCollectionApi(configuration);
-const eventEmitterSetupClosure = server => setupEventEmitter(server, collectionApi, configuration.rabbitmq)
+
+// Setup the event emitter. On error setting up, stop the process
+const eventEmitterSetupClosure = server =>
+    setupEventEmitter(server, collectionApi, configuration.rabbitmq)
+        .catch(e => process.exit(3))
+
+// Setup webdav middleware and associate the event emitter
 setupWebdavMiddleware(app, configuration, collectionApi, eventEmitterSetupClosure);
 
 module.exports = app;

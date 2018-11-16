@@ -16,7 +16,7 @@ const WebdavFileTypeProvider = require('../events/FileTypeProvider').webdav
 module.exports = function setupEventEmitter(server, collectionApi, settings) {
     if(!settings.enabled) {
         console.log("Not emitting events due to configuration settings");
-        return;
+        return Promise.resolve();
     }
 
     // Configure filetype provider
@@ -24,7 +24,7 @@ module.exports = function setupEventEmitter(server, collectionApi, settings) {
 
     console.log("Emitting events to RabbitMQ on host " + settings.host);
 
-    rabbot.configure({
+    return rabbot.configure({
         connection: settings,
         exchanges: [
             { name: settings.exchange, type: 'topic' }
@@ -34,5 +34,6 @@ module.exports = function setupEventEmitter(server, collectionApi, settings) {
         server.afterRequest(eventEmitter(rabbot, collectionApi, fileTypeProvider, settings.exchange));
     }).catch(e => {
         console.error("Connection with RabbitMQ failed:", e);
+        throw Error("Connection with RabbitMQ failed: " + e.message);
     })
 };
