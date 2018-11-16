@@ -14,6 +14,7 @@ env:
      - SNAPSHOT_BRANCH="dev"
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
+     - KUBERNETES_CONTEXT="FairspaceCICluster"
 
      # Github credentials:
      # GITHUB_PASSWORD=....
@@ -58,6 +59,7 @@ jobs:
       - ./ci/k8s/install_kubectl.sh
       - export PATH="$HOME/downloads/v${KUBECTL_VERSION}:$PATH"
       - ./ci/k8s/config_kubectl.sh
+      - ./ci/k8s/switch_context.sh
       script:
       - ./ci/helm/tag.sh
       - ./ci/helm/add_repos.sh
