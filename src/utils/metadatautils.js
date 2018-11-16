@@ -48,7 +48,7 @@ export function isDateTimeProperty(property) {
     return  property.range === 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
 }
 
-export function genUuid() {
+export function generateUuid() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g,
         // eslint-disable-next-line
         c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))

@@ -1,5 +1,5 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import MetadataAPI from "../services/MetadataAPI/MetadataAPI"
+import MetadataAPI, {TYPE_URI} from "../services/MetadataAPI/MetadataAPI"
 import {
     METADATA,
     METADATA_ALL_ENTITIES,
@@ -29,7 +29,12 @@ export const updateMetadata = (subject, predicate, values) => ({
 })
 
 export const createMetadataEntity = (type, id) => {
-    const subject = window.location.origin + '/iri/' + getSingleValue(type, 'http://fairspace.io/ontology#classInfix') + '/' + id;
+    let infix = getSingleValue(type, 'http://fairspace.io/ontology#classInfix');
+    if (!infix) {
+        console.error('Couldn\'t determine a class infix for ' + type['@id']);
+        infix = 'generic';
+    }
+    const subject = window.location.origin + '/iri/' + infix + '/' + id;
     return {
         type: METADATA_NEW_ENTITY,
         payload: MetadataAPI.get({subject: subject})
@@ -37,8 +42,9 @@ export const createMetadataEntity = (type, id) => {
                 if (meta.length) {
                     throw Error('Metadata entity already exists: ' + subject)
                 }
-                return MetadataAPI.update(subject, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', [{id: type['@id']}])
-            }) ,
+            })
+            .then(() => MetadataAPI.update(subject, TYPE_URI, [{id: type['@id']}]))
+            .then(() => subject),
         meta: {
             subject: subject,
             type: type['@id']

@@ -8,23 +8,20 @@ import List from "@material-ui/core/List/List";
 import ListItem from "@material-ui/core/ListItem/ListItem";
 import ListItemText from "@material-ui/core/ListItemText/ListItemText";
 import Icon from "@material-ui/core/Icon/Icon";
-import {genUuid, getLabel} from "../../utils/metadatautils";
+import {generateUuid, getLabel} from "../../utils/metadatautils";
 import Paper from "@material-ui/core/Paper/Paper";
 import {compareBy} from "../../utils/comparators";
 import TextField from "@material-ui/core/TextField/TextField";
 import MetadataAPI from "../../services/MetadataAPI/MetadataAPI";
+import Typography from "@material-ui/core/Typography/Typography";
 
 
 class NewMetadataEntityDialog extends React.Component{
     constructor(props) {
         super(props);
-        const {
-            onCreate,
-            ...componentProps
-        } = props;
+        const { onCreate } = props;
 
         this.onCreate = onCreate;
-        this.componentProps = componentProps;
 
         this.state = {
             creating: false,
@@ -35,18 +32,9 @@ class NewMetadataEntityDialog extends React.Component{
             .then(vocabulary => this.setState({types: vocabulary.getFairspaceClasses()}))
     }
 
-    componentWillReceiveProps(props) {
-        if(props.onCreate)
-            this.onCreate = props.onCreate;
-
-        this.setState({
-            creating: false
-        });
-    }
-
     openDialog(e) {
         e.stopPropagation();
-        this.setState({creating: true, id: genUuid(), type: undefined});
+        this.setState({creating: true, id: generateUuid(), type: undefined});
     }
 
     closeDialog(e) {
@@ -92,20 +80,23 @@ class NewMetadataEntityDialog extends React.Component{
                             style={{width: 400}}
                         />
                         <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
-
-                        <List>
                             {
-                                this.state.types.sort(compareBy(getLabel)).map(t => (
-                                    <ListItem
-                                        button
-                                        selected={this.state.type === t}
-                                        onClick={() => this.setState({type: t})}
-                                    >
-                                        <ListItemText primary={getLabel(t)}/>
-                                    </ListItem>
-                                ))
+                                this.state.types.length
+                                    ? <List>
+                                        {
+                                            this.state.types.sort(compareBy(getLabel)).map(t => (
+                                                <ListItem
+                                                    button
+                                                    selected={this.state.type === t}
+                                                    onClick={() => this.setState({type: t})}
+                                                >
+                                                    <ListItemText primary={getLabel(t)}/>
+                                                </ListItem>
+                                            ))
+                                        }
+                                    </List>
+                                    : <Typography>Loading...</Typography>
                             }
-                        </List>
                         </Paper>
                     </DialogContent>
                     <DialogActions>

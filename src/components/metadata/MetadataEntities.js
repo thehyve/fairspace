@@ -80,8 +80,7 @@ const mapDispatchToProps = (dispatch) => ({
     load: () => dispatch(fetchAllEntitiesIfNeeded()),
     create: (type, id) => {
         dispatch(createMetadataEntity(type, id))
-            .then(() => window.location.href = navigableLink(
-                window.location.origin + '/iri/' + getSingleValue(type, 'http://fairspace.io/ontology#classInfix') + '/' + id))
+            .then(result => window.location.href = navigableLink(result.value))
             .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
     }
 });
