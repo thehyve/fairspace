@@ -38,14 +38,6 @@
             "@type": "foaf:Person"
         },
         {
-            "@id": "ws:collections/7",
-            "@type": "fairspace:Collection"
-        },
-        {
-            "@id": "ws:collections/12",
-            "@type": "fairspace:Collection"
-        },
-        {
             "@id": "ws:samples/IMPORTANT-SAMPLE-DO-NOT-THROW-AWAY",
             "@type": "schema:Material"
         },

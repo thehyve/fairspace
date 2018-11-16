@@ -1,15 +1,17 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import MetadataAPI from "../services/MetadataAPI/MetadataAPI"
+import MetadataAPI, {TYPE_URI} from "../services/MetadataAPI/MetadataAPI"
 import {
     METADATA,
     METADATA_ALL_ENTITIES,
     METADATA_COMBINATION,
     METADATA_ENTITIES,
+    METADATA_NEW_ENTITY,
     METADATA_URI_BY_PATH,
     METADATA_VOCABULARY,
     UPDATE_METADATA
 } from "./actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
+import {getSingleValue} from "../utils/metadatautils";
 
 export const invalidateMetadata = (subject) => ({
     type: actionTypes.invalidate(METADATA),
@@ -25,6 +27,30 @@ export const updateMetadata = (subject, predicate, values) => ({
         values: values
     }
 })
+
+export const createMetadataEntity = (type, id) => {
+    let infix = getSingleValue(type, 'http://fairspace.io/ontology#classInfix');
+    if (!infix) {
+        console.error('Couldn\'t determine a class infix for ' + type['@id']);
+        infix = 'generic';
+    }
+    const subject = window.location.origin + '/iri/' + infix + '/' + id;
+    return {
+        type: METADATA_NEW_ENTITY,
+        payload: MetadataAPI.get({subject: subject})
+            .then(meta => {
+                if (meta.length) {
+                    throw Error('Metadata entity already exists: ' + subject)
+                }
+            })
+            .then(() => MetadataAPI.update(subject, TYPE_URI, [{id: type['@id']}]))
+            .then(() => subject),
+        meta: {
+            subject: subject,
+            type: type['@id']
+        }
+    }
+};
 
 export const fetchCombinedMetadataIfNeeded = (subject) => dispatchIfNeeded(
     () => combineMetadataForSubject(subject),
