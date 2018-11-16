@@ -8,14 +8,19 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class PidConverter(@Value("\${app.metadata.base-url}") val urlPrefix: String) {
+class PidConverter(
+        @Value("\${app.metadata.base-url}") val urlPrefix: String,
+        @Value("\${app.metadata.infix}") val urlInfix: String
+) {
+    val prefix get() = ensureTrailingSlashOrEmpty(urlPrefix) + ensureTrailingSlashOrEmpty(urlInfix)
+
     fun pidToPidDTO(pid: Pid): PidDTO {
         return PidDTO(id = uuidToId(pid.uuid), value = pid.value)
     }
 
     fun idToUUID(input: String): UUID {
-        if (input.startsWith(urlPrefix)) {
-            val uuidString: String = input.replaceFirst(urlPrefix, "")
+        if (input.startsWith(prefix)) {
+            val uuidString: String = input.replaceFirst(prefix, "")
             try {
                 return UUID.fromString(uuidString)
             } catch (_: IllegalArgumentException) {
@@ -27,6 +32,13 @@ class PidConverter(@Value("\${app.metadata.base-url}") val urlPrefix: String) {
     }
 
     fun uuidToId(input: UUID): String {
-        return urlPrefix + input
+        println("UUID to ID: " + prefix)
+        return prefix + input
     }
+
+    private fun ensureTrailingSlashOrEmpty(input: String) =
+            if(input.isNotBlank())
+                input + (if(input.takeLast(1) == "/") "" else "/")
+            else
+                ""
 }
