@@ -6,6 +6,7 @@ import {
     METADATA_COMBINATION,
     METADATA_ENTITIES,
     METADATA_NEW_ENTITY,
+    METADATA_URI_BY_PATH,
     METADATA_VOCABULARY,
     UPDATE_METADATA
 } from "./actionTypes";
@@ -115,3 +116,13 @@ const fetchAllEntities = createErrorHandlingPromiseAction((dispatch) => ({
                 )
 }));
 
+export const fetchSubjectByPathIfNeeded = (path) => dispatchIfNeeded(
+    () => getUriByPath(path),
+    state => state && state.cache && state.cache.subjectByPath && state.cache.subjectByPath[path]
+);
+
+const getUriByPath = createErrorHandlingPromiseAction((path) => ({
+    type: METADATA_URI_BY_PATH,
+    payload: MetadataAPI.getSubjectByPath(path),
+    meta: { path: path }
+}))

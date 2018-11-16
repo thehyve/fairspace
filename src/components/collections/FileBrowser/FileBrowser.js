@@ -29,7 +29,7 @@ class FileBrowser extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const {selectCollection, fetchFilesIfNeeded, openedCollection, openedPath} = this.props
+        const {selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath} = this.props
         if(prevProps.openedCollection.id !== openedCollection.id) {
             selectCollection(openedCollection.id)
         }
@@ -39,7 +39,8 @@ class FileBrowser extends React.Component {
         const hasNewOpenedPath = prevProps.openedPath !== openedPath;
 
         if(hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
-            fetchFilesIfNeeded(openedCollection, openedPath)
+            fetchFilesIfNeeded(openedCollection, openedPath);
+            openPath('/' + openedCollection.location + (openedPath === '/' ? '' : openedPath));
         }
     }
 
@@ -92,8 +93,10 @@ class FileBrowser extends React.Component {
 
     openDir(path) {
         const basePath = this.props.openedPath || '';
-        const separator = basePath.endsWith('/') ? '' : '/'
-        this.props.history.push("/collections/" + this.props.openedCollection.id + basePath + separator + path);
+        const separator = basePath.endsWith('/') ? '' : '/';
+        const fullPath = "/collections/" + this.props.openedCollection.id + basePath + separator + path;
+        this.props.history.push(fullPath);
+        this.props.openPath('/' + this.props.openedCollection.location + basePath + separator + path)
     }
 
     downloadFile(path) {
@@ -159,8 +162,6 @@ class FileBrowser extends React.Component {
             onRename={this.handlePathRename.bind(this)}
             onDelete={this.handlePathDelete.bind(this)}/>
     }
-
-
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -172,13 +173,9 @@ const mapStateToProps = (state, ownProps) => {
 
     const collectionBrowser = state.collectionBrowser;
 
-    const getCollection = (collectionId) => {
-        if(!collections.data || collections.data.length === 0) {
-            return {}
-        }
+    const getCollection = collectionId =>
+        (collections.data && collections.data.find(collection => collection.id === collectionId)) || {};
 
-        return collections.data.find(collection => collection.id === collectionId) || {}
-    }
 
     return {
         loading: files.pending || collections.pending || collections.data.length === 0,

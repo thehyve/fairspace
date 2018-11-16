@@ -8,6 +8,7 @@
         "icdo3": "http://fairspace.io/ontology#",
         "obo": "http://purl.obolibrary.org/obo/#",
         "osiris": "http://fairspace.io/ontology#",
+        "owl": "http://www.w3.org/2002/07/owl#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "schema": "http://schema.org/",
@@ -27,7 +28,7 @@
             "@type": "rdf:Class",
             "fs:classInfix": "person-consents",
             "fs:fairspaceEntity": true,
-            "rdfs:comment": "A research consent given by person. ",
+            "rdfs:comment": "A research consent given by person.",
             "rdfs:label": "Person Consent"
         },
         {
@@ -45,6 +46,13 @@
             "fs:fairspaceEntity": false,
             "rdfs:comment": "A single file.",
             "rdfs:label": "File"
+        },
+        {
+          "@id": "fs:Directory",
+          "@type": "rdf:Class",
+          "fs:fairspaceEntity": false,
+          "rdfs:comment": "A directory.",
+          "rdfs:label": "Directory"
         },
         {
             "@id": "fs:Collection",
@@ -457,7 +465,7 @@
             ]
         },
         {
-            "@id": "fs:investigationNature ",
+            "@id": "fs:investigationNature",
             "@type": "rdf:Property",
             "fs:allowMultiple": true,
             "rdfs:comment": "choose between: basic research, biomedical research, clinical trial, medical diagnosis",
@@ -1067,7 +1075,7 @@
                     "@id": "fs:File"
                 }
             ],
-            "rdfs:label": "Analysed by ",
+            "rdfs:label": "Analysed by",
             "rdfs:range": [
                 {
                     "@id": "fs:Analysis"
