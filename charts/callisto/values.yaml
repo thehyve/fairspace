@@ -30,6 +30,11 @@ rabbitmq:
   username:
   password:
 
+
+# Please note that mail settings are copied into the application.yaml configuration
+# file for spring. This means you can add any mail settings accepted by Spring mail
+# See e.g. https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-email.html
+# for more information.
 mail:
   host:
   port: 25
