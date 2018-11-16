@@ -47,13 +47,24 @@ app.get('/api/workspace/config', (req, res) => res.sendFile(mockDataDir + '/work
 app.get('/api/workspace/details', (req, res) => res.sendFile(mockDataDir + '/workspace/workspace-details.json'));
 
 
+app.post('/api/metadata/pid', (req, res) => {
+    res.send({id:'http://fairspace.com' + req.body.value})
+});
+
 // Add webdav server on /files
 const server = new webdav.WebDAVServer();
 
 server.rootFileSystem().addSubTree(server.createExternalContext(), {
     'Jan_Smit_s_collection-500': {
+        'dir1': webdav.ResourceType.Directory,
         'file1.txt': webdav.ResourceType.File,
-        'file2.txt': webdav.ResourceType.File
+        'file2.txt': webdav.ResourceType.File,
+        'sub-dir': {
+            'subdirfile.txt': webdav.ResourceType.File,
+            'another-dir': {
+                'deeply-nested.txt': webdav.ResourceType.File,
+            }
+        }
     },
     'samples': {
         'samples.txt': webdav.ResourceType.File,

@@ -48,6 +48,13 @@
             "rdfs:label": "File"
         },
         {
+          "@id": "fs:Directory",
+          "@type": "rdf:Class",
+          "fs:fairspaceEntity": false,
+          "rdfs:comment": "A directory.",
+          "rdfs:label": "Directory"
+        },
+        {
             "@id": "fs:Collection",
             "@type": "rdf:Class",
             "fs:classInfix": "collections",
