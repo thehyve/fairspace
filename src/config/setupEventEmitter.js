@@ -24,7 +24,7 @@ module.exports = function setupEventEmitter(server, collectionApi, settings) {
 
     console.log("Emitting events to RabbitMQ on host " + settings.host);
 
-    rabbot.configure({
+    return rabbot.configure({
         connection: settings,
         exchanges: [
             { name: settings.exchange, type: 'topic' }
@@ -34,5 +34,6 @@ module.exports = function setupEventEmitter(server, collectionApi, settings) {
         server.afterRequest(eventEmitter(rabbot, collectionApi, fileTypeProvider, settings.exchange));
     }).catch(e => {
         console.error("Connection with RabbitMQ failed:", e);
+        throw Error("Connection with RabbitMQ failed: " + e.message);
     })
 };
