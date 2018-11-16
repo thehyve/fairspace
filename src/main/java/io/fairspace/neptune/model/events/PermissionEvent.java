@@ -4,10 +4,12 @@ import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.model.dto.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @AllArgsConstructor
-public abstract class PermissionEvent {
+@EqualsAndHashCode(callSuper = false)
+public abstract class PermissionEvent extends NeptuneEvent {
     private User user;
     private User subject;
     private Permission permission;

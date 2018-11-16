@@ -5,14 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,6 +50,10 @@ public class UsersService {
             ).getBody());
         } catch(HttpClientErrorException e) {
             log.info("No user found for id {}", id);
+            log.debug("Stacktrace", e);
+            return Optional.empty();
+        } catch(ResourceAccessException e) {
+            log.error("An IO exception occurred while retrieving user from user provider: {}", e.getMessage());
             log.debug("Stacktrace", e);
             return Optional.empty();
         } catch (Exception e) {

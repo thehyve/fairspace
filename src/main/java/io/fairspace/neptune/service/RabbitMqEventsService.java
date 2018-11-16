@@ -8,6 +8,7 @@ import io.fairspace.neptune.model.Permission;
 import io.fairspace.neptune.model.events.CollectionAddedEvent;
 import io.fairspace.neptune.model.events.CollectionDeletedEvent;
 import io.fairspace.neptune.model.events.CollectionModifiedEvent;
+import io.fairspace.neptune.model.events.NeptuneEvent;
 import io.fairspace.neptune.model.events.PermissionAddedEvent;
 import io.fairspace.neptune.model.events.PermissionDeletedEvent;
 import io.fairspace.neptune.model.events.PermissionModifiedEvent;
@@ -37,8 +38,7 @@ public class RabbitMqEventsService implements EventsService {
     }
 
     public void permissionAdded(Permission permission, boolean permissionForNewCollection) {
-        rabbitTemplate.convertAndSend(
-                collectionsExchange.getName(),
+        send(
                 RabbitMqConfig.RoutingKeys.ADD_PERMISSION.getValue(),
                 new PermissionAddedEvent(
                     getCurrentUser(),
@@ -51,8 +51,7 @@ public class RabbitMqEventsService implements EventsService {
     }
 
     public void permissionModified(Permission permission, Access oldAccess) {
-        rabbitTemplate.convertAndSend(
-                collectionsExchange.getName(),
+        send(
                 RabbitMqConfig.RoutingKeys.MODIFY_PERMISSION.getValue(),
                 new PermissionModifiedEvent(
                     getCurrentUser(),
@@ -65,8 +64,7 @@ public class RabbitMqEventsService implements EventsService {
     }
 
     public void permissionDeleted(Permission permission) {
-        rabbitTemplate.convertAndSend(
-                collectionsExchange.getName(),
+        send(
                 RabbitMqConfig.RoutingKeys.DELETE_PERMISSION.getValue(),
                 new PermissionDeletedEvent(
                     getCurrentUser(),
@@ -78,8 +76,7 @@ public class RabbitMqEventsService implements EventsService {
     }
 
     public void collectionAdded(Collection collection) {
-        rabbitTemplate.convertAndSend(
-                collectionsExchange.getName(),
+        send(
                 RabbitMqConfig.RoutingKeys.ADD_COLLECTION.getValue(),
                 new CollectionAddedEvent(
                         getCurrentUser(),
@@ -89,8 +86,7 @@ public class RabbitMqEventsService implements EventsService {
     }
 
     public void collectionModified(Collection collection, Collection oldCollection) {
-        rabbitTemplate.convertAndSend(
-                collectionsExchange.getName(),
+        send(
                 RabbitMqConfig.RoutingKeys.MODIFY_COLLECTION.getValue(),
                 new CollectionModifiedEvent(
                         getCurrentUser(),
@@ -101,14 +97,17 @@ public class RabbitMqEventsService implements EventsService {
     }
 
     public void collectionDeleted(Collection collection) {
-        rabbitTemplate.convertAndSend(
-                collectionsExchange.getName(),
+        send(
                 RabbitMqConfig.RoutingKeys.DELETE_COLLECTION.getValue(),
                 new CollectionDeletedEvent(
                         getCurrentUser(),
                         collection
                 )
         );
+    }
+
+    private void send(String routingKey, NeptuneEvent event) {
+        rabbitTemplate.convertAndSend(collectionsExchange.getName(), routingKey, event);
     }
 
     private User getCurrentUser() {
