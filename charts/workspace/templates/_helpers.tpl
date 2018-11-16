@@ -123,3 +123,6 @@ Storage external hostname (through pluto to hydra)
 {{- define "rabbitmq.titan.username" -}}
 {{- .Values.titan.rabbitmq.username | default (printf "%s-titan" .Release.Name) -}}
 {{- end -}}
+{{- define "rabbitmq.callisto.username" -}}
+{{- .Values.callisto.rabbitmq.username | default (printf "%s-callisto" .Release.Name) -}}
+{{- end -}}

@@ -74,6 +74,20 @@ neptune:
     metadata:
       baseUrl: https://workspace.demo.fairspace.app
 
+# Specific settings for Callisto subchart
+callisto:
+  rabbitmq:
+    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
+    password: "TctDN6DBtfHkmGv8"
+
+  mail:
+    host: email-smtp.us-east-1.amazonaws.com
+    port: 587
+    username: AKIAISXHGXUIMMU75YVA
+    password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
 
 # Specific settings for JupyterHub subchart
 jupyterhub:

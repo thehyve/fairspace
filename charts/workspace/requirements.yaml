@@ -17,5 +17,8 @@ dependencies:
 - name: neptune
   version: v0.x.x-SNAPSHOT
   repository: https://fairspace.azurecr.io/helm/v1/repo
+- name: callisto
+  version: v0.x.x-SNAPSHOT
+  repository: https://fairspace.azurecr.io/helm/v1/repo
 
 

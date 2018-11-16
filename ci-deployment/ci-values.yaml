@@ -86,6 +86,21 @@ mercury:
   image:
     pullPolicy: Always
 
+# Specific settings for Callisto subchart
+callisto:
+  rabbitmq:
+    hostname: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
+    password: "6hfdJUr7RW6LTFgB"
+
+  mail:
+    host: email-smtp.us-east-1.amazonaws.com
+    port: 587
+    username: AKIAISXHGXUIMMU75YVA
+    password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
 # Specific settings for JupyterHub subchart
 jupyterhub:
   rbac:
