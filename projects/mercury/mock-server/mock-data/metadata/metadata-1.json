@@ -12,11 +12,12 @@
         "dataset": "sdo:Dataset",
         "person": "sdo:Person",
         "material": "sdo:Material",
-        "dateCreated": "sdo:dateCreated"
+        "dateCreated": "sdo:dateCreated",
+        "externalReference": "fs:externalReference"
     },
     "@graph": [
         {
-            "@id": "ws:collections/1",
+            "@id": "ws:collections/500",
             "@type": [
                 "fs:Collection"
             ],
@@ -33,6 +34,10 @@
                 {
                     "@id": "ws:patients/GSM211008"
                 }
+            ],
+            "externalReference": [
+              { "@id": "http://fairspace.com" },
+              { "@id": "http://thehyve.nl" }
             ]
         }
     ]

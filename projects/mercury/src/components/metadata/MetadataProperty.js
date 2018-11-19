@@ -112,8 +112,8 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
     // Do not show an add component if no multiples are allowed
     // and there is already a value
     const canAdd = editable && (property.allowMultiple || property.values.length === 0);
-    const labelId = 'label-' + property.key
-    const ValueComponent = editable ?
+    const labelId = 'label-' + property.key;
+    const ValueComponent = (editable && !property.allowMultiple) ?
         ValueComponentFactory.editComponent(property) : ValueComponentFactory.readOnlyComponent();
 
     return (<ListItem disableGutters key={property.key} style={{display: 'block'}}>
