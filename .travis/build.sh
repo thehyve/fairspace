@@ -1,9 +1,12 @@
 #!/bin/bash
 DIR=$(dirname $0)
+PROJECT=$1
 
-for PROJECT in projects/*; do
-  export APPNAME=$(basename $PROJECT)
-  if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE $PROJECT; then
+# Set variables for use in build scripts
+export APPNAME=$(basename $PROJECT)
+export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
+
+if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE $PROJECT; then
     echo "Building $APPNAME...";
     cd $PROJECT
 
@@ -16,7 +19,6 @@ for PROJECT in projects/*; do
     fi
 
     cd ../..
-  else
+else
     echo "No changes for $APPNAME";
-  fi
-done
+fi
