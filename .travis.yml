@@ -64,6 +64,7 @@ jobs:
       - if .travis/build-condition.sh $TRAVIS_COMMIT_RANGE $DIR; then $DIR/.travis/build.sh; else echo "No changes for $APPNAME"; fi
       - 'if [[ .travis/build-condition.sh $TRAVIS_COMMIT_RANGE $DIR ]] && [[ $SHOULD_RELEASE ]]; then $DIR/.travis/release.sh; else echo "No release needed for $APPNAME"; fi'
     - stage: deploy
+      env: DIR=charts
       if: branch IN (master, dev) AND type != pull_request
       install:
         - $DIR/.travis/install.sh
