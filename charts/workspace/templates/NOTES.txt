@@ -28,7 +28,7 @@ Your workspace is named {{ template "workspace.name" . }} and can be accessed vi
 
 {{- end }}
 
-The installation contains an instance of Mercury, Pluto, Ceres and Neptune. Please note that currently Jupyterhub is disabled!
+The installation contains instances of Mercury, Pluto, Ceres, Neptune, Titan and Jupyterhub.
 
 ----------------------------
 
