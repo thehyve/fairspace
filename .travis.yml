@@ -1,10 +1,11 @@
-language: node_js
+language: java
 
-node_js:
-- "node"
+jdk:
+- oraclejdk8
 
 env:
   global:
+     - NODE_VERSION="11.2.0"
      - APPNAME="workspace"
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
@@ -28,6 +29,8 @@ env:
 cache:
   directories:
   - $HOME/downloads
+  - $HOME/.cache/yarn
+  - $HOME/.gradle
 
 notifications:
   hipchat:
@@ -40,44 +43,43 @@ notifications:
     notify: true
 
 before_install:
+  - nvm install $NODE_VERSION
   - export KUBE_CONFIG_ENC_KEY=$encrypted_5162cfbd2a53_key
   - export KUBE_CONFIG_ENC_IV=$encrypted_5162cfbd2a53_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
+  - export BUILD_SCRIPTS_DIR=$(pwd)/ci
   - source ./ci/setup_env.sh
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT"; fi'
   - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo KUBERNETES_CONTEXT="$RELEASE_CONTEXT"; fi'
 
 jobs:
   include:
-    - stage: Build
-      name: Helm chart
+    - stage: build
+      name: Build projects
+      script:
+      - .travis/build.sh projects/callisto
+      - .travis/build.sh projects/ceres
+      - .travis/build.sh projects/mercury
+      - .travis/build.sh projects/neptune
+      - .travis/build.sh projects/pluto
+      - .travis/build.sh projects/titan
+      - .travis/build.sh projects/jupyterhub-hub-docker
+      - .travis/build.sh projects/jupyterhub-singleuser-docker
+      - .travis/build.sh projects/oidc-auth
+    - stage: build
+      name: Build helm charts
       install:
-      - source ./ci/helm/install_helm.sh
-      - ./ci/az/install.sh
-      - ./ci/az/login.sh
-      - ./ci/k8s/install_kubectl.sh
-      - export PATH="$HOME/downloads/v${KUBECTL_VERSION}:$PATH"
-      - ./ci/k8s/config_kubectl.sh
-      - ./ci/k8s/switch_context.sh
+      - source charts/.travis/install.sh
       script:
-      - ./ci/helm/tag.sh
-      - ./ci/helm/add_repos.sh
-      - 'if [[ $ALLOW_SNAPSHOTS ]]; then ./ci/helm/allow_snapshot_dependencies.sh; fi'
-      - ./ci/helm/build.sh
-      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh && helm repo update; fi'
-      - 'if [[ $SHOULD_RELEASE ]]; then travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
-    - # For snapshot branch, run e2e tests
-      if: branch = env(SNAPSHOT_BRANCH) AND type != "pull_request"
-      stage: e2e tests
-      name: Run e2e tests
+      - charts/.travis/build.sh
+    - stage: deploy
+      if: branch IN (master, dev) AND type != pull_request
+      install:
+        - source charts/.travis/install.sh
       script:
-      - ./ci/run_e2e_tests.sh
-    - # For release branch, update git with the new tag and update version
-      if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
-      stage: Versioning
-      install: skip
-      name: Set tag and update version
+      - travis_wait ci/helm/deploy.sh
+    - stage: e2e test
+      if: branch = dev AND type != pull_request
       script:
-        - ./ci/helm/tag.sh
-        - ./ci/versioning/add_tag_to_git.sh
-        - ./ci/versioning/set_next_version.sh
+      - .travis/build.sh projects/janus
+
