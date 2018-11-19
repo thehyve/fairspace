@@ -2,8 +2,9 @@
 DIR=$(dirname $0)
 
 for PROJECT in projects/*; do
+  export APPNAME=$(basename $PROJECT)
   if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE $PROJECT; then
-    echo "Building $PROJECT...";
+    echo "Building $APPNAME...";
     cd $PROJECT
 
     source .travis/env.sh;
@@ -16,6 +17,6 @@ for PROJECT in projects/*; do
 
     cd ../..
   else
-    echo "No changes for $PROJECT";
+    echo "No changes for $APPNAME";
   fi
 done

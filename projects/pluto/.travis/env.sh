@@ -1,2 +1,2 @@
 #!/bin/bash
-export ARTIFACT_BUILD_FILE=build.gradle
+export ARTIFACT_BUILD_FILE=app/build.gradle
