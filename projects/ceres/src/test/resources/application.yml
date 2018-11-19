@@ -1,0 +1,29 @@
+# Security configuration
+security:
+  oidc:
+    jwk-key-set-uri: http://localhost:${wiremock.server.port}/certs
+  urls:
+    permitAll:
+    - /actuator/health
+    needsAuthentication:
+    - /*
+
+jena:
+  dataset:
+    path: data
+
+
+logging.level.org.springframework.security: DEBUG
+
+spring:
+  test:
+    mockmvc:
+      print: log_debug
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+
+app:
+  metadata:
+    base-url: http://fairspace.com
+  rabbitmq:
+    enabled: false

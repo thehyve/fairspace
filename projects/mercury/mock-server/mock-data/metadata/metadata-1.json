@@ -1,0 +1,39 @@
+{
+    "@context": {
+        "ws": "http://localhost:3000/iri/",
+        "sdo": "http://schema.org/",
+        "fs": "http://fairspace.io/ontology#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "name": "fs:name",
+        "description": "fs:description",
+        "about": "sdo:about",
+        "derivesFrom": "fs:derivesFrom",
+        "isConsentOf": "fs:isConsentOf",
+        "dataset": "sdo:Dataset",
+        "person": "sdo:Person",
+        "material": "sdo:Material",
+        "dateCreated": "sdo:dateCreated"
+    },
+    "@graph": [
+        {
+            "@id": "ws:collections/1",
+            "@type": [
+                "fs:Collection"
+            ],
+            "description": "An example collection with testdata from GSE8581",
+            "name": "GSE8581",
+            "dateCreated": "2018-10-05T12:35:51.099Z",
+            "about": [
+                {
+                    "@id": "ws:patients/GSM212810"
+                },
+                {
+                    "@id": "ws:patients/GSM212811"
+                },
+                {
+                    "@id": "ws:patients/GSM211008"
+                }
+            ]
+        }
+    ]
+}

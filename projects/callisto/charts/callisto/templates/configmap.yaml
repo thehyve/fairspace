@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "callisto.fullname" . }}
+  labels:
+    app: {{ template "callisto.name" . }}
+    chart: {{ template "callisto.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    app:
+      mail:
+        from: {{ .Values.app.mail.from }}
+    spring:
+      zipkin:
+        enabled: {{ .Values.tracing.enabled }}
+        base-url: {{ .Values.tracing.baseUrl }}
+      rabbitmq:
+        host: {{ .Values.rabbitmq.hostname }}
+        username: {{ .Values.rabbitmq.username | default (printf "%s-callisto" .Release.Name) }}
+        password: {{ .Values.rabbitmq.password }}
+        virtualHost: {{ .Values.rabbitmq.vhost | default .Release.Name }}
+      mail:
+{{ toYaml .Values.mail | indent 8 }}

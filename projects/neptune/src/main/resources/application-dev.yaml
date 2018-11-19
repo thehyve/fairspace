@@ -1,0 +1,31 @@
+app:
+  oauth2:
+    base-url: http://192.168.99.100:31000
+    realm: minikube
+
+spring:
+  datasource:
+    url: "jdbc:h2:mem:neptune"
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+
+ceres:
+  url: "http://localhost:8001"
+
+titan:
+  url: "http://localhost:3000"
+
+server:
+  port: 8082
+
+logging.level.org.springframework.cache: TRACE
