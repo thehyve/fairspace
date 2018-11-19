@@ -4,7 +4,7 @@ node_js:
 - "node"
 
 stages:
-  - build
+  - test
   - deploy
 
 env:
