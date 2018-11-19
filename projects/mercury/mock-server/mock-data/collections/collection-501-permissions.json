@@ -1,0 +1,17 @@
+[
+    {
+        "collectionId": 501,
+        "subject": "user2-id",
+        "access": "Write"
+    },
+    {
+        "collectionId": 501,
+        "subject": "user3-id",
+        "access": "Manage"
+    },
+    {
+        "collectionId": 501,
+        "subject": "user1-id",
+        "access": "Read"
+    }
+]

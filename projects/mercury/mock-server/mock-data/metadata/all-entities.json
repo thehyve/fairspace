@@ -1,0 +1,49 @@
+{
+    "@context": {
+        "ws": "http://localhost:3000/iri/",
+        "schema": "http://schema.org/",
+        "fairspace": "http://fairspace.io/ontology#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "foaf": "http://xmlns.com/foaf/0.1/#"
+    },
+    "@graph": [
+        {
+            "@id": "ws:patients/GSM212810",
+            "@type": "foaf:Person"
+        },
+        {
+            "@id": "ws:patients/GSM212811",
+            "@type": "foaf:Person",
+            "rdfs:label": "Very Important Person"
+        },
+        {
+            "@id": "ws:research-projects/MyResearchProject",
+            "@type": "fairspace:ResearchProject",
+            "rdfs:label": "My Research Project"
+        },
+        {
+            "@id": "ws:patients/GSM211008",
+            "@type": "foaf:Person"
+        },
+        {
+            "@id": "ws:patients/THEHYVE-4",
+            "@type": "foaf:Person"
+        },
+        {
+            "@id": "ws:patients/THEHYVE-7",
+            "@type": "foaf:Person"
+        },
+        {
+            "@id": "ws:patients/FAIRSPACE-123",
+            "@type": "foaf:Person"
+        },
+        {
+            "@id": "ws:samples/IMPORTANT-SAMPLE-DO-NOT-THROW-AWAY",
+            "@type": "schema:Material"
+        },
+        {
+            "@id": "ws:samples/GSM198234",
+            "@type": "schema:Material"
+        }
+    ]
+}
