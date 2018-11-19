@@ -3,14 +3,7 @@ language: node_js
 node_js:
 - "node"
 
-stages:
-  - test
-  - deploy
-
 env:
-  matrix:
-    - DIR=projects/callisto APPNAME=callisto
-    - DIR=charts
   global:
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
@@ -58,7 +51,11 @@ before_install:
 
 jobs:
   include:
-    - stage: test
+    - stage: build
+      matrix:
+        include:
+          - env: DIR=projects/callisto APPNAME=callisto
+          - env: DIR=charts
       install:
       - if .travis/build-condition.sh $TRAVIS_COMMIT_RANGE $DIR; then $DIR/.travis/install.sh; else echo "No changes for $APPNAME"; fi
       script:
