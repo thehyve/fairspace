@@ -1,0 +1,16 @@
+# Where to store the dataset
+jena:
+  dataset:
+    path: /tmp/data
+
+# Tracing configuration
+spring:
+  zipkin:
+    enabled: false
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+
+server:
+  port: 8001
