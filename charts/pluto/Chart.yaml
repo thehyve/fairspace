@@ -1,5 +1,0 @@
-apiVersion: v1
-description: Lightweight api gateway used within a workspace
-icon: https://raw.githubusercontent.com/fairspace/pluto/master/charts/pluto/logo.jpg
-name: pluto
-version: 0.0.0-RELEASEVERSION

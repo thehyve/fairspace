@@ -1,7 +1,0 @@
-server:
-  port: 8443
-  ssl:
-    key-store: classpath:self-signed-keystore.p12
-    key-store-password: nonsecure
-    keyStoreType: PKCS12
-    keyAlias: pluto
