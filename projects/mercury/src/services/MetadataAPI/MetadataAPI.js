@@ -7,6 +7,7 @@ import Vocabulary from "./Vocabulary";
 export const PROPERTY_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
 export const CLASS_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class';
 export const LABEL_URI = 'http://www.w3.org/2000/01/rdf-schema#label';
+export const COMMENT_URI = 'http://www.w3.org/2000/01/rdf-schema#comment';
 export const DOMAIN_URI = 'http://www.w3.org/2000/01/rdf-schema#domain';
 export const RANGE_URI = 'http://www.w3.org/2000/01/rdf-schema#range';
 export const TYPE_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
