@@ -75,7 +75,11 @@ jobs:
     - stage: deploy
       if: branch IN (master, dev) AND type != pull_request
       install:
-        - charts/.travis/install.sh
+        - source charts/.travis/install.sh
       script:
-      - echo "Deploying..."
       - travis_wait ci/helm/deploy.sh
+    - stage: e2e test
+      if: branch = dev AND type != pull_request
+      script:
+      - .travis/build.sh projects/janus
+
