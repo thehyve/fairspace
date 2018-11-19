@@ -3,7 +3,8 @@ DIR=$(dirname $0)
 
 for PROJECT in projects/*; do
   if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE $PROJECT; then
-    cd $APPDIR
+    echo "Building $PROJECT...";
+    cd $PROJECT
 
     source .travis/env.sh;
     .travis/build.sh;
@@ -13,7 +14,7 @@ for PROJECT in projects/*; do
       .travis/release.sh;
     fi
 
-    cd ..
+    cd ../..
   else
     echo "No changes for $PROJECT";
   fi
