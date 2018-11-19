@@ -1,0 +1,73 @@
+language: java
+jdk:
+- oraclejdk8
+os:
+- linux
+env:
+  global:
+  - APPNAME="callisto"
+  - ORG="fairspace"
+  - ARTIFACT_BUILD_FILE="build.gradle"
+  - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
+  - RELEASE_BRANCH="master"
+  - SNAPSHOT_BRANCH="dev"
+  - DOCKER_USERNAME="fairspace"
+  - GITHUB_USERNAME="fairspace-ci"
+  - HELM_VERSION="2.11.0"
+  # DOCKER_PASSWORD = ...
+  - secure: "vt+Vtq970pY/Im9EVhP7E3yPoWqqj3tjhzRb/BTk81Xt1e8gKecA5riEcsNWTj/uQSSDvWaefGJZeekUlewkTk3CAkYiuWfxH2Unjm3LgHGGmOzNYJxOCOXKzRWy3aJFFFpPbc/Dq7ppyr2ZXrLX47Zs1/aRrQFbkpEqu+H4WiDnmhliLjGW0n+1zwlojKlYljFDI+NrDD0UT9seSV3g+OxFQezmIVwuyibc5X2BGfC/PLw+zpJGg93ynRoaFYBnp9a723G6dqsZdxMUpJiMwEMA4H/5YQFcIjZfsxDbXyCZNNjOpHPBg6u7Vt1JU+pnapviIEEKp7PPumILyFRjkLyQQsu7ayfLhPPq3OyDmdMoppj4mKxhjNaov/rV6pREDE9nXRjzEv4hwVS4iCVW5H2MUH9j6TDtjrl32sUUfebFXvAH9JYhwhpY9Az0WN7jtlPXQYKKwWRKtP7+/uzWXmea3WFXhxb4t8yRVOMz0NYJCf1S6lqAyaC9LHGXAjGXaiy8LiEf28G2yaFL9XAB/N9CPfamvyLZDyw/vBC2lBJQ2dv0EV9jzxTtDRZrs6Va+SWhVeyvR7vu146UT9gEJJ2Z+EENK9JYsyrF8+Fhp84bHhzIu4G2lgyva1WMdOWezmZhCEDAaQ39G/OFZlvdJNAB18f3OScwkTQD2XjWFP0="
+  # GITHUB_PASSWORD = ...
+  - secure: "p0ooyaEnCKU86b9+s7egaNedlbCawuQhdW3ZKGLv+0tzK104yv5ayDlZDj6YZk+e6wCE6NVSHBrjkuOA/iCmXxOc8v4EX0k20EwpYvgPx1HPhU6V7htExrsp0z/4YlTaHx/EHIRyZsCmQDxqp37eYHEjxVJrbG3TkW77+Yoy/FcZ3W3mjSsiY2UkiGmWWWg3rVRLgzqypadwq3W1m7qYBTrE8mEU+eOole6ezZUPPDP5bmi9QhpdVSevU2A5NT8VGi2IpRaG/22xe3cagl2+BpSXLdmY4tc17nuatKf5Qk4f/051j4+MnWxhpXdVwG0U1C1c94L/9SKCcRqlGINJVBg5NQludEZRCgtNCz9kONB262Tx70Hn4/4Fyz3VHcr2j3kdYMM6D80els8PgzHueuJSgf/QvcNIZU9ycQg61mMIaiOV570EN8JvihxEiLlVnTyaDlDusrzJhmaFJVElbOz5a0WxgJLfH8jigZf8KoIgs4EzhIbnJUa3ieDkpPlz1c/5u8lOm+kANp7l4DN4JAQtd1g8n2KGGKr29rI3IF3UALrn5eUqqtTLGc/5LAcqtwl43qBT/D2tHYxlMrr8fdc/wUc51HAcLwY5k9vTQKfLUhM2zXSpIhXvJmtApKAr2vdz/RBBLn84Y0kuQD5Tv7ZlpsxVst4xzH8zSAXV5+8="
+  # Azure credentials
+  - secure: "D0u206zL9gAhIoVgMp1XBSz2GMpDn9mYeGGz5zOFuZ9dsgVBJ5puNrQeymCkFYic2LoTI0Ig2JvoY9j5oo2iZ/QlJjh+MZGhwQNgqDdvA1bq1R7un/q30NdlGet4ReZidzwHFaAHhjSQkiVJ6RdrGtv9Yc5oaPfveX+62ZdYWQE2wClr0eIpq7fG5OzL4LApCODSciGsyj5vVh1NhJV5PP7TViZyTXer6SOKz/4Mbs3hBrAJqi06vv5Fu+yYS++TrELL3IM8ayCBh2TADQGk3H8Z0V5XcfKnEIvHJXwkDRHTNSMA0l7dwWHtyYjsr9hnrPm+a25R1beL0eXWLpe3IZoMGSpiZ4zVGqGMqXgMt5eDdxl1THkWFSfO9nztzdE/g2DsYyOInR4zLw7sKO1ptFu44ZB1fXAO0KGzBvabgvw74lCtECt4Yf+XZoEYmZ0fIhWEG/Dq9aurWRliMwJ9a3QZM6oIhDS0EkqhFMWMJg/ns+u9XaQVnin68UBPmYLKF2Gz6z6nZHXdlKZH8Eef6byjHUyiwHcaagJqcn5N6kkW/GioDux2x+pi8CJZ4Y2ifiemXZYrKYS4s/kD/VHhMBGJoMspB8hJyfSd4Cs0jnYIfRBwHI4+OC4i3DD2FtI+yyAkf1VhuDASMxOlDljSt4nJU3LcW1Ua/ewTgzNEXnU="
+notifications:
+  hipchat:
+    on_pull_requests: false
+    rooms:
+      secure: "wEX1XgHhqViEMBKCsLStJH0FruDJhF8zsb6vDhPzXT0DS3Xkm0NjAPRjRjm0Kiht47Be/WC3r0mzteXT19lFi9hdtpgzB/5QFk5U5VwmmGPIHm0M6deL6VVDhMoTHEIwa6KgtK/70L+IuJda2uL21JQeK/UI0yO+gflEPUX8MDEsGY8AqlQaM5SCTic3wMILoMjGObuUhDVsjZXvuc7IdWevDc6GOCaCXnoiXvVjozogS4eSFzj0cWi8sdt2TC8QaJ1EBhj0XR3u0PbP1UH3elO/pbq2PP3R8pU/M6ttOniibHONTpZXkDFcUf1ozGKtr2G2jVifAwKZ7VsHdAedk4yEbbXTcdK+Ea3xKThh4AE8ehEK0ztAIi6u+LON69pWuT8w2vLNhWSeihlU9wO8M4UQM0199LMaS2FyYNynTHPUFfqewimfJvX4rd3zA+u9trxY9/hsAcpU/Ri4AS783ddIhvI2fTEE5fSuumvnOW9PuluD93q2sRQ+sHWn/yMUMQwNI1EsslvSt7D9RRbiKm++AnydlOkcsYTOasBBLXvNIfxw/BbYrEiI7rq6yluOm9Zy/PpwbzCRCTRSLV6pAB6iaCFH32jaR3BcyRYfs6w6mmeAOic/DDa1peed9xUIsK85YneF+lCfgTPRt4/g3q0SQv0aZlyQ0gnWciHmnZ4="
+    template:
+    - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} -
+      <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
+    format: html
+    notify: true
+
+before_install:
+  - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
+  - source ./ci/setup_env.sh
+
+jobs:
+  include:
+  - stage: Build
+    name: App and Docker image
+    services:
+    - docker
+    cache:
+      directories:
+      - "$HOME/.gradle"
+    script:
+    - ./ci/gradle/tag.sh
+    - ./ci/gradle/build.sh
+    - ./ci/docker/build.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/docker/release.sh; fi'
+  - stage: Build
+    name: Helm chart
+    install:
+    - source ./ci/helm/install_helm.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/az/install.sh && ./ci/az/login.sh; fi'
+    script:
+    - ./ci/helm/tag.sh
+    - ./ci/helm/add_pod_annotations.sh
+    - ./ci/helm/build.sh
+    - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
+  - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+    stage: Versioning
+    name: Set tag and update version
+    script:
+    - "./ci/versioning/add_tag_to_git.sh"
+    - "./ci/versioning/set_next_version.sh"
+  - if: branch = env(SNAPSHOT_BRANCH) AND type != "pull_request"
+    stage: Trigger downstream
+    name: Trigger workspace build
+    install: skip
+    script:
+    - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN
