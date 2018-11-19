@@ -1,7 +1,7 @@
 #!/bin/bash
 DIR=$(dirname $0)
 for PROJECT in $DIR/../projects/*; do
-  if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE $DIR/../projects/$PROJECT; then
+  if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE $PROJECT; then
     $DIR/projects/$PROJECT/.travis/build.sh;
 
     if [[ $SHOULD_RELEASE ]]; then

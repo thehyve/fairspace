@@ -5,6 +5,7 @@ node_js:
 
 env:
   global:
+     - APPNAME="workspace"
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
      - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
@@ -58,7 +59,7 @@ jobs:
     - stage: build
       name: Build helm charts
       install:
-      - charts/.travis/install.sh
+      - source charts/.travis/install.sh
       script:
       - charts/.travis/build.sh
     - stage: deploy
