@@ -1,8 +1,0 @@
-titan:
-  auth:
-    enabled: true
-    jwt:
-      issuer: http://192.168.99.100:32639
-      realm: fairspace
-persistence:
-  size: 8Gi
