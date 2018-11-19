@@ -112,8 +112,10 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
 
     // Do not show an add component if no multiples are allowed
     // and there is already a value
+    editable = editable && !property.machineOnly;
     const canAdd = editable && (property.allowMultiple || property.values.length === 0);
     const labelId = 'label-' + property.key;
+
     const ValueComponent = (editable && property.range !== RESOURCE_URI) ?
         ValueComponentFactory.editComponent(property) :
         ValueComponentFactory.readOnlyComponent();

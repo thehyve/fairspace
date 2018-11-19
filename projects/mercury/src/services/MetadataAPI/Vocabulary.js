@@ -1,6 +1,7 @@
 import {compareBy, comparing} from "../../utils/comparators";
 import {
     ALLOW_MULTIPLE_URI,
+    MACHINE_ONLY_URI,
     CLASS_URI,
     DOMAIN_URI,
     FAIRSPACE_ENTITY_URI,
@@ -41,7 +42,7 @@ class Vocabulary {
      *  }
      */
     combine(expandedMetadata) {
-        if(!Array.isArray(expandedMetadata) || expandedMetadata.length !== 1) {
+        if (!Array.isArray(expandedMetadata) || expandedMetadata.length !== 1) {
             console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
             return [];
         }
@@ -68,7 +69,7 @@ class Vocabulary {
      * @param id
      */
     getById(id) {
-        return this.vocabularyById[id] || { "@id": id };
+        return this.vocabularyById[id] || {"@id": id};
     }
 
     /**
@@ -103,7 +104,7 @@ class Vocabulary {
             }
 
             // Ensure that we have a list of values for the predicate
-            if(!Array.isArray(metadata[predicateUri])) {
+            if (!Array.isArray(metadata[predicateUri])) {
                 console.warn("Metadata should be provided in expanded form");
                 continue;
             }
@@ -202,6 +203,7 @@ class Vocabulary {
         const label = Vocabulary._getLabel(vocabularyEntry);
         const range = Vocabulary._getFirstPredicateId(vocabularyEntry, RANGE_URI);
         const allowMultiple = Vocabulary._getFirstPredicateValue(vocabularyEntry, ALLOW_MULTIPLE_URI, false);
+        const machineOnly = Vocabulary._getFirstPredicateValue(vocabularyEntry, MACHINE_ONLY_URI, false);
         const multiLine = Vocabulary._getFirstPredicateValue(vocabularyEntry, MULTILINE_PROPERTY_URI, false);
         const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
@@ -211,6 +213,7 @@ class Vocabulary {
             values: sortedValues,
             range: range,
             allowMultiple: allowMultiple,
+            machineOnly: machineOnly,
             multiLine: multiLine
         };
     }
