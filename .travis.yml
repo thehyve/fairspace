@@ -58,7 +58,8 @@ before_install:
 
 jobs:
   include:
-    - install:
+    - stage: test
+      install:
       - if .travis/build-condition.sh $TRAVIS_COMMIT_RANGE $DIR; then $DIR/.travis/install.sh; else echo "No changes for $APPNAME"; fi
       script:
       - if .travis/build-condition.sh $TRAVIS_COMMIT_RANGE $DIR; then $DIR/.travis/build.sh; else echo "No changes for $APPNAME"; fi
