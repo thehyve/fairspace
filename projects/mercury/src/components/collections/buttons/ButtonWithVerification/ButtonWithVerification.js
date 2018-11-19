@@ -49,7 +49,9 @@ class ButtonWithVerification extends React.Component {
     render() {
         return (
             <div style={{visibility: this.props.visibility}}>
-                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
+                <IconButton {...this.componentProps}
+                            onClick={this.openDialog.bind(this)}
+                            disabled={this.props.disabled}>
                     {this.props.children}
                 </IconButton>
                 <Dialog

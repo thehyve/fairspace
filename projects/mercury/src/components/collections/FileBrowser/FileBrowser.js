@@ -160,7 +160,9 @@ class FileBrowser extends React.Component {
             onPathClick={this.handlePathClick.bind(this)}
             onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
             onRename={this.handlePathRename.bind(this)}
-            onDelete={this.handlePathDelete.bind(this)}/>
+            onDelete={this.handlePathDelete.bind(this)}
+            readonly={!PermissionChecker.canWrite(this.props.openedCollection)}
+        />
     }
 }
 
