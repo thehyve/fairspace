@@ -3,12 +3,11 @@ language: node_js
 node_js:
 - "node"
 
-matrix:
-  include:
-  - env: DIR=projects/callisto APPNAME=callisto
-  - env: DIR=charts
 
 env:
+  matrix:
+    - DIR=projects/callisto APPNAME=callisto
+    - DIR=charts
   global:
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
