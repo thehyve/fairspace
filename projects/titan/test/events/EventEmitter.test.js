@@ -33,7 +33,7 @@ describe('EventEmitter', () => {
     it('should include the collection in events', () =>
         emitter(constructWebdavArgs('PUT'), nextMock)
             .then(() => {
-                assert.deepEqual(collectionApiMock.retrieveCollection.args[0], ['subdir', {'password':'token'}])
+                assert.deepEqual(collectionApiMock.retrieveCollection.args[0], ['subdir%201', {'password':'token'}])
                 assert.equal(rabbotMock.publish.args[0][1].body.collection.name, 'test')
             })
     )
@@ -49,7 +49,7 @@ describe('EventEmitter', () => {
     it('should include the path type in events', () =>
         emitter(constructWebdavArgs('PUT'), nextMock)
             .then(() => {
-                assert.deepEqual(fileTypeProviderMock.type.args[0][1], '/subdir')
+                assert.deepEqual(fileTypeProviderMock.type.args[0][1], '/subdir 1')
                 assert.equal(rabbotMock.publish.args[0][1].body.type, 'test-type')
             })
     )
@@ -117,7 +117,7 @@ describe('EventEmitter', () => {
     const constructWebdavArgs = method => ({
         request: {
             method: method,
-            path: '/subdir',
+            path: '/subdir%201',
             headers: { 'content-length': 100 }
         },
         response: {

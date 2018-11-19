@@ -99,19 +99,21 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
 
     const handler = (ctx, next) => {
         if(methodToEventsMap.hasOwnProperty(ctx.request.method)) {
-            console.debug("Emitting event for", ctx.request.method, "on", ctx.request.path);
+            const path = decodeURIComponent(ctx.request.path);
+
+            console.debug("Emitting event for", ctx.request.method, "on", path);
 
             // Add collection information to the event
             const addCollection = getCollection(ctx.request, ctx.user)
                 .catch(e => {
-                    console.error("Error while retrieving collection for path", ctx.request.path, ":", e.message);
+                    console.error("Error while retrieving collection for path", path, ":", e.message);
                     return null
                 });
 
             // Add path and type to the event
-            const addPath = fileTypeProvider.type(ctx, ctx.request.path)
+            const addPath = fileTypeProvider.type(ctx, path)
                 .catch(e => {
-                    console.error("Error while retrieving file information for path", ctx.request.path, ":", e.message);
+                    console.error("Error while retrieving file information for path", path, ":", e.message);
                     return FileTypeProvider.TYPE_UNKNOWN
                 });
 
@@ -123,7 +125,7 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
 
                     // Append the information
                     event.body.collection = collection;
-                    event.body.path = ctx.request.path;
+                    event.body.path = path;
                     event.body.type = type;
 
                     return event;
