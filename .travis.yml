@@ -18,11 +18,12 @@ env:
      - RELEASE_CONTEXT="FairspaceDemoCluster"
      - SNAPSHOT_CONTEXT="FairspaceCICluster"
 
-     # Github credentials:
+     # DOCKER_PASSWORD=
+     - secure: "FJTXKY792rdmQZ6DLU5Dlm1W9ZAmFwBFWEJDO4dLJySBO/clUUV0OfRkNX4OaachKUlRCFGxYbXaXCioYtMTVg54aD1d+hjBO5azPzUiT8V2mz2w3MkvxsvnvivziJtcSfol/PNHQdEK8qZhZ9IwdCnQM9LQ3YVwv9tkNpR//qNmUjA4ZdcbQrBLQ63wm/UX2vCo4D3/J24TfCJrmlu9AyoIAqiFsRczsQGixQLRzeRgwH3yFgACZrMt42ySrx4rL+Yi3Ro/ZftY+YrZPRs+wrObh++OmdzjQWXH4KBg8HTFEIJXYMOVnpG0OSdNO7j7oVS8qVRHJmFAG0VHrmSIMMbjU+3js3SVJxtwXRc3xEPJzKzhtyqGaQa5mr3pI1Q8YingcsEBEpWOh9zXBzJm1uh7JhgTgcEbBwQl12/SctMjejyAFFqVHhlSAEzuDBwTkXLiv6z6sF+SUpww8I6eKmQrJUN1HVPm9+n1nsBy1j3PIM0RmTAf+jZCuAMDg0Dg0dlY/in/Jz1k/QuFDbJ4ura4YBBQ315UDoki5rucDi2poxq9YoAaMpMouso9ilAwOms3guVaU/rgOHZsmIPqv2ccH6FEoOh2UeEq3RCGbprLAj88f2rcGNPaHNWRkeek31c+TI9JZPmeL5eh5tJ64cN+feVVk8lbqNWtR9VHRrI="
+
      # GITHUB_PASSWORD=....
      - secure: "l8Eug1n9WfHuNkrqrw0pLsxei2RsU1V+r3dty5YMDavWabBBkb5mEC9gQQ1LpPeHsLAFXxs6SXnahmZN6p9gj+yhWBnARXis7KFalMnXOyfa7PFAGmjT+rodtHy3B5CZLxcuN9wKFgDFtgrMc9xgsPN3fZEmloJKkmfGjHuGlNd0KACJFdZ16Y1pYl5AOoo0M6psyl+V1/13PSRPFxl88sOMfeyK3DbPUzF18zJ4EwQHxChJQr2oycvJl4ZhjoZ/6ivkaADySLZj0snXAbG5Rzch9lqwb/JkKbwAygXVwikCcT6YhQs5MjEbSQ1ZON0Pm2lPCH4IfP24dpraNlCn61YqGJR37WcWcGRlf+jlnjslJuJbynFlfqzzc1Blwm8DVV3hj4TfxwKSA5pba2ZHPR8TuV41pmfdLi4kOB0FZr+x8t0SdL2qHIPkCtQZ1/k/MCaTwUvS4SuURfeDI2b5Kbr7Eaoez0jdyE6jBRUhFP6Vehx22ZO5xbCsQ0pLXZdOSG8gRqHdp9b59mJgTZrx/Lycjrfy7VJzCM+n6MN4YHw8Vc5c5SHlH8XuJbUQkyjZdEFsGASHtzmq+LmZHIJ+GIbXxK9GWLXjG/3cePMXMrIuis9kHstpo1GLWHcOLVkQeZHyY8eo1iJrKKejT8LJ7/E2SzZwpZYl+9sCgKTr3e0="
 
-     # Azure credentials
      # AZ_SERVICE_PRINCIPAL=... AZ_CLIENT_SECRET=... AZ_TENANT=...
      - secure: "qikLebpdlIdCRq4fGnC/EHzjSA9ZytjDAb38+q7Zly9Dzp27iLRIa3VZhmIT2yJ13aRvps14OqceY1sfbFtt6uzkoD42wTvMNbnbv4wqWtc676SkNt/1rppj9+aRpbuUGYa+D2VmBWrLPfEaIHSxYu5mg/l6js8SgCGbLhOCuhX3ZzrfwH8U7m8fq5ROJz3RBizdnGtTB1okrA6O/cdCVdR/1WoUyu0FJDvj1wEjc7EWSSlipm/GE+rYeKg1iQxqUF1+H9K/G5gQ8xNUCr+lJIHgnx+IO7o07Pt0buDik8S4hSoe57V3QeU1oAvfbpmubz9pSW4BsDOIzITbenZx+BQUbcpGxmtx4YU2lW6jmIgSE10D35hWBbPeoaOxDm1pPtGNKp4w1j+3XExdT7/j/OSEA/EhKh59nnP8J7qmGZrs1z68q6d50Dq+m9SxFRrG0bIHMO9NKrd5J7gnva2pnixQFkXeMr3/OK1ktmamf11a66OyGN+2WylbvP8n1CTK4RCmp6GOtLw4mjck1CDN0Jqq/DSW4gLU6VcmyJkSFLOksXAcTB+KhB/Z+yBX0bEskV9VyIeXryuzVnbqE36jJ5bLZUAU/9tsyiAmHuI9hc5pz2o+fu3Dje/zYZyqB7jMsuA9vZBMyNnpo+scunS7/ZD+5IvY+7l95Blu8xbiArc="
 
@@ -81,5 +82,5 @@ jobs:
     - stage: e2e test
       if: branch = dev AND type != pull_request
       script:
-      - .travis/build.sh projects/janus
+      - projects/janus/.travis/build.sh
 
