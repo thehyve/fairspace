@@ -5,5 +5,5 @@ if [[ $ALLOW_SNAPSHOTS ]]; then $BUILD_SCRIPTS_DIR/helm/allow_snapshot_dependenc
 $BUILD_SCRIPTS_DIR/helm/build.sh
 
 if [[ $SHOULD_RELEASE ]]; then
-  $BUILD_SCRIPTS_DIR/ci/helm/release.sh
+  $BUILD_SCRIPTS_DIR/helm/release.sh
 fi
