@@ -82,5 +82,5 @@ jobs:
     - stage: e2e test
       if: branch = dev AND type != pull_request
       script:
-      - projects/janus/.travis/build.sh
+      - 'cd projects/janus && .travis/build.sh'
 
