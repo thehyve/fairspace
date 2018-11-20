@@ -13,6 +13,7 @@ import * as collectionActions from "../../../actions/collections";
 import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -62,7 +63,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderLoading() {
-        return (<Typography variant="body1" paragraph={true} noWrap>Loading...</Typography>);
+        return <CircularProgress/>;
     }
 
     renderCollectionList() {
