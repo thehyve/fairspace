@@ -1,3 +1,3 @@
 #!/bin/bash
 
-$BUILD_SCRIPTS_DIR/ci/docker/release.sh
+$BUILD_SCRIPTS_DIR/docker/release.sh
