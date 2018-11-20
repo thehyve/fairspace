@@ -11,8 +11,8 @@ data:
   application.yaml: |-
     app:
       oauth2:
-        base-url: {{ .Values.neptune.app.oauth2.baseUrl }}
-        realm: {{ .Values.neptune.app.oauth2.realm }}
+        base-url: {{ template "keycloak.baseUrl" . }}
+        realm: {{ .Values.hyperspace.keycloak.realm }}
       metadata:
         base-url: {{ .Values.neptune.app.metadata.baseUrl }}
     ceres:

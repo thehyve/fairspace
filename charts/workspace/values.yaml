@@ -114,7 +114,6 @@ pluto:
   terminationGracePeriodSeconds: 10
 
   rabbitmq:
-    hostname:
     vhost:
     username:
     password:
@@ -128,11 +127,9 @@ pluto:
 
   # Keycloak configuration for authentication
   keycloak:
-    baseUrl:
     client:
       id:
       secret:
-    realm:
     redirectAfterLogoutUrl: https://fairspace.com
     requiredAuthority:
 
@@ -209,15 +206,11 @@ ceres:
     mountPath: /data/ceres
 
   rabbitmq:
-    hostname:
     vhost:
     username:
     password:
 
   app:
-    oauth2:
-      baseUrl:
-      realm:
     metadata:
       baseUrl:
 
@@ -257,15 +250,11 @@ neptune:
   terminationGracePeriodSeconds: 10
 
   rabbitmq:
-    hostname:
     vhost:
     username:
     password:
 
   app:
-    oauth2:
-      baseUrl:
-      realm:
     metadata:
       baseUrl:
 
@@ -301,7 +290,6 @@ titan:
   # Authentication parameters
   rabbitmq:
     exchange: storage
-    hostname:
     vhost:
     username:
     password:
@@ -355,7 +343,6 @@ callisto:
   terminationGracePeriodSeconds: 10
 
   rabbitmq:
-    hostname:
     vhost:
     username:
     password:

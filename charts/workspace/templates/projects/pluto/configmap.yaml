@@ -11,8 +11,8 @@ data:
   application.yaml: |-
     app:
       oauth2:
-        base-url: {{ .Values.pluto.keycloak.baseUrl }}
-        realm: {{ .Values.pluto.keycloak.realm }}
+        base-url: {{ template "keycloak.baseUrl" . }}
+        realm: {{ .Values.hyperspace.keycloak.realm }}
 
     frontend:
       urls:

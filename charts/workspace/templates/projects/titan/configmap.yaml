@@ -21,7 +21,7 @@ data:
         "samplingRate": {{ .Values.tracing.samplingRate }}
       },
       "rabbitmq": {
-        "host": "{{ .Values.titan.rabbitmq.hostname }}",
+        "host": "{{ .Values.hyperspace.locationOverrides.rabbitmqhostname }}",
         "vhost": "{{ .Values.titan.rabbitmq.vhost | default .Release.Name }}",
         "user": "{{ .Values.titan.rabbitmq.username | default (printf "%s-titan" .Release.Name) }}",
         "pass": "{{ .Values.titan.rabbitmq.password }}",
