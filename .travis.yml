@@ -64,8 +64,8 @@ jobs:
       - .travis/build.sh projects/neptune
       - .travis/build.sh projects/pluto
       - .travis/build.sh projects/titan
-      - .travis/build.sh projects/jupyterhub-hub-docker
-      - .travis/build.sh projects/jupyterhub-singleuser-docker
+      - .travis/build.sh projects/jupyterhub-hub
+      - .travis/build.sh projects/jupyterhub-singleuser
       - .travis/build.sh projects/oidc-auth
     - stage: build
       name: Build helm charts

@@ -428,14 +428,14 @@ jupyterhub:
   singleuser:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
-      tag: 0.3.1
+      tag: RELEASEVERSION
     defaultUrl: "/lab"
     extraEnv:
       WORKSPACE_URL:
   hub:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-hub
-      tag: 0.3.2
+      tag: RELEASEVERSION
     ingress:
       enabled: false
     extraEnv:
