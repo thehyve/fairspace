@@ -7,6 +7,7 @@ import {
     DATETIME_URI,
     DECIMAL_URI,
     INTEGER_URI,
+    RESOURCE_URI,
     STRING_URI,
     TIME_URI
 } from "../../../services/MetadataAPI/MetadataAPI";
@@ -16,6 +17,7 @@ import DecimalValue from "./DecimalValue";
 import DateValue from "./DateValue";
 import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
+import ResourceValue from "./ResourceValue";
 
 const getInputComponent = property => {
     switch (property.range) {
@@ -33,6 +35,8 @@ const getInputComponent = property => {
             return TimeValue;
         case BOOLEAN_URI:
             return SwitchValue;
+        case RESOURCE_URI:
+            return ResourceValue;
         default:
             return undefined;
     }

@@ -1151,6 +1151,23 @@
                     "@id": "osiris:TumorPathologyEvent"
                 }
             ]
+        },
+        {
+          "@id": "fs:externalReference",
+          "@type": "rdf:Property",
+          "fs:allowMultiple": true,
+          "rdfs:comment": "Any external resource",
+          "rdfs:domain": [
+            {
+              "@id": "fs:Collection"
+            }
+          ],
+          "rdfs:label": "External reference",
+          "rdfs:range": [
+            {
+              "@id": "rdfs:Resource"
+            }
+          ]
         }
     ]
 }
