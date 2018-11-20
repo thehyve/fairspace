@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: {{ template "mercury.fullname" . }}
-        image: "{{ .Values.mercury.image.repository }}:{{ .Values.mercury.image.tag }}"
+        image: "{{ .Values.docker.repository }}/{{ .Values.mercury.image.image }}:{{ .Values.mercury.image.tag }}"
         imagePullPolicy: {{ .Values.mercury.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.mercury.service.internalPort }}

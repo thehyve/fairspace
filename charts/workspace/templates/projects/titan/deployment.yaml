@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: {{ template "titan.fullname" . }}
-          image: "{{ .Values.titan.image.repository }}:{{ .Values.titan.image.tag }}"
+          image: "{{ .Values.docker.repository }}/{{ .Values.titan.image.image }}:{{ .Values.titan.image.tag }}"
           imagePullPolicy: {{ .Values.titan.image.pullPolicy }}
           ports:
             - name: http

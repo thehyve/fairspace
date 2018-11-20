@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: {{ template "callisto.fullname" . }}
-        image: "{{ .Values.callisto.image.repository }}:{{ .Values.callisto.image.tag }}"
+        image: "{{ .Values.docker.repository }}/{{ .Values.callisto.image.image }}:{{ .Values.callisto.image.tag }}"
         imagePullPolicy: {{ .Values.callisto.image.pullPolicy }}
         volumeMounts:
         - name: config-volume

@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: {{ template "neptune.fullname" . }}
-        image: "{{ .Values.neptune.image.repository }}:{{ .Values.neptune.image.tag }}"
+        image: "{{ .Values.docker.repository }}/{{ .Values.neptune.image.image }}:{{ .Values.neptune.image.tag }}"
         imagePullPolicy: {{ .Values.neptune.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.neptune.service.internalPort }}
