@@ -1,4 +1,4 @@
-FROM fairspace.azurecr.io/fairspace/jupyterhub-singleuser-base:0.5.3-SNAPSHOT
+FROM fairspace.azurecr.io/fairspace/jupyterhub-singleuser-base:0.3.2-SNAPSHOT
 
 USER root
 
@@ -19,7 +19,7 @@ EXPOSE 80
 
 RUN echo "$NB_USER ALL=(ALL) NOPASSWD: /usr/sbin/nginx" >> /etc/sudoers
 
-ADD start /
+ADD ../../start /
 RUN chmod a+rx /start
 
 USER $NB_USER

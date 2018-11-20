@@ -1,3 +1,4 @@
 #!/bin/bash
 
-$BUILD_SCRIPTS_DIR/docker/build.sh
+docker build ./images/full --tag "${CONTAINER_NAME}" --tag "${CONTAINER_NAME}-full"
+docker build ./images/simple --tag "${CONTAINER_NAME}-simple"
