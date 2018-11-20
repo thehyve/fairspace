@@ -10,7 +10,11 @@ function flushPromises() {
 
 it('displays properties properly', () => {
     const store = mockStore({})
-    const wrapper = mount(<Provider store={store}><MetadataViewer properties={properties}/></Provider>);
+    const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
+    const wrapper = mount(
+        <Provider store={store}>
+            <MetadataViewer properties={properties} subject={subject}/>
+        </Provider>);
     return flushPromises().then(() => {
         wrapper.update();
     }).then(() => {
