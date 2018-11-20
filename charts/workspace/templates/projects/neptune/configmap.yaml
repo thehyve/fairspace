@@ -25,7 +25,7 @@ data:
         base-url: {{ .Values.tracing.baseUrl }}
       datasource:
         url: "jdbc:postgresql://{{ template "neptune.postgres.host" . }}:5432/{{ .Values.postgresql_neptune.postgresqlDatabase }}"
-        username: "{{ .Values.postgresql_neptune.postgresqlUser }}"
+        username: "{{ .Values.postgresql_neptune.postgresqlUsername }}"
         password: "{{ .Values.postgresql_neptune.postgresqlPassword }}"
       rabbitmq:
         host: {{ .Values.hyperspace.locationOverrides.rabbitmqhostname }}
