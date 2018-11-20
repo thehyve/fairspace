@@ -10,12 +10,12 @@ if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE $PROJECT; then
     echo "Building $APPNAME...";
     cd $PROJECT
 
-    source .travis/env.sh;
-    .travis/build.sh;
+    source .travis/env.sh
+    .travis/build.sh || exit 1
 
     if [[ $SHOULD_RELEASE ]]; then
       echo "Releasing artifact for $PROJECT"
-      .travis/release.sh;
+      .travis/release.sh || exit 2
     fi
 
     cd ../..
