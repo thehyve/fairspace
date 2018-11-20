@@ -1,44 +1,39 @@
 {
-    "@context": {
-        "ws": "http://localhost:3000/iri/",
-        "sdo": "http://schema.org/",
-        "fs": "http://fairspace.io/ontology#",
-        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "name": "fs:name",
-        "description": "fs:description",
-        "about": "sdo:about",
-        "derivesFrom": "fs:derivesFrom",
-        "isConsentOf": "fs:isConsentOf",
-        "dataset": "sdo:Dataset",
-        "person": "sdo:Person",
-        "material": "sdo:Material",
-        "dateCreated": "sdo:dateCreated",
-        "externalReference": "fs:externalReference"
+  "@id" : "ws:collections/500",
+  "@type" : "http://fairspace.io/ontology#Collection",
+  "aboutPerson" : "https://workspace.ci.fairway.app/iri/persons/E2E-TEST",
+  "description" : "",
+  "externalReference" : [ "http://google.com/", "http://a.b.c/", "http://thehyve.nl/" ],
+  "hasPart" : "https://workspace.ci.fairway.app/iri/files/dcea2c50-fccf-42ec-83bb-cc622d5d9294",
+  "name" : "John Snow's collection",
+  "creator" : "https://workspace.ci.fairway.app/iri/users/2d6c4187-0199-4a0e-981b-b9dc711644e7",
+  "dateCreated" : "2018-11-20T14:53:28.657Z",
+  "@context" : {
+    "dateCreated" : {
+      "@id" : "http://schema.org/dateCreated",
+      "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"
     },
-    "@graph": [
-        {
-            "@id": "ws:collections/500",
-            "@type": [
-                "fs:Collection"
-            ],
-            "description": "An example collection with testdata from GSE8581",
-            "name": "GSE8581",
-            "dateCreated": "2018-10-05T12:35:51.099Z",
-            "about": [
-                {
-                    "@id": "ws:patients/GSM212810"
-                },
-                {
-                    "@id": "ws:patients/GSM212811"
-                },
-                {
-                    "@id": "ws:patients/GSM211008"
-                }
-            ],
-            "externalReference": [
-              { "@id": "http://fairspace.com" },
-              { "@id": "http://thehyve.nl" }
-            ]
-        }
-    ]
+    "externalReference" : {
+      "@id" : "http://fairspace.io/ontology#externalReference",
+      "@type" : "@id"
+    },
+    "creator" : {
+      "@id" : "http://schema.org/creator",
+      "@type" : "@id"
+    },
+    "hasPart" : {
+      "@id" : "http://fairspace.io/ontology#hasPart",
+      "@type" : "@id"
+    },
+    "description" : {
+      "@id" : "http://fairspace.io/ontology#description"
+    },
+    "name" : {
+      "@id" : "http://fairspace.io/ontology#name"
+    },
+    "aboutPerson" : {
+      "@id" : "http://fairspace.io/ontology#aboutPerson",
+      "@type" : "@id"
+    }
+  }
 }
