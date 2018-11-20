@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: {{ template "ceres.fullname" . }}
-          image: "{{ .Values.docker.repository }}/{{ .Values.ceres.image.image }}:{{ .Values.ceres.image.tag }}"
+          image: "{{ .Values.ceres.image.image }}:{{ .Values.ceres.image.tag }}"
           imagePullPolicy: {{ .Values.ceres.image.pullPolicy }}
           ports:
           - containerPort: {{ .Values.ceres.service.internalPort }}

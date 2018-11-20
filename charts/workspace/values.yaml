@@ -10,9 +10,6 @@ imagePullSecrets: {}
 # Please note that if this is set, also set it for pluto in `pluto.workspace.name`
 nameOverride:
 
-docker:
-  repository: DOCKERREPO
-
 # Hyperspace that this workspace is connected to
 # Please note that pluto also has to know about the
 # keycloak baseUrl and realm, see the pluto configuration
@@ -90,7 +87,7 @@ pluto:
     maxUnavailable: 25%
     maxSurge: 25%
   image:
-    image: fairspace/pluto
+    image: fairspace.azurecr.io/fairspace/pluto
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   service:
@@ -159,7 +156,7 @@ ceres:
     maxSurge: 0%
     maxUnavailable: 100%
   image:
-    image: fairspace/ceres
+    image: fairspace.azurecr.io/fairspace/ceres
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
 
@@ -231,7 +228,7 @@ neptune:
   replicaCount: 1
 
   image:
-    image: fairspace/neptune
+    image: fairspace.azurecr.io/fairspace/neptune
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
 
@@ -287,7 +284,7 @@ titan:
     maxSurge: 0%
     maxUnavailable: 100%
   image:
-    image: fairspace/titan
+    image: fairspace.azurecr.io/fairspace/titan
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   service:
@@ -344,7 +341,7 @@ callisto:
   replicaCount: 1
 
   image:
-    image: fairspace/callisto
+    image: fairspace.azurecr.io/fairspace/callisto
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
 
@@ -383,7 +380,7 @@ callisto:
 mercury:
   replicaCount: 1
   image:
-    image: fairspace/mercury
+    image: fairspace.azurecr.io/fairspace/mercury
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   service:

@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: {{ template "pluto.fullname" . }}
-        image: "{{ .Values.docker.repository }}/{{ .Values.pluto.image.image }}:{{ .Values.pluto.image.tag }}"
+        image: "{{ .Values.pluto.image.image }}:{{ .Values.pluto.image.tag }}"
         imagePullPolicy: {{ .Values.pluto.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.pluto.service.internalPort }}
