@@ -93,12 +93,8 @@ class CollectionBrowser extends React.Component {
 
     handleAddCollection(name, description, type) {
         this.setState({addingCollection: false});
-        console.log('handle add collection')
         this.props.addCollection(name, description, type)
-            .then(() => {
-                this.props.fetchCollectionsIfNeeded();
-                console.log('added...')
-            })
+            .then(this.props.fetchCollectionsIfNeeded)
             .catch(err =>
                 ErrorDialog.showError(
                     err,
