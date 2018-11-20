@@ -8,8 +8,8 @@ const FileTypeProvider = require('./FileTypeProvider')
 module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, exchangeName) {
     const publish = event => rabbot.publish(exchangeName, event);
 
-    const getCollection = (req, user) => {
-        const paths = req.path.split('/');
+    const getCollection = (path, user) => {
+        const paths = path.split('/');
 
         if(paths.length == 0 || !paths[1]) {
             return Promise.reject(Error("No correct path specified to retrieve a collection"));
@@ -98,46 +98,29 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
     }
 
     const handler = (ctx, next) => {
-        if(methodToEventsMap.hasOwnProperty(ctx.request.method)) {
-            const path = decodeURIComponent(ctx.request.path);
+        next();
 
-            console.debug("Emitting event for", ctx.request.method, "on", path);
+        return Promise.resolve().then(() => {
+            if (methodToEventsMap.hasOwnProperty(ctx.request.method)) {
+                const path = decodeURIComponent(ctx.request.path);
 
-            // Add collection information to the event
-            const addCollection = getCollection(ctx.request, ctx.user)
-                .catch(e => {
-                    console.error("Error while retrieving collection for path", path, ":", e.message);
-                    return null
-                });
+                console.debug("Emitting event for", ctx.request.method, "on", path);
 
-            // Add path and type to the event
-            const addPath = fileTypeProvider.type(ctx, path)
-                .catch(e => {
-                    console.error("Error while retrieving file information for path", path, ":", e.message);
-                    return FileTypeProvider.TYPE_UNKNOWN
-                });
+                // Generate base event
+                const event = methodToEventsMap[ctx.request.method](ctx.request, ctx.response);
+                event.body.path = path;
 
-            // Wait for both information sources before sending the event
-            return Promise.all([addCollection, addPath])
-                .then(([collection, type]) => {
-                    // Generate base event
-                    const event = methodToEventsMap[ctx.request.method](ctx.request, ctx.response)
-
-                    // Append the information
-                    event.body.collection = collection;
-                    event.body.path = path;
-                    event.body.type = type;
-
-                    return event;
-                })
-                .then(publish)
-                .then(next)
-                .catch(e => {
-                    console.error("Error while publishing event to RabbitMQ:", e);
-                });
-        } else {
-            return Promise.resolve().then(next());
-        }
+                return Promise.all([
+                    getCollection(path, ctx.user) // Add collection information to the event
+                        .catch(e => console.error("Error while retrieving collection for path", path, ":", e.message))
+                        .then(collection => event.body.collection = collection),
+                    fileTypeProvider.type(ctx, path) // Add file type to the event
+                        .catch(e => console.error("Error while retrieving file information for path", path, ":", e.message))
+                        .then(type => event.body.type = type || FileTypeProvider.TYPE_UNKNOWN)])
+                    .then(() => publish(event))
+                    .catch(e => console.error("Error while publishing event to RabbitMQ:", e));
+            }
+        });
     };
 
     return handler;

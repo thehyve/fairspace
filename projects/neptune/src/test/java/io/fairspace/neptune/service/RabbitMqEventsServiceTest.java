@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -39,6 +41,8 @@ public class RabbitMqEventsServiceTest {
     @Mock
     private UsersService usersService;
 
+    private TaskExecutor taskExecutor = new SyncTaskExecutor();
+
     RabbitMqEventsService service;
 
     Collection collection = Collection.builder().id(7L).name("my-collection").build();
@@ -53,7 +57,7 @@ public class RabbitMqEventsServiceTest {
         when(collectionsExchange.getName()).thenReturn("exchange-name");
 
         user = new User("test-subject", "test-username", "test-fullname", "test-email");
-        service = new RabbitMqEventsService(rabbitTemplate, authorizationContainer, usersService, collectionsExchange);
+        service = new RabbitMqEventsService(rabbitTemplate, authorizationContainer, usersService, collectionsExchange, taskExecutor);
     }
 
     @Test
