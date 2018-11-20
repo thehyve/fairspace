@@ -22,9 +22,9 @@ spec:
       labels:
         app: titan
         release: {{ .Release.Name }}
-      {{- if .Values.titan.podAnnotations }}
+      {{- if .Values.podAnnotations }}
       annotations:
-      {{ toYaml .Values.titan.podAnnotations | indent 8 }}
+      {{ toYaml .Values.podAnnotations | indent 8 }}
       {{- end }}
     spec:
       containers:

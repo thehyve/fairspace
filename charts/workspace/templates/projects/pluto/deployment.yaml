@@ -24,9 +24,9 @@ spec:
         draft: {{ default "draft-app" .Values.draft }}
         app: pluto
         release: {{ .Release.Name }}
-{{- if .Values.pluto.podAnnotations }}
+{{- if .Values.podAnnotations }}
       annotations:
-{{ toYaml .Values.pluto.podAnnotations | indent 8 }}
+{{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
       containers:
