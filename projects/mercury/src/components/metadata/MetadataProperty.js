@@ -12,6 +12,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ErrorDialog from "../error/ErrorDialog";
 import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
+import {RESOURCE_URI} from "../../services/MetadataAPI/MetadataAPI";
 
 /**
  * Shows the property and values for the property
@@ -113,8 +114,9 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
     // and there is already a value
     const canAdd = editable && (property.allowMultiple || property.values.length === 0);
     const labelId = 'label-' + property.key;
-    const ValueComponent = (editable && !property.allowMultiple) ?
-        ValueComponentFactory.editComponent(property) : ValueComponentFactory.readOnlyComponent();
+    const ValueComponent = (editable && property.range !== RESOURCE_URI) ?
+        ValueComponentFactory.editComponent(property) :
+        ValueComponentFactory.readOnlyComponent();
 
     return (<ListItem disableGutters key={property.key} style={{display: 'block'}}>
         <Typography variant="body1" component='label' id={labelId}>{property.label}</Typography>
