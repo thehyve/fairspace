@@ -10,9 +10,11 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
 @ConditionalOnProperty("app.rabbitmq.enabled")
+@EnableAsync
 public class RabbitMqConfig {
     @Bean
     RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){

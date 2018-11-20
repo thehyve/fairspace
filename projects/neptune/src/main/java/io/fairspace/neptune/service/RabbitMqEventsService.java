@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -106,7 +107,8 @@ public class RabbitMqEventsService implements EventsService {
         );
     }
 
-    private void send(String routingKey, NeptuneEvent event) {
+    @Async
+    void send(String routingKey, NeptuneEvent event) {
         rabbitTemplate.convertAndSend(collectionsExchange.getName(), routingKey, event);
     }
 
