@@ -455,14 +455,14 @@ jupyterhub:
 # Specific settings for databases
 #####################################################################
 postgresql_neptune:
-  postgresUser: postgres
-  postgresPassword: test123
-  postgresDatabase: neptune
+  postgresqlUser: postgres-neptune
+  postgresqlPassword: test123
+  postgresqlDatabase: neptune
   nameOverride: postgresql-neptune
 
 postgresql_ceres:
-  postgresUser: postgres
-  postgresPassword: test123
-  postgresDatabase: ceres
+  postgresqlUser: postgres-ceres
+  postgresqlPassword: test123
+  postgresqlDatabase: ceres
   nameOverride: postgresql-ceres
 
