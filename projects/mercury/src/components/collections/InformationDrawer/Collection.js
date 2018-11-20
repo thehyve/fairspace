@@ -7,6 +7,7 @@ import * as collectionActions from '../../../actions/collections'
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
 import {getDisplayName} from "../../../utils/userUtils";
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
 class Collection extends React.Component {
     constructor(props) {
@@ -60,31 +61,36 @@ class Collection extends React.Component {
     }
 
     render() {
-        return (
-            <div>
-                <div
-                    onClick={this.handleTextClick.bind(this)}
-                    onMouseEnter={this.handleTextMouseEnter.bind(this)}
-                    onMouseLeave={this.handleTextMouseLeave.bind(this)}
-                >
-                    <Typography variant="h5"
-                                component='h2'>{this.state.collection.name} {this.state.showEditButton ? (
-                        <Icon>edit</Icon>) : ''}</Typography>
-                    <Typography gutterBottom variant='subtitle1'
-                                color="textSecondary">Owner: {this.props.creatorFullname}</Typography>
-                    <Typography component='p'>{this.state.collection.description}</Typography>
-                </div>
+        const {loading, ...otherProps} = this.props;
+        if(loading) {
+            return <CircularProgress/>;
+        } else {
+            return (
+                <div>
+                    <div
+                        onClick={this.handleTextClick.bind(this)}
+                        onMouseEnter={this.handleTextMouseEnter.bind(this)}
+                        onMouseLeave={this.handleTextMouseLeave.bind(this)}
+                    >
+                        <Typography variant="h5"
+                                    component='h2'>{this.state.collection.name} {this.state.showEditButton ? (
+                            <Icon>edit</Icon>) : ''}</Typography>
+                        <Typography gutterBottom variant='subtitle1'
+                                    color="textSecondary">Owner: {this.props.creatorFullname}</Typography>
+                        <Typography component='p'>{this.state.collection.description}</Typography>
+                    </div>
 
-                <CollectionEditor
-                    editing={this.state.editing}
-                    name={this.state.collection.name}
-                    description={this.state.collection.description}
-                    title={"Edit collection: " + this.state.collection.name}
-                    onSave={this.handleChangeDetails.bind(this)}
-                    onCancel={this.closeEditDialog.bind(this)}
-                />
-            </div>
-        );
+                    <CollectionEditor
+                        editing={this.state.editing}
+                        name={this.state.collection.name}
+                        description={this.state.collection.description}
+                        title={"Edit collection: " + this.state.collection.name}
+                        onSave={this.handleChangeDetails.bind(this)}
+                        onCancel={this.closeEditDialog.bind(this)}
+                    />
+                </div>
+            );
+        }
     }
 }
 
