@@ -14,6 +14,7 @@ import * as collectionActions from "../../../actions/collections";
 import FileAPIFactory from "../../../services/FileAPI/FileAPIFactory";
 import {parsePath} from "../../../utils/fileutils";
 import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
 class FileBrowser extends React.Component {
     componentDidMount() {
@@ -150,7 +151,7 @@ class FileBrowser extends React.Component {
     }
 
     renderLoading() {
-        return (<Typography variant="body1" paragraph={true} noWrap>Loading...</Typography>);
+        return <CircularProgress/>;
     }
 
     renderFiles() {
