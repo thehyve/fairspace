@@ -1,0 +1,28 @@
+{{- if and .Values.titan.persistence.enabled (not .Values.titan.persistence.existingClaim) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "titan.fullname" . }}
+  labels:
+    app: titan
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.titan.persistence.annotations }}
+  annotations:
+{{ toYaml .Values.titan.persistence.annotations | indent 4 }}
+{{- end }}
+spec:
+  accessModes:
+    - {{ .Values.titan.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.titan.persistence.size | quote }}
+{{- if .Values.titan.persistence.storageClass }}
+{{- if (eq "-" .Values.titan.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.titan.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end -}}

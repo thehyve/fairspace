@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "neptune.fullname" . }}
+  labels:
+    app: neptune
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    app:
+      oauth2:
+        base-url: {{ .Values.neptune.app.oauth2.baseUrl }}
+        realm: {{ .Values.neptune.app.oauth2.realm }}
+      metadata:
+        base-url: {{ .Values.neptune.app.metadata.baseUrl }}
+    ceres:
+      url: {{ .Values.neptune.ceres.url | default (printf "http://%s-ceres.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+    titan:
+      url: {{ .Values.neptune.titan.url | default (printf "http://%s-titan.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+    spring:
+      zipkin:
+        enabled: {{ .Values.tracing.enabled }}
+        base-url: {{ .Values.tracing.baseUrl }}
+      datasource:
+        url: "jdbc:postgresql://{{ template "neptune.postgres.host" . }}:5432/{{ .Values.postgresql_neptune.postgresDatabase }}"
+        username: "{{ .Values.postgresql_neptune.postgresUser }}"
+        password: "{{ .Values.postgresql_neptune.postgresPassword }}"
+      rabbitmq:
+        host: {{ .Values.neptune.rabbitmq.hostname }}
+        username: {{ .Values.neptune.rabbitmq.username | default (printf "%s-neptune" .Release.Name) }}
+        password: {{ .Values.neptune.rabbitmq.password }}
+        virtualHost: {{ .Values.neptune.rabbitmq.vhost | default .Release.Name }}
+

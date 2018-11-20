@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "pluto.fullname" . }}
+  labels:
+    app: pluto
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.pluto.service.type }}
+  ports:
+  - port: {{ .Values.pluto.service.externalPort }}
+    targetPort: {{ .Values.pluto.service.internalPort }}
+    protocol: TCP
+    name: http
+    {{- if and (eq "NodePort" .Values.pluto.service.type) .Values.pluto.service.nodePort }}
+    nodePort: {{ .Values.pluto.service.nodePort }}
+    {{- end }}
+  selector:
+    app: pluto
+    chart: {{ template "workspace.chart" . }}
