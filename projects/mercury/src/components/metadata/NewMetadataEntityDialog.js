@@ -15,7 +15,6 @@ import TextField from "@material-ui/core/TextField/TextField";
 import MetadataAPI from "../../services/MetadataAPI/MetadataAPI";
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
-
 class NewMetadataEntityDialog extends React.Component{
     constructor(props) {
         super(props);

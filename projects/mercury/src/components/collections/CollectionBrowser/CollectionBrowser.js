@@ -13,6 +13,7 @@ import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollect
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import LoadingOverlay from '../../generic/LoadingOverlay/LoadingOverlay';
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -67,7 +68,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderCollectionList() {
-        const {users, collections} = this.props;
+        const {users, collections, loading} = this.props;
         collections.map(col => col.creatorObj = findById(users, col.creator));
         return (
             <div>
@@ -85,16 +86,19 @@ class CollectionBrowser extends React.Component {
                     onCancel={this.handleCancelAddCollection.bind(this)}
                     editType={true}
                 />
+                <LoadingOverlay loading={loading}/>
             </div>
         );
-
     }
 
     handleAddCollection(name, description, type) {
         this.setState({addingCollection: false});
-
+        console.log('handle add collection')
         this.props.addCollection(name, description, type)
-            .then(this.props.fetchCollectionsIfNeeded)
+            .then(() => {
+                this.props.fetchCollectionsIfNeeded();
+                console.log('added...')
+            })
             .catch(err =>
                 ErrorDialog.showError(
                     err,
