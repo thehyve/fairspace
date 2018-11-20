@@ -56,8 +56,6 @@ jobs:
   include:
     - stage: build
       name: Build projects
-      install:
-      - source .travis/install.sh
       script:
       - .travis/build.sh projects/callisto
       - .travis/build.sh projects/ceres
@@ -71,7 +69,6 @@ jobs:
     - stage: build
       name: Build helm charts
       install:
-      - source .travis/install.sh
       - source charts/.travis/install.sh
       script:
       - charts/.travis/build.sh
