@@ -20,9 +20,10 @@ if [[ -z $2 ]]; then
     exit 1
 fi
 
-if [[ $TRAVIS_COMMIT_MESSAGE == *"[full build]"* ]];then
+if [[ $TRAVIS_COMMIT_MESSAGE == *"[full build]"* ]]; then
     # Commit message contains '[full build]' and all
     # directories should be built
+    exit 0
 fi
 
 git diff --name-only $1 | sort -u | uniq | grep $2 > /dev/null
