@@ -11,7 +11,7 @@ imagePullSecrets: {}
 nameOverride:
 
 docker:
-  repository:
+  repository: DOCKERREPO
 
 # Hyperspace that this workspace is connected to
 # Please note that pluto also has to know about the
