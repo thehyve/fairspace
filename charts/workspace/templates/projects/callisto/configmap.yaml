@@ -17,7 +17,7 @@ data:
         enabled: {{ .Values.tracing.enabled }}
         base-url: {{ .Values.tracing.baseUrl }}
       rabbitmq:
-        host: {{ .Values.callisto.rabbitmq.hostname }}
+        host: {{ .Values.hyperspace.locationOverrides.rabbitmqhostname }}
         username: {{ .Values.callisto.rabbitmq.username | default (printf "%s-callisto" .Release.Name) }}
         password: {{ .Values.callisto.rabbitmq.password }}
         virtualHost: {{ .Values.callisto.rabbitmq.vhost | default .Release.Name }}

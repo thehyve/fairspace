@@ -10,6 +10,10 @@ metadata:
     chart: {{ template "workspace.chart" . }}
 spec:
   replicas: {{ .Values.callisto.replicaCount }}
+  selector:
+    matchLabels:
+      app: callisto
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:

@@ -10,11 +10,14 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.mercury.replicaCount }}
+  selector:
+    matchLabels:
+      app: mercury
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: mercury
-        draft: {{ default "draft-app" .Values.draft }}
         release: {{ .Release.Name }}
 {{- if .Values.mercury.podAnnotations }}
       annotations:

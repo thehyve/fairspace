@@ -27,7 +27,7 @@ data:
       zipkin:
         base-url: {{ .Values.tracing.baseUrl }}
       rabbitmq:
-        host: {{ .Values.ceres.rabbitmq.hostname }}
+        host: {{ .Values.hyperspace.locationOverrides.rabbitmqhostname }}
         username: {{ .Values.ceres.rabbitmq.username | default (printf "%s-ceres" .Release.Name) }}
         password: {{ .Values.ceres.rabbitmq.password }}
         virtualHost: {{ .Values.ceres.rabbitmq.vhost | default .Release.Name }}

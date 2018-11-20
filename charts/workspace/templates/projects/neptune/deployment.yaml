@@ -10,6 +10,10 @@ metadata:
     draft: {{ default "draft-app" .Values.draft }}
 spec:
   replicas: {{ .Values.neptune.replicaCount }}
+  selector:
+    matchLabels:
+      app: neptune
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:

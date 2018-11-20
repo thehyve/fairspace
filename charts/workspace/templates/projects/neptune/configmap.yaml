@@ -28,7 +28,7 @@ data:
         username: "{{ .Values.postgresql_neptune.postgresUser }}"
         password: "{{ .Values.postgresql_neptune.postgresPassword }}"
       rabbitmq:
-        host: {{ .Values.neptune.rabbitmq.hostname }}
+        host: {{ .Values.hyperspace.locationOverrides.rabbitmqhostname }}
         username: {{ .Values.neptune.rabbitmq.username | default (printf "%s-neptune" .Release.Name) }}
         password: {{ .Values.neptune.rabbitmq.password }}
         virtualHost: {{ .Values.neptune.rabbitmq.vhost | default .Release.Name }}

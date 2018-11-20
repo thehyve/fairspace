@@ -14,6 +14,10 @@ spec:
     rollingUpdate:
       maxSurge: {{ .Values.pluto.rollingUpdate.maxSurge | default "25%" }}
       maxUnavailable: {{ .Values.pluto.rollingUpdate.maxUnavailable | default "25%" }}
+  selector:
+    matchLabels:
+      app: pluto
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
