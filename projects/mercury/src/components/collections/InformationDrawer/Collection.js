@@ -61,7 +61,7 @@ class Collection extends React.Component {
     }
 
     render() {
-        const {loading, ...otherProps} = this.props;
+        const {loading} = this.props;
         if(loading) {
             return <CircularProgress/>;
         } else {
