@@ -70,6 +70,11 @@ class CollectionBrowser extends React.Component {
     renderCollectionList() {
         const {users, collections, loading} = this.props;
         collections.map(col => col.creatorObj = findById(users, col.creator));
+
+        if(loading) {
+            return <CircularProgress/>
+        }
+
         return (
             <div>
                 <CollectionList collections={this.props.collections}
@@ -86,7 +91,6 @@ class CollectionBrowser extends React.Component {
                     onCancel={this.handleCancelAddCollection.bind(this)}
                     editType={true}
                 />
-                <LoadingOverlay loading={loading}/>
             </div>
         );
     }
