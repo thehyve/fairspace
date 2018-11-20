@@ -100,8 +100,8 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
     const handler = (ctx, next) => {
         next();
 
-        if (methodToEventsMap.hasOwnProperty(ctx.request.method)) {
-            return Promise.resolve().then(() => {
+        return Promise.resolve().then(() => {
+            if (methodToEventsMap.hasOwnProperty(ctx.request.method)) {
                 const path = decodeURIComponent(ctx.request.path);
 
                 console.debug("Emitting event for", ctx.request.method, "on", path);
@@ -118,8 +118,8 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
                     .then(type => event.body.type = type || FileTypeProvider.TYPE_UNKNOWN)
                     .then(() => publish(event))
                     .catch(e => console.error("Error while publishing event to RabbitMQ:", e));
-            });
-        }
+            }
+        });
     };
 
     return handler;
