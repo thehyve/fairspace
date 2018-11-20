@@ -19,7 +19,7 @@ EXPOSE 80
 
 RUN echo "$NB_USER ALL=(ALL) NOPASSWD: /usr/sbin/nginx" >> /etc/sudoers
 
-ADD start /
+ADD ../../start /
 RUN chmod a+rx /start
 
 USER $NB_USER
