@@ -33,7 +33,7 @@ describe('EventEmitter', () => {
     it('should include the collection in events', () =>
         emitter(constructWebdavArgs('PUT'), nextMock)
             .then(() => {
-                assert.deepEqual(collectionApiMock.retrieveCollection.args[0], ['subdir%201', {'password':'token'}])
+                assert.deepEqual(collectionApiMock.retrieveCollection.args[0], ['subdir 1', {'password':'token'}])
                 assert.equal(rabbotMock.publish.args[0][1].body.collection.name, 'test')
             })
     )
