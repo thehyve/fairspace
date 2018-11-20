@@ -28,65 +28,65 @@ export class InformationDrawer extends React.Component {
 
         if (!collection) {
             return <Typography variant="h6">No collection</Typography>;
-        } else {
-            const isMetaDataEditable =
-                permissionChecker.canManage(collection) &&
-                this.props.paths.length === 0;
-
-            return <React.Fragment>
-                <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                        <Typography className={classes.heading}>Collection Details</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <Collection
-                            collection={collection}
-                            collectionAPI={collectionAPI}
-                            onDidChangeDetails={this.handleDetailsChange}
-                        />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-                <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                        <Typography className={classes.heading}>Collaborators:</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <PermissionsContainer
-                            collectionId={collection.id}
-                            canManage={permissionChecker.canManage(collection)}
-                        />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-                <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                        <Typography className={classes.heading}>Collection metadata</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <Metadata
-                            subject={collection.uri}
-                            editable={isMetaDataEditable}
-                            style={{width: '100%'}}
-                        />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-                {
-                    this.props.paths.map(path => (
-                        <ExpansionPanel defaultExpanded>
-                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography className={classes.heading}>Metadata for {relativePath(path)}</Typography>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails>
-                                <PathMetadata
-                                    path={path}
-                                    editable={permissionChecker.canManage(collection) && path === this.props.paths[this.props.paths.length - 1]}
-                                    style={{width: '100%'}}
-                                />
-                            </ExpansionPanelDetails>
-                        </ExpansionPanel>
-                    ))
-                }
-            </React.Fragment>
         }
+
+        const isMetaDataEditable =
+            permissionChecker.canManage(collection) &&
+            this.props.paths.length === 0;
+
+        return <React.Fragment>
+            <ExpansionPanel defaultExpanded>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                    <Typography className={classes.heading}>Collection Details</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                    <Collection
+                        collection={collection}
+                        collectionAPI={collectionAPI}
+                        onDidChangeDetails={this.handleDetailsChange}
+                    />
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+            <ExpansionPanel defaultExpanded>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                    <Typography className={classes.heading}>Collaborators:</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                    <PermissionsContainer
+                        collectionId={collection.id}
+                        canManage={permissionChecker.canManage(collection)}
+                    />
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+            <ExpansionPanel defaultExpanded>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                    <Typography className={classes.heading}>Collection metadata</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                    <Metadata
+                        subject={collection.uri}
+                        editable={isMetaDataEditable}
+                        style={{width: '100%'}}
+                    />
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+            {
+                this.props.paths.map(path => (
+                    <ExpansionPanel defaultExpanded>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                            <Typography className={classes.heading}>Metadata for {relativePath(path)}</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <PathMetadata
+                                path={path}
+                                editable={permissionChecker.canManage(collection) && path === this.props.paths[this.props.paths.length - 1]}
+                                style={{width: '100%'}}
+                            />
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                ))
+            }
+        </React.Fragment>
     };
 
 
