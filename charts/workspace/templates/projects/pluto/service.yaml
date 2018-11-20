@@ -19,4 +19,4 @@ spec:
     {{- end }}
   selector:
     app: pluto
-    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}

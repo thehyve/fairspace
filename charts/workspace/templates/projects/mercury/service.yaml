@@ -5,6 +5,8 @@ metadata:
   labels:
     app: mercury
     chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   type: {{ .Values.mercury.service.type }}
   ports:
@@ -13,4 +15,5 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: {{ template "mercury.fullname" . }}
+    app: mercury
+    release: {{ .Release.Name }}
