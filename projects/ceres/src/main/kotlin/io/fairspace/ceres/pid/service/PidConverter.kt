@@ -32,7 +32,6 @@ class PidConverter(
     }
 
     fun uuidToId(input: UUID): String {
-        println("UUID to ID: " + prefix)
         return prefix + input
     }
 
