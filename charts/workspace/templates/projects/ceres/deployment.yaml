@@ -22,9 +22,9 @@ spec:
       labels:
         app: ceres
         release: {{ .Release.Name }}
-{{- if .Values.podAnnotations }}
+{{- if .Values.podAnnotations.ceres }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
+{{ toYaml .Values.podAnnotations.ceres | indent 8 }}
 {{- end }}
     spec:
       containers:

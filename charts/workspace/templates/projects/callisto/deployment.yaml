@@ -20,9 +20,9 @@ spec:
         draft: {{ default "draft-app" .Values.draft }}
         app: callisto
         release: {{ .Release.Name }}
-{{- if .Values.podAnnotations }}
+{{- if .Values.podAnnotations.callisto }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
+{{ toYaml .Values.podAnnotations.callisto | indent 8 }}
 {{- end }}
     spec:
       containers:
