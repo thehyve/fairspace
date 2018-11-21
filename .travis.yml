@@ -17,6 +17,7 @@ env:
      - GITHUB_USERNAME="fairspace-ci"
      - RELEASE_CONTEXT="FairspaceDemoCluster"
      - SNAPSHOT_CONTEXT="FairspaceCICluster"
+     - GIT_TAG_FILES_OVERRIDE="charts/workspace/Chart.yaml charts/workspace/values.yaml projects/"
 
      # DOCKER_PASSWORD=
      - secure: "FJTXKY792rdmQZ6DLU5Dlm1W9ZAmFwBFWEJDO4dLJySBO/clUUV0OfRkNX4OaachKUlRCFGxYbXaXCioYtMTVg54aD1d+hjBO5azPzUiT8V2mz2w3MkvxsvnvivziJtcSfol/PNHQdEK8qZhZ9IwdCnQM9LQ3YVwv9tkNpR//qNmUjA4ZdcbQrBLQ63wm/UX2vCo4D3/J24TfCJrmlu9AyoIAqiFsRczsQGixQLRzeRgwH3yFgACZrMt42ySrx4rL+Yi3Ro/ZftY+YrZPRs+wrObh++OmdzjQWXH4KBg8HTFEIJXYMOVnpG0OSdNO7j7oVS8qVRHJmFAG0VHrmSIMMbjU+3js3SVJxtwXRc3xEPJzKzhtyqGaQa5mr3pI1Q8YingcsEBEpWOh9zXBzJm1uh7JhgTgcEbBwQl12/SctMjejyAFFqVHhlSAEzuDBwTkXLiv6z6sF+SUpww8I6eKmQrJUN1HVPm9+n1nsBy1j3PIM0RmTAf+jZCuAMDg0Dg0dlY/in/Jz1k/QuFDbJ4ura4YBBQ315UDoki5rucDi2poxq9YoAaMpMouso9ilAwOms3guVaU/rgOHZsmIPqv2ccH6FEoOh2UeEq3RCGbprLAj88f2rcGNPaHNWRkeek31c+TI9JZPmeL5eh5tJ64cN+feVVk8lbqNWtR9VHRrI="
@@ -74,13 +75,19 @@ jobs:
       script:
       - charts/.travis/build.sh
     - stage: deploy
-      if: branch IN (master, dev) AND type != pull_request
+      if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
       install:
         - source charts/.travis/install.sh
       script:
       - travis_wait ci/helm/deploy.sh
+    - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+      stage: Versioning
+      name: Set tag and update version
+      script:
+      - "ci/versioning/add_tag_to_git.sh"
+      - "ci/versioning/set_next_version.sh"
     - stage: e2e test
-      if: branch = dev AND type != pull_request
+      if: branch = env(SNAPSHOT_BRANCH) AND type != pull_request
       script:
       - 'cd projects/janus && .travis/build.sh'
 
