@@ -1,7 +1,6 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
-import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";
