@@ -110,12 +110,16 @@ module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, 
                 const event = methodToEventsMap[ctx.request.method](ctx.request, ctx.response);
                 event.body.path = path;
 
+                // For move and copy operations, the original resource probably does not exist anymore
+                // To find the type of resource, we should better use the destination path
+                const resourcePath = event.body.destination || path;
+
                 return Promise.all([
                     getCollection(path, ctx.user) // Add collection information to the event
                         .catch(e => console.error("Error while retrieving collection for path", path, ":", e.message))
                         .then(collection => event.body.collection = collection),
-                    fileTypeProvider.type(ctx, path) // Add file type to the event
-                        .catch(e => console.error("Error while retrieving file information for path", path, ":", e.message))
+                    fileTypeProvider.type(ctx, resourcePath) // Add file type to the event
+                        .catch(e => console.error("Error while retrieving file information for path", resourcePath, ":", e.message))
                         .then(type => event.body.type = type || FileTypeProvider.TYPE_UNKNOWN)])
                     .then(() => publish(event))
                     .catch(e => console.error("Error while publishing event to RabbitMQ:", e));

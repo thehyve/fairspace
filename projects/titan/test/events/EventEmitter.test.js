@@ -40,7 +40,7 @@ describe('EventEmitter', () => {
 
     it('should include null if collection retrieval fails', () => {
         collectionApiMock.retrieveCollection = sinon.stub().rejects(new Error("Error message"))
-        emitter(constructWebdavArgs('PUT'), nextMock)
+        return emitter(constructWebdavArgs('PUT'), nextMock)
             .then(() => {
                 assert.equal(rabbotMock.publish.args[0][1].body.collection, null)
             })
@@ -62,36 +62,56 @@ describe('EventEmitter', () => {
             })
     })
 
-    it('should include the destination for MOVE events', () => {
-        const args = constructWebdavArgs('MOVE');
-        args.request.headers.destination = '/newdir';
+    describe('Moving and copying', () => {
+        it('should include the destination for MOVE events', () => {
+            const args = constructWebdavArgs('MOVE');
+            args.request.headers.destination = '/newdir';
 
-        emitter(args, nextMock)
-            .then(() => {
-                assert.equal(rabbotMock.publish.args[0][1].body.destination, '/subdir')
-            })
-    })
+            return emitter(args, nextMock)
+                .then(() => {
+                    assert.equal(rabbotMock.publish.args[0][1].body.destination, '/newdir')
+                })
+        })
 
-    it('should include the destination for COPY events', () => {
-        const args = constructWebdavArgs('COPY');
-        args.request.headers.destination = '/newdir';
+        it('should include the destination for COPY events', () => {
+            const args = constructWebdavArgs('COPY');
+            args.request.headers.destination = '/newdir';
 
-        emitter(args, nextMock)
-            .then(() => {
-                assert.equal(rabbotMock.publish.args[0][1].body.destination, '/subdir')
-            })
-    })
+            return emitter(args, nextMock)
+                .then(() => {
+                    assert.equal(rabbotMock.publish.args[0][1].body.destination, '/newdir')
+                })
+        })
 
-    it('should strip the hostname from the destination header if present', () => {
-        const args = constructWebdavArgs('COPY');
-        args.request.headers.destination = 'http://fake-site:102/newdir';
+        it('should strip the hostname from the destination header if present', () => {
+            const args = constructWebdavArgs('COPY');
+            args.request.headers.destination = 'http://fake-site:102/newdir';
 
-        emitter(args, nextMock)
-            .then(() => {
-                assert.equal(rabbotMock.publish.args[0][1].body.destination, '/subdir')
-            })
-    })
+            return emitter(args, nextMock)
+                .then(() => {
+                    assert.equal(rabbotMock.publish.args[0][1].body.destination, '/newdir')
+                })
+        })
 
+        it('should use the destination path to determine the type for MOVE events', () => {
+            const args = constructWebdavArgs('MOVE');
+            args.request.headers.destination = '/newdir';
+            emitter(args, nextMock)
+                .then(() => {
+                    assert.deepEqual(fileTypeProviderMock.type.args[0][1], '/newdir')
+                })
+        })
+
+        it('should use the destination path to determine the type for COPY events', () => {
+            const args = constructWebdavArgs('COPY');
+            args.request.headers.destination = '/newdir';
+            emitter(args, nextMock)
+                .then(() => {
+                    assert.deepEqual(fileTypeProviderMock.type.args[0][1], '/newdir')
+                })
+        })
+
+    });
 
     it('should also call next on invalid HTTP methods', () =>
         emitter(constructWebdavArgs('UNKNOWN-VERB'), nextMock)
