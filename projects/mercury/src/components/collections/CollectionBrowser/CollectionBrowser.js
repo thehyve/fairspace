@@ -12,13 +12,17 @@ import * as collectionActions from "../../../actions/collections";
 import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
-import LoadingOverlay from '../../generic/LoadingOverlay/LoadingOverlay';
+import LoadingInlay from '../../generic/Loading/LoadingInlay';
+import LoadingOverlay from '../../generic/Loading/LoadingOverlay';
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {addingCollection: false}
+        this.state = {
+            addingCollection: false,
+            savingCollection: false,
+            deletingCollection: false
+        }
     }
 
     componentDidMount() {
@@ -42,8 +46,12 @@ class CollectionBrowser extends React.Component {
 
     handleCollectionDelete(collection) {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
+        this.setState({deletingCollection: true});
         deleteCollection(collection.id)
-            .then(fetchCollectionsIfNeeded)
+            .then(() => {
+                fetchCollectionsIfNeeded();
+                this.setState({deletingCollection: false});
+            })
             .catch(err =>
                 ErrorDialog.showError(
                     err,
@@ -64,16 +72,13 @@ class CollectionBrowser extends React.Component {
     }
 
     renderLoading() {
-        return <CircularProgress/>;
+        return <LoadingInlay/>;
     }
 
     renderCollectionList() {
-        const {users, collections, loading} = this.props;
+        const {users, collections} = this.props;
         collections.map(col => col.creatorObj = findById(users, col.creator));
-
-        if(loading) {
-            return <CircularProgress/>
-        }
+        console.log('render collection list, ', this.state)
 
         return (
             <div>
@@ -91,14 +96,20 @@ class CollectionBrowser extends React.Component {
                     onCancel={this.handleCancelAddCollection.bind(this)}
                     editType={true}
                 />
+                <LoadingOverlay loading={this.state.savingCollection}/>
+                <LoadingOverlay loading={this.state.deletingCollection}/>
             </div>
         );
     }
 
     handleAddCollection(name, description, type) {
         this.setState({addingCollection: false});
+        this.setState({savingCollection: true});
         this.props.addCollection(name, description, type)
-            .then(this.props.fetchCollectionsIfNeeded)
+            .then(() => {
+                this.props.fetchCollectionsIfNeeded();
+                this.setState({savingCollection: false});
+            })
             .catch(err =>
                 ErrorDialog.showError(
                     err,
