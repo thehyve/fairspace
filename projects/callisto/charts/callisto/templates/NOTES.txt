@@ -1,1 +1,0 @@
-Callisto has been installed into your cluster

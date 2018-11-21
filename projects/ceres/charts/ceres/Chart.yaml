@@ -1,6 +1,0 @@
-apiVersion: v1
-appVersion: "1.0"
-description: RDF and SPARQL over HTTP
-name: ceres
-version: 0.0.0-RELEASEVERSION
-icon: https://raw.githubusercontent.com/fairspace/ceres/master/charts/ceres/ceres.jpg

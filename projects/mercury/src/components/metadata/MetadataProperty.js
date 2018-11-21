@@ -13,11 +13,13 @@ import ErrorDialog from "../error/ErrorDialog";
 import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 import {RESOURCE_URI} from "../../services/MetadataAPI/MetadataAPI";
+import {LABEL_URI, COMMENT_URI} from '../../services/MetadataAPI/MetadataAPI';
+
 
 /**
  * Shows the property and values for the property
  */
-function MetadataProperty ({editable, subject, property, updateMetadata, onItemMouseOut, onItemMouseOver, hovered}) {
+function MetadataProperty({editable, subject, property, updateMetadata, onItemMouseOut, onItemMouseOver, hovered}) {
 
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
@@ -110,25 +112,34 @@ function MetadataProperty ({editable, subject, property, updateMetadata, onItemM
         )
     };
 
-    // Do not show an add component if no multiples are allowed
-    // and there is already a value
-    const canAdd = editable && (property.allowMultiple || property.values.length === 0);
-    const labelId = 'label-' + property.key;
-    const ValueComponent = (editable && property.range !== RESOURCE_URI) ?
-        ValueComponentFactory.editComponent(property) :
-        ValueComponentFactory.readOnlyComponent();
 
-    return (<ListItem disableGutters key={property.key} style={{display: 'block'}}>
-        <Typography variant="body1" component='label' id={labelId}>{property.label}</Typography>
-        <List dense>
-            {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent, labelId))}
-            {canAdd ? renderAddComponent(labelId) : null}
-        </List>
-    </ListItem>)
+    const isCollection = subject.toString().includes('/collections');
+    const isCommentOrLabel = property.key === LABEL_URI || property.key === COMMENT_URI;
+    if (isCollection && isCommentOrLabel) {
+        return '';
+    } else {
+        // Do not show an add component if no multiples are allowed
+        // and there is already a value
+        editable = editable && !property.machineOnly;
+        const canAdd = editable && (property.allowMultiple || property.values.length === 0);
+        const labelId = 'label-' + property.key;
+
+        const ValueComponent = (editable && property.range !== RESOURCE_URI) ?
+            ValueComponentFactory.editComponent(property) :
+            ValueComponentFactory.readOnlyComponent();
+
+        return (<ListItem disableGutters key={property.key} style={{display: 'block'}}>
+            <Typography variant="body1" component='label' id={labelId}>{property.label}</Typography>
+            <List dense>
+                {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent, labelId))}
+                {canAdd ? renderAddComponent(labelId) : null}
+            </List>
+        </ListItem>)
+    }
 }
 
 const mapDispatchToProps = {
     updateMetadata
 }
 
-export default compose (connect(null, mapDispatchToProps), withHovered)(MetadataProperty)
+export default compose(connect(null, mapDispatchToProps), withHovered)(MetadataProperty)

@@ -1,7 +1,6 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
-import Typography from "@material-ui/core/Typography";
 import ErrorDialog from "../../error/ErrorDialog";
 import ErrorMessage from "../../error/ErrorMessage";
 import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";

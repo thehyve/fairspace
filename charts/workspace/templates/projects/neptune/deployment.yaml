@@ -21,9 +21,9 @@ spec:
         app: neptune
         chart: {{ template "workspace.chart" . }}
         release: {{ .Release.Name }}
-{{- if .Values.podAnnotations }}
+{{- if .Values.podAnnotations.neptune }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
+{{ toYaml .Values.podAnnotations.neptune | indent 8 }}
 {{- end }}
     spec:
       containers:

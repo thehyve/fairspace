@@ -14,7 +14,7 @@ data:
         base-url: {{ template "keycloak.baseUrl" . }}
         realm: {{ .Values.hyperspace.keycloak.realm }}
       metadata:
-        base-url: {{ .Values.neptune.app.metadata.baseUrl }}
+        base-url: {{ template "workspace.url" . }}
     ceres:
       url: {{ .Values.neptune.ceres.url | default (printf "http://%s-ceres.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
     titan:

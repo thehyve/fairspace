@@ -19,9 +19,9 @@ spec:
       labels:
         app: mercury
         release: {{ .Release.Name }}
-{{- if .Values.podAnnotations }}
+{{- if .Values.podAnnotations.mercury }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
+{{ toYaml .Values.podAnnotations.mercury | indent 8 }}
 {{- end }}
     spec:
       containers:

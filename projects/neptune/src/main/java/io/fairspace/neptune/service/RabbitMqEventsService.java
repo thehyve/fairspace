@@ -13,10 +13,12 @@ import io.fairspace.neptune.model.events.PermissionAddedEvent;
 import io.fairspace.neptune.model.events.PermissionDeletedEvent;
 import io.fairspace.neptune.model.events.PermissionModifiedEvent;
 import io.fairspace.neptune.model.events.User;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,18 +26,13 @@ import java.io.IOException;
 @Service
 @ConditionalOnProperty("app.rabbitmq.enabled")
 @Slf4j
+@AllArgsConstructor
 public class RabbitMqEventsService implements EventsService {
     private RabbitTemplate rabbitTemplate;
     private AuthorizationContainer authorizationContainer;
     private UsersService usersService;
     private Exchange collectionsExchange;
-
-    public RabbitMqEventsService(RabbitTemplate rabbitTemplate, AuthorizationContainer authorizationContainer, UsersService usersService, Exchange collectionsExchange) {
-        this.rabbitTemplate = rabbitTemplate;
-        this.authorizationContainer = authorizationContainer;
-        this.usersService = usersService;
-        this.collectionsExchange = collectionsExchange;
-    }
+    private TaskExecutor taskExecutor;
 
     public void permissionAdded(Permission permission, boolean permissionForNewCollection) {
         send(
@@ -107,7 +104,7 @@ public class RabbitMqEventsService implements EventsService {
     }
 
     private void send(String routingKey, NeptuneEvent event) {
-        rabbitTemplate.convertAndSend(collectionsExchange.getName(), routingKey, event);
+        taskExecutor.execute(() -> rabbitTemplate.convertAndSend(collectionsExchange.getName(), routingKey, event));
     }
 
     private User getCurrentUser() {
