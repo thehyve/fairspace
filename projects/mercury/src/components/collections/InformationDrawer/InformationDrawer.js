@@ -30,6 +30,10 @@ export class InformationDrawer extends React.Component {
             return <Typography variant="h6">No collection</Typography>;
         }
 
+        const isMetaDataEditable =
+            permissionChecker.canManage(collection) &&
+            this.props.paths.length === 0;
+
         return <React.Fragment>
             <ExpansionPanel defaultExpanded>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
@@ -61,7 +65,7 @@ export class InformationDrawer extends React.Component {
                 <ExpansionPanelDetails>
                     <Metadata
                         subject={collection.uri}
-                        editable={permissionChecker.canManage(collection) && this.props.paths.length === 0}
+                        editable={isMetaDataEditable}
                         style={{width: '100%'}}
                     />
                 </ExpansionPanelDetails>
@@ -80,7 +84,7 @@ export class InformationDrawer extends React.Component {
                             />
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
-                    ))
+                ))
             }
         </React.Fragment>
     };
@@ -99,12 +103,12 @@ function pathHierarchy(fullPath) {
     let paths = [];
     while (fullPath && fullPath.lastIndexOf('/') > 0) {
         paths.push(fullPath);
-        fullPath = fullPath.substring(0, fullPath.lastIndexOf('/') )
+        fullPath = fullPath.substring(0, fullPath.lastIndexOf('/'))
     }
     return paths.reverse();
 }
 
-const relativePath = (path)  => path.split('/').slice(2).join('/');
+const relativePath = (path) => path.split('/').slice(2).join('/');
 
 const mapDispatchToProps = {
     ...metadataActions,
