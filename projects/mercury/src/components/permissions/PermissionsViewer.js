@@ -68,7 +68,7 @@ const canAlterPermission = (canManage, permission, currentLoggedUser) => {
 
 export class PermissionsViewer extends React.Component {
 
-    constructor(props) { console.log('permissions props', props)
+    constructor(props) {
         super(props);
         this.state = {
             showPermissionDialog: false,
@@ -77,6 +77,7 @@ export class PermissionsViewer extends React.Component {
             selectedUser: null,
             currentLoggedUser: null,
             canManage: false,
+            deletingCollaborator: false
         };
     }
 
@@ -119,8 +120,12 @@ export class PermissionsViewer extends React.Component {
     handleDeleteCollaborator = () => {
         const {collectionId, alterPermission} = this.props;
         const {selectedUser} = this.state;
+        this.setState({deletingCollaborator: true});
         if (selectedUser) {
-            alterPermission(selectedUser.subject, collectionId, 'None');
+            alterPermission(selectedUser.subject, collectionId, 'None')
+                .then(() => {
+                    this.setState({deletingCollaborator: false});
+                });
             this.handleCloseConfirmDeleteDialog();
         }
     };
@@ -137,6 +142,7 @@ export class PermissionsViewer extends React.Component {
             showConfirmDeleteDialog: false,
         });
     };
+
     renderAlterPermissionButtons(idx, collaborator) {
         const {canManage, currentLoggedUser} = this.props;
         return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
@@ -157,14 +163,15 @@ export class PermissionsViewer extends React.Component {
     renderCollaboratorList(permissions) {
         return sortPermissions(permissions)
             .map((p, idx) => {
-                return (<ListItem
-                    key={idx}
-                    onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
-                    onMouseOut={() => this.props.onItemMouseOut(idx)}
-                >
-                    <ListItemText primary={getDisplayName(p.user)} secondary={p.access}/>
-                    {this.renderAlterPermissionButtons(idx, p)}
-                </ListItem>);
+                return (
+                    <ListItem
+                        key={idx}
+                        onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
+                        onMouseOut={() => this.props.onItemMouseOut(idx)}>
+                        <ListItemText primary={getDisplayName(p.user)} secondary={p.access}/>
+                        {this.renderAlterPermissionButtons(idx, p)}
+                    </ListItem>
+                );
             });
     }
 
@@ -219,6 +226,10 @@ export class PermissionsViewer extends React.Component {
         );
     };
 
+    renderLoadingOnCollaboratorDeletion = () => {
+        return this.state.deletingCollaborator ? <LoadingInlay/> : null;
+    }
+
     render() {
         const {classes, permissions} = this.props;
         if (permissions.error) {
@@ -233,6 +244,7 @@ export class PermissionsViewer extends React.Component {
                     {this.renderPermissionDialog()}
                     {this.renderConfirmationDialog()}
                     {this.renderUserList(permissions.data)}
+                    {this.renderLoadingOnCollaboratorDeletion()}
                 </div>
             );
         }
