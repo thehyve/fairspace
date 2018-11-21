@@ -5,6 +5,7 @@ import {
     OPEN_COLLECTION,
     OPEN_INFODRAWER,
     OPEN_PATH,
+    CLOSE_PATH,
     SELECT_COLLECTION,
     SELECT_PATH
 } from "./actionTypes";
@@ -46,3 +47,6 @@ export const deselectPath = (path) => ({
     path: path
 })
 
+export const closePath = () => ({
+    type: CLOSE_PATH,
+})
