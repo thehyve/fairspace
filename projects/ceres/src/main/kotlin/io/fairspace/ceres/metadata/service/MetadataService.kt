@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class MetadataService(val modelRepository: ModelRepository) {
     val QUERY_ALL_METADATA_FOR_RESOURCES = """
-        CONSTRUCT {?s ?o ?t}
+        CONSTRUCT {?s ?p ?t}
         WHERE {
             { ?s ?p ?t FILTER(?s in (%s))}
         }
