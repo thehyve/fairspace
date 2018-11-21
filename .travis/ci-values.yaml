@@ -78,8 +78,7 @@ jupyterhub:
               session_url: https://workspace.ci.fairway.app/account/tokens
   singleuser:
     image:
-      name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser-base
-      tag: 0.3.2-SNAPSHOT
+      tag: 0.5.3-SNAPSHOT-simple
     extraEnv:
       WORKSPACE_URL: https://workspace.ci.fairway.app
   hub:
