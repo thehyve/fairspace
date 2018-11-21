@@ -95,8 +95,7 @@ class CollectionBrowser extends React.Component {
                     onCancel={this.handleCancelAddCollection.bind(this)}
                     editType={true}
                 />
-                <LoadingOverlay loading={this.state.savingCollection}/>
-                <LoadingOverlay loading={this.state.deletingCollection}/>
+                <LoadingOverlay loading={this.state.savingCollection || this.state.deletingCollection}/>
             </div>
         );
     }

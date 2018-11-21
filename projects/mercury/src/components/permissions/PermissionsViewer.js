@@ -18,6 +18,7 @@ import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 import {findById} from "../../utils/arrayutils";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
+import LoadingOverlay from '../generic/Loading/LoadingOverlay';
 
 export const styles = theme => ({
     collaboratorList: {
@@ -227,7 +228,7 @@ export class PermissionsViewer extends React.Component {
     };
 
     renderLoadingOnCollaboratorDeletion = () => {
-        return this.state.deletingCollaborator ? <LoadingInlay/> : null;
+        return this.state.deletingCollaborator ? <LoadingOverlay/> : null;
     }
 
     render() {
