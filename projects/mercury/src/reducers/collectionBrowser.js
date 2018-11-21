@@ -6,6 +6,7 @@ import {
     DESELECT_PATH,
     OPEN_INFODRAWER,
     OPEN_PATH,
+    CLOSE_PATH,
     SELECT_COLLECTION,
     SELECT_PATH
 } from "../actions/actionTypes";
@@ -71,6 +72,12 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 openedPath: action.path,
+                selectedPaths: []
+            };
+        case CLOSE_PATH:
+            return {
+                ...state,
+                openedPath: null,
                 selectedPaths: []
             };
         default:

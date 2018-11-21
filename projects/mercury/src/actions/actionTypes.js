@@ -15,6 +15,7 @@ export const OPEN_COLLECTION        = "OPEN_COLLECTION";
 export const SELECT_COLLECTION      = "SELECT_COLLECTION";
 export const DESELECT_COLLECTION    = "DESELECT_COLLECTION";
 export const OPEN_PATH              = "OPEN_PATH";
+export const CLOSE_PATH             = "CLOSE_PATH";
 export const SELECT_PATH            = "SELECT_PATH";
 export const DESELECT_PATH          = "DESELECT_PATH";
 

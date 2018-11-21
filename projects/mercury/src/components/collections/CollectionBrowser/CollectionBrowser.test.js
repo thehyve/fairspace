@@ -63,7 +63,9 @@ it('renders without crashing', () => {
 
 it('creates a new collection on button click', () => {
     const wrapper = mount(collectionBrowser);
-    expect(store.getActions().length).toEqual(0);
+
+    // There should be one action for closing the path
+    expect(store.getActions().length).toEqual(1);
 
     // Setup proper state
     const addButton = wrapper
@@ -81,7 +83,7 @@ it('creates a new collection on button click', () => {
     saveButton.simulate('click');
 
     // Expect the collection to be created in storage
-    expect(store.getActions().length).toEqual(1);
+    expect(store.getActions().length).toEqual(2);
 });
 
 describe('loading state', () => {

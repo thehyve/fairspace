@@ -1,5 +1,5 @@
 import {
-    CLOSE_INFODRAWER,
+    CLOSE_INFODRAWER, CLOSE_PATH,
     DESELECT_COLLECTION,
     DESELECT_PATH,
     OPEN_COLLECTION,
@@ -46,3 +46,6 @@ export const deselectPath = (path) => ({
     path: path
 })
 
+export const closePath = () => ({
+    type: CLOSE_PATH,
+})
