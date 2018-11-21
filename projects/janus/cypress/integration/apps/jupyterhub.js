@@ -1,5 +1,10 @@
 describe('JupyterHub', function () {
-    const maxJupyterStartupTime = 90000;
+    const maxJupyterStartupTime = 150000;
+
+    before(() => {
+        // Login and ensure clean setup of test assets
+        cy.login() && cy.setupClean();
+    })
 
     it('should have SSO with Fairspace', () => {
         openJupyter();
@@ -103,8 +108,9 @@ describe('JupyterHub', function () {
         // Go to a metadata page about a patient
         cy.visit("/notebooks");
 
-        // Wait for the page to show 'Metadata' (which indicates that metadata has been loaded)
-        cy.get("main").contains("a", "Open").click();
+        // Wait for the page to contain a link 'Open'
+        // As it opens the link in a new tab, we will just go to the url
+        cy.get("main").contains("a", "Open").invoke('removeAttr', 'target').click();
 
         // Ensure we are on the JupyterHub page
         cy.url().should('include', 'jupyterhub');
@@ -116,8 +122,7 @@ describe('JupyterHub', function () {
 
         // Wait for the launcher to be visible
         // Use increased timeout to allow Jupyter to start properly
-        cy.contains(".p-TabBar-tabLabel", "Launcher", {timeout: 10000}).should('exist');
-
+        return cy.contains(".p-TabBar-tabLabel", "Launcher", {timeout: 10000}).should('exist');
     }
 
 });

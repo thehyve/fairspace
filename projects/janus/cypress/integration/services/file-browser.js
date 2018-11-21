@@ -2,6 +2,11 @@ describe('File browser', function () {
     const collectionName = 'TestCollection';
     let uniqueId;
 
+    before(() => {
+        // Login and ensure clean setup of test assets
+        cy.login() && cy.setupClean();
+    })
+    
     beforeEach(() => {
         uniqueId = Math.round(100000 + (Math.random() * 900000));
     });

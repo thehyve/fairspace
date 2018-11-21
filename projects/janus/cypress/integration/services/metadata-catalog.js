@@ -2,6 +2,9 @@ describe('Metadata Catalog', function () {
     let uniqueId = 0;
 
     before(() => {
+        // Login and ensure clean setup of test assets
+        cy.login() && cy.setupClean();
+        
         cy.ensureMetadataPresent();
     })
 

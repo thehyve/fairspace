@@ -5,6 +5,9 @@ describe('Storage API', function () {
     let uniqueId;
 
     before(() => {
+        // Login and ensure clean setup of test assets
+        cy.login() && cy.setupClean();
+
         cy.addCollectionFast({name: collectionName})
             .then(response => {
                 expect(response.status).to.equal(201);

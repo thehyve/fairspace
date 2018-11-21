@@ -17,7 +17,7 @@
             "@type": "foaf:Person",
             "foaf:gender": "foaf:GenderMale",
             "foaf:myersBriggs": "INTJ",
-            "foaf:name": "Person 1",
+            "rdfs:label": "Person 1",
             "fs:gaveConsent": [
                 {
                     "@id": "ws:consents/E2E-TEST-consent"
