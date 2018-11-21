@@ -90,6 +90,20 @@ Cypress.Commands.add("closeRightPanel", () => {
     cy.contains('button', 'close').click({force: true});
 });
 
+Cypress.Commands.add("setupClean", () => {
+    // Remove all old collections
+    cy.request('/api/collections')
+        .then(data => {
+            expect(data.status).to.equal(200);
+
+            return Promise.all(data.body.map(collection => cy.request('DELETE', '/api/collections/' + collection.id)));
+        });
+
+    // Ensure at least a single collection
+    cy.addCollectionFast();
+})
+
+
 function deleteCollection(row) {
     cy.clickButtonOnHover(row);
 

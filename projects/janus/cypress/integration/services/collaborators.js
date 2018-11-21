@@ -4,6 +4,9 @@ describe('Collection collaborators', function () {
     let fileUrl;
 
     before(() => {
+        // Login and ensure clean setup of test assets
+        cy.login() && cy.setupClean();
+        
         uniqueId = Math.round(100000 + (Math.random() * 900000));
         collectionName = 'collaborator ' + uniqueId;
 

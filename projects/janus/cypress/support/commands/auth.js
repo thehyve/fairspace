@@ -39,10 +39,14 @@ Cypress.Commands.add("logout", () => {
 })
 
 const clearCookies = () => {
-    // We have to clear the cookies both in keycloak and in
+    // We have to clear the cookies both in keycloak, jupyter and in
     // our own system. However, Cypress only allows us to clear
     // cookies for a single host at a time
     cy.visit(Cypress.env('KEYCLOAK_URL'));
+    cy.clearCookies();
+    cy.clearCookie('JSESSIONID');
+
+    cy.visit(Cypress.env('JUPYTER_URL'));
     cy.clearCookies();
     cy.clearCookie('JSESSIONID');
 
