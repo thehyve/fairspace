@@ -24,9 +24,9 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.create}"])
     fun receiveCreateMessage(message: StorageEvent) {
-        if (isInvalidMessage(message)) return
-
         log.debug("Create message received from RabbitMQ: {}", message)
+
+        if (isInvalidMessage(message)) return
 
         // Generate identifiers
         storeParentRelation(message.path, message.type, message.collection)
@@ -34,14 +34,16 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.move}"])
     fun receiveMoveMessage(message: StorageEvent) {
+        log.debug("Move message received from RabbitMQ: {}", message)
+
         if (isInvalidMessage(message)) return
 
-        log.debug("Move message received from RabbitMQ: {}", message)
         val source = message.path
         val destination = message.destination!!
 
         // Update all identifiers within the old path (could be multiple
         // if the path is a directory
+        log.trace("Updating persistent identifier mapping for items with prefix {}", source)
         pidService.updateByPrefix(source, destination)
 
         // Afterwards, ensure that the tree structure is properly
@@ -54,15 +56,16 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.copy}"])
     fun receiveCopyMessage(message: StorageEvent) {
-        if (isInvalidMessage(message)) return
-
         log.debug("Copy message received from RabbitMQ: {}", message)
+
+        if (isInvalidMessage(message)) return
 
         val source = message.path
         val destination = message.destination!!
 
         // Retrieve all mappings for the oldPath
         val sourceIdentifiers = pidService.findByPrefix(source)
+        log.trace("Found {} identifiers with the prefix {} - {}", sourceIdentifiers.size, source, sourceIdentifiers)
 
         // We get a mapping for every descendant of the source
         // We need a uri for each one of them in the destination as well
@@ -75,10 +78,14 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
         // Now, retrieve the metadata for the original URIs and replace the original URIs
         // with the new ones
+        log.trace("Copying metadata for entities: {}", mapping)
         val originalMetadata = metadataService.getMetadataForResources(mapping.keys)
+
+        log.trace("Original metadata contains {} statements", originalMetadata.size())
         val metadataForNewEntities = replaceEntities(originalMetadata, mapping)
 
         // Store the new model
+        log.trace("Replaced metadata contains {} statements", metadataForNewEntities.size())
         modelRepository.add(metadataForNewEntities)
 
         // Afterwards, ensure that the tree structure is properly
@@ -91,9 +98,9 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.delete}"])
     fun receiveDeleteMessage(message: StorageEvent) {
-        if (isInvalidMessage(message)) return
-
         log.debug("Delete message received from RabbitMQ: {}", message)
+
+        if (isInvalidMessage(message)) return
 
         // Delete the mappings for this path (and underlying paths)
         pidService.deleteByPrefix(message.path)
@@ -106,7 +113,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
     private fun isInvalidMessage(message: StorageEvent): Boolean {
         // Filter the creation of unknown paths
         if (message.type == PathType.UNKNOWN) {
-            log.debug("Message received for creating an unknown resource type: {}", message.path)
+            log.debug("Message received for with an unknown resource type: {}", message.path)
             return true
         }
 
@@ -174,6 +181,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
      */
     fun replaceEntities(model: Model, mapping: Map<String, String>): Model {
         val newModel = ModelFactory.createDefaultModel()
+        log.trace("Replacing entities for metadata model")
 
         model.listStatements().forEach {
             // Determine the statement  with replaced entities
@@ -185,6 +193,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
                 it.`object`
             }
 
+            log.trace("  Adding new entity {} {} {}", newSubject, it.predicate, newObject)
             newModel.add(StatementImpl(newSubject, it.predicate, newObject))
         }
 
