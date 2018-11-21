@@ -113,9 +113,9 @@ function MetadataProperty({editable, subject, property, updateMetadata, onItemMo
     };
 
 
-    const isCollection = subject.toString().includes('/collections');
-    const isCommentOrLabel = property.key === LABEL_URI || property.key === COMMENT_URI;
-    if (isCollection && isCommentOrLabel) {
+    const isCollection = subject.includes('/iri/collections/');
+    const isManaged = isCollection || subject.includes('/iri/files/') || subject.includes('/iri/directories/');
+    if ((isManaged && property.key === LABEL_URI) || (isCollection && property.key === COMMENT_URI)) {
         return '';
     } else {
         // Do not show an add component if no multiples are allowed
