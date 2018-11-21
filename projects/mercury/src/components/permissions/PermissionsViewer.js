@@ -8,7 +8,6 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import AlterPermission from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
@@ -18,6 +17,7 @@ import ActionItem from "../generic/MoreActions/ActionItem";
 import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 import {findById} from "../../utils/arrayutils";
+import LoadingInlay from '../generic/Loading/LoadingInlay';
 
 export const styles = theme => ({
     collaboratorList: {
@@ -68,7 +68,7 @@ const canAlterPermission = (canManage, permission, currentLoggedUser) => {
 
 export class PermissionsViewer extends React.Component {
 
-    constructor(props) {
+    constructor(props) { console.log('permissions props', props)
         super(props);
         this.state = {
             showPermissionDialog: false,
@@ -224,7 +224,7 @@ export class PermissionsViewer extends React.Component {
         if (permissions.error) {
             return (<ErrorMessage message={'An error occurred loading permissions'}/>)
         } else if (permissions.pending) {
-            return (<CircularProgress/>);
+            return (<LoadingInlay/>);
         } else if (!permissions || !permissions.data) {
             return (<div>No permission found</div>)
         } else {

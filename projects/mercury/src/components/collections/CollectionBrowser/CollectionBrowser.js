@@ -78,7 +78,6 @@ class CollectionBrowser extends React.Component {
     renderCollectionList() {
         const {users, collections} = this.props;
         collections.map(col => col.creatorObj = findById(users, col.creator));
-        console.log('render collection list, ', this.state)
 
         return (
             <div>

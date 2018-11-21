@@ -13,7 +13,7 @@ import Paper from "@material-ui/core/Paper/Paper";
 import {compareBy} from "../../utils/comparators";
 import TextField from "@material-ui/core/TextField/TextField";
 import MetadataAPI from "../../services/MetadataAPI/MetadataAPI";
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import LoadingInlay from '../generic/Loading/LoadingInlay';
 
 class NewMetadataEntityDialog extends React.Component{
     constructor(props) {
@@ -94,7 +94,7 @@ class NewMetadataEntityDialog extends React.Component{
                                             ))
                                         }
                                     </List>
-                                    : <CircularProgress/>
+                                    : <LoadingInlay/>
                             }
                         </Paper>
                     </DialogContent>
