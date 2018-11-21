@@ -9,13 +9,18 @@ import Badge from "@material-ui/core/Badge";
 import {connect} from 'react-redux'
 import * as clipboardActions from "../../../actions/clipboard";
 import * as fileActions from "../../../actions/files";
+import LoadingOverlay from '../../generic/Loading/LoadingOverlay';
 
 function FileOperations(props) {
+
+    let isCreatingDirectory = false;
+
     const {
         numClipboardItems, disabled,
         openedPath, selectedPaths, openedCollection,
         fetchFilesIfNeeded, uploadFiles, createDirectory,
-        cut, copy, paste} = props;
+        cut, copy, paste
+    } = props;
 
     function refreshFiles() {
         fetchFilesIfNeeded(openedCollection, openedPath)
@@ -25,10 +30,12 @@ function FileOperations(props) {
         e.stopPropagation()
         cut(openedPath, selectedPaths)
     }
+
     function handleCopy(e) {
         e.stopPropagation()
         copy(openedPath, selectedPaths)
     }
+
     function handlePaste(e) {
         e.stopPropagation()
         paste(openedCollection, openedPath)
@@ -51,10 +58,14 @@ function FileOperations(props) {
     }
 
     function handleCreateDirectory(name) {
+        isCreatingDirectory = true;
         return createDirectory(openedCollection, openedPath, name)
-            .then(refreshFiles)
+            .then(() => {
+                refreshFiles();
+                isCreatingDirectory = false;
+            })
             .catch(err => {
-                if(err.status === 405) {
+                if (err.status === 405) {
                     // Directory already exists
                     ErrorDialog.showError(err, "A directory or file with this name already exists. Please choose another name");
                     return false;
@@ -66,7 +77,7 @@ function FileOperations(props) {
     }
 
     function addBadgeIfNotEmpty(badgeContent, children) {
-        if(badgeContent) {
+        if (badgeContent) {
             return <Badge badgeContent={badgeContent} color="primary">
                 {children}
             </Badge>
@@ -75,44 +86,46 @@ function FileOperations(props) {
         }
     }
 
-    return (<React.Fragment>
-        <IconButton
-            aria-label="Copy"
-            onClick={handleCopy}
-            disabled={selectedPaths.length === 0 || disabled}>
-            <ContentCopy/>
-        </IconButton>
-        <IconButton
-            aria-label="Cut"
-            onClick={handleCut}
-            disabled={selectedPaths.length === 0 || disabled}>
-            <ContentCut/>
-        </IconButton>
-        <IconButton
-            aria-label="Paste"
-            onClick={handlePaste}
-            disabled={numClipboardItems === 0 || disabled}>
-            {addBadgeIfNotEmpty(
-                numClipboardItems,
-                <ContentPaste/>
-            )}
-        </IconButton>
-        <CreateDirectoryButton
-            aria-label="Create directory"
-            onCreate={(name) => handleCreateDirectory(name)}
-            disabled={disabled}>
-            <Icon>create_new_folder</Icon>
-        </CreateDirectoryButton>
+    return isCreatingDirectory ?
+        <LoadingOverlay loading={isCreatingDirectory}/> :
+        (<React.Fragment>
+            <IconButton
+                aria-label="Copy"
+                onClick={handleCopy}
+                disabled={selectedPaths.length === 0 || disabled}>
+                <ContentCopy/>
+            </IconButton>
+            <IconButton
+                aria-label="Cut"
+                onClick={handleCut}
+                disabled={selectedPaths.length === 0 || disabled}>
+                <ContentCut/>
+            </IconButton>
+            <IconButton
+                aria-label="Paste"
+                onClick={handlePaste}
+                disabled={numClipboardItems === 0 || disabled}>
+                {addBadgeIfNotEmpty(
+                    numClipboardItems,
+                    <ContentPaste/>
+                )}
+            </IconButton>
+            <CreateDirectoryButton
+                aria-label="Create directory"
+                onCreate={(name) => handleCreateDirectory(name)}
+                disabled={disabled}>
+                <Icon>create_new_folder</Icon>
+            </CreateDirectoryButton>
 
-        <UploadButton
-            color="primary"
-            aria-label="Upload"
-            onUpload={(files) => handleUpload(files)}
-            onDidUpload={refreshFiles}
-            disabled={disabled}>
-            <Icon>cloud_upload</Icon>
-        </UploadButton>
-    </React.Fragment>)
+            <UploadButton
+                color="primary"
+                aria-label="Upload"
+                onUpload={(files) => handleUpload(files)}
+                onDidUpload={refreshFiles}
+                disabled={disabled}>
+                <Icon>cloud_upload</Icon>
+            </UploadButton>
+        </React.Fragment>)
 }
 
 const mapStateToProps = (state) => ({
