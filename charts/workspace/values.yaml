@@ -76,6 +76,9 @@ tracing:
   samplingRate: 0.1
   baseUrl: http://jaeger-collector.jaeger:9411
 
+services:
+  jupyterhub:
+
 #####################################################################
 # Specific settings for Pluto subchart
 # Default configuration points to titan, mercury and neptune
@@ -139,10 +142,6 @@ pluto:
     metadata:
     storage:
     collections:
-
-  # External services
-  services:
-    jupyter:
 
 #####################################################################
 # Specific settings for Ceres subchart
@@ -210,10 +209,6 @@ ceres:
     username:
     password:
 
-  app:
-    metadata:
-      baseUrl:
-
 #####################################################################
 # Specific settings for Neptune subchart
 #####################################################################
@@ -253,10 +248,6 @@ neptune:
     vhost:
     username:
     password:
-
-  app:
-    metadata:
-      baseUrl:
 
   ceres:
     url:
@@ -453,3 +444,5 @@ postgresql_ceres:
   postgresqlDatabase: ceres
   nameOverride: postgresql-ceres
 
+# Pod annotations should remain empty. They are filled within the build process
+podAnnotations: {}

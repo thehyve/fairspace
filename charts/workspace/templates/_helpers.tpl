@@ -102,6 +102,19 @@ Jupyterhub external hostname
 {{- .Values.workspace.ingress.domain -}}
 {{- end -}}
 
+{{- define "workspace.url" -}}
+{{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}
+{{- end -}}
+
+{{- define "jupyterhub.url" -}}
+{{- if .Values.services.jupyterhub -}}
+{{- .Values.services.jupyterhub -}}
+{{- else -}}
+{{ template "workspace.scheme" . }}://{{ template "jupyterhub.hostname" . }}
+{{- end -}}
+
+{{- end -}}
+
 {{- define "neptune.postgres.host" -}}
 {{- printf "%s-%s" .Release.Name .Values.postgresql_neptune.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

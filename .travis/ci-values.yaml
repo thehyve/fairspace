@@ -25,16 +25,12 @@ pluto:
     pullPolicy: Always
   rabbitmq:
     password: "PaF6ZMbDZmgrztJY"
-  services:
-    jupyter: https://jupyterhub.workspace.ci.fairway.app
 
 titan:
   image:
     pullPolicy: Always
   rabbitmq:
     password: "L3bE8yGJp7um2PVk"
-  permissions:
-    collectionPermissionsUrl: https://workspace.ci.fairway.app/api/collections/permissions?location=%s
 
 # Specific settings for Ceres subchart
 ceres:
@@ -42,10 +38,6 @@ ceres:
     pullPolicy: Always
   rabbitmq:
     password: "hx6SQUBe99EBr8dM"
-  app:
-    metadata:
-      # Please note: this URL must end with a /
-      baseUrl: https://workspace.ci.fairway.app/
 
 # Specific settings for Neptune subchart
 neptune:
@@ -53,9 +45,6 @@ neptune:
     pullPolicy: Always
   rabbitmq:
     password: "4uXa4BFkHTuNxFAF"
-  app:
-    metadata:
-      baseUrl: https://workspace.ci.fairway.app
 
 # Specific settings for Mercury subchart
 mercury:

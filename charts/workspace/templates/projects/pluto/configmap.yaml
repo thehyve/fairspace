@@ -16,7 +16,7 @@ data:
 
     frontend:
       urls:
-        jupyter: {{ .Values.pluto.services.jupyter }}
+        jupyter: {{ template "jupyterhub.url" . }}
 
     workspace:
       name: {{ .Release.Name }}
