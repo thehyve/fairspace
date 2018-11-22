@@ -15,11 +15,9 @@ import ErrorDialog from "../error/ErrorDialog";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
 import LoadingOverlay from '../generic/Loading/LoadingOverlay';
 
-let isCreatingMetadataEntity = false;
-
-function MetadataEntities({loading, error, entities, load, vocabulary, types, create}) {
+function MetadataEntities({loading, creatingMetadataEntity, error, entities, load, vocabulary, types, create}) {
     load();
-
+    
     if(loading) {
         return <LoadingInlay/>
     } else if(error) {
@@ -60,7 +58,7 @@ function MetadataEntities({loading, error, entities, load, vocabulary, types, cr
                     )) : null}
                 </TableBody>
             </Table>
-            <LoadingOverlay loading={isCreatingMetadataEntity}/>
+            <LoadingOverlay loading={creatingMetadataEntity}/>
         </div>
     );
 }
@@ -77,17 +75,16 @@ const mapStateToProps = (state) => ({
     loading: state.cache.allEntities ? state.cache.allEntities.pending : true,
     error: state.cache.allEntities ? state.cache.allEntities.error : false,
     entities: state.cache.allEntities ? state.cache.allEntities.data : [],
-    vocabulary: state.cache.vocabulary ? state.cache.vocabulary.data : undefined
+    vocabulary: state.cache.vocabulary ? state.cache.vocabulary.data : undefined,
+    creatingMetadataEntity: state.metadataBySubject.creatingMetadataEntity
 })
 
 const mapDispatchToProps = (dispatch) => ({
     load: () => dispatch(fetchAllEntitiesIfNeeded()),
     create: (type, id) => {
-        isCreatingMetadataEntity = true;
         dispatch(createMetadataEntity(type, id))
             .then(result => {
                 window.location.href = navigableLink(result.value);
-                isCreatingMetadataEntity = false;
             })
             .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
     }

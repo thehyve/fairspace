@@ -85,6 +85,7 @@ class NewMetadataEntityDialog extends React.Component{
                                         {
                                             this.state.types.sort(compareBy(getLabel)).map(t => (
                                                 <ListItem
+                                                    key={t}
                                                     button
                                                     selected={this.state.type === t}
                                                     onClick={() => this.setState({type: t})}
