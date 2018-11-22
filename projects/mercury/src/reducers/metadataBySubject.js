@@ -13,9 +13,8 @@ const metadataUpdateReducer = (state = defaultState, action) => {
                 ...state,
                 [action.meta.subject]: {
                     ...state[action.meta.subject],
-                    data: (state[action.meta.subject] || {data: []}).data
-                        .filter(el => el.key !== action.meta.predicate)
-                        .concat([{key: action.meta.predicate, values: action.meta.values}]),
+                    data: state[action.meta.subject].data.map(el =>
+                        (el.key === action.meta.predicate) ? {...el, values: action.meta.values} : el),
                     invalidated: true
                 }
             };
