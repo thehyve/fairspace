@@ -13,10 +13,8 @@ import LoadingOverlay from '../../generic/Loading/LoadingOverlay';
 
 function FileOperations(props) {
 
-    let isCreatingDirectory = false;
-
     const {
-        numClipboardItems, disabled,
+        numClipboardItems, disabled, creatingDirectory,
         openedPath, selectedPaths, openedCollection,
         fetchFilesIfNeeded, uploadFiles, createDirectory,
         cut, copy, paste
@@ -58,11 +56,9 @@ function FileOperations(props) {
     }
 
     function handleCreateDirectory(name) {
-        isCreatingDirectory = true;
         return createDirectory(openedCollection, openedPath, name)
             .then(() => {
                 refreshFiles();
-                isCreatingDirectory = false;
             })
             .catch(err => {
                 if (err.status === 405) {
@@ -86,8 +82,8 @@ function FileOperations(props) {
         }
     }
 
-    return isCreatingDirectory ?
-        <LoadingOverlay loading={isCreatingDirectory}/> :
+    return creatingDirectory ?
+        <LoadingOverlay loading={creatingDirectory}/> :
         (<React.Fragment>
             <IconButton
                 aria-label="Copy"
@@ -131,6 +127,7 @@ function FileOperations(props) {
 const mapStateToProps = (state) => ({
     selectedPaths: state.collectionBrowser.selectedPaths,
     numClipboardItems: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
+    creatingDirectory: state.cache.filesByCollectionAndPath.creatingDirectory
 })
 
 const mapDispatchToProps = {

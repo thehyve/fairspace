@@ -3,10 +3,11 @@ import CircularProgress from '@material-ui/core/CircularProgress/CircularProgres
 import {withStyles} from '@material-ui/core/styles';
 
 const styles = theme => ({
-    progress: {
+    inlayProgress: {
         margin: theme.spacing.unit * 2,
-        textAlign: 'center'
-    },
+        textAlign: 'center',
+        backgroundColor: 'transparent'
+    }
 });
 
 class LoadingInlay extends React.Component {
@@ -14,7 +15,7 @@ class LoadingInlay extends React.Component {
     render() {
         const {classes} = this.props;
         return (
-            <div className={classes.progress}>
+            <div className={classes.inlayProgress}>
                 <CircularProgress/>
             </div>
         );
