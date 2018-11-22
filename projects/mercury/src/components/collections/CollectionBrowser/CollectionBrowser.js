@@ -19,9 +19,7 @@ class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            addingCollection: false,
-            savingCollection: false,
-            deletingCollection: false
+            editingCollection: false
         }
     }
 
@@ -31,7 +29,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleAddCollectionClick() {
-        this.setState({addingCollection: true})
+        this.setState({editingCollection: true})
     }
 
     handleCollectionClick(collection) {
@@ -46,11 +44,9 @@ class CollectionBrowser extends React.Component {
 
     handleCollectionDelete(collection) {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
-        this.setState({deletingCollection: true});
         deleteCollection(collection.id)
             .then(() => {
                 fetchCollectionsIfNeeded();
-                this.setState({deletingCollection: false});
             })
             .catch(err =>
                 ErrorDialog.showError(
@@ -76,7 +72,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderCollectionList() {
-        const {users, collections} = this.props;
+        const {users, collections, addingCollection, deletingCollection} = this.props;
         collections.map(col => col.creatorObj = findById(users, col.creator));
 
         return (
@@ -90,23 +86,21 @@ class CollectionBrowser extends React.Component {
                 <CollectionEditor
                     title={'Add collection'}
                     name={this.props.user.fullName + '\'s collection'}
-                    editing={this.state.addingCollection}
+                    editing={this.state.editingCollection}
                     onSave={this.handleAddCollection.bind(this)}
                     onCancel={this.handleCancelAddCollection.bind(this)}
                     editType={true}
                 />
-                <LoadingOverlay loading={this.state.savingCollection || this.state.deletingCollection}/>
+                <LoadingOverlay loading={addingCollection || deletingCollection}/>
             </div>
         );
     }
 
     handleAddCollection(name, description, type) {
-        this.setState({addingCollection: false});
-        this.setState({savingCollection: true});
+        this.setState({editingCollection: false});
         this.props.addCollection(name, description, type)
             .then(() => {
                 this.props.fetchCollectionsIfNeeded();
-                this.setState({savingCollection: false});
             })
             .catch(err =>
                 ErrorDialog.showError(
@@ -117,7 +111,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCancelAddCollection() {
-        this.setState({addingCollection: false});
+        this.setState({editingCollection: false});
     }
 
     render() {
@@ -142,6 +136,8 @@ const mapStateToProps = (state, ownProps) => ({
     collections: state.cache.collections.data,
     users: state.cache.users.data,
     selectedCollectionId: state.collectionBrowser.selectedCollectionId,
+    addingCollection: state.collectionBrowser.addingCollection,
+    deletingCollection: state.collectionBrowser.deletingCollection
 });
 
 const mapDispatchToProps = {

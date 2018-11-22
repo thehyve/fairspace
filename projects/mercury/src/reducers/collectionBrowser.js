@@ -8,7 +8,8 @@ import {
     OPEN_PATH,
     CLOSE_PATH,
     SELECT_COLLECTION,
-    SELECT_PATH
+    SELECT_PATH,
+    ADD_COLLECTION
 } from "../actions/actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
 
@@ -20,6 +21,8 @@ const defaultState = {
     openedPath: null,
 
     infoDrawerOpened: false,
+    addingCollection: false,
+    deletingCollection: false
 };
 
 const deselectPath = (state, path) => {
@@ -51,13 +54,29 @@ const collectionBrowser = (state = defaultState, action) => {
             };
         case DESELECT_PATH:
             return deselectPath(state, action.path);
+        case actionTypes.pending(DELETE_COLLECTION):
+            return {
+                ...state,
+                deletingCollection: true
+            };
         case actionTypes.fulfilled(DELETE_COLLECTION):
             return {
                 ...state,
+                deletingCollection: false,
                 selectedCollectionId: state.selectedCollectionId === action.collectionId ? null : state.selectedCollectionId
             }
         case actionTypes.fulfilled(DELETE_FILE):
             return deselectPath(state, action.meta.fullpath);
+        case actionTypes.pending(ADD_COLLECTION):
+            return {
+                ...state,
+                addingCollection: true
+            };
+        case actionTypes.fulfilled(ADD_COLLECTION):
+            return {
+                ...state,
+                addingCollection: false
+            };
         case OPEN_INFODRAWER:
             return {
                 ...state,
