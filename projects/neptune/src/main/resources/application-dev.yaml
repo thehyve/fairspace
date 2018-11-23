@@ -4,11 +4,6 @@ app:
     realm: minikube
 
 spring:
-  datasource:
-    url: "jdbc:h2:mem:neptune"
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
   h2:

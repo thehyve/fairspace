@@ -1,6 +1,9 @@
 app:
   oauth2:
     base-url: http://localhost:9080
+    # If the public uri of keycloak is different than the one used from pluto itself
+    # if can be specified using public-base-url
+    # public-base-url:
     realm: keycloak
 
 frontend:
@@ -17,10 +20,10 @@ spring:
 
 security:
   oidc:
-    auth-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
+    auth-uri: ${app.oauth2.public-base-url:${app.oauth2.base-url}}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
+    logout-uri: ${app.oauth2.public-base-url:${app.oauth2.base-url}}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
     token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
     jwk-key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
-    logout-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
     redirect-after-logout-uri: https://fairspace.com
     clientId: web_app
     clientSecret: web_app
