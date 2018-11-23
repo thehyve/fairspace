@@ -101,7 +101,7 @@ describe('Metadata Catalog', function () {
     });
 
     describe('Adding metadata', () => {
-        it.only('should allow addition of new entities', () => {
+        it('should allow addition of new entities', () => {
             cy.visit("/metadata");
             cy.contains("button", "add").click();
 
