@@ -1,0 +1,82 @@
+version: '3'
+services:
+  pluto:
+    image: fairspace.azurecr.io/fairspace/pluto:0.5.3-SNAPSHOT
+    ports:
+      - "22000:8080"
+    networks:
+      - e2e-testing
+    volumes:
+      - "./config/pluto:/opt/config"
+  mercury:
+    image: fairspace.azurecr.io/fairspace/mercury:0.5.3-SNAPSHOT
+    networks:
+      - e2e-testing
+  neptune:
+    image: fairspace.azurecr.io/fairspace/neptune:0.5.3-SNAPSHOT
+    networks:
+      - e2e-testing
+    depends_on:
+      - rabbitmq
+    volumes:
+    - "./config/neptune:/opt/config"
+  ceres:
+    image: fairspace.azurecr.io/fairspace/ceres:0.5.3-SNAPSHOT
+    networks:
+      - e2e-testing
+    depends_on:
+      - rabbitmq
+    volumes:
+      - "./config/ceres:/opt/config"
+  titan:
+    image: fairspace.azurecr.io/fairspace/titan:0.5.3-SNAPSHOT
+    networks:
+      - e2e-testing
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ".:/pr"
+    environment:
+      CONFIG_FILE: "/pr/config/titan/config.json"
+    entrypoint:
+    - /pr/wait-for-it/wait-for-it.sh
+    - rabbitmq:5672
+    - --
+    - npm
+    - start
+
+  keycloak:
+    image: jboss/keycloak:4.6.0.Final
+    volumes:
+      - ".:/pr"
+    networks:
+    - e2e-testing
+    environment:
+      KEYCLOAK_USER: "e2e"
+      KEYCLOAK_PASSWORD: "e2e"
+    ports:
+      - "21000:8080"
+  rabbitmq:
+    image: rabbitmq:management
+    networks:
+      - e2e-testing
+
+  keycloak-config:
+    image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.0
+    networks:
+    - e2e-testing
+    depends_on:
+    - keycloak
+    environment:
+      KEYCLOAK_PASSWORD: "e2e"
+      TESTUSER_USERNAME: "e2e-test"
+      TESTUSER_PASSWORD: "e2e-test"
+      COORDINATOR_USERNAME: "coordinator"
+      COORDINATOR_PASSWORD: "coordinator"
+      CLIENT_SECRET: 5871a148-f425-4f8e-a96e-3a532abbb210
+    volumes:
+    - ".:/pr"
+    command:
+      - "/pr/config/keycloak/run-config.sh"
+networks:
+  e2e-testing:
