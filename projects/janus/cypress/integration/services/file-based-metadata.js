@@ -58,7 +58,8 @@ describe('File-based metadata', function () {
             .should('exist').click()
 
         // Enter data for name
-        getMetadataContainer("Metadata for initial-dir-" + uniqueId, "Name")
+        getMetadataContainer("Metadata for initial-dir-" + uniqueId, "Description")
+            .find('textarea:not([aria-hidden])').first()
             .clear().type("name-" + uniqueId)
             .blur();
 
@@ -79,8 +80,8 @@ describe('File-based metadata', function () {
         cy.contains('tr', 'new-dir-' + uniqueId)
             .should('exist').click()
 
-        getMetadataContainer("Metadata for new-dir-" + uniqueId, "Name")
-            .find('input').first()
+        getMetadataContainer("Metadata for new-dir-" + uniqueId, "Description")
+            .find('textarea:not([aria-hidden])').first()
             .should('have.value', "name-" + uniqueId);
     });
 
@@ -100,8 +101,8 @@ describe('File-based metadata', function () {
             .should('exist').click()
 
         // Enter data for name
-        getMetadataContainer("Metadata for copy-" + uniqueId + "/dir-" + uniqueId, "Name")
-            .find('input').first()
+        getMetadataContainer("Metadata for copy-" + uniqueId + "/dir-" + uniqueId, "Description")
+            .find('textarea:not([aria-hidden])').first()
             .clear().type("sub-directory-" + uniqueId)
             .blur();
 
@@ -142,8 +143,8 @@ describe('File-based metadata', function () {
             .should('exist').click()
 
         // Verify the metadata has been moved as well
-        getMetadataContainer("Metadata for target-" + uniqueId + "/copy-" + uniqueId + "/dir-" + uniqueId, "Name")
-            .find('input').first()
+        getMetadataContainer("Metadata for target-" + uniqueId + "/copy-" + uniqueId + "/dir-" + uniqueId, "Description")
+            .find('textarea:not([aria-hidden])').first()
             .should('have.value', "sub-directory-" + uniqueId);
     });
 
