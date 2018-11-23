@@ -8,15 +8,8 @@ const FileTypeProvider = require('./FileTypeProvider')
 module.exports = function EventEmitter(rabbot, collectionApi, fileTypeProvider, exchangeName) {
     const publish = event => rabbot.publish(exchangeName, event);
 
-    const getCollection = (path, user) => {
-        const paths = path.split('/');
-
-        if(paths.length == 0 || !paths[1]) {
-            return Promise.reject(Error("No correct path specified to retrieve a collection"));
-        }
-
-        return collectionApi.retrieveCollection(paths[1], user)
-    }
+    const getCollection = (path, user) =>
+        (path === '/') ? Promise.resolve(null) : collectionApi.retrieveCollection(path.split('/')[1], user);
 
     const getDestination = req => {
         const destination = req.headers['destination']
