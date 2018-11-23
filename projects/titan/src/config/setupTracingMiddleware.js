@@ -3,7 +3,15 @@ const zipkinMiddleware = require('zipkin-instrumentation-express').expressMiddle
 const HttpLogger = require('zipkin-transport-http').HttpLogger;
 
 module.exports = function setupTracingMiddleware(app, tracingConfiguration) {
-    console.log("Use tracing middleware to send traces to " + tracingConfiguration.zipkinUrl);
+    if (!tracingConfiguration.enabled) {
+        console.log('Tracing is disabled');
+        return app;
+    }
+    if (!tracingConfiguration.zipkinUrl) {
+        console.error('Tracing is enabled, but not configured properly');
+        return app;
+    }
+    console.log('Use tracing middleware to send traces to ' + tracingConfiguration.zipkinUrl);
     const localServiceName = 'Titan';
     const ctxImpl = new zipkin.ExplicitContext();
     const recorder = new zipkin.BatchRecorder({

@@ -24,7 +24,7 @@ const defaultConfig = {
     "urls":{
         "collections": ""
     }
-}
+};
 
 // Read external configuration file
 let configuration;
@@ -37,14 +37,14 @@ if(process.env.CONFIG_FILE) {
 // Respond to / anonymously to allow for health checks
 app.get('/', (req, res, next) => req.get('probe') ? res.send('Hi, I\'m Titan!').end() : next());
 
-if(configuration.tracing.enabled) setupTracingMiddleware(app, configuration.tracing);
+setupTracingMiddleware(app, configuration.tracing);
 
 const collectionApi = setupCollectionApi(configuration);
 
 // Setup the event emitter. On error setting up, stop the process
 const eventEmitterSetupClosure = server =>
     setupEventEmitter(server, collectionApi, configuration.rabbitmq)
-        .catch(e => process.exit(3))
+        .catch(e => process.exit(3));
 
 // Setup webdav middleware and associate the event emitter
 setupWebdavMiddleware(app, configuration, collectionApi, eventEmitterSetupClosure);
