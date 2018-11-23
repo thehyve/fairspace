@@ -1,4 +1,6 @@
-logging.level.io.fairspace.oidc_auth: TRACE
+logging.level:
+  io.fairspace.oidc_auth: TRACE
+  nl.fairspace.pluto: TRACE
 
 # OAuth2 base configuration
 app:
