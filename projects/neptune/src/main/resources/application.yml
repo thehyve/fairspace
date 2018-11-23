@@ -25,7 +25,6 @@ spring:
   # Should be overridden in production
   datasource:
     url: "jdbc:h2:mem:neptune"
-    driverClassName: org.h2.Driver
     username: sa
     password:
   jpa:
