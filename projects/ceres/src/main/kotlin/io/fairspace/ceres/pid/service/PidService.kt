@@ -12,13 +12,13 @@ class PidService(val repository: PidRepository, val pidConverter: PidConverter) 
     fun findById(id: String) =
             pidConverter.pidToPidDTO(
                     repository.findById(pidConverter.idToUUID(id))
-                            .orElseThrow({ MappingNotFoundException("ID not found: " + id) })
+                            .orElseThrow { MappingNotFoundException("ID not found: $id") }
             )
 
     fun findByValue(value: String) =
             pidConverter.pidToPidDTO(
                     repository.findByValue(value)
-                            .orElseThrow({ MappingNotFoundException("Value not found: " + value) })
+                            .orElseThrow { MappingNotFoundException("Value not found: $value") }
             )
 
     fun findByPrefix(prefix: String) =

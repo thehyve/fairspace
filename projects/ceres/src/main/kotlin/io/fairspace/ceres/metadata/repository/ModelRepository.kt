@@ -1,5 +1,6 @@
 package io.fairspace.ceres.metadata.repository
 
+import mu.KotlinLogging.logger
 import org.apache.jena.query.Dataset
 import org.apache.jena.query.Query.*
 import org.apache.jena.query.QueryExecutionFactory
@@ -19,37 +20,52 @@ import kotlin.concurrent.write
 class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
     private val lock = ReentrantReadWriteLock()
     private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)
+    private val log = logger {}
 
-    fun list(subject: String?, predicate: String? = null, obj: String? = null): Model =
-            read {
-                listStatements(subject?.let(::createResource), predicate?.let(::createProperty), obj?.let(::createResource))
-                        .toModel()
-            }
+    fun list(subject: String?, predicate: String? = null, obj: String? = null): Model {
+        log.trace { "Retrieving statements for s: $subject p: $predicate o: $obj" }
+        return read {
+            listStatements(subject?.let(::createResource), predicate?.let(::createProperty), obj?.let(::createResource))
+                    .toModel()
+        }
+    }
 
     fun add(delta: Model) {
+        log.trace { "Adding statements: $delta" }
         write { add(delta) }
     }
 
     fun remove(subject: String?, predicate: String? = null) {
+        log.trace { "Removing statements for s: $subject p: $predicate" }
         write {
             removeAll(subject?.let(::createResource), predicate?.let(::createProperty), null)
         }
     }
 
-    fun query(queryString: String): Any = // ResultSet | Model | Boolean
-            read {
-                QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
-                    when (query.queryType) {
-                        QueryTypeSelect -> execSelect().detach()
-                        QueryTypeConstruct -> execConstruct().detach()
-                        QueryTypeDescribe -> execDescribe().detach()
-                        QueryTypeAsk -> execAsk()
-                        else -> throw IllegalArgumentException("Cannot parse query: $queryString")
-                    }
+    fun query(queryString: String): Any { // ResultSet | Model | Boolean
+        log.trace {
+            val singleLieQuery = queryString
+                    .splitToSequence('\n')
+                    .map(String::trim)
+                    .filter(CharSequence::isNotEmpty)
+                    .joinToString(" ")
+            "Executing SPARQL: $singleLieQuery"
+        }
+        return read {
+            QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
+                when (query.queryType) {
+                    QueryTypeSelect -> execSelect().detach()
+                    QueryTypeConstruct -> execConstruct().detach()
+                    QueryTypeDescribe -> execDescribe().detach()
+                    QueryTypeAsk -> execAsk()
+                    else -> throw IllegalArgumentException("Cannot parse query: $queryString")
                 }
             }
+        }
+    }
 
     fun update(delta: Model) {
+        log.trace { "Updating statements: $delta" }
         write {
             delta.listStatements().forEach {
                 removeAll(it.subject, it.predicate, null)
