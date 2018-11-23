@@ -22,10 +22,12 @@ spring:
   zipkin:
     base-url: http://jaeger-collector.jaeger:9411/
   # Configuration for sql database which stores predicates and labels
+  # Should be overridden in production
   datasource:
-    url: "jdbc:postgresql://demo-postgresql:5432/postgres"
-    username: "postgres"
-    password: "test123"
+    url: "jdbc:h2:mem:neptune"
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
   jpa:
     hibernate:
       ddl-auto: update

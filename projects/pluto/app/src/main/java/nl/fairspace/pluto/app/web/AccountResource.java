@@ -45,7 +45,7 @@ public class AccountResource {
      */
     @GetMapping("/authorizations")
     public List<String> getAuthorizations() throws ParseException {
-        log.debug("REST authentication to retrieve authorizations");
+        log.trace("REST request to retrieve authorizations");
         if(token == null) {
             log.warn("No token found in account/authorizations call");
             return Collections.emptyList();
@@ -61,7 +61,7 @@ public class AccountResource {
      */
     @GetMapping("/user")
     public UserInfo getUser() {
-        log.debug("REST request to check if the current user is authenticated");
+        log.trace("REST request to check if the current user is authenticated");
         if(token == null) {
             log.warn("No token found in account/user call");
             return new UserInfo();
