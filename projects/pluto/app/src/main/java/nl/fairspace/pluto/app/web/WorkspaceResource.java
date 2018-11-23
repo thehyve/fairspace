@@ -68,6 +68,7 @@ public class WorkspaceResource {
         HttpHeaders headers = new HttpHeaders();
 
         if(token != null) {
+            log.trace("Adding authorization header for user retrieval: {}",token.getAccessToken());
             headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
         }
 
@@ -78,6 +79,7 @@ public class WorkspaceResource {
 
         // Send the request upstream
         try {
+            log.trace("Retrieving users from {}", uri);
             return restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
         } catch(HttpClientErrorException e) {
             log.warn("Client error while retrieving list of users from Auth provider", e);
