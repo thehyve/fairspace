@@ -92,14 +92,14 @@ class Vocabulary {
         // Add the metadata already available
         for (const predicateUri in metadata) {
             // Skip this predicate if it is not allowed for the current type
-            if (!predicates.find(predicate => predicate['@id'] === predicateUri)) {
+            if (predicateUri !== "@type" && !predicates.find(predicate => predicate['@id'] === predicateUri)) {
                 continue;
             }
 
             // Skip this predicate if it is not in the vocabulary
             const vocabularyEntry = this.vocabularyById[predicateUri];
 
-            if (!vocabularyEntry) {
+            if (predicateUri !== "@type" && !vocabularyEntry) {
                 continue;
             }
 

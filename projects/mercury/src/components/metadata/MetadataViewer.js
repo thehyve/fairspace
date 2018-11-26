@@ -15,16 +15,31 @@ const styles = {
  */
 const MetadataViewer = props => {
 
+    let type = undefined;
+    const typeProp = props.properties.find(property => {
+        return property.key === '@type'
+    });
+    if(typeProp && typeProp.values) {
+        type = typeProp.values[0].id;
+    }
+
     const renderProperty =
-            property => <MetadataProperty
-                editable={props.editable && !isDateTimeProperty(property)}
-                subject={props.subject}
-                key={property.key}
-                property={property} />
+        property => <MetadataProperty
+            editable={props.editable && !isDateTimeProperty(property)}
+            subject={props.subject}
+            key={property.key}
+            property={property}/>
 
     return <List dense classes={props.classes}>
-        {props.properties.map(renderProperty)}
-        </List>
+        {
+            props.properties
+                .map(property => {
+                    property.type = type;
+                    return property;
+                })
+                .map(renderProperty)
+        }
+    </List>
 }
 
 export default withStyles(styles)(MetadataViewer)

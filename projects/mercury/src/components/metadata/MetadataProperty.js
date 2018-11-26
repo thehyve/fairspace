@@ -13,14 +13,13 @@ import ErrorDialog from "../error/ErrorDialog";
 import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 import {RESOURCE_URI} from "../../services/MetadataAPI/MetadataAPI";
-import {LABEL_URI, COMMENT_URI} from '../../services/MetadataAPI/MetadataAPI';
-
+import {LABEL_URI, COMMENT_URI, COLLECTION_URL} from '../../services/MetadataAPI/MetadataAPI';
 
 /**
  * Shows the property and values for the property
  */
 function MetadataProperty({editable, subject, property, updateMetadata, onItemMouseOut, onItemMouseOver, hovered}) {
-
+    
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
     // will save a given value (if it has changed) along with the other
@@ -113,9 +112,11 @@ function MetadataProperty({editable, subject, property, updateMetadata, onItemMo
     };
 
 
-    const isCollection = subject.includes('/iri/collections/');
+    const isCollection = property.type === COLLECTION_URL;
     const isManaged = isCollection || subject.includes('/iri/files/') || subject.includes('/iri/directories/');
-    if ((isManaged && property.key === LABEL_URI) || (isCollection && property.key === COMMENT_URI)) {
+    if ((property.key === '@type') ||
+        (isManaged && property.key === LABEL_URI) ||
+        (isCollection && property.key === COMMENT_URI)) {
         return '';
     } else {
         // Do not show an add component if no multiples are allowed
