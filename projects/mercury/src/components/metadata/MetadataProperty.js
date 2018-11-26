@@ -112,7 +112,7 @@ function MetadataProperty({editable, subject, property, updateMetadata, onItemMo
     };
 
 
-    const isCollection = property.type === COLLECTION_URL;
+    const isCollection = property.domain === COLLECTION_URL;
     const isManaged = isCollection || subject.includes('/iri/files/') || subject.includes('/iri/directories/');
     if ((property.key === '@type') ||
         (isManaged && property.key === LABEL_URI) ||

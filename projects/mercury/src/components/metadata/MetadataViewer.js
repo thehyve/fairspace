@@ -15,10 +15,11 @@ const styles = {
  */
 const MetadataViewer = props => {
 
-    const typeProp = props.properties.find(property => {
+    const domainProp = props.properties.find(property => {
         return property.key === '@type'
     });
-    const type = typeProp && typeProp.values ? typeProp.values[0].id : undefined;
+    const domain = domainProp && domainProp.values && domainProp.values[0] ?
+        domainProp.values[0].id : undefined;
 
     const renderProperty =
         property => <MetadataProperty
@@ -31,7 +32,7 @@ const MetadataViewer = props => {
         {
             props.properties
                 .map(property => {
-                    property.type = type;
+                    property.domain = domain;
                     return property;
                 })
                 .map(renderProperty)
