@@ -4,6 +4,7 @@ describe('Collection collaborators', function () {
     let fileUrl;
 
     before(() => {
+        console.error("Start logging in")
         // Login and ensure clean setup of test assets
         cy.login() && cy.setupClean();
         
@@ -28,7 +29,7 @@ describe('Collection collaborators', function () {
             .contains('First UserManage').should('exist')
     });
 
-    it('should allow addition and deletion of collaborators', function () {
+    it.only('should allow addition and deletion of collaborators', function () {
         cy.listCollections();
         cy.contains('tr', collectionName).click();
 
@@ -37,7 +38,7 @@ describe('Collection collaborators', function () {
         // Add other user as collaborator
         cy.get('[role="dialog"] input[type="text"]').click({force:true})
         cy.contains('Test User').click();
-        cy.contains('button', 'Submit').click();
+        cy.contains('[role="dialog"] button', 'Submit').click();
 
         // Ensure its visibility on the screen
         getCollaboratorsCard()
@@ -45,7 +46,7 @@ describe('Collection collaborators', function () {
 
         // Login as the other user
         cy.logout();
-        cy.login(Cypress.env("SECOND_USER"), Cypress.config("password"));
+        cy.login({ username: Cypress.env("SECOND_USER"), password: Cypress.env("PASSWORD") });
         cy.listCollections();
 
         // Verify the existence of the collection and files
@@ -75,7 +76,7 @@ describe('Collection collaborators', function () {
             .contains('Test UserRead').should('not.exist')
 
         // Login as the other user
-        cy.login(Cypress.env("SECOND_USER"), Cypress.config("password"));
+        cy.login({username: Cypress.env("SECOND_USER"), password: Cypress.env("PASSWORD")});
         cy.listCollections();
 
         // Verify the existence of the collection and files
