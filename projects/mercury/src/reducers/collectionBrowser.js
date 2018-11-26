@@ -64,6 +64,11 @@ const collectionBrowser = (state = defaultState, action) => {
                 ...state,
                 deletingCollection: false,
                 selectedCollectionId: state.selectedCollectionId === action.collectionId ? null : state.selectedCollectionId
+            };
+        case actionTypes.rejected(DELETE_COLLECTION):
+            return {
+                ...state,
+                deletingCollection: false
             }
         case actionTypes.fulfilled(DELETE_FILE):
             return deselectPath(state, action.meta.fullpath);
@@ -73,6 +78,11 @@ const collectionBrowser = (state = defaultState, action) => {
                 addingCollection: true
             };
         case actionTypes.fulfilled(ADD_COLLECTION):
+            return {
+                ...state,
+                addingCollection: false
+            };
+        case actionTypes.rejected(ADD_COLLECTION):
             return {
                 ...state,
                 addingCollection: false
