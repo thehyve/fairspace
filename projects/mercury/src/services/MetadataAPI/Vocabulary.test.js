@@ -11,7 +11,7 @@ const vocabularyJsonLd = [
         ]
     },
     {
-        '@id': 'http://fairspace.io/ontology#name',
+        '@id': 'http://www.w3.org/2000/01/rdf-schema#label',
         '@type': [PROPERTY_URI],
         [LABEL_URI]: [{ '@value': 'Name' }],
         [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }]
@@ -79,7 +79,7 @@ describe('combination of vocabulary and metadata', () => {
     it('returns nothing without type', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
-            'http://fairspace.io/ontology#name': { '@value': 'Collection 1' }
+            'http://www.w3.org/2000/01/rdf-schema#label': { '@value': 'Collection 1' }
         }];
 
         let result = vocabulary.combine(metadata);
@@ -90,13 +90,13 @@ describe('combination of vocabulary and metadata', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
             '@type': ['http://fairspace.io/ontology#Collection'],
-            'http://fairspace.io/ontology#name': [{ '@value': 'Collection 1' }]
+            'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Collection 1' }]
         }];
 
         let result = vocabulary.combine(metadata);
 
         expect(result.length).toEqual(4);
-        expect(result[0].key).toEqual("http://fairspace.io/ontology#name");
+        expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
         expect(result[0].label).toEqual("Name");
         expect(result[0].values.length).toEqual(1);
         expect(result[0].values[0].value).toEqual('Collection 1');
@@ -109,7 +109,7 @@ describe('combination of vocabulary and metadata', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
             '@type': ['http://fairspace.io/ontology#Collection', 'http://fairspace.io/ontology#Dataset'],
-            'http://fairspace.io/ontology#name': [{ '@value': 'Collection 1' }],
+            'http://www.w3.org/2000/01/rdf-schema#label': [{ '@value': 'Collection 1' }],
             'http://schema.org/Creator': [{ '@value': 'John Snow' }]
         }];
 
@@ -120,7 +120,7 @@ describe('combination of vocabulary and metadata', () => {
         expect(result[0].label).toEqual("Creator");
         expect(result[0].values.length).toEqual(1);
         expect(result[0].values[0].value).toEqual('John Snow');
-        expect(result[1].key).toEqual("http://fairspace.io/ontology#name");
+        expect(result[1].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
         expect(result[1].label).toEqual("Name");
         expect(result[1].values.length).toEqual(1);
         expect(result[1].values[0].value).toEqual('Collection 1');
@@ -179,7 +179,7 @@ describe('combination of vocabulary and metadata', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
             '@type': ['http://fairspace.io/ontology#Collection'],
-            'http://fairspace.io/ontology#name': [
+            'http://www.w3.org/2000/01/rdf-schema#label': [
                 {
                     '@value': 'My first collection'
                 }
@@ -194,7 +194,7 @@ describe('combination of vocabulary and metadata', () => {
         let result = vocabulary.combine(metadata);
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("http://schema.org/CreatedDate");
-        expect(result[1].key).toEqual("http://fairspace.io/ontology#name");
+        expect(result[1].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
         expect(result[2].key).toEqual("@type");
 
         expect(result[3].values.length).toEqual(0);
@@ -221,7 +221,7 @@ describe('combination of vocabulary and metadata', () => {
         const metadata = [{
             '@id': 'http://fairspace.com/iri/collections/1',
             '@type': ['http://fairspace.io/ontology#Collection'],
-            'http://fairspace.io/ontology#name': [
+            'http://www.w3.org/2000/01/rdf-schema#label': [
                 {
                     '@value': 'My first collection'
                 }
@@ -230,7 +230,7 @@ describe('combination of vocabulary and metadata', () => {
 
         let result = vocabulary.combine(metadata);
         expect(result.length).toEqual(4);
-        expect(result[0].key).toEqual("http://fairspace.io/ontology#name");
+        expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
         expect(result[1].key).toEqual("@type");
     });
 
