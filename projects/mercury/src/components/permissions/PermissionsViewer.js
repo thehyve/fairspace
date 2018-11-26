@@ -77,8 +77,7 @@ export class PermissionsViewer extends React.Component {
             error: false,
             selectedUser: null,
             currentLoggedUser: null,
-            canManage: false,
-            deletingCollaborator: false
+            canManage: false
         };
     }
 
@@ -121,12 +120,8 @@ export class PermissionsViewer extends React.Component {
     handleDeleteCollaborator = () => {
         const {collectionId, alterPermission} = this.props;
         const {selectedUser} = this.state;
-        this.setState({deletingCollaborator: true});
         if (selectedUser) {
-            alterPermission(selectedUser.subject, collectionId, 'None')
-                .then(() => {
-                    this.setState({deletingCollaborator: false});
-                });
+            alterPermission(selectedUser.subject, collectionId, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
@@ -227,10 +222,6 @@ export class PermissionsViewer extends React.Component {
         );
     };
 
-    renderLoadingOnCollaboratorDeletion = () => {
-        return this.state.deletingCollaborator ? <LoadingOverlay/> : null;
-    }
-
     render() {
         const {classes, permissions} = this.props;
         if (permissions.error) {
@@ -245,7 +236,6 @@ export class PermissionsViewer extends React.Component {
                     {this.renderPermissionDialog()}
                     {this.renderConfirmationDialog()}
                     {this.renderUserList(permissions.data)}
-                    {this.renderLoadingOnCollaboratorDeletion()}
                 </div>
             );
         }
