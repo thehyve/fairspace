@@ -13,7 +13,7 @@ import ErrorDialog from "../error/ErrorDialog";
 import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 import {RESOURCE_URI} from "../../services/MetadataAPI/MetadataAPI";
-import {LABEL_URI, COMMENT_URI, COLLECTION_URL} from '../../services/MetadataAPI/MetadataAPI';
+import {LABEL_URI, COMMENT_URI, COLLECTION_URI, FILE_URI, DIRECTORY_URI} from '../../services/MetadataAPI/MetadataAPI';
 
 /**
  * Shows the property and values for the property
@@ -112,8 +112,10 @@ function MetadataProperty({editable, subject, property, updateMetadata, onItemMo
     };
 
 
-    const isCollection = property.domain === COLLECTION_URL;
-    const isManaged = isCollection || subject.includes('/iri/files/') || subject.includes('/iri/directories/');
+    const isCollection = property.domain === COLLECTION_URI;
+    const isFile = property.domain === FILE_URI;
+    const isDirectory = property.domain === DIRECTORY_URI;
+    const isManaged = isCollection || isFile || isDirectory;
     if ((property.key === '@type') ||
         (isManaged && property.key === LABEL_URI) ||
         (isCollection && property.key === COMMENT_URI)) {
