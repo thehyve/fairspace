@@ -18,7 +18,6 @@ import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 import {findById} from "../../utils/arrayutils";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
-import LoadingOverlay from '../generic/Loading/LoadingOverlay';
 
 export const styles = theme => ({
     collaboratorList: {
