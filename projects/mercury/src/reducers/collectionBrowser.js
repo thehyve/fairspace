@@ -66,6 +66,7 @@ const collectionBrowser = (state = defaultState, action) => {
                 selectedCollectionId: state.selectedCollectionId === action.collectionId ? null : state.selectedCollectionId
             };
         case actionTypes.rejected(DELETE_COLLECTION):
+        case actionTypes.invalidate(DELETE_COLLECTION):
             return {
                 ...state,
                 deletingCollection: false
@@ -78,11 +79,8 @@ const collectionBrowser = (state = defaultState, action) => {
                 addingCollection: true
             };
         case actionTypes.fulfilled(ADD_COLLECTION):
-            return {
-                ...state,
-                addingCollection: false
-            };
         case actionTypes.rejected(ADD_COLLECTION):
+        case actionTypes.invalidate(ADD_COLLECTION):
             return {
                 ...state,
                 addingCollection: false

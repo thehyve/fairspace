@@ -78,6 +78,8 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                 creatingDirectory: true
             };
         case actionTypes.fulfilled(CREATE_DIRECTORY):
+        case actionTypes.rejected(CREATE_DIRECTORY):
+        case actionTypes.invalidate(CREATE_DIRECTORY):
             let newState = {
                 ...state,
                 creatingDirectory: false
