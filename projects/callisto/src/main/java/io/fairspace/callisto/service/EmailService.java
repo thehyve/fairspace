@@ -3,6 +3,7 @@ package io.fairspace.callisto.service;
 import io.fairspace.callisto.config.MailProperties;
 import io.fairspace.callisto.model.PermissionEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,11 @@ public class EmailService {
         message.setTo(email);
         message.setSubject("Someone shared a collection with you");
         message.setText(event.getUser().getDisplayName() + " shared collection " + event.getCollection().getName() + " with you. You have " + event.getPermission().getAccess() + " rights.");
-        emailSender.send(message);
+        try {
+            emailSender.send(message);
+        } catch (MailException e) {
+            log.error("Error sending an email", e);
+        }
+
     }
 }
