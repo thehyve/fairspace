@@ -18,7 +18,7 @@ class PermissionAPI {
             method: 'GET',
             header: PermissionAPI.getHeaders,
             credentials: 'same-origin',
-            cache: noCache ? 'no-cache' : 'default'
+            cache: noCache ? 'reload' : 'default'
         })
             .then(failOnHttpError('Error while loading collection permissions'))
             .then(response => response.json());
