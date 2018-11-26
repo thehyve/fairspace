@@ -9,16 +9,16 @@ import PropTypes from 'prop-types';
 
 class ConfirmationDialog extends React.Component {
 
-    handleDisagree = () => {
-        this.props.onDisagree();
+    handleDisagree = (e) => {
+        this.props.onDisagree(e);
     };
 
-    handleAgree = () => {
-        this.props.onAgree();
+    handleAgree = (e) => {
+        this.props.onAgree(e);
     };
 
-    handleClose = () => {
-        this.props.onClose();
+    handleClose = (e) => {
+        this.props.onClose(e);
     };
 
     render() {
