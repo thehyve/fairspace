@@ -19,8 +19,10 @@ import Paper from "@material-ui/core/Paper";
 import {getDisplayName} from "../../../utils/userUtils";
 
 export const COLLECTION_ICONS = {
-    'LOCAL_STORAGE': 'folder_open',
-    'S3_BUCKET': 'cloud_open'
+    LOCAL_STORAGE: 'folder_open',
+    AZURE_BLOB_STORAGE: 'cloud_open',
+    S3_BUCKET: 'cloud_open',
+    GOOGLE_CLOUD_BUCKET: 'cloud_open'
 };
 
 export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
