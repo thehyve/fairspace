@@ -1,15 +1,19 @@
 #!/bin/bash
-cd ../../projects/janus
+cd projects/janus
 npm install
 
 # Wait for the keycloak-configuration script to be finished before
 # actually starting the e2e tests
 # TODO
 
-export KEYCLOAK_URL=http://localhost:21000/
-export SECOND_USER=test2-e2e
+export CYPRESS_KEYCLOAK_URL=http://keycloak:8080
+export CYPRESS_KEYCLOAK_PUBLIC_CLIENT_ID=e2e-public
+export CYPRESS_KEYCLOAK_REALM=e2e
+export CYPRESS_SECOND_USER=test2-e2e
+export CYPRESS_USERNAME=e2e-test
+export CYPRESS_PASSWORD=e2e-test
 
 node_modules/.bin/cypress run \
-  --spec 'cypress/integration/services/**/*
-  --config baseUrl=http://localhost:22000,user_name=e2e-test,password=e2e-test
+  --spec cypress/integration/services/**/*.js \
+  --config baseUrl=http://localhost:22000
 

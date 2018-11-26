@@ -1,5 +1,8 @@
 #!/bin/sh
 
-./wait-for-server-to-respond.sh http://keycloak:8080/auth
-./setup-keycloak-hyperspace.sh "http://keycloak:8080/auth" "e2e" "e2e"
-./setup-keycloak-workspace.sh "http://keycloak:8080/auth" "e2e" "e2e" "e2e" "/pr/config/keycloak/redirect.urls"
+SERVER=http://keycloak:8080/auth
+USER=e2e
+REALM=e2e
+./wait-for-server-to-respond.sh $SERVER
+./setup-keycloak-hyperspace.sh $SERVER $USER $REALM
+./setup-keycloak-workspace.sh $SERVER $USER $REALM e2e /pr/config/keycloak/redirect.urls

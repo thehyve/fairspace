@@ -7,7 +7,7 @@ app:
 ceres:
   url: http://ceres:8080
 titan:
-  url: http://titan:8080
+  url: http://titan:3000
 spring:
   zipkin:
     enabled: false

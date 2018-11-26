@@ -1,10 +1,14 @@
-logging.level:
-  io.fairspace.oidc_auth: TRACE
-  nl.fairspace.pluto: TRACE
-
 # OAuth2 base configuration
 app:
   oauth2:
+    # Please note that this value is used in two ways:
+    # - in the url that is resolved from the browser (e.g. for logging in)
+    # - from within the pluto container (e.g. for retrieving or refreshing the token)
+    #
+    # When making calls to keycloak, the url that was used to login should be the same
+    # as the url that the call is being made to. If not, keycloak will respond with a 401
+    # This is the case when loading the list of users via pluto.
+    # For that reason, the host should have an entry 'keycloak' that points to localhost.
     base-url: http://keycloak:8080
     realm: e2e
   metadata:
@@ -26,10 +30,6 @@ security:
   oidc:
     clientId: e2e-pluto
     clientSecret: 5871a148-f425-4f8e-a96e-3a532abbb210
-    auth-uri: http://localhost:21000/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
-    token-uri: http://keycloak:8080/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
-    jwk-key-set-uri: http://keycloak:8080/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
-    logout-uri: http://localhost:21000/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
     redirect-after-logout-url: http://localhost:22000
     required-authority: user-e2e
 
