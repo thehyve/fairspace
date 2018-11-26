@@ -161,6 +161,7 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
         const {collectionId, alterPermission} = this.props;
         if (selectedUser) {
+            // TODO: async, loading
             alterPermission(selectedUser.value, collectionId, accessRight);
             this.handleClose();
         } else {
