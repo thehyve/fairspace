@@ -15,13 +15,10 @@ const styles = {
  */
 const MetadataViewer = props => {
 
-    let type = undefined;
     const typeProp = props.properties.find(property => {
         return property.key === '@type'
     });
-    if(typeProp && typeProp.values) {
-        type = typeProp.values[0].id;
-    }
+    const type = typeProp && typeProp.values ? typeProp.values[0].id : undefined;
 
     const renderProperty =
         property => <MetadataProperty

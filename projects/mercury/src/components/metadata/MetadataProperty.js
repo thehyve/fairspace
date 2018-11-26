@@ -19,7 +19,7 @@ import {LABEL_URI, COMMENT_URI, COLLECTION_URL} from '../../services/MetadataAPI
  * Shows the property and values for the property
  */
 function MetadataProperty({editable, subject, property, updateMetadata, onItemMouseOut, onItemMouseOver, hovered}) {
-    
+
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
     // will save a given value (if it has changed) along with the other
