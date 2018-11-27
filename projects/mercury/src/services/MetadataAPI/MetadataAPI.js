@@ -25,6 +25,9 @@ export const ALLOW_MULTIPLE_URI = 'http://fairspace.io/ontology#allowMultiple';
 export const MACHINE_ONLY_URI = 'http://fairspace.io/ontology#machineOnly';
 export const MULTILINE_PROPERTY_URI = 'http://fairspace.io/ontology#multiLine';
 export const FAIRSPACE_ENTITY_URI = 'http://fairspace.io/ontology#fairspaceEntity';
+export const COLLECTION_URI = 'http://fairspace.io/ontology#Collection';
+export const FILE_URI = 'http://fairspace.io/ontology#File';
+export const DIRECTORY_URI = 'http://fairspace.io/ontology#Directory';
 
 const GET_ENTITIES_SPARQL = `
     PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>

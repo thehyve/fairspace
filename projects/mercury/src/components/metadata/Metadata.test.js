@@ -116,7 +116,7 @@ const vocabulary = [
         ]
     },
     {
-        '@id': 'http://fairspace.io/ontology#name',
+        '@id': 'http://www.w3.org/2000/01/rdf-schema#label',
         '@type': PROPERTY_URI,
         [LABEL_URI]: [{'@value': 'Name'}],
         [DOMAIN_URI]: [{'@id': 'http://fairspace.io/ontology#Collection'}]

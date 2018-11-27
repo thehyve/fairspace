@@ -15,16 +15,29 @@ const styles = {
  */
 const MetadataViewer = props => {
 
+    const domainProp = props.properties.find(property => {
+        return property.key === '@type'
+    });
+    const domain = domainProp && domainProp.values && domainProp.values[0] ?
+        domainProp.values[0].id : undefined;
+
     const renderProperty =
-            property => <MetadataProperty
-                editable={props.editable && !isDateTimeProperty(property)}
-                subject={props.subject}
-                key={property.key}
-                property={property} />
+        property => <MetadataProperty
+            editable={props.editable && !isDateTimeProperty(property)}
+            subject={props.subject}
+            key={property.key}
+            property={property}/>
 
     return <List dense classes={props.classes}>
-        {props.properties.map(renderProperty)}
-        </List>
+        {
+            props.properties
+                .map(property => {
+                    property.domain = domain;
+                    return property;
+                })
+                .map(renderProperty)
+        }
+    </List>
 }
 
 export default withStyles(styles)(MetadataViewer)

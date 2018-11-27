@@ -19,7 +19,9 @@ import java.time.ZonedDateTime;
 public class Collection {
     public enum CollectionType {
         LOCAL_FILE,
-        S3_BUCKET
+        AZURE_BLOB_STORAGE,
+        S3_BUCKET,
+        GOOGLE_CLOUD_BUCKET
     }
 
     @Id

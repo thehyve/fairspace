@@ -5,6 +5,7 @@ import io.fairspace.neptune.vocabulary.Fairspace;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class CollectionMetadataService {
 
         Resource subject = model.createResource(getCollectionUri(collection.getId()));
         model.add(subject, RDF.type, Fairspace.Collection);
-        model.add(subject, Fairspace.name, model.createLiteral(collection.getName()));
+        model.add(subject, RDFS.label, model.createLiteral(collection.getName()));
         model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
         if (collection.getCreator() != null) {
             model.add(subject, Fairspace.creator, model.createResource(getUserUri(collection.getCreator())));
@@ -65,7 +66,7 @@ public class CollectionMetadataService {
         Resource subject = model.createResource(getCollectionUri(collection.getId()));
 
         if (collection.getName() != null) {
-            model.add(subject, Fairspace.name, model.createLiteral(requireNonNull(collection.getName(), "CollectionMetadata name is mandatory")));
+            model.add(subject, RDFS.label, model.createLiteral(requireNonNull(collection.getName(), "CollectionMetadata name is mandatory")));
         }
 
         if (collection.getDescription() != null) {
