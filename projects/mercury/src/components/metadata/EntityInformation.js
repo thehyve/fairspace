@@ -1,6 +1,4 @@
 import {connect} from 'react-redux';
-import Metadata from './Metadata';
-import metadataAPI from '../../services/MetadataAPI/MetadataAPI';
 import React from 'react';
 import Table from "@material-ui/core/Table/Table";
 import TableRow from "@material-ui/core/TableRow";
@@ -9,7 +7,7 @@ import TableCell from "@material-ui/core/TableCell";
 export class EntityInformation extends React.Component {
 
     render() {
-        const {id, label, comment, subject} = this.props;
+        const {id, label, comment} = this.props;
         return (
             <div>
                 <Table>
@@ -30,12 +28,6 @@ export class EntityInformation extends React.Component {
                     }
 
                 </Table>
-
-                <Metadata
-                    editable={true}
-                    metadataAPI={metadataAPI}
-                    subject={this.props.subject}
-                />
             </div>
         );
     }
@@ -43,8 +35,8 @@ export class EntityInformation extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject} = state;
-    const {match: {params}} = ownProps;
-    const subject = `${window.location.origin}/iri/${params.type}/${params.id}`;
+    const {id, type} = ownProps;
+    const subject = `${window.location.origin}/iri/${type}/${id}`;
     let typeProp = undefined;
     if (metadataBySubject &&
         metadataBySubject[subject] &&
@@ -62,8 +54,7 @@ const mapStateToProps = (state, ownProps) => {
         typeProp.values[0].comment : undefined;
 
     return {
-        subject: subject,
-        id: params.id,
+        id: id,
         label: label,
         comment: comment
     };
