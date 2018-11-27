@@ -1,3 +1,6 @@
+// When testing from electron for a PR, the cache control settings used
+// for reloading the collaborators are not respected. That causes the
+// test to fail, because it does not see the updated settings.
 describe('Collection collaborators', function () {
     let uniqueId = 0;
     let collectionName = '';
@@ -29,7 +32,7 @@ describe('Collection collaborators', function () {
             .contains('First UserManage').should('exist')
     });
 
-    it.only('should allow addition and deletion of collaborators', function () {
+    it('should allow addition and deletion of collaborators', function () {
         cy.listCollections();
         cy.contains('tr', collectionName).click();
 
@@ -45,7 +48,6 @@ describe('Collection collaborators', function () {
             .contains('Test UserRead').should('exist')
 
         // Login as the other user
-        cy.logout();
         cy.login({ username: Cypress.env("SECOND_USER"), password: Cypress.env("PASSWORD") });
         cy.listCollections();
 

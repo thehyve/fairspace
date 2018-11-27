@@ -29,7 +29,7 @@ fi
 # When doing a real release (on the release branch) we have to
 # build all artifacts, as there have never been other builds for this
 # particular version
-if [[ $SHOULD_RELEASE ]] && [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then
+if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then
     exit 0
 fi
 

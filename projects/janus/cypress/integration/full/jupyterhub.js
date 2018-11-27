@@ -103,7 +103,7 @@ describe('JupyterHub', function () {
         // the user is logged out between tests. This is most probably caused
         // by the JSESSIONID cookie being removed.
         // The easiest fix is to login again
-        cy.login();
+        cy.loginWithBrowser();
 
         // Go to a metadata page about a patient
         cy.visit("/notebooks");

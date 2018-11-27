@@ -1,7 +1,7 @@
 version: '3'
 services:
   pluto:
-    image: fairspace.azurecr.io/fairspace/pluto:0.5.3-SNAPSHOT
+    image: fairspace.azurecr.io/fairspace/pluto:${VERSION}
     ports:
       - "22000:8080"
     networks:
@@ -9,11 +9,11 @@ services:
     volumes:
       - "./config/pluto:/opt/config"
   mercury:
-    image: fairspace.azurecr.io/fairspace/mercury:0.5.3-SNAPSHOT
+    image: fairspace.azurecr.io/fairspace/mercury:${VERSION}
     networks:
       - e2e-testing
   neptune:
-    image: fairspace.azurecr.io/fairspace/neptune:0.5.3-SNAPSHOT
+    image: fairspace.azurecr.io/fairspace/neptune:${VERSION}
     networks:
       - e2e-testing
     depends_on:
@@ -21,7 +21,7 @@ services:
     volumes:
     - "./config/neptune:/opt/config"
   ceres:
-    image: fairspace.azurecr.io/fairspace/ceres:0.5.3-SNAPSHOT
+    image: fairspace.azurecr.io/fairspace/ceres:${VERSION}
     networks:
       - e2e-testing
     depends_on:
@@ -29,7 +29,7 @@ services:
     volumes:
       - "./config/ceres:/opt/config"
   titan:
-    image: fairspace.azurecr.io/fairspace/titan:0.5.3-SNAPSHOT
+    image: fairspace.azurecr.io/fairspace/titan:${VERSION}
     networks:
       - e2e-testing
     depends_on:
