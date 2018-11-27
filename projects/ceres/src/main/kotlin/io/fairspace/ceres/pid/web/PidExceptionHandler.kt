@@ -5,7 +5,6 @@ import io.fairspace.ceres.web.ErrorBody
 import io.fairspace.ceres.pid.exception.InvalidPersistentIdentifierException
 import io.fairspace.ceres.pid.exception.MappingNotFoundException
 import io.fairspace.ceres.pid.exception.ValueAlreadyExistsException
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -24,13 +23,13 @@ class PidExceptionHandler {
     @ExceptionHandler(ValueAlreadyExistsException::class)
     @ResponseStatus(HttpStatus.CONFLICT)
     protected fun handleMappingAlreadyExistsException(ex: ValueAlreadyExistsException): ErrorBody {
-        return ErrorBody("Mapping already exists: ${ex}")
+        return ErrorBody("Mapping already exists: $ex")
     }
 
     @ExceptionHandler(InvalidPersistentIdentifierException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun invalidPersistentIdentifierException(ex: InvalidPersistentIdentifierException): ErrorBody {
-        return ErrorBody("Invalid persistent identifier: ${ex}")
+        return ErrorBody("Invalid persistent identifier: $ex")
     }
 
     @ExceptionHandler(InvalidParameterException::class)

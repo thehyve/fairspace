@@ -1,6 +1,6 @@
 package io.fairspace.ceres.web
 
-import org.slf4j.LoggerFactory
+import mu.KotlinLogging.logger
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.HttpMediaTypeNotAcceptableException
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @ControllerAdvice
 @ResponseBody
 class CeresExceptionHandler {
-    val log = LoggerFactory.getLogger(CeresExceptionHandler::class.java);
+    val log = logger {  }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
