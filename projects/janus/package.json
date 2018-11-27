@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/fairspace/Janus#readme",
   "devDependencies": {
-    "cypress": "^3.0.3"
+    "cypress": "^3.1.2"
   }
 }

@@ -1,9 +1,13 @@
+// When testing from electron for a PR, the cache control settings used
+// for reloading the collaborators are not respected. That causes the
+// test to fail, because it does not see the updated settings.
 describe('Collection collaborators', function () {
     let uniqueId = 0;
     let collectionName = '';
     let fileUrl;
 
     before(() => {
+        console.error("Start logging in")
         // Login and ensure clean setup of test assets
         cy.login() && cy.setupClean();
         
@@ -37,15 +41,14 @@ describe('Collection collaborators', function () {
         // Add other user as collaborator
         cy.get('[role="dialog"] input[type="text"]').click({force:true})
         cy.contains('Test User').click();
-        cy.contains('button', 'Submit').click();
+        cy.contains('[role="dialog"] button', 'Submit').click();
 
         // Ensure its visibility on the screen
         getCollaboratorsCard()
             .contains('Test UserRead').should('exist')
 
         // Login as the other user
-        cy.logout();
-        cy.login(Cypress.env("SECOND_USER"), Cypress.config("password"));
+        cy.login({ username: Cypress.env("SECOND_USER"), password: Cypress.env("PASSWORD") });
         cy.listCollections();
 
         // Verify the existence of the collection and files
@@ -75,7 +78,7 @@ describe('Collection collaborators', function () {
             .contains('Test UserRead').should('not.exist')
 
         // Login as the other user
-        cy.login(Cypress.env("SECOND_USER"), Cypress.config("password"));
+        cy.login({username: Cypress.env("SECOND_USER"), password: Cypress.env("PASSWORD")});
         cy.listCollections();
 
         // Verify the existence of the collection and files

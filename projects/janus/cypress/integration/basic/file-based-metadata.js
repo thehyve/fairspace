@@ -41,9 +41,13 @@ describe('File-based metadata', function () {
 
         // Verify that there is a link from the directory to the file
         cy.url().then(currentUrl => {
+            // As the hostname may be different for e2e testing, we
+            // only check the path part
+            const currentPath = new URL(currentUrl).pathname;
             getMetadataContainer("Metadata for metadata-dir", "Part of collection")
                 .find("li a")
-                .should('have.attr', 'href', currentUrl)
+                .should('have.attr', 'href')
+                .should('contain', currentPath)
         })
     })
 
@@ -161,7 +165,8 @@ describe('File-based metadata', function () {
         cy.contains("button", "Create").click();
 
         // Wait sometime and refresh to ensure that the metadata is propagated
-        cy.wait(400);
+        cy.get('[role="dialog"]').should('not.exist');
+        cy.wait(300);
     }
 
 

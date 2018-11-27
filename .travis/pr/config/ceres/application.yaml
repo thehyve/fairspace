@@ -1,0 +1,25 @@
+# OAuth2 base configuration
+app:
+  oauth2:
+    base-url: http://keycloak:8080
+    realm: e2e
+  metadata:
+    base-url: http://e2e-test
+
+# Tracing configuration
+spring:
+  sleuth:
+    sampler:
+      probability: 0.1
+  zipkin:
+    enabled: false
+  rabbitmq:
+    host: rabbitmq
+    username: guest
+    password: guest
+    virtualHost: "/"
+
+# Where to store the dataset
+jena:
+  dataset:
+    path: /tmp
