@@ -6,7 +6,17 @@ PROJECT=$1
 export APPNAME=$(basename $PROJECT)
 export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
 
-if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE $PROJECT; then
+# If we are building a PR, use the target branch as 'commit range'.
+# As it is used with `git diff ...`, it will trigger all files that
+# have updated in the complete pull request
+if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
+  COMMIT_TRIGGER=$TRAVIS_COMMIT_RANGE
+else
+  COMMIT_TRIGGER=$TRAVIS_BRANCH
+fi
+
+# Only execute build if something has changed within the project
+if $DIR/build-condition.sh $COMMIT_TRIGGER $PROJECT; then
     echo "Building $APPNAME...";
     cd $PROJECT
 
