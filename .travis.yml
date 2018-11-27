@@ -68,7 +68,7 @@ jobs:
       - .travis/build.sh projects/jupyterhub-hub
       - .travis/build.sh projects/jupyterhub-singleuser
       - .travis/build.sh projects/oidc-auth
-      - 'if [[ $TRAVIS_PULL_REQUEST ]]; then ./travis/pr/start-local-environment.sh && .travis/pr/run-e2e-tests.sh; fi'
+      - 'if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then .travis/pr/start-local-environment.sh && .travis/pr/run-e2e-tests.sh; fi'
     - stage: build
       name: Build helm charts
       install:
