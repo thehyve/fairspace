@@ -23,7 +23,6 @@ class Vocabulary {
 
         // Cache a version of the vocabulary by id, to do easy lookups
         this.vocabularyById = this._groupVocabularyById();
-        console.log('this.vocabularyById',this.vocabularyById)
     }
 
     /**
