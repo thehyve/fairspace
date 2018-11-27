@@ -328,7 +328,7 @@
                 }
             ],
             "rdfs:label": "Is about person",
-            "rdfs: comment": "This is the description/comment for 'Is about person'",
+            "rdfs:comment": "This is the description/comment for 'Is about person'",
             "rdfs:range": [
                 {
                     "@id": "foaf:Person"
@@ -351,7 +351,7 @@
                 }
             ],
             "rdfs:label": "Is about material",
-            "rdfs: comment": "This is the description/comment for 'Is about material'",
+            "rdfs:comment": "This is the description/comment for 'Is about material'",
             "rdfs:range": [
                 {
                     "@id": "osiris:BiologicalSample"

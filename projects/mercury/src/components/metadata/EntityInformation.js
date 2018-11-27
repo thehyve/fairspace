@@ -12,18 +12,18 @@ export class EntityInformation extends React.Component {
             <div>
                 <Table>
                     <TableRow>
-                        <TableCell>Id: </TableCell> <TableCell>{id}</TableCell>
+                        <TableCell>Id:</TableCell> <TableCell>{id}</TableCell>
                     </TableRow>
                     {
                         label ?
                             <TableRow>
-                                <TableCell>Type: </TableCell> <TableCell>{label}</TableCell>
+                                <TableCell>Type:</TableCell> <TableCell>{label}</TableCell>
                             </TableRow> : ''
                     }
                     {
                         comment ?
                             <TableRow>
-                                <TableCell>Description: </TableCell> <TableCell>{comment}</TableCell>
+                                <TableCell>Description:</TableCell> <TableCell>{comment}</TableCell>
                             </TableRow> : ''
                     }
 
@@ -46,12 +46,8 @@ const mapStateToProps = (state, ownProps) => {
             return prop.key === '@type';
         });
     }
-
-    const label = typeProp && typeProp.values && typeProp.values[0] ?
-        typeProp.values[0].label : undefined;
-
-    const comment = typeProp && typeProp.values && typeProp.values[0] ?
-        typeProp.values[0].comment : undefined;
+    const label = typeProp && typeProp.values && typeProp.values[0];
+    const comment = typeProp && typeProp.values && typeProp.values[0];
 
     return {
         id: id,
