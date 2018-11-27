@@ -24,8 +24,6 @@ public class Fairspace {
 
     public static final Resource Collection = resource("Collection");
 
-    public static final Property name = property("name");
-
     public static final Property description = property("description");
 
     public static final Property creator = property(SCHEMA_ORG_URI,"creator");

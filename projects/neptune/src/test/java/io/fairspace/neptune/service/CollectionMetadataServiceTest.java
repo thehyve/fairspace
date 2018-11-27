@@ -4,6 +4,7 @@ import io.fairspace.neptune.model.Collection;
 import io.fairspace.neptune.vocabulary.Fairspace;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +57,7 @@ public class CollectionMetadataServiceTest {
                         Fairspace.Collection)
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
-                        Fairspace.name,
+                        RDFS.label,
                         m.createLiteral(c.getName()))
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
@@ -92,7 +93,7 @@ public class CollectionMetadataServiceTest {
                         Fairspace.Collection)
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
-                        Fairspace.name,
+                        RDFS.label,
                         m.createLiteral(c.getName()))
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
@@ -132,7 +133,7 @@ public class CollectionMetadataServiceTest {
                 .patchTriples(argThat(m -> m.size() == 1
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
-                        Fairspace.name,
+                        RDFS.label,
                         m.createLiteral(c.getName()))));
     }
 
@@ -163,7 +164,7 @@ public class CollectionMetadataServiceTest {
                 .patchTriples(argThat(m -> m.size() == 2
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
-                        Fairspace.name,
+                        RDFS.label,
                         m.createLiteral(c.getName()))
                         && m.contains(
                         m.createResource(EXPECTED_COLLECTION_URI),
