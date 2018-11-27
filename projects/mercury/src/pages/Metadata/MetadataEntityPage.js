@@ -17,8 +17,14 @@ export class MetadataEntityPage extends React.Component{
 
                 <List>
                     <ListItem>Id: {this.props.id}</ListItem>
-                    <ListItem>Id: {this.props.label}</ListItem>
-                    <ListItem>Id: {this.props.comment}</ListItem>
+                    {
+                        this.props.label ?
+                        <ListItem>{this.props.label}</ListItem> : ''
+                    }
+                    {
+                        this.props.comment ?
+                        <ListItem>{this.props.comment}</ListItem> : ''
+                    }
                 </List>
 
                 <Metadata
