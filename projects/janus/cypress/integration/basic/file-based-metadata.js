@@ -165,7 +165,8 @@ describe('File-based metadata', function () {
         cy.contains("button", "Create").click();
 
         // Wait sometime and refresh to ensure that the metadata is propagated
-        cy.wait(400);
+        cy.get('[role="dialog"]').should('not.exist');
+        cy.wait(300);
     }
 
 
