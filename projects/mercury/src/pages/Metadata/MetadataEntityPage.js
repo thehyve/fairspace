@@ -40,25 +40,21 @@ export class MetadataEntityPage extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {match: {params}} = ownProps;
     const subject = `${window.location.origin}/iri/${params.type}/${params.id}`;
-    let labelProp = undefined;
-    let commentProp = undefined;
+    let typeProp = undefined;
     if (state['metadataBySubject'] &&
         state['metadataBySubject'][subject] &&
         state['metadataBySubject'][subject]['data']) {
         const data = state['metadataBySubject'][subject]['data'];
-        labelProp = data.find(prop => {
-            return prop.key === LABEL_URI;
-        });
-        commentProp = data.find(prop => {
-            return prop.key === COMMENT_URI;
+        typeProp = data.find(prop => {
+            return prop.key === '@type';
         });
     }
 
-    const label = labelProp && labelProp.values && labelProp.values[0] ?
-        labelProp.values[0] : undefined;
+    const label = typeProp && typeProp.values && typeProp.values[0] ?
+        typeProp.values[0].label : undefined;
 
-    const comment = commentProp && commentProp.values && commentProp.values[0] ?
-        commentProp.values[0] : undefined;
+    const comment = typeProp && typeProp.values && typeProp.values[0] ?
+        typeProp.values[0].comment : undefined;
 
     return {
         subject: subject,

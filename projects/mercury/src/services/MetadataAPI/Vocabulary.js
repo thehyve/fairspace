@@ -6,6 +6,7 @@ import {
     DOMAIN_URI,
     FAIRSPACE_ENTITY_URI,
     LABEL_URI,
+    COMMENT_URI,
     MULTILINE_PROPERTY_URI,
     PROPERTY_URI,
     RANGE_URI
@@ -22,6 +23,7 @@ class Vocabulary {
 
         // Cache a version of the vocabulary by id, to do easy lookups
         this.vocabularyById = this._groupVocabularyById();
+        console.log('this.vocabularyById',this.vocabularyById)
     }
 
     /**
@@ -187,7 +189,8 @@ class Vocabulary {
         return values
             .map(type => ({
                 id: type,
-                label: Vocabulary._getLabel(this.vocabularyById[type])
+                label: Vocabulary._getLabel(this.vocabularyById[type]),
+                comment: Vocabulary._getComment(this.vocabularyById[type])
             }))
     }
 
@@ -232,6 +235,10 @@ class Vocabulary {
 
     static _getLabel(vocabularyEntry) {
         return this._getFirstPredicateValue(vocabularyEntry, LABEL_URI, '');
+    }
+
+    static _getComment(vocabularyEntry) {
+        return this._getFirstPredicateValue(vocabularyEntry, COMMENT_URI, '');
     }
 
 }
