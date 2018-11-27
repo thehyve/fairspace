@@ -1,9 +1,6 @@
 import React from 'react';
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
+import ConfirmationDialog from '../../../generic/ConfirmationDialog/ConfirmationDialog';
 
 class ButtonWithVerification extends React.Component {
     state = {
@@ -46,6 +43,21 @@ class ButtonWithVerification extends React.Component {
         }
     }
 
+
+    renderConfirmationDialog() {
+        if(this.state.verifying) {
+            const content = this.props['aria-label'] + '?';
+            return (<ConfirmationDialog open={this.state.verifying}
+                                        title={'Confirmation'}
+                                        content={content}
+                                        onAgree={this.handleClick.bind(this)}
+                                        onDisagree={this.closeDialog.bind(this)}
+                                        onClose={this.closeDialog.bind(this)}/>);
+        }
+
+        return '';
+    }
+
     render() {
         return (
             <div style={{visibility: this.props.visibility}}>
@@ -54,22 +66,7 @@ class ButtonWithVerification extends React.Component {
                             disabled={this.props.disabled}>
                     {this.props.children}
                 </IconButton>
-                <Dialog
-                    open={this.state.verifying}
-                    onClick={(e) => e.stopPropagation()}
-                    onClose={this.closeDialog.bind(this)}
-                    aria-labelledby="form-dialog-title"
-                >
-                    <DialogTitle id="form-dialog-title">{this.dialogText}</DialogTitle>
-                    <DialogActions>
-                        <Button onClick={this.handleClick.bind(this)} color="secondary">
-                            Yes
-                        </Button>
-                        <Button onClick={this.closeDialog.bind(this)} color="primary">
-                            No
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                {this.renderConfirmationDialog()}
             </div>
         );
     }
