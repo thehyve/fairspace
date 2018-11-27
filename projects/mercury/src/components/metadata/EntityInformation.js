@@ -1,26 +1,35 @@
 import connect from 'react-redux/es/connect/connect';
-import List from '@material-ui/core/List/List';
-import ListItem from '@material-ui/core/ListItem/ListItem';
 import Metadata from './Metadata';
 import metadataAPI from '../../services/MetadataAPI/MetadataAPI';
 import React from 'react';
+import Table from '@material-ui/core/es/Table/Table';
+import TableRow from '@material-ui/core/es/TableRow/TableRow';
+import TableCell from '@material-ui/core/es/TableCell/TableCell';
 
 export class EntityInformation extends React.Component {
 
     render() {
+        const {id, label, comment, subject} = this.props;
         return (
             <div>
-                <List>
-                    <ListItem>Id: {this.props.id}</ListItem>
+                <Table>
+                    <TableRow>
+                        <TableCell>Id: </TableCell> <TableCell>{id}</TableCell>
+                    </TableRow>
                     {
-                        this.props.label ?
-                            <ListItem>{this.props.label}</ListItem> : ''
+                        label ?
+                            <TableRow>
+                                <TableCell>Type: </TableCell> <TableCell>{label}</TableCell>
+                            </TableRow> : ''
                     }
                     {
-                        this.props.comment ?
-                            <ListItem>{this.props.comment}</ListItem> : ''
+                        comment ?
+                            <TableRow>
+                                <TableCell>Description: </TableCell> <TableCell>{comment}</TableCell>
+                            </TableRow> : ''
                     }
-                </List>
+
+                </Table>
 
                 <Metadata
                     editable={true}
