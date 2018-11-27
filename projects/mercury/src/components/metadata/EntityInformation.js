@@ -46,8 +46,9 @@ const mapStateToProps = (state, ownProps) => {
             return prop.key === '@type';
         });
     }
-    const label = typeProp && typeProp.values && typeProp.values[0];
-    const comment = typeProp && typeProp.values && typeProp.values[0];
+
+    const label = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
+    const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
 
     return {
         id: id,
