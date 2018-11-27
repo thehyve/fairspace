@@ -1,10 +1,10 @@
-import connect from 'react-redux/es/connect/connect';
+import {connect} from 'react-redux';
 import Metadata from './Metadata';
 import metadataAPI from '../../services/MetadataAPI/MetadataAPI';
 import React from 'react';
-import Table from '@material-ui/core/es/Table/Table';
-import TableRow from '@material-ui/core/es/TableRow/TableRow';
-import TableCell from '@material-ui/core/es/TableCell/TableCell';
+import Table from "@material-ui/core/Table/Table";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 
 export class EntityInformation extends React.Component {
 
@@ -42,13 +42,14 @@ export class EntityInformation extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
+    const {metadataBySubject} = state;
     const {match: {params}} = ownProps;
     const subject = `${window.location.origin}/iri/${params.type}/${params.id}`;
     let typeProp = undefined;
-    if (state['metadataBySubject'] &&
-        state['metadataBySubject'][subject] &&
-        state['metadataBySubject'][subject]['data']) {
-        const data = state['metadataBySubject'][subject]['data'];
+    if (metadataBySubject &&
+        metadataBySubject[subject] &&
+        metadataBySubject[subject]['data']) {
+        const data = metadataBySubject[subject]['data'];
         typeProp = data.find(prop => {
             return prop.key === '@type';
         });
