@@ -68,7 +68,7 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
 
     private fun <R> read(action: Model.() -> R): R = calculateRead(dataset) { action(model.get()) }
 
-    private fun write(action: Model.() -> Unit) = executeWrite(dataset) { action(dataset.defaultModel) }
+    private fun write(action: Model.() -> Unit) = executeWrite(dataset) { action(model.get()) }
 
     private fun ResultSet.detach() = ResultSetMem(this)
 
