@@ -4,6 +4,7 @@ import io.fairspace.ceres.metadata.TestData
 import io.fairspace.ceres.metadata.repository.ModelRepository
 import io.fairspace.ceres.metadata.repository.parse
 import io.fairspace.ceres.metadata.repository.toString
+import io.fairspace.ceres.metadata.service.MetadataService
 import org.apache.jena.riot.RDFFormat
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -28,12 +29,15 @@ class StatementsControllerTest {
     @MockBean
     private lateinit var modelRepository: ModelRepository
 
+    @MockBean
+    private lateinit var metadataService: MetadataService
+
     val JSON_LD = RDFFormat.JSONLD.lang.headerString
 
     @Test
     fun testGet() {
         val subject = TestData.personURI
-        `when`(modelRepository.list(subject, null, null)).thenReturn(TestData.model)
+        `when`(metadataService.getStatementsWithObjectLabels(subject, null, null)).thenReturn(TestData.model)
 
         // Happy flow
         this.mockMvc
@@ -50,7 +54,7 @@ class StatementsControllerTest {
     @Test
     fun testGetOtherAcceptHeader() {
         val subject = TestData.personURI
-        `when`(modelRepository.list(subject, null)).thenReturn(TestData.model)
+        `when`(metadataService.getStatementsWithObjectLabels(subject, null)).thenReturn(TestData.model)
 
         this.mockMvc
                 .perform(get("/statements?subject=" + subject))

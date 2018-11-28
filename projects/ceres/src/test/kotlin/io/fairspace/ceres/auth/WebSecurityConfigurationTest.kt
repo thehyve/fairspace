@@ -12,6 +12,7 @@ import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.fairspace.ceres.metadata.repository.ModelRepository
+import io.fairspace.ceres.metadata.service.MetadataService
 import net.minidev.json.JSONObject
 import org.apache.jena.query.Dataset
 import org.apache.jena.rdf.model.ModelFactory
@@ -56,6 +57,9 @@ class WebSecurityConfigurationTest {
     private val modelRepository: ModelRepository? = null
 
     @MockBean
+    private val metadataService: MetadataService? = null
+
+    @MockBean
     private val dataset: Dataset? = null
 
     private var publicKey: RSAPublicKey? = null
@@ -87,7 +91,7 @@ class WebSecurityConfigurationTest {
     @Test
     @Throws(JOSEException::class)
     fun testValidAccessToken() {
-        `when`(modelRepository?.list(any(), any(), any())).thenReturn(ModelFactory.createDefaultModel())
+        `when`(metadataService?.getStatementsWithObjectLabels(any(), any(), any())).thenReturn(ModelFactory.createDefaultModel())
         val response = getWithKey(signedJWT)
         assertEquals(HttpStatus.OK, response.statusCode)
     }
