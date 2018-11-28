@@ -21,4 +21,6 @@ node_modules/.bin/cypress run \
   --spec cypress/integration/basic/**/*.js \
   --config baseUrl=http://localhost:22000
 
+result=$?
 echo -e "travis_fold:end:e2e-tests"
+exit $result

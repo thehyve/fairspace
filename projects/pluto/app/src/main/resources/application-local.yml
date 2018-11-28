@@ -1,16 +1,15 @@
+server.port: 5000
 app:
   forceHttps: false
   oauth2:
-    base-url: http://192.168.99.100:30881
-    realm: curie
-
-logging.level.io.fairspace: DEBUG
+    base-url: http://localhost:5100
+    realm: minikube
 
 security:
   oidc:
-    required-authority: user-test
-    clientId: test-pluto
-    clientSecret: c108557d-9e9a-44e2-bb4d-d6f8cbef5860
+    required-authority: user-ws
+    clientId: ws-pluto
+    clientSecret: 00000000-0000-0000-0000-000000000000
 
 spring:
   zipkin:
@@ -20,9 +19,12 @@ spring:
 zuul:
   routes:
     storage:
-      url: http://192.168.99.100:31098/
+      url: http://localhost:5110
+    metadata:
+      url: http://localhost:5120
     collections:
-      url: http://localhost:8082/
+      url: http://localhost:5130
     ui:
-      url: http://192.168.99.100:30721/
+      url: http://localhost:3000
+
   include-debug-header: true

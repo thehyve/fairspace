@@ -8,7 +8,6 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import AlterPermission from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import ErrorDialog from "../error/ErrorDialog";
@@ -18,6 +17,7 @@ import ActionItem from "../generic/MoreActions/ActionItem";
 import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 import {findById} from "../../utils/arrayutils";
+import LoadingInlay from '../generic/Loading/LoadingInlay';
 
 export const styles = theme => ({
     collaboratorList: {
@@ -76,7 +76,7 @@ export class PermissionsViewer extends React.Component {
             error: false,
             selectedUser: null,
             currentLoggedUser: null,
-            canManage: false,
+            canManage: false
         };
     }
 
@@ -137,6 +137,7 @@ export class PermissionsViewer extends React.Component {
             showConfirmDeleteDialog: false,
         });
     };
+
     renderAlterPermissionButtons(idx, collaborator) {
         const {canManage, currentLoggedUser} = this.props;
         return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
@@ -157,14 +158,15 @@ export class PermissionsViewer extends React.Component {
     renderCollaboratorList(permissions) {
         return sortPermissions(permissions)
             .map((p, idx) => {
-                return (<ListItem
-                    key={idx}
-                    onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
-                    onMouseOut={() => this.props.onItemMouseOut(idx)}
-                >
-                    <ListItemText primary={getDisplayName(p.user)} secondary={p.access}/>
-                    {this.renderAlterPermissionButtons(idx, p)}
-                </ListItem>);
+                return (
+                    <ListItem
+                        key={idx}
+                        onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
+                        onMouseOut={() => this.props.onItemMouseOut(idx)}>
+                        <ListItemText primary={getDisplayName(p.user)} secondary={p.access}/>
+                        {this.renderAlterPermissionButtons(idx, p)}
+                    </ListItem>
+                );
             });
     }
 
@@ -224,7 +226,7 @@ export class PermissionsViewer extends React.Component {
         if (permissions.error) {
             return (<ErrorMessage message={'An error occurred loading permissions'}/>)
         } else if (permissions.pending) {
-            return (<CircularProgress/>);
+            return (<LoadingInlay/>);
         } else if (!permissions || !permissions.data) {
             return (<div>No permission found</div>)
         } else {

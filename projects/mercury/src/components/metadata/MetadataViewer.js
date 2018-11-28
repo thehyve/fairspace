@@ -6,7 +6,8 @@ import {isDateTimeProperty} from "../../utils/metadatautils";
 
 const styles = {
     root: {
-        width: '100%'
+        minWidth: 200,
+        maxWidth: 500
     }
 }
 

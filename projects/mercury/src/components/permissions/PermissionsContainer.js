@@ -7,7 +7,7 @@ const mapStateToProps = ({permissions: {fetch, alter}, account: {user}, cache: {
         currentLoggedUser: user.data,
         permissions: fetch,
         alteredPermission: alter,
-        users: users.data,
+        users: users.data
     };
 };
 

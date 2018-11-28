@@ -3,7 +3,7 @@ import MetadataViewer from "./MetadataViewer";
 import ErrorMessage from "../error/ErrorMessage";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadata";
 import {connect} from 'react-redux';
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import LoadingInlay from '../generic/Loading/LoadingInlay';
 
 export class Metadata extends React.Component {
 
@@ -32,7 +32,7 @@ export class Metadata extends React.Component {
         if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
         } else if (loading) {
-            return <CircularProgress/>;
+            return <LoadingInlay/>;
         } else if (!metadata || metadata.length === 0) {
             return (<div>No metadata found</div>)
         } else {

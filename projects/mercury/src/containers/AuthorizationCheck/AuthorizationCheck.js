@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import { connect } from 'react-redux';
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
 import {withRouter} from "react-router-dom";
+import LoadingInlay from '../../components/generic/Loading/LoadingInlay';
 
 /**
  * This component performs an authorization check for the current user
@@ -50,7 +50,7 @@ function AuthorizationCheck(props) {
     }
 
     if(props.pending) {
-        return <CircularProgress/>
+        return <LoadingInlay/>
     } else if(props.error || !hasAuthorization()) {
         return renderError();
     } else {
