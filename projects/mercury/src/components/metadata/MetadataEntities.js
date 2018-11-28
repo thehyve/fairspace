@@ -17,11 +17,11 @@ import LoadingOverlay from '../generic/Loading/LoadingOverlay';
 
 function MetadataEntities({loading, creatingMetadataEntity, error, entities, load, vocabulary, types, create}) {
     load();
-    
-    if(loading) {
+
+    if (loading) {
         return <LoadingInlay/>
-    } else if(error) {
-        return <ErrorMessage message={"An error occurred while loading metadata"} />
+    } else if (error) {
+        return <ErrorMessage message={"An error occurred while loading metadata"}/>
     }
 
     return (

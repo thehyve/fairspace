@@ -57,9 +57,7 @@ function FileOperations(props) {
 
     function handleCreateDirectory(name) {
         return createDirectory(openedCollection, openedPath, name)
-            .then(() => {
-                refreshFiles();
-            })
+            .then(refreshFiles)
             .catch(err => {
                 if (err.status === 405) {
                     // Directory already exists

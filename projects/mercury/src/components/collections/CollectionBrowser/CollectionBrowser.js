@@ -45,9 +45,7 @@ class CollectionBrowser extends React.Component {
     handleCollectionDelete(collection) {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
         deleteCollection(collection.id)
-            .then(() => {
-                fetchCollectionsIfNeeded();
-            })
+            .then(fetchCollectionsIfNeeded)
             .catch(err =>
                 ErrorDialog.showError(
                     err,
@@ -99,9 +97,7 @@ class CollectionBrowser extends React.Component {
     handleAddCollection(name, description, type) {
         this.setState({editingCollection: false});
         this.props.addCollection(name, description, type)
-            .then(() => {
-                this.props.fetchCollectionsIfNeeded();
-            })
+            .then(this.props.fetchCollectionsIfNeeded)
             .catch(err =>
                 ErrorDialog.showError(
                     err,
