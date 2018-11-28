@@ -10,7 +10,15 @@ export const fetchPermissions = createErrorHandlingPromiseAction((collectionId, 
     }
 }));
 
-export const fetchPermissionsIfNeeded = (collectionId, useCache = true) => dispatchIfNeeded(
+/**
+ * Method to retrieve permissions from the backend when the data is not available or invalidated
+ * Please note that by default it does not use the browser cache (i.e. explicitly reloading from the backend)
+ *
+ * @param collectionId
+ * @param useCache
+ * @returns {Function}
+ */
+export const fetchPermissionsIfNeeded = (collectionId, useCache = false) => dispatchIfNeeded(
     () => fetchPermissions(collectionId, useCache),
     state => state && state.cache && state.cache.permissionsByCollectionId ? state.cache.permissionsByCollectionId[collectionId]: undefined
 );
