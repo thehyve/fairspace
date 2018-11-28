@@ -65,7 +65,7 @@ function MetadataProperty({editable, subject, property, updateMetadata, onItemMo
         return (
             <ListItem key={idx}
                       onMouseOver={(e) => onItemMouseOver(idx, e)}
-                      onMouseOut={() => onItemMouseOver(idx)}
+                      onMouseOut={() => onItemMouseOut(idx)}
             >
                 <ListItemText>
                     <PropertyValueComponent
