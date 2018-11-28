@@ -11,15 +11,9 @@ const mapStateToProps = ({permissions: {fetch, alter}, account: {user}, cache: {
     };
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-        alterPermission: (userId, collectionId, access) => {
-            return dispatch(alterPermission(userId, collectionId, access))
-        },
-        fetchPermissions: (collectionId, useCache = true) => {
-            dispatch(fetchPermissions(collectionId, useCache))
-        }
-    }
+const mapDispatchToProps = {
+    alterPermission,
+    fetchPermissions
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PermissionsViewer);
