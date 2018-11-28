@@ -12,13 +12,9 @@ import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
 import org.apache.jena.system.Txn
 import org.springframework.stereotype.Component
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 
 @Component
 class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
-    private val lock = ReentrantReadWriteLock()
     private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)
     private val log = logger {}
 
@@ -43,14 +39,7 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
     }
 
     fun query(queryString: String): Any { // ResultSet | Model | Boolean
-        log.trace {
-            val singleLieQuery = queryString
-                    .splitToSequence('\n')
-                    .map(String::trim)
-                    .filter(CharSequence::isNotEmpty)
-                    .joinToString(" ")
-            "Executing SPARQL: $singleLieQuery"
-        }
+        log.trace { "Executing SPARQL: ${toSingleLine(queryString)}" }
         return read {
             QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
                 when (query.queryType) {
@@ -74,14 +63,17 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
         }
     }
 
-    private fun <R> read(action: Model.() -> R): R = lock.read {
-         Txn.calculateRead(dataset) { action(model) }
-    }
+    private fun <R> read(action: Model.() -> R): R = Txn.calculateRead(dataset) { action(model) }
 
-    private fun write(action: Model.() -> Unit) = lock.write {
-        Txn.executeWrite(dataset) { action(model) }
-    }
+    private fun write(action: Model.() -> Unit) = Txn.executeWrite(dataset) { action(model) }
 
     private fun ResultSet.detach() = ResultSetMem(this)
+
     private fun Model.detach() = ModelFactory.createDefaultModel().add(this)
+
+    private fun toSingleLine(s: String) =
+            s.splitToSequence('\n')
+                    .map(String::trim)
+                    .filter(CharSequence::isNotEmpty)
+                    .joinToString(" ")
 }
