@@ -16,47 +16,47 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class ModelRepositoryTest {
-    var repo: ModelRepository? = null
-    var dataset: Dataset? = null
-    var reasoner: Reasoner? = null
+    lateinit var repo: ModelRepository
+    lateinit var dataset: Dataset
+    lateinit var reasoner: Reasoner
 
     @Before
     fun setUp() {
         dataset = DatasetFactory.create()
         reasoner = GenericRuleReasoner(emptyList())
-        repo = ModelRepository(dataset!!, reasoner!!)
+        repo = ModelRepository(dataset, reasoner)
     }
 
     @Test
     fun `adding an empty model is a noop`() {
         val delta = ModelFactory.createDefaultModel()
-        repo!!.add(delta)
-        assertFalse(dataset!!.listNames().hasNext())
-        assertTrue(dataset!!.isEmpty)
+        repo.add(delta)
+        assertFalse(dataset.listNames().hasNext())
+        assertTrue(dataset.isEmpty)
     }
 
     @Test
     fun `adding to an empty model results in an isomorphic model`() {
-        repo!!.add(TestData.model)
+        repo.add(TestData.model)
 
-        assertTrue(TestData.model.isIsomorphicWith(dataset!!.defaultModel))
-        assertEquals(4, repo!!.list(null, null).listStatements().toList().size)
+        assertTrue(TestData.model.isIsomorphicWith(dataset.defaultModel))
+        assertEquals(4, repo.list(null, null).listStatements().toList().size)
     }
 
     @Test
     fun `adding a model is idempotent`() {
-        repo!!.add(TestData.model)
-        repo!!.add(TestData.model)
-        assertTrue(TestData.model.isIsomorphicWith(dataset!!.defaultModel))
-        assertEquals(4, repo!!.list(null, null).listStatements().toList().size)
+        repo.add(TestData.model)
+        repo.add(TestData.model)
+        assertTrue(TestData.model.isIsomorphicWith(dataset.defaultModel))
+        assertEquals(4, repo.list(null, null).listStatements().toList().size)
     }
 
     @Test
     fun `single statement removal works as expected`() {
-        repo!!.add(TestData.model)
-        repo!!.remove(TestData.personURI, VCARD.FN.toString())
+        repo.add(TestData.model)
+        repo.remove(TestData.personURI, VCARD.FN.toString())
         assertEquals(TestData.model.listStatements().toList().size - 1,
-                repo!!.list( null, null).listStatements().toList().size)
+                repo.list( null, null).listStatements().toList().size)
     }
 
     @Test
@@ -65,15 +65,15 @@ class ModelRepositoryTest {
         val newName = "William Shakespeare"
 
         // Initialize with initial model
-        repo!!.add(TestData.model)
-        assertTrue(repo!!.list(TestData.personURI).contains(personResource, VCARD.FN, TestData.fullName))
+        repo.add(TestData.model)
+        assertTrue(repo.list(TestData.personURI).contains(personResource, VCARD.FN, TestData.fullName))
 
         // Add a new name
         val delta = createFullNameModel(newName)
-        repo!!.add(delta)
+        repo.add(delta)
 
         // Ensure the fullname has been added, but that the previous one is still there
-        val list = repo!!.list(TestData.personURI, VCARD.FN.toString())
+        val list = repo.list(TestData.personURI, VCARD.FN.toString())
         assertEquals(2, list.size())
         assertTrue(list.contains(personResource, VCARD.FN, newName))
         assertTrue(list.contains(personResource, VCARD.FN, TestData.fullName))
@@ -85,24 +85,24 @@ class ModelRepositoryTest {
         val newName = "William Shakespeare"
 
         // Initialize with initial model
-        repo!!.add(TestData.model)
-        assertTrue(repo!!.list(TestData.personURI).contains(personResource, VCARD.FN, TestData.fullName))
+        repo.add(TestData.model)
+        assertTrue(repo.list(TestData.personURI).contains(personResource, VCARD.FN, TestData.fullName))
 
         // Store the curent name model (firstname and lastname)
-        val name = repo!!.list(TestData.personURI, VCARD.N.toString())
+        val name = repo.list(TestData.personURI, VCARD.N.toString())
 
         // Update the persons name
         val delta = createFullNameModel(newName)
-        repo!!.update(delta)
+        repo.update(delta)
 
         // Ensure the fullname has changed
-        val list = repo!!.list(TestData.personURI, VCARD.FN.toString())
+        val list = repo.list(TestData.personURI, VCARD.FN.toString())
         assertEquals(1, list.size())
         assertTrue(list.contains(personResource, VCARD.FN, newName))
         assertFalse(list.contains(personResource, VCARD.FN, TestData.fullName))
 
         // Ensure the name (first and last) have not changed
-        assertTrue(name.isIsomorphicWith(repo!!.list(TestData.personURI, VCARD.N.toString())))
+        assertTrue(name.isIsomorphicWith(repo.list(TestData.personURI, VCARD.N.toString())))
     }
 
     @Test
@@ -112,21 +112,21 @@ class ModelRepositoryTest {
         val finalName = "Leonardo da Vinci"
 
         // Initialize with initial model
-        repo!!.add(TestData.model)
+        repo.add(TestData.model)
 
         // Add an additional persons name
         val delta = createFullNameModel(newName)
-        repo!!.add(delta)
+        repo.add(delta)
 
-        val list = repo!!.list(TestData.personURI, VCARD.FN.toString())
+        val list = repo.list(TestData.personURI, VCARD.FN.toString())
         assertEquals(2, list.size())
 
         // Now update the value
         val finalDelta = createFullNameModel(finalName)
-        repo!!.update(finalDelta)
+        repo.update(finalDelta)
 
         // Ensure the fullname has changed
-        val finalList = repo!!.list(TestData.personURI, VCARD.FN.toString())
+        val finalList = repo.list(TestData.personURI, VCARD.FN.toString())
         assertEquals(1, finalList.size())
         assertTrue(finalList.contains(personResource, VCARD.FN, finalName))
     }
