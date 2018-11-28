@@ -10,7 +10,6 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import AlterPermission from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
-import ErrorDialog from "../error/ErrorDialog";
 import {getDisplayName} from "../../utils/userUtils";
 import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
@@ -18,6 +17,7 @@ import withHovered from "../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
 import {findById} from "../../utils/arrayutils";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
+import LoadingOverlay from "../generic/Loading/LoadingOverlay";
 
 export const styles = theme => ({
     collaboratorList: {
@@ -67,38 +67,20 @@ const canAlterPermission = (canManage, permission, currentLoggedUser) => {
 };
 
 export class PermissionsViewer extends React.Component {
-
     constructor(props) {
         super(props);
+
         this.state = {
             showPermissionDialog: false,
             showConfirmDeleteDialog: false,
-            error: false,
-            selectedUser: null,
-            currentLoggedUser: null,
-            canManage: false
+            selectedUser: null
         };
     }
 
     componentDidMount() {
-        const {collectionId, fetchPermissions} = this.props;
+        const {collectionId, fetchPermissionsIfNeeded} = this.props;
         if (collectionId) {
-            fetchPermissions(collectionId);
-        }
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        const {collectionId, alteredPermission, fetchPermissions} = this.props;
-        if (collectionId && (collectionId !== prevProps.collectionId)) {
-            fetchPermissions(collectionId);
-        }
-        if (alteredPermission.data !== prevProps.alteredPermission.data) {
-            fetchPermissions(collectionId, false);
-        } else if (prevProps.alteredPermission !== alteredPermission && alteredPermission.error) {
-            const {alteredPermission} = this.props;
-            if (prevProps.alteredPermission !== alteredPermission && alteredPermission.error) {
-                ErrorDialog.showError(true, 'An error occurred while altering the permission.');
-            }
+            fetchPermissionsIfNeeded(collectionId);
         }
     }
 
@@ -116,6 +98,13 @@ export class PermissionsViewer extends React.Component {
         })
     };
 
+    handleRemoveCollaborator = (collaborator) => {
+        this.setState({
+            selectedUser: collaborator,
+            showConfirmDeleteDialog: true
+        });
+    };
+
     handleDeleteCollaborator = () => {
         const {collectionId, alterPermission} = this.props;
         const {selectedUser} = this.state;
@@ -125,13 +114,6 @@ export class PermissionsViewer extends React.Component {
         }
     };
 
-    handleRemoveCollaborator = (collaborator) => {
-        this.setState({
-            selectedUser: collaborator,
-            showConfirmDeleteDialog: true
-        });
-    };
-
     handleCloseConfirmDeleteDialog = () => {
         this.setState({
             showConfirmDeleteDialog: false,
@@ -139,8 +121,8 @@ export class PermissionsViewer extends React.Component {
     };
 
     renderAlterPermissionButtons(idx, collaborator) {
-        const {canManage, currentLoggedUser} = this.props;
-        return canAlterPermission(canManage, collaborator, currentLoggedUser) ? (
+        const {canManage, currentUser} = this.props;
+        return canAlterPermission(canManage, collaborator, currentUser) ? (
             <ListItemSecondaryAction
                 onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
                 onMouseOut={() => this.props.onItemMouseOut(idx)}
@@ -185,24 +167,30 @@ export class PermissionsViewer extends React.Component {
 
     renderUserList = (permissions) => {
         const {users} = this.props;
-        permissions.map(p => p.user = findById(users, p.subject));
+
+        // Extend the permissions map with the user itself
+        const permissionsWithUsers = permissions.map(p => ({
+            ...p,
+            user: findById(users, p.subject)
+        }));
+
         return (
             <List dense>
-                {this.renderCollaboratorList(permissions)}
+                {this.renderCollaboratorList(permissionsWithUsers)}
                 {this.renderAddCollaboratorButton()}
             </List>
         );
     };
 
     renderPermissionDialog = () => {
-        const {collectionId, currentLoggedUser} = this.props;
+        const {collectionId, currentUser} = this.props;
         const {selectedUser, showPermissionDialog} = this.state;
         return (
             <AlterPermission open={showPermissionDialog}
                              onClose={this.handleShareWithDialogClose}
                              user={selectedUser}
                              collectionId={collectionId}
-                             currentLoggedUser={currentLoggedUser}/>
+                             currentUser={currentUser}/>
         );
     };
 
@@ -222,19 +210,21 @@ export class PermissionsViewer extends React.Component {
     };
 
     render() {
-        const {classes, permissions} = this.props;
-        if (permissions.error) {
+        const {classes, permissions, error, loading, altering} = this.props;
+        if (error) {
             return (<ErrorMessage message={'An error occurred loading permissions'}/>)
-        } else if (permissions.pending) {
+        } else if (loading) {
             return (<LoadingInlay/>);
-        } else if (!permissions || !permissions.data) {
+        } else if (altering) {
+            return (<LoadingOverlay loading={true}/>);
+        } else if (!permissions) {
             return (<div>No permission found</div>)
         } else {
             return (
                 <div className={classes.collaboratorList}>
                     {this.renderPermissionDialog()}
                     {this.renderConfirmationDialog()}
-                    {this.renderUserList(permissions.data)}
+                    {this.renderUserList(permissions)}
                 </div>
             );
         }

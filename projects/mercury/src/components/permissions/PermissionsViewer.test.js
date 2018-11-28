@@ -3,42 +3,39 @@ import {createShallow} from '@material-ui/core/test-utils';
 import {PermissionsViewer, styles} from "./PermissionsViewer";
 
 describe('PermissionsViewer', () => {
-
-    const mockCollaborators = {
-        data: [
-            {
-                'collectionId': 500,
-                'subject': 'user2-id',
-                'access': 'Write',
-                'firstName': 'Michael',
-                'lastName': 'Jackson'
-            },
-            {
-                'collectionId': 500,
-                'subject': 'user3-id',
-                'access': 'Read',
-                'firstName': 'Bruno',
-                'lastName': 'Mars'
-            },
-            {
-                'collectionId': 500,
-                'subject': 'user1-id',
-                'access': 'Manage',
-                'firstName': 'Mariah',
-                'lastName': 'Carey'
-            },
-            {
-                'collectionId': 500,
-                'subject': 'user4-id',
-                'access': 'Manage',
-                'firstName': 'Kurt',
-                'lastName': 'Cobain'
-            }
-        ]
-    };
-    const mockCurrentLoggedUserCreatorCanManage = {id: 'user4-id'};
-    const mockCurrentLoggedUserNotCreatorCanManage = {id: 'user1-id'};
-    const mockCurrentLoggedUserNotCreatorCannotManage = {id: 'user3-id'};
+    const mockCollaborators = [
+        {
+            'collectionId': 500,
+            'subject': 'user2-id',
+            'access': 'Write',
+            'firstName': 'Michael',
+            'lastName': 'Jackson'
+        },
+        {
+            'collectionId': 500,
+            'subject': 'user3-id',
+            'access': 'Read',
+            'firstName': 'Bruno',
+            'lastName': 'Mars'
+        },
+        {
+            'collectionId': 500,
+            'subject': 'user1-id',
+            'access': 'Manage',
+            'firstName': 'Mariah',
+            'lastName': 'Carey'
+        },
+        {
+            'collectionId': 500,
+            'subject': 'user4-id',
+            'access': 'Manage',
+            'firstName': 'Kurt',
+            'lastName': 'Cobain'
+        }
+    ];
+    const mockcurrentUserCreatorCanManage = {id: 'user4-id'};
+    const mockcurrentUserNotCreatorCanManage = {id: 'user1-id'};
+    const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
     const mockUsers = [
             {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
             {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
@@ -47,7 +44,7 @@ describe('PermissionsViewer', () => {
             {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
         ];
     const mockCreator = 'user4-id';
-    const mockFecthPermissionsFn = jest.fn();
+    const mockFetchPermissionsFn = jest.fn();
     const mockAlterPermissionFn = jest.fn();
 
     let shallow;
@@ -72,9 +69,9 @@ describe('PermissionsViewer', () => {
                 classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
-                currentLoggedUser={mockCurrentLoggedUserCreatorCanManage}
+                currentUser={mockcurrentUserCreatorCanManage}
                 alterPermission={mockAlterPermissionFn}
-                fetchPermissions={mockFecthPermissionsFn}
+                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
             />);
         });
         it('should render all collaborators', () => {
@@ -124,9 +121,9 @@ describe('PermissionsViewer', () => {
                 classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
-                currentLoggedUser={mockCurrentLoggedUserNotCreatorCannotManage}
+                currentUser={mockcurrentUserNotCreatorCannotManage}
                 alterPermission={mockAlterPermissionFn}
-                fetchPermissions={mockFecthPermissionsFn}
+                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
             />);
         });
 
@@ -178,9 +175,9 @@ describe('PermissionsViewer', () => {
                 classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
-                currentLoggedUser={mockCurrentLoggedUserNotCreatorCanManage}
+                currentUser={mockcurrentUserNotCreatorCanManage}
                 alterPermission={mockAlterPermissionFn}
-                fetchPermissions={mockFecthPermissionsFn}
+                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
             />);
         });
 

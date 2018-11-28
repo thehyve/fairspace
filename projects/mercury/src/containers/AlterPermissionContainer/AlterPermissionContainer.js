@@ -2,11 +2,10 @@ import {connect} from 'react-redux';
 import AlterPermissionDialog from "../../components/permissions/AlterPermissionDialog";
 import {alterPermission} from "../../actions/permissions";
 
-const mapStateToProps = ({permissions: {alter, fetch}, cache}) => {
+const mapStateToProps = ({cache}, {collectionId}) => {
     return {
-        alteredPermission: alter,
         users: cache.users,
-        collaborators: fetch
+        collaborators: cache.permissionsByCollection[collectionId]
     };
 };
 

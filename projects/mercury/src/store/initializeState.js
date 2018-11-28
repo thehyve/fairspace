@@ -9,7 +9,8 @@ const initializeState = () => {
 
     return {
         ui: {
-            menuExpanded: menuExpanded !== 'false'
+            menuExpanded: menuExpanded !== 'false',
+            pending: {}
         }
     };
 }

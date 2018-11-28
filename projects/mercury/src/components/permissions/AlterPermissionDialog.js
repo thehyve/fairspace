@@ -43,13 +43,13 @@ export const styles = theme => ({
  *  - owner of the collection
  * @param options
  * @param collaborators
- * @param currentLoggedUser
+ * @param currentUser
  * @returns {*}
  */
-const applyDisableFilter = (options, collaborators, currentLoggedUser) => {
+const applyDisableFilter = (options, collaborators, currentUser) => {
     return options.map(option => {
         const isAlreadySelected = collaborators.find(c => c.subject === option.value) !== undefined;
-        const isCurrentUser = option.value === currentLoggedUser.id;
+        const isCurrentUser = option.value === currentUser.id;
         option.disabled = isAlreadySelected || isCurrentUser;
         return option;
     });
@@ -169,12 +169,12 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     renderUser = () => {
-        const {user, users, collaborators, currentLoggedUser} = this.props;
+        const {user, users, collaborators, currentUser} = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
         let options = [];
 
         if (users.data && collaborators.data) {
-            options = transformUserToOptions(users, collaborators.data, currentLoggedUser);
+            options = transformUserToOptions(users, collaborators.data, currentUser);
             if (user) { // only render the label if user is passed into this component
                 return (<div>
                     <Typography variant="subtitle1"
