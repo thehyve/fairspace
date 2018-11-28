@@ -19,9 +19,9 @@ export const alterPermission = createErrorHandlingPromiseAction((userId, collect
     type: ALTER_PERMISSION,
     payload: PermissionAPI.alterCollectionPermission(userId,  collectionId, access),
     meta: {
-        userId,
-        collectionId,
-        access
+        subject: userId,
+        collectionId: collectionId,
+        access: access
     }
 }));
 
