@@ -108,7 +108,7 @@ function deleteCollection(row) {
     cy.clickButtonOnHover(row);
 
     // Confirm deletion
-    cy.contains('button', 'Yes').click({force:true});
+    cy.contains('button', 'Submit').click({force:true});
 
     // Wait a bit to ensure deletion
     cy.wait(100);
