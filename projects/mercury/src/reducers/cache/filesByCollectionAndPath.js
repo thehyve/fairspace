@@ -8,7 +8,9 @@ import {
 } from "../../actions/actionTypes";
 import * as actionTypes from "../../utils/redux-action-types";
 
-const defaultState = {};
+const defaultState = {
+    creatingDirectory: false
+};
 
 const invalidateFiles = (state, collectionId, ...paths) => {
     const newPathsState = paths.map(path => ({
@@ -69,11 +71,23 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                         error: action.payload || true
                     }
                 }
-            }
+            };
+        case actionTypes.pending(CREATE_DIRECTORY):
+            return {
+                ...state,
+                creatingDirectory: true
+            };
+        case actionTypes.fulfilled(CREATE_DIRECTORY):
+        case actionTypes.rejected(CREATE_DIRECTORY):
+        case actionTypes.invalidate(CREATE_DIRECTORY):
+            let newState = {
+                ...state,
+                creatingDirectory: false
+            };
+            return invalidateFiles(newState, action.meta.collection.id, action.meta.path);
         case actionTypes.invalidate(FILES):
         case actionTypes.fulfilled(RENAME_FILE):
         case actionTypes.fulfilled(DELETE_FILE):
-        case actionTypes.fulfilled(CREATE_DIRECTORY):
         case actionTypes.fulfilled(UPLOAD_FILES):
             return invalidateFiles(state, action.meta.collection.id, action.meta.path);
         case actionTypes.fulfilled(CLIPBOARD_PASTE):

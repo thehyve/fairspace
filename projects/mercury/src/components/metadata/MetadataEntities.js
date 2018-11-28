@@ -8,19 +8,20 @@ import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableBody from "@material-ui/core/TableBody/TableBody";
 import {getLabel, navigableLink} from "../../utils/metadatautils";
 import {createMetadataEntity, fetchAllEntitiesIfNeeded} from "../../actions/metadata";
-import Typography from "@material-ui/core/Typography";
 import ErrorMessage from "../error/ErrorMessage";
 import {Column, Row} from "simple-flexbox";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import ErrorDialog from "../error/ErrorDialog";
+import LoadingInlay from '../generic/Loading/LoadingInlay';
+import LoadingOverlay from '../generic/Loading/LoadingOverlay';
 
-function MetadataEntities({loading, error, entities, load, vocabulary, types, create}) {
+function MetadataEntities({loading, creatingMetadataEntity, error, entities, load, vocabulary, types, create}) {
     load();
 
-    if(loading) {
-        return <Typography>Loading...</Typography>
-    } else if(error) {
-        return <ErrorMessage message={"An error occurred while loading metadata"} />
+    if (loading) {
+        return <LoadingInlay/>
+    } else if (error) {
+        return <ErrorMessage message={"An error occurred while loading metadata"}/>
     }
 
     return (
@@ -57,6 +58,7 @@ function MetadataEntities({loading, error, entities, load, vocabulary, types, cr
                     )) : null}
                 </TableBody>
             </Table>
+            <LoadingOverlay loading={creatingMetadataEntity}/>
         </div>
     );
 }
@@ -73,14 +75,17 @@ const mapStateToProps = (state) => ({
     loading: state.cache.allEntities ? state.cache.allEntities.pending : true,
     error: state.cache.allEntities ? state.cache.allEntities.error : false,
     entities: state.cache.allEntities ? state.cache.allEntities.data : [],
-    vocabulary: state.cache.vocabulary ? state.cache.vocabulary.data : undefined
+    vocabulary: state.cache.vocabulary ? state.cache.vocabulary.data : undefined,
+    creatingMetadataEntity: state.metadataBySubject.creatingMetadataEntity
 })
 
 const mapDispatchToProps = (dispatch) => ({
     load: () => dispatch(fetchAllEntitiesIfNeeded()),
     create: (type, id) => {
         dispatch(createMetadataEntity(type, id))
-            .then(result => window.location.href = navigableLink(result.value))
+            .then(result => {
+                window.location.href = navigableLink(result.value);
+            })
             .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
     }
 });

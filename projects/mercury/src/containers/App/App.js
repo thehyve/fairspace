@@ -13,7 +13,7 @@ import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import styles from './App.styles';
 import theme from './App.theme';
 import Layout from "../Layout/Layout";
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import LoadingInlay from '../../components/generic/Loading/LoadingInlay';
 
 class App extends React.Component {
 
@@ -76,7 +76,7 @@ class App extends React.Component {
                 </MuiThemeProvider>
             );
         } else {
-            return <CircularProgress/>;
+            return <LoadingInlay/>;
         }
     }
 }

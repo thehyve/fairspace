@@ -7,7 +7,7 @@ import * as collectionActions from '../../../actions/collections'
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
 import {getDisplayName} from "../../../utils/userUtils";
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import LoadingInlay from '../../generic/Loading/LoadingInlay';
 
 class Collection extends React.Component {
     constructor(props) {
@@ -63,7 +63,7 @@ class Collection extends React.Component {
     render() {
         const {loading} = this.props;
         if(loading) {
-            return <CircularProgress/>;
+            return <LoadingInlay/>;
         } else {
             return (
                 <div>

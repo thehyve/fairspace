@@ -13,7 +13,7 @@ import * as collectionActions from "../../../actions/collections";
 import FileAPIFactory from "../../../services/FileAPI/FileAPIFactory";
 import {parsePath} from "../../../utils/fileutils";
 import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import LoadingInlay from '../../generic/Loading/LoadingInlay';
 
 class FileBrowser extends React.Component {
     componentDidMount() {
@@ -150,7 +150,7 @@ class FileBrowser extends React.Component {
     }
 
     renderLoading() {
-        return <CircularProgress/>;
+        return <LoadingInlay/>;
     }
 
     renderFiles() {
