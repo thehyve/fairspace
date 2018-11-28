@@ -6,6 +6,7 @@ import nl.fairspace.pluto.app.config.dto.FrontendConfig;
 import nl.fairspace.pluto.app.config.dto.WorkspaceDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,6 +27,7 @@ import java.util.Map;
  */
 @RestController
 @Slf4j
+@Profile("!noAuth")
 @RequestMapping("/api/workspace")
 public class WorkspaceResource {
     @Value("${workspace.usersUri}")
