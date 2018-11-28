@@ -12,12 +12,15 @@ import * as collectionActions from "../../../actions/collections";
 import GenericCollectionsScreen from "../GenericCollectionsScreen/GenericCollectionsScreen";
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import LoadingInlay from '../../generic/Loading/LoadingInlay';
+import LoadingOverlay from '../../generic/Loading/LoadingOverlay';
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {addingCollection: false}
+        this.state = {
+            editingCollection: false
+        }
     }
 
     componentDidMount() {
@@ -26,7 +29,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleAddCollectionClick() {
-        this.setState({addingCollection: true})
+        this.setState({editingCollection: true})
     }
 
     handleCollectionClick(collection) {
@@ -63,12 +66,13 @@ class CollectionBrowser extends React.Component {
     }
 
     renderLoading() {
-        return <CircularProgress/>;
+        return <LoadingInlay/>;
     }
 
     renderCollectionList() {
-        const {users, collections} = this.props;
+        const {users, collections, addingCollection, deletingCollection} = this.props;
         collections.map(col => col.creatorObj = findById(users, col.creator));
+
         return (
             <div>
                 <CollectionList collections={this.props.collections}
@@ -80,19 +84,18 @@ class CollectionBrowser extends React.Component {
                 <CollectionEditor
                     title={'Add collection'}
                     name={this.props.user.fullName + '\'s collection'}
-                    editing={this.state.addingCollection}
+                    editing={this.state.editingCollection}
                     onSave={this.handleAddCollection.bind(this)}
                     onCancel={this.handleCancelAddCollection.bind(this)}
                     editType={true}
                 />
+                <LoadingOverlay loading={addingCollection || deletingCollection}/>
             </div>
         );
-
     }
 
     handleAddCollection(name, description, type) {
-        this.setState({addingCollection: false});
-
+        this.setState({editingCollection: false});
         this.props.addCollection(name, description, type)
             .then(this.props.fetchCollectionsIfNeeded)
             .catch(err =>
@@ -104,7 +107,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCancelAddCollection() {
-        this.setState({addingCollection: false});
+        this.setState({editingCollection: false});
     }
 
     render() {
@@ -129,6 +132,8 @@ const mapStateToProps = (state, ownProps) => ({
     collections: state.cache.collections.data,
     users: state.cache.users.data,
     selectedCollectionId: state.collectionBrowser.selectedCollectionId,
+    addingCollection: state.collectionBrowser.addingCollection,
+    deletingCollection: state.collectionBrowser.deletingCollection
 });
 
 const mapDispatchToProps = {

@@ -1,0 +1,22 @@
+hyperspace:
+  keycloak:
+    realm: minikube
+  ingress:
+    enabled: false
+    
+# Set passwords to prevent having a new password at every upgrade
+keycloak:
+  keycloak:
+    password: keycloak
+    service:
+      type: NodePort
+      nodePort: 5100
+  postgresql:
+    postgresPassword: "abcdefghijkl"
+
+rabbitmq:
+  rabbitmq:
+    password: "rabbitmq"
+    erlangCookie: "abcdefghijklmnop1234567890"
+    diskFreeLimit: '"1GiB"'
+

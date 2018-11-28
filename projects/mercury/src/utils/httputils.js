@@ -1,7 +1,13 @@
 export function failOnHttpError(message) {
     return response => {
         if(!response.ok) {
-            throw Error(message + ' ' + response.error);
+            switch (response.status) {
+                case 401:
+                    window.location.reload(true);
+                    break;
+                default:
+                    throw Error(message + ' ' + response.error);
+            }
         }
         return response;
     }

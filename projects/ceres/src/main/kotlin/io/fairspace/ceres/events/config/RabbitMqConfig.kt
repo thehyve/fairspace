@@ -15,27 +15,27 @@ import org.springframework.context.annotation.Configuration
 @ConditionalOnProperty("app.rabbitmq.enabled")
 class RabbitMqConfig(val properties: RabbitMqProperties) {
     @Bean
-    fun storageExchange(properties: RabbitMqProperties): TopicExchange {
+    fun storageExchange(): TopicExchange {
         return TopicExchange(properties.topology.storage.exchange)
     }
 
     @Bean
-    fun storageCreateQueue(properties: RabbitMqProperties): Queue {
+    fun storageCreateQueue(): Queue {
         return Queue(properties.topology.storage.queues["create"], true)
     }
 
     @Bean
-    fun storageMoveQueue(properties: RabbitMqProperties): Queue {
+    fun storageMoveQueue(): Queue {
         return Queue(properties.topology.storage.queues["move"], true)
     }
 
     @Bean
-    fun storageCopyQueue(properties: RabbitMqProperties): Queue {
+    fun storageCopyQueue(): Queue {
         return Queue(properties.topology.storage.queues["copy"], true)
     }
 
     @Bean
-    fun storageDeleteQueue(properties: RabbitMqProperties): Queue {
+    fun storageDeleteQueue(): Queue {
         return Queue(properties.topology.storage.queues["delete"], true)
     }
 
