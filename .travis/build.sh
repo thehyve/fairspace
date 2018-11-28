@@ -10,9 +10,9 @@ export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
 # As it is used with `git diff ...`, it will trigger all files that
 # have updated in the complete pull request
 if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
-  COMMIT_TRIGGER=$TRAVIS_COMMIT_RANGE
-else
   COMMIT_TRIGGER=$TRAVIS_BRANCH
+else
+  COMMIT_TRIGGER=$TRAVIS_COMMIT_RANGE
 fi
 
 # Only execute build if something has changed within the project
