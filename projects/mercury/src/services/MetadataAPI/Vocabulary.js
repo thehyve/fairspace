@@ -114,7 +114,11 @@ class Vocabulary {
                 // @type needs special attention: it is specified as a literal string
                 // but should be treated as an object
                 ? this._convertTypeEntries(metadata[predicateUri])
-                : metadata[predicateUri].map(i => ({id: i['@id'], value: i['@value']}));
+                : metadata[predicateUri].map(i => ({
+                    id: i['@id'],
+                    value: i['@value'],
+                    label: Vocabulary._getLabel(i)
+                }));
 
             prefilledProperties.push(Vocabulary._generatePropertyEntry(predicateUri, values, vocabularyEntry));
         }
