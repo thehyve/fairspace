@@ -16,8 +16,8 @@ const mapDispatchToProps = dispatch => {
         alterPermission: (userId, collectionId, access) => {
             return dispatch(alterPermission(userId, collectionId, access))
         },
-        fetchPermissions: (collectionId, noCache = false) => {
-            dispatch(fetchPermissions(collectionId, noCache))
+        fetchPermissions: (collectionId, useCache = true) => {
+            dispatch(fetchPermissions(collectionId, useCache))
         }
     }
 };

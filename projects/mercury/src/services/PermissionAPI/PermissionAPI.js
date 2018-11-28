@@ -12,13 +12,13 @@ class PermissionAPI {
      * @param collectionId The id of the collection.
      * @returns A Promise returning an array of user permissions, not including users with None permissions.
      */
-    getCollectionPermissions(collectionId, noCache = false) {
+    getCollectionPermissions(collectionId, useCache = true) {
         let url = format(Config.get().urls.permissionsByCollectionId, collectionId);
         return fetch(url, {
             method: 'GET',
             header: PermissionAPI.getHeaders,
             credentials: 'same-origin',
-            cache: noCache ? 'reload' : 'default'
+            cache: useCache ? 'default' : 'reload'
         })
             .then(failOnHttpError('Error while loading collection permissions'))
             .then(response => response.json());
