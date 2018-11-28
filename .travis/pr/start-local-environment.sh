@@ -8,6 +8,6 @@ cd .travis/pr
 # For a PR to master, all images will be built locally, without a -SNAPSHOT
 # postfix
 
-echo -e "travis_fold:start:\"Starting local environment\""
+echo -e "travis_fold:start:docker-compose"
 docker-compose up -d
-echo -e "travis_fold:end:\"Starting local environment\""
+echo -e "travis_fold:end:docker-compose"

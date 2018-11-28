@@ -1,5 +1,5 @@
 #!/bin/bash
-echo -e "travis_fold:start:\"Running e2e tests\""
+echo -e "travis_fold:start:e2e-tests"
 
 cd projects/janus
 npm install
@@ -21,4 +21,4 @@ node_modules/.bin/cypress run \
   --spec cypress/integration/basic/**/*.js \
   --config baseUrl=http://localhost:22000
 
-echo -e "travis_fold:end:\"Running e2e tests\""
+echo -e "travis_fold:end:e2e-tests"

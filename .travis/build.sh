@@ -20,16 +20,16 @@ if $DIR/build-condition.sh $COMMIT_TRIGGER $PROJECT; then
     echo "Building $APPNAME...";
     cd $PROJECT
 
-    echo -e "travis_fold:start:\"Building $PROJECT\""
+    echo -e "travis_fold:start:Building-$PROJECT"
     source .travis/env.sh
     .travis/build.sh || exit 1
-    echo -e "travis_fold:end:\"Building $PROJECT\""
+    echo -e "travis_fold:end:Building-$PROJECT"
 
     if [[ $SHOULD_RELEASE ]]; then
       echo "Releasing artifact for $PROJECT"
-      echo -e "travis_fold:start:\"Releasing $PROJECT\""
+      echo -e "travis_fold:start:Releasing-$PROJECT"
       .travis/release.sh || exit 2
-      echo -e "travis_fold:end:\"Releasing $PROJECT\""
+      echo -e "travis_fold:end:Releasing-$PROJECT"
     fi
 
     cd ../..
