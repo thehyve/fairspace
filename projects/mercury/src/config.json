@@ -1,5 +1,6 @@
 {
   "urls": {
+    "login": "/login",
     "logout": "/logout",
     "userInfo": "/account/user",
     "authorizations": "/account/authorizations",
