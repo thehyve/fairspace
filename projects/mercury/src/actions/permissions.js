@@ -6,7 +6,7 @@ export const fetchPermissions = createErrorHandlingPromiseAction((collectionId, 
     type: PERMISSIONS,
     payload: PermissionAPI.getCollectionPermissions(collectionId, useCache),
     meta: {
-        collectionId
+        collectionId: collectionId
     }
 }));
 
