@@ -8,14 +8,17 @@ import org.apache.jena.query.QueryFactory
 import org.apache.jena.query.ResultSet
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.ModelFactory.createInfModel
 import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
-import org.apache.jena.system.Txn
+import org.apache.jena.system.Txn.calculateRead
+import org.apache.jena.system.Txn.executeWrite
 import org.springframework.stereotype.Component
 
 @Component
 class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
-    private val model = ModelFactory.createInfModel(reasoner, dataset.defaultModel)
+    private val model = ThreadLocal.withInitial { createInfModel(reasoner, dataset.defaultModel) }
+
     private val log = logger {}
 
     fun list(subject: String?, predicate: String? = null, obj: String? = null): Model {
@@ -63,9 +66,9 @@ class ModelRepository(private val dataset: Dataset, reasoner: Reasoner) {
         }
     }
 
-    private fun <R> read(action: Model.() -> R): R = Txn.calculateRead(dataset) { action(model) }
+    private fun <R> read(action: Model.() -> R): R = calculateRead(dataset) { action(model.get()) }
 
-    private fun write(action: Model.() -> Unit) = Txn.executeWrite(dataset) { action(model) }
+    private fun write(action: Model.() -> Unit) = executeWrite(dataset) { action(model.get()) }
 
     private fun ResultSet.detach() = ResultSetMem(this)
 
