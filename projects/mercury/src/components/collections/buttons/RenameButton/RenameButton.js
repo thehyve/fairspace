@@ -28,13 +28,12 @@ class RenameButton extends React.Component{
     }
 
     componentWillReceiveProps(props) {
-        this.onRename = props.onRename;
-        this.currentName = props.currentName;
+        if (!this.state.renaming) {
+            this.onRename = props.onRename;
+            this.currentName = props.currentName;
 
-        this.setState({
-            renaming: false,
-            name: this.currentName
-        });
+            this.setState({name: this.currentName});
+        }
     }
 
     openDialog(e) {
