@@ -32,10 +32,7 @@ class RenameButton extends React.Component{
             this.onRename = props.onRename;
             this.currentName = props.currentName;
 
-            this.setState({
-                renaming: false,
-                name: this.currentName
-            });
+            this.setState({name: this.currentName});
         }
     }
 
