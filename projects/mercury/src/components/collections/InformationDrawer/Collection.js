@@ -8,6 +8,7 @@ import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
 import {getDisplayName} from "../../../utils/userUtils";
 import LoadingInlay from '../../generic/Loading/LoadingInlay';
+import PermissionChecker from "../../permissions/PermissionChecker";
 
 class Collection extends React.Component {
     constructor(props) {
@@ -49,7 +50,7 @@ class Collection extends React.Component {
     }
 
     handleTextMouseEnter() {
-        this.setState({showEditButton: true});
+        this.setState({showEditButton: PermissionChecker.canManage(this.state.collection)});
     }
 
     handleTextMouseLeave() {
@@ -57,7 +58,7 @@ class Collection extends React.Component {
     }
 
     handleTextClick() {
-        this.setState({editing: true});
+        this.setState({editing: PermissionChecker.canManage(this.state.collection)});
     }
 
     render() {
