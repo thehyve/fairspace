@@ -83,7 +83,7 @@ describe('AlterPermissionDialog', () => {
             user={null}
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
-            currentLoggedUser={mockCurrentLoggedUser}
+            currentUser={mockCurrentLoggedUser}
 
             fetchUsers={mockfetchUsersFn}
             alterPermission={mockAlterPermissionFn}
@@ -123,7 +123,7 @@ describe('AlterPermissionDialog', () => {
                     user={mockUser}
                     collectionId={mockCollectionId}
                     collaborators={mockCollaborators}
-                    currentLoggedUser={mockCurrentLoggedUser}
+                    currentUser={mockCurrentLoggedUser}
 
                     fetchUsers={mockfetchUsersFn}
                     alterPermission={mockAlterPermissionFn}

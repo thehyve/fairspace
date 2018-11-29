@@ -1,25 +1,29 @@
 import {connect} from 'react-redux';
 import PermissionsViewer from "./PermissionsViewer";
-import {alterPermission, fetchPermissions} from "../../actions/permissions";
+import {alterPermission, fetchPermissionsIfNeeded} from "../../actions/permissions";
 
-const mapStateToProps = ({permissions: {fetch, alter}, account: {user}, cache: {users}}) => {
+const mapStateToProps = (state, ownProps) => {
+    const {
+        account: {user},
+        cache: {users, permissionsByCollection},
+        ui: { pending: { alterPermission }}
+    } = state;
+
+    const collectionPermission = permissionsByCollection[ownProps.collectionId] || { pending: true }
+
     return {
-        currentLoggedUser: user.data,
-        permissions: fetch,
-        alteredPermission: alter,
+        loading: user.pending || users.pending || collectionPermission.pending,
+        altering: alterPermission,
+        error: user.error || users.error || collectionPermission.error,
+        currentUser: user.data,
+        permissions: collectionPermission.data,
         users: users.data
     };
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-        alterPermission: (userId, collectionId, access) => {
-            return dispatch(alterPermission(userId, collectionId, access))
-        },
-        fetchPermissions: (collectionId, noCache = false) => {
-            dispatch(fetchPermissions(collectionId, noCache))
-        }
-    }
+const mapDispatchToProps = {
+    alterPermission,
+    fetchPermissionsIfNeeded
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PermissionsViewer);

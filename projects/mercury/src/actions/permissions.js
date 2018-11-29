@@ -1,14 +1,35 @@
 import PermissionAPI from '../services/PermissionAPI/PermissionAPI'
-import {createErrorHandlingPromiseAction} from "../utils/redux";
-import {PERMISSIONS, ALTER_PERMISSION} from "./actionTypes";
+import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
+import {ALTER_PERMISSION, PERMISSIONS} from "./actionTypes";
 
-export const fetchPermissions = createErrorHandlingPromiseAction((collectionId, noCache = false) =>  ({
-        type: PERMISSIONS,
-        payload: PermissionAPI.getCollectionPermissions(collectionId, noCache)
+export const fetchPermissions = createErrorHandlingPromiseAction((collectionId, useCache = true) =>  ({
+    type: PERMISSIONS,
+    payload: PermissionAPI.getCollectionPermissions(collectionId, useCache),
+    meta: {
+        collectionId: collectionId
+    }
 }));
+
+/**
+ * Method to retrieve permissions from the backend when the data is not available or invalidated
+ * Please note that by default it does not use the browser cache (i.e. explicitly reloading from the backend)
+ *
+ * @param collectionId
+ * @param useCache
+ * @returns {Function}
+ */
+export const fetchPermissionsIfNeeded = (collectionId, useCache = false) => dispatchIfNeeded(
+    () => fetchPermissions(collectionId, useCache),
+    state => state && state.cache && state.cache.permissionsByCollectionId ? state.cache.permissionsByCollectionId[collectionId]: undefined
+);
 
 export const alterPermission = createErrorHandlingPromiseAction((userId, collectionId, access) => ({
     type: ALTER_PERMISSION,
-    payload: PermissionAPI.alterCollectionPermission(userId,  collectionId, access)
+    payload: PermissionAPI.alterCollectionPermission(userId,  collectionId, access),
+    meta: {
+        subject: userId,
+        collectionId: collectionId,
+        access: access
+    }
 }));
 
