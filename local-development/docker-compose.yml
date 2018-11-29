@@ -1,0 +1,39 @@
+version: '3'
+services:
+  keycloak:
+    image: jboss/keycloak:4.6.0.Final
+    volumes:
+      - ".:/pr"
+    networks:
+      - local-development
+    environment:
+      KEYCLOAK_USER: "keycloak"
+      KEYCLOAK_PASSWORD: "keycloak"
+    ports:
+      - "5100:8080"
+
+  rabbitmq:
+    image: rabbitmq:management
+    networks:
+      - local-development
+    ports:
+    - "5672:5672"
+    - "15672:15672"
+
+  keycloak-config:
+    image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.0
+    networks:
+      - local-development
+    environment:
+      KEYCLOAK_PASSWORD: "keycloak"
+      TESTUSER_USERNAME: "test"
+      TESTUSER_PASSWORD: "test"
+      COORDINATOR_USERNAME: "coordinator"
+      COORDINATOR_PASSWORD: "coordinator"
+      CLIENT_SECRET: 00000000-0000-0000-0000-000000000000
+    volumes:
+    - ".:/config"
+    command:
+      - "/config/keycloak/run-config.sh"
+networks:
+  local-development:

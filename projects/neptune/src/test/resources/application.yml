@@ -24,7 +24,7 @@ spring:
     url: "jdbc:h2:mem:"
   profiles:
     active:
-      - dev
+      - local
   cache:
     type: simple
   jpa:

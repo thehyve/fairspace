@@ -67,7 +67,7 @@ describe('File browser', function () {
         // Delete directory
         cy.contains('tr', 'renamed')
             .then(row => cy.clickButtonOnHover(row, 'button[aria-label="Delete renamed"]'))
-        cy.contains('button', 'Yes').click({force:true});
+        cy.contains('button', 'Submit').click({force:true});
 
         // Wait for deletion to be shown
         cy.contains('tr', 'renamed')

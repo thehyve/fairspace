@@ -1,6 +1,6 @@
 app:
   oauth2:
-    base-url: http://192.168.99.100:31000
+    base-url: http://localhost:5100
     realm: minikube
 
 spring:
@@ -15,12 +15,10 @@ spring:
     password: guest
 
 ceres:
-  url: "http://localhost:8001"
+  url: "http://localhost:5120"
 
 titan:
-  url: "http://localhost:3000"
+  url: "http://localhost:5110"
 
 server:
-  port: 8082
-
-logging.level.org.springframework.cache: TRACE
+  port: 5130
