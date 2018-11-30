@@ -63,7 +63,7 @@ addons:
 jobs:
   include:
     - stage: build
-      name: Build projects
+      name: Build projects (and run e2e test for a PR)
       script:
       - .travis/build.sh projects/callisto
       - .travis/build.sh projects/ceres
