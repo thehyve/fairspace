@@ -1,5 +1,5 @@
 import Vocabulary from './Vocabulary';
-import {DOMAIN_URI, LABEL_URI, PROPERTY_URI} from "./MetadataAPI";
+import {DOMAIN_URI, LABEL_URI, PROPERTY_URI, RANGE_URI} from "./MetadataAPI";
 
 const vocabularyJsonLd = [
     {
@@ -23,6 +23,13 @@ const vocabularyJsonLd = [
         [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }]
     },
     {
+        '@id': 'http://fairspace.io/ontology#contains',
+        '@type': PROPERTY_URI,
+        [LABEL_URI]: [{ '@value': 'Contains' }],
+        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }],
+        [RANGE_URI]: [{'@id': 'http://fairspace.io/ontology#File' }]
+    },
+    {
         '@id': 'http://schema.org/Creator',
         '@type': PROPERTY_URI,
         [LABEL_URI]: [{ '@value': 'Creator' }],
@@ -43,6 +50,11 @@ const vocabularyJsonLd = [
         '@id': 'http://fairspace.io/ontology#Dataset',
         '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class',
         [LABEL_URI]: [{ '@value': 'Dataset' }]
+    },
+    {
+        '@id': 'http://fairspace.io/ontology#File',
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class',
+        [LABEL_URI]: [{ '@value': 'File' }]
     }
 ];
 const vocabulary = new Vocabulary(vocabularyJsonLd);
@@ -249,4 +261,44 @@ describe('combination of vocabulary and metadata', () => {
         expect(result.length).toEqual(4);
         expect(result.map(property => property.key)).not.toContain('http://schema.org/Creator');
     });
+
+
+    describe.only('multiple entities', () => {
+        const metadata = [
+            {
+                '@id': 'http://fairspace.com/iri/collections/1',
+                '@type': ['http://fairspace.io/ontology#Collection'],
+                "http://fairspace.io/ontology#contains": [
+                    {
+                        "@id": "http://fairspace.com/iri/files/2"
+                    },
+                    {
+                        "@id": "http://fairspace.com/iri/files/3"
+                    }
+                ]
+            },
+            {
+                '@id': 'http://fairspace.com/iri/files/2',
+                '@type': ['http://fairspace.io/ontology#File'],
+                "http://www.w3.org/2000/01/rdf-schema#label": [{"@value": "File 2"}]
+            }
+        ]
+
+        it('returns nothing if multiple nodes are given but no subject', () => {
+            let result = vocabulary.combine(metadata);
+            expect(result.length).toEqual(0)
+        })
+
+        it('includes label of associated nodes if given', () => {
+            let result = vocabulary.combine(metadata, 'http://fairspace.com/iri/collections/1');
+
+            expect(result[0].key).toEqual("http://fairspace.io/ontology#contains");
+            expect(result[0].values.length).toEqual(2);
+            expect(result[0].values[0].id).toEqual('http://fairspace.com/iri/files/2')
+            expect(result[0].values[0].label).toEqual("File 2")
+            expect(result[0].values[1].id).toEqual('http://fairspace.com/iri/files/3')
+            expect(result[0].values[1].label).toEqual(undefined)
+        })
+    });
 })
+

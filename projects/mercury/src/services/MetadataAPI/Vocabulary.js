@@ -32,6 +32,8 @@ class Vocabulary {
      * Please note that only the metadata for the first subject will be used
      *
      * @param expandedMetadata Metadata in expanded json-ld format with actual metadata about one subject
+     * @param subject Subject to combine the metadata for. If not provided, the metadata is expected to contain
+     *                information on a single entity
      * @returns A promise resolving in an array with metadata. Each element will look like this:
      * {
      *      key: "http://fairspace.io/ontology#description",
@@ -42,25 +44,33 @@ class Vocabulary {
      *      ]
      *  }
      */
-    combine(expandedMetadata) {
-        if (!Array.isArray(expandedMetadata) || expandedMetadata.length !== 1) {
+    combine(expandedMetadata, subject) {
+        if (!Array.isArray(expandedMetadata) || (!subject && expandedMetadata.length !== 1)) {
             console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
             return [];
         }
 
-        const metadataItem = expandedMetadata[0];
+        // If no subject is provided, use the first (and only) entry in the metadata
+        let metadataItem;
+        if(!subject) {
+            subject = expandedMetadata[0]['@id'];
+            metadataItem = expandedMetadata[0];
+        } else {
+            metadataItem = expandedMetadata.find(item => item['@id'] === subject);
+        }
+
+        // Retrieve the metadata item for this subject
         if (!Array.isArray(metadataItem['@type'])) {
             console.warn("Can not combine metadata without a type or that is not expanded");
             return [];
-
         }
 
         // Determine properties allowed for the given type
         const typePredicates = this._determinePredicatesForTypes(metadataItem['@type']);
 
         // Actually convert the metadata into a list of properties
-        const properties = this._convertMetadataIntoPropertyList(expandedMetadata[0], typePredicates);
-        const emptyProperties = this._determineAdditionalEmptyProperties(expandedMetadata[0], typePredicates);
+        const properties = this._convertMetadataIntoPropertyList(metadataItem, typePredicates, expandedMetadata);
+        const emptyProperties = this._determineAdditionalEmptyProperties(metadataItem, typePredicates);
 
         return [...properties, ...emptyProperties];
     }
@@ -87,7 +97,7 @@ class Vocabulary {
      * @param predicates List of predicates that should be included
      * @returns {Array}
      */
-    _convertMetadataIntoPropertyList(metadata, predicates = []) {
+    _convertMetadataIntoPropertyList(metadata, predicates = [], allMetadata = []) {
         const prefilledProperties = [];
 
         // Add the metadata already available
@@ -117,7 +127,7 @@ class Vocabulary {
                 : metadata[predicateUri].map(i => ({
                     id: i['@id'],
                     value: i['@value'],
-                    label: Vocabulary._getLabel(i)
+                    label: Vocabulary._lookupLabel(i['@id'], allMetadata)
                 }));
 
             prefilledProperties.push(Vocabulary._generatePropertyEntry(predicateUri, values, vocabularyEntry));
@@ -244,6 +254,10 @@ class Vocabulary {
         return this._getFirstPredicateValue(vocabularyEntry, COMMENT_URI, '');
     }
 
+    static _lookupLabel(id, allMetadata) {
+        const entry = allMetadata.find(element => element['@id'] === id);
+        return Vocabulary._getFirstPredicateValue(entry, LABEL_URI)
+    }
 }
 
 export default Vocabulary;
