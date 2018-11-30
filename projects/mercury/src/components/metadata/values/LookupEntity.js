@@ -33,7 +33,7 @@ function LookupEntity({entities, property, onSave, dispatch, ...otherProps}) {
 
     // Prevent saving any labels used for UI
     const handleSave = selected => {
-        onSave({id: selected.id})
+        onSave({id: selected.id, label: selected.label})
     }
 
     return <div style={{width: '100%'}}>
