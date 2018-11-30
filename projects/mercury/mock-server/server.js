@@ -88,5 +88,3 @@ app.use(fixWebdavDestinationMiddleware('/api/storage/webdav'));
 app.use(webdav.extensions.express('/api/storage/webdav', server));
 
 app.listen(port, () => console.log('Backend stub listening on port ' + port ));
-
-
