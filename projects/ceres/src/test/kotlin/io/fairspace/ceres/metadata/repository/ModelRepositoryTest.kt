@@ -11,10 +11,7 @@ import org.apache.jena.vocabulary.VCARD
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class ModelRepositoryTest {
     lateinit var repo: ModelRepository
     lateinit var dataset: Dataset

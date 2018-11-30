@@ -8,10 +8,7 @@ import org.apache.jena.util.FileManager
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class InferenceTest {
     private val NS = "http://fairspace.io/ontology#"
 
