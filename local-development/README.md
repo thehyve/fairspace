@@ -41,10 +41,13 @@ for the whole cluster or by providing the credentials manually
 * https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/. 
   Provide the secret name to helm with the `fairspaceImagePullSecret` variable. 
 
-Afterwards, install the chart
+The chart is configured by default to run on a RBAC enabled cluster. If you don't have RBAC enabled
+set the variable `rabbitmq.rbacEnabled` to `false`. 
+
+Installing the chart can be done with the following command: 
 
 ```bash
-helm install fairspace/hyperspace -n hyperspace -f hyperspace.yaml [ --set fairspaceImagePullSecret=... ]
+helm install fairspace/hyperspace -n hyperspace -f hyperspace.yaml [ --set rabbitmq.rbacEnabled=false ] [ --set fairspaceImagePullSecret=... ]
 ```
 
 This will install:
