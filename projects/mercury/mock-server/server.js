@@ -1,6 +1,7 @@
 const express = require('express');
 const webdav = require('webdav-server').v2;
 const bodyParser = require('body-parser');
+const fs = require('fs');
 const fixWebdavDestinationMiddleware = require('./fixWebdavDestinationMiddleware');
 const port = process.env.PORT || 5000;
 const mockDataDir = __dirname + '/mock-data';
@@ -40,6 +41,14 @@ app.get('/api/metadata/statements', (req, res) => {
         res.sendFile(mockDataDir + '/metadata/persons.json')
     }
 });
+
+app.get('/api/metadata/extended/statements', (req, res) =>
+    fs.readFile(mockDataDir + '/metadata/metadata-with-labels.json', (err, data) => {
+        res.set('Content-Type', 'application/json');
+        res.send(data.toString().replace(/ws:subject/g, req.query.subject));
+    })
+);
+
 app.patch('/api/metadata/statements', (req, res) => res.send());
 app.delete('/api/metadata/statements', (req, res) => res.send());
 app.post('/api/metadata/query', (req, res) => res.sendFile(mockDataDir + '/metadata/all-entities.json'));
