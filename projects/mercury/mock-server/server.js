@@ -8,6 +8,9 @@ const mockDataDir = __dirname + '/mock-data';
 // Start a generic server on port 5000 that serves default API
 const app = express();
 
+// Add a delay to make the loading visible
+// app.use((req, res, next) => setTimeout(next, 3000));
+
 // parse application/json
 app.use(bodyParser.json());
 
