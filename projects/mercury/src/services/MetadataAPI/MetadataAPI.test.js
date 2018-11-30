@@ -16,6 +16,7 @@ beforeAll(() => {
         "urls": {
             "metadata": {
                 statements: "/metadata",
+                extendedStatements: "/extended",
                 query: "/query",
                 pid: "/pid"
             }
@@ -31,7 +32,7 @@ it('fetches metadata with provided parameters', () => {
     ;
 
     MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c'})
-    expect(window.fetch.mock.calls[0][0]).toEqual("/metadata?subject=a&predicate=b&object=c");
+    expect(window.fetch.mock.calls[0][0]).toEqual("/extended?subject=a&predicate=b&object=c");
 })
 
 it('stores metadata as jsonld', () => {

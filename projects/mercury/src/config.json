@@ -9,6 +9,7 @@
     "files": "/api/storage/webdav",
     "metadata": {
       "statements": "/api/metadata/statements",
+      "extendedStatements": "/api/metadata/extended/statements",
       "query": "/api/metadata/query",
       "pid": "/api/metadata/pid"
     },

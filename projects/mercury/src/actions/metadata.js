@@ -93,7 +93,7 @@ const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dis
                 dispatch(fetchJsonLdBySubjectIfNeeded(subject)),
                 dispatch(fetchMetadataVocabularyIfNeeded())
             ]).then(([jsonLd, vocabulary]) => {
-                return vocabulary.value.combine(jsonLd.value);
+                return vocabulary.value.combine(jsonLd.value, subject);
             }),
     meta: { subject: subject }
 }))
