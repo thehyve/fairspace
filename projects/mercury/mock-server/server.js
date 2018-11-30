@@ -9,7 +9,7 @@ const mockDataDir = __dirname + '/mock-data';
 const app = express();
 
 // Add a delay to make the loading visible
-app.use((req, res, next) => setTimeout(next, 1000));
+// app.use((req, res, next) => setTimeout(next, 3000));
 
 // parse application/json
 app.use(bodyParser.json());
