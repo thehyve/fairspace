@@ -56,7 +56,7 @@ class MetadataAPI {
 
     get(params) {
         let query = Object.keys(params).map(key => key + '=' + encodeURIComponent(params[key])).join('&');
-        return fetch(Config.get().urls.metadata.statements + '?' + query, MetadataAPI.getParams)
+        return fetch(Config.get().urls.metadata.extendedStatements + '?' + query, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(jsonld.expand);

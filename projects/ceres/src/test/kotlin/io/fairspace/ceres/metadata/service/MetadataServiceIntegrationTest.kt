@@ -161,10 +161,9 @@ class MetadataServiceIntegrationTest {
 
     @Test
     fun testMetadataRetrievalWithInference() {
-        val model = service.getMetadataForResources(listOf("http://j"))
+        val model = service.getStatementsWithObjectLabels("http://j")
 
         val i = model.createResource("http://i")
-        val oneway = model.createProperty("http://oneway")
         val otherway = model.createProperty("http://otherway")
         val j = model.createResource("http://j")
 

@@ -1,7 +1,6 @@
 package io.fairspace.ceres.metadata.web
 
 import io.fairspace.ceres.metadata.repository.ModelRepository
-import io.fairspace.ceres.metadata.service.MetadataService
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.shared.NotFoundException
 import org.springframework.http.HttpStatus
@@ -9,11 +8,11 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/statements")
-class StatementsController(val repository: ModelRepository, val metadataService: MetadataService) {
+class StatementsController(val repository: ModelRepository) {
 
     @GetMapping(produces = ["application/ld+json"])
     fun get(@RequestParam("subject") subject: String?, @RequestParam("predicate") predicate: String?, @RequestParam("object") obj: String?): Model {
-        return metadataService.getStatementsWithObjectLabels(subject, predicate, obj)
+        return repository.list(subject, predicate, obj)
     }
 
     @PostMapping(consumes = ["application/ld+json"])
