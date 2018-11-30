@@ -36,6 +36,13 @@ class ModelRepository(private val dataset: Dataset, private val reasoner: Reason
         write { model -> model.add(delta) }
     }
 
+    /**
+     * By default deletion of an inferred statement in Jena never makes any changes to the statements physically stored
+     * in the database, even if there's a "physical" statement which is an inverse of the deleted inferred statement,
+     * e.g. isAChildOf and isAParentOf.
+     * To handle deletion of inferred statements this method first searches for statements matching the provided criteria,
+     * then it extends the found statements with whatever can be inferred from them, and finally deletes the extended set
+     */
     fun remove(subject: String?, predicate: String? = null, obj: String? = null) {
         log.trace { "Removing statements for s: $subject p: $predicate" }
         write { model ->
@@ -60,6 +67,11 @@ class ModelRepository(private val dataset: Dataset, private val reasoner: Reason
         }
     }
 
+    /**
+     * To handle inferred statements properly this method first searches for statements matching subject-predicate pairs
+     * from the delta model, then it extends the found statements with statements which can be inferred from then,
+     * removes the extended set, and finally adds the delta model.
+     */
     fun update(delta: Model) {
         log.trace { "Updating statements: $delta" }
         write { model ->
@@ -82,6 +94,9 @@ class ModelRepository(private val dataset: Dataset, private val reasoner: Reason
 
     private fun Model.detach() = ModelFactory.createDefaultModel().add(this)
 
+    /**
+     * Adds inferred statements to a model
+     */
     private fun extendedModel(model: Model) = createInfModel(reasoner, model)
 
     private fun toSingleLine(s: String) =
