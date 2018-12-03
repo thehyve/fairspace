@@ -1,4 +1,5 @@
 {{- $scripts := .Values.workspace.configurationScripts.rabbitmq -}}
+{{- if $scripts.enabled -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -40,3 +41,4 @@ spec:
       - name: config-volume
         configMap:
           name: "{{.Release.Name}}-rabbitmq-config-map"
+{{- end -}}

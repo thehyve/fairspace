@@ -20,6 +20,9 @@ workspace:
     tls:
       certificate:
         dns01Provider: azuredns-test
+  configurationScripts:
+    keycloak:
+      enabled: false
 
 pluto:
   image:
