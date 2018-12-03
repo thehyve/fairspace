@@ -8,34 +8,39 @@ import MetadataEntityPage from "../../pages/Metadata/MetadataEntityPage";
 import MetadataOverviewPage from "../../pages/Metadata/MetadataOverviewPage";
 import Files from "../../pages/Files/Files";
 import {logout} from "../../services/Logout/logout";
+import {withRouter} from 'react-router-dom';
 import connect from 'react-redux/es/connect/connect';
 
 const getMarginLeft = (menuExpanded) => {
     return menuExpanded ? 230 : 60;
 }
 
-const Routes = (props) => {
-    const left = getMarginLeft(props.menuExpanded);
-    return (
-        <div style={{marginLeft: left}}>
-            <React.Fragment>
-                <Route exact path="/" component={Home}/>
-                <Route exact path="/collections" component={Collections}/>
-                <Route path="/collections/:collection/:path(.*)?" component={Files}/>
-                <Route path="/notebooks" component={Notebooks}/>
+class Routes extends React.Component {
 
-                <Route exact path="/metadata" component={MetadataOverviewPage}/>
-                <Route path="/metadata/:type/:id"
-                       component={MetadataEntityPage}/>
+    render() {
+        const left = getMarginLeft(this.props.menuExpanded);
+        return (
+            <div style={{marginLeft: left}}>
+                <React.Fragment>
+                    <Route exact path="/" component={Home}/>
+                    <Route exact path="/collections" component={Collections}/>
+                    <Route path="/collections/:collection/:path(.*)?" component={Files}/>
+                    <Route path="/notebooks" component={Notebooks}/>
 
-                {/* Handle auth urls that should go to the server */}
-                <Route path="/login" render={() => {
-                    window.location.href = '/login';
-                }}/>
-                <Route path="/logout" render={logout}/>
-            </React.Fragment>
-        </div>
-    );
+                    <Route exact path="/metadata" component={MetadataOverviewPage}/>
+                    <Route path="/metadata/:type/:id"
+                           component={MetadataEntityPage}/>
+
+                    {/* Handle auth urls that should go to the server */}
+                    <Route path="/login" render={() => {
+                        window.location.href = '/login';
+                    }}/>
+                    <Route path="/logout" render={logout}/>
+                </React.Fragment>
+            </div>
+        );
+    }
+
 }
 
 const mapStateToProps = (state) => {
@@ -44,4 +49,6 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default connect(mapStateToProps)(Routes);
+export default withRouter(
+    connect(mapStateToProps)(Routes)
+)
