@@ -26,7 +26,7 @@ const vocabularyJsonLd = [
         '@id': 'http://fairspace.io/ontology#contains',
         '@type': PROPERTY_URI,
         [LABEL_URI]: [{ '@value': 'Contains' }],
-        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Collection' }],
+        [DOMAIN_URI]: [{ '@id': 'http://fairspace.io/ontology#Directory' }],
         [RANGE_URI]: [{'@id': 'http://fairspace.io/ontology#File' }]
     },
     {
@@ -76,7 +76,6 @@ describe('combination of vocabulary and metadata', () => {
         }];
 
         let result = vocabulary.combine(metadata);
-
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("@type");
         expect(result[0].label).toEqual("Type");
@@ -263,11 +262,11 @@ describe('combination of vocabulary and metadata', () => {
     });
 
 
-    describe.only('multiple entities', () => {
+    describe('multiple entities', () => {
         const metadata = [
             {
-                '@id': 'http://fairspace.com/iri/collections/1',
-                '@type': ['http://fairspace.io/ontology#Collection'],
+                '@id': 'http://fairspace.com/iri/collections/1/dir',
+                '@type': ['http://fairspace.io/ontology#Directory'],
                 "http://fairspace.io/ontology#contains": [
                     {
                         "@id": "http://fairspace.com/iri/files/2"
@@ -290,7 +289,7 @@ describe('combination of vocabulary and metadata', () => {
         })
 
         it('includes label of associated nodes if given', () => {
-            let result = vocabulary.combine(metadata, 'http://fairspace.com/iri/collections/1');
+            let result = vocabulary.combine(metadata, 'http://fairspace.com/iri/collections/1/dir');
 
             expect(result[0].key).toEqual("http://fairspace.io/ontology#contains");
             expect(result[0].values.length).toEqual(2);
