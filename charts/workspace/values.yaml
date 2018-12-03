@@ -64,9 +64,11 @@ workspace:
     # Scripts for setting up keycloak for a workspace
     configurationScripts:
       keycloak:
+        enabled: true
         image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.0
         pullPolicy: IfNotPresent
       rabbitmq:
+        enabled: true
         image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0-SNAPSHOT
         pullPolicy: IfNotPresent
 
