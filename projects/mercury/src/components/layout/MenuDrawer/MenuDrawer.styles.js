@@ -32,7 +32,7 @@ const styles = theme => ({
         display: 'none',
     },
     drawerPaper: {
-        position: 'relative',
+        position: 'fixed',
         whiteSpace: 'nowrap',
         width: drawerWidth,
         marginTop: '65px',
