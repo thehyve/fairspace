@@ -12,7 +12,7 @@ const styles = theme => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        marginRight: 0,
+        marginRight: 0
     },
 
     contentShift: {

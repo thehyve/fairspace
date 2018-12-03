@@ -8,9 +8,17 @@ import MetadataEntityPage from "../../pages/Metadata/MetadataEntityPage";
 import MetadataOverviewPage from "../../pages/Metadata/MetadataOverviewPage";
 import Files from "../../pages/Files/Files";
 import {logout} from "../../services/Logout/logout";
+import connect from 'react-redux/es/connect/connect';
 
-const Routes = () => {
-    return (<React.Fragment>
+const getMarginLeft = (menuExpanded) => {
+    return menuExpanded ? 230 : 60;
+}
+
+const Routes = (props) => {
+    const left = getMarginLeft(props.menuExpanded);
+    return (
+        <div style={{marginLeft: left}}>
+            <React.Fragment>
                 <Route exact path="/" component={Home}/>
                 <Route exact path="/collections" component={Collections}/>
                 <Route path="/collections/:collection/:path(.*)?" component={Files}/>
@@ -26,7 +34,14 @@ const Routes = () => {
                 }}/>
                 <Route path="/logout" render={logout}/>
             </React.Fragment>
+        </div>
     );
 }
 
-export default Routes;
+const mapStateToProps = (state) => {
+    return {
+        menuExpanded: state.ui.menuExpanded
+    }
+};
+
+export default connect(mapStateToProps)(Routes);
