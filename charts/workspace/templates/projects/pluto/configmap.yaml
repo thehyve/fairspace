@@ -17,6 +17,7 @@ data:
     frontend:
       urls:
         jupyter: {{ template "jupyterhub.url" . }}
+        {{ if ( and .Values.services .Values.services.cbioportal  ) }}cbioportal: {{ .Values.services.cbioportal }}{{ end }}
 
     workspace:
       name: {{ .Release.Name }}
