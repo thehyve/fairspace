@@ -15,7 +15,6 @@ import DateTime from "../../generic/DateTime/DateTime";
 import Typography from "@material-ui/core/Typography/Typography";
 import withHovered from "../../../containers/WithHovered/WithHovered";
 import {compose} from "redux";
-import Paper from "@material-ui/core/Paper";
 import {getDisplayName} from "../../../utils/userUtils";
 
 export const COLLECTION_ICONS = {
@@ -48,23 +47,22 @@ export class CollectionList extends React.Component {
             return "No collections";
         } else {
             return (
-                <Paper style={{marginBottom: 200}}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell padding={'dense'}/>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Created</TableCell>
-                                <TableCell>Creator</TableCell>
+                <Table style={{marginBottom: 200}}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell padding={'dense'}/>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Created</TableCell>
+                            <TableCell>Creator</TableCell>
                             <TableCell>Access</TableCell>
-                                <TableCell/>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {collections.map((collection, idx) => {
-                                const selected = selectedCollectionId && (collection.id === selectedCollectionId);
-                                const classes = this.props.classes;
-                                return (
+                            <TableCell/>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {collections.map((collection, idx) => {
+                            const selected = selectedCollectionId && (collection.id === selectedCollectionId);
+                            const classes = this.props.classes;
+                            return (
                                 <ClickHandler
                                     component={TableRow}
                                     className={selected ? classes.tableRowSelected : classes.tableRow}
@@ -103,11 +101,10 @@ export class CollectionList extends React.Component {
                                             </ButtonWithVerification> : null}
                                     </TableCell>
                                 </ClickHandler>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </Paper>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
             );
         }
     }
