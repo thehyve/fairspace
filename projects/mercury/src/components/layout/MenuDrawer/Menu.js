@@ -52,14 +52,12 @@ const Menu = ({classes}) => (
                 </ListItemIcon>
                 <ListItemText primary="Dataverse"/>
             </ListItem>
-            <a href={ Config.get().urls.cbioportal } style={{ textDecoration: 'none' }}>
-                <ListItem Button>
-                    <ListItemIcon>
-                        <Icon>public</Icon>
-                    </ListItemIcon>
-                    <ListItemText primary="cBioportal" />
-                </ListItem>
-            </a>
+            <ListItem component='a' href={Config.get().urls.cbioportal} Button>
+                <ListItemIcon>
+                    <Icon>public</Icon>
+                </ListItemIcon>
+                <ListItemText primary="cBioportal" />
+            </ListItem>
         </List>
     </div>
 )
