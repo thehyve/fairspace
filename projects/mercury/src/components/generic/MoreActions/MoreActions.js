@@ -30,10 +30,11 @@ class MoreActions extends React.Component {
      * when clicking on the menuitem
      * @param menuItem
      */
-    closeMenuOnClick = menuItem =>
-        <MenuItem onClick={this.handleMenuOnClose}>
+    closeMenuOnClick = (menuItem, idx) =>
+        <MenuItem key={idx} onClick={this.handleMenuOnClose}>
             {menuItem}
         </MenuItem>
+
 
     render() {
         const {ariaLabel, visibility} = this.props;
