@@ -11,6 +11,9 @@ import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.rdf.model.StmtIterator
 import org.apache.jena.sparql.resultset.ResultSetMem
 import org.springframework.stereotype.Component
+import java.net.URI
+import java.net.URISyntaxException
+import javax.validation.ValidationException
 
 abstract class Enhancer {
     abstract fun enhance(iterator: StmtIterator): StmtIterator
@@ -33,6 +36,7 @@ class ModelRepository(private val model: Model, private val enhancer: Enhancer) 
 
     fun add(delta: Model) {
         log.trace { "Adding statements: $delta" }
+        validate(delta)
         model.executeInTxn { model.add(enhancer.enhance(delta)) }
     }
 
@@ -59,6 +63,8 @@ class ModelRepository(private val model: Model, private val enhancer: Enhancer) 
      */
     fun update(delta: Model) {
         log.trace { "Updating statements: $delta" }
+
+        validate(delta)
 
         val lhs = delta.listStatements().asSequence()
                 .map { it.subject to it.predicate }
@@ -99,6 +105,26 @@ class ModelRepository(private val model: Model, private val enhancer: Enhancer) 
                     .map(String::trim)
                     .filter(CharSequence::isNotEmpty)
                     .joinToString(" ")
+
+    @Throws(ValidationException::class)
+    private fun validate(model: Model): Model = model.apply {
+            listStatements().forEach {
+                validate(it.subject)
+                validate(it.predicate)
+                validate(it.`object`)
+            }
+    }
+
+    @Throws(ValidationException::class)
+    private fun validate(node: RDFNode) {
+        if (node.isURIResource) {
+            try {
+                URI(node.asResource().uri)
+            } catch (e: URISyntaxException) {
+                throw ValidationException("The model contains an invalid URI: " + e.input, e)
+            }
+        }
+    }
 
     private fun String?.toResource() = this?.let(model::createResource)
 
