@@ -157,7 +157,7 @@ export class PermissionsViewer extends React.Component {
         return canManage ? (
             <ListItem className={classes.buttonList}>
                 <ListItemSecondaryAction>
-                    <Button variant='fab' aria-label="Add" onClick={() => this.handleAlterPermission()} mini>
+                    <Button variant='fab' aria-label="Add" title="Add collaborator" onClick={() => this.handleAlterPermission()} mini>
                         <AddIcon/>
                     </Button>
                 </ListItemSecondaryAction>
