@@ -22,7 +22,7 @@ class ModelRepositoryTest {
     @Before
     fun setUp() {
         dataset = createTxnMem()
-        repo = ModelRepository(dataset.defaultModel, PropertyInverter(emptySequence()))
+        repo = ModelRepository(dataset.defaultModel, PropertyInverter(emptyList()))
     }
 
     @Test
