@@ -2,13 +2,11 @@ package io.fairspace.ceres.metadata.service
 
 import io.fairspace.ceres.CeresApplication
 import io.fairspace.ceres.metadata.repository.ModelRepository
+import io.fairspace.ceres.metadata.repository.PropertyInverter
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import org.apache.jena.query.DatasetFactory.createTxnMem
 import org.apache.jena.rdf.model.ModelFactory
-import org.apache.jena.reasoner.Reasoner
-import org.apache.jena.reasoner.rulesys.GenericRuleReasoner
-import org.apache.jena.reasoner.rulesys.Rule
-import org.apache.jena.tdb2.TDB2Factory
 import org.apache.jena.vocabulary.RDFS
 import org.junit.Before
 import org.junit.Test
@@ -28,15 +26,10 @@ class MetadataServiceIntegrationTest {
     @Import(CeresApplication::class)
     class TestConfig {
         @Bean
-        fun dataset() = TDB2Factory.createDataset()
+        fun model() = createTxnMem().defaultModel
 
         @Bean
-        fun reasoner(): Reasoner {
-            val rules = "[(?a http://oneway ?b) -> (?b http://otherway ?a)]"
-            val reasoner = GenericRuleReasoner(Rule.parseRules(rules))
-            reasoner.setDerivationLogging(true)
-            return reasoner
-        }
+        fun enhancer() = PropertyInverter(listOf("http://oneway" to "http://otherway"))
     }
 
     @Autowired
