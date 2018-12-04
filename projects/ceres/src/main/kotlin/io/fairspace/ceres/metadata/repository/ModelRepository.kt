@@ -109,16 +109,21 @@ class ModelRepository(private val dataset: Dataset, private val reasoner: Reason
 
     @Throws(ValidationException::class)
     private fun validate(model: Model): Model = model.apply {
-        try {
             listStatements().forEach {
-                URI(it.subject.uri)
-                URI(it.predicate.uri)
-                if (it.`object`.isURIResource) {
-                    URI(it.`object`.asResource().uri)
-                }
+                validate(it.subject)
+                validate(it.predicate)
+                validate(it.`object`)
             }
-        } catch (e: URISyntaxException) {
-            throw ValidationException("The model contains an invalid URI: " + e.input, e)
+    }
+
+    @Throws(ValidationException::class)
+    private fun validate(node: RDFNode) {
+        if (node.isURIResource) {
+            try {
+                URI(node.asResource().uri)
+            } catch (e: URISyntaxException) {
+                throw ValidationException("The model contains an invalid URI: " + e.input, e)
+            }
         }
     }
 }
