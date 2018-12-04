@@ -105,7 +105,7 @@ describe('Storage API', function () {
             )
             .then(() =>
                 // Verify the file can not be downloaded anymore
-                cy.request({url: uploadedFileUrl, failOnStatusCode: false}).its('status').should('equal', 404));
+                cy.request({url: uploadedFileUrl, failOnStatusCode: false}).its('status').should('be.within', 400, 499));
 
     });
 });
