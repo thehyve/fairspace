@@ -29,7 +29,7 @@ public class CollectionController {
     private CollectionMetadataService collectionMetadataService;
 
     public CollectionController(
-            @Value("${cachingPeriod.collection:60}") int cachePeriod,
+            @Value("${app.cachingPeriod.collection:60}") int cachePeriod,
             CollectionService collectionService,
             CollectionMetadataService collectionMetadataService
     ) {

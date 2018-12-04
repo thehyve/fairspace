@@ -4,6 +4,9 @@ app:
     realm: e2e
   metadata:
     base-url: http://e2e-test
+  cachingPeriod:
+    collection: 0
+    permission: 0
 ceres:
   url: http://ceres:8080
 titan:
