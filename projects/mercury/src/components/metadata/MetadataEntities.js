@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import Table from "@material-ui/core/Table/Table";
+import {Table, Paper, List} from "@material-ui/core";
 import TableHead from "@material-ui/core/TableHead/TableHead";
 import TableRow from "@material-ui/core/TableRow/TableRow";
 import TableCell from "@material-ui/core/TableCell/TableCell";
@@ -32,32 +32,39 @@ function MetadataEntities({loading, creatingMetadataEntity, error, entities, loa
                     <NewMetadataEntityDialog onCreate={create}/>
                 </Column>
             </Row>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Label</TableCell>
-                        <TableCell>Type</TableCell>
-                        <TableCell>URI</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {entities ? entities.map(entity => (
-                        <TableRow key={entity['@id']}>
-                            <TableCell>{getLabel(entity)}</TableCell>
-                            <TableCell>
-                                {entity['@type'].map(type => (
-                                    <a href={navigableLink(type)} key={type}>
-                                        {getLabel(vocabulary.getById(type))}
-                                    </a>
-                                ))}
-                            </TableCell>
-                            <TableCell>
-                                <a href={navigableLink(entity['@id'])}>{entity['@id']}</a>
-                            </TableCell>
-                        </TableRow>
-                    )) : null}
-                </TableBody>
-            </Table>
+
+            <Paper style={{width: '100%', height: '80vh'}}>
+                <List style={{maxHeight: '100%', overflow: 'auto', marginBottom: 10}}>
+
+                    <Table style={{marginBottom: 200}}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Label</TableCell>
+                                <TableCell>Type</TableCell>
+                                <TableCell>URI</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {entities ? entities.map(entity => (
+                                <TableRow key={entity['@id']}>
+                                    <TableCell>{getLabel(entity)}</TableCell>
+                                    <TableCell>
+                                        {entity['@type'].map(type => (
+                                            <a href={navigableLink(type)} key={type}>
+                                                {getLabel(vocabulary.getById(type))}
+                                            </a>
+                                        ))}
+                                    </TableCell>
+                                    <TableCell>
+                                        <a href={navigableLink(entity['@id'])}>{entity['@id']}</a>
+                                    </TableCell>
+                                </TableRow>
+                            )) : null}
+                        </TableBody>
+                    </Table>
+                </List>
+            </Paper>
+
             <LoadingOverlay loading={creatingMetadataEntity}/>
         </div>
     );

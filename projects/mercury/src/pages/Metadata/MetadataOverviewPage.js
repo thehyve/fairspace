@@ -23,6 +23,7 @@ const MetadataOverviewPage = ({classes}) => (
         </Paper>
 
     </div>
+
 );
 
 const style = (theme) => ({

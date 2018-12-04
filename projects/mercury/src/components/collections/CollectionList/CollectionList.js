@@ -48,7 +48,7 @@ export class CollectionList extends React.Component {
             return "No collections";
         } else {
             return (
-                <Paper>
+                <Paper style={{marginBottom: 200}}>
                     <Table>
                         <TableHead>
                             <TableRow>

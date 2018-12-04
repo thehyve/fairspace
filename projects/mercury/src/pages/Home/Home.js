@@ -5,6 +5,7 @@ import asPage from "../../containers/asPage/asPage";
 import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 
 function Home(props) {
+
     return (
         <WithRightDrawer
             collapsible={false}
@@ -16,6 +17,3 @@ function Home(props) {
 }
 
 export default asPage(Home);
-
-
-

@@ -1,5 +1,14 @@
 const drawerWidth = 360
 const styles = theme => ({
+    contentPaper: {
+        width: '100%',
+        height: '100vh',
+        minWidth: 600
+    },
+    contentList: {
+        maxHeight: '100%',
+        overflow: 'auto'
+    },
     drawerContents: {
         marginTop: 50,
         marginBottom: 100
@@ -20,7 +29,7 @@ const styles = theme => ({
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        marginRight: drawerWidth + 3 * theme.spacing.unit,
+        marginRight: drawerWidth + 3 * theme.spacing.unit
     },
 
     infoDrawerPaper: {
