@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import React from 'react';
-import Table from "@material-ui/core/Table/Table";
+import {Table, Paper} from "@material-ui/core";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 
@@ -9,7 +9,7 @@ export class EntityInformation extends React.Component {
     render() {
         const {id, label, comment} = this.props;
         return (
-            <div>
+            <Paper>
                 <Table>
                     <TableRow>
                         <TableCell>Id:</TableCell> <TableCell>{id}</TableCell>
@@ -28,7 +28,7 @@ export class EntityInformation extends React.Component {
                     }
 
                 </Table>
-            </div>
+            </Paper>
         );
     }
 }

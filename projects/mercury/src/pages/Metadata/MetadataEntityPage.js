@@ -4,6 +4,7 @@ import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 import EntityInformation from '../../components/metadata/EntityInformation';
 import metadataAPI from '../../services/MetadataAPI/MetadataAPI';
 import Metadata from '../../components/metadata/Metadata';
+import {Paper} from '@material-ui/core';
 
 export class MetadataEntityPage extends React.Component {
 
@@ -11,15 +12,16 @@ export class MetadataEntityPage extends React.Component {
         const {match: {params}} = this.props;
         const subject = `${window.location.origin}/iri/${params.type}/${params.id}`;
         return (
-            <div>
+            <Paper>
                 <BreadCrumbs/>
                 <EntityInformation id={params.id} type={params.type}/>
-                <Metadata
-                    editable={true}
-                    metadataAPI={metadataAPI}
-                    subject={subject}
-                />
-            </div>
+                <Paper className={'withScroll'} style={{paddingLeft: 20}}>
+                    <Metadata
+                        editable={true}
+                        metadataAPI={metadataAPI}
+                        subject={subject}/>
+                </Paper>
+            </Paper>
         );
     }
 }
