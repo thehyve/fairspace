@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.net.URISyntaxException
+import javax.validation.ValidationException
 
 @ControllerAdvice
 @ResponseBody
@@ -41,10 +41,10 @@ class CeresExceptionHandler {
         return ErrorBody("Missing request parameter " + ex.parameterName)
     }
 
-    @ExceptionHandler(URISyntaxException::class)
+    @ExceptionHandler(ValidationException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun handleURISyntaxException(ex: URISyntaxException): ErrorBody {
-        return ErrorBody("The request contains an invalid URI: " + ex.input)
+    protected fun handleValidationException(ex: ValidationException): ErrorBody {
+        return ErrorBody("Bad request: ${ex.message}")
     }
 
     @ExceptionHandler(Exception::class)

@@ -13,8 +13,9 @@ import org.apache.jena.sparql.resultset.ResultSetMem
 import org.apache.jena.system.Txn.calculateRead
 import org.apache.jena.system.Txn.executeWrite
 import org.springframework.stereotype.Component
-import java.lang.Exception
 import java.net.URI
+import java.net.URISyntaxException
+import javax.validation.ValidationException
 
 @Component
 class ModelRepository(private val dataset: Dataset, private val reasoner: Reasoner) {
@@ -106,13 +107,18 @@ class ModelRepository(private val dataset: Dataset, private val reasoner: Reason
                     .filter(CharSequence::isNotEmpty)
                     .joinToString(" ")
 
+    @Throws(ValidationException::class)
     private fun validate(model: Model): Model = model.apply {
-        listStatements().forEach {
-            URI(it.subject.uri)
-            URI(it.predicate.uri)
-            if (it.`object`.isURIResource) {
-                URI(it.`object`.asResource().uri)
+        try {
+            listStatements().forEach {
+                URI(it.subject.uri)
+                URI(it.predicate.uri)
+                if (it.`object`.isURIResource) {
+                    URI(it.`object`.asResource().uri)
+                }
             }
+        } catch (e: URISyntaxException) {
+            throw ValidationException("The model contains an invalid URI: " + e.input, e)
         }
     }
 }
