@@ -70,10 +70,7 @@ describe('Metadata Catalog', function () {
                 .should('have.value', personName);
         })
 
-        // Due to a bug described in VRE-282 and VRE-157 this
-        // test does not succeed yet. However, it should, after the
-        // fix for those issues has been implemented.
-        xit('should allow deletion of metadata', function () {
+        it('should allow deletion of metadata', function () {
             // Go to a metadata page about a patient
             cy.visit("/metadata/persons/E2E-TEST");
 
