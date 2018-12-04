@@ -5,3 +5,9 @@ body {
     height: 100%;
     overflow: hidden;
 }
+
+.withScroll {
+    overflow: scroll;
+    height: 100vh;
+    margin-bottom: 100px
+}

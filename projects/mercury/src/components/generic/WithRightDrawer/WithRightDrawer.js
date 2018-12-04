@@ -6,7 +6,6 @@ import styles from "./WithRightDrawer.styles";
 import Drawer from "@material-ui/core/Drawer/Drawer";
 import IconButton from "@material-ui/core/IconButton/IconButton";
 import Icon from "@material-ui/core/Icon/Icon";
-import {Paper, List} from '@material-ui/core';
 
 function WithRightDrawer({classes, mainContents, drawerContents, collapsible, drawerOpened, onCloseDrawer}) {
     return (
@@ -16,11 +15,9 @@ function WithRightDrawer({classes, mainContents, drawerContents, collapsible, dr
                     [classes.contentShift]: drawerOpened
                 }
             )}>
-                <Paper className={classes.contentPaper}>
-                    <List className={classes.contentList}>
-                        {mainContents}
-                    </List>
-                </Paper>
+                <div className={'withScroll'}>
+                    {mainContents}
+                </div>
             </main>
             <Drawer
                 variant="persistent"

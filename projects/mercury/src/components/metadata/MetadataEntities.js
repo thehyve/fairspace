@@ -33,37 +33,34 @@ function MetadataEntities({loading, creatingMetadataEntity, error, entities, loa
                 </Column>
             </Row>
 
-            <Paper style={{width: '100%', height: '80vh'}}>
-                <List style={{maxHeight: '100%', overflow: 'auto', marginBottom: 10}}>
-
-                    <Table style={{marginBottom: 200}}>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Label</TableCell>
-                                <TableCell>Type</TableCell>
-                                <TableCell>URI</TableCell>
+            <div className={'withScroll'}>
+                <Table style={{marginBottom: 300}}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Label</TableCell>
+                            <TableCell>Type</TableCell>
+                            <TableCell>URI</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {entities ? entities.map(entity => (
+                            <TableRow key={entity['@id']}>
+                                <TableCell>{getLabel(entity)}</TableCell>
+                                <TableCell>
+                                    {entity['@type'].map(type => (
+                                        <a href={navigableLink(type)} key={type}>
+                                            {getLabel(vocabulary.getById(type))}
+                                        </a>
+                                    ))}
+                                </TableCell>
+                                <TableCell>
+                                    <a href={navigableLink(entity['@id'])}>{entity['@id']}</a>
+                                </TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {entities ? entities.map(entity => (
-                                <TableRow key={entity['@id']}>
-                                    <TableCell>{getLabel(entity)}</TableCell>
-                                    <TableCell>
-                                        {entity['@type'].map(type => (
-                                            <a href={navigableLink(type)} key={type}>
-                                                {getLabel(vocabulary.getById(type))}
-                                            </a>
-                                        ))}
-                                    </TableCell>
-                                    <TableCell>
-                                        <a href={navigableLink(entity['@id'])}>{entity['@id']}</a>
-                                    </TableCell>
-                                </TableRow>
-                            )) : null}
-                        </TableBody>
-                    </Table>
-                </List>
-            </Paper>
+                        )) : null}
+                    </TableBody>
+                </Table>
+            </div>
 
             <LoadingOverlay loading={creatingMetadataEntity}/>
         </div>
