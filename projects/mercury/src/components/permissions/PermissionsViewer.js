@@ -84,6 +84,13 @@ export class PermissionsViewer extends React.Component {
         }
     }
 
+    componentDidUpdate() {
+        const {collectionId, fetchPermissionsIfNeeded} = this.props;
+        if (collectionId) {
+            fetchPermissionsIfNeeded(collectionId);
+        }
+    }
+
     handleAlterPermission = (user) => {
         this.setState({
             showPermissionDialog: true,
