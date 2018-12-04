@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
+import javax.validation.ValidationException
 
 @ControllerAdvice
 @ResponseBody
@@ -38,6 +39,12 @@ class CeresExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun handleMissingParameterException(ex: MissingServletRequestParameterException): ErrorBody {
         return ErrorBody("Missing request parameter " + ex.parameterName)
+    }
+
+    @ExceptionHandler(ValidationException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun handleValidationException(ex: ValidationException): ErrorBody {
+        return ErrorBody("Bad request: ${ex.message}")
     }
 
     @ExceptionHandler(Exception::class)
