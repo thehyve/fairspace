@@ -26,12 +26,7 @@ class InferenceTest {
     private val provides = modelForInference.createProperty(NS, "providesMaterial")
 
     private val repo = ModelRepository(createTxnMem().defaultModel,
-            PropertyInverter(
-                    FileManager.get().loadModel("inference-model.jsonld").run {
-                        listStatements(null, createProperty("http://www.w3.org/2002/07/owl#inverseOf"), null as? RDFNode)
-                                .asSequence()
-                                .map { it.subject.uri to it.`object`.asResource().uri }
-                    }))
+            OwlPropertyInverter(FileManager.get().loadModel("inference-model.jsonld")))
 
     @Test
     fun `see if model is setup properly`() {

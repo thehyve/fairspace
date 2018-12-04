@@ -1,12 +1,10 @@
 package io.fairspace.ceres.metadata.repository
 
-import org.apache.jena.rdf.model.Model
-import org.apache.jena.rdf.model.Resource
-import org.apache.jena.rdf.model.Statement
-import org.apache.jena.rdf.model.StmtIterator
+import org.apache.jena.rdf.model.*
 import org.apache.jena.util.iterator.WrappedIterator
+import org.apache.jena.vocabulary.OWL2
 
-class PropertyInverter(properties: Sequence<Pair<String, String>>) {
+open class PropertyInverter(properties: Iterable<Pair<String, String>>): Enhancer() {
     private val map = mutableMapOf<String, String>().apply {
         properties.forEach {
             put(it.first, it.second)
@@ -14,9 +12,7 @@ class PropertyInverter(properties: Sequence<Pair<String, String>>) {
         }
     }
 
-    fun extend(model: Model): StmtIterator = extend(model.listStatements())
-
-    fun extend(iterator: StmtIterator): StmtIterator =
+    override fun enhance(iterator: StmtIterator): StmtIterator =
             object : WrappedIterator<Statement>(iterator, true), StmtIterator {
                 private var inferred: Statement? = null
 
@@ -36,3 +32,9 @@ class PropertyInverter(properties: Sequence<Pair<String, String>>) {
                 override fun nextStatement(): Statement = next()
             }
 }
+
+
+class OwlPropertyInverter(model: Model) : PropertyInverter(
+        model.listStatements(null, OWL2.inverseOf, null as? RDFNode)
+                .mapWith { it.subject.uri to it.`object`.asResource().uri }
+                .toList())

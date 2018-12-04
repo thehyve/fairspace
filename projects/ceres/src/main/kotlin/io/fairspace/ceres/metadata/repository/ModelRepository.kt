@@ -8,11 +8,18 @@ import org.apache.jena.query.ResultSet
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory.createDefaultModel
 import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.rdf.model.StmtIterator
 import org.apache.jena.sparql.resultset.ResultSetMem
 import org.springframework.stereotype.Component
 
+abstract class Enhancer {
+    abstract fun enhance(iterator: StmtIterator): StmtIterator
+
+    fun enhance(model: Model): StmtIterator = enhance(model.listStatements())
+}
+
 @Component
-class ModelRepository(private val model: Model, private val propertyInverter: PropertyInverter) {
+class ModelRepository(private val model: Model, private val enhancer: Enhancer) {
 
     private val log = logger {}
 
@@ -26,7 +33,7 @@ class ModelRepository(private val model: Model, private val propertyInverter: Pr
 
     fun add(delta: Model) {
         log.trace { "Adding statements: $delta" }
-        model.executeInTxn { model.add(propertyInverter.extend(delta)) }
+        model.executeInTxn { model.add(enhancer.enhance(delta)) }
     }
 
     /**
@@ -40,7 +47,7 @@ class ModelRepository(private val model: Model, private val propertyInverter: Pr
         log.trace { "Removing statements for s: $subject p: $predicate" }
         model.executeInTxn {
             val found = model.listStatements(subject.toResource(), predicate.toProperty(), obj.toResource())
-            val toRemove = propertyInverter.extend(found)
+            val toRemove = enhancer.enhance(found)
             model.remove(toRemove)
         }
     }
@@ -60,9 +67,9 @@ class ModelRepository(private val model: Model, private val propertyInverter: Pr
         model.executeInTxn {
             lhs.forEach {
                 val siblings = model.listStatements(it.first, it.second, null as? RDFNode)
-                model.remove(propertyInverter.extend(siblings))
+                model.remove(enhancer.enhance(siblings))
             }
-            model.add(propertyInverter.extend(delta))
+            model.add(enhancer.enhance(delta))
         }
     }
 
