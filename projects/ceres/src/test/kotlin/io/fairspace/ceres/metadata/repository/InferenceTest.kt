@@ -1,11 +1,8 @@
 package io.fairspace.ceres.metadata.repository
 
-import org.apache.jena.query.DatasetFactory
 import org.apache.jena.query.DatasetFactory.createTxnMem
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.ModelFactory.createDefaultModel
-import org.apache.jena.rdf.model.RDFNode
-import org.apache.jena.reasoner.ReasonerRegistry
 import org.apache.jena.util.FileManager
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
