@@ -105,6 +105,9 @@ describe('Storage API', function () {
             )
             .then(() =>
                 // Verify the file can not be downloaded anymore
+                // The actual response code does not really matter, as long as it indicates a client error
+                // Implementations could either return a 404 (indicating not found) or 401 (because the
+                // collection itself does not exist anymore, and the user does not have access to the path)
                 cy.request({url: uploadedFileUrl, failOnStatusCode: false}).its('status').should('be.within', 400, 499));
 
     });
