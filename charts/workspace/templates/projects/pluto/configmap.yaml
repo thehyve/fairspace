@@ -18,6 +18,7 @@ data:
       urls:
         files: {{ template "storage.url" . }}/api/storage/webdav
         jupyter: {{ template "jupyterhub.url" . }}
+        {{ if ( and .Values.services .Values.services.cbioportal  ) }}cbioportal: {{ .Values.services.cbioportal }}{{ end }}
 
     workspace:
       name: {{ .Release.Name }}

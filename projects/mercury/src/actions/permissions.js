@@ -20,7 +20,7 @@ export const fetchPermissions = createErrorHandlingPromiseAction((collectionId, 
  */
 export const fetchPermissionsIfNeeded = (collectionId, useCache = false) => dispatchIfNeeded(
     () => fetchPermissions(collectionId, useCache),
-    state => state && state.cache && state.cache.permissionsByCollectionId ? state.cache.permissionsByCollectionId[collectionId]: undefined
+    state => state && state.cache && state.cache.permissionsByCollection ? state.cache.permissionsByCollection[collectionId]: undefined
 );
 
 export const alterPermission = createErrorHandlingPromiseAction((userId, collectionId, access) => ({

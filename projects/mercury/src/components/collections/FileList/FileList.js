@@ -77,12 +77,14 @@ class FileList extends React.Component {
                                                 {props.onRename ?
                                                     <RenameButton currentName={row.basename}
                                                                   aria-label={"Rename " + row.basename}
+                                                                  title={"Rename " + row.basename}
                                                                   onRename={(newName) => props.onRename(row, newName)}
                                                                   disabled={props.readonly}>
                                                         <RenameBox/>
                                                     </RenameButton> : null}
                                                 {props.onDelete ?
                                                     <ButtonWithVerification aria-label={"Delete " + row.basename}
+                                                                            title={"Delete " + row.basename}
                                                                             onClick={() => props.onDelete(row)}
                                                                             disabled={props.readonly}>
                                                         <Icon>delete</Icon>

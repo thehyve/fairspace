@@ -48,7 +48,7 @@ export class CollectionList extends React.Component {
             return "No collections";
         } else {
             return (
-                <Paper>
+                <Paper style={{marginBottom: 200}}>
                     <Table>
                         <TableHead>
                             <TableRow>
@@ -97,6 +97,7 @@ export class CollectionList extends React.Component {
                                             <ButtonWithVerification
                                                 visibility={this.props.hovered !== idx ? 'hidden' : 'visible'}
                                                 aria-label={"Delete " + collection.name}
+                                                title={"Delete " + collection.name}
                                                 onClick={() => onCollectionDelete(collection)}
                                                 disabled={!PermissionChecker.canManage(collection)}>
                                                 <Icon>delete</Icon>

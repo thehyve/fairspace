@@ -59,7 +59,7 @@ class CollectionBrowser extends React.Component {
     }
 
     renderButtons() {
-        return <Button variant="fab" mini color="secondary" aria-label="Add"
+        return <Button variant="fab" mini color="secondary" aria-label="Add" title="Add collection"
                        onClick={this.handleAddCollectionClick.bind(this)}>
             <Icon>add</Icon>
         </Button>

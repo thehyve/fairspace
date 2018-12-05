@@ -1,8 +1,7 @@
 const drawerWidth = 360
 const styles = theme => ({
     drawerContents: {
-        marginTop: 50,
-        marginBottom: 100
+        marginTop: 50
     },
     content: {
         flexGrow: 1,
@@ -20,7 +19,7 @@ const styles = theme => ({
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        marginRight: drawerWidth + 3 * theme.spacing.unit,
+        marginRight: drawerWidth + 3 * theme.spacing.unit
     },
 
     infoDrawerPaper: {

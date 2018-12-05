@@ -84,6 +84,13 @@ export class PermissionsViewer extends React.Component {
         }
     }
 
+    componentDidUpdate() {
+        const {collectionId, fetchPermissionsIfNeeded} = this.props;
+        if (collectionId) {
+            fetchPermissionsIfNeeded(collectionId);
+        }
+    }
+
     handleAlterPermission = (user) => {
         this.setState({
             showPermissionDialog: true,
@@ -157,7 +164,7 @@ export class PermissionsViewer extends React.Component {
         return canManage ? (
             <ListItem className={classes.buttonList}>
                 <ListItemSecondaryAction>
-                    <Button variant='fab' aria-label="Add" onClick={() => this.handleAlterPermission()} mini>
+                    <Button variant='fab' aria-label="Add" title="Add collaborator" onClick={() => this.handleAlterPermission()} mini>
                         <AddIcon/>
                     </Button>
                 </ListItemSecondaryAction>

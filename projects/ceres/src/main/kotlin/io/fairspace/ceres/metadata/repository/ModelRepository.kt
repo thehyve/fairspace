@@ -6,16 +6,16 @@ import org.apache.jena.query.Query.*
 import org.apache.jena.query.QueryExecutionFactory
 import org.apache.jena.query.QueryFactory
 import org.apache.jena.query.ResultSet
-import org.apache.jena.rdf.model.InfModel
-import org.apache.jena.rdf.model.Model
-import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.*
 import org.apache.jena.rdf.model.ModelFactory.createInfModel
-import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.sparql.resultset.ResultSetMem
 import org.apache.jena.system.Txn.calculateRead
 import org.apache.jena.system.Txn.executeWrite
 import org.springframework.stereotype.Component
+import java.net.URI
+import java.net.URISyntaxException
+import javax.validation.ValidationException
 
 @Component
 class ModelRepository(private val dataset: Dataset, private val reasoner: Reasoner) {
@@ -33,6 +33,7 @@ class ModelRepository(private val dataset: Dataset, private val reasoner: Reason
 
     fun add(delta: Model) {
         log.trace { "Adding statements: $delta" }
+        validate(delta)
         write { model -> model.add(delta) }
     }
 
@@ -74,6 +75,7 @@ class ModelRepository(private val dataset: Dataset, private val reasoner: Reason
      */
     fun update(delta: Model) {
         log.trace { "Updating statements: $delta" }
+        validate(delta)
         write { model ->
             delta.listStatements()
                     .forEach {
@@ -104,4 +106,24 @@ class ModelRepository(private val dataset: Dataset, private val reasoner: Reason
                     .map(String::trim)
                     .filter(CharSequence::isNotEmpty)
                     .joinToString(" ")
+
+    @Throws(ValidationException::class)
+    private fun validate(model: Model): Model = model.apply {
+            listStatements().forEach {
+                validate(it.subject)
+                validate(it.predicate)
+                validate(it.`object`)
+            }
+    }
+
+    @Throws(ValidationException::class)
+    private fun validate(node: RDFNode) {
+        if (node.isURIResource) {
+            try {
+                URI(node.asResource().uri)
+            } catch (e: URISyntaxException) {
+                throw ValidationException("The model contains an invalid URI: " + e.input, e)
+            }
+        }
+    }
 }

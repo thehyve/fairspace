@@ -87,6 +87,7 @@ function MetadataProperty({editable, subject, property, updateMetadata, onItemMo
                                 }}
                                 size='small'
                                 aria-label="Delete"
+                                title="Delete"
                                 onClick={handleDelete(idx)}>
                                 <ClearIcon/>
                             </IconButton>
