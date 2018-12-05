@@ -21,7 +21,7 @@ class ResourceValue extends React.Component {
     }
 
     render() {
-        const {property, style, ...otherProps} = this.props;
+        const {property, style, onSave, ...otherProps} = this.props;
 
         return <TextField
             {...otherProps}

@@ -6,7 +6,7 @@ const styles = {
         overflow: 'hidden',
         position: 'relative',
         display: 'flex',
-    },
+    }
 };
 
 export default styles;

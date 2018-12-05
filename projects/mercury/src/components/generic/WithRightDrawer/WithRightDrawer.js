@@ -15,7 +15,9 @@ function WithRightDrawer({classes, mainContents, drawerContents, collapsible, dr
                     [classes.contentShift]: drawerOpened
                 }
             )}>
-                {mainContents}
+                <div className={'withScroll'}>
+                    {mainContents}
+                </div>
             </main>
             <Drawer
                 variant="persistent"
@@ -29,7 +31,7 @@ function WithRightDrawer({classes, mainContents, drawerContents, collapsible, dr
                 {collapsible ?
                     <div>
                         <div className={classes.toolbar}/>
-                        <IconButton onClick={onCloseDrawer} className={classes.closeButton}>
+                        <IconButton onClick={onCloseDrawer} title="Close drawer" className={classes.closeButton}>
                             <Icon>close</Icon>
                         </IconButton>
                     </div> : null }

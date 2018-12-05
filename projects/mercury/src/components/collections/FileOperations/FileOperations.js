@@ -85,18 +85,21 @@ function FileOperations(props) {
         (<React.Fragment>
             <IconButton
                 aria-label="Copy"
+                title="Copy"
                 onClick={handleCopy}
                 disabled={selectedPaths.length === 0 || disabled}>
                 <ContentCopy/>
             </IconButton>
             <IconButton
                 aria-label="Cut"
+                title="Cut"
                 onClick={handleCut}
                 disabled={selectedPaths.length === 0 || disabled}>
                 <ContentCut/>
             </IconButton>
             <IconButton
                 aria-label="Paste"
+                title="Paste"
                 onClick={handlePaste}
                 disabled={numClipboardItems === 0 || disabled}>
                 {addBadgeIfNotEmpty(
@@ -106,6 +109,7 @@ function FileOperations(props) {
             </IconButton>
             <CreateDirectoryButton
                 aria-label="Create directory"
+                title="Create directory"
                 onCreate={(name) => handleCreateDirectory(name)}
                 disabled={disabled}>
                 <Icon>create_new_folder</Icon>
@@ -114,6 +118,7 @@ function FileOperations(props) {
             <UploadButton
                 color="primary"
                 aria-label="Upload"
+                title="Upload"
                 onUpload={(files) => handleUpload(files)}
                 onDidUpload={refreshFiles}
                 disabled={disabled}>

@@ -1,6 +1,8 @@
 package io.fairspace.neptune.service;
 
+import io.fairspace.neptune.config.upstream.AuthorizationContainer;
 import io.fairspace.neptune.model.Collection;
+import io.fairspace.neptune.model.UnauthorizedException;
 import io.fairspace.neptune.vocabulary.Fairspace;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
@@ -24,12 +27,15 @@ public class CollectionMetadataService {
 
     private String metadataBaseUrl;
     private TripleService tripleService;
+    private final AuthorizationContainer authorizationContainer;
 
     @Autowired
     public CollectionMetadataService(
             TripleService tripleService,
+            AuthorizationContainer authorizationContainer,
             @Value("${app.metadata.base-url}") String metadataBaseUrl) {
         this.tripleService = tripleService;
+        this.authorizationContainer = authorizationContainer;
         this.metadataBaseUrl = metadataBaseUrl;
     }
 
@@ -51,7 +57,9 @@ public class CollectionMetadataService {
         model.add(subject, RDFS.label, model.createLiteral(collection.getName()));
         model.add(subject, Fairspace.description, model.createLiteral(Optional.ofNullable(collection.getDescription()).orElse("")));
         if (collection.getCreator() != null) {
-            model.add(subject, Fairspace.creator, model.createResource(getUserUri(collection.getCreator())));
+            Resource creatorResource = model.createResource(getUserUri(collection.getCreator()));
+            model.add(subject, Fairspace.creator, creatorResource);
+            model.add(creatorResource, RDFS.label, model.createLiteral(getUserFullName()));
         }
 
         if ( dateCreated != null ) {
@@ -102,4 +110,17 @@ public class CollectionMetadataService {
     public String getUserUri(String username) {
         return String.format(USER_URI_FORMAT, this.metadataBaseUrl, username);
     }
+
+    /**
+     * Ask for the fullname of the user that is currently logged in
+     * @return
+     */
+    public String getUserFullName() {
+        try {
+            return Objects.requireNonNull(authorizationContainer.getFullname());
+        } catch (Exception e) {
+            throw new UnauthorizedException("No valid authorization", e);
+        }
+    }
+
 }

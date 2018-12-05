@@ -1,4 +1,5 @@
 import React from 'react';
+import Config from '../../../services/Config/Config';
 import styles from "./Menu.styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -51,11 +52,11 @@ const Menu = ({classes}) => (
                 </ListItemIcon>
                 <ListItemText primary="Dataverse"/>
             </ListItem>
-            <ListItem button>
+            <ListItem component='a' href={Config.get().urls.cbioportal} Button>
                 <ListItemIcon>
                     <Icon>public</Icon>
                 </ListItemIcon>
-                <ListItemText primary="cBioportal"/>
+                <ListItemText primary="cBioportal" />
             </ListItem>
         </List>
     </div>
