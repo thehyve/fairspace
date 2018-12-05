@@ -33,7 +33,7 @@ function MetadataEntities({loading, creatingMetadataEntity, error, entities, loa
                 </Column>
             </Row>
 
-            <div className={'withScroll'}>
+            <div>
                 <Table style={{marginBottom: 300}}>
                     <TableHead>
                         <TableRow>

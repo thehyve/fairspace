@@ -15,7 +15,7 @@ class Routes extends React.Component {
     render() {
         const left = this.props.menuExpanded ? 230 : 60;
         return (
-            <div style={{marginLeft: left}}>
+            <div className={'withScroll'} style={{marginLeft: left}}>
                 <React.Fragment>
                     <Route exact path="/" component={Home}/>
                     <Route exact path="/collections" component={Collections}/>

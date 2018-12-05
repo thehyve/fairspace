@@ -1,9 +1,10 @@
 import React from 'react';
 import {Column, Row} from 'simple-flexbox';
 import PropTypes from 'prop-types';
+import {Paper} from '@material-ui/core'
 
 const GenericCollectionsScreen = (props) => (
-    <div>
+    <Paper>
         <Row>
             <Column flexGrow={1} vertical='center' horizontal='start'>
                 <div>
@@ -14,7 +15,7 @@ const GenericCollectionsScreen = (props) => (
         </Row>
 
         {props.main}
-    </div>
+    </Paper>
 )
 
 GenericCollectionsScreen.propTypes = {
