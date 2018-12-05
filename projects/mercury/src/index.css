@@ -9,4 +9,5 @@ body {
 .withScroll {
     overflow: scroll;
     height: 100vh;
+    width: 100%;
 }
