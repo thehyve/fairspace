@@ -45,6 +45,13 @@ workspace:
         enabled: true
         domain:
         annotations:
+          pluto:
+            kubernetes.io/ingress.class: nginx
+          storage:
+            kubernetes.io/ingress.class: nginx
+            nginx.ingress.kubernetes.io/proxy-body-size: 10g
+            nginx.ingress.kubernetes.io/rewrite-target: /zuul
+          jupyter:
             kubernetes.io/ingress.class: nginx
         tls:
             enabled: true

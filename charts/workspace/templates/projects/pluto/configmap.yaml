@@ -16,6 +16,7 @@ data:
 
     frontend:
       urls:
+        files: {{ template "storage.url" . }}/api/storage/webdav
         jupyter: {{ template "jupyterhub.url" . }}
 
     workspace:

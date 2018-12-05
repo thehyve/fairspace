@@ -3,8 +3,8 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "workspace.name" . }}-pluto-ingress
-{{- with $ingress.annotations }}
+  name: {{ template "workspace.name" . }}-storage-ingress
+{{- with $ingress.annotations.storage }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -17,11 +17,11 @@ spec:
 {{- if $ingress.tls.enabled }}
   tls:
     - hosts:
-      - {{ template "pluto.hostname" $ }}
+      - {{ template "storage.hostname" $ }}
       secretName: {{ template "workspace.tlsSecretName" $ }}
 {{- end }}
   rules:
-    - host: {{ template "pluto.hostname" $ }}
+    - host: {{ template "storage.hostname" $ }}
       http:
         paths:
           - path: /

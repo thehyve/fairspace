@@ -4,7 +4,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ template "workspace.name" . }}-jupyterhub-ingress
-{{- with $ingress.annotations }}
+{{- with $ingress.annotations.jupyter }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
