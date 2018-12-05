@@ -1,0 +1,35 @@
+{{- $ingress := .Values.workspace.ingress -}}
+{{- if $ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "workspace.name" . }}-pluto-ingress
+{{- with $ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ template "workspace.name" . }}
+    chart: {{ template "workspace.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+{{- if $ingress.tls.enabled }}
+  tls:
+    - hosts:
+      - {{ template "pluto.hostname" $ }}
+      secretName: {{ template "workspace.tlsSecretName" $ }}
+{{- end }}
+  rules:
+    - host: {{ template "pluto.hostname" $ }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ .Release.Name }}-pluto
+              servicePort: 80
+{{- end -}}
+
+
+
+
