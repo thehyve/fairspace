@@ -128,7 +128,7 @@ describe('JupyterHub', function () {
             .its('status')
             .then(status => {
                 if(status === 500) {
-                    cy.request(url + '/hub/spawn');
+                    cy.request(new URL($url).origin + '/hub/spawn');
                     return cy.reload(true);
                 } else {
                     return Promise.resolve();
