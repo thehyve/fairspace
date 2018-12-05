@@ -15,7 +15,9 @@ function WithRightDrawer({classes, mainContents, drawerContents, collapsible, dr
                     [classes.contentShift]: drawerOpened
                 }
             )}>
-                {mainContents}
+                <div className={'withScroll'}>
+                    {mainContents}
+                </div>
             </main>
             <Drawer
                 variant="persistent"
