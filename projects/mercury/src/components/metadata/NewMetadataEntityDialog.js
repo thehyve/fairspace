@@ -52,7 +52,7 @@ class NewMetadataEntityDialog extends React.Component{
     render() {
         return (
             <div style={{display: 'inline'}}>
-                <Button variant="fab" mini color="secondary" aria-label="Add"
+                <Button variant="fab" mini color="secondary" aria-label="Add" title="Add"
                         onClick={this.openDialog.bind(this)}>
                     <Icon>add</Icon>
                 </Button>
