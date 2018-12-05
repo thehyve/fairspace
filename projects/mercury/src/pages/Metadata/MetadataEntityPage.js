@@ -12,16 +12,16 @@ export class MetadataEntityPage extends React.Component {
         const {match: {params}} = this.props;
         const subject = `${window.location.origin}/iri/${params.type}/${params.id}`;
         return (
-            <Paper>
+            <div>
                 <BreadCrumbs/>
                 <EntityInformation id={params.id} type={params.type}/>
-                <Paper style={{paddingLeft: 20, height: '68vh'}}>
+                <Paper style={{paddingLeft: 20}}>
                     <Metadata
                         editable={true}
                         metadataAPI={metadataAPI}
                         subject={subject}/>
                 </Paper>
-            </Paper>
+            </div>
         );
     }
 }
