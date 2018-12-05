@@ -83,7 +83,7 @@ it('shows error when no subject provided', () => {
     });
     const wrapper = mount(<ConnectedMetadata subject={""} store={store}/>);
 
-    expect(wrapper.text()).toEqual("error_outlineAn error occurred while loading metadata");
+    expect(wrapper.text()).toEqual("No metadata found");
 });
 
 it('tries to load the metadata and the vocabulary', () => {
