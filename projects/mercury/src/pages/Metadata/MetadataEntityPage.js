@@ -15,7 +15,8 @@ export class MetadataEntityPage extends React.Component {
             <Paper>
                 <BreadCrumbs/>
                 <EntityInformation id={params.id} type={params.type}/>
-                <Paper className={'withScroll'} style={{paddingLeft: 20}}>
+                <Paper className={'withScroll'}
+                       style={{paddingLeft: 20, height: '68vh'}}>
                     <Metadata
                         editable={true}
                         metadataAPI={metadataAPI}
