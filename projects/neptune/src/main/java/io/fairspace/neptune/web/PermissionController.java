@@ -17,7 +17,7 @@ public class PermissionController {
     private Caching caching;
 
     public PermissionController(
-            @Value("${cachingPeriod.permission:60}") int cachePeriod,
+            @Value("${app.cachingPeriod.permission:60}") int cachePeriod,
             PermissionService permissionService
     ) {
         this.permissionService = permissionService;

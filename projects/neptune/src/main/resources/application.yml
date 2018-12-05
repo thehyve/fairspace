@@ -12,6 +12,9 @@ app:
     topology:
       collections:
         exchange: "collections"
+  cachingPeriod:
+    collection: 60
+    permission: 60
 
 spring:
   application:

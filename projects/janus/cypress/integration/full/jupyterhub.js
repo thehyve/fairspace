@@ -109,20 +109,41 @@ describe('JupyterHub', function () {
         cy.visit("/notebooks");
 
         // Wait for the page to contain a link 'Open'
-        // As it opens the link in a new tab, we will just go to the url
-        cy.get("main").contains("a", "Open").invoke('removeAttr', 'target').click();
+        // As it opens the link in a new tab, we will remove the target from the link first
+        cy.get("main")
+            .contains("a", "Open")
+            .invoke('removeAttr', 'target')
+            .click();
 
         // Ensure we are on the JupyterHub page
         cy.url().should('include', 'jupyterhub');
 
-        // Wait for the server to start
-        cy.contains("Your server is starting up", { timeout: maxJupyterStartupTime }).should("not.exist");
-        cy.get('#jupyterlab-splash').should('exist');
-        cy.get('#jupyterlab-splash').should('not.exist');
+        // Verify whether we have a 500 response on the current url
+        // If so, the server has not started properly due to a k8s hickup
+        cy.url().then($url =>
+            cy.request({
+                url: $url,
+                failOnStatusCode: false
+            })
+            .its('status')
+            .then(status => {
+                if(status === 500) {
+                    cy.request(url + '/hub/spawn');
+                    return cy.reload(true);
+                } else {
+                    return Promise.resolve();
+                }
+            }))
+            .then(() => {
+                // Wait for the server to start
+                cy.contains("Your server is starting up", { timeout: maxJupyterStartupTime }).should("not.exist");
+                cy.get('#jupyterlab-splash').should('exist');
+                cy.get('#jupyterlab-splash').should('not.exist');
 
-        // Wait for the launcher to be visible
-        // Use increased timeout to allow Jupyter to start properly
-        return cy.contains(".p-TabBar-tabLabel", "Launcher", {timeout: 10000}).should('exist');
-    }
+                // Wait for the launcher to be visible
+                // Use increased timeout to allow Jupyter to start properly
+                return cy.contains(".p-TabBar-tabLabel", "Launcher", {timeout: 10000}).should('exist');
+            })
+}
 
 });

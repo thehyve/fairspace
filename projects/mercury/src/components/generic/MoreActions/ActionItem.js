@@ -1,11 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 
-class ActionItem extends React.Component {
-    render() {
-        return <div onClick={this.props.onClick}>{this.props.children}</div>
-    }
-}
+const ActionItem = (props) =>
+    <MenuItem onClick={props.onClick}>{props.children}</MenuItem>
 
 ActionItem.propTypes = {
     onClick: PropTypes.func,

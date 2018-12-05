@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import IconButton from '@material-ui/core/IconButton';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import MoreActionsMenu from "./MoreActionsMenu";
-import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 
 class MoreActions extends React.Component {
 
@@ -31,9 +30,9 @@ class MoreActions extends React.Component {
      * @param menuItem
      */
     closeMenuOnClick = (menuItem, idx) =>
-        <MenuItem key={idx} onClick={this.handleMenuOnClose}>
+        <span key={idx} onClick={this.handleMenuOnClose}>
             {menuItem}
-        </MenuItem>
+        </span>
 
 
     render() {
