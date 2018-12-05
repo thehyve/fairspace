@@ -25,7 +25,7 @@ class FileList extends React.Component {
         const props = this.props;
 
         if (!props.files || props.files.length === 0 || props.files[0] === null) {
-            return "No collection found";
+            return "No files";
         } else {
             const selectedFilenames = props.selectedPaths || [];
             return (
