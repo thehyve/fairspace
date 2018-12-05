@@ -30,7 +30,7 @@ export class Metadata extends React.Component {
         const {subject, metadata, error, loading, editable, dispatch, ...otherProps} = this.props;
 
         if (!metadata || metadata.length === 0) {
-            return (<div>No metadata found</div>)
+            return (<div>404. No such resource.</div>)
         } else if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
         } else if (loading) {

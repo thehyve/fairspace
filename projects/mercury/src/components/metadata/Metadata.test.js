@@ -68,7 +68,7 @@ it('shows a message if no metadata was found', () => {
 
     const wrapper = mount(<ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} store={store}/>);
 
-    expect(wrapper.text()).toEqual("No metadata found");
+    expect(wrapper.text()).toEqual("404. No such resource.");
 });
 
 it('shows error when no subject provided', () => {
@@ -83,7 +83,7 @@ it('shows error when no subject provided', () => {
     });
     const wrapper = mount(<ConnectedMetadata subject={""} store={store}/>);
 
-    expect(wrapper.text()).toEqual("No metadata found");
+    expect(wrapper.text()).toEqual("404. No such resource.");
 });
 
 it('tries to load the metadata and the vocabulary', () => {
