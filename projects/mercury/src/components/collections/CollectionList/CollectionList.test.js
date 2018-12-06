@@ -70,6 +70,7 @@ describe('CollectionList', () => {
         const cells = wrapper.dive().find(TableCell);
         expect(cells.length).toEqual(12);
         expect(cells.at(2).childAt(0).text()).toEqual('Created');
-        expect(cells.at(8).childAt(0).childAt(0).html()).toEqual(DateTime({value: date}));
+        console.log(cells.at(8).childAt(0).childAt(0).html())
+        expect(cells.at(8).childAt(0).childAt(0).html()).toEqual('now');
     });
 });

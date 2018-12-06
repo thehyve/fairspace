@@ -43,16 +43,17 @@ export class CollectionList extends React.Component {
             collections, selectedCollectionId,
             onCollectionClick, onCollectionDoubleClick, onCollectionDelete
         } = this.props;
+        const classes = this.props.classes;
 
         if (!collections || collections.length === 0) {
             return "No collections";
         } else {
             return (
-                <Paper style={{marginBottom: 200}}>
-                    <Table>
+                <Paper className={classes.collectionListContainer}>
+                    <Table padding={'dense'}>
                         <TableHead>
                             <TableRow>
-                                <TableCell padding={'dense'}/>
+                                <TableCell/>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Created</TableCell>
                                 <TableCell>Creator</TableCell>
@@ -63,7 +64,6 @@ export class CollectionList extends React.Component {
                         <TableBody>
                             {collections.map((collection, idx) => {
                                 const selected = selectedCollectionId && (collection.id === selectedCollectionId);
-                                const classes = this.props.classes;
                                 return (
                                 <ClickHandler
                                     component={TableRow}
