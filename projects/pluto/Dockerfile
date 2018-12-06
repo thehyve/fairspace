@@ -4,4 +4,4 @@ ENV PORT 8080
 EXPOSE 8080
 COPY app/build/libs/*.jar /opt/app.jar
 WORKDIR /opt
-CMD ["java", "-Xms128m", "-Xmx192m",  "--add-modules", "java.se.ee", "-jar", "app.jar"]
+CMD ["java", "-Xms92m", "-Xmx128m",  "--add-modules", "java.se.ee", "-jar", "app.jar"]

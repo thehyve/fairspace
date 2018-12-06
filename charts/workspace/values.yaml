@@ -101,11 +101,11 @@ pluto:
     internalPort: 8080
   resources:
     limits:
-      cpu: 400m
+      cpu: 1
       memory: 512Mi
     requests:
-      cpu: 100m
-      memory: 256Mi
+      cpu: 50m
+      memory: 192Mi
   probePath: /actuator/health
   livenessProbe:
     initialDelaySeconds: 20
@@ -166,11 +166,11 @@ ceres:
 
   resources:
     limits:
-      cpu: 500m
+      cpu: 1
       memory: 512Mi
     requests:
-      cpu: 150m
-      memory: 256Mi
+      cpu: 50m
+      memory: 192Mi
 
   probePath: /actuator/health
   livenessProbe:
@@ -229,11 +229,11 @@ neptune:
 
   resources:
     limits:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: 1
+      memory: 512Mi
     requests:
-      cpu: 400m
-      memory: 768Mi
+      cpu: 50m
+      memory: 192Mi
   probePath: /actuator/health
   livenessProbe:
     initialDelaySeconds: 20
