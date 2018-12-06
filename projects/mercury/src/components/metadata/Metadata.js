@@ -27,14 +27,12 @@ export class Metadata extends React.Component {
 
     render() {
         // putting dispatch here to avoid it being passed down to children
-        const {subject, metadata, error, loading, editable, dispatch, ...otherProps} = this.props;
+        const {subject, metadata, error, message, loading, editable, dispatch, ...otherProps} = this.props;
 
-        if (!metadata || metadata.length === 0) {
-            return (<div>404. No such resource.</div>)
-        } else if (error) {
-            return (<ErrorMessage message="An error occurred while loading metadata"/>)
+        if (error) {
+            return <ErrorMessage message={message}/>
         } else if (loading) {
-            return <LoadingInlay/>;
+            return <LoadingInlay/>
         }
 
         return (<MetadataViewer {...otherProps}
@@ -48,17 +46,29 @@ const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject, cache: {vocabulary}} = state;
     const metadata = metadataBySubject[ownProps.subject];
 
-    // If there is no metadata by subject (not even pending)
-    // some error occurred.
-    if (!metadata || !ownProps.subject) {
+    let message = null;
+    let error = false;
+    const hasNoSubject = !ownProps.subject;
+    const hasNoMetadata = !metadata || !metadata.data || metadata.data.length === 0;
+    const hasOtherErrors = (metadata && metadata.error) || !vocabulary || vocabulary.error;
+
+    if (hasNoSubject || hasNoMetadata || hasOtherErrors) {
+        error = true;
+        message = hasNoSubject || hasOtherErrors ?
+            'An error occurred while loading metadata.' : '(404) No such resource.';
+    }
+
+    if (error) {
         return {
-            error: true
+            error: error,
+            message: message
         }
     }
 
     return {
         loading: metadata.pending || vocabulary.pending,
-        error: metadata.error || vocabulary.error,
+        error: error,
+        message: message,
         metadata: metadata.data
     }
 }
