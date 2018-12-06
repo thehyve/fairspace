@@ -29,8 +29,8 @@ class DateTime extends React.Component {
     }
 
     render() {
-        const {full, value} = this.props;
-        return full ?
+        const {absolute, value} = this.props;
+        return absolute ?
             this.dateFormatter.format(new Date(value)) :
             this.formatMoment(new Date(value));
     }
