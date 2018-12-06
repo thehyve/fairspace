@@ -16,16 +16,25 @@ open class PropertyInverter(properties: Iterable<Pair<String, String>>): Enhance
             object : WrappedIterator<Statement>(iterator, true), StmtIterator {
                 private var inferred: Statement? = null
 
-                override fun next(): Statement =
-                        inferred?.also { inferred = null }
-                                ?: base.next().also { s ->
-                                    map[s.predicate.uri]?.let { inverse ->
-                                        inferred = s.model.createStatement(
-                                                s.`object` as Resource,
-                                                s.model.createProperty(inverse),
-                                                s.subject)
-                                    }
-                                }
+                override fun next(): Statement {
+                    val result: Statement
+                    if (inferred != null) {
+                        result = inferred!!
+                        inferred = null
+                    } else {
+                        result = base.next()
+                        inferred = invert(result)
+                    }
+                    return result
+                }
+
+                private fun invert(statement: Statement): Statement? =
+                        map[statement.predicate.uri]?.let { inverseProperty ->
+                            statement.model.createStatement(
+                                    statement.`object` as Resource,
+                                    statement.model.createProperty(inverseProperty),
+                                    statement.subject)
+                        }
 
                 override fun hasNext(): Boolean = (inferred != null) || base.hasNext()
 
