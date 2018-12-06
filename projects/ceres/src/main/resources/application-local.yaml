@@ -6,7 +6,7 @@ jena:
 app:
   oauth2:
     base-url: http://localhost:5100
-    realm: minikube
+    realm: test
 
 # Tracing configuration
 spring:
