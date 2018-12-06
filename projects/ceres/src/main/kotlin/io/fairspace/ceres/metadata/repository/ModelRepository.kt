@@ -66,12 +66,12 @@ class ModelRepository(private val model: Model, private val enhancer: Enhancer) 
 
         validate(delta)
 
-        val lhs = delta.listStatements().asSequence()
+        val subjectsAndPredicates = delta.listStatements().asSequence()
                 .map { it.subject to it.predicate }
                 .toSet()
 
         model.executeInTxn {
-            lhs.forEach {
+            subjectsAndPredicates.forEach {
                 val siblings = model.listStatements(it.first, it.second, null as? RDFNode)
                 model.remove(enhancer.enhance(siblings))
             }
