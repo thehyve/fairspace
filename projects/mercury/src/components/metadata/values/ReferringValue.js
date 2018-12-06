@@ -7,7 +7,7 @@ import {RESOURCE_URI} from "../../../services/MetadataAPI/MetadataAPI";
 const ReferringValue = ({property, entry}) => {
     function extractDisplayValue(value) {
         let extractedVal = value.label || value.value || linkLabel(value.id) || '';
-        extractedVal = isDateTimeProperty(property) ? <DateTime value={extractedVal}/> : extractedVal;
+        extractedVal = isDateTimeProperty(property) ? <DateTime value={extractedVal} full={true}/> : extractedVal;
         return extractedVal;
     }
 
