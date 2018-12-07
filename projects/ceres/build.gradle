@@ -42,6 +42,7 @@ compileTestKotlin {
 repositories {
 	mavenCentral()
 	maven { url = "https://repo.thehyve.nl/content/repositories/fairspace-releases" }
+	maven { url "https://repo.thehyve.nl/content/repositories/fairspace-snapshots" }
 }
 
 
