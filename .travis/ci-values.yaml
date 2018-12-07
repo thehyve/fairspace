@@ -31,6 +31,8 @@ titan:
     pullPolicy: Always
   rabbitmq:
     password: "L3bE8yGJp7um2PVk"
+  persistence:
+    size: 20Gi
 
 # Specific settings for Ceres subchart
 ceres:
