@@ -27,6 +27,3 @@ export class MetadataEntityPage extends React.Component {
 }
 
 export default asPage(MetadataEntityPage);
-
-
-

@@ -29,18 +29,18 @@ export class Metadata extends React.Component {
         // putting dispatch here to avoid it being passed down to children
         const {subject, metadata, error, loading, editable, dispatch, ...otherProps} = this.props;
 
-        if (error) {
+        if (!metadata || metadata.length === 0) {
+            return (<div>404. No such resource.</div>)
+        } else if (error) {
             return (<ErrorMessage message="An error occurred while loading metadata"/>)
         } else if (loading) {
             return <LoadingInlay/>;
-        } else if (!metadata || metadata.length === 0) {
-            return (<div>No metadata found</div>)
-        } else {
-            return (<MetadataViewer {...otherProps}
-                                    editable={editable}
-                                    subject={subject}
-                                    properties={metadata}/>)
         }
+
+        return (<MetadataViewer {...otherProps}
+                                editable={editable}
+                                subject={subject}
+                                properties={metadata}/>)
     }
 }
 

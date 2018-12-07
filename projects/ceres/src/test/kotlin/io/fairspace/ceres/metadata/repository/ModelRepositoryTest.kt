@@ -2,11 +2,10 @@ package io.fairspace.ceres.metadata.repository
 
 import io.fairspace.ceres.metadata.TestData
 import org.apache.jena.query.Dataset
-import org.apache.jena.query.DatasetFactory
+import org.apache.jena.query.DatasetFactory.createTxnMem
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.reasoner.Reasoner
-import org.apache.jena.reasoner.rulesys.GenericRuleReasoner
 import org.apache.jena.vocabulary.VCARD
 import org.junit.Assert.*
 import org.junit.Before
@@ -19,9 +18,8 @@ class ModelRepositoryTest {
 
     @Before
     fun setUp() {
-        dataset = DatasetFactory.create()
-        reasoner = GenericRuleReasoner(emptyList())
-        repo = ModelRepository(dataset, reasoner)
+        dataset = createTxnMem()
+        repo = ModelRepository(dataset.defaultModel, PropertyInverter(emptyList()))
     }
 
     @Test

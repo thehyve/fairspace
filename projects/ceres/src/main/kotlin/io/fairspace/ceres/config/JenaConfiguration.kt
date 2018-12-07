@@ -1,7 +1,6 @@
 package io.fairspace.ceres.config
 
-import org.apache.jena.reasoner.Reasoner
-import org.apache.jena.reasoner.ReasonerRegistry
+import io.fairspace.ceres.metadata.repository.OwlPropertyInverter
 import org.apache.jena.tdb2.TDB2Factory
 import org.apache.jena.util.FileManager
 import org.springframework.beans.factory.annotation.Value
@@ -14,12 +13,8 @@ class JenaConfiguration {
     lateinit var datasetPath: String;
 
     @Bean
-    fun dataset() = TDB2Factory.connectDataset(datasetPath)
+    fun model() = TDB2Factory.connectDataset(datasetPath).defaultModel
 
     @Bean
-    fun reasoner(): Reasoner {
-        val inferenceModel = FileManager.get().loadModel("inference-model.jsonld")
-        return ReasonerRegistry.getOWLReasoner().bindSchema(inferenceModel)
-    }
-
+    fun enhancer() = OwlPropertyInverter(FileManager.get().loadModel("inference-model.jsonld"))
 }

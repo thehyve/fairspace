@@ -154,6 +154,11 @@ class FileBrowser extends React.Component {
     }
 
     renderFiles() {
+        const doesCollectionExist = this.props.openedCollection && this.props.openedCollection.id;
+        if(!doesCollectionExist) {
+            return 'Collection does not exist.';
+        }
+
         return <FileList
             files={this.props.files}
             selectedPaths={this.props.selectedPaths}

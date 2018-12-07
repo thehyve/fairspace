@@ -3,7 +3,7 @@ import CreateWebdavClient from "webdav";
 
 // Ensure that the window fetch method is used for webdav calls
 // and that is passes along the credentials
-const defaultOptions = { credentials: 'same-origin' };
+const defaultOptions = { credentials: 'include' };
 CreateWebdavClient.setFetchMethod((input, init) => {
     const options = init ? Object.assign({}, init, defaultOptions) : defaultOptions;
 

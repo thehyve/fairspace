@@ -11,8 +11,12 @@ way to set it up is to use docker-compose. Alternatively, you could install hype
 onto minikube to have a more real-life scenario.
 
 ### Using docker-compose
-You can run `docker-compose up -d` in the current directory to setup and configure
-a hyperspace for local development. This will also configure keycloak. 
+
+First log in on the Fairspace Docker registry using `docker login fairspace.azurecr.io`.
+The user name is: fairspace. The password is available through Robert or Sietse.
+
+Then run `docker-compose up -d` in the current directory to setup and configure
+a hyperspace for local development. This will also configure keycloak.
 
 The configuration is as follows:
 * Keycloak exposed on port 5100 (credentials: keycloak/keycloak)

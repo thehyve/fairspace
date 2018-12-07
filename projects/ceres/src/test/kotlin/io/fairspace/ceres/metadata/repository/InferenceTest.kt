@@ -1,9 +1,8 @@
 package io.fairspace.ceres.metadata.repository
 
-import org.apache.jena.query.DatasetFactory
+import org.apache.jena.query.DatasetFactory.createTxnMem
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.ModelFactory.createDefaultModel
-import org.apache.jena.reasoner.ReasonerRegistry
 import org.apache.jena.util.FileManager
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -23,10 +22,8 @@ class InferenceTest {
     private val derivesFrom = modelForInference.createProperty(NS, "derivesFrom")
     private val provides = modelForInference.createProperty(NS, "providesMaterial")
 
-    private val repo = ModelRepository(DatasetFactory.create(), {
-        val inferenceModel = FileManager.get().loadModel("inference-model.jsonld")
-        ReasonerRegistry.getOWLReasoner().bindSchema(inferenceModel)
-    }())
+    private val repo = ModelRepository(createTxnMem().defaultModel,
+            OwlPropertyInverter(FileManager.get().loadModel("inference-model.jsonld")))
 
     @Test
     fun `see if model is setup properly`() {
@@ -39,11 +36,8 @@ class InferenceTest {
     @Test
     fun `see if inference works`() {
         modelForInference.add(sample, derivesFrom, subject)
-
         repo.add(modelForInference)
-        val inferred = repo.list(subject.uri, null)
-
-        assertTrue(inferred.contains(subject, provides, sample))
+        assertTrue(repo.list().contains(subject, provides, sample))
     }
 
     @Test
