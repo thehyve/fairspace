@@ -1,6 +1,7 @@
 package io.fairspace.ceres.metadata.repository
 
 import mu.KotlinLogging.logger
+import org.apache.jena.query.Dataset
 import org.apache.jena.query.Query.*
 import org.apache.jena.query.QueryExecutionFactory
 import org.apache.jena.query.QueryFactory
@@ -10,6 +11,7 @@ import org.apache.jena.rdf.model.ModelFactory.createDefaultModel
 import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.rdf.model.StmtIterator
 import org.apache.jena.sparql.resultset.ResultSetMem
+import org.apache.jena.system.Txn.*
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.net.URISyntaxException
@@ -22,22 +24,22 @@ abstract class Enhancer {
 }
 
 @Component
-class ModelRepository(private val model: Model, private val enhancer: Enhancer) {
+class ModelRepository(private val dataset: Dataset, private val enhancer: Enhancer) {
 
     private val log = logger {}
 
     fun list(subject: String? = null, predicate: String? = null, obj: String? = null): Model {
         log.trace { "Retrieving statements for s: $subject p: $predicate o: $obj" }
 
-        return model.calculateInTxn {
-            model.listStatements(subject.toResource(), predicate.toProperty(), obj.toResource()).toModel()
+        return read {
+            listStatements(toResource(subject), toProperty(predicate), toResource(obj)).toModel()
         }
     }
 
     fun add(delta: Model) {
         log.trace { "Adding statements: $delta" }
         validate(delta)
-        model.executeInTxn { model.add(enhancer.enhance(delta)) }
+        write{ add(enhancer.enhance(delta)) }
     }
 
     /**
@@ -49,10 +51,10 @@ class ModelRepository(private val model: Model, private val enhancer: Enhancer) 
      */
     fun remove(subject: String?, predicate: String? = null, obj: String? = null) {
         log.trace { "Removing statements for s: $subject p: $predicate" }
-        model.executeInTxn {
-            val found = model.listStatements(subject.toResource(), predicate.toProperty(), obj.toResource())
+        write {
+            val found = listStatements(toResource(subject), toProperty(predicate), toResource(obj))
             val toRemove = enhancer.enhance(found)
-            model.remove(toRemove)
+            remove(toRemove)
         }
     }
 
@@ -70,20 +72,20 @@ class ModelRepository(private val model: Model, private val enhancer: Enhancer) 
                 .map { it.subject to it.predicate }
                 .toSet()
 
-        model.executeInTxn {
+        write {
             subjectsAndPredicates.forEach {
-                val siblings = model.listStatements(it.first, it.second, null as? RDFNode)
-                model.remove(enhancer.enhance(siblings))
+                val siblings = listStatements(it.first, it.second, toResource(null))
+                remove(enhancer.enhance(siblings))
             }
-            model.add(enhancer.enhance(delta))
+            add(enhancer.enhance(delta))
         }
     }
 
 
     fun query(queryString: String): Any { // ResultSet | Model | Boolean
         log.trace { "Executing SPARQL: ${toSingleLine(queryString)}" }
-        return model.calculateInTxn {
-            QueryExecutionFactory.create(QueryFactory.create(queryString), model).run {
+        return read {
+            QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
                 when (query.queryType) {
                     QueryTypeSelect -> execSelect().detach()
                     QueryTypeConstruct -> execConstruct().detach()
@@ -126,7 +128,11 @@ class ModelRepository(private val model: Model, private val enhancer: Enhancer) 
         }
     }
 
-    private fun String?.toResource() = this?.let(model::createResource)
+    private fun <R> read(action: Model.() -> R): R = calculateRead(dataset) { dataset.defaultModel.action() }
 
-    private fun String?.toProperty() = this?.let(model::createProperty)
+    private fun write(action: Model.() -> Unit): Unit = executeWrite(dataset) { dataset.defaultModel.action() }
+
+    private fun Model.toResource(s: String?) = s?.let(this::createResource)
+
+    private fun Model.toProperty(s: String?) = s?.let(this::createProperty)
 }

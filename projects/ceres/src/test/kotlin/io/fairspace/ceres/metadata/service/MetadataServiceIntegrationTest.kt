@@ -26,7 +26,7 @@ class MetadataServiceIntegrationTest {
     @Import(CeresApplication::class)
     class TestConfig {
         @Bean
-        fun model() = createTxnMem().defaultModel
+        fun dataset() = createTxnMem()
 
         @Bean
         fun enhancer() = PropertyInverter(listOf("http://oneway" to "http://otherway"))
