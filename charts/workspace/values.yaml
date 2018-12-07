@@ -72,11 +72,11 @@ workspace:
     configurationScripts:
       keycloak:
         enabled: true
-        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.0
+        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.1
         pullPolicy: IfNotPresent
       rabbitmq:
         enabled: true
-        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0-SNAPSHOT
+        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0
         pullPolicy: IfNotPresent
 
 # Generic settings for tracing
@@ -108,14 +108,14 @@ pluto:
     internalPort: 8080
   resources:
     limits:
-      cpu: 400m
+      cpu: 1
       memory: 512Mi
     requests:
-      cpu: 100m
-      memory: 256Mi
+      cpu: 50m
+      memory: 192Mi
   probePath: /actuator/health
   livenessProbe:
-    initialDelaySeconds: 180
+    initialDelaySeconds: 20
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 1
@@ -173,15 +173,15 @@ ceres:
 
   resources:
     limits:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 1
+      memory: 1024Mi
     requests:
-      cpu: 150m
-      memory: 256Mi
+      cpu: 200m
+      memory: 512Mi
 
   probePath: /actuator/health
   livenessProbe:
-    initialDelaySeconds: 180
+    initialDelaySeconds: 20
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 1
@@ -236,14 +236,14 @@ neptune:
 
   resources:
     limits:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: 1
+      memory: 512Mi
     requests:
-      cpu: 400m
-      memory: 768Mi
+      cpu: 50m
+      memory: 192Mi
   probePath: /actuator/health
   livenessProbe:
-    initialDelaySeconds: 60
+    initialDelaySeconds: 20
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 1
