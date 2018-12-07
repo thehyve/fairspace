@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -34,10 +35,17 @@ public class AuthEndpoints {
     OAuthFlow oAuthFlow;
 
     @GetMapping("/login")
-    public ResponseEntity login(HttpServletRequest request) throws URISyntaxException {
+    public ResponseEntity login(
+            @RequestParam(name = "redirectUrl", required = false) String redirectUrl,
+            HttpServletRequest request) throws URISyntaxException {
         // Generate random state string for pairing the response to the request
         State state = new State();
         request.getSession().setAttribute(LOGIN_STATE_SESSION_ATTRIBUTE, state.getValue());
+
+        // If a redirectUrl is specified, store it to use later on
+        if(!StringUtils.isEmpty(redirectUrl)) {
+            request.getSession().setAttribute(PREVIOUS_REQUEST_SESSION_ATTRIBUTE, redirectUrl);
+        }
 
         return ResponseEntity
                 .status(HttpStatus.SEE_OTHER)
