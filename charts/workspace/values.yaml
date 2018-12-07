@@ -72,11 +72,11 @@ workspace:
     configurationScripts:
       keycloak:
         enabled: true
-        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.0
+        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.1
         pullPolicy: IfNotPresent
       rabbitmq:
         enabled: true
-        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0-SNAPSHOT
+        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0
         pullPolicy: IfNotPresent
 
 # Generic settings for tracing
