@@ -68,6 +68,7 @@ jobs:
     - stage: build
       name: Build projects (and run e2e test for a PR)
       script:
+      - .travis/build.sh projects/oidc-auth
       - .travis/build.sh projects/callisto
       - .travis/build.sh projects/ceres
       - .travis/build.sh projects/mercury
@@ -76,7 +77,6 @@ jobs:
       - .travis/build.sh projects/titan
       - .travis/build.sh projects/jupyterhub-hub
       - .travis/build.sh projects/jupyterhub-singleuser
-      - .travis/build.sh projects/oidc-auth
       - 'if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then ci/docker/login.sh && .travis/pr/start-local-environment.sh && .travis/pr/run-e2e-tests.sh; fi'
     - stage: build
       name: Build helm charts
