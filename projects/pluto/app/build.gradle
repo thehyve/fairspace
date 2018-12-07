@@ -32,7 +32,7 @@ repositories {
 
 ext {
 	springCloudVersion = 'Finchley.RC2'
-	oidcAuthVersion = '0.1.1-SNAPSHOT'
+	oidcAuthVersion = System.getenv('OIDC_AUTH_VERSION') ?:'0.1.1-SNAPSHOT'
 }
 
 dependencies {
