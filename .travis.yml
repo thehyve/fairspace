@@ -15,6 +15,7 @@ env:
      - SNAPSHOT_BRANCH="dev"
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
+     - NEXUS_USERNAME="travis-fairspace"
      - RELEASE_CONTEXT="FairspaceDemoCluster"
      - SNAPSHOT_CONTEXT="FairspaceCICluster"
      - GIT_TAG_FILES_OVERRIDE="charts/workspace/Chart.yaml charts/workspace/values.yaml projects/"
