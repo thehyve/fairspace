@@ -1,4 +1,9 @@
 const styles = theme => ({
+    collectionListContainer: {
+        width: '100%',
+        overflowX: 'auto',
+        marginBottom: 200
+    },
     head: {
         backgroundColor: "#FFF",
         position: "sticky",
