@@ -49,16 +49,16 @@ const mapStateToProps = (state, ownProps) => {
     const hasNoMetadata = !metadata || !metadata.data || metadata.data.length === 0;
     const hasOtherErrors = (metadata && metadata.error) || !vocabulary || vocabulary.error;
 
-    let e = null;
     if (hasNoSubject || hasNoMetadata || hasOtherErrors) {
         const message = hasNoSubject || hasOtherErrors ?
             'An error occurred while loading metadata.' : '(404) No such resource.';
-        e = new Error(message);
+        return {
+            error: new Error(message)
+        }
     }
 
     return {
         loading: metadata.pending || vocabulary.pending,
-        error: e,
         metadata: metadata.data
     }
 }
