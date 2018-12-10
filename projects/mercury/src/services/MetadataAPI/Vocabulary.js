@@ -55,12 +55,13 @@ class Vocabulary {
         if(!subject) {
             subject = expandedMetadata[0]['@id'];
             metadataItem = expandedMetadata[0];
+            console.warn(`The given subject ${subject} is unknown`);
         } else {
             metadataItem = expandedMetadata.find(item => item['@id'] === subject);
         }
 
         // Retrieve the metadata item for this subject
-        if (!Array.isArray(metadataItem['@type'])) {
+        if (!metadataItem || !Array.isArray(metadataItem['@type'])) {
             console.warn("Can not combine metadata without a type or that is not expanded");
             return [];
         }
