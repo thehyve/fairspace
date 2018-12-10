@@ -316,7 +316,7 @@ titan:
     ##
     # storageClass: "-"
     accessMode: ReadWriteOnce
-    size: 512Mi
+    size: 10Gi
     subPath: titan
 
   collections:
