@@ -27,10 +27,10 @@ export class Metadata extends React.Component {
 
     render() {
         // putting dispatch here to avoid it being passed down to children
-        const {subject, metadata, error, message, loading, editable, dispatch, ...otherProps} = this.props;
+        const {subject, metadata, error, loading, editable, dispatch, ...otherProps} = this.props;
 
         if (error) {
-            return <ErrorMessage message={message}/>
+            return <ErrorMessage message={error.message}/>
         } else if (loading) {
             return <LoadingInlay/>
         }
@@ -45,30 +45,20 @@ export class Metadata extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject, cache: {vocabulary}} = state;
     const metadata = metadataBySubject[ownProps.subject];
-
-    let message = null;
-    let error = false;
     const hasNoSubject = !ownProps.subject;
     const hasNoMetadata = !metadata || !metadata.data || metadata.data.length === 0;
     const hasOtherErrors = (metadata && metadata.error) || !vocabulary || vocabulary.error;
 
+    let e = null;
     if (hasNoSubject || hasNoMetadata || hasOtherErrors) {
-        error = true;
-        message = hasNoSubject || hasOtherErrors ?
+        const message = hasNoSubject || hasOtherErrors ?
             'An error occurred while loading metadata.' : '(404) No such resource.';
-    }
-
-    if (error) {
-        return {
-            error: error,
-            message: message
-        }
+        e = new Error(message);
     }
 
     return {
         loading: metadata.pending || vocabulary.pending,
-        error: error,
-        message: message,
+        error: e,
         metadata: metadata.data
     }
 }
