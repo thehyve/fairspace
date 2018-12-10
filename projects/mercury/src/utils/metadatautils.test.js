@@ -10,35 +10,38 @@ describe('getLabel', () => {
         expect(getLabel({
             '@id': 'http://test.com/name',
             [LABEL_URI]: 'My label'
-        })).toEqual('name');
+        }, true)).toEqual('name');
 
         expect(getLabel({
             '@id': 'http://test.com/name',
             [LABEL_URI]: {'@value': 'My label'}
-        })).toEqual('name');
+        }, true)).toEqual('name');
 
         expect(getLabel({
             '@id': 'http://test.com/name',
             [LABEL_URI]: ['My label']
-        })).toEqual('name');
+        }, true)).toEqual('name');
 
         expect(getLabel({
             '@id': 'http://test.com/name',
             [LABEL_URI]: []
-        })).toEqual('name');
+        }, true)).toEqual('name');
     });
 
+    it('should keep external urls intact if shortenExternalUris is set to false', () => {
+        expect(getLabel({'@id': 'http://test.nl/name#lastname'}, false)).toEqual('http://test.nl/name#lastname');
+    });
     it('should return part of the url after the pound sign', () => {
-        expect(getLabel({'@id': 'http://test.nl/name#lastname'})).toEqual('lastname');
+        expect(getLabel({'@id': 'http://test.nl/name#lastname'}, true)).toEqual('lastname');
     });
     it('should return part of the url after the last slash if no pound sign present', () => {
-        expect(getLabel({'@id': 'http://test.nl/name'})).toEqual('name');
+        expect(getLabel({'@id': 'http://test.nl/name'}, true)).toEqual('name');
     })
 })
 
 describe('navigableLink', () => {
-    it('should transform IRI links within the current location to metadata', () => {
-        expect(navigableLink('http://localhost/iri/test')).toEqual('http://localhost/metadata/test');
+    it('should keep IRI links', () => {
+        expect(navigableLink('http://localhost/iri/test')).toEqual('http://localhost/iri/test');
     });
 
     it('should transform IRI links to a collection to the collection page', () => {

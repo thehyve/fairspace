@@ -23,7 +23,7 @@ class Routes extends React.Component {
                     <Route exact path="/notebooks" component={Notebooks}/>
 
                     <Route exact path="/metadata" component={MetadataOverviewPage}/>
-                    <Route path="/metadata/:type/:id"
+                    <Route path="/iri/**"
                            component={MetadataEntityPage}/>
 
                     {/* Handle auth urls that should go to the server */}

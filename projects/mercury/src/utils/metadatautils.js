@@ -7,9 +7,10 @@ import {LABEL_URI} from "../services/MetadataAPI/MetadataAPI";
  * the last part of the id is returned
  *
  * @param entity    Expanded JSON-LD entity
+ * @shortenExternalUris Shorten external URIs
  * @returns string
  */
-export function getLabel(entity) {
+export function getLabel(entity, shortenExternalUris = false) {
     if(
         Array.isArray(entity[LABEL_URI]) &&
         entity[LABEL_URI].length > 0 &&
@@ -18,10 +19,7 @@ export function getLabel(entity) {
         return entity[LABEL_URI][0]['@value'];
     } else {
         let id = entity['@id'];
-        return id &&
-            (id.includes('#')
-                ? id.substring(id.lastIndexOf('#') + 1)
-                : id.substring(id.lastIndexOf('/') + 1))
+        return id && linkLabel(id, shortenExternalUris)
     }
 }
 
@@ -36,11 +34,30 @@ export function getLabel(entity) {
  * @returns string      The navigable URI
  */
 export function navigableLink(link) {
-    return link.startsWith(window.location.origin)
-        ? link
-            .replace('/iri/collections/', '/collections/')
-            .replace('/iri/', '/metadata/')
+    return link.startsWith(window.location.origin + '/iri/collections/')
+        ? link.replace('/iri/collections/', '/collections/')
         : link
+}
+
+export function linkLabel(uri, shortenExternalUris = false) {
+    const entityPrefix = window.location.origin + '/iri/';
+    if (uri.startsWith(entityPrefix)) {
+        const path = uri.substring(entityPrefix.length);
+        return path.substring(path.indexOf('/') + 1)
+    }
+
+    const collectionPrefix = window.location.origin + '/collections/';
+    if (uri.startsWith(collectionPrefix)) {
+        return uri.substring(collectionPrefix.length);
+    }
+
+    if (shortenExternalUris) {
+        return uri.includes('#')
+            ? uri.substring(uri.lastIndexOf('#') + 1)
+            : uri.substring(uri.lastIndexOf('/') + 1)
+    }
+
+    return uri
 }
 
 
