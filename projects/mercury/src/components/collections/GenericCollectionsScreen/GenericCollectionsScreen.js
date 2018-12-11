@@ -11,7 +11,11 @@ const GenericCollectionsScreen = (props) => (
                     {props.breadCrumbs}
                 </div>
             </Column>
-            {props.buttons ? <Row>{props.buttons}</Row> : null}
+        </Row>
+        <Row>
+            <Column flexGrow={1} vertical='center' horizontal='end'>
+                {props.buttons ? <Row>{props.buttons}</Row> : null}
+            </Column>
         </Row>
 
         {props.main}

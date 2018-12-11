@@ -19,7 +19,8 @@ const styles = theme => ({
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        marginRight: drawerWidth + 3 * theme.spacing.unit
+        marginRight: drawerWidth + 3 * theme.spacing.unit,
+        minWidth: drawerWidth
     },
 
     infoDrawerPaper: {

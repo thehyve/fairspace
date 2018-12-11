@@ -65,10 +65,9 @@ it('shows a message if no metadata was found', () => {
         }
     });
 
-
     const wrapper = mount(<ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} store={store}/>);
 
-    expect(wrapper.text()).toEqual("404. No such resource.");
+    expect(wrapper.text()).toContain("(404) No such resource.");
 });
 
 it('shows error when no subject provided', () => {
@@ -81,9 +80,9 @@ it('shows error when no subject provided', () => {
                 }
         }
     });
-    const wrapper = mount(<ConnectedMetadata subject={""} store={store}/>);
+    const wrapper = mount(<ConnectedMetadata subject={null} store={store}/>);
 
-    expect(wrapper.text()).toEqual("404. No such resource.");
+    expect(wrapper.text()).toContain("An error occurred while loading metadata");
 });
 
 it('tries to load the metadata and the vocabulary', () => {
@@ -102,7 +101,6 @@ it('tries to load the metadata and the vocabulary', () => {
 
     const dispatch = jest.fn();
     const wrapper = mount(<Metadata subject={"John"} store={store} dispatch={dispatch}/>);
-
     expect(dispatch.mock.calls.length).toEqual(1);
 });
 

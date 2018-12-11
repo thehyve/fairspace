@@ -17,7 +17,7 @@ const styles = {
  */
 const MetadataViewer = props => {
 
-    const domainProp = props.properties.find(property => {
+    const domainProp = props.properties && props.properties.find(property => {
         return property.key === '@type'
     });
     const domain = domainProp && domainProp.values && domainProp.values[0] ?
@@ -29,6 +29,10 @@ const MetadataViewer = props => {
             subject={props.subject}
             key={property.key}
             property={property}/>
+
+    if(!props.properties) {
+        return '';
+    }
 
     return <List dense classes={props.classes}>
         {

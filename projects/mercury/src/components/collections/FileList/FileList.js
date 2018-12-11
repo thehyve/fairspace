@@ -23,14 +23,15 @@ import Paper from "@material-ui/core/Paper";
 class FileList extends React.Component {
     render() {
         const props = this.props;
+        const classes = props.classes;
 
         if (!props.files || props.files.length === 0 || props.files[0] === null) {
             return "No files";
         } else {
             const selectedFilenames = props.selectedPaths || [];
             return (
-                <Paper>
-                    <Table>
+                <Paper className={classes.fileListContainer}>
+                    <Table padding={'dense'}>
                         <TableHead>
                             <TableRow>
                                 <TableCell></TableCell>
@@ -43,7 +44,6 @@ class FileList extends React.Component {
                         <TableBody>
                             {props.files.map((row, idx) => {
                                 const selected = selectedFilenames.includes(row.filename);
-                                const classes = props.classes;
                                 return (
                                     <ClickHandler
                                         component={TableRow}
