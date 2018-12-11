@@ -74,6 +74,7 @@ class NewMetadataEntityDialog extends React.Component{
                             onChange={this.handleInputChange.bind(this)}
                             fullWidth
                             required={true}
+                            error={this._hasValidId()}
                             style={{width: 400}}
                         />
                         <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
@@ -101,13 +102,21 @@ class NewMetadataEntityDialog extends React.Component{
                         <Button onClick={this.closeDialog.bind(this)} color="secondary">
                             Close
                         </Button>
-                        <Button onClick={this.createEntity.bind(this)} color="primary" disabled={!(this.state.type && this.state.id)}>
+                        <Button onClick={this.createEntity.bind(this)} color="primary" disabled={!this._canCreate()}>
                             Create
                         </Button>
                     </DialogActions>
                 </Dialog>
             </div>
         );
+    }
+
+    _hasValidId() {
+       return new URL('http://example.com/' + this.state.id).toString() === 'http://example.com/' + this.state.id
+    }
+
+    _canCreate() {
+        return this.state.type && this.state.id && this._hasValidId()
     }
 }
 

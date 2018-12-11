@@ -34,6 +34,11 @@ const metadataUpdateReducer = (state = defaultState, action) => {
                     invalidated: true
                 }
             };
+        case actionTypes.rejected(METADATA_NEW_ENTITY):
+            return {
+                ...state,
+                creatingMetadataEntity: false
+            };
         default:
             return state
     }
