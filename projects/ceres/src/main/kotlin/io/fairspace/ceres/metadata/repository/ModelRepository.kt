@@ -1,11 +1,8 @@
 package io.fairspace.ceres.metadata.repository
 
 import mu.KotlinLogging.logger
-import org.apache.jena.query.Dataset
+import org.apache.jena.query.*
 import org.apache.jena.query.Query.*
-import org.apache.jena.query.QueryExecutionFactory
-import org.apache.jena.query.QueryFactory
-import org.apache.jena.query.ResultSet
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory.createDefaultModel
 import org.apache.jena.rdf.model.RDFNode
@@ -83,20 +80,30 @@ class ModelRepository(private val dataset: Dataset, private val enhancer: Enhanc
 
 
     fun query(queryString: String): Any { // ResultSet | Model | Boolean
+        val query = try {
+            QueryFactory.create(queryString)
+        } catch (_: QueryParseException) {
+            badQuery(queryString)
+        }
+
         log.trace { "Executing SPARQL: ${toSingleLine(queryString)}" }
         return read {
-            QueryExecutionFactory.create(QueryFactory.create(queryString), this).run {
+            QueryExecutionFactory.create(query, this).run {
                 when (query.queryType) {
                     QueryTypeSelect -> execSelect().detach()
                     QueryTypeConstruct -> execConstruct().detach()
                     QueryTypeDescribe -> execDescribe().detach()
                     QueryTypeAsk -> execAsk()
-                    else -> throw IllegalArgumentException("Cannot parse query: $queryString")
+                    else -> badQuery(queryString)
                 }
             }
         }
     }
 
+    private fun badQuery(queryString: String): Nothing {
+        log.error { "An invalid SPARQL query: ${toSingleLine(queryString)}" }
+        throw ValidationException("An invalid SPARQL query")
+    }
 
     private fun ResultSet.detach() = ResultSetMem(this)
 
