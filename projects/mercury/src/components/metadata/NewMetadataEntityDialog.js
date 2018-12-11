@@ -74,7 +74,7 @@ class NewMetadataEntityDialog extends React.Component{
                             onChange={this.handleInputChange.bind(this)}
                             fullWidth
                             required={true}
-                            error={this._hasValidId()}
+                            error={!this._hasValidId()}
                             style={{width: 400}}
                         />
                         <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
