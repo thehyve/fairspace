@@ -1,11 +1,8 @@
 #!/bin/bash
 
-set -e
-set -u
-
 source $BUILD_SCRIPTS_DIR/helm/install_helm.sh
 
-if [[ "$SHOULD_RELEASE" ]]; then
+if [[ $SHOULD_RELEASE ]]; then
   $BUILD_SCRIPTS_DIR/az/install.sh
   $BUILD_SCRIPTS_DIR/az/login.sh
   $BUILD_SCRIPTS_DIR/k8s/install_kubectl.sh
