@@ -7,16 +7,17 @@ import Button from "@material-ui/core/Button";
 import List from "@material-ui/core/List/List";
 import ListItem from "@material-ui/core/ListItem/ListItem";
 import ListItemText from "@material-ui/core/ListItemText/ListItemText";
-import Icon from "@material-ui/core/Icon/Icon";
-import {generateUuid, getLabel} from "../../utils/metadatautils";
+import { generateUuid, getLabel } from "../../utils/metadatautils";
 import Paper from "@material-ui/core/Paper/Paper";
-import {compareBy} from "../../utils/comparators";
+import { compareBy } from "../../utils/comparators";
 import TextField from "@material-ui/core/TextField/TextField";
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 import LoadingInlay from '../generic/Loading/LoadingInlay';
-import {fetchMetadataVocabularyIfNeeded} from "../../actions/metadata";
-import {connect} from "react-redux";
+import { fetchMetadataVocabularyIfNeeded } from "../../actions/metadata";
+import { connect } from "react-redux";
 
-class NewMetadataEntityDialog extends React.Component{
+class NewMetadataEntityDialog extends React.Component {
     constructor(props) {
         super(props);
 
@@ -25,44 +26,40 @@ class NewMetadataEntityDialog extends React.Component{
             type: null
         };
 
-        // Retrieve the metadata vocabulary, if needed
-        props.fetchMetadataVocabularyIfNeeded()
+        props.fetchMetadataVocabularyIfNeeded();
     }
 
     openDialog(e) {
         e.stopPropagation();
-        this.setState({creating: true, id: generateUuid(), type: undefined});
+        this.setState({ creating: true, id: generateUuid(), type: undefined });
     }
 
     closeDialog(e) {
-        if(e) e.stopPropagation();
-        this.setState({creating: false});
+        if (e) e.stopPropagation();
+        this.setState({ creating: false });
     }
 
     createEntity(e) {
         e.stopPropagation();
-        this.setState({creating: false});
+        this.setState({ creating: false });
         this.props.onCreate(this.state.type, this.state.id);
     }
 
     handleInputChange(event) {
-        this.setState({[event.target.name]: event.target.value});
+        this.setState({ [event.target.name]: event.target.value });
     }
 
     render() {
         return (
-            <div style={{display: 'inline'}}>
-                <Button variant="fab" mini color="secondary" aria-label="Add" title="Add"
-                        onClick={this.openDialog.bind(this)}>
-                    <Icon>add</Icon>
-                </Button>
-
+            <div style={{ display: 'inline' }}>
+                <Fab size="small" color="secondary" aria-label="Add" onClick={this.openDialog.bind(this)}>
+                    <AddIcon />
+                </Fab>
                 <Dialog
                     open={this.state.creating}
                     onClick={e => e.stopPropagation()}
                     onClose={this.closeDialog.bind(this)}
-                    aria-labelledby="form-dialog-title"
-                >
+                    aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Create new metadata entity</DialogTitle>
                     <DialogContent>
                         <TextField
@@ -75,9 +72,8 @@ class NewMetadataEntityDialog extends React.Component{
                             fullWidth
                             required={true}
                             error={!this._hasValidId()}
-                            style={{width: 400}}
-                        />
-                        <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
+                            style={{ width: 400 }} />
+                        <Paper style={{ maxHeight: 400, overflow: 'auto', width: 400 }}>
                             {
                                 this.props.types.length
                                     ? <List>
@@ -87,14 +83,13 @@ class NewMetadataEntityDialog extends React.Component{
                                                     key={t['@id']}
                                                     button
                                                     selected={this.state.type === t}
-                                                    onClick={() => this.setState({type: t})}
-                                                >
-                                                    <ListItemText primary={getLabel(t)}/>
+                                                    onClick={() => this.setState({ type: t })}>
+                                                    <ListItemText primary={getLabel(t)} />
                                                 </ListItem>
                                             ))
                                         }
                                     </List>
-                                    : <LoadingInlay/>
+                                    : <LoadingInlay />
                             }
                         </Paper>
                     </DialogContent>
@@ -112,9 +107,9 @@ class NewMetadataEntityDialog extends React.Component{
     }
 
     _hasValidId() {
-       return new URL('http://example.com/' + this.state.id).toString() === 'http://example.com/' + this.state.id
+        return new URL('http://example.com/' + this.state.id).toString() === 'http://example.com/' + this.state.id
     }
-
+    
     _canCreate() {
         return this.state.type && this.state.id && this._hasValidId()
     }
