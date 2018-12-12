@@ -86,6 +86,8 @@ describe('Collection collaborators', function () {
         cy.contains('tr', collectionName)
             .should('not.exist')
 
+        // Wait until Titan's cache expires
+        cy.wait(90000);
         cy.request({url: fileUrl, failOnStatusCode: false}).its('status').should('equal', 401);
 
         // Login again as the first user
