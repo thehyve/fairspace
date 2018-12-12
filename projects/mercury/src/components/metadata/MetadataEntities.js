@@ -49,12 +49,12 @@ function MetadataEntities({loading, creatingMetadataEntity, error, entities, loa
                                 <TableCell>
                                     {entity['@type'].map(type => (
                                         <a href={navigableLink(type)} key={type}>
-                                            {getLabel(vocabulary.getById(type))}
+                                            {getLabel(vocabulary.getById(type), true)}
                                         </a>
                                     ))}
                                 </TableCell>
                                 <TableCell>
-                                    <a href={navigableLink(entity['@id'])}>{entity['@id']}</a>
+                                    <a href={navigableLink(entity['@id'])}>{getLabel(entity)}</a>
                                 </TableCell>
                             </TableRow>
                         )) : null}

@@ -1,33 +1,17 @@
 import {connect} from 'react-redux';
 import React from 'react';
-import {Table, Paper} from "@material-ui/core";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
+import {Paper} from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import {linkLabel} from "../../utils/metadatautils";
 
 export class EntityInformation extends React.Component {
 
     render() {
-        const {id, label, comment} = this.props;
+        const {subject, typeInfo} = this.props;
         return (
-            <Paper>
-                <Table>
-                    <TableRow>
-                        <TableCell>Id:</TableCell> <TableCell>{id}</TableCell>
-                    </TableRow>
-                    {
-                        label ?
-                            <TableRow>
-                                <TableCell>Type:</TableCell> <TableCell>{label}</TableCell>
-                            </TableRow> : ''
-                    }
-                    {
-                        comment ?
-                            <TableRow>
-                                <TableCell>Description:</TableCell> <TableCell>{comment}</TableCell>
-                            </TableRow> : ''
-                    }
-
-                </Table>
+            <Paper style={{padding: 20}}>
+                <Typography variant={"h6"}>{linkLabel(subject)}</Typography>
+                <Typography variant={"h7"}>{typeInfo}</Typography>
             </Paper>
         );
     }
@@ -35,13 +19,12 @@ export class EntityInformation extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject} = state;
-    const {id, type} = ownProps;
-    const subject = `${window.location.origin}/iri/${type}/${id}`;
+    const {subject} = ownProps;
     let typeProp = undefined;
     if (metadataBySubject &&
         metadataBySubject[subject] &&
-        metadataBySubject[subject]['data']) {
-        const data = metadataBySubject[subject]['data'];
+        metadataBySubject[subject].data) {
+        const data = metadataBySubject[subject].data;
         typeProp = data.find(prop => {
             return prop.key === '@type';
         });
@@ -50,10 +33,11 @@ const mapStateToProps = (state, ownProps) => {
     const label = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
     const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
 
+    const typeInfo = (label && comment) ? `${label} - ${comment}` : (label || comment);
+
     return {
-        id: id,
-        label: label,
-        comment: comment
+        subject: subject,
+        typeInfo: typeInfo
     };
 }
 

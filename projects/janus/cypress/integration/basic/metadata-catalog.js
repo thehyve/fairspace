@@ -15,13 +15,13 @@ describe('Metadata Catalog', function () {
     describe('Existing metadata', () => {
         it('should show metadata about a person', function () {
             // Go to a metadata page about a patient
-            cy.visit("/metadata/persons/E2E-TEST");
+            cy.visit("/iri/persons/E2E-TEST");
 
             // Wait for the page to show 'Metadata' (which indicates that metadata has been loaded)
             cy.get("main").contains("Metadata");
 
             // Expect the id to be shown on the page,
-            cy.contains("Id: E2E-TEST");
+            cy.contains("E2E-TEST");
 
             // Expect at least a name field with the correct value
             cy.contains("Name")
@@ -32,7 +32,7 @@ describe('Metadata Catalog', function () {
 
         it('should link between entities', function () {
             // Go to a metadata page about a patient
-            cy.visit("/metadata/persons/E2E-TEST");
+            cy.visit("/iri/persons/E2E-TEST");
 
             // Wait for the page to show 'Metadata' (which indicates that metadata has been loaded)
             cy.get("main").contains("Metadata");
@@ -49,7 +49,7 @@ describe('Metadata Catalog', function () {
             const personName = 'New user ' + uniqueId;
 
             // Go to a metadata page about a patient
-            cy.visit("/metadata/persons/E2E-TEST");
+            cy.visit("/iri/persons/E2E-TEST");
 
             // Wait for the page to show 'Metadata' (which indicates that metadata has been loaded)
             cy.get("main").contains("Metadata");
@@ -72,7 +72,7 @@ describe('Metadata Catalog', function () {
 
         it('should allow deletion of metadata', function () {
             // Go to a metadata page about a patient
-            cy.visit("/metadata/persons/E2E-TEST");
+            cy.visit("/iri/persons/E2E-TEST");
 
             // Wait for the page to show 'Metadata' (which indicates that metadata has been loaded)
             cy.get("main").contains("Metadata");
