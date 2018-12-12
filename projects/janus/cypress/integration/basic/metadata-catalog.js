@@ -42,7 +42,7 @@ describe('Metadata Catalog', function () {
                 .parent("li")
                 .find("a").first()
                 .contains("E2E-TEST-material")
-                .should('have.attr', 'href', Cypress.config("baseUrl") + '/metadata/samples/E2E-TEST-material')
+                .should('have.attr', 'href', Cypress.config("baseUrl") + '/iri/samples/E2E-TEST-material')
         });
 
         it('should allow editing of metadata', function () {
