@@ -9,7 +9,7 @@ const defaultState = {
 };
 const metadataCombinationReducer = promiseReducerFactory(METADATA_COMBINATION, defaultState, action => action.meta.subject);
 const metadataUpdateReducer = (state = defaultState, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case actionTypes.fulfilled(UPDATE_METADATA):
             return {
                 ...state,
@@ -37,7 +37,11 @@ const metadataUpdateReducer = (state = defaultState, action) => {
         case actionTypes.rejected(METADATA_NEW_ENTITY):
             return {
                 ...state,
+<<<<<<< HEAD
                 creatingMetadataEntity: false
+=======
+                creatingMetadataEntity: false,
+>>>>>>> fetch metadata entities if needed after adding metadata
             };
         default:
             return state
