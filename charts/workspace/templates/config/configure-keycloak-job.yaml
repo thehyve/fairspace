@@ -22,9 +22,9 @@ spec:
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     spec:
       restartPolicy: Never
-      {{- if .Values.fairspaceImagePullSecret }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-          - name: {{ .Values.fairspaceImagePullSecret }}
+      {{ toYaml . | indent 8 }}
       {{- end }}
       containers:
       - name: configure-keycloak-job
