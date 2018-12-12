@@ -39,6 +39,14 @@ export function navigableLink(link) {
         : link
 }
 
+/**
+ *
+ * @param uri the URI to generate a label for
+ * @param shortenExternalUris if true will generate a short label even if a URI doesn't belong to the current workspace
+ * e.g. http://example.com/aaa/bbb => bbb
+ * otherwise will leave external URIs unmodified
+ * @returns {*}
+ */
 export function linkLabel(uri, shortenExternalUris = false) {
     const entityPrefix = window.location.origin + '/iri/';
     if (uri.startsWith(entityPrefix)) {
