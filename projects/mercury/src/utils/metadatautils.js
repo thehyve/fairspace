@@ -40,6 +40,16 @@ export function navigableLink(link) {
 }
 
 /**
+ * Returns a partial navigable link, excluding the base url
+ * @param link
+ * @returns {string}
+ */
+export function navigablePartialLink(link) {
+    const arr = link.split(window.location.origin);
+    return arr && arr.length > 1 ? arr[1] : '';
+}
+
+/**
  *
  * @param uri the URI to generate a label for
  * @param shortenExternalUris if true will generate a short label even if a URI doesn't belong to the current workspace

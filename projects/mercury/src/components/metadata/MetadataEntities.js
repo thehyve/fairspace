@@ -6,22 +6,35 @@ import TableRow from "@material-ui/core/TableRow/TableRow";
 import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableBody from "@material-ui/core/TableBody/TableBody";
 import {getLabel, navigableLink} from "../../utils/metadatautils";
-import {createMetadataEntity, fetchAllEntitiesIfNeeded} from "../../actions/metadata";
+import * as metadataActions from "../../actions/metadata";
 import ErrorMessage from "../error/ErrorMessage";
 import {Column, Row} from "simple-flexbox";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import ErrorDialog from "../error/ErrorDialog";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
 import LoadingOverlay from '../generic/Loading/LoadingOverlay';
+import {withRouter} from 'react-router-dom';
+import {navigablePartialLink} from '../../utils/metadatautils';
 
 class MetadataEntities extends React.Component {
 
     componentDidMount() {
-        this.props.load();
+        this.props.fetchAllEntitiesIfNeeded();
     }
 
+    handleEntityCreation(type, id) {
+        this.props.createMetadataEntity(type, id)
+            .then(res => {
+                this.props.fetchAllEntitiesIfNeeded();
+                const partialLink = navigablePartialLink(res.value);
+                this.props.history.push(partialLink);
+            })
+            .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
+    }
+
+
     render() {
-        const {loading, creatingMetadataEntity, error, entities, vocabulary, create} = this.props;
+        const {loading, creatingMetadataEntity, error, entities, vocabulary} = this.props;
 
         if (loading) {
             return <LoadingInlay/>
@@ -34,7 +47,7 @@ class MetadataEntities extends React.Component {
                 <Row>
                     <Column children={[]} flexGrow={1} vertical='center' horizontal='start'/>
                     <Column>
-                        <NewMetadataEntityDialog onCreate={create}/>
+                        <NewMetadataEntityDialog onCreate={this.handleEntityCreation.bind(this)}/>
                     </Column>
                 </Row>
 
@@ -81,13 +94,8 @@ const mapStateToProps = (state) => ({
     creatingMetadataEntity: state.metadataBySubject.creatingMetadataEntity
 })
 
-const mapDispatchToProps = (dispatch) => ({
-    load: () => dispatch(fetchAllEntitiesIfNeeded()),
-    create: (type, id) => {
-        dispatch(createMetadataEntity(type, id))
-            .then(fetchAllEntitiesIfNeeded())
-            .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
-    }
-});
+const mapDispatchToProps = {
+    ...metadataActions
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntities);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(MetadataEntities));
