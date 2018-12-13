@@ -61,6 +61,9 @@ describe('Metadata Catalog', function () {
                 .clear().type(personName)
                 .blur();
 
+            // Wait for the change to be propagated
+            cy.wait(100);
+
             // Go to a metadata page about a patient
             cy.reload();
 

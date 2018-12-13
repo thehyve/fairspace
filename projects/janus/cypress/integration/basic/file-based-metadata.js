@@ -138,6 +138,7 @@ describe('File-based metadata', function () {
         // Wait sometime and refresh to ensure that the metadata is propagated
         cy.wait(500);
         cy.reload();
+        cy.wait(500);
 
         // Verify the metadata on the subdirectory within the copied directory
         cy.contains('tr', 'copy-' + uniqueId).click().click()
