@@ -1,4 +1,4 @@
 #!/bin/bash
 
-npm install cypress
+npm ci
 node_modules/.bin/cypress run
