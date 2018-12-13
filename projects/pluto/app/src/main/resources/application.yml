@@ -3,6 +3,11 @@ app:
     base-url: http://localhost:9080
     realm: keycloak
 
+server:
+  error:
+    whitelabel:
+      enabled: false
+
 frontend:
   urls: {}
 
