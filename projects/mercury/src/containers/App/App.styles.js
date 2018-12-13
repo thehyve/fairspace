@@ -1,4 +1,4 @@
-const styles = {
+const styles = theme => ({
     root: {
         flexGrow: 1,
         height: '100%',
@@ -6,7 +6,8 @@ const styles = {
         overflow: 'hidden',
         position: 'relative',
         display: 'flex',
+        backgroundColor: theme.palette.background.default,
     }
-};
+});
 
 export default styles;
