@@ -40,13 +40,12 @@ export function navigableLink(link) {
 }
 
 /**
- * Returns a partial navigable link, excluding the base url
+ * Returns a relative navigable link, excluding the base url
  * @param link
  * @returns {string}
  */
-export function navigablePartialLink(link) {
-    const arr = link.split(window.location.origin);
-    return arr && arr.length > 1 ? arr[1] : '';
+export function relativeLink(link) {
+    return link.substring(window.location.origin.length);
 }
 
 /**

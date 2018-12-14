@@ -14,7 +14,7 @@ import ErrorDialog from "../error/ErrorDialog";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
 import LoadingOverlay from '../generic/Loading/LoadingOverlay';
 import {withRouter} from 'react-router-dom';
-import {navigablePartialLink} from '../../utils/metadatautils';
+import {relativeLink} from '../../utils/metadatautils';
 
 class MetadataEntities extends React.Component {
 
@@ -26,8 +26,7 @@ class MetadataEntities extends React.Component {
         this.props.createMetadataEntity(type, id)
             .then(res => {
                 this.props.fetchAllEntitiesIfNeeded();
-                const partialLink = navigablePartialLink(res.value);
-                this.props.history.push(partialLink);
+                this.props.history.push(relativeLink(res.value));
             })
             .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
     }
