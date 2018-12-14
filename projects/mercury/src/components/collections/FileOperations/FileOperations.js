@@ -10,6 +10,7 @@ import {connect} from 'react-redux'
 import * as clipboardActions from "../../../actions/clipboard";
 import * as fileActions from "../../../actions/files";
 import LoadingOverlay from '../../generic/Loading/LoadingOverlay';
+import {uniqueName} from "../../../utils/fileutils";
 
 function FileOperations(props) {
 
@@ -17,7 +18,7 @@ function FileOperations(props) {
         numClipboardItems, disabled, creatingDirectory,
         openedPath, selectedPaths, openedCollection,
         fetchFilesIfNeeded, uploadFiles, createDirectory,
-        cut, copy, paste
+        cut, copy, paste, existingFiles
     } = props;
 
     function refreshFiles() {
@@ -45,7 +46,9 @@ function FileOperations(props) {
 
     function handleUpload(files) {
         if (files && files.length > 0) {
-            return uploadFiles(openedCollection, openedPath, files)
+            const nameMapping = new Map();
+            files.forEach(file => nameMapping.set(file.name, uniqueName(file.name, existingFiles)));
+            return uploadFiles(openedCollection, openedPath, files, nameMapping)
                 .then(() => files)
                 .catch(err => {
                     ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(files));

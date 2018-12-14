@@ -52,9 +52,10 @@ class FileAPI {
      * Uploads the given files into the provided path
      * @param path
      * @param files
+     * @param nameMapping
      * @returns Promise<any>
      */
-    upload(path, files) {
+    upload(path, files, nameMapping) {
         if(!files) {
             return Promise.reject("No files given");
         }
@@ -63,7 +64,7 @@ class FileAPI {
 
         return Promise.all(
             files.map(file =>
-                this.client.putFileContents(fullPath + '/' + file.name, file))
+                this.client.putFileContents(fullPath + '/' + nameMapping.get(file.name), file))
         ).then(() => files);
     }
 
