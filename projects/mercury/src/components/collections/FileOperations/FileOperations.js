@@ -49,7 +49,7 @@ function FileOperations(props) {
         }
         const dotPos = fileName.lastIndexOf('.');
         const name = (dotPos >= 0) ? fileName.substring(0, dotPos) : fileName;
-        let ext = (dotPos >= 0) ? fileName.substring(dotPos) : '';
+        const ext = (dotPos >= 0) ? fileName.substring(dotPos) : '';
         let index = 1;
 
         while (true) {
