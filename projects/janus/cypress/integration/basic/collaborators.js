@@ -47,25 +47,7 @@ describe('Collection collaborators', function () {
         getCollaboratorsCard()
             .contains('Test UserRead').should('exist')
 
-        // Login as the other user
-        cy.login({ username: Cypress.env("SECOND_USER"), password: Cypress.env("PASSWORD") });
-        cy.listCollections();
-
-        // Verify the existence of the collection and files
-        cy.contains('tr', collectionName)
-            .should('exist')
-            .click().click();
-
-        // The user should be able to download the files
-        cy.contains('tr', 'myfile.txt').should('exist');
-        cy.request(fileUrl).its('status').should('equal', 200);
-
-        // Login again as the first user
-        cy.login();
-        cy.listCollections();
-
         // Now remove the collaborator
-        cy.contains('tr', collectionName).click();
         getCollaboratorsCard()
             .contains('li', 'Test UserRead')
             .then(li => cy.clickButtonOnHover(li))
@@ -76,21 +58,6 @@ describe('Collection collaborators', function () {
         // Ensure he is removed
         getCollaboratorsCard()
             .contains('Test UserRead').should('not.exist')
-
-        // Login as the other user
-        cy.login({username: Cypress.env("SECOND_USER"), password: Cypress.env("PASSWORD")});
-        cy.listCollections();
-
-        // Verify the existence of the collection and files
-        cy.contains('Collections');
-        cy.contains('tr', collectionName)
-            .should('not.exist')
-
-        cy.request({url: fileUrl, failOnStatusCode: false}).its('status').should('equal', 401);
-
-        // Login again as the first user
-        cy.login();
-
     });
 
     const getCollaboratorsCard = () =>
