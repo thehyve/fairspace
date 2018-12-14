@@ -40,6 +40,15 @@ export function navigableLink(link) {
 }
 
 /**
+ * Returns a relative navigable link, excluding the base url
+ * @param link
+ * @returns {string}
+ */
+export function relativeLink(link) {
+    return link.substring(window.location.origin.length);
+}
+
+/**
  *
  * @param uri the URI to generate a label for
  * @param shortenExternalUris if true will generate a short label even if a URI doesn't belong to the current workspace

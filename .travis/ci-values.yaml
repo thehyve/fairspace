@@ -82,7 +82,7 @@ jupyterhub:
     image:
       tag: 0.5.3-SNAPSHOT-simple
     extraEnv:
-      WORKSPACE_URL: https://workspace.ci.fairway.app
+      WORKSPACE_URL: https://storage.workspace.ci.fairway.app
   hub:
       extraEnv:
           JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026

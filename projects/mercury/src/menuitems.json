@@ -24,6 +24,11 @@
         "url": "/metadata",
         "icon": "assignment",
         "label": "Metadata"
+      },
+      {
+        "url": "/iri",
+        "icon": "assignment",
+        "label": "Metadata"
       }
     ]
   },

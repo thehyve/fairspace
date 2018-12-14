@@ -122,7 +122,6 @@ class CollectionBrowser extends React.Component {
             buttons={this.renderButtons()}
             main={loading ? this.renderLoading() : this.renderCollectionList()}/>
     }
-
 }
 
 const mapStateToProps = (state, ownProps) => ({

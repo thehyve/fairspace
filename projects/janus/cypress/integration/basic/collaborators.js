@@ -58,6 +58,8 @@ describe('Collection collaborators', function () {
         // Ensure he is removed
         getCollaboratorsCard()
             .contains('Test UserRead').should('not.exist')
+        // Wait until Titan's cache expires
+        cy.wait(90000);
     });
 
     const getCollaboratorsCard = () =>
