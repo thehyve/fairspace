@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Table} from "@material-ui/core";
 import TableHead from "@material-ui/core/TableHead/TableHead";
@@ -7,72 +6,83 @@ import TableRow from "@material-ui/core/TableRow/TableRow";
 import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableBody from "@material-ui/core/TableBody/TableBody";
 import {getLabel, navigableLink} from "../../utils/metadatautils";
-import {createMetadataEntity, fetchAllEntitiesIfNeeded} from "../../actions/metadata";
+import * as metadataActions from "../../actions/metadata";
 import ErrorMessage from "../error/ErrorMessage";
 import {Column, Row} from "simple-flexbox";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import ErrorDialog from "../error/ErrorDialog";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
 import LoadingOverlay from '../generic/Loading/LoadingOverlay';
+import {withRouter} from 'react-router-dom';
+import {relativeLink} from '../../utils/metadatautils';
 
-function MetadataEntities({loading, creatingMetadataEntity, error, entities, load, vocabulary, types, create}) {
-    load();
+class MetadataEntities extends React.Component {
 
-    if (loading) {
-        return <LoadingInlay/>
-    } else if (error) {
-        return <ErrorMessage message={"An error occurred while loading metadata"}/>
+    componentDidMount() {
+        this.props.fetchAllEntitiesIfNeeded();
     }
 
-    return (
-        <div>
-            <Row>
-                <Column flexGrow={1} vertical='center' horizontal='start'/>
-                <Column>
-                    <NewMetadataEntityDialog onCreate={create}/>
-                </Column>
-            </Row>
+    handleEntityCreation(type, id) {
+        this.props.createMetadataEntity(type, id)
+            .then(res => {
+                this.props.fetchAllEntitiesIfNeeded();
+                this.props.history.push(relativeLink(res.value));
+            })
+            .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
+    }
 
+
+    render() {
+        const {loading, creatingMetadataEntity, error, entities, vocabulary} = this.props;
+
+        if (loading) {
+            return <LoadingInlay/>
+        } else if (error) {
+            return <ErrorMessage message={"An error occurred while loading metadata"}/>
+        }
+
+        return (
             <div>
-                <Table style={{marginBottom: 300}}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Label</TableCell>
-                            <TableCell>Type</TableCell>
-                            <TableCell>URI</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {entities ? entities.map(entity => (
-                            <TableRow key={entity['@id']}>
-                                <TableCell>{getLabel(entity)}</TableCell>
-                                <TableCell>
-                                    {entity['@type'].map(type => (
-                                        <a href={navigableLink(type)} key={type}>
-                                            {getLabel(vocabulary.getById(type), true)}
-                                        </a>
-                                    ))}
-                                </TableCell>
-                                <TableCell>
-                                    <a href={navigableLink(entity['@id'])}>{getLabel(entity)}</a>
-                                </TableCell>
+                <Row>
+                    <Column children={[]} flexGrow={1} vertical='center' horizontal='start'/>
+                    <Column>
+                        <NewMetadataEntityDialog onCreate={this.handleEntityCreation.bind(this)}/>
+                    </Column>
+                </Row>
+
+                <div>
+                    <Table style={{marginBottom: 300}}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Label</TableCell>
+                                <TableCell>Type</TableCell>
+                                <TableCell>URI</TableCell>
                             </TableRow>
-                        )) : null}
-                    </TableBody>
-                </Table>
+                        </TableHead>
+                        <TableBody>
+                            {entities ? entities.map(entity => (
+                                <TableRow key={entity['@id']}>
+                                    <TableCell>{getLabel(entity)}</TableCell>
+                                    <TableCell>
+                                        {entity['@type'].map(type => (
+                                            <a href={navigableLink(type)} key={type}>
+                                                {getLabel(vocabulary.getById(type), true)}
+                                            </a>
+                                        ))}
+                                    </TableCell>
+                                    <TableCell>
+                                        <a href={navigableLink(entity['@id'])}>{getLabel(entity)}</a>
+                                    </TableCell>
+                                </TableRow>
+                            )) : null}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                <LoadingOverlay loading={creatingMetadataEntity}/>
             </div>
-
-            <LoadingOverlay loading={creatingMetadataEntity}/>
-        </div>
-    );
-}
-
-MetadataEntities.propTypes = {
-    loading: PropTypes.bool,
-    error: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
-    entities: PropTypes.array,
-    load: PropTypes.func.isRequired,
-    create: PropTypes.func.isRequired
+        );
+    }
 }
 
 const mapStateToProps = (state) => ({
@@ -83,15 +93,8 @@ const mapStateToProps = (state) => ({
     creatingMetadataEntity: state.metadataBySubject.creatingMetadataEntity
 })
 
-const mapDispatchToProps = (dispatch) => ({
-    load: () => dispatch(fetchAllEntitiesIfNeeded()),
-    create: (type, id) => {
-        dispatch(createMetadataEntity(type, id))
-            .then(result => {
-                window.location.href = navigableLink(result.value);
-            })
-            .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
-    }
-});
+const mapDispatchToProps = {
+    ...metadataActions
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntities);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(MetadataEntities));

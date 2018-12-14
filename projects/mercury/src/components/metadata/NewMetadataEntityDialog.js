@@ -4,6 +4,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
+import Fab from  "@material-ui/core/Fab";
 import List from "@material-ui/core/List/List";
 import ListItem from "@material-ui/core/ListItem/ListItem";
 import ListItemText from "@material-ui/core/ListItemText/ListItemText";
@@ -52,10 +53,10 @@ class NewMetadataEntityDialog extends React.Component{
     render() {
         return (
             <div style={{display: 'inline'}}>
-                <Button variant="fab" mini color="secondary" aria-label="Add" title="Add"
+                <Fab mini="true" color="secondary" aria-label="Add" title="Add"
                         onClick={this.openDialog.bind(this)}>
                     <Icon>add</Icon>
-                </Button>
+                </Fab>
 
                 <Dialog
                     open={this.state.creating}

@@ -9,7 +9,7 @@ const defaultState = {
 };
 const metadataCombinationReducer = promiseReducerFactory(METADATA_COMBINATION, defaultState, action => action.meta.subject);
 const metadataUpdateReducer = (state = defaultState, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case actionTypes.fulfilled(UPDATE_METADATA):
             return {
                 ...state,

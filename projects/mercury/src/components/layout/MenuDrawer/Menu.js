@@ -52,7 +52,7 @@ const Menu = ({classes}) => (
                 </ListItemIcon>
                 <ListItemText primary="Dataverse"/>
             </ListItem>
-            <ListItem component='a' href={Config.get().urls.cbioportal} Button>
+            <ListItem component='a' href={Config.get().urls.cbioportal} button>
                 <ListItemIcon>
                     <Icon>public</Icon>
                 </ListItemIcon>
