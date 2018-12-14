@@ -10,6 +10,7 @@ import {connect} from 'react-redux'
 import * as clipboardActions from "../../../actions/clipboard";
 import * as fileActions from "../../../actions/files";
 import LoadingOverlay from '../../generic/Loading/LoadingOverlay';
+import {uniqueName} from "../../../utils/fileutils";
 
 function FileOperations(props) {
 
@@ -43,29 +44,10 @@ function FileOperations(props) {
             })
     }
 
-    function uniqueName(fileName) {
-        if(!existingFiles.includes(fileName)) {
-            return fileName;
-        }
-        const dotPos = fileName.lastIndexOf('.');
-        const name = (dotPos >= 0) ? fileName.substring(0, dotPos) : fileName;
-        const ext = (dotPos >= 0) ? fileName.substring(dotPos) : '';
-        let index = 1;
-
-        while (true) {
-            const newName = `${name} (${index})${ext}`;
-            if(!existingFiles.includes(newName)) {
-                existingFiles.push(newName);
-                return newName;
-            }
-            index++;
-        }
-    }
-
     function handleUpload(files) {
         if (files && files.length > 0) {
             const nameMapping = new Map();
-            files.forEach(file => nameMapping.set(file.name, uniqueName(file.name)));
+            files.forEach(file => nameMapping.set(file.name, uniqueName(file.name, existingFiles)));
             return uploadFiles(openedCollection, openedPath, files, nameMapping)
                 .then(() => files)
                 .catch(err => {
