@@ -47,13 +47,13 @@ function FileOperations(props) {
         if(!existingFiles.includes(fileName)) {
             return fileName;
         }
-        let parts = fileName.split('.');
-        let name = parts[0];
-        let ext = parts.length > 1 ? parts[1] : '';
+        const dotPos = fileName.indexOf('.');
+        const name = (dotPos >= 0) ? fileName.substring(0, dotPos) : fileName;
+        let ext = (dotPos >= 0) ? fileName.substring(dotPos) : '';
         let index = 1;
 
         while (true) {
-            const newName = `${name} (${index}).${ext}`;
+            const newName = `${name} (${index})${ext}`;
             if(!existingFiles.includes(newName)) {
                 existingFiles.push(newName);
                 return newName;
