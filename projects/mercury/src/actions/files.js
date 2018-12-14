@@ -30,12 +30,12 @@ export const deleteFile = (collection, path, basename) => {
     }
 }
 
-export const uploadFiles = (collection, path, files) => {
+export const uploadFiles = (collection, path, files, nameMapping) => {
     const fileApi = getFileApi(collection);
     return {
         type: UPLOAD_FILES,
-        payload: fileApi.upload(path, files),
-        meta: {collection, path, files}
+        payload: fileApi.upload(path, files, nameMapping),
+        meta: {collection, path, files, nameMapping}
     }
 }
 
