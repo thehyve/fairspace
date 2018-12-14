@@ -1,4 +1,6 @@
 #!/bin/bash
 
+set -e
 npm ci
-node_modules/.bin/cypress run
+$(npm bin)/mocha api-tests/*.js --timeout 5000
+$(npm bin)/cypress run
