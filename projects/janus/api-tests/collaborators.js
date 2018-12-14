@@ -16,6 +16,9 @@ describe('Collaborators api', function() {
         sessionCookie = await auth.retrieveSessionCookie();
         uniqueId = Math.round(100000 + (Math.random() * 900000));
 
+        // Remove old collections
+        await fakedata.removeAllCollections(sessionCookie);
+
         // Create a collection
         collection = await fakedata.createCollection(sessionCookie, uniqueId);
 
@@ -28,7 +31,7 @@ describe('Collaborators api', function() {
         // Store the second user properties
         normalUser = users.find(user => user.username === config.username);
         secondUser = users.find(user => user.username === config.secondUsername);
-    })
+    });
 
     describe('CRUD operations', () => {
         it('should allow for the addition and modification of collaborators', async () => {

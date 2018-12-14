@@ -29,6 +29,23 @@ const createCollection = async (sessionCookie, uniqueId) => {
         });
 }
 
+const removeAllCollections = (sessionCookie) =>
+    // Retrieve a list of collections
+    request.get(config.workspaceUri + '/api/collections')
+        .set('Cookie', sessionCookie)
+        .then(data => {
+            expect(data.status).to.equal(200);
+
+            // Delete very one of them
+            return Promise.all(data.body.map(
+                collection => request
+                    .delete(config.workspaceUri + '/api/collections/' +  collection.id)
+                    .set('Cookie', sessionCookie)
+            ));
+        });
+
+
 module.exports = {
-    createCollection: createCollection
+    createCollection: createCollection,
+    removeAllCollections: removeAllCollections
 };

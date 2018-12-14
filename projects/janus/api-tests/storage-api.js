@@ -13,9 +13,12 @@ describe('Storage API', function() {
         sessionCookie = await auth.retrieveSessionCookie();
         uniqueId = Math.round(100000 + (Math.random() * 900000));
 
+        // Remove old collections
+        await fakedata.removeAllCollections(sessionCookie);
+
         // Create a collection
         collection = await fakedata.createCollection(sessionCookie, uniqueId);
-    })
+    });
 
     describe('Storage API', () => {
         let storageApiBaseUrl, directory;

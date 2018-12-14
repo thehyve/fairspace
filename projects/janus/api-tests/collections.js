@@ -13,7 +13,10 @@ describe('Collections api', () => {
     before(async () => {
         sessionCookie = await auth.retrieveSessionCookie();
         uniqueId = Math.round(100000 + (Math.random() * 900000));
-    })
+
+        // Remove old collections
+        await fakedata.removeAllCollections(sessionCookie);
+    });
 
     describe('Collection lifecycle', () => {
         it('should allow for the addition and deletion of collections', async () => {

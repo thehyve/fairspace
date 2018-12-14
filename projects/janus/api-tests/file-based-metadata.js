@@ -11,7 +11,10 @@ describe('File-based metadata', function () {
 
     before(async () => {
         sessionCookie = await auth.retrieveSessionCookie();
-    })
+
+        // Remove old collections
+        await fakedata.removeAllCollections(sessionCookie);
+    });
 
     beforeEach(async () => {
         uniqueId = Math.round(100000 + (Math.random() * 900000));
