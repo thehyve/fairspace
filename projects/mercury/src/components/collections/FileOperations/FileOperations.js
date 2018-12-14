@@ -47,7 +47,7 @@ function FileOperations(props) {
         if(!existingFiles.includes(fileName)) {
             return fileName;
         }
-        const dotPos = fileName.indexOf('.');
+        const dotPos = fileName.lastIndexOf('.');
         const name = (dotPos >= 0) ? fileName.substring(0, dotPos) : fileName;
         let ext = (dotPos >= 0) ? fileName.substring(dotPos) : '';
         let index = 1;
