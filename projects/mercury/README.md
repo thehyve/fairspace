@@ -22,3 +22,11 @@ This frontend will be served by [pluto](https://github.com/fairspace/pluto) to a
 
 ### React
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app). See [REACT.md](REACT.md) for more information.
+
+### Linting
+The project has extended the eslint configuration by React. At the moment it is not enforced and therefore it is recommended to use a plugin for eslint in your favorite IDE. The rules can be found and therefore modified in the .eslintrc.json file.
+
+You can also run eslint manually by doing:
+```
+.\node_modules\.bin\eslint <DIRECTORY/FILE LOCATION>
+```
