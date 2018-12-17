@@ -36,7 +36,7 @@ open class PropertyInverter(properties: Iterable<Pair<String, String>>): Enhance
                                         statement.`object` as Resource,
                                         statement.model.createProperty(inverseProperty),
                                         statement.subject)
-                             else throw ValidationException("Statement $statement cannot be inverted, is's object is not a RDF resource")
+                             else throw ValidationException("Statement $statement cannot be inverted, its object is not a RDF resource")
                         }
 
                 override fun hasNext(): Boolean = (inferred != null) || base.hasNext()
