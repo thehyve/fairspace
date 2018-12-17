@@ -1,20 +1,21 @@
-import MetadataViewer from "./MetadataViewer"
 import React from 'react';
 import {mount} from "enzyme";
-import mockStore from "../../store/mockStore"
 import {Provider} from "react-redux";
+import mockStore from "../../store/mockStore";
+import MetadataViewer from "./MetadataViewer";
 
 function flushPromises() {
     return new Promise(resolve => setImmediate(resolve));
 }
 
 it('displays properties properly', () => {
-    const store = mockStore({})
+    const store = mockStore({});
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
     const wrapper = mount(
         <Provider store={store}>
-            <MetadataViewer properties={properties} subject={subject}/>
-        </Provider>);
+            <MetadataViewer properties={properties} subject={subject} />
+        </Provider>
+    );
     return flushPromises().then(() => {
         wrapper.update();
     }).then(() => {

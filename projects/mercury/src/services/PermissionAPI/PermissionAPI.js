@@ -1,11 +1,11 @@
+import {format} from 'util';
 import Config from '../Config/Config';
 import {failOnHttpError} from "../../utils/httputils";
-import {format} from 'util';
 
 class PermissionAPI {
-
     static changeHeaders = new Headers({'Content-Type': 'application/json'});
-    static getHeaders = new Headers({'Accept': 'application/json'});
+
+    static getHeaders = new Headers({Accept: 'application/json'});
 
     /**
      * Retrieves a list of permissions for a specific collection.
@@ -13,7 +13,7 @@ class PermissionAPI {
      * @returns A Promise returning an array of user permissions, not including users with None permissions.
      */
     getCollectionPermissions(collectionId, useCache = true) {
-        let url = format(Config.get().urls.permissionsByCollectionId, collectionId);
+        const url = format(Config.get().urls.permissionsByCollectionId, collectionId);
         return fetch(url, {
             method: 'GET',
             header: PermissionAPI.getHeaders,
@@ -32,14 +32,14 @@ class PermissionAPI {
             method: 'PUT',
             headers: PermissionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({subject: userId, collection: collectionId, access: access})
+            body: JSON.stringify({subject: userId, collection: collectionId, access})
         })
             .then(failOnHttpError("Failure while alter a collection's permission"))
             .then(response => response.json());
     }
 
     removeUserFromCollectionPermission(userId, collectionId) {
-        return this.alterCollectionPermission(userId, collectionId, 'None')
+        return this.alterCollectionPermission(userId, collectionId, 'None');
     }
 }
 

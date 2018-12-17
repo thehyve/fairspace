@@ -17,30 +17,34 @@ import LoadingInlay from '../../generic/Loading/LoadingInlay';
 
 class FileBrowser extends React.Component {
     componentDidMount() {
-        const {fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath} = this.props
-        fetchCollectionsIfNeeded()
-        selectCollection(openedCollection.id)
+        const {
+            fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath
+        } = this.props;
+        fetchCollectionsIfNeeded();
+        selectCollection(openedCollection.id);
 
         // If the collection has not been fetched yet,
         // do not bother fetching the files
-        if(openedCollection.id) {
-            fetchFilesIfNeeded(openedCollection, openedPath)
+        if (openedCollection.id) {
+            fetchFilesIfNeeded(openedCollection, openedPath);
         }
     }
 
     componentDidUpdate(prevProps) {
-        const {selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath} = this.props
-        if(prevProps.openedCollection.id !== openedCollection.id) {
-            selectCollection(openedCollection.id)
+        const {
+            selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath
+        } = this.props;
+        if (prevProps.openedCollection.id !== openedCollection.id) {
+            selectCollection(openedCollection.id);
         }
 
         const hasCollectionDetails = openedCollection.id;
         const hasNewOpenedCollection = prevProps.openedCollection.id !== openedCollection.id;
         const hasNewOpenedPath = prevProps.openedPath !== openedPath;
 
-        if(hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
+        if (hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
             fetchFilesIfNeeded(openedCollection, openedPath);
-            openPath('/' + openedCollection.location + (openedPath === '/' ? '' : openedPath));
+            openPath(`/${openedCollection.location}${openedPath === '/' ? '' : openedPath}`);
         }
     }
 
@@ -49,9 +53,9 @@ class FileBrowser extends React.Component {
 
         // If this pathis already selected, deselect
         if (this.isPathSelected(path.filename)) {
-            deselectPath(path.filename)
+            deselectPath(path.filename);
         } else {
-            selectPath(path.filename)
+            selectPath(path.filename);
         }
     }
 
@@ -64,20 +68,23 @@ class FileBrowser extends React.Component {
     }
 
     handlePathDelete(path) {
-        const {deleteFile, fetchFilesIfNeeded, openedCollection, openedPath} = this.props;
+        const {
+            deleteFile, fetchFilesIfNeeded, openedCollection, openedPath
+        } = this.props;
         return deleteFile(openedCollection, openedPath, path.basename)
             .then(() => fetchFilesIfNeeded(openedCollection, openedPath))
-            .catch(err => {
+            .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
             });
-
     }
 
     handlePathRename(path, newName) {
-        const {renameFile, fetchFilesIfNeeded, openedCollection, openedPath} = this.props;
+        const {
+            renameFile, fetchFilesIfNeeded, openedCollection, openedPath
+        } = this.props;
         return renameFile(openedCollection, openedPath, path.basename, newName)
             .then(() => fetchFilesIfNeeded(openedCollection, openedPath))
-            .catch(err => {
+            .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
                 return false;
             });
@@ -88,19 +95,19 @@ class FileBrowser extends React.Component {
     }
 
     openCollection(collection) {
-        this.props.history.push("/collections/" + collection.id);
+        this.props.history.push(`/collections/${collection.id}`);
     }
 
     openDir(path) {
         const basePath = this.props.openedPath || '';
         const separator = basePath.endsWith('/') ? '' : '/';
-        const fullPath = "/collections/" + this.props.openedCollection.id + basePath + separator + path;
+        const fullPath = `/collections/${this.props.openedCollection.id}${basePath}${separator}${path}`;
         this.props.history.push(fullPath);
-        this.props.openPath('/' + this.props.openedCollection.location + basePath + separator + path)
+        this.props.openPath(`/${this.props.openedCollection.location}${basePath}${separator}${path}`);
     }
 
     downloadFile(path) {
-        const fileAPI = FileAPIFactory.build(this.props.openedCollection)
+        const fileAPI = FileAPIFactory.build(this.props.openedCollection);
         fileAPI.download(fileAPI.joinPaths(this.props.openedPath || '', path));
     }
 
@@ -111,65 +118,72 @@ class FileBrowser extends React.Component {
             return this.renderError(error);
         }
 
-        return <GenericCollectionsScreen
-            breadCrumbs={this.renderBreadcrumbs()}
-            buttons={loading ? null : this.renderButtons()}
-            main={loading ? this.renderLoading() : this.renderFiles()} />
+        return (
+            <GenericCollectionsScreen
+                breadCrumbs={this.renderBreadcrumbs()}
+                buttons={loading ? null : this.renderButtons()}
+                main={loading ? this.renderLoading() : this.renderFiles()}
+            />
+        );
     }
 
     renderBreadcrumbs() {
         const {openedCollection, openedPath, loading} = this.props;
 
-        if(loading) {
-            return <BreadCrumbs/>
+        if (loading) {
+            return <BreadCrumbs />;
         }
 
-        let segments = [
-            {segment: '' + openedCollection.id, label: openedCollection.name}
+        const segments = [
+            {segment: `${openedCollection.id}`, label: openedCollection.name}
         ];
 
-        if(openedPath) {
-            const toBreadcrumb = segment => ({segment: segment, label: segment})
-            const pathParts = parsePath(openedPath)
-                segments.push(...pathParts.map(toBreadcrumb));
+        if (openedPath) {
+            const toBreadcrumb = segment => ({segment, label: segment});
+            const pathParts = parsePath(openedPath);
+            segments.push(...pathParts.map(toBreadcrumb));
         }
 
-        return <BreadCrumbs segments={segments}/>;
+        return <BreadCrumbs segments={segments} />;
     }
 
     renderButtons() {
-        const {openedCollection, openedPath} = this.props
-        return <FileOperations
-                    openedCollection={openedCollection}
-                    openedPath={openedPath}
-                    disabled={!PermissionChecker.canWrite(openedCollection)}
-                    existingFiles={this.props.files ? this.props.files.map(file => file.basename) : []}
-        />
+        const {openedCollection, openedPath} = this.props;
+        return (
+            <FileOperations
+                openedCollection={openedCollection}
+                openedPath={openedPath}
+                disabled={!PermissionChecker.canWrite(openedCollection)}
+                existingFiles={this.props.files ? this.props.files.map(file => file.basename) : []}
+            />
+        );
     }
 
     renderError(errorMessage) {
-        return (<ErrorMessage message={"An error occurred while loading files"} />);
+        return (<ErrorMessage message="An error occurred while loading files" />);
     }
 
     renderLoading() {
-        return <LoadingInlay/>;
+        return <LoadingInlay />;
     }
 
     renderFiles() {
         const doesCollectionExist = this.props.openedCollection && this.props.openedCollection.id;
-        if(!doesCollectionExist) {
+        if (!doesCollectionExist) {
             return 'Collection does not exist.';
         }
 
-        return <FileList
-            files={this.props.files}
-            selectedPaths={this.props.selectedPaths}
-            onPathClick={this.handlePathClick.bind(this)}
-            onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
-            onRename={this.handlePathRename.bind(this)}
-            onDelete={this.handlePathDelete.bind(this)}
-            readonly={!PermissionChecker.canWrite(this.props.openedCollection)}
-        />
+        return (
+            <FileList
+                files={this.props.files}
+                selectedPaths={this.props.selectedPaths}
+                onPathClick={this.handlePathClick.bind(this)}
+                onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
+                onRename={this.handlePathRename.bind(this)}
+                onDelete={this.handlePathDelete.bind(this)}
+                readonly={!PermissionChecker.canWrite(this.props.openedCollection)}
+            />
+        );
     }
 }
 
@@ -182,8 +196,7 @@ const mapStateToProps = (state, ownProps) => {
 
     const collectionBrowser = state.collectionBrowser;
 
-    const getCollection = collectionId =>
-        (collections.data && collections.data.find(collection => collection.id === collectionId)) || {};
+    const getCollection = collectionId => (collections.data && collections.data.find(collection => collection.id === collectionId)) || {};
 
 
     return {
@@ -193,16 +206,13 @@ const mapStateToProps = (state, ownProps) => {
 
         selectedPaths: collectionBrowser.selectedPaths,
         openedCollection: openedCollectionId ? getCollection(openedCollectionId) : {}
-    }
-}
+    };
+};
 
 const mapDispatchToProps = {
     ...collectionActions,
     ...fileActions,
     ...collectionBrowserActions
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(FileBrowser));
-
-
-

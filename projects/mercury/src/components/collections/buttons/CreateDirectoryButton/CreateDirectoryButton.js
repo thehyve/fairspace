@@ -7,7 +7,7 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 
-class CreateDirectoryButton extends React.Component{
+class CreateDirectoryButton extends React.Component {
     constructor(props) {
         super(props);
         const {
@@ -26,8 +26,7 @@ class CreateDirectoryButton extends React.Component{
     }
 
     componentWillReceiveProps(props) {
-        if(props.onCreate)
-            this.onCreate = props.onCreate;
+        if (props.onCreate) this.onCreate = props.onCreate;
 
         this.setState({
             creating: false
@@ -40,21 +39,21 @@ class CreateDirectoryButton extends React.Component{
     }
 
     closeDialog(e) {
-        if(e) e.stopPropagation();
+        if (e) e.stopPropagation();
         this.setState({creating: false});
     }
 
     createDirectory(e) {
         e.stopPropagation();
-        if(this.onCreate) {
+        if (this.onCreate) {
             this
                 .onCreate(this.state.name)
-                .then((shouldClose) => shouldClose && this.closeDialog.bind(this))
+                .then(shouldClose => shouldClose && this.closeDialog.bind(this));
         }
     }
 
     handleInputChange(event) {
-        let newValues = {}
+        const newValues = {};
         newValues[event.target.name] = event.target.value;
         this.setState(newValues);
     }
@@ -68,7 +67,7 @@ class CreateDirectoryButton extends React.Component{
 
                 <Dialog
                     open={this.state.creating}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
                     onClose={this.closeDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >
@@ -87,9 +86,11 @@ class CreateDirectoryButton extends React.Component{
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.closeDialog.bind(this)} color="secondary">
+
                             Close
                         </Button>
                         <Button onClick={this.createDirectory.bind(this)} color="primary" disabled={!this.state.name}>
+
                             Create
                         </Button>
                     </DialogActions>
@@ -100,7 +101,3 @@ class CreateDirectoryButton extends React.Component{
 }
 
 export default CreateDirectoryButton;
-
-
-
-

@@ -20,25 +20,25 @@ class CollectionBrowser extends React.Component {
         super(props);
         this.state = {
             editingCollection: false
-        }
+        };
     }
 
     componentDidMount() {
         this.props.fetchCollectionsIfNeeded();
-        this.props.closePath()
+        this.props.closePath();
     }
 
     handleAddCollectionClick() {
-        this.setState({editingCollection: true})
+        this.setState({editingCollection: true});
     }
 
     handleCollectionClick(collection) {
         const {selectedCollectionId, selectCollection, deselectCollection} = this.props;
         // If this collection is already selected, deselect
         if (selectedCollectionId && selectedCollectionId === collection.id) {
-            deselectCollection()
+            deselectCollection();
         } else {
-            selectCollection(collection.id)
+            selectCollection(collection.id);
         }
     }
 
@@ -46,50 +46,60 @@ class CollectionBrowser extends React.Component {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
         deleteCollection(collection.id)
             .then(fetchCollectionsIfNeeded)
-            .catch(err =>
-                ErrorDialog.showError(
-                    err,
-                    "An error occurred while deleting a collection",
-                    this.handleCollectionDelete.bind(this)
-                ))
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while deleting a collection",
+                this.handleCollectionDelete.bind(this)
+            ));
     }
 
     handleCollectionDoubleClick(collection) {
-        this.props.history.push("/collections/" + collection.id);
+        this.props.history.push(`/collections/${collection.id}`);
     }
 
     renderButtons() {
-        return <Button variant="fab" mini color="secondary" aria-label="Add" title="Add collection"
-                       onClick={this.handleAddCollectionClick.bind(this)}>
-            <Icon>add</Icon>
-        </Button>
+        return (
+            <Button
+                variant="fab"
+                mini
+                color="secondary"
+                aria-label="Add"
+                title="Add collection"
+                onClick={this.handleAddCollectionClick.bind(this)}
+            >
+                <Icon>add</Icon>
+            </Button>
+        );
     }
 
     renderLoading() {
-        return <LoadingInlay/>;
+        return <LoadingInlay />;
     }
 
     renderCollectionList() {
-        const {users, collections, addingCollection, deletingCollection} = this.props;
+        const {
+            users, collections, addingCollection, deletingCollection
+        } = this.props;
         collections.map(col => col.creatorObj = findById(users, col.creator));
 
         return (
             <div>
-                <CollectionList collections={this.props.collections}
-                                selectedCollectionId={this.props.selectedCollectionId}
-                                onCollectionClick={this.handleCollectionClick.bind(this)}
-                                onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
-                                onCollectionDelete={this.handleCollectionDelete.bind(this)}
+                <CollectionList
+                    collections={this.props.collections}
+                    selectedCollectionId={this.props.selectedCollectionId}
+                    onCollectionClick={this.handleCollectionClick.bind(this)}
+                    onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
+                    onCollectionDelete={this.handleCollectionDelete.bind(this)}
                 />
                 <CollectionEditor
-                    title={'Add collection'}
-                    name={this.props.user.fullName + '\'s collection'}
+                    title="Add collection"
+                    name={`${this.props.user.fullName}'s collection`}
                     editing={this.state.editingCollection}
                     onSave={this.handleAddCollection.bind(this)}
                     onCancel={this.handleCancelAddCollection.bind(this)}
-                    editType={true}
+                    editType
                 />
-                <LoadingOverlay loading={addingCollection || deletingCollection}/>
+                <LoadingOverlay loading={addingCollection || deletingCollection} />
             </div>
         );
     }
@@ -98,12 +108,11 @@ class CollectionBrowser extends React.Component {
         this.setState({editingCollection: false});
         this.props.addCollection(name, description, type)
             .then(this.props.fetchCollectionsIfNeeded)
-            .catch(err =>
-                ErrorDialog.showError(
-                    err,
-                    "An error occurred while creating a collection",
-                    this.handleAddCollectionClick.bind(this)
-                ))
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while creating a collection",
+                this.handleAddCollectionClick.bind(this)
+            ));
     }
 
     handleCancelAddCollection() {
@@ -114,13 +123,16 @@ class CollectionBrowser extends React.Component {
         const {loading, error} = this.props;
 
         if (error) {
-            return <ErrorMessage message={"An error occurred while loading collections"}/>
+            return <ErrorMessage message="An error occurred while loading collections" />;
         }
 
-        return <GenericCollectionsScreen
-            breadCrumbs={<BreadCrumbs/>}
-            buttons={this.renderButtons()}
-            main={loading ? this.renderLoading() : this.renderCollectionList()}/>
+        return (
+            <GenericCollectionsScreen
+                breadCrumbs={<BreadCrumbs />}
+                buttons={this.renderButtons()}
+                main={loading ? this.renderLoading() : this.renderCollectionList()}
+            />
+        );
     }
 }
 

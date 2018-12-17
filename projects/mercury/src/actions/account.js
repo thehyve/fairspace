@@ -1,4 +1,4 @@
-import AccountAPI from '../services/AccountAPI/AccountAPI'
+import AccountAPI from '../services/AccountAPI/AccountAPI';
 import {createErrorHandlingPromiseAction} from "../utils/redux";
 import {AUTHORIZATIONS, USER} from "./actionTypes";
 

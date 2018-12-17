@@ -13,7 +13,7 @@ class MoreActionsMenu extends React.Component {
             >
                 {this.props.menuItems}
             </Menu>
-        )
+        );
     }
 }
 

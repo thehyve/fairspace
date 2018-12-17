@@ -9,7 +9,7 @@ export const fetchWorkspace = createErrorHandlingPromiseAction(() => ({
 
 export const fetchUsersIfNeeded = () => dispatchIfNeeded(
     fetchUsers,
-    state => state && state.cache ? state.cache.users : undefined
+    state => (state && state.cache ? state.cache.users : undefined)
 );
 
 export const fetchUsers = createErrorHandlingPromiseAction(() => ({

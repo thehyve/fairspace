@@ -5,13 +5,12 @@ import Typography from "@material-ui/core/Typography";
 import {linkLabel} from "../../utils/metadatautils";
 
 export class EntityInformation extends React.Component {
-
     render() {
         const {subject, typeInfo} = this.props;
         return (
             <Paper style={{padding: 20}}>
-                <Typography variant={"h6"}>{linkLabel(subject)}</Typography>
-                <Typography variant={"h7"}>{typeInfo}</Typography>
+                <Typography variant="h6">{linkLabel(subject)}</Typography>
+                <Typography variant="h7">{typeInfo}</Typography>
             </Paper>
         );
     }
@@ -20,14 +19,12 @@ export class EntityInformation extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject} = state;
     const {subject} = ownProps;
-    let typeProp = undefined;
-    if (metadataBySubject &&
-        metadataBySubject[subject] &&
-        metadataBySubject[subject].data) {
+    let typeProp;
+    if (metadataBySubject
+        && metadataBySubject[subject]
+        && metadataBySubject[subject].data) {
         const data = metadataBySubject[subject].data;
-        typeProp = data.find(prop => {
-            return prop.key === '@type';
-        });
+        typeProp = data.find(prop => prop.key === '@type');
     }
 
     const label = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
@@ -36,9 +33,9 @@ const mapStateToProps = (state, ownProps) => {
     const typeInfo = (label && comment) ? `${label} - ${comment}` : (label || comment);
 
     return {
-        subject: subject,
-        typeInfo: typeInfo
+        subject,
+        typeInfo
     };
-}
+};
 
-export default connect(mapStateToProps)(EntityInformation)
+export default connect(mapStateToProps)(EntityInformation);

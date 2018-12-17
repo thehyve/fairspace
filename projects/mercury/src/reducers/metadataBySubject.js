@@ -1,5 +1,5 @@
-import {promiseReducerFactory} from "../utils/redux";
 import reduceReducers from "reduce-reducers";
+import {promiseReducerFactory} from "../utils/redux";
 import {METADATA_COMBINATION, METADATA_NEW_ENTITY, UPDATE_METADATA} from "../actions/actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
 import {TYPE_URI} from "../services/MetadataAPI/MetadataAPI";
@@ -15,8 +15,7 @@ const metadataUpdateReducer = (state = defaultState, action) => {
                 ...state,
                 [action.meta.subject]: {
                     ...state[action.meta.subject],
-                    data: state[action.meta.subject].data.map(el =>
-                        (el.key === action.meta.predicate) ? {...el, values: action.meta.values} : el),
+                    data: state[action.meta.subject].data.map(el => ((el.key === action.meta.predicate) ? {...el, values: action.meta.values} : el)),
                     invalidated: true
                 }
             };
@@ -40,8 +39,8 @@ const metadataUpdateReducer = (state = defaultState, action) => {
                 creatingMetadataEntity: false
             };
         default:
-            return state
+            return state;
     }
-}
+};
 
 export default reduceReducers(metadataCombinationReducer, metadataUpdateReducer, defaultState);

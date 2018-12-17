@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import Typography from "@material-ui/core/Typography";
 import {withRouter} from "react-router-dom";
 import LoadingInlay from '../../components/generic/Loading/LoadingInlay';
@@ -19,7 +19,7 @@ function AuthorizationCheck(props) {
      */
     function hasAuthorization() {
         const {authorizations, authorization} = props;
-        if(Array.isArray(authorizations)) {
+        if (Array.isArray(authorizations)) {
             // If no authorization is given as property, the only check is for a status 200 response
             // If the authorization is specified, we want the array to actually contain the authorization
             if (!authorization || authorizations.includes(authorization)) {
@@ -36,26 +36,27 @@ function AuthorizationCheck(props) {
      */
     function renderError() {
         // An error occurred or no authorization
-        const showError = props.transformError ? props.transformError : (error) => error;
+        const showError = props.transformError ? props.transformError : error => error;
 
         return showError(<div style={{minHeight: 300}}>
             <Typography variant="h5" component="h2">
+
                 Error
             </Typography>
             <Typography component="p">
+
                 You do not have sufficient privileges to access this function. Please contact an
                 administrator.
             </Typography>
-        </div>)
+        </div>);
     }
 
-    if(props.pending) {
-        return <LoadingInlay/>
-    } else if(props.error || !hasAuthorization()) {
+    if (props.pending) {
+        return <LoadingInlay />;
+    } if (props.error || !hasAuthorization()) {
         return renderError();
-    } else {
-        return props.children;
     }
+    return props.children;
 }
 
 AuthorizationCheck.propTypes = {
@@ -74,16 +75,14 @@ AuthorizationCheck.propTypes = {
      * Optional transformation method to convert the error message into correct HTML. Defaults to identity
      */
     transformError: PropTypes.func
-}
+};
 
 
-const mapStateToProps = ({account: { authorizations }}) => {
-    return {
-        pending: authorizations.pending,
-        error: authorizations.error,
-        authorizations: authorizations.data || []
-    }
-}
+const mapStateToProps = ({account: {authorizations}}) => ({
+    pending: authorizations.pending,
+    error: authorizations.error,
+    authorizations: authorizations.data || []
+});
 
 // Please note that withRouter is needed here to make the routing
 // work properly with react-redux.

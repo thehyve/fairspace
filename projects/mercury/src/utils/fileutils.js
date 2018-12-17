@@ -1,16 +1,14 @@
 // Parse path into array
 export function parsePath(path) {
-    if (!path)
-        return [];
+    if (!path) return [];
 
-    if (path[0] === '/')
-        path = path.slice(1);
+    if (path[0] === '/') path = path.slice(1);
 
     return path ? path.split('/') : [];
 }
 
 export function uniqueName(fileName, usedNames) {
-    if(!usedNames.includes(fileName)) {
+    if (!usedNames.includes(fileName)) {
         usedNames.push(fileName);
         return fileName;
     }
@@ -21,7 +19,7 @@ export function uniqueName(fileName, usedNames) {
 
     while (true) {
         const newName = `${name} (${index})${ext}`;
-        if(!usedNames.includes(newName)) {
+        if (!usedNames.includes(newName)) {
             usedNames.push(newName);
             return newName;
         }

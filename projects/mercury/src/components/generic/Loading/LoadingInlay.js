@@ -11,12 +11,11 @@ const styles = theme => ({
 });
 
 class LoadingInlay extends React.Component {
-
     render() {
         const {classes} = this.props;
         return (
             <div className={classes.inlayProgress}>
-                <CircularProgress/>
+                <CircularProgress />
             </div>
         );
     }

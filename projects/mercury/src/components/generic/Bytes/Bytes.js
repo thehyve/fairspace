@@ -6,12 +6,11 @@ function Bytes(props) {
     if (!size) {
         return '0 bytes';
     }
-    const magnitude = Math.floor( Math.log(size) / Math.log(MULTIPLIER) );
+    const magnitude = Math.floor(Math.log(size) / Math.log(MULTIPLIER));
     const unit = UNITS[magnitude];
     const decimals = 0;
 
-    return ( size / Math.pow(MULTIPLIER, magnitude) ).toFixed(decimals) + ' ' + unit;
-
+    return `${(size / Math.pow(MULTIPLIER, magnitude)).toFixed(decimals)} ${unit}`;
 }
 
 export default Bytes;

@@ -12,6 +12,3 @@ function Collections(props) {
 }
 
 export default asPage(Collections);
-
-
-

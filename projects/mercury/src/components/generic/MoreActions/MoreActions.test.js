@@ -11,7 +11,7 @@ describe('MoreIconButton', () => {
 
     it('should render the sub components', () => {
         const wrapper = shallow(
-            <MoreActions onClick={jest.fn()} className={{}}/>
+            <MoreActions onClick={jest.fn()} className={{}} />
         );
         expect(wrapper.find('WithStyles(IconButton)').length).toBe(1);
         expect(wrapper.find('MoreActionsMenu').length).toBe(1);

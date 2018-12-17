@@ -10,9 +10,9 @@ import Routes from "../Routes/Routes";
 const Layout = ({classes}) => {
     // If an error is to be shown, it should be underneath the
     // AppBar. This method take care of it
-    const transformError = (errorContent) => (
+    const transformError = errorContent => (
         <main className={classes.content}>
-            <div className={classes.toolbar}/>
+            <div className={classes.toolbar} />
             {errorContent}
         </main>);
 
@@ -20,14 +20,14 @@ const Layout = ({classes}) => {
     // The topbar is shown even if the user has no proper authorization
     return (
         <React.Fragment>
-            <TopBar classes={classes}/>
+            <TopBar classes={classes} />
             <AuthorizationCheck transformError={transformError.bind(this)}>
                 <Routes />
             </AuthorizationCheck>
-            <Footer/>
+            <Footer />
         </React.Fragment>
     );
-}
+};
 
 Layout.propTypes = {
     classes: PropTypes.object.isRequired,

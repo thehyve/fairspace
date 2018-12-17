@@ -100,7 +100,8 @@ function Option(props) {
             }}
             {...props.innerProps}
             disabled={!!props.data.disabled}
-            onClick={props.data.disabled ? blockEvent : props.innerProps.onClick}>
+            onClick={props.data.disabled ? blockEvent : props.innerProps.onClick}
+        >
             {props.children}
         </MenuItem>
     );
@@ -177,7 +178,6 @@ const components = {
 };
 
 class MaterialReactSelect extends React.Component {
-
     render() {
         const {classes, theme} = this.props;
 

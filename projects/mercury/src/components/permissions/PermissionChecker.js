@@ -3,8 +3,8 @@ const WRITE = 'Write';
 const READ = 'Read';
 
 export default {
-    canRead: collection => {
-        switch(collection.access) {
+    canRead: (collection) => {
+        switch (collection.access) {
             case MANAGE:
             case WRITE:
             case READ:
@@ -14,8 +14,8 @@ export default {
         }
     },
 
-    canWrite: collection => {
-        switch(collection.access) {
+    canWrite: (collection) => {
+        switch (collection.access) {
             case MANAGE:
             case WRITE:
                 return true;
@@ -24,12 +24,12 @@ export default {
         }
     },
 
-    canManage: collection => {
-        switch(collection.access) {
+    canManage: (collection) => {
+        switch (collection.access) {
             case MANAGE:
                 return true;
             default:
                 return false;
         }
     }
-}
+};

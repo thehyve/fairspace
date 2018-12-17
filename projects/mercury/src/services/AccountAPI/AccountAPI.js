@@ -7,8 +7,8 @@ class AccountAPI {
             method: 'GET',
             credentials: 'same-origin'
         })
-        .then(failOnHttpError("Failure when retrieving username"))
-        .then(response => response.json())
+            .then(failOnHttpError("Failure when retrieving username"))
+            .then(response => response.json());
     }
 
     getAuthorizations() {
@@ -17,7 +17,7 @@ class AccountAPI {
             credentials: 'same-origin'
         })
             .then(failOnHttpError("Failure when retrieving authorizations"))
-            .then(response => response.json())
+            .then(response => response.json());
     }
 }
 

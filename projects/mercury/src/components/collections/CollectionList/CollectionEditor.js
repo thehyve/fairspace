@@ -40,7 +40,7 @@ class CollectionEditor extends React.Component {
     }
 
     handleSave() {
-        if(!this.state.name) {
+        if (!this.state.name) {
             return;
         }
 
@@ -56,62 +56,68 @@ class CollectionEditor extends React.Component {
 
     render() {
         return (<Dialog
-                open={this.state.editing}
-                onClose={this.close.bind(this)}
-                aria-labelledby='form-dialog-title'>
-                <DialogTitle id='form-dialog-title'>{this.state.title}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
+            open={this.state.editing}
+            onClose={this.close.bind(this)}
+            aria-labelledby="form-dialog-title"
+        >
+            <DialogTitle id="form-dialog-title">{this.state.title}</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+
                         You can edit the collection details here.
-                    </DialogContentText>
-                    <TextField
-                        autoFocus
-                        margin='dense'
-                        id='name'
-                        label='Name'
-                        value={this.state.name}
-                        name='name'
-                        onChange={this.handleInputChange.bind(this)}
-                        fullWidth
-                        required={true}
-                    />
-                    <TextField
-                        autoFocus
-                        margin='dense'
-                        multiline={true}
-                        id='description'
-                        label='Description'
-                        name='description'
-                        value={this.state.description}
-                        onChange={this.handleInputChange.bind(this)}
-                        fullWidth
-                    />
-                    {this.props.editType ?
+                </DialogContentText>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="Name"
+                    value={this.state.name}
+                    name="name"
+                    onChange={this.handleInputChange.bind(this)}
+                    fullWidth
+                    required
+                />
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    multiline
+                    id="description"
+                    label="Description"
+                    name="description"
+                    value={this.state.description}
+                    onChange={this.handleInputChange.bind(this)}
+                    fullWidth
+                />
+                {this.props.editType
+                    ? (
                         <FormControl>
                             <InputLabel>Type</InputLabel>
                             <Select
-                                name={'type'}
+                                name="type"
                                 value={this.state.type}
                                 onChange={this.handleInputChange.bind(this)}
                             >
-                                <MenuItem value={'LOCAL_FILE'}>On Premise</MenuItem>
-                                <MenuItem value={'AZURE_BLOB_STORAGE'}>Azure Blob Storage</MenuItem>
-                                <MenuItem value={'S3_BUCKET'}>Amazon S3 Bucket</MenuItem>
-                                <MenuItem value={'GOOGLE_CLOUD_BUCKET'}>Google Cloud Bucket</MenuItem>
+                                <MenuItem value="LOCAL_FILE">On Premise</MenuItem>
+                                <MenuItem value="AZURE_BLOB_STORAGE">Azure Blob Storage</MenuItem>
+                                <MenuItem value="S3_BUCKET">Amazon S3 Bucket</MenuItem>
+                                <MenuItem value="GOOGLE_CLOUD_BUCKET">Google Cloud Bucket</MenuItem>
                             </Select>
                         </FormControl>
-                        : null}
+                    )
+                    : null}
 
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={this.handleCancel.bind(this)} aria-label='Cancel' color='secondary'>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={this.handleCancel.bind(this)} aria-label="Cancel" color="secondary">
+
                         Cancel
-                    </Button>
-                    <Button onClick={this.handleSave.bind(this)} aria-label='Save' color='primary'>
+                </Button>
+                <Button onClick={this.handleSave.bind(this)} aria-label="Save" color="primary">
+
                         Save
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                </Button>
+            </DialogActions>
+                </Dialog>
         );
     }
 }

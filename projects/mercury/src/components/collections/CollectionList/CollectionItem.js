@@ -13,7 +13,3 @@ function Collection(props) {
 }
 
 export default Collection;
-
-
-
-

@@ -8,8 +8,8 @@
  *  - username when no names and email
  *  - id when no names, email and username
  */
-export const getDisplayName = user => {
-    if(!user) {
+export const getDisplayName = (user) => {
+    if (!user) {
         return '';
     }
 
@@ -20,5 +20,5 @@ export const getDisplayName = user => {
     const hasUsername = user.hasOwnProperty('username') && user.username;
     const hasId = user.hasOwnProperty('id') && user.id;
 
-    return (hasFullName ? hasFullName : hasFirstName || hasLastName) || hasEmail || hasUsername || hasId;
+    return (hasFullName || hasFirstName || hasLastName) || hasEmail || hasUsername || hasId;
 };

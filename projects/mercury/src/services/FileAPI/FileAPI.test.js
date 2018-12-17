@@ -3,8 +3,8 @@ import Config from "../Config/Config";
 
 beforeAll(() => {
     Config.setConfig({
-        "urls": {
-            "files": "/files"
+        urls: {
+            files: "/files"
         }
     });
 
@@ -12,13 +12,13 @@ beforeAll(() => {
 });
 
 it('uses the collection name in the webdav path', () => {
-    const fileAPI = new FileAPI('subdir')
+    const fileAPI = new FileAPI('subdir');
     expect(fileAPI.getFullPath('/filename')).toEqual('/subdir/filename');
     expect(fileAPI.getFullPath()).toEqual('/subdir');
-})
+});
 
-if('uploads multiple files', () => {
-    const fileAPI = new FileAPI('subdir')
+if ('uploads multiple files', () => {
+    const fileAPI = new FileAPI('subdir');
     fileAPI.client = {putFileContents: jest.fn(() => Promise.resolve())};
 
     const result = fileAPI.upload([{name: 'filea.txt'}, {name: 'fileb.txt'}, {name: 'filec.txt'}]);

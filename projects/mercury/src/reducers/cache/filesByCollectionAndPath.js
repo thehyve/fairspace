@@ -23,11 +23,12 @@ const invalidateFiles = (state, collectionId, ...paths) => {
     return {
         ...state,
         [collectionId]: Object.assign({}, state[collectionId], ...newPathsState)
-    }
-}
+    };
+};
 
 const filesByCollectionAndPath = (state = defaultState, action) => {
-    let collectionId, path;
+    let collectionId; let
+        path;
     switch (action.type) {
         case actionTypes.pending(FILES):
             collectionId = action.meta.collection.id;
@@ -43,7 +44,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                         data: {}
                     }
                 }
-            }
+            };
         case actionTypes.fulfilled(FILES):
             collectionId = action.meta.collection.id;
             path = action.meta.path;
@@ -57,7 +58,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                         data: action.payload
                     }
                 }
-            }
+            };
         case actionTypes.rejected(FILES):
             collectionId = action.meta.collection.id;
             path = action.meta.path;
@@ -80,7 +81,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
         case actionTypes.fulfilled(CREATE_DIRECTORY):
         case actionTypes.rejected(CREATE_DIRECTORY):
         case actionTypes.invalidate(CREATE_DIRECTORY):
-            let newState = {
+            const newState = {
                 ...state,
                 creatingDirectory: false
             };

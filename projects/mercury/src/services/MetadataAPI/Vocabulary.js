@@ -52,7 +52,7 @@ class Vocabulary {
 
         // If no subject is provided, use the first (and only) entry in the metadata
         let metadataItem;
-        if(!subject) {
+        if (!subject) {
             subject = expandedMetadata[0]['@id'];
             metadataItem = expandedMetadata[0];
         } else { // Retrieve the metadata item for this subject
@@ -63,8 +63,8 @@ class Vocabulary {
             console.warn(`The given subject ${subject} is unknown`);
             return [];
         }
-        
-        if(!Array.isArray(metadataItem['@type'])) {
+
+        if (!Array.isArray(metadataItem['@type'])) {
             console.warn("Can not combine metadata without a type or that is not expanded");
             return [];
         }
@@ -92,7 +92,7 @@ class Vocabulary {
      */
     getFairspaceClasses() {
         return this.vocabulary
-            .filter(entry => entry['@type'].includes(CLASS_URI) && getSingleValue(entry, FAIRSPACE_ENTITY_URI))
+            .filter(entry => entry['@type'].includes(CLASS_URI) && getSingleValue(entry, FAIRSPACE_ENTITY_URI));
     }
 
     /**
@@ -124,7 +124,7 @@ class Vocabulary {
                 continue;
             }
 
-            let values = (predicateUri === "@type")
+            const values = (predicateUri === "@type")
                 // @type needs special attention: it is specified as a literal string
                 // but should be treated as an object
                 ? this._convertTypeEntries(metadata[predicateUri])
@@ -150,10 +150,10 @@ class Vocabulary {
         // Also add an entry for fields not yet entered
         const additionalProperties = predicates
             .filter(predicate => !Object.keys(metadata).includes(predicate['@id']))
-            .map(predicate => {
+            .map((predicate) => {
                 const predicateUri = predicate['@id'];
                 const vocabularyEntry = this.vocabularyById[predicateUri];
-                return Vocabulary._generatePropertyEntry(predicateUri, [], vocabularyEntry)
+                return Vocabulary._generatePropertyEntry(predicateUri, [], vocabularyEntry);
             });
 
         return additionalProperties.sort(compareBy('label'));
@@ -191,12 +191,9 @@ class Vocabulary {
      * @param type
      */
     _determinePredicatesForType(type) {
-        const isProperty = entry =>
-            entry['@type'].includes(PROPERTY_URI);
+        const isProperty = entry => entry['@type'].includes(PROPERTY_URI);
 
-        const isInDomain = entry => {
-            return entry[DOMAIN_URI] && entry[DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
-        }
+        const isInDomain = entry => entry[DOMAIN_URI] && entry[DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
 
         const predicates = this.vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
         return predicates;
@@ -208,7 +205,7 @@ class Vocabulary {
                 id: type,
                 label: Vocabulary._getLabel(this.vocabularyById[type]),
                 comment: Vocabulary._getComment(this.vocabularyById[type])
-            }))
+            }));
     }
 
     /**
@@ -229,12 +226,12 @@ class Vocabulary {
 
         return {
             key: predicate,
-            label: label,
+            label,
             values: sortedValues,
-            range: range,
-            allowMultiple: allowMultiple,
-            machineOnly: machineOnly,
-            multiLine: multiLine
+            range,
+            allowMultiple,
+            machineOnly,
+            multiLine
         };
     }
 
@@ -260,7 +257,7 @@ class Vocabulary {
 
     static _lookupLabel(id, allMetadata) {
         const entry = allMetadata.find(element => element['@id'] === id);
-        return Vocabulary._getFirstPredicateValue(entry, LABEL_URI)
+        return Vocabulary._getFirstPredicateValue(entry, LABEL_URI);
     }
 }
 

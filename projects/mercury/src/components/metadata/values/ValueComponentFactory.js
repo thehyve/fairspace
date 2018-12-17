@@ -19,7 +19,7 @@ import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
 import ResourceValue from "./ResourceValue";
 
-const getInputComponent = property => {
+const getInputComponent = (property) => {
     switch (property.range) {
         case STRING_URI:
             return StringValue;
@@ -40,10 +40,10 @@ const getInputComponent = property => {
         default:
             return undefined;
     }
-}
+};
 
 export default {
-    editComponent: (property) => getInputComponent(property) || ReferringValue,
-    addComponent: (property) => getInputComponent(property) || LookupEntity,
+    editComponent: property => getInputComponent(property) || ReferringValue,
+    addComponent: property => getInputComponent(property) || LookupEntity,
     readOnlyComponent: () => ReferringValue
-}
+};

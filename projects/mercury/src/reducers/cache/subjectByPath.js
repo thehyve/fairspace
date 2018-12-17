@@ -19,6 +19,6 @@ export default (state = {}, action) => {
                 [action.meta.path]: {error: action.payload || true}
             };
         default:
-            return state
+            return state;
     }
-}
+};

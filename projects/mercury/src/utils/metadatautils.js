@@ -11,16 +11,15 @@ import {LABEL_URI} from "../services/MetadataAPI/MetadataAPI";
  * @returns string
  */
 export function getLabel(entity, shortenExternalUris = false) {
-    if(
-        Array.isArray(entity[LABEL_URI]) &&
-        entity[LABEL_URI].length > 0 &&
-        entity[LABEL_URI][0]['@value']
+    if (
+        Array.isArray(entity[LABEL_URI])
+        && entity[LABEL_URI].length > 0
+        && entity[LABEL_URI][0]['@value']
     ) {
         return entity[LABEL_URI][0]['@value'];
-    } else {
-        let id = entity['@id'];
-        return id && linkLabel(id, shortenExternalUris)
     }
+    const id = entity['@id'];
+    return id && linkLabel(id, shortenExternalUris);
 }
 
 /**
@@ -34,9 +33,9 @@ export function getLabel(entity, shortenExternalUris = false) {
  * @returns string      The navigable URI
  */
 export function navigableLink(link) {
-    return link.startsWith(window.location.origin + '/iri/collections/')
+    return link.startsWith(`${window.location.origin}/iri/collections/`)
         ? link.replace('/iri/collections/', '/collections/')
-        : link
+        : link;
 }
 
 /**
@@ -57,13 +56,13 @@ export function relativeLink(link) {
  * @returns {*}
  */
 export function linkLabel(uri, shortenExternalUris = false) {
-    const entityPrefix = window.location.origin + '/iri/';
+    const entityPrefix = `${window.location.origin}/iri/`;
     if (uri.startsWith(entityPrefix)) {
         const path = uri.substring(entityPrefix.length);
-        return path.substring(path.indexOf('/') + 1)
+        return path.substring(path.indexOf('/') + 1);
     }
 
-    const collectionPrefix = window.location.origin + '/collections/';
+    const collectionPrefix = `${window.location.origin}/collections/`;
     if (uri.startsWith(collectionPrefix)) {
         return uri.substring(collectionPrefix.length);
     }
@@ -71,15 +70,15 @@ export function linkLabel(uri, shortenExternalUris = false) {
     if (shortenExternalUris) {
         return uri.includes('#')
             ? uri.substring(uri.lastIndexOf('#') + 1)
-            : uri.substring(uri.lastIndexOf('/') + 1)
+            : uri.substring(uri.lastIndexOf('/') + 1);
     }
 
-    return uri
+    return uri;
 }
 
 
 export function isDateTimeProperty(property) {
-    return  property.range === 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
+    return property.range === 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
 }
 
 export function generateUuid() {
@@ -89,10 +88,10 @@ export function generateUuid() {
 }
 
 export function getValues(entity, property) {
-    return (entity[property] || []).map(v => v['@value'] || v['@id'])
+    return (entity[property] || []).map(v => v['@value'] || v['@id']);
 }
 
 export function getSingleValue(entity, property) {
-    let values = getValues(entity, property);
-    return (values.length > 0) ? values[0] : undefined
+    const values = getValues(entity, property);
+    return (values.length > 0) ? values[0] : undefined;
 }

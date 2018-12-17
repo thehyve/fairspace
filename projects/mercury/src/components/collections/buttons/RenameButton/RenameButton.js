@@ -7,7 +7,7 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 
-class RenameButton extends React.Component{
+class RenameButton extends React.Component {
     constructor(props) {
         super(props);
         const {
@@ -42,22 +42,22 @@ class RenameButton extends React.Component{
     }
 
     closeDialog(e) {
-        if(e) e.stopPropagation();
+        if (e) e.stopPropagation();
         this.setState({renaming: false});
     }
 
     handleRename(e) {
         e.stopPropagation();
 
-        if(this.onRename) {
+        if (this.onRename) {
             this
                 .onRename(this.state.name)
-                .then((shouldClose) => shouldClose && this.closeDialog.bind(this))
+                .then(shouldClose => shouldClose && this.closeDialog.bind(this));
         }
     }
 
     handleInputChange(event) {
-        let newValues = {}
+        const newValues = {};
         newValues[event.target.name] = event.target.value;
         this.setState(newValues);
     }
@@ -71,13 +71,18 @@ class RenameButton extends React.Component{
 
                 <Dialog
                     open={this.state.renaming}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
                     onClose={this.closeDialog.bind(this)}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Rename {this.currentName}</DialogTitle>
+                    <DialogTitle id="form-dialog-title">
+Rename
+                        {this.currentName}
+                    </DialogTitle>
                     <DialogContent>
-                        Enter a new name for {this.currentName}
+
+                        Enter a new name for
+                        {this.currentName}
                         <TextField
                             autoFocus
                             margin="dense"
@@ -91,9 +96,11 @@ class RenameButton extends React.Component{
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.closeDialog.bind(this)} color="secondary">
+
                             Close
                         </Button>
                         <Button onClick={this.handleRename.bind(this)} color="primary" disabled={!this.state.name || this.state.name === this.currentName}>
+
                             Rename
                         </Button>
                     </DialogActions>
@@ -104,7 +111,3 @@ class RenameButton extends React.Component{
 }
 
 export default RenameButton;
-
-
-
-

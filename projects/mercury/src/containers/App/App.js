@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
+import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
 import {fetchUsers, fetchWorkspace} from "../../actions/workspace";
 import ErrorDialog from "../../components/error/ErrorDialog";
@@ -9,14 +10,12 @@ import configureStore from "../../store/configureStore";
 import Config from "../../services/Config/Config";
 
 // theme
-import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import styles from './App.styles';
 import theme from './App.theme';
 import Layout from "../Layout/Layout";
 import LoadingInlay from '../../components/generic/Loading/LoadingInlay';
 
 class App extends React.Component {
-
     cancellable = {
         // it's important that this is one level down, so we can drop the
         // reference to the entire object by setting it to undefined.
@@ -52,10 +51,12 @@ class App extends React.Component {
     // If an error is to be shown, it should be underneath the
     // AppBar. This method take care of it
     transformError(errorContent) {
-        return (<main className={this.props.classes.content}>
-            <div className={this.props.classes.toolbar}/>
-            {errorContent}
-        </main>)
+        return (
+            <main className={this.props.classes.content}>
+                <div className={this.props.classes.toolbar} />
+                {errorContent}
+            </main>
+        );
     }
 
     render() {
@@ -75,9 +76,8 @@ class App extends React.Component {
                     </div>
                 </MuiThemeProvider>
             );
-        } else {
-            return <LoadingInlay/>;
         }
+        return <LoadingInlay />;
     }
 }
 
