@@ -9,4 +9,8 @@ module.exports = {
   username: process.env.CYPRESS_USERNAME || "test-workspace-ci",
   password: process.env.CYPRESS_PASSWORD || "fairspace123",
   secondUsername: process.env.CYPRESS_SECOND_USER || "test2-workspace-ci",
+  timeouts: {
+      metadataPropagation: process.env.METADATA_PROPAGATION_TIME || 500,
+      requestTimeout: process.env.REQUEST_TIMEOUT || 1000
+  }
 }

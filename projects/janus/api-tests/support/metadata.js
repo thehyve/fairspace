@@ -1,4 +1,3 @@
-const request = require('superagent');
 const expect = require('expect.js');
 const config = require('./config');
 
@@ -20,12 +19,10 @@ getPropertyValue = (jsonld, predicate) => {
     return Array.isArray(data) ? data : [data];
 };
 
-getMetadataForSubject = async (subject, sessionCookie) => {
-    const response = await request
-        .get(config.workspaceUri + '/api/metadata/statements')
+getMetadataForSubject = async (subject, authenticatedRequest) => {
+    const response = await authenticatedRequest('GET', config.workspaceUri + '/api/metadata/statements')
         .query({subject: subject})
-        .accept('application/ld+json')
-        .set('Cookie', sessionCookie);
+        .accept('application/ld+json');
 
     expect(response.status).to.equal(200);
 

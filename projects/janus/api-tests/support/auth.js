@@ -32,8 +32,15 @@ async function retrieveSessionCookie(username = config.username, password = conf
     return "JSESSIONID=" + sessionId;
 }
 
+function authenticatedRequest(sessionCookie) {
+    return (method, url) => request(method, url)
+        .set('Cookie', sessionCookie)
+        .timeout(config.timeouts.requestTimeout);
+}
+
 module.exports = {
     retrieveToken,
     retrieveSessionId,
-    retrieveSessionCookie
+    retrieveSessionCookie,
+    authenticatedRequest
 }

@@ -3,15 +3,13 @@ const expect = require('expect.js');
 const config = require('./config');
 const fixture = require('./fixture');
 
-const createCollection = async (sessionCookie, uniqueId) => {
+const createCollection = async (authenticatedRequest, uniqueId) => {
     const collection = fixture.asJSON('empty-collection.json');
     const collectionName = collection.name + ' ' + uniqueId;
 
     // Create a new collection
-    const collectionId = await request
-        .post(config.workspaceUri + '/api/collections')
+    const collectionId = await authenticatedRequest('POST', config.workspaceUri + '/api/collections')
         .set('Content-type', 'application/json')
-        .set('Cookie', sessionCookie)
         .send({...collection, name: collectionName})
         .then(response => {
             expect(response.status).to.equal(201);
@@ -19,9 +17,7 @@ const createCollection = async (sessionCookie, uniqueId) => {
             return  url.substr(url.lastIndexOf('/') + 1);
         });
 
-    return request
-        .get(config.workspaceUri + '/api/collections/' + collectionId)
-        .set('Cookie', sessionCookie)
+    return authenticatedRequest('GET', config.workspaceUri + '/api/collections/' + collectionId)
         .then(response => {
             expect(response.status).to.equal(200);
 
@@ -29,18 +25,15 @@ const createCollection = async (sessionCookie, uniqueId) => {
         });
 }
 
-const removeAllCollections = (sessionCookie) =>
+const removeAllCollections = (authenticatedRequest) =>
     // Retrieve a list of collections
-    request.get(config.workspaceUri + '/api/collections')
-        .set('Cookie', sessionCookie)
+    authenticatedRequest('GET', config.workspaceUri + '/api/collections')
         .then(data => {
             expect(data.status).to.equal(200);
 
             // Delete very one of them
             return Promise.all(data.body.map(
-                collection => request
-                    .delete(config.workspaceUri + '/api/collections/' +  collection.id)
-                    .set('Cookie', sessionCookie)
+                collection => authenticatedRequest('DELETE', config.workspaceUri + '/api/collections/' +  collection.id)
             ));
         });
 
