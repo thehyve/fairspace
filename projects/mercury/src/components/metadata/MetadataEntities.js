@@ -77,8 +77,7 @@ class MetadataEntities extends React.Component {
                                         ))}
                                     </TableCell>
                                     <TableCell>
-                                        <a href={navigableLink(entity['@id'])}
-                                           onClick={this.handleEntityNavigation.bind(this, entity)}>
+                                        <a href='' onClick={this.handleEntityNavigation.bind(this, entity)}>
                                             {getLabel(entity)}
                                         </a>
                                     </TableCell>
