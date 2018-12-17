@@ -22,7 +22,7 @@ class Routes extends React.Component {
                     <Route path="/collections/:collection/:path(.*)?" component={Files}/>
                     <Route exact path="/notebooks" component={Notebooks}/>
 
-                    <Route exact path="/metadata" component={MetadataOverviewPage}/>
+                    <Route exact path="/iri" component={MetadataOverviewPage}/>
                     <Route path="/iri/**"
                            component={MetadataEntityPage}/>
 

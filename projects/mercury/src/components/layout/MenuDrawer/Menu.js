@@ -37,7 +37,7 @@ const Menu = ({classes}) => (
                 </ListItemIcon>
                 <ListItemText primary="Workflows"/>
             </ListItem>
-            <ListItem component={NavLink} to="/metadata" button>
+            <ListItem component={NavLink} to="/iri" button>
                 <ListItemIcon>
                     <Icon>assignment</Icon>
                 </ListItemIcon>
