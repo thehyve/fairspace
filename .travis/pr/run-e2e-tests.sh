@@ -19,10 +19,14 @@ export CYPRESS_KEYCLOAK_REALM=e2e
 export CYPRESS_SECOND_USER=test2-e2e
 export CYPRESS_USERNAME=e2e-test
 export CYPRESS_PASSWORD=e2e-test
-export METADATA_PROPAGATION_TIME=1500
+
+# Set large timeouts as the ci environment tends to respond slowly
+export METADATA_PROPAGATION_TIME=2000
+export REQUEST_TIMEOUT=2000
+export TEST_TIMEOUT=15000
 
 echo -e $(date +%T) "Running API tests"
-$(npm bin)/mocha api-tests/*.js --timeout 10000
+$(npm bin)/mocha api-tests/*.js --timeout $TEST_TIMEOUT
 result=$?
 
 echo -e $(date +%T) "Running E2E tests"
