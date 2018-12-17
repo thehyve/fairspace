@@ -1,0 +1,52 @@
+allprojects {
+  ext {
+    springVersion = '4.3.5.RELEASE'
+    junitVersion = '5.3.1'
+    mockitoVersion = '2.22.0'
+  }
+
+  apply plugin: 'java-library'
+  apply plugin: 'maven'
+  apply plugin: 'maven-publish'
+
+  group = 'io.fairspace'
+  version = System.getenv('VERSION') ?: '0.1.0-SNAPSHOT'
+
+  repositories {
+    jcenter()
+  }
+
+  task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+  }
+
+  test {
+    useJUnitPlatform()
+    testLogging {
+      events "passed", "skipped", "failed"
+    }
+  }
+
+  publishing {
+    publications {
+      oidcAuthComponent(MavenPublication) {
+        from components.java
+        artifact sourcesJar
+      }
+    }
+    repositories {
+      maven {
+        def releasesRepoUrl = "https://repo.thehyve.nl/content/repositories/fairspace-releases"
+        def snapshotsRepoUrl = "https://repo.thehyve.nl/content/repositories/fairspace-snapshots"
+        url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        name = 'nexus'
+
+        credentials {
+          username System.getenv("NEXUS_USERNAME")
+          password System.getenv("NEXUS_PASSWORD")
+        }
+      }
+    }
+  }
+}

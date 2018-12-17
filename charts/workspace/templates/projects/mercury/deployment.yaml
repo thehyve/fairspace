@@ -1,0 +1,61 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "mercury.fullname" . }}
+  labels:
+    app: mercury
+    chart: {{ template "workspace.chart" . }}
+    draft: {{ default "draft-app" .Values.draft }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.mercury.replicaCount }}
+  selector:
+    matchLabels:
+      app: mercury
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: mercury
+        release: {{ .Release.Name }}
+{{- if .Values.podAnnotations.mercury }}
+      annotations:
+{{ toYaml .Values.podAnnotations.mercury | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+      - name: {{ template "mercury.fullname" . }}
+        image: "{{ .Values.mercury.image.image }}:{{ .Values.mercury.image.tag }}"
+        imagePullPolicy: {{ .Values.mercury.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.mercury.service.internalPort }}
+        volumeMounts:
+          - name: config-storage
+            mountPath: /usr/share/nginx/html/config/
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.mercury.probePath }}
+            port: {{ .Values.mercury.service.internalPort }}
+          initialDelaySeconds: {{ .Values.mercury.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.mercury.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.mercury.livenessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.mercury.livenessProbe.timeoutSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.mercury.probePath }}
+            port: {{ .Values.mercury.service.internalPort }}
+          periodSeconds: {{ .Values.mercury.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.mercury.readinessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.mercury.readinessProbe.timeoutSeconds }}
+        resources:
+{{ toYaml .Values.mercury.resources | indent 12 }}
+      terminationGracePeriodSeconds: {{ .Values.mercury.terminationGracePeriodSeconds }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      volumes:
+      - name: config-storage
+        configMap:
+          name: {{ template "mercury.fullname" . }}

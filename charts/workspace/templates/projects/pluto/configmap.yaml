@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "pluto.fullname" . }}
+  labels:
+    app: pluto
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    app:
+      oauth2:
+        base-url: {{ template "keycloak.baseUrl" . }}
+        realm: {{ .Values.hyperspace.keycloak.realm }}
+
+    frontend:
+      urls:
+        files: {{ template "storage.url" . }}/api/storage/webdav
+        jupyter: {{ template "jupyterhub.url" . }}
+        {{ if ( and .Values.services .Values.services.cbioportal  ) }}cbioportal: {{ .Values.services.cbioportal }}{{ end }}
+
+    workspace:
+      name: {{ .Release.Name }}
+      version: {{ .Values.pluto.workspace.version }}
+
+    security:
+      oidc:
+        redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}
+        required-authority: {{ .Values.pluto.keycloak.requiredAuthority | default (printf "user-%s" (include "workspace.name" .)) }}
+
+    spring:
+      zipkin:
+        enabled: {{ .Values.tracing.enabled }}
+        base-url: {{ .Values.tracing.baseUrl }}
+
+    zuul:
+      routes:
+        ui:
+          url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+        storage:
+          url: {{ .Values.pluto.backends.storage | default (printf "http://%s-titan.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+        collections:
+          url: {{ .Values.pluto.backends.collections | default (printf "http://%s-neptune.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+        metadata:
+          url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-ceres.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}

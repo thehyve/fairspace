@@ -2,3 +2,4 @@
 This helm chart will install and setup a single VRE workspace, including JupyterHub. 
 
 See [workspace/README.md](/charts/workspace/README.md) for more information
+

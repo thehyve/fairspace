@@ -1,0 +1,61 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "neptune.fullname" . }}
+  labels:
+    app: neptune
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    draft: {{ default "draft-app" .Values.draft }}
+spec:
+  replicas: {{ .Values.neptune.replicaCount }}
+  selector:
+    matchLabels:
+      app: neptune
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        draft: {{ default "draft-app" .Values.draft }}
+        app: neptune
+        chart: {{ template "workspace.chart" . }}
+        release: {{ .Release.Name }}
+{{- if .Values.podAnnotations.neptune }}
+      annotations:
+{{ toYaml .Values.podAnnotations.neptune | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+      - name: {{ template "neptune.fullname" . }}
+        image: "{{ .Values.neptune.image.image }}:{{ .Values.neptune.image.tag }}"
+        imagePullPolicy: {{ .Values.neptune.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.neptune.service.internalPort }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/config
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.neptune.probePath }}
+            port: {{ .Values.neptune.service.internalPort }}
+          initialDelaySeconds: {{ .Values.neptune.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.neptune.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.neptune.livenessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.neptune.livenessProbe.timeoutSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.neptune.probePath }}
+            port: {{ .Values.neptune.service.internalPort }}
+          periodSeconds: {{ .Values.neptune.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.neptune.readinessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.neptune.readinessProbe.timeoutSeconds }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ template "neptune.fullname" . }}
+      terminationGracePeriodSeconds: {{ .Values.neptune.terminationGracePeriodSeconds }}

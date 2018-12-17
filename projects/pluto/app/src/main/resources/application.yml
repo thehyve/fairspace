@@ -1,0 +1,90 @@
+app:
+  oauth2:
+    base-url: http://localhost:9080
+    realm: keycloak
+
+server:
+  error:
+    whitelabel:
+      enabled: false
+
+frontend:
+  urls: {}
+
+spring:
+  application:
+    name: Pluto
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://jaeger-collector.jaeger:9411/
+
+security:
+  oidc:
+    auth-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
+    logout-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
+    token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
+    jwk-key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
+    redirect-after-logout-uri: https://fairspace.com
+    clientId: web_app
+    clientSecret: web_app
+    scope: openid
+    required-authority: user-workspace
+
+  # Specify urls for security configuration. There are
+  urls:
+    permitAll:
+    - /actuator/health
+    - /error
+    - /manifest.json
+    - /login
+    - /logout
+    - /authorize
+    - /account/tokens
+    needsAuthentication:
+    - /account/name
+    - /*
+    needsAuthorization:
+    - /account/authorizations
+    - /api/*
+
+workspace:
+  usersUri: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/users
+  name: Workspace
+  version: 0.0.0
+
+zuul:
+  routes:
+    storage:
+      path: /api/storage/**
+      url: http://titan/
+      strip-prefix: false
+    metadata:
+      path: /api/metadata/**
+      url: http://ceres/
+    collections:
+      path: /api/collections/**
+      url: http://neptune/
+    ui:
+      path: /**
+      url: http://mercury/
+    notebooks:
+      path: /api/notebooks/**
+      url: http://jupyterhub/
+  ignored-patterns:
+  - /actuator/**
+  - /account/**
+  - /api/workspace/**
+  - /login
+  - /logout
+  - /authorize
+  - /error
+  add-host-header: true
+  ignored-headers:
+    - Access-Control-Allow-Credentials
+    - Access-Control-Allow-Origin
+    - Pragma
+    - X-Frame-Options
+    - X-Content-Type-Options
+    - X-XSS-Protection

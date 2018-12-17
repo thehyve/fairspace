@@ -90,26 +90,63 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 {{- end -}}
 
-{{/*
-Jupyterhub external hostname
-*/}}
+{{/* Jupyterhub external hostname */}}
 {{- define "jupyterhub.hostname" -}}
 {{- printf "jupyterhub.%s" .Values.workspace.ingress.domain -}}
 {{- end -}}
 
-{{/*
-Pluto external hostname
-*/}}
+{{/* Pluto external hostname */}}
 {{- define "pluto.hostname" -}}
 {{- .Values.workspace.ingress.domain -}}
 {{- end -}}
 
-{{/*
-Storage external hostname (through pluto to hydra)
-*/}}
+{{/* Storage external hostname */}}
 {{- define "storage.hostname" -}}
 {{- printf "storage.%s" .Values.workspace.ingress.domain -}}
 {{- end -}}
+
+{{- define "workspace.url" -}}
+{{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}
+{{- end -}}
+
+{{- define "jupyterhub.url" -}}
+{{- if .Values.services.jupyterhub -}}
+{{- .Values.services.jupyterhub -}}
+{{- else -}}
+{{ template "workspace.scheme" . }}://{{ template "jupyterhub.hostname" . }}
+{{- end -}}
+{{- end -}}
+
+{{- define "storage.url" -}}
+{{ template "workspace.scheme" . }}://{{ template "storage.hostname" . }}
+{{- end -}}
+
+{{- define "neptune.postgres.host" -}}
+{{- printf "%s-%s" .Release.Name .Values.postgresql_neptune.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- define "ceres.postgres.host" -}}
+{{- printf "%s-%s" .Release.Name .Values.postgresql_neptune.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "callisto.fullname" -}}
+{{- .Values.callisto.nameOverride | default (printf "%s-callisto" .Release.Name) -}}
+{{- end -}}
+{{- define "ceres.fullname" -}}
+{{- .Values.ceres.nameOverride | default (printf "%s-ceres" .Release.Name) -}}
+{{- end -}}
+{{- define "mercury.fullname" -}}
+{{- .Values.mercury.nameOverride | default (printf "%s-mercury" .Release.Name) -}}
+{{- end -}}
+{{- define "neptune.fullname" -}}
+{{- .Values.neptune.nameOverride | default (printf "%s-neptune" .Release.Name) -}}
+{{- end -}}
+{{- define "pluto.fullname" -}}
+{{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
+{{- end -}}
+{{- define "titan.fullname" -}}
+{{- .Values.titan.nameOverride | default (printf "%s-titan" .Release.Name) -}}
+{{- end -}}
+
 
 {{- define "rabbitmq.pluto.username" -}}
 {{- .Values.pluto.rabbitmq.username | default (printf "%s-pluto" .Release.Name) -}}
@@ -122,4 +159,7 @@ Storage external hostname (through pluto to hydra)
 {{- end -}}
 {{- define "rabbitmq.titan.username" -}}
 {{- .Values.titan.rabbitmq.username | default (printf "%s-titan" .Release.Name) -}}
+{{- end -}}
+{{- define "rabbitmq.callisto.username" -}}
+{{- .Values.callisto.rabbitmq.username | default (printf "%s-callisto" .Release.Name) -}}
 {{- end -}}

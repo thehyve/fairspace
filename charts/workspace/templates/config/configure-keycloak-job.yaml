@@ -1,4 +1,5 @@
 {{- $scripts := .Values.workspace.configurationScripts.keycloak -}}
+{{- if $scripts.enabled -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -21,9 +22,9 @@ spec:
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     spec:
       restartPolicy: Never
-      {{- if .Values.fairspaceImagePullSecret }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-          - name: {{ .Values.fairspaceImagePullSecret }}
+      {{ toYaml . | indent 8 }}
       {{- end }}
       containers:
       - name: configure-keycloak-job
@@ -74,3 +75,4 @@ spec:
       - name: config-volume
         configMap:
           name: "{{.Release.Name}}-keycloak-config-map"
+{{- end -}}

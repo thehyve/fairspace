@@ -1,3 +1,4 @@
+{{- if .Values.workspace.configurationScripts.rabbitmq.enabled -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -18,7 +19,10 @@ data:
     declare user name={{ template "rabbitmq.neptune.username" . }} password={{.Values.neptune.rabbitmq.password}} tags=
     declare user name={{ template "rabbitmq.titan.username" . }} password={{.Values.titan.rabbitmq.password}} tags=
     declare user name={{ template "rabbitmq.ceres.username" . }} password={{.Values.ceres.rabbitmq.password}} tags=
+    declare user name={{ template "rabbitmq.callisto.username" . }} password={{.Values.callisto.rabbitmq.password}} tags=
     declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.pluto.username" . }} configure=.* read=.* write=.*
     declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.neptune.username" . }} configure=.* read=.* write=.*
     declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.titan.username" . }} configure=.* read=.* write=.*
     declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.ceres.username" . }} configure=.* read=.* write=.*
+    declare permission vhost={{ template "workspace.name" . }} user={{ template "rabbitmq.callisto.username" . }} configure=.* read=.* write=.*
+{{- end -}}

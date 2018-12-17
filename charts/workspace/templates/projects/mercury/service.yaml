@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "mercury.fullname" . }}
+  labels:
+    app: mercury
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.mercury.service.type }}
+  ports:
+  - port: {{ .Values.mercury.service.externalPort }}
+    targetPort: {{ .Values.mercury.service.internalPort }}
+    protocol: TCP
+    name: http
+  selector:
+    app: mercury
+    release: {{ .Release.Name }}

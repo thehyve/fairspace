@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ceres.fullname" . }}
+  labels:
+    app: ceres
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    server.port: {{ .Values.ceres.service.internalPort }}
+
+    # OAuth2 base configuration
+    app:
+      oauth2:
+        base-url: {{ template "keycloak.baseUrl" . }}
+        realm: {{ .Values.hyperspace.keycloak.realm }}
+      metadata:
+        base-url: {{ template "workspace.url" . }}
+
+    # Tracing configuration
+    spring:
+      sleuth:
+        sampler:
+          probability: {{ .Values.tracing.samplingRate }}
+      zipkin:
+        base-url: {{ .Values.tracing.baseUrl }}
+      rabbitmq:
+        host: {{ .Values.hyperspace.locationOverrides.rabbitmqhostname }}
+        username: {{ .Values.ceres.rabbitmq.username | default (printf "%s-ceres" .Release.Name) }}
+        password: {{ .Values.ceres.rabbitmq.password }}
+        virtualHost: {{ .Values.ceres.rabbitmq.vhost | default .Release.Name }}
+
+    # Where to store the dataset
+    jena:
+      dataset:
+        path: {{ .Values.ceres.persistence.mountPath }}

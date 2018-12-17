@@ -1,0 +1,64 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.5.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+plugins {
+	id 'net.ltgt.apt' version '0.10'
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'nl.fairspace.pluto'
+version = System.getenv('VERSION') ?: '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	jcenter()
+	maven { url "https://repo.spring.io/milestone" }
+	maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
+	maven { url "https://repo.thehyve.nl/content/repositories/fairspace-snapshots/" }
+}
+
+ext {
+	springCloudVersion = 'Finchley.RC2'
+	oidcAuthVersion = System.getenv('OIDC_AUTH_VERSION') ?:'0.1.1-SNAPSHOT'
+}
+
+dependencies {
+	compileOnly 'org.projectlombok:lombok:1.18.0'
+
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+	compile('org.springframework.session:spring-session-core')
+	compile('org.springframework.cloud:spring-cloud-starter-sleuth')
+	compile('org.springframework.cloud:spring-cloud-sleuth-zipkin')
+
+	compile("io.fairspace:oidc-auth-sso:${oidcAuthVersion}")
+	compile("io.fairspace:oidc-auth-bearer-auth:${oidcAuthVersion}")
+	compile("io.fairspace:oidc-auth-zuul:${oidcAuthVersion}")
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
+}
+
+springBoot {
+  buildInfo()
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}

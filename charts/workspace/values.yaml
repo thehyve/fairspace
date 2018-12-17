@@ -4,7 +4,7 @@
 # The fairspace container images are in a private repository
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 # on how to store and specify the credentials for it
-fairspaceImagePullSecret:
+imagePullSecrets: {}
 
 # Set specific workspace name. Defaults to release name
 # Please note that if this is set, also set it for pluto in `pluto.workspace.name`
@@ -45,6 +45,13 @@ workspace:
         enabled: true
         domain:
         annotations:
+          pluto:
+            kubernetes.io/ingress.class: nginx
+          storage:
+            kubernetes.io/ingress.class: nginx
+            nginx.ingress.kubernetes.io/proxy-body-size: 10g
+            nginx.ingress.kubernetes.io/rewrite-target: /zuul
+          jupyter:
             kubernetes.io/ingress.class: nginx
         tls:
             enabled: true
@@ -64,94 +71,334 @@ workspace:
     # Scripts for setting up keycloak for a workspace
     configurationScripts:
       keycloak:
-        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.0
+        enabled: true
+        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.1
         pullPolicy: IfNotPresent
       rabbitmq:
-        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0-SNAPSHOT
+        enabled: true
+        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0
         pullPolicy: IfNotPresent
 
-# Specific settings for pluto
+# Generic settings for tracing
+tracing:
+  enabled: true
+  samplingRate: 0.1
+  baseUrl: http://jaeger-collector.jaeger:9411
+
+services:
+  jupyterhub:
+
+#####################################################################
+# Specific settings for Pluto subchart
 # Default configuration points to titan, mercury and neptune
 # in the same workspace
+#####################################################################
 pluto:
-  overrides:
-    keycloak:
-      client:
-        secretNamePostfix: oauth-client
-
-  keycloak:
-    baseUrl:
-    realm:
-    redirectAfterLogoutUrl: https://fairspace.com
+  replicaCount: 1
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+  image:
+    image: fairspace.azurecr.io/fairspace/pluto
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    externalPort: 80
+    internalPort: 8080
+  resources:
+    limits:
+      cpu: 1
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 192Mi
+  probePath: /actuator/health
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  terminationGracePeriodSeconds: 10
 
   rabbitmq:
-    hostname:
     vhost:
     username:
     password:
 
-  services:
-    jupyter:
-
+  # Reference to the workspace for informational purposes
+  # These values default to the release name and chart version
+  # The name is also used in the default setting for requiredAuthority and clientId
   workspace:
+    name:
     version: 0.0.0-RELEASEVERSION
 
+  # Keycloak configuration for authentication
+  keycloak:
+    client:
+      id:
+      secret:
+    redirectAfterLogoutUrl: https://fairspace.com
+    requiredAuthority:
+
+  # Where to find the backends for this proxy
+  backends:
+    ui:
+    metadata:
+    storage:
+    collections:
+
+#####################################################################
 # Specific settings for Ceres subchart
+#####################################################################
 ceres:
+  replicaCount: 1
+  rollingUpdate:
+    maxSurge: 0%
+    maxUnavailable: 100%
+  image:
+    image: fairspace.azurecr.io/fairspace/ceres
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+
+  service:
+    name: ceres
+    type: ClusterIP
+    externalPort: 80
+    internalPort: 8080
+
+  resources:
+    limits:
+      cpu: 1
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+  probePath: /actuator/health
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  terminationGracePeriodSeconds: 10
+
+  ## Persist data to a persistent volume
   persistence:
     enabled: true
+
+    ## A manually managed Persistent Volume and Claim
+    ## Requires persistence.enabled: true
+    ## If defined, PVC must be created manually before volume will be bound
+    # existingClaim:
+
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
     accessMode: ReadWriteOnce
     size: 512Mi
     subPath: "ceres-db"
     mountPath: /data/ceres
 
   rabbitmq:
-    hostname:
     vhost:
     username:
     password:
 
-  app:
-    oauth2:
-      baseUrl:
-      realm:
-    metadata:
-      baseUrl:
-
+#####################################################################
 # Specific settings for Neptune subchart
+#####################################################################
 neptune:
+  replicaCount: 1
+
+  image:
+    image: fairspace.azurecr.io/fairspace/neptune
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    externalPort: 80
+    internalPort: 8080
+
+  resources:
+    limits:
+      cpu: 1
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 192Mi
+  probePath: /actuator/health
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  terminationGracePeriodSeconds: 10
+
   rabbitmq:
-    hostname:
     vhost:
     username:
     password:
 
-  app:
-    oauth2:
-      baseUrl:
-      realm:
-    metadata:
-      baseUrl:
+  ceres:
+    url:
 
+  titan:
+    url:
+
+#####################################################################
 # Specific settings for Titan subchart
+#####################################################################
 titan:
+  replicaCount: 1
+  rollingUpdate:
+    maxSurge: 0%
+    maxUnavailable: 100%
+  image:
+    image: fairspace.azurecr.io/fairspace/titan
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+  service:
+    name: titan
+    type: ClusterIP
+    externalPort: 80
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+
+  # Authentication parameters
   rabbitmq:
-    hostname:
+    exchange: storage
     vhost:
     username:
     password:
   auth:
+    enabled: true
     tokenUrl:
     clientId:
   persistence:
     enabled: true
-    accessMode: ReadWriteOnce
-    size: 512Mi
-    subPath: "titan"
     mountPath: /data
+    rootPath: /data
 
+    ## A manually managed Persistent Volume and Claim
+    ## Requires persistence.enabled: true
+    ## If defined, PVC must be created manually before volume will be bound
+    # existingClaim:
 
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    subPath: titan
+
+  collections:
+    collectionUrl:
+
+#####################################################################
+# Specific settings for Callisto subchart
+#####################################################################
+callisto:
+  replicaCount: 1
+
+  image:
+    image: fairspace.azurecr.io/fairspace/callisto
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 384Mi
+  terminationGracePeriodSeconds: 10
+
+  rabbitmq:
+    vhost:
+    username:
+    password:
+
+  # Please note that mail settings are copied into the application.yaml configuration
+  # file for spring. This means you can add any mail settings accepted by Spring mail
+  # See e.g. https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-email.html
+  # for more information.
+  mail:
+    host:
+    port:
+    username:
+    password:
+
+  app:
+    mail:
+      from: info@fairspace.com
+
+#####################################################################
+# Specific settings for Mercury subchart
+#####################################################################
+mercury:
+  replicaCount: 1
+  image:
+    image: fairspace.azurecr.io/fairspace/mercury
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    externalPort: 80
+    internalPort: 80
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+  probePath: /
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  terminationGracePeriodSeconds: 10
+
+  urls:
+    storage:
+
+#####################################################################
 # Specific settings for JupyterHub subchart
+#####################################################################
 jupyterhub:
   auth:
     type: custom
@@ -168,14 +415,14 @@ jupyterhub:
   singleuser:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
-      tag: 0.3.1
+      tag: RELEASEVERSION
     defaultUrl: "/lab"
     extraEnv:
       WORKSPACE_URL:
   hub:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-hub
-      tag: 0.3.2
+      tag: RELEASEVERSION
     ingress:
       enabled: false
     extraEnv:
@@ -191,3 +438,20 @@ jupyterhub:
     # Ensure to override this value with a 64-character hex string when installing
     secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
 
+#####################################################################
+# Specific settings for databases
+#####################################################################
+postgresql_neptune:
+  postgresqlUsername: postgres
+  postgresqlPassword: test123
+  postgresqlDatabase: neptune
+  nameOverride: postgresql-neptune
+
+postgresql_ceres:
+  postgresqlUsername: postgres
+  postgresqlPassword: test123
+  postgresqlDatabase: ceres
+  nameOverride: postgresql-ceres
+
+# Pod annotations should remain empty. They are filled within the build process
+podAnnotations: {}

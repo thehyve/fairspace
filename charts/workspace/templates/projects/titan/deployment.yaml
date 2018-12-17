@@ -1,0 +1,77 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "titan.fullname" . }}
+  labels:
+    app: titan
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.titan.replicaCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.titan.rollingUpdate.maxSurge | default "0%" }}
+      maxUnavailable: {{ .Values.titan.rollingUpdate.maxUnavailable | default "100%" }}
+  selector:
+    matchLabels:
+      app: titan
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: titan
+        release: {{ .Release.Name }}
+      {{- if .Values.podAnnotations.titan }}
+      annotations:
+      {{ toYaml .Values.podAnnotations.titan | indent 8 }}
+      {{- end }}
+    spec:
+      containers:
+        - name: {{ template "titan.fullname" . }}
+          image: "{{ .Values.titan.image.image }}:{{ .Values.titan.image.tag }}"
+          imagePullPolicy: {{ .Values.titan.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: CONFIG_FILE
+              value: "/config/config.json"
+          volumeMounts:
+          - name: data
+            mountPath: {{ .Values.titan.persistence.rootPath }}
+            subPath: {{ .Values.titan.persistence.subPath }}
+          - name: config-volume
+            mountPath: /config
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              httpHeaders:
+              - name: Probe
+                value: Liveness
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              httpHeaders:
+              - name: Probe
+                value: Readiness
+          resources:
+{{ toYaml .Values.titan.resources | indent 12 }}
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+      - name: data
+        {{- if .Values.titan.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.titan.persistence.existingClaim | default (include "titan.fullname" .) }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+      - name: config-volume
+        configMap:
+          name: {{ template "titan.fullname" . }}

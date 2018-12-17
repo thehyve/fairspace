@@ -1,0 +1,28 @@
+{{- if and .Values.ceres.persistence.enabled (not .Values.ceres.persistence.existingClaim) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "ceres.fullname" . }}
+  labels:
+    app: ceres
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.ceres.persistence.annotations }}
+  annotations:
+{{ toYaml .Values.ceres.persistence.annotations | indent 4 }}
+{{- end }}
+spec:
+  accessModes:
+    - {{ .Values.ceres.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.ceres.persistence.size | quote }}
+{{- if .Values.ceres.persistence.storageClass }}
+{{- if (eq "-" .Values.ceres.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.ceres.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end -}}

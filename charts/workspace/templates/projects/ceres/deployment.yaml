@@ -1,0 +1,76 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "ceres.fullname" . }}
+  labels:
+    app: ceres
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.ceres.replicaCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.ceres.rollingUpdate.maxSurge | default "0%" }}
+      maxUnavailable: {{ .Values.ceres.rollingUpdate.maxUnavailable | default "100%" }}
+  selector:
+    matchLabels:
+      app: ceres
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: ceres
+        release: {{ .Release.Name }}
+{{- if .Values.podAnnotations.ceres }}
+      annotations:
+{{ toYaml .Values.podAnnotations.ceres | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+        - name: {{ template "ceres.fullname" . }}
+          image: "{{ .Values.ceres.image.image }}:{{ .Values.ceres.image.tag }}"
+          imagePullPolicy: {{ .Values.ceres.image.pullPolicy }}
+          ports:
+          - containerPort: {{ .Values.ceres.service.internalPort }}
+          volumeMounts:
+          - name: config-volume
+            mountPath: /opt/config
+          - name: data
+            mountPath: /data/ceres
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.ceres.probePath }}
+              port: {{ .Values.ceres.service.internalPort }}
+            initialDelaySeconds: {{ .Values.ceres.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.ceres.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.ceres.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.ceres.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.ceres.probePath }}
+              port: {{ .Values.ceres.service.internalPort }}
+            periodSeconds: {{ .Values.ceres.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.ceres.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.ceres.readinessProbe.timeoutSeconds }}
+          resources:
+{{ toYaml .Values.ceres.resources | indent 12 }}
+    {{- with .Values.ceres.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ template "ceres.fullname" . }}
+      - name: data
+        {{- if .Values.ceres.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.ceres.persistence.existingClaim | default (include "ceres.fullname" .) }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}

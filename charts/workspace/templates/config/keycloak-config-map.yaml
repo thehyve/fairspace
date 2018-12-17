@@ -1,3 +1,4 @@
+{{- if .Values.workspace.configurationScripts.keycloak.enabled -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -8,7 +9,7 @@ metadata:
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
 data:
   redirect.urls: |-
-    {{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}/*
-    {{ template "workspace.scheme" . }}://{{ template "jupyterhub.hostname" $ }}/*
+    {{ template "workspace.url" . }}/*
+    {{ template "jupyterhub.url" $ }}/*
     {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}/*
-
+{{- end -}}
