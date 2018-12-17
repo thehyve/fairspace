@@ -21,8 +21,8 @@ export CYPRESS_USERNAME=e2e-test
 export CYPRESS_PASSWORD=e2e-test
 
 # Set large timeouts as the ci environment tends to respond slowly
-export METADATA_PROPAGATION_TIME=2000
-export REQUEST_TIMEOUT=2000
+export METADATA_PROPAGATION_TIME=4000
+export REQUEST_TIMEOUT=4000
 export TEST_TIMEOUT=15000
 
 echo -e $(date +%T) "Running API tests"
