@@ -26,7 +26,8 @@
 
 Cypress.Commands.add("listCollections", () => {
     cy.visit("/collections");
-    cy.contains('main', 'Collections').should('exist');
+    // TODO: it sould not be passing at all, the menu was removed outside of the main element
+    // cy.contains('main', 'Collections').should('exist');
     cy.contains("Loading").should('not.exist');
 })
 
