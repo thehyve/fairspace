@@ -131,7 +131,9 @@ class UploadButton extends React.Component {
                                     {filename}
                                 </span>
                             </td>
-                            <td>{this.state.files[filename] === 'uploading' ? <LinearProgress /> : 'Uploaded'}</td>
+                            <td>
+                                {this.state.files[filename] === 'uploading' ? <LinearProgress /> : 'Uploaded'}
+                            </td>
                         </tr>
                     ))}
                 </tbody>

@@ -5,7 +5,7 @@ import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 import EntityInformation from '../../components/metadata/EntityInformation';
 import Metadata from '../../components/metadata/Metadata';
 
-const metadataEntityPage = () =>  (
+const metadataEntityPage = () => (
     <div>
         <BreadCrumbs />
         <EntityInformation subject={window.location.href} />
