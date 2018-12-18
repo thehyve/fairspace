@@ -8,3 +8,23 @@ export function parsePath(path) {
 
     return path ? path.split('/') : [];
 }
+
+export function uniqueName(fileName, usedNames) {
+    if(!usedNames.includes(fileName)) {
+        usedNames.push(fileName);
+        return fileName;
+    }
+    const dotPos = fileName.lastIndexOf('.');
+    const name = (dotPos >= 0) ? fileName.substring(0, dotPos) : fileName;
+    const ext = (dotPos >= 0) ? fileName.substring(dotPos) : '';
+    let index = 1;
+
+    while (true) {
+        const newName = `${name} (${index})${ext}`;
+        if(!usedNames.includes(newName)) {
+            usedNames.push(newName);
+            return newName;
+        }
+        index++;
+    }
+}

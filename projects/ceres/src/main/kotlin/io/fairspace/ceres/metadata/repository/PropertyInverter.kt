@@ -3,6 +3,7 @@ package io.fairspace.ceres.metadata.repository
 import org.apache.jena.rdf.model.*
 import org.apache.jena.util.iterator.WrappedIterator
 import org.apache.jena.vocabulary.OWL2
+import javax.xml.bind.ValidationException
 
 open class PropertyInverter(properties: Iterable<Pair<String, String>>): Enhancer() {
     private val map = mutableMapOf<String, String>().apply {
@@ -30,10 +31,12 @@ open class PropertyInverter(properties: Iterable<Pair<String, String>>): Enhance
 
                 private fun invert(statement: Statement): Statement? =
                         map[statement.predicate.uri]?.let { inverseProperty ->
-                            statement.model.createStatement(
-                                    statement.`object` as Resource,
-                                    statement.model.createProperty(inverseProperty),
-                                    statement.subject)
+                            if (statement.`object` is Resource)
+                                statement.model.createStatement(
+                                        statement.`object` as Resource,
+                                        statement.model.createProperty(inverseProperty),
+                                        statement.subject)
+                             else throw ValidationException("Statement $statement cannot be inverted, its object is not a RDF resource")
                         }
 
                 override fun hasNext(): Boolean = (inferred != null) || base.hasNext()

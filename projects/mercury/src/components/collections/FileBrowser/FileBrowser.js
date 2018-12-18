@@ -142,7 +142,9 @@ class FileBrowser extends React.Component {
         return <FileOperations
                     openedCollection={openedCollection}
                     openedPath={openedPath}
-                    disabled={!PermissionChecker.canWrite(openedCollection)} />
+                    disabled={!PermissionChecker.canWrite(openedCollection)}
+                    existingFiles={this.props.files ? this.props.files.map(file => file.basename) : []}
+        />
     }
 
     renderError(errorMessage) {

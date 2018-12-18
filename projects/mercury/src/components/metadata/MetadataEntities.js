@@ -31,6 +31,12 @@ class MetadataEntities extends React.Component {
             .catch(e => ErrorDialog.showError(e, 'Error creating a new metadata entity.\n' + e.message))
     }
 
+    handleEntityNavigation(entity, e) {
+        e.preventDefault();
+        const link = navigableLink(entity['@id']);
+        this.props.history.push(relativeLink(link));
+    }
+
 
     render() {
         const {loading, creatingMetadataEntity, error, entities, vocabulary} = this.props;
@@ -71,7 +77,10 @@ class MetadataEntities extends React.Component {
                                         ))}
                                     </TableCell>
                                     <TableCell>
-                                        <a href={navigableLink(entity['@id'])}>{getLabel(entity)}</a>
+                                        <a href={navigableLink(entity['@id'])}
+                                           onClick={this.handleEntityNavigation.bind(this, entity)}>
+                                            {getLabel(entity)}
+                                        </a>
                                     </TableCell>
                                 </TableRow>
                             )) : null}

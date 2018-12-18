@@ -81,11 +81,11 @@ class UploadButton extends React.Component{
         });
     }
 
-    uploadFiles(files) {
+    uploadFiles(files, names) {
         this.filesUploaded = true;
         if(this.onUpload) {
             this.startUploading(files);
-            this.onUpload(files)
+            this.onUpload(files, names)
                 .then(this.finishUploading.bind(this));
         }
     }
