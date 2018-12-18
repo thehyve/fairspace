@@ -191,15 +191,13 @@ const mapStateToProps = (state, ownProps) => {
     const {openedCollectionId, openedPath} = ownProps;
     const filesPerCollection = state.cache.filesByCollectionAndPath[openedCollectionId] || {};
     const files = filesPerCollection[openedPath] || {};
-    const collections = {...state.cache.collections};
-    const collectionBrowser = {...state.collectionBrowser};
-    const getCollection = collectionId => (collections.data && collections.data.find(collection => collection.id === collectionId)) || {};
+    const getCollection = collectionId => (state.cache.collections.data && state.cache.collections.data.find(collection => collection.id === collectionId)) || {};
 
     return {
-        loading: files.pending || collections.pending || collections.data.length === 0,
-        error: files.error || collections.error,
+        loading: files.pending || state.cache.collections.pending || state.cache.collections.data.length === 0,
+        error: files.error || state.cache.collections.error,
         files: files.data,
-        selectedPaths: collectionBrowser.selectedPaths,
+        selectedPaths: state.collectionBrowser.selectedPaths,
         openedCollection: openedCollectionId ? getCollection(openedCollectionId) : {}
     };
 };
