@@ -100,7 +100,7 @@ jobs:
       install:
         - source charts/.travis/install.sh
       script:
-      - travis_wait ci/helm/deploy.sh
+      - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET
     - stage: e2e test
       if: branch = env(SNAPSHOT_BRANCH) AND type != pull_request
       script:
