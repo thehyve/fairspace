@@ -80,7 +80,7 @@ class Collection extends React.Component {
                         {this.state.collection.name}
                         {' '}
                         {this.state.showEditButton ? (
-                            <Icon>edit</Icon>) : ''}
+                            <Icon style={{fontSize: '0.9em'}}>edit</Icon>) : ''}
                     </Typography>
                     <Typography
                         gutterBottom

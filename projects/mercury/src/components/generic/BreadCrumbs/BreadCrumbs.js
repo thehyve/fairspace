@@ -33,7 +33,6 @@ function determineHomeEntry(homeUrl, classes) {
             <Icon className={classes.icon}>
                 {entry.icon}
             </Icon>
-            {' '}
             {entry.label}
         </span>), entry.url, classes.link);
 }
@@ -47,24 +46,30 @@ function determineHomeEntry(homeUrl, classes) {
  * @returns {Array}
  * @constructor
  */
-function BreadCrumbs({segments, match, classes}) {
+function BreadCrumbs({
+    homeUrl, segments, match, classes
+}) {
     // Ensure we only have the first part of the url
-    let homeUrl = match.path;
-    if (homeUrl !== '/') {
+    let homePath = match.path;
+    if (homePath !== '/') {
         // eslint-disable-next-line prefer-template
-        homeUrl = '/' + homeUrl.split('/')[1];
+        homePath = '/' + homePath.split('/')[1];
+    }
+    if (homeUrl) {
+        homePath = homeUrl;
     }
 
     // Add the first item to the list of breadcrumbs
     const breadcrumbs = [
-        determineHomeEntry(homeUrl, classes)
+        determineHomeEntry(homePath, classes)
     ];
 
     if (segments) {
-        let currentPath = stripTrailingSlash(homeUrl);
+        let currentPath = stripTrailingSlash(homePath);
         segments.forEach(segment => {
             if (segment.segment && segment.label) {
-                currentPath += stripTrailingSlash(`/${segment.segment}`);
+                // eslint-disable-next-line prefer-template
+                currentPath += stripTrailingSlash('/' + segment.segment);
                 breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, classes.link));
             }
         });
