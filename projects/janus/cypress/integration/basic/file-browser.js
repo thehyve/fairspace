@@ -26,6 +26,8 @@ describe('File browser', function () {
         cy.get("button[aria-label=Upload]").click();
         cy.uploadFile("input[type=file]", 'myfile.txt');
 
+        cy.wait(400);
+
         // Normally a user does not have to reload
         // but it seems that cypress needs it to run the test properly
         cy.reload()
