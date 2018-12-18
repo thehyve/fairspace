@@ -78,6 +78,7 @@ workspace:
         enabled: true
         image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0
         pullPolicy: IfNotPresent
+    enableExperimentalFeatures: false
 
 # Generic settings for tracing
 tracing:

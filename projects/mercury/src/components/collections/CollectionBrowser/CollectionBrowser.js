@@ -14,6 +14,7 @@ import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
 import LoadingInlay from '../../generic/Loading/LoadingInlay';
 import LoadingOverlay from '../../generic/Loading/LoadingOverlay';
+import Config from "../../../services/Config/Config";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
@@ -87,7 +88,7 @@ class CollectionBrowser extends React.Component {
                     editing={this.state.editingCollection}
                     onSave={this.handleAddCollection.bind(this)}
                     onCancel={this.handleCancelAddCollection.bind(this)}
-                    editType={true}
+                    editType={Config.get().enableExperimentalFeatures}
                 />
                 <LoadingOverlay loading={addingCollection || deletingCollection}/>
             </div>
