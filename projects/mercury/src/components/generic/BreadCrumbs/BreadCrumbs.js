@@ -25,7 +25,8 @@ function determineHomeEntry(homeUrl, classes) {
     const entry = menuEntries.find(entry => entry.url === homeUrl) || defaultHomeEntry;
 
     // Return a breadcrumb link for the given entry
-    return getBreadCrumbLink((<span><Icon className={classes.icon}>{entry.icon}</Icon> {entry.label}</span>), entry.url, classes.link )
+    return getBreadCrumbLink((
+        <span><Icon className={classes.icon}>{entry.icon}</Icon> {entry.label}</span>), entry.url, classes.link)
 }
 
 /**
@@ -37,22 +38,26 @@ function determineHomeEntry(homeUrl, classes) {
  * @returns {Array}
  * @constructor
  */
-function BreadCrumbs({segments, match, classes}) {
+function BreadCrumbs({homeUrl, segments, match, classes}) {
+    console.log('bread', homeUrl, segments, match)
     // Ensure we only have the first part of the url
-    let homeUrl = match.path
-    if(homeUrl !== '/') {
-        homeUrl = '/' + homeUrl.split('/')[1];
+    let _homeUrl = match.path
+    if (_homeUrl !== '/') {
+        _homeUrl = '/' + _homeUrl.split('/')[1];
+    }
+    if (homeUrl) {
+        _homeUrl = homeUrl;
     }
 
     // Add the first item to the list of breadcrumbs
     let breadcrumbs = [
-        determineHomeEntry(homeUrl, classes)
+        determineHomeEntry(_homeUrl, classes)
     ];
 
-    if(segments) {
-        let currentPath = stripTrailingSlash(homeUrl);
-        for(let segment of segments) {
-            if(segment.segment && segment.label) {
+    if (segments) {
+        let currentPath = stripTrailingSlash(_homeUrl);
+        for (let segment of segments) {
+            if (segment.segment && segment.label) {
                 currentPath += stripTrailingSlash('/' + segment.segment);
                 breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, classes.link))
             }
@@ -76,9 +81,9 @@ BreadCrumbs.propTypes = {
 }
 
 const styles = theme => ({
-    root: { marginBottom: theme.spacing.unit },
-    link: { minWidth: 'auto' },
-    icon: { verticalAlign: 'middle', marginRight: theme.spacing.unit  }
+    root: {marginBottom: theme.spacing.unit},
+    link: {minWidth: 'auto'},
+    icon: {verticalAlign: 'middle', marginRight: theme.spacing.unit}
 });
 
 export default withStyles(styles)(withRouter(BreadCrumbs));
