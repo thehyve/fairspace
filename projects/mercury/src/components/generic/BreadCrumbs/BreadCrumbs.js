@@ -51,7 +51,8 @@ function BreadCrumbs({segments, match, classes}) {
     // Ensure we only have the first part of the url
     let homeUrl = match.path;
     if (homeUrl !== '/') {
-        homeUrl = `/${homeUrl.split('/')[1]}`;
+        // eslint-disable-next-line prefer-template
+        homeUrl = '/' + homeUrl.split('/')[1];
     }
 
     // Add the first item to the list of breadcrumbs

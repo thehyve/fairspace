@@ -4,7 +4,7 @@
  * @param itemId
  */
 export function findById(itemList, itemId) {
-    return itemList && Array.isArray(itemList)
+    return Array.isArray(itemList)
         ? itemList.find(item => item.hasOwnProperty('id') && item.id === itemId) : undefined;
 }
 

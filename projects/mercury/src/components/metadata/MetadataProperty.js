@@ -31,12 +31,7 @@ function MetadataProperty({
     const handleSave = index => (newEntry) => {
         const currentEntry = property.values[index];
         if (currentEntry.value !== newEntry.value) {
-            const updatedValues = property.values.map((el, idx) => {
-                if (idx === index) {
-                    return newEntry;
-                }
-                return el;
-            });
+            const updatedValues = property.values.map((el, idx) => ((idx === index) ? newEntry : el));
             return updateMetadata(subject, property.key, updatedValues)
                 .catch(e => ErrorDialog.showError(e, "Error while saving metadata"));
         }

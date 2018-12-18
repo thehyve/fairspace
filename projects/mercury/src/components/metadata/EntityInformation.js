@@ -24,7 +24,7 @@ const mapStateToProps = (state, ownProps) => {
     const typeProp = metadataBySubject
         && metadataBySubject[subject]
         && metadataBySubject[subject].data
-        ? metadataBySubject[subject].data.find(prop => prop.key === '@type') : null;
+        && metadataBySubject[subject].data.find(prop => prop.key === '@type');
     const label = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
     const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
     const typeInfo = (label && comment) ? `${label} - ${comment}` : (label || comment);

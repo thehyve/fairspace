@@ -75,12 +75,10 @@ class MetadataAPI {
         }
 
         const request = (values.length === 0)
-            ? fetch(`${Config.get().urls.metadata.statements
-            }?subject=${encodeURIComponent(subject)
-            }&predicate=${encodeURIComponent(predicate)}`, {
-                method: 'DELETE',
-                credentials: 'same-origin'
-            })
+            // eslint-disable-next-line prefer-template
+            ? fetch(Config.get().urls.metadata.statements
+                + '?subject=' + encodeURIComponent(subject)
+                + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE',credentials: 'same-origin'})
             : fetch(Config.get().urls.metadata.statements, {
                 method: 'PATCH',
                 headers: new Headers({'Content-type': 'application/ld+json'}),
