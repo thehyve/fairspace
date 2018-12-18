@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fairspace/Janus.git"
+    "url": "git+https://github.com/fairspace/workspace.git"
   },
   "keywords": [
     "cypress"
@@ -20,6 +20,9 @@
   },
   "homepage": "https://github.com/fairspace/Janus#readme",
   "devDependencies": {
-    "cypress": "^3.1.2"
+    "cypress": "^3.1.2",
+    "expect.js": "^0.3.1",
+    "mocha": "^5.2.0",
+    "superagent": "^4.0.0"
   }
 }
