@@ -78,7 +78,7 @@ jobs:
       - .travis/build.sh projects/pluto
       - .travis/build.sh projects/titan
       - .travis/build.sh projects/jupyterhub-hub
-      - travis_wait 30 .travis/build.sh projects/jupyterhub-singleuser
+      - travis_wait 40 .travis/build.sh projects/jupyterhub-singleuser
       - 'if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then ci/docker/login.sh && .travis/pr/start-local-environment.sh && .travis/pr/run-e2e-tests.sh; fi'
     - stage: build
       cache: false
