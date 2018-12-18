@@ -1,0 +1,8 @@
+{
+  "enabled":true,
+  "attributes":{},
+  "emailVerified":"",
+  "username":"${USERNAME}",
+  "firstName":"${FIRSTNAME}",
+  "lastName":"${LASTNAME}"
+}
