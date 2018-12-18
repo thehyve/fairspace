@@ -39,7 +39,6 @@ function determineHomeEntry(homeUrl, classes) {
  * @constructor
  */
 function BreadCrumbs({homeUrl, segments, match, classes}) {
-    console.log('bread', homeUrl, segments, match)
     // Ensure we only have the first part of the url
     let _homeUrl = match.path
     if (_homeUrl !== '/') {
