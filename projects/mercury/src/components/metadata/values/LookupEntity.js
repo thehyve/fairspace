@@ -52,7 +52,7 @@ LookupEntity.propTypes = {
 const mapStateToProps = (state, ownProps) => {
     if(state.cache && state.cache.entitiesByType) {
         const entities = state.cache.entitiesByType[ownProps.property.range];
-        if (entities && !entities.pending && !entities.error) {
+        if (entities && entities.data && !entities.pending && !entities.error) {
             return {entities: entities.data}
         }
     }
