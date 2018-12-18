@@ -86,18 +86,18 @@ jobs:
       - source charts/.travis/install.sh
       script:
       - charts/.travis/build.sh
-    - stage: deploy
-      if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
-      install:
-        - source charts/.travis/install.sh
-      script:
-      - travis_wait ci/helm/deploy.sh
     - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
       stage: Versioning
       name: Set tag and update version
       script:
       - "ci/versioning/add_tag_to_git.sh"
       - "ci/versioning/set_next_version.sh"
+    - stage: deploy
+      if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
+      install:
+        - source charts/.travis/install.sh
+      script:
+      - travis_wait ci/helm/deploy.sh
     - stage: e2e test
       if: branch = env(SNAPSHOT_BRANCH) AND type != pull_request
       script:
