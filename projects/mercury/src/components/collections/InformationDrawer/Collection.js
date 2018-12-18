@@ -75,7 +75,7 @@ class Collection extends React.Component {
                     >
                         <Typography variant="h5"
                                     component='h2'>{this.state.collection.name} {this.state.showEditButton ? (
-                            <Icon>edit</Icon>) : ''}</Typography>
+                            <Icon style={{fontSize: '0.9em'}}>edit</Icon>) : ''}</Typography>
                         <Typography gutterBottom variant='subtitle1'
                                     color="textSecondary">Owner: {this.props.creatorFullname}</Typography>
                         <Typography component='p'>{this.state.collection.description}</Typography>
