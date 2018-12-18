@@ -10,7 +10,7 @@ export class MetadataEntityPage extends React.Component {
     render() {
         return (
             <div>
-                <BreadCrumbs/>
+                <BreadCrumbs homeUrl={'/metadata'}/>
                 <EntityInformation subject={window.location.href}/>
                 <Paper style={{paddingLeft: 20}}>
                     <Metadata
