@@ -37,11 +37,11 @@ const MetadataViewer = (props) => {
         <List dense classes={props.classes}>
             {
                 props.properties
-                    .map((property) => {
+                    .map((p) => {
+                        const property = p;
                         property.domain = domain;
-                        return property;
+                        return renderProperty(p);
                     })
-                    .map(renderProperty)
             }
         </List>
     );

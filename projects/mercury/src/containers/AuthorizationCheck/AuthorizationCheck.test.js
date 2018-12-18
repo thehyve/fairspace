@@ -10,7 +10,11 @@ const mockStore = configureStore(middlewares);
 
 it('renders without crashing', () => {
     const store = mockStore({account: {user: {}, authorizations: {}}});
-    const element = <MemoryRouter><AuthorizationCheck store={store}>Children</AuthorizationCheck></MemoryRouter>;
+    const element = (
+        <MemoryRouter>
+            <AuthorizationCheck store={store}>Children</AuthorizationCheck>
+        </MemoryRouter>
+    );
 
     const div = document.createElement('div');
 
@@ -20,7 +24,11 @@ it('renders without crashing', () => {
 
 it('renders content if no authorization is specified', () => {
     const store = mockStore({account: {user: {}, authorizations: {data: []}}});
-    const element = <MemoryRouter><AuthorizationCheck store={store}>Children</AuthorizationCheck></MemoryRouter>;
+    const element = (
+        <MemoryRouter>
+            <AuthorizationCheck store={store}>Children</AuthorizationCheck>
+        </MemoryRouter>
+    );
 
     const wrapper = mount(element);
 
@@ -29,7 +37,11 @@ it('renders content if no authorization is specified', () => {
 
 it('renders content if existing authorization is specified', () => {
     const store = mockStore({account: {user: {}, authorizations: {data: ['authorization']}}});
-    const element = <MemoryRouter><AuthorizationCheck authorization="authorization" store={store}>Children</AuthorizationCheck></MemoryRouter>;
+    const element = (
+        <MemoryRouter>
+            <AuthorizationCheck authorization="authorization" store={store}>Children</AuthorizationCheck>
+        </MemoryRouter>
+    );
 
     const wrapper = mount(element);
 
@@ -38,7 +50,11 @@ it('renders content if existing authorization is specified', () => {
 
 it('does not render content if existing authorization is specified', () => {
     const store = mockStore({account: {user: {}, authorizations: {data: ['authorization']}}});
-    const element = <MemoryRouter><AuthorizationCheck authorization="non-existing" store={store}>Children</AuthorizationCheck></MemoryRouter>;
+    const element = (
+        <MemoryRouter>
+            <AuthorizationCheck authorization="non-existing" store={store}>Children</AuthorizationCheck>
+        </MemoryRouter>
+    );
 
     const wrapper = mount(element);
 

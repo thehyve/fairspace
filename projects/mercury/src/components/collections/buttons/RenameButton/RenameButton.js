@@ -36,27 +36,27 @@ class RenameButton extends React.Component {
         }
     }
 
-    openDialog(e) {
+    openDialog = (e) => {
         e.stopPropagation();
         this.setState({renaming: true, name: this.currentName});
     }
 
-    closeDialog(e) {
+    closeDialog = (e) => {
         if (e) e.stopPropagation();
         this.setState({renaming: false});
     }
 
-    handleRename(e) {
+    handleRename = (e) => {
         e.stopPropagation();
 
         if (this.onRename) {
             this
                 .onRename(this.state.name)
-                .then(shouldClose => shouldClose && this.closeDialog.bind(this));
+                .then(shouldClose => shouldClose && this.closeDialog);
         }
     }
 
-    handleInputChange(event) {
+    handleInputChange = (event) => {
         const newValues = {};
         newValues[event.target.name] = event.target.value;
         this.setState(newValues);
@@ -65,18 +65,18 @@ class RenameButton extends React.Component {
     render() {
         return (
             <div>
-                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
+                <IconButton {...this.componentProps} onClick={this.openDialog}>
                     {this.props.children}
                 </IconButton>
 
                 <Dialog
                     open={this.state.renaming}
                     onClick={e => e.stopPropagation()}
-                    onClose={this.closeDialog.bind(this)}
+                    onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
                 >
                     <DialogTitle id="form-dialog-title">
-Rename
+                        Rename
                         {this.currentName}
                     </DialogTitle>
                     <DialogContent>
@@ -90,16 +90,16 @@ Rename
                             label="Name"
                             value={this.state.name}
                             name="name"
-                            onChange={this.handleInputChange.bind(this)}
+                            onChange={this.handleInputChange}
                             fullWidth
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog.bind(this)} color="secondary">
+                        <Button onClick={this.closeDialog} color="secondary">
 
                             Close
                         </Button>
-                        <Button onClick={this.handleRename.bind(this)} color="primary" disabled={!this.state.name || this.state.name === this.currentName}>
+                        <Button onClick={this.handleRename} color="primary" disabled={!this.state.name || this.state.name === this.currentName}>
 
                             Rename
                         </Button>

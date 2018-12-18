@@ -20,7 +20,7 @@ class ClickHandler extends React.Component {
     }
 
     handleClicks() {
-        this.clickCount++;
+        this.clickCount += 1;
         if (this.clickCount === 1) {
             this.singleClickTimer = setTimeout(() => {
                 this.clickCount = 0;

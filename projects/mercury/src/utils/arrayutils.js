@@ -3,11 +3,10 @@
  * @param itemList
  * @param itemId
  */
-export const findById = (itemList, itemId) => {
-    if (itemList && Array.isArray(itemList)) {
-        return itemList.find(item => item.hasOwnProperty('id') && item.id === itemId);
-    }
-};
+export function findById(itemList, itemId) {
+    return itemList && Array.isArray(itemList)
+        ? itemList.find(item => item.hasOwnProperty('id') && item.id === itemId) : undefined;
+}
 
 /**
  * Joins an array with JSX entries together
@@ -19,12 +18,13 @@ export const jsxJoin = (array, str) => {
     if (!array || array.length === 0) return [];
 
     const returnArray = [];
-    for (const idx in array) {
+
+    array.forEach(idx => {
         if (idx > 0) {
             returnArray.push(str);
         }
         returnArray.push(array[idx]);
-    }
+    });
 
     return returnArray;
 };

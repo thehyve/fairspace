@@ -18,7 +18,7 @@ class DateTime extends React.Component {
         const t1 = moment(Date.now());
         const t2 = moment(date);
         const past = t2.isBefore(t1);
-        for (let i = 0; i < this.timeUnits.length; i++) {
+        for (let i = 0; i < this.timeUnits.length; i += 1) {
             const unit = this.timeUnits[i];
             const diff = Math.abs(Math.round(t1.diff(t2, unit)));
             if (diff > 0) {

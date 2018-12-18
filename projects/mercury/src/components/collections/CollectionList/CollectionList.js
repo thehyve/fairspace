@@ -16,7 +16,7 @@ import styles from './CollectionList.styles';
 import DateTime from "../../generic/DateTime/DateTime";
 import withHovered from "../../../containers/WithHovered/WithHovered";
 import CollectionItem from "./CollectionItem";
-import {getDisplayName} from "../../../utils/userUtils";
+import getDisplayName from "../../../utils/userUtils";
 
 export const COLLECTION_ICONS = {
     LOCAL_STORAGE: 'folder_open',
@@ -41,7 +41,7 @@ export class CollectionList extends React.Component {
             collections, selectedCollectionId,
             onCollectionClick, onCollectionDoubleClick, onCollectionDelete
         } = this.props;
-        const classes = this.props.classes;
+        const classes = {...this.props.classes};
 
         if (!collections || collections.length === 0) {
             return "No collections";
@@ -74,7 +74,9 @@ export class CollectionList extends React.Component {
                                     onMouseOut={() => this.props.onItemMouseOut(idx)}
                                 >
                                     <TableCell padding="dense">
-                                        <Icon>{CollectionList.getCollectionIcon(collection)}</Icon>
+                                        <Icon>
+                                            {CollectionList.getCollectionIcon(collection)}
+                                        </Icon>
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <CollectionItem collection={collection} />
@@ -89,7 +91,9 @@ export class CollectionList extends React.Component {
                                             {getDisplayName(collection.creatorObj)}
                                         </Typography>
                                     </TableCell>
-                                    <TableCell>{collection.access}</TableCell>
+                                    <TableCell>
+                                        {collection.access}
+                                    </TableCell>
                                     <TableCell numeric>
                                         {onCollectionDelete
                                             ? (

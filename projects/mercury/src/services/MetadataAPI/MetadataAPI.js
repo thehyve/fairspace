@@ -1,7 +1,7 @@
 import * as jsonld from 'jsonld/dist/jsonld';
 import Config from "../Config/Config";
 import vocabulary from './vocabulary.json';
-import {failOnHttpError} from "../../utils/httputils";
+import failOnHttpError from "../../utils/httputils";
 import Vocabulary from "./Vocabulary";
 
 export const PROPERTY_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
@@ -71,7 +71,7 @@ class MetadataAPI {
      */
     update(subject, predicate, values) {
         if (!subject || !predicate || !values) {
-            return Promise.reject("No subject, predicate or values given");
+            return Promise.reject(Error("No subject, predicate or values given"));
         }
 
         const request = (values.length === 0)

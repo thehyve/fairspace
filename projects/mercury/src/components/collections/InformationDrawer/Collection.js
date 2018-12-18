@@ -6,7 +6,7 @@ import ErrorDialog from "../../error/ErrorDialog";
 import * as collectionActions from '../../../actions/collections';
 import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
-import {getDisplayName} from "../../../utils/userUtils";
+import getDisplayName from "../../../utils/userUtils";
 import LoadingInlay from '../../generic/Loading/LoadingInlay';
 import PermissionChecker from "../../permissions/PermissionChecker";
 
@@ -29,11 +29,11 @@ class Collection extends React.Component {
         });
     }
 
-    closeEditDialog() {
+    closeEditDialog = () => {
         this.setState({editing: false});
     }
 
-    handleChangeDetails(name, description, type) {
+    handleChangeDetails = (name, description) => {
         this.closeEditDialog();
 
         if ((name !== this.state.collection.name || description !== this.state.collection.description) && name !== '') {
@@ -50,7 +50,7 @@ class Collection extends React.Component {
     }
 
     handleTextMouseEnter() {
-        this.setState({showEditButton: PermissionChecker.canManage(this.state.collection)});
+        this.setState(prevState => ({showEditButton: PermissionChecker.canManage(prevState.collection)}));
     }
 
     handleTextMouseLeave() {
@@ -58,7 +58,7 @@ class Collection extends React.Component {
     }
 
     handleTextClick() {
-        this.setState({editing: PermissionChecker.canManage(this.state.collection)});
+        this.setState(prevState => ({editing: PermissionChecker.canManage(prevState.collection)}));
     }
 
     render() {
@@ -87,11 +87,12 @@ class Collection extends React.Component {
                         variant="subtitle1"
                         color="textSecondary"
                     >
-Owner:
-                        {' '}
-                        {this.props.creatorFullname}
+                        Owner:
+                        {` ${this.props.creatorFullname}`}
                     </Typography>
-                    <Typography component="p">{this.state.collection.description}</Typography>
+                    <Typography component="p">
+                        {this.state.collection.description}
+                    </Typography>
                 </div>
 
                 <CollectionEditor
@@ -99,8 +100,8 @@ Owner:
                     name={this.state.collection.name}
                     description={this.state.collection.description}
                     title={`Edit collection: ${this.state.collection.name}`}
-                    onSave={this.handleChangeDetails.bind(this)}
-                    onCancel={this.closeEditDialog.bind(this)}
+                    onSave={this.handleChangeDetails}
+                    onCancel={this.closeEditDialog}
                 />
             </div>
         );

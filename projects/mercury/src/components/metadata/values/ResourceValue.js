@@ -8,15 +8,15 @@ class ResourceValue extends React.Component {
         this.state = {value: props.entry.id, oldValue: props.entry.id};
     }
 
-    handleChange(e) {
+    handleChange = (e) => {
         this.setState({value: e.target.value});
     }
 
-    handleSave() {
+    handleSave = () => {
         try {
             this.props.onSave({id: new URL(this.state.value).toString()});
         } catch (e) {
-            this.setState({value: this.state.oldValue});
+            this.setState(prevState => ({value: prevState.oldValue}));
         }
     }
 
@@ -30,8 +30,8 @@ class ResourceValue extends React.Component {
                 {...otherProps}
                 multiline={property.multiLine}
                 value={this.state.value}
-                onChange={this.handleChange.bind(this)}
-                onBlur={this.handleSave.bind(this)}
+                onChange={this.handleChange}
+                onBlur={this.handleSave}
                 margin="normal"
                 style={{...style, marginTop: 0, width: '100%'}}
                 type="url"

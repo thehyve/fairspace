@@ -10,6 +10,32 @@ export const clear = () => ({
     type: CLIPBOARD_CLEAR
 });
 
+const extractBasename = filename => (filename.indexOf('/') > -1 ? filename.substring(filename.lastIndexOf('/') + 1) : filename);
+
+const canPaste = clipboard => clipboard.type && clipboard.filenames.length > 0;
+
+const doPaste = (clipboard, collection, destinationDir) => {
+    const fileAPI = FileAPIFactory.build(collection);
+
+    if (clipboard.type === CUT) {
+        return fileAPI.movePaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
+    } if (clipboard.type === COPY) {
+        return fileAPI.copyPaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
+    }
+    return Promise.reject(Error("Invalid clipboard type"));
+};
+
+
+const pasteAction = (clipboard, collection, destinationDir) => ({
+    type: CLIPBOARD_PASTE,
+    payload: doPaste(clipboard, collection, destinationDir),
+    meta: {
+        collection,
+        destinationDir,
+        sourceDir: clipboard.sourcedir
+    }
+});
+
 export const cut = (sourcedir, filenames) => ({
     type: CLIPBOARD_CUT,
     sourcedir,
@@ -30,28 +56,3 @@ export const paste = (collection, destinationDir) => (dispatch, getState) => {
     }
     return Promise.resolve();
 };
-
-const canPaste = clipboard => clipboard.type && clipboard.filenames.length > 0;
-
-const pasteAction = (clipboard, collection, destinationDir) => ({
-    type: CLIPBOARD_PASTE,
-    payload: doPaste(clipboard, collection, destinationDir),
-    meta: {
-        collection,
-        destinationDir,
-        sourceDir: clipboard.sourcedir
-    }
-});
-
-const doPaste = (clipboard, collection, destinationDir) => {
-    const fileAPI = FileAPIFactory.build(collection);
-
-    if (clipboard.type === CUT) {
-        return fileAPI.movePaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
-    } if (clipboard.type === COPY) {
-        return fileAPI.copyPaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
-    }
-    return Promise.reject("Invalid clipboard type");
-};
-
-const extractBasename = filename => (filename.indexOf('/') > -1 ? filename.substring(filename.lastIndexOf('/') + 1) : filename);

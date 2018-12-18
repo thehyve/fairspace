@@ -23,6 +23,6 @@ export function uniqueName(fileName, usedNames) {
             usedNames.push(newName);
             return newName;
         }
-        index++;
+        index += 1;
     }
 }

@@ -14,7 +14,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect';
 
-export const styles = theme => ({
+export const styles = () => ({
     root: {
         width: 400,
         height: 350,
@@ -81,6 +81,7 @@ const transformUserToOptions = (users, collaborators, currentUser) => {
         }));
         return applyDisableFilter(tmp, collaborators, currentUser);
     }
+    return [];
 };
 
 /**
@@ -230,11 +231,9 @@ export class AlterPermissionDialog extends React.Component {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.handleClose} color="secondary">
-
                         Cancel
                     </Button>
                     <Button onClick={this.handleSubmit} color="primary" disabled={!selectedUser}>
-
                         Submit
                     </Button>
                 </DialogActions>

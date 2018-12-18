@@ -36,19 +36,18 @@ function AuthorizationCheck(props) {
      */
     function renderError() {
         // An error occurred or no authorization
-        const showError = props.transformError ? props.transformError : error => error;
+        const showError = props.transformError || (error => error);
 
-        return showError(<div style={{minHeight: 300}}>
-            <Typography variant="h5" component="h2">
-
-                Error
-            </Typography>
-            <Typography component="p">
-
-                You do not have sufficient privileges to access this function. Please contact an
-                administrator.
-            </Typography>
-        </div>);
+        return showError(
+            <div style={{minHeight: 300}}>
+                <Typography variant="h5" component="h2">
+                    Error
+                </Typography>
+                <Typography component="p">
+                    You do not have sufficient privileges to access this function. Please contact an administrator.
+                </Typography>
+            </div>
+        );
     }
 
     if (props.pending) {

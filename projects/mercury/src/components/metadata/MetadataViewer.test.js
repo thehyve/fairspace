@@ -8,6 +8,12 @@ function flushPromises() {
     return new Promise(resolve => setImmediate(resolve));
 }
 
+const properties = [
+    {key: 'description', label: 'Description', values: [{value: 'More info'}, {value: 'My first collection'}]},
+    {key: 'name', label: 'Name', values: [{value: 'Collection 5'}]},
+    {key: 'type', label: "Type", values: [{id: "http://fairspace.io/ontology#Collection", label: "Collection"}]}
+];
+
 it('displays properties properly', () => {
     const store = mockStore({});
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
@@ -29,9 +35,3 @@ it('displays properties properly', () => {
     });
 });
 
-
-const properties = [
-    {key: 'description', label: 'Description', values: [{value: 'More info'}, {value: 'My first collection'}]},
-    {key: 'name', label: 'Name', values: [{value: 'Collection 5'}]},
-    {key: 'type', label: "Type", values: [{id: "http://fairspace.io/ontology#Collection", label: "Collection"}]}
-];

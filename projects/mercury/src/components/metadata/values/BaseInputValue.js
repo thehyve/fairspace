@@ -8,11 +8,11 @@ class BaseInputValue extends React.Component {
         this.state = {value: props.entry.value};
     }
 
-    handleChange(e) {
+    handleChange = (e) => {
         this.setState({value: e.target.value});
     }
 
-    handleSave() {
+    handleSave = () => {
         const {onSave, transformValue} = this.props;
         onSave({value: transformValue(this.state.value)});
     }
@@ -27,8 +27,8 @@ class BaseInputValue extends React.Component {
                 {...otherProps}
                 multiline={property.multiLine}
                 value={this.state.value}
-                onChange={this.handleChange.bind(this)}
-                onBlur={this.handleSave.bind(this)}
+                onChange={this.handleChange}
+                onBlur={this.handleSave}
                 margin="normal"
                 style={{...style, marginTop: 0, width: '100%'}}
             />

@@ -40,7 +40,10 @@ class App extends React.Component {
                 this.store.dispatch(fetchUsers());
                 this.store.dispatch(fetchAuthorizations());
                 this.store.dispatch(fetchWorkspace());
-                this.cancellable.setState && this.cancellable.setState({configLoaded: true});
+
+                if (this.cancellable.setState) {
+                    this.cancellable.setState({configLoaded: true});
+                }
             });
     }
 
@@ -61,11 +64,9 @@ class App extends React.Component {
 
     render() {
         if (this.state.configLoaded) {
-            const classes = this.props.classes;
-
             return (
                 <MuiThemeProvider theme={theme}>
-                    <div className={classes.root}>
+                    <div className={this.props.classes.root}>
                         <Provider store={this.store}>
                             <ErrorDialog>
                                 <Router>

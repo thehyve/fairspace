@@ -35,11 +35,9 @@ const Notebooks = ({classes}) => (
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-
                         Jupyter Notebook
                     </Typography>
                     <Typography component="p">
-
                         The Jupyter Notebook is an open-source web application that allows
                         you to create and share documents that contain live code, equations,
                         visualizations and narrative text.
@@ -49,7 +47,6 @@ const Notebooks = ({classes}) => (
             <CardActions>
                 <a href={Config.get().urls.jupyter} target="_blank" rel="noopener noreferrer">
                     <Button size="small" color="primary">
-
                         Open
                     </Button>
                 </a>

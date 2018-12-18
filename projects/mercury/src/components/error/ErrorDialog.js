@@ -81,14 +81,18 @@ class ErrorDialog extends React.Component {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleClose.bind(this)} color="primary">
-
-                            Dismiss
+                    <Button
+                        onClick={this.handleClose}
+                        color="primary"
+                    >
+                        Dismiss
                     </Button>
                     {this.state.onRetry
                         ? (
-                            <Button onClick={this.handleRetry.bind(this)} color="primary">
-
+                            <Button
+                                onClick={this.handleRetry}
+                                color="primary"
+                            >
                                 Retry
                             </Button>
                         )

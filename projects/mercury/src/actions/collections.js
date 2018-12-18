@@ -9,6 +9,11 @@ export const invalidateCollections = () => ({
     type: actionTypes.invalidate(COLLECTIONS)
 });
 
+const fetchCollections = createErrorHandlingPromiseAction(() => ({
+    type: COLLECTIONS,
+    payload: CollectionAPI.getCollections()
+}));
+
 export const fetchCollectionsIfNeeded = () => dispatchIfNeeded(
     fetchCollections,
     state => (state && state.cache ? state.cache.collections : undefined)
@@ -31,9 +36,3 @@ export const deleteCollection = id => ({
     type: DELETE_COLLECTION,
     payload: CollectionAPI.deleteCollection(id),
 });
-
-
-const fetchCollections = createErrorHandlingPromiseAction(() => ({
-    type: COLLECTIONS,
-    payload: CollectionAPI.getCollections()
-}));

@@ -11,7 +11,7 @@ import ErrorMessage from "../error/ErrorMessage";
 import ConfirmationDialog from "../generic/ConfirmationDialog/ConfirmationDialog";
 import AlterPermission from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
-import {getDisplayName} from "../../utils/userUtils";
+import getDisplayName from "../../utils/userUtils";
 import MoreActions from "../generic/MoreActions/MoreActions";
 import ActionItem from "../generic/MoreActions/ActionItem";
 import withHovered from "../../containers/WithHovered/WithHovered";
@@ -19,7 +19,7 @@ import {findById} from "../../utils/arrayutils";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
 import LoadingOverlay from "../generic/Loading/LoadingOverlay";
 
-export const styles = theme => ({
+export const styles = () => ({
     collaboratorList: {
         width: '100%'
     },

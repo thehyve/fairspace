@@ -21,7 +21,7 @@ const Layout = ({classes}) => {
     return (
         <React.Fragment>
             <TopBar classes={classes} />
-            <AuthorizationCheck transformError={transformError.bind(this)}>
+            <AuthorizationCheck transformError={transformError}>
                 <Routes />
             </AuthorizationCheck>
             <Footer />

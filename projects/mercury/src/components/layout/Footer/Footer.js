@@ -15,7 +15,7 @@ const Footer = ({classes, name, version}) => (
 );
 
 function mapStateToProps(state) {
-    const data = state.workspace.data;
+    const data = {...state.workspace.data};
     return {
         name: data ? data.name : '',
         version: data ? data.version : ''

@@ -28,11 +28,11 @@ class CollectionBrowser extends React.Component {
         this.props.closePath();
     }
 
-    handleAddCollectionClick() {
+    handleAddCollectionClick = () => {
         this.setState({editingCollection: true});
     }
 
-    handleCollectionClick(collection) {
+    handleCollectionClick = (collection) => {
         const {selectedCollectionId, selectCollection, deselectCollection} = this.props;
         // If this collection is already selected, deselect
         if (selectedCollectionId && selectedCollectionId === collection.id) {
@@ -49,11 +49,11 @@ class CollectionBrowser extends React.Component {
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while deleting a collection",
-                this.handleCollectionDelete.bind(this)
+                this.handleCollectionDelete
             ));
     }
 
-    handleCollectionDoubleClick(collection) {
+    handleCollectionDoubleClick = (collection) => {
         this.props.history.push(`/collections/${collection.id}`);
     }
 
@@ -65,7 +65,7 @@ class CollectionBrowser extends React.Component {
                 color="secondary"
                 aria-label="Add"
                 title="Add collection"
-                onClick={this.handleAddCollectionClick.bind(this)}
+                onClick={this.handleAddCollectionClick}
             >
                 <Icon>add</Icon>
             </Button>
@@ -80,6 +80,7 @@ class CollectionBrowser extends React.Component {
         const {
             users, collections, addingCollection, deletingCollection
         } = this.props;
+        // TODO: is this required, does it have an effect?
         collections.map(col => col.creatorObj = findById(users, col.creator));
 
         return (
@@ -87,16 +88,16 @@ class CollectionBrowser extends React.Component {
                 <CollectionList
                     collections={this.props.collections}
                     selectedCollectionId={this.props.selectedCollectionId}
-                    onCollectionClick={this.handleCollectionClick.bind(this)}
-                    onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
-                    onCollectionDelete={this.handleCollectionDelete.bind(this)}
+                    onCollectionClick={this.handleCollectionClick}
+                    onCollectionDoubleClick={this.handleCollectionDoubleClick}
+                    onCollectionDelete={this.handleCollectionDelete}
                 />
                 <CollectionEditor
                     title="Add collection"
                     name={`${this.props.user.fullName}'s collection`}
                     editing={this.state.editingCollection}
-                    onSave={this.handleAddCollection.bind(this)}
-                    onCancel={this.handleCancelAddCollection.bind(this)}
+                    onSave={this.handleAddCollection}
+                    onCancel={this.handleCancelAddCollection}
                     editType
                 />
                 <LoadingOverlay loading={addingCollection || deletingCollection} />
@@ -104,18 +105,18 @@ class CollectionBrowser extends React.Component {
         );
     }
 
-    handleAddCollection(name, description, type) {
+    handleAddCollection = (name, description, type) => {
         this.setState({editingCollection: false});
         this.props.addCollection(name, description, type)
             .then(this.props.fetchCollectionsIfNeeded)
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while creating a collection",
-                this.handleAddCollectionClick.bind(this)
+                this.handleAddCollectionClick
             ));
     }
 
-    handleCancelAddCollection() {
+    handleCancelAddCollection = () => {
         this.setState({editingCollection: false});
     }
 
@@ -136,7 +137,7 @@ class CollectionBrowser extends React.Component {
     }
 }
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state) => ({
     user: state.account.user.data,
     loading: state.cache.collections.pending || state.account.user.pending || state.cache.users.pending,
     error: state.cache.collections.error || state.account.user.error || state.cache.users.error,

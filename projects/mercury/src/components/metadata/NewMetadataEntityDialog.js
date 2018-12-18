@@ -30,23 +30,23 @@ class NewMetadataEntityDialog extends React.Component {
         props.fetchMetadataVocabularyIfNeeded();
     }
 
-    openDialog(e) {
+    openDialog = (e) => {
         e.stopPropagation();
         this.setState({creating: true, id: generateUuid(), type: undefined});
     }
 
-    closeDialog(e) {
+    closeDialog = (e) => {
         if (e) e.stopPropagation();
         this.setState({creating: false});
     }
 
-    createEntity(e) {
+    createEntity = (e) => {
         e.stopPropagation();
         this.setState({creating: false});
         this.props.onCreate(this.state.type, this.state.id);
     }
 
-    handleInputChange(event) {
+    handleInputChange = (event) => {
         this.setState({[event.target.name]: event.target.value});
     }
 
@@ -58,7 +58,7 @@ class NewMetadataEntityDialog extends React.Component {
                     color="secondary"
                     aria-label="Add"
                     title="Add"
-                    onClick={this.openDialog.bind(this)}
+                    onClick={this.openDialog}
                 >
                     <Icon>add</Icon>
                 </Fab>
@@ -66,7 +66,7 @@ class NewMetadataEntityDialog extends React.Component {
                 <Dialog
                     open={this.state.creating}
                     onClick={e => e.stopPropagation()}
-                    onClose={this.closeDialog.bind(this)}
+                    onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
                 >
                     <DialogTitle id="form-dialog-title">Create new metadata entity</DialogTitle>
@@ -77,10 +77,10 @@ class NewMetadataEntityDialog extends React.Component {
                             label="Id"
                             value={this.state.id}
                             name="id"
-                            onChange={this.handleInputChange.bind(this)}
+                            onChange={this.handleInputChange}
                             fullWidth
                             required
-                            error={!this._hasValidId()}
+                            error={!this.hasValidId()}
                             style={{width: 400}}
                         />
                         <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
@@ -107,12 +107,10 @@ class NewMetadataEntityDialog extends React.Component {
                         </Paper>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog.bind(this)} color="secondary">
-
+                        <Button onClick={this.closeDialog} color="secondary">
                             Close
                         </Button>
-                        <Button onClick={this.createEntity.bind(this)} color="primary" disabled={!this._canCreate()}>
-
+                        <Button onClick={this.createEntity} color="primary" disabled={!this.canCreate()}>
                             Create
                         </Button>
                     </DialogActions>
@@ -121,12 +119,12 @@ class NewMetadataEntityDialog extends React.Component {
         );
     }
 
-    _hasValidId() {
+    hasValidId() {
         return new URL(`http://example.com/${this.state.id}`).toString() === `http://example.com/${this.state.id}`;
     }
 
-    _canCreate() {
-        return this.state.type && this.state.id && this._hasValidId();
+    canCreate() {
+        return this.state.type && this.state.id && this.hasValidId();
     }
 }
 

@@ -42,7 +42,7 @@ class FileAPI {
      */
     createDirectory(path) {
         if (!path) {
-            return Promise.reject("No path specified for directory creation");
+            return Promise.reject(Error("No path specified for directory creation"));
         }
 
         return this.client.createDirectory(this.getFullPath(path));
@@ -57,7 +57,7 @@ class FileAPI {
      */
     upload(path, files, nameMapping) {
         if (!files) {
-            return Promise.reject("No files given");
+            return Promise.reject(Error("No files given"));
         }
 
         const fullPath = this.getFullPath(path);
@@ -85,7 +85,7 @@ class FileAPI {
      * @returns Promise<any>
      */
     delete(path) {
-        if (!path) return Promise.reject("No path specified for deletion");
+        if (!path) return Promise.reject(Error("No path specified for deletion"));
 
         return this.client.deleteFile(this.getFullPath(path));
     }
@@ -98,10 +98,10 @@ class FileAPI {
      */
     move(source, destination) {
         if (!source) {
-            return Promise.reject("No source specified to move");
+            return Promise.reject(Error("No source specified to move"));
         }
         if (!destination) {
-            return Promise.reject("No destination specified to move to");
+            return Promise.reject(Error("No destination specified to move to"));
         }
 
         // We have to specify the destination ourselves, as the client adds the fullpath
@@ -117,10 +117,10 @@ class FileAPI {
      */
     copy(source, destination) {
         if (!source) {
-            return Promise.reject("No source specified to copy");
+            return Promise.reject(Error("No source specified to copy"));
         }
         if (!destination) {
-            return Promise.reject("No destination specified to copy to");
+            return Promise.reject(Error("No destination specified to copy to"));
         }
 
         return this.client.copyFile(this.getFullPath(source), this.getFullPath(destination));
@@ -180,7 +180,7 @@ class FileAPI {
 
             // Copying files to the current directory involves renaming
             if (destinationDir === sourceDir) {
-                destinationFilename = FileAPI._addCounterToFilename(destinationFilename);
+                destinationFilename = FileAPI.addCounterToFilename(destinationFilename);
             }
 
             const destinationFile = this.joinPaths(destinationDir || '', destinationFilename);
@@ -189,7 +189,7 @@ class FileAPI {
         }));
     }
 
-    static _addCounterToFilename(filename) {
+    static addCounterToFilename(filename) {
         // Parse the filename
         const dotPosition = filename.lastIndexOf('.');
         let basename = filename.substring(0, dotPosition);

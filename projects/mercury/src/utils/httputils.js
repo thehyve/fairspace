@@ -1,4 +1,4 @@
-export function failOnHttpError(message) {
+function failOnHttpError(message) {
     return (response) => {
         if (!response.ok) {
             switch (response.status) {
@@ -12,3 +12,5 @@ export function failOnHttpError(message) {
         return response;
     };
 }
+
+export default failOnHttpError;

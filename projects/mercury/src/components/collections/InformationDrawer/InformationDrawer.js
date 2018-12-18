@@ -32,6 +32,8 @@ export class InformationDrawer extends React.Component {
         const isMetaDataEditable = permissionChecker.canManage(collection)
             && this.props.paths.length === 0;
 
+        const relativePath = path => path.split('/').slice(2).join('/');
+
         return (
             <React.Fragment>
                 <ExpansionPanel defaultExpanded>
@@ -74,7 +76,7 @@ export class InformationDrawer extends React.Component {
                         <ExpansionPanel defaultExpanded>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                                 <Typography className={classes.heading}>
-Metadata for
+                                    Metadata for
                                     {relativePath(path)}
                                 </Typography>
                             </ExpansionPanelSummary>
@@ -93,21 +95,20 @@ Metadata for
     }
 }
 
-const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId, openedPath, selectedPaths}}) => ({
-    collection: findById(collections.data, selectedCollectionId),
-    paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath)
-});
-
 function pathHierarchy(fullPath) {
     const paths = [];
-    while (fullPath && fullPath.lastIndexOf('/') > 0) {
-        paths.push(fullPath);
-        fullPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
+    let path = fullPath;
+    while (path && path.lastIndexOf('/') > 0) {
+        paths.push(path);
+        path = path.substring(0, path.lastIndexOf('/'));
     }
     return paths.reverse();
 }
 
-const relativePath = path => path.split('/').slice(2).join('/');
+const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId, openedPath, selectedPaths}}) => ({
+    collection: findById(collections.data, selectedCollectionId),
+    paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath)
+});
 
 const mapDispatchToProps = {
     ...metadataActions,

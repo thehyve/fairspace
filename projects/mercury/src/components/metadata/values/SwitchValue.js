@@ -8,7 +8,7 @@ class SwitchValue extends React.Component {
         this.state = {checked: !!props.entry.value};
     }
 
-    handleChange(e) {
+    handleChange = (e) => {
         this.setState({checked: e.target.checked});
         this.props.onSave({value: e.target.checked});
     }
@@ -22,7 +22,7 @@ class SwitchValue extends React.Component {
             <Switch
                 {...otherProps}
                 checked={this.state.checked}
-                onChange={this.handleChange.bind(this)}
+                onChange={this.handleChange}
             />
         );
     }

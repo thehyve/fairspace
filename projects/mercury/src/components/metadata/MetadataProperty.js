@@ -12,9 +12,8 @@ import {updateMetadata} from "../../actions/metadata";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ErrorDialog from "../error/ErrorDialog";
 import withHovered from "../../containers/WithHovered/WithHovered";
-import {RESOURCE_URI} from "../../services/MetadataAPI/MetadataAPI";
 import {
-    LABEL_URI, COMMENT_URI, COLLECTION_URI, FILE_URI, DIRECTORY_URI
+    LABEL_URI, COMMENT_URI, COLLECTION_URI, FILE_URI, DIRECTORY_URI, RESOURCE_URI
 } from '../../services/MetadataAPI/MetadataAPI';
 
 /**
@@ -114,7 +113,6 @@ function MetadataProperty({
         );
     };
 
-
     const isCollection = property.domain === COLLECTION_URI;
     const isFile = property.domain === FILE_URI;
     const isDirectory = property.domain === DIRECTORY_URI;
@@ -126,17 +124,19 @@ function MetadataProperty({
     }
     // Do not show an add component if no multiples are allowed
     // and there is already a value
-    editable = editable && !property.machineOnly;
-    const canAdd = editable && (property.allowMultiple || property.values.length === 0);
+    const editableAndNotMachineOnly = editable && !property.machineOnly;
+    const canAdd = editableAndNotMachineOnly && (property.allowMultiple || property.values.length === 0);
     const labelId = `label-${property.key}`;
 
-    const ValueComponent = (editable && property.range !== RESOURCE_URI)
+    const ValueComponent = (editableAndNotMachineOnly && property.range !== RESOURCE_URI)
         ? ValueComponentFactory.editComponent(property)
         : ValueComponentFactory.readOnlyComponent();
 
     return (
         <ListItem disableGutters key={property.key} style={{display: 'block'}}>
-            <Typography variant="body1" component="label" id={labelId}>{property.label}</Typography>
+            <Typography variant="body1" component="label" id={labelId}>
+                {property.label}
+            </Typography>
             <List dense>
                 {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent, labelId))}
                 {canAdd ? renderAddComponent(labelId) : null}

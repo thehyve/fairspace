@@ -52,33 +52,6 @@ export const createMetadataEntity = (type, id) => {
     };
 };
 
-export const fetchCombinedMetadataIfNeeded = subject => dispatchIfNeeded(
-    () => combineMetadataForSubject(subject),
-    state => (state && state.metadataBySubject ? state.metadataBySubject[subject] : undefined)
-);
-
-export const fetchEntitiesIfNeeded = type => dispatchIfNeeded(
-    () => fetchEntitiesByType(type),
-    state => (state && state.cache && state.cache.entitiesByType ? state.cache.entitiesByType[type] : undefined)
-);
-
-export const fetchAllEntitiesIfNeeded = () => dispatchIfNeeded(
-    () => fetchAllEntities(),
-    state => (state && state.cache ? state.cache.allEntities : undefined)
-);
-
-
-export const fetchJsonLdBySubjectIfNeeded = subject => dispatchIfNeeded(
-    () => fetchJsonLdBySubject(subject),
-    state => (state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined)
-);
-
-export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
-    fetchVocabulary,
-    state => (state && state.cache ? state.cache.vocabulary : undefined)
-);
-
-
 const fetchJsonLdBySubject = createErrorHandlingPromiseAction(subject => ({
     type: METADATA,
     payload: MetadataAPI.get({subject}),
@@ -87,6 +60,21 @@ const fetchJsonLdBySubject = createErrorHandlingPromiseAction(subject => ({
     }
 }));
 
+const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
+    type: METADATA_VOCABULARY,
+    payload: MetadataAPI.getVocabulary()
+}));
+
+export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
+    fetchVocabulary,
+    state => (state && state.cache ? state.cache.vocabulary : undefined)
+);
+
+export const fetchJsonLdBySubjectIfNeeded = subject => dispatchIfNeeded(
+    () => fetchJsonLdBySubject(subject),
+    state => (state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined)
+);
+
 const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dispatch) => ({
     type: METADATA_COMBINATION,
     payload: Promise.all([
@@ -94,11 +82,6 @@ const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dis
         dispatch(fetchMetadataVocabularyIfNeeded())
     ]).then(([jsonLd, vocabulary]) => vocabulary.value.combine(jsonLd.value, subject)),
     meta: {subject}
-}));
-
-const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
-    type: METADATA_VOCABULARY,
-    payload: MetadataAPI.getVocabulary()
 }));
 
 const fetchEntitiesByType = createErrorHandlingPromiseAction(type => ({
@@ -118,9 +101,19 @@ const fetchAllEntities = createErrorHandlingPromiseAction(dispatch => ({
         ))
 }));
 
-export const fetchSubjectByPathIfNeeded = path => dispatchIfNeeded(
-    () => getUriByPath(path),
-    state => state && state.cache && state.cache.subjectByPath && state.cache.subjectByPath[path]
+export const fetchCombinedMetadataIfNeeded = subject => dispatchIfNeeded(
+    () => combineMetadataForSubject(subject),
+    state => (state && state.metadataBySubject ? state.metadataBySubject[subject] : undefined)
+);
+
+export const fetchEntitiesIfNeeded = type => dispatchIfNeeded(
+    () => fetchEntitiesByType(type),
+    state => (state && state.cache && state.cache.entitiesByType ? state.cache.entitiesByType[type] : undefined)
+);
+
+export const fetchAllEntitiesIfNeeded = () => dispatchIfNeeded(
+    () => fetchAllEntities(),
+    state => (state && state.cache ? state.cache.allEntities : undefined)
 );
 
 const getUriByPath = createErrorHandlingPromiseAction(path => ({
@@ -128,3 +121,8 @@ const getUriByPath = createErrorHandlingPromiseAction(path => ({
     payload: MetadataAPI.getSubjectByPath(path),
     meta: {path}
 }));
+
+export const fetchSubjectByPathIfNeeded = path => dispatchIfNeeded(
+    () => getUriByPath(path),
+    state => state && state.cache && state.cache.subjectByPath && state.cache.subjectByPath[path]
+);

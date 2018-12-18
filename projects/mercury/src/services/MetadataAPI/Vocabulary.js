@@ -22,7 +22,7 @@ class Vocabulary {
         this.vocabulary = vocabulary;
 
         // Cache a version of the vocabulary by id, to do easy lookups
-        this.vocabularyById = this._groupVocabularyById();
+        this.vocabularyById = this.groupVocabularyById();
     }
 
     /**
@@ -51,16 +51,11 @@ class Vocabulary {
         }
 
         // If no subject is provided, use the first (and only) entry in the metadata
-        let metadataItem;
-        if (!subject) {
-            subject = expandedMetadata[0]['@id'];
-            metadataItem = expandedMetadata[0];
-        } else { // Retrieve the metadata item for this subject
-            metadataItem = expandedMetadata.find(item => item['@id'] === subject);
-        }
+        const sub = subject || expandedMetadata[0]['@id'];
+        const metadataItem = subject ? expandedMetadata.find(item => item['@id'] === sub) : expandedMetadata[0];
 
         if (!metadataItem) {
-            console.warn(`The given subject ${subject} is unknown`);
+            console.warn(`The given subject ${sub} is unknown`);
             return [];
         }
 
@@ -70,11 +65,11 @@ class Vocabulary {
         }
 
         // Determine properties allowed for the given type
-        const typePredicates = this._determinePredicatesForTypes(metadataItem['@type']);
+        const typePredicates = this.determinePredicatesForTypes(metadataItem['@type']);
 
         // Actually convert the metadata into a list of properties
-        const properties = this._convertMetadataIntoPropertyList(metadataItem, typePredicates, expandedMetadata);
-        const emptyProperties = this._determineAdditionalEmptyProperties(metadataItem, typePredicates);
+        const properties = this.convertMetadataIntoPropertyList(metadataItem, typePredicates, expandedMetadata);
+        const emptyProperties = this.determineAdditionalEmptyProperties(metadataItem, typePredicates);
 
         return [...properties, ...emptyProperties];
     }
@@ -101,7 +96,7 @@ class Vocabulary {
      * @param predicates List of predicates that should be included
      * @returns {Array}
      */
-    _convertMetadataIntoPropertyList(metadata, predicates = [], allMetadata = []) {
+    convertMetadataIntoPropertyList(metadata, predicates = [], allMetadata = []) {
         const prefilledProperties = [];
 
         // Add the metadata already available
@@ -127,14 +122,14 @@ class Vocabulary {
             const values = (predicateUri === "@type")
                 // @type needs special attention: it is specified as a literal string
                 // but should be treated as an object
-                ? this._convertTypeEntries(metadata[predicateUri])
+                ? this.convertTypeEntries(metadata[predicateUri])
                 : metadata[predicateUri].map(i => ({
                     id: i['@id'],
                     value: i['@value'],
-                    label: Vocabulary._lookupLabel(i['@id'], allMetadata)
+                    label: Vocabulary.lookupLabel(i['@id'], allMetadata)
                 }));
 
-            prefilledProperties.push(Vocabulary._generatePropertyEntry(predicateUri, values, vocabularyEntry));
+            prefilledProperties.push(Vocabulary.generatePropertyEntry(predicateUri, values, vocabularyEntry));
         }
 
         return prefilledProperties.sort(compareBy('label'));
@@ -146,14 +141,14 @@ class Vocabulary {
      * @param predicates
      * @returns {{key, label, values, range, allowMultiple}[]}
      */
-    _determineAdditionalEmptyProperties(metadata, predicates = []) {
+    determineAdditionalEmptyProperties(metadata, predicates = []) {
         // Also add an entry for fields not yet entered
         const additionalProperties = predicates
             .filter(predicate => !Object.keys(metadata).includes(predicate['@id']))
             .map((predicate) => {
                 const predicateUri = predicate['@id'];
                 const vocabularyEntry = this.vocabularyById[predicateUri];
-                return Vocabulary._generatePropertyEntry(predicateUri, [], vocabularyEntry);
+                return Vocabulary.generatePropertyEntry(predicateUri, [], vocabularyEntry);
             });
 
         return additionalProperties.sort(compareBy('label'));
@@ -165,7 +160,7 @@ class Vocabulary {
      * @param vocabulary json-ld format where labels are specified.
      * @returns {*}
      */
-    _groupVocabularyById() {
+    groupVocabularyById() {
         return this.vocabulary.reduce((vocabularyById, entry) => {
             vocabularyById[entry['@id']] = entry;
             return vocabularyById;
@@ -177,10 +172,10 @@ class Vocabulary {
      * @param vocabulary
      * @param type
      */
-    _determinePredicatesForTypes(types) {
+    determinePredicatesForTypes(types) {
         return Array.from(new Set(
             types
-                .map(type => this._determinePredicatesForType(type))
+                .map(type => this.determinePredicatesForType(type))
                 .reduce((fullList, typeList) => fullList.concat(typeList), [])
         ));
     }
@@ -190,7 +185,7 @@ class Vocabulary {
      * @param vocabulary
      * @param type
      */
-    _determinePredicatesForType(type) {
+    determinePredicatesForType(type) {
         const isProperty = entry => entry['@type'].includes(PROPERTY_URI);
 
         const isInDomain = entry => entry[DOMAIN_URI] && entry[DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
@@ -199,12 +194,12 @@ class Vocabulary {
         return predicates;
     }
 
-    _convertTypeEntries(values) {
+    convertTypeEntries(values) {
         return values
             .map(type => ({
                 id: type,
-                label: Vocabulary._getLabel(this.vocabularyById[type]),
-                comment: Vocabulary._getComment(this.vocabularyById[type])
+                label: Vocabulary.getLabel(this.vocabularyById[type]),
+                comment: Vocabulary.getComment(this.vocabularyById[type])
             }));
     }
 
@@ -216,12 +211,12 @@ class Vocabulary {
      * @returns {{key: string, label: string, values: [], range: string, allowMultiple: boolean}}
      * @private
      */
-    static _generatePropertyEntry(predicate, values, vocabularyEntry) {
-        const label = Vocabulary._getLabel(vocabularyEntry);
-        const range = Vocabulary._getFirstPredicateId(vocabularyEntry, RANGE_URI);
-        const allowMultiple = Vocabulary._getFirstPredicateValue(vocabularyEntry, ALLOW_MULTIPLE_URI, false);
-        const machineOnly = Vocabulary._getFirstPredicateValue(vocabularyEntry, MACHINE_ONLY_URI, false);
-        const multiLine = Vocabulary._getFirstPredicateValue(vocabularyEntry, MULTILINE_PROPERTY_URI, false);
+    static generatePropertyEntry(predicate, values, vocabularyEntry) {
+        const label = Vocabulary.getLabel(vocabularyEntry);
+        const range = Vocabulary.getFirstPredicateId(vocabularyEntry, RANGE_URI);
+        const allowMultiple = Vocabulary.getFirstPredicateValue(vocabularyEntry, ALLOW_MULTIPLE_URI, false);
+        const machineOnly = Vocabulary.getFirstPredicateValue(vocabularyEntry, MACHINE_ONLY_URI, false);
+        const multiLine = Vocabulary.getFirstPredicateValue(vocabularyEntry, MULTILINE_PROPERTY_URI, false);
         const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
         return {
@@ -235,29 +230,29 @@ class Vocabulary {
         };
     }
 
-    static _getFirstPredicateValue(vocabularyEntry, predicate, defaultValue) {
-        return this._getFirstPredicateProperty(vocabularyEntry, predicate, '@value', defaultValue);
+    static getFirstPredicateValue(vocabularyEntry, predicate, defaultValue) {
+        return this.getFirstPredicateProperty(vocabularyEntry, predicate, '@value', defaultValue);
     }
 
-    static _getFirstPredicateId(vocabularyEntry, predicate, defaultValue) {
-        return this._getFirstPredicateProperty(vocabularyEntry, predicate, '@id', defaultValue);
+    static getFirstPredicateId(vocabularyEntry, predicate, defaultValue) {
+        return this.getFirstPredicateProperty(vocabularyEntry, predicate, '@id', defaultValue);
     }
 
-    static _getFirstPredicateProperty(vocabularyEntry, predicate, property, defaultValue) {
+    static getFirstPredicateProperty(vocabularyEntry, predicate, property, defaultValue) {
         return vocabularyEntry && vocabularyEntry[predicate] && vocabularyEntry[predicate][0] ? vocabularyEntry[predicate][0][property] : defaultValue;
     }
 
-    static _getLabel(vocabularyEntry) {
-        return this._getFirstPredicateValue(vocabularyEntry, LABEL_URI, '');
+    static getLabel(vocabularyEntry) {
+        return this.getFirstPredicateValue(vocabularyEntry, LABEL_URI, '');
     }
 
-    static _getComment(vocabularyEntry) {
-        return this._getFirstPredicateValue(vocabularyEntry, COMMENT_URI, '');
+    static getComment(vocabularyEntry) {
+        return this.getFirstPredicateValue(vocabularyEntry, COMMENT_URI, '');
     }
 
-    static _lookupLabel(id, allMetadata) {
+    static lookupLabel(id, allMetadata) {
         const entry = allMetadata.find(element => element['@id'] === id);
-        return Vocabulary._getFirstPredicateValue(entry, LABEL_URI);
+        return Vocabulary.getFirstPredicateValue(entry, LABEL_URI);
     }
 }
 

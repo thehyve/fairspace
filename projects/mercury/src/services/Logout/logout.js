@@ -1,7 +1,7 @@
 import Config from "../Config/Config";
 
-export function logout() {
+export default function logout() {
     fetch(`${Config.get().urls.jupyter}/hub/logout`, {credentials: 'include'})
-        .catch((ignore) => {})
-        .then(() => window.location.href = Config.get().urls.logout);
+        .catch(() => {})
+        .then(() => {window.location.href = Config.get().urls.logout;});
 }

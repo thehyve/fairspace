@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-properties */
 const MULTIPLIER = 1024;
 const UNITS = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
 

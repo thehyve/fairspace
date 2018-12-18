@@ -5,21 +5,17 @@ import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 import EntityInformation from '../../components/metadata/EntityInformation';
 import Metadata from '../../components/metadata/Metadata';
 
-export class MetadataEntityPage extends React.Component {
-    render() {
-        return (
-            <div>
-                <BreadCrumbs />
-                <EntityInformation subject={window.location.href} />
-                <Paper style={{paddingLeft: 20}}>
-                    <Metadata
-                        editable
-                        subject={window.location.href}
-                    />
-                </Paper>
-            </div>
-        );
-    }
-}
+const metadataEntityPage = () =>  (
+    <div>
+        <BreadCrumbs />
+        <EntityInformation subject={window.location.href} />
+        <Paper style={{paddingLeft: 20}}>
+            <Metadata
+                editable
+                subject={window.location.href}
+            />
+        </Paper>
+    </div>
+);
 
-export default asPage(MetadataEntityPage);
+export default asPage(metadataEntityPage);

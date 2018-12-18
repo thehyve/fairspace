@@ -16,7 +16,7 @@ class CollectionEditor extends React.Component {
         editing: false
     };
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate() {
         if (this.state.editing !== this.props.editing) {
             this.setState({
                 title: this.props.title,
@@ -28,18 +28,18 @@ class CollectionEditor extends React.Component {
         }
     }
 
-    close() {
+    close = () => {
         this.setState({editing: false});
     }
 
-    handleCancel() {
+    handleCancel = () => {
         this.close();
         if (this.props.onCancel) {
             this.props.onCancel();
         }
     }
 
-    handleSave() {
+    handleSave = () => {
         if (!this.state.name) {
             return;
         }
@@ -50,74 +50,68 @@ class CollectionEditor extends React.Component {
         }
     }
 
-    handleInputChange(event) {
+    handleInputChange = (event) => {
         this.setState({[event.target.name]: event.target.value});
     }
 
     render() {
-        return (<Dialog
-            open={this.state.editing}
-            onClose={this.close.bind(this)}
-            aria-labelledby="form-dialog-title"
-        >
-            <DialogTitle id="form-dialog-title">{this.state.title}</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
+        return (
+            <Dialog
+                open={this.state.editing}
+                onClose={this.close}
+                aria-labelledby="form-dialog-title"
+            >
+                <DialogTitle id="form-dialog-title">
+                    {this.state.title}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>You can edit the collection details here.</DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        label="Name"
+                        value={this.state.name}
+                        name="name"
+                        onChange={this.handleInputChange}
+                        fullWidth
+                        required
+                    />
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        multiline
+                        id="description"
+                        label="Description"
+                        name="description"
+                        value={this.state.description}
+                        onChange={this.handleInputChange}
+                        fullWidth
+                    />
+                    {this.props.editType
+                        ? (
+                            <FormControl>
+                                <InputLabel>Type</InputLabel>
+                                <Select
+                                    name="type"
+                                    value={this.state.type}
+                                    onChange={this.handleInputChange}
+                                >
+                                    <MenuItem value="LOCAL_FILE">On Premise</MenuItem>
+                                    <MenuItem value="AZURE_BLOB_STORAGE">Azure Blob Storage</MenuItem>
+                                    <MenuItem value="S3_BUCKET">Amazon S3 Bucket</MenuItem>
+                                    <MenuItem value="GOOGLE_CLOUD_BUCKET">Google Cloud Bucket</MenuItem>
+                                </Select>
+                            </FormControl>
+                        )
+                        : null}
 
-                        You can edit the collection details here.
-                </DialogContentText>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="name"
-                    label="Name"
-                    value={this.state.name}
-                    name="name"
-                    onChange={this.handleInputChange.bind(this)}
-                    fullWidth
-                    required
-                />
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    multiline
-                    id="description"
-                    label="Description"
-                    name="description"
-                    value={this.state.description}
-                    onChange={this.handleInputChange.bind(this)}
-                    fullWidth
-                />
-                {this.props.editType
-                    ? (
-                        <FormControl>
-                            <InputLabel>Type</InputLabel>
-                            <Select
-                                name="type"
-                                value={this.state.type}
-                                onChange={this.handleInputChange.bind(this)}
-                            >
-                                <MenuItem value="LOCAL_FILE">On Premise</MenuItem>
-                                <MenuItem value="AZURE_BLOB_STORAGE">Azure Blob Storage</MenuItem>
-                                <MenuItem value="S3_BUCKET">Amazon S3 Bucket</MenuItem>
-                                <MenuItem value="GOOGLE_CLOUD_BUCKET">Google Cloud Bucket</MenuItem>
-                            </Select>
-                        </FormControl>
-                    )
-                    : null}
-
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={this.handleCancel.bind(this)} aria-label="Cancel" color="secondary">
-
-                        Cancel
-                </Button>
-                <Button onClick={this.handleSave.bind(this)} aria-label="Save" color="primary">
-
-                        Save
-                </Button>
-            </DialogActions>
-                </Dialog>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.handleCancel} aria-label="Cancel" color="secondary">Cancel</Button>
+                    <Button onClick={this.handleSave} aria-label="Save" color="primary">Save</Button>
+                </DialogActions>
+            </Dialog>
         );
     }
 }

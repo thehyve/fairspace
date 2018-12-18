@@ -88,9 +88,13 @@ class UserMenu extends React.Component {
                     className={this.props.classes.row}
                 >
                     <Avatar alt="{user.fullName}" src="/images/avatar.png" className={this.props.classes.avatar} />
-                    <span>{user.fullName}</span>
+                    <span>
+                        {user.fullName}
+                    </span>
                 </Button>);
         }
+
+        return "";
     }
 }
 

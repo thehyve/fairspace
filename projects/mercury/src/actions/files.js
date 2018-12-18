@@ -13,6 +13,8 @@ export const invalidateFiles = (collection, path) => ({
     }
 });
 
+const getFileApi = collection => FileAPIFactory.build(collection);
+
 export const renameFile = (collection, path, currentFilename, newFilename) => {
     const fileApi = getFileApi(collection);
     return {
@@ -56,14 +58,6 @@ export const createDirectory = (collection, path, directoryname) => {
     };
 };
 
-export const fetchFilesIfNeeded = (collection, path) => dispatchIfNeeded(
-    () => fetchFiles(collection, path),
-    (state) => {
-        const filesPerCollection = state.cache.filesByCollectionAndPath[collection.id] || {};
-        return filesPerCollection[path];
-    }
-);
-
 const fetchFiles = createErrorHandlingPromiseAction((collection, path) => ({
     type: FILES,
     payload: getFileApi(collection).list(path),
@@ -73,4 +67,10 @@ const fetchFiles = createErrorHandlingPromiseAction((collection, path) => ({
     }
 }));
 
-const getFileApi = collection => FileAPIFactory.build(collection);
+export const fetchFilesIfNeeded = (collection, path) => dispatchIfNeeded(
+    () => fetchFiles(collection, path),
+    (state) => {
+        const filesPerCollection = state.cache.filesByCollectionAndPath[collection.id] || {};
+        return filesPerCollection[path];
+    }
+);

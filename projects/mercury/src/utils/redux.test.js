@@ -13,7 +13,7 @@ describe('Error handling promise action', () => {
     });
 
     it('handles failures within actions', () => {
-        const actionCreator = createErrorHandlingPromiseAction(() => Promise.reject("Test error"));
+        const actionCreator = createErrorHandlingPromiseAction(() => Promise.reject(Error("Test error")));
         const action = actionCreator();
         return expect(action(mockDispatch)).resolves.toBeUndefined();
     });

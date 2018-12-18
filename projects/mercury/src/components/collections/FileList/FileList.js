@@ -22,15 +22,13 @@ import withHovered from "../../../containers/WithHovered/WithHovered";
 
 class FileList extends React.Component {
     render() {
-        const props = this.props;
-        const classes = props.classes;
-
-        if (!props.files || props.files.length === 0 || props.files[0] === null) {
+        // TODO: what is the point of this.props.files[0] === null?
+        if (!this.props.files || this.props.files.length === 0 || this.props.files[0] === null) {
             return "No files";
         }
-        const selectedFilenames = props.selectedPaths || [];
+        const selectedFilenames = this.props.selectedPaths || [];
         return (
-            <Paper className={classes.fileListContainer}>
+            <Paper className={this.props.classes.fileListContainer}>
                 <Table padding="dense">
                     <TableHead>
                         <TableRow>
@@ -42,21 +40,23 @@ class FileList extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {props.files.map((row, idx) => {
+                        {this.props.files.map((row, idx) => {
                             const selected = selectedFilenames.includes(row.filename);
                             return (
                                 <ClickHandler
                                     component={TableRow}
                                     key={row.filename}
                                     selected={selected}
-                                    className={selected ? classes.tableRowSelected : classes.tableRow}
-                                    onSingleClick={() => props.onPathClick(row)}
-                                    onDoubleClick={() => props.onPathDoubleClick(row)}
+                                    className={selected ? this.props.classes.tableRowSelected : this.props.classes.tableRow}
+                                    onSingleClick={() => this.props.onPathClick(row)}
+                                    onDoubleClick={() => this.props.onPathDoubleClick(row)}
                                     onMouseOver={e => this.props.onItemMouseOver(idx, e)}
                                     onMouseOut={() => this.props.onItemMouseOut(idx)}
                                 >
                                     <TableCell>
-                                        <Icon>{row.type === 'directory' ? 'folder_open' : 'note_open'}</Icon>
+                                        <Icon>
+                                            {row.type === 'directory' ? 'folder_open' : 'note_open'}
+                                        </Icon>
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         {row.basename}
@@ -75,25 +75,25 @@ class FileList extends React.Component {
                                         <Row
                                             style={{visibility: this.props.hovered !== idx ? 'hidden' : 'visible'}}
                                         >
-                                            {props.onRename
+                                            {this.props.onRename
                                                 ? (
                                                     <RenameButton
                                                         currentName={row.basename}
                                                         aria-label={`Rename ${row.basename}`}
                                                         title={`Rename ${row.basename}`}
-                                                        onRename={newName => props.onRename(row, newName)}
-                                                        disabled={props.readonly}
+                                                        onRename={newName => this.props.onRename(row, newName)}
+                                                        disabled={this.props.readonly}
                                                     >
                                                         <RenameBox />
                                                     </RenameButton>
                                                 ) : null}
-                                            {props.onDelete
+                                            {this.props.onDelete
                                                 ? (
                                                     <ButtonWithVerification
                                                         aria-label={`Delete ${row.basename}`}
                                                         title={`Delete ${row.basename}`}
-                                                        onClick={() => props.onDelete(row)}
-                                                        disabled={props.readonly}
+                                                        onClick={() => this.props.onDelete(row)}
+                                                        disabled={this.props.readonly}
                                                     >
                                                         <Icon>delete</Icon>
                                                     </ButtonWithVerification>

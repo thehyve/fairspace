@@ -31,12 +31,12 @@ class ButtonWithVerification extends React.Component {
         this.setState({verifying: true});
     }
 
-    closeDialog(e) {
+    closeDialog = (e) => {
         if (e) e.stopPropagation();
         this.setState({verifying: false});
     }
 
-    handleClick(e) {
+    handleClick = (e) => {
         this.closeDialog(e);
         if (this.onClick) {
             window.setImmediate(() => this.onClick(e));
@@ -52,9 +52,9 @@ class ButtonWithVerification extends React.Component {
                     open={this.state.verifying}
                     title="Confirmation"
                     content={content}
-                    onAgree={this.handleClick.bind(this)}
-                    onDisagree={this.closeDialog.bind(this)}
-                    onClose={this.closeDialog.bind(this)}
+                    onAgree={this.handleClick}
+                    onDisagree={this.closeDialog}
+                    onClose={this.closeDialog}
                 />
             );
         }
@@ -67,7 +67,7 @@ class ButtonWithVerification extends React.Component {
             <div style={{visibility: this.props.visibility}}>
                 <IconButton
                     {...this.componentProps}
-                    onClick={this.openDialog.bind(this)}
+                    onClick={this.openDialog}
                     disabled={this.props.disabled}
                 >
                     {this.props.children}

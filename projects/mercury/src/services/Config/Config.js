@@ -37,7 +37,7 @@ class Config {
         if (this.internalConfig.externalConfigurationFiles) {
             this.loadingPromise = Promise.all(
                 this.internalConfig.externalConfigurationFiles.map(file => fetch(file, {credentials: 'same-origin'})
-                    .then(response => (response.ok ? response.json() : Promise.reject(`Error loading configuration file ${file}`)))
+                    .then(response => (response.ok ? response.json() : Promise.reject(Error(`Error loading configuration file ${file}`))))
                     .then((json) => {
                         console.info("Loaded external configuration from", file);
                         this.externalConfig = merge(this.externalConfig, json);

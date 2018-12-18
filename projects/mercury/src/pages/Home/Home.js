@@ -4,7 +4,7 @@ import RecentActivity from "../../components/generic/RecentActivity/RecentActivi
 import asPage from "../../containers/asPage/asPage";
 import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 
-function Home(props) {
+function Home() {
     return (
         <WithRightDrawer
             collapsible={false}

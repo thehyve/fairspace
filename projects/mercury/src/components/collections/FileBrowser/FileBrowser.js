@@ -48,7 +48,7 @@ class FileBrowser extends React.Component {
         }
     }
 
-    handlePathClick(path) {
+    handlePathClick = (path) => {
         const {selectPath, deselectPath} = this.props;
 
         // If this pathis already selected, deselect
@@ -59,7 +59,7 @@ class FileBrowser extends React.Component {
         }
     }
 
-    handlePathDoubleClick(path) {
+    handlePathDoubleClick = (path) => {
         if (path.type === 'directory') {
             this.openDir(path.basename);
         } else {
@@ -67,7 +67,7 @@ class FileBrowser extends React.Component {
         }
     }
 
-    handlePathDelete(path) {
+    handlePathDelete = (path) => {
         const {
             deleteFile, fetchFilesIfNeeded, openedCollection, openedPath
         } = this.props;
@@ -78,7 +78,7 @@ class FileBrowser extends React.Component {
             });
     }
 
-    handlePathRename(path, newName) {
+    handlePathRename = (path, newName) => {
         const {
             renameFile, fetchFilesIfNeeded, openedCollection, openedPath
         } = this.props;
@@ -159,7 +159,7 @@ class FileBrowser extends React.Component {
         );
     }
 
-    renderError(errorMessage) {
+    renderError() {
         return (<ErrorMessage message="An error occurred while loading files" />);
     }
 
@@ -177,10 +177,10 @@ class FileBrowser extends React.Component {
             <FileList
                 files={this.props.files}
                 selectedPaths={this.props.selectedPaths}
-                onPathClick={this.handlePathClick.bind(this)}
-                onPathDoubleClick={this.handlePathDoubleClick.bind(this)}
-                onRename={this.handlePathRename.bind(this)}
-                onDelete={this.handlePathDelete.bind(this)}
+                onPathClick={this.handlePathClick}
+                onPathDoubleClick={this.handlePathDoubleClick}
+                onRename={this.handlePathRename}
+                onDelete={this.handlePathDelete}
                 readonly={!PermissionChecker.canWrite(this.props.openedCollection)}
             />
         );
@@ -189,21 +189,16 @@ class FileBrowser extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     const {openedCollectionId, openedPath} = ownProps;
-
     const filesPerCollection = state.cache.filesByCollectionAndPath[openedCollectionId] || {};
     const files = filesPerCollection[openedPath] || {};
-    const collections = state.cache.collections;
-
-    const collectionBrowser = state.collectionBrowser;
-
+    const collections = {...state.cache.collections};
+    const collectionBrowser = {...state.collectionBrowser};
     const getCollection = collectionId => (collections.data && collections.data.find(collection => collection.id === collectionId)) || {};
-
 
     return {
         loading: files.pending || collections.pending || collections.data.length === 0,
         error: files.error || collections.error,
         files: files.data,
-
         selectedPaths: collectionBrowser.selectedPaths,
         openedCollection: openedCollectionId ? getCollection(openedCollectionId) : {}
     };

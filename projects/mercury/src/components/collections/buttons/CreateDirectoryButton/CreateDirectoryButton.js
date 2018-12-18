@@ -38,12 +38,12 @@ class CreateDirectoryButton extends React.Component {
         this.setState({creating: true, name: ''});
     }
 
-    closeDialog(e) {
+    closeDialog = (e) => {
         if (e) e.stopPropagation();
         this.setState({creating: false});
     }
 
-    createDirectory(e) {
+    createDirectory = (e) => {
         e.stopPropagation();
         if (this.onCreate) {
             this
@@ -52,7 +52,7 @@ class CreateDirectoryButton extends React.Component {
         }
     }
 
-    handleInputChange(event) {
+    handleInputChange = (event) => {
         const newValues = {};
         newValues[event.target.name] = event.target.value;
         this.setState(newValues);
@@ -61,14 +61,14 @@ class CreateDirectoryButton extends React.Component {
     render() {
         return (
             <div style={{display: 'inline'}}>
-                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
+                <IconButton {...this.componentProps} onClick={this.openDialog}>
                     {this.props.children}
                 </IconButton>
 
                 <Dialog
                     open={this.state.creating}
                     onClick={e => e.stopPropagation()}
-                    onClose={this.closeDialog.bind(this)}
+                    onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
                 >
                     <DialogTitle id="form-dialog-title">Create new directory</DialogTitle>
@@ -80,19 +80,13 @@ class CreateDirectoryButton extends React.Component {
                             label="Name"
                             value={this.state.name}
                             name="name"
-                            onChange={this.handleInputChange.bind(this)}
+                            onChange={this.handleInputChange}
                             fullWidth
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog.bind(this)} color="secondary">
-
-                            Close
-                        </Button>
-                        <Button onClick={this.createDirectory.bind(this)} color="primary" disabled={!this.state.name}>
-
-                            Create
-                        </Button>
+                        <Button onClick={this.closeDialog} color="secondary">Close</Button>
+                        <Button onClick={this.createDirectory} color="primary" disabled={!this.state.name}>Create</Button>
                     </DialogActions>
                 </Dialog>
             </div>

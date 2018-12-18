@@ -29,10 +29,12 @@ class MoreActions extends React.Component {
      * @param menuItem
      */
     closeMenuOnClick = (menuItem, idx) => (
-<span key={idx} onClick={this.handleMenuOnClose}>
+        <span key={idx} onClick={this.handleMenuOnClose}>
             {menuItem}
         </span>
-)render() {
+    )
+
+    render() {
         const {ariaLabel, visibility} = this.props;
         return (
             <div>
@@ -42,7 +44,8 @@ class MoreActions extends React.Component {
                 <MoreActionsMenu
                     menuItems={this.props.children ? this.props.children.map(this.closeMenuOnClick) : undefined}
                     onClose={this.handleMenuOnClose}
-                    anchorEl={this.state.anchorEl} />
+                    anchorEl={this.state.anchorEl}
+                />
             </div>
         );
     }

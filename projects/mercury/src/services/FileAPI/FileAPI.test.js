@@ -17,11 +17,11 @@ it('uses the collection name in the webdav path', () => {
     expect(fileAPI.getFullPath()).toEqual('/subdir');
 });
 
-if ('uploads multiple files', () => {
+it('uploads multiple files', () => {
     const fileAPI = new FileAPI('subdir');
     fileAPI.client = {putFileContents: jest.fn(() => Promise.resolve())};
 
-    const result = fileAPI.upload([{name: 'filea.txt'}, {name: 'fileb.txt'}, {name: 'filec.txt'}]);
+    const result = fileAPI.upload('', [{name: 'filea.txt'}, {name: 'fileb.txt'}, {name: 'filec.txt'}], new Map());
     expect(result).resolves;
     expect(fileAPI.client.putFileContents.mock.calls.length).toEqual(3);
 });

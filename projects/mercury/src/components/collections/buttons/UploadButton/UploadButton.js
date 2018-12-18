@@ -63,13 +63,13 @@ class UploadButton extends React.Component {
         });
     }
 
-    openDialog(e) {
+    openDialog = (e) => {
         e.stopPropagation();
         this.filesUploaded = false;
         this.setState({uploading: true});
     }
 
-    closeDialog(e) {
+    closeDialog = (e) => {
         if (e) e.stopPropagation();
         if (this.filesUploaded && this.onDidUpload) {
             this.onDidUpload();
@@ -81,7 +81,7 @@ class UploadButton extends React.Component {
         });
     }
 
-    uploadFiles(files, names) {
+    uploadFiles = (files, names) => {
         this.filesUploaded = true;
         if (this.onUpload) {
             this.startUploading(files);
@@ -101,7 +101,7 @@ class UploadButton extends React.Component {
     setFilesState(files, state) {
         // Add these file to a copy of the current map with files
         const filesMap = Object.assign({}, this.state.files);
-        files.forEach((file) => { filesMap[file.name] = state; });
+        files.forEach((file) => {filesMap[file.name] = state;});
 
         // Set the new state
         this.setState({files: filesMap});
@@ -116,7 +116,7 @@ class UploadButton extends React.Component {
                         paragraph
                         noWrap
                     >
-Drop files here to upload them to the current directory
+                        Drop files here to upload them to the current directory
                     </Typography>
                 </Column>
             );
@@ -142,29 +142,27 @@ Drop files here to upload them to the current directory
     render() {
         return (
             <div style={{display: 'inline'}}>
-                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
+                <IconButton {...this.componentProps} onClick={this.openDialog}>
                     {this.props.children}
                 </IconButton>
 
                 <Dialog
                     open={this.state.uploading}
                     onClick={e => e.stopPropagation()}
-                    onClose={this.closeDialog.bind(this)}
+                    onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
                 >
                     <DialogTitle id="form-dialog-title">Upload files</DialogTitle>
                     <DialogContent>
                         <Dropzone
-                            onDrop={this.uploadFiles.bind(this)}
+                            onDrop={this.uploadFiles}
                             className={this.props.classes.dropZone}
                         >
-
                             {this.renderDropzoneContent()}
                         </Dropzone>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog.bind(this)} color="secondary">
-
+                        <Button onClick={this.closeDialog} color="secondary">
                             Close
                         </Button>
                     </DialogActions>

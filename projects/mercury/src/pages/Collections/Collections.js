@@ -3,7 +3,7 @@ import CollectionBrowser from "../../components/collections/CollectionBrowser/Co
 import WithInfoDrawer from "../../components/collections/WithInfoDrawer/WithInfoDrawer";
 import asPage from "../../containers/asPage/asPage";
 
-function Collections(props) {
+function Collections() {
     return (
         <WithInfoDrawer>
             <CollectionBrowser />

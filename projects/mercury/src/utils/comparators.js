@@ -1,5 +1,11 @@
 export function comparePrimitives(x, y) {
-    return (x < y) ? -1 : (x > y) ? 1 : 0;
+    if (x < y) {
+        return -1;
+    }
+    if (x > y) {
+        return 1;
+    }
+    return 0;
 }
 
 export function compareBy(valueExtractor, ascending = true) {

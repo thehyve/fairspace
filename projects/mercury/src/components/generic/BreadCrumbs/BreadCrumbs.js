@@ -12,7 +12,10 @@ const menuEntries = flattenShallow(menuitems.map(sublist => sublist.items));
 const defaultHomeEntry = menuEntries[0];
 
 function getBreadCrumbLink(text, path, linkClass) {
-    return (<Button component={Link} to={path} key={path} variant="text" className={linkClass}>{text}</Button>);
+    return (
+        <Button component={Link} to={path} key={path} variant="text" className={linkClass}>
+            {text}
+        </Button>);
 }
 
 function stripTrailingSlash(path) {
@@ -22,14 +25,17 @@ function stripTrailingSlash(path) {
 function determineHomeEntry(homeUrl, classes) {
     // Now lookup the right entry. If none is found,
     // default to the first entry in the list.
-    const entry = menuEntries.find(entry => entry.url === homeUrl) || defaultHomeEntry;
+    const entry = menuEntries.find(e => e.url === homeUrl) || defaultHomeEntry;
 
     // Return a breadcrumb link for the given entry
-    return getBreadCrumbLink((<span>
-        <Icon className={classes.icon}>{entry.icon}</Icon>
-        {' '}
-        {entry.label}
-                              </span>), entry.url, classes.link);
+    return getBreadCrumbLink((
+        <span>
+            <Icon className={classes.icon}>
+                {entry.icon}
+            </Icon>
+            {' '}
+            {entry.label}
+        </span>), entry.url, classes.link);
 }
 
 /**
@@ -55,12 +61,12 @@ function BreadCrumbs({segments, match, classes}) {
 
     if (segments) {
         let currentPath = stripTrailingSlash(homeUrl);
-        for (const segment of segments) {
+        segments.forEach(segment => {
             if (segment.segment && segment.label) {
                 currentPath += stripTrailingSlash(`/${segment.segment}`);
                 breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, classes.link));
             }
-        }
+        });
     }
 
     return (

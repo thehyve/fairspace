@@ -3,9 +3,7 @@ import ReactDOM from 'react-dom';
 import Icon from "@material-ui/core/Icon";
 import {TableCell} from "@material-ui/core";
 import {createShallow} from '@material-ui/core/test-utils';
-import {CollectionList} from "./CollectionList";
-import {COLLECTION_ICONS} from "./CollectionList";
-import DateTime from "../../generic/DateTime/DateTime";
+import {CollectionList, COLLECTION_ICONS} from "./CollectionList";
 import styles from './CollectionList.styles';
 
 const shallow = createShallow({dive: true});

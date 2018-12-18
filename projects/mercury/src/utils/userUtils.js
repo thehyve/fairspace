@@ -8,7 +8,7 @@
  *  - username when no names and email
  *  - id when no names, email and username
  */
-export const getDisplayName = (user) => {
+export default function getDisplayName(user) {
     if (!user) {
         return '';
     }
@@ -21,4 +21,4 @@ export const getDisplayName = (user) => {
     const hasId = user.hasOwnProperty('id') && user.id;
 
     return (hasFullName || hasFirstName || hasLastName) || hasEmail || hasUsername || hasId;
-};
+}

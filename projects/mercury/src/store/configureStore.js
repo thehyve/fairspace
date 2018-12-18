@@ -1,8 +1,4 @@
-if (process.env.NODE_ENV === 'production') {
-    module.exports = require('./configureStore.prod');
-} else {
-    module.exports = require('./configureStore.dev');
-}
+module.exports = process.env.NODE_ENV === 'production' ? require('./configureStore.prod') : require('./configureStore.dev');
 
 /*
 Below you can find the structure of the state that is in the store. It is

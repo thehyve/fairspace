@@ -96,8 +96,8 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('WithStyles(DialogTitle)').childAt(0).text()).toEqual('Share with');
 
         // render collacborator selector
-        expect(wrapper.find('WithStyles(MaterialReactSelect)').prop('value')).toBe(null);
-        expect(wrapper.find('WithStyles(MaterialReactSelect)').prop('options')).toEqual(expectedOptions);
+        expect(wrapper.find('WithStyles(materialReactSelect)').prop('value')).toBe(null);
+        expect(wrapper.find('WithStyles(materialReactSelect)').prop('options')).toEqual(expectedOptions);
 
         // initial value of the access right is "Read"
         expect(wrapper.find('RadioGroup').prop('value')).toEqual('Read');

@@ -1,5 +1,5 @@
 import Config from "../Config/Config";
-import {failOnHttpError} from "../../utils/httputils";
+import failOnHttpError from "../../utils/httputils";
 
 class WorkspaceAPI {
     static getConfig = {

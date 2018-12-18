@@ -1,6 +1,6 @@
 import {format} from 'util';
 import Config from '../Config/Config';
-import {failOnHttpError} from "../../utils/httputils";
+import failOnHttpError from "../../utils/httputils";
 
 class PermissionAPI {
     static changeHeaders = new Headers({'Content-Type': 'application/json'});
@@ -26,7 +26,7 @@ class PermissionAPI {
 
     alterCollectionPermission(userId, collectionId, access) {
         if (!userId || !collectionId || !access) {
-            return Promise.reject("No userId, collectionId or access given");
+            return Promise.reject(Error("No userId, collectionId or access given"));
         }
         return fetch(Config.get().urls.permissions, {
             method: 'PUT',

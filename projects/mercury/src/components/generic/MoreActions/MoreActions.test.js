@@ -14,6 +14,6 @@ describe('MoreIconButton', () => {
             <MoreActions onClick={jest.fn()} className={{}} />
         );
         expect(wrapper.find('WithStyles(IconButton)').length).toBe(1);
-        expect(wrapper.find('MoreActionsMenu').length).toBe(1);
+        expect(wrapper.find('moreActionsMenu').length).toBe(1);
     });
 });

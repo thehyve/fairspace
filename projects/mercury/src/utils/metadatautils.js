@@ -1,6 +1,35 @@
 import {LABEL_URI} from "../services/MetadataAPI/MetadataAPI";
 
 /**
+ *
+ * @param uri the URI to generate a label for
+ * @param shortenExternalUris if true will generate a short label even if a URI doesn't belong to the current workspace
+ * e.g. http://example.com/aaa/bbb => bbb
+ * otherwise will leave external URIs unmodified
+ * @returns {*}
+ */
+export function linkLabel(uri, shortenExternalUris = false) {
+    const entityPrefix = `${window.location.origin}/iri/`;
+    if (uri.startsWith(entityPrefix)) {
+        const path = uri.substring(entityPrefix.length);
+        return path.substring(path.indexOf('/') + 1);
+    }
+
+    const collectionPrefix = `${window.location.origin}/collections/`;
+    if (uri.startsWith(collectionPrefix)) {
+        return uri.substring(collectionPrefix.length);
+    }
+
+    if (shortenExternalUris) {
+        return uri.includes('#')
+            ? uri.substring(uri.lastIndexOf('#') + 1)
+            : uri.substring(uri.lastIndexOf('/') + 1);
+    }
+
+    return uri;
+}
+
+/**
  * Returns the label for the given entity.
  *
  * If an rdfs:label is present, that label is used. Otherwise
@@ -46,36 +75,6 @@ export function navigableLink(link) {
 export function relativeLink(link) {
     return link.substring(window.location.origin.length);
 }
-
-/**
- *
- * @param uri the URI to generate a label for
- * @param shortenExternalUris if true will generate a short label even if a URI doesn't belong to the current workspace
- * e.g. http://example.com/aaa/bbb => bbb
- * otherwise will leave external URIs unmodified
- * @returns {*}
- */
-export function linkLabel(uri, shortenExternalUris = false) {
-    const entityPrefix = `${window.location.origin}/iri/`;
-    if (uri.startsWith(entityPrefix)) {
-        const path = uri.substring(entityPrefix.length);
-        return path.substring(path.indexOf('/') + 1);
-    }
-
-    const collectionPrefix = `${window.location.origin}/collections/`;
-    if (uri.startsWith(collectionPrefix)) {
-        return uri.substring(collectionPrefix.length);
-    }
-
-    if (shortenExternalUris) {
-        return uri.includes('#')
-            ? uri.substring(uri.lastIndexOf('#') + 1)
-            : uri.substring(uri.lastIndexOf('/') + 1);
-    }
-
-    return uri;
-}
-
 
 export function isDateTimeProperty(property) {
     return property.range === 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
