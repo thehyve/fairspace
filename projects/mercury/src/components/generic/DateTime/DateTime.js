@@ -1,15 +1,19 @@
 import React from 'react';
 
 class DateTime extends React.Component {
-    options = {
+    optionsDate = {
         year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    }
+
+    optionsTime = {
         hour: 'numeric',
         minute: 'numeric'
     }
 
-    dateFormatter = new Intl.DateTimeFormat('en-US', this.options);
+    dateFormatter = new Intl.DateTimeFormat('en-US', this.optionsDate);
+    timeFormatter = new Intl.DateTimeFormat('en-US', this.optionsTime);
 
     formatDateTime = (date) => {
         const today = new Date();
