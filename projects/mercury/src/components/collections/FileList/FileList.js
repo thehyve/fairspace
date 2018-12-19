@@ -22,11 +22,13 @@ import withHovered from "../../../containers/WithHovered/WithHovered";
 
 class FileList extends React.Component {
     render() {
+        const {files, selectedPaths, classes} = this.props;
+
         // TODO: what is the point of this.props.files[0] === null?
-        if (!this.props.files || this.props.files.length === 0 || this.props.files[0] === null) {
+        if (!files || files.length === 0 || files[0] === null) {
             return "No files";
         } else {
-            const selectedFilenames = props.selectedPaths || [];
+            const selectedFilenames = selectedPaths || [];
             return (
                 <Paper className={classes.fileListContainer}>
                     <Table padding={'dense'}>
@@ -40,7 +42,7 @@ class FileList extends React.Component {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {props.files.map((row, idx) => {
+                            {files.map((row, idx) => {
                                 const selected = selectedFilenames.includes(row.filename);
                                 return (
                                     <ClickHandler
@@ -48,8 +50,8 @@ class FileList extends React.Component {
                                         key={row.filename}
                                         selected={selected}
                                         className={selected ? classes.tableRowSelected : classes.tableRow}
-                                        onSingleClick={() => props.onPathClick(row)}
-                                        onDoubleClick={() => props.onPathDoubleClick(row)}
+                                        onSingleClick={() => this.props.onPathClick(row)}
+                                        onDoubleClick={() => this.props.onPathDoubleClick(row)}
                                         onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
                                         onMouseOut={() => this.props.onItemMouseOut(idx)}
                                     >
@@ -72,19 +74,19 @@ class FileList extends React.Component {
                                         <TableCell numeric>
                                             <Row
                                                 style={{visibility: this.props.hovered !== idx ? 'hidden' : 'visible'}}>
-                                                {props.onRename ?
+                                                {this.props.onRename ?
                                                     <RenameButton currentName={row.basename}
                                                                   aria-label={"Rename " + row.basename}
                                                                   title={"Rename " + row.basename}
-                                                                  onRename={(newName) => props.onRename(row, newName)}
-                                                                  disabled={props.readonly}>
+                                                                  onRename={(newName) => this.props.onRename(row, newName)}
+                                                                  disabled={this.props.readonly}>
                                                         <RenameBox/>
                                                     </RenameButton> : null}
-                                                {props.onDelete ?
+                                                {this.props.onDelete ?
                                                     <ButtonWithVerification aria-label={"Delete " + row.basename}
                                                                             title={"Delete " + row.basename}
-                                                                            onClick={() => props.onDelete(row)}
-                                                                            disabled={props.readonly}>
+                                                                            onClick={() => this.props.onDelete(row)}
+                                                                            disabled={this.props.readonly}>
                                                         <Icon>delete</Icon>
                                                     </ButtonWithVerification> : null}
                                             </Row>
