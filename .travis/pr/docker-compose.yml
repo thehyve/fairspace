@@ -1,5 +1,22 @@
 version: '3'
 services:
+  keycloak:
+    image: jboss/keycloak:4.6.0.Final
+    volumes:
+    - ".:/pr"
+    networks:
+    - e2e-testing
+    environment:
+      KEYCLOAK_USER: "e2e"
+      KEYCLOAK_PASSWORD: "e2e"
+      KEYCLOAK_IMPORT: "/pr/config/keycloak/realm.json"
+    ports:
+    - "8080:8080"
+  rabbitmq:
+    image: rabbitmq:management
+    networks:
+    - e2e-testing
+
   pluto:
     image: fairspace.azurecr.io/fairspace/pluto:${VERSION}
     ports:
@@ -47,37 +64,5 @@ services:
     - npm
     - start
 
-  keycloak:
-    image: jboss/keycloak:4.6.0.Final
-    volumes:
-      - ".:/pr"
-    networks:
-    - e2e-testing
-    environment:
-      KEYCLOAK_USER: "e2e"
-      KEYCLOAK_PASSWORD: "e2e"
-    ports:
-      - "8080:8080"
-
-  rabbitmq:
-    image: rabbitmq:management
-    networks:
-      - e2e-testing
-
-  keycloak-config:
-    image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.0
-    networks:
-    - e2e-testing
-    environment:
-      KEYCLOAK_PASSWORD: "e2e"
-      TESTUSER_USERNAME: "e2e-test"
-      TESTUSER_PASSWORD: "e2e-test"
-      COORDINATOR_USERNAME: "coordinator"
-      COORDINATOR_PASSWORD: "coordinator"
-      CLIENT_SECRET: 5871a148-f425-4f8e-a96e-3a532abbb210
-    volumes:
-    - ".:/pr"
-    command:
-      - "/pr/config/keycloak/run-config.sh"
 networks:
   e2e-testing:
