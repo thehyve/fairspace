@@ -66,7 +66,7 @@ function BreadCrumbs({
 
     if (segments) {
         let currentPath = stripTrailingSlash(homePath);
-        segments.forEach(segment => { console.log('segment', segment)
+        segments.forEach(segment => {
             if (segment.segment && segment.label) {
                 // eslint-disable-next-line prefer-template
                 currentPath += stripTrailingSlash('/' + segment.segment);
@@ -74,7 +74,6 @@ function BreadCrumbs({
             }
         });
     }
-    console.log('breadcrumbs', breadcrumbs)
 
     return (
         <div className={classes.root}>
