@@ -19,6 +19,7 @@ workspace:
     tls:
       certificate:
         dns01Provider: azuredns-ci
+  enableExperimentalFeatures: true
 
 pluto:
   image:
