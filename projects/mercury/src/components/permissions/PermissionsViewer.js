@@ -1,6 +1,6 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
+import Fab from "@material-ui/core/Fab";
+import Icon from "@material-ui/core/Icon";
 import {withStyles} from "@material-ui/core/styles/index";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -161,9 +161,15 @@ export class PermissionsViewer extends React.Component {
         return canManage ? (
             <ListItem className={classes.buttonList}>
                 <ListItemSecondaryAction>
-                    <Button variant="fab" aria-label="Add" title="Add collaborator" onClick={() => this.handleAlterPermission()} mini>
-                        <AddIcon />
-                    </Button>
+                    <Fab
+                        mini="true"
+                        color="secondary"
+                        aria-label="Add"
+                        title="Ad collaboratord"
+                        onClick={this.handleAlterPermission}
+                    >
+                        <Icon>add</Icon>
+                    </Fab>
                 </ListItemSecondaryAction>
             </ListItem>
         ) : '';
