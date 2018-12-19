@@ -1,4 +1,6 @@
-import {CLIPBOARD_CLEAR, CLIPBOARD_COPY, CLIPBOARD_CUT, CLIPBOARD_PASTE} from "../actions/actionTypes";
+import {
+    CLIPBOARD_CLEAR, CLIPBOARD_COPY, CLIPBOARD_CUT, CLIPBOARD_PASTE
+} from "../actions/actionTypes";
 import {COPY, CUT} from "../actions/clipboard";
 import * as actionTypes from "../utils/redux-action-types";
 

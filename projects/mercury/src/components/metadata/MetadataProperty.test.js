@@ -1,14 +1,14 @@
-import MetadataProperty from "./MetadataProperty"
 import React from 'react';
-import mockStore from "../../store/mockStore"
-import Config from "../../services/Config/Config";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ClearIcon from '@material-ui/icons/Clear';
 import IconButton from "@material-ui/core/IconButton";
+import {createShallow, createMount} from '@material-ui/core/test-utils';
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import {STRING_URI} from "../../services/MetadataAPI/MetadataAPI";
-import {createShallow, createMount} from '@material-ui/core/test-utils';
+import Config from "../../services/Config/Config";
+import mockStore from "../../store/mockStore";
+import MetadataProperty from "./MetadataProperty";
 
 const subject = 'https://thehyve.nl';
 const defaultProperty = {
@@ -24,8 +24,8 @@ const mount = createMount();
 beforeEach(() => {
     window.fetch = jest.fn(() => Promise.resolve({ok: true}));
     Config.setConfig({
-        "urls": {
-            "metadata": "/metadata"
+        urls: {
+            metadata: "/metadata"
         }
     });
 
@@ -37,17 +37,17 @@ describe('MetadataProperty elements', () => {
         const property = {
             ...defaultProperty,
             allowMultiple: false
-        }
+        };
 
-        const store = mockStore({})
-        const wrapper = shallow(<MetadataProperty editable={true} store={store} property={property} subject={subject} />);
+        const store = mockStore({});
+        const wrapper = shallow(<MetadataProperty editable store={store} property={property} subject={subject} />);
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(3);
     });
 
     it('shows an add element if multiple values are allowed, and it is editable', () => {
-        const store = mockStore({})
-        const wrapper = shallow(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
+        const store = mockStore({});
+        const wrapper = shallow(<MetadataProperty editable store={store} property={defaultProperty} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(4);
@@ -56,7 +56,7 @@ describe('MetadataProperty elements', () => {
     });
 
     it('shows no add element if multiple values are allowed, but it is uneditable', () => {
-        const store = mockStore({})
+        const store = mockStore({});
         const wrapper = shallow(<MetadataProperty editable={false} store={store} property={defaultProperty} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
@@ -69,10 +69,10 @@ describe('MetadataProperty elements', () => {
         const property = {
             ...defaultProperty,
             values: []
-        }
+        };
 
-        const store = mockStore({})
-        const wrapper = shallow(<MetadataProperty editable={true} store={store} property={property} subject={subject} />);
+        const store = mockStore({});
+        const wrapper = shallow(<MetadataProperty editable store={store} property={property} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
@@ -80,16 +80,16 @@ describe('MetadataProperty elements', () => {
         // Assert contents of the single component
         const ExpectedComponent = ValueComponentFactory.addComponent(property);
         const inputComponent = listItems.at(0).dive().find(ExpectedComponent);
-        expect(inputComponent.prop('entry')).toEqual({value: ""})
+        expect(inputComponent.prop('entry')).toEqual({value: ""});
     });
 
     it('shows no add element if there is no value yet, but it is uneditable', () => {
         const property = {
             ...defaultProperty,
             values: []
-        }
+        };
 
-        const store = mockStore({})
+        const store = mockStore({});
         const wrapper = shallow(<MetadataProperty editable={false} store={store} property={property} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
@@ -101,10 +101,10 @@ describe('MetadataProperty elements', () => {
             ...defaultProperty,
             values: [{value: 'More info'}],
             allowMultiple: false
-        }
+        };
 
-        const store = mockStore({})
-        const wrapper = shallow(<MetadataProperty editable={true} store={store} property={property} subject={subject} />);
+        const store = mockStore({});
+        const wrapper = shallow(<MetadataProperty editable store={store} property={property} subject={subject} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
@@ -131,10 +131,10 @@ describe('MetadataProperty elements', () => {
 describe('MetadataProperty changes', () => {
     it('handles addition correctly', () => {
         const store = mockStore({});
-        const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
+        const wrapper = mount(<MetadataProperty editable store={store} property={defaultProperty} subject={subject} />);
         const input = wrapper.find('input').last();
         input.simulate('focus');
-        input.simulate('change', { target: { value: 'New more info' }});
+        input.simulate('change', {target: {value: 'New more info'}});
         input.simulate('blur');
 
         wrapper.unmount();
@@ -150,11 +150,11 @@ describe('MetadataProperty changes', () => {
     it('handles updates correctly', () => {
         const store = mockStore({});
 
-        const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
+        const wrapper = mount(<MetadataProperty editable store={store} property={defaultProperty} subject={subject} />);
 
         const input = wrapper.find('input').first();
         input.simulate('focus');
-        input.simulate('change', { target: { value: 'New more info' }});
+        input.simulate('change', {target: {value: 'New more info'}});
         input.simulate('blur');
 
         wrapper.unmount();
@@ -169,12 +169,12 @@ describe('MetadataProperty changes', () => {
     });
 
     it('does not actually update when input does not change', () => {
-        const store = mockStore({})
-        const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
+        const store = mockStore({});
+        const wrapper = mount(<MetadataProperty editable store={store} property={defaultProperty} subject={subject} />);
 
         const input = wrapper.find('input').first();
         input.simulate('focus');
-        input.simulate('change', { target: { value: 'More info' }});
+        input.simulate('change', {target: {value: 'More info'}});
         input.simulate('blur');
 
         wrapper.unmount();
@@ -184,9 +184,9 @@ describe('MetadataProperty changes', () => {
     });
 
     it('handles deletion correctly', () => {
-        const store = mockStore({})
+        const store = mockStore({});
 
-        const wrapper = mount(<MetadataProperty editable={true} store={store} property={defaultProperty} subject={subject} />);
+        const wrapper = mount(<MetadataProperty editable store={store} property={defaultProperty} subject={subject} />);
 
         const secondButton = wrapper.find(IconButton).at(1);
         secondButton.simulate('click');
@@ -200,5 +200,4 @@ describe('MetadataProperty changes', () => {
         expect(actions[0].meta.values[0].value).toEqual('More info');
         expect(actions[0].meta.values[1].value).toEqual('My second collection');
     });
-
-})
+});

@@ -5,23 +5,22 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import MoreActionsMenu from "./MoreActionsMenu";
 
 class MoreActions extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
             anchorEl: null
-        }
+        };
     }
 
     handleClick = (event) => {
         if (this.props.onClick) {
             this.props.onClick(event);
         }
-        this.setState({anchorEl: event.currentTarget})
+        this.setState({anchorEl: event.currentTarget});
     };
 
     handleMenuOnClose = () => {
-        this.setState({anchorEl:null});
+        this.setState({anchorEl: null});
     };
 
     /**
@@ -29,25 +28,26 @@ class MoreActions extends React.Component {
      * when clicking on the menuitem
      * @param menuItem
      */
-    closeMenuOnClick = (menuItem, idx) =>
+    closeMenuOnClick = (menuItem, idx) => (
         <span key={idx} onClick={this.handleMenuOnClose}>
             {menuItem}
         </span>
-
+    )
 
     render() {
         const {ariaLabel, visibility} = this.props;
         return (
             <div>
-                <IconButton aria-label={ariaLabel} style={{visibility: visibility}} onClick={this.handleClick}>
-                    <MoreIcon/>
+                <IconButton aria-label={ariaLabel} style={{visibility}} onClick={this.handleClick}>
+                    <MoreIcon />
                 </IconButton>
                 <MoreActionsMenu
                     menuItems={this.props.children ? this.props.children.map(this.closeMenuOnClick) : undefined}
                     onClose={this.handleMenuOnClose}
-                    anchorEl={this.state.anchorEl}/>
+                    anchorEl={this.state.anchorEl}
+                />
             </div>
-        )
+        );
     }
 }
 

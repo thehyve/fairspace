@@ -35,7 +35,9 @@ class ErrorDialog extends React.Component {
     static showError(error, message, onRetry = null) {
         console.error(message, error);
         if (ErrorDialog.instance) {
-            ErrorDialog.instance.setState({error: true, stackTrace: error, message: message, onRetry: onRetry})
+            ErrorDialog.instance.setState({
+                error: true, stackTrace: error, message, onRetry
+            });
         }
     }
 
@@ -48,48 +50,56 @@ class ErrorDialog extends React.Component {
     };
 
     handleRetry = () => {
-        let retry = this.state.onRetry;
+        const retry = this.state.onRetry;
         this.setState({error: false, onRetry: null, stackTrace: null});
-        retry()
+        retry();
     };
 
     render() {
-        let dialog = (
-                <Dialog
-                    open={this.state.error}
-                    TransitionComponent={Transition}
-                    onClose={this.handleClose}
-                    aria-labelledby="alert-dialog-slide-title"
-                    aria-describedby="alert-dialog-slide-description"
-                    key={"error-dialog"}
-                >
-                    <DialogTitle id="alert-dialog-slide-title">
-                        <Row>
-                            <Column vertical='center' horizontal='start'>
-                                    <Icon color="error" style={{fontSize: 40, padding: '5px'}}>report_problem</Icon>
-                            </Column>
-                            <Column vertical='center' horizontal='start'>
-                                {"An error has occurred"}
-                            </Column>
-                        </Row>
-                    </DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-slide-description">
-                            {this.state.message}
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleClose.bind(this)} color="primary">
-                            Dismiss
-                        </Button>
-                        {this.state.onRetry ?
-                            (<Button onClick={this.handleRetry.bind(this)} color="primary">
+        const dialog = (
+            <Dialog
+                open={this.state.error}
+                TransitionComponent={Transition}
+                onClose={this.handleClose}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description"
+                key="error-dialog"
+            >
+                <DialogTitle id="alert-dialog-slide-title">
+                    <Row>
+                        <Column vertical="center" horizontal="start">
+                            <Icon color="error" style={{fontSize: 40, padding: '5px'}}>report_problem</Icon>
+                        </Column>
+                        <Column vertical="center" horizontal="start">
+                            {"An error has occurred"}
+                        </Column>
+                    </Row>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-slide-description">
+                        {this.state.message}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={this.handleClose}
+                        color="primary"
+                    >
+                        Dismiss
+                    </Button>
+                    {this.state.onRetry
+                        ? (
+                            <Button
+                                onClick={this.handleRetry}
+                                color="primary"
+                            >
                                 Retry
-                            </Button>)
-                            : null
-                        }
-                    </DialogActions>
-                </Dialog>
+                            </Button>
+                        )
+                        : null
+                    }
+                </DialogActions>
+            </Dialog>
         );
 
         return [this.props.children, dialog];

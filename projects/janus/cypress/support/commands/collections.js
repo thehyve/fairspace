@@ -37,11 +37,11 @@ Cypress.Commands.add("addCollection", (name, description) => {
     cy.contains('button', 'add').click({force: true});
 
     // Enter parameters if given
-    if(name) {
+    if (name) {
         cy.get('input[name=name]').clear();
         cy.get('input[name=name]').type(name);
     }
-    if(description) {
+    if (description) {
         cy.get('textarea[name=description]').clear();
         cy.get('textarea[name=description]').type(changedDescription);
     }
@@ -60,7 +60,7 @@ Cypress.Commands.add("addCollectionFast", (overrides = {}) => {
             cy.request({
                 method: 'POST',
                 url: '/api/collections',
-                body: JSON.stringify({...data,...overrides}),
+                body: JSON.stringify({...data, ...overrides}),
                 headers: {'Content-type': 'application/json'}
             })
         );
@@ -108,7 +108,7 @@ function deleteCollection(row) {
     cy.clickButtonOnHover(row);
 
     // Confirm deletion
-    cy.contains('button', 'Submit').click({force:true});
+    cy.contains('button', 'Submit').click({force: true});
 
     // Wait a bit to ensure deletion
     cy.wait(100);

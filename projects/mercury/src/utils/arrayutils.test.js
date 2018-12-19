@@ -5,12 +5,12 @@ describe('collectionUtils', () => {
         const mockCollectionsNoId = [{}];
         const mockCollections = [
             {
-                "id": 500,
-                "name": "Jan Smit's collection 1",
+                id: 500,
+                name: "Jan Smit's collection 1",
             },
             {
-                "id": 501,
-                "name": "Jan Smit's collection 2",
+                id: 501,
+                name: "Jan Smit's collection 2",
             },
         ];
         it('should get collection by id', () => {

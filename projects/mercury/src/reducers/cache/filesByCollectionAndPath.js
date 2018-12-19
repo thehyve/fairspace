@@ -23,11 +23,12 @@ const invalidateFiles = (state, collectionId, ...paths) => {
     return {
         ...state,
         [collectionId]: Object.assign({}, state[collectionId], ...newPathsState)
-    }
-}
+    };
+};
 
 const filesByCollectionAndPath = (state = defaultState, action) => {
-    let collectionId, path;
+    let collectionId;
+    let path;
     switch (action.type) {
         case actionTypes.pending(FILES):
             collectionId = action.meta.collection.id;
@@ -43,7 +44,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                         data: {}
                     }
                 }
-            }
+            };
         case actionTypes.fulfilled(FILES):
             collectionId = action.meta.collection.id;
             path = action.meta.path;
@@ -57,7 +58,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                         data: action.payload
                     }
                 }
-            }
+            };
         case actionTypes.rejected(FILES):
             collectionId = action.meta.collection.id;
             path = action.meta.path;
@@ -79,20 +80,22 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
             };
         case actionTypes.fulfilled(CREATE_DIRECTORY):
         case actionTypes.rejected(CREATE_DIRECTORY):
-        case actionTypes.invalidate(CREATE_DIRECTORY):
-            let newState = {
+        case actionTypes.invalidate(CREATE_DIRECTORY): {
+            const newState = {
                 ...state,
                 creatingDirectory: false
             };
             return invalidateFiles(newState, action.meta.collection.id, action.meta.path);
+        }
         case actionTypes.invalidate(FILES):
         case actionTypes.fulfilled(RENAME_FILE):
         case actionTypes.fulfilled(DELETE_FILE):
         case actionTypes.fulfilled(UPLOAD_FILES):
             return invalidateFiles(state, action.meta.collection.id, action.meta.path);
-        case actionTypes.fulfilled(CLIPBOARD_PASTE):
+        case actionTypes.fulfilled(CLIPBOARD_PASTE): {
             const {sourceDir, destinationDir} = action.meta;
             return invalidateFiles(state, action.meta.collection.id, sourceDir, destinationDir);
+        }
         default:
             return state;
     }

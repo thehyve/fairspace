@@ -1,4 +1,4 @@
-import reducer from "./permissionsByCollection"
+import reducer from "./permissionsByCollection";
 
 describe('updating permissions', () => {
     it('should add collaborators', () => {
@@ -22,14 +22,14 @@ describe('updating permissions', () => {
             }
         };
 
-        const newState = reducer(previousState, action)
+        const newState = reducer(previousState, action);
 
         expect(newState[500].data.length).toEqual(2);
-        expect(newState[500].data).toContainEqual({subject: 'my-subject', access: 'Read', collectionId: 500})
-        expect(newState[500].data).toContainEqual({subject: 'user-1', access: 'Manage', collectionId: 500})
+        expect(newState[500].data).toContainEqual({subject: 'my-subject', access: 'Read', collectionId: 500});
+        expect(newState[500].data).toContainEqual({subject: 'user-1', access: 'Manage', collectionId: 500});
         expect(newState[500].invalidated).toBe(true);
         expect(newState[501].data.length).toEqual(0);
-    })
+    });
 
     it('should update existing collaborators', () => {
         const previousState = {
@@ -52,13 +52,13 @@ describe('updating permissions', () => {
             }
         };
 
-        const newState = reducer(previousState, action)
+        const newState = reducer(previousState, action);
 
         expect(newState[500].data.length).toEqual(1);
-        expect(newState[500].data).toContainEqual({subject: 'my-subject', access: 'Read', collectionId: 500})
+        expect(newState[500].data).toContainEqual({subject: 'my-subject', access: 'Read', collectionId: 500});
         expect(newState[500].invalidated).toBe(true);
         expect(newState[501].data.length).toEqual(0);
-    })
+    });
 
     it('should delete existing collaborators', () => {
         const previousState = {
@@ -82,12 +82,12 @@ describe('updating permissions', () => {
             }
         };
 
-        const newState = reducer(previousState, action)
+        const newState = reducer(previousState, action);
 
         expect(newState[500].data.length).toEqual(1);
-        expect(newState[500].data).toContainEqual({subject: 'other-subject', access: 'Write', collectionId: 500})
+        expect(newState[500].data).toContainEqual({subject: 'other-subject', access: 'Write', collectionId: 500});
         expect(newState[500].invalidated).toBe(true);
-    })
+    });
 
     it('should not fail when deleting a collaborator that does not exist', () => {
         const previousState = {
@@ -110,12 +110,12 @@ describe('updating permissions', () => {
             }
         };
 
-        const newState = reducer(previousState, action)
+        const newState = reducer(previousState, action);
 
         expect(newState[500].data.length).toEqual(1);
-        expect(newState[500].data).toContainEqual({subject: 'other-subject', access: 'Write', collectionId: 500})
+        expect(newState[500].data).toContainEqual({subject: 'other-subject', access: 'Write', collectionId: 500});
         expect(newState[500].invalidated).toBe(true);
-    })
+    });
 
     it('should not fail when the collection information has not yet been retrieved', () => {
         const previousState = {
@@ -135,12 +135,10 @@ describe('updating permissions', () => {
             }
         };
 
-        const newState = reducer(previousState, action)
+        const newState = reducer(previousState, action);
 
         expect(newState[600].data.length).toEqual(1);
-        expect(newState[600].data).toContainEqual({subject: 'my-subject', access: 'Manage', collectionId: 600})
+        expect(newState[600].data).toContainEqual({subject: 'my-subject', access: 'Manage', collectionId: 600});
         expect(newState[600].invalidated).toBe(true);
-    })
-
-
-})
+    });
+});

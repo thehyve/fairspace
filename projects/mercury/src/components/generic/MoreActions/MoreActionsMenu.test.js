@@ -16,7 +16,7 @@ describe('MoreActionsMenu', () => {
             <ActionItem key={1}>Bar</ActionItem>
         ];
         const wrapper = shallow(
-            <MoreActionsMenu menuItems={dummyMenuItems}/>
+            <MoreActionsMenu menuItems={dummyMenuItems} />
         );
         expect(wrapper.find('ActionItem').at(0).childAt(0).text()).toEqual('Foo');
         expect(wrapper.find('ActionItem').at(1).childAt(0).text()).toEqual('Bar');

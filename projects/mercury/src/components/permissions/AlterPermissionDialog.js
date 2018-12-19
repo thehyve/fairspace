@@ -7,14 +7,14 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import {withStyles} from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
-import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect'
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
+import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect';
 
-export const styles = theme => ({
+export const styles = () => ({
     root: {
         width: 400,
         height: 350,
@@ -46,14 +46,12 @@ export const styles = theme => ({
  * @param currentUser
  * @returns {*}
  */
-const applyDisableFilter = (options, collaborators, currentUser) => {
-    return options.map(option => {
-        const isAlreadySelected = collaborators.find(c => c.subject === option.value) !== undefined;
-        const isCurrentUser = option.value === currentUser.id;
-        option.disabled = isAlreadySelected || isCurrentUser;
-        return option;
-    });
-};
+const applyDisableFilter = (options, collaborators, currentUser) => options.map((option) => {
+    const isAlreadySelected = collaborators.find(c => c.subject === option.value) !== undefined;
+    const isCurrentUser = option.value === currentUser.id;
+    option.disabled = isAlreadySelected || isCurrentUser;
+    return option;
+});
 
 /**
  * Get user label by user object
@@ -77,14 +75,13 @@ const getUserLabelByUser = (user, options) => {
  */
 const transformUserToOptions = (users, collaborators, currentUser) => {
     if (users.data) {
-        const tmp = users.data.map(r => {
-            return {
-                label: `${r.firstName} ${r.lastName}`,
-                value: r.id
-            };
-        });
+        const tmp = users.data.map(r => ({
+            label: `${r.firstName} ${r.lastName}`,
+            value: r.id
+        }));
         return applyDisableFilter(tmp, collaborators, currentUser);
     }
+    return [];
 };
 
 /**
@@ -109,9 +106,7 @@ const getNoOptionMessage = (users) => {
  * @param user
  * @returns {{value}}
  */
-const convertUserToOptionValue = (user) => {
-    return user ? {value: user.subject} : null;
-};
+const convertUserToOptionValue = user => (user ? {value: user.subject} : null);
 
 const AccessRights = {
     Read: 'Read',
@@ -120,7 +115,6 @@ const AccessRights = {
 };
 
 export class AlterPermissionDialog extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -141,11 +135,11 @@ export class AlterPermissionDialog extends React.Component {
         });
     };
 
-    handleAccessRightChange = event => {
+    handleAccessRightChange = (event) => {
         this.setState({accessRight: event.target.value});
     };
 
-    handleSelectedUserChange = selectedOption => {
+    handleSelectedUserChange = (selectedOption) => {
         this.setState({selectedUser: selectedOption});
     };
 
@@ -169,27 +163,39 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     renderUser = () => {
-        const {user, users, collaborators, currentUser} = this.props;
+        const {
+            user, users, collaborators, currentUser
+        } = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
         let options = [];
 
         if (users.data && collaborators.data) {
             options = transformUserToOptions(users, collaborators.data, currentUser);
             if (user) { // only render the label if user is passed into this component
-                return (<div>
-                    <Typography variant="subtitle1"
-                                gutterBottom>{getUserLabelByUser(user, options)}</Typography>
-                </div>)
+                return (
+                    <div>
+                        <Typography
+                            variant="subtitle1"
+                            gutterBottom
+                        >
+                            {getUserLabelByUser(user, options)}
+                        </Typography>
+                    </div>
+                );
             }
         }
 
         // otherwise render select user component
-        return (<MaterialReactSelect options={options}
-                                     onChange={this.handleSelectedUserChange}
-                                     placeholder={'Please select a user'}
-                                     value={selectedUser}
-                                     noOptionsMessage={() => (getNoOptionMessage(users))}
-                                     label={selectedUserLabel}/>);
+        return (
+            <MaterialReactSelect
+                options={options}
+                onChange={this.handleSelectedUserChange}
+                placeholder="Please select a user"
+                value={selectedUser}
+                noOptionsMessage={() => (getNoOptionMessage(users))}
+                label={selectedUserLabel}
+            />
+        );
     };
 
     render() {
@@ -209,11 +215,16 @@ export class AlterPermissionDialog extends React.Component {
                                 name="access-right"
                                 className={classes.group}
                                 value={accessRight}
-                                onChange={this.handleAccessRightChange}>
-                                {Object.keys(AccessRights).map(access => {
-                                    return <FormControlLabel key={access} value={access} control={<Radio/>}
-                                                             label={AccessRights[access]}/>
-                                })}
+                                onChange={this.handleAccessRightChange}
+                            >
+                                {Object.keys(AccessRights).map(access => (
+                                    <FormControlLabel
+                                        key={access}
+                                        value={access}
+                                        control={<Radio />}
+                                        label={AccessRights[access]}
+                                    />
+                                ))}
                             </RadioGroup>
                         </FormControl>
                     </div>

@@ -5,7 +5,7 @@ import asPage from "../../containers/asPage/asPage";
 import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 import Config from "../../services/Config/Config";
 
-function Home(props) {
+function Home() {
     return Config.get().enableExperimentalFeatures
         ? (
             <WithRightDrawer

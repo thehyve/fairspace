@@ -1,14 +1,14 @@
-import Config from "../Config/Config";
 import CreateWebdavClient from "webdav";
+import Config from "../Config/Config";
 
 // Ensure that the window fetch method is used for webdav calls
 // and that is passes along the credentials
-const defaultOptions = { credentials: 'include' };
+const defaultOptions = {credentials: 'include'};
 CreateWebdavClient.setFetchMethod((input, init) => {
     const options = init ? Object.assign({}, init, defaultOptions) : defaultOptions;
 
     return fetch(input, options);
-})
+});
 
 /**
  * Service to perform file operations
@@ -17,10 +17,10 @@ class FileAPI {
     static PATH_SEPARATOR = '/';
 
     constructor(collectionSubDirectory) {
-        this.basePath = '/' + collectionSubDirectory;
+        this.basePath = `/${collectionSubDirectory}`;
 
         const baseUrl = Config.get().urls.files;
-        this.client = CreateWebdavClient(baseUrl)
+        this.client = CreateWebdavClient(baseUrl);
     }
 
     /**
@@ -41,11 +41,11 @@ class FileAPI {
      * @returns {*}
      */
     createDirectory(path) {
-        if(!path) {
-            return Promise.reject("No path specified for directory creation");
+        if (!path) {
+            return Promise.reject(Error("No path specified for directory creation"));
         }
 
-        return this.client.createDirectory(this.getFullPath(path))
+        return this.client.createDirectory(this.getFullPath(path));
     }
 
     /**
@@ -56,15 +56,14 @@ class FileAPI {
      * @returns Promise<any>
      */
     upload(path, files, nameMapping) {
-        if(!files) {
-            return Promise.reject("No files given");
+        if (!files) {
+            return Promise.reject(Error("No files given"));
         }
 
         const fullPath = this.getFullPath(path);
 
         return Promise.all(
-            files.map(file =>
-                this.client.putFileContents(fullPath + '/' + nameMapping.get(file.name), file))
+            files.map(file => this.client.putFileContents(`${fullPath}/${nameMapping.get(file.name)}`, file))
         ).then(() => files);
     }
 
@@ -73,7 +72,7 @@ class FileAPI {
      * @param path
      */
     download(path) {
-        if(!path) {
+        if (!path) {
             return;
         }
 
@@ -86,10 +85,9 @@ class FileAPI {
      * @returns Promise<any>
      */
     delete(path) {
-        if(!path)
-            return Promise.reject("No path specified for deletion");
+        if (!path) return Promise.reject(Error("No path specified for deletion"));
 
-        return this.client.deleteFile(this.getFullPath(path))
+        return this.client.deleteFile(this.getFullPath(path));
     }
 
     /**
@@ -100,10 +98,10 @@ class FileAPI {
      */
     move(source, destination) {
         if (!source) {
-            return Promise.reject("No source specified to move");
+            return Promise.reject(Error("No source specified to move"));
         }
         if (!destination) {
-            return Promise.reject("No destination specified to move to");
+            return Promise.reject(Error("No destination specified to move to"));
         }
 
         // We have to specify the destination ourselves, as the client adds the fullpath
@@ -119,13 +117,13 @@ class FileAPI {
      */
     copy(source, destination) {
         if (!source) {
-            return Promise.reject("No source specified to copy");
+            return Promise.reject(Error("No source specified to copy"));
         }
         if (!destination) {
-            return Promise.reject("No destination specified to copy to");
+            return Promise.reject(Error("No destination specified to copy to"));
         }
 
-        return this.client.copyFile(this.getFullPath(source), this.getFullPath(destination))
+        return this.client.copyFile(this.getFullPath(source), this.getFullPath(destination));
     }
 
 
@@ -144,7 +142,7 @@ class FileAPI {
      */
     joinPaths(...paths) {
         return paths
-            .map(p => p && p !== '/' ? p : '')   // For falsy values, or '/', use an empty string
+            .map(p => (p && p !== '/' ? p : '')) // For falsy values, or '/', use an empty string
             .join(FileAPI.PATH_SEPARATOR);
     }
 
@@ -157,15 +155,15 @@ class FileAPI {
      */
     movePaths(sourceDir, filenames, destinationDir) {
         // Moving files to the current directory is a noop
-        if(destinationDir === sourceDir) {
+        if (destinationDir === sourceDir) {
             return Promise.resolve();
         }
 
-        return Promise.all(filenames.map(filename => {
+        return Promise.all(filenames.map((filename) => {
             const sourceFile = this.joinPaths(sourceDir || '', filename);
             const destinationFile = this.joinPaths(destinationDir || '', filename);
             return this.move(sourceFile, destinationFile);
-        }))
+        }));
     }
 
     /**
@@ -176,22 +174,22 @@ class FileAPI {
      * @returns {*}
      */
     copyPaths(sourceDir, filenames, destinationDir) {
-        return Promise.all(filenames.map(filename => {
+        return Promise.all(filenames.map((filename) => {
             const sourceFile = this.joinPaths(sourceDir || '', filename);
             let destinationFilename = filename;
 
             // Copying files to the current directory involves renaming
-            if(destinationDir === sourceDir) {
-                destinationFilename = FileAPI._addCounterToFilename(destinationFilename);
+            if (destinationDir === sourceDir) {
+                destinationFilename = FileAPI.addCounterToFilename(destinationFilename);
             }
 
             const destinationFile = this.joinPaths(destinationDir || '', destinationFilename);
 
             return this.copy(sourceFile, destinationFile);
-        }))
+        }));
     }
 
-    static _addCounterToFilename(filename) {
+    static addCounterToFilename(filename) {
         // Parse the filename
         const dotPosition = filename.lastIndexOf('.');
         let basename = filename.substring(0, dotPosition);
@@ -204,15 +202,13 @@ class FileAPI {
         // If so, update the counter in the filename
         const counterMatch = / \((\d+)\)$/;
         const matches = basename.match(counterMatch);
-        if(matches) {
+        if (matches) {
             basename = basename.substring(0, basename.length - matches[0].length);
             counter = parseInt(matches[1], 10) + 1;
         }
 
         return `${basename} (${counter}).${extension}`;
     }
-
-
 }
 
 export default FileAPI;

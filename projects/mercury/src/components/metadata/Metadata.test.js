@@ -1,107 +1,25 @@
-import ConnectedMetadata from "./Metadata"
-import {Metadata} from "./Metadata"
 import React from 'react';
 import {mount} from "enzyme";
-import Vocabulary from "../../services/MetadataAPI/Vocabulary";
-import mockStore from "../../store/mockStore"
-import MetadataViewer from "./MetadataViewer";
 import {Provider} from "react-redux";
+import ConnectedMetadata, {Metadata} from "./Metadata";
+import Vocabulary from "../../services/MetadataAPI/Vocabulary";
+import mockStore from "../../store/mockStore";
+import MetadataViewer from "./MetadataViewer";
 import Config from "../../services/Config/Config";
-import {CLASS_URI, DOMAIN_URI, LABEL_URI, PROPERTY_URI} from "../../services/MetadataAPI/MetadataAPI";
+import {
+    CLASS_URI, DOMAIN_URI, LABEL_URI, PROPERTY_URI
+} from "../../services/MetadataAPI/MetadataAPI";
 
 beforeAll(() => {
-    window.fetch = jest.fn(() => Promise.resolve({ok: true, json: () => ({})}))
+    window.fetch = jest.fn(() => Promise.resolve({ok: true, json: () => ({})}));
 
     Config.setConfig({
-        "urls": {
-            "metadata": "/metadata"
+        urls: {
+            metadata: "/metadata"
         }
     });
 
     return Config.init();
-});
-
-it('shows result when subject provided and data is loaded', () => {
-    const store = mockStore({
-        metadataBySubject: {
-            "http://fairspace.com/iri/collections/1": {
-                data: [
-                    {key: 'test', values: []}
-                ]
-            }
-        },
-        cache: {
-            vocabulary:
-                {
-                    data: new Vocabulary(vocabulary)
-                }
-        }
-    });
-
-    const collection = {
-        uri: "http://fairspace.com/iri/collections/1"
-    }
-
-    const wrapper = mount(
-        <Provider store={store}>
-            <ConnectedMetadata editable={true} subject={collection.uri}/>
-        </Provider>);
-
-    expect(wrapper.find(MetadataViewer).length).toEqual(1);
-});
-
-it('shows a message if no metadata was found', () => {
-    const store = mockStore({
-        metadataBySubject: {
-            "http://fairspace.com/iri/collections/1": {
-                data: []
-            }
-        },
-        cache: {
-            vocabulary:
-                {
-                    data: new Vocabulary(vocabulary)
-                }
-        }
-    });
-
-    const wrapper = mount(<ConnectedMetadata subject={"http://fairspace.com/iri/collections/1"} store={store}/>);
-
-    expect(wrapper.text()).toContain("(404) No such resource.");
-});
-
-it('shows error when no subject provided', () => {
-    const store = mockStore({
-        metadataBySubject: {},
-        cache: {
-            vocabulary:
-                {
-                    data: new Vocabulary(vocabulary)
-                }
-        }
-    });
-    const wrapper = mount(<ConnectedMetadata subject={null} store={store}/>);
-
-    expect(wrapper.text()).toContain("An error occurred while loading metadata");
-});
-
-it('tries to load the metadata and the vocabulary', () => {
-    const store = mockStore({
-        cache: {
-            jsonLdBySubject: {
-                "http://fairspace.com/iri/collections/1": {
-                    data: []
-                }
-            },
-            vocabulary: {
-                data: new Vocabulary(vocabulary)
-            }
-        }
-    });
-
-    const dispatch = jest.fn();
-    const wrapper = mount(<Metadata subject={"John"} store={store} dispatch={dispatch}/>);
-    expect(dispatch.mock.calls.length).toEqual(1);
 });
 
 const vocabulary = [
@@ -143,3 +61,87 @@ const vocabulary = [
         [LABEL_URI]: [{'@value': 'Collection'}]
     }
 ];
+
+it('shows result when subject provided and data is loaded', () => {
+    const store = mockStore({
+        metadataBySubject: {
+            "http://fairspace.com/iri/collections/1": {
+                data: [
+                    {key: 'test', values: []}
+                ]
+            }
+        },
+        cache: {
+            vocabulary:
+            {
+                data: new Vocabulary(vocabulary)
+            }
+        }
+    });
+
+    const collection = {
+        uri: "http://fairspace.com/iri/collections/1"
+    };
+
+    const wrapper = mount(
+        <Provider store={store}>
+            <ConnectedMetadata editable subject={collection.uri} />
+        </Provider>
+    );
+
+    expect(wrapper.find(MetadataViewer).length).toEqual(1);
+});
+
+it('shows a message if no metadata was found', () => {
+    const store = mockStore({
+        metadataBySubject: {
+            "http://fairspace.com/iri/collections/1": {
+                data: []
+            }
+        },
+        cache: {
+            vocabulary:
+            {
+                data: new Vocabulary(vocabulary)
+            }
+        }
+    });
+
+    const wrapper = mount(<ConnectedMetadata subject="http://fairspace.com/iri/collections/1" store={store} />);
+
+    expect(wrapper.text()).toContain("(404) No such resource.");
+});
+
+it('shows error when no subject provided', () => {
+    const store = mockStore({
+        metadataBySubject: {},
+        cache: {
+            vocabulary:
+            {
+                data: new Vocabulary(vocabulary)
+            }
+        }
+    });
+    const wrapper = mount(<ConnectedMetadata subject={null} store={store} />);
+
+    expect(wrapper.text()).toContain("An error occurred while loading metadata");
+});
+
+it('tries to load the metadata and the vocabulary', () => {
+    const store = mockStore({
+        cache: {
+            jsonLdBySubject: {
+                "http://fairspace.com/iri/collections/1": {
+                    data: []
+                }
+            },
+            vocabulary: {
+                data: new Vocabulary(vocabulary)
+            }
+        }
+    });
+
+    const dispatch = jest.fn();
+    const wrapper = mount(<Metadata subject="John" store={store} dispatch={dispatch} />);
+    expect(dispatch.mock.calls.length).toEqual(1);
+});
