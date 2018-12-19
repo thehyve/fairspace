@@ -165,7 +165,7 @@ export class PermissionsViewer extends React.Component {
                         mini="true"
                         color="secondary"
                         aria-label="Add"
-                        title="Add collaboratord"
+                        title="Add collaborator"
                         onClick={this.handleAlterPermission}
                     >
                         <Icon>add</Icon>
