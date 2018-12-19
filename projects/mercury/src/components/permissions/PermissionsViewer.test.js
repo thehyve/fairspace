@@ -5,44 +5,44 @@ import {PermissionsViewer, styles} from "./PermissionsViewer";
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
         {
-            'collectionId': 500,
-            'subject': 'user2-id',
-            'access': 'Write',
-            'firstName': 'Michael',
-            'lastName': 'Jackson'
+            collectionId: 500,
+            subject: 'user2-id',
+            access: 'Write',
+            firstName: 'Michael',
+            lastName: 'Jackson'
         },
         {
-            'collectionId': 500,
-            'subject': 'user3-id',
-            'access': 'Read',
-            'firstName': 'Bruno',
-            'lastName': 'Mars'
+            collectionId: 500,
+            subject: 'user3-id',
+            access: 'Read',
+            firstName: 'Bruno',
+            lastName: 'Mars'
         },
         {
-            'collectionId': 500,
-            'subject': 'user1-id',
-            'access': 'Manage',
-            'firstName': 'Mariah',
-            'lastName': 'Carey'
+            collectionId: 500,
+            subject: 'user1-id',
+            access: 'Manage',
+            firstName: 'Mariah',
+            lastName: 'Carey'
         },
         {
-            'collectionId': 500,
-            'subject': 'user4-id',
-            'access': 'Manage',
-            'firstName': 'Kurt',
-            'lastName': 'Cobain'
+            collectionId: 500,
+            subject: 'user4-id',
+            access: 'Manage',
+            firstName: 'Kurt',
+            lastName: 'Cobain'
         }
     ];
     const mockcurrentUserCreatorCanManage = {id: 'user4-id'};
     const mockcurrentUserNotCreatorCanManage = {id: 'user1-id'};
     const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
     const mockUsers = [
-            {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
-            {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
-            {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars'},
-            {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain'},
-            {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
-        ];
+        {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
+        {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
+        {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars'},
+        {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain'},
+        {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
+    ];
     const mockCreator = 'user4-id';
     const mockFetchPermissionsFn = jest.fn();
     const mockAlterPermissionFn = jest.fn();
@@ -64,7 +64,7 @@ describe('PermissionsViewer', () => {
             wrapper = shallow(<PermissionsViewer
                 creator={mockCreator}
                 collectionId={500}
-                canManage={true}
+                canManage
 
                 classes={styles}
                 permissions={mockCollaborators}
@@ -98,10 +98,10 @@ describe('PermissionsViewer', () => {
         });
 
         it('should enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find('MoreActions').length).toEqual(3)
+            expect(wrapper.find('MoreActions').length).toEqual(3);
         });
         it('should render add button', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(1)
+            expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
         });
     });
 
@@ -151,11 +151,11 @@ describe('PermissionsViewer', () => {
         });
 
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find('MoreActions').length).toEqual(0)
+            expect(wrapper.find('MoreActions').length).toEqual(0);
         });
 
         it('should NOT render add button', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(0)
+            expect(wrapper.find('[aria-label="Add"]').length).toEqual(0);
         });
     });
 
@@ -170,7 +170,7 @@ describe('PermissionsViewer', () => {
             wrapper = shallow(<PermissionsViewer
                 creator={mockCreator}
                 collectionId={500}
-                canManage={true}
+                canManage
 
                 classes={styles}
                 permissions={mockCollaborators}
@@ -205,12 +205,11 @@ describe('PermissionsViewer', () => {
         });
 
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find('MoreActions').length).toEqual(3)
+            expect(wrapper.find('MoreActions').length).toEqual(3);
         });
 
         it('should render add button', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(1)
+            expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
         });
     });
-
 });

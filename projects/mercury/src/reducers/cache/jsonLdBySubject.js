@@ -1,5 +1,5 @@
-import {promiseReducerFactory} from "../../utils/redux";
 import reduceReducers from 'reduce-reducers';
+import {promiseReducerFactory} from "../../utils/redux";
 import {METADATA, UPDATE_METADATA} from "../../actions/actionTypes";
 import * as actionTypes from "../../utils/redux-action-types";
 
@@ -8,7 +8,7 @@ const defaultState = {};
 const jsonLdFetchReducer = promiseReducerFactory(METADATA, defaultState, action => action.meta.subject);
 
 const updateMetadataReducer = (state = defaultState, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case actionTypes.fulfilled(UPDATE_METADATA):
             return {
                 ...state,
@@ -16,10 +16,10 @@ const updateMetadataReducer = (state = defaultState, action) => {
                     ...state[action.meta.subject],
                     invalidated: true
                 }
-            }
+            };
         default:
-            return state
+            return state;
     }
-}
+};
 
 export default reduceReducers(jsonLdFetchReducer, updateMetadataReducer, defaultState);

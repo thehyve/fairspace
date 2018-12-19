@@ -1,9 +1,7 @@
 import FileAPI from "./FileAPI";
 
 const factory = {
-    build: (collection) => {
-        return new FileAPI(collection.location)
-    }
-}
+    build: collection => new FileAPI(collection.location)
+};
 
 export default factory;

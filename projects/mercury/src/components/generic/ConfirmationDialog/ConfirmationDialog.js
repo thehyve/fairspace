@@ -8,7 +8,6 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import PropTypes from 'prop-types';
 
 class ConfirmationDialog extends React.Component {
-
     handleDisagree = (e) => {
         this.props.onDisagree(e);
     };
@@ -30,17 +29,26 @@ class ConfirmationDialog extends React.Component {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">
+                    {title}
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
                         {content}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleDisagree} color="primary">
+                    <Button
+                        onClick={this.handleDisagree}
+                        color="primary"
+                    >
                         Cancel
                     </Button>
-                    <Button onClick={this.handleAgree} color="primary" autoFocus>
+                    <Button
+                        onClick={this.handleAgree}
+                        color="primary"
+                        autoFocus
+                    >
                         Submit
                     </Button>
                 </DialogActions>

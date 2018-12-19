@@ -1,4 +1,4 @@
-const drawerWidth = 360
+const drawerWidth = 360;
 const styles = theme => ({
     drawerContents: {
         marginTop: 50

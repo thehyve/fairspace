@@ -1,7 +1,7 @@
 import {applyMiddleware, createStore} from "redux";
-import rootReducer from "../reducers";
 import promiseMiddleware from "redux-promise-middleware";
 import thunk from 'redux-thunk';
+import rootReducer from "../reducers";
 import initializeState from "./initializeState";
 import menuStateInLocalStorage from "./menuStateInLocalStorage";
 

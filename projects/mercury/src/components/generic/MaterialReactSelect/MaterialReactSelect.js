@@ -89,6 +89,19 @@ function Control(props) {
     );
 }
 
+function blockEvent(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if ((event.target.tagName !== 'A') || !('href' in event.target)) {
+        return;
+    }
+    if (event.target.target) {
+        window.open(event.target.href, event.target.target);
+    } else {
+        window.location.href = event.target.href;
+    }
+}
+
 function Option(props) {
     return (
         <MenuItem
@@ -100,7 +113,8 @@ function Option(props) {
             }}
             {...props.innerProps}
             disabled={!!props.data.disabled}
-            onClick={props.data.disabled ? blockEvent : props.innerProps.onClick}>
+            onClick={props.data.disabled ? blockEvent : props.innerProps.onClick}
+        >
             {props.children}
         </MenuItem>
     );
@@ -127,20 +141,11 @@ function SingleValue(props) {
 }
 
 function ValueContainer(props) {
-    return <div className={props.selectProps.classes.valueContainer}>{props.children}</div>;
-}
-
-function blockEvent(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    if ((event.target.tagName !== 'A') || !('href' in event.target)) {
-        return;
-    }
-    if (event.target.target) {
-        window.open(event.target.href, event.target.target);
-    } else {
-        window.location.href = event.target.href;
-    }
+    return (
+        <div className={props.selectProps.classes.valueContainer}>
+            {props.children}
+        </div>
+    );
 }
 
 function MultiValue(props) {
@@ -176,40 +181,37 @@ const components = {
     ValueContainer,
 };
 
-class MaterialReactSelect extends React.Component {
+const materialReactSelect = (props) => {
+    const {classes, theme} = props;
 
-    render() {
-        const {classes, theme} = this.props;
+    const selectStyles = {
+        input: base => ({
+            ...base,
+            color: theme.palette.text.primary,
+        }),
+    };
 
-        const selectStyles = {
-            input: base => ({
-                ...base,
-                color: theme.palette.text.primary,
-            }),
-        };
+    return (
+        <Select
+            classes={classes}
+            styles={selectStyles}
+            options={props.options}
+            components={components}
+            value={props.value}
+            onChange={props.onChange}
+            noOptionsMessage={props.noOptionsMessage}
+            placeholder={props.placeholder}
+            textFieldProps={{
+                label: props.label,
+                InputLabelProps: {
+                    shrink: true,
+                },
+            }}
+        />
+    );
+};
 
-        return (
-            <Select
-                classes={classes}
-                styles={selectStyles}
-                options={this.props.options}
-                components={components}
-                value={this.props.value}
-                onChange={this.props.onChange}
-                noOptionsMessage={this.props.noOptionsMessage}
-                placeholder={this.props.placeholder}
-                textFieldProps={{
-                    label: this.props.label,
-                    InputLabelProps: {
-                        shrink: true,
-                    },
-                }}
-            />
-        );
-    }
-}
-
-MaterialReactSelect.propTypes = {
+materialReactSelect.propTypes = {
     options: PropTypes.array,
     value: PropTypes.object,
     placeholder: PropTypes.string,
@@ -219,10 +221,10 @@ MaterialReactSelect.propTypes = {
     noOptionsMessage: PropTypes.func
 };
 
-MaterialReactSelect.defaultProps = {
+materialReactSelect.defaultProps = {
     placeholder: 'Please select a value',
     label: '',
     required: false,
 };
 
-export default withStyles(styles, {withTheme: true})(MaterialReactSelect);
+export default withStyles(styles, {withTheme: true})(materialReactSelect);

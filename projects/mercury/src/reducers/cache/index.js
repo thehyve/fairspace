@@ -1,5 +1,5 @@
-import {combineReducers} from 'redux'
-import jsonLdBySubject from './jsonLdBySubject'
+import {combineReducers} from 'redux';
+import jsonLdBySubject from './jsonLdBySubject';
 import vocabulary from "./vocabulary";
 import entitiesByType from "./entitiesByType";
 import collections from "./collections";
@@ -19,4 +19,4 @@ export default combineReducers({
     filesByCollectionAndPath,
     subjectByPath,
     permissionsByCollection
-})
+});
