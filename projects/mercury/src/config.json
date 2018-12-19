@@ -18,6 +18,7 @@
   },
   "externalConfigurationFiles": [
     "/api/workspace/config"
-  ]
+  ],
+  "enableExperimentalFeatures": false
 
 }

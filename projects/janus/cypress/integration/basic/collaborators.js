@@ -19,10 +19,6 @@ describe('Collection collaborators', function () {
             .then(url => fileUrl = url);
     })
 
-    beforeEach(() => {
-        uniqueId = Math.round(100000 + (Math.random() * 900000));
-    });
-
     it('should be visible along with a collection', function () {
         cy.listCollections();
         cy.contains('tr', collectionName).click();
@@ -58,8 +54,6 @@ describe('Collection collaborators', function () {
         // Ensure he is removed
         getCollaboratorsCard()
             .contains('Test UserRead').should('not.exist')
-        // Wait until Titan's cache expires
-        cy.wait(90000);
     });
 
     const getCollaboratorsCard = () =>
