@@ -25,8 +25,6 @@ class FileList extends React.Component {
         // TODO: what is the point of this.props.files[0] === null?
         if (!this.props.files || this.props.files.length === 0 || this.props.files[0] === null) {
             return "No files";
-<<<<<<< HEAD
-=======
         } else {
             const selectedFilenames = props.selectedPaths || [];
             return (
@@ -68,7 +66,7 @@ class FileList extends React.Component {
                                         </TableCell>
                                         <TableCell numeric>
                                             <Typography noWrap={true}>
-                                                {row.lastmod ? <DateTime value={row.lastmod} /> : null}
+                                                {row.lastmod ? <DateTime value={row.lastmod}/> : null}
                                             </Typography>
                                         </TableCell>
                                         <TableCell numeric>
@@ -98,7 +96,6 @@ class FileList extends React.Component {
                     </Table>
                 </Paper>
             )
->>>>>>> remove moment lib
         }
         const selectedFilenames = this.props.selectedPaths || [];
         return (
@@ -106,11 +103,11 @@ class FileList extends React.Component {
                 <Table padding="dense">
                     <TableHead>
                         <TableRow>
-                            <TableCell />
+                            <TableCell/>
                             <TableCell>Name</TableCell>
                             <TableCell numeric>size</TableCell>
                             <TableCell numeric>Last Modified</TableCell>
-                            <TableCell />
+                            <TableCell/>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -137,12 +134,12 @@ class FileList extends React.Component {
                                     </TableCell>
                                     <TableCell numeric>
                                         <Typography noWrap>
-                                            {row.type === 'file' ? <Bytes value={row.size} /> : ''}
+                                            {row.type === 'file' ? <Bytes value={row.size}/> : ''}
                                         </Typography>
                                     </TableCell>
                                     <TableCell numeric>
                                         <Typography noWrap>
-                                            {row.lastmod ? <DateTime value={row.lastmod} /> : null}
+                                            {row.lastmod ? <DateTime value={row.lastmod}/> : null}
                                         </Typography>
                                     </TableCell>
                                     <TableCell numeric>
@@ -158,7 +155,7 @@ class FileList extends React.Component {
                                                         onRename={newName => this.props.onRename(row, newName)}
                                                         disabled={this.props.readonly}
                                                     >
-                                                        <RenameBox />
+                                                        <RenameBox/>
                                                     </RenameButton>
                                                 ) : null}
                                             {this.props.onDelete
