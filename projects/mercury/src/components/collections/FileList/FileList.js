@@ -22,82 +22,9 @@ import withHovered from "../../../containers/WithHovered/WithHovered";
 
 class FileList extends React.Component {
     render() {
-        const {files, selectedPaths, classes} = this.props;
-
         // TODO: what is the point of this.props.files[0] === null?
-        if (!files || files.length === 0 || files[0] === null) {
+        if (!this.props.files || this.props.files.length === 0 || this.props.files[0] === null) {
             return "No files";
-        } else {
-            const selectedFilenames = selectedPaths || [];
-            return (
-                <Paper className={classes.fileListContainer}>
-                    <Table padding={'dense'}>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell></TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell numeric>size</TableCell>
-                                <TableCell numeric>Last Modified</TableCell>
-                                <TableCell></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {files.map((row, idx) => {
-                                const selected = selectedFilenames.includes(row.filename);
-                                return (
-                                    <ClickHandler
-                                        component={TableRow}
-                                        key={row.filename}
-                                        selected={selected}
-                                        className={selected ? classes.tableRowSelected : classes.tableRow}
-                                        onSingleClick={() => this.props.onPathClick(row)}
-                                        onDoubleClick={() => this.props.onPathDoubleClick(row)}
-                                        onMouseOver={(e) => this.props.onItemMouseOver(idx, e)}
-                                        onMouseOut={() => this.props.onItemMouseOut(idx)}
-                                    >
-                                        <TableCell>
-                                            <Icon>{row.type === 'directory' ? 'folder_open' : 'note_open'}</Icon>
-                                        </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            {row.basename}
-                                        </TableCell>
-                                        <TableCell numeric>
-                                            <Typography noWrap={true}>
-                                                {row.type === 'file' ? <Bytes value={row.size}/> : ''}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell numeric>
-                                            <Typography noWrap={true}>
-                                                {row.lastmod ? <DateTime value={row.lastmod}/> : null}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell numeric>
-                                            <Row
-                                                style={{visibility: this.props.hovered !== idx ? 'hidden' : 'visible'}}>
-                                                {this.props.onRename ?
-                                                    <RenameButton currentName={row.basename}
-                                                                  aria-label={"Rename " + row.basename}
-                                                                  title={"Rename " + row.basename}
-                                                                  onRename={(newName) => this.props.onRename(row, newName)}
-                                                                  disabled={this.props.readonly}>
-                                                        <RenameBox/>
-                                                    </RenameButton> : null}
-                                                {this.props.onDelete ?
-                                                    <ButtonWithVerification aria-label={"Delete " + row.basename}
-                                                                            title={"Delete " + row.basename}
-                                                                            onClick={() => this.props.onDelete(row)}
-                                                                            disabled={this.props.readonly}>
-                                                        <Icon>delete</Icon>
-                                                    </ButtonWithVerification> : null}
-                                            </Row>
-                                        </TableCell>
-                                    </ClickHandler>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </Paper>
-            )
         }
         const selectedFilenames = this.props.selectedPaths || [];
         return (
@@ -105,11 +32,11 @@ class FileList extends React.Component {
                 <Table padding="dense">
                     <TableHead>
                         <TableRow>
-                            <TableCell/>
+                            <TableCell />
                             <TableCell>Name</TableCell>
                             <TableCell numeric>size</TableCell>
                             <TableCell numeric>Last Modified</TableCell>
-                            <TableCell/>
+                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -136,12 +63,12 @@ class FileList extends React.Component {
                                     </TableCell>
                                     <TableCell numeric>
                                         <Typography noWrap>
-                                            {row.type === 'file' ? <Bytes value={row.size}/> : ''}
+                                            {row.type === 'file' ? <Bytes value={row.size} /> : ''}
                                         </Typography>
                                     </TableCell>
                                     <TableCell numeric>
                                         <Typography noWrap>
-                                            {row.lastmod ? <DateTime value={row.lastmod}/> : null}
+                                            {row.lastmod ? <DateTime value={row.lastmod} /> : null}
                                         </Typography>
                                     </TableCell>
                                     <TableCell numeric>
@@ -157,7 +84,7 @@ class FileList extends React.Component {
                                                         onRename={newName => this.props.onRename(row, newName)}
                                                         disabled={this.props.readonly}
                                                     >
-                                                        <RenameBox/>
+                                                        <RenameBox />
                                                     </RenameButton>
                                                 ) : null}
                                             {this.props.onDelete
