@@ -1,8 +1,5 @@
 import React from 'react';
 import Typography from "@material-ui/core/Typography";
-import Config from "../../services/Config/Config";
-import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
-import asPage from "../../containers/asPage/asPage";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardActionArea from "@material-ui/core/CardActionArea";
@@ -10,6 +7,9 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core";
+import asPage from "../../containers/asPage/asPage";
+import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
+import Config from "../../services/Config/Config";
 
 const styles = theme => ({
     card: {
@@ -57,6 +57,3 @@ const Notebooks = ({classes}) => (
 );
 
 export default asPage(withStyles(styles)(Notebooks));
-
-
-

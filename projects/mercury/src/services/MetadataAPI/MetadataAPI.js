@@ -1,7 +1,7 @@
-import Config from "../Config/Config";
-import vocabulary from './vocabulary.json'
-import {failOnHttpError} from "../../utils/httputils";
 import * as jsonld from 'jsonld/dist/jsonld';
+import Config from "../Config/Config";
+import vocabulary from './vocabulary.json';
+import failOnHttpError from "../../utils/httputils";
 import Vocabulary from "./Vocabulary";
 
 export const PROPERTY_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
@@ -37,26 +37,24 @@ const GET_ENTITIES_SPARQL = `
         { ?s rdf:type ?t FILTER(?t in (%types))}
         OPTIONAL { ?s rdfs:label ?l}
     }
-`
+`;
 
 class MetadataAPI {
-
     static getParams = {
         method: 'GET',
-        headers: new Headers({'Accept': 'application/ld+json'}),
+        headers: new Headers({Accept: 'application/ld+json'}),
         credentials: 'same-origin'
     };
 
     constructor() {
         // Initialize the vocabulary
-        this.vocabularyPromise =
-            jsonld.expand(vocabulary)
-                .then(expandedVocabulary => new Vocabulary(expandedVocabulary))
+        this.vocabularyPromise = jsonld.expand(vocabulary)
+            .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
     }
 
     get(params) {
-        let query = Object.keys(params).map(key => key + '=' + encodeURIComponent(params[key])).join('&');
-        return fetch(Config.get().urls.metadata.extendedStatements + '?' + query, MetadataAPI.getParams)
+        const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
+        return fetch(`${Config.get().urls.metadata.extendedStatements}?${query}`, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(jsonld.expand);
@@ -73,16 +71,14 @@ class MetadataAPI {
      */
     update(subject, predicate, values) {
         if (!subject || !predicate || !values) {
-            return Promise.reject("No subject, predicate or values given");
+            return Promise.reject(Error("No subject, predicate or values given"));
         }
 
-        let request = (values.length === 0)
+        const request = (values.length === 0)
+            // eslint-disable-next-line prefer-template
             ? fetch(Config.get().urls.metadata.statements
                 + '?subject=' + encodeURIComponent(subject)
-                + '&predicate=' + encodeURIComponent(predicate), {
-                method: 'DELETE',
-                credentials: 'same-origin'
-            })
+                + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE',credentials: 'same-origin'})
             : fetch(Config.get().urls.metadata.statements, {
                 method: 'PATCH',
                 headers: new Headers({'Content-type': 'application/ld+json'}),
@@ -108,7 +104,7 @@ class MetadataAPI {
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
     getEntitiesByType(type) {
-        return this.getEntitiesByTypes([type])
+        return this.getEntitiesByTypes([type]);
     }
 
     /**
@@ -137,9 +133,8 @@ class MetadataAPI {
 
     getPropertiesByDomain(type) {
         return this.getVocabulary()
-            .then(subjects => subjects.filter(s =>
-                (s['@type'] || []).includes(PROPERTY_URI)
-                && (s[DOMAIN_URI] || []).includes(type)))
+            .then(subjects => subjects.filter(s => (s['@type'] || []).includes(PROPERTY_URI)
+                && (s[DOMAIN_URI] || []).includes(type)));
     }
 
     toJsonLd(subject, predicate, values) {
@@ -148,7 +143,7 @@ class MetadataAPI {
                 '@id': subject,
                 [predicate]: values.map(value => ({'@id': value.id, '@value': value.value}))
             }
-        ]
+        ];
     }
 
     getSubjectByPath(path) {
@@ -160,7 +155,7 @@ class MetadataAPI {
         })
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
-            .then(data => data.id)
+            .then(data => data.id);
     }
 }
 

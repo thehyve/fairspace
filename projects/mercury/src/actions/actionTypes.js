@@ -1,3 +1,5 @@
+/* eslint-disable no-multi-spaces */
+
 // Account
 export const USER                   = "USER";
 export const AUTHORIZATIONS         = "AUTHORIZATIONS";

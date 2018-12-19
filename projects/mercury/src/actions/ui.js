@@ -1,5 +1,7 @@
 import {TOGGLE_MENU} from "./actionTypes";
 
-export const toggleMenuExpansion= () => ({
+const toggleMenuExpansion = () => ({
     type: TOGGLE_MENU
 });
+
+export default toggleMenuExpansion;

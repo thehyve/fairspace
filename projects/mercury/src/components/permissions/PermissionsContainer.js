@@ -6,10 +6,10 @@ const mapStateToProps = (state, ownProps) => {
     const {
         account: {user},
         cache: {users, permissionsByCollection},
-        ui: { pending: { alterPermission }}
+        ui: {pending: {alterPermission}}
     } = state;
 
-    const collectionPermission = permissionsByCollection[ownProps.collectionId] || { pending: true }
+    const collectionPermission = permissionsByCollection[ownProps.collectionId] || {pending: true};
 
     return {
         loading: user.pending || users.pending || collectionPermission.pending,

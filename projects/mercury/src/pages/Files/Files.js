@@ -4,19 +4,16 @@ import WithInfoDrawer from "../../components/collections/WithInfoDrawer/WithInfo
 import asPage from "../../containers/asPage/asPage";
 
 function Files(props) {
-    const {match: { params }} = props;
+    const {match: {params}} = props;
 
     return (
         <WithInfoDrawer>
             <FileBrowser
                 openedCollectionId={parseInt(params.collection, 10)}
-                openedPath={params.path ? '/' + params.path : '/'}
+                openedPath={params.path ? `/${params.path}` : '/'}
             />
         </WithInfoDrawer>
     );
 }
 
 export default asPage(Files);
-
-
-

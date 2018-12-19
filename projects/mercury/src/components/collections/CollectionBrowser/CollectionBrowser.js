@@ -14,99 +14,110 @@ import CollectionEditor from "../CollectionList/CollectionEditor";
 import {findById} from "../../../utils/arrayutils";
 import LoadingInlay from '../../generic/Loading/LoadingInlay';
 import LoadingOverlay from '../../generic/Loading/LoadingOverlay';
+import Config from "../../../services/Config/Config";
 
 class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             editingCollection: false
-        }
+        };
     }
 
     componentDidMount() {
         this.props.fetchCollectionsIfNeeded();
-        this.props.closePath()
+        this.props.closePath();
     }
 
-    handleAddCollectionClick() {
-        this.setState({editingCollection: true})
+    handleAddCollectionClick = () => {
+        this.setState({editingCollection: true});
     }
 
-    handleCollectionClick(collection) {
+    handleCollectionClick = (collection) => {
         const {selectedCollectionId, selectCollection, deselectCollection} = this.props;
         // If this collection is already selected, deselect
         if (selectedCollectionId && selectedCollectionId === collection.id) {
-            deselectCollection()
+            deselectCollection();
         } else {
-            selectCollection(collection.id)
+            selectCollection(collection.id);
         }
     }
 
-    handleCollectionDelete(collection) {
+    handleCollectionDelete = (collection) => {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
         deleteCollection(collection.id)
             .then(fetchCollectionsIfNeeded)
-            .catch(err =>
-                ErrorDialog.showError(
-                    err,
-                    "An error occurred while deleting a collection",
-                    this.handleCollectionDelete.bind(this)
-                ))
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while deleting a collection",
+                this.handleCollectionDelete
+            ));
     }
 
-    handleCollectionDoubleClick(collection) {
-        this.props.history.push("/collections/" + collection.id);
+    handleCollectionDoubleClick = (collection) => {
+        this.props.history.push(`/collections/${collection.id}`);
     }
 
     renderButtons() {
-        return <Button variant="fab" mini color="secondary" aria-label="Add" title="Add collection"
-                       onClick={this.handleAddCollectionClick.bind(this)}>
-            <Icon>add</Icon>
-        </Button>
+        return (
+            <Button
+                variant="fab"
+                mini
+                color="secondary"
+                aria-label="Add"
+                title="Add collection"
+                onClick={this.handleAddCollectionClick}
+            >
+                <Icon>add</Icon>
+            </Button>
+        );
     }
 
     renderLoading() {
-        return <LoadingInlay/>;
+        return <LoadingInlay />;
     }
 
     renderCollectionList() {
-        const {users, collections, addingCollection, deletingCollection} = this.props;
+        const {
+            users, collections, addingCollection, deletingCollection
+        } = this.props;
+        // TODO: is this required, does it have an effect?
         collections.map(col => col.creatorObj = findById(users, col.creator));
 
         return (
             <div>
-                <CollectionList collections={this.props.collections}
-                                selectedCollectionId={this.props.selectedCollectionId}
-                                onCollectionClick={this.handleCollectionClick.bind(this)}
-                                onCollectionDoubleClick={this.handleCollectionDoubleClick.bind(this)}
-                                onCollectionDelete={this.handleCollectionDelete.bind(this)}
+                <CollectionList
+                    collections={this.props.collections}
+                    selectedCollectionId={this.props.selectedCollectionId}
+                    onCollectionClick={this.handleCollectionClick}
+                    onCollectionDoubleClick={this.handleCollectionDoubleClick}
+                    onCollectionDelete={this.handleCollectionDelete}
                 />
                 <CollectionEditor
-                    title={'Add collection'}
-                    name={this.props.user.fullName + '\'s collection'}
+                    title="Add collection"
+                    name={`${this.props.user.fullName}'s collection`}
                     editing={this.state.editingCollection}
-                    onSave={this.handleAddCollection.bind(this)}
-                    onCancel={this.handleCancelAddCollection.bind(this)}
-                    editType={true}
+                    onSave={this.handleAddCollection}
+                    onCancel={this.handleCancelAddCollection}
+                    editType={Config.get().enableExperimentalFeatures}
                 />
-                <LoadingOverlay loading={addingCollection || deletingCollection}/>
+                <LoadingOverlay loading={addingCollection || deletingCollection} />
             </div>
         );
     }
 
-    handleAddCollection(name, description, type) {
+    handleAddCollection = (name, description, type) => {
         this.setState({editingCollection: false});
         this.props.addCollection(name, description, type)
             .then(this.props.fetchCollectionsIfNeeded)
-            .catch(err =>
-                ErrorDialog.showError(
-                    err,
-                    "An error occurred while creating a collection",
-                    this.handleAddCollectionClick.bind(this)
-                ))
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while creating a collection",
+                this.handleAddCollectionClick
+            ));
     }
 
-    handleCancelAddCollection() {
+    handleCancelAddCollection = () => {
         this.setState({editingCollection: false});
     }
 
@@ -114,17 +125,20 @@ class CollectionBrowser extends React.Component {
         const {loading, error} = this.props;
 
         if (error) {
-            return <ErrorMessage message={"An error occurred while loading collections"}/>
+            return <ErrorMessage message="An error occurred while loading collections" />;
         }
 
-        return <GenericCollectionsScreen
-            breadCrumbs={<BreadCrumbs/>}
-            buttons={this.renderButtons()}
-            main={loading ? this.renderLoading() : this.renderCollectionList()}/>
+        return (
+            <GenericCollectionsScreen
+                breadCrumbs={<BreadCrumbs />}
+                buttons={this.renderButtons()}
+                main={loading ? this.renderLoading() : this.renderCollectionList()}
+            />
+        );
     }
 }
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state) => ({
     user: state.account.user.data,
     loading: state.cache.collections.pending || state.account.user.pending || state.cache.users.pending,
     error: state.cache.collections.error || state.account.user.error || state.cache.users.error,

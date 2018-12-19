@@ -25,12 +25,10 @@ const defaultState = {
     deletingCollection: false
 };
 
-const deselectPath = (state, path) => {
-    return {
-        ...state,
-        selectedPaths: (state.selectedPaths || []).filter(el => el !== path)
-    };
-}
+const deselectPath = (state, path) => ({
+    ...state,
+    selectedPaths: (state.selectedPaths || []).filter(el => el !== path)
+});
 
 const collectionBrowser = (state = defaultState, action) => {
     switch (action.type) {
@@ -70,7 +68,7 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 deletingCollection: false
-            }
+            };
         case actionTypes.fulfilled(DELETE_FILE):
             return deselectPath(state, action.meta.fullpath);
         case actionTypes.pending(ADD_COLLECTION):

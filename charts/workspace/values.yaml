@@ -53,6 +53,7 @@ workspace:
             nginx.ingress.kubernetes.io/rewrite-target: /zuul
           jupyter:
             kubernetes.io/ingress.class: nginx
+            nginx.org/client-max-body-size: "0"
         tls:
             enabled: true
             secretNameOverride:
@@ -78,6 +79,7 @@ workspace:
         enabled: true
         image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0
         pullPolicy: IfNotPresent
+    enableExperimentalFeatures: false
 
 # Generic settings for tracing
 tracing:

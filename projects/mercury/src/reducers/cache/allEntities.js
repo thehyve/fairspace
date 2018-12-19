@@ -1,6 +1,6 @@
+import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
 import {METADATA_ALL_ENTITIES, METADATA_NEW_ENTITY} from "../../actions/actionTypes";
-import reduceReducers from "reduce-reducers";
 import * as actionTypes from "../../utils/redux-action-types";
 
 const metadataCreateReducer = (state = {}, action) => {
@@ -12,7 +12,7 @@ const metadataCreateReducer = (state = {}, action) => {
                 invalidated: true,
             };
         default:
-            return state
+            return state;
     }
 };
 

@@ -13,5 +13,6 @@ data:
       "urls": {
         "storage": "{{ .Values.mercury.urls.storage }}"
       }
+      "enableExperimentalFeatures": {{ .Values.workspace.enableExperimentalFeatures }}
     }
 

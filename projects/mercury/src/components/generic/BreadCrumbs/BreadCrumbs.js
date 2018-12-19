@@ -12,7 +12,10 @@ const menuEntries = flattenShallow(menuitems.map(sublist => sublist.items));
 const defaultHomeEntry = menuEntries[0];
 
 function getBreadCrumbLink(text, path, linkClass) {
-    return (<Button component={Link} to={path} key={path} variant='text' className={linkClass}>{text}</Button>);
+    return (
+        <Button component={Link} to={path} key={path} variant="text" className={linkClass}>
+            {text}
+        </Button>);
 }
 
 function stripTrailingSlash(path) {
@@ -22,10 +25,16 @@ function stripTrailingSlash(path) {
 function determineHomeEntry(homeUrl, classes) {
     // Now lookup the right entry. If none is found,
     // default to the first entry in the list.
-    const entry = menuEntries.find(entry => entry.url === homeUrl) || defaultHomeEntry;
+    const entry = menuEntries.find(e => e.url === homeUrl) || defaultHomeEntry;
 
     // Return a breadcrumb link for the given entry
-    return getBreadCrumbLink((<span><Icon className={classes.icon}>{entry.icon}</Icon> {entry.label}</span>), entry.url, classes.link )
+    return getBreadCrumbLink((
+        <span>
+            <Icon className={classes.icon}>
+                {entry.icon}
+            </Icon>
+            {entry.label}
+        </span>), entry.url, classes.link);
 }
 
 /**
@@ -37,33 +46,40 @@ function determineHomeEntry(homeUrl, classes) {
  * @returns {Array}
  * @constructor
  */
-function BreadCrumbs({segments, match, classes}) {
+function BreadCrumbs({
+    homeUrl, segments, match, classes
+}) {
     // Ensure we only have the first part of the url
-    let homeUrl = match.path
-    if(homeUrl !== '/') {
-        homeUrl = '/' + homeUrl.split('/')[1];
+    let homePath = match.path;
+    if (homePath !== '/') {
+        // eslint-disable-next-line prefer-template
+        homePath = '/' + homePath.split('/')[1];
+    }
+    if (homeUrl) {
+        homePath = homeUrl;
     }
 
     // Add the first item to the list of breadcrumbs
-    let breadcrumbs = [
-        determineHomeEntry(homeUrl, classes)
+    const breadcrumbs = [
+        determineHomeEntry(homePath, classes)
     ];
 
-    if(segments) {
-        let currentPath = stripTrailingSlash(homeUrl);
-        for(let segment of segments) {
-            if(segment.segment && segment.label) {
+    if (segments) {
+        let currentPath = stripTrailingSlash(homePath);
+        segments.forEach(segment => {
+            if (segment.segment && segment.label) {
+                // eslint-disable-next-line prefer-template
                 currentPath += stripTrailingSlash('/' + segment.segment);
-                breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, classes.link))
+                breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, classes.link));
             }
-        }
+        });
     }
 
     return (
         <div className={classes.root}>
             {jsxJoin(breadcrumbs, ' > ')}
         </div>
-    )
+    );
 }
 
 BreadCrumbs.propTypes = {
@@ -72,13 +88,14 @@ BreadCrumbs.propTypes = {
         PropTypes.shape({
             segment: PropTypes.string.isRequired,
             label: PropTypes.string.isRequired
-        }))
-}
+        })
+    )
+};
 
 const styles = theme => ({
-    root: { marginBottom: theme.spacing.unit },
-    link: { minWidth: 'auto' },
-    icon: { verticalAlign: 'middle', marginRight: theme.spacing.unit  }
+    root: {marginBottom: theme.spacing.unit},
+    link: {minWidth: 'auto'},
+    icon: {verticalAlign: 'middle', marginRight: theme.spacing.unit}
 });
 
 export default withStyles(styles)(withRouter(BreadCrumbs));
