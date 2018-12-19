@@ -1,7 +1,7 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
-import Button from "@material-ui/core/Button";
+import Fab from "@material-ui/core/Fab";
 import Icon from "@material-ui/core/Icon";
 import BreadCrumbs from "../../generic/BreadCrumbs/BreadCrumbs";
 import ErrorDialog from "../../error/ErrorDialog";
@@ -60,16 +60,15 @@ class CollectionBrowser extends React.Component {
 
     renderButtons() {
         return (
-            <Button
-                variant="fab"
-                mini
+            <Fab
+                mini="true"
                 color="secondary"
                 aria-label="Add"
                 title="Add collection"
                 onClick={this.handleAddCollectionClick}
             >
                 <Icon>add</Icon>
-            </Button>
+            </Fab>
         );
     }
 

@@ -107,10 +107,17 @@ class NewMetadataEntityDialog extends React.Component {
                         </Paper>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog} color="secondary">
+                        <Button
+                            onClick={this.closeDialog}
+                            color="secondary"
+                        >
                             Close
                         </Button>
-                        <Button onClick={this.createEntity} color="primary" disabled={!this.canCreate()}>
+                        <Button
+                            onClick={this.createEntity}
+                            color="primary"
+                            disabled={!this.canCreate()}
+                        >
                             Create
                         </Button>
                     </DialogActions>
