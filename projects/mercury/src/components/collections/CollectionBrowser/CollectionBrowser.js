@@ -43,7 +43,7 @@ class CollectionBrowser extends React.Component {
         }
     }
 
-    handleCollectionDelete(collection) {
+    handleCollectionDelete = (collection) => {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
         deleteCollection(collection.id)
             .then(fetchCollectionsIfNeeded)

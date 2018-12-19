@@ -26,7 +26,7 @@ class ButtonWithVerification extends React.Component {
         });
     }
 
-    openDialog(e) {
+    openDialog = (e) => {
         e.stopPropagation();
         this.setState({verifying: true});
     }
