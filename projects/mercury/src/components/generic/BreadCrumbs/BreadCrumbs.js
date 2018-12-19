@@ -47,7 +47,7 @@ function determineHomeEntry(homeUrl, classes) {
  * @constructor
  */
 function BreadCrumbs({
-    homeUrl, segments, match, classes
+    segments, match, classes, homeUrl
 }) {
     // Ensure we only have the first part of the url
     let homePath = match.path;
@@ -60,13 +60,13 @@ function BreadCrumbs({
     }
 
     // Add the first item to the list of breadcrumbs
-    const breadcrumbs = [
+    let breadcrumbs = [
         determineHomeEntry(homePath, classes)
     ];
 
     if (segments) {
         let currentPath = stripTrailingSlash(homePath);
-        segments.forEach(segment => {
+        segments.forEach(segment => { console.log('segment', segment)
             if (segment.segment && segment.label) {
                 // eslint-disable-next-line prefer-template
                 currentPath += stripTrailingSlash('/' + segment.segment);
@@ -74,6 +74,7 @@ function BreadCrumbs({
             }
         });
     }
+    console.log('breadcrumbs', breadcrumbs)
 
     return (
         <div className={classes.root}>

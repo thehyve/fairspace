@@ -17,8 +17,15 @@ export function findById(itemList, itemId) {
 export const jsxJoin = (array, str) => {
     if (!array || array.length === 0) return [];
 
-    return Object.keys(array)
-        .map(idx => (idx > 0 ? str : array[idx]));
+    let returnArray = [];
+    Object.keys(array).forEach(idx => {
+        if(idx > 0) {
+            returnArray.push(str);
+        }
+        returnArray.push(array[idx])
+    });
+
+    return returnArray;
 };
 
 /**
