@@ -17,16 +17,8 @@ export function findById(itemList, itemId) {
 export const jsxJoin = (array, str) => {
     if (!array || array.length === 0) return [];
 
-    const returnArray = [];
-
-    array.forEach(idx => {
-        if (idx > 0) {
-            returnArray.push(str);
-        }
-        returnArray.push(array[idx]);
-    });
-
-    return returnArray;
+    return Object.keys(array)
+        .map(idx => (idx > 0 ? str : array[idx]));
 };
 
 /**
