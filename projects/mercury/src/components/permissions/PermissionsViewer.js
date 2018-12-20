@@ -147,7 +147,7 @@ export class PermissionsViewer extends React.Component {
         return sortPermissions(permissions)
             .map((p, idx) => (
                 <ListItem
-                    key={idx}
+                    key={p.access + p.collectionId + p.subject}
                     onMouseOver={e => this.props.onItemMouseOver(idx, e)}
                     onMouseOut={() => this.props.onItemMouseOut(idx)}
                 >
