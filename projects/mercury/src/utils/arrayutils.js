@@ -5,7 +5,7 @@
  */
 export function findById(itemList, itemId) {
     return Array.isArray(itemList)
-        ? itemList.find(item => item.id && item.id === itemId) : undefined;
+        ? itemList.find(item => item.id === itemId) : undefined;
 }
 
 /**
