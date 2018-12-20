@@ -61,7 +61,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     protected ErrorBody handleAccessDeniedException(UnauthorizedException ex) {
         ErrorBody errorBody = new ErrorBody(ex.getMessage());
-        log.error("Unauthorized denied exception occurred.", ex);
+        log.error("Unauthorized exception occurred.", ex);
         return errorBody;
     }
 
