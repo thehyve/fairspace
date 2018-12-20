@@ -5,7 +5,7 @@
  */
 export function findById(itemList, itemId) {
     return Array.isArray(itemList)
-        ? itemList.find(item => item.hasOwnProperty('id') && item.id === itemId) : undefined;
+        ? itemList.find(item => item.id && item.id === itemId) : undefined;
 }
 
 /**
@@ -17,14 +17,13 @@ export function findById(itemList, itemId) {
 export const jsxJoin = (array, str) => {
     if (!array || array.length === 0) return [];
 
-    let returnArray = [];
+    const returnArray = [];
     Object.keys(array).forEach(idx => {
-        if(idx > 0) {
+        if (idx > 0) {
             returnArray.push(str);
         }
-        returnArray.push(array[idx])
+        returnArray.push(array[idx]);
     });
-
     return returnArray;
 };
 

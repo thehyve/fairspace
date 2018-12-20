@@ -60,7 +60,7 @@ function BreadCrumbs({
     }
 
     // Add the first item to the list of breadcrumbs
-    let breadcrumbs = [
+    const breadcrumbs = [
         determineHomeEntry(homePath, classes)
     ];
 
