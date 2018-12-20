@@ -47,7 +47,7 @@ function determineHomeEntry(homeUrl, classes) {
  * @constructor
  */
 function BreadCrumbs({
-    homeUrl, segments, match, classes
+    segments, match, classes, homeUrl
 }) {
     // Ensure we only have the first part of the url
     let homePath = match.path;
