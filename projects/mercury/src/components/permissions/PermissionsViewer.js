@@ -132,8 +132,9 @@ export class PermissionsViewer extends React.Component {
                 onMouseOut={() => this.props.onItemMouseOut(idx)}
             >
                 <MoreActions visibility={this.props.hovered !== idx ? 'hidden' : 'visible'}>
-                    <ActionItem onClick={() => this.handleAlterPermission(collaborator)}>
-
+                    <ActionItem
+                        onClick={() => this.handleAlterPermission(collaborator)}
+                    >
                         Change access
                     </ActionItem>
                     <ActionItem onClick={() => this.handleRemoveCollaborator(collaborator)}>Delete</ActionItem>
