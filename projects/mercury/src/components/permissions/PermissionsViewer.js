@@ -166,7 +166,7 @@ export class PermissionsViewer extends React.Component {
                         color="secondary"
                         aria-label="Add"
                         title="Add collaborator"
-                        onClick={this.handleAlterPermission}
+                        onClick={() => this.handleAlterPermission()}
                     >
                         <Icon>add</Icon>
                     </Fab>
