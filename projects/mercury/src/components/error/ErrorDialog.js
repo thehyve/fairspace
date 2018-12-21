@@ -14,9 +14,6 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-/**
- * This component is displayed when an error has occurred.
- */
 class ErrorDialog extends React.Component {
     static instance;
 
@@ -41,7 +38,7 @@ class ErrorDialog extends React.Component {
         }
     }
 
-    componentDidCatch(error, info) {
+    componentDidCatch(error) {
         ErrorDialog.showError(error, error.message);
     }
 
