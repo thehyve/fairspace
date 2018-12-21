@@ -1,5 +1,6 @@
 server.port: 5000
 app:
+  domain: http://localhost
   forceHttps: false
   oauth2:
     base-url: http://localhost:5100
