@@ -66,6 +66,7 @@
       {
         "props": false
       }
-    ]
+    ],
+    "jsx-a11y/mouse-events-have-key-events": 0
   }
 }

@@ -132,8 +132,9 @@ export class PermissionsViewer extends React.Component {
                 onMouseOut={() => this.props.onItemMouseOut(idx)}
             >
                 <MoreActions visibility={this.props.hovered !== idx ? 'hidden' : 'visible'}>
-                    <ActionItem onClick={() => this.handleAlterPermission(collaborator)}>
-
+                    <ActionItem
+                        onClick={() => this.handleAlterPermission(collaborator)}
+                    >
                         Change access
                     </ActionItem>
                     <ActionItem onClick={() => this.handleRemoveCollaborator(collaborator)}>Delete</ActionItem>
@@ -146,7 +147,7 @@ export class PermissionsViewer extends React.Component {
         return sortPermissions(permissions)
             .map((p, idx) => (
                 <ListItem
-                    key={idx}
+                    key={p.access + p.collectionId + p.subject}
                     onMouseOver={e => this.props.onItemMouseOver(idx, e)}
                     onMouseOut={() => this.props.onItemMouseOut(idx)}
                 >
@@ -166,7 +167,7 @@ export class PermissionsViewer extends React.Component {
                         color="secondary"
                         aria-label="Add"
                         title="Add collaborator"
-                        onClick={this.handleAlterPermission}
+                        onClick={() => this.handleAlterPermission()}
                     >
                         <Icon>add</Icon>
                     </Fab>
