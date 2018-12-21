@@ -4,7 +4,7 @@ import LoadingInlay from "./LoadingInlay";
 
 const loadingOverlay = (props) => (
     <Dialog
-        open={props.loading}
+        open={props.loading || false}
         PaperProps={{
             style: {
                 backgroundColor: 'transparent',

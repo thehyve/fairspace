@@ -9,7 +9,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import {compose} from "redux";
 import ErrorMessage from "../error/ErrorMessage";
 import ConfirmationDialog from "../generic/ConfirmationDialog/ConfirmationDialog";
-import AlterPermission from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
+import AlterPermissionContainer from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import getDisplayName from "../../utils/userUtils";
 import MoreActions from "../generic/MoreActions/MoreActions";
@@ -197,7 +197,7 @@ export class PermissionsViewer extends React.Component {
         const {collectionId, currentUser} = this.props;
         const {selectedUser, showPermissionDialog} = this.state;
         return (
-            <AlterPermission
+            <AlterPermissionContainer
                 open={showPermissionDialog}
                 onClose={this.handleShareWithDialogClose}
                 user={selectedUser}

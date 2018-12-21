@@ -1,6 +1,6 @@
 function failOnHttpError(message) {
     return (response) => {
-        if (!response.ok) {
+        if (response && !response.ok) {
             switch (response.status) {
                 case 401:
                     window.location.href = `/login?redirectUrl=${encodeURI(window.location.href)}`;

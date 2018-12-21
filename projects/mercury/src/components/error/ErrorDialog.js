@@ -9,7 +9,6 @@ import Slide from '@material-ui/core/Slide';
 import Icon from "@material-ui/core/Icon";
 import {Column, Row} from 'simple-flexbox';
 
-
 function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
@@ -19,8 +18,6 @@ class ErrorDialog extends React.Component {
 
     constructor(props) {
         super(props);
-        this.props = props;
-        this.message = props.errorMessage;
         this.state = {
             error: false,
             message: null,
@@ -29,12 +26,12 @@ class ErrorDialog extends React.Component {
         ErrorDialog.instance = this;
     }
 
-    static showError(error, message, onRetry = null) {
-        console.error(message, error);
+    static showError(error, message, onRetry, printToConsole = true) {
+        if (printToConsole) {
+            console.error(message, error);
+        }
         if (ErrorDialog.instance) {
-            ErrorDialog.instance.setState({
-                error: true, stackTrace: error, message, onRetry
-            });
+            ErrorDialog.instance.setState({error: true, stackTrace: error, message, onRetry});
         }
     }
 
