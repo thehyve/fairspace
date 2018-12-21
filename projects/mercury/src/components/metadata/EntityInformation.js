@@ -11,7 +11,7 @@ const entityInformation = (props) => {
             <Typography variant="h6">
                 {linkLabel(subject)}
             </Typography>
-            <Typography variant="h7">
+            <Typography variant="h6">
                 {typeInfo}
             </Typography>
         </Paper>
