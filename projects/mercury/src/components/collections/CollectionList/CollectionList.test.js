@@ -22,14 +22,11 @@ describe('CollectionList', () => {
     });
 
     it('renders separate icon for s3 buckets', () => {
+        const dateCreated = new Date().toUTCString();
         const collections = [
-            {
-                type: 'LOCAL_STORAGE', name: 'Test1', id: '1', dateCreated: new Date().toUTCString()
-            },
-            {
-                type: 'S3_BUCKET', name: 'Test2', id: '2', dateCreated: new Date().toUTCString()
-            },
-            {name: 'Test3', id: '3', dateCreated: new Date().toUTCString()}
+            {type: 'LOCAL_STORAGE', name: 'Test1', id: '1', dateCreated},
+            {type: 'S3_BUCKET', name: 'Test2', id: '2', dateCreated},
+            {name: 'Test3', id: '3', dateCreated}
         ];
 
         const props = {
@@ -48,7 +45,7 @@ describe('CollectionList', () => {
     });
 
     it('renders Creator column', () => {
-        const collections = [{creatorObj: {firstName: 'Mariah', lastName: 'Carey'}}];
+        const collections = [{creatorObj: {firstName: 'Mariah', lastName: 'Carey'}, id: '0'}];
         const wrapper = shallow(<CollectionList collections={collections} classes={styles} />);
         const cells = wrapper.dive().find(TableCell);
         expect(cells.length).toEqual(12);
@@ -57,7 +54,7 @@ describe('CollectionList', () => {
     });
 
     it('renders Access column', () => {
-        const collections = [{access: 'Read', dateCreated: new Date().toUTCString()}];
+        const collections = [{access: 'Read', dateCreated: new Date().toUTCString(), id: '0'}];
         const wrapper = shallow(<CollectionList collections={collections} classes={styles} />);
         const cells = wrapper.dive().find(TableCell);
         expect(cells.length).toEqual(12);
@@ -67,7 +64,7 @@ describe('CollectionList', () => {
 
     it('renders Created column', () => {
         const date = new Date();
-        const collections = [{dateCreated: date.toUTCString()}];
+        const collections = [{dateCreated: date.toUTCString(), id: '0'}];
         const wrapper = shallow(<CollectionList collections={collections} classes={styles} />);
         const cells = wrapper.dive().find(TableCell);
         expect(cells.length).toEqual(12);
