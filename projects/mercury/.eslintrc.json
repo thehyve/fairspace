@@ -67,6 +67,12 @@
         "props": false
       }
     ],
-    "jsx-a11y/mouse-events-have-key-events": 0
+    "jsx-a11y/mouse-events-have-key-events": 0,
+    "object-curly-newline": [
+      "error",
+      {
+        "consistent": true
+      }
+    ]
   }
 }
