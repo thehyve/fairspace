@@ -39,9 +39,9 @@ export class CollectionList extends React.Component {
     render() {
         const {
             collections, selectedCollectionId,
-            onCollectionClick, onCollectionDoubleClick, onCollectionDelete
+            onCollectionClick, onCollectionDoubleClick, onCollectionDelete,
+            classes
         } = this.props;
-        const classes = {...this.props.classes};
 
         if (!collections || collections.length === 0) {
             return "No collections";
