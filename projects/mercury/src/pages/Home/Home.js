@@ -1,7 +1,6 @@
 import React from 'react';
 import WithRightDrawer from "../../components/generic/WithRightDrawer/WithRightDrawer";
 import RecentActivity from "../../components/generic/RecentActivity/RecentActivity";
-import asPage from "../../containers/asPage/asPage";
 import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 import Config from "../../services/Config/Config";
 
@@ -25,4 +24,4 @@ function Home() {
         );
 }
 
-export default asPage(Home);
+export default Home;

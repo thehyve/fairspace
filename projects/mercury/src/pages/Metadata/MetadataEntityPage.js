@@ -1,6 +1,5 @@
 import React from 'react';
 import {Paper} from '@material-ui/core';
-import asPage from "../../containers/asPage/asPage";
 import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 import EntityInformation from '../../components/metadata/EntityInformation';
 import Metadata from '../../components/metadata/Metadata';
@@ -18,4 +17,4 @@ const metadataEntityPage = () => (
     </div>
 );
 
-export default asPage(metadataEntityPage);
+export default metadataEntityPage;

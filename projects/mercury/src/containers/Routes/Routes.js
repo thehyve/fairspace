@@ -10,7 +10,7 @@ import Files from "../../pages/Files/Files";
 import logout from "../../services/Logout/logout";
 
 const routes = (props) => (
-    <div className="withScroll" style={{marginLeft: props.menuExpanded ? 230 : 60}}>
+    <div style={{marginLeft: props.menuExpanded ? 230 : 60}}>
         <React.Fragment>
             <Route exact path="/" component={Home} />
             <Route exact path="/collections" component={Collections} />
