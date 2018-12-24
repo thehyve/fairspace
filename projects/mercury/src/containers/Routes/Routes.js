@@ -9,29 +9,16 @@ import MetadataOverviewPage from "../../pages/Metadata/MetadataOverviewPage";
 import Files from "../../pages/Files/Files";
 import logout from "../../services/Logout/logout";
 
-const routes = (props) => (
-    <div style={{marginLeft: props.menuExpanded ? 230 : 60}}>
-        <React.Fragment>
-            <Route exact path="/" component={Home} />
-            <Route exact path="/collections" component={Collections} />
-            <Route path="/collections/:collection/:path(.*)?" component={Files} />
-            <Route exact path="/notebooks" component={Notebooks} />
-
-            <Route exact path="/metadata" component={MetadataOverviewPage} />
-            <Route
-                path="/iri/**"
-                component={MetadataEntityPage}
-            />
-
-            {/* Handle auth urls that should go to the server */}
-            <Route
-                path="/login"
-                render={() => {
-                    window.location.href = '/login';
-                }}
-            />
-            <Route path="/logout" render={logout} />
-        </React.Fragment>
+const routes = ({menuExpanded}) => (
+    <div style={{marginLeft: menuExpanded ? 230 : 60}}>
+        <Route path="/" exact component={Home} />
+        <Route path="/collections" exact component={Collections} />
+        <Route path="/collections/:collection/:path(.*)?" component={Files} />
+        <Route path="/notebooks" exact component={Notebooks} />
+        <Route path="/metadata" exact component={MetadataOverviewPage} />
+        <Route path="/iri/**" component={MetadataEntityPage} />
+        <Route path="/login" render={() => {window.location.href = '/login';}} />
+        <Route path="/logout" render={logout} />
     </div>
 );
 

@@ -67,7 +67,7 @@ class Collection extends React.Component {
             return <LoadingInlay />;
         }
         return (
-            <div>
+            <>
                 <div
                     onClick={this.handleTextClick.bind(this)}
                     onMouseEnter={this.handleTextMouseEnter.bind(this)}
@@ -103,7 +103,7 @@ class Collection extends React.Component {
                     onSave={this.handleChangeDetails}
                     onCancel={this.closeEditDialog}
                 />
-            </div>
+            </>
         );
     }
 }

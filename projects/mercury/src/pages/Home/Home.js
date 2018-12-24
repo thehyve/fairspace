@@ -10,18 +10,14 @@ function Home() {
             <WithRightDrawer
                 collapsible={false}
                 mainContents={(
-                    <React.Fragment>
+                    <>
                         <BreadCrumbs />
-                    </React.Fragment>
+                    </>
                 )}
                 drawerContents={<RecentActivity />}
             />
         )
-        : (
-            <React.Fragment>
-                <BreadCrumbs />
-            </React.Fragment>
-        );
+        : <BreadCrumbs />;
 }
 
 export default Home;

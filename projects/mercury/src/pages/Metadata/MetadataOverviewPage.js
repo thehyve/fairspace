@@ -6,7 +6,7 @@ import SearchBar from "../../components/generic/SearchBar/SearchBar";
 import BreadCrumbs from "../../components/generic/BreadCrumbs/BreadCrumbs";
 
 const MetadataOverviewPage = ({classes}) => (
-    <div>
+    <>
         <BreadCrumbs />
 
         <Paper className={classes.searchBar}>
@@ -21,7 +21,7 @@ const MetadataOverviewPage = ({classes}) => (
             <MetadataEntities />
         </Paper>
 
-    </div>
+    </>
 );
 
 const style = theme => ({

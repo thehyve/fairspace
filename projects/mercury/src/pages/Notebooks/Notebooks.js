@@ -22,7 +22,7 @@ const styles = theme => ({
 });
 
 const Notebooks = ({classes}) => (
-    <React.Fragment>
+    <>
         <BreadCrumbs />
 
         <Card className={classes.card}>
@@ -52,7 +52,7 @@ const Notebooks = ({classes}) => (
             </CardActions>
         </Card>
 
-    </React.Fragment>
+    </>
 );
 
 export default withStyles(styles)(Notebooks);

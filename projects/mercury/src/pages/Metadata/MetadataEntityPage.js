@@ -5,7 +5,7 @@ import EntityInformation from '../../components/metadata/EntityInformation';
 import Metadata from '../../components/metadata/Metadata';
 
 const metadataEntityPage = () => (
-    <div>
+    <>
         <BreadCrumbs homeUrl="/metadata" />
         <EntityInformation subject={window.location.href} />
         <Paper style={{paddingLeft: 20}}>
@@ -14,7 +14,7 @@ const metadataEntityPage = () => (
                 subject={window.location.href}
             />
         </Paper>
-    </div>
+    </>
 );
 
 export default metadataEntityPage;
