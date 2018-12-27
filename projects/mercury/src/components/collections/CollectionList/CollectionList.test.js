@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import Icon from "@material-ui/core/Icon";
 import {TableCell} from "@material-ui/core";
 import {createShallow} from '@material-ui/core/test-utils';
-import {CollectionList, COLLECTION_ICONS} from "./CollectionList";
+import {CollectionList, ICONS} from "./CollectionList";
 import styles from './CollectionList.styles';
 
 const shallow = createShallow({dive: true});
@@ -39,9 +39,9 @@ describe('CollectionList', () => {
 
         const icons = wrapper.dive().find(Icon);
         expect(icons.length).toEqual(3);
-        expect(icons.get(0).props.children).toEqual(COLLECTION_ICONS.LOCAL_STORAGE);
-        expect(icons.get(1).props.children).toEqual(COLLECTION_ICONS.S3_BUCKET);
-        expect(icons.get(2).props.children).toEqual(COLLECTION_ICONS.LOCAL_STORAGE);
+        expect(icons.get(0).props.children).toEqual(ICONS.LOCAL_STORAGE);
+        expect(icons.get(1).props.children).toEqual(ICONS.S3_BUCKET);
+        expect(icons.get(2).props.children).toEqual(ICONS.LOCAL_STORAGE);
     });
 
     it('renders Creator column', () => {
