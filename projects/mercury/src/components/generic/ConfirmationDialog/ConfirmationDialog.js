@@ -70,6 +70,9 @@ ConfirmationDialog.defaultProps = {
     open: false,
     title: '',
     content: '',
+    onYes: () => {},
+    onNo: () => {},
+    onClose: () => {},
 };
 
 export default ConfirmationDialog;

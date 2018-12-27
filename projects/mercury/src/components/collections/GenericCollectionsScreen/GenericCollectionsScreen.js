@@ -33,4 +33,8 @@ GenericCollectionsScreen.propTypes = {
     main: PropTypes.node.isRequired
 };
 
+GenericCollectionsScreen.defaultProps = {
+    buttons: null
+};
+
 export default GenericCollectionsScreen;

@@ -39,13 +39,12 @@ function LookupEntity({
     };
 
     return (
-        <div style={{width: '100%'}}>
-            <MaterialReactSelect
-                {...otherProps}
-                options={options}
-                onChange={handleSave}
-            />
-        </div>
+        <MaterialReactSelect
+            style={{width: '100%'}}
+            {...otherProps}
+            options={options}
+            onChange={handleSave}
+        />
     );
 }
 
