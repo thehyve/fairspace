@@ -19,7 +19,7 @@ beforeEach(() => {
             name="name"
             description="description"
             type="S3_MOUNT"
-            onCancel={() => {
+            onClose={() => {
                 cancelClicked = true;
             }}
             onSave={(name, description, type) => {
@@ -44,7 +44,6 @@ it('renders without crashing', () => {
 
 it('applies properties properly', () => {
     const wrapper = shallow(collectionEditor);
-    wrapper.instance().componentDidUpdate();
 
     expect(wrapper.find(DialogTitle).at(0).childAt(0).text()).toEqual('title');
 

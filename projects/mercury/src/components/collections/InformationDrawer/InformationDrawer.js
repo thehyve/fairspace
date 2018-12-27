@@ -7,7 +7,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {connect} from 'react-redux';
 import styles from './InformationDrawer.styles';
-import Collection from "./Collection";
+import CollectionDetails from "./CollectionDetails";
 import Metadata from "../../metadata/Metadata";
 import * as metadataActions from "../../../actions/metadata";
 import PermissionsContainer from "../../permissions/PermissionsContainer";
@@ -41,7 +41,7 @@ export class InformationDrawer extends React.Component {
                         <Typography className={classes.heading}>Collection Details</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <Collection
+                        <CollectionDetails
                             collection={collection}
                             collectionAPI={collectionAPI}
                             onDidChangeDetails={this.handleDetailsChange}
