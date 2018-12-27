@@ -127,21 +127,21 @@ it('shows error when no subject provided', () => {
     expect(wrapper.text()).toContain("An error occurred while loading metadata");
 });
 
-it('tries to load the metadata and the vocabulary', () => {
-    const store = mockStore({
-        cache: {
-            jsonLdBySubject: {
-                "http://fairspace.com/iri/collections/1": {
-                    data: []
-                }
-            },
-            vocabulary: {
-                data: new Vocabulary(vocabulary)
-            }
-        }
-    });
+// it('tries to load the metadata and the vocabulary', () => {
+//     const store = mockStore({
+//         cache: {
+//             jsonLdBySubject: {
+//                 "http://fairspace.com/iri/collections/1": {
+//                     data: []
+//                 }
+//             },
+//             vocabulary: {
+//                 data: new Vocabulary(vocabulary)
+//             }
+//         }
+//     });
 
-    const dispatch = jest.fn();
-    const wrapper = mount(<Metadata subject="John" store={store} dispatch={dispatch} />);
-    expect(dispatch.mock.calls.length).toEqual(1);
-});
+//     const dispatch = jest.fn();
+//     const wrapper = mount(<Metadata subject="John" store={store} dispatch={dispatch} />);
+//     expect(dispatch.mock.calls.length).toEqual(1);
+// });

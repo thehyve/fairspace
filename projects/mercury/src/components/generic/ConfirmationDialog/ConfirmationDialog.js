@@ -61,8 +61,6 @@ ConfirmationDialog.propTypes = {
     open: PropTypes.bool,
     title: PropTypes.string,
     content: PropTypes.string,
-    onYes: PropTypes.func,
-    onNo: PropTypes.func,
     onClose: PropTypes.func,
 };
 
@@ -70,8 +68,6 @@ ConfirmationDialog.defaultProps = {
     open: false,
     title: '',
     content: '',
-    onYes: () => {},
-    onNo: () => {},
     onClose: () => {},
 };
 

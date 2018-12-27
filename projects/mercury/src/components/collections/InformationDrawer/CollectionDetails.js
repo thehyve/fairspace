@@ -83,7 +83,9 @@ class CollectionDetails extends React.Component {
                         Owner:
                         {` ${this.props.creatorFullname}`}
                     </Typography>
-                    <Typography component="p">
+                    <Typography
+                        component="p"
+                    >
                         {this.state.collection.description}
                     </Typography>
                 </div>

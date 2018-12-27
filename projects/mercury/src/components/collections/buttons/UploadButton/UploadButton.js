@@ -164,7 +164,10 @@ class UploadButton extends React.Component {
                         </Dropzone>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog} color="secondary">
+                        <Button
+                            onClick={this.closeDialog}
+                            color="secondary"
+                        >
                             Close
                         </Button>
                     </DialogActions>

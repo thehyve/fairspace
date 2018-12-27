@@ -73,9 +73,16 @@ export class InformationDrawer extends React.Component {
                 </ExpansionPanel>
                 {
                     this.props.paths.map(path => (
-                        <ExpansionPanel defaultExpanded>
-                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                                <Typography className={classes.heading}>
+                        <ExpansionPanel
+                            key={path}
+                            defaultExpanded
+                        >
+                            <ExpansionPanelSummary
+                                expandIcon={<ExpandMoreIcon />}
+                            >
+                                <Typography
+                                    className={classes.heading}
+                                >
                                     Metadata for
                                     {relativePath(path)}
                                 </Typography>

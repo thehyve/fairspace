@@ -96,10 +96,17 @@ class RenameButton extends React.Component {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog} color="secondary">
+                        <Button
+                            onClick={this.closeDialog}
+                            color="secondary"
+                        >
                             Close
                         </Button>
-                        <Button onClick={this.handleRename} color="primary" disabled={!this.state.name || this.state.name === this.currentName}>
+                        <Button
+                            onClick={this.handleRename}
+                            color="primary"
+                            disabled={!this.state.name || this.state.name === this.currentName}
+                        >
                             Rename
                         </Button>
                     </DialogActions>

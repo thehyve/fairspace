@@ -155,10 +155,14 @@ export class PermissionsViewer extends React.Component {
                     anchorEl={this.state.anchorEl}
                     open={Boolean(this.state.anchorEl)}
                 >
-                    <MenuItem onClick={() => this.handleAlterPermission(collaborator)}>
+                    <MenuItem
+                        onClick={() => this.handleAlterPermission(collaborator)}
+                    >
                         Change access
                     </MenuItem>
-                    <MenuItem onClick={() => this.handleRemoveCollaborator(collaborator)}>
+                    <MenuItem
+                        onClick={() => this.handleRemoveCollaborator(collaborator)}
+                    >
                         Delete
                     </MenuItem>
                 </Menu>

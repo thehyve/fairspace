@@ -64,9 +64,19 @@ function RecentActivity({classes}) {
             message:
                 <span>
                     You deleted a collection:
-                    <Link to="/collections" className={classes.primaryAction}>Johns Collection</Link>
+                    <Link
+                        to="/collections"
+                        className={classes.primaryAction}
+                    >
+                        Johns Collection
+                    </Link>
                     . Click
-                    <a href="#restore" className={classes.secondaryAction}>here</a>
+                    <a
+                        href="#restore"
+                        className={classes.secondaryAction}
+                    >
+                        here
+                    </a>
                     {' '}
                     to restore.
                 </span>,
@@ -78,9 +88,19 @@ function RecentActivity({classes}) {
             message:
                 <span>
                     Four people accessed files in your collection:
-                    <Link to="/collections" className={classes.primaryAction}>Johns Collection</Link>
+                    <Link
+                        to="/collections"
+                        className={classes.primaryAction}
+                    >
+                        Johns Collection
+                    </Link>
                     . See detailed audit logs
-                    <a href="#auditlogs" className={classes.secondaryAction}>here</a>
+                    <a
+                        href="#auditlogs"
+                        className={classes.secondaryAction}
+                    >
+                        here
+                    </a>
                     .
                 </span>,
             icon: 'info',

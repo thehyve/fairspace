@@ -13,6 +13,7 @@ class DateTime extends React.Component {
     }
 
     dateFormatter = new Intl.DateTimeFormat('en-US', this.optionsDate);
+
     timeFormatter = new Intl.DateTimeFormat('en-US', this.optionsTime);
 
     formatDateTime = (date) => {

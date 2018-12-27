@@ -78,7 +78,7 @@ const breadCrumbs = ({segments, match, classes, homeUrl}) => {
             {jsxJoin(breadcrumbs, ' > ')}
         </div>
     );
-}
+};
 
 breadCrumbs.propTypes = {
     homeUrl: PropTypes.string,
@@ -90,7 +90,7 @@ breadCrumbs.propTypes = {
     )
 };
 
-breadCrumbs.defaulrProps = {
+breadCrumbs.defaultProps = {
     homeUrl: '',
     segments: null
 };
