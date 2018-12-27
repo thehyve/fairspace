@@ -230,10 +230,17 @@ export class AlterPermissionDialog extends React.Component {
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleClose} color="secondary">
-                        Cancel
+                    <Button
+                        onClick={this.handleClose} 
+                        color="secondary"
+                    >
+                    Cancel
                     </Button>
-                    <Button onClick={this.handleSubmit} color="primary" disabled={!selectedUser}>
+                    <Button
+                        onClick={this.handleSubmit}
+                        color="primary"
+                        disabled={!selectedUser}
+                    >
                         Submit
                     </Button>
                 </DialogActions>

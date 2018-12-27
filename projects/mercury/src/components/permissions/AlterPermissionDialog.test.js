@@ -78,7 +78,7 @@ describe('AlterPermissionDialog', () => {
 
         wrapper = shallow(<AlterPermissionDialog
             open={false}
-            classes={styles}
+            classes={styles()}
             user={null}
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
@@ -118,12 +118,11 @@ describe('AlterPermissionDialog', () => {
             <Provider store={store}>
                 <AlterPermissionDialog
                     open={false}
-                    classes={styles}
+                    classes={styles()}
                     user={mockUser}
                     collectionId={mockCollectionId}
                     collaborators={mockCollaborators}
                     currentUser={mockCurrentLoggedUser}
-
                     fetchUsers={mockfetchUsersFn}
                     alterPermission={mockAlterPermissionFn}
                     users={mockUsers}

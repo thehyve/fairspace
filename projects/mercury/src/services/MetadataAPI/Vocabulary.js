@@ -99,38 +99,37 @@ class Vocabulary {
     convertMetadataIntoPropertyList(metadata, predicates = [], allMetadata = []) {
         const prefilledProperties = [];
 
-        // Add the metadata already available
-        for (const predicateUri in metadata) {
-            // Skip this predicate if it is not allowed for the current type
-            if (predicateUri !== "@type" && !predicates.find(predicate => predicate['@id'] === predicateUri)) {
-                continue;
-            }
+        Object.keys(metadata)
+            .forEach(predicateUri => {
+                if (predicateUri !== "@type" && !predicates.find(predicate => predicate['@id'] === predicateUri)) {
+                    return;
+                }
 
-            // Skip this predicate if it is not in the vocabulary
-            const vocabularyEntry = this.vocabularyById[predicateUri];
+                // Skip this predicate if it is not in the vocabulary
+                const vocabularyEntry = this.vocabularyById[predicateUri];
 
-            if (predicateUri !== "@type" && !vocabularyEntry) {
-                continue;
-            }
+                if (predicateUri !== "@type" && !vocabularyEntry) {
+                    return;
+                }
 
-            // Ensure that we have a list of values for the predicate
-            if (!Array.isArray(metadata[predicateUri])) {
-                console.warn("Metadata should be provided in expanded form");
-                continue;
-            }
+                // Ensure that we have a list of values for the predicate
+                if (!Array.isArray(metadata[predicateUri])) {
+                    console.warn("Metadata should be provided in expanded form");
+                    return;
+                }
 
-            const values = (predicateUri === "@type")
-                // @type needs special attention: it is specified as a literal string
-                // but should be treated as an object
-                ? this.convertTypeEntries(metadata[predicateUri])
-                : metadata[predicateUri].map(i => ({
-                    id: i['@id'],
-                    value: i['@value'],
-                    label: Vocabulary.lookupLabel(i['@id'], allMetadata)
-                }));
+                const values = (predicateUri === "@type")
+                    // @type needs special attention: it is specified as a literal string
+                    // but should be treated as an object
+                    ? this.convertTypeEntries(metadata[predicateUri])
+                    : metadata[predicateUri].map(i => ({
+                        id: i['@id'],
+                        value: i['@value'],
+                        label: Vocabulary.lookupLabel(i['@id'], allMetadata)
+                    }));
 
-            prefilledProperties.push(Vocabulary.generatePropertyEntry(predicateUri, values, vocabularyEntry));
-        }
+                prefilledProperties.push(Vocabulary.generatePropertyEntry(predicateUri, values, vocabularyEntry));
+            });
 
         return prefilledProperties.sort(compareBy('label'));
     }

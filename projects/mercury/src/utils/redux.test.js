@@ -13,7 +13,7 @@ describe('Error handling promise action', () => {
     });
 
     it('handles failures within actions', () => {
-        const actionCreator = createErrorHandlingPromiseAction(() => Promise.reject(Error("Test error")));
+        const actionCreator = createErrorHandlingPromiseAction(() => Promise.reject(Error("Test error")), false);
         const action = actionCreator();
         return expect(action(mockDispatch)).resolves.toBeUndefined();
     });
@@ -157,11 +157,11 @@ describe('Dispatch If Needed', () => {
             () => ({invalidated: true})
         );
 
-        const mockDispatch = jest.fn(() => 'result');
-        const result = actionCreator(mockDispatch, () => false);
+        const localMockDispatch = jest.fn(() => 'result');
+        const result = actionCreator(localMockDispatch, () => false);
 
-        expect(mockDispatch.mock.calls.length).toEqual(1);
-        expect(mockDispatch.mock.calls[0][0]).toEqual('testaction');
+        expect(localMockDispatch.mock.calls.length).toEqual(1);
+        expect(localMockDispatch.mock.calls[0][0]).toEqual('testaction');
         expect(result).toEqual('result');
     });
     it('looks at the current state for determining update', () => {
@@ -170,11 +170,11 @@ describe('Dispatch If Needed', () => {
             state => state
         );
 
-        const mockDispatch = jest.fn(() => 'result');
-        const result = actionCreator(mockDispatch, () => ({invalidated: true}));
+        const localMockDispatch = jest.fn(() => 'result');
+        const result = actionCreator(localMockDispatch, () => ({invalidated: true}));
 
-        expect(mockDispatch.mock.calls.length).toEqual(1);
-        expect(mockDispatch.mock.calls[0][0]).toEqual('testaction');
+        expect(localMockDispatch.mock.calls.length).toEqual(1);
+        expect(localMockDispatch.mock.calls[0][0]).toEqual('testaction');
         expect(result).toEqual('result');
     });
     it('resolves with the current value if no update is needed', () => {
@@ -183,10 +183,10 @@ describe('Dispatch If Needed', () => {
             () => ({data: 'current-data'})
         );
 
-        const mockDispatch = jest.fn(() => 'result');
-        const result = actionCreator(mockDispatch, () => undefined);
+        const localMockDispatch = jest.fn(() => 'result');
+        const result = actionCreator(localMockDispatch, () => undefined);
 
-        expect(mockDispatch.mock.calls.length).toEqual(0);
+        expect(localMockDispatch.mock.calls.length).toEqual(0);
 
         return expect(result).resolves.toEqual({value: 'current-data'});
     });
