@@ -75,12 +75,13 @@ class RenameButton extends React.Component {
                     onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">
+                    <DialogTitle
+                        id="form-dialog-title"
+                    >
                         Rename
                         {this.currentName}
                     </DialogTitle>
                     <DialogContent>
-
                         Enter a new name for
                         {this.currentName}
                         <TextField
@@ -96,11 +97,9 @@ class RenameButton extends React.Component {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.closeDialog} color="secondary">
-
                             Close
                         </Button>
                         <Button onClick={this.handleRename} color="primary" disabled={!this.state.name || this.state.name === this.currentName}>
-
                             Rename
                         </Button>
                     </DialogActions>
