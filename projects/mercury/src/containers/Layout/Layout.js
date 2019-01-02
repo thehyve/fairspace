@@ -5,6 +5,7 @@ import styles from './Layout.styles';
 import TopBar from "../../components/layout/TopBar/TopBar";
 import Footer from '../../components/layout/Footer/Footer';
 import AuthorizationCheck from "../AuthorizationCheck/AuthorizationCheck";
+import MenuDrawer from "../../components/layout/MenuDrawer/MenuDrawer";
 import Routes from "../Routes/Routes";
 
 const Layout = ({classes}) => {
@@ -19,13 +20,16 @@ const Layout = ({classes}) => {
     // The app itself consists of a topbar, a drawer and the actual page
     // The topbar is shown even if the user has no proper authorization
     return (
-        <React.Fragment>
+        <>
             <TopBar classes={classes} />
             <AuthorizationCheck transformError={transformError}>
-                <Routes />
+                <MenuDrawer />
+                <main style={{overflow: 'scroll', height: '100vh'}} className={classes.main}>
+                    <Routes />
+                </main>
             </AuthorizationCheck>
             <Footer />
-        </React.Fragment>
+        </>
     );
 };
 

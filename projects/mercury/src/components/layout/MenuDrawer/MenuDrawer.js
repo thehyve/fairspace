@@ -12,16 +12,16 @@ import toggleMenuExpansion from "../../../actions/ui";
 import Menu from "./Menu";
 import styles from "./MenuDrawer.styles";
 
-const MenuDrawer = ({open, toggleMenuExpansion, classes}) => (
+const MenuDrawer = (props) => (
     <Drawer
         variant="permanent"
         classes={{
-            paper: classNames(classes.drawerPaper, !open ? classes.drawerPaperClose : classes.drawerPaperOpen),
+            paper: classNames(props.classes.drawerPaper, !props.open ? props.classes.drawerPaperClose : props.classes.drawerPaperOpen),
         }}
     >
-        <div className={classes.toolbar}>
-            <IconButton onClick={toggleMenuExpansion}>
-                {!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        <div className={props.classes.toolbar}>
+            <IconButton onClick={props.toggleMenuExpansion}>
+                {!props.open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
         </div>
         <Divider />

@@ -84,7 +84,7 @@ function FileOperations(props) {
     return creatingDirectory
         ? <LoadingOverlay loading={creatingDirectory} />
         : (
-            <React.Fragment>
+            <>
                 <IconButton
                     aria-label="Copy"
                     title="Copy"
@@ -131,7 +131,7 @@ function FileOperations(props) {
                 >
                     <Icon>cloud_upload</Icon>
                 </UploadButton>
-            </React.Fragment>
+            </>
         );
 }
 

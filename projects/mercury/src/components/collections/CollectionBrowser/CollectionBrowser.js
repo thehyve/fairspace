@@ -84,7 +84,7 @@ class CollectionBrowser extends React.Component {
         collections.map(col => col.creatorObj = findById(users, col.creator));
 
         return (
-            <div>
+            <>
                 <CollectionList
                     collections={this.props.collections}
                     selectedCollectionId={this.props.selectedCollectionId}
@@ -101,7 +101,7 @@ class CollectionBrowser extends React.Component {
                     editType={Config.get().enableExperimentalFeatures}
                 />
                 <LoadingOverlay loading={addingCollection || deletingCollection} />
-            </div>
+            </>
         );
     }
 
