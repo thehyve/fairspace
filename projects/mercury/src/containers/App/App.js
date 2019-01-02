@@ -1,15 +1,13 @@
 import React from 'react';
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
-import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
+import {MuiThemeProvider} from '@material-ui/core/styles';
 import {fetchAuthorizations, fetchUser} from "../../actions/account";
 import {fetchUsers, fetchWorkspace} from "../../actions/workspace";
 import ErrorDialog from "../../components/error/ErrorDialog";
 import configureStore from "../../store/configureStore";
 import Config from "../../services/Config/Config";
 
-// theme
-import styles from './App.styles';
 import theme from './App.theme';
 import Layout from "../Layout/Layout";
 import LoadingInlay from '../../components/generic/Loading/LoadingInlay';
@@ -50,30 +48,17 @@ class App extends React.Component {
         this.cancellable.setState = undefined;
     }
 
-    // If an error is to be shown, it should be underneath the
-    // AppBar. This method take care of it
-    transformError(errorContent) {
-        return (
-            <main className={this.props.classes.content}>
-                <div className={this.props.classes.toolbar} />
-                {errorContent}
-            </main>
-        );
-    }
-
     render() {
         if (this.state.configLoaded) {
             return (
                 <MuiThemeProvider theme={theme}>
-                    <div className={this.props.classes.root}>
-                        <Provider store={this.store}>
-                            <ErrorDialog>
-                                <Router>
-                                    <Layout />
-                                </Router>
-                            </ErrorDialog>
-                        </Provider>
-                    </div>
+                    <Provider store={this.store}>
+                        <ErrorDialog>
+                            <Router>
+                                <Layout />
+                            </Router>
+                        </ErrorDialog>
+                    </Provider>
                 </MuiThemeProvider>
             );
         }
@@ -81,4 +66,4 @@ class App extends React.Component {
     }
 }
 
-export default withStyles(styles)(App);
+export default App;

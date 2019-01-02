@@ -60,7 +60,7 @@ class CollectionDetails extends React.Component {
             return <LoadingInlay />;
         }
         return (
-            <div>
+            <>
                 <div
                     onClick={this.handleTextClick.bind(this)}
                     onMouseEnter={this.handleTextMouseEnter.bind(this)}
@@ -90,17 +90,15 @@ class CollectionDetails extends React.Component {
                     </Typography>
                 </div>
 
-                {this.state.editing ? (
-                    <CollectionEditor
-                        editing
-                        name={this.state.collection.name}
-                        description={this.state.collection.description}
-                        title={`Edit collection: ${this.state.collection.name}`}
-                        onSave={this.handleChangeDetails}
-                        onClose={() => this.setState({editing: false})}
-                    />
-                ) : null}
-            </div>
+                <CollectionEditor
+                    editing={this.state.editing}
+                    name={this.state.collection.name}
+                    description={this.state.collection.description}
+                    title={`Edit collection: ${this.state.collection.name}`}
+                    onSave={this.handleChangeDetails}
+                    onCancel={this.closeEditDialog}
+                />
+            </>
         );
     }
 }

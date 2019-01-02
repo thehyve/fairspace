@@ -1,7 +1,6 @@
 import React from 'react';
 import CollectionBrowser from "../../components/collections/CollectionBrowser/CollectionBrowser";
 import WithInfoDrawer from "../../components/collections/WithInfoDrawer/WithInfoDrawer";
-import asPage from "../../containers/asPage/asPage";
 
 function Collections() {
     return (
@@ -11,4 +10,4 @@ function Collections() {
     );
 }
 
-export default asPage(Collections);
+export default Collections;

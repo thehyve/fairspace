@@ -11,7 +11,7 @@ import styles from "./Menu.styles";
 import Config from '../../../services/Config/Config';
 
 const Menu = ({classes}) => (
-    <div>
+    <>
         <List className={classes.menuItemList}>
             <ListItem component={NavLink} exact to="/" button>
                 <ListItemIcon>
@@ -59,7 +59,7 @@ const Menu = ({classes}) => (
                 <ListItemText primary="cBioportal" />
             </ListItem>
         </List>
-    </div>
+    </>
 );
 
 export default withStyles(styles)(Menu);

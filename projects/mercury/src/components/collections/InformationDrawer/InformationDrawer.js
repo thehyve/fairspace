@@ -35,7 +35,7 @@ export class InformationDrawer extends React.Component {
         const relativePath = path => path.split('/').slice(2).join('/');
 
         return (
-            <React.Fragment>
+            <>
                 <ExpansionPanel defaultExpanded>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography className={classes.heading}>Collection Details</Typography>
@@ -97,7 +97,7 @@ export class InformationDrawer extends React.Component {
                         </ExpansionPanel>
                     ))
                 }
-            </React.Fragment>
+            </>
         );
     }
 }
