@@ -88,7 +88,7 @@ export class CollectionList extends React.Component {
                                     <TableCell>
                                         {collection.access}
                                     </TableCell>
-                                    <TableCell numeric>
+                                    <TableCell>
                                         {onCollectionDelete
                                             ? (
                                                 <ButtonWithVerification

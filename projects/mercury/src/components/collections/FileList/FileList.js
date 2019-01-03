@@ -34,8 +34,8 @@ class FileList extends React.Component {
                         <TableRow>
                             <TableCell />
                             <TableCell>Name</TableCell>
-                            <TableCell numeric>size</TableCell>
-                            <TableCell numeric>Last Modified</TableCell>
+                            <TableCell align="right">Size</TableCell>
+                            <TableCell align="right">Last Modified</TableCell>
                             <TableCell />
                         </TableRow>
                     </TableHead>
@@ -61,17 +61,17 @@ class FileList extends React.Component {
                                     <TableCell component="th" scope="row">
                                         {row.basename}
                                     </TableCell>
-                                    <TableCell numeric>
+                                    <TableCell align="right">
                                         <Typography noWrap>
                                             {row.type === 'file' ? <Bytes value={row.size} /> : ''}
                                         </Typography>
                                     </TableCell>
-                                    <TableCell numeric>
+                                    <TableCell align="right">
                                         <Typography noWrap>
                                             {row.lastmod ? <DateTime value={row.lastmod} /> : null}
                                         </Typography>
                                     </TableCell>
-                                    <TableCell numeric>
+                                    <TableCell align="right">
                                         <Row
                                             style={{visibility: this.props.hovered !== idx ? 'hidden' : 'visible'}}
                                         >
