@@ -90,14 +90,15 @@ class CollectionDetails extends React.Component {
                     </Typography>
                 </div>
 
-                <CollectionEditor
-                    editing={this.state.editing}
-                    name={this.state.collection.name}
-                    description={this.state.collection.description}
-                    title={`Edit collection: ${this.state.collection.name}`}
-                    onSave={this.handleChangeDetails}
-                    onCancel={this.closeEditDialog}
-                />
+                {this.state.editing ? (
+                    <CollectionEditor
+                        name={this.state.collection.name}
+                        description={this.state.collection.description}
+                        title={`Edit collection: ${this.state.collection.name}`}
+                        onSave={this.handleChangeDetails}
+                        onClose={() => this.setState({editing: false})}
+                    />
+                ) : null}
             </>
         );
     }
