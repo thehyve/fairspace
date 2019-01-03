@@ -160,7 +160,7 @@ class UploadButton extends React.Component {
                             onDrop={this.uploadFiles}
                             className={this.props.classes.dropZone}
                         >
-                            {this.renderDropzoneContent()}
+                            {() => this.renderDropzoneContent()}
                         </Dropzone>
                     </DialogContent>
                     <DialogActions>
