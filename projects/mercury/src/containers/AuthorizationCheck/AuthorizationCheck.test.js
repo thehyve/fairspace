@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom';
 import {MemoryRouter} from "react-router-dom";
 import configureStore from 'redux-mock-store';
 import {mount} from "enzyme";
+import thunk from 'redux-thunk';
+import promiseMiddleware from "redux-promise-middleware";
 import AuthorizationCheck from './AuthorizationCheck';
 
-const middlewares = [];
+const middlewares = [thunk, promiseMiddleware()];
 const mockStore = configureStore(middlewares);
 
 it('renders without crashing', () => {

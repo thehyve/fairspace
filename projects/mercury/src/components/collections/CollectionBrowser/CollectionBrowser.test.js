@@ -5,12 +5,17 @@ import Button from "@material-ui/core/Button";
 import Fab from "@material-ui/core/Fab";
 import {MemoryRouter} from "react-router-dom";
 import {Provider} from "react-redux";
+import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
+import promiseMiddleware from "redux-promise-middleware";
 import CollectionBrowser from "./CollectionBrowser";
-import mockStore from "../../../store/mockStore";
 import Config from "../../../services/Config/Config";
 
-let store; let
-    collectionBrowser;
+const middlewares = [thunk, promiseMiddleware()];
+const mockStore = configureStore(middlewares);
+
+let store;
+let collectionBrowser;
 const defaultState = {
     account: {
         user: {

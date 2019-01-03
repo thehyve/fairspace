@@ -4,11 +4,16 @@ import ListItem from '@material-ui/core/ListItem';
 import ClearIcon from '@material-ui/icons/Clear';
 import IconButton from "@material-ui/core/IconButton";
 import {createShallow, createMount} from '@material-ui/core/test-utils';
+import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
+import promiseMiddleware from "redux-promise-middleware";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import {STRING_URI} from "../../services/MetadataAPI/MetadataAPI";
 import Config from "../../services/Config/Config";
-import mockStore from "../../store/mockStore";
 import MetadataProperty from "./MetadataProperty";
+
+const middlewares = [thunk, promiseMiddleware()];
+const mockStore = configureStore(middlewares);
 
 const subject = 'https://thehyve.nl';
 const defaultProperty = {
