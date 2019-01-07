@@ -1,7 +1,7 @@
 import React from 'react';
 import {mount} from "enzyme";
 import {Provider} from "react-redux";
-import ConnectedMetadata, {Metadata} from "./Metadata";
+import ConnectedMetadata from "./Metadata";
 import Vocabulary from "../../services/MetadataAPI/Vocabulary";
 import mockStore from "../../store/mockStore";
 import MetadataViewer from "./MetadataViewer";
@@ -127,6 +127,7 @@ it('shows error when no subject provided', () => {
     expect(wrapper.text()).toContain("An error occurred while loading metadata");
 });
 
+// TODO: review
 // it('tries to load the metadata and the vocabulary', () => {
 //     const store = mockStore({
 //         cache: {
