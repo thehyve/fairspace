@@ -105,7 +105,6 @@ class CollectionBrowser extends React.Component {
                     <CollectionEditor
                         title="Add collection"
                         name={`${this.props.user.fullName}'s collection`}
-                        editing
                         onSave={this.handleAddCollection}
                         onClose={this.handleCancelAddCollection}
                         editType={Config.get().enableExperimentalFeatures}
