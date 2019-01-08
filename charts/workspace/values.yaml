@@ -34,6 +34,7 @@ hyperspace:
         password:
         realm:
         clientSecret:
+        extraArgs: "-Dfile.encoding=UTF8"
 
     rabbitmq:
       username:
