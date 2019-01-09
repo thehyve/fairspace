@@ -10,7 +10,7 @@ metadata:
 data:
   application.yaml: |-
     app:
-      domain: {{ .Values.workspace.ingress.domain }}
+      domain: https://{{ .Values.workspace.ingress.domain }}
       oauth2:
         base-url: {{ template "keycloak.baseUrl" . }}
         realm: {{ .Values.hyperspace.keycloak.realm }}
