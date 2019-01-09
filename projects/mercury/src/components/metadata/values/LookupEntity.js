@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import MaterialReactSelect from "../../generic/MaterialReactSelect/MaterialReactSelect";
+import MaterialReactSelect from "../../common/MaterialReactSelect";
 import {fetchEntitiesIfNeeded} from "../../../actions/metadata";
 import {getLabel} from "../../../utils/metadatautils";
 

@@ -11,15 +11,15 @@ import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import IconButton from '@material-ui/core/IconButton';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Menu from "@material-ui/core/Menu";
-import ErrorMessage from "../error/ErrorMessage";
-import ConfirmationDialog from "../generic/ConfirmationDialog/ConfirmationDialog";
-import AlterPermissionContainer from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
+import ErrorMessage from "../common/ErrorMessage";
+import ConfirmationDialog from "../common/ConfirmationDialog";
+import LoadingInlay from '../common/LoadingInlay';
+import LoadingOverlay from "../common/LoadingOverlay";
+import AlterPermissionContainer from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import getDisplayName from "../../utils/userUtils";
-import withHovered from "../../containers/WithHovered/WithHovered";
+import withHovered from "../common/WithHovered";
 import {findById} from "../../utils/arrayutils";
-import LoadingInlay from '../generic/Loading/LoadingInlay';
-import LoadingOverlay from "../generic/Loading/LoadingOverlay";
 
 export const styles = () => ({
     collaboratorList: {

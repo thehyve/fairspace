@@ -9,11 +9,11 @@ import {Column, Row} from "simple-flexbox";
 import {withRouter} from 'react-router-dom';
 import {getLabel, navigableLink, relativeLink} from "../../utils/metadatautils";
 import * as metadataActions from "../../actions/metadata";
-import ErrorMessage from "../error/ErrorMessage";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
-import ErrorDialog from "../error/ErrorDialog";
-import LoadingInlay from '../generic/Loading/LoadingInlay';
-import LoadingOverlay from '../generic/Loading/LoadingOverlay';
+import ErrorMessage from "../common/ErrorMessage";
+import ErrorDialog from "../common/ErrorDialog";
+import LoadingInlay from '../common/LoadingInlay';
+import LoadingOverlay from '../common/LoadingOverlay';
 
 class MetadataEntities extends React.Component {
     componentDidMount() {

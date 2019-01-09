@@ -1,6 +1,6 @@
 import React from 'react';
 import {navigableLink, isDateTimeProperty} from "../../../utils/metadatautils";
-import DateTime from "../../generic/DateTime/DateTime";
+import DateTime from "../../common/DateTime";
 import {RESOURCE_URI} from "../../../services/MetadataAPI/MetadataAPI";
 
 function linkLabel(link) {
@@ -23,7 +23,8 @@ const ReferringValue = ({property, entry}) => {
         return (
             <a href={navigableLink(entry.id)}>
                 {displayValue}
-            </a>);
+            </a>
+        );
     }
     return displayValue;
 };
