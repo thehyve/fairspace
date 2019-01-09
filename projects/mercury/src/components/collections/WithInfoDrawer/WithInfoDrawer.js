@@ -4,24 +4,21 @@ import InformationDrawer from "../InformationDrawer/InformationDrawer";
 import WithRightDrawer from "../../generic/WithRightDrawer/WithRightDrawer";
 import {closeInfoDrawer} from "../../../actions/collectionbrowser";
 
-const WithInfoDrawer = ({closeInfoDrawer, infoDrawerOpened, children}) =>
+const WithInfoDrawer = (props) => (
     <WithRightDrawer
-        drawerContents={<InformationDrawer/>}
-        mainContents={children}
-        drawerOpened={infoDrawerOpened}
-        onCloseDrawer={closeInfoDrawer} />;
+        drawerContents={<InformationDrawer />}
+        mainContents={props.children}
+        drawerOpened={props.infoDrawerOpened}
+        onCloseDrawer={props.closeInfoDrawer}
+    />
+);
 
-const mapStateToProps = (state) => {
-    return {
-        infoDrawerOpened: state.collectionBrowser.infoDrawerOpened
-    }
-};
+const mapStateToProps = state => ({
+    infoDrawerOpened: state.collectionBrowser.infoDrawerOpened
+});
 
 const mapDispatchToProps = {
     closeInfoDrawer
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WithInfoDrawer);
-
-
-

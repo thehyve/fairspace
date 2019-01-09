@@ -19,6 +19,7 @@ workspace:
     tls:
       certificate:
         dns01Provider: azuredns-demo
+  enableExperimentalFeatures: true
 
 # Specific settings for Pluto subchart
 pluto:

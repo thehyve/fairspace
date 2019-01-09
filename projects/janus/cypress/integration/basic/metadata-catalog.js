@@ -30,21 +30,6 @@ describe('Metadata Catalog', function () {
                 .should('have.value', 'Person 1');
         });
 
-        it('should link between entities', function () {
-            // Go to a metadata page about a patient
-            cy.visit("/iri/persons/E2E-TEST");
-
-            // Wait for the page to show 'Metadata' (which indicates that metadata has been loaded)
-            cy.get("main").contains("Metadata");
-
-            // Expect at least a name field with the correct value
-            cy.contains("Provides material")
-                .parent("li")
-                .find("a").first()
-                .contains("E2E-TEST-material")
-                .should('have.attr', 'href', Cypress.config("baseUrl") + '/iri/samples/E2E-TEST-material')
-        });
-
         it('should allow editing of metadata', function () {
             const personName = 'New user ' + uniqueId;
 
@@ -60,6 +45,9 @@ describe('Metadata Catalog', function () {
                 .find('input').first()
                 .clear().type(personName)
                 .blur();
+
+            // Wait for the change to be propagated
+            cy.wait(100);
 
             // Go to a metadata page about a patient
             cy.reload();

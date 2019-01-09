@@ -20,12 +20,12 @@ class ClickHandler extends React.Component {
     }
 
     handleClicks() {
-        this.clickCount++;
+        this.clickCount += 1;
         if (this.clickCount === 1) {
             this.singleClickTimer = setTimeout(() => {
                 this.clickCount = 0;
 
-                if(this.onSingleClick) {
+                if (this.onSingleClick) {
                     this.onSingleClick();
                 }
             }, this.doubleClickTimeout);
@@ -33,7 +33,7 @@ class ClickHandler extends React.Component {
             clearTimeout(this.singleClickTimer);
             this.clickCount = 0;
 
-            if(this.onDoubleClick) {
+            if (this.onDoubleClick) {
                 this.onDoubleClick();
             }
         }
@@ -50,12 +50,16 @@ class ClickHandler extends React.Component {
 
         const Component = componentProp || 'div';
 
-        return <Component
-            onMouseOver={this.props.onMouseOver}
-            onMouseOut={this.props.onMouseOut}
-            onClick={() => this.handleClicks()}
-            {...componentProps}
-        >{this.props.children}</Component>
+        return (
+            <Component
+                onMouseOver={this.props.onMouseOver}
+                onMouseOut={this.props.onMouseOut}
+                onClick={() => this.handleClicks()}
+                {...componentProps}
+            >
+                {this.props.children}
+            </Component>
+        );
     }
 }
 

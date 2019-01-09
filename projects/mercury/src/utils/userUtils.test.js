@@ -1,27 +1,27 @@
-import {getDisplayName} from "./userUtils";
+import getDisplayName from "./userUtils";
 
 describe('usersUtils', () => {
-    let mockUser = {
-        "id": "b4804cdb-b690-41ef-a167-6af7ed983d8d",
-        "createdTimestamp": 1538733234561,
-        "username": "user-workspace-ci",
-        "enabled": true,
-        "totp": false,
-        "emailVerified": false,
-        "firstName": "Daenarys",
-        "lastName": "Targaryen",
-        "email": "daenarys@thehyve.nl",
-        "disableableCredentialTypes": [
+    const mockUser = {
+        id: "b4804cdb-b690-41ef-a167-6af7ed983d8d",
+        createdTimestamp: 1538733234561,
+        username: "user-workspace-ci",
+        enabled: true,
+        totp: false,
+        emailVerified: false,
+        firstName: "Daenarys",
+        lastName: "Targaryen",
+        email: "daenarys@thehyve.nl",
+        disableableCredentialTypes: [
             "password"
         ],
-        "requiredActions": [],
-        "notBefore": 0,
-        "access": {
-            "manageGroupMembership": false,
-            "view": true,
-            "mapRoles": false,
-            "impersonate": false,
-            "manage": false
+        requiredActions: [],
+        notBefore: 0,
+        access: {
+            manageGroupMembership: false,
+            view: true,
+            mapRoles: false,
+            impersonate: false,
+            manage: false
         }
     };
 
@@ -55,5 +55,4 @@ describe('usersUtils', () => {
             expect(getDisplayName(mockUser)).toBeUndefined();
         });
     });
-
 });

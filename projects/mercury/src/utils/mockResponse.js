@@ -1,9 +1,9 @@
-export default function(status, statusText, response) {
+export default function (status, statusText, response) {
     return new window.Response(response, {
-        status: status,
-        statusText: statusText,
+        status,
+        statusText,
         headers: {
             'Content-type': 'application/json'
         }
     });
-};
+}

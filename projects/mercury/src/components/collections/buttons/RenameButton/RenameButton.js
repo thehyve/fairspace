@@ -7,7 +7,7 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 
-class RenameButton extends React.Component{
+class RenameButton extends React.Component {
     constructor(props) {
         super(props);
         const {
@@ -36,28 +36,28 @@ class RenameButton extends React.Component{
         }
     }
 
-    openDialog(e) {
+    openDialog = (e) => {
         e.stopPropagation();
         this.setState({renaming: true, name: this.currentName});
     }
 
-    closeDialog(e) {
-        if(e) e.stopPropagation();
+    closeDialog = (e) => {
+        if (e) e.stopPropagation();
         this.setState({renaming: false});
     }
 
-    handleRename(e) {
+    handleRename = (e) => {
         e.stopPropagation();
 
-        if(this.onRename) {
+        if (this.onRename) {
             this
                 .onRename(this.state.name)
-                .then((shouldClose) => shouldClose && this.closeDialog.bind(this))
+                .then(shouldClose => shouldClose && this.closeDialog);
         }
     }
 
-    handleInputChange(event) {
-        let newValues = {}
+    handleInputChange = (event) => {
+        const newValues = {};
         newValues[event.target.name] = event.target.value;
         this.setState(newValues);
     }
@@ -65,19 +65,24 @@ class RenameButton extends React.Component{
     render() {
         return (
             <div>
-                <IconButton {...this.componentProps} onClick={this.openDialog.bind(this)}>
+                <IconButton {...this.componentProps} onClick={this.openDialog}>
                     {this.props.children}
                 </IconButton>
 
                 <Dialog
                     open={this.state.renaming}
-                    onClick={(e) => e.stopPropagation()}
-                    onClose={this.closeDialog.bind(this)}
+                    onClick={e => e.stopPropagation()}
+                    onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Rename {this.currentName}</DialogTitle>
+                    <DialogTitle id="form-dialog-title">
+                        Rename
+                        {this.currentName}
+                    </DialogTitle>
                     <DialogContent>
-                        Enter a new name for {this.currentName}
+
+                        Enter a new name for
+                        {this.currentName}
                         <TextField
                             autoFocus
                             margin="dense"
@@ -85,15 +90,17 @@ class RenameButton extends React.Component{
                             label="Name"
                             value={this.state.name}
                             name="name"
-                            onChange={this.handleInputChange.bind(this)}
+                            onChange={this.handleInputChange}
                             fullWidth
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog.bind(this)} color="secondary">
+                        <Button onClick={this.closeDialog} color="secondary">
+
                             Close
                         </Button>
-                        <Button onClick={this.handleRename.bind(this)} color="primary" disabled={!this.state.name || this.state.name === this.currentName}>
+                        <Button onClick={this.handleRename} color="primary" disabled={!this.state.name || this.state.name === this.currentName}>
+
                             Rename
                         </Button>
                     </DialogActions>
@@ -104,7 +111,3 @@ class RenameButton extends React.Component{
 }
 
 export default RenameButton;
-
-
-
-

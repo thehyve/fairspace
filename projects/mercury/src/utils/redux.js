@@ -12,16 +12,17 @@ import * as actionTypes from "./redux-action-types";
  * @param actionClosure
  * @returns {function(): function(*): (*|Promise<T>)}
  */
-export function createErrorHandlingPromiseAction(actionClosure){
-    return (...params) => dispatch =>
-        dispatch(
-            actionClosure(...params, dispatch)
-        ).catch(e => {
-                // In general, the error will be handled by the component that works with
-                // the data. However, to avoid problems with uncaught exceptions, these
-                // are handled explicitly
-                console.error(e);
-            })
+export function createErrorHandlingPromiseAction(actionClosure, printToConsole = true) {
+    return (...params) => dispatch => dispatch(
+        actionClosure(...params, dispatch)
+    ).catch((e) => {
+        // In general, the error will be handled by the component that works with
+        // the data. However, to avoid problems with uncaught exceptions, these
+        // are handled explicitly
+        if (printToConsole) {
+            console.error(e);
+        }
+    });
 }
 
 /**
@@ -51,22 +52,20 @@ export function createErrorHandlingPromiseAction(actionClosure){
  */
 export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction = () => undefined) => (state = defaultState, action) => {
     const mergeState = (newState, key) => {
-        if(key) {
+        if (key) {
             return {
                 ...state,
                 [key]: {
                     ...state[key],
                     ...newState
                 }
-            }
-        } else {
-            return {
-                ...state,
-                ...newState
-            }
-
+            };
         }
-    }
+        return {
+            ...state,
+            ...newState
+        };
+    };
 
     switch (action.type) {
         case actionTypes.pending(type):
@@ -77,7 +76,7 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
                     data: undefined
                 },
                 getKeyFromAction(action)
-            )
+            );
         case actionTypes.fulfilled(type):
             return mergeState(
                 {
@@ -87,7 +86,7 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
                     data: action.payload
                 },
                 getKeyFromAction(action)
-            )
+            );
         case actionTypes.rejected(type):
             return mergeState(
                 {
@@ -95,18 +94,18 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
                     error: action.payload || true
                 },
                 getKeyFromAction(action)
-            )
+            );
         case actionTypes.invalidate(type):
             return mergeState(
                 {
                     invalidated: true
                 },
                 getKeyFromAction(action)
-            )
+            );
         default:
             return state;
     }
-}
+};
 
 /**
  * Determines whether the data for a given property in state should be updated
@@ -121,15 +120,14 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
  * @param stateProperty
  * @returns {boolean} True if the data should be updated, i.e. there is no data, or pending = false and invalidated = true
  */
-export const shouldUpdate = stateProperty =>{
+export const shouldUpdate = (stateProperty) => {
     if (!stateProperty) {
-        return true
-    } else if (stateProperty.pending) {
-        return false
-    } else {
-        return stateProperty.invalidated
+        return true;
+    } if (stateProperty.pending) {
+        return false;
     }
-}
+    return stateProperty.invalidated;
+};
 
 /**
  * Dispatches an action if a property in state should be updated.
@@ -139,13 +137,10 @@ export const shouldUpdate = stateProperty =>{
  * @returns {Function}              Action to be dispatched, using the redux-thunk middleware
  * @see shouldUpdate
  */
-export const dispatchIfNeeded = (actionCreator, statePropertyExtractor) => {
-    return (dispatch, getState) => {
-        const stateProperty = statePropertyExtractor(getState());
-        if (shouldUpdate(stateProperty)) {
-            return dispatch(actionCreator())
-        } else {
-            return Promise.resolve({value: stateProperty.data});
-        }
+export const dispatchIfNeeded = (actionCreator, statePropertyExtractor) => (dispatch, getState) => {
+    const stateProperty = statePropertyExtractor(getState());
+    if (shouldUpdate(stateProperty)) {
+        return dispatch(actionCreator());
     }
-}
+    return Promise.resolve({value: stateProperty.data});
+};

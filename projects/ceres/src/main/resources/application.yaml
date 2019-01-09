@@ -42,3 +42,7 @@ spring:
   zipkin:
     base-url: http://jaeger-collector.jaeger:9411/
 
+server:
+  error:
+    whitelabel:
+      enabled: false

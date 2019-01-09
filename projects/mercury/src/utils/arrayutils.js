@@ -3,13 +3,10 @@
  * @param itemList
  * @param itemId
  */
-export const findById = (itemList, itemId) => {
-    if (itemList && Array.isArray(itemList)) {
-        return itemList.find(item => {
-            return item.hasOwnProperty('id') &&  item.id === itemId
-        })
-    }
-};
+export function findById(itemList, itemId) {
+    return Array.isArray(itemList)
+        ? itemList.find(item => item.id === itemId) : undefined;
+}
 
 /**
  * Joins an array with JSX entries together
@@ -18,19 +15,17 @@ export const findById = (itemList, itemId) => {
  * @returns {Array}
  */
 export const jsxJoin = (array, str) => {
-    if(!array || array.length === 0)
-        return [];
+    if (!array || array.length === 0) return [];
 
-    let returnArray = [];
-    for(const idx in array) {
-        if(idx > 0) {
+    const returnArray = [];
+    Object.keys(array).forEach(idx => {
+        if (idx > 0) {
             returnArray.push(str);
         }
-        returnArray.push(array[idx])
-    }
-
-    return returnArray
-}
+        returnArray.push(array[idx]);
+    });
+    return returnArray;
+};
 
 /**
  * Flattens the given array with a depth of 1

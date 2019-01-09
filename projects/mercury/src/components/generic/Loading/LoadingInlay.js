@@ -10,16 +10,10 @@ const styles = theme => ({
     }
 });
 
-class LoadingInlay extends React.Component {
+const loadingInlay = (props) => (
+    <div className={props.inlayProgress}>
+        <CircularProgress />
+    </div>
+);
 
-    render() {
-        const {classes} = this.props;
-        return (
-            <div className={classes.inlayProgress}>
-                <CircularProgress/>
-            </div>
-        );
-    }
-}
-
-export default withStyles(styles)(LoadingInlay);
+export default withStyles(styles)(loadingInlay);

@@ -1,0 +1,5 @@
+{
+    "name": "TestCollection",
+    "description":"This collection is in here to ensure at least one collection",
+    "type":"LOCAL_FILE"
+}

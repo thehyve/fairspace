@@ -1,18 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import CollectionBrowser from "./CollectionBrowser";
 import {mount, shallow} from "enzyme";
 import Button from "@material-ui/core/Button";
+import Fab from "@material-ui/core/Fab";
 import {MemoryRouter} from "react-router-dom";
 import {Provider} from "react-redux";
-import mockStore from "../../../store/mockStore"
+import CollectionBrowser from "./CollectionBrowser";
+import mockStore from "../../../store/mockStore";
 import Config from "../../../services/Config/Config";
 
-let store, collectionBrowser;
+let store; let
+    collectionBrowser;
 const defaultState = {
     account: {
         user: {
-            data: { username: 'test' },
+            data: {username: 'test'},
             pending: false,
             error: false,
         }
@@ -40,19 +42,18 @@ beforeEach(() => {
     collectionBrowser = (
         <MemoryRouter>
             <Provider store={store}>
-                <CollectionBrowser/>
+                <CollectionBrowser />
             </Provider>
         </MemoryRouter>
     );
 
     Config.setConfig({
-        "urls": {
-            "collections": "/collections"
+        urls: {
+            collections: "/collections"
         }
     });
 
     return Config.init();
-
 });
 
 it('renders without crashing', () => {
@@ -69,7 +70,7 @@ it('creates a new collection on button click', () => {
 
     // Setup proper state
     const addButton = wrapper
-        .find(Button)
+        .find(Fab)
         .filter('[aria-label="Add"]')
         .first();
     // Click on Add button
@@ -92,7 +93,7 @@ describe('loading state', () => {
             ...defaultState,
             account: {
                 user: {
-                    ... defaultState.account.user,
+                    ...defaultState.account.user,
                     pending: true
                 }
             },
@@ -108,7 +109,7 @@ describe('loading state', () => {
             ...defaultState,
             cache: {
                 collections: {
-                    ... defaultState.cache.collections,
+                    ...defaultState.cache.collections,
                     pending: true
                 },
                 users: defaultState.cache.users
@@ -125,7 +126,7 @@ describe('loading state', () => {
             ...defaultState,
             cache: {
                 users: {
-                    ... defaultState.cache.users,
+                    ...defaultState.cache.users,
                     pending: true
                 },
                 collections: defaultState.cache.collections
@@ -136,7 +137,6 @@ describe('loading state', () => {
 
         expect(node.prop('loading')).toEqual(true);
     });
-
 });
 
 describe('error state', () => {
@@ -145,7 +145,7 @@ describe('error state', () => {
             ...defaultState,
             account: {
                 user: {
-                    ... defaultState.account.user,
+                    ...defaultState.account.user,
                     error: new Error('Test')
                 }
             },
@@ -161,11 +161,11 @@ describe('error state', () => {
             ...defaultState,
             cache: {
                 collections: {
-                    ... defaultState.cache.collections,
+                    ...defaultState.cache.collections,
                     error: new Error('Test')
                 },
                 users: {
-                    ... defaultState.cache.users,
+                    ...defaultState.cache.users,
                     error: false
                 }
             },
@@ -181,11 +181,11 @@ describe('error state', () => {
             ...defaultState,
             cache: {
                 users: {
-                    ... defaultState.cache.users,
+                    ...defaultState.cache.users,
                     error: new Error('Test')
                 },
                 collections: {
-                    ... defaultState.cache.collections,
+                    ...defaultState.cache.collections,
                     error: null
                 }
             },

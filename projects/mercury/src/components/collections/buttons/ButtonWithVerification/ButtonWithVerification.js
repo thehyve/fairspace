@@ -26,17 +26,17 @@ class ButtonWithVerification extends React.Component {
         });
     }
 
-    openDialog(e) {
+    openDialog = (e) => {
         e.stopPropagation();
         this.setState({verifying: true});
     }
 
-    closeDialog(e) {
+    closeDialog = (e) => {
         if (e) e.stopPropagation();
         this.setState({verifying: false});
     }
 
-    handleClick(e) {
+    handleClick = (e) => {
         this.closeDialog(e);
         if (this.onClick) {
             window.setImmediate(() => this.onClick(e));
@@ -45,14 +45,18 @@ class ButtonWithVerification extends React.Component {
 
 
     renderConfirmationDialog() {
-        if(this.state.verifying) {
-            const content = this.props['aria-label'] + '?';
-            return (<ConfirmationDialog open={this.state.verifying}
-                                        title={'Confirmation'}
-                                        content={content}
-                                        onAgree={this.handleClick.bind(this)}
-                                        onDisagree={this.closeDialog.bind(this)}
-                                        onClose={this.closeDialog.bind(this)}/>);
+        if (this.state.verifying) {
+            const content = `${this.props['aria-label']}?`;
+            return (
+                <ConfirmationDialog
+                    open={this.state.verifying}
+                    title="Confirmation"
+                    content={content}
+                    onAgree={this.handleClick}
+                    onDisagree={this.closeDialog}
+                    onClose={this.closeDialog}
+                />
+            );
         }
 
         return '';
@@ -61,9 +65,11 @@ class ButtonWithVerification extends React.Component {
     render() {
         return (
             <div style={{visibility: this.props.visibility}}>
-                <IconButton {...this.componentProps}
-                            onClick={this.openDialog.bind(this)}
-                            disabled={this.props.disabled}>
+                <IconButton
+                    {...this.componentProps}
+                    onClick={this.openDialog}
+                    disabled={this.props.disabled}
+                >
                     {this.props.children}
                 </IconButton>
                 {this.renderConfirmationDialog()}
@@ -73,7 +79,3 @@ class ButtonWithVerification extends React.Component {
 }
 
 export default ButtonWithVerification;
-
-
-
-

@@ -10,4 +10,5 @@ cd .travis/pr
 
 echo -e "travis_fold:start:docker-compose"
 docker-compose up -d
+docker exec pr_keycloak_1 /pr/config/keycloak/run-config.sh
 echo -e "travis_fold:end:docker-compose"

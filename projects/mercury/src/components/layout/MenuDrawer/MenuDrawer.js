@@ -1,35 +1,35 @@
 import React from 'react';
 import classNames from 'classnames';
-import styles from "./MenuDrawer.styles";
 import Drawer from "@material-ui/core/Drawer";
 import Divider from "@material-ui/core/Divider";
 import {withStyles} from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import {toggleMenuExpansion} from "../../../actions/ui";
-import Menu from "./Menu";
 import {compose} from "redux";
 import {connect} from "react-redux";
+import toggleMenuExpansion from "../../../actions/ui";
+import Menu from "./Menu";
+import styles from "./MenuDrawer.styles";
 
-const MenuDrawer = ({open, toggleMenuExpansion, classes}) => (
+const MenuDrawer = (props) => (
     <Drawer
         variant="permanent"
         classes={{
-            paper: classNames(classes.drawerPaper, !open ? classes.drawerPaperClose : classes.drawerPaperOpen),
+            paper: classNames(props.classes.drawerPaper, !props.open ? props.classes.drawerPaperClose : props.classes.drawerPaperOpen),
         }}
     >
-        <div className={classes.toolbar}>
-            <IconButton onClick={toggleMenuExpansion}>
-                {!open ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
+        <div className={props.classes.toolbar}>
+            <IconButton onClick={props.toggleMenuExpansion}>
+                {!props.open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
         </div>
-        <Divider/>
+        <Divider />
         <Menu />
     </Drawer>
 );
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
     open: state.ui.menuExpanded
 });
 
@@ -38,5 +38,3 @@ const mapDispatchToProps = {
 };
 
 export default compose(withStyles(styles), connect(mapStateToProps, mapDispatchToProps))(MenuDrawer);
-
-

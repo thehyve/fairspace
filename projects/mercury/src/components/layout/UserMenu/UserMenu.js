@@ -1,12 +1,12 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from "@material-ui/core/Avatar";
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList';
 
@@ -27,12 +27,12 @@ class UserMenu extends React.Component {
         anchorEl: null,
     };
 
-    handleClick = event => {
-        this.setState({ anchorEl: event.currentTarget });
+    handleClick = (event) => {
+        this.setState({anchorEl: event.currentTarget});
     };
 
     handleClose = () => {
-        this.setState({ anchorEl: null });
+        this.setState({anchorEl: null});
     };
 
     handleLogout = () => {
@@ -41,17 +41,17 @@ class UserMenu extends React.Component {
     };
 
     render() {
-        const { anchorEl } = this.state;
+        const {anchorEl} = this.state;
 
         return (
             <div>
                 {this.renderUserButton()}
                 <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>
-                    {({ TransitionProps, placement }) => (
+                    {({TransitionProps, placement}) => (
                         <Grow
                             {...TransitionProps}
                             id="menu-list-grow"
-                            style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                            style={{transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom'}}
                         >
                             <Paper>
                                 <ClickAwayListener onClickAway={this.handleClose}>
@@ -70,7 +70,7 @@ class UserMenu extends React.Component {
     }
 
     renderUserButton = () => {
-        const { pending, error, user } = this.props;
+        const {pending, error, user} = this.props;
 
         if (pending) {
             return "Unknown";
@@ -85,20 +85,23 @@ class UserMenu extends React.Component {
                     aria-haspopup="true"
                     color="inherit"
                     onClick={this.handleClick}
-                    className={this.props.classes.row}>
-                    <Avatar alt='{user.fullName}' src="/images/avatar.png" className={this.props.classes.avatar}/>
-                    <span>{user.fullName}</span>
-                </Button>)
+                    className={this.props.classes.row}
+                >
+                    <Avatar alt="{user.fullName}" src="/images/avatar.png" className={this.props.classes.avatar} />
+                    <span>
+                        {user.fullName}
+                    </span>
+                </Button>);
         }
+
+        return "";
     }
 }
 
-const mapStateToProps = ({account: { user }}) => {
-    return {
-        pending: user.pending,
-        error: user.error,
-        user: user.data
-    }
-};
+const mapStateToProps = ({account: {user}}) => ({
+    pending: user.pending,
+    error: user.error,
+    user: user.data
+});
 
 export default connect(mapStateToProps)(withStyles(styles)(UserMenu));

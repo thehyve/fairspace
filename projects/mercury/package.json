@@ -13,10 +13,9 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "express": "^4.16.3",
     "http-proxy-middleware": "^0.19.0",
-    "jsonld": "^1.0.4",
+    "jsonld": "^1.2.1",
     "mdi-material-ui": "^5.3.0",
     "merge": "^1.2.1",
-    "moment": "^2.22.2",
     "prop-types": "^15.6.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
@@ -41,7 +40,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "./node_modules/.bin/eslint ./src"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

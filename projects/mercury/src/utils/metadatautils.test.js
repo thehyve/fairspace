@@ -36,8 +36,8 @@ describe('getLabel', () => {
     });
     it('should return part of the url after the last slash if no pound sign present', () => {
         expect(getLabel({'@id': 'http://test.nl/name'}, true)).toEqual('name');
-    })
-})
+    });
+});
 
 describe('navigableLink', () => {
     it('should keep IRI links', () => {
@@ -56,5 +56,4 @@ describe('navigableLink', () => {
     it('should not change links outside the metadata', () => {
         expect(navigableLink('http://localhost/collections/300')).toEqual('http://localhost/collections/300');
     });
-
-})
+});

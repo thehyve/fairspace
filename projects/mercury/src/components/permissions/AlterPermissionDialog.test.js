@@ -1,11 +1,10 @@
 import React from 'react';
 import {createShallow} from '@material-ui/core/test-utils';
+import {Provider} from "react-redux";
 import {AlterPermissionDialog, styles} from "./AlterPermissionDialog";
 import mockStore from "../../store/mockStore";
-import {Provider} from "react-redux";
 
 describe('AlterPermissionDialog', () => {
-
     let shallow;
     const mockAlterPermissionFn = jest.fn();
     const mockfetchUsersFn = jest.fn();
@@ -21,14 +20,14 @@ describe('AlterPermissionDialog', () => {
     const mockCollaborators = {
         data: [
             {
-                'collectionId': 500,
-                'subject': 'user2-id',
-                'access': 'Write'
+                collectionId: 500,
+                subject: 'user2-id',
+                access: 'Write'
             },
             {
-                'collectionId': 500,
-                'subject': 'user4-id',
-                'access': 'Manage'
+                collectionId: 500,
+                subject: 'user4-id',
+                access: 'Manage'
             }
         ]
     };
@@ -37,9 +36,9 @@ describe('AlterPermissionDialog', () => {
     };
     const mockCollectionId = 500;
     const mockUser = {
-        'collectionId': 500,
-        'subject': 'user2-id',
-        'access': 'Write'
+        collectionId: 500,
+        subject: 'user2-id',
+        access: 'Write'
     };
 
     let wrapper;
@@ -51,35 +50,35 @@ describe('AlterPermissionDialog', () => {
     it('should render initial state of the dialog correctly', () => {
         const expectedOptions = [
             {
-                "disabled": true,
-                "label": "Mariah Carey",
-                "value": "user1-id"
+                disabled: true,
+                label: "Mariah Carey",
+                value: "user1-id"
             },
             {
-                "disabled": true,
-                "label": "Michael Jackson",
-                "value": "user2-id"
+                disabled: true,
+                label: "Michael Jackson",
+                value: "user2-id"
             },
             {
-                "disabled": false,
-                "label": "Bruno Mars",
-                "value": "user3-id"
+                disabled: false,
+                label: "Bruno Mars",
+                value: "user3-id"
             },
             {
-                "disabled": true,
-                "label": "Kurt Cobain",
-                "value": "user4-id"
+                disabled: true,
+                label: "Kurt Cobain",
+                value: "user4-id"
             },
             {
-                "disabled": false,
-                "label": "Ariana Grande",
-                "value": "user5-id"
+                disabled: false,
+                label: "Ariana Grande",
+                value: "user5-id"
             }
         ];
 
         wrapper = shallow(<AlterPermissionDialog
             open={false}
-            classes={styles}
+            classes={styles()}
             user={null}
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
@@ -97,8 +96,8 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('WithStyles(DialogTitle)').childAt(0).text()).toEqual('Share with');
 
         // render collacborator selector
-        expect(wrapper.find('WithStyles(MaterialReactSelect)').prop('value')).toBe(null);
-        expect(wrapper.find('WithStyles(MaterialReactSelect)').prop('options')).toEqual(expectedOptions);
+        expect(wrapper.find('WithStyles(materialReactSelect)').prop('value')).toBe(null);
+        expect(wrapper.find('WithStyles(materialReactSelect)').prop('options')).toEqual(expectedOptions);
 
         // initial value of the access right is "Read"
         expect(wrapper.find('RadioGroup').prop('value')).toEqual('Read');
@@ -119,12 +118,11 @@ describe('AlterPermissionDialog', () => {
             <Provider store={store}>
                 <AlterPermissionDialog
                     open={false}
-                    classes={styles}
+                    classes={styles()}
                     user={mockUser}
                     collectionId={mockCollectionId}
                     collaborators={mockCollaborators}
                     currentUser={mockCurrentLoggedUser}
-
                     fetchUsers={mockfetchUsersFn}
                     alterPermission={mockAlterPermissionFn}
                     users={mockUsers}

@@ -35,7 +35,7 @@ env:
 cache:
   directories:
   - $HOME/downloads
-  - $HOME/.cache/yarn
+  - $HOME/.cache
   - $HOME/.gradle
 
 notifications:
@@ -78,26 +78,29 @@ jobs:
       - .travis/build.sh projects/pluto
       - .travis/build.sh projects/titan
       - .travis/build.sh projects/jupyterhub-hub
-      - .travis/build.sh projects/jupyterhub-singleuser
+      - travis_wait 40 .travis/build.sh projects/jupyterhub-singleuser
       - 'if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then ci/docker/login.sh && .travis/pr/start-local-environment.sh && .travis/pr/run-e2e-tests.sh; fi'
     - stage: build
+      cache: false
       name: Build helm charts
       install:
       - source charts/.travis/install.sh
       script:
       - charts/.travis/build.sh
-    - stage: deploy
-      if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
-      install:
-        - source charts/.travis/install.sh
-      script:
-      - travis_wait ci/helm/deploy.sh
     - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+      cache: false
       stage: Versioning
       name: Set tag and update version
       script:
       - "ci/versioning/add_tag_to_git.sh"
       - "ci/versioning/set_next_version.sh"
+    - stage: deploy
+      cache: false
+      if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
+      install:
+        - source charts/.travis/install.sh
+      script:
+      - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET
     - stage: e2e test
       if: branch = env(SNAPSHOT_BRANCH) AND type != pull_request
       script:

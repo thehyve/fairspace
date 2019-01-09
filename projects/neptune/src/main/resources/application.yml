@@ -59,3 +59,8 @@ security:
     - /actuator/health
     needsAuthentication:
     - /*
+
+server:
+  error:
+    whitelabel:
+      enabled: false

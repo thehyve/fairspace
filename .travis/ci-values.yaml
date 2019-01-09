@@ -19,6 +19,7 @@ workspace:
     tls:
       certificate:
         dns01Provider: azuredns-ci
+  enableExperimentalFeatures: true
 
 pluto:
   image:
@@ -80,7 +81,7 @@ jupyterhub:
               session_url: https://workspace.ci.fairway.app/account/tokens
   singleuser:
     image:
-      tag: 0.5.3-SNAPSHOT-simple
+      tag: 0.5.4-SNAPSHOT-simple
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.ci.fairway.app
   hub:
