@@ -96,7 +96,9 @@ class NewMetadataEntityDialog extends React.Component {
                                                         selected={this.state.type === t}
                                                         onClick={() => this.setState({type: t})}
                                                     >
-                                                        <ListItemText primary={getLabel(t)} />
+                                                        <ListItemText
+                                                            primary={getLabel(t)}
+                                                        />
                                                     </ListItem>
                                                 ))
                                             }

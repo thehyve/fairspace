@@ -19,6 +19,7 @@ function AuthorizationCheck(props) {
      */
     function hasAuthorization() {
         const {authorizations, authorization} = props;
+
         if (Array.isArray(authorizations)) {
             // If no authorization is given as property, the only check is for a status 200 response
             // If the authorization is specified, we want the array to actually contain the authorization
@@ -40,10 +41,15 @@ function AuthorizationCheck(props) {
 
         return showError(
             <div style={{minHeight: 300}}>
-                <Typography variant="h5" component="h2">
+                <Typography
+                    variant="h5"
+                    component="h2"
+                >
                     Error
                 </Typography>
-                <Typography component="p">
+                <Typography
+                    component="p"
+                >
                     You do not have sufficient privileges to access this function. Please contact an administrator.
                 </Typography>
             </div>
@@ -62,7 +68,7 @@ AuthorizationCheck.propTypes = {
     /**
      * List of authorization for the current user
      */
-    authorizations: PropTypes.array,
+    authorizations: PropTypes.arrayOf(PropTypes.string),
 
     /**
      * Optional value to indicate the actual authorization to check for. If not specified, the check will only
@@ -83,7 +89,4 @@ const mapStateToProps = ({account: {authorizations}}) => ({
     authorizations: authorizations.data || []
 });
 
-// Please note that withRouter is needed here to make the routing
-// work properly with react-redux.
-// See https://reacttraining.com/react-router/web/guides/redux-integration
 export default withRouter(connect(mapStateToProps)(AuthorizationCheck));

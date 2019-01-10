@@ -10,10 +10,9 @@ import getDisplayName from "../../../utils/userUtils";
 import LoadingInlay from '../../generic/Loading/LoadingInlay';
 import PermissionChecker from "../../permissions/PermissionChecker";
 
-class Collection extends React.Component {
+class CollectionDetails extends React.Component {
     constructor(props) {
         super(props);
-        this.onDidChangeDetails = props.onDidChangeDetails;
 
         this.state = {
             collection: props.collection,
@@ -29,20 +28,14 @@ class Collection extends React.Component {
         });
     }
 
-    closeEditDialog = () => {
-        this.setState({editing: false});
-    }
-
     handleChangeDetails = (name, description) => {
-        this.closeEditDialog();
-
         if ((name !== this.state.collection.name || description !== this.state.collection.description) && name !== '') {
             this.props.updateCollection(this.state.collection.id, name, description)
                 .then(() => {
                     const collection = Object.assign(this.state.collection, {name, description});
 
-                    if (this.onDidChangeDetails) {
-                        this.onDidChangeDetails(collection);
+                    if (this.props.onDidChangeDetails) {
+                        this.props.onDidChangeDetails(collection);
                     }
                 })
                 .catch(e => ErrorDialog.showError(e, "An error occurred while updating collection metadata"));
@@ -90,7 +83,9 @@ class Collection extends React.Component {
                         Owner:
                         {` ${this.props.creatorFullname}`}
                     </Typography>
-                    <Typography component="p">
+                    <Typography
+                        component="p"
+                    >
                         {this.state.collection.description}
                     </Typography>
                 </div>
@@ -121,4 +116,4 @@ const mapDispatchToProps = {
     ...collectionActions
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Collection);
+export default connect(mapStateToProps, mapDispatchToProps)(CollectionDetails);

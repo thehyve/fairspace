@@ -28,16 +28,14 @@ const invalidateFiles = (state, collectionId, ...paths) => {
 
 const filesByCollectionAndPath = (state = defaultState, action) => {
     let collectionId;
-    let path;
     switch (action.type) {
         case actionTypes.pending(FILES):
             collectionId = action.meta.collection.id;
-            path = action.meta.path;
             return {
                 ...state,
                 [collectionId]: {
                     ...state[collectionId],
-                    [path]: {
+                    [action.meta.path]: {
                         pending: true,
                         error: false,
                         invalidated: false,
@@ -47,13 +45,12 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
             };
         case actionTypes.fulfilled(FILES):
             collectionId = action.meta.collection.id;
-            path = action.meta.path;
             return {
                 ...state,
                 [collectionId]: {
                     ...state[collectionId],
-                    [path]: {
-                        ...state[collectionId][path],
+                    [action.meta.path]: {
+                        ...state[collectionId][action.meta.path],
                         pending: false,
                         data: action.payload
                     }
@@ -61,13 +58,12 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
             };
         case actionTypes.rejected(FILES):
             collectionId = action.meta.collection.id;
-            path = action.meta.path;
             return {
                 ...state,
                 [collectionId]: {
                     ...state[collectionId],
-                    [path]: {
-                        ...state[collectionId][path],
+                    [action.meta.path]: {
+                        ...state[collectionId][action.meta.path],
                         pending: false,
                         error: action.payload || true
                     }

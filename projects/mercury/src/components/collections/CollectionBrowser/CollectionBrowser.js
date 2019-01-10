@@ -20,7 +20,7 @@ class CollectionBrowser extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            editingCollection: false
+            addingNewCollection: false
         };
     }
 
@@ -30,7 +30,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleAddCollectionClick = () => {
-        this.setState({editingCollection: true});
+        this.setState({addingNewCollection: true});
     }
 
     handleCollectionClick = (collection) => {
@@ -58,55 +58,19 @@ class CollectionBrowser extends React.Component {
         this.props.history.push(`/collections/${collection.id}`);
     }
 
-    renderButtons() {
-        return (
-            <Fab
-                mini="true"
-                color="secondary"
-                aria-label="Add"
-                title="Add collection"
-                onClick={this.handleAddCollectionClick}
-            >
-                <Icon>add</Icon>
-            </Fab>
-        );
-    }
-
-    renderLoading() {
-        return <LoadingInlay />;
-    }
-
-    renderCollectionList() {
-        const {
-            users, collections, addingCollection, deletingCollection
-        } = this.props;
-        // TODO: is this required, does it have an effect?
-        collections.map(col => col.creatorObj = findById(users, col.creator));
-
-        return (
-            <>
-                <CollectionList
-                    collections={this.props.collections}
-                    selectedCollectionId={this.props.selectedCollectionId}
-                    onCollectionClick={this.handleCollectionClick}
-                    onCollectionDoubleClick={this.handleCollectionDoubleClick}
-                    onCollectionDelete={this.handleCollectionDelete}
-                />
-                <CollectionEditor
-                    title="Add collection"
-                    name={`${this.props.user.fullName}'s collection`}
-                    editing={this.state.editingCollection}
-                    onSave={this.handleAddCollection}
-                    onCancel={this.handleCancelAddCollection}
-                    editType={Config.get().enableExperimentalFeatures}
-                />
-                <LoadingOverlay loading={addingCollection || deletingCollection} />
-            </>
-        );
-    }
+    renderButtons = () => (
+        <Fab
+            mini="true"
+            color="secondary"
+            aria-label="Add"
+            title="Add collection"
+            onClick={this.handleAddCollectionClick}
+        >
+            <Icon>add</Icon>
+        </Fab>
+    );
 
     handleAddCollection = (name, description, type) => {
-        this.setState({editingCollection: false});
         this.props.addCollection(name, description, type)
             .then(this.props.fetchCollectionsIfNeeded)
             .catch(err => ErrorDialog.showError(
@@ -117,7 +81,38 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCancelAddCollection = () => {
-        this.setState({editingCollection: false});
+        this.setState({addingNewCollection: false});
+    }
+
+    renderCollectionList() {
+        const {
+            users, collections, addingCollection, deletingCollection
+        } = this.props;
+        collections.forEach(col => {
+            col.creatorObj = findById(users, col.creator);
+        });
+
+        return (
+            <>
+                <CollectionList
+                    collections={this.props.collections}
+                    selectedCollectionId={this.props.selectedCollectionId}
+                    onCollectionClick={this.handleCollectionClick}
+                    onCollectionDoubleClick={this.handleCollectionDoubleClick}
+                    onCollectionDelete={this.handleCollectionDelete}
+                />
+                {this.state.addingNewCollection ? (
+                    <CollectionEditor
+                        title="Add collection"
+                        name={`${this.props.user.fullName}'s collection`}
+                        onSave={this.handleAddCollection}
+                        onClose={this.handleCancelAddCollection}
+                        editType={Config.get().enableExperimentalFeatures}
+                    />
+                ) : null}
+                <LoadingOverlay loading={addingCollection || deletingCollection} />
+            </>
+        );
     }
 
     render() {
@@ -131,7 +126,7 @@ class CollectionBrowser extends React.Component {
             <GenericCollectionsScreen
                 breadCrumbs={<BreadCrumbs />}
                 buttons={this.renderButtons()}
-                main={loading ? this.renderLoading() : this.renderCollectionList()}
+                main={loading ? <LoadingInlay /> : this.renderCollectionList()}
             />
         );
     }

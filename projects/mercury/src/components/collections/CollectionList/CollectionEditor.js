@@ -13,56 +13,44 @@ import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 
 class CollectionEditor extends React.Component {
     state = {
-        editing: false
+        editing: true,
+        name: this.props.name || '',
+        description: this.props.description || '',
+        type: this.props.type || 'LOCAL_FILE',
     };
 
-    componentDidUpdate() {
-        if (this.state.editing !== this.props.editing) {
-            this.setState({
-                title: this.props.title,
-                name: this.props.name || '',
-                description: this.props.description || '',
-                type: this.props.type || 'LOCAL_FILE',
-                editing: !!this.props.editing
-            });
-        }
-    }
-
-    close = () => {
-        this.setState({editing: false});
-    }
-
-    handleCancel = () => {
-        this.close();
-        if (this.props.onCancel) {
-            this.props.onCancel();
-        }
-    }
-
     handleSave = () => {
-        if (!this.state.name) {
+        if (!this.isInputValid()) {
             return;
         }
 
-        this.close();
         if (this.props.onSave) {
             this.props.onSave(this.state.name, this.state.description, this.state.type);
         }
     }
 
-    handleInputChange = (event) => {
-        this.setState({[event.target.name]: event.target.value});
+    handleCancel = () => {
+        this.setState({editing: false});
+
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
     }
+
+    handleInputChange = (name, value) => {
+        this.setState({[name]: value});
+    }
+
+    isInputValid = () => !!this.state.name;
 
     render() {
         return (
             <Dialog
                 open={this.state.editing}
-                onClose={this.close}
                 aria-labelledby="form-dialog-title"
             >
                 <DialogTitle id="form-dialog-title">
-                    {this.state.title}
+                    {this.props.title}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>You can edit the collection details here.</DialogContentText>
@@ -73,7 +61,7 @@ class CollectionEditor extends React.Component {
                         label="Name"
                         value={this.state.name}
                         name="name"
-                        onChange={this.handleInputChange}
+                        onChange={(event) => this.handleInputChange('name', event.target.value)}
                         fullWidth
                         required
                     />
@@ -85,7 +73,7 @@ class CollectionEditor extends React.Component {
                         label="Description"
                         name="description"
                         value={this.state.description}
-                        onChange={this.handleInputChange}
+                        onChange={(event) => this.handleInputChange('description', event.target.value)}
                         fullWidth
                     />
                     {this.props.editType
@@ -95,7 +83,7 @@ class CollectionEditor extends React.Component {
                                 <Select
                                     name="type"
                                     value={this.state.type}
-                                    onChange={this.handleInputChange}
+                                    onChange={(event) => this.handleInputChange('type', event.target.value)}
                                 >
                                     <MenuItem value="LOCAL_FILE">On Premise</MenuItem>
                                     <MenuItem value="AZURE_BLOB_STORAGE">Azure Blob Storage</MenuItem>
@@ -109,7 +97,7 @@ class CollectionEditor extends React.Component {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.handleCancel} aria-label="Cancel" color="secondary">Cancel</Button>
-                    <Button onClick={this.handleSave} aria-label="Save" color="primary">Save</Button>
+                    <Button onClick={this.handleSave} disabled={!this.isInputValid()} aria-label="Save" color="primary">Save</Button>
                 </DialogActions>
             </Dialog>
         );

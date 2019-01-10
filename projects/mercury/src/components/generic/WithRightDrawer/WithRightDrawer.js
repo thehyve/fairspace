@@ -39,7 +39,7 @@ function WithRightDrawer({
                                 <Icon>close</Icon>
                             </IconButton>
                         </div>
-                    ) : null }
+                    ) : null}
 
                 <div className={classes.drawerContents}>
                     {drawerContents}
@@ -50,12 +50,11 @@ function WithRightDrawer({
 }
 
 WithRightDrawer.propTypes = {
-    classes: PropTypes.object.isRequired,
     drawerOpened: PropTypes.bool,
     collapsible: PropTypes.bool,
     onCloseDrawer: PropTypes.func,
-    mainContents: PropTypes.node,
-    drawerContents: PropTypes.node
+    mainContents: PropTypes.node.isRequired,
+    drawerContents: PropTypes.node.isRequired
 };
 
 WithRightDrawer.defaultProps = {

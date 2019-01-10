@@ -211,20 +211,23 @@ const materialReactSelect = (props) => {
     );
 };
 
+const selectType = {disabled: PropTypes.bool, lavel: PropTypes.string, value: PropTypes.string};
+
 materialReactSelect.propTypes = {
-    options: PropTypes.array,
-    value: PropTypes.object,
+    options: PropTypes.arrayOf(PropTypes.shape(selectType)).isRequired,
+    value: PropTypes.shape(selectType),
     placeholder: PropTypes.string,
-    classes: PropTypes.object,
-    onChange: PropTypes.func,
-    required: PropTypes.bool,
-    noOptionsMessage: PropTypes.func
+    classes: PropTypes.shape(),
+    onChange: PropTypes.func.isRequired
 };
 
 materialReactSelect.defaultProps = {
     placeholder: 'Please select a value',
     label: '',
     required: false,
+    value: null,
+    classes: null,
+
 };
 
 export default withStyles(styles, {withTheme: true})(materialReactSelect);

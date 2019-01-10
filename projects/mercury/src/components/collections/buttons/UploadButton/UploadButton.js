@@ -98,13 +98,13 @@ class UploadButton extends React.Component {
         this.setFilesState(files, 'uploaded');
     }
 
-    setFilesState(files, state) {
-        // Add these file to a copy of the current map with files
-        const filesMap = Object.assign({}, this.state.files);
-        files.forEach((file) => {filesMap[file.name] = state;});
-
-        // Set the new state
-        this.setState({files: filesMap});
+    setFilesState(files, fileState) {
+        this.setState(prevState => {
+            // Add these file to a copy of the current map with files
+            const filesMap = {...prevState.files};
+            files.forEach((file) => {filesMap[file.name] = fileState;});
+            this.setState({files: filesMap});
+        });
     }
 
     renderDropzoneContent() {
@@ -164,7 +164,10 @@ class UploadButton extends React.Component {
                         </Dropzone>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.closeDialog} color="secondary">
+                        <Button
+                            onClick={this.closeDialog}
+                            color="secondary"
+                        >
                             Close
                         </Button>
                     </DialogActions>

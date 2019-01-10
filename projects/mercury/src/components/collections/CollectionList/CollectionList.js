@@ -18,23 +18,16 @@ import withHovered from "../../../containers/WithHovered/WithHovered";
 import CollectionItem from "./CollectionItem";
 import getDisplayName from "../../../utils/userUtils";
 
-export const COLLECTION_ICONS = {
+export const ICONS = {
     LOCAL_STORAGE: 'folder_open',
     AZURE_BLOB_STORAGE: 'cloud_open',
     S3_BUCKET: 'cloud_open',
     GOOGLE_CLOUD_BUCKET: 'cloud_open'
 };
 
-export const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
-
-
 export class CollectionList extends React.Component {
-    static getCollectionIcon(collection) {
-        if (collection.type && COLLECTION_ICONS.hasOwnProperty(collection.type)) {
-            return COLLECTION_ICONS[collection.type];
-        }
-        return COLLECTION_ICONS[DEFAULT_COLLECTION_TYPE];
-    }
+    static getCollectionIcon =
+        (col) => (col.type && ICONS[col.type] ? ICONS[col.type] : ICONS.LOCAL_STORAGE);
 
     render() {
         const {
@@ -46,6 +39,7 @@ export class CollectionList extends React.Component {
         if (!collections || collections.length === 0) {
             return "No collections";
         }
+
         return (
             <Paper className={classes.collectionListContainer}>
                 <Table padding="dense">
@@ -118,7 +112,4 @@ export class CollectionList extends React.Component {
     }
 }
 
-export default compose(
-    withStyles(styles),
-    withHovered
-)(CollectionList);
+export default compose(withStyles(styles), withHovered)(CollectionList);

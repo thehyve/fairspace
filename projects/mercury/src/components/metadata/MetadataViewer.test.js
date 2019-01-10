@@ -34,4 +34,3 @@ it('displays properties properly', () => {
         expect(wrapper.text()).toEqual("DescriptionMore infoMy first collectionNameCollection 5TypeCollection");
     });
 });
-

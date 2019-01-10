@@ -20,8 +20,7 @@ class ErrorDialog extends React.Component {
         super(props);
         this.state = {
             error: false,
-            message: null,
-            stackTrace: null
+            message: null
         };
         ErrorDialog.instance = this;
     }
@@ -40,12 +39,12 @@ class ErrorDialog extends React.Component {
     }
 
     handleClose = () => {
-        this.setState({error: false, onRetry: null, stackTrace: null});
+        this.setState({error: false, onRetry: null});
     };
 
     handleRetry = () => {
         const retry = this.state.onRetry;
-        this.setState({error: false, onRetry: null, stackTrace: null});
+        this.setState({error: false, onRetry: null});
         retry();
     };
 

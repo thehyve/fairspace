@@ -7,13 +7,15 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import {compose} from "redux";
+import MenuItem from "@material-ui/core/MenuItem/MenuItem";
+import IconButton from '@material-ui/core/IconButton';
+import MoreIcon from '@material-ui/icons/MoreVert';
+import Menu from "@material-ui/core/Menu";
 import ErrorMessage from "../error/ErrorMessage";
 import ConfirmationDialog from "../generic/ConfirmationDialog/ConfirmationDialog";
 import AlterPermissionContainer from "../../containers/AlterPermissionContainer/AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparators";
 import getDisplayName from "../../utils/userUtils";
-import MoreActions from "../generic/MoreActions/MoreActions";
-import ActionItem from "../generic/MoreActions/ActionItem";
 import withHovered from "../../containers/WithHovered/WithHovered";
 import {findById} from "../../utils/arrayutils";
 import LoadingInlay from '../generic/Loading/LoadingInlay';
@@ -91,7 +93,8 @@ export class PermissionsViewer extends React.Component {
     handleAlterPermission = (user) => {
         this.setState({
             showPermissionDialog: true,
-            selectedUser: user
+            selectedUser: user,
+            anchorEl: null
         });
     };
 
@@ -105,7 +108,8 @@ export class PermissionsViewer extends React.Component {
     handleRemoveCollaborator = (collaborator) => {
         this.setState({
             selectedUser: collaborator,
-            showConfirmDeleteDialog: true
+            showConfirmDeleteDialog: true,
+            anchorEl: null
         });
     };
 
@@ -124,23 +128,46 @@ export class PermissionsViewer extends React.Component {
         });
     };
 
+    handleClick = (event) => {
+        this.setState({anchorEl: event.currentTarget});
+    };
+
+    closeMenu = () => {
+        this.setState({anchorEl: null});
+    };
+
     renderAlterPermissionButtons(idx, collaborator) {
         const {canManage, currentUser} = this.props;
+
         return canAlterPermission(canManage, collaborator, currentUser) ? (
             <ListItemSecondaryAction
                 onMouseOver={e => this.props.onItemMouseOver(idx, e)}
                 onMouseOut={() => this.props.onItemMouseOut(idx)}
             >
-                <MoreActions visibility={this.props.hovered !== idx ? 'hidden' : 'visible'}>
-                    <ActionItem
+                <IconButton
+                    style={{visibility: this.props.hovered !== idx ? 'hidden' : 'visible'}}
+                    onClick={this.handleClick}
+                >
+                    <MoreIcon />
+                </IconButton>
+                <Menu
+                    id="more-menu"
+                    anchorEl={this.state.anchorEl}
+                    open={Boolean(this.state.anchorEl)}
+                >
+                    <MenuItem
                         onClick={() => this.handleAlterPermission(collaborator)}
                     >
                         Change access
-                    </ActionItem>
-                    <ActionItem onClick={() => this.handleRemoveCollaborator(collaborator)}>Delete</ActionItem>
-                </MoreActions>
+                    </MenuItem>
+                    <MenuItem
+                        onClick={() => this.handleRemoveCollaborator(collaborator)}
+                    >
+                        Delete
+                    </MenuItem>
+                </Menu>
             </ListItemSecondaryAction>
-        ) : '';
+        ) : null;
     }
 
     renderCollaboratorList(permissions) {

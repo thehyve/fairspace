@@ -46,9 +46,7 @@ function determineHomeEntry(homeUrl, classes) {
  * @returns {Array}
  * @constructor
  */
-function BreadCrumbs({
-    segments, match, classes, homeUrl
-}) {
+const breadCrumbs = ({segments, match, classes, homeUrl}) => {
     // Ensure we only have the first part of the url
     let homePath = match.path;
     if (homePath !== '/') {
@@ -80,9 +78,9 @@ function BreadCrumbs({
             {jsxJoin(breadcrumbs, ' > ')}
         </div>
     );
-}
+};
 
-BreadCrumbs.propTypes = {
+breadCrumbs.propTypes = {
     homeUrl: PropTypes.string,
     segments: PropTypes.arrayOf(
         PropTypes.shape({
@@ -92,10 +90,15 @@ BreadCrumbs.propTypes = {
     )
 };
 
+breadCrumbs.defaultProps = {
+    homeUrl: '',
+    segments: null
+};
+
 const styles = theme => ({
     root: {marginBottom: theme.spacing.unit},
     link: {minWidth: 'auto'},
     icon: {verticalAlign: 'middle', marginRight: theme.spacing.unit}
 });
 
-export default withStyles(styles)(withRouter(BreadCrumbs));
+export default withStyles(styles)(withRouter(breadCrumbs));

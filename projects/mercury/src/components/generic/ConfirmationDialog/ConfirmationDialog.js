@@ -7,69 +7,55 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import PropTypes from 'prop-types';
 
-class ConfirmationDialog extends React.Component {
-    handleDisagree = (e) => {
-        this.props.onDisagree(e);
-    };
-
-    handleAgree = (e) => {
-        this.props.onAgree(e);
-    };
-
-    handleClose = (e) => {
-        this.props.onClose(e);
-    };
-
-    render() {
-        const {title, content, open} = this.props;
-        return (
-            <Dialog
-                open={open}
-                onClose={this.handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
+const confirmationDialog = ({title, content, open, onClose, onAgree, onDisagre}) => (
+    <Dialog
+        open={open}
+        onClose={onClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+    >
+        <DialogTitle id="alert-dialog-title">
+            {title}
+        </DialogTitle>
+        <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+                {content}
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+            <Button
+                onClick={onDisagre}
+                color="primary"
             >
-                <DialogTitle id="alert-dialog-title">
-                    {title}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        {content}
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={this.handleDisagree}
-                        color="primary"
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={this.handleAgree}
-                        color="primary"
-                        autoFocus
-                    >
-                        Submit
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        );
-    }
-}
+                Cancel
+                </Button>
+            <Button
+                onClick={onAgree}
+                color="primary"
+                autoFocus
+            >
+                Submit
+                </Button>
+        </DialogActions>
+    </Dialog>
+);
 
-ConfirmationDialog.propTypes = {
+confirmationDialog.propTypes = {
     open: PropTypes.bool,
     title: PropTypes.string,
     content: PropTypes.string,
-    onYes: PropTypes.func,
-    onNo: PropTypes.func,
     onClose: PropTypes.func,
+    onAgree: PropTypes.func,
+    onDisagre: PropTypes.func,
 };
 
-ConfirmationDialog.defaultProps = {
+confirmationDialog.defaultProps = {
     open: false,
     title: '',
     content: '',
+    onClose: () => {},
+    onAgree: () => {},
+    onDisagre: () => {},
 };
 
-export default ConfirmationDialog;
+export default confirmationDialog;
