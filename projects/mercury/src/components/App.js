@@ -7,7 +7,7 @@ import {fetchUsers, fetchWorkspace} from "../actions/workspace";
 import configureStore from "../store/configureStore";
 import Config from "../services/Config/Config";
 import theme from './App.theme';
-import Layout from "./common/layout/Layout";
+import Layout from "./common/Layout/Layout";
 import LoadingInlay from './common/LoadingInlay';
 import ErrorDialog from "./common/ErrorDialog";
 
