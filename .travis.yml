@@ -59,16 +59,10 @@ before_install:
   - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo KUBERNETES_CONTEXT="$RELEASE_CONTEXT"; fi'
   - 'if [[ "$SHOULD_RELEASE" ]]; then export OIDC_AUTH_VERSION=$VERSION; fi'
 
-# This additional host is needed for the e2e tests to run properly
-# against the docker-compose setup
-addons:
-  hosts:
-  - keycloak
-
 jobs:
   include:
     - stage: build
-      name: Build projects (and run e2e test for a PR)
+      name: Build projects
       script:
       - .travis/build.sh projects/oidc-auth
       - .travis/build.sh projects/callisto
@@ -79,7 +73,6 @@ jobs:
       - .travis/build.sh projects/titan
       - .travis/build.sh projects/jupyterhub-hub
       - travis_wait 40 .travis/build.sh projects/jupyterhub-singleuser
-      - 'if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then ci/docker/login.sh && .travis/pr/start-local-environment.sh && .travis/pr/run-e2e-tests.sh; fi'
     - stage: build
       cache: false
       name: Build helm charts
@@ -101,8 +94,3 @@ jobs:
         - source charts/.travis/install.sh
       script:
       - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET
-    - stage: e2e test
-      if: branch = env(SNAPSHOT_BRANCH) AND type != pull_request
-      script:
-      - 'cd projects/janus && .travis/build.sh'
-
