@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import Icon from "@material-ui/core/Icon";
 import {TableCell} from "@material-ui/core";
 import {createShallow} from '@material-ui/core/test-utils';
-import {CollectionList, ICONS} from "./CollectionList";
+import CollectionList, {ICONS} from "./CollectionList";
 import styles from './CollectionList.styles';
 
 const shallow = createShallow({dive: true});
