@@ -1,9 +1,12 @@
 package io.fairspace.oidc_auth.config;
 
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.BadJWTException;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.JWTClaimsSetVerifier;
+import com.nimbusds.jwt.proc.JWTProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +21,7 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -59,6 +63,28 @@ public class AuthBeansTest {
         claimsSetVerifier.verify(claimsSet, null);
     }
 
+    @Test
+    void testJWKAlgorithmConfiguration() throws MalformedURLException, BadJWTException, URISyntaxException {
+        // Setup
+        oidcConfig = new OidcConfig();
+        oidcConfig.setJwkKeySetUri(new URI("http://test.uri"));
+        oidcConfig.setAccessTokenJwkAlgorithm(JWSAlgorithm.RS512);
+        oidcConfig.setRefreshTokenJwkAlgorithm(JWSAlgorithm.HS256);
+
+        authBeans = new AuthBeans(oidcConfig);
+
+        // Create processors
+        ConfigurableJWTProcessor accessTokenJwtProcessor = (ConfigurableJWTProcessor) authBeans.accessTokenJwtProcessor();
+        ConfigurableJWTProcessor refreshTokenJwtProcessor = (ConfigurableJWTProcessor) authBeans.refreshTokenJwtProcessor();
+
+        // Verify configuration of the processor
+        JWSAlgorithm configuredAccessTokenJWSAlgorithm = ((JWSVerificationKeySelector) accessTokenJwtProcessor.getJWSKeySelector()).getExpectedJWSAlgorithm();
+        JWSAlgorithm configuredRefreshTokenJWSAlgorithm = ((JWSVerificationKeySelector) refreshTokenJwtProcessor.getJWSKeySelector()).getExpectedJWSAlgorithm();
+
+        assertEquals(JWSAlgorithm.RS512, configuredAccessTokenJWSAlgorithm);
+        assertEquals(JWSAlgorithm.HS256, configuredRefreshTokenJWSAlgorithm);
+    }
+
     private JWTClaimsSet getJwtClaimsSet(int addSeconds) {
         Date expiry = Date.from(Instant.now().plus(addSeconds, ChronoUnit.SECONDS));
         return new JWTClaimsSet.Builder()
@@ -67,7 +93,7 @@ public class AuthBeansTest {
     }
 
     private JWTClaimsSetVerifier getJwtClaimsSetVerifier() throws MalformedURLException {
-        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.jwtProcessor();
+        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.refreshTokenJwtProcessor();
         return jwtProcessor.getJWTClaimsSetVerifier();
     }
 

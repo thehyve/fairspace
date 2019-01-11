@@ -27,15 +27,35 @@ import static com.nimbusds.jose.JWSAlgorithm.RS256;
 public class AuthBeans {
     private OidcConfig oidcConfig;
 
-
-
     @Autowired
     public AuthBeans(OidcConfig oidcConfig) {
         this.oidcConfig = oidcConfig;
     }
 
     @Bean
-    JWTProcessor jwtProcessor() throws MalformedURLException {
+    JWTProcessor accessTokenJwtProcessor() throws MalformedURLException {
+        return jwtProcessor(oidcConfig.getAccessTokenJwkAlgorithm());
+    }
+
+    @Bean
+    JWTProcessor refreshTokenJwtProcessor() throws MalformedURLException {
+        return jwtProcessor(oidcConfig.getRefreshTokenJwkAlgorithm());
+    }
+
+
+    @Bean
+    @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+    OAuthAuthenticationToken authenticationToken(HttpServletRequest request) {
+        return (OAuthAuthenticationToken) request.getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
+    }
+
+    /**
+     * Constructs a JWTProcessor instance to process JWT tokens according to the oidcConfiguration
+     * @param expectedJWSAlgorithm The expected JWS algorithm of the access tokens (agreed out-of-band)
+     * @return
+     * @throws MalformedURLException
+     */
+    JWTProcessor jwtProcessor(JWSAlgorithm expectedJWSAlgorithm) throws MalformedURLException {
         // Set up a JWT processor to parse the tokens and then check their signature
         // and validity time window (bounded by the "iat", "nbf" and "exp" claims)
         ConfigurableJWTProcessor jwtProcessor = new DefaultJWTProcessor();
@@ -47,12 +67,9 @@ public class AuthBeans {
         log.info("Using remote key set from URL {}", oidcConfig.getJwkKeySetUri().toString());
         JWKSource keySource = new RemoteJWKSet(oidcConfig.getJwkKeySetUri().toURL());
 
-        // The expected JWS algorithm of the access tokens (agreed out-of-band)
-        JWSAlgorithm expectedJWSAlg = RS256;
-
         // Configure the JWT processor with a key selector to feed matching public
         // RSA keys sourced from the JWK set URL
-        JWSKeySelector keySelector = new JWSVerificationKeySelector(expectedJWSAlg, keySource);
+        JWSKeySelector keySelector = new JWSVerificationKeySelector(expectedJWSAlgorithm, keySource);
         jwtProcessor.setJWSKeySelector(keySelector);
 
         // The overridden version of "verify" allows expiration time to be set to zero (no expiry).
@@ -78,9 +95,4 @@ public class AuthBeans {
         return jwtProcessor;
     }
 
-    @Bean
-    @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-    OAuthAuthenticationToken authenticationToken(HttpServletRequest request) {
-        return (OAuthAuthenticationToken) request.getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
-    }
 }
