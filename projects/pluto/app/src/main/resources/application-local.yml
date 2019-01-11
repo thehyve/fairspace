@@ -11,6 +11,7 @@ security:
     required-authority: user-ws
     clientId: ws-pluto
     clientSecret: 00000000-0000-0000-0000-000000000000
+    refresh-token-jwk-algorithm: HS256
 
 spring:
   zipkin:
