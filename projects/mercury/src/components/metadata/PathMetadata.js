@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 import React from "react";
 import {fetchSubjectByPathIfNeeded} from "../../actions/metadata";
-import ErrorMessage from "../error/ErrorMessage";
+import ErrorMessage from "../common/ErrorMessage";
 import Metadata from "./Metadata";
 
 export class PathMetadata extends React.Component {

@@ -1,8 +1,13 @@
 import React from 'react';
 import {createShallow} from '@material-ui/core/test-utils';
 import {Provider} from "react-redux";
+import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
+import promiseMiddleware from "redux-promise-middleware";
 import {AlterPermissionDialog, styles} from "./AlterPermissionDialog";
-import mockStore from "../../store/mockStore";
+
+const middlewares = [thunk, promiseMiddleware()];
+const mockStore = configureStore(middlewares);
 
 describe('AlterPermissionDialog', () => {
     let shallow;

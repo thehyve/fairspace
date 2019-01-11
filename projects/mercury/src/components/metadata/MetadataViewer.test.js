@@ -1,8 +1,13 @@
 import React from 'react';
 import {mount} from "enzyme";
 import {Provider} from "react-redux";
-import mockStore from "../../store/mockStore";
+import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
+import promiseMiddleware from "redux-promise-middleware";
 import MetadataViewer from "./MetadataViewer";
+
+const middlewares = [thunk, promiseMiddleware()];
+const mockStore = configureStore(middlewares);
 
 function flushPromises() {
     return new Promise(resolve => setImmediate(resolve));
@@ -34,4 +39,3 @@ it('displays properties properly', () => {
         expect(wrapper.text()).toEqual("DescriptionMore infoMy first collectionNameCollection 5TypeCollection");
     });
 });
-

@@ -14,7 +14,7 @@ import TextField from "@material-ui/core/TextField/TextField";
 import {connect} from "react-redux";
 import {generateUuid, getLabel} from "../../utils/metadatautils";
 import {compareBy} from "../../utils/comparators";
-import LoadingInlay from '../generic/Loading/LoadingInlay';
+import LoadingInlay from '../common/LoadingInlay';
 import {fetchMetadataVocabularyIfNeeded} from "../../actions/metadata";
 
 class NewMetadataEntityDialog extends React.Component {
@@ -96,7 +96,9 @@ class NewMetadataEntityDialog extends React.Component {
                                                         selected={this.state.type === t}
                                                         onClick={() => this.setState({type: t})}
                                                     >
-                                                        <ListItemText primary={getLabel(t)} />
+                                                        <ListItemText
+                                                            primary={getLabel(t)}
+                                                        />
                                                     </ListItem>
                                                 ))
                                             }

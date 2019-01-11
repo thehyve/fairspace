@@ -1,10 +1,14 @@
-import mockStore from "../store/mockStore";
+import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
+import promiseMiddleware from "redux-promise-middleware";
 import {fetchJsonLdBySubjectIfNeeded} from "./metadata";
 import Config from "../services/Config/Config";
 import configFile from "../config";
 import mockResponse from "../utils/mockResponse";
 
 const subject = 'my-subject';
+const middlewares = [thunk, promiseMiddleware()];
+const mockStore = configureStore(middlewares);
 
 beforeAll(() => {
     Config.setConfig(Object.assign(configFile, {

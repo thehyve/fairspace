@@ -10,8 +10,8 @@ import ListItemText from "@material-ui/core/ListItemText";
 import {compose} from "redux";
 import {updateMetadata} from "../../actions/metadata";
 import ValueComponentFactory from "./values/ValueComponentFactory";
-import ErrorDialog from "../error/ErrorDialog";
-import withHovered from "../../containers/WithHovered/WithHovered";
+import ErrorDialog from "../common/ErrorDialog";
+import withHovered from "../common/WithHovered";
 import {
     LABEL_URI, COMMENT_URI, COLLECTION_URI, FILE_URI, DIRECTORY_URI, RESOURCE_URI
 } from '../../services/MetadataAPI/MetadataAPI';
@@ -90,7 +90,8 @@ function MetadataProperty({
                         </ListItemSecondaryAction>
                     ) : null
             }
-        </ListItem>);
+        </ListItem>
+    );
 
     const renderAddComponent = (labelledBy) => {
         const ValueAddComponent = ValueComponentFactory.addComponent(property);

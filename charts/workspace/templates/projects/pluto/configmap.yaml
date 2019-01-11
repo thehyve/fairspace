@@ -10,6 +10,7 @@ metadata:
 data:
   application.yaml: |-
     app:
+      domain: {{ template "workspace.url" . }}
       oauth2:
         base-url: {{ template "keycloak.baseUrl" . }}
         realm: {{ .Values.hyperspace.keycloak.realm }}

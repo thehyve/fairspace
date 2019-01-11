@@ -10,5 +10,6 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
     private String sessionCookieName = "JSESSIONID";
     private boolean forceHttps = true;
+    private String domain;
 }
 
