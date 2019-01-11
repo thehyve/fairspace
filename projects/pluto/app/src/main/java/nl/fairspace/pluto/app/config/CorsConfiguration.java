@@ -19,7 +19,7 @@ public class CorsConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedOrigin(appConfig.getDomain());
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
 

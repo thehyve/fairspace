@@ -32,6 +32,7 @@ hyperspace:
     keycloak:
         username:
         password:
+        loginRealm: master
         realm:
         clientSecret:
 
