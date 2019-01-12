@@ -4,7 +4,7 @@ import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
-import ConnectedMetadata from "./Metadata";
+import ConnectedMetadata, {Metadata} from "./Metadata";
 import Vocabulary from "../../services/MetadataAPI/Vocabulary";
 import MetadataViewer from "./MetadataViewer";
 import Config from "../../services/Config/Config";
@@ -132,22 +132,21 @@ it('shows error when no subject provided', () => {
     expect(wrapper.text()).toContain("An error occurred while loading metadata");
 });
 
-// TODO: review
-// it('tries to load the metadata and the vocabulary', () => {
-//     const store = mockStore({
-//         cache: {
-//             jsonLdBySubject: {
-//                 "http://fairspace.com/iri/collections/1": {
-//                     data: []
-//                 }
-//             },
-//             vocabulary: {
-//                 data: new Vocabulary(vocabulary)
-//             }
-//         }
-//     });
+it('tries to load the metadata and the vocabulary', () => {
+    const store = mockStore({
+        cache: {
+            jsonLdBySubject: {
+                "http://fairspace.com/iri/collections/1": {
+                    data: []
+                }
+            },
+            vocabulary: {
+                data: new Vocabulary(vocabulary)
+            }
+        }
+    });
 
-//     const dispatch = jest.fn();
-//     const wrapper = mount(<Metadata subject="John" store={store} dispatch={dispatch} />);
-//     expect(dispatch.mock.calls.length).toEqual(1);
-// });
+    const dispatch = jest.fn();
+    mount(<Metadata subject="John" store={store} dispatch={dispatch} />);
+    expect(dispatch.mock.calls.length).toEqual(1);
+});
