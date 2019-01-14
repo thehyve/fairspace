@@ -29,7 +29,7 @@ class App extends React.Component {
     componentDidMount() {
         const menuExpanded = window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false';
 
-        this.store = configureStore({ui: {menuExpanded}});
+        this.store = configureStore({ui: {menuExpanded, pending: {}}});
 
         this.store.subscribe(() => {
             window.localStorage.setItem(LOCAL_STORAGE_MENU_KEY, this.store.getState().ui.menuExpanded);
