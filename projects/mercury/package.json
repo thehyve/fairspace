@@ -30,7 +30,7 @@
     "webdav": "^1.6.0"
   },
   "scripts": {
-    "dev": "concurrently \"yarn server\" \"yarn start\"",
+    "dev": "concurrently \"yarn server\" \"yarn start\" \"yarn test\"",
     "server": "node mock-server/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
