@@ -1,8 +1,8 @@
 package io.fairspace.ceres.metadata.service
 
 import io.fairspace.ceres.CeresApplication
-import io.fairspace.ceres.metadata.repository.ModelRepository
 import io.fairspace.ceres.metadata.repository.PropertyInverter
+import io.fairspace.ceres.metadata.repository.ModelRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.apache.jena.query.DatasetFactory.createTxnMem
@@ -29,7 +29,7 @@ class MetadataServiceIntegrationTest {
         fun dataset() = createTxnMem()
 
         @Bean
-        fun enhancer() = PropertyInverter(listOf("http://oneway" to "http://otherway"))
+        fun listener() = PropertyInverter(dataset().defaultModel, listOf("http://oneway" to "http://otherway"))
     }
 
     @Autowired

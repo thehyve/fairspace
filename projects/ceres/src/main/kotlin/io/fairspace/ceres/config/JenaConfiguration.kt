@@ -16,5 +16,5 @@ class JenaConfiguration {
     fun dataset() = connectDataset(datasetPath)
 
     @Bean
-    fun enhancer() = OwlPropertyInverter(FileManager.get().loadModel("inference-model.jsonld"))
+    fun listener() = OwlPropertyInverter(dataset().defaultModel, FileManager.get().loadModel("inference-model.jsonld"))
 }

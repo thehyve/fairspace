@@ -11,14 +11,13 @@ import java.util.*
 class PidService(val repository: PidRepository, val pidConverter: PidConverter) {
     fun findById(id: String) =
             pidConverter.pidToPidDTO(
-                    repository.findById(pidConverter.idToUUID(id))
-                            .orElseThrow { MappingNotFoundException("ID not found: $id") }
+                    repository.findById(pidConverter.idToUUID(id)) ?: throw MappingNotFoundException("ID not found: $id")
             )
 
     fun findByValue(value: String) =
             pidConverter.pidToPidDTO(
                     repository.findByValue(value)
-                            .orElseThrow { MappingNotFoundException("Value not found: $value") }
+                            ?: throw MappingNotFoundException("Value not found: $value")
             )
 
     fun findByPrefix(prefix: String) =
@@ -28,11 +27,12 @@ class PidService(val repository: PidRepository, val pidConverter: PidConverter) 
     fun findOrCreateByValue(value: String) =
             pidConverter.pidToPidDTO(_findOrCreateByValue(value))
 
-    fun updateByPrefix(oldPrefix: String, newPrefix: String): MutableIterable<Pid> =
-            repository.saveAll(
-                    repository.findByValueStartingWith(oldPrefix)
-                            .map { it.copy(value = it.value.replaceFirst(oldPrefix, newPrefix)) }
-            )
+    fun updateByPrefix(oldPrefix: String, newPrefix: String) {
+        repository.saveAll(
+                repository.findByValueStartingWith(oldPrefix)
+                        .map { it.copy(value = it.value.replaceFirst(oldPrefix, newPrefix)) }
+        )
+    }
 
     fun deleteById(id: String) =
             repository.deleteById(pidConverter.idToUUID(id))
@@ -52,5 +52,5 @@ class PidService(val repository: PidRepository, val pidConverter: PidConverter) 
     }
 
     private fun _findOrCreateByValue(value: String) =
-            repository.findByValue(value).orElseGet { _add(value) }
+            repository.findByValue(value) ?: _add(value)
 }

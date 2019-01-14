@@ -1,15 +1,22 @@
 package io.fairspace.ceres.metadata.repository
 
-import org.apache.jena.rdf.model.*
-import org.apache.jena.util.iterator.WrappedIterator
+import org.apache.jena.rdf.listeners.StatementListener
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.Property
+import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.rdf.model.ResourceFactory.createProperty
+import org.apache.jena.rdf.model.Statement
 import org.apache.jena.vocabulary.OWL2
-import javax.xml.bind.ValidationException
+import javax.validation.ValidationException
 
-open class PropertyInverter(properties: Iterable<Pair<String, String>>): Enhancer() {
-    private val map = mutableMapOf<String, String>().apply {
+open class PropertyInverter(private val model: Model, properties: Iterable<Pair<String, String>>): StatementListener() {
+
+    private val map = mutableMapOf<Property, Property>().apply {
         properties.forEach {
-            put(it.first, it.second)
-            put(it.second, it.first)
+            val p1 = createProperty(it.first)
+            val p2 = createProperty(it.second)
+            put(p1, p2)
+            put(p2, p1)
         }
     }
 
@@ -17,36 +24,25 @@ open class PropertyInverter(properties: Iterable<Pair<String, String>>): Enhance
         invert(s, true)
     }
 
-                override fun next(): Statement {
-                    val result: Statement
-                    if (inferred != null) {
-                        result = inferred!!
-                        inferred = null
-                    } else {
-                        result = base.next()
-                        inferred = invert(result)
-                    }
-                    return result
+    override fun removedStatement(s: Statement) {
+       invert(s, false)
+    }
+
+    private fun invert(s: Statement, add: Boolean) {
+            map[s.predicate]?.also {
+                if(!s.`object`.isResource) {
+                    throw ValidationException("Statement $s cannot be inverted, its object is not a RDF resource")
                 }
 
-                private fun invert(statement: Statement): Statement? =
-                        map[statement.predicate.uri]?.let { inverseProperty ->
-                            if (statement.`object` is Resource)
-                                statement.model.createStatement(
-                                        statement.`object` as Resource,
-                                        statement.model.createProperty(inverseProperty),
-                                        statement.subject)
-                             else throw ValidationException("Statement $statement cannot be inverted, its object is not a RDF resource")
-                        }
-
-                override fun hasNext(): Boolean = (inferred != null) || base.hasNext()
-
-                override fun nextStatement(): Statement = next()
+                if (add && !model.contains(s.`object`.asResource(), it, s.subject)) {
+                    model.add(s.`object`.asResource(), it, s.subject)
+                } else if (model.contains(s.`object`.asResource(), it, s.subject)) {
+                    model.remove(s.`object`.asResource(), it, s.subject)
+                }
             }
+    }
 }
-
-
-class OwlPropertyInverter(model: Model) : PropertyInverter(
-        model.listStatements(null, OWL2.inverseOf, null as? RDFNode)
+class OwlPropertyInverter(model: Model, inversionModel: Model) : PropertyInverter(model,
+        inversionModel.listStatements(null, OWL2.inverseOf, null as? RDFNode)
                 .mapWith { it.subject.uri to it.`object`.asResource().uri }
                 .toList())
