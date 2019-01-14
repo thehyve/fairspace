@@ -55,7 +55,6 @@ in a Spring application. It has 4 different parts:
         logout-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
         redirect-after-logout-uri: https://fairspace.com
         access-token-jwk-algorithm: RS256
-        refresh-token-jwk-algorithm = HS256;
         clientId: web_app
         clientSecret: web_app
         scope: openid

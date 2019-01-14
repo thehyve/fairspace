@@ -7,7 +7,11 @@ import com.nimbusds.jose.proc.JWSKeySelector;
 import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.proc.*;
+import com.nimbusds.jwt.proc.BadJWTException;
+import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
+import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
+import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import com.nimbusds.jwt.proc.JWTProcessor;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +23,6 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.util.Date;
-
-import static com.nimbusds.jose.JWSAlgorithm.RS256;
 
 @Configuration
 @Slf4j
@@ -36,12 +38,6 @@ public class AuthBeans {
     JWTProcessor accessTokenJwtProcessor() throws MalformedURLException {
         return jwtProcessor(oidcConfig.getAccessTokenJwkAlgorithm());
     }
-
-    @Bean
-    JWTProcessor refreshTokenJwtProcessor() throws MalformedURLException {
-        return jwtProcessor(oidcConfig.getRefreshTokenJwkAlgorithm());
-    }
-
 
     @Bean
     @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -94,5 +90,4 @@ public class AuthBeans {
 
         return jwtProcessor;
     }
-
 }

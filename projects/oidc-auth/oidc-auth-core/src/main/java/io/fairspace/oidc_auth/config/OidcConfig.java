@@ -11,7 +11,6 @@ public class OidcConfig {
     private URI authUri;
     private URI jwkKeySetUri;
     private JWSAlgorithm accessTokenJwkAlgorithm = JWSAlgorithm.RS256;
-    private JWSAlgorithm refreshTokenJwkAlgorithm = JWSAlgorithm.RS256;
     private String logoutUri;
     private URI redirectAfterLogoutUri;
     private String clientId;

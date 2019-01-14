@@ -6,7 +6,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.BadJWTException;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.JWTClaimsSetVerifier;
-import com.nimbusds.jwt.proc.JWTProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,14 +15,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthBeansTest {
@@ -69,20 +65,16 @@ public class AuthBeansTest {
         oidcConfig = new OidcConfig();
         oidcConfig.setJwkKeySetUri(new URI("http://test.uri"));
         oidcConfig.setAccessTokenJwkAlgorithm(JWSAlgorithm.RS512);
-        oidcConfig.setRefreshTokenJwkAlgorithm(JWSAlgorithm.HS256);
 
         authBeans = new AuthBeans(oidcConfig);
 
         // Create processors
         ConfigurableJWTProcessor accessTokenJwtProcessor = (ConfigurableJWTProcessor) authBeans.accessTokenJwtProcessor();
-        ConfigurableJWTProcessor refreshTokenJwtProcessor = (ConfigurableJWTProcessor) authBeans.refreshTokenJwtProcessor();
 
         // Verify configuration of the processor
         JWSAlgorithm configuredAccessTokenJWSAlgorithm = ((JWSVerificationKeySelector) accessTokenJwtProcessor.getJWSKeySelector()).getExpectedJWSAlgorithm();
-        JWSAlgorithm configuredRefreshTokenJWSAlgorithm = ((JWSVerificationKeySelector) refreshTokenJwtProcessor.getJWSKeySelector()).getExpectedJWSAlgorithm();
 
         assertEquals(JWSAlgorithm.RS512, configuredAccessTokenJWSAlgorithm);
-        assertEquals(JWSAlgorithm.HS256, configuredRefreshTokenJWSAlgorithm);
     }
 
     private JWTClaimsSet getJwtClaimsSet(int addSeconds) {
@@ -93,7 +85,7 @@ public class AuthBeansTest {
     }
 
     private JWTClaimsSetVerifier getJwtClaimsSetVerifier() throws MalformedURLException {
-        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.refreshTokenJwtProcessor();
+        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.accessTokenJwtProcessor();
         return jwtProcessor.getJWTClaimsSetVerifier();
     }
 

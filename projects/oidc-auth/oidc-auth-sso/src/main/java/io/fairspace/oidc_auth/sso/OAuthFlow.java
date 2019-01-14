@@ -41,7 +41,7 @@ public class OAuthFlow {
     OidcConfig configuration;
 
     @Autowired
-    JwtTokenValidator jwtTokenValidator;
+    JwtTokenValidator accessTokenValidator;
 
     @Autowired
     HttpServletRequest request;
@@ -82,7 +82,7 @@ public class OAuthFlow {
         RefreshToken refreshToken = successResponse.getTokens().getRefreshToken();
 
         // Retrieve JWT claimsset
-        Map<String, Object> claims = jwtTokenValidator.parseAndValidate(accessToken.getValue());
+        Map<String, Object> claims = accessTokenValidator.parseAndValidate(accessToken.getValue());
 
         if(claims == null) {
             log.warn("Access token provided by the token endpoint is invalid");
