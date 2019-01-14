@@ -6,7 +6,7 @@ import io.fairspace.ceres.events.model.StorageEvent
 import io.fairspace.ceres.metadata.repository.ModelRepository
 import io.fairspace.ceres.metadata.service.MetadataService
 import io.fairspace.ceres.metadata.vocabulary.Fairspace
-import io.fairspace.ceres.pid.model.PidDTO
+import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.service.PidService
 import junit.framework.TestCase.assertTrue
 import org.apache.jena.rdf.model.Model
@@ -22,6 +22,10 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class StorageEventHandlerTest {
+    val urlPrefix = "http://fairspace.io"
+    val filePrefix = "$urlPrefix/iri/files/"
+    val dirPrefix = "$urlPrefix/iri/directories/"
+
     @Mock
     lateinit var pidService: PidService
 
@@ -35,7 +39,7 @@ class StorageEventHandlerTest {
 
     @Before
     fun setUp() {
-        handler = StorageEventHandler(pidService, modelRepository, metadataService)
+        handler = StorageEventHandler(pidService, modelRepository, metadataService, urlPrefix)
     }
 
     @Test
@@ -44,7 +48,7 @@ class StorageEventHandlerTest {
         val collectionUri = "http://collection-1"
         val event = StorageEvent(path = "/collection-1/subdir", type = PathType.DIRECTORY, collection = Collection(uri = collectionUri))
 
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir")).thenReturn(PidDTO(dirUri, "/subdir"));
+        `when`(pidService.findOrCreateByValue(dirPrefix, "/collection-1/subdir")).thenReturn(Pid(dirUri, "/subdir"));
 
         handler.receiveCreateMessage(event)
 
@@ -57,8 +61,8 @@ class StorageEventHandlerTest {
         val fileUri = "http://fileuri-2"
         val event = StorageEvent(path = "/collection-1/subdir/file.txt", type = PathType.FILE, collection = Collection())
 
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir")).thenReturn(PidDTO(dirUri, "/subdir"));
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir/file.txt")).thenReturn(PidDTO(fileUri, "/subdir/file.txt"));
+        `when`(pidService.findOrCreateByValue(dirPrefix,"/collection-1/subdir")).thenReturn(Pid(dirUri, "/subdir"));
+        `when`(pidService.findOrCreateByValue(filePrefix,"/collection-1/subdir/file.txt")).thenReturn(Pid(fileUri, "/subdir/file.txt"));
 
         handler.receiveCreateMessage(event)
 
@@ -82,8 +86,8 @@ class StorageEventHandlerTest {
         val subdirUri = "http://subdiruri-2"
         val event = StorageEvent(path = "/collection-1/subdir", destination = "/collection-1/subdir2/nested", type = PathType.DIRECTORY, collection = Collection())
 
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir2")).thenReturn(PidDTO(dirUri, "/subdir2"));
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir2/nested")).thenReturn(PidDTO(subdirUri, "/subdir2/nested"));
+        `when`(pidService.findOrCreateByValue(dirPrefix,"/collection-1/subdir2")).thenReturn(Pid(dirUri, "/subdir2"));
+        `when`(pidService.findOrCreateByValue(dirPrefix,"/collection-1/subdir2/nested")).thenReturn(Pid(subdirUri, "/subdir2/nested"));
 
         handler.receiveMoveMessage(event)
 
@@ -97,10 +101,10 @@ class StorageEventHandlerTest {
 
         // Original identifiers
         `when`(pidService.findByPrefix("/collection-1/subdir")).thenReturn(listOf(
-                PidDTO("http://dir", "/collection-1/subdir"),
-                PidDTO("http://file", "/collection-1/subdir/file1"),
-                PidDTO("http://subdir", "/collection-1/subdir/dir2"),
-                PidDTO("http://nested", "/collection-1/subdir/dir2/collection-1/subdir")
+                Pid("http://dir", "/collection-1/subdir"),
+                Pid("http://file", "/collection-1/subdir/file1"),
+                Pid("http://subdir", "/collection-1/subdir/dir2"),
+                Pid("http://nested", "/collection-1/subdir/dir2/collection-1/subdir")
         ))
 
         // Original metadata
@@ -114,10 +118,10 @@ class StorageEventHandlerTest {
                 })
 
         // New identifiers
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir2")).thenReturn(PidDTO("http://newdir", ""))
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir2/file1")).thenReturn(PidDTO("http://newfile", ""))
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir2/dir2")).thenReturn(PidDTO("http://newsubdir", ""))
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir2/dir2/collection-1/subdir")).thenReturn(PidDTO("http://newnested", ""))
+        `when`(pidService.findOrCreateByValue("http://","/collection-1/subdir2")).thenReturn(Pid("http://newdir", ""))
+        `when`(pidService.findOrCreateByValue("http://","/collection-1/subdir2/file1")).thenReturn(Pid("http://newfile", ""))
+        `when`(pidService.findOrCreateByValue("http://","/collection-1/subdir2/dir2")).thenReturn(Pid("http://newsubdir", ""))
+        `when`(pidService.findOrCreateByValue("http://","/collection-1/subdir2/dir2/collection-1/subdir")).thenReturn(Pid("http://newnested", ""))
 
         handler.receiveCopyMessage(event)
 
@@ -139,19 +143,19 @@ class StorageEventHandlerTest {
 
         // Original identifiers
         `when`(pidService.findByPrefix("/collection-1/subdir")).thenReturn(listOf(
-                PidDTO("http://dir", "/collection-1/subdir")
+                Pid("${dirPrefix}dir", "/collection-1/subdir")
         ))
 
         // Original metadata
-        `when`(metadataService.getMetadataForResources(setOf("http://dir"))).thenReturn(ModelFactory.createDefaultModel())
+        `when`(metadataService.getMetadataForResources(setOf("${dirPrefix}dir"))).thenReturn(ModelFactory.createDefaultModel())
 
         // New identifiers
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir2/nested")).thenReturn(PidDTO("http://newdir", ""))
-        `when`(pidService.findOrCreateByValue("/collection-1/subdir2")).thenReturn(PidDTO("http://newparentdir", ""))
+        `when`(pidService.findOrCreateByValue(dirPrefix,"/collection-1/subdir2/nested")).thenReturn(Pid("${dirPrefix}newdir", ""))
+        `when`(pidService.findOrCreateByValue(dirPrefix,"/collection-1/subdir2")).thenReturn(Pid("${dirPrefix}newparentdir", ""))
 
         handler.receiveCopyMessage(event)
 
-        verifyParentRelationStored("http://newparentdir", "http://newdir", Fairspace.directory)
+        verifyParentRelationStored("${dirPrefix}newparentdir", "${dirPrefix}newdir", Fairspace.directory)
     }
 
     @Test

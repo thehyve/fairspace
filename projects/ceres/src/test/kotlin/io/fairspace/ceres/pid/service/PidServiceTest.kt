@@ -5,6 +5,7 @@ import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.repository.PidRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import org.apache.commons.lang3.RandomStringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,7 +13,6 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
-import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
 class PidServiceTest {
@@ -23,38 +23,38 @@ class PidServiceTest {
 
     @Before
     fun setUp() {
-        pidService = PidService(pidRepository, PidConverter("http://service-test/", "iri/files"))
+        pidService = PidService(pidRepository)
      }
 
     @Test
     fun canFindEntityByUUID() {
-        val foundUUID = UUID.randomUUID()
+        val foundUUID = RandomStringUtils.random(10)
 
         doReturn(Pid(foundUUID, "/found"))
                 .`when`(pidRepository).findById(foundUUID)
 
-        assertEquals(pidService.findById("http://service-test/iri/files/" + foundUUID).value, "/found")
+        assertEquals(pidService.findById(foundUUID).value, "/found")
     }
 
     @Test(expected = MappingNotFoundException::class)
     fun throwsExceptionIfMappingNotFound() {
-        val notFoundUUID = UUID.randomUUID()
+        val notFoundUUID = RandomStringUtils.random(10)
 
         doReturn(null)
                 .`when`(pidRepository).findById(notFoundUUID)
 
-        pidService.findById("http://service-test/iri/files/" + notFoundUUID)
+        pidService.findById(notFoundUUID)
     }
 
     @Test
     fun canFindEntityByValue() {
-        val uuid =UUID.randomUUID()
+        val uuid =  RandomStringUtils.random(10)
         val value = "/test"
 
         doReturn(Pid(uuid, value))
                 .`when`(pidRepository).findByValue(value)
 
-        assertTrue(pidService.findByValue(value).id!!.endsWith(uuid.toString()))
+        assertTrue(pidService.findByValue(value).id.endsWith(uuid.toString()))
     }
 
     @Test(expected = MappingNotFoundException::class)
@@ -69,10 +69,10 @@ class PidServiceTest {
 
     @Test
     fun updateByPrefixUpdatesAll() {
-        val uuid1 = UUID.randomUUID()
-        val uuid2 = UUID.randomUUID()
-        val uuid3 = UUID.randomUUID()
-        val uuid4 = UUID.randomUUID()
+        val uuid1 = RandomStringUtils.random(10)
+        val uuid2 = RandomStringUtils.random(10)
+        val uuid3 = RandomStringUtils.random(10)
+        val uuid4 = RandomStringUtils.random(10)
 
         val input = listOf(
                 Pid(uuid1, "/input-prefix/abcdef"),
@@ -98,10 +98,10 @@ class PidServiceTest {
 
     @Test
     fun testFindOrCreateByValueWithExistingMapping() {
-        val existingPid = Pid(UUID.randomUUID(), "stored-value");
+        val existingPid = Pid(RandomStringUtils.random(10), "stored-value");
         doReturn(existingPid).`when`(pidRepository).findByValue("value")
 
-        val output = pidService.findOrCreateByValue("value")
+        val output = pidService.findOrCreateByValue("http://files", "value")
 
         assertEquals("stored-value", output.value)
         verify(pidRepository, times(0)).save(ArgumentMatchers.any())
@@ -109,11 +109,11 @@ class PidServiceTest {
 
     @Test
     fun testFindOrCreateByValueWithNewMapping() {
-        val newPid = Pid(UUID.randomUUID(), "stored-value");
+        val newPid = Pid(RandomStringUtils.random(10), "stored-value");
         doReturn(null).`when`(pidRepository).findByValue("new-value")
         doReturn(newPid).`when`(pidRepository).save(any())
 
-        val output = pidService.findOrCreateByValue("new-value")
+        val output = pidService.findOrCreateByValue("http://files","new-value")
 
         assertEquals("stored-value", output.value)
         verify(pidRepository).save(ArgumentMatchers.argThat { it!!.value == "new-value" })

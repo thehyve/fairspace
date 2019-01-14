@@ -13,13 +13,17 @@ import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.impl.StatementImpl
 import org.apache.jena.vocabulary.RDF
 import org.springframework.amqp.rabbit.annotation.RabbitListener
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.io.File
 
 @Component
 @ConditionalOnProperty("app.rabbitmq.enabled")
-class StorageEventHandler(val pidService: PidService, val modelRepository: ModelRepository, val metadataService: MetadataService) {
+class StorageEventHandler(val pidService: PidService, val modelRepository: ModelRepository, val metadataService: MetadataService,
+                          @Value("\${app.metadata.base-url}") val urlPrefix: String) {
+
+
     val log = logger { }
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.create}"])
@@ -71,9 +75,10 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         // We need a uri for each one of them in the destination as well
         val mapping = mutableMapOf<String, String>()
         sourceIdentifiers.forEach {
+            val prefix = it.id.substring(0, it.id.lastIndexOf('/') + 1)
             val pathInDestination = it.value.replaceFirst(source, destination)
-            val newIdentifier = pidService.findOrCreateByValue(pathInDestination)
-            mapping[it.id!!] = newIdentifier.id!!
+            val newIdentifier = pidService.findOrCreateByValue(prefix, pathInDestination)
+            mapping[it.id] = newIdentifier.id
         }
 
         // Now, retrieve the metadata for the original URIs and replace the original URIs
@@ -131,7 +136,8 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
      * Stores the relation between the path and its parent in metadata
      */
     private fun storeParentRelation(path: String, type: PathType, collection: Collection?) {
-        val currentIdentifier = pidService.findOrCreateByValue(path)
+        val prefix = urlPrefix + if (type == PathType.FILE) "/iri/files/" else "/iri/directories/"
+        val currentIdentifier = pidService.findOrCreateByValue(prefix, path)
         val parentUri = getParentUri(path, collection)
         val metadataType = if (type == PathType.FILE) Fairspace.file else Fairspace.directory
 
@@ -140,7 +146,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
             return
         }
 
-        storePartOfRelation(parentUri, currentIdentifier.id!!, metadataType)
+        storePartOfRelation(parentUri, currentIdentifier.id, metadataType)
     }
 
 
@@ -171,7 +177,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         return if (pathParts.size == 3) {
             collection?.uri
         } else {
-            pidService.findOrCreateByValue(File(path).parent).id
+            pidService.findOrCreateByValue("$urlPrefix/iri/directories/", File(path).parent).id
         }
     }
 
@@ -198,5 +204,4 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
         return newModel
     }
-
 }

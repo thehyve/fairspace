@@ -8,24 +8,21 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class PidService(val repository: PidRepository, val pidConverter: PidConverter) {
+class PidService(val repository: PidRepository) {
     fun findById(id: String) =
-            pidConverter.pidToPidDTO(
-                    repository.findById(pidConverter.idToUUID(id)) ?: throw MappingNotFoundException("ID not found: $id")
-            )
+            repository.findById(id) ?: throw MappingNotFoundException("ID not found: $id")
+
 
     fun findByValue(value: String) =
-            pidConverter.pidToPidDTO(
-                    repository.findByValue(value)
-                            ?: throw MappingNotFoundException("Value not found: $value")
-            )
+            repository.findByValue(value)
+                    ?: throw MappingNotFoundException("Value not found: $value")
+
 
     fun findByPrefix(prefix: String) =
-            repository.findByValueStartingWith(prefix).toList()
-                    .map { pid -> pidConverter.pidToPidDTO(pid) }
+            repository.findByValueStartingWith(prefix)
 
-    fun findOrCreateByValue(value: String) =
-            pidConverter.pidToPidDTO(_findOrCreateByValue(value))
+    fun findOrCreateByValue(prefix: String, value: String) =
+            repository.findByValue(value) ?: repository.save(Pid(prefix + UUID.randomUUID(), value))
 
     fun updateByPrefix(oldPrefix: String, newPrefix: String) {
         repository.saveAll(
@@ -35,22 +32,11 @@ class PidService(val repository: PidRepository, val pidConverter: PidConverter) 
     }
 
     fun deleteById(id: String) =
-            repository.deleteById(pidConverter.idToUUID(id))
+            repository.deleteById(id)
 
     fun deleteByValue(value: String) =
             repository.deleteByValue(value)
 
     fun deleteByPrefix(prefix: String) =
             repository.deleteByValueStartingWith(prefix)
-
-    private fun _add(value: String): Pid {
-        try {
-            return repository.save(Pid(UUID.randomUUID(), value))
-        } catch (_: Exception) {
-            throw ValueAlreadyExistsException("Value already exists: $value")
-        }
-    }
-
-    private fun _findOrCreateByValue(value: String) =
-            repository.findByValue(value) ?: _add(value)
 }

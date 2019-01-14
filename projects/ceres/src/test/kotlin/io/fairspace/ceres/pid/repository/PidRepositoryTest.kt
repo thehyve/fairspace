@@ -3,6 +3,7 @@ package io.fairspace.ceres.pid.repository
 
 import io.fairspace.ceres.CeresApplication
 import io.fairspace.ceres.pid.model.Pid
+import org.apache.commons.lang3.RandomStringUtils
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.query.DatasetFactory.createTxnMem
 import org.junit.Assert.assertEquals
@@ -35,11 +36,11 @@ open class PidRepositoryTest {
     @Before
     fun setUp() {
         pidRepository.deleteByValueStartingWith("")
-       pidRepository.save(Pid(UUID.randomUUID(), "prefix1/abc"))
-       pidRepository.save(Pid(UUID.randomUUID(), "prefix1"))
-       pidRepository.save(Pid(UUID.randomUUID(), "prefix2/abc"))
-       pidRepository.save(Pid(UUID.randomUUID(), "prefix2/prefix1"))
-       pidRepository.save(Pid(UUID.randomUUID(), ""))
+       pidRepository.save(Pid(RandomStringUtils.random(10), "prefix1/abc"))
+       pidRepository.save(Pid(RandomStringUtils.random(10), "prefix1"))
+       pidRepository.save(Pid(RandomStringUtils.random(10), "prefix2/abc"))
+       pidRepository.save(Pid(RandomStringUtils.random(10), "prefix2/prefix1"))
+       pidRepository.save(Pid(RandomStringUtils.random(10), ""))
     }
 
     @Test
