@@ -19,6 +19,13 @@ Also, account information is available at `/account/name` and `/account/authoriz
 The `app` directory contains the actual application. It can be run from the IDE or from the command line
 using gradle: `gradle bootRun`.
 
+## Using mavenLocal
+If you have created custom artifacts (e.g. for oidc_auth library) that are in your local maven repository,
+you can set the env variable `LOCAL_DEVELOPMENT` to 1 to enable mavenLocal in your build. For example:
+``` 
+LOCAL_DEVELOPMENT=1 gradle clean build
+```
+
 ## CSRF
 CSRF functionality is enabled. A csrf token is returned on each request in the `X-CSRF-TOKEN` header of the response.
 For POST, PUT and PATCH requests, that value should be returned in the `X-CSRF-TOKEN` header in the request.
