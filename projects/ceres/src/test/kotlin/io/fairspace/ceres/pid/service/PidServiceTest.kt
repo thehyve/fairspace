@@ -30,7 +30,7 @@ class PidServiceTest {
     fun canFindEntityByUUID() {
         val foundUUID = UUID.randomUUID()
 
-        doReturn(Optional.of(Pid(foundUUID, "/found")))
+        doReturn(Pid(foundUUID, "/found"))
                 .`when`(pidRepository).findById(foundUUID)
 
         assertEquals(pidService.findById("http://service-test/iri/files/" + foundUUID).value, "/found")
@@ -40,7 +40,7 @@ class PidServiceTest {
     fun throwsExceptionIfMappingNotFound() {
         val notFoundUUID = UUID.randomUUID()
 
-        doReturn(Optional.empty<Pid>())
+        doReturn(null)
                 .`when`(pidRepository).findById(notFoundUUID)
 
         pidService.findById("http://service-test/iri/files/" + notFoundUUID)
@@ -51,7 +51,7 @@ class PidServiceTest {
         val uuid =UUID.randomUUID()
         val value = "/test"
 
-        doReturn(Optional.of(Pid(uuid, value)))
+        doReturn(Pid(uuid, value))
                 .`when`(pidRepository).findByValue(value)
 
         assertTrue(pidService.findByValue(value).id!!.endsWith(uuid.toString()))
@@ -61,7 +61,7 @@ class PidServiceTest {
     fun throwsExceptionIfMappingNotFoundForValue() {
         val value = "/test"
 
-        doReturn(Optional.empty<Pid>())
+        doReturn(null)
                 .`when`(pidRepository).findByValue(value)
 
         pidService.findByValue(value)
@@ -99,7 +99,7 @@ class PidServiceTest {
     @Test
     fun testFindOrCreateByValueWithExistingMapping() {
         val existingPid = Pid(UUID.randomUUID(), "stored-value");
-        doReturn(Optional.of(existingPid)).`when`(pidRepository).findByValue("value")
+        doReturn(existingPid).`when`(pidRepository).findByValue("value")
 
         val output = pidService.findOrCreateByValue("value")
 
@@ -110,13 +110,13 @@ class PidServiceTest {
     @Test
     fun testFindOrCreateByValueWithNewMapping() {
         val newPid = Pid(UUID.randomUUID(), "stored-value");
-        doReturn(Optional.empty<Pid>()).`when`(pidRepository).findByValue("new-value")
+        doReturn(null).`when`(pidRepository).findByValue("new-value")
         doReturn(newPid).`when`(pidRepository).save(any())
 
         val output = pidService.findOrCreateByValue("new-value")
 
         assertEquals("stored-value", output.value)
-        verify(pidRepository).save(ArgumentMatchers.argThat { it.value == "new-value" })
+        verify(pidRepository).save(ArgumentMatchers.argThat { it!!.value == "new-value" })
     }
 
 }

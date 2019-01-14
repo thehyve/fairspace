@@ -13,9 +13,9 @@ open class PropertyInverter(properties: Iterable<Pair<String, String>>): Enhance
         }
     }
 
-    override fun enhance(iterator: StmtIterator): StmtIterator =
-            object : WrappedIterator<Statement>(iterator, true), StmtIterator {
-                private var inferred: Statement? = null
+    override fun addedStatement(s: Statement) {
+        invert(s, true)
+    }
 
                 override fun next(): Statement {
                     val result: Statement

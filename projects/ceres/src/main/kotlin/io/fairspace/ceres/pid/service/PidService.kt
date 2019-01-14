@@ -47,7 +47,7 @@ class PidService(val repository: PidRepository, val pidConverter: PidConverter) 
         try {
             return repository.save(Pid(UUID.randomUUID(), value))
         } catch (_: Exception) {
-            throw ValueAlreadyExistsException("Value already exists: " + value)
+            throw ValueAlreadyExistsException("Value already exists: $value")
         }
     }
 

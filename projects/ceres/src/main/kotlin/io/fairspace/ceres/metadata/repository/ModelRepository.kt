@@ -137,7 +137,15 @@ class ModelRepository(private val dataset: Dataset, private val enhancer: Enhanc
 
     private fun <R> read(action: Model.() -> R): R = calculateRead(dataset) { dataset.defaultModel.action() }
 
-    private fun write(action: Model.() -> Unit): Unit = executeWrite(dataset) { dataset.defaultModel.action() }
+    private fun write(action: Model.() -> Unit): Unit = executeWrite(dataset) {
+        val m = dataset.defaultModel
+        m.register(modelChangedListener)
+        try {
+            return@executeWrite m.action()
+        } finally {
+            m.unregister(modelChangedListener)
+        }
+    }
 
     private fun Model.toResource(s: String?) = s?.let(this::createResource)
 
