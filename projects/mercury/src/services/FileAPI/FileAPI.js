@@ -1,21 +1,17 @@
 import CreateWebdavClient from "webdav";
 import Config from "../Config/Config";
+import {joinPaths, addCounterToFilename} from '../../utils/fileutils';
 
 // Ensure that the window fetch method is used for webdav calls
 // and that is passes along the credentials
 const defaultOptions = {credentials: 'include'};
+
 CreateWebdavClient.setFetchMethod((input, init) => {
     const options = init ? Object.assign({}, init, defaultOptions) : defaultOptions;
-
     return fetch(input, options);
 });
 
-/**
- * Service to perform file operations
- */
 class FileAPI {
-    static PATH_SEPARATOR = '/';
-
     constructor(collectionSubDirectory) {
         this.basePath = `/${collectionSubDirectory}`;
 
@@ -137,16 +133,6 @@ class FileAPI {
     }
 
     /**
-     * Combines multiple parts of the path with the proper separator
-     * @param paths
-     */
-    joinPaths(...paths) {
-        return paths
-            .map(p => (p && p !== '/' ? p : '')) // For falsy values, or '/', use an empty string
-            .join(FileAPI.PATH_SEPARATOR);
-    }
-
-    /**
      * Move one or more files from a sourcedir to a destinationdir
      * @param sourceDir
      * @param filenames
@@ -160,8 +146,8 @@ class FileAPI {
         }
 
         return Promise.all(filenames.map((filename) => {
-            const sourceFile = this.joinPaths(sourceDir || '', filename);
-            const destinationFile = this.joinPaths(destinationDir || '', filename);
+            const sourceFile = joinPaths(sourceDir || '', filename);
+            const destinationFile = joinPaths(destinationDir || '', filename);
             return this.move(sourceFile, destinationFile);
         }));
     }
@@ -175,39 +161,18 @@ class FileAPI {
      */
     copyPaths(sourceDir, filenames, destinationDir) {
         return Promise.all(filenames.map((filename) => {
-            const sourceFile = this.joinPaths(sourceDir || '', filename);
+            const sourceFile = joinPaths(sourceDir || '', filename);
             let destinationFilename = filename;
 
             // Copying files to the current directory involves renaming
             if (destinationDir === sourceDir) {
-                destinationFilename = FileAPI.addCounterToFilename(destinationFilename);
+                destinationFilename = addCounterToFilename(destinationFilename);
             }
 
-            const destinationFile = this.joinPaths(destinationDir || '', destinationFilename);
+            const destinationFile = joinPaths(destinationDir || '', destinationFilename);
 
             return this.copy(sourceFile, destinationFile);
         }));
-    }
-
-    static addCounterToFilename(filename) {
-        // Parse the filename
-        const dotPosition = filename.lastIndexOf('.');
-        let basename = filename.substring(0, dotPosition);
-        const extension = filename.substring(dotPosition + 1);
-
-        // By default the counter is set to 2
-        let counter = 2;
-
-        // Verify if the filename already contains a counter
-        // If so, update the counter in the filename
-        const counterMatch = / \((\d+)\)$/;
-        const matches = basename.match(counterMatch);
-        if (matches) {
-            basename = basename.substring(0, basename.length - matches[0].length);
-            counter = parseInt(matches[1], 10) + 1;
-        }
-
-        return `${basename} (${counter}).${extension}`;
     }
 }
 

@@ -11,8 +11,8 @@ import permissionUtils from '../../utils/permissionUtils';
 import * as collectionBrowserActions from "../../actions/collectionbrowser";
 import * as fileActions from "../../actions/files";
 import * as collectionActions from "../../actions/collections";
-import FileAPIFactory from "../../services/FileAPI/FileAPIFactory";
-import {parsePath} from "../../utils/fileutils";
+import FileAPI from "../../services/FileAPI/FileAPI";
+import {splitPathIntoArray, joinPaths} from "../../utils/fileutils";
 import GenericCollectionsScreen from "../common/GenericCollectionsScreen";
 
 class FileBrowser extends React.Component {
@@ -107,8 +107,8 @@ class FileBrowser extends React.Component {
     }
 
     downloadFile(path) {
-        const fileAPI = FileAPIFactory.build(this.props.openedCollection);
-        fileAPI.download(fileAPI.joinPaths(this.props.openedPath || '', path));
+        const fileAPI = new FileAPI(this.props.openedCollection.location);
+        fileAPI.download(joinPaths(this.props.openedPath || '', path));
     }
 
     render() {
@@ -140,7 +140,7 @@ class FileBrowser extends React.Component {
 
         if (openedPath) {
             const toBreadcrumb = segment => ({segment, label: segment});
-            const pathParts = parsePath(openedPath);
+            const pathParts = splitPathIntoArray(openedPath);
             segments.push(...pathParts.map(toBreadcrumb));
         }
 

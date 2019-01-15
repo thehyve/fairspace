@@ -1,4 +1,4 @@
-import FileAPIFactory from "../services/FileAPI/FileAPIFactory";
+import FileAPI from "../services/FileAPI/FileAPI";
 import * as actionTypes from "./actionTypes";
 import {COPY, CUT} from '../constants';
 
@@ -12,7 +12,7 @@ const extractBasename = filename => (filename.indexOf('/') > -1
 const canPaste = clipboard => clipboard.type && clipboard.filenames.length > 0;
 
 const doPaste = (clipboard, collection, destinationDir) => {
-    const fileAPI = FileAPIFactory.build(collection);
+    const fileAPI = new FileAPI(collection.location);
 
     if (clipboard.type === CUT) {
         return fileAPI.movePaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
