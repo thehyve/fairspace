@@ -42,7 +42,7 @@ open class PropertyInverter(private val model: Model, properties: Iterable<Pair<
             }
     }
 }
-class OwlPropertyInverter(model: Model, inversionModel: Model) : PropertyInverter(model,
-        inversionModel.listStatements(null, OWL2.inverseOf, null as? RDFNode)
+class OwlPropertyInverter(targetModel: Model, inversionModel: Model) : PropertyInverter(targetModel,
+        inversionModel.listStatements(null, OWL2.inverseOf, null as RDFNode?)
                 .mapWith { it.subject.uri to it.`object`.asResource().uri }
                 .toList())
