@@ -75,9 +75,8 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         // We need a uri for each one of them in the destination as well
         val mapping = mutableMapOf<String, String>()
         sourceIdentifiers.forEach {
-            val prefix = it.id.substring(0, it.id.lastIndexOf('/') + 1)
             val pathInDestination = it.value.replaceFirst(source, destination)
-            val newIdentifier = pidService.findOrCreateByValue(prefix, pathInDestination)
+            val newIdentifier = pidService.findOrCreateByValue(urlPrefix, pathInDestination)
             mapping[it.id] = newIdentifier.id
         }
 
@@ -136,8 +135,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
      * Stores the relation between the path and its parent in metadata
      */
     private fun storeParentRelation(path: String, type: PathType, collection: Collection?) {
-        val prefix = urlPrefix + if (type == PathType.FILE) "/iri/files/" else "/iri/directories/"
-        val currentIdentifier = pidService.findOrCreateByValue(prefix, path)
+        val currentIdentifier = pidService.findOrCreateByValue(urlPrefix, path)
         val parentUri = getParentUri(path, collection)
         val metadataType = if (type == PathType.FILE) Fairspace.file else Fairspace.directory
 
@@ -177,7 +175,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         return if (pathParts.size == 3) {
             collection?.uri
         } else {
-            pidService.findOrCreateByValue("$urlPrefix/iri/directories/", File(path).parent).id
+            pidService.findOrCreateByValue(urlPrefix, File(path).parent).id
         }
     }
 
