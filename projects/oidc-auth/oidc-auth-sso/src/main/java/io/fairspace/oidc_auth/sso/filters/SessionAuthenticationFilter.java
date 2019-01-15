@@ -82,8 +82,7 @@ public class SessionAuthenticationFilter implements Filter {
 
         // If it does not validate, but we have a valid refresh token, perform a refresh
         log.debug("JWT in user session is not valid anymore.");
-        Map<String, Object> refreshTokenClaims = jwtTokenValidator.parseAndValidate(token.getRefreshToken());
-        if(refreshTokenClaims != null) {
+        if(token.getRefreshToken() != null) {
             try {
                 log.debug("A valid refresh token was found in the user session. Try refreshing the access token");
 
@@ -101,6 +100,9 @@ public class SessionAuthenticationFilter implements Filter {
                         OAuthAuthenticationToken tokenWithClaims = refreshedToken.toBuilder().claimsSet(refreshedTokenClaims).build();
                         storeTokenInSession(tokenWithClaims, request);
                         return tokenWithClaims;
+                    } else {
+                        log.warn("The access token has been refreshed, but the returned token seems to be invalid.");
+                        return null;
                     }
                 }
 
@@ -113,8 +115,8 @@ public class SessionAuthenticationFilter implements Filter {
             }
         }
 
-        // In this case, both the accesstoken and the refreshtoken have expired
-        log.debug("A token was found in session, but both the access_token and refresh_token have expired");
+        // In this case, both the accesstoken and the refresh token have expired
+        log.debug("A token was found in session, but both the access_token has expired and no refresh token was available");
         return null;
     }
 
