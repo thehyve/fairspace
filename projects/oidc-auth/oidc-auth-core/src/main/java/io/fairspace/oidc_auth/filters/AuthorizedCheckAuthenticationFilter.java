@@ -4,7 +4,6 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
 
 @Slf4j
 public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilter {

@@ -1,5 +1,7 @@
 package io.fairspace.oidc_auth.config;
 
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.BadJWTException;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
@@ -13,13 +15,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthBeansTest {
@@ -59,6 +59,24 @@ public class AuthBeansTest {
         claimsSetVerifier.verify(claimsSet, null);
     }
 
+    @Test
+    void testJWKAlgorithmConfiguration() throws MalformedURLException, BadJWTException, URISyntaxException {
+        // Setup
+        oidcConfig = new OidcConfig();
+        oidcConfig.setJwkKeySetUri(new URI("http://test.uri"));
+        oidcConfig.setAccessTokenJwkAlgorithm(JWSAlgorithm.RS512);
+
+        authBeans = new AuthBeans(oidcConfig);
+
+        // Create processors
+        ConfigurableJWTProcessor accessTokenJwtProcessor = (ConfigurableJWTProcessor) authBeans.accessTokenJwtProcessor();
+
+        // Verify configuration of the processor
+        JWSAlgorithm configuredAccessTokenJWSAlgorithm = ((JWSVerificationKeySelector) accessTokenJwtProcessor.getJWSKeySelector()).getExpectedJWSAlgorithm();
+
+        assertEquals(JWSAlgorithm.RS512, configuredAccessTokenJWSAlgorithm);
+    }
+
     private JWTClaimsSet getJwtClaimsSet(int addSeconds) {
         Date expiry = Date.from(Instant.now().plus(addSeconds, ChronoUnit.SECONDS));
         return new JWTClaimsSet.Builder()
@@ -67,7 +85,7 @@ public class AuthBeansTest {
     }
 
     private JWTClaimsSetVerifier getJwtClaimsSetVerifier() throws MalformedURLException {
-        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.jwtProcessor();
+        ConfigurableJWTProcessor jwtProcessor = (ConfigurableJWTProcessor) authBeans.accessTokenJwtProcessor();
         return jwtProcessor.getJWTClaimsSetVerifier();
     }
 

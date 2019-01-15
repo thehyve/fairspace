@@ -23,8 +23,6 @@ import java.util.Map;
 import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,7 +33,7 @@ public class SessionAuthenticationFilterTest {
     private SessionAuthenticationFilter filter;
 
     @Mock
-    private JwtTokenValidator tokenValidator;
+    private JwtTokenValidator accessTokenValidator;
 
     @Mock
     private OAuthFlow oAuthFlow;
@@ -56,10 +54,11 @@ public class SessionAuthenticationFilterTest {
     OAuthAuthenticationToken token = new OAuthAuthenticationToken("test-token", "refresh-token");
     OAuthAuthenticationToken tokenWithClaims;
     OAuthAuthenticationToken refreshedToken = new OAuthAuthenticationToken("refreshed-test-token", "refreshed-refresh-token");
+    OAuthAuthenticationToken tokenWithoutRefreshToken = new OAuthAuthenticationToken("test-token", (String) null);
 
     @BeforeEach
     void setUp() {
-        filter = new SessionAuthenticationFilter(tokenValidator, oAuthFlow);
+        filter = new SessionAuthenticationFilter(accessTokenValidator, oAuthFlow);
 
         claims = new HashMap<>();
         claims.put("authorities", Collections.singletonList("test"));
@@ -72,7 +71,7 @@ public class SessionAuthenticationFilterTest {
 
         doReturn(session).when(request).getSession();
         doReturn(token).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
-        doReturn(claims).when(tokenValidator).parseAndValidate("test-token");
+        doReturn(claims).when(accessTokenValidator).parseAndValidate("test-token");
         filter.doFilter(request, response, filterChain);
 
         verify(request).setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, tokenWithClaims);
@@ -101,9 +100,8 @@ public class SessionAuthenticationFilterTest {
     @Test
     void testInvalidRefreshToken() throws IOException, ServletException {
         doReturn(session).when(request).getSession();
-        doReturn(token).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
-        doReturn(null).when(tokenValidator).parseAndValidate("test-token");
-        doReturn(null).when(tokenValidator).parseAndValidate("refresh-token");
+        doReturn(tokenWithoutRefreshToken).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
+        doReturn(null).when(accessTokenValidator).parseAndValidate("test-token");
         filter.doFilter(request, response, filterChain);
 
         verify(request, times(0)).setAttribute(any(), any());
@@ -114,9 +112,8 @@ public class SessionAuthenticationFilterTest {
     void testValidRefreshToken() throws IOException, ServletException, ParseException {
         doReturn(session).when(request).getSession();
         doReturn(token).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
-        doReturn(null).when(tokenValidator).parseAndValidate("test-token");
-        doReturn(claims).when(tokenValidator).parseAndValidate("refresh-token");
-        doReturn(claims).when(tokenValidator).parseAndValidate("refreshed-test-token");
+        doReturn(null).when(accessTokenValidator).parseAndValidate("test-token");
+        doReturn(claims).when(accessTokenValidator).parseAndValidate("refreshed-test-token");
         doReturn(refreshedToken).when(oAuthFlow).refreshToken(token);
 
         filter.doFilter(request, response, filterChain);
@@ -131,10 +128,9 @@ public class SessionAuthenticationFilterTest {
     void testRefreshingFailed() throws IOException, ServletException, ParseException {
         doReturn(session).when(request).getSession();
         doReturn(token).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
-        doReturn(null).when(tokenValidator).parseAndValidate("test-token");
-        doReturn(claims).when(tokenValidator).parseAndValidate("refresh-token");
+        doReturn(null).when(accessTokenValidator).parseAndValidate("test-token");
         doReturn(refreshedToken).when(oAuthFlow).refreshToken(token);
-        doReturn(null).when(tokenValidator).parseAndValidate("refreshed-test-token");
+        doReturn(null).when(accessTokenValidator).parseAndValidate("refreshed-test-token");
 
         filter.doFilter(request, response, filterChain);
 
