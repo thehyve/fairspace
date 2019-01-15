@@ -1,4 +1,4 @@
 import {promiseReducerFactory} from "../../utils/redux";
-import {METADATA_VOCABULARY} from "../../actions/actionTypes";
+import {FETCH_METADATA_VOCABULARY} from "../../actions/actionTypes";
 
-export default promiseReducerFactory(METADATA_VOCABULARY, null);
+export default promiseReducerFactory(FETCH_METADATA_VOCABULARY, null);

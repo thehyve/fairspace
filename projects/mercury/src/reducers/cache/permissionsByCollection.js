@@ -1,10 +1,10 @@
 import reduceReducers from 'reduce-reducers';
 import {promiseReducerFactory} from "../../utils/redux";
-import {ALTER_PERMISSION, PERMISSIONS} from "../../actions/actionTypes";
+import {ALTER_PERMISSION, FETCH_PERMISSIONS} from "../../actions/actionTypes";
 import * as actionTypes from "../../utils/redux-action-types";
 
 const defaultState = {};
-const permissionByCollectionReducer = promiseReducerFactory(PERMISSIONS, defaultState, action => action.meta.collectionId);
+const permissionByCollectionReducer = promiseReducerFactory(FETCH_PERMISSIONS, defaultState, action => action.meta.collectionId);
 
 // Functions to modify the permission cache after altering the permissions
 const removeCollaborator = (collaborators, actionMeta) => (collaborators ? collaborators.filter(collaborator => collaborator.subject !== actionMeta.subject) : []);

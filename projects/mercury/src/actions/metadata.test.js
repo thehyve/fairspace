@@ -5,6 +5,7 @@ import {fetchJsonLdBySubjectIfNeeded} from "./metadata";
 import Config from "../services/Config/Config";
 import configFile from "../config";
 import mockResponse from "../utils/mockResponse";
+import {FETCH_METADATA} from "./actionTypes";
 
 const subject = 'my-subject';
 const middlewares = [thunk, promiseMiddleware()];
@@ -27,9 +28,9 @@ describe('fetch metadata', () => {
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(2);
-                expect(actions[0].type).toEqual('METADATA_PENDING');
+                expect(actions[0].type).toEqual(`${FETCH_METADATA}_PENDING`);
                 expect(actions[0].meta.subject).toEqual(subject);
-                expect(actions[1].type).toEqual('METADATA_FULFILLED');
+                expect(actions[1].type).toEqual(`${FETCH_METADATA}_FULFILLED`);
                 expect(actions[1].meta.subject).toEqual(subject);
             });
     });
@@ -70,9 +71,9 @@ describe('fetch metadata', () => {
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(2);
-                expect(actions[0].type).toEqual('METADATA_PENDING');
+                expect(actions[0].type).toEqual(`${FETCH_METADATA}_PENDING`);
                 expect(actions[0].meta.subject).toEqual(subject);
-                expect(actions[1].type).toEqual('METADATA_FULFILLED');
+                expect(actions[1].type).toEqual(`${FETCH_METADATA}_FULFILLED`);
                 expect(actions[1].meta.subject).toEqual(subject);
             });
     });

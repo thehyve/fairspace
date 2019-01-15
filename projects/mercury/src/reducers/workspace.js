@@ -1,6 +1,6 @@
 import {promiseReducerFactory} from "../utils/redux";
-import {WORKSPACE} from "../actions/actionTypes";
+import {FETCH_WORKSPACE} from "../actions/actionTypes";
 
 const defaultState = {};
 
-export default promiseReducerFactory(WORKSPACE, defaultState);
+export default promiseReducerFactory(FETCH_WORKSPACE, defaultState);

@@ -1,10 +1,11 @@
 import reducer from "./jsonLdBySubject";
+import {FETCH_METADATA, UPDATE_METADATA} from "../../actions/actionTypes";
 
 describe('metadata retrieval', () => {
     it('should store pending state per subject', () => {
         const previousState = {'previous-subject': 'test'};
         const action = {
-            type: 'METADATA_PENDING',
+            type: `${FETCH_METADATA}_PENDING`,
             meta: {subject: 'my-subject'}
         };
 
@@ -17,7 +18,7 @@ describe('metadata retrieval', () => {
     it('should store retrieved metadata per subject', () => {
         const previousState = {'previous-subject': 'test'};
         const action = {
-            type: 'METADATA_FULFILLED',
+            type: `${FETCH_METADATA}_FULFILLED`,
             meta: {subject: 'my-subject'},
             payload: 'new-metadata'
         };
@@ -32,7 +33,7 @@ describe('metadata retrieval', () => {
     it('should store errors per subject', () => {
         const previousState = {'previous-subject': 'test'};
         const action = {
-            type: 'METADATA_REJECTED',
+            type: `${FETCH_METADATA}_REJECTED`,
             meta: {subject: 'my-subject'},
             payload: new Error('new-metadata')
         };
@@ -49,7 +50,7 @@ describe('metadata invalidation', () => {
     it('should invalidate subject metadata upon invalidation action', () => {
         const previousState = {'previous-subject': 'test'};
         const action = {
-            type: 'INVALIDATE_METADATA',
+            type: `INVALIDATE_${FETCH_METADATA}`,
             meta: {subject: 'my-subject'}
         };
 
@@ -62,7 +63,7 @@ describe('metadata invalidation', () => {
     it('should invalidate subject metadata when metadata is updated', () => {
         const previousState = {'previous-subject': 'test'};
         const action = {
-            type: 'UPDATE_METADATA_FULFILLED',
+            type: `${UPDATE_METADATA}_FULFILLED`,
             meta: {subject: 'my-subject'}
         };
 

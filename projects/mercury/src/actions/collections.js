@@ -1,16 +1,16 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import CollectionAPI from "../services/CollectionAPI/CollectionAPI";
 import {
-    ADD_COLLECTION, COLLECTIONS, DELETE_COLLECTION, UPDATE_COLLECTION
+    ADD_COLLECTION, FETCH_COLLECTIONS, DELETE_COLLECTION, UPDATE_COLLECTION
 } from "./actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
 
 export const invalidateCollections = () => ({
-    type: actionTypes.invalidate(COLLECTIONS)
+    type: actionTypes.invalidate(FETCH_COLLECTIONS)
 });
 
 const fetchCollections = createErrorHandlingPromiseAction(() => ({
-    type: COLLECTIONS,
+    type: FETCH_COLLECTIONS,
     payload: CollectionAPI.getCollections()
 }));
 

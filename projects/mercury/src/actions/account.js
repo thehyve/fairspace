@@ -1,13 +1,13 @@
 import AccountAPI from '../services/AccountAPI/AccountAPI';
 import {createErrorHandlingPromiseAction} from "../utils/redux";
-import {AUTHORIZATIONS, USER} from "./actionTypes";
+import {FETCH_AUTHORIZATIONS, FETCH_USER} from "./actionTypes";
 
 export const fetchUser = createErrorHandlingPromiseAction(() => ({
-    type: USER,
+    type: FETCH_USER,
     payload: AccountAPI.getUser()
 }));
 
 export const fetchAuthorizations = createErrorHandlingPromiseAction(() => ({
-    type: AUTHORIZATIONS,
+    type: FETCH_AUTHORIZATIONS,
     payload: AccountAPI.getAuthorizations()
 }));

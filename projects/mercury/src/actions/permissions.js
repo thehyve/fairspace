@@ -1,9 +1,9 @@
 import PermissionAPI from '../services/PermissionAPI/PermissionAPI';
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import {ALTER_PERMISSION, PERMISSIONS} from "./actionTypes";
+import {ALTER_PERMISSION, FETCH_PERMISSIONS} from "./actionTypes";
 
 export const fetchPermissions = createErrorHandlingPromiseAction((collectionId, useCache = true) => ({
-    type: PERMISSIONS,
+    type: FETCH_PERMISSIONS,
     payload: PermissionAPI.getCollectionPermissions(collectionId, useCache),
     meta: {
         collectionId

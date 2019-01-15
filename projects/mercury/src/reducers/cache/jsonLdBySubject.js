@@ -1,11 +1,11 @@
 import reduceReducers from 'reduce-reducers';
 import {promiseReducerFactory} from "../../utils/redux";
-import {METADATA, UPDATE_METADATA} from "../../actions/actionTypes";
+import {FETCH_METADATA, UPDATE_METADATA} from "../../actions/actionTypes";
 import * as actionTypes from "../../utils/redux-action-types";
 
 const defaultState = {};
 
-const jsonLdFetchReducer = promiseReducerFactory(METADATA, defaultState, action => action.meta.subject);
+const jsonLdFetchReducer = promiseReducerFactory(FETCH_METADATA, defaultState, action => action.meta.subject);
 
 const updateMetadataReducer = (state = defaultState, action) => {
     switch (action.type) {

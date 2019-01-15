@@ -2,7 +2,7 @@ import {
     CLIPBOARD_PASTE,
     CREATE_DIRECTORY,
     DELETE_FILE,
-    FILES,
+    FETCH_FILES,
     RENAME_FILE,
     UPLOAD_FILES
 } from "../../actions/actionTypes";
@@ -29,7 +29,7 @@ const invalidateFiles = (state, collectionId, ...paths) => {
 const filesByCollectionAndPath = (state = defaultState, action) => {
     let collectionId;
     switch (action.type) {
-        case actionTypes.pending(FILES):
+        case actionTypes.pending(FETCH_FILES):
             collectionId = action.meta.collection.id;
             return {
                 ...state,
@@ -43,7 +43,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             };
-        case actionTypes.fulfilled(FILES):
+        case actionTypes.fulfilled(FETCH_FILES):
             collectionId = action.meta.collection.id;
             return {
                 ...state,
@@ -56,7 +56,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             };
-        case actionTypes.rejected(FILES):
+        case actionTypes.rejected(FETCH_FILES):
             collectionId = action.meta.collection.id;
             return {
                 ...state,
@@ -83,7 +83,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
             };
             return invalidateFiles(newState, action.meta.collection.id, action.meta.path);
         }
-        case actionTypes.invalidate(FILES):
+        case actionTypes.invalidate(FETCH_FILES):
         case actionTypes.fulfilled(RENAME_FILE):
         case actionTypes.fulfilled(DELETE_FILE):
         case actionTypes.fulfilled(UPLOAD_FILES):

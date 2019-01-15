@@ -1,4 +1,4 @@
-import {USERS} from "../../actions/actionTypes";
+import {FETCH_USERS} from "../../actions/actionTypes";
 import {promiseReducerFactory} from "../../utils/redux";
 
-export default promiseReducerFactory(USERS, null);
+export default promiseReducerFactory(FETCH_USERS, null);

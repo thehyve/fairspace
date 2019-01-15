@@ -1,12 +1,12 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import FileAPIFactory from "../services/FileAPI/FileAPIFactory";
 import {
-    CREATE_DIRECTORY, DELETE_FILE, FILES, RENAME_FILE, UPLOAD_FILES
+    CREATE_DIRECTORY, DELETE_FILE, FETCH_FILES, RENAME_FILE, UPLOAD_FILES
 } from "./actionTypes";
 import * as actionTypes from "../utils/redux-action-types";
 
 export const invalidateFiles = (collection, path) => ({
-    type: actionTypes.invalidate(FILES),
+    type: actionTypes.invalidate(FETCH_FILES),
     meta: {
         collection,
         path
@@ -59,7 +59,7 @@ export const createDirectory = (collection, path, directoryname) => {
 };
 
 const fetchFiles = createErrorHandlingPromiseAction((collection, path) => ({
-    type: FILES,
+    type: FETCH_FILES,
     payload: getFileApi(collection).list(path),
     meta: {
         collection,
