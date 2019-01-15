@@ -1,8 +1,5 @@
-import {
-    CLIPBOARD_CLEAR, CLIPBOARD_COPY, CLIPBOARD_CUT, CLIPBOARD_PASTE
-} from "../actions/actionTypes";
+import * as actionTypes from "../actions/actionTypes";
 import {COPY, CUT} from "../actions/clipboard";
-import * as actionTypes from "../utils/redux-action-types";
 
 const defaultState = {
     type: null,
@@ -14,27 +11,27 @@ const defaultState = {
 
 const clipboard = (state = defaultState, action) => {
     switch (action.type) {
-        case CLIPBOARD_CUT:
+        case actionTypes.CLIPBOARD_CUT:
             return {
                 ...state,
                 type: CUT,
                 sourcedir: action.sourcedir,
                 filenames: action.filenames
             };
-        case CLIPBOARD_COPY:
+        case actionTypes.CLIPBOARD_COPY:
             return {
                 ...state,
                 type: COPY,
                 sourcedir: action.sourcedir,
                 filenames: action.filenames
             };
-        case actionTypes.pending(CLIPBOARD_PASTE):
+        case actionTypes.CLIPBOARD_PASTE_PENDING:
             return {
                 ...state,
                 pending: true
             };
-        case actionTypes.fulfilled(CLIPBOARD_PASTE):
-        case CLIPBOARD_CLEAR:
+        case actionTypes.CLIPBOARD_PASTE_FULFILLED:
+        case actionTypes.CLIPBOARD_CLEAR:
             return {
                 ...state,
                 pending: false,
@@ -42,7 +39,7 @@ const clipboard = (state = defaultState, action) => {
                 sourcedir: null,
                 filenames: []
             };
-        case actionTypes.rejected(CLIPBOARD_PASTE):
+        case actionTypes.CLIPBOARD_PASTE_REJECTED:
             return {
                 ...state,
                 pending: false,

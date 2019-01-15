@@ -1,52 +1,42 @@
-import {
-    CLOSE_INFODRAWER,
-    DESELECT_COLLECTION,
-    DESELECT_PATH,
-    OPEN_COLLECTION,
-    OPEN_INFODRAWER,
-    OPEN_PATH,
-    CLOSE_PATH,
-    SELECT_COLLECTION,
-    SELECT_PATH
-} from "./actionTypes";
+import * as actionTypes from "./actionTypes";
 
 export const openInfoDrawer = () => ({
-    type: OPEN_INFODRAWER
+    type: actionTypes.OPEN_INFODRAWER
 });
 
 export const closeInfoDrawer = () => ({
-    type: CLOSE_INFODRAWER
+    type: actionTypes.CLOSE_INFODRAWER
 });
 
 export const openCollection = collectionId => ({
-    type: OPEN_COLLECTION,
+    type: actionTypes.OPEN_COLLECTION,
     collectionId
 });
 
 export const selectCollection = collectionId => ({
-    type: SELECT_COLLECTION,
+    type: actionTypes.SELECT_COLLECTION,
     collectionId
 });
 
 export const deselectCollection = () => ({
-    type: DESELECT_COLLECTION
+    type: actionTypes.DESELECT_COLLECTION
 });
 
 export const openPath = path => ({
-    type: OPEN_PATH,
+    type: actionTypes.OPEN_PATH,
     path
 });
 
 export const selectPath = path => ({
-    type: SELECT_PATH,
+    type: actionTypes.SELECT_PATH,
     path
 });
 
 export const deselectPath = path => ({
-    type: DESELECT_PATH,
+    type: actionTypes.DESELECT_PATH,
     path
 });
 
 export const closePath = () => ({
-    type: CLOSE_PATH,
+    type: actionTypes.CLOSE_PATH,
 });

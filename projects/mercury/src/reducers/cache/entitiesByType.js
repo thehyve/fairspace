@@ -1,11 +1,10 @@
 import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
-import {FETCH_METADATA_ENTITIES, CREATE_METADATA_ENTITY} from "../../actions/actionTypes";
-import * as actionTypes from "../../utils/redux-action-types";
+import * as actionTypes from "../../actions/actionTypes";
 
 const metadataCreateReducer = (state = {}, action) => {
     switch (action.type) {
-        case actionTypes.fulfilled(CREATE_METADATA_ENTITY):
+        case actionTypes.CREATE_METADATA_ENTITY_FULFILLED:
             return {
                 ...state,
                 [action.meta.type]: {
@@ -18,4 +17,7 @@ const metadataCreateReducer = (state = {}, action) => {
     }
 };
 
-export default reduceReducers(promiseReducerFactory(FETCH_METADATA_ENTITIES, {}, action => action.meta.type), metadataCreateReducer);
+export default reduceReducers(
+    promiseReducerFactory(actionTypes.FETCH_METADATA_ENTITIES, {}, action => action.meta.type),
+    metadataCreateReducer
+);

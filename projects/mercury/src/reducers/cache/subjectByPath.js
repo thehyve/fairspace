@@ -1,19 +1,18 @@
-import {FETCH_METADATA_URI_BY_PATH} from "../../actions/actionTypes";
-import * as actionTypes from "../../utils/redux-action-types";
+import * as actionTypes from "../../actions/actionTypes";
 
 export default (state = {}, action) => {
     switch (action.type) {
-        case actionTypes.pending(FETCH_METADATA_URI_BY_PATH):
+        case actionTypes.FETCH_METADATA_URI_BY_PATH_PENDING:
             return {
                 ...state,
                 [action.meta.path]: {pending: true}
             };
-        case actionTypes.fulfilled(FETCH_METADATA_URI_BY_PATH):
+        case actionTypes.FETCH_METADATA_URI_BY_PATH_FULFILLED:
             return {
                 ...state,
                 [action.meta.path]: {data: action.payload}
             };
-        case actionTypes.rejected(FETCH_METADATA_URI_BY_PATH):
+        case actionTypes.FETCH_METADATA_URI_BY_PATH_REJECTED:
             return {
                 ...state,
                 [action.meta.path]: {error: action.payload || true}

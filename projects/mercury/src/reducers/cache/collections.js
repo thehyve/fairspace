@@ -1,21 +1,20 @@
 import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
-import {
-    ADD_COLLECTION, FETCH_COLLECTIONS, DELETE_COLLECTION, UPDATE_COLLECTION
-} from "../../actions/actionTypes";
+import * as actionTypes from "../../actions/actionTypes";
 
 const defaultState = {invalidated: true, data: []};
 
-const fetchReducer = promiseReducerFactory(FETCH_COLLECTIONS, defaultState);
+const fetchReducer = promiseReducerFactory(actionTypes.FETCH_COLLECTIONS, defaultState);
+
 const additionalReducer = (state = defaultState, action) => {
     switch (action.type) {
-        case `${ADD_COLLECTION}_FULFILLED`:
-        case `${DELETE_COLLECTION}_FULFILLED`:
+        case actionTypes.ADD_COLLECTION_FULFILLED:
+        case actionTypes.DELETE_COLLECTION_FULFILLED:
             return {
                 ...state,
                 invalidated: true,
             };
-        case `${UPDATE_COLLECTION}_FULFILLED`:
+        case actionTypes.UPDATE_COLLECTION_FULFILLED:
             return {
                 ...state,
                 invalidated: true,

@@ -1,5 +1,4 @@
-import {ALTER_PERMISSION, TOGGLE_MENU} from "../actions/actionTypes";
-import * as actionTypes from "../utils/redux-action-types";
+import * as actionTypes from "../actions/actionTypes";
 
 const defaultState = {
     menuExpanded: true,
@@ -8,12 +7,12 @@ const defaultState = {
 
 const ui = (state = defaultState, action) => {
     switch (action.type) {
-        case TOGGLE_MENU:
+        case actionTypes.TOGGLE_MENU:
             return {
                 ...state,
                 menuExpanded: !state.menuExpanded
             };
-        case actionTypes.pending(ALTER_PERMISSION):
+        case actionTypes.ALTER_PERMISSION_PENDING:
             return {
                 ...state,
                 pending: {
@@ -21,8 +20,8 @@ const ui = (state = defaultState, action) => {
                     alterPermission: true
                 }
             };
-        case actionTypes.fulfilled(ALTER_PERMISSION):
-        case actionTypes.rejected(ALTER_PERMISSION):
+        case actionTypes.ALTER_PERMISSION_FULFILLED:
+        case actionTypes.ALTER_PERMISSION_REJECTED:
             return {
                 ...state,
                 pending: {

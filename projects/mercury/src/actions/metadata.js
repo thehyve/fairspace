@@ -1,25 +1,15 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import MetadataAPI, {TYPE_URI} from "../services/MetadataAPI/MetadataAPI";
-import {
-    FETCH_METADATA,
-    FETCH_ALL_METADATA_ENTITIES,
-    COMBINE_METADATA,
-    FETCH_METADATA_ENTITIES,
-    CREATE_METADATA_ENTITY,
-    FETCH_METADATA_URI_BY_PATH,
-    FETCH_METADATA_VOCABULARY,
-    UPDATE_METADATA
-} from "./actionTypes";
-import * as actionTypes from "../utils/redux-action-types";
+import * as actionTypes from "./actionTypes";
 import {getSingleValue} from "../utils/metadatautils";
 
 export const invalidateMetadata = subject => ({
-    type: actionTypes.invalidate(FETCH_METADATA),
+    type: actionTypes.INVALIDATE_FETCH_METADATA,
     meta: {subject}
 });
 
 export const updateMetadata = (subject, predicate, values) => ({
-    type: UPDATE_METADATA,
+    type: actionTypes.UPDATE_METADATA,
     payload: MetadataAPI.update(subject, predicate, values),
     meta: {
         subject,
@@ -36,7 +26,7 @@ export const createMetadataEntity = (type, id) => {
     }
     const subject = `${window.location.origin}/iri/${infix}/${id}`;
     return {
-        type: CREATE_METADATA_ENTITY,
+        type: actionTypes.CREATE_METADATA_ENTITY,
         payload: MetadataAPI.get({subject})
             .then((meta) => {
                 if (meta.length) {
@@ -53,7 +43,7 @@ export const createMetadataEntity = (type, id) => {
 };
 
 const fetchJsonLdBySubject = createErrorHandlingPromiseAction(subject => ({
-    type: FETCH_METADATA,
+    type: actionTypes.FETCH_METADATA,
     payload: MetadataAPI.get({subject}),
     meta: {
         subject
@@ -61,7 +51,7 @@ const fetchJsonLdBySubject = createErrorHandlingPromiseAction(subject => ({
 }));
 
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
-    type: FETCH_METADATA_VOCABULARY,
+    type: actionTypes.FETCH_METADATA_VOCABULARY,
     payload: MetadataAPI.getVocabulary()
 }));
 
@@ -76,7 +66,7 @@ export const fetchJsonLdBySubjectIfNeeded = subject => dispatchIfNeeded(
 );
 
 const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dispatch) => ({
-    type: COMBINE_METADATA,
+    type: actionTypes.COMBINE_METADATA,
     payload: Promise.all([
         dispatch(fetchJsonLdBySubjectIfNeeded(subject)),
         dispatch(fetchMetadataVocabularyIfNeeded())
@@ -85,7 +75,7 @@ const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dis
 }));
 
 const fetchEntitiesByType = createErrorHandlingPromiseAction(type => ({
-    type: FETCH_METADATA_ENTITIES,
+    type: actionTypes.FETCH_METADATA_ENTITIES,
     payload: MetadataAPI.getEntitiesByType(type),
     meta: {
         type
@@ -93,7 +83,7 @@ const fetchEntitiesByType = createErrorHandlingPromiseAction(type => ({
 }));
 
 const fetchAllEntities = createErrorHandlingPromiseAction(dispatch => ({
-    type: FETCH_ALL_METADATA_ENTITIES,
+    type: actionTypes.FETCH_ALL_METADATA_ENTITIES,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
         .then(({value: vocabulary}) => MetadataAPI.getEntitiesByTypes(
             vocabulary.getFairspaceClasses()
@@ -117,7 +107,7 @@ export const fetchAllEntitiesIfNeeded = () => dispatchIfNeeded(
 );
 
 const getUriByPath = createErrorHandlingPromiseAction(path => ({
-    type: FETCH_METADATA_URI_BY_PATH,
+    type: actionTypes.FETCH_METADATA_URI_BY_PATH,
     payload: MetadataAPI.getSubjectByPath(path),
     meta: {path}
 }));

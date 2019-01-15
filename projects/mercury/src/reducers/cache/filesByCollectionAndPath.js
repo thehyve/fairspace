@@ -1,12 +1,4 @@
-import {
-    CLIPBOARD_PASTE,
-    CREATE_DIRECTORY,
-    DELETE_FILE,
-    FETCH_FILES,
-    RENAME_FILE,
-    UPLOAD_FILES
-} from "../../actions/actionTypes";
-import * as actionTypes from "../../utils/redux-action-types";
+import * as actionTypes from "../../actions/actionTypes";
 
 const defaultState = {
     creatingDirectory: false
@@ -29,7 +21,7 @@ const invalidateFiles = (state, collectionId, ...paths) => {
 const filesByCollectionAndPath = (state = defaultState, action) => {
     let collectionId;
     switch (action.type) {
-        case actionTypes.pending(FETCH_FILES):
+        case actionTypes.FETCH_FILES_PENDING:
             collectionId = action.meta.collection.id;
             return {
                 ...state,
@@ -43,7 +35,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             };
-        case actionTypes.fulfilled(FETCH_FILES):
+        case actionTypes.FETCH_FILES_FULFILLED:
             collectionId = action.meta.collection.id;
             return {
                 ...state,
@@ -56,7 +48,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             };
-        case actionTypes.rejected(FETCH_FILES):
+        case actionTypes.FETCH_FILES_REJECTED:
             collectionId = action.meta.collection.id;
             return {
                 ...state,
@@ -69,26 +61,26 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             };
-        case actionTypes.pending(CREATE_DIRECTORY):
+        case actionTypes.CREATE_DIRECTORY_PENDING:
             return {
                 ...state,
                 creatingDirectory: true
             };
-        case actionTypes.fulfilled(CREATE_DIRECTORY):
-        case actionTypes.rejected(CREATE_DIRECTORY):
-        case actionTypes.invalidate(CREATE_DIRECTORY): {
+        case actionTypes.CREATE_DIRECTORY_FULFILLED:
+        case actionTypes.CREATE_DIRECTORY_REJECTED:
+        case actionTypes.INVALIDATE_CREATE_DIRECTORY: {
             const newState = {
                 ...state,
                 creatingDirectory: false
             };
             return invalidateFiles(newState, action.meta.collection.id, action.meta.path);
         }
-        case actionTypes.invalidate(FETCH_FILES):
-        case actionTypes.fulfilled(RENAME_FILE):
-        case actionTypes.fulfilled(DELETE_FILE):
-        case actionTypes.fulfilled(UPLOAD_FILES):
+        case actionTypes.INVALIDATE_FETCH_FILES:
+        case actionTypes.RENAME_FILE_FULFILLED:
+        case actionTypes.DELETE_FILE_FULFILLED:
+        case actionTypes.UPLOAD_FILES_FULFILLED:
             return invalidateFiles(state, action.meta.collection.id, action.meta.path);
-        case actionTypes.fulfilled(CLIPBOARD_PASTE): {
+        case actionTypes.CLIPBOARD_PASTE_FULFILLED: {
             const {sourceDir, destinationDir} = action.meta;
             return invalidateFiles(state, action.meta.collection.id, sourceDir, destinationDir);
         }

@@ -1,16 +1,15 @@
 import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../utils/redux";
-import {COMBINE_METADATA, CREATE_METADATA_ENTITY, UPDATE_METADATA} from "../actions/actionTypes";
-import * as actionTypes from "../utils/redux-action-types";
+import * as actionTypes from "../actions/actionTypes";
 import {TYPE_URI} from "../services/MetadataAPI/MetadataAPI";
 
 const defaultState = {
     creatingMetadataEntity: false
 };
-const metadataCombinationReducer = promiseReducerFactory(COMBINE_METADATA, defaultState, action => action.meta.subject);
+const metadataCombinationReducer = promiseReducerFactory(actionTypes.COMBINE_METADATA, defaultState, action => action.meta.subject);
 const metadataUpdateReducer = (state = defaultState, action) => {
     switch (action.type) {
-        case actionTypes.fulfilled(UPDATE_METADATA):
+        case actionTypes.UPDATE_METADATA_FULFILLED:
             return {
                 ...state,
                 [action.meta.subject]: {
@@ -19,12 +18,12 @@ const metadataUpdateReducer = (state = defaultState, action) => {
                     invalidated: true
                 }
             };
-        case actionTypes.pending(CREATE_METADATA_ENTITY):
+        case actionTypes.CREATE_METADATA_ENTITY_PENDING:
             return {
                 ...state,
                 creatingMetadataEntity: true
             };
-        case actionTypes.fulfilled(CREATE_METADATA_ENTITY):
+        case actionTypes.CREATE_METADATA_ENTITY_FULFILLED:
             return {
                 ...state,
                 creatingMetadataEntity: false,
@@ -33,7 +32,7 @@ const metadataUpdateReducer = (state = defaultState, action) => {
                     invalidated: true
                 }
             };
-        case actionTypes.rejected(CREATE_METADATA_ENTITY):
+        case actionTypes.CREATE_METADATA_ENTITY_REJECTED:
             return {
                 ...state,
                 creatingMetadataEntity: false

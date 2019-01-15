@@ -1,25 +1,10 @@
-import {
-    CLOSE_INFODRAWER,
-    DELETE_COLLECTION,
-    DELETE_FILE,
-    DESELECT_COLLECTION,
-    DESELECT_PATH,
-    OPEN_INFODRAWER,
-    OPEN_PATH,
-    CLOSE_PATH,
-    SELECT_COLLECTION,
-    SELECT_PATH,
-    ADD_COLLECTION
-} from "../actions/actionTypes";
-import * as actionTypes from "../utils/redux-action-types";
+import * as actionTypes from "../actions/actionTypes";
 
 const defaultState = {
     selectedCollectionId: null,
     selectedPaths: [],
-
     openedCollectionId: null,
     openedPath: null,
-
     infoDrawerOpened: false,
     addingCollection: false,
     deletingCollection: false
@@ -32,74 +17,74 @@ const deselectPath = (state, path) => ({
 
 const collectionBrowser = (state = defaultState, action) => {
     switch (action.type) {
-        case SELECT_COLLECTION:
+        case actionTypes.SELECT_COLLECTION:
             return {
                 ...state,
                 infoDrawerOpened: true,
                 selectedCollectionId: action.collectionId
             };
-        case DESELECT_COLLECTION:
+        case actionTypes.DESELECT_COLLECTION:
             return {
                 ...state,
                 infoDrawerOpened: false,
                 selectedCollectionId: null
             };
-        case SELECT_PATH:
+        case actionTypes.SELECT_PATH:
             return {
                 ...state,
                 infoDrawerOpened: true,
                 selectedPaths: (state.selectedPaths || []).concat(action.path)
             };
-        case DESELECT_PATH:
+        case actionTypes.DESELECT_PATH:
             return deselectPath(state, action.path);
-        case actionTypes.pending(DELETE_COLLECTION):
+        case actionTypes.DELETE_COLLECTION_PENDING:
             return {
                 ...state,
                 deletingCollection: true
             };
-        case actionTypes.fulfilled(DELETE_COLLECTION):
+        case actionTypes.DELETE_COLLECTION_FULFILLED:
             return {
                 ...state,
                 deletingCollection: false,
                 selectedCollectionId: state.selectedCollectionId === action.collectionId ? null : state.selectedCollectionId
             };
-        case actionTypes.rejected(DELETE_COLLECTION):
-        case actionTypes.invalidate(DELETE_COLLECTION):
+        case actionTypes.DELETE_COLLECTION_REJECTED:
+        case actionTypes.DELETE_COLLECTION_INVALIDATE:
             return {
                 ...state,
                 deletingCollection: false
             };
-        case actionTypes.fulfilled(DELETE_FILE):
+        case actionTypes.DELETE_FILE_FULFILLED:
             return deselectPath(state, action.meta.fullpath);
-        case actionTypes.pending(ADD_COLLECTION):
+        case actionTypes.ADD_COLLECTION_PENDING:
             return {
                 ...state,
                 addingCollection: true
             };
-        case actionTypes.fulfilled(ADD_COLLECTION):
-        case actionTypes.rejected(ADD_COLLECTION):
-        case actionTypes.invalidate(ADD_COLLECTION):
+        case actionTypes.ADD_COLLECTION_FULFILLED:
+        case actionTypes.ADD_COLLECTION_REJECTED:
+        case actionTypes.ADD_COLLECTION_INVALIDATE:
             return {
                 ...state,
                 addingCollection: false
             };
-        case OPEN_INFODRAWER:
+        case actionTypes.OPEN_INFODRAWER:
             return {
                 ...state,
                 infoDrawerOpened: true
             };
-        case CLOSE_INFODRAWER:
+        case actionTypes.CLOSE_INFODRAWER:
             return {
                 ...state,
                 infoDrawerOpened: false
             };
-        case OPEN_PATH:
+        case actionTypes.OPEN_PATH:
             return {
                 ...state,
                 openedPath: action.path,
                 selectedPaths: []
             };
-        case CLOSE_PATH:
+        case actionTypes.CLOSE_PATH:
             return {
                 ...state,
                 openedPath: null,
