@@ -16,7 +16,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
-import java.io.File
 
 @Component
 @ConditionalOnProperty("app.rabbitmq.enabled")
@@ -53,7 +52,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         // Afterwards, ensure that the tree structure is properly
         // updated in the metadata as well. This is only needed if the file/directory
         // is moved to another parent directory
-        if (File(source).parent != File(destination).parent) {
+        if (parentPath(source) != parentPath(destination)) {
             storeParentRelation(destination, message.type, message.collection)
         }
     }
@@ -95,7 +94,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         // Afterwards, ensure that the tree structure is properly
         // updated in the metadata as well. This is only needed if the file/directory
         // is copied to another parent directory
-        if (File(source).parent != File(destination).parent) {
+        if (parentPath(source) != parentPath(destination)) {
             storeParentRelation(destination, message.type, message.collection)
         }
     }
@@ -175,7 +174,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         return if (pathParts.size == 3) {
             collection?.uri
         } else {
-            pidService.findOrCreateByValue(urlPrefix, File(path).parent).id
+            pidService.findOrCreateByValue(urlPrefix, parentPath(path)).id
         }
     }
 
@@ -202,4 +201,6 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
 
         return newModel
     }
+
+    private fun parentPath(path: String) = path.substring(0, path.lastIndexOf('/'))
 }
