@@ -24,14 +24,12 @@ export const DESELECT_PATH                  = 'DESELECT_PATH';
 
 // Collections
 export const FETCH_COLLECTIONS              = 'FETCH_COLLECTIONS';
-export const INVALIDATE_COLLECTIONS         = 'INVALIDATE_COLLECTIONS';
 export const ADD_COLLECTION                 = 'ADD_COLLECTION';
 export const UPDATE_COLLECTION              = 'UPDATE_COLLECTION';
 export const DELETE_COLLECTION              = 'DELETE_COLLECTION';
 
 // Files
 export const FETCH_FILES                    = 'FETCH_FILES';
-export const INVALIDATE_FILES               = 'INVALIDATE_FILES';
 export const RENAME_FILE                    = 'RENAME_FILE';
 export const DELETE_FILE                    = 'DELETE_FILE';
 export const UPLOAD_FILES                   = 'UPLOAD_FILES';
@@ -39,7 +37,6 @@ export const CREATE_DIRECTORY               = 'CREATE_DIRECTORY';
 
 // Metadata
 export const FETCH_METADATA                 = 'FETCH_METADATA';
-export const INVALIDATE_METADATA            = 'INVALIDATE_METADATA';
 export const UPDATE_METADATA                = 'UPDATE_METADATA';
 export const COMBINE_METADATA               = 'COMBINE_METADATA';
 export const FETCH_METADATA_VOCABULARY      = 'FETCH_METADATA_VOCABULARY';
