@@ -56,12 +56,10 @@ jobs:
     - sh ./ci/trigger-travis/trigger-travis.sh --pro --branch dev $ORG workspace $TRAVIS_ACCESS_TOKEN
 
 notifications:
-  hipchat:
-    on_pull_requests: false
+  slack:
     rooms:
-      secure: "RY7CtICOIzSXNDXxtqqlCRzgheMfMNDbZKbkmffcuh2Z61G9uedL6IE1rInc1gWPCWAp/j2A7rtj7Hex1dbD2EckdLD1g8I0hN4bbK79J4tkhLlTxDX72zkJbGd43KbHZoe7DwfEZkj/LIti6m1dQ9Hfe9wo1TBBbnJvG/JOUz7noS0H74vVmxzzbCb7cFgssyrAn/yxXt4f0Amm2kRyjfcbsrVFaICiLV5Jz98hy9otcLc10S8+xp5k1tPPq1ESqTfUUF07uLtCx3vU3Exz/qVTDHqJml00ehI3oTUZkZjQJybBiTyVtdWw+LgG4m09D7x6XDxkJZz4JYR1OSve6v4GajFtFZ42s5IwxTXXry7+0WOqvIoxMBlhiw1zmegOycc+wIefIu7NjOu9KV0DJ4dcqVMC+p5nm5QL3bz/DJQ11aPuybbpEi81ms4j4O7bhAJGA9qsXppboCuiwsEHQ76ULtY0EAXUXzKb8ZuBd0rG04spv4vC7GEONqUaaB7zwi6r/MNh+lRgev7C1tL4Jlm8M36wt8FCg1e8ANKX+2k4xa29yIE6mwcA78Pr5yq73eH5vAzltiJQSkZtoh48/H6FVB171N6iCzvbdB65j8jZVO6Lpvj7OTGcTkhQE1GSqsgarpC2Ka+CFNW0L/hwOQdxdjMhMK06pZSpvS4dZ+E="
+     - secure: "xujLTGH8Vsmm3HDs02/utkTjhV+X4PY0FLOPdDUg0A38RZRgtQ+TeKerZmVBivK958e1KzsL/wPhTdeOHm7DJnanvWs1Jkw3mgbrHcaiagGjBdaEW8F30f2nsIibGWGDqzUZd5ifXYSugLNpJSpdFkVOseuWhUyTwjwrb4Ec/U/D24YvZUwX/kfi/waly57iFkxIkhq2XwcvtJtEDAzsKPhfwL67giV0flbGvCRL4xkvHERSr/HsXJ+V2NCaJ/qiSm8NkWq5gsrIIRkAA3mBSDs5Uq1ozAEI/DxN752O/OReghvjd249AEhzqJ0Ezyu0BjX3kYR1bP3gKB2/wOrLv069tAchY+KQF2F6Jh3AzGAEh0x5ARMsOxDkJybz5nXwMoYwsUjN9zGo8j9egbzkkxoVTK+MOf34jaSn7UBwAT239MaXB4Er1srJEZRqIzXVH0qwc/lC1QYX0fA89a5GdFjyN7EhfdlsvIp93nn8sjgj9iYsqS3yQboGBOSou1sboR8U/RsjPQowOkqMv8XIcjTUodirKNiRSdo5Wf+nGl4fgc3AS7rJcRaPLpbAvJZtXJzi4tutbU293q2k+bfvXbNz8R4IG7R4+MGdMWeSWDd9A0UBHgQkpXkb8Oxzr7PDAyDvhVEI5KewVy1PnV7dMCeRzSASjXTfPNnYpgBMw3E="
     template:
-    - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} -
-      <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
-    format: html
-    notify: true
+     - "Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository_slug}@%{branch}"
+     - "Latest commit: %{commit_message} - by %{author}"
+     - "Result:  %{result} in %{duration}"
