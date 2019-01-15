@@ -1,5 +1,5 @@
 import * as actionTypes from "../actions/actionTypes";
-import {COPY, CUT} from "../actions/clipboard";
+import {COPY, CUT} from '../constants';
 
 const defaultState = {
     type: null,

@@ -1,16 +1,13 @@
 import FileAPIFactory from "../services/FileAPI/FileAPIFactory";
-import {
-    CLIPBOARD_CLEAR, CLIPBOARD_COPY, CLIPBOARD_CUT, CLIPBOARD_PASTE
-} from "./actionTypes";
-
-export const CUT = 'CUT';
-export const COPY = 'COPY';
+import * as actionTypes from "./actionTypes";
+import {COPY, CUT} from '../constants';
 
 export const clear = () => ({
-    type: CLIPBOARD_CLEAR
+    type: actionTypes.CLIPBOARD_CLEAR
 });
 
-const extractBasename = filename => (filename.indexOf('/') > -1 ? filename.substring(filename.lastIndexOf('/') + 1) : filename);
+const extractBasename = filename => (filename.indexOf('/') > -1
+    ? filename.substring(filename.lastIndexOf('/') + 1) : filename);
 
 const canPaste = clipboard => clipboard.type && clipboard.filenames.length > 0;
 
@@ -22,12 +19,12 @@ const doPaste = (clipboard, collection, destinationDir) => {
     } if (clipboard.type === COPY) {
         return fileAPI.copyPaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
     }
+
     return Promise.reject(Error("Invalid clipboard type"));
 };
 
-
 const pasteAction = (clipboard, collection, destinationDir) => ({
-    type: CLIPBOARD_PASTE,
+    type: actionTypes.CLIPBOARD_PASTE,
     payload: doPaste(clipboard, collection, destinationDir),
     meta: {
         collection,
@@ -37,13 +34,13 @@ const pasteAction = (clipboard, collection, destinationDir) => ({
 });
 
 export const cut = (sourcedir, filenames) => ({
-    type: CLIPBOARD_CUT,
+    type: actionTypes.CLIPBOARD_CUT,
     sourcedir,
     filenames: filenames.map(extractBasename)
 });
 
 export const copy = (sourcedir, filenames) => ({
-    type: CLIPBOARD_COPY,
+    type: actionTypes.CLIPBOARD_COPY,
     sourcedir,
     filenames: filenames.map(extractBasename)
 });
