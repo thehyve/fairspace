@@ -49,14 +49,12 @@ class PidRepository(private val ds: Dataset) {
             WHERE
             {
               ?s <http://fairspace.io/ontology#filePath> ?o .
-              FILTER (STRSTARTS(?o, ?prefix))
+              FILTER (STRSTARTS(?o, CONCAT(?prefix, "/")) || (?o = ?prefix))
             }""")
                 .apply { setLiteral("prefix", prefix) }
                 .toString())
 
-        return calculateRead(ds) {
-            QueryExecutionFactory.create(query, ds.defaultModel).execSelect()
-        }
+        return QueryExecutionFactory.create(query, ds.defaultModel).execSelect()
     }
 
     fun findById(id: String): Pid? =

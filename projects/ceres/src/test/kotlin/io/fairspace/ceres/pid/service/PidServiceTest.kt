@@ -5,7 +5,6 @@ import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.repository.PidRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
-import org.apache.commons.lang3.RandomStringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,33 +27,28 @@ class PidServiceTest {
 
     @Test
     fun canFindEntityByUUID() {
-        val foundUUID = RandomStringUtils.random(10)
+        doReturn(Pid("foundId", "/found"))
+                .`when`(pidRepository).findById("foundId")
 
-        doReturn(Pid(foundUUID, "/found"))
-                .`when`(pidRepository).findById(foundUUID)
-
-        assertEquals(pidService.findById(foundUUID).value, "/found")
+        assertEquals(pidService.findById("foundId").value, "/found")
     }
 
     @Test(expected = MappingNotFoundException::class)
     fun throwsExceptionIfMappingNotFound() {
-        val notFoundUUID = RandomStringUtils.random(10)
-
         doReturn(null)
-                .`when`(pidRepository).findById(notFoundUUID)
+                .`when`(pidRepository).findById("notFoundUUID")
 
-        pidService.findById(notFoundUUID)
+        pidService.findById("notFoundUUID")
     }
 
     @Test
     fun canFindEntityByValue() {
-        val uuid =  RandomStringUtils.random(10)
         val value = "/test"
 
-        doReturn(Pid(uuid, value))
+        doReturn(Pid("id", value))
                 .`when`(pidRepository).findByValue(value)
 
-        assertTrue(pidService.findByValue(value).id.endsWith(uuid.toString()))
+        assertTrue(pidService.findByValue(value).id.endsWith("id"))
     }
 
     @Test(expected = MappingNotFoundException::class)
@@ -69,10 +63,10 @@ class PidServiceTest {
 
     @Test
     fun updateByPrefixUpdatesAll() {
-        val uuid1 = RandomStringUtils.random(10)
-        val uuid2 = RandomStringUtils.random(10)
-        val uuid3 = RandomStringUtils.random(10)
-        val uuid4 = RandomStringUtils.random(10)
+        val uuid1 = "id1"
+        val uuid2 = "id2"
+        val uuid3 = "id3"
+        val uuid4 = "id4"
 
         val input = listOf(
                 Pid(uuid1, "/input-prefix/abcdef"),
@@ -98,7 +92,7 @@ class PidServiceTest {
 
     @Test
     fun testFindOrCreateByValueWithExistingMapping() {
-        val existingPid = Pid(RandomStringUtils.random(10), "stored-value");
+        val existingPid = Pid("id", "stored-value");
         doReturn(existingPid).`when`(pidRepository).findByValue("value")
 
         val output = pidService.findOrCreateByValue("http://files", "value")
@@ -109,7 +103,7 @@ class PidServiceTest {
 
     @Test
     fun testFindOrCreateByValueWithNewMapping() {
-        val newPid = Pid(RandomStringUtils.random(10), "stored-value");
+        val newPid = Pid("id", "stored-value");
         doReturn(null).`when`(pidRepository).findByValue("new-value")
         doReturn(newPid).`when`(pidRepository).save(any())
 
