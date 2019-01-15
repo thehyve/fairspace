@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import PermissionsViewer from "./PermissionsViewer";
-import {alterPermission, fetchPermissionsIfNeeded} from "../../actions/permissions";
+import {alterPermission as alterPermissionActions, fetchPermissionsIfNeeded} from "../../actions/permissions";
 
 const mapStateToProps = (state, ownProps) => {
     const {
@@ -22,7 +22,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = {
-    alterPermission,
+    alterPermission: alterPermissionActions,
     fetchPermissionsIfNeeded
 };
 
