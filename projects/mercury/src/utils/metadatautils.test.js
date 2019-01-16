@@ -1,4 +1,4 @@
-import {getLabel, navigableLink} from "./metadatautils";
+import {getLabel, navigableLink} from "./metadataUtils";
 import {LABEL_URI} from "../constants";
 
 describe('getLabel', () => {

@@ -16,10 +16,10 @@ import ConfirmationDialog from "../common/ConfirmationDialog";
 import LoadingInlay from '../common/LoadingInlay';
 import LoadingOverlay from "../common/LoadingOverlay";
 import AlterPermissionContainer from "./AlterPermissionContainer";
-import {compareBy, comparing} from "../../utils/comparators";
+import {compareBy, comparing} from "../../utils/comparisionUtils";
 import getDisplayName from "../../utils/userUtils";
 import withHovered from "../common/WithHovered";
-import {findById} from "../../utils/arrayutils";
+import {findById} from "../../utils/arrayUtils";
 
 export const styles = () => ({
     collaboratorList: {

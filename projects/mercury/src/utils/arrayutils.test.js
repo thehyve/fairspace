@@ -1,4 +1,4 @@
-import {findById} from "./arrayutils";
+import {findById} from "./arrayUtils";
 
 describe('collectionUtils', () => {
     describe('getCollectionById', () => {

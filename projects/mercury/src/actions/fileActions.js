@@ -1,7 +1,7 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import FileAPI from "../services/FileAPI/FileAPI";
 import * as actionTypes from "./actionTypes";
-import {joinPaths} from '../utils/fileutils';
+import {joinPaths} from '../utils/fileUtils';
 
 export const invalidateFiles = (collection, path) => ({
     type: actionTypes.INVALIDATE_FETCH_FILES,

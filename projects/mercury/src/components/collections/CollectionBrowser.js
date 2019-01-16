@@ -10,7 +10,7 @@ import CollectionList from "./CollectionList";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as collectionActions from "../../actions/collectionActions";
 import GenericCollectionsScreen from "../common/GenericCollectionsScreen";
-import {findById} from "../../utils/arrayutils";
+import {findById} from "../../utils/arrayUtils";
 import CollectionEditor from "../common/CollectionEditor";
 import LoadingInlay from '../common/LoadingInlay';
 import LoadingOverlay from '../common/LoadingOverlay';

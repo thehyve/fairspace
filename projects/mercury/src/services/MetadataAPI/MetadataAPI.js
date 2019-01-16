@@ -1,7 +1,7 @@
 import * as jsonld from 'jsonld/dist/jsonld';
 import Config from "../Config/Config";
 import vocabulary from './vocabulary.json';
-import failOnHttpError from "../../utils/httputils";
+import failOnHttpError from "../../utils/httpUtils";
 import Vocabulary from "./Vocabulary";
 import {PROPERTY_URI, DOMAIN_URI} from '../../constants';
 

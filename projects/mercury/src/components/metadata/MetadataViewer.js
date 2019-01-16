@@ -2,7 +2,7 @@ import React from 'react';
 import List from '@material-ui/core/List';
 import {withStyles} from '@material-ui/core/styles';
 import MetadataProperty from "./MetadataProperty";
-import {isDateTimeProperty} from "../../utils/metadatautils";
+import {isDateTimeProperty} from "../../utils/metadataUtils";
 
 const styles = {
     root: {

@@ -5,7 +5,7 @@ import {withStyles} from '@material-ui/core/styles';
 import Icon from '@material-ui/core/Icon';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
-import {flattenShallow} from "../../utils/arrayutils";
+import {flattenShallow} from "../../utils/arrayUtils";
 import menuitems from "../../menuitems";
 
 const menuEntries = flattenShallow(menuitems.map(sublist => sublist.items));

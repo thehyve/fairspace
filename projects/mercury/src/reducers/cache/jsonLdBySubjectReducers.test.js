@@ -1,4 +1,4 @@
-import reducer from "./jsonLdBySubject";
+import reducer from "./jsonLdBySubjectReducers";
 import {FETCH_METADATA, UPDATE_METADATA} from "../../actions/actionTypes";
 
 describe('metadata retrieval', () => {

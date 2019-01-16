@@ -1,4 +1,4 @@
-import {uniqueName} from "./fileutils";
+import {uniqueName} from "./fileUtils";
 
 describe('uniqueName', () => {
     it('leaves already unique names untouched', () => {

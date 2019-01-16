@@ -6,7 +6,7 @@ import ErrorDialog from "./ErrorDialog";
 import * as collectionActions from '../../actions/collectionActions';
 import LoadingInlay from './LoadingInlay';
 import CollectionEditor from "./CollectionEditor";
-import {findById} from "../../utils/arrayutils";
+import {findById} from "../../utils/arrayUtils";
 import getDisplayName from "../../utils/userUtils";
 import permissionUtils from '../../utils/permissionUtils';
 

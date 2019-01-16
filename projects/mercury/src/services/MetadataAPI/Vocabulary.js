@@ -1,6 +1,6 @@
-import {compareBy, comparing} from "../../utils/comparators";
+import {compareBy, comparing} from "../../utils/comparisionUtils";
 import * as constants from "../../constants";
-import {getSingleValue} from "../../utils/metadatautils";
+import {getSingleValue} from "../../utils/metadataUtils";
 
 class Vocabulary {
     /**

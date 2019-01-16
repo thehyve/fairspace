@@ -2,7 +2,7 @@ import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux
 import MetadataAPI from "../services/MetadataAPI/MetadataAPI";
 import {TYPE_URI} from "../constants";
 import * as actionTypes from "./actionTypes";
-import {getSingleValue} from "../utils/metadatautils";
+import {getSingleValue} from "../utils/metadataUtils";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,

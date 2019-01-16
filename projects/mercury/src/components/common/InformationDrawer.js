@@ -13,7 +13,7 @@ import PermissionsContainer from "../permissions/PermissionsContainer";
 import PathMetadata from "../metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
 import permissionUtils from '../../utils/permissionUtils';
-import {findById} from "../../utils/arrayutils";
+import {findById} from "../../utils/arrayUtils";
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection) => {

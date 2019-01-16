@@ -12,7 +12,7 @@ import * as collectionBrowserActions from "../../actions/collectionBrowserAction
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
 import FileAPI from "../../services/FileAPI/FileAPI";
-import {splitPathIntoArray, joinPaths} from "../../utils/fileutils";
+import {splitPathIntoArray, joinPaths} from "../../utils/fileUtils";
 import GenericCollectionsScreen from "../common/GenericCollectionsScreen";
 
 class FileBrowser extends React.Component {

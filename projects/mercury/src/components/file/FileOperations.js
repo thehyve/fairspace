@@ -10,7 +10,7 @@ import ErrorDialog from "../common/ErrorDialog";
 import LoadingOverlay from '../common/LoadingOverlay';
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
-import {uniqueName} from "../../utils/fileutils";
+import {uniqueName} from "../../utils/fileUtils";
 
 function FileOperations(props) {
     const {

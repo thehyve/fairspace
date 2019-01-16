@@ -1,6 +1,6 @@
 import CreateWebdavClient from "webdav";
 import Config from "../Config/Config";
-import {joinPaths, addCounterToFilename} from '../../utils/fileutils';
+import {joinPaths, addCounterToFilename} from '../../utils/fileUtils';
 
 // Ensure that the window fetch method is used for webdav calls
 // and that is passes along the credentials

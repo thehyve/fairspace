@@ -4,7 +4,7 @@ import promiseMiddleware from "redux-promise-middleware";
 import {fetchJsonLdBySubjectIfNeeded} from "./metadataActions";
 import Config from "../services/Config/Config";
 import configFile from "../config";
-import mockResponse from "../utils/mockResponse";
+import mockResponse from "../utils/testUtils";
 import {FETCH_METADATA} from "./actionTypes";
 
 const subject = 'my-subject';
