@@ -1,5 +1,5 @@
 import {getLabel, navigableLink} from "./metadatautils";
-import {LABEL_URI} from "../services/MetadataAPI/MetadataAPI";
+import {LABEL_URI} from "../constants";
 
 describe('getLabel', () => {
     it('should return the label if present', () => {

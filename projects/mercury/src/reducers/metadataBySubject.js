@@ -1,7 +1,7 @@
 import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../utils/redux";
 import * as actionTypes from "../actions/actionTypes";
-import {TYPE_URI} from "../services/MetadataAPI/MetadataAPI";
+import {TYPE_URI} from "../constants";
 
 const defaultState = {
     creatingMetadataEntity: false

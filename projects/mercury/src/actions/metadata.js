@@ -1,5 +1,6 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import MetadataAPI, {TYPE_URI} from "../services/MetadataAPI/MetadataAPI";
+import MetadataAPI from "../services/MetadataAPI/MetadataAPI";
+import {TYPE_URI} from "../constants";
 import * as actionTypes from "./actionTypes";
 import {getSingleValue} from "../utils/metadatautils";
 

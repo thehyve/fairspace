@@ -1,4 +1,4 @@
-import {LABEL_URI} from "../services/MetadataAPI/MetadataAPI";
+import {LABEL_URI} from "../constants";
 
 /**
  *

@@ -1,16 +1,5 @@
 import {compareBy, comparing} from "../../utils/comparators";
-import {
-    ALLOW_MULTIPLE_URI,
-    MACHINE_ONLY_URI,
-    CLASS_URI,
-    DOMAIN_URI,
-    FAIRSPACE_ENTITY_URI,
-    LABEL_URI,
-    COMMENT_URI,
-    MULTILINE_PROPERTY_URI,
-    PROPERTY_URI,
-    RANGE_URI
-} from "./MetadataAPI";
+import * as constants from "../../constants";
 import {getSingleValue} from "../../utils/metadatautils";
 
 class Vocabulary {
@@ -87,7 +76,7 @@ class Vocabulary {
      */
     getFairspaceClasses() {
         return this.vocabulary
-            .filter(entry => entry['@type'].includes(CLASS_URI) && getSingleValue(entry, FAIRSPACE_ENTITY_URI));
+            .filter(entry => entry['@type'].includes(constants.CLASS_URI) && getSingleValue(entry, constants.FAIRSPACE_ENTITY_URI));
     }
 
     /**
@@ -185,9 +174,9 @@ class Vocabulary {
      * @param type
      */
     determinePredicatesForType(type) {
-        const isProperty = entry => entry['@type'].includes(PROPERTY_URI);
+        const isProperty = entry => entry['@type'].includes(constants.PROPERTY_URI);
 
-        const isInDomain = entry => entry[DOMAIN_URI] && entry[DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
+        const isInDomain = entry => entry[constants.DOMAIN_URI] && entry[constants.DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
 
         const predicates = this.vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
         return predicates;
@@ -212,10 +201,10 @@ class Vocabulary {
      */
     static generatePropertyEntry(predicate, values, vocabularyEntry) {
         const label = Vocabulary.getLabel(vocabularyEntry);
-        const range = Vocabulary.getFirstPredicateId(vocabularyEntry, RANGE_URI);
-        const allowMultiple = Vocabulary.getFirstPredicateValue(vocabularyEntry, ALLOW_MULTIPLE_URI, false);
-        const machineOnly = Vocabulary.getFirstPredicateValue(vocabularyEntry, MACHINE_ONLY_URI, false);
-        const multiLine = Vocabulary.getFirstPredicateValue(vocabularyEntry, MULTILINE_PROPERTY_URI, false);
+        const range = Vocabulary.getFirstPredicateId(vocabularyEntry, constants.RANGE_URI);
+        const allowMultiple = Vocabulary.getFirstPredicateValue(vocabularyEntry, constants.ALLOW_MULTIPLE_URI, false);
+        const machineOnly = Vocabulary.getFirstPredicateValue(vocabularyEntry, constants.MACHINE_ONLY_URI, false);
+        const multiLine = Vocabulary.getFirstPredicateValue(vocabularyEntry, constants.MULTILINE_PROPERTY_URI, false);
         const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
         return {
@@ -242,16 +231,16 @@ class Vocabulary {
     }
 
     static getLabel(vocabularyEntry) {
-        return this.getFirstPredicateValue(vocabularyEntry, LABEL_URI, '');
+        return this.getFirstPredicateValue(vocabularyEntry, constants.LABEL_URI, '');
     }
 
     static getComment(vocabularyEntry) {
-        return this.getFirstPredicateValue(vocabularyEntry, COMMENT_URI, '');
+        return this.getFirstPredicateValue(vocabularyEntry, constants.COMMENT_URI, '');
     }
 
     static lookupLabel(id, allMetadata) {
         const entry = allMetadata.find(element => element['@id'] === id);
-        return Vocabulary.getFirstPredicateValue(entry, LABEL_URI);
+        return Vocabulary.getFirstPredicateValue(entry, constants.LABEL_URI);
     }
 }
 
