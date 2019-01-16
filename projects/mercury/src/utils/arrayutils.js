@@ -9,25 +9,6 @@ export function findById(itemList, itemId) {
 }
 
 /**
- * Joins an array with JSX entries together
- * @param array
- * @param str
- * @returns {Array}
- */
-export const jsxJoin = (array, str) => {
-    if (!array || array.length === 0) return [];
-
-    const returnArray = [];
-    Object.keys(array).forEach(idx => {
-        if (idx > 0) {
-            returnArray.push(str);
-        }
-        returnArray.push(array[idx]);
-    });
-    return returnArray;
-};
-
-/**
  * Flattens the given array with a depth of 1
  * @param array
  * @returns {*}
