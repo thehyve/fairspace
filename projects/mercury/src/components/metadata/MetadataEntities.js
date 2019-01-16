@@ -8,7 +8,7 @@ import TableBody from "@material-ui/core/TableBody/TableBody";
 import {Column, Row} from "simple-flexbox";
 import {withRouter} from 'react-router-dom';
 import {getLabel, navigableLink, relativeLink} from "../../utils/metadatautils";
-import * as metadataActions from "../../actions/metadata";
+import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import ErrorMessage from "../common/ErrorMessage";
 import ErrorDialog from "../common/ErrorDialog";

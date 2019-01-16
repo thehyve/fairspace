@@ -15,7 +15,7 @@ import {connect} from "react-redux";
 import {generateUuid, getLabel} from "../../utils/metadatautils";
 import {compareBy} from "../../utils/comparators";
 import LoadingInlay from '../common/LoadingInlay';
-import {fetchMetadataVocabularyIfNeeded} from "../../actions/metadata";
+import {fetchMetadataVocabularyIfNeeded} from "../../actions/metadataActions";
 
 class NewMetadataEntityDialog extends React.Component {
     constructor(props) {

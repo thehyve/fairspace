@@ -1,4 +1,4 @@
-import reducer from "./permissionsByCollection";
+import reducer from "./permissionsByCollectionReducers";
 
 describe('updating permissions', () => {
     it('should add collaborators', () => {

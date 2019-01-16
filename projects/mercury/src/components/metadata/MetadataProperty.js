@@ -8,7 +8,7 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import {connect} from 'react-redux';
 import ListItemText from "@material-ui/core/ListItemText";
 import {compose} from "redux";
-import {updateMetadata as updateMetadataAction} from "../../actions/metadata";
+import {updateMetadata as updateMetadataAction} from "../../actions/metadataActions";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ErrorDialog from "../common/ErrorDialog";
 import withHovered from "../common/WithHovered";

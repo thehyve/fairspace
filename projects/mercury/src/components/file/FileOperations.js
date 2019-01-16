@@ -8,8 +8,8 @@ import CreateDirectoryButton from "../common/buttons/CreateDirectoryButton";
 import UploadButton from "../common/buttons/UploadButton";
 import ErrorDialog from "../common/ErrorDialog";
 import LoadingOverlay from '../common/LoadingOverlay';
-import * as clipboardActions from "../../actions/clipboard";
-import * as fileActions from "../../actions/files";
+import * as clipboardActions from "../../actions/clipboardActions";
+import * as fileActions from "../../actions/fileActions";
 import {uniqueName} from "../../utils/fileutils";
 
 function FileOperations(props) {

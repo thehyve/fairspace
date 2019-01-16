@@ -1,13 +1,13 @@
 import {combineReducers} from 'redux';
-import jsonLdBySubject from './jsonLdBySubject';
-import vocabulary from "./vocabulary";
-import entitiesByType from "./entitiesByType";
-import collections from "./collections";
-import filesByCollectionAndPath from "./filesByCollectionAndPath";
-import users from "./users";
-import allEntities from "./allEntities";
-import subjectByPath from "./subjectByPath";
-import permissionsByCollection from "./permissionsByCollection";
+import jsonLdBySubject from './jsonLdBySubjectReducers';
+import vocabulary from "./vocabularyReducers";
+import entitiesByType from "./entitiesByTypeReducers";
+import collections from "./collectionReducers";
+import filesByCollectionAndPath from "./filesByCollectionAndPathReducers";
+import users from "./usersReducers";
+import allEntities from "./allEntitiesReducers";
+import subjectByPath from "./subjectByPathReducers";
+import permissionsByCollection from "./permissionsByCollectionReducers";
 
 export default combineReducers({
     jsonLdBySubject,

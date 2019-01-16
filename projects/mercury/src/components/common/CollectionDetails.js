@@ -3,7 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import Icon from "@material-ui/core/Icon";
 import {connect} from 'react-redux';
 import ErrorDialog from "./ErrorDialog";
-import * as collectionActions from '../../actions/collections';
+import * as collectionActions from '../../actions/collectionActions';
 import LoadingInlay from './LoadingInlay';
 import CollectionEditor from "./CollectionEditor";
 import {findById} from "../../utils/arrayutils";

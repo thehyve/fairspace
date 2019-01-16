@@ -11,7 +11,7 @@ import CollectionDetails from "./CollectionDetails";
 import Metadata from "../metadata/Metadata";
 import PermissionsContainer from "../permissions/PermissionsContainer";
 import PathMetadata from "../metadata/PathMetadata";
-import * as metadataActions from "../../actions/metadata";
+import * as metadataActions from "../../actions/metadataActions";
 import permissionUtils from '../../utils/permissionUtils';
 import {findById} from "../../utils/arrayutils";
 
