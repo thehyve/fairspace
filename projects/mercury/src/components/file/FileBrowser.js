@@ -11,7 +11,7 @@ import permissionUtils from '../../utils/permissionUtils';
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
-import FileAPI from "../../services/FileAPI/FileAPI";
+import FileAPI from "../../services/FileAPI";
 import {splitPathIntoArray, joinPaths} from "../../utils/fileUtils";
 
 class FileBrowser extends React.Component {

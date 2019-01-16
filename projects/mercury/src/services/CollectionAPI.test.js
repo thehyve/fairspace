@@ -1,6 +1,6 @@
 import CollectionAPI from "./CollectionAPI";
-import Config from "../Config/Config";
-import mockResponse from "../../utils/testUtils";
+import Config from "./Config/Config";
+import mockResponse from "../utils/testUtils";
 
 beforeAll(() => {
     Config.setConfig({

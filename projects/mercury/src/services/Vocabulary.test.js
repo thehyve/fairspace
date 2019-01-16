@@ -1,7 +1,7 @@
 import Vocabulary from './Vocabulary';
 import {
     DOMAIN_URI, LABEL_URI, PROPERTY_URI, RANGE_URI
-} from "../../constants";
+} from "../constants";
 
 const vocabularyJsonLd = [
     {

@@ -5,7 +5,7 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import ConnectedMetadata, {Metadata} from "./Metadata";
-import Vocabulary from "../../services/MetadataAPI/Vocabulary";
+import Vocabulary from "../../services/Vocabulary";
 import MetadataViewer from "./MetadataViewer";
 import Config from "../../services/Config/Config";
 import {PROPERTY_URI, LABEL_URI, DOMAIN_URI, CLASS_URI} from '../../constants';

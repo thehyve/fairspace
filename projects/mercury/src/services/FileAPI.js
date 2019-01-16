@@ -1,6 +1,6 @@
 import CreateWebdavClient from "webdav";
-import Config from "../Config/Config";
-import {joinPaths, addCounterToFilename} from '../../utils/fileUtils';
+import Config from "./Config/Config";
+import {joinPaths, addCounterToFilename} from '../utils/fileUtils';
 
 // Ensure that the window fetch method is used for webdav calls
 // and that is passes along the credentials
@@ -57,10 +57,9 @@ class FileAPI {
         }
 
         const fullPath = this.getFullPath(path);
+        const allPromises = files.map(file => this.client.putFileContents(`${fullPath}/${nameMapping.get(file.name)}`, file));
 
-        return Promise.all(
-            files.map(file => this.client.putFileContents(`${fullPath}/${nameMapping.get(file.name)}`, file))
-        ).then(() => files);
+        return Promise.all(allPromises).then(() => files);
     }
 
     /**

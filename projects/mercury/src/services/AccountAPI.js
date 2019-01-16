@@ -1,5 +1,5 @@
-import Config from "../Config/Config";
-import failOnHttpError from "../../utils/httpUtils";
+import Config from "./Config/Config";
+import failOnHttpError from "../utils/httpUtils";
 
 class AccountAPI {
     getUser() {

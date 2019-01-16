@@ -1,5 +1,5 @@
 import FileAPI from "./FileAPI";
-import Config from "../Config/Config";
+import Config from "./Config/Config";
 
 beforeAll(() => {
     Config.setConfig({
@@ -20,8 +20,9 @@ it('uses the collection name in the webdav path', () => {
 it('uploads multiple files', () => {
     const fileAPI = new FileAPI('subdir');
     fileAPI.client = {putFileContents: jest.fn(() => Promise.resolve())};
+    const files = [{name: 'filea.txt'}, {name: 'fileb.txt'}, {name: 'filec.txt'}];
 
-    const result = fileAPI.upload('', [{name: 'filea.txt'}, {name: 'fileb.txt'}, {name: 'filec.txt'}], new Map());
-    expect(result).resolves;
+    const result = fileAPI.upload('', files, new Map());
+    expect(result).resolves.toEqual(files);
     expect(fileAPI.client.putFileContents.mock.calls.length).toEqual(3);
 });

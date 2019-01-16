@@ -1,6 +1,6 @@
 import {format} from 'util';
-import Config from '../Config/Config';
-import failOnHttpError from "../../utils/httpUtils";
+import Config from './Config/Config';
+import failOnHttpError from "../utils/httpUtils";
 
 class PermissionAPI {
     static changeHeaders = new Headers({'Content-Type': 'application/json'});

@@ -1,6 +1,6 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {FETCH_USERS, FETCH_WORKSPACE} from "./actionTypes";
-import WorkspaceAPI from "../services/WorkspaceAPI/WorkspaceAPI";
+import WorkspaceAPI from "../services/WorkspaceAPI";
 
 export const fetchWorkspace = createErrorHandlingPromiseAction(() => ({
     type: FETCH_WORKSPACE,

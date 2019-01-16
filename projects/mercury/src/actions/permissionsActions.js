@@ -1,4 +1,4 @@
-import PermissionAPI from '../services/PermissionAPI/PermissionAPI';
+import PermissionAPI from '../services/PermissionAPI';
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {ALTER_PERMISSION, FETCH_PERMISSIONS} from "./actionTypes";
 
