@@ -11,14 +11,13 @@ import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import IconButton from '@material-ui/core/IconButton';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Menu from "@material-ui/core/Menu";
-import ErrorMessage from "../common/ErrorMessage";
-import ConfirmationDialog from "../common/ConfirmationDialog";
-import LoadingInlay from '../common/LoadingInlay';
-import LoadingOverlay from "../common/LoadingOverlay";
+import {
+    ErrorMessage, ConfirmationDialog, LoadingInlay,
+     LoadingOverlay, withHovered
+} from "../common";
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import {compareBy, comparing} from "../../utils/comparisionUtils";
 import getDisplayName from "../../utils/userUtils";
-import withHovered from "../common/WithHovered";
 import {findById} from "../../utils/arrayUtils";
 
 export const styles = () => ({

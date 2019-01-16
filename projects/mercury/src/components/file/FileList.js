@@ -12,11 +12,10 @@ import {Row} from "simple-flexbox";
 import {withStyles} from '@material-ui/core/styles';
 import {compose} from "redux";
 import Paper from "@material-ui/core/Paper";
-import ClickHandler from "../common/ClickHandler";
-import withHovered from "../common/WithHovered";
-import ButtonWithVerification from "../common/buttons/ButtonWithVerification";
-import RenameButton from "../common/buttons/RenameButton";
-import DateTime from "../common/DateTime";
+import {
+    ClickHandler, ButtonWithVerification,
+    RenameButton, withHovered, DateTime
+} from "../common";
 import Bytes from "./Bytes";
 import styles from './FileList.styles';
 

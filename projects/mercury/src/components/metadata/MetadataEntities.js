@@ -10,10 +10,7 @@ import {withRouter} from 'react-router-dom';
 import {getLabel, navigableLink, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
-import ErrorMessage from "../common/ErrorMessage";
-import ErrorDialog from "../common/ErrorDialog";
-import LoadingInlay from '../common/LoadingInlay';
-import LoadingOverlay from '../common/LoadingOverlay';
+import {ErrorMessage, ErrorDialog, LoadingInlay, LoadingOverlay} from "../common";
 
 class MetadataEntities extends React.Component {
     componentDidMount() {

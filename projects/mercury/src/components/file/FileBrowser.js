@@ -1,10 +1,10 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
-import ErrorDialog from "../common/ErrorDialog";
-import ErrorMessage from "../common/ErrorMessage";
-import BreadCrumbs from "../common/BreadCrumbs";
-import LoadingInlay from '../common/LoadingInlay';
+import {
+    ErrorDialog, ErrorMessage, BreadCrumbs,
+    LoadingInlay, GenericCollectionsScreen
+} from "../common";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import permissionUtils from '../../utils/permissionUtils';
@@ -13,7 +13,6 @@ import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
 import FileAPI from "../../services/FileAPI/FileAPI";
 import {splitPathIntoArray, joinPaths} from "../../utils/fileUtils";
-import GenericCollectionsScreen from "../common/GenericCollectionsScreen";
 
 class FileBrowser extends React.Component {
     componentDidMount() {
