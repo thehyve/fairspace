@@ -16,10 +16,6 @@ import javax.validation.ValidationException
 
 @Component
 class ModelRepository(private val dataset: Dataset, private val modelChangedListener: ModelChangedListener) {
-//    init {
-//        dataset.defaultModel.register(modelChangedListener)
-//    }
-
     private val log = logger {}
 
     fun list(subject: String? = null, predicate: String? = null, obj: String? = null): Model {
