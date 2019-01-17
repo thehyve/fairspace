@@ -1,11 +1,10 @@
 package io.fairspace.ceres.pid.service
 
 import io.fairspace.ceres.pid.exception.MappingNotFoundException
-import io.fairspace.ceres.pid.exception.ValueAlreadyExistsException
 import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.repository.PidRepository
+import org.apache.commons.codec.digest.DigestUtils.md5Hex
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class PidService(val repository: PidRepository) {
@@ -22,7 +21,7 @@ class PidService(val repository: PidRepository) {
             repository.findByValueStartingWith(prefix)
 
     fun findOrCreateByValue(prefix: String, value: String) =
-            repository.findByValue(value) ?: repository.save(Pid(prefix + UUID.randomUUID(), value))
+            repository.findByValue(value) ?: repository.save(Pid(prefix + md5Hex(value), value))
 
     fun updateByPrefix(oldPrefix: String, newPrefix: String) {
         repository.saveAll(
