@@ -5,7 +5,7 @@ import io.fairspace.ceres.CeresApplication
 import io.fairspace.ceres.pid.model.Pid
 import org.apache.jena.query.Dataset
 import org.apache.jena.query.DatasetFactory.createTxnMem
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner
 @RunWith(SpringRunner::class)
 @SpringBootTest
 @DirtiesContext
-open class PidRepositoryTest {
+class PidRepositoryTest {
     @Configuration
     @Import(CeresApplication::class)
     class TestConfig {
@@ -61,11 +61,37 @@ open class PidRepositoryTest {
 
         pidRepository.deleteByValueStartingWith("prefix1")
 
-        val pids = pidRepository.findAll().toList()
+        val pids = pidRepository.findAll()
         val values = pids.map { p -> p.value }
 
         assertEquals(4, pids.size)
         assert(!values.contains("prefix1/abc"))
         assert(!values.contains("prefix1"))
+    }
+
+    @Test
+    fun testFindByValue() {
+        assertEquals(Pid("2", "prefix1"), pidRepository.findByValue("prefix1"))
+        assertNull(pidRepository.findByValue("free cheese"))
+    }
+
+    @Test
+    fun testDeleteByValue() {
+        assertNotNull(pidRepository.findByValue("prefix1"))
+        pidRepository.deleteByValue("prefix1")
+        assertNull(pidRepository.findByValue("prefix1"))
+    }
+
+    @Test
+    fun testDeleteById() {
+        assertNotNull(pidRepository.findById("1"))
+        pidRepository.deleteById("1")
+        assertNull(pidRepository.findById("1"))
+    }
+
+    @Test
+    fun testFindById() {
+        assertNotNull(pidRepository.findById("1"))
+        assertNull(pidRepository.findById("0"))
     }
 }

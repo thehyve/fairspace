@@ -68,7 +68,7 @@ class PidRepository(private val ds: Dataset) {
             }
 
     fun saveAll(pids: List<Pid>): List<Pid> =
-            calculateWrite(ds) { pids.map { save(it) } }
+            calculateWrite(ds) { pids.map(this::save) }
 
     fun deleteById(id: String) {
         executeWrite(ds) {
