@@ -95,21 +95,21 @@ class PidServiceTest {
         val existingPid = Pid("id", "stored-value");
         doReturn(existingPid).`when`(pidRepository).findByValue("value")
 
-        val output = pidService.findOrCreateByValue("http://files", "value")
+        val output = pidService.findOrCreateByValue("http://files/", "value")
 
-        assertEquals("stored-value", output.value)
+        assertEquals(existingPid, output)
         verify(pidRepository, times(0)).save(ArgumentMatchers.any())
     }
 
     @Test
     fun testFindOrCreateByValueWithNewMapping() {
-        val newPid = Pid("id", "stored-value");
+        val newPid = Pid("http://files/57112d58563bfa5ab52fedee81ee0d07", "new-value");
         doReturn(null).`when`(pidRepository).findByValue("new-value")
-        doReturn(newPid).`when`(pidRepository).save(any())
+        doReturn(newPid).`when`(pidRepository).save(newPid)
 
-        val output = pidService.findOrCreateByValue("http://files","new-value")
+        val output = pidService.findOrCreateByValue("http://files/","new-value")
 
-        assertEquals("stored-value", output.value)
+        assertEquals(newPid, output)
         verify(pidRepository).save(ArgumentMatchers.argThat { it!!.value == "new-value" })
     }
 
