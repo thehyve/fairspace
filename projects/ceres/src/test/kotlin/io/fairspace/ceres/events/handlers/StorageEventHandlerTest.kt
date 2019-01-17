@@ -99,7 +99,7 @@ class StorageEventHandlerTest {
         val event = StorageEvent(path = "/collection-1/subdir", destination = "/collection-1/subdir2", type = PathType.DIRECTORY, collection = Collection(uri = collectionUri))
 
         // Original identifiers
-        `when`(pidService.findByPrefix("/collection-1/subdir")).thenReturn(listOf(
+        `when`(pidService.findByValueStartingWith("/collection-1/subdir")).thenReturn(listOf(
                 Pid("http://dir", "/collection-1/subdir"),
                 Pid("http://file", "/collection-1/subdir/file1"),
                 Pid("http://subdir", "/collection-1/subdir/dir2"),
@@ -141,7 +141,7 @@ class StorageEventHandlerTest {
         val event = StorageEvent(path = "/collection-1/subdir", destination = "/collection-1/subdir2/nested", type = PathType.DIRECTORY, collection = Collection(uri = collectionUri))
 
         // Original identifiers
-        `when`(pidService.findByPrefix("/collection-1/subdir")).thenReturn(listOf(
+        `when`(pidService.findByValueStartingWith("/collection-1/subdir")).thenReturn(listOf(
                 Pid("${prefix}dir", "/collection-1/subdir")
         ))
 
@@ -164,7 +164,7 @@ class StorageEventHandlerTest {
 
         handler.receiveDeleteMessage(event)
 
-        verify(pidService).deleteByPrefix("/collection-1/subdir")
+        verify(pidService).deleteByValueStartingWith("/collection-1/subdir")
 
     }
 

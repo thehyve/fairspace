@@ -17,11 +17,11 @@ class PidService(val repository: PidRepository) {
                     ?: throw MappingNotFoundException("Value not found: $value")
 
 
-    fun findByPrefix(prefix: String) =
+    fun findByValueStartingWith(prefix: String) =
             repository.findByValueStartingWith(prefix)
 
-    fun findOrCreateByValue(prefix: String, value: String) =
-            repository.findByValue(value) ?: repository.save(Pid(prefix + md5Hex(value), value))
+    fun findOrCreateByValue(uriPrefix: String, value: String) =
+            repository.findByValue(value) ?: repository.save(Pid(uriPrefix + md5Hex(value), value))
 
     fun updateByPrefix(oldPrefix: String, newPrefix: String) {
         repository.saveAll(
@@ -36,6 +36,6 @@ class PidService(val repository: PidRepository) {
     fun deleteByValue(value: String) =
             repository.deleteByValue(value)
 
-    fun deleteByPrefix(prefix: String) =
+    fun deleteByValueStartingWith(prefix: String) =
             repository.deleteByValueStartingWith(prefix)
 }

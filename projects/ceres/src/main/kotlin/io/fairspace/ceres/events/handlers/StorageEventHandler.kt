@@ -67,7 +67,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         val destination = message.destination!!
 
         // Retrieve all mappings for the oldPath
-        val sourceIdentifiers = pidService.findByPrefix(source)
+        val sourceIdentifiers = pidService.findByValueStartingWith(source)
         log.trace { "Found ${sourceIdentifiers.size} identifiers with the prefix $source - $sourceIdentifiers" }
 
         // We get a mapping for every descendant of the source
@@ -106,7 +106,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         if (isInvalidMessage(message)) return
 
         // Delete the mappings for this path (and underlying paths)
-        pidService.deleteByPrefix(message.path)
+        pidService.deleteByValueStartingWith(message.path)
     }
 
     /**
