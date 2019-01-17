@@ -4,7 +4,6 @@ import mu.KotlinLogging.logger
 import org.apache.jena.query.*
 import org.apache.jena.query.Query.*
 import org.apache.jena.rdf.model.Model
-import org.apache.jena.rdf.model.ModelChangedListener
 import org.apache.jena.rdf.model.ModelFactory.createDefaultModel
 import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.sparql.resultset.ResultSetMem
@@ -15,7 +14,7 @@ import java.net.URISyntaxException
 import javax.validation.ValidationException
 
 @Component
-class ModelRepository(private val dataset: Dataset, private val modelChangedListener: ModelChangedListener) {
+class ModelRepository(private val dataset: Dataset, private val modelTransformer: (Model) -> Model = { it }) {
     private val log = logger {}
 
     fun list(subject: String? = null, predicate: String? = null, obj: String? = null): Model {
@@ -126,17 +125,12 @@ class ModelRepository(private val dataset: Dataset, private val modelChangedList
         }
     }
 
-    private fun <R> read(action: Model.() -> R): R = calculateRead(dataset) { dataset.defaultModel.action() }
+    private fun <R> read(action: Model.() -> R): R = calculateRead(dataset) { model.action() }
 
-    private fun write(action: Model.() -> Unit): Unit = executeWrite(dataset) {
-        val m = dataset.defaultModel
-        m.register(modelChangedListener)
-        try {
-            return@executeWrite m.action()
-        } finally {
-            m.unregister(modelChangedListener)
-        }
-    }
+    private fun write(action: Model.() -> Unit): Unit = executeWrite(dataset) { model.action() }
+
+    private val model
+        get() = modelTransformer(dataset.defaultModel)
 
     private fun Model.toResource(s: String?) = s?.let(this::createResource)
 

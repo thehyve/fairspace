@@ -5,7 +5,6 @@ import org.apache.jena.query.Dataset
 import org.apache.jena.query.DatasetFactory.createTxnMem
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
-import org.apache.jena.reasoner.Reasoner
 import org.apache.jena.vocabulary.VCARD
 import org.junit.Assert.*
 import org.junit.Before
@@ -14,12 +13,11 @@ import org.junit.Test
 class ModelRepositoryTest {
     lateinit var repo: ModelRepository
     lateinit var dataset: Dataset
-    lateinit var reasoner: Reasoner
 
     @Before
     fun setUp() {
         dataset = createTxnMem()
-        repo = ModelRepository(dataset, PropertyInverter(dataset.defaultModel, emptyList()))
+        repo = ModelRepository(dataset)
     }
 
     @Test

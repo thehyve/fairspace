@@ -1,6 +1,7 @@
 package io.fairspace.ceres.config
 
 import io.fairspace.ceres.metadata.repository.OwlPropertyInverter
+import org.apache.jena.rdf.model.Model
 import org.apache.jena.tdb2.TDB2Factory.connectDataset
 import org.apache.jena.util.FileManager
 import org.springframework.beans.factory.annotation.Value
@@ -16,5 +17,10 @@ class JenaConfiguration {
     fun dataset() = connectDataset(datasetPath)
 
     @Bean
-    fun listener() = OwlPropertyInverter(dataset().defaultModel, FileManager.get().loadModel("inference-model.jsonld"))
+    fun inferenceModel() = FileManager.get().loadModel("inference-model.jsonld")
+
+    @Bean
+    fun modelTransformer(): (Model) -> Model = {
+        it.register(OwlPropertyInverter(it, inferenceModel()))
+    }
 }

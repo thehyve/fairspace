@@ -11,7 +11,7 @@ import javax.validation.ValidationException
 
 open class PropertyInverter(private val model: Model, properties: Iterable<Pair<String, String>>): StatementListener() {
 
-    private val map = mutableMapOf<Property, Property>().apply {
+    private val inversePropertiesMap = mutableMapOf<Property, Property>().apply {
         properties.forEach {
             val p1 = createProperty(it.first)
             val p2 = createProperty(it.second)
@@ -21,25 +21,29 @@ open class PropertyInverter(private val model: Model, properties: Iterable<Pair<
     }
 
     override fun addedStatement(s: Statement) {
-        invert(s, true)
+        process(s) { inverse ->
+            if (!model.contains(inverse)) {
+                model.add(inverse)
+            }
+        }
     }
 
     override fun removedStatement(s: Statement) {
-       invert(s, false)
+        process(s) { inverse ->
+            if (model.contains(inverse)) {
+                model.remove(inverse)
+            }
+        }
     }
 
-    private fun invert(s: Statement, add: Boolean) {
-            map[s.predicate]?.also {
-                if(!s.`object`.isResource) {
-                    throw ValidationException("Statement $s cannot be inverted, its object is not a RDF resource")
-                }
-
-                if (add && !model.contains(s.`object`.asResource(), it, s.subject)) {
-                    model.add(s.`object`.asResource(), it, s.subject)
-                } else if (model.contains(s.`object`.asResource(), it, s.subject)) {
-                    model.remove(s.`object`.asResource(), it, s.subject)
-                }
+    private fun process(s: Statement, inverseStmtHandler: (Statement) -> Unit) {
+        inversePropertiesMap[s.predicate]?.also {
+            if(!s.`object`.isResource) {
+                throw ValidationException("Statement $s cannot be inverted, its object is not a RDF resource")
             }
+
+            inverseStmtHandler(model.createStatement(s.`object`.asResource(), it, s.subject))
+        }
     }
 }
 class OwlPropertyInverter(targetModel: Model, inversionModel: Model) : PropertyInverter(targetModel,
