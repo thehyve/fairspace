@@ -1188,6 +1188,27 @@
               "@id": "rdfs:Resource"
             }
           ]
+        },
+        {
+          "@id": "fs:filePath",
+          "@type": "rdf:Property",
+          "fs:allowMultiple": false,
+          "rdfs:comment": "File path",
+          "fs:machineOnly": true,
+          "rdfs:domain": [
+            {
+              "@id": "fs:File"
+            },
+            {
+              "@id": "fs:Directory"
+            }
+          ],
+          "rdfs:label": "File path",
+          "rdfs:range": [
+            {
+              "@id": "xsd:string"
+            }
+          ]
         }
     ]
 }
