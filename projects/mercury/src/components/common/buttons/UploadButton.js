@@ -33,82 +33,39 @@ const styles = {
 };
 
 class UploadButton extends React.Component {
-    constructor(props) {
-        super(props);
-        const {
-            onDidUpload,
-            onUpload,
-            children,
-            classes,
-            ...componentProps
-        } = props;
-
-        this.onDidUpload = onDidUpload;
-        this.onUpload = onUpload;
-        this.componentProps = componentProps;
-
-        this.state = {
-            uploading: false,
-            files: {}
-        };
-    }
-
-    componentWillReceiveProps(props) {
-        this.onDidUpload = props.onDidUpload;
-        this.onUpload = props.onUpload;
-
-        this.setState({
-            uploading: false,
-            files: {}
-        });
-    }
+    state = {
+        uploading: false,
+        filesUploaded: false,
+        files: []
+    };
 
     openDialog = (e) => {
         e.stopPropagation();
-        this.filesUploaded = false;
-        this.setState({uploading: true});
+        this.setState({uploading: true, filesUploaded: false});
     }
 
     closeDialog = (e) => {
         if (e) e.stopPropagation();
-        if (this.filesUploaded && this.onDidUpload) {
-            this.onDidUpload();
+        if (this.state.filesUploaded && this.props.onDidUpload) {
+            this.props.onDidUpload();
         }
-
-        this.setState({
-            uploading: false,
-            files: {}
-        });
     }
 
     uploadFiles = (files, names) => {
-        this.filesUploaded = true;
-        if (this.onUpload) {
-            this.startUploading(files);
-            this.onUpload(files, names)
-                .then(this.finishUploading.bind(this));
+        if (this.props.onUpload) {
+            this.setFilesState(files, 'uploading');
+            this.props.onUpload(files, names)
+                .then(() => this.setFilesState(files, 'uploaded'));
         }
     }
 
-    startUploading(files) {
-        this.setFilesState(files, 'uploading');
-    }
-
-    finishUploading(files) {
-        this.setFilesState(files, 'uploaded');
-    }
-
-    setFilesState(files, fileState) {
-        this.setState(prevState => {
-            // Add these file to a copy of the current map with files
-            const filesMap = {...prevState.files};
-            files.forEach((file) => {filesMap[file.name] = fileState;});
-            this.setState({files: filesMap});
-        });
+    setFilesState = (filesToUpdate, state) => {
+        const files = filesToUpdate.map(({name}) => ({name, state}));
+        this.setState({files, filesUploaded: true});
     }
 
     renderDropzoneContent() {
-        if (!this.filesUploaded) {
+        if (!this.state.filesUploaded) {
             return (
                 <Column horizontal="center">
                     <Icon>cloud_upload</Icon>
@@ -124,57 +81,65 @@ class UploadButton extends React.Component {
         return (
             <table width="100%">
                 <tbody>
-                    {Object.keys(this.state.files).map(filename => (
-                        <tr key={filename}>
-                            <td className={this.props.classes.progressFilename}>
-                                <span>
-                                    {filename}
-                                </span>
-                            </td>
-                            <td>
-                                {this.state.files[filename] === 'uploading' ? <LinearProgress /> : 'Uploaded'}
-                            </td>
-                        </tr>
-                    ))}
+                    {this.state.files
+                        .map(file => (
+                            <tr key={file.name}>
+                                <td className={this.props.classes.progressFilename}>
+                                    <span>
+                                        {file.name}
+                                    </span>
+                                </td>
+                                <td>
+                                    {file.state === 'uploading' ? <LinearProgress /> : 'Uploaded'}
+                                </td>
+                            </tr>
+                        ))}
                 </tbody>
             </table>
         );
     }
 
-    render() {
-        return (
-            <div style={{display: 'inline'}}>
-                <IconButton {...this.componentProps} onClick={this.openDialog}>
-                    {this.props.children}
-                </IconButton>
+    render = () => (
+        <div style={{display: 'inline'}}>
+            <IconButton {...this.componentProps} onClick={this.openDialog}>
+                {this.props.children}
+            </IconButton>
 
-                <Dialog
-                    open={this.state.uploading}
-                    onClick={e => e.stopPropagation()}
-                    onClose={this.closeDialog}
-                    aria-labelledby="form-dialog-title"
-                >
-                    <DialogTitle id="form-dialog-title">Upload files</DialogTitle>
-                    <DialogContent>
-                        <Dropzone
-                            onDrop={this.uploadFiles}
-                            className={this.props.classes.dropZone}
-                        >
-                            {() => this.renderDropzoneContent()}
-                        </Dropzone>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button
-                            onClick={this.closeDialog}
-                            color="secondary"
-                        >
-                            Close
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
-        );
-    }
+            <Dialog
+                open={this.state.uploading}
+                onClick={e => e.stopPropagation()}
+                onClose={this.closeDialog}
+                aria-labelledby="form-dialog-title"
+            >
+                <DialogTitle id="form-dialog-title">Upload files</DialogTitle>
+                <DialogContent>
+                    <Dropzone
+                        onDrop={this.uploadFiles}
+                    >
+                        {({getRootProps, getInputProps}) => (
+                            <div
+                                {...getRootProps()}
+                                className={this.props.classes.dropZone}
+                            >
+                                <input {...getInputProps()} />
+                                {
+                                    this.renderDropzoneContent()
+                                }
+                            </div>
+                        )}
+                    </Dropzone>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={this.closeDialog}
+                        color="secondary"
+                    >
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    );
 }
 
 export default withStyles(styles)(UploadButton);
