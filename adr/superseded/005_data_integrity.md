@@ -65,7 +65,7 @@ As the immutable, add-only file storage will always preserve all versions, we wi
 
 *Status*
 
-Proposed
+Rejected
 
 *Consequences*
  
