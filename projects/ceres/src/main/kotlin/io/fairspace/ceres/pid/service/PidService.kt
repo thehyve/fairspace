@@ -20,8 +20,22 @@ class PidService(val repository: PidRepository) {
     fun findByValueStartingWith(prefix: String) =
             repository.findByValueStartingWith(prefix)
 
-    fun findOrCreateByValue(uriPrefix: String, value: String) =
-            repository.findByValue(value) ?: repository.save(Pid(uriPrefix + md5Hex(value), value))
+    fun findOrCreateByValue(uriPrefix: String, value: String): Pid {
+        val existingPid = repository.findByValue(value)
+        if (existingPid != null) {
+            return existingPid
+        }
+
+        var id = uriPrefix + md5Hex(value)
+        var index = 0
+                while (true) {
+                    if (repository.findById(id) == null) {
+                       return repository.save(Pid(id, value))
+                    } else {
+                        id = uriPrefix + md5Hex(value + ++index)
+                    }
+                }
+    }
 
     fun updateByPrefix(oldPrefix: String, newPrefix: String) {
         repository.saveAll(
