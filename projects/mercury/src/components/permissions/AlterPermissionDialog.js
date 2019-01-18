@@ -12,7 +12,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-import MaterialReactSelect from '../generic/MaterialReactSelect/MaterialReactSelect';
+import MaterialReactSelect from '../common/MaterialReactSelect';
 
 export const styles = () => ({
     root: {
@@ -120,8 +120,7 @@ export class AlterPermissionDialog extends React.Component {
         this.state = {
             accessRight: 'Read',
             selectedUser: null,
-            selectedUserLabel: '',
-            error: null,
+            selectedUserLabel: ''
         };
     }
 
@@ -130,8 +129,7 @@ export class AlterPermissionDialog extends React.Component {
         this.setState({
             accessRight: user ? user.access : 'Read',
             selectedUser: user ? convertUserToOptionValue(user) : null,
-            selectedUserLabel: '',
-            error: null,
+            selectedUserLabel: ''
         });
     };
 
@@ -231,10 +229,10 @@ export class AlterPermissionDialog extends React.Component {
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        onClick={this.handleClose} 
+                        onClick={this.handleClose}
                         color="secondary"
                     >
-                    Cancel
+                        Cancel
                     </Button>
                     <Button
                         onClick={this.handleSubmit}
@@ -251,7 +249,6 @@ export class AlterPermissionDialog extends React.Component {
 
 AlterPermissionDialog.propTypes = {
     classes: PropTypes.object.isRequired,
-    theme: PropTypes.object,
     user: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,

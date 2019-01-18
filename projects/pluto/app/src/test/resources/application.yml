@@ -1,3 +1,6 @@
+app:
+  domain: http://fake-origin
+
 frontend:
   urls:
     jupyter: https://jupyterhub.someplace

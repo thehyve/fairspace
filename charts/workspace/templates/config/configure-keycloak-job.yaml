@@ -31,6 +31,8 @@ spec:
         image: "{{ $scripts.image }}"
         imagePullPolicy: {{ $scripts.pullPolicy }}
         env:
+          - name: LOGIN_REALM
+            value: {{ .Values.hyperspace.keycloak.loginRealm }}
           - name: KEYCLOAK_PASSWORD
             valueFrom:
               secretKeyRef:

@@ -1,7 +1,5 @@
 # Mercury
-
-This application contains a portal UI for within a workspace. The UI is based on 
-[material-ui](https://material-ui.com/).
+This application contains a portal UI for within a workspace. The UI is based on [Material UI](https://material-ui.com/).
 
 ### Running the app in development mode
 The app needs a backend to communicate with. For convenience, there are 2 npm/yarn scripts
@@ -29,4 +27,87 @@ The project has extended the eslint configuration by React. At the moment it is 
 You can also run eslint manually by doing:
 ```
 .\node_modules\.bin\eslint <DIRECTORY/FILE LOCATION>
+```
+
+## App State Structure
+Below you can find the structure of the state that is in the store. It is
+shown here for future reference and easy lookup.
+```javascript
+{
+    cache: {
+        collections: {
+            pending: false,
+            error: false,
+            items: {
+                4: {
+                    id: 4,
+                    name: 'John Snow\'s collection',
+                    description: 'Around the world...',
+                    location: 'john_snow_s_collection-4',
+                    uri: 'http://workspace.uri/iri/collections/4'
+                },
+                6: {
+                    id: 6,
+                    name: 'John Snow\'s collection',
+                    description: 'Around the world...',
+                    location: 'john_snow_s_collection-6',
+                    uri: 'http://workspace.uri/iri/collections/6'
+                }
+            }
+        },
+        files: {
+            4: {
+                '/': {
+                    pending: false,
+                    error: false,
+                    items: [
+                        {
+                            name: 'file.txt',
+                            size: 292
+                        },
+                        {
+                            name: 'subdir',
+                            type: 'dir'
+                        }
+                    ]
+                },
+                '/subdir': {
+                    pending: true,
+                    error: false,
+                    items: []
+                }
+            }
+        }
+    }
+    collections: {
+        selectedCollectionId: 4,
+        selectedPaths: '/subdirectory/file.txt',
+
+        openedCollectionId: 4,
+        openedPath: '/subdirectory',
+    },
+    account: {
+        user: {
+            pending: false,
+            error: false,
+            item: {
+                id: 'a2ecd794-faa8-44ef-8fae-d70af8f437ee',
+                name: 'Ygritte'
+            }
+        }
+        authorizations: {
+            pending: false,
+            error: false,
+            items: [
+                'user-workspace-ci',
+                'admin-workspace-ci',
+                'uma-authorization'
+            ]
+        }
+    },
+    ui: {
+        informationPanelOpened: true
+    }
+}
+ */
 ```

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import MaterialReactSelect from "../../generic/MaterialReactSelect/MaterialReactSelect";
+import MaterialReactSelect from "../../common/MaterialReactSelect";
 import {fetchEntitiesIfNeeded} from "../../../actions/metadata";
 import {getLabel} from "../../../utils/metadatautils";
 
@@ -39,13 +39,12 @@ function LookupEntity({
     };
 
     return (
-        <div style={{width: '100%'}}>
-            <MaterialReactSelect
-                {...otherProps}
-                options={options}
-                onChange={handleSave}
-            />
-        </div>
+        <MaterialReactSelect
+            style={{width: '100%'}}
+            {...otherProps}
+            options={options}
+            onChange={handleSave}
+        />
     );
 }
 
