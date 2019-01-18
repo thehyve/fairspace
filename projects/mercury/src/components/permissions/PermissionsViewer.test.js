@@ -1,5 +1,6 @@
 import React from 'react';
 import {createShallow} from '@material-ui/core/test-utils';
+import Menu from "@material-ui/core/Menu";
 import {PermissionsViewer, styles} from "./PermissionsViewer";
 
 describe('PermissionsViewer', () => {
@@ -65,7 +66,6 @@ describe('PermissionsViewer', () => {
                 creator={mockCreator}
                 collectionId={500}
                 canManage
-
                 classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
@@ -77,7 +77,6 @@ describe('PermissionsViewer', () => {
         it('should render all collaborators', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
-
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
                 primary: 'Mariah Carey',
@@ -97,6 +96,10 @@ describe('PermissionsViewer', () => {
             });
         });
 
+        it('should enable current user to alter all collaborator\'s permissions', () => {
+            expect(wrapper.find(Menu).length).toEqual(3);
+        });
+
         it('should render add button', () => {
             expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
         });
@@ -114,7 +117,6 @@ describe('PermissionsViewer', () => {
                 creator={mockCreator}
                 collectionId={500}
                 canManage={false}
-
                 classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
@@ -146,11 +148,9 @@ describe('PermissionsViewer', () => {
                 secondary: 'Read'
             });
         });
-
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
             expect(wrapper.find('MoreActions').length).toEqual(0);
         });
-
         it('should NOT render add button', () => {
             expect(wrapper.find('[aria-label="Add"]').length).toEqual(0);
         });
@@ -168,7 +168,6 @@ describe('PermissionsViewer', () => {
                 creator={mockCreator}
                 collectionId={500}
                 canManage
-
                 classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
@@ -200,7 +199,9 @@ describe('PermissionsViewer', () => {
                 secondary: 'Read'
             });
         });
-
+        it('should NOT enable current user to alter all collaborator\'s permissions', () => {
+            expect(wrapper.find(Menu).length).toEqual(3);
+        });
         it('should render add button', () => {
             expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
         });

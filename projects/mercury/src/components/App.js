@@ -10,6 +10,7 @@ import theme from './App.theme';
 import Layout from "./common/Layout/Layout";
 import LoadingInlay from './common/LoadingInlay';
 import ErrorDialog from "./common/ErrorDialog";
+import {LOCAL_STORAGE_MENU_KEY} from '../constants';
 
 class App extends React.Component {
     cancellable = {
@@ -26,10 +27,14 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        // Setup store
-        this.store = configureStore();
+        const menuExpanded = window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false';
 
-        // Wait for the configuration to be loaded
+        this.store = configureStore({ui: {menuExpanded, pending: {}}});
+
+        this.store.subscribe(() => {
+            window.localStorage.setItem(LOCAL_STORAGE_MENU_KEY, this.store.getState().ui.menuExpanded);
+        });
+
         Config.init()
             .then(() => {
                 this.store.dispatch(fetchUser());

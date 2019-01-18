@@ -24,94 +24,91 @@ export const ICONS = {
     GOOGLE_CLOUD_BUCKET: 'cloud_open'
 };
 
-export class CollectionList extends React.Component {
-    static getCollectionIcon =
-        (col) => (col.type && ICONS[col.type] ? ICONS[col.type] : ICONS.LOCAL_STORAGE);
+const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
-    render() {
-        const {
-            collections, selectedCollectionId,
-            onCollectionClick, onCollectionDoubleClick, onCollectionDelete,
-            classes
-        } = this.props;
-
-        if (!collections || collections.length === 0) {
-            return "No collections";
-        }
-
-        return (
-            <Paper className={classes.collectionListContainer}>
-                <Table padding="dense">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell />
-                            <TableCell>Name</TableCell>
-                            <TableCell>Created</TableCell>
-                            <TableCell>Creator</TableCell>
-                            <TableCell>Access</TableCell>
-                            <TableCell />
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {collections.map((collection, idx) => {
-                            const selected = selectedCollectionId && (collection.id === selectedCollectionId);
-                            return (
-                                <ClickHandler
-                                    component={TableRow}
-                                    className={selected ? classes.tableRowSelected : classes.tableRow}
-                                    key={collection.id}
-                                    selected={selected}
-                                    onSingleClick={() => onCollectionClick(collection)}
-                                    onDoubleClick={() => onCollectionDoubleClick(collection)}
-                                    onMouseOver={e => this.props.onItemMouseOver(idx, e)}
-                                    onMouseOut={() => this.props.onItemMouseOut(idx)}
-                                >
-                                    <TableCell padding="dense">
-                                        <Icon>
-                                            {CollectionList.getCollectionIcon(collection)}
-                                        </Icon>
-                                    </TableCell>
-                                    <TableCell component="th" scope="row">
-                                        <Typography variant="subtitle1">
-                                            {collection.name}
-                                        </Typography>
-                                        {collection.description}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography noWrap>
-                                            <DateTime value={collection.dateCreated} />
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography noWrap>
-                                            {getDisplayName(collection.creatorObj)}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        {collection.access}
-                                    </TableCell>
-                                    <TableCell>
-                                        {onCollectionDelete
-                                            ? (
-                                                <ButtonWithVerification
-                                                    visibility={this.props.hovered !== idx ? 'hidden' : 'visible'}
-                                                    aria-label={`Delete ${collection.name}`}
-                                                    title={`Delete ${collection.name}`}
-                                                    onClick={() => onCollectionDelete(collection)}
-                                                    disabled={!permissionUtils.canManage(collection)}
-                                                >
-                                                    <Icon>delete</Icon>
-                                                </ButtonWithVerification>
-                                            ) : null}
-                                    </TableCell>
-                                </ClickHandler>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </Paper>
-        );
+const collectionList = ({
+    collections, selectedCollectionId,
+    onCollectionClick, onCollectionDoubleClick, onCollectionDelete,
+    classes, onItemMouseOver, onItemMouseOut, hovered
+}) => {
+    if (!collections || collections.length === 0) {
+        return "No collections";
     }
-}
 
-export default compose(withStyles(styles), withHovered)(CollectionList);
+    return (
+        <Paper className={classes.collectionListContainer}>
+            <Table padding="dense">
+                <TableHead>
+                    <TableRow>
+                        <TableCell />
+                        <TableCell>Name</TableCell>
+                        <TableCell>Created</TableCell>
+                        <TableCell>Creator</TableCell>
+                        <TableCell>Access</TableCell>
+                        <TableCell />
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {collections.map((collection, idx) => {
+                        const selected = selectedCollectionId && (collection.id === selectedCollectionId);
+                        const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
+
+                        return (
+                            <ClickHandler
+                                component={TableRow}
+                                className={selected ? classes.tableRowSelected : classes.tableRow}
+                                key={collection.id}
+                                selected={selected}
+                                onSingleClick={() => onCollectionClick(collection)}
+                                onDoubleClick={() => onCollectionDoubleClick(collection)}
+                                onMouseOver={e => onItemMouseOver(idx, e)}
+                                onMouseOut={() => onItemMouseOut(idx)}
+                            >
+                                <TableCell padding="dense">
+                                    <Icon>
+                                        {ICONS[iconName]}
+                                    </Icon>
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    <Typography variant="subtitle1">
+                                        {collection.name}
+                                    </Typography>
+                                    {collection.description}
+                                </TableCell>
+                                <TableCell>
+                                    <Typography noWrap>
+                                        <DateTime value={collection.dateCreated} />
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography noWrap>
+                                        {getDisplayName(collection.creatorObj)}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell>
+                                    {collection.access}
+                                </TableCell>
+                                <TableCell>
+                                    {onCollectionDelete
+                                        ? (
+                                            <ButtonWithVerification
+                                                visibility={hovered !== idx ? 'hidden' : 'visible'}
+                                                aria-label={`Delete ${collection.name}`}
+                                                title={`Delete ${collection.name}`}
+                                                onClick={() => onCollectionDelete(collection)}
+                                                disabled={!permissionUtils.canManage(collection)}
+                                            >
+                                                <Icon>delete</Icon>
+                                            </ButtonWithVerification>
+                                        ) : null}
+                                </TableCell>
+                            </ClickHandler>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+        </Paper>
+    );
+};
+
+export default compose(withStyles(styles), withHovered)(collectionList);

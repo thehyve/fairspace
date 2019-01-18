@@ -83,7 +83,7 @@ export class InformationDrawer extends React.Component {
                                 <Typography
                                     className={classes.heading}
                                 >
-                                    Metadata for
+                                    {'Metadata for '}
                                     {relativePath(path)}
                                 </Typography>
                             </ExpansionPanelSummary>
