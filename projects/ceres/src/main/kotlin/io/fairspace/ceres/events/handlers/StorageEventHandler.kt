@@ -16,6 +16,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+import java.lang.IllegalArgumentException
 
 @Component
 @ConditionalOnProperty("app.rabbitmq.enabled")
@@ -202,5 +203,10 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         return newModel
     }
 
-    private fun parentPath(path: String) = path.substring(0, path.lastIndexOf('/'))
+    fun parentPath(path: String): String =
+            if(!path.contains('/') || path.endsWith('/')) {
+                throw IllegalArgumentException("Invalid path $path")
+            } else {
+                path.substring(0, path.lastIndexOf('/'))
+            }
 }

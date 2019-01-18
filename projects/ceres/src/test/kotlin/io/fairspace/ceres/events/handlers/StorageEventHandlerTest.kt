@@ -8,6 +8,7 @@ import io.fairspace.ceres.metadata.service.MetadataService
 import io.fairspace.ceres.metadata.vocabulary.Fairspace
 import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.service.PidService
+import junit.framework.Assert.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
@@ -222,6 +223,25 @@ class StorageEventHandlerTest {
             assertTrue(contains(dir, property, createLiteral("literal")))
         }
     }
+
+    @Test
+    fun testValidParentPath() {
+        assertEquals("coll-1", handler.parentPath("coll-1/dir"))
+        assertEquals("coll-1/dir/subdir", handler.parentPath("coll-1/dir/subdir/file.txt"))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testInvalidParentPath() {
+         handler.parentPath("coll-1/dir/")
+
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testParentPathWithNoParent() {
+        handler.parentPath("coll-1")
+
+    }
+
 
     private fun verifyParentRelationStored(parentUri: String, childUri: String, typeUri: String) {
         verify(modelRepository).update(modelArgThat(ArgumentMatcher {
