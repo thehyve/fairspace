@@ -36,7 +36,7 @@ class UploadButton extends React.Component {
     state = {
         uploading: false,
         filesUploaded: false,
-        files: []
+        files: {}
     };
 
     openDialog = (e) => {
@@ -49,6 +49,11 @@ class UploadButton extends React.Component {
         if (this.state.filesUploaded && this.props.onDidUpload) {
             this.props.onDidUpload();
         }
+
+        this.setState({
+            uploading: false,
+            files: {}
+        });
     }
 
     uploadFiles = (files, names) => {
@@ -59,9 +64,13 @@ class UploadButton extends React.Component {
         }
     }
 
-    setFilesState = (filesToUpdate, state) => {
-        const files = filesToUpdate.map(({name}) => ({name, state}));
-        this.setState({files, filesUploaded: true});
+    setFilesState(files, fileState) {
+        this.setState(prevState => {
+            // Add these file to a copy of the current map with files
+            const filesMap = {...prevState.files};
+            files.forEach((file) => {filesMap[file.name] = fileState;});
+            return {files: filesMap, filesUploaded: true};
+        });
     }
 
     renderDropzoneContent() {
@@ -81,16 +90,16 @@ class UploadButton extends React.Component {
         return (
             <table width="100%">
                 <tbody>
-                    {this.state.files
-                        .map(file => (
-                            <tr key={file.name}>
+                    {Object.keys(this.state.files)
+                        .map(filename => (
+                            <tr key={filename}>
                                 <td className={this.props.classes.progressFilename}>
                                     <span>
-                                        {file.name}
+                                        {filename}
                                     </span>
                                 </td>
                                 <td>
-                                    {file.state === 'uploading' ? <LinearProgress /> : 'Uploaded'}
+                                    {this.state.files[filename] === 'uploading' ? <LinearProgress /> : 'Uploaded'}
                                 </td>
                             </tr>
                         ))}
@@ -101,7 +110,7 @@ class UploadButton extends React.Component {
 
     render = () => (
         <div style={{display: 'inline'}}>
-            <IconButton {...this.componentProps} onClick={this.openDialog}>
+            <IconButton {...this.state.componentProps} onClick={this.openDialog}>
                 {this.props.children}
             </IconButton>
 
