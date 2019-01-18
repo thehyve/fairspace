@@ -2,7 +2,7 @@
 
 * **Status**: accepted
 
-* **Context**: We are about to [integrate different storage backends via Titan](implement_external_data_storages.md).
+* **Context**: We are about to [integrate different storage backends via Titan](006_implement_external_data_storages.md).
   
   ![Integration of external storage system via Titan](images/external-storage-via-titan.png)
   
