@@ -1,6 +1,6 @@
 # Backups
 
-* **Status**: accepted
+* **Status**: rejected
 
 * **Context**: A backup strategy is needed mainly because we want to recover from 
   'disasters' (e.g. failing hardware or inconsistent data due to software bugs). 

@@ -65,12 +65,20 @@ As the immutable, add-only file storage will always preserve all versions, we wi
 
 *Status*
 
-Rejected
+Accepted
 
 *Consequences*
  
- The proposed solution will simplify the data model of Fairspace,  make it more metadata-centric, and  provide strong data integrity guarantees, i.e. serializable ACID transactions for all metadata and file operations. It will also bring us such features as  backup-and-restore and audit log almost for free.
-  Apparently, most difficult to implement is the metadata-driven filesystem(s). However, it shouldn’t be a too complex task. For comparison, both existing implementations of WebDAV server filesystems are about 300 LOC long. 
+* The proposed solution will simplify the data model of Fairspace,  make it more metadata-centric, and  provide strong data integrity guarantees, i.e. serializable ACID transactions for all metadata and file operations. It will also bring us such features as  backup-and-restore and audit log almost for free.
+* Apparently, most difficult to implement is the metadata-driven filesystem(s). However, it shouldn’t be a too complex task. For comparison, both existing implementations of WebDAV server filesystems are about 300 LOC long.
+* We are locked to the single metadata database. When adding new functionality, everything has to be stored in the same database, or all consistency benefits of this solution are gone.
+* Using a schemaless database with structured data requires the addition of validation logic in the application layer.
+* Having a single service makes it impossible to scale, develop or deploy only parts of the application.
+* A full rewrite is needed
+* The storage requirements are much higher because of the duplication of data on the filesystem and the duplication of data in the transaction log.
+* Performance could be affected because there is a bottleneck with the single database
+* Strict transactions do not come for free. They could degrade performance
+ 
 
 
 

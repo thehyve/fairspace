@@ -1,6 +1,6 @@
 # Goal architecture and basic principles
 
-* **Status**: accepted
+* **Status**: rejected
 
 * **Context**: The requirements for Fairspace and the insights on the best solutions are continuously evolving. However, there is
   a need for a direction where to go to and some guidance on the choices to make. To support those choices, this document describes
@@ -21,7 +21,7 @@
   * Collection details: collections are entities within our system that we know something about. This could be the location on disk or the S3 credentials. With this information, we can provide a view on the contents of a collection
   * Permissions: the system should allow permissions on the level of metadata entities. Related to the permissions is the logging of an audit trail for business reasons 
 
-  ![High level goal architecture](images/high-level-goal-architecture.png)
+  ![High level goal architecture](../images/high-level-goal-architecture.png)
 
   All this functionality is part of what we call a workspace. Related functionality is provided by existing systems:
  
@@ -46,7 +46,7 @@
   makes it possible to add guarantees on the database in terms of durability and disaster recovery, 
   separate from the application requirements. 
   
-  ![High level storage architecture](images/architecture-persistent-storage.png)
+  ![High level storage architecture](../images/architecture-persistent-storage.png)
   
   When running in a cloud environment it makes most sense to leverage existing cloud databases 
   (like Microsoft CosmosDB or Google Cloud Datastore). These services have high levels of availability, 

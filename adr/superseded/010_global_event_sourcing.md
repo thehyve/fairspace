@@ -27,7 +27,7 @@
   * When updating the application, it may not be trivial to replay 'old' events and end up 
     with the same state. Non-trivial measures must be taken to handle this situation, which complicate the solution.
   * Implementing a consistent sequential logs comes with concurrency issues, given that we
-    want to be able to [run multiple instances of our services](../008_architecture_principles.md)   
+    want to be able to [run multiple instances of our services](008_architecture_principles.md)   
   * It can be costly to replay a full event log (if there are many operations), so in most 
     implementations it is suggested to take snapshots at regular intervals. 
     This would mean we need to implement both backup/restore and event sourcing.

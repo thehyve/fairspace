@@ -1,6 +1,6 @@
 # Consistency and data integrity
 
-* **Status**: accepted
+* **Status**: rejected
 
 * **Context**: We have several different storages and we do want to make sure that the 
   data in different systems is consistent. Due to the very nature of distributed systems, 
@@ -26,10 +26,10 @@
   Please note that it will ensure eventual consistency between the metadata on the 
   one hand and the collections/file storage on the other hand.
   
-  ![Implementing consistency between services](images/eventual-consistency.png) 
+  ![Implementing consistency between services](../images/eventual-consistency.png) 
  
 * **Consequences**: 
-  * using these principles means that the proposal to [integrate all data in a single datasource](superseded/005_data_integrity.md)
+  * using these principles means that the proposal to [integrate all data in a single datasource](../005_data_integrity.md)
     will not be followed.
   * This proposal does not include a way to undo accidental or malicious operations.
   * Other users could see partially uploaded files or directories that are currently being moved.
