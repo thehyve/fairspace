@@ -22,6 +22,8 @@ A backup and restore solution is a must-have. Having multiple persistent storage
 6. Every write transaction effectively consists of two lists, namely of deleted and added statements. That makes reverting of a committed historical transaction as simple as creation of a new transaction with the two lists swapped.
 7. Avoid tight coupling between Jena and the high-level APIs and other services by using universal client-side APIs such as RDFConnection.
 
+ ![Implementing consistency between services](./images/transactional-arch.gif) 
+
 *Status*
 
 Accepted
