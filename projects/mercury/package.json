@@ -11,6 +11,7 @@
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.7.1",
     "express": "^4.16.4",
+    "filesize": "^4.0.0",
     "http-proxy-middleware": "^0.19.1",
     "jsonld": "^1.2.1",
     "mdi-material-ui": "^5.8.0",
