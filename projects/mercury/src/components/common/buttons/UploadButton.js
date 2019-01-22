@@ -33,11 +33,24 @@ const styles = {
 };
 
 class UploadButton extends React.Component {
-    state = {
-        uploading: false,
-        filesUploaded: false,
-        files: {}
-    };
+    constructor(props) {
+        super(props);
+
+        const {
+            onDidUpload,
+            onUpload,
+            children,
+            classes,
+            ...componentProps
+        } = props;
+
+        this.state = {
+            uploading: false,
+            filesUploaded: false,
+            files: {},
+            componentProps
+        };
+    }
 
     openDialog = (e) => {
         e.stopPropagation();
