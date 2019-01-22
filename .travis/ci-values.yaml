@@ -35,6 +35,11 @@ titan:
   persistence:
     size: 20Gi
 
+# Specific settings for Saturn subchart
+saturn:
+  image:
+    pullPolicy: Always
+
 # Specific settings for Ceres subchart
 ceres:
   image:
