@@ -13,13 +13,17 @@ import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.impl.StatementImpl
 import org.apache.jena.vocabulary.RDF
 import org.springframework.amqp.rabbit.annotation.RabbitListener
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
-import java.io.File
+import java.lang.IllegalArgumentException
 
 @Component
 @ConditionalOnProperty("app.rabbitmq.enabled")
-class StorageEventHandler(val pidService: PidService, val modelRepository: ModelRepository, val metadataService: MetadataService) {
+class StorageEventHandler(val pidService: PidService, val modelRepository: ModelRepository, val metadataService: MetadataService,
+                          @Value("\${app.metadata.base-url}") val urlPrefix: String) {
+
+
     val log = logger { }
 
     @RabbitListener(queues = ["\${app.rabbitmq.topology.storage.queues.create}"])
@@ -49,7 +53,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         // Afterwards, ensure that the tree structure is properly
         // updated in the metadata as well. This is only needed if the file/directory
         // is moved to another parent directory
-        if (File(source).parent != File(destination).parent) {
+        if (parentPath(source) != parentPath(destination)) {
             storeParentRelation(destination, message.type, message.collection)
         }
     }
@@ -64,7 +68,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         val destination = message.destination!!
 
         // Retrieve all mappings for the oldPath
-        val sourceIdentifiers = pidService.findByPrefix(source)
+        val sourceIdentifiers = pidService.findByValueStartingWith(source)
         log.trace { "Found ${sourceIdentifiers.size} identifiers with the prefix $source - $sourceIdentifiers" }
 
         // We get a mapping for every descendant of the source
@@ -72,8 +76,8 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         val mapping = mutableMapOf<String, String>()
         sourceIdentifiers.forEach {
             val pathInDestination = it.value.replaceFirst(source, destination)
-            val newIdentifier = pidService.findOrCreateByValue(pathInDestination)
-            mapping[it.id!!] = newIdentifier.id!!
+            val newIdentifier = pidService.findOrCreateByValue(urlPrefix, pathInDestination)
+            mapping[it.id] = newIdentifier.id
         }
 
         // Now, retrieve the metadata for the original URIs and replace the original URIs
@@ -91,7 +95,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         // Afterwards, ensure that the tree structure is properly
         // updated in the metadata as well. This is only needed if the file/directory
         // is copied to another parent directory
-        if (File(source).parent != File(destination).parent) {
+        if (parentPath(source) != parentPath(destination)) {
             storeParentRelation(destination, message.type, message.collection)
         }
     }
@@ -103,7 +107,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         if (isInvalidMessage(message)) return
 
         // Delete the mappings for this path (and underlying paths)
-        pidService.deleteByPrefix(message.path)
+        pidService.deleteByValueStartingWith(message.path)
     }
 
     /**
@@ -131,7 +135,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
      * Stores the relation between the path and its parent in metadata
      */
     private fun storeParentRelation(path: String, type: PathType, collection: Collection?) {
-        val currentIdentifier = pidService.findOrCreateByValue(path)
+        val currentIdentifier = pidService.findOrCreateByValue(urlPrefix, path)
         val parentUri = getParentUri(path, collection)
         val metadataType = if (type == PathType.FILE) Fairspace.file else Fairspace.directory
 
@@ -140,7 +144,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
             return
         }
 
-        storePartOfRelation(parentUri, currentIdentifier.id!!, metadataType)
+        storePartOfRelation(parentUri, currentIdentifier.id, metadataType)
     }
 
 
@@ -171,7 +175,7 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         return if (pathParts.size == 3) {
             collection?.uri
         } else {
-            pidService.findOrCreateByValue(File(path).parent).id
+            pidService.findOrCreateByValue(urlPrefix, parentPath(path)).id
         }
     }
 
@@ -199,4 +203,10 @@ class StorageEventHandler(val pidService: PidService, val modelRepository: Model
         return newModel
     }
 
+    fun parentPath(path: String): String =
+            if(!path.contains('/') || path.endsWith('/')) {
+                throw IllegalArgumentException("Invalid path $path")
+            } else {
+                path.substring(0, path.lastIndexOf('/'))
+            }
 }
