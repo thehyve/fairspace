@@ -1,6 +1,6 @@
 # Enforcing and managing permissions model
 
-* **Status**: proposed
+* **Status**: accepted
 
 * **Context**: From the business requirements it follows that we want to 
   apply permissions on the level of collections, as well as on the level of 
