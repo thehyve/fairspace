@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import React from "react";
-import {fetchSubjectByPathIfNeeded} from "../../actions/metadata";
+import {fetchSubjectByPathIfNeeded} from "../../actions/metadataActions";
 import ErrorMessage from "../common/ErrorMessage";
 import Metadata from "./Metadata";
 

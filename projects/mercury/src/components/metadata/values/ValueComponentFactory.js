@@ -1,16 +1,7 @@
 import ReferringValue from "./ReferringValue";
 import StringValue from "./StringValue";
 import LookupEntity from "./LookupEntity";
-import {
-    BOOLEAN_URI,
-    DATE_URI,
-    DATETIME_URI,
-    DECIMAL_URI,
-    INTEGER_URI,
-    RESOURCE_URI,
-    STRING_URI,
-    TIME_URI
-} from "../../../services/MetadataAPI/MetadataAPI";
+import * as constants from "../../../constants";
 import IntegerValue from "./IntegerValue";
 import DateTimeValue from "./DateTimeValue";
 import DecimalValue from "./DecimalValue";
@@ -21,21 +12,21 @@ import ResourceValue from "./ResourceValue";
 
 const getInputComponent = (property) => {
     switch (property.range) {
-        case STRING_URI:
+        case constants.STRING_URI:
             return StringValue;
-        case INTEGER_URI:
+        case constants.INTEGER_URI:
             return IntegerValue;
-        case DECIMAL_URI:
+        case constants.DECIMAL_URI:
             return DecimalValue;
-        case DATETIME_URI:
+        case constants.DATETIME_URI:
             return DateTimeValue;
-        case DATE_URI:
+        case constants.DATE_URI:
             return DateValue;
-        case TIME_URI:
+        case constants.TIME_URI:
             return TimeValue;
-        case BOOLEAN_URI:
+        case constants.BOOLEAN_URI:
             return SwitchValue;
-        case RESOURCE_URI:
+        case constants.RESOURCE_URI:
             return ResourceValue;
         default:
             return undefined;

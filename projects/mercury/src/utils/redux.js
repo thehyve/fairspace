@@ -1,6 +1,3 @@
-import * as actionTypes from "./redux-action-types";
-
-
 /**
  * Creates a redux action that executes a promise.
  *
@@ -68,7 +65,7 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
     };
 
     switch (action.type) {
-        case actionTypes.pending(type):
+        case `${type}_PENDING`:
             return mergeState(
                 {
                     pending: true,
@@ -77,7 +74,7 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
                 },
                 getKeyFromAction(action)
             );
-        case actionTypes.fulfilled(type):
+        case `${type}_FULFILLED`:
             return mergeState(
                 {
                     pending: false,
@@ -87,7 +84,7 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
                 },
                 getKeyFromAction(action)
             );
-        case actionTypes.rejected(type):
+        case `${type}_REJECTED`:
             return mergeState(
                 {
                     pending: false,
@@ -95,7 +92,7 @@ export const promiseReducerFactory = (type, defaultState = {}, getKeyFromAction 
                 },
                 getKeyFromAction(action)
             );
-        case actionTypes.invalidate(type):
+        case `INVALIDATE_${type}`:
             return mergeState(
                 {
                     invalidated: true

@@ -1,9 +1,8 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import MetadataViewer from "./MetadataViewer";
-import ErrorMessage from "../common/ErrorMessage";
-import LoadingInlay from '../common/LoadingInlay';
-import {fetchCombinedMetadataIfNeeded} from "../../actions/metadata";
+import {ErrorMessage, LoadingInlay} from "../common";
+import {fetchCombinedMetadataIfNeeded} from "../../actions/metadataActions";
 
 export class Metadata extends React.Component {
     componentDidMount() {

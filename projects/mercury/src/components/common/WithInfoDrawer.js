@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import InformationDrawer from "./InformationDrawer";
 import WithRightDrawer from "./WithRightDrawer";
-import {closeInfoDrawer} from "../../actions/collectionbrowser";
+import {closeInfoDrawer} from "../../actions/collectionBrowserActions";
 
 const WithInfoDrawer = (props) => (
     <WithRightDrawer

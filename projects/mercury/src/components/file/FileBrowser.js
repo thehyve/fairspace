@@ -1,19 +1,18 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
-import ErrorDialog from "../common/ErrorDialog";
-import ErrorMessage from "../common/ErrorMessage";
-import BreadCrumbs from "../common/BreadCrumbs";
-import LoadingInlay from '../common/LoadingInlay';
+import {
+    ErrorDialog, ErrorMessage, BreadCrumbs,
+    LoadingInlay, GenericCollectionsScreen
+} from "../common";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import permissionUtils from '../../utils/permissionUtils';
-import * as collectionBrowserActions from "../../actions/collectionbrowser";
-import * as fileActions from "../../actions/files";
-import * as collectionActions from "../../actions/collections";
-import FileAPIFactory from "../../services/FileAPI/FileAPIFactory";
-import {parsePath} from "../../utils/fileutils";
-import GenericCollectionsScreen from "../common/GenericCollectionsScreen";
+import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
+import * as fileActions from "../../actions/fileActions";
+import * as collectionActions from "../../actions/collectionActions";
+import FileAPI from "../../services/FileAPI";
+import {splitPathIntoArray, joinPaths} from "../../utils/fileUtils";
 
 class FileBrowser extends React.Component {
     componentDidMount() {
@@ -107,8 +106,8 @@ class FileBrowser extends React.Component {
     }
 
     downloadFile(path) {
-        const fileAPI = FileAPIFactory.build(this.props.openedCollection);
-        fileAPI.download(fileAPI.joinPaths(this.props.openedPath || '', path));
+        const fileAPI = new FileAPI(this.props.openedCollection.location);
+        fileAPI.download(joinPaths(this.props.openedPath || '', path));
     }
 
     render() {
@@ -140,7 +139,7 @@ class FileBrowser extends React.Component {
 
         if (openedPath) {
             const toBreadcrumb = segment => ({segment, label: segment});
-            const pathParts = parsePath(openedPath);
+            const pathParts = splitPathIntoArray(openedPath);
             segments.push(...pathParts.map(toBreadcrumb));
         }
 
