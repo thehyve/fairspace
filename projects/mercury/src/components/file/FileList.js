@@ -12,104 +12,98 @@ import {Row} from "simple-flexbox";
 import {withStyles} from '@material-ui/core/styles';
 import {compose} from "redux";
 import Paper from "@material-ui/core/Paper";
+import filesize from 'filesize';
 import {
     ClickHandler, ButtonWithVerification,
     RenameButton, withHovered, DateTime
 } from "../common";
-import Bytes from "./Bytes";
 import styles from './FileList.styles';
 
-class FileList extends React.Component {
-    render() {
-        // TODO: what is the point of this.props.files[0] === null?
-        if (!this.props.files || this.props.files.length === 0 || this.props.files[0] === null) {
-            return "No files";
-        }
-        const selectedFilenames = this.props.selectedPaths || [];
-        return (
-            <Paper className={this.props.classes.fileListContainer}>
-                <Table padding="dense">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell />
-                            <TableCell>Name</TableCell>
-                            <TableCell align="right">Size</TableCell>
-                            <TableCell align="right">Last Modified</TableCell>
-                            <TableCell />
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {this.props.files.map((row, idx) => {
-                            const selected = selectedFilenames.includes(row.filename);
-                            return (
-                                <ClickHandler
-                                    component={TableRow}
-                                    key={row.filename}
-                                    selected={selected}
-                                    className={selected ? this.props.classes.tableRowSelected : this.props.classes.tableRow}
-                                    onSingleClick={() => this.props.onPathClick(row)}
-                                    onDoubleClick={() => this.props.onPathDoubleClick(row)}
-                                    onMouseOver={e => this.props.onItemMouseOver(idx, e)}
-                                    onMouseOut={() => this.props.onItemMouseOut(idx)}
-                                >
-                                    <TableCell>
-                                        <Icon>
-                                            {row.type === 'directory' ? 'folder_open' : 'note_open'}
-                                        </Icon>
-                                    </TableCell>
-                                    <TableCell component="th" scope="row">
-                                        {row.basename}
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Typography noWrap>
-                                            {row.type === 'file' ? <Bytes value={row.size} /> : ''}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Typography noWrap>
-                                            {row.lastmod ? <DateTime value={row.lastmod} /> : null}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Row
-                                            style={{visibility: this.props.hovered !== idx ? 'hidden' : 'visible'}}
-                                        >
-                                            {this.props.onRename
-                                                ? (
-                                                    <RenameButton
-                                                        currentName={row.basename}
-                                                        aria-label={`Rename ${row.basename}`}
-                                                        title={`Rename ${row.basename}`}
-                                                        onRename={newName => this.props.onRename(row, newName)}
-                                                        disabled={this.props.readonly}
-                                                    >
-                                                        <RenameBox />
-                                                    </RenameButton>
-                                                ) : null}
-                                            {this.props.onDelete
-                                                ? (
-                                                    <ButtonWithVerification
-                                                        aria-label={`Delete ${row.basename}`}
-                                                        title={`Delete ${row.basename}`}
-                                                        onClick={() => this.props.onDelete(row)}
-                                                        disabled={this.props.readonly}
-                                                    >
-                                                        <Icon>delete</Icon>
-                                                    </ButtonWithVerification>
-                                                ) : null}
-                                        </Row>
-                                    </TableCell>
-                                </ClickHandler>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </Paper>
-        );
+const fileList = (props) => {
+    if (!props.files || props.files.length === 0 || props.files[0] === null) {
+        return "No files";
     }
-}
+    const selectedFilenames = props.selectedPaths || [];
+    return (
+        <Paper className={props.classes.fileListContainer}>
+            <Table padding="dense">
+                <TableHead>
+                    <TableRow>
+                        <TableCell />
+                        <TableCell>Name</TableCell>
+                        <TableCell align="right">Size</TableCell>
+                        <TableCell align="right">Last Modified</TableCell>
+                        <TableCell />
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {props.files.map((file, idx) => {
+                        const selected = selectedFilenames.includes(file.filename);
+                        return (
+                            <ClickHandler
+                                component={TableRow}
+                                key={file.filename}
+                                selected={selected}
+                                className={selected ? props.classes.tableRowSelected : props.classes.tableRow}
+                                onSingleClick={() => props.onPathClick(file)}
+                                onDoubleClick={() => props.onPathDoubleClick(file)}
+                                onMouseOver={e => props.onItemMouseOver(idx, e)}
+                                onMouseOut={() => props.onItemMouseOut(idx)}
+                            >
+                                <TableCell>
+                                    <Icon>
+                                        {file.type === 'directory' ? 'folder_open' : 'note_open'}
+                                    </Icon>
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    {file.basename}
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Typography noWrap>
+                                        {file.type === 'file' ? filesize(file.size) : ''}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Typography noWrap>
+                                        {file.lastmod ? <DateTime value={file.lastmod} /> : null}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Row
+                                        style={{visibility: props.hovered !== idx ? 'hidden' : 'visible'}}
+                                    >
+                                        {props.onRename
+                                            ? (
+                                                <RenameButton
+                                                    currentName={file.basename}
+                                                    aria-label={`Rename ${file.basename}`}
+                                                    title={`Rename ${file.basename}`}
+                                                    onRename={newName => props.onRename(file, newName)}
+                                                    disabled={props.readonly}
+                                                >
+                                                    <RenameBox />
+                                                </RenameButton>
+                                            ) : null}
+                                        {props.onDelete
+                                            ? (
+                                                <ButtonWithVerification
+                                                    aria-label={`Delete ${file.basename}`}
+                                                    title={`Delete ${file.basename}`}
+                                                    onClick={() => props.onDelete(file)}
+                                                    disabled={props.readonly}
+                                                >
+                                                    <Icon>delete</Icon>
+                                                </ButtonWithVerification>
+                                            ) : null}
+                                    </Row>
+                                </TableCell>
+                            </ClickHandler>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+        </Paper>
+    );
+};
 
-export default compose(
-    withStyles(styles),
-    withHovered,
-)(FileList);
+export default compose(withStyles(styles), withHovered)(fileList);

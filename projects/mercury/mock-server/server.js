@@ -59,8 +59,8 @@ app.get('/api/workspace/config', (req, res) => res.sendFile(mockDataDir + '/work
 app.get('/api/workspace/details', (req, res) => res.sendFile(mockDataDir + '/workspace/workspace-details.json'));
 
 
-app.post('/api/metadata/pid', (req, res) => {
-    res.send({id:'http://fairspace.com' + req.body.value, value: req.body.value})
+app.get('/api/metadata/pid', (req, res) => {
+    res.send({id:'http://fairspace.com' + req.query.value, value: req.query.value});
 });
 
 // Add webdav server on /files

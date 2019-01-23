@@ -3,7 +3,7 @@ package io.fairspace.ceres.pid.web
 import io.fairspace.ceres.pid.exception.InvalidPersistentIdentifierException
 import io.fairspace.ceres.pid.exception.MappingNotFoundException
 import io.fairspace.ceres.pid.exception.ValueAlreadyExistsException
-import io.fairspace.ceres.pid.model.PidDTO
+import io.fairspace.ceres.pid.model.Pid
 import io.fairspace.ceres.pid.service.PidService
 import org.hamcrest.Matchers.`is`
 import org.junit.Before
@@ -29,8 +29,8 @@ class PidControllerTest {
     @MockBean
     private lateinit var pidService: PidService
 
-    val pidDtoById = PidDTO("http://id", "by-id")
-    val pidDtoByValue = PidDTO("http://value", "by-value")
+    val pidDtoById = Pid("http://id", "by-id")
+    val pidDtoByValue = Pid("http://value", "by-value")
 
     @Before
     fun setUp() {

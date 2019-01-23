@@ -60,8 +60,7 @@ it('fetches pid with provided parameters', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.getSubjectByPath('/aaa/bbb/ccc');
 
-    expect(window.fetch.mock.calls[0][0]).toEqual("/pid");
-    expect(window.fetch.mock.calls[0][1].method).toEqual('POST');
-    expect(window.fetch.mock.calls[0][1].body).toEqual('{"value":"/aaa/bbb/ccc"}');
-    expect(window.fetch.mock.calls[0][1].headers.map['content-type']).toEqual('application/json');
+    expect(window.fetch.mock.calls[0][0]).toEqual(`/pid?value=${encodeURIComponent('/aaa/bbb/ccc')}`);
+    expect(window.fetch.mock.calls[0][1].method).toEqual('GET');
+    expect(window.fetch.mock.calls[0][1].headers.map['accept']).toEqual('application/json');
 });

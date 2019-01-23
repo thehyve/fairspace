@@ -1,39 +1,53 @@
 package io.fairspace.ceres.pid.repository
 
 
+import io.fairspace.ceres.CeresApplication
 import io.fairspace.ceres.pid.model.Pid
-import org.junit.Assert.assertEquals
+import org.apache.jena.query.Dataset
+import org.apache.jena.query.DatasetFactory.createTxnMem
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.junit4.SpringRunner
-import java.util.*
 
-@DataJpaTest
 @RunWith(SpringRunner::class)
 @SpringBootTest
 @DirtiesContext
-open class PidRepositoryTest {
+class PidRepositoryTest {
+    @Configuration
+    @Import(CeresApplication::class)
+    class TestConfig {
+        @Bean
+        fun dataset() = createTxnMem()
+    }
+
+    @Autowired
+    lateinit var ds: Dataset
 
     @Autowired
     lateinit var pidRepository: PidRepository
 
     @Before
     fun setUp() {
-       pidRepository.save(Pid(UUID.randomUUID(), "prefix1/abc"))
-       pidRepository.save(Pid(UUID.randomUUID(), "prefix1"))
-       pidRepository.save(Pid(UUID.randomUUID(), "prefix2/abc"))
-       pidRepository.save(Pid(UUID.randomUUID(), "prefix2/prefix1"))
-       pidRepository.save(Pid(UUID.randomUUID(), ""))
+        ds.defaultModel.removeAll()
+        pidRepository.save(Pid("1", "prefix1/abc"))
+        pidRepository.save(Pid("2", "prefix1"))
+        pidRepository.save(Pid("3", "prefix123"))
+        pidRepository.save(Pid("4", "prefix2/abc"))
+        pidRepository.save(Pid("5", "prefix2/prefix1"))
+        pidRepository.save(Pid("6", ""))
     }
 
     @Test
     fun testPrefixList() {
-        val pids = pidRepository.findByValueStartingWith("prefix1").toList()
+        val pids = pidRepository.findByValueStartingWith("prefix1")
         val values = pids.map { p -> p.value }
 
         assertEquals(2, pids.size)
@@ -43,15 +57,41 @@ open class PidRepositoryTest {
 
     @Test
     fun testPrefixDeletion() {
-        assertEquals(5, pidRepository.findAll().toList().size)
+        assertEquals(6, pidRepository.findAll().size)
 
         pidRepository.deleteByValueStartingWith("prefix1")
 
-        val pids = pidRepository.findAll().toList()
+        val pids = pidRepository.findAll()
         val values = pids.map { p -> p.value }
 
-        assertEquals(3, pids.size)
+        assertEquals(4, pids.size)
         assert(!values.contains("prefix1/abc"))
         assert(!values.contains("prefix1"))
+    }
+
+    @Test
+    fun testFindByValue() {
+        assertEquals(Pid("2", "prefix1"), pidRepository.findByValue("prefix1"))
+        assertNull(pidRepository.findByValue("free cheese"))
+    }
+
+    @Test
+    fun testDeleteByValue() {
+        assertNotNull(pidRepository.findByValue("prefix1"))
+        pidRepository.deleteByValue("prefix1")
+        assertNull(pidRepository.findByValue("prefix1"))
+    }
+
+    @Test
+    fun testDeleteById() {
+        assertNotNull(pidRepository.findById("1"))
+        pidRepository.deleteById("1")
+        assertNull(pidRepository.findById("1"))
+    }
+
+    @Test
+    fun testFindById() {
+        assertNotNull(pidRepository.findById("1"))
+        assertNull(pidRepository.findById("0"))
     }
 }

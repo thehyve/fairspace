@@ -11,10 +11,8 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import io.fairspace.ceres.metadata.repository.ModelRepository
 import io.fairspace.ceres.metadata.service.MetadataService
 import net.minidev.json.JSONObject
-import org.apache.jena.query.Dataset
 import org.apache.jena.rdf.model.ModelFactory
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -54,13 +52,7 @@ class WebSecurityConfigurationTest {
     private val restTemplate: TestRestTemplate? = null
 
     @MockBean
-    private val modelRepository: ModelRepository? = null
-
-    @MockBean
     private val metadataService: MetadataService? = null
-
-    @MockBean
-    private val dataset: Dataset? = null
 
     private var publicKey: RSAPublicKey? = null
     private var privateKey: RSAPrivateKey? = null
