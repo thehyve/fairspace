@@ -38,7 +38,6 @@ public class MetadataAPITest {
     public void get() {
         assertEquals(0, api.get(null, null, null).size());
 
-
         executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
         Model m1 = api.get(null, null, null);

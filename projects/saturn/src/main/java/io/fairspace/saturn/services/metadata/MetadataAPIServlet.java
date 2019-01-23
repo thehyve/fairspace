@@ -61,8 +61,8 @@ public class MetadataAPIServlet extends HttpServlet {
     }
 
     private void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-
+        api.patch(readModel(req));
+        resp.setStatus(SC_ACCEPTED);
     }
 
     private Model readModel(HttpServletRequest req) throws IOException {
