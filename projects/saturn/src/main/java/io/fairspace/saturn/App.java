@@ -6,7 +6,7 @@ import org.apache.jena.tdb2.TDB2Factory;
 public class App {
     public static void main(String[] args) {
         FusekiServer.create()
-                .add("/rdf", TDB2Factory.connectDataset("./db"))
+                .add("/rdf", TDB2Factory.connectDataset("/data/saturn/db"))
                 .port(8080)
                 .build()
                 .start();
