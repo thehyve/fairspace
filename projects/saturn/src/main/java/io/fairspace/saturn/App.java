@@ -22,6 +22,7 @@ public class App {
 
         FusekiServer.create()
                 .add("/rdf", ds)
+                .addServlet("/statements", new MetadataAPIServlet(connection))
                 .port(8080)
                 .build()
                 .start();
