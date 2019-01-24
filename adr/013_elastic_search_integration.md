@@ -17,6 +17,7 @@ The index doesn't support nested documents, but one property can have multiple v
   * Use `jena-text` and `jena-text-es` libraries for integration
   * Use dynamic mapping between property URIs and field names, based on the vocabulary. 
   * Use [ElasticSearch JavaScript API](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/index.html) in the front-end
+  * Access to the ElasticSearch will be guarded by Pluto and can be restricted to read-only mode by allowing only GET HTTP requests. According to the business requiremnets, we don't need fine-grained permissions model for search.
 
 * **Consequences**: 
   * The front-end will not depend on SPARQL
