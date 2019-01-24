@@ -1,5 +1,6 @@
 package io.fairspace.saturn;
 
+import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.rdf.Vocabulary;
 import io.fairspace.saturn.rdf.inversion.PropertyInverter;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
@@ -28,12 +29,14 @@ public class App {
 
         FusekiServer.create()
                 .add("/rdf", ds)
+                .addServlet("/statements", new MetadataAPIServlet(connection))
                 .addServlet("/vocabulary", new VocabularyAPIServlet(connection))
                 .port(8080)
                 .build()
                 .start();
 
         System.out.println("Fuseki is running on :8080/rdf");
+        System.out.println("Metadata API is running on :8080/statements");
         System.out.println("Vocabulary API is running on :8080/vocabulary");
     }
 }
