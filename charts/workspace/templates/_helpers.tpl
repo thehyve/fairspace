@@ -131,6 +131,9 @@ Scheme to access workspace components (http or https)
 {{- define "callisto.fullname" -}}
 {{- .Values.callisto.nameOverride | default (printf "%s-callisto" .Release.Name) -}}
 {{- end -}}
+{{- define "saturn.fullname" -}}
+{{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
+{{- end -}}
 {{- define "ceres.fullname" -}}
 {{- .Values.ceres.nameOverride | default (printf "%s-ceres" .Release.Name) -}}
 {{- end -}}

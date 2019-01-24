@@ -4,7 +4,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import {connect} from "react-redux";
 import UserMenu from "../UserMenu/UserMenu";
-import logout from "../../../../services/Logout/logout";
+import logout from "../../../../services/logout";
 
 function TopBar(props) {
     const {classes, workspaceName} = props;

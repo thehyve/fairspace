@@ -2,7 +2,7 @@ import {connect} from 'react-redux';
 import React from 'react';
 import {Paper} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-import {linkLabel} from "../../utils/metadatautils";
+import {linkLabel} from "../../utils/metadataUtils";
 
 const entityInformation = (props) => {
     const {subject, typeInfo} = props;
