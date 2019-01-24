@@ -1,16 +1,18 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.rdf.Vocabulary;
-import io.fairspace.saturn.rdf.inversion.PropertyInverter;
+import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
+import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
-import org.apache.jena.tdb2.TDB2Factory;
 
 import java.io.File;
+
+import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
 
 public class App {
     private static final String DEFAULT_DATASET_PATH = "/data/saturn/db";
@@ -21,7 +23,7 @@ public class App {
 
         String datasetPath = new File(DEFAULT_DATASET_PATH).exists() ? DEFAULT_DATASET_PATH : LOCAL_DATASET_PATH;
 
-        Dataset ds = PropertyInverter.wrap(TDB2Factory.connectDataset(datasetPath));
+        Dataset ds = DatasetFactory.wrap(new InvertingDatasetGraph(connectDatasetGraph(datasetPath)));
 
         Vocabulary.init(ds);
 

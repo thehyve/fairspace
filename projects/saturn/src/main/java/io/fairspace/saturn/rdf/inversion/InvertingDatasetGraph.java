@@ -12,14 +12,14 @@ import java.util.Map;
 import static io.fairspace.saturn.rdf.Vocabulary.VOCABULARY_GRAPH;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
-class InvertingDatasetGraph extends DatasetGraphMonitor {
+public class InvertingDatasetGraph extends DatasetGraphMonitor {
     private static final Node vocabulary = createURI(VOCABULARY_GRAPH);
     private static final Node inverseOf = OWL.inverseOf.asNode();
 
     private final Map<Node, Graph> graphs = new HashMap<>();
 
 
-    InvertingDatasetGraph(DatasetGraph dsg) {
+    public InvertingDatasetGraph(DatasetGraph dsg) {
         super(dsg, new Inverter(dsg)) ;
     }
 
