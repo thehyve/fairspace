@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf.inversion;
 
+import io.fairspace.saturn.rdf.AbstractDatasetChanges;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.*;
@@ -32,7 +33,7 @@ class InvertingDatasetGraph extends DatasetGraphMonitor {
         return graphs.computeIfAbsent(graphNode, gn -> GraphView.createNamedGraph(this, gn)) ;
     }
 
-    private static class Inverter implements DatasetChanges {
+    private static class Inverter extends AbstractDatasetChanges {
         private final DatasetGraph dsg;
         private final Map<Node, Node> propertiesMap = new HashMap<>();
 
@@ -64,18 +65,6 @@ class InvertingDatasetGraph extends DatasetGraphMonitor {
                     }
                     break;
             }
-        }
-
-        @Override
-        public void start() {
-        }
-
-        @Override
-        public void finish() {
-        }
-
-        @Override
-        public void reset() {
         }
     }
 }
