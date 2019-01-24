@@ -50,10 +50,10 @@ class MetadataAPI {
                         .map(s -> Pair.create(s.getSubject(), s.getPredicate()))
                         .distinct()
                         .map(p -> new Quad(
-                                Quad.defaultGraphNodeGenerated,
-                                p.getLeft().asNode(),
-                                p.getRight().asNode(),
-                                NodeFactory.createVariable("o" + ++counter[0])))
+                                Quad.defaultGraphNodeGenerated,                  // Default graph
+                                p.getLeft().asNode(),                            // Subject
+                                p.getRight().asNode(),                           // Predicate
+                                NodeFactory.createVariable("o" + ++counter[0]))) // A free variable matching any object
                         .collect(toList());
 
         List<Quad> quadsToAdd = toQuads(statements);
