@@ -10,27 +10,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.fairspace.saturn.rdf.Vocabulary.VOCABULARY_GRAPH;
-import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.system.Txn.executeRead;
 
 public class InvertingDatasetGraph extends DatasetGraphMonitor {
-    private static final Node vocabulary = createURI(VOCABULARY_GRAPH);
     private static final Node inverseOf = OWL.inverseOf.asNode();
 
     private final Map<Node, Graph> graphs = new HashMap<>();
 
 
     public InvertingDatasetGraph(DatasetGraph dsg) {
-        super(dsg, new Inverter(dsg)) ;
+        super(dsg, new Inverter(dsg));
     }
 
     @Override
     public Graph getDefaultGraph() {
-        return getGraph(Quad.defaultGraphNodeGenerated) ;
+        return getGraph(Quad.defaultGraphNodeGenerated);
     }
 
     @Override
     public Graph getGraph(Node graphNode) {
-        return graphs.computeIfAbsent(graphNode, gn -> GraphView.createNamedGraph(this, gn)) ;
+        return graphs.computeIfAbsent(graphNode, gn -> GraphView.createNamedGraph(this, gn));
     }
 
     private static class Inverter extends AbstractDatasetChanges {
@@ -39,13 +38,18 @@ public class InvertingDatasetGraph extends DatasetGraphMonitor {
 
         private Inverter(DatasetGraph dsg) {
             this.dsg = dsg;
+            executeRead(dsg, () -> dsg.find(VOCABULARY_GRAPH, Node.ANY, inverseOf, Node.ANY)
+                    .forEachRemaining(quad -> {
+                        propertiesMap.put(quad.getSubject(), quad.getObject());
+                        propertiesMap.put(quad.getObject(), quad.getSubject());
+                    }));
         }
 
         @Override
         public void change(QuadAction action, Node g, Node s, Node p, Node o) {
             switch (action) {
                 case ADD:
-                    if (g.equals(vocabulary) && p.equals(inverseOf)) {
+                    if (g.equals(VOCABULARY_GRAPH) && p.equals(inverseOf)) {
                         propertiesMap.put(s, o);
                         propertiesMap.put(o, s);
                     }
@@ -55,7 +59,7 @@ public class InvertingDatasetGraph extends DatasetGraphMonitor {
                     }
                     break;
                 case DELETE:
-                    if (g.equals(vocabulary) && p.equals(inverseOf)) {
+                    if (g.equals(VOCABULARY_GRAPH) && p.equals(inverseOf)) {
                         propertiesMap.remove(s);
                         propertiesMap.remove(o);
                     }

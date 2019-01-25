@@ -18,6 +18,6 @@ class VocabularyAPI {
     }
 
     void setVocabulary(Model vocabulary) {
-        rdfConnection.put(VOCABULARY_GRAPH, vocabulary);
+        rdfConnection.put(VOCABULARY_GRAPH.getURI(), vocabulary);
     }
 }

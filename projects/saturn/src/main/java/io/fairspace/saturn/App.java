@@ -9,6 +9,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.sparql.core.DatasetGraph;
 
 import java.io.File;
 
@@ -23,9 +24,11 @@ public class App {
 
         String datasetPath = new File(DEFAULT_DATASET_PATH).exists() ? DEFAULT_DATASET_PATH : LOCAL_DATASET_PATH;
 
-        Dataset ds = DatasetFactory.wrap(new InvertingDatasetGraph(connectDatasetGraph(datasetPath)));
+        DatasetGraph dsg = new InvertingDatasetGraph(connectDatasetGraph(datasetPath));
+        Vocabulary.init(dsg);
+        Dataset ds = DatasetFactory.wrap(dsg);
 
-        Vocabulary.init(ds);
+
 
         RDFConnection connection = new RDFConnectionLocal(ds);
 
