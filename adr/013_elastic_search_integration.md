@@ -21,5 +21,5 @@ The index doesn't support nested documents, but one property can have multiple v
 
 * **Consequences**: 
   * The front-end will not depend on SPARQL
-  * Reference properties will be indexed using URIs, not labels
+  * Reference properties will be indexed using URIs, not labels. The user will only be able to search on that URI, not on the label
   * Changes in the vocabulary can make previously indexed fields useless. 
