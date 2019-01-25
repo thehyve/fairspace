@@ -8,7 +8,7 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import ValueComponentFactory from "./values/ValueComponentFactory";
-import {STRING_URI} from "../../services/MetadataAPI/MetadataAPI";
+import {STRING_URI} from "../../constants";
 import Config from "../../services/Config/Config";
 import MetadataProperty from "./MetadataProperty";
 

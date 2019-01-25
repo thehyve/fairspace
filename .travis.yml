@@ -56,6 +56,7 @@ jobs:
       script:
       - .travis/build.sh projects/oidc-auth
       - .travis/build.sh projects/callisto
+      - .travis/build.sh projects/saturn
       - .travis/build.sh projects/ceres
       - .travis/build.sh projects/mercury
       - .travis/build.sh projects/neptune

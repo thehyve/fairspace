@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import MaterialReactSelect from "../../common/MaterialReactSelect";
-import {fetchEntitiesIfNeeded} from "../../../actions/metadata";
-import {getLabel} from "../../../utils/metadatautils";
+import {fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
+import {getLabel} from "../../../utils/metadataUtils";
 
 function LookupEntity({
     entities, property, onSave, dispatch, ...otherProps

@@ -17,7 +17,7 @@ data:
         base-url: {{ template "keycloak.baseUrl" . }}
         realm: {{ .Values.hyperspace.keycloak.realm }}
       metadata:
-        base-url: {{ template "workspace.url" . }}
+        base-url: {{ template "workspace.url" . }}/iri/
 
     # Tracing configuration
     spring:

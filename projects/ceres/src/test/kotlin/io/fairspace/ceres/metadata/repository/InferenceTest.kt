@@ -22,8 +22,10 @@ class InferenceTest {
     private val derivesFrom = modelForInference.createProperty(NS, "derivesFrom")
     private val provides = modelForInference.createProperty(NS, "providesMaterial")
 
-    private val repo = ModelRepository(createTxnMem(),
-            OwlPropertyInverter(FileManager.get().loadModel("inference-model.jsonld")))
+    private val ds = createTxnMem()
+            private val repo = ModelRepository(ds) {
+                it.register(OwlPropertyInverter(it, FileManager.get().loadModel("inference-model.jsonld")))
+            }
 
     @Test
     fun `see if model is setup properly`() {

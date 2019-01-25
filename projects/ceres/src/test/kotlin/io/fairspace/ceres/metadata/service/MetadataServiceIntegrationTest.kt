@@ -2,7 +2,6 @@ package io.fairspace.ceres.metadata.service
 
 import io.fairspace.ceres.CeresApplication
 import io.fairspace.ceres.metadata.repository.ModelRepository
-import io.fairspace.ceres.metadata.repository.PropertyInverter
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.apache.jena.query.DatasetFactory.createTxnMem
@@ -27,9 +26,6 @@ class MetadataServiceIntegrationTest {
     class TestConfig {
         @Bean
         fun dataset() = createTxnMem()
-
-        @Bean
-        fun enhancer() = PropertyInverter(listOf("http://oneway" to "http://otherway"))
     }
 
     @Autowired
@@ -55,7 +51,7 @@ class MetadataServiceIntegrationTest {
 
             // Add data for inference
             val i = createResource("http://i")
-            val p2 = createProperty("http://oneway")
+            val p2 = createProperty("http://fairspace.io/ontology#derivesFrom")
             val j = createResource("http://j")
 
             add(i, p2, j);
@@ -157,7 +153,7 @@ class MetadataServiceIntegrationTest {
         val model = service.getStatementsWithObjectLabels("http://j")
 
         val i = model.createResource("http://i")
-        val otherway = model.createProperty("http://otherway")
+        val otherway = model.createProperty("http://fairspace.io/ontology#providesMaterial")
         val j = model.createResource("http://j")
 
         assertTrue(model.contains(j, otherway, i))
