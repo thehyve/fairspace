@@ -43,5 +43,4 @@ public class RdfFileResource extends RdfAbstractResource implements VfsFileResou
         RDFNode fileSizeObject = getPropertyValueOrNull(rdfResource, model, FILESIZE);
         fileSize = fileSizeObject != null ? FileSize.parse(fileSizeObject.toString()) : 0;
     }
-
 }

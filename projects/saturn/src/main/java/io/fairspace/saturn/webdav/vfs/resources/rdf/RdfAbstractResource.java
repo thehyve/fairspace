@@ -20,6 +20,7 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.IS_READY;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
+import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
 
 @Getter
 @EqualsAndHashCode
@@ -27,6 +28,7 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 public abstract class RdfAbstractResource implements VfsResource {
     private String uniqueId;
     private String name;
+    private String path;
     private ZonedDateTime createdDate;
     private ZonedDateTime modifiedDate;
 
@@ -47,11 +49,19 @@ public abstract class RdfAbstractResource implements VfsResource {
         extractModel(rdfResource, model);
     }
 
+    /**
+     * Extracts the basic properties for a resource from the RDF model
+     * @param rdfResource
+     * @param model
+     */
     protected void extractModel(Resource rdfResource, Model model) {
         uniqueId = rdfResource.getURI();
 
         RDFNode nameObject = getPropertyValueOrNull(rdfResource, model, NAME);
         name = nameObject != null ? nameObject.toString() : null;
+
+        RDFNode pathObject = getPropertyValueOrNull(rdfResource, model, PATH);
+        path = pathObject != null ? pathObject.toString() : null;
 
         RDFNode createdDateObject = getPropertyValueOrNull(rdfResource, model, DATE_CREATED);
         try {
@@ -66,7 +76,7 @@ public abstract class RdfAbstractResource implements VfsResource {
             modifiedDate = modifiedDateObject != null ? ZonedDateTime.parse(modifiedDateObject.toString()) : null;
         } catch(DateTimeParseException e) {
             // Only log the problem, but modifiedDate will remain null
-            log.info("Invalid datetime found in RDF datastore for date modified: " + createdDateObject.toString());
+            log.info("Invalid datetime found in RDF datastore for date modified: " + modifiedDateObject.toString());
         }
 
         RDFNode parentObject = getPropertyValueOrNull(rdfResource, model, PARENT);

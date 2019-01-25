@@ -12,7 +12,7 @@ public class VirtualFileSystemIris {
     public static final Property PATH = createProperty("http://fairspace.io/ontology/File#localPath");
     public static final Property CONTENT_LOCATION = createProperty("http://fairspace.io/ontology/File#contentLocation");
     public static final Property DATE_MODIFIED = createProperty("http://schema.org/dateModified");
-    public static final Property DATE_CREATED = createProperty("http://schema.org/dateModified");
+    public static final Property DATE_CREATED = createProperty("http://schema.org/dateCreated");
     public static final Property CREATOR = createProperty("http://schema.org/creator");
     public static final Property IS_READY = createProperty("http://fairspace.io/ontology/File#isReady");
     public static final Property FILESIZE = createProperty("http://schema.org/fileSize");
