@@ -46,26 +46,26 @@ public class InvertingDatasetGraph extends DatasetGraphMonitor {
         }
 
         @Override
-        public void change(QuadAction action, Node g, Node s, Node p, Node o) {
+        public void change(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
             switch (action) {
                 case ADD:
-                    if (g.equals(VOCABULARY_GRAPH) && p.equals(inverseOf)) {
-                        propertiesMap.put(s, o);
-                        propertiesMap.put(o, s);
+                    if (graph.equals(VOCABULARY_GRAPH) && predicate.equals(inverseOf)) {
+                        propertiesMap.put(subject, object);
+                        propertiesMap.put(object, subject);
                     }
-                    Node toAdd = propertiesMap.get(p);
-                    if (toAdd != null && !dsg.contains(g, o, toAdd, s)) {
-                        dsg.add(g, o, toAdd, s);
+                    Node toAdd = propertiesMap.get(predicate);
+                    if (toAdd != null && !dsg.contains(graph, object, toAdd, subject)) {
+                        dsg.add(graph, object, toAdd, subject);
                     }
                     break;
                 case DELETE:
-                    if (g.equals(VOCABULARY_GRAPH) && p.equals(inverseOf)) {
-                        propertiesMap.remove(s);
-                        propertiesMap.remove(o);
+                    if (graph.equals(VOCABULARY_GRAPH) && predicate.equals(inverseOf)) {
+                        propertiesMap.remove(subject);
+                        propertiesMap.remove(object);
                     }
-                    Node toDelete = propertiesMap.get(p);
-                    if (toDelete != null && dsg.contains(g, o, toDelete, s)) {
-                        dsg.delete(g, o, toDelete, s);
+                    Node toDelete = propertiesMap.get(predicate);
+                    if (toDelete != null && dsg.contains(graph, object, toDelete, subject)) {
+                        dsg.delete(graph, object, toDelete, subject);
                     }
                     break;
             }
