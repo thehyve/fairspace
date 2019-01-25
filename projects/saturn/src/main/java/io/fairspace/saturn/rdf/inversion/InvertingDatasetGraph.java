@@ -32,30 +32,30 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
     }
 
     @Override
-    protected void change(QuadAction action, Node g, Node s, Node p, Node o) {
+    protected void change(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
         switch (action) {
             case ADD:
                 // A new inversion rule added?
-                    if (g.equals(VOCABULARY_GRAPH) && p.equals(inverseOf)) {
-                        propertiesMap.put(s, o);
-                        propertiesMap.put(o, s);
+                    if (graph.equals(VOCABULARY_GRAPH) && predicate.equals(inverseOf)) {
+                        propertiesMap.put(subject, object);
+                        propertiesMap.put(object, subject);
                 }
                 // Check if an inverse statement should be added as well
-                Node toAdd = propertiesMap.get(p);
-                if (toAdd != null && !get().contains(g, o, toAdd, s)) {
-                    get().add(g, o, toAdd, s);
+                Node toAdd = propertiesMap.get(predicate);
+                if (toAdd != null && !get().contains(graph, object, toAdd, subject)) {
+                    get().add(graph, object, toAdd, subject);
                 }
                 break;
             case DELETE:
                 // An inversion rule removed?
-                    if (g.equals(VOCABULARY_GRAPH) && p.equals(inverseOf)) {
-                        propertiesMap.remove(s);
-                        propertiesMap.remove(o);
+                    if (graph.equals(VOCABULARY_GRAPH) && predicate.equals(inverseOf)) {
+                        propertiesMap.remove(subject);
+                        propertiesMap.remove(object);
                 }
                 // Check if an inverse statement should be removed as well
-                Node toDelete = propertiesMap.get(p);
-                if (toDelete != null && get().contains(g, o, toDelete, s)) {
-                    get().delete(g, o, toDelete, s);
+                Node toDelete = propertiesMap.get(predicate);
+                if (toDelete != null && get().contains(graph, object, toDelete, subject)) {
+                    get().delete(graph, object, toDelete, subject);
                 }
                 break;
         }
