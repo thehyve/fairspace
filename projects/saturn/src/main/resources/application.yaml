@@ -1,4 +1,4 @@
 saturn:
   port: 8080
-  datasetPath: db
+  datasetPath: data/db
   transactionLogPath: data/log

@@ -4,8 +4,7 @@ import lombok.Data;
 import org.apache.jena.sparql.core.Quad;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Data
 public class TransactionRecord implements Serializable {
@@ -21,7 +20,7 @@ public class TransactionRecord implements Serializable {
 
     private String commitMessage;
 
-    private final List<Quad> added = new ArrayList<>();
+    private Set<Quad> added;
 
-    private final List<Quad> deleted = new ArrayList<>();
+    private Set<Quad> deleted;
 }
