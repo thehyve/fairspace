@@ -22,5 +22,6 @@ public class VirtualFileSystemIris {
 
     public static final Resource TYPE_FILE = createResource("http://fairspace.io/ontology/File");
     public static final Resource TYPE_DIRECTORY = createResource("http://fairspace.io/ontology/Directory");
+    public static final Resource TYPE_COLLECTION = createResource("http://fairspace.io/ontology/Collection");
 
 }

@@ -1,9 +1,12 @@
 package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
 import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
+import io.fairspace.saturn.webdav.vfs.resources.VfsFairspaceCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
+import io.fairspace.saturn.webdav.vfs.resources.VfsRootResource;
+import lombok.NonNull;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -26,6 +29,7 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.RDF_TYPE;
+import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_COLLECTION;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_DIRECTORY;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_FILE;
 
@@ -33,6 +37,7 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
  * @TODO Handle paths regardless of trailing slashes (suggested behavior by milton)
  */
 public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
+    private static final VfsResource ROOT_RESOURCE = new VfsRootResource();
     private RDFConnection connection;
 
     public RdfBackedVfsResourceFactory(RDFConnection connection) {
@@ -40,7 +45,12 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
     }
 
     @Override
-    public VfsResource getResource(String path) {
+    public VfsResource getResource(@NonNull String path) {
+        // Special case for the root resource
+        if(path.equals("/")) {
+            return ROOT_RESOURCE;
+        }
+
         // Retrieve information on the resource from the RDF store
         ParameterizedSparqlString sparql = new ParameterizedSparqlString();
         sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?filePath ?path ; ?p ?o }");
@@ -70,6 +80,10 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
 
     @Override
     public VfsDirectoryResource createCollection(String parentId, String path) {
+        if(parentId == null) {
+            return null;
+        }
+
         // Generate a new model for this collection
         // TODO: Store creator
         Model model = ModelFactory.createDefaultModel();
@@ -90,6 +104,36 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
 
     @Override
     public List<? extends VfsResource> getChildren(String parentId) {
+        if(parentId == null) {
+            return this.getFairspaceCollectionResources();
+        } else {
+            return this.getChildrenFromStore(parentId);
+        }
+    }
+
+    private List<VfsFairspaceCollectionResource> getFairspaceCollectionResources() {
+        // TODO: Invoke collections api here
+        ParameterizedSparqlString sparql = new ParameterizedSparqlString();
+        sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?type ?collection ; ?p ?o }");
+        sparql.setIri("type", RDF_TYPE.getURI());
+        sparql.setIri("collection", TYPE_COLLECTION.getURI());
+
+        // Retrieve the data
+        Model model = connection.queryConstruct(sparql.asQuery());
+
+        // If no results are found, stop now
+        if(model.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Loop through all subjects in the model and return the resource in a list
+        return model.listSubjects()
+                .mapWith(rdfResource -> (VfsFairspaceCollectionResource) toVfsResource(model, rdfResource))
+                .toList();
+
+    }
+
+    private List<? extends VfsResource> getChildrenFromStore(@NonNull String parentId) {
         ParameterizedSparqlString sparql = new ParameterizedSparqlString();
         sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?parent ?parentId ; ?isReady ?true ; ?p ?o }");
         sparql.setIri("parent", PARENT.getURI());
@@ -109,6 +153,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         return model.listSubjects()
                 .mapWith(rdfResource -> toVfsResource(model, rdfResource))
                 .toList();
+
     }
 
     @Override
@@ -172,6 +217,8 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
             return new RdfDirectoryResource(rdfResource, model);
         } else if(typeTriple.getObject().equals(TYPE_FILE)) {
             return new RdfFileResource(rdfResource, model);
+        } else if(typeTriple.getObject().equals(TYPE_COLLECTION)) {
+            return new RdfFairspaceCollectionResource(rdfResource, model);
         } else {
             throw new IllegalStateException("Invalid type specified for metadata entity with id " + rdfResource.toString() + ": " + typeTriple.getObject().toString());
         }

@@ -1,9 +1,11 @@
 package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
 import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
+import io.fairspace.saturn.webdav.vfs.resources.VfsFairspaceCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
+import io.fairspace.saturn.webdav.vfs.resources.VfsRootResource;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -31,6 +33,7 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.RDF_TYPE;
+import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_COLLECTION;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_DIRECTORY;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_FILE;
 import static org.junit.Assert.assertEquals;
@@ -48,8 +51,6 @@ public class RdfBackedVfsResourceFactoryTest {
         Dataset dataset = DatasetFactory.createTxnMem();
         model = dataset.getDefaultModel();
         resourceFactory = new RdfBackedVfsResourceFactory(new RDFConnectionLocal(dataset));
-
-        setupTestModel();
     }
 
     @Test
@@ -59,12 +60,16 @@ public class RdfBackedVfsResourceFactoryTest {
 
     @Test
     public void testGetWithTrailingSlash() {
+        setupTestModel();
+
         assertNotNull(resourceFactory.getResource("/directory"));
         assertNull(resourceFactory.getResource("/directory/"));
     }
 
     @Test
     public void testGetResourceForDirectory() {
+        setupTestModel();
+
         // Verify top level directory
         VfsResource directoryResource = resourceFactory.getResource("/directory");
 
@@ -85,6 +90,8 @@ public class RdfBackedVfsResourceFactoryTest {
 
     @Test
     public void testGetResourceForFile() {
+        setupTestModel();
+
         // Verify top level directory
         VfsResource resource = resourceFactory.getResource("/directory/subdirectory/data.txt");
 
@@ -100,6 +107,15 @@ public class RdfBackedVfsResourceFactoryTest {
         assertEquals("/location-on-disk/abc.txt", fileResource.getContentLocation());
         assertEquals("text/plain", fileResource.getMimeType());
         assertEquals(2097152l, fileResource.getFileSize());
+    }
+
+    @Test
+    public void testGetRootResource() {
+        // Verify top level directory
+        VfsResource resource = resourceFactory.getResource("/");
+
+        assertNotNull(resource);
+        assertTrue(resource instanceof VfsRootResource);
     }
 
     @Test
@@ -121,6 +137,7 @@ public class RdfBackedVfsResourceFactoryTest {
     // TODO: Test edge cases for collection creation
     @Test
     public void testCreateCollection() {
+
         // Create a parent collection
         Resource parent = model.createResource("http://parent");
         model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
@@ -155,6 +172,18 @@ public class RdfBackedVfsResourceFactoryTest {
         assertEquals(storedCreatedDate, resource.getCreatedDate());
         assertEquals(storedModifiedDate, resource.getModifiedDate());
     }
+
+    @Test
+    public void testCreateCollectionForRoot() {
+        // Creating a collection for the root should be prohibited,
+        // as the top level directories are collections, which should be
+        // created through the Collections API
+        resourceFactory.createCollection(null, "/test/xyz");
+
+        // Verify no triples have been added
+        assertTrue(model.isEmpty());
+    }
+
 
     // TODO: Test edge cases
     @Test
@@ -196,21 +225,39 @@ public class RdfBackedVfsResourceFactoryTest {
     // TODO: Test edge cases for retrieving children
     @Test
     public void testGetChildren() {
-        for (StmtIterator it = model.listStatements(); it.hasNext(); ) {
-            System.out.println(it.next());
-        }
+        setupTestModel();
+
         List<? extends VfsResource> children = resourceFactory.getChildren("http://subdirectory");
 
         assertEquals(2, children.size());
         assertTrue(children.stream().anyMatch(resource ->
-            ((VfsResource) resource).getName().equals("data.txt") &&
-                    resource instanceof VfsFileResource
+                ((VfsResource) resource).getName().equals("data.txt") &&
+                        resource instanceof VfsFileResource
         ));
         assertTrue(children.stream().anyMatch(resource ->
                 ((VfsResource) resource).getName().equals("temp") &&
                         resource instanceof VfsDirectoryResource
         ));
     }
+
+    @Test
+    public void testGetChildrenForRoot() {
+        setupTestCollections();
+
+        List<? extends VfsResource> children = resourceFactory.getChildren(null);
+
+        assertEquals(2, children.size());
+        assertTrue(children.stream().anyMatch(resource ->
+                ((VfsResource) resource).getName().equals("My collection") &&
+                        resource instanceof VfsFairspaceCollectionResource
+        ));
+        assertTrue(children.stream().anyMatch(resource ->
+                ((VfsResource) resource).getName().equals("All my data") &&
+                        resource instanceof VfsFairspaceCollectionResource
+        ));
+    }
+
+
 
     // TODO: Test edge cases for file creation
     @Test
@@ -253,6 +300,21 @@ public class RdfBackedVfsResourceFactoryTest {
 
 
     public void testIntegration() {}
+
+    private void setupTestCollections() {
+        Resource collection1 = model.createResource("http://collection1");
+        Resource collection2 = model.createResource("http://collection2");
+
+        model.add(collection1, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection1, NAME, "My collection");
+        model.add(collection1, PATH, "/directory1");
+        model.add(collection1, DATE_CREATED, "2019-01-23T12:55:01+00:00");
+
+        model.add(collection2, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection2, NAME, "All my data");
+        model.add(collection2, PATH, "/directory2");
+        model.add(collection2, DATE_CREATED, "2019-01-23T12:58:01+00:00");
+    }
 
     private void setupTestModel() {
         Resource directory = model.createResource("http://directory");

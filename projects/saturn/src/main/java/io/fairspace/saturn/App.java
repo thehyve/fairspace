@@ -1,6 +1,7 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
+import io.fairspace.saturn.webdav.milton.MiltonWebDAVServlet;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -18,11 +19,15 @@ public class App {
 
         String datasetPath = new File(DEFAULT_DATASET_PATH).exists() ? DEFAULT_DATASET_PATH : LOCAL_DATASET_PATH;
         Dataset ds = TDB2Factory.connectDataset(datasetPath);
+
+        // The RDF connection is supposed to be threadsafe and can
+        // be reused in all the application
         RDFConnection connection = new RDFConnectionLocal(ds);
 
         FusekiServer.create()
                 .add("/rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
+                .addServlet("/webdav", new MiltonWebDAVServlet("/webdav", connection))
                 .port(8080)
                 .build()
                 .start();

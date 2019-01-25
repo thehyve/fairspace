@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
-import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsUser;
 import lombok.EqualsAndHashCode;
