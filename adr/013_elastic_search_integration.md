@@ -21,7 +21,7 @@ The index doesn't support nested documents, but one property can have multiple v
 
 * **Consequences**: 
   * The front-end will not depend on SPARQL
-  * Reference properties will be indexed using URIs, not labels. The user will only be able to search on that URI, not on the label
+  * Reference properties will be indexed using URIs, not labels. The user will have to first search for a referenced entity.
   * Changes in the vocabulary can make previously indexed fields useless. 
   * Triple updates are sent to ES synchronously. This means the client has to wait for it, and client calls may fail when data is stored in Jena but not in ES.
   * The business logic drives which triples should be indexed or not. This business logic will be integrated with the database layer with this implementation.
