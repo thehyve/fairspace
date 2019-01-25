@@ -72,6 +72,9 @@ You can run pluto as a spring boot application from you IDE with the following p
 * local
 * noAuth (optionally, if you want to disable authentication)
 
+### Saturn
+You can run ceres as a Java application from you IDE by running the main class `io.fairspace.saturn.App`
+
 ### Ceres
 You can run ceres as a spring boot application from you IDE with the following profiles:
 * local
