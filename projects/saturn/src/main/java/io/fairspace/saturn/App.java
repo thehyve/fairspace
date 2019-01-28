@@ -10,6 +10,7 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.cfg4j.provider.ConfigurationProviderBuilder;
 import org.cfg4j.source.classpath.ClasspathConfigurationSource;
 import org.cfg4j.source.compose.FallbackConfigurationSource;
+import org.cfg4j.source.context.filesprovider.ConfigFilesProvider;
 import org.cfg4j.source.files.FilesConfigurationSource;
 
 import java.nio.file.Paths;
@@ -17,10 +18,11 @@ import java.nio.file.Paths;
 import static java.util.Collections.singletonList;
 
 public class App {
+    private static ConfigFilesProvider configFilesProvider = () -> singletonList(Paths.get("./application.yaml"));
     private static Config CONFIG = new ConfigurationProviderBuilder()
             .withConfigurationSource(new FallbackConfigurationSource(
-                    new ClasspathConfigurationSource(() -> singletonList(Paths.get("./application.yaml"))),
-                    new FilesConfigurationSource(() -> singletonList(Paths.get("./application.yaml")))))
+                    new ClasspathConfigurationSource(configFilesProvider),
+                    new FilesConfigurationSource(configFilesProvider)))
             .build()
             .bind("saturn", Config.class);
 
