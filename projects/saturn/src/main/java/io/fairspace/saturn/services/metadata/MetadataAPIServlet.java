@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.metadata;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.riot.RDFDataMgr;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -10,8 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static javax.servlet.http.HttpServletResponse.*;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static io.fairspace.saturn.services.ModelUtils.readModel;
+import static io.fairspace.saturn.services.ModelUtils.writeModel;
+import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 
 
@@ -38,9 +39,7 @@ public class MetadataAPIServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Model result = api.get(req.getParameter("subject"), req.getParameter("predicate"), req.getParameter("object"));
-        resp.setStatus(SC_OK);
-        resp.setContentType(JSONLD.getLang().getHeaderString());
-        RDFDataMgr.write(resp.getOutputStream(), result, JSONLD);
+        writeModel(result, resp);
     }
 
 
@@ -63,11 +62,5 @@ public class MetadataAPIServlet extends HttpServlet {
     private void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         api.patch(readModel(req));
         resp.setStatus(SC_ACCEPTED);
-    }
-
-    private Model readModel(HttpServletRequest req) throws IOException {
-        Model model = createDefaultModel();
-        RDFDataMgr.read(model, req.getInputStream(), JSONLD.getLang());
-        return model;
     }
 }
