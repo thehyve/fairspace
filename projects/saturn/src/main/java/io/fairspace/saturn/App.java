@@ -27,7 +27,7 @@ public class App {
         FusekiServer.create()
                 .add("/rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/webdav", new MiltonWebDAVServlet("/webdav", connection))
+                .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
                 .port(8080)
                 .build()
                 .start();
