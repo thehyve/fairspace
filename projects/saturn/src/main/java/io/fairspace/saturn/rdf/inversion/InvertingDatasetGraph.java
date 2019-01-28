@@ -56,6 +56,8 @@ public class InvertingDatasetGraph extends DatasetGraphMonitor {
                 case ADD:
                     // A new inversion rule added?
                     if (graph.equals(VOCABULARY_GRAPH) && predicate.equals(inverseOf)) {
+                        checkConflicts(subject, object);
+                        checkConflicts(object, subject);
                         propertiesMap.put(subject, object);
                         propertiesMap.put(object, subject);
                     }
@@ -77,6 +79,13 @@ public class InvertingDatasetGraph extends DatasetGraphMonitor {
                         dsg.delete(graph, object, toDelete, subject);
                     }
                     break;
+            }
+        }
+
+        private void checkConflicts(Node subject, Node object) {
+            Node mapped = propertiesMap.get(subject);
+            if (mapped != null && !mapped.equals(object)) {
+                throw new UnsupportedOperationException("An inverse property for " + subject + " already exists");
             }
         }
     }
