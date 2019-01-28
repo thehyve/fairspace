@@ -38,7 +38,7 @@ public class MetadataAPIServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Model result = api.get(req.getParameter("subject"), req.getParameter("predicate"), req.getParameter("object"));
+        var result = api.get(req.getParameter("subject"), req.getParameter("predicate"), req.getParameter("object"));
         writeModel(result, resp);
     }
 

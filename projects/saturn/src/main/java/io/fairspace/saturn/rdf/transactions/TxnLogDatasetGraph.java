@@ -27,7 +27,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     @Override
     protected void change(QuadAction action, Node g, Node s, Node p, Node o) {
-        Quad q = new Quad(g, s, p, o);
+        var q = new Quad(g, s, p, o);
         switch (action) {
             case ADD:
                 if (!deleted.remove(q)) {
@@ -59,7 +59,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void commit() {
         if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
-            TransactionRecord t = new TransactionRecord();
+            var t = new TransactionRecord();
             t.setAdded(added);
             t.setDeleted(deleted);
             t.setTimestamp(currentTimeMillis());

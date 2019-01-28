@@ -18,7 +18,7 @@ public class LocalTransactionLog implements TransactionLog {
 
     @Override
     public void log(TransactionRecord transaction) throws IOException {
-        File file = new File(directory, "tx-" + counter.incrementAndGet());
+        var file = new File(directory, "tx-" + counter.incrementAndGet());
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
             serializer.write(transaction, out);
         }

@@ -10,7 +10,7 @@ class DelegatingDatasetChanges extends AbstractDatasetChanges {
 
     @Override
     public void change(QuadAction action, Node g, Node s, Node p, Node o) {
-        ChangeListener listener = changeListener;
+        var listener = changeListener;
         if (listener != null) {
             listener.change(action, g, s, p, o);
         }

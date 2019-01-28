@@ -23,7 +23,7 @@ public class SparqlTransactionSerializer implements TransactionSerializer {
 
     @Override
     public void write(TransactionRecord transaction, OutputStream out) throws IOException {
-        IndentedWriter writer = new IndentedWriter(out);
+        var writer = new IndentedWriter(out);
 
         writer.write(TIMESTAMP_PREFIX + transaction.getTimestamp() + "\n") ;
         if (transaction.getUserName() != null) {
@@ -37,8 +37,8 @@ public class SparqlTransactionSerializer implements TransactionSerializer {
         }
         writer.write('\n');
 
-        UpdateDataDelete updateDataDelete = new UpdateDataDelete(new QuadDataAcc(new ArrayList<>(transaction.getDeleted())));
-        UpdateDataInsert updateDataInsert = new UpdateDataInsert(new QuadDataAcc(new ArrayList<>(transaction.getAdded())));
+        var updateDataDelete = new UpdateDataDelete(new QuadDataAcc(new ArrayList<>(transaction.getDeleted())));
+        var updateDataInsert = new UpdateDataInsert(new QuadDataAcc(new ArrayList<>(transaction.getAdded())));
 
         new UpdateRequest().add(updateDataDelete).add(updateDataInsert).output(writer);
     }

@@ -8,7 +8,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'io.franzbecker.gradle-lombok' version '1.14'
+    id 'io.franzbecker.gradle-lombok' version '2.0'
     id 'application'
 }
 
@@ -16,7 +16,7 @@ plugins {
 group 'io.fairspace'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_1_10
 
 application {
     mainClassName = "io.fairspace.saturn.App"

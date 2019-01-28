@@ -29,8 +29,8 @@ public class App {
     public static void main(String[] args) {
         System.out.println("Saturn is starting");
 
-        Dataset ds = SaturnDatasetFactory.connect(CONFIG);
-        RDFConnection connection = new RDFConnectionLocal(ds);
+        var ds = SaturnDatasetFactory.connect(CONFIG);
+        var connection = new RDFConnectionLocal(ds);
 
         FusekiServer.create()
                 .add("/rdf", ds)

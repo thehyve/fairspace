@@ -24,7 +24,7 @@ class MetadataAPI {
     }
 
     Model get(String subject, String predicate, String object) {
-        String query = prepareQuery("CONSTRUCT { ?s ?p ?o . } WHERE { ?s ?p ?o . }", subject, predicate, object);
+        var query = prepareQuery("CONSTRUCT { ?s ?p ?o . } WHERE { ?s ?p ?o . }", subject, predicate, object);
         return rdfConnection.queryConstruct(query);
     }
 
@@ -33,7 +33,7 @@ class MetadataAPI {
     }
 
     void delete(String subject, String predicate, String object) {
-        String query = prepareQuery("DELETE WHERE { ?s ?p ?o . }", subject, predicate, object);
+        var query = prepareQuery("DELETE WHERE { ?s ?p ?o . }", subject, predicate, object);
         rdfConnection.update(query);
     }
 
@@ -46,7 +46,7 @@ class MetadataAPI {
     }
 
     static String createPatchQuery(Collection<Statement> statements) {
-        UpdateRequest updateRequest = new UpdateRequest();
+        var updateRequest = new UpdateRequest();
 
         int[] counter = {0};
         statements
@@ -74,7 +74,7 @@ class MetadataAPI {
     }
 
     private static String prepareQuery(String template, String subject, String predicate, String object) {
-        ParameterizedSparqlString sparql = new ParameterizedSparqlString(template);
+        var sparql = new ParameterizedSparqlString(template);
         bindIri(sparql, "s", subject);
         bindIri(sparql, "p", predicate);
         bindIri(sparql, "o", object);

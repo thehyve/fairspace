@@ -21,9 +21,9 @@ public class SparqlTransactionDeserializer implements TransactionDeserializer {
 
     @Override
     public TransactionRecord read(InputStream in) throws IOException {
-        TransactionRecord transaction = new TransactionRecord();
-        StringBuilder queryBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+        var transaction = new TransactionRecord();
+        var queryBuilder = new StringBuilder();
+        try (var reader = new BufferedReader(new InputStreamReader(in))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(TIMESTAMP_PREFIX)) {
@@ -39,14 +39,14 @@ public class SparqlTransactionDeserializer implements TransactionDeserializer {
                 }
             }
         }
-        UpdateRequest updateRequest = UpdateFactory.create(queryBuilder.toString());
-        UpdateDataInsert updateDataInsert = (UpdateDataInsert) updateRequest.getOperations()
+        var updateRequest = UpdateFactory.create(queryBuilder.toString());
+        var updateDataInsert = (UpdateDataInsert) updateRequest.getOperations()
                 .stream()
                 .filter(UpdateDataInsert.class::isInstance)
                 .findFirst()
                 .get();
         transaction.setAdded(new HashSet<>(updateDataInsert.getQuads()));
-        UpdateDataDelete updateDataDelete = (UpdateDataDelete) updateRequest.getOperations()
+        var updateDataDelete = (UpdateDataDelete) updateRequest.getOperations()
                 .stream()
                 .filter(UpdateDataDelete.class::isInstance)
                 .findFirst()

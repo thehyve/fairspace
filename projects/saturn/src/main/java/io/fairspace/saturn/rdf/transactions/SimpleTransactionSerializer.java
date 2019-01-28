@@ -12,7 +12,7 @@ public class SimpleTransactionSerializer implements TransactionSerializer {
 
     @Override
     public void write(TransactionRecord transaction, OutputStream out) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(out)) {
+        try (var oos = new ObjectOutputStream(out)) {
             oos.writeObject(transaction);
         }
     }

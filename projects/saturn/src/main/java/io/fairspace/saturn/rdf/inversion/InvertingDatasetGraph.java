@@ -46,7 +46,7 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
                         propertiesMap.put(object, subject);
                 }
                 // Check if an inverse statement should be added as well
-                Node toAdd = propertiesMap.get(predicate);
+                var toAdd = propertiesMap.get(predicate);
                 if (toAdd != null && !get().contains(graph, object, toAdd, subject)) {
                     get().add(graph, object, toAdd, subject);
                 }
@@ -58,7 +58,7 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
                         propertiesMap.remove(object);
                 }
                 // Check if an inverse statement should be removed as well
-                Node toDelete = propertiesMap.get(predicate);
+                var toDelete = propertiesMap.get(predicate);
                 if (toDelete != null && get().contains(graph, object, toDelete, subject)) {
                     get().delete(graph, object, toDelete, subject);
                 }
@@ -67,7 +67,7 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
     }
 
         private void checkConflicts(Node subject, Node object) {
-            Node mapped = propertiesMap.get(subject);
+            var mapped = propertiesMap.get(subject);
             if (mapped != null && !mapped.equals(object)) {
                 throw new UnsupportedOperationException("An inverse property for " + subject + " already exists");
             }
