@@ -27,13 +27,13 @@ public class App {
     public static void main(String[] args) {
         System.out.println("Saturn is starting");
 
-        Dataset ds = SaturnDatasetFactory.connect(CONFIG.datasetPath(), CONFIG.transactionLogPath());
+        Dataset ds = SaturnDatasetFactory.connect(CONFIG);
         RDFConnection connection = new RDFConnectionLocal(ds);
 
         FusekiServer.create()
                 .add("/rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/vocabulary", new VocabularyAPIServlet(connection))
+                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, CONFIG.vocabularyURI()))
                 .port(CONFIG.port())
                 .build()
                 .start();

@@ -10,9 +10,7 @@ import java.util.Set;
 public class TransactionRecord implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private long startTimestamp;
-
-    private long commitTimestamp;
+    private long timestamp;
 
     private String userId;
 

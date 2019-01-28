@@ -60,8 +60,8 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             TransactionRecord t = new TransactionRecord();
             t.setAdded(added);
             t.setDeleted(deleted);
-            t.setCommitTimestamp(currentTimeMillis());
-            // TODO: Set user info
+            t.setTimestamp(currentTimeMillis());
+            // TODO: Set user info and commit message
             added = null;
             deleted = null;
             try {

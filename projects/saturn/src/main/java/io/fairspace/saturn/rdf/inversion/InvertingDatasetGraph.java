@@ -9,7 +9,6 @@ import org.apache.jena.vocabulary.OWL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.fairspace.saturn.rdf.Vocabulary.VOCABULARY_GRAPH;
 import static org.apache.jena.system.Txn.executeRead;
 
 /**
@@ -20,11 +19,15 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private static final Node inverseOf = OWL.inverseOf.asNode();
 
     private final Map<Node, Node> propertiesMap = new HashMap<>();
+    private final Node vocabularyGraph;
 
-    public InvertingDatasetGraph(DatasetGraph dsg) {
+    public InvertingDatasetGraph(DatasetGraph dsg, Node vocabularyGraph) {
         super(dsg);
+
+        this.vocabularyGraph = vocabularyGraph;
+
         // Load inversion rules from the dictionary
-        executeRead(dsg, () -> dsg.find(VOCABULARY_GRAPH, Node.ANY, inverseOf, Node.ANY)
+        executeRead(dsg, () -> dsg.find(vocabularyGraph, Node.ANY, inverseOf, Node.ANY)
                 .forEachRemaining(quad -> {
                     propertiesMap.put(quad.getSubject(), quad.getObject());
                     propertiesMap.put(quad.getObject(), quad.getSubject());
@@ -36,7 +39,7 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
         switch (action) {
             case ADD:
                 // A new inversion rule added?
-                    if (graph.equals(VOCABULARY_GRAPH) && predicate.equals(inverseOf)) {
+                    if (graph.equals(vocabularyGraph) && predicate.equals(inverseOf)) {
                         propertiesMap.put(subject, object);
                         propertiesMap.put(object, subject);
                 }
@@ -48,7 +51,7 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 break;
             case DELETE:
                 // An inversion rule removed?
-                    if (graph.equals(VOCABULARY_GRAPH) && predicate.equals(inverseOf)) {
+                    if (graph.equals(vocabularyGraph) && predicate.equals(inverseOf)) {
                         propertiesMap.remove(subject);
                         propertiesMap.remove(object);
                 }

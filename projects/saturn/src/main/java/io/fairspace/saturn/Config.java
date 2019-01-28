@@ -1,6 +1,7 @@
 package io.fairspace.saturn;
 
 public interface Config {
+    String vocabularyURI();
 
     int port();
 

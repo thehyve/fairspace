@@ -15,8 +15,8 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 public class VocabularyAPIServlet extends HttpServlet {
     private final VocabularyAPI api;
 
-    public VocabularyAPIServlet(RDFConnection rdfConnection) {
-        this.api = new VocabularyAPI(rdfConnection);
+    public VocabularyAPIServlet(RDFConnection rdfConnection, String vocabularyUri) {
+        this.api = new VocabularyAPI(rdfConnection, vocabularyUri);
     }
 
     @Override

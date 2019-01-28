@@ -5,6 +5,11 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 
 public class SimpleTransactionDeserializer implements TransactionDeserializer {
+    public static final TransactionDeserializer INSTANCE = new SimpleTransactionDeserializer();
+
+    private SimpleTransactionDeserializer() {
+    }
+
     @Override
     public TransactionRecord read(InputStream in) throws IOException {
         try (ObjectInputStream ois = new ObjectInputStream(in)) {
