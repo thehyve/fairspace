@@ -37,9 +37,4 @@ public class VfsRootResource implements VfsCollectionResource {
     public String getParentId() {
         return null;
     }
-
-    @Override
-    public boolean isReady() {
-        return true;
-    }
 }

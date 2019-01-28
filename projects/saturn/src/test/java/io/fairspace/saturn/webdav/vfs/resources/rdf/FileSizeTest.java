@@ -48,4 +48,16 @@ public class FileSizeTest {
         FileSize.parse("1XB");
     }
 
+    @Test
+    public void formatFileSize() {
+        assertEquals("0B", FileSize.format(0));
+        assertEquals("1024B", FileSize.format(1024));
+        assertEquals("1048576B", FileSize.format(1048576));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void formatNegativeValue() {
+        FileSize.format(-10);
+    }
+
 }

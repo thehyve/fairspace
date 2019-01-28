@@ -49,8 +49,12 @@ public class FileSize {
     }
 
     public static String format(long fileSize) {
-        // TODO: Still to implement
-        return "";
+        if(fileSize < 0) {
+            throw new IllegalArgumentException("File size can not be negative");
+        }
+
+        // Always store the exact filesize in bytes
+        return fileSize + "B";
     }
 
     enum FileSizeUnit {

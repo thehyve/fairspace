@@ -10,5 +10,4 @@ public interface VfsResource {
     public ZonedDateTime getModifiedDate();
     public VfsUser getCreator();
     public String getParentId();
-    public boolean isReady();
 }

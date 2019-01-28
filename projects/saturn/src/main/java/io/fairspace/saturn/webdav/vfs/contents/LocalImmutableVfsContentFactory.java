@@ -27,19 +27,20 @@ public class LocalImmutableVfsContentFactory implements VfsContentFactory {
     }
 
     @Override
-    public String putContent(String vfsPath, InputStream in) throws IOException {
+    public StoredContent putContent(String vfsPath, InputStream in) throws IOException {
         // Create a new location every time something is written
         String contentLocation = newLocation();
 
+        long contentSize;
         try (OutputStream file = FileUtils.openOutputStream(getFileForLocation(contentLocation))) {
-            IOUtils.copy(in, file);
+            contentSize = IOUtils.copyLarge(in, file);
         }
 
-        return contentLocation;
+        return new StoredContent(contentLocation, contentSize);
     }
 
     private String newLocation() {
-        // TODO: Make deterministic
+        // TODO: Make deterministic?
         // TODO: Check for existence or rely on UUID randomness?
         return UUID.randomUUID().toString();
     }

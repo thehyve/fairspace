@@ -36,11 +36,13 @@ public class LocalImmutableVfsContentFactoryTest {
         String inputText = "Test text";
         Charset charset = UTF_8;
 
-        String location = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
+        StoredContent storedContent = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
+
+        assertEquals(inputText.getBytes(charset).length, storedContent.getSize());
 
         // Read content back again
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
-        contentFactory.getContent(location, capture);
+        contentFactory.getContent(storedContent.getLocation(), capture);
         String outputText = capture.toString(charset.name());
 
         assertEquals(inputText, outputText);
@@ -53,11 +55,12 @@ public class LocalImmutableVfsContentFactoryTest {
         // Write content
         byte[] bytes = { 0, 1, 2, 3, 10, 50, 100, 127, -1, -128 };
         ByteArrayInputStream input = new ByteArrayInputStream(bytes);
-        String location = contentFactory.putContent(vfsPath, input);
+        StoredContent storedContent = contentFactory.putContent(vfsPath, input);
+        assertEquals(bytes.length, storedContent.getSize());
 
         // Read content back again
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
-        contentFactory.getContent(location, capture);
+        contentFactory.getContent(storedContent.getLocation(), capture);
 
         assertArrayEquals(bytes, capture.toByteArray());
     }
@@ -78,12 +81,10 @@ public class LocalImmutableVfsContentFactoryTest {
         String inputText = "Test text";
         Charset charset = UTF_8;
 
-        String location = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
-        String location2 = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
+        StoredContent storedContent = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
+        StoredContent storedContent2 = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
 
-        assertNotEquals(location, location2);
+        assertEquals(storedContent.getSize(), storedContent2.getSize());
+        assertNotEquals(storedContent.getLocation(), storedContent2.getLocation());
     }
-
-
-
 }

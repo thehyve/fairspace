@@ -14,12 +14,13 @@ import org.apache.jena.rdf.model.Statement;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 
+import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CREATOR;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_CREATED;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_MODIFIED;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.IS_READY;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
+import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.SCHEMA_IDENTIFIER;
 
 @Getter
 @EqualsAndHashCode
@@ -30,11 +31,8 @@ public abstract class RdfAbstractResource implements VfsResource {
     private String path;
     private ZonedDateTime createdDate;
     private ZonedDateTime modifiedDate;
-
-    // TODO: Implement creator
     private VfsUser creator = null;
     private String parentId;
-    private boolean isReady;
 
     /**
      * Instantiates a resource object by reading values from the RDF model
@@ -81,13 +79,21 @@ public abstract class RdfAbstractResource implements VfsResource {
         RDFNode parentObject = getPropertyValueOrNull(rdfResource, model, PARENT);
         parentId= parentObject != null ? parentObject.asResource().getURI() : null;
 
-        RDFNode readyObject = getPropertyValueOrNull(rdfResource, model, IS_READY);
-        isReady = readyObject == null ? true : !readyObject.toString().equals("false");
+        RDFNode creatorUriObject = getPropertyValueOrNull(rdfResource, model, CREATOR);
+        if(creatorUriObject != null) {
+            RDFNode creatorNameObject = getPropertyValueOrNull(creatorUriObject.asResource(), model, NAME);
+            RDFNode creatorIdObject = getPropertyValueOrNull(creatorUriObject.asResource(), model, SCHEMA_IDENTIFIER);
+
+            creator = new VfsUser(
+                    creatorIdObject != null ? creatorIdObject.toString() : null,
+                    creatorNameObject != null ? creatorNameObject.toString() : null
+            );
+        }
+
     }
 
-    protected RDFNode getPropertyValueOrNull(Resource rdfResource, Model model, Property property) {
+    protected static RDFNode getPropertyValueOrNull(Resource rdfResource, Model model, Property property) {
         Statement statement = model.getProperty(rdfResource, property);
         return statement != null ? statement.getObject() : null;
     }
-
 }

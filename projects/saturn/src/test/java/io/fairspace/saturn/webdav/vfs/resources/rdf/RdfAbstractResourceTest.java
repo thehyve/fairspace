@@ -2,21 +2,20 @@ package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
 
+import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CREATOR;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_CREATED;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_MODIFIED;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.IS_READY;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
+import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.SCHEMA_IDENTIFIER;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class RdfAbstractResourceTest {
     @Test
@@ -46,26 +45,6 @@ public class RdfAbstractResourceTest {
 
         RdfAbstractResource vfsResource2 = createResource(resource2, model);
         assertEquals("http://resource2", vfsResource2.getUniqueId());
-    }
-
-    @Test
-    public void testIsReady() {
-        Model model = ModelFactory.createDefaultModel();
-
-        Resource resource1 = model.createResource("http://resource1");
-        Resource resource2 = model.createResource("http://resource2");
-        Resource resource3 = model.createResource("http://resource3");
-        model.add(resource2, IS_READY, "false");
-        model.add(resource3, IS_READY, "true");
-
-        RdfAbstractResource vfsResource1 = createResource(resource1, model);
-        assertTrue(vfsResource1.isReady());
-
-        RdfAbstractResource vfsResource2 = createResource(resource2, model);
-        assertFalse(vfsResource2.isReady());
-
-        RdfAbstractResource vfsResource3 = createResource(resource3, model);
-        assertTrue(vfsResource3.isReady());
     }
 
     @Test
@@ -135,6 +114,61 @@ public class RdfAbstractResourceTest {
 
         RdfAbstractResource vfsResource2 = createResource(resource2, model);
         assertNull(vfsResource2.getParentId());
+    }
+
+    @Test
+    public void testCreator() {
+        Model model = ModelFactory.createDefaultModel();
+
+        Resource resource1 = model.createResource("http://resource1");
+        Resource resource2 = model.createResource("http://resource2");
+        Resource user = model.createResource("http://user");
+
+        model.add(resource2, CREATOR, user);
+        model.add(user, SCHEMA_IDENTIFIER, "user-id");
+        model.add(user, NAME, "Donald Tusk");
+
+        RdfAbstractResource vfsResource1 = createResource(resource1, model);
+        assertNull(vfsResource1.getCreator());
+
+        RdfAbstractResource vfsResource2 = createResource(resource2, model);
+        assertNotNull(vfsResource2.getCreator());
+        assertEquals("user-id", vfsResource2.getCreator().getId());
+        assertEquals("Donald Tusk", vfsResource2.getCreator().getName());
+    }
+
+    @Test
+    public void testCreatorPartialData() {
+        // Both the id and name of the creator (or both) could be missing
+        Model model = ModelFactory.createDefaultModel();
+
+        Resource resource1 = model.createResource("http://resource1");
+        Resource resource2 = model.createResource("http://resource2");
+        Resource resource3 = model.createResource("http://resource3");
+        Resource user1 = model.createResource("http://user1");
+        Resource user2 = model.createResource("http://user2");
+        Resource user3 = model.createResource("http://user3");
+
+        model.add(resource1, CREATOR, user1);
+        model.add(resource2, CREATOR, user2);
+        model.add(resource3, CREATOR, user3);
+        model.add(user1, SCHEMA_IDENTIFIER, "user-id");
+        model.add(user2, NAME, "Donald Tusk");
+
+        RdfAbstractResource vfsResource1 = createResource(resource1, model);
+        assertNotNull(vfsResource1.getCreator());
+        assertEquals("user-id", vfsResource1.getCreator().getId());
+        assertNull(vfsResource1.getCreator().getName());
+
+        RdfAbstractResource vfsResource2 = createResource(resource2, model);
+        assertNotNull(vfsResource2.getCreator());
+        assertNull(vfsResource2.getCreator().getId());
+        assertEquals("Donald Tusk", vfsResource2.getCreator().getName());
+
+        RdfAbstractResource vfsResource3 = createResource(resource3, model);
+        assertNotNull(vfsResource3.getCreator());
+        assertNull(vfsResource3.getCreator().getId());
+        assertNull(vfsResource3.getCreator().getName());
     }
 
     private RdfAbstractResource createResource(Resource resource, Model model) {

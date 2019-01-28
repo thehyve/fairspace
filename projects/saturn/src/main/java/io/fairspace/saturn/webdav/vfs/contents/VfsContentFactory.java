@@ -18,8 +18,8 @@ public interface VfsContentFactory {
      * Stores the content from the inputstream to disk
      * @param vfsPath The VFS path for which the content is stored. May be used to determine the location
      * @param in      InputStream with the contents to store
-     * @return The location where the contents are stored
+     * @return A data object describing the location and size of the content that were stored
      * @throws IOException
      */
-    public String putContent(String vfsPath, InputStream in) throws IOException;
+    public StoredContent putContent(String vfsPath, InputStream in) throws IOException;
 }

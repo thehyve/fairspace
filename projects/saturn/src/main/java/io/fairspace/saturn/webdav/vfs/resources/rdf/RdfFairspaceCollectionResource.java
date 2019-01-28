@@ -14,7 +14,9 @@ public class RdfFairspaceCollectionResource extends RdfAbstractResource implemen
     }
 
     @Override
-    public boolean isReady() {
-        return true;
+    public String getName() {
+        // The name of a collection as it should appear to the file system does not
+        // equal the label, but it equals the basename of the path
+        return getPath().startsWith("/") ? getPath().replaceFirst("/", "") : getPath();
     }
 }

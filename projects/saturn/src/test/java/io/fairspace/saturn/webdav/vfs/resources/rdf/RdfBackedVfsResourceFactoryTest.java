@@ -9,11 +9,11 @@ import io.fairspace.saturn.webdav.vfs.resources.VfsRootResource;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,11 +28,11 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_CREATED;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_MODIFIED;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.FILESIZE;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.IS_READY;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.RDF_TYPE;
+import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.SCHEMA_IDENTIFIER;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_COLLECTION;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_DIRECTORY;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_FILE;
@@ -75,7 +75,6 @@ public class RdfBackedVfsResourceFactoryTest {
 
         assertNotNull(directoryResource);
         assertTrue(directoryResource instanceof VfsDirectoryResource);
-        assertTrue(directoryResource.isReady());
         assertNull(directoryResource.getParentId());
 
         assertEquals("directory", directoryResource.getName());
@@ -84,6 +83,7 @@ public class RdfBackedVfsResourceFactoryTest {
 
         // Verify subdirectory
         VfsResource subdirectoryResource = resourceFactory.getResource("/directory/subdirectory");
+        assertNotNull(subdirectoryResource);
         assertEquals("subdirectory", subdirectoryResource.getName());
         assertEquals("http://subdirectory", subdirectoryResource.getUniqueId());
     }
@@ -100,7 +100,6 @@ public class RdfBackedVfsResourceFactoryTest {
 
         VfsFileResource fileResource = (VfsFileResource) resource;
 
-        assertTrue(fileResource.isReady());
         assertEquals("http://file", fileResource.getUniqueId());
         assertEquals("http://subdirectory", fileResource.getParentId());
 
@@ -119,25 +118,36 @@ public class RdfBackedVfsResourceFactoryTest {
     }
 
     @Test
-    public void testDateCreated() {
-        // TODO: Test timezones, formats
+    public void testGetCreatorForResource() {
+        setupTestModel();
 
+        // Verify top level directory
+        VfsResource directoryResource = resourceFactory.getResource("/directory");
+
+        assertNotNull(directoryResource);
+        assertTrue(directoryResource instanceof VfsDirectoryResource);
+        assertNotNull(directoryResource.getCreator());
+        assertEquals("Donald Trump", directoryResource.getCreator().getName());
+        assertEquals("user-uuid", directoryResource.getCreator().getId());
     }
 
     @Test
-    public void testCreator() {
-        // TODO: Test username, missing value, etc
+    public void testGetResourceWithoutCreator() {
+        Resource directory = model.createResource("http://not-ready");
+        model.add(directory, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(directory, NAME, "no-creator");
+        model.add(directory, PATH, "/no-creator");
+        model.add(directory, DATE_CREATED, "2019-01-23T12:55:01+00:00");
+
+        // Verify top level directory
+        VfsResource directoryResource = resourceFactory.getResource("/no-creator");
+
+        assertNotNull(directoryResource);
+        assertNull(directoryResource.getCreator());
     }
 
     @Test
-    public void testFilesize() {
-        // TODO: Test username, missing value, etc
-    }
-
-    // TODO: Test edge cases for collection creation
-    @Test
-    public void testCreateCollection() {
-
+    public void testCreateDirectory() {
         // Create a parent collection
         Resource parent = model.createResource("http://parent");
         model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
@@ -145,7 +155,7 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(parent, PATH, "/test");
 
         // Create a collection
-        VfsDirectoryResource resource = resourceFactory.createCollection("http://parent", "/test/xyz");
+        VfsDirectoryResource resource = resourceFactory.createDirectory("http://parent", "/test/xyz");
 
         // Verify how it is stored
         Resource directory = model.createResource(resource.getUniqueId());
@@ -153,7 +163,6 @@ public class RdfBackedVfsResourceFactoryTest {
         assertTrue(model.contains(directory, RDF_TYPE, TYPE_DIRECTORY));
         assertTrue(model.contains(directory, NAME, "xyz"));
         assertTrue(model.contains(directory, PATH, "/test/xyz"));
-        assertTrue(model.contains(directory, IS_READY, "true"));
         assertTrue(model.contains(directory, PARENT, parent));
 
         // Verify dates
@@ -174,55 +183,67 @@ public class RdfBackedVfsResourceFactoryTest {
     }
 
     @Test
-    public void testCreateCollectionForRoot() {
+    public void testCreateDirectoryForRoot() {
         // Creating a collection for the root should be prohibited,
         // as the top level directories are collections, which should be
         // created through the Collections API
-        resourceFactory.createCollection(null, "/test/xyz");
+        resourceFactory.createDirectory(null, "/test/xyz");
 
         // Verify no triples have been added
         assertTrue(model.isEmpty());
     }
 
-
-    // TODO: Test edge cases
     @Test
-    public void testMarkFileStored() {
-        // Create a file stored in the triple store
-        String previousDate = ZonedDateTime.now().minusDays(1).toString();
-        Resource file= model.createResource("http://justuploaded");
-        model.add(file, RDF_TYPE, TYPE_FILE);
-        model.add(file, NAME, "test");
-        model.add(file, PATH, "/test");
-        model.add(file, CONTENT_LOCATION, "somewhere");
-        model.add(file, IS_READY, "false");
-        model.add(file, DATE_MODIFIED, previousDate);
-        model.add(file, DATE_CREATED, previousDate);
+    public void testCreateDirectoryWithinCollection() {
+        // Create a parent collection
+        Resource collection = model.createResource("http://collection");
+        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, NAME, "my-collection");
+        model.add(collection, PATH, "/test");
 
-        // Mark it as stored
-        VfsFileResource fileResource = new RdfFileResource(file, model);
-        VfsFileResource finalResource = resourceFactory.markFileStored(fileResource, "otherlocation");
+        // Creating a collection for the root should be prohibited,
+        // as the top level directories are collections, which should be
+        // created through the Collections API
+        VfsDirectoryResource directory = resourceFactory.createDirectory("http://collection", "/test/xyz");
 
-        // Verify date created has not changed
-        assertSingleValue(file, DATE_CREATED);
-        assertTrue(model.contains(file, DATE_CREATED, previousDate));
-
-        // Verify date modified has been changed
-        assertSingleValue(file, DATE_MODIFIED);
-        Statement dateModified = model.getProperty(file, DATE_MODIFIED);
-        ZonedDateTime storedModifiedDate = ZonedDateTime.parse(dateModified.getObject().toString());
-        assertDateIsJustNow(storedModifiedDate);
-
-        // Verify content_location has updated
-        assertSingleValue(file, CONTENT_LOCATION);
-        assertTrue(model.contains(file, CONTENT_LOCATION, "otherlocation"));
-
-        // Verify that the file is marked as ready
-        assertSingleValue(file, IS_READY);
-        assertTrue(model.contains(file, IS_READY, "true"));
+        // Verify directory creation
+        Resource resource = model.createResource(directory.getUniqueId());
+        assertTrue(model.contains(resource, PATH, "/test/xyz"));
     }
 
-    // TODO: Test edge cases for retrieving children
+    @Test(expected = NullPointerException.class)
+    public void testCreateDirectoryWithoutPath() {
+        // Create a parent collection
+        Resource collection = model.createResource("http://collection");
+        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, NAME, "my-collection");
+        model.add(collection, PATH, "/test");
+
+        resourceFactory.createDirectory("http://collection", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDirectoryWithEmptyPath() {
+        // Create a parent collection
+        Resource collection = model.createResource("http://collection");
+        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, NAME, "my-collection");
+        model.add(collection, PATH, "/test");
+
+        resourceFactory.createDirectory("http://collection", "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDirectoryWithPathNotMatchingParent() {
+        // Create a parent collection
+        Resource collection = model.createResource("http://collection");
+        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, NAME, "my-collection");
+        model.add(collection, PATH, "/test");
+
+        resourceFactory.createDirectory("http://collection", "/other-dir/my-new-dir");
+    }
+
     @Test
     public void testGetChildren() {
         setupTestModel();
@@ -246,20 +267,40 @@ public class RdfBackedVfsResourceFactoryTest {
 
         List<? extends VfsResource> children = resourceFactory.getChildren(null);
 
+        // Please note that for collections, the name equals the path
+        // as the name of the collection itself is not relevant to the filesystem
+        // as presented to the user
         assertEquals(2, children.size());
         assertTrue(children.stream().anyMatch(resource ->
-                ((VfsResource) resource).getName().equals("My collection") &&
+                ((VfsResource) resource).getName().equals("directory1") &&
                         resource instanceof VfsFairspaceCollectionResource
         ));
         assertTrue(children.stream().anyMatch(resource ->
-                ((VfsResource) resource).getName().equals("All my data") &&
+                ((VfsResource) resource).getName().equals("directory2") &&
                         resource instanceof VfsFairspaceCollectionResource
         ));
     }
 
+    @Test
+    public void testGetChildrenForCollection() {
+        setupTestCollections();
 
+        List<? extends VfsResource> children = resourceFactory.getChildren("http://collection1");
 
-    // TODO: Test edge cases for file creation
+        assertEquals(1, children.size());
+        assertTrue(children.stream().anyMatch(resource ->
+                ((VfsResource) resource).getName().equals("data.txt") &&
+                        resource instanceof VfsFileResource
+        ));
+    }
+
+    @Test
+    public void testGetChildrenForNonExistingDirectory() {
+        List<? extends VfsResource> children = resourceFactory.getChildren("http://not-existing-uri");
+
+        assertEquals(0, children.size());
+    }
+
     @Test
     public void testCreateFile() {
         // Create a parent collection
@@ -269,7 +310,7 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(parent, PATH, "/test");
 
         // Create a file
-        VfsFileResource file = resourceFactory.createFile("http://parent", "/test/path", 123l, "text/html");
+        VfsFileResource file = resourceFactory.storeFile("http://parent", "/test/path", 123l, "text/html", "content-location");
 
         // Verify how it is stored
         Resource resource = model.createResource(file.getUniqueId());
@@ -278,7 +319,8 @@ public class RdfBackedVfsResourceFactoryTest {
         assertTrue(model.contains(resource, NAME, "path"));
         assertTrue(model.contains(resource, PATH, "/test/path"));
         assertTrue(model.contains(resource, PARENT, parent));
-        assertTrue(model.contains(resource, IS_READY, "false"));
+        assertTrue(model.contains(resource, FILESIZE, "123B"));
+        assertTrue(model.contains(resource, CONTENT_LOCATION, "content-location"));
 
         // Verify dates
         Statement dateCreated = model.getProperty(resource, DATE_CREATED);
@@ -295,15 +337,107 @@ public class RdfBackedVfsResourceFactoryTest {
         assertEquals("http://parent", file.getParentId());
         assertEquals(storedCreatedDate, file.getCreatedDate());
         assertEquals(storedModifiedDate, file.getModifiedDate());
-        assertFalse(file.isReady());
+        assertEquals("content-location", file.getContentLocation());
     }
 
+    @Test
+    public void testCreateFileInRootDirectoryFails() {
+        VfsFileResource file = resourceFactory.storeFile(null, "/test/path", 123l, "text/html", "location");
 
-    public void testIntegration() {}
+        assertNull(file);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateFileWithNonExistingParent() {
+        // Create a parent collection
+        Resource parent = model.createResource("http://parent");
+        model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(parent, NAME, "test");
+        model.add(parent, PATH, "/test");
+
+        resourceFactory.storeFile("http://not-existing", "/test/path", 123l, "text/html", "location");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateFileInvalidPath() {
+        // Create a parent collection
+        Resource parent = model.createResource("http://parent");
+        model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(parent, NAME, "test");
+        model.add(parent, PATH, "/test");
+
+        resourceFactory.storeFile("http://parent", "/other-path/test.txt", 123l, "text/html", "location");
+    }
+
+    @Test
+    public void testCreateFileWithoutContentType() {
+        // Create a parent collection
+        Resource parent = model.createResource("http://parent");
+        model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(parent, NAME, "test");
+        model.add(parent, PATH, "/test");
+
+        VfsFileResource file = resourceFactory.storeFile("http://parent", "/test/test.txt", 123l, null, "location");
+
+        Resource fileResource = model.createResource(file.getUniqueId());
+        assertTrue(model.contains(fileResource, PATH, "/test/test.txt"));
+        assertNull(model.getProperty(fileResource, CONTENT_TYPE));
+    }
+
+    @Test
+    public void testUpdateFile() {
+        // Create a file resource
+        ZonedDateTime yesterday = ZonedDateTime.now().minusDays(1);
+
+        Resource file = model.createResource("http://parent");
+        model.add(file, RDF_TYPE, TYPE_FILE);
+        model.add(file, NAME, "test.txt");
+        model.add(file, PATH, "/test.txt");
+        model.add(file, DATE_CREATED, yesterday.toString());
+        model.add(file, DATE_MODIFIED, yesterday.toString());
+        model.add(file, FILESIZE, "0B");
+        model.add(file, CONTENT_LOCATION, "location-on-disk");
+
+        Model modelClone = ModelFactory.createModelForGraph(model.getGraph());
+        VfsFileResource fileResource = new RdfFileResource(file, modelClone);
+
+        VfsFileResource updatedFile = resourceFactory.updateFile(fileResource, 10l, "application/json", "other-place");
+
+        // Verify how it is stored
+        assertTrue(model.contains(file, RDF_TYPE, TYPE_FILE));
+        assertTrue(model.contains(file, NAME, "test.txt"));
+        assertTrue(model.contains(file, PATH, "/test.txt"));
+        assertTrue(model.contains(file, FILESIZE, "10B"));
+        assertTrue(model.contains(file, CONTENT_LOCATION, "other-place"));
+        assertTrue(model.contains(file, CONTENT_TYPE, "application/json"));
+
+        // Verify old values are removed
+        assertFalse(model.contains(file, FILESIZE, "0B"));
+        assertFalse(model.contains(file, CONTENT_LOCATION, "location-on-disk"));
+        assertFalse(model.contains(file, DATE_MODIFIED, yesterday.toString()));
+
+        // Verify dates
+        assertTrue(model.contains(file, DATE_CREATED, yesterday.toString()));
+
+        Statement dateModified = model.getProperty(file, DATE_MODIFIED);
+        ZonedDateTime storedModifiedDate = ZonedDateTime.parse(dateModified.getObject().toString());
+        assertDateIsJustNow(storedModifiedDate);
+
+        // Verify returned value
+        assertEquals("test.txt", updatedFile.getName());
+        assertEquals("/test.txt", updatedFile.getPath());
+        assertEquals(10, updatedFile.getFileSize());
+        assertEquals(yesterday, updatedFile.getCreatedDate());
+        assertEquals(storedModifiedDate, updatedFile.getModifiedDate());
+        assertEquals("other-place", updatedFile.getContentLocation());
+        assertEquals("application/json", updatedFile.getMimeType());
+    }
+
 
     private void setupTestCollections() {
         Resource collection1 = model.createResource("http://collection1");
         Resource collection2 = model.createResource("http://collection2");
+        Resource file = model.createResource("http://collection-file");
 
         model.add(collection1, RDF_TYPE, TYPE_COLLECTION);
         model.add(collection1, NAME, "My collection");
@@ -314,6 +448,15 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(collection2, NAME, "All my data");
         model.add(collection2, PATH, "/directory2");
         model.add(collection2, DATE_CREATED, "2019-01-23T12:58:01+00:00");
+
+        model.add(file, RDF_TYPE, TYPE_FILE);
+        model.add(file, NAME, "data.txt");
+        model.add(file, PATH, "/directory1/data.txt");
+        model.add(file, CONTENT_LOCATION, "/location-on-disk/abc.txt");
+        model.add(file, CONTENT_TYPE, "text/plain");
+        model.add(file, FILESIZE, "2MB");
+        model.add(file, DATE_CREATED, "2019-01-23T12:58:01+00:00");
+        model.add(file, PARENT, collection1);
     }
 
     private void setupTestModel() {
@@ -325,6 +468,7 @@ public class RdfBackedVfsResourceFactoryTest {
         Resource user = model.createResource("http://user");
 
         // Add a user
+        model.add(user, SCHEMA_IDENTIFIER, "user-uuid");
         model.add(user, NAME, "Donald Trump");
 
         // Setup a directory structure
@@ -338,7 +482,7 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(subdirectory, NAME, "subdirectory");
         model.add(subdirectory, PATH, "/directory/subdirectory");
         model.add(subdirectory, PARENT, directory);
-        model.add(subdirectory, IS_READY, "false");
+        model.add(subdirectory, CREATOR, user);
 
         // Add a file
         model.add(file, RDF_TYPE, TYPE_FILE);
@@ -349,7 +493,6 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(file, FILESIZE, "2MB");
         model.add(file, DATE_CREATED, "2019-01-23T12:58:01+00:00");
         model.add(file, CREATOR, user);
-        model.add(file, IS_READY, "true");
         model.add(file, PARENT, subdirectory);
 
         // Add another subdirectory
@@ -359,19 +502,6 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(additionaldirectory, DATE_CREATED, "2019-01-23T12:58:01+00:00");
         model.add(additionaldirectory, CREATOR, user);
         model.add(additionaldirectory, PARENT, subdirectory);
-        model.add(additionaldirectory, IS_READY, "true");
-
-        // Add a failed file
-        model.add(failed, RDF_TYPE, TYPE_FILE);
-        model.add(failed, NAME, "failed.txt");
-        model.add(failed, PATH, "/directory/subdirectory/failed.txt");
-        model.add(failed, CONTENT_LOCATION, "/somewhere-else.txt");
-        model.add(failed, CONTENT_TYPE, "text/plain");
-        model.add(failed, FILESIZE, "1MB");
-        model.add(failed, DATE_CREATED, "2019-01-23T12:58:01+00:00");
-        model.add(failed, CREATOR, user);
-        model.add(failed, IS_READY, "false");
-        model.add(failed, PARENT, subdirectory);
 
     }
 
