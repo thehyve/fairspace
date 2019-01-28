@@ -30,12 +30,14 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         Quad q = new Quad(g, s, p, o);
         switch (action) {
             case ADD:
-                added.add(q);
-                deleted.remove(q);
+                if (!deleted.remove(q)) {
+                    added.add(q);
+                }
                 break;
             case DELETE:
-                added.remove(q);
-                deleted.add(q);
+                if(!added.remove(q)) {
+                    deleted.add(q);
+                }
                 break;
         }
     }
