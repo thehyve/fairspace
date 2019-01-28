@@ -100,7 +100,7 @@ public class InvertingDatasetGraphTest {
 
     @Test
     public void propertyCanBeInverseToItself() {
-        Model vocabulary = ds.getNamedModel(VOCABULARY_GRAPH.getURI());
+        Model vocabulary = ds.getNamedModel(vocabularyGraph.getURI());
         vocabulary.add(p1, OWL.inverseOf, p1);
 
         Model m = ds.getDefaultModel();
@@ -111,14 +111,14 @@ public class InvertingDatasetGraphTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void propertyCannotHaveMultipleOpposites() {
-        Model vocabulary = ds.getNamedModel(VOCABULARY_GRAPH.getURI());
+        Model vocabulary = ds.getNamedModel(vocabularyGraph.getURI());
         vocabulary.add(p1, OWL.inverseOf, p2);
         vocabulary.add(p1, OWL.inverseOf, p3);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void checksMutualConsistency() {
-        Model vocabulary = ds.getNamedModel(VOCABULARY_GRAPH.getURI());
+        Model vocabulary = ds.getNamedModel(vocabularyGraph.getURI());
         vocabulary.add(p1, OWL.inverseOf, p2);
         vocabulary.add(p3, OWL.inverseOf, p1);
     }
