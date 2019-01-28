@@ -1,11 +1,11 @@
 package io.fairspace.saturn.webdav.milton;
 
-import io.fairspace.saturn.webdav.vfs.contents.VfsContentFactory;
+import io.fairspace.saturn.webdav.vfs.VirtualFileSystem;
 import io.fairspace.saturn.webdav.vfs.resources.VfsCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
+import io.fairspace.saturn.webdav.vfs.resources.VfsFairspaceCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
 import io.fairspace.saturn.webdav.vfs.resources.VfsRootResource;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -20,13 +20,12 @@ import java.io.InputStream;
 @Slf4j
 @Getter
 public class VfsBackedMiltonResourceFactory implements ResourceFactory {
+    public static final String PATH_SEPARATOR = "/";
     private final String contextPath;
-    private final VfsResourceFactory resourceFactory;
-    private final VfsContentFactory contentFactory;
+    private final VirtualFileSystem virtualFileSystem;
 
-    public VfsBackedMiltonResourceFactory(String contextPath, VfsResourceFactory resourceFactory, VfsContentFactory contentFactory) {
-        this.resourceFactory = resourceFactory;
-        this.contentFactory = contentFactory;
+    public VfsBackedMiltonResourceFactory(String contextPath, VirtualFileSystem virtualFileSystem) {
+        this.virtualFileSystem = virtualFileSystem;
 
         // Ensure the context path starts with a /
         if(contextPath == null) {
@@ -52,17 +51,22 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
             return null;
         }
 
-        return toMiltonResource(resourceFactory.getResource(webdavPath), this);
+        // The implementation should be insensitive to trailing slashes
+        // (see JavaDoc for {@see ResourceFactory} interface)
+        // As there may be multiple trailing slashes, the check is being repeated
+        while(webdavPath.endsWith(PATH_SEPARATOR)) {
+            webdavPath = webdavPath.substring(0, webdavPath.length() - 1);
+        }
+
+        return toMiltonResource(virtualFileSystem.getResource(webdavPath), this);
     }
 
-    public VfsFileResource storeFile(VfsFileResource vfsResource, InputStream inputStream) throws IOException {
-        // TODO: Handle error cases, exceptions etc.
-        // TODO: Update file length
-        String contentLocation = contentFactory.putContent(vfsResource.getPath(), inputStream);
+    public VfsFileResource storeFile(VfsCollectionResource parentResource, String name, String contentType, InputStream inputStream) throws IOException {
+        return virtualFileSystem.storeFile(parentResource, name, contentType, inputStream);
+    }
 
-        // On succesful upload, mark it as stored
-        // Store a reference to the updated resource
-        return resourceFactory.markFileStored(vfsResource, contentLocation);
+    public VfsFileResource updateFile(VfsFileResource resource, String contentType, InputStream inputStream) throws IOException {
+        return virtualFileSystem.updateFile(resource, contentType, inputStream);
     }
 
     /**
@@ -76,7 +80,7 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
             return null;
         }
 
-        if(vfsResource instanceof VfsDirectoryResource || vfsResource instanceof VfsRootResource) {
+        if(vfsResource instanceof VfsDirectoryResource || vfsResource instanceof VfsRootResource || vfsResource instanceof VfsFairspaceCollectionResource) {
             return new VfsBackedMiltonDirectoryResource((VfsCollectionResource) vfsResource, factory);
         } else if(vfsResource instanceof VfsFileResource) {
             return new VfsBackedMiltonFileResource((VfsFileResource) vfsResource, factory);
@@ -94,7 +98,7 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
     private String stripContext(String path) {
         if (this.contextPath != null && contextPath.length() > 0 && !contextPath.equals("/")) {
             if(path.equals(contextPath)) {
-                return "/";
+                return PATH_SEPARATOR;
             } else if(path.startsWith(contextPath)) {
                 return path.replaceFirst(contextPath, "");
             } else {

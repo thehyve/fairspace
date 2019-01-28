@@ -1,5 +1,6 @@
 package io.fairspace.saturn.webdav.milton;
 
+import io.fairspace.saturn.webdav.vfs.VirtualFileSystem;
 import io.fairspace.saturn.webdav.vfs.contents.LocalImmutableVfsContentFactory;
 import io.fairspace.saturn.webdav.vfs.contents.VfsContentFactory;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
@@ -26,12 +27,9 @@ import java.io.IOException;
 public class MiltonWebDAVServlet extends HttpServlet {
     private ServletContext servletContext;
 
-    private String basePath;
     private HttpManager httpManager;
 
     public MiltonWebDAVServlet(String basePath, RDFConnection connection) {
-        this.basePath = basePath;
-
         // TODO: Use DI
         VfsResourceFactory resourceFactory = new RdfBackedVfsResourceFactory(connection);
         VfsContentFactory contentFactory = new LocalImmutableVfsContentFactory(new File("/tmp"));
@@ -66,9 +64,9 @@ public class MiltonWebDAVServlet extends HttpServlet {
         }
     }
 
-    private static HttpManager setupHttpManager(String basePath, VfsResourceFactory resourceFactory, VfsContentFactory contentFactory) {
+    static HttpManager setupHttpManager(String basePath, VfsResourceFactory resourceFactory, VfsContentFactory contentFactory) {
         HttpManagerBuilder builder = new HttpManagerBuilder();
-        builder.setResourceFactory(new VfsBackedMiltonResourceFactory(basePath, resourceFactory, contentFactory));
+        builder.setResourceFactory(new VfsBackedMiltonResourceFactory(basePath, new VirtualFileSystem(contentFactory, resourceFactory)));
         builder.setEnableBasicAuth(false);
         return builder.buildHttpManager();
     }

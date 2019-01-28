@@ -11,12 +11,15 @@ import io.milton.http.exceptions.NotFoundException;
 import io.milton.resource.CollectionResource;
 import io.milton.resource.GetableResource;
 import io.milton.resource.ReplaceableResource;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.io.RuntimeIOException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
+@Slf4j
 public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource implements GetableResource, ReplaceableResource {
     private VfsFileResource vfsResource;
 
@@ -28,15 +31,18 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
     @Override
     public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
         // TODO: Handle additional parameters
-        factory.getContentFactory().getContent(vfsResource.getContentLocation(), out);
+        factory.getVirtualFileSystem().getContent(vfsResource.getContentLocation(), out);
     }
 
     @Override
     public void replaceContent(InputStream inputStream, Long length) throws BadRequestException, ConflictException, NotAuthorizedException {
         try {
-            this.vfsResource = factory.storeFile(vfsResource, inputStream);
+            // TODO: We do not have the content type for the new content, as it is not provided by Milton
+            //       Should we add logic to determine the content type?
+            this.vfsResource = factory.updateFile(vfsResource, vfsResource.getMimeType(), inputStream);
         } catch (IOException e) {
-            // TODO: How to handle error
+            log.warn("An IOException occurred while replacing content for file at " + vfsResource.getPath());
+            throw new RuntimeIOException(e);
         }
     }
 
