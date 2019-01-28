@@ -1,102 +1,176 @@
 import React from 'react';
-import Typography from "@material-ui/core/Typography";
-import Icon from "@material-ui/core/Icon";
-import {connect} from 'react-redux';
-import ErrorDialog from "./ErrorDialog";
-import * as collectionActions from '../../actions/collectionActions';
+import {
+    Card, CardHeader, CardContent,
+    IconButton, CardActions, Collapse,
+    Typography, Icon, withStyles,
+    Menu, MenuItem
+} from '@material-ui/core';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import classnames from 'classnames';
+
 import LoadingInlay from './LoadingInlay';
 import CollectionEditor from "./CollectionEditor";
-import {findById} from "../../utils/arrayUtils";
-import getDisplayName from "../../utils/userUtils";
-import permissionUtils from '../../utils/permissionUtils';
+import ConfirmationDialog from './ConfirmationDialog';
+import PermissionsContainer from "../permissions/PermissionsContainer";
+import {canManage} from '../../utils/permissionUtils';
+
+const ICONS = {
+    LOCAL_STORAGE: 'folder_open',
+    AZURE_BLOB_STORAGE: 'cloud_open',
+    S3_BUCKET: 'cloud_open',
+    GOOGLE_CLOUD_BUCKET: 'cloud_open'
+};
+
+const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
+
+const styles = theme => ({
+    expand: {
+        transform: 'rotate(0deg)',
+        marginLeft: 'auto',
+        transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest,
+        }),
+    },
+    expandOpen: {
+        transform: 'rotate(180deg)',
+    },
+});
 
 class CollectionDetails extends React.Component {
-    constructor(props) {
-        super(props);
+    state = {
+        editing: false,
+        anchorEl: null,
+        expanded: false,
+        deleting: false
+    };
 
-        this.state = {
-            collection: props.collection,
-            editing: false,
-            showEditButton: false
-        };
-    }
+    handleExpandClick = () => {
+        this.setState(state => ({expanded: !state.expanded}));
+    };
 
-    componentWillReceiveProps(props) {
-        this.setState({
-            collection: props.collection,
-            editing: false
-        });
-    }
-
-    handleChangeDetails = (name, description) => {
-        if ((name !== this.state.collection.name || description !== this.state.collection.description) && name !== '') {
-            this.props.updateCollection(this.state.collection.id, name, description)
-                .then(() => {
-                    const collection = Object.assign(this.state.collection, {name, description});
-
-                    if (this.props.onDidChangeDetails) {
-                        this.props.onDidChangeDetails(collection);
-                    }
-                })
-                .catch(e => ErrorDialog.showError(e, "An error occurred while updating collection metadata"));
+    handleEdit = () => {
+        if (canManage(this.props.collection)) {
+            this.setState({editing: true});
+            this.handleMenuClose();
         }
     }
 
-    handleTextMouseEnter() {
-        this.setState(prevState => ({showEditButton: permissionUtils.canManage(prevState.collection)}));
+    handleDelete = () => {
+        if (canManage(this.props.collection)) {
+            this.setState({deleting: true});
+            this.handleMenuClose();
+        }
     }
 
-    handleTextMouseLeave() {
-        this.setState({showEditButton: false});
+    handleCloseDelete = () => {
+        this.setState({deleting: false});
     }
 
-    handleTextClick() {
-        this.setState(prevState => ({editing: permissionUtils.canManage(prevState.collection)}));
+    handleMenuClick = event => {
+        this.setState({anchorEl: event.currentTarget});
+    };
+
+    handleMenuClose = () => {
+        this.setState({anchorEl: null});
+    };
+
+    handleSave = (name, description) => {
+        this.props.onUpdateCollection(name, description);
+        this.setState({editing: false});
     }
 
     render() {
-        const {loading} = this.props;
-        if (loading) {
+        const {classes, loading, collection} = this.props;
+        const {anchorEl, expanded, editing, deleting} = this.state;
+        const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
+        const canManageCollection = canManage(collection);
+
+        if (loading || !collection.creator) {
             return <LoadingInlay />;
         }
+
         return (
             <>
-                <div
-                    onClick={this.handleTextClick.bind(this)}
-                    onMouseEnter={this.handleTextMouseEnter.bind(this)}
-                    onMouseLeave={this.handleTextMouseLeave.bind(this)}
-                >
-                    <Typography
-                        variant="h5"
-                        component="h2"
-                    >
-                        {this.state.collection.name}
-                        {' '}
-                        {this.state.showEditButton ? (
-                            <Icon style={{fontSize: '0.9em'}}>edit</Icon>) : ''}
-                    </Typography>
-                    <Typography
-                        gutterBottom
-                        variant="subtitle1"
-                        color="textSecondary"
-                    >
-                        Owner:
-                        {` ${this.props.creatorFullname}`}
-                    </Typography>
-                    <Typography
-                        component="p"
-                    >
-                        {this.state.collection.description}
-                    </Typography>
-                </div>
-
-                {this.state.editing ? (
+                <Card>
+                    <CardHeader
+                        action={!canManageCollection ? null : (
+                            <>
+                                <IconButton
+                                    aria-label="More"
+                                    aria-owns={anchorEl ? 'long-menu' : undefined}
+                                    aria-haspopup="true"
+                                    onClick={this.handleMenuClick}
+                                >
+                                    <MoreVertIcon />
+                                </IconButton>
+                                <Menu
+                                    id="simple-menu"
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl)}
+                                    onClose={this.handleMenuClose}
+                                >
+                                    <MenuItem onClick={this.handleEdit}>
+                                        Rename
+                                    </MenuItem>
+                                    <MenuItem onClick={this.handleDelete}>
+                                        Delete
+                                    </MenuItem>
+                                </Menu>
+                            </>
+                        )}
+                        titleTypographyProps={{variant: 'h6'}}
+                        title={collection.name}
+                        avatar={(
+                            <Icon>
+                                {ICONS[iconName]}
+                            </Icon>
+                        )}
+                    />
+                    <CardContent>
+                        <Typography component="p">
+                            {collection.description}
+                        </Typography>
+                    </CardContent>
+                    <CardActions style={{padding: '0 8px'}} disableActionSpacing>
+                        <IconButton
+                            className={classnames(classes.expand, {
+                                [classes.expandOpen]: expanded,
+                            })}
+                            onClick={this.handleExpandClick}
+                            aria-expanded={expanded}
+                            aria-label="Show more"
+                            title="Collaborators"
+                        >
+                            <ExpandMoreIcon />
+                        </IconButton>
+                    </CardActions>
+                    <Collapse in={expanded} timeout="auto" unmountOnExit>
+                        <CardContent>
+                            <PermissionsContainer
+                                collectionId={collection.id}
+                                canManage={canManageCollection}
+                            />
+                        </CardContent>
+                    </Collapse>
+                </Card>
+                {editing ? (
                     <CollectionEditor
-                        name={this.state.collection.name}
-                        description={this.state.collection.description}
-                        title={`Edit collection: ${this.state.collection.name}`}
-                        onSave={this.handleChangeDetails}
+                        name={collection.name}
+                        description={collection.description}
+                        title={`Edit ${collection.name}`}
+                        onSave={this.handleSave}
                         onClose={() => this.setState({editing: false})}
+                    />
+                ) : null}
+                {deleting ? (
+                    <ConfirmationDialog
+                        open
+                        title="Confirmation"
+                        content={`Delete ${collection.name}`}
+                        onAgree={() => this.props.onCollectionDelete(this.props.collection)}
+                        onDisagree={this.handleCloseDelete}
+                        onClose={this.handleCloseDelete}
                     />
                 ) : null}
             </>
@@ -104,17 +178,4 @@ class CollectionDetails extends React.Component {
     }
 }
 
-const mapStateToProps = ({cache: {users}}, {collection: {creator}}) => {
-    const user = findById(users.data, creator);
-    const loading = users.pending || !creator;
-    return {
-        loading,
-        creatorFullname: loading ? '' : getDisplayName(user)
-    };
-};
-
-const mapDispatchToProps = {
-    ...collectionActions
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(CollectionDetails);
+export default withStyles(styles)(CollectionDetails);
