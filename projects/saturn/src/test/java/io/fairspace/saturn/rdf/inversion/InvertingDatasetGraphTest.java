@@ -30,6 +30,7 @@ public class InvertingDatasetGraphTest {
     private static final Property hasPart = createProperty("http://fairspace.io/ontology#hasPart");
     private static final Property p1 = createProperty("http://examle.com/p1");
     private static final Property p2 = createProperty("http://examle.com/p2");
+    private static final Property p3 = createProperty("http://examle.com/p3");
 
     private Dataset ds;
 
@@ -95,5 +96,30 @@ public class InvertingDatasetGraphTest {
         m.add(folder, p1, file);
         assertTrue(m.contains(folder, p1, file));
         assertTrue(m.contains(file, p2, folder));
+    }
+
+    @Test
+    public void propertyCanBeInverseToItself() {
+        Model vocabulary = ds.getNamedModel(VOCABULARY_GRAPH.getURI());
+        vocabulary.add(p1, OWL.inverseOf, p1);
+
+        Model m = ds.getDefaultModel();
+        m.add(folder, p1, file);
+        assertTrue(m.contains(folder, p1, file));
+        assertTrue(m.contains(file, p1, folder));
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void propertyCannotHaveMultipleOpposites() {
+        Model vocabulary = ds.getNamedModel(VOCABULARY_GRAPH.getURI());
+        vocabulary.add(p1, OWL.inverseOf, p2);
+        vocabulary.add(p1, OWL.inverseOf, p3);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void checksMutualConsistency() {
+        Model vocabulary = ds.getNamedModel(VOCABULARY_GRAPH.getURI());
+        vocabulary.add(p1, OWL.inverseOf, p2);
+        vocabulary.add(p3, OWL.inverseOf, p1);
     }
 }

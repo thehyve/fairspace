@@ -24,6 +24,7 @@ public class VocabularyAPIServlet extends HttpServlet {
         writeModel(api.getVocabulary(), resp);
     }
 
+    // TODO: Replace with more fine-grained methods
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         api.setVocabulary(readModel(req));

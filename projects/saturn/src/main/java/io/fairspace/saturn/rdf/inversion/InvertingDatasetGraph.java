@@ -40,6 +40,8 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
             case ADD:
                 // A new inversion rule added?
                     if (graph.equals(vocabularyGraph) && predicate.equals(inverseOf)) {
+                        checkConflicts(subject, object);
+                        checkConflicts(object, subject);
                         propertiesMap.put(subject, object);
                         propertiesMap.put(object, subject);
                 }
@@ -63,5 +65,12 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 break;
         }
     }
+
+        private void checkConflicts(Node subject, Node object) {
+            Node mapped = propertiesMap.get(subject);
+            if (mapped != null && !mapped.equals(object)) {
+                throw new UnsupportedOperationException("An inverse property for " + subject + " already exists");
+            }
+        }
 }
 
