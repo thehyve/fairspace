@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+/**
+ * Serializes transactions in SPARQL. Stores additional properties, e.g. timestamp using comment lines
+ */
 public class SparqlTransactionSerializer implements TransactionSerializer {
     static final String TIMESTAMP_PREFIX = "# Timestamp: ";
     static final String USER_NAME_PREFIX = "# User Name: ";

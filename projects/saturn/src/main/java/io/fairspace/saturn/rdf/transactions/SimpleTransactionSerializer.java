@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
+/**
+ * A TransactionSerializer using Java Serialization.
+ */
 public class SimpleTransactionSerializer implements TransactionSerializer {
     public static final TransactionSerializer INSTANCE = new SimpleTransactionSerializer();
 

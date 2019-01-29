@@ -35,7 +35,7 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
     }
 
     @Override
-    protected void change(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
+    protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
         switch (action) {
             case ADD:
                 // A new inversion rule added?

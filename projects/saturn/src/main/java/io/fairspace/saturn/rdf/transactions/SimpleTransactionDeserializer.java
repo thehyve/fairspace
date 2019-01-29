@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 
+/**
+ * A TransactionDeserializer using Java Serialization.
+ */
 public class SimpleTransactionDeserializer implements TransactionDeserializer {
     public static final TransactionDeserializer INSTANCE = new SimpleTransactionDeserializer();
 

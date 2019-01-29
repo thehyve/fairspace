@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Stores transactions in the following directory structure
+ * Stores transactions in the following directory structure:
  * volume-1
  *   chapter-1
  *     tx-1
@@ -77,7 +77,7 @@ public class LocalTransactionLog implements TransactionLog {
         var chapter = new File(volume, CHAPTER_PREFIX + chapterNumber);
         chapter.mkdirs();
         var record = new File(chapter, RECORD_PREFIX + (transactionNumber + 1));
-        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(record))) {
+        try (var out = new BufferedOutputStream(new FileOutputStream(record))) {
             serializer.write(transaction, out);
         }
     }

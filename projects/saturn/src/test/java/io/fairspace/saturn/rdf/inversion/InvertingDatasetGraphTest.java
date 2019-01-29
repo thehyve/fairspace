@@ -89,7 +89,7 @@ public class InvertingDatasetGraphTest {
 
         vocabulary.remove(p2, OWL.inverseOf, p1);
 
-        // Vocabulary updates do not change the graph
+        // Vocabulary updates do not onChange the graph
         assertTrue(m.contains(folder, p1, file));
         assertTrue(m.contains(file, p2, folder));
         // Adding an existing statement does not remove any statements
