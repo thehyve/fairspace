@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class RdfAbstractResourceTest {
+public class AbstractRdfResourceTest {
     @Test
     public void testName() {
         Model model = ModelFactory.createDefaultModel();
@@ -27,10 +27,10 @@ public class RdfAbstractResourceTest {
         Resource resource2 = model.createResource("http://resource2");
         model.add(resource2, NAME, "resource-name");
 
-        RdfAbstractResource vfsResource1 = createResource(resource1, model);
+        AbstractRdfResource vfsResource1 = createResource(resource1, model);
         assertNull(vfsResource1.getName());
 
-        RdfAbstractResource vfsResource2 = createResource(resource2, model);
+        AbstractRdfResource vfsResource2 = createResource(resource2, model);
         assertEquals("resource-name", vfsResource2.getName());
     }
 
@@ -41,10 +41,10 @@ public class RdfAbstractResourceTest {
         Resource resource1 = model.createResource("http://resource1");
         Resource resource2 = model.createResource("http://resource2");
 
-        RdfAbstractResource vfsResource1 = createResource(resource1, model);
+        AbstractRdfResource vfsResource1 = createResource(resource1, model);
         assertEquals("http://resource1", vfsResource1.getUniqueId());
 
-        RdfAbstractResource vfsResource2 = createResource(resource2, model);
+        AbstractRdfResource vfsResource2 = createResource(resource2, model);
         assertEquals("http://resource2", vfsResource2.getUniqueId());
     }
 
@@ -60,18 +60,18 @@ public class RdfAbstractResourceTest {
         model.add(resource3, DATE_CREATED, model.createTypedLiteral(GregorianCalendar.from(ZonedDateTime.parse("2019-01-23T12:58:01Z"))));
         model.add(resource4, DATE_CREATED, "unparsable-date");
 
-        RdfAbstractResource vfsResource1 = createResource(resource1, model);
+        AbstractRdfResource vfsResource1 = createResource(resource1, model);
         assertEquals(null, vfsResource1.getCreatedDate());
 
-        RdfAbstractResource vfsResource2 = createResource(resource2, model);
+        AbstractRdfResource vfsResource2 = createResource(resource2, model);
         assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01+03:00").toInstant(), vfsResource2.getCreatedDate());
 
         // Timezones are not needed. If not specified, UTC is assumed
-        RdfAbstractResource vfsResource3 = createResource(resource3, model);
+        AbstractRdfResource vfsResource3 = createResource(resource3, model);
         assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01Z").toInstant(), vfsResource3.getCreatedDate());
 
         // Set to null for unparsable dates
-        RdfAbstractResource vfsResource4 = createResource(resource4, model);
+        AbstractRdfResource vfsResource4 = createResource(resource4, model);
         assertEquals(null, vfsResource4.getCreatedDate());
     }
 
@@ -87,34 +87,19 @@ public class RdfAbstractResourceTest {
         model.add(resource3, DATE_MODIFIED, model.createTypedLiteral(GregorianCalendar.from(ZonedDateTime.parse("2019-01-23T12:58:01Z"))));
         model.add(resource4, DATE_MODIFIED, "unparsable-date");
 
-        RdfAbstractResource vfsResource1 = createResource(resource1, model);
+        AbstractRdfResource vfsResource1 = createResource(resource1, model);
         assertEquals(null, vfsResource1.getModifiedDate());
 
-        RdfAbstractResource vfsResource2 = createResource(resource2, model);
+        AbstractRdfResource vfsResource2 = createResource(resource2, model);
         assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01+03:00").toInstant(), vfsResource2.getModifiedDate());
 
         // Timezones are not needed. If not specified, UTC is assumed
-        RdfAbstractResource vfsResource3 = createResource(resource3, model);
+        AbstractRdfResource vfsResource3 = createResource(resource3, model);
         assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01Z").toInstant(), vfsResource3.getModifiedDate());
 
         // Set to null for unparsable dates
-        RdfAbstractResource vfsResource4 = createResource(resource4, model);
+        AbstractRdfResource vfsResource4 = createResource(resource4, model);
         assertEquals(null, vfsResource4.getModifiedDate());
-    }
-
-    @Test
-    public void testParentId() {
-        Model model = ModelFactory.createDefaultModel();
-
-        Resource resource1 = model.createResource("http://resource1");
-        Resource resource2 = model.createResource("http://resource2");
-        model.add(resource1, PARENT, resource2);
-
-        RdfAbstractResource vfsResource1 = createResource(resource1, model);
-        assertEquals("http://resource2", vfsResource1.getParentId());
-
-        RdfAbstractResource vfsResource2 = createResource(resource2, model);
-        assertNull(vfsResource2.getParentId());
     }
 
     @Test
@@ -129,10 +114,10 @@ public class RdfAbstractResourceTest {
         model.add(user, SCHEMA_IDENTIFIER, "user-id");
         model.add(user, NAME, "Donald Tusk");
 
-        RdfAbstractResource vfsResource1 = createResource(resource1, model);
+        AbstractRdfResource vfsResource1 = createResource(resource1, model);
         assertNull(vfsResource1.getCreator());
 
-        RdfAbstractResource vfsResource2 = createResource(resource2, model);
+        AbstractRdfResource vfsResource2 = createResource(resource2, model);
         assertNotNull(vfsResource2.getCreator());
         assertEquals("user-id", vfsResource2.getCreator().getId());
         assertEquals("Donald Tusk", vfsResource2.getCreator().getName());
@@ -156,23 +141,23 @@ public class RdfAbstractResourceTest {
         model.add(user1, SCHEMA_IDENTIFIER, "user-id");
         model.add(user2, NAME, "Donald Tusk");
 
-        RdfAbstractResource vfsResource1 = createResource(resource1, model);
+        AbstractRdfResource vfsResource1 = createResource(resource1, model);
         assertNotNull(vfsResource1.getCreator());
         assertEquals("user-id", vfsResource1.getCreator().getId());
         assertNull(vfsResource1.getCreator().getName());
 
-        RdfAbstractResource vfsResource2 = createResource(resource2, model);
+        AbstractRdfResource vfsResource2 = createResource(resource2, model);
         assertNotNull(vfsResource2.getCreator());
         assertNull(vfsResource2.getCreator().getId());
         assertEquals("Donald Tusk", vfsResource2.getCreator().getName());
 
-        RdfAbstractResource vfsResource3 = createResource(resource3, model);
+        AbstractRdfResource vfsResource3 = createResource(resource3, model);
         assertNotNull(vfsResource3.getCreator());
         assertNull(vfsResource3.getCreator().getId());
         assertNull(vfsResource3.getCreator().getName());
     }
 
-    private RdfAbstractResource createResource(Resource resource, Model model) {
-        return new RdfAbstractResource(resource, model) {};
+    private AbstractRdfResource createResource(Resource resource, Model model) {
+        return new AbstractRdfResource(resource, model) {};
     }
 }

@@ -1,9 +1,9 @@
 package io.fairspace.saturn.webdav.milton;
 
-import io.fairspace.saturn.webdav.vfs.VirtualFileSystem;
 import io.fairspace.saturn.webdav.vfs.resources.VfsCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
+import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -11,18 +11,15 @@ import io.milton.resource.Resource;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 @Slf4j
 @Getter
 public class VfsBackedMiltonResourceFactory implements ResourceFactory {
     public static final String PATH_SEPARATOR = "/";
     private final String contextPath;
-    private final VirtualFileSystem virtualFileSystem;
+    private final VfsResourceFactory resourceFactory;
 
-    public VfsBackedMiltonResourceFactory(String contextPath, VirtualFileSystem virtualFileSystem) {
-        this.virtualFileSystem = virtualFileSystem;
+    public VfsBackedMiltonResourceFactory(String contextPath, VfsResourceFactory resourceFactory) {
+        this.resourceFactory = resourceFactory;
 
         // Ensure the context path starts with a /
         if(contextPath == null) {
@@ -55,32 +52,23 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
             webdavPath = webdavPath.substring(0, webdavPath.length() - 1);
         }
 
-        return toMiltonResource(virtualFileSystem.getResource(webdavPath), this);
-    }
-
-    public VfsFileResource storeFile(VfsCollectionResource parentResource, String name, String contentType, InputStream inputStream) throws IOException {
-        return virtualFileSystem.storeFile(parentResource, name, contentType, inputStream);
-    }
-
-    public VfsFileResource updateFile(VfsFileResource resource, String contentType, InputStream inputStream) throws IOException {
-        return virtualFileSystem.updateFile(resource, contentType, inputStream);
+        return toMiltonResource(resourceFactory.getResource(webdavPath));
     }
 
     /**
      * Generates a new Milton {@Resource} object for the given Vfs resource
      * @param vfsResource
-     * @param factory
      * @return
      */
-    public static Resource toMiltonResource(VfsResource vfsResource, VfsBackedMiltonResourceFactory factory) {
+    public static Resource toMiltonResource(VfsResource vfsResource) {
         if(vfsResource == null) {
             return null;
         }
 
         if(vfsResource instanceof VfsCollectionResource) {
-            return new VfsBackedMiltonDirectoryResource((VfsCollectionResource) vfsResource, factory);
+            return new VfsBackedMiltonDirectoryResource((VfsCollectionResource) vfsResource);
         } else if(vfsResource instanceof VfsFileResource) {
-            return new VfsBackedMiltonFileResource((VfsFileResource) vfsResource, factory);
+            return new VfsBackedMiltonFileResource((VfsFileResource) vfsResource);
         }
 
         log.info("Unknown type of vfs resource provided {}", vfsResource.getClass().getSimpleName());

@@ -1,5 +1,6 @@
 package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
+import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
 import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFairspaceCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
@@ -19,7 +20,13 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.GregorianCalendar;
@@ -44,16 +51,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RdfBackedVfsResourceFactoryTest {
-    VfsResourceFactory resourceFactory;
+    @Mock
+    VfsContentStore contentStore;
+
+    RdfBackedVfsResourceFactory resourceFactory;
     Model model;
 
     @Before
     public void setUp() {
         Dataset dataset = DatasetFactory.createTxnMem();
         model = dataset.getDefaultModel();
-        resourceFactory = new RdfBackedVfsResourceFactory(new RDFConnectionLocal(dataset));
+        resourceFactory = new RdfBackedVfsResourceFactory(new RDFConnectionLocal(dataset), contentStore);
     }
 
     @Test
@@ -78,7 +90,6 @@ public class RdfBackedVfsResourceFactoryTest {
 
         assertNotNull(directoryResource);
         assertTrue(directoryResource instanceof VfsDirectoryResource);
-        assertNull(directoryResource.getParentId());
 
         assertEquals("directory", directoryResource.getName());
         assertEquals("http://directory", directoryResource.getUniqueId());
@@ -92,7 +103,7 @@ public class RdfBackedVfsResourceFactoryTest {
     }
 
     @Test
-    public void testGetResourceForFile() {
+    public void testGetResourceForFile() throws IOException {
         setupTestModel();
 
         // Verify top level directory
@@ -104,11 +115,14 @@ public class RdfBackedVfsResourceFactoryTest {
         VfsFileResource fileResource = (VfsFileResource) resource;
 
         assertEquals("http://file", fileResource.getUniqueId());
-        assertEquals("http://subdirectory", fileResource.getParentId());
 
-        assertEquals("/location-on-disk/abc.txt", fileResource.getContentLocation());
         assertEquals("text/plain", fileResource.getMimeType());
         assertEquals(2097152l, fileResource.getFileSize());
+
+        // Verify content location
+        OutputStream outputStream = new ByteArrayOutputStream();
+        fileResource.sendContent(outputStream);
+        verify(contentStore).getContent("/location-on-disk/abc.txt", outputStream);
     }
 
     @Test
@@ -180,7 +194,6 @@ public class RdfBackedVfsResourceFactoryTest {
         // Verify returned value
         assertEquals("xyz", resource.getName());
         assertEquals("/test/xyz", resource.getPath());
-        assertEquals("http://parent", resource.getParentId());
         assertEquals(storedCreatedDate.toInstant(), resource.getCreatedDate());
         assertEquals(storedModifiedDate.toInstant(), resource.getModifiedDate());
     }
@@ -265,10 +278,10 @@ public class RdfBackedVfsResourceFactoryTest {
     }
 
     @Test
-    public void testGetChildrenForRoot() {
+    public void testGetFairspaceCollections() {
         setupTestCollections();
 
-        List<? extends VfsResource> children = resourceFactory.getChildren(null);
+        List<? extends VfsResource> children = resourceFactory.getFairspaceCollections();
 
         // Please note that for collections, the name equals the path
         // as the name of the collection itself is not relevant to the filesystem
@@ -305,7 +318,7 @@ public class RdfBackedVfsResourceFactoryTest {
     }
 
     @Test
-    public void testCreateFile() {
+    public void testCreateFile() throws IOException {
         // Create a parent collection
         Resource parent = model.createResource("http://parent");
         model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
@@ -337,10 +350,13 @@ public class RdfBackedVfsResourceFactoryTest {
         // Verify returned value
         assertEquals("path", file.getName());
         assertEquals("/test/path", file.getPath());
-        assertEquals("http://parent", file.getParentId());
         assertEquals(storedCreatedDate.toInstant(), file.getCreatedDate());
         assertEquals(storedModifiedDate.toInstant(), file.getModifiedDate());
-        assertEquals("content-location", file.getContentLocation());
+
+        // Verify content location
+        OutputStream outputStream = new ByteArrayOutputStream();
+        file.sendContent(outputStream);
+        verify(contentStore).getContent("content-location", outputStream);
     }
 
     @Test
@@ -388,7 +404,7 @@ public class RdfBackedVfsResourceFactoryTest {
     }
 
     @Test
-    public void testUpdateFile() {
+    public void testUpdateFile() throws IOException {
         // Create a file resource
         ZonedDateTime yesterday = ZonedDateTime.now().minusDays(1);
         Literal yesterdayLiteral = model.createTypedLiteral(GregorianCalendar.from(yesterday));
@@ -403,7 +419,7 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(file, CONTENT_LOCATION, "location-on-disk");
 
         Model modelClone = ModelFactory.createModelForGraph(model.getGraph());
-        VfsFileResource fileResource = new RdfFileResource(file, modelClone);
+        VfsFileResource fileResource = new FileRdfResource(file, modelClone, resourceFactory, contentStore);
 
         VfsFileResource updatedFile = resourceFactory.updateFile(fileResource, 10l, "application/json", "other-place");
 
@@ -433,8 +449,12 @@ public class RdfBackedVfsResourceFactoryTest {
         assertEquals(10, updatedFile.getFileSize());
         assertEquals(yesterday.toInstant(), updatedFile.getCreatedDate());
         assertEquals(storedModifiedDate.toInstant(), updatedFile.getModifiedDate());
-        assertEquals("other-place", updatedFile.getContentLocation());
         assertEquals("application/json", updatedFile.getMimeType());
+
+        // Verify content location
+        OutputStream outputStream = new ByteArrayOutputStream();
+        updatedFile.sendContent(outputStream);
+        verify(contentStore).getContent("other-place", outputStream);
     }
 
     private void setupTestCollections() {

@@ -16,11 +16,9 @@ public abstract class VfsBackedMiltonResource implements Resource, PropFindableR
     private static final String REALM = "WebDAV";
 
     protected VfsResource vfsResource;
-    protected final VfsBackedMiltonResourceFactory factory;
 
-    public VfsBackedMiltonResource(VfsResource resource, VfsBackedMiltonResourceFactory factory) {
+    public VfsBackedMiltonResource(VfsResource resource) {
         this.vfsResource = resource;
-        this.factory = factory;
     }
 
     @Override

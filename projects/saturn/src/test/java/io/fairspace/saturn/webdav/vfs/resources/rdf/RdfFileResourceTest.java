@@ -1,10 +1,15 @@
 package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
+import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
+import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.ZonedDateTime;
 import java.util.GregorianCalendar;
@@ -16,27 +21,23 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RdfFileResourceTest {
+    @Mock
+    RdfBackedVfsResourceFactory resourceFactory;
+
+    @Mock
+    VfsContentStore contentStore;
+
+
     @Test
-    public void testtest() {
-        Model model = ModelFactory.createDefaultModel();
-
-        Resource resource1 = model.createResource("http://resource1");
-        model.add(resource1, NAME, model.createTypedLiteral(GregorianCalendar.from(ZonedDateTime.now())));
-
-        Statement property = model.getProperty(resource1, NAME);
-
-
-    }
-
-        @Test
     public void testBasicProperties() {
         Model model = ModelFactory.createDefaultModel();
 
         Resource resource1 = model.createResource("http://resource1");
         model.add(resource1, NAME, "resource-name");
 
-        RdfAbstractResource vfsResource1 = new RdfFileResource(resource1, model);
+        AbstractRdfResource vfsResource1 = new FileRdfResource(resource1, model, resourceFactory, contentStore);
         assertEquals("resource-name", vfsResource1.getName());
         assertEquals("http://resource1", vfsResource1.getUniqueId());
     }
@@ -49,10 +50,10 @@ public class RdfFileResourceTest {
         Resource resource2 = model.createResource("http://resource2");
         model.add(resource2, CONTENT_TYPE, "application/json");
 
-        RdfFileResource vfsResource1 = new RdfFileResource(resource1, model);
+        FileRdfResource vfsResource1 = new FileRdfResource(resource1, model, resourceFactory, contentStore);
         assertNull(vfsResource1.getMimeType());
 
-        RdfFileResource vfsResource2 = new RdfFileResource(resource2, model);
+        FileRdfResource vfsResource2 = new FileRdfResource(resource2, model, resourceFactory, contentStore);
         assertEquals("application/json", vfsResource2.getMimeType());
     }
 
@@ -64,10 +65,10 @@ public class RdfFileResourceTest {
         Resource resource2 = model.createResource("http://resource2");
         model.add(resource2, CONTENT_LOCATION, "location-on-disk");
 
-        RdfFileResource vfsResource1 = new RdfFileResource(resource1, model);
+        FileRdfResource vfsResource1 = new FileRdfResource(resource1, model, resourceFactory, contentStore);
         assertNull(vfsResource1.getContentLocation());
 
-        RdfFileResource vfsResource2 = new RdfFileResource(resource2, model);
+        FileRdfResource vfsResource2 = new FileRdfResource(resource2, model, resourceFactory, contentStore);
         assertEquals("location-on-disk", vfsResource2.getContentLocation());
     }
 
@@ -81,13 +82,13 @@ public class RdfFileResourceTest {
         model.add(resource2, FILESIZE, "1MB");
         model.add(resource3, FILESIZE, "10");
 
-        RdfFileResource vfsResource1 = new RdfFileResource(resource1, model);
+        FileRdfResource vfsResource1 = new FileRdfResource(resource1, model, resourceFactory, contentStore);
         assertEquals(0l, vfsResource1.getFileSize());
 
-        RdfFileResource vfsResource2 = new RdfFileResource(resource2, model);
+        FileRdfResource vfsResource2 = new FileRdfResource(resource2, model, resourceFactory, contentStore);
         assertEquals(1048576l, vfsResource2.getFileSize());
 
-        RdfFileResource vfsResource3 = new RdfFileResource(resource3, model);
+        FileRdfResource vfsResource3 = new FileRdfResource(resource3, model, resourceFactory, contentStore);
         assertEquals(10240, vfsResource3.getFileSize());
     }
 }

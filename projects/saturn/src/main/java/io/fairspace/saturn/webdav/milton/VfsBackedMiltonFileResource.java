@@ -23,15 +23,15 @@ import java.util.Map;
 public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource implements GetableResource, ReplaceableResource {
     private VfsFileResource vfsResource;
 
-    public VfsBackedMiltonFileResource(VfsFileResource resource, VfsBackedMiltonResourceFactory factory) {
-        super(resource, factory);
+    public VfsBackedMiltonFileResource(VfsFileResource resource) {
+        super(resource);
         this.vfsResource = resource;
     }
 
     @Override
     public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
         // TODO: Handle additional parameters
-        factory.getVirtualFileSystem().getContent(vfsResource.getContentLocation(), out);
+        vfsResource.sendContent(out);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
         try {
             // TODO: We do not have the content type for the new content, as it is not provided by Milton
             //       Should we add logic to determine the content type?
-            this.vfsResource = factory.updateFile(vfsResource, vfsResource.getMimeType(), inputStream);
+            this.vfsResource = vfsResource.updateContents(vfsResource.getMimeType(), inputStream);
         } catch (IOException e) {
             log.warn("An IOException occurred while replacing content for file at " + vfsResource.getPath());
             throw new RuntimeIOException(e);

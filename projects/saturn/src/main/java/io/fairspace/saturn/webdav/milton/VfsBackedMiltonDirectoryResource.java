@@ -28,26 +28,25 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     public static final String DIRECTORY_SEPARATOR = "/";
     private VfsCollectionResource vfsResource;
 
-    public VfsBackedMiltonDirectoryResource(VfsCollectionResource resource, VfsBackedMiltonResourceFactory factory) {
-        super(resource, factory);
+    public VfsBackedMiltonDirectoryResource(VfsCollectionResource resource) {
+        super(resource);
         this.vfsResource = resource;
     }
 
     @Override
     public CollectionResource createCollection(String newName) {
-        VfsDirectoryResource vfsCollectionResource = factory.getVirtualFileSystem().createDirectory(vfsResource.getUniqueId(), vfsResource.getPath() + DIRECTORY_SEPARATOR + newName);
-        return new VfsBackedMiltonDirectoryResource(vfsCollectionResource, factory);
+        return new VfsBackedMiltonDirectoryResource(vfsResource.createCollection(newName));
     }
 
     @Override
     public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
-        return factory.getResource(null,vfsResource.getPath() + DIRECTORY_SEPARATOR + childName);
+        return VfsBackedMiltonResourceFactory.toMiltonResource(vfsResource.getChild(childName));
     }
 
     @Override
     public List<? extends Resource> getChildren() {
-        return factory.getVirtualFileSystem().getChildren(vfsResource.getUniqueId()).stream()
-                .map(resource -> VfsBackedMiltonResourceFactory.toMiltonResource(resource, factory))
+        return vfsResource.getChildren().stream()
+                .map(resource -> VfsBackedMiltonResourceFactory.toMiltonResource(resource))
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +60,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         writer.println(String.format("<h1>Folder listing for %s</h1>", relativePath));
         writer.println("<ul>");
 
-        for (VfsResource child: factory.getVirtualFileSystem().getChildren(vfsResource.getUniqueId())) {
+        for (VfsResource child: vfsResource.getChildren()) {
             // TODO: Determine correct URI to link to
             writer.println(String.format("<li><a href=\"%s\">%s</a></li>", vfsResource.getPath() + "/" + child.getName(), child.getName()));
         }
@@ -89,10 +88,10 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     @Override
     public Resource createNew(String newName, InputStream inputStream, Long length, String contentType) throws IOException {
         // Store the file contents itself and add the resource to the directory tree
-        VfsFileResource fileResource = factory.storeFile(this.vfsResource, newName, contentType, inputStream);
+        VfsFileResource fileResource = vfsResource.createFile(newName, contentType, inputStream);
 
         // Return a reference to this resource
-        return VfsBackedMiltonResourceFactory.toMiltonResource(fileResource, factory);
+        return VfsBackedMiltonResourceFactory.toMiltonResource(fileResource);
     }
 
     @Override

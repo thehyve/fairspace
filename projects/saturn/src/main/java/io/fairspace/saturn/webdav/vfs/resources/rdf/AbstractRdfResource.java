@@ -21,21 +21,19 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_CREATED;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_MODIFIED;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.SCHEMA_IDENTIFIER;
 
 @Getter
 @EqualsAndHashCode
 @Slf4j
-public abstract class RdfAbstractResource implements VfsResource {
+public abstract class AbstractRdfResource implements VfsResource {
     private String uniqueId;
     private String name;
     private String path;
     private Instant createdDate;
     private Instant modifiedDate;
     private VfsUser creator = null;
-    private String parentId;
 
     /**
      * Instantiates a resource object by reading values from the RDF model
@@ -45,7 +43,7 @@ public abstract class RdfAbstractResource implements VfsResource {
      * @param rdfResource
      * @param model
      */
-    public RdfAbstractResource(Resource rdfResource, Model model) {
+    public AbstractRdfResource(Resource rdfResource, Model model) {
         extractModel(rdfResource, model);
     }
 
@@ -84,9 +82,6 @@ public abstract class RdfAbstractResource implements VfsResource {
                 modifiedDate = zonedDateTime.toInstant();
             }
         }
-
-        RDFNode parentObject = getPropertyValueOrNull(rdfResource, model, PARENT);
-        parentId= parentObject != null ? parentObject.asResource().getURI() : null;
 
         RDFNode creatorUriObject = getPropertyValueOrNull(rdfResource, model, CREATOR);
         if(creatorUriObject != null) {

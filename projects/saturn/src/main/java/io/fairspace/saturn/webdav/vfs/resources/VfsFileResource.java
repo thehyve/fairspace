@@ -1,10 +1,16 @@
 package io.fairspace.saturn.webdav.vfs.resources;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * Represents a file in the virtual file system
  */
 public interface VfsFileResource extends VfsResource {
-    public String getMimeType();
-    public long getFileSize();
-    public String getContentLocation();
+    String getMimeType();
+    long getFileSize();
+
+    void sendContent(OutputStream outputStream) throws IOException;
+    VfsFileResource updateContents(String contentType, InputStream inputStream) throws IOException;
 }

@@ -1,5 +1,6 @@
 package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
+import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
 import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFairspaceCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
@@ -44,11 +45,14 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
  * @TODO: Add transactions
  */
 public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
-    private static final VfsResource ROOT_RESOURCE = new VfsRootResource();
+    public static final String DIRECTORY_SEPARATOR = "/";
+    private final VfsResource ROOT_RESOURCE = new VfsRootResource(this);
     private RDFConnection connection;
+    private VfsContentStore contentStore;
 
-    public RdfBackedVfsResourceFactory(RDFConnection connection) {
+    public RdfBackedVfsResourceFactory(RDFConnection connection, VfsContentStore contentStore) {
         this.connection = connection;
+        this.contentStore = contentStore;
     }
 
     @Override
@@ -99,7 +103,57 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
     }
 
     @Override
-    public VfsDirectoryResource createDirectory(String parentId, @NonNull String path) {
+    public List<? extends VfsFairspaceCollectionResource> getFairspaceCollections() {
+        // TODO: Invoke collections api here
+        ParameterizedSparqlString sparql = new ParameterizedSparqlString();
+        sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?type ?collection ; ?p ?o }");
+        sparql.setIri("type", RDF_TYPE.getURI());
+        sparql.setIri("collection", TYPE_COLLECTION.getURI());
+
+        // Retrieve the data
+        Model model = connection.queryConstruct(sparql.asQuery());
+
+        // If no results are found, stop now
+        if(model.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Loop through all subjects in the model and return the resource in a list
+        return model.listSubjects()
+                .mapWith(rdfResource -> (VfsFairspaceCollectionResource) toVfsResource(model, rdfResource))
+                .toList();
+
+    }
+
+    @Override
+    public VfsFairspaceCollectionResource getFairspaceCollection(String name) {
+        // TODO: Invoke collections api here
+        ParameterizedSparqlString sparql = new ParameterizedSparqlString();
+        sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?type ?collection ; ?path ?requestedPath ; ?p ?o }");
+        sparql.setIri("type", RDF_TYPE.getURI());
+        sparql.setIri("collection", TYPE_COLLECTION.getURI());
+        sparql.setIri("path", PATH.getURI());
+        sparql.setLiteral("requestedPath", DIRECTORY_SEPARATOR + name);
+
+        // Retrieve the data
+        Model model = connection.queryConstruct(sparql.asQuery());
+
+        // If no results are found, stop now
+        if(model.isEmpty()) {
+            return null;
+        }
+
+        Resource subject = model.listSubjects().next();
+        return new FairspaceCollectionRdfResource(subject, model, this, contentStore);
+    }
+
+    /**
+     * Convenience method for creating a new directory
+     * @param parentId
+     * @param path
+     * @return
+     */
+    VfsDirectoryResource createDirectory(String parentId, @NonNull String path) {
         // The toplevel directories are modelled after fairspace collections. If
         // parentId is null, the user tries to create a toplevel directory, which
         // should be done via the Collections API
@@ -125,41 +179,15 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         // Store new triples in rdf store
         connection.load(model);
 
-        return new RdfDirectoryResource(collection, model);
+        return new DirectoryRdfResource(collection, model, this, contentStore);
     }
 
-    @Override
-    public List<? extends VfsResource> getChildren(String parentId) {
-        if(parentId == null) {
-            return this.getFairspaceCollectionResources();
-        } else {
-            return this.getChildrenFromStore(parentId);
-        }
-    }
-
-    private List<VfsFairspaceCollectionResource> getFairspaceCollectionResources() {
-        // TODO: Invoke collections api here
-        ParameterizedSparqlString sparql = new ParameterizedSparqlString();
-        sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?type ?collection ; ?p ?o }");
-        sparql.setIri("type", RDF_TYPE.getURI());
-        sparql.setIri("collection", TYPE_COLLECTION.getURI());
-
-        // Retrieve the data
-        Model model = connection.queryConstruct(sparql.asQuery());
-
-        // If no results are found, stop now
-        if(model.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // Loop through all subjects in the model and return the resource in a list
-        return model.listSubjects()
-                .mapWith(rdfResource -> (VfsFairspaceCollectionResource) toVfsResource(model, rdfResource))
-                .toList();
-
-    }
-
-    private List<? extends VfsResource> getChildrenFromStore(@NonNull String parentId) {
+    /**
+     * Convenience method to retrieve a list of children for a given resource identifier
+     * @param parentId
+     * @return
+     */
+    List<? extends VfsResource> getChildren(@NonNull String parentId) {
         ParameterizedSparqlString sparql = new ParameterizedSparqlString();
         sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?parent ?parentId ; ?p ?o }");
         sparql.setIri("parent", PARENT.getURI());
@@ -175,8 +203,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
 
     }
 
-    @Override
-    public VfsFileResource storeFile(String parentId, String path, Long fileSize, String contentType, String contentLocation) {
+    VfsFileResource storeFile(String parentId, String path, Long fileSize, String contentType, String contentLocation) {
         // The toplevel directories are modelled after fairspace collections
         // The user can not create files outside a collection
         if(parentId == null) {
@@ -197,8 +224,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         }
     }
 
-    @Override
-    public VfsFileResource updateFile(VfsResource resource, Long fileSize, String contentType, String contentLocation) {
+    VfsFileResource updateFile(VfsResource resource, Long fileSize, String contentType, String contentLocation) {
         // Update an existing file in the triple store
         // Please note that it expects a dateModified and a contentLocation triple to be present
         ParameterizedSparqlString deleteCommand = new ParameterizedSparqlString();
@@ -256,10 +282,10 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         connection.load(model);
 
         // Return the resource to be used immediately
-        return new RdfFileResource(file, model);
+        return new FileRdfResource(file, model, this, contentStore);
     }
 
-    private RdfAbstractResource toVfsResource(Model model, Resource rdfResource) {
+    private AbstractRdfResource toVfsResource(Model model, Resource rdfResource) {
         // Determine the resource type
         Statement typeTriple = model.getProperty(rdfResource, RDF_TYPE);
         if(typeTriple == null) {
@@ -267,11 +293,11 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         }
 
         if(typeTriple.getObject().equals(TYPE_DIRECTORY)) {
-            return new RdfDirectoryResource(rdfResource, model);
+            return new DirectoryRdfResource(rdfResource, model, this, contentStore);
         } else if(typeTriple.getObject().equals(TYPE_FILE)) {
-            return new RdfFileResource(rdfResource, model);
+            return new FileRdfResource(rdfResource, model, this, contentStore);
         } else if(typeTriple.getObject().equals(TYPE_COLLECTION)) {
-            return new RdfFairspaceCollectionResource(rdfResource, model);
+            return new FairspaceCollectionRdfResource(rdfResource, model, this, contentStore);
         } else {
             throw new IllegalStateException("Invalid type specified for metadata entity with id " + rdfResource.toString() + ": " + typeTriple.getObject().toString());
         }
@@ -285,7 +311,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
      * @param path      Path of the child resource
      * @return
      */
-    private boolean doesPathMatchParent(String parentId, String path) {
+    boolean doesPathMatchParent(String parentId, String path) {
         // Check whether the model contains the parent resource
         // and its path matches the requested path
         ParameterizedSparqlString sparql = new ParameterizedSparqlString();

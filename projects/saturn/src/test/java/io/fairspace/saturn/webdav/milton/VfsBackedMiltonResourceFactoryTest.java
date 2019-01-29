@@ -1,7 +1,7 @@
 package io.fairspace.saturn.webdav.milton;
 
-import io.fairspace.saturn.webdav.vfs.VirtualFileSystem;
-import io.fairspace.saturn.webdav.vfs.resources.rdf.RdfDirectoryResource;
+import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
+import io.fairspace.saturn.webdav.vfs.resources.rdf.DirectoryRdfResource;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
@@ -22,19 +22,19 @@ public class VfsBackedMiltonResourceFactoryTest {
     private String contextPath = "/testing";
 
     @Mock
-    private VirtualFileSystem virtualFileSystem;
+    private VfsResourceFactory resourceFactory;
 
     @Test
     public void testGetResource() throws NotAuthorizedException, BadRequestException {
-        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(null, virtualFileSystem);
+        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(null, resourceFactory);
 
-        RdfDirectoryResource root = mock(RdfDirectoryResource.class);
-        RdfDirectoryResource dir1 = mock(RdfDirectoryResource.class);
+        DirectoryRdfResource root = mock(DirectoryRdfResource.class);
+        DirectoryRdfResource dir1 = mock(DirectoryRdfResource.class);
         when(root.getName()).thenReturn("root");
         when(dir1.getName()).thenReturn("dir1");
 
-        when(virtualFileSystem.getResource("/testing")).thenReturn(root);
-        when(virtualFileSystem.getResource("/testing/dir1")).thenReturn(dir1);
+        when(resourceFactory.getResource("/testing")).thenReturn(root);
+        when(resourceFactory.getResource("/testing/dir1")).thenReturn(dir1);
 
         assertEquals("root", factory.getResource(null, "/testing").getName());
         assertEquals("dir1", factory.getResource(null, "/testing/dir1").getName());
@@ -44,15 +44,15 @@ public class VfsBackedMiltonResourceFactoryTest {
 
     @Test
     public void testGetResourceWithContextPath() throws NotAuthorizedException, BadRequestException {
-        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(contextPath, virtualFileSystem);
+        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(contextPath, resourceFactory);
 
-        RdfDirectoryResource root = mock(RdfDirectoryResource.class);
-        RdfDirectoryResource dir1 = mock(RdfDirectoryResource.class);
+        DirectoryRdfResource root = mock(DirectoryRdfResource.class);
+        DirectoryRdfResource dir1 = mock(DirectoryRdfResource.class);
         when(root.getName()).thenReturn("root");
         when(dir1.getName()).thenReturn("dir1");
 
-        when(virtualFileSystem.getResource("")).thenReturn(root);
-        when(virtualFileSystem.getResource("/dir1")).thenReturn(dir1);
+        when(resourceFactory.getResource("")).thenReturn(root);
+        when(resourceFactory.getResource("/dir1")).thenReturn(dir1);
 
         assertEquals("root", factory.getResource(null, "/testing").getName());
         assertEquals("dir1", factory.getResource(null, "/testing/dir1").getName());
@@ -62,15 +62,15 @@ public class VfsBackedMiltonResourceFactoryTest {
 
     @Test
     public void testGetResourceWithTrailingSlashes() throws NotAuthorizedException, BadRequestException {
-        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(contextPath, virtualFileSystem);
+        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(contextPath, resourceFactory);
 
-        RdfDirectoryResource root = mock(RdfDirectoryResource.class);
-        RdfDirectoryResource dir1 = mock(RdfDirectoryResource.class);
+        DirectoryRdfResource root = mock(DirectoryRdfResource.class);
+        DirectoryRdfResource dir1 = mock(DirectoryRdfResource.class);
         when(root.getName()).thenReturn("root");
         when(dir1.getName()).thenReturn("dir1");
 
-        when(virtualFileSystem.getResource("")).thenReturn(root);
-        when(virtualFileSystem.getResource("/dir1")).thenReturn(dir1);
+        when(resourceFactory.getResource("")).thenReturn(root);
+        when(resourceFactory.getResource("/dir1")).thenReturn(dir1);
 
         // Trailing slashes should not matter for the resource retrieval
         assertEquals("root", factory.getResource(null, "/testing").getName());
@@ -86,7 +86,7 @@ public class VfsBackedMiltonResourceFactoryTest {
 
     @Test
     public void testGetResourceOutsideContextPath() throws NotAuthorizedException, BadRequestException {
-        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(contextPath, virtualFileSystem);
+        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(contextPath, resourceFactory);
         Resource resource = factory.getResource(null, "/outside/testing/dir1");
 
         assertNull(resource);
@@ -95,7 +95,7 @@ public class VfsBackedMiltonResourceFactoryTest {
 
     @Test
     public void testGetNullResource() throws NotAuthorizedException, BadRequestException {
-        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(contextPath, virtualFileSystem);
+        VfsBackedMiltonResourceFactory factory = new VfsBackedMiltonResourceFactory(contextPath, resourceFactory);
         Resource resource = factory.getResource(null, null);
 
         assertNull(resource);
