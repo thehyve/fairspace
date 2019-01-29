@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    withStyles, List, ListItem, ListItemSecondaryAction,
+    List, ListItem, ListItemSecondaryAction,
     ListItemText, IconButton, Menu, Button
 } from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
@@ -15,16 +15,7 @@ import getDisplayName from "../../utils/userUtils";
 import {findById} from "../../utils/arrayUtils";
 import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
 
-export const styles = () => ({
-    collaboratorList: {
-        width: '100%'
-    },
-    buttonList: {
-        marginTop: '1em'
-    }
-});
-
-export class PermissionsViewer extends React.Component {
+class PermissionsViewer extends React.Component {
     constructor(props) {
         super(props);
 
@@ -87,7 +78,7 @@ export class PermissionsViewer extends React.Component {
         });
     };
 
-    handleClick = (event) => {
+    handleMenuClick = (event) => {
         this.setState({anchorEl: event.currentTarget});
     };
 
@@ -106,7 +97,7 @@ export class PermissionsViewer extends React.Component {
                     <ListItemText primary={getDisplayName(p.user)} secondary={p.access} />
                     <ListItemSecondaryAction>
                         <IconButton
-                            onClick={this.handleClick}
+                            onClick={this.handleMenuClick}
                             disabled={!canAlterPermission(canManage, p, currentUser)}
                         >
                             <MoreIcon />
@@ -145,6 +136,7 @@ export class PermissionsViewer extends React.Component {
             <Button
                 variant="text"
                 title="Add a collaborator"
+                aria-label="Add"
                 onClick={() => this.handleAlterPermission()}
                 disabled={!canManage}
             >
@@ -192,9 +184,7 @@ export class PermissionsViewer extends React.Component {
     };
 
     render() {
-        const {
-            classes, permissions, error, loading, altering
-        } = this.props;
+        const {permissions, error, loading, altering} = this.props;
 
         if (error) {
             return (<ErrorMessage message="An error occurred loading permissions" />);
@@ -207,7 +197,7 @@ export class PermissionsViewer extends React.Component {
         }
 
         return (
-            <div className={classes.collaboratorList}>
+            <div>
                 {this.renderPermissionDialog()}
                 {this.renderConfirmationDialog()}
                 {this.renderUserList(permissions)}
@@ -216,4 +206,4 @@ export class PermissionsViewer extends React.Component {
     }
 }
 
-export default withStyles(styles, {withTheme: true})(PermissionsViewer);
+export default PermissionsViewer;
