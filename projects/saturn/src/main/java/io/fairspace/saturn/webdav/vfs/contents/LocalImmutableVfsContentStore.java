@@ -40,8 +40,6 @@ public class LocalImmutableVfsContentStore implements VfsContentStore {
     }
 
     private String newLocation() {
-        // TODO: Make deterministic?
-        // TODO: Check for existence or rely on UUID randomness?
         return UUID.randomUUID().toString();
     }
 

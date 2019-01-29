@@ -164,15 +164,9 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?parent ?parentId ; ?p ?o }");
         sparql.setIri("parent", PARENT.getURI());
         sparql.setIri("parentId", parentId);
-        sparql.setLiteral("true", "true");
 
         // Retrieve the data
         Model model = connection.queryConstruct(sparql.asQuery());
-
-        // If no results are found, stop now
-        if(model.isEmpty()) {
-            return Collections.emptyList();
-        }
 
         // Loop through all subjects in the model and return the resource in a list
         return model.listSubjects()
