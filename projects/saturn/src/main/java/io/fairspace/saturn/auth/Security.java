@@ -1,10 +1,9 @@
-package io.fairspace.saturn;
+package io.fairspace.saturn.auth;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.UserAuthentication;
-import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.util.security.Constraint;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.jetty.KeycloakJettyAuthenticator;
@@ -13,7 +12,7 @@ import org.keycloak.representations.adapters.config.AdapterConfig;
 import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 
 public class Security {
-    static SecurityHandler createSecurityHandler(String jwksProviderUrl, String authRealm, String authRole) {
+    public static SecurityHandler createSecurityHandler(String jwksProviderUrl, String authRealm, String authRole) {
         return new ConstraintSecurityHandler() {{
             setAuthenticator(new KeycloakJettyAuthenticator() {{
                 setAdapterConfig(new AdapterConfig() {{

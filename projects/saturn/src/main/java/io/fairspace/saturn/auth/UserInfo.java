@@ -1,4 +1,4 @@
-package io.fairspace.saturn;
+package io.fairspace.saturn.auth;
 
 import lombok.Value;
 
@@ -6,7 +6,7 @@ import java.util.Set;
 
 @Value
 public class UserInfo {
-    String subject;
+    String userId;
     String userName;
     String fullName;
     Set<String> roles;

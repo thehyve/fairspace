@@ -1,6 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.Security;
+import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
 import org.apache.jena.graph.Node;
@@ -13,17 +13,20 @@ import org.apache.jena.sparql.core.QuadAction;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static java.lang.System.currentTimeMillis;
 
 public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private final TransactionLog transactionLog;
+    private final Supplier<UserInfo> userInfoProvider;
     private Set<Quad> added;   // Quads added in current transaction
     private Set<Quad> deleted; // Quads deleted in current transaction
 
-    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {
+    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<UserInfo> userInfoProvider) {
         super(dsg);
         this.transactionLog = transactionLog;
+        this.userInfoProvider = userInfoProvider;
     }
 
     /**
@@ -77,10 +80,12 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         t.setAdded(added);
         t.setDeleted(deleted);
         t.setTimestamp(currentTimeMillis());
-        var userInfo = Security.getUserInfo();
-        if (userInfo != null) {
-            t.setUserId(userInfo.getSubject());
-            t.setUserName(userInfo.getFullName());
+        if (userInfoProvider != null) {
+            var userInfo = userInfoProvider.get();
+            if (userInfo != null) {
+                t.setUserId(userInfo.getUserId());
+                t.setUserName(userInfo.getFullName());
+            }
         }
         added = null;
         deleted = null;

@@ -11,12 +11,10 @@ import org.cfg4j.source.classpath.ClasspathConfigurationSource;
 import org.cfg4j.source.compose.FallbackConfigurationSource;
 import org.cfg4j.source.context.filesprovider.ConfigFilesProvider;
 import org.cfg4j.source.files.FilesConfigurationSource;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.session.SessionHandler;
 
 import java.nio.file.Paths;
 
-import static io.fairspace.saturn.Security.createSecurityHandler;
+import static io.fairspace.saturn.auth.Security.createSecurityHandler;
 import static java.util.Collections.singletonList;
 
 public class App {
@@ -34,7 +32,6 @@ public class App {
         var ds = SaturnDatasetFactory.connect(CONFIG);
         var connection = new RDFConnectionLocal(ds);
 
-
         var fusekiServerBuilder = FusekiServer.create()
                 .add("/rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
@@ -46,13 +43,8 @@ public class App {
             fusekiServerBuilder.securityHandler(createSecurityHandler(CONFIG.authServerUrl(), CONFIG.authRealm(), CONFIG.authRole()));
         }
 
-        FusekiServer fusekiServer = fusekiServerBuilder
-                .build();
-
-        fusekiServer.getJettyServer().setHandler(new HandlerList(new SessionHandler(), fusekiServer.getJettyServer().getHandler()));
-
-        fusekiServer
-
+        fusekiServerBuilder
+                .build()
                 .start();
 
         System.out.println("Saturn is running on port " + CONFIG.port());
