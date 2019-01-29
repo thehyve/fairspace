@@ -14,12 +14,26 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
 
 public class SaturnDatasetFactory {
+    /**
+     * Returns a dataset.
+     * The original TDB2 dataset graph is wrapped with a number of wrapper classes, each adding a new feature
+     */
     public static Dataset connect(Config config) {
-        var vocabularyGraph = createURI(config.vocabularyURI());
+        // Create a TDB2 dataset graph
+        var baseDatasetGraph = connectDatasetGraph(config.datasetPath());
+
+        // Add transaction log
         var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), SparqlTransactionSerializer.INSTANCE);
-        var txnLogDatasetGraph = new TxnLogDatasetGraph(connectDatasetGraph(config.datasetPath()), txnLog);
+        var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog);
+
+        // Add property inversion
+        var vocabularyGraph = createURI(config.vocabularyURI());
         var dsg = new InvertingDatasetGraph(txnLogDatasetGraph, vocabularyGraph);
+
+        // Apply the vocabulary
         Vocabulary.init(dsg, vocabularyGraph);
+
+        // Create a dataset
         return DatasetFactory.wrap(dsg);
     }
 }

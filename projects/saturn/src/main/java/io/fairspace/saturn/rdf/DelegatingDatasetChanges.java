@@ -6,13 +6,13 @@ import org.apache.jena.sparql.core.QuadAction;
 
 @Data
 class DelegatingDatasetChanges extends AbstractDatasetChanges {
-    private ChangeListener changeListener;
+    private GraphChangeListener changeListener;
 
     @Override
-    public void change(QuadAction action, Node g, Node s, Node p, Node o) {
+    public void change(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
         var listener = changeListener;
         if (listener != null) {
-            listener.change(action, g, s, p, o);
+            listener.onChange(action, graph, subject, predicate, object);
         }
     }
 }

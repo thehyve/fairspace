@@ -17,25 +17,28 @@ import static java.lang.System.currentTimeMillis;
 
 public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private final TransactionLog transactionLog;
-    private Set<Quad> added;
-    private Set<Quad> deleted;
+    private Set<Quad> added;   // Quads added in current transaction
+    private Set<Quad> deleted; // Quads deleted in current transaction
 
     public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {
         super(dsg);
         this.transactionLog = transactionLog;
     }
 
+    /**
+     * Collects changes
+     */
     @Override
-    protected void change(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
+    protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
         var q = new Quad(graph, subject, predicate, object);
         switch (action) {
             case ADD:
-                if (!deleted.remove(q)) {
+                if (!deleted.remove(q)) {  // Check if it was previously deleted in same transaction
                     added.add(q);
                 }
                 break;
             case DELETE:
-                if(!added.remove(q)) {
+                if (!added.remove(q)) {    // Check if it was previously added in same transaction
                     deleted.add(q);
                 }
                 break;
@@ -47,10 +50,14 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         begin(TxnType.convert(type));
     }
 
+
+    /**
+     * Start either a READ or WRITE transaction.
+     **/
     @Override
     public void begin(ReadWrite readWrite) {
         super.begin(readWrite);
-        if (readWrite == ReadWrite.WRITE) {
+        if (readWrite == ReadWrite.WRITE) { // a write transaction => be ready to collect changes
             added = new HashSet<>();
             deleted = new HashSet<>();
         }
@@ -59,20 +66,24 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void commit() {
         if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
-            var t = new TransactionRecord();
-            t.setAdded(added);
-            t.setDeleted(deleted);
-            t.setTimestamp(currentTimeMillis());
-            // TODO: Set user info and commit message
-            added = null;
-            deleted = null;
-            try {
-                transactionLog.log(t);
-            } catch (IOException e) {
-                throw new TransactionException("Error writing to the transaction transactionLog", e);
-            }
+            logTransaction();
         }
         super.commit();
+    }
+
+    private void logTransaction() {
+        var t = new TransactionRecord();
+        t.setAdded(added);
+        t.setDeleted(deleted);
+        t.setTimestamp(currentTimeMillis());
+        // TODO: Set user info and commit message
+        added = null;
+        deleted = null;
+        try {
+            transactionLog.log(t);
+        } catch (IOException e) {
+            throw new TransactionException("Error writing to the transaction log", e);
+        }
     }
 
     @Override

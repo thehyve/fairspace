@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Stores transactions in the following directory structure
+ * Stores transactions in the following directory structure:
  * volume-1
  *   chapter-1
  *     tx-1

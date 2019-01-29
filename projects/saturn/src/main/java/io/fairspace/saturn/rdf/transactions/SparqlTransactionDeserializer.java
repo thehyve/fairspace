@@ -13,6 +13,9 @@ import java.util.HashSet;
 
 import static io.fairspace.saturn.rdf.transactions.SparqlTransactionSerializer.*;
 
+/**
+ * Deserializes transactions serialized by SparqlTransactionSerializer
+ */
 public class SparqlTransactionDeserializer implements TransactionDeserializer {
     public static final TransactionDeserializer INSTANCE = new SparqlTransactionDeserializer();
 

@@ -10,16 +10,20 @@ import java.util.Map;
 import static org.apache.jena.sparql.core.GraphView.createNamedGraph;
 import static org.apache.jena.sparql.core.Quad.defaultGraphNodeGenerated;
 
+/**
+ * A DatasetGraphMonitor which handles changes itself. Can be useful if changes-handling logic depends on Graph's state.
+ * Also overrides getDefaultGraph and getGraph to avoid exposure of unwrapped graphs.
+ */
 public abstract class AbstractChangesAwareDatasetGraph extends DatasetGraphMonitor {
     private final Map<Node, Graph> graphs = new HashMap<>();
 
     public AbstractChangesAwareDatasetGraph(DatasetGraph dsg) {
         super(dsg, new DelegatingDatasetChanges(), true);
 
-        ((DelegatingDatasetChanges) getMonitor()).setChangeListener(this::change);
+        ((DelegatingDatasetChanges) getMonitor()).setChangeListener(this::onChange);
     }
 
-    protected void change(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
+    protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
     }
 
     @Override
