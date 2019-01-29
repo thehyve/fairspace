@@ -26,8 +26,8 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     }
 
     @Override
-    protected void change(QuadAction action, Node g, Node s, Node p, Node o) {
-        var q = new Quad(g, s, p, o);
+    protected void change(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
+        var q = new Quad(graph, subject, predicate, object);
         switch (action) {
             case ADD:
                 if (!deleted.remove(q)) {
