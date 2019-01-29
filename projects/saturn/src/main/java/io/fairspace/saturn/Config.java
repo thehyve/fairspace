@@ -8,4 +8,12 @@ public interface Config {
     String datasetPath();
 
     String transactionLogPath();
+
+    boolean authEnabled();
+
+    String authServerUrl();
+
+    String authRealm();
+
+    String authRole();
 }

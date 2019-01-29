@@ -3,3 +3,7 @@ saturn:
   datasetPath: data/db
   transactionLogPath: data/log
   vocabularyURI: http://fairspace.io/vocabulary#
+  authEnabled: false
+  authServerUrl: none
+  authRealm: none
+  authRole: none

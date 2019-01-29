@@ -29,6 +29,7 @@ repositories {
 dependencies {
     compile "org.apache.jena:jena-fuseki-main:${jena_version}"
     compile "org.cfg4j:cfg4j-core:4.4.1"
+    compile 'org.keycloak:keycloak-jetty94-adapter:4.8.2.Final'
     
     testCompile "junit:junit:4.12"
 }
