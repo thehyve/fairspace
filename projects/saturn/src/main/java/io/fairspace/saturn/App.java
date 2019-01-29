@@ -11,6 +11,8 @@ import org.cfg4j.source.classpath.ClasspathConfigurationSource;
 import org.cfg4j.source.compose.FallbackConfigurationSource;
 import org.cfg4j.source.context.filesprovider.ConfigFilesProvider;
 import org.cfg4j.source.files.FilesConfigurationSource;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.session.SessionHandler;
 
 import java.nio.file.Paths;
 
@@ -44,8 +46,13 @@ public class App {
             fusekiServerBuilder.securityHandler(createSecurityHandler(CONFIG.authServerUrl(), CONFIG.authRealm(), CONFIG.authRole()));
         }
 
-        fusekiServerBuilder
-                .build()
+        FusekiServer fusekiServer = fusekiServerBuilder
+                .build();
+
+        fusekiServer.getJettyServer().setHandler(new HandlerList(new SessionHandler(), fusekiServer.getJettyServer().getHandler()));
+
+        fusekiServer
+
                 .start();
 
         System.out.println("Saturn is running on port " + CONFIG.port());

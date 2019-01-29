@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import io.fairspace.saturn.Security;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
 import org.apache.jena.graph.Node;
@@ -76,7 +77,11 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         t.setAdded(added);
         t.setDeleted(deleted);
         t.setTimestamp(currentTimeMillis());
-        // TODO: Set user info and commit message
+        var userInfo = Security.getUserInfo();
+        if (userInfo != null) {
+            t.setUserId(userInfo.getSubject());
+            t.setUserName(userInfo.getFullName());
+        }
         added = null;
         deleted = null;
         try {
