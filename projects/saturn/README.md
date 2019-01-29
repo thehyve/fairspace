@@ -21,7 +21,14 @@ Currently it supports the following methods:
 | DELETE      | -                                         | JsonLD-encoded statements | Deletes the statements provided                                    |
 | PATCH       | -                                         | JsonLD-encoded statements | Replaces existing triples with the statements provided             |
 
-In the future, Saturn will also host a number of high-level APIs and, at least temporarily, a WebDAV service.
+### High-level vocabulary API
+The high-level metadata API runs on :8080/vocabulary.
+Currently it supports the following methods:
+
+| HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                  |
+|-------------|-------------------------------------------|---------------------------|------------------------------------------------------------------- |
+| GET         | -                                         | -                         | Returns JsonLD-encoded vocabulary                                  |
+| PUT         | -                                         | JsonLD-encoded vocabulary | Replaces the vocabulary with the provided model                    |
 
 ## How to build
 
