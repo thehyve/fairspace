@@ -9,6 +9,7 @@ import io.fairspace.saturn.webdav.vfs.resources.VfsRootResource;
 import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
@@ -18,6 +19,7 @@ import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CONTENT_LOCATION;
@@ -116,8 +118,8 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         model.add(collection, RDF_TYPE, TYPE_DIRECTORY);
         model.add(collection, NAME, baseName(path));
         model.add(collection, PATH, path);
-        model.add(collection, DATE_CREATED, ZonedDateTime.now().toString());
-        model.add(collection, DATE_MODIFIED, ZonedDateTime.now().toString());
+        model.add(collection, DATE_CREATED, createNowLiteral());
+        model.add(collection, DATE_MODIFIED, createNowLiteral());
         model.add(collection, PARENT, model.createResource(parentId));
 
         // Store new triples in rdf store
@@ -225,7 +227,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         insertCommand.setIri("fileSize", FILESIZE.getURI());
         insertCommand.setIri("contentType", CONTENT_TYPE.getURI());
         insertCommand.setIri("contentLocation", CONTENT_LOCATION.getURI());
-        insertCommand.setLiteral("now", ZonedDateTime.now().toString());
+        insertCommand.setLiteral("now", createNowLiteral());
         insertCommand.setLiteral("size", FileSize.format(fileSize));
         insertCommand.setLiteral("location", contentLocation);
         insertCommand.setLiteral("type", contentType);
@@ -245,8 +247,8 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         model.add(file, RDF_TYPE, TYPE_FILE);
         model.add(file, NAME, baseName(path));
         model.add(file, PATH, path);
-        model.add(file, DATE_CREATED, ZonedDateTime.now().toString());
-        model.add(file, DATE_MODIFIED, ZonedDateTime.now().toString());
+        model.add(file, DATE_CREATED, createNowLiteral());
+        model.add(file, DATE_MODIFIED, createNowLiteral());
         model.add(file, PARENT, model.createResource(parentId));
 
         model.add(file, FILESIZE, FileSize.format(fileSize));
@@ -322,6 +324,14 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         } else {
             return path.substring(0, path.lastIndexOf("/"));
         }
+    }
+
+    private Literal createTypedLiteral(ZonedDateTime dateTime) {
+        return ModelFactory.createDefaultModel().createTypedLiteral(GregorianCalendar.from(dateTime));
+    }
+
+    private Literal createNowLiteral() {
+        return createTypedLiteral(ZonedDateTime.now());
     }
 
 }

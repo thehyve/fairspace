@@ -6,6 +6,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
+import java.util.GregorianCalendar;
 
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CREATOR;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_CREATED;
@@ -55,19 +56,19 @@ public class RdfAbstractResourceTest {
         Resource resource2 = model.createResource("http://resource2");
         Resource resource3 = model.createResource("http://resource3");
         Resource resource4 = model.createResource("http://resource4");
-        model.add(resource2, DATE_CREATED, "2019-01-23T12:58:01+03:00");
-        model.add(resource3, DATE_CREATED, "2019-01-23T12:58:01");
+        model.add(resource2, DATE_CREATED, model.createTypedLiteral(GregorianCalendar.from(ZonedDateTime.parse("2019-01-23T12:58:01+03:00"))));
+        model.add(resource3, DATE_CREATED, model.createTypedLiteral(GregorianCalendar.from(ZonedDateTime.parse("2019-01-23T12:58:01Z"))));
         model.add(resource4, DATE_CREATED, "unparsable-date");
 
         RdfAbstractResource vfsResource1 = createResource(resource1, model);
         assertEquals(null, vfsResource1.getCreatedDate());
 
         RdfAbstractResource vfsResource2 = createResource(resource2, model);
-        assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01+03:00"), vfsResource2.getCreatedDate());
+        assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01+03:00").toInstant(), vfsResource2.getCreatedDate());
 
-        // Require a timezone to be specified
+        // Timezones are not needed. If not specified, UTC is assumed
         RdfAbstractResource vfsResource3 = createResource(resource3, model);
-        assertEquals(null, vfsResource3.getCreatedDate());
+        assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01Z").toInstant(), vfsResource3.getCreatedDate());
 
         // Set to null for unparsable dates
         RdfAbstractResource vfsResource4 = createResource(resource4, model);
@@ -82,19 +83,19 @@ public class RdfAbstractResourceTest {
         Resource resource2 = model.createResource("http://resource2");
         Resource resource3 = model.createResource("http://resource3");
         Resource resource4 = model.createResource("http://resource4");
-        model.add(resource2, DATE_MODIFIED, "2019-01-23T12:58:01+03:00");
-        model.add(resource3, DATE_MODIFIED, "2019-01-23T12:58:01");
+        model.add(resource2, DATE_MODIFIED, model.createTypedLiteral(GregorianCalendar.from(ZonedDateTime.parse("2019-01-23T12:58:01+03:00"))));
+        model.add(resource3, DATE_MODIFIED, model.createTypedLiteral(GregorianCalendar.from(ZonedDateTime.parse("2019-01-23T12:58:01Z"))));
         model.add(resource4, DATE_MODIFIED, "unparsable-date");
 
         RdfAbstractResource vfsResource1 = createResource(resource1, model);
         assertEquals(null, vfsResource1.getModifiedDate());
 
         RdfAbstractResource vfsResource2 = createResource(resource2, model);
-        assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01+03:00"), vfsResource2.getModifiedDate());
+        assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01+03:00").toInstant(), vfsResource2.getModifiedDate());
 
-        // Require a timezone to be specified
+        // Timezones are not needed. If not specified, UTC is assumed
         RdfAbstractResource vfsResource3 = createResource(resource3, model);
-        assertEquals(null, vfsResource3.getModifiedDate());
+        assertEquals(ZonedDateTime.parse("2019-01-23T12:58:01Z").toInstant(), vfsResource3.getModifiedDate());
 
         // Set to null for unparsable dates
         RdfAbstractResource vfsResource4 = createResource(resource4, model);

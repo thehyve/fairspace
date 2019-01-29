@@ -52,7 +52,7 @@ public abstract class VfsBackedMiltonResource implements Resource, PropFindableR
 
     @Override
     public Date getModifiedDate() {
-        return vfsResource.getModifiedDate() != null ? Date.from(vfsResource.getModifiedDate().toInstant()) : null;
+        return vfsResource.getModifiedDate() != null ? Date.from(vfsResource.getModifiedDate()) : null;
     }
 
     @Override
@@ -62,6 +62,6 @@ public abstract class VfsBackedMiltonResource implements Resource, PropFindableR
 
     @Override
     public Date getCreateDate() {
-        return vfsResource.getCreatedDate() != null ? Date.from(vfsResource.getCreatedDate().toInstant()) : null;
+        return vfsResource.getCreatedDate() != null ? Date.from(vfsResource.getCreatedDate()) : null;
     }
 }

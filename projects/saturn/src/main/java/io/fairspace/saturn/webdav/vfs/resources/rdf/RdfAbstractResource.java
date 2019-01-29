@@ -5,14 +5,17 @@ import io.fairspace.saturn.webdav.vfs.resources.VfsUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
+import java.util.GregorianCalendar;
 
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CREATOR;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_CREATED;
@@ -29,8 +32,8 @@ public abstract class RdfAbstractResource implements VfsResource {
     private String uniqueId;
     private String name;
     private String path;
-    private ZonedDateTime createdDate;
-    private ZonedDateTime modifiedDate;
+    private Instant createdDate;
+    private Instant modifiedDate;
     private VfsUser creator = null;
     private String parentId;
 
@@ -61,19 +64,25 @@ public abstract class RdfAbstractResource implements VfsResource {
         path = pathObject != null ? pathObject.toString() : null;
 
         RDFNode createdDateObject = getPropertyValueOrNull(rdfResource, model, DATE_CREATED);
-        try {
-            createdDate = createdDateObject != null ? ZonedDateTime.parse(createdDateObject.toString()) : null;
-        } catch(DateTimeParseException e) {
-            // Only log the problem, but createdDate will remain null
-            log.info("Invalid datetime found in RDF datastore for date created: " + createdDateObject.toString());
+        if(createdDateObject != null) {
+            ZonedDateTime zonedDateTime = parseTypedDateTimeLiteral(createdDateObject.asLiteral());
+            if(zonedDateTime == null) {
+                log.info("Invalid datetime found in RDF datastore for date created: " + createdDateObject.toString());
+                createdDate = null;
+            } else {
+                createdDate = zonedDateTime.toInstant();
+            }
         }
 
         RDFNode modifiedDateObject = getPropertyValueOrNull(rdfResource, model, DATE_MODIFIED);
-        try {
-            modifiedDate = modifiedDateObject != null ? ZonedDateTime.parse(modifiedDateObject.toString()) : null;
-        } catch(DateTimeParseException e) {
-            // Only log the problem, but modifiedDate will remain null
-            log.info("Invalid datetime found in RDF datastore for date modified: " + modifiedDateObject.toString());
+        if(modifiedDateObject != null) {
+            ZonedDateTime zonedDateTime = parseTypedDateTimeLiteral(modifiedDateObject.asLiteral());
+            if(zonedDateTime == null) {
+                log.info("Invalid datetime found in RDF datastore for date modified: " + modifiedDateObject.toString());
+                modifiedDate = null;
+            } else {
+                modifiedDate = zonedDateTime.toInstant();
+            }
         }
 
         RDFNode parentObject = getPropertyValueOrNull(rdfResource, model, PARENT);
@@ -91,6 +100,20 @@ public abstract class RdfAbstractResource implements VfsResource {
         }
 
     }
+
+    private ZonedDateTime parseTypedDateTimeLiteral(Literal literal) {
+        if(literal == null)
+            return null;
+
+        Object value = literal.getValue();
+
+        if(value instanceof XSDDateTime) {
+            return ((GregorianCalendar) ((XSDDateTime) value).asCalendar()).toZonedDateTime();
+        }
+
+        return null;
+    }
+
 
     protected static RDFNode getPropertyValueOrNull(Resource rdfResource, Model model, Property property) {
         Statement statement = model.getProperty(rdfResource, property);

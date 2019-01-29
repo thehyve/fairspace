@@ -6,8 +6,10 @@ import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
 import io.fairspace.saturn.webdav.vfs.resources.VfsRootResource;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
@@ -20,6 +22,7 @@ import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CONTENT_LOCATION;
@@ -79,7 +82,7 @@ public class RdfBackedVfsResourceFactoryTest {
 
         assertEquals("directory", directoryResource.getName());
         assertEquals("http://directory", directoryResource.getUniqueId());
-        assertEquals(ZonedDateTime.parse("2019-01-23T12:55:01+00:00"), directoryResource.getCreatedDate());
+        assertEquals(ZonedDateTime.parse("2019-01-23T12:55:01+00:00").toInstant(), directoryResource.getCreatedDate());
 
         // Verify subdirectory
         VfsResource subdirectoryResource = resourceFactory.getResource("/directory/subdirectory");
@@ -167,19 +170,19 @@ public class RdfBackedVfsResourceFactoryTest {
 
         // Verify dates
         Statement dateCreated = model.getProperty(directory, DATE_CREATED);
-        ZonedDateTime storedCreatedDate = ZonedDateTime.parse(dateCreated.getObject().toString());
+        ZonedDateTime storedCreatedDate = getStoredDateTimeValue(dateCreated);
         assertDateIsJustNow(storedCreatedDate);
 
         Statement dateModified = model.getProperty(directory, DATE_MODIFIED);
-        ZonedDateTime storedModifiedDate = ZonedDateTime.parse(dateModified.getObject().toString());
+        ZonedDateTime storedModifiedDate = getStoredDateTimeValue(dateModified);
         assertDateIsJustNow(storedModifiedDate);
 
         // Verify returned value
         assertEquals("xyz", resource.getName());
         assertEquals("/test/xyz", resource.getPath());
         assertEquals("http://parent", resource.getParentId());
-        assertEquals(storedCreatedDate, resource.getCreatedDate());
-        assertEquals(storedModifiedDate, resource.getModifiedDate());
+        assertEquals(storedCreatedDate.toInstant(), resource.getCreatedDate());
+        assertEquals(storedModifiedDate.toInstant(), resource.getModifiedDate());
     }
 
     @Test
@@ -324,19 +327,19 @@ public class RdfBackedVfsResourceFactoryTest {
 
         // Verify dates
         Statement dateCreated = model.getProperty(resource, DATE_CREATED);
-        ZonedDateTime storedCreatedDate = ZonedDateTime.parse(dateCreated.getObject().toString());
+        ZonedDateTime storedCreatedDate = getStoredDateTimeValue(dateCreated);
         assertDateIsJustNow(storedCreatedDate);
 
         Statement dateModified = model.getProperty(resource, DATE_MODIFIED);
-        ZonedDateTime storedModifiedDate = ZonedDateTime.parse(dateModified.getObject().toString());
+        ZonedDateTime storedModifiedDate = getStoredDateTimeValue(dateModified);
         assertDateIsJustNow(storedModifiedDate);
 
         // Verify returned value
         assertEquals("path", file.getName());
         assertEquals("/test/path", file.getPath());
         assertEquals("http://parent", file.getParentId());
-        assertEquals(storedCreatedDate, file.getCreatedDate());
-        assertEquals(storedModifiedDate, file.getModifiedDate());
+        assertEquals(storedCreatedDate.toInstant(), file.getCreatedDate());
+        assertEquals(storedModifiedDate.toInstant(), file.getModifiedDate());
         assertEquals("content-location", file.getContentLocation());
     }
 
@@ -388,13 +391,14 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testUpdateFile() {
         // Create a file resource
         ZonedDateTime yesterday = ZonedDateTime.now().minusDays(1);
+        Literal yesterdayLiteral = model.createTypedLiteral(GregorianCalendar.from(yesterday));
 
-        Resource file = model.createResource("http://parent");
+                Resource file = model.createResource("http://parent");
         model.add(file, RDF_TYPE, TYPE_FILE);
         model.add(file, NAME, "test.txt");
         model.add(file, PATH, "/test.txt");
-        model.add(file, DATE_CREATED, yesterday.toString());
-        model.add(file, DATE_MODIFIED, yesterday.toString());
+        model.add(file, DATE_CREATED, yesterdayLiteral);
+        model.add(file, DATE_MODIFIED, yesterdayLiteral);
         model.add(file, FILESIZE, "0B");
         model.add(file, CONTENT_LOCATION, "location-on-disk");
 
@@ -414,27 +418,29 @@ public class RdfBackedVfsResourceFactoryTest {
         // Verify old values are removed
         assertFalse(model.contains(file, FILESIZE, "0B"));
         assertFalse(model.contains(file, CONTENT_LOCATION, "location-on-disk"));
-        assertFalse(model.contains(file, DATE_MODIFIED, yesterday.toString()));
+        assertFalse(model.contains(file, DATE_MODIFIED, yesterdayLiteral));
 
         // Verify dates
-        assertTrue(model.contains(file, DATE_CREATED, yesterday.toString()));
+        assertTrue(model.contains(file, DATE_CREATED, yesterdayLiteral));
 
         Statement dateModified = model.getProperty(file, DATE_MODIFIED);
-        ZonedDateTime storedModifiedDate = ZonedDateTime.parse(dateModified.getObject().toString());
+        ZonedDateTime storedModifiedDate = getStoredDateTimeValue(dateModified);
         assertDateIsJustNow(storedModifiedDate);
 
         // Verify returned value
         assertEquals("test.txt", updatedFile.getName());
         assertEquals("/test.txt", updatedFile.getPath());
         assertEquals(10, updatedFile.getFileSize());
-        assertEquals(yesterday, updatedFile.getCreatedDate());
-        assertEquals(storedModifiedDate, updatedFile.getModifiedDate());
+        assertEquals(yesterday.toInstant(), updatedFile.getCreatedDate());
+        assertEquals(storedModifiedDate.toInstant(), updatedFile.getModifiedDate());
         assertEquals("other-place", updatedFile.getContentLocation());
         assertEquals("application/json", updatedFile.getMimeType());
     }
 
-
     private void setupTestCollections() {
+        Literal dateTime1 = createTypedLiteral(ZonedDateTime.parse("2019-01-23T12:55:01+00:00"));
+        Literal dateTime2 = createTypedLiteral(ZonedDateTime.parse("2019-01-23T12:58:01+00:00"));
+
         Resource collection1 = model.createResource("http://collection1");
         Resource collection2 = model.createResource("http://collection2");
         Resource file = model.createResource("http://collection-file");
@@ -442,12 +448,12 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(collection1, RDF_TYPE, TYPE_COLLECTION);
         model.add(collection1, NAME, "My collection");
         model.add(collection1, PATH, "/directory1");
-        model.add(collection1, DATE_CREATED, "2019-01-23T12:55:01+00:00");
+        model.add(collection1, DATE_CREATED, dateTime1);
 
         model.add(collection2, RDF_TYPE, TYPE_COLLECTION);
         model.add(collection2, NAME, "All my data");
         model.add(collection2, PATH, "/directory2");
-        model.add(collection2, DATE_CREATED, "2019-01-23T12:58:01+00:00");
+        model.add(collection2, DATE_CREATED, dateTime2);
 
         model.add(file, RDF_TYPE, TYPE_FILE);
         model.add(file, NAME, "data.txt");
@@ -455,11 +461,14 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(file, CONTENT_LOCATION, "/location-on-disk/abc.txt");
         model.add(file, CONTENT_TYPE, "text/plain");
         model.add(file, FILESIZE, "2MB");
-        model.add(file, DATE_CREATED, "2019-01-23T12:58:01+00:00");
+        model.add(file, DATE_CREATED, dateTime2);
         model.add(file, PARENT, collection1);
     }
 
     private void setupTestModel() {
+        Literal dateTime1 = createTypedLiteral(ZonedDateTime.parse("2019-01-23T12:55:01+00:00"));
+        Literal dateTime2 = createTypedLiteral(ZonedDateTime.parse("2019-01-23T12:58:01+00:00"));
+
         Resource directory = model.createResource("http://directory");
         Resource subdirectory = model.createResource("http://subdirectory");
         Resource file = model.createResource("http://file");
@@ -475,7 +484,7 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(directory, RDF_TYPE, TYPE_DIRECTORY);
         model.add(directory, NAME, "directory");
         model.add(directory, PATH, "/directory");
-        model.add(directory, DATE_CREATED, "2019-01-23T12:55:01+00:00");
+        model.add(directory, DATE_CREATED, dateTime1);
         model.add(directory, CREATOR, user);
 
         model.add(subdirectory, RDF_TYPE, TYPE_DIRECTORY);
@@ -491,7 +500,7 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(file, CONTENT_LOCATION, "/location-on-disk/abc.txt");
         model.add(file, CONTENT_TYPE, "text/plain");
         model.add(file, FILESIZE, "2MB");
-        model.add(file, DATE_CREATED, "2019-01-23T12:58:01+00:00");
+        model.add(file, DATE_CREATED, dateTime2);
         model.add(file, CREATOR, user);
         model.add(file, PARENT, subdirectory);
 
@@ -499,7 +508,7 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(additionaldirectory, RDF_TYPE, TYPE_DIRECTORY);
         model.add(additionaldirectory, NAME, "temp");
         model.add(additionaldirectory, PATH, "/directory/subdirectory/temp");
-        model.add(additionaldirectory, DATE_CREATED, "2019-01-23T12:58:01+00:00");
+        model.add(additionaldirectory, DATE_CREATED, dateTime2);
         model.add(additionaldirectory, CREATOR, user);
         model.add(additionaldirectory, PARENT, subdirectory);
 
@@ -526,6 +535,14 @@ public class RdfBackedVfsResourceFactoryTest {
         assertTrue("Model contains 0 values for <" + subject + "> <" + predicate + ">; 1 expected", nodeIterator.hasNext());
         nodeIterator.next();
         assertFalse("Model contains more than 1 value for <" + subject + "> <" + predicate + ">; 1 expected", nodeIterator.hasNext());
+    }
+
+    private ZonedDateTime getStoredDateTimeValue(Statement dateModified) {
+        return ((GregorianCalendar) ((XSDDateTime) dateModified.getObject().asLiteral().getValue()).asCalendar()).toZonedDateTime();
+    }
+
+    private Literal createTypedLiteral(ZonedDateTime dateTime) {
+        return ModelFactory.createDefaultModel().createTypedLiteral(GregorianCalendar.from(dateTime));
     }
 
 

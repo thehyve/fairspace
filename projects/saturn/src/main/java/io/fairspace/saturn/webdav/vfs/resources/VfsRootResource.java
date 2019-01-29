@@ -1,6 +1,6 @@
 package io.fairspace.saturn.webdav.vfs.resources;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 public class VfsRootResource implements VfsCollectionResource {
     @Override
@@ -19,12 +19,12 @@ public class VfsRootResource implements VfsCollectionResource {
     }
 
     @Override
-    public ZonedDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return null;
     }
 
     @Override
-    public ZonedDateTime getModifiedDate() {
+    public Instant getModifiedDate() {
         return null;
     }
 

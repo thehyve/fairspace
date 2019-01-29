@@ -2,11 +2,8 @@ package io.fairspace.saturn.webdav.milton;
 
 import io.fairspace.saturn.webdav.vfs.VirtualFileSystem;
 import io.fairspace.saturn.webdav.vfs.resources.VfsCollectionResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsFairspaceCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsRootResource;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;

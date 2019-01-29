@@ -3,7 +3,11 @@ package io.fairspace.saturn.webdav.vfs.resources.rdf;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.junit.Test;
+
+import java.time.ZonedDateTime;
+import java.util.GregorianCalendar;
 
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CONTENT_LOCATION;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CONTENT_TYPE;
@@ -14,6 +18,18 @@ import static org.junit.Assert.assertNull;
 
 public class RdfFileResourceTest {
     @Test
+    public void testtest() {
+        Model model = ModelFactory.createDefaultModel();
+
+        Resource resource1 = model.createResource("http://resource1");
+        model.add(resource1, NAME, model.createTypedLiteral(GregorianCalendar.from(ZonedDateTime.now())));
+
+        Statement property = model.getProperty(resource1, NAME);
+
+
+    }
+
+        @Test
     public void testBasicProperties() {
         Model model = ModelFactory.createDefaultModel();
 
