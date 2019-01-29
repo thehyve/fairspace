@@ -1,7 +1,7 @@
 package io.fairspace.saturn.webdav.vfs;
 
 import io.fairspace.saturn.webdav.vfs.contents.StoredContent;
-import io.fairspace.saturn.webdav.vfs.contents.VfsContentFactory;
+import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
 import io.fairspace.saturn.webdav.vfs.resources.VfsCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
@@ -30,13 +30,13 @@ public class VirtualFileSystemTest {
     private VfsResourceFactory resourceFactory;
 
     @Mock
-    private VfsContentFactory contentFactory;
+    private VfsContentStore contentStore;
 
     private VirtualFileSystem vfs;
 
     @Before
     public void setUp() throws Exception {
-        vfs = new VirtualFileSystem(contentFactory, resourceFactory);
+        vfs = new VirtualFileSystem(contentStore, resourceFactory);
     }
 
     @Test
@@ -49,11 +49,11 @@ public class VirtualFileSystemTest {
         when(parent.getPath()).thenReturn("/dir");
         when(parent.getUniqueId()).thenReturn("parent-id");
 
-        when(contentFactory.putContent("/dir/test.txt", inputStream)).thenReturn(new StoredContent("test-location", 20));
+        when(contentStore.putContent("/dir/test.txt", inputStream)).thenReturn(new StoredContent("test-location", 20));
 
         vfs.storeFile(parent, "test.txt", "abcdef", inputStream);
 
-        verify(contentFactory).putContent("/dir/test.txt", inputStream);
+        verify(contentStore).putContent("/dir/test.txt", inputStream);
         verify(resourceFactory).storeFile("parent-id", "/dir/test.txt", 20l, "abcdef", "test-location");
     }
 
@@ -93,7 +93,7 @@ public class VirtualFileSystemTest {
             // Expected exception
         }
 
-        verify(contentFactory, times(0)).putContent(any(), any());
+        verify(contentStore, times(0)).putContent(any(), any());
         verify(resourceFactory, times(0)).storeFile(any(), any(), any(), any(), any());
     }
 
@@ -106,7 +106,7 @@ public class VirtualFileSystemTest {
         VfsCollectionResource parent = mock(VfsCollectionResource.class);
         when(parent.getPath()).thenReturn("/dir");
 
-        when(contentFactory.putContent("/dir/test.txt", inputStream)).thenThrow(new IOException());
+        when(contentStore.putContent("/dir/test.txt", inputStream)).thenThrow(new IOException());
 
         try {
             vfs.storeFile(parent, "test.txt", "abcdef", inputStream);
@@ -127,11 +127,11 @@ public class VirtualFileSystemTest {
         VfsFileResource file = mock(VfsFileResource.class);
         when(file.getPath()).thenReturn("/dir/test.txt");
 
-        when(contentFactory.putContent("/dir/test.txt", inputStream)).thenReturn(new StoredContent("test-location", 20));
+        when(contentStore.putContent("/dir/test.txt", inputStream)).thenReturn(new StoredContent("test-location", 20));
 
         vfs.updateFile(file, "abcdef", inputStream);
 
-        verify(contentFactory).putContent("/dir/test.txt", inputStream);
+        verify(contentStore).putContent("/dir/test.txt", inputStream);
         verify(resourceFactory).updateFile(file, 20l, "abcdef", "test-location");
     }
 
@@ -144,7 +144,7 @@ public class VirtualFileSystemTest {
         VfsFileResource file = mock(VfsFileResource.class);
         when(file.getPath()).thenReturn("/dir/test.txt");
 
-        when(contentFactory.putContent("/dir/test.txt", inputStream)).thenThrow(new IOException());
+        when(contentStore.putContent("/dir/test.txt", inputStream)).thenThrow(new IOException());
 
         try {
             vfs.updateFile(file, "abcdef", inputStream);
@@ -170,7 +170,7 @@ public class VirtualFileSystemTest {
             // Expected
         }
 
-        verify(contentFactory, times(0)).putContent(any(), any());
+        verify(contentStore, times(0)).putContent(any(), any());
         verify(resourceFactory, times(0)).updateFile(any(), any(), any(), any());
     }
 

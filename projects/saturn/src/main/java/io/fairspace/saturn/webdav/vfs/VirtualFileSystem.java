@@ -1,7 +1,7 @@
 package io.fairspace.saturn.webdav.vfs;
 
 import io.fairspace.saturn.webdav.vfs.contents.StoredContent;
-import io.fairspace.saturn.webdav.vfs.contents.VfsContentFactory;
+import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
 import io.fairspace.saturn.webdav.vfs.resources.VfsCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
@@ -17,15 +17,15 @@ import java.util.List;
 /**
  * Represents a virtual file system, consisting of
  *      Resources representing the directory structure, handled by a {@see ResourceFactory}
- *      Contents representing the file contents, handled by a {@see ContentFactory}
+ *      Contents representing the file contents, handled by a {@see ContentStore}
  */
 public class VirtualFileSystem {
     private static final String PATH_SEPARATOR = "/";
-    private VfsContentFactory contentFactory;
+    private VfsContentStore contentStore;
     private VfsResourceFactory resourceFactory;
 
-    public VirtualFileSystem(VfsContentFactory contentFactory, VfsResourceFactory resourceFactory) {
-        this.contentFactory = contentFactory;
+    public VirtualFileSystem(VfsContentStore contentStore, VfsResourceFactory resourceFactory) {
+        this.contentStore = contentStore;
         this.resourceFactory = resourceFactory;
     }
 
@@ -35,13 +35,13 @@ public class VirtualFileSystem {
 
     /**
      * Retrieves the content for a given contentLocation.
-     * @param contentLocation location of the contents within the contentFactory.
+     * @param contentLocation location of the contents within the contentStore.
      *                        Is produced when using putContent
      * @param out             OutputStream to write the content to
      * @throws IOException
      */
     public void getContent(String contentLocation, OutputStream out) throws IOException {
-        contentFactory.getContent(contentLocation, out);
+        contentStore.getContent(contentLocation, out);
     }
 
     public VfsDirectoryResource createDirectory(String parentId, String path) {
@@ -66,7 +66,7 @@ public class VirtualFileSystem {
 
         // In case of an exception while storing the contents, it will not be added
         // to the directory structure.
-        StoredContent storedContent = contentFactory.putContent(path, inputStream);
+        StoredContent storedContent = contentStore.putContent(path, inputStream);
 
         // On succesful upload, store a reference to the file in the resources
         return resourceFactory.storeFile(parentResource.getUniqueId(), path, storedContent.getSize(), contentType, storedContent.getLocation());
@@ -79,7 +79,7 @@ public class VirtualFileSystem {
 
         // In case of an exception while storing the contents, it will not be added
         // to the directory structure.
-        StoredContent storedContent = contentFactory.putContent(resource.getPath(), inputStream);
+        StoredContent storedContent = contentStore.putContent(resource.getPath(), inputStream);
 
         // On succesful upload, store a reference to the file in the resources
         return resourceFactory.updateFile(resource, storedContent.getSize(), contentType, storedContent.getLocation());

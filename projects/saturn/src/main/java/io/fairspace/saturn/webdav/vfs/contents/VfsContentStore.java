@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public interface VfsContentFactory {
+public interface VfsContentStore {
     /**
      * Retrieves the content for a given contentLocation.
-     * @param contentLocation location of the contents within the contentFactory.
+     * @param contentLocation location of the contents within the content store.
      *                        Is produced when using putContent
      * @param out             OutputStream to write the content to
      * @throws IOException

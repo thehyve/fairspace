@@ -13,11 +13,11 @@ import java.util.UUID;
  * This content factory will store all files on local disk, while
  * never overwriting existing files. For every new write, a new location is generated
  */
-public class LocalImmutableVfsContentFactory implements VfsContentFactory {
+public class LocalImmutableVfsContentStore implements VfsContentStore {
     private static final String DIRECTORY_SEPARATOR = "/";
     private String rootLocation;
 
-    public LocalImmutableVfsContentFactory(File rootLocation) {
+    public LocalImmutableVfsContentStore(File rootLocation) {
         this.rootLocation = rootLocation.getAbsolutePath();
     }
 

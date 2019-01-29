@@ -17,15 +17,15 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class LocalImmutableVfsContentFactoryTest {
+public class LocalImmutableVfsContentStoreTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder(new File(System.getProperty("java.io.tmpdir")));
 
-    private LocalImmutableVfsContentFactory contentFactory;
+    private LocalImmutableVfsContentStore contentStore;
 
     @Before
     public void setUp() throws Exception {
-        contentFactory = new LocalImmutableVfsContentFactory(folder.getRoot());
+        contentStore = new LocalImmutableVfsContentStore(folder.getRoot());
     }
 
     @Test
@@ -36,13 +36,13 @@ public class LocalImmutableVfsContentFactoryTest {
         String inputText = "Test text";
         Charset charset = UTF_8;
 
-        StoredContent storedContent = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
+        StoredContent storedContent = contentStore.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
 
         assertEquals(inputText.getBytes(charset).length, storedContent.getSize());
 
         // Read content back again
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
-        contentFactory.getContent(storedContent.getLocation(), capture);
+        contentStore.getContent(storedContent.getLocation(), capture);
         String outputText = capture.toString(charset.name());
 
         assertEquals(inputText, outputText);
@@ -55,12 +55,12 @@ public class LocalImmutableVfsContentFactoryTest {
         // Write content
         byte[] bytes = { 0, 1, 2, 3, 10, 50, 100, 127, -1, -128 };
         ByteArrayInputStream input = new ByteArrayInputStream(bytes);
-        StoredContent storedContent = contentFactory.putContent(vfsPath, input);
+        StoredContent storedContent = contentStore.putContent(vfsPath, input);
         assertEquals(bytes.length, storedContent.getSize());
 
         // Read content back again
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
-        contentFactory.getContent(storedContent.getLocation(), capture);
+        contentStore.getContent(storedContent.getLocation(), capture);
 
         assertArrayEquals(bytes, capture.toByteArray());
     }
@@ -70,7 +70,7 @@ public class LocalImmutableVfsContentFactoryTest {
         String location = "not-existing";
 
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
-        contentFactory.getContent(location, capture);
+        contentStore.getContent(location, capture);
     }
 
     @Test
@@ -81,8 +81,8 @@ public class LocalImmutableVfsContentFactoryTest {
         String inputText = "Test text";
         Charset charset = UTF_8;
 
-        StoredContent storedContent = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
-        StoredContent storedContent2 = contentFactory.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
+        StoredContent storedContent = contentStore.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
+        StoredContent storedContent2 = contentStore.putContent(vfsPath, IOUtils.toInputStream(inputText, charset));
 
         assertEquals(storedContent.getSize(), storedContent2.getSize());
         assertNotEquals(storedContent.getLocation(), storedContent2.getLocation());

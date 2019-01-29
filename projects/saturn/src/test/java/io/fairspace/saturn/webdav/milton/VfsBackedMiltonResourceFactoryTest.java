@@ -1,29 +1,15 @@
 package io.fairspace.saturn.webdav.milton;
 
 import io.fairspace.saturn.webdav.vfs.VirtualFileSystem;
-import io.fairspace.saturn.webdav.vfs.contents.VfsContentFactory;
-import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
-import io.fairspace.saturn.webdav.vfs.resources.VfsUser;
 import io.fairspace.saturn.webdav.vfs.resources.rdf.RdfDirectoryResource;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.time.ZonedDateTime;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

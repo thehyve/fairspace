@@ -80,7 +80,7 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
             return null;
         }
 
-        if(vfsResource instanceof VfsDirectoryResource || vfsResource instanceof VfsRootResource || vfsResource instanceof VfsFairspaceCollectionResource) {
+        if(vfsResource instanceof VfsCollectionResource) {
             return new VfsBackedMiltonDirectoryResource((VfsCollectionResource) vfsResource, factory);
         } else if(vfsResource instanceof VfsFileResource) {
             return new VfsBackedMiltonFileResource((VfsFileResource) vfsResource, factory);

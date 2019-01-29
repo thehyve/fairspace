@@ -1,8 +1,8 @@
 package io.fairspace.saturn.webdav.milton;
 
 import io.fairspace.saturn.webdav.vfs.VirtualFileSystem;
-import io.fairspace.saturn.webdav.vfs.contents.LocalImmutableVfsContentFactory;
-import io.fairspace.saturn.webdav.vfs.contents.VfsContentFactory;
+import io.fairspace.saturn.webdav.vfs.contents.LocalImmutableVfsContentStore;
+import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
 import io.fairspace.saturn.webdav.vfs.resources.rdf.RdfBackedVfsResourceFactory;
 import io.milton.config.HttpManagerBuilder;
@@ -32,9 +32,9 @@ public class MiltonWebDAVServlet extends HttpServlet {
     public MiltonWebDAVServlet(String basePath, RDFConnection connection) {
         // TODO: Use DI
         VfsResourceFactory resourceFactory = new RdfBackedVfsResourceFactory(connection);
-        VfsContentFactory contentFactory = new LocalImmutableVfsContentFactory(new File("/tmp"));
+        VfsContentStore contentStore = new LocalImmutableVfsContentStore(new File("/tmp"));
 
-        this.httpManager = setupHttpManager(basePath, resourceFactory, contentFactory);
+        this.httpManager = setupHttpManager(basePath, resourceFactory, contentStore);
     }
 
     @Override
@@ -64,9 +64,9 @@ public class MiltonWebDAVServlet extends HttpServlet {
         }
     }
 
-    static HttpManager setupHttpManager(String basePath, VfsResourceFactory resourceFactory, VfsContentFactory contentFactory) {
+    static HttpManager setupHttpManager(String basePath, VfsResourceFactory resourceFactory, VfsContentStore contentStore) {
         HttpManagerBuilder builder = new HttpManagerBuilder();
-        builder.setResourceFactory(new VfsBackedMiltonResourceFactory(basePath, new VirtualFileSystem(contentFactory, resourceFactory)));
+        builder.setResourceFactory(new VfsBackedMiltonResourceFactory(basePath, new VirtualFileSystem(contentStore, resourceFactory)));
         builder.setEnableBasicAuth(false);
         return builder.buildHttpManager();
     }
