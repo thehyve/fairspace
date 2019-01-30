@@ -10,7 +10,7 @@ import FilesPage from "./file/FilesPage";
 import logout from "../services/logout";
 
 const routes = ({menuExpanded}) => (
-    <div style={{marginLeft: menuExpanded ? 230 : 60}}>
+    <div style={{marginLeft: menuExpanded ? 250 : 76}}>
         <Route path="/" exact component={Home} />
         <Route path="/collections" exact component={Collections} />
         <Route path="/collections/:collection/:path(.*)?" component={FilesPage} />
