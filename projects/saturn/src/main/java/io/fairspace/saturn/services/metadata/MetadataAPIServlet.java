@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -9,13 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static io.fairspace.saturn.services.ModelUtils.readModel;
+import static io.fairspace.saturn.services.ModelUtils.processModel;
 import static io.fairspace.saturn.services.ModelUtils.writeModel;
 import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 
-
+@Slf4j
 public class MetadataAPIServlet extends HttpServlet {
     private static final String METHOD_PATCH = "PATCH";
 
@@ -37,30 +38,28 @@ public class MetadataAPIServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Model result = api.get(req.getParameter("subject"), req.getParameter("predicate"), req.getParameter("object"));
         writeModel(result, resp);
     }
 
-
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        api.put(readModel(req));
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        processModel(req, resp, api::put);
         resp.setStatus(SC_CREATED);
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (req.getContentType().equals(JSONLD.getLang().getHeaderString())) {
-            api.delete(readModel(req));
+            processModel(req, resp, api::delete);
         } else {
             api.delete(req.getParameter("subject"), req.getParameter("predicate"), req.getParameter("object"));
+            resp.setStatus(SC_ACCEPTED);
         }
-        resp.setStatus(SC_ACCEPTED);
     }
 
-    private void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        api.patch(readModel(req));
-        resp.setStatus(SC_ACCEPTED);
+    private void doPatch(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        processModel(req, resp, api::patch);
     }
 }

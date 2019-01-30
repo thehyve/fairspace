@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import org.apache.jena.atlas.lib.Pair;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.Model;
@@ -7,7 +8,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.modify.request.*;
-import org.apache.jena.atlas.lib.Pair;
 
 import java.util.Collection;
 import java.util.List;
