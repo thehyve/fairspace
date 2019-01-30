@@ -1,25 +1,48 @@
 package io.fairspace.saturn.rdf.transactions;
 
+
+import org.apache.jena.atlas.io.IndentedWriter;
+import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 import org.apache.jena.sparql.modify.request.UpdateDataInsert;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 
-import static io.fairspace.saturn.rdf.transactions.SparqlTransactionSerializer.*;
+public class SparqlTransactionCodec implements TransactionCodec {
+    public static final TransactionCodec INSTANCE = new SparqlTransactionCodec();
 
-/**
- * Deserializes transactions serialized by SparqlTransactionSerializer
- */
-public class SparqlTransactionDeserializer implements TransactionDeserializer {
-    public static final TransactionDeserializer INSTANCE = new SparqlTransactionDeserializer();
+    private static final String TIMESTAMP_PREFIX = "# Timestamp: ";
+    private static final String USER_NAME_PREFIX = "# User Name: ";
+    private static final String USER_ID_PREFIX = "# User ID: ";
+    private static final String COMMIT_MESSAGE_PREFIX = "# Commit Message: ";
 
-    private SparqlTransactionDeserializer() {
+    private SparqlTransactionCodec() {};
+
+    @Override
+    public void write(TransactionRecord transaction, OutputStream out) throws IOException {
+        var writer = new IndentedWriter(out);
+
+        writer.write(TIMESTAMP_PREFIX + transaction.getTimestamp() + "\n") ;
+        if (transaction.getUserName() != null) {
+            writer.write(USER_NAME_PREFIX + transaction.getUserName() + "\n");
+        }
+        if (transaction.getUserId() != null) {
+            writer.write(USER_ID_PREFIX + transaction.getUserId() + "\n");
+        }
+        if (transaction.getCommitMessage() != null) {
+            writer.write(COMMIT_MESSAGE_PREFIX + transaction.getCommitMessage().replace('\n', ' ') + "\n");
+        }
+        writer.write('\n');
+
+        var updateDataDelete = new UpdateDataDelete(new QuadDataAcc(new ArrayList<>(transaction.getDeleted())));
+        var updateDataInsert = new UpdateDataInsert(new QuadDataAcc(new ArrayList<>(transaction.getAdded())));
+
+        new UpdateRequest().add(updateDataDelete).add(updateDataInsert).output(writer);
+        writer.write("\n# The End\n");
     }
 
     @Override

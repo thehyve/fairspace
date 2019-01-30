@@ -3,7 +3,7 @@ package io.fairspace.saturn.rdf;
 import io.fairspace.saturn.Config;
 import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
-import io.fairspace.saturn.rdf.transactions.SparqlTransactionSerializer;
+import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -23,7 +23,7 @@ public class SaturnDatasetFactory {
         var baseDatasetGraph = connectDatasetGraph(config.datasetPath());
 
         // Add transaction log
-        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), SparqlTransactionSerializer.INSTANCE);
+        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), SparqlTransactionCodec.INSTANCE);
         var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog);
 
         // Add property inversion

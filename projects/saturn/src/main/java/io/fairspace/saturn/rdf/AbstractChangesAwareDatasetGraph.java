@@ -2,7 +2,9 @@ package io.fairspace.saturn.rdf;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
-import org.apache.jena.sparql.core.*;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphMonitor;
+import org.apache.jena.sparql.core.QuadAction;
 
 import java.util.HashMap;
 import java.util.Map;

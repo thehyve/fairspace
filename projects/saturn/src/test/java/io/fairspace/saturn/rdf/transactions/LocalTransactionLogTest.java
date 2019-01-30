@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -13,14 +15,26 @@ import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.junit.Assert.*;
 
 public class LocalTransactionLogTest {
+    private static final TransactionCodec DUMMY_FORMAT = new TransactionCodec() {
+
+        @Override
+        public void write(TransactionRecord transaction, OutputStream out) throws IOException {
+        }
+
+        @Override
+        public TransactionRecord read(InputStream in) throws IOException {
+            return null;
+        }
+    };
 
     private File logDir;
     private LocalTransactionLog log;
 
+
     @Before
     public void before() {
         logDir = new File(getTempDirectory(), randomUUID().toString());
-        log = new LocalTransactionLog(logDir, (t, o) -> {});
+        log = new LocalTransactionLog(logDir, DUMMY_FORMAT);
     }
 
     @After
@@ -31,7 +45,7 @@ public class LocalTransactionLogTest {
     @Test
     public void logContinuesNumbering() throws IOException {
         log.log(new TransactionRecord());
-        var newLog = new LocalTransactionLog(logDir, (t, o) -> {});
+        var newLog = new LocalTransactionLog(logDir, DUMMY_FORMAT);
         newLog.log(new TransactionRecord());
 
         assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-1").exists());
