@@ -24,7 +24,7 @@ public class FileRdfResource extends AbstractRdfResource implements VfsFileResou
     protected final VfsContentStore contentStore;
 
     private String contentLocation;
-    private String mimeType;
+    private String contentType;
     private long fileSize;
 
     public FileRdfResource(Resource rdfResource, Model model, RdfBackedVfsResourceFactory resourceFactory, VfsContentStore contentStore) {
@@ -39,8 +39,8 @@ public class FileRdfResource extends AbstractRdfResource implements VfsFileResou
         RDFNode contentLocationObject = getPropertyValueOrNull(rdfResource, model, CONTENT_LOCATION);
         contentLocation = contentLocationObject != null ? contentLocationObject.toString() : null;
 
-        RDFNode mimeTypeObject = getPropertyValueOrNull(rdfResource, model, CONTENT_TYPE);
-        mimeType = mimeTypeObject != null ? mimeTypeObject.toString() : null;
+        RDFNode contentTypeObject = getPropertyValueOrNull(rdfResource, model, CONTENT_TYPE);
+        contentType = contentTypeObject != null ? contentTypeObject.toString() : null;
 
         RDFNode fileSizeObject = getPropertyValueOrNull(rdfResource, model, FILESIZE);
         fileSize = fileSizeObject != null ? FileSize.parse(fileSizeObject.toString()) : 0;

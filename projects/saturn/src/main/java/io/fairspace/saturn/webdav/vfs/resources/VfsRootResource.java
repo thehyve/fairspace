@@ -51,7 +51,7 @@ public class VfsRootResource implements VfsCollectionResource {
 
     @Override
     public VfsResource getChild(String name) {
-        return resourceFactory.getFairspaceCollection(name);
+        return resourceFactory.getResource(getPath() + name);
     }
 
     @Override

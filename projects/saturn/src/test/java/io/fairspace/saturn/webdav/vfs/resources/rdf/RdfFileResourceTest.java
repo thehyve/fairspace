@@ -1,18 +1,13 @@
 package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
 import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
-import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.time.ZonedDateTime;
-import java.util.GregorianCalendar;
 
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CONTENT_LOCATION;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CONTENT_TYPE;
@@ -51,10 +46,10 @@ public class RdfFileResourceTest {
         model.add(resource2, CONTENT_TYPE, "application/json");
 
         FileRdfResource vfsResource1 = new FileRdfResource(resource1, model, resourceFactory, contentStore);
-        assertNull(vfsResource1.getMimeType());
+        assertNull(vfsResource1.getContentType());
 
         FileRdfResource vfsResource2 = new FileRdfResource(resource2, model, resourceFactory, contentStore);
-        assertEquals("application/json", vfsResource2.getMimeType());
+        assertEquals("application/json", vfsResource2.getContentType());
     }
 
     @Test

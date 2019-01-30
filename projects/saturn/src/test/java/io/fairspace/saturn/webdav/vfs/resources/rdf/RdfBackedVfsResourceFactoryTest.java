@@ -5,7 +5,6 @@ import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFairspaceCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
 import io.fairspace.saturn.webdav.vfs.resources.VfsRootResource;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.Dataset;
@@ -116,7 +115,7 @@ public class RdfBackedVfsResourceFactoryTest {
 
         assertEquals("http://file", fileResource.getUniqueId());
 
-        assertEquals("text/plain", fileResource.getMimeType());
+        assertEquals("text/plain", fileResource.getContentType());
         assertEquals(2097152l, fileResource.getFileSize());
 
         // Verify content location
@@ -449,7 +448,7 @@ public class RdfBackedVfsResourceFactoryTest {
         assertEquals(10, updatedFile.getFileSize());
         assertEquals(yesterday.toInstant(), updatedFile.getCreatedDate());
         assertEquals(storedModifiedDate.toInstant(), updatedFile.getModifiedDate());
-        assertEquals("application/json", updatedFile.getMimeType());
+        assertEquals("application/json", updatedFile.getContentType());
 
         // Verify content location
         OutputStream outputStream = new ByteArrayOutputStream();

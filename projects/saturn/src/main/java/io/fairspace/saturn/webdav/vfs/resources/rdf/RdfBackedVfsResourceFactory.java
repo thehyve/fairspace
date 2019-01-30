@@ -125,28 +125,6 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
 
     }
 
-    @Override
-    public VfsFairspaceCollectionResource getFairspaceCollection(String name) {
-        // TODO: Invoke collections api here
-        ParameterizedSparqlString sparql = new ParameterizedSparqlString();
-        sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?type ?collection ; ?path ?requestedPath ; ?p ?o }");
-        sparql.setIri("type", RDF_TYPE.getURI());
-        sparql.setIri("collection", TYPE_COLLECTION.getURI());
-        sparql.setIri("path", PATH.getURI());
-        sparql.setLiteral("requestedPath", DIRECTORY_SEPARATOR + name);
-
-        // Retrieve the data
-        Model model = connection.queryConstruct(sparql.asQuery());
-
-        // If no results are found, stop now
-        if(model.isEmpty()) {
-            return null;
-        }
-
-        Resource subject = model.listSubjects().next();
-        return new FairspaceCollectionRdfResource(subject, model, this, contentStore);
-    }
-
     /**
      * Convenience method for creating a new directory
      * @param parentId

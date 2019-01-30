@@ -39,7 +39,7 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
         try {
             // TODO: We do not have the content type for the new content, as it is not provided by Milton
             //       Should we add logic to determine the content type?
-            this.vfsResource = vfsResource.updateContents(vfsResource.getMimeType(), inputStream);
+            this.vfsResource = vfsResource.updateContents(vfsResource.getContentType(), inputStream);
         } catch (IOException e) {
             log.warn("An IOException occurred while replacing content for file at " + vfsResource.getPath());
             throw new RuntimeIOException(e);
@@ -53,7 +53,7 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
 
     @Override
     public String getContentType(String accepts) {
-        return ContentTypeUtils.findAcceptableContentType(vfsResource.getMimeType(), accepts);
+        return ContentTypeUtils.findAcceptableContentType(vfsResource.getContentType(), accepts);
     }
 
     @Override

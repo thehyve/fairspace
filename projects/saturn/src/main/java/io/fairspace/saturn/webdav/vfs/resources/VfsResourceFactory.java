@@ -6,5 +6,4 @@ public interface VfsResourceFactory {
     VfsResource getResource(String path);
 
     List<? extends VfsFairspaceCollectionResource> getFairspaceCollections();
-    VfsResource getFairspaceCollection(String name);
 }
