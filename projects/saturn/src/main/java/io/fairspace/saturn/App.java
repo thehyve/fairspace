@@ -4,8 +4,6 @@ import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.cfg4j.provider.ConfigurationProviderBuilder;
 import org.cfg4j.source.classpath.ClasspathConfigurationSource;
