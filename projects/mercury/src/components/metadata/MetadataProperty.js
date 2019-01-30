@@ -1,6 +1,5 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {compose} from "redux";
 import {
     List, ListItem, Typography, IconButton,
     ListItemSecondaryAction, ListItemText
@@ -157,5 +156,4 @@ const mapDispatchToProps = {
     updateMetadata: updateMetadataAction
 };
 
-<<<<<<< HEAD
 export default connect(null, mapDispatchToProps)(MetadataProperty);
