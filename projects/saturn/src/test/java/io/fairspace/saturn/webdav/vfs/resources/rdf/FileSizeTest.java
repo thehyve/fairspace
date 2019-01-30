@@ -2,7 +2,7 @@ package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class FileSizeTest {
 

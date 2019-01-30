@@ -17,6 +17,7 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.vocabulary.RDF;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -32,7 +33,6 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.RDF_TYPE;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_COLLECTION;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_DIRECTORY;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_FILE;
@@ -106,8 +106,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
     public List<? extends VfsFairspaceCollectionResource> getFairspaceCollections() {
         // TODO: Invoke collections api here
         ParameterizedSparqlString sparql = new ParameterizedSparqlString();
-        sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?type ?collection ; ?p ?o }");
-        sparql.setIri("type", RDF_TYPE.getURI());
+        sparql.setCommandText("CONSTRUCT { ?s ?p ?o } WHERE { ?s a ?collection ; ?p ?o }");
         sparql.setIri("collection", TYPE_COLLECTION.getURI());
 
         // Retrieve the data
@@ -147,7 +146,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         // TODO: Store creator
         Model model = ModelFactory.createDefaultModel();
         Resource collection = model.createResource(generateIri(path));
-        model.add(collection, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(collection, RDF.type, TYPE_DIRECTORY);
         model.add(collection, NAME, baseName(path));
         model.add(collection, PATH, path);
         model.add(collection, DATE_CREATED, createNowLiteral());
@@ -242,7 +241,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
         // TODO Store creator
         Model model = ModelFactory.createDefaultModel();
         Resource file = model.createResource(generateIri(path));
-        model.add(file, RDF_TYPE, TYPE_FILE);
+        model.add(file, RDF.type, TYPE_FILE);
         model.add(file, NAME, baseName(path));
         model.add(file, PATH, path);
         model.add(file, DATE_CREATED, createNowLiteral());
@@ -265,7 +264,7 @@ public class RdfBackedVfsResourceFactory implements VfsResourceFactory {
 
     private AbstractRdfResource toVfsResource(Model model, Resource rdfResource) {
         // Determine the resource type
-        Statement typeTriple = model.getProperty(rdfResource, RDF_TYPE);
+        Statement typeTriple = model.getProperty(rdfResource, RDF.type);
         if(typeTriple == null) {
             throw new IllegalStateException("No type specified for metadata entity with id " + rdfResource.toString());
         }

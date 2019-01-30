@@ -2,6 +2,7 @@ package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -17,7 +18,6 @@ public class VirtualFileSystemIris {
     public static final Property FILESIZE = createProperty("http://schema.org/fileSize");
     public static final Property CONTENT_TYPE = createProperty("http://fairspace.io/ontology/File#contentType");
 
-    public static final Property RDF_TYPE = createProperty("http://www.w3.org/2000/01/rdf-schema#type");
     public static final Property SCHEMA_IDENTIFIER = createProperty("http://schema.org/identifier");
 
     public static final Resource TYPE_FILE = createResource("http://fairspace.io/ontology/File");

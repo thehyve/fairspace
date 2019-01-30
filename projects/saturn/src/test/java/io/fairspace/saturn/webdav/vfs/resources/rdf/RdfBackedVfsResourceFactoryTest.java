@@ -17,6 +17,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +41,6 @@ import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.RDF_TYPE;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.SCHEMA_IDENTIFIER;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_COLLECTION;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_DIRECTORY;
@@ -150,7 +150,7 @@ public class RdfBackedVfsResourceFactoryTest {
     @Test
     public void testGetResourceWithoutCreator() {
         Resource directory = model.createResource("http://not-ready");
-        model.add(directory, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(directory, RDF.type, TYPE_DIRECTORY);
         model.add(directory, NAME, "no-creator");
         model.add(directory, PATH, "/no-creator");
         model.add(directory, DATE_CREATED, "2019-01-23T12:55:01+00:00");
@@ -166,7 +166,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateDirectory() {
         // Create a parent collection
         Resource parent = model.createResource("http://parent");
-        model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(parent, RDF.type, TYPE_DIRECTORY);
         model.add(parent, NAME, "test");
         model.add(parent, PATH, "/test");
 
@@ -176,7 +176,7 @@ public class RdfBackedVfsResourceFactoryTest {
         // Verify how it is stored
         Resource directory = model.createResource(resource.getUniqueId());
 
-        assertTrue(model.contains(directory, RDF_TYPE, TYPE_DIRECTORY));
+        assertTrue(model.contains(directory, RDF.type, TYPE_DIRECTORY));
         assertTrue(model.contains(directory, NAME, "xyz"));
         assertTrue(model.contains(directory, PATH, "/test/xyz"));
         assertTrue(model.contains(directory, PARENT, parent));
@@ -212,7 +212,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateDirectoryWithinCollection() {
         // Create a parent collection
         Resource collection = model.createResource("http://collection");
-        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, RDF.type, TYPE_COLLECTION);
         model.add(collection, NAME, "my-collection");
         model.add(collection, PATH, "/test");
 
@@ -230,7 +230,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateDirectoryWithoutPath() {
         // Create a parent collection
         Resource collection = model.createResource("http://collection");
-        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, RDF.type, TYPE_COLLECTION);
         model.add(collection, NAME, "my-collection");
         model.add(collection, PATH, "/test");
 
@@ -241,7 +241,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateDirectoryWithEmptyPath() {
         // Create a parent collection
         Resource collection = model.createResource("http://collection");
-        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, RDF.type, TYPE_COLLECTION);
         model.add(collection, NAME, "my-collection");
         model.add(collection, PATH, "/test");
 
@@ -252,7 +252,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateDirectoryWithPathNotMatchingParent() {
         // Create a parent collection
         Resource collection = model.createResource("http://collection");
-        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, RDF.type, TYPE_COLLECTION);
         model.add(collection, NAME, "my-collection");
         model.add(collection, PATH, "/test");
 
@@ -320,7 +320,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateFile() throws IOException {
         // Create a parent collection
         Resource parent = model.createResource("http://parent");
-        model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(parent, RDF.type, TYPE_DIRECTORY);
         model.add(parent, NAME, "test");
         model.add(parent, PATH, "/test");
 
@@ -330,7 +330,7 @@ public class RdfBackedVfsResourceFactoryTest {
         // Verify how it is stored
         Resource resource = model.createResource(file.getUniqueId());
 
-        assertTrue(model.contains(resource, RDF_TYPE, TYPE_FILE));
+        assertTrue(model.contains(resource, RDF.type, TYPE_FILE));
         assertTrue(model.contains(resource, NAME, "path"));
         assertTrue(model.contains(resource, PATH, "/test/path"));
         assertTrue(model.contains(resource, PARENT, parent));
@@ -369,7 +369,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateFileWithNonExistingParent() {
         // Create a parent collection
         Resource parent = model.createResource("http://parent");
-        model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(parent, RDF.type, TYPE_DIRECTORY);
         model.add(parent, NAME, "test");
         model.add(parent, PATH, "/test");
 
@@ -380,7 +380,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateFileInvalidPath() {
         // Create a parent collection
         Resource parent = model.createResource("http://parent");
-        model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(parent, RDF.type, TYPE_DIRECTORY);
         model.add(parent, NAME, "test");
         model.add(parent, PATH, "/test");
 
@@ -391,7 +391,7 @@ public class RdfBackedVfsResourceFactoryTest {
     public void testCreateFileWithoutContentType() {
         // Create a parent collection
         Resource parent = model.createResource("http://parent");
-        model.add(parent, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(parent, RDF.type, TYPE_DIRECTORY);
         model.add(parent, NAME, "test");
         model.add(parent, PATH, "/test");
 
@@ -409,7 +409,7 @@ public class RdfBackedVfsResourceFactoryTest {
         Literal yesterdayLiteral = model.createTypedLiteral(GregorianCalendar.from(yesterday));
 
                 Resource file = model.createResource("http://parent");
-        model.add(file, RDF_TYPE, TYPE_FILE);
+        model.add(file, RDF.type, TYPE_FILE);
         model.add(file, NAME, "test.txt");
         model.add(file, PATH, "/test.txt");
         model.add(file, DATE_CREATED, yesterdayLiteral);
@@ -423,7 +423,7 @@ public class RdfBackedVfsResourceFactoryTest {
         VfsFileResource updatedFile = resourceFactory.updateFile(fileResource, 10l, "application/json", "other-place");
 
         // Verify how it is stored
-        assertTrue(model.contains(file, RDF_TYPE, TYPE_FILE));
+        assertTrue(model.contains(file, RDF.type, TYPE_FILE));
         assertTrue(model.contains(file, NAME, "test.txt"));
         assertTrue(model.contains(file, PATH, "/test.txt"));
         assertTrue(model.contains(file, FILESIZE, "10B"));
@@ -464,17 +464,17 @@ public class RdfBackedVfsResourceFactoryTest {
         Resource collection2 = model.createResource("http://collection2");
         Resource file = model.createResource("http://collection-file");
 
-        model.add(collection1, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection1, RDF.type, TYPE_COLLECTION);
         model.add(collection1, NAME, "My collection");
         model.add(collection1, PATH, "/directory1");
         model.add(collection1, DATE_CREATED, dateTime1);
 
-        model.add(collection2, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection2, RDF.type, TYPE_COLLECTION);
         model.add(collection2, NAME, "All my data");
         model.add(collection2, PATH, "/directory2");
         model.add(collection2, DATE_CREATED, dateTime2);
 
-        model.add(file, RDF_TYPE, TYPE_FILE);
+        model.add(file, RDF.type, TYPE_FILE);
         model.add(file, NAME, "data.txt");
         model.add(file, PATH, "/directory1/data.txt");
         model.add(file, CONTENT_LOCATION, "/location-on-disk/abc.txt");
@@ -500,20 +500,20 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(user, NAME, "Donald Trump");
 
         // Setup a directory structure
-        model.add(directory, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(directory, RDF.type, TYPE_DIRECTORY);
         model.add(directory, NAME, "directory");
         model.add(directory, PATH, "/directory");
         model.add(directory, DATE_CREATED, dateTime1);
         model.add(directory, CREATOR, user);
 
-        model.add(subdirectory, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(subdirectory, RDF.type, TYPE_DIRECTORY);
         model.add(subdirectory, NAME, "subdirectory");
         model.add(subdirectory, PATH, "/directory/subdirectory");
         model.add(subdirectory, PARENT, directory);
         model.add(subdirectory, CREATOR, user);
 
         // Add a file
-        model.add(file, RDF_TYPE, TYPE_FILE);
+        model.add(file, RDF.type, TYPE_FILE);
         model.add(file, NAME, "data.txt");
         model.add(file, PATH, "/directory/subdirectory/data.txt");
         model.add(file, CONTENT_LOCATION, "/location-on-disk/abc.txt");
@@ -524,7 +524,7 @@ public class RdfBackedVfsResourceFactoryTest {
         model.add(file, PARENT, subdirectory);
 
         // Add another subdirectory
-        model.add(additionaldirectory, RDF_TYPE, TYPE_DIRECTORY);
+        model.add(additionaldirectory, RDF.type, TYPE_DIRECTORY);
         model.add(additionaldirectory, NAME, "temp");
         model.add(additionaldirectory, PATH, "/directory/subdirectory/temp");
         model.add(additionaldirectory, DATE_CREATED, dateTime2);

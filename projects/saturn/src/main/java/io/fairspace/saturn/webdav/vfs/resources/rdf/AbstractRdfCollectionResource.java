@@ -6,34 +6,18 @@ import io.fairspace.saturn.webdav.vfs.resources.VfsCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.apache.jena.datatypes.xsd.XSDDateTime;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.RdfBackedVfsResourceFactory.DIRECTORY_SEPARATOR;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.CREATOR;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_CREATED;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_MODIFIED;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PARENT;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.SCHEMA_IDENTIFIER;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)

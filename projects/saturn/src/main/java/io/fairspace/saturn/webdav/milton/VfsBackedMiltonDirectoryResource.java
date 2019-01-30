@@ -1,7 +1,6 @@
 package io.fairspace.saturn.webdav.milton;
 
 import io.fairspace.saturn.webdav.vfs.resources.VfsCollectionResource;
-import io.fairspace.saturn.webdav.vfs.resources.VfsDirectoryResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
 import io.milton.common.ContentTypeUtils;

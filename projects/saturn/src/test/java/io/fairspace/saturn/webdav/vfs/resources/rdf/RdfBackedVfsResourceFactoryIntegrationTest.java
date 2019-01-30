@@ -1,7 +1,6 @@
 package io.fairspace.saturn.webdav.vfs.resources.rdf;
 
 import io.fairspace.saturn.webdav.vfs.contents.LocalImmutableVfsContentStore;
-import io.fairspace.saturn.webdav.vfs.contents.StoredContent;
 import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
 import io.fairspace.saturn.webdav.vfs.resources.VfsCollectionResource;
 import io.fairspace.saturn.webdav.vfs.resources.VfsFileResource;
@@ -13,6 +12,7 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,10 +25,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.DATE_CREATED;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.NAME;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.RDF_TYPE;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_COLLECTION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
@@ -58,7 +56,7 @@ public class RdfBackedVfsResourceFactoryIntegrationTest {
         // Setup basic collection
         Resource collection = model.createResource(COLLECTION_ID);
 
-        model.add(collection, RDF_TYPE, TYPE_COLLECTION);
+        model.add(collection, RDF.type, TYPE_COLLECTION);
         model.add(collection, NAME, "My collection");
         model.add(collection, PATH, COLLECTION_DIR);
     }

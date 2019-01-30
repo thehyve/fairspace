@@ -6,6 +6,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -16,7 +17,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.PATH;
-import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.RDF_TYPE;
 import static io.fairspace.saturn.webdav.vfs.resources.rdf.VirtualFileSystemIris.TYPE_FILE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.fail;
@@ -70,7 +70,7 @@ public class FileRdfResourceTest {
     private FileRdfResource instantiateTestResource(String uri, String path) {
         Model model = ModelFactory.createDefaultModel();
         Resource resource = model.createResource(uri);
-        model.add(resource, RDF_TYPE, TYPE_FILE);
+        model.add(resource, RDF.type, TYPE_FILE);
         model.add(resource, PATH, path);
 
         return new FileRdfResource(resource, model, resourceFactory, contentStore);

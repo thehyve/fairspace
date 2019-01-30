@@ -1,7 +1,5 @@
 package io.fairspace.saturn.webdav.vfs.resources;
 
-import io.fairspace.saturn.webdav.vfs.contents.VfsContentStore;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
