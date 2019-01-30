@@ -1,7 +1,6 @@
 buildscript {
     ext {
         jena_version = '3.10.0'
-        oidcAuthVersion = '0.1.1-SNAPSHOT'
     }
 }
 

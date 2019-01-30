@@ -14,3 +14,5 @@ data:
       datasetPath: /data/db
       transactionLogPath: /data/files/log
       vocabularyURI: {{ template "workspace.url" . }}/ontology#
+      authEnabled: true
+      jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs

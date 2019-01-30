@@ -14,7 +14,7 @@ import org.cfg4j.source.files.FilesConfigurationSource;
 
 import java.nio.file.Paths;
 
-import static io.fairspace.saturn.auth.Security.createAuthenticationFilter;
+import static io.fairspace.saturn.auth.Security.createSecurityHandler;
 import static java.util.Collections.singletonList;
 
 public class App {
@@ -40,10 +40,7 @@ public class App {
                 .port(CONFIG.port());
 
         if (CONFIG.authEnabled()) {
-            var authFilter = createAuthenticationFilter(CONFIG.jwksUrl());
-            fusekiServerBuilder.addFilter("/rdf", authFilter);
-            fusekiServerBuilder.addFilter("/statements", authFilter);
-            fusekiServerBuilder.addFilter("/vocabulary", authFilter);
+            fusekiServerBuilder.securityHandler(createSecurityHandler(CONFIG.jwksUrl()));
         }
 
         fusekiServerBuilder

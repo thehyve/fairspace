@@ -1,14 +1,17 @@
 package io.fairspace.saturn.auth;
 
-import javax.servlet.Filter;
+import org.eclipse.jetty.security.SecurityHandler;
+
 import java.net.URL;
 
-import static io.fairspace.saturn.auth.BearerAuthenticationFilter.USER_INFO_REQUEST_ATTRIBUTE;
+import static io.fairspace.saturn.auth.TokenValidationSecurityHandler.USER_INFO_REQUEST_ATTRIBUTE;
 import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 
 public class Security {
-    public static Filter createAuthenticationFilter(URL jwksUrl) {
-        return new BearerAuthenticationFilter(jwksUrl);
+    public static SecurityHandler createSecurityHandler(URL jwksUrl) {
+        return new TokenValidationSecurityHandler(jwksUrl)
+            .addConstraintMapping("/health", false)
+            .addConstraintMapping("/*", true);
     }
 
     public static UserInfo userInfo() {
