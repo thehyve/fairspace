@@ -20,7 +20,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
     private static final String USER_ID_PREFIX = "# User ID: ";
     private static final String COMMIT_MESSAGE_PREFIX = "# Commit Message: ";
 
-    private SparqlTransactionCodec() {};
+    private SparqlTransactionCodec() {}
 
     @Override
     public void write(TransactionRecord transaction, OutputStream out) throws IOException {
