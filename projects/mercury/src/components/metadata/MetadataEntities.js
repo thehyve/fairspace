@@ -7,13 +7,10 @@ import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableBody from "@material-ui/core/TableBody/TableBody";
 import {Column, Row} from "simple-flexbox";
 import {withRouter} from 'react-router-dom';
-import {getLabel, navigableLink, relativeLink} from "../../utils/metadatautils";
-import * as metadataActions from "../../actions/metadata";
+import {getLabel, navigableLink, relativeLink} from "../../utils/metadataUtils";
+import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
-import ErrorMessage from "../common/ErrorMessage";
-import ErrorDialog from "../common/ErrorDialog";
-import LoadingInlay from '../common/LoadingInlay';
-import LoadingOverlay from '../common/LoadingOverlay';
+import {ErrorMessage, ErrorDialog, LoadingInlay, LoadingOverlay} from "../common";
 
 class MetadataEntities extends React.Component {
     componentDidMount() {

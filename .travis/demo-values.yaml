@@ -47,6 +47,9 @@ titan:
   permissions:
     collectionPermissionsUrl: https://workspace.demo.fairspace.app/api/collections/permissions?location=%s
 
+# Specific settings for Saturn subchart
+saturn:
+
 # Specific settings for Ceres subchart
 ceres:
   rabbitmq:

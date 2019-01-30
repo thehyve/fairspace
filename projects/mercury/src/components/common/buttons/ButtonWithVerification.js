@@ -53,7 +53,7 @@ class ButtonWithVerification extends React.Component {
                     title="Confirmation"
                     content={content}
                     onAgree={this.handleClick}
-                    onDisagre={this.closeDialog}
+                    onDisagree={this.closeDialog}
                     onClose={this.closeDialog}
                 />
             );

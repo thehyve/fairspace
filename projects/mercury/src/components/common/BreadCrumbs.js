@@ -5,7 +5,7 @@ import {withStyles} from '@material-ui/core/styles';
 import Icon from '@material-ui/core/Icon';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
-import {flattenShallow, jsxJoin} from "../../utils/arrayutils";
+import {flattenShallow} from "../../utils/arrayUtils";
 import menuitems from "../../menuitems";
 
 const menuEntries = flattenShallow(menuitems.map(sublist => sublist.items));
@@ -76,7 +76,13 @@ const breadCrumbs = ({segments, match, classes, homeUrl}) => {
 
     return (
         <div className={classes.root}>
-            {jsxJoin(breadcrumbs, ' > ')}
+            {breadcrumbs
+                .map((e, index) => (
+                    <span key={e.key}>
+                        {e} {(index < Object.keys(breadcrumbs).length - 1) ? '>' : null}
+                    </span>
+                ))
+            }
         </div>
     );
 };

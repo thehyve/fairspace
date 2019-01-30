@@ -7,7 +7,7 @@ import Notebooks from "./Notebooks";
 import MetadataEntityPage from "./metadata/MetadataEntityPage";
 import MetadataOverviewPage from "./metadata/MetadataOverviewPage";
 import FilesPage from "./file/FilesPage";
-import logout from "../services/Logout/logout";
+import logout from "../services/logout";
 
 const routes = ({menuExpanded}) => (
     <div style={{marginLeft: menuExpanded ? 230 : 60}}>

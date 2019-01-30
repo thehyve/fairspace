@@ -7,7 +7,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import PropTypes from 'prop-types';
 
-const confirmationDialog = ({title, content, open, onClose, onAgree, onDisagre}) => (
+const confirmationDialog = ({title, content, open, onClose, onAgree, onDisagree}) => (
     <Dialog
         open={open}
         onClose={onClose}
@@ -24,7 +24,7 @@ const confirmationDialog = ({title, content, open, onClose, onAgree, onDisagre})
         </DialogContent>
         <DialogActions>
             <Button
-                onClick={onDisagre}
+                onClick={onDisagree}
                 color="primary"
             >
                 Cancel
@@ -46,7 +46,7 @@ confirmationDialog.propTypes = {
     content: PropTypes.string,
     onClose: PropTypes.func,
     onAgree: PropTypes.func,
-    onDisagre: PropTypes.func,
+    onDisagree: PropTypes.func,
 };
 
 confirmationDialog.defaultProps = {
@@ -55,7 +55,7 @@ confirmationDialog.defaultProps = {
     content: '',
     onClose: () => {},
     onAgree: () => {},
-    onDisagre: () => {},
+    onDisagree: () => {},
 };
 
 export default confirmationDialog;

@@ -156,6 +156,72 @@ pluto:
     collections:
 
 #####################################################################
+# Specific settings for Saturn subchart
+#####################################################################
+saturn:
+  replicaCount: 1
+  rollingUpdate:
+    maxSurge: 0%
+    maxUnavailable: 100%
+  image:
+    image: fairspace.azurecr.io/fairspace/saturn
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+
+  service:
+    name: saturn
+    type: ClusterIP
+    externalPort: 80
+    internalPort: 8080
+
+  resources:
+    limits:
+      cpu: 1
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+  probePath: /rdf
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  terminationGracePeriodSeconds: 10
+
+  ## Persist data to a persistent volume
+  persistence:
+    enabled: true
+
+    ## A manually managed Persistent Volume and Claim
+    ## Requires persistence.enabled: true
+    ## If defined, PVC must be created manually before volume will be bound
+    # existingClaim:
+
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
+    accessMode: ReadWriteOnce
+    size: 512Mi
+    mountPath: /data
+
+  rabbitmq:
+    vhost:
+    username:
+    password:
+
+
+#####################################################################
 # Specific settings for Ceres subchart
 #####################################################################
 ceres:

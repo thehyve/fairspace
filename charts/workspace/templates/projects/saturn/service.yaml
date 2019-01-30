@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "saturn.fullname" . }}
+  labels:
+    app: saturn
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.saturn.service.type }}
+  ports:
+    - port: {{ .Values.saturn.service.externalPort }}
+      targetPort: {{ .Values.saturn.service.internalPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: saturn
+    release: {{ .Release.Name }}

@@ -4,13 +4,10 @@ import IconButton from "@material-ui/core/IconButton";
 import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import Badge from "@material-ui/core/Badge";
 import {connect} from 'react-redux';
-import CreateDirectoryButton from "../common/buttons/CreateDirectoryButton";
-import UploadButton from "../common/buttons/UploadButton";
-import ErrorDialog from "../common/ErrorDialog";
-import LoadingOverlay from '../common/LoadingOverlay';
-import * as clipboardActions from "../../actions/clipboard";
-import * as fileActions from "../../actions/files";
-import {uniqueName} from "../../utils/fileutils";
+import {CreateDirectoryButton, UploadButton, ErrorDialog, LoadingOverlay} from "../common";
+import * as clipboardActions from "../../actions/clipboardActions";
+import * as fileActions from "../../actions/fileActions";
+import {uniqueName} from "../../utils/fileUtils";
 
 function FileOperations(props) {
     const {

@@ -31,7 +31,6 @@ class CollectionEditor extends React.Component {
 
     handleCancel = () => {
         this.setState({editing: false});
-
         if (this.props.onClose) {
             this.props.onClose();
         }
@@ -47,6 +46,7 @@ class CollectionEditor extends React.Component {
         return (
             <Dialog
                 open={this.state.editing}
+                onClose={this.props.onClose}
                 aria-labelledby="form-dialog-title"
             >
                 <DialogTitle id="form-dialog-title">

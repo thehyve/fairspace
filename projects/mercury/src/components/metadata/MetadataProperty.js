@@ -8,17 +8,12 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import {connect} from 'react-redux';
 import ListItemText from "@material-ui/core/ListItemText";
 import {compose} from "redux";
-import {updateMetadata} from "../../actions/metadata";
+import {updateMetadata as updateMetadataAction} from "../../actions/metadataActions";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ErrorDialog from "../common/ErrorDialog";
 import withHovered from "../common/WithHovered";
-import {
-    LABEL_URI, COMMENT_URI, COLLECTION_URI, FILE_URI, DIRECTORY_URI, RESOURCE_URI
-} from '../../services/MetadataAPI/MetadataAPI';
+import * as constants from '../../constants';
 
-/**
- * Shows the property and values for the property
- */
 function MetadataProperty({
     editable, subject, property, updateMetadata, onItemMouseOut, onItemMouseOver, hovered
 }) {
@@ -109,13 +104,13 @@ function MetadataProperty({
         );
     };
 
-    const isCollection = property.domain === COLLECTION_URI;
-    const isFile = property.domain === FILE_URI;
-    const isDirectory = property.domain === DIRECTORY_URI;
+    const isCollection = property.domain === constants.COLLECTION_URI;
+    const isFile = property.domain === constants.FILE_URI;
+    const isDirectory = property.domain === constants.DIRECTORY_URI;
     const isManaged = isCollection || isFile || isDirectory;
     if ((property.key === '@type')
-        || (isManaged && property.key === LABEL_URI)
-        || (isCollection && property.key === COMMENT_URI)) {
+        || (isManaged && property.key === constants.LABEL_URI)
+        || (isCollection && property.key === constants.COMMENT_URI)) {
         return '';
     }
     // Do not show an add component if no multiples are allowed
@@ -124,7 +119,7 @@ function MetadataProperty({
     const canAdd = editableAndNotMachineOnly && (property.allowMultiple || property.values.length === 0);
     const labelId = `label-${property.key}`;
 
-    const ValueComponent = (editableAndNotMachineOnly && property.range !== RESOURCE_URI)
+    const ValueComponent = (editableAndNotMachineOnly && property.range !== constants.RESOURCE_URI)
         ? ValueComponentFactory.editComponent(property)
         : ValueComponentFactory.readOnlyComponent();
 
@@ -142,7 +137,7 @@ function MetadataProperty({
 }
 
 const mapDispatchToProps = {
-    updateMetadata
+    updateMetadata: updateMetadataAction
 };
 
 export default compose(connect(null, mapDispatchToProps), withHovered)(MetadataProperty);

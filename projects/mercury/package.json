@@ -11,6 +11,7 @@
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.7.1",
     "express": "^4.16.4",
+    "filesize": "^4.0.0",
     "http-proxy-middleware": "^0.19.1",
     "jsonld": "^1.2.1",
     "mdi-material-ui": "^5.8.0",
@@ -30,7 +31,7 @@
     "webdav": "^1.6.0"
   },
   "scripts": {
-    "dev": "concurrently \"yarn server\" \"yarn start\"",
+    "dev": "concurrently \"yarn server\" \"yarn start\" \"yarn test\"",
     "server": "node mock-server/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",

@@ -1,0 +1,76 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "saturn.fullname" . }}
+  labels:
+    app: saturn
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.saturn.replicaCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.saturn.rollingUpdate.maxSurge | default "0%" }}
+      maxUnavailable: {{ .Values.saturn.rollingUpdate.maxUnavailable | default "100%" }}
+  selector:
+    matchLabels:
+      app: saturn
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: saturn
+        release: {{ .Release.Name }}
+{{- if .Values.podAnnotations.saturn }}
+      annotations:
+{{ toYaml .Values.podAnnotations.saturn | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+        - name: {{ template "saturn.fullname" . }}
+          image: "{{ .Values.saturn.image.image }}:{{ .Values.saturn.image.tag }}"
+          imagePullPolicy: {{ .Values.saturn.image.pullPolicy }}
+          ports:
+          - containerPort: {{ .Values.saturn.service.internalPort }}
+          volumeMounts:
+          - name: config-volume
+            mountPath: /opt/config
+          - name: data
+            mountPath: /data/saturn/db
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.saturn.probePath }}
+              port: {{ .Values.saturn.service.internalPort }}
+            initialDelaySeconds: {{ .Values.saturn.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.saturn.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.saturn.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.saturn.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.saturn.probePath }}
+              port: {{ .Values.saturn.service.internalPort }}
+            periodSeconds: {{ .Values.saturn.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.saturn.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.saturn.readinessProbe.timeoutSeconds }}
+          resources:
+{{ toYaml .Values.saturn.resources | indent 12 }}
+    {{- with .Values.saturn.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ template "saturn.fullname" . }}
+      - name: data
+        {{- if .Values.saturn.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.saturn.persistence.existingClaim | default (include "saturn.fullname" .) }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}

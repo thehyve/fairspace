@@ -8,7 +8,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import {compose} from "redux";
 import {connect} from "react-redux";
-import toggleMenuExpansion from "../../../../actions/ui";
+import toggleMenuExpansion from "../../../../actions/uiActions";
 import Menu from "./Menu";
 import styles from "./MenuDrawer.styles";
 

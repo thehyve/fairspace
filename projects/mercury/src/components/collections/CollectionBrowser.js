@@ -3,17 +3,15 @@ import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 import Fab from "@material-ui/core/Fab";
 import Icon from "@material-ui/core/Icon";
-import BreadCrumbs from "../common/BreadCrumbs";
-import ErrorDialog from "../common/ErrorDialog";
-import ErrorMessage from "../common/ErrorMessage";
+import {
+    BreadCrumbs, ErrorDialog, ErrorMessage,
+    GenericCollectionsScreen, CollectionEditor,
+    LoadingInlay, LoadingOverlay
+} from "../common";
 import CollectionList from "./CollectionList";
-import * as collectionBrowserActions from "../../actions/collectionbrowser";
-import * as collectionActions from "../../actions/collections";
-import GenericCollectionsScreen from "../common/GenericCollectionsScreen";
-import {findById} from "../../utils/arrayutils";
-import CollectionEditor from "../common/CollectionEditor";
-import LoadingInlay from '../common/LoadingInlay';
-import LoadingOverlay from '../common/LoadingOverlay';
+import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
+import * as collectionActions from "../../actions/collectionActions";
+import {findById} from "../../utils/arrayUtils";
 import Config from "../../services/Config/Config";
 
 class CollectionBrowser extends React.Component {
@@ -73,6 +71,7 @@ class CollectionBrowser extends React.Component {
     handleAddCollection = (name, description, type) => {
         this.props.addCollection(name, description, type)
             .then(this.props.fetchCollectionsIfNeeded)
+            .then(() => this.setState({addingNewCollection: false}))
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while creating a collection",

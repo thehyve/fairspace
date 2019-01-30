@@ -24,6 +24,6 @@ spring:
 
 app:
   metadata:
-    base-url: http://fairspace.com
+    base-url: http://fairspace.com/iri/
   rabbitmq:
     enabled: false

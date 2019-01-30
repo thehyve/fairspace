@@ -52,20 +52,20 @@ it('applies properties properly', () => {
     expect(edit.at(0).prop('value')).toEqual('name');
     expect(edit.at(1).prop('value')).toEqual('description');
 
-    const button = wrapper.find(Button);
-    expect(button.length).toEqual(2);
-    expect(button.at(0).childAt(0).text()).toEqual('Cancel');
-    expect(button.at(1).childAt(0).text()).toEqual('Save');
+    const buttons = wrapper.find(Button);
+    expect(buttons.length).toEqual(2);
+    expect(buttons.at(0).childAt(0).text()).toEqual('Cancel');
+    expect(buttons.at(1).childAt(0).text()).toEqual('Save');
 
     const select = wrapper.find(Select);
     expect(select.length).toEqual(1);
     expect(select.at(0).prop('value')).toEqual('S3_MOUNT');
 
     cancelClicked = false;
-    button.at(0).simulate('click');
+    buttons.at(0).simulate('click');
     expect(cancelClicked).toEqual(true);
 
-    button.at(1).simulate('click');
+    buttons.at(1).simulate('click');
     expect(receivedName).toEqual('name');
     expect(receivedDescription).toEqual('description');
     expect(receivedType).toEqual('S3_MOUNT');
