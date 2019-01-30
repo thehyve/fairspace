@@ -9,5 +9,5 @@ public class UserInfo {
     String userId;
     String userName;
     String fullName;
-    Set<String> roles;
+    Set<String> authorities;
 }

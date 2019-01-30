@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import javax.servlet.ServletException;

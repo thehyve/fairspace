@@ -1,5 +1,7 @@
 package io.fairspace.saturn;
 
+import java.net.URL;
+
 public interface Config {
     String vocabularyURI();
 
@@ -11,9 +13,5 @@ public interface Config {
 
     boolean authEnabled();
 
-    String authServerUrl();
-
-    String authRealm();
-
-    String authRole();
+    URL jwksUrl();
 }

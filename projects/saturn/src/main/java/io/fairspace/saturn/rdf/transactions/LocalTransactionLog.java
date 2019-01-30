@@ -1,27 +1,30 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Stores transactions in the following directory structure:
  * volume-1
- *   chapter-1
- *     tx-1
- *     ...
- *     tx-1000
- *   chapter-2
- *     tx-1001
- *     ...
- *     tx-2000
- *   ...
- *   chapter-1000
- *     tx-999001
- *     ...
- *     tx-1000000
+ * chapter-1
+ * tx-1
+ * ...
+ * tx-1000
+ * chapter-2
+ * tx-1001
+ * ...
+ * tx-2000
+ * ...
+ * chapter-1000
+ * tx-999001
+ * ...
+ * tx-1000000
  * volume-2
- *   chapter-1001
- *     tx-1000001
+ * chapter-1001
+ * tx-1000001
  * ...
  */
 public class LocalTransactionLog implements TransactionLog {

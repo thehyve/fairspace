@@ -28,7 +28,7 @@ public class SparqlTransactionSerializer implements TransactionSerializer {
     public void write(TransactionRecord transaction, OutputStream out) throws IOException {
         var writer = new IndentedWriter(out);
 
-        writer.write(TIMESTAMP_PREFIX + transaction.getTimestamp() + "\n") ;
+        writer.write(TIMESTAMP_PREFIX + transaction.getTimestamp() + "\n");
         if (transaction.getUserName() != null) {
             writer.write(USER_NAME_PREFIX + transaction.getUserName() + "\n");
         }

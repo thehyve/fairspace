@@ -10,7 +10,7 @@ import java.io.IOException;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class LocalTransactionLogTest {
 
@@ -20,7 +20,8 @@ public class LocalTransactionLogTest {
     @Before
     public void before() {
         logDir = new File(getTempDirectory(), randomUUID().toString());
-        log = new LocalTransactionLog(logDir, (t, o) -> {});
+        log = new LocalTransactionLog(logDir, (t, o) -> {
+        });
     }
 
     @After
@@ -31,7 +32,8 @@ public class LocalTransactionLogTest {
     @Test
     public void logContinuesNumbering() throws IOException {
         log.log(new TransactionRecord());
-        var newLog = new LocalTransactionLog(logDir, (t, o) -> {});
+        var newLog = new LocalTransactionLog(logDir, (t, o) -> {
+        });
         newLog.log(new TransactionRecord());
 
         assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-1").exists());

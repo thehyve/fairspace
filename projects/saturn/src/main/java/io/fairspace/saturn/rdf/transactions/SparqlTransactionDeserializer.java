@@ -3,7 +3,6 @@ package io.fairspace.saturn.rdf.transactions;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 import org.apache.jena.sparql.modify.request.UpdateDataInsert;
 import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
