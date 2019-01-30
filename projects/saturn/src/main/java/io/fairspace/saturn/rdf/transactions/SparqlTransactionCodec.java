@@ -13,14 +13,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class SparqlTransactionCodec implements TransactionCodec {
-    public static final TransactionCodec INSTANCE = new SparqlTransactionCodec();
-
     private static final String TIMESTAMP_PREFIX = "# Timestamp: ";
     private static final String USER_NAME_PREFIX = "# User Name: ";
     private static final String USER_ID_PREFIX = "# User ID: ";
     private static final String COMMIT_MESSAGE_PREFIX = "# Commit Message: ";
-
-    private SparqlTransactionCodec() {}
 
     @Override
     public void write(TransactionRecord transaction, OutputStream out) throws IOException {

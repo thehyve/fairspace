@@ -52,23 +52,23 @@ public class SerializationTest {
 
     @Test
     public void sparqlSerializationWorks() throws IOException {
-        testSerialization(additionsAndDeletions, SparqlTransactionCodec.INSTANCE);
+        testSerialization(additionsAndDeletions, new SparqlTransactionCodec());
     }
 
     @Test
     public void simpleSerializationWorks() throws IOException {
-        testSerialization(additionsAndDeletions, JavaSerializationTransactionCodec.INSTANCE);
+        testSerialization(additionsAndDeletions, new JavaSerializationTransactionCodec());
     }
     
     @Test
     public void testNoDeletions() throws IOException {
-        testSerialization(additionsOnly, SparqlTransactionCodec.INSTANCE);
+        testSerialization(additionsOnly, new SparqlTransactionCodec());
     }
 
-    private void testSerialization(TransactionRecord transaction, TransactionCodec transactionCodec) throws IOException {
+    private void testSerialization(TransactionRecord original, TransactionCodec transactionCodec) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        transactionCodec.write(transaction, out);
+        transactionCodec.write(original, out);
         TransactionRecord deserialized = transactionCodec.read(new ByteArrayInputStream(out.toByteArray()));
-        assertEquals(transaction, deserialized);
+        assertEquals(original, deserialized);
     }
 }

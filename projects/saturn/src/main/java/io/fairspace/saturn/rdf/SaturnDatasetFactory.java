@@ -23,7 +23,7 @@ public class SaturnDatasetFactory {
         var baseDatasetGraph = connectDatasetGraph(config.datasetPath());
 
         // Add transaction log
-        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), SparqlTransactionCodec.INSTANCE);
+        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), new SparqlTransactionCodec());
         var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog);
 
         // Add property inversion

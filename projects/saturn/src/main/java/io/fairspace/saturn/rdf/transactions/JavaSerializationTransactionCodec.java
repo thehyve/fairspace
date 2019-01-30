@@ -3,10 +3,6 @@ package io.fairspace.saturn.rdf.transactions;
 import java.io.*;
 
 public class JavaSerializationTransactionCodec implements TransactionCodec {
-    public static final TransactionCodec INSTANCE = new JavaSerializationTransactionCodec();
-
-    private JavaSerializationTransactionCodec() { }
-
     @Override
     public void write(TransactionRecord transaction, OutputStream out) throws IOException {
         try (var oos = new ObjectOutputStream(out)) {
