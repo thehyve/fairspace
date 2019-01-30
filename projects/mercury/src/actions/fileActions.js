@@ -70,7 +70,7 @@ const fetchFiles = createErrorHandlingPromiseAction((collection, path) => ({
 export const fetchFilesIfNeeded = (collection, path) => dispatchIfNeeded(
     () => fetchFiles(collection, path),
     (state) => {
-        const filesPerCollection = state.cache.filesByCollectionAndPath[collection.id] || [];
+        const filesPerCollection = state.cache.filesByCollectionAndPath[collection.id] || {};
         return filesPerCollection[path];
     }
 );
