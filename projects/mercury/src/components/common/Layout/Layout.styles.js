@@ -9,8 +9,7 @@ const styles = theme => ({
     main: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
-        // padding: theme.spacing.unit * 3,
-        padding: '84px 24px 0 24px',
+        padding: '84px 10px 0 0',
         minWidth: 0, // So the Typography noWrap works
     },
     toolbar: theme.mixins.toolbar,

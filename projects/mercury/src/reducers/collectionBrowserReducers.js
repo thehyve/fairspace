@@ -23,12 +23,6 @@ const collectionBrowser = (state = defaultState, action) => {
                 infoDrawerOpened: true,
                 selectedCollectionId: action.collectionId
             };
-        case actionTypes.DESELECT_COLLECTION:
-            return {
-                ...state,
-                infoDrawerOpened: false,
-                selectedCollectionId: null
-            };
         case actionTypes.SELECT_PATH:
             return {
                 ...state,
