@@ -6,23 +6,26 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphMonitor;
 import org.apache.jena.sparql.core.QuadAction;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.apache.jena.sparql.core.GraphView.createNamedGraph;
 import static org.apache.jena.sparql.core.Quad.defaultGraphNodeGenerated;
 
 /**
- * A DatasetGraphMonitor which handles changes itself. Can be useful if changes-handling logic depends on Graph's state.
- * Also overrides getDefaultGraph and getGraph to avoid exposure of unwrapped graphs.
+ * A DatasetGraphMonitor which handles changes itself.
+ * Can be useful if changes-handling logic depends on Graph's state.
+ * Normally DatasetGraphMonitor reports changes to an external listener.
+ * That can be very inconvenient, if you need to implement complex logic involving not only quad operations, but also
+ * some other aspect's of the dataset graph;s behavior, e.g. transaction lifecycle.
+ *
+ * It also overrides getDefaultGraph and getGraph to avoid exposure of unwrapped graphs.
+ * The default DatasetGraphWrapper implementation is somewhat leaky, as it allows to access unwrapped graphs.
+ * Changes made to such an unwrapped graph wouldn't be picked up by DatasetGraphMonitor.
  */
 public abstract class AbstractChangesAwareDatasetGraph extends DatasetGraphMonitor {
-    private final Map<Node, Graph> graphs = new HashMap<>();
 
     public AbstractChangesAwareDatasetGraph(DatasetGraph dsg) {
         super(dsg, new DelegatingDatasetChanges(), true);
 
-        ((DelegatingDatasetChanges) getMonitor()).setChangeListener(this::onChange);
+        ((DelegatingDatasetChanges) getMonitor()).setChangeListener(this::onChange); // delegates handling to itself
     }
 
     protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
@@ -35,6 +38,6 @@ public abstract class AbstractChangesAwareDatasetGraph extends DatasetGraphMonit
 
     @Override
     public Graph getGraph(Node graphNode) {
-        return graphs.computeIfAbsent(graphNode, gn -> createNamedGraph(this, gn));
+        return createNamedGraph(this, graphNode);
     }
 }

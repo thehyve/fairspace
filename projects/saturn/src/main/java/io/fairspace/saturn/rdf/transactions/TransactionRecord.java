@@ -1,8 +1,10 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import lombok.Data;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.sparql.core.Quad;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -21,4 +23,15 @@ public class TransactionRecord implements Serializable {
     private Set<Quad> added;
 
     private Set<Quad> deleted;
+
+    @Override
+    public String toString() {
+        var out = new ByteArrayOutputStream();
+        try {
+            new SparqlTransactionCodec().write(this, out);
+            return out.toString("UTF-8");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

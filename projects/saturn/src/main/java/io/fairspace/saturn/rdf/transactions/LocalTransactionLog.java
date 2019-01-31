@@ -35,12 +35,12 @@ public class LocalTransactionLog implements TransactionLog {
     private static final String RECORD_PREFIX = "tx-";
 
     private final File directory;
-    private final TransactionSerializer serializer;
+    private final TransactionCodec transactionCodec;
     private final AtomicLong counter = new AtomicLong();
 
-    public LocalTransactionLog(File directory, TransactionSerializer serializer) {
+    public LocalTransactionLog(File directory, TransactionCodec transactionCodec) {
         this.directory = directory;
-        this.serializer = serializer;
+        this.transactionCodec = transactionCodec;
 
         directory.mkdirs();
 
@@ -81,7 +81,7 @@ public class LocalTransactionLog implements TransactionLog {
         chapter.mkdirs();
         var record = new File(chapter, RECORD_PREFIX + (transactionNumber + 1));
         try (var out = new BufferedOutputStream(new FileOutputStream(record))) {
-            serializer.write(transaction, out);
+            transactionCodec.write(transaction, out);
         }
     }
 }

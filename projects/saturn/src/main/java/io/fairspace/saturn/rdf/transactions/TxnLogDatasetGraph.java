@@ -2,7 +2,7 @@ package io.fairspace.saturn.rdf.transactions;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
-import org.apache.jena.dboe.transaction.txn.TransactionException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
@@ -17,16 +17,19 @@ import java.util.function.Supplier;
 
 import static java.lang.System.currentTimeMillis;
 
+@Slf4j
 public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private final TransactionLog transactionLog;
     private final Supplier<UserInfo> userInfoProvider;
+    private final Supplier<String> commitMessageProvider;
     private Set<Quad> added;   // Quads added in current transaction
     private Set<Quad> deleted; // Quads deleted in current transaction
 
-    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<UserInfo> userInfoProvider) {
+    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<UserInfo> userInfoProvider, Supplier<String> commitMessageProvider) {
         super(dsg);
         this.transactionLog = transactionLog;
         this.userInfoProvider = userInfoProvider;
+        this.commitMessageProvider = commitMessageProvider;
     }
 
     /**
@@ -69,30 +72,61 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     @Override
     public void commit() {
-        if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
-            logTransaction();
+        try {
+            if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
+                logTransaction();
+            }
+            super.commit();
+        } catch (Throwable t) {
+            log.error("Error committing a transaction.", t);
+
+            // Just in case
+            System.err.println("Catastrophic failure. Error committing a transaction.");
+            System.err.println("The system is probably in inconsistent state and requires recovery.");
+            t.printStackTrace();
+            System.err.println("Shutting down");
+            System.err.flush();
+
+            // If the system is unstable it's better to shut it down.
+            System.exit(1);
         }
-        super.commit();
     }
 
     private void logTransaction() {
-        var t = new TransactionRecord();
-        t.setAdded(added);
-        t.setDeleted(deleted);
-        t.setTimestamp(currentTimeMillis());
+        var transaction = new TransactionRecord();
+        transaction.setAdded(added);
+        transaction.setDeleted(deleted);
+        transaction.setTimestamp(currentTimeMillis()
+
         if (userInfoProvider != null) {
             var userInfo = userInfoProvider.get();
             if (userInfo != null) {
-                t.setUserId(userInfo.getUserId());
-                t.setUserName(userInfo.getFullName());
+                transaction.setUserId(userInfo.getUserId());
+                transaction.setUserName(userInfo.getFullName());
             }
         }
+
+        if (commitMessageProvider != null) {
+            var commitMessage = commitMessageProvider.get();
+            if (commitMessage != null) {
+                transaction.setCommitMessage(commitMessage.replace('\n', ' ').trim());
+            }
+        }
+
         added = null;
         deleted = null;
+
         try {
-            transactionLog.log(t);
+            transactionLog.log(transaction);
         } catch (IOException e) {
-            throw new TransactionException("Error writing to the transaction log", e);
+            log.error("Error saving a transaction to the transaction log.", e);
+            log.error("The lost transaction: \n" + transaction);
+
+            // Just in case
+            System.err.println("Error saving a transaction to the transaction log:\n");
+            System.err.println(transaction);
+
+            throw e;
         }
     }
 
@@ -108,10 +142,11 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void end() {
         if (isInWriteTransaction()) {
-            abort();
-        } else {
-            super.end();
+            added = null;
+            deleted = null;
         }
+
+        super.end();
     }
 
     private boolean isInWriteTransaction() {

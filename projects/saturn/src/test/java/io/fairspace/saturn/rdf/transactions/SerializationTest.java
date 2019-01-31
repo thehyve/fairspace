@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringBufferInputStream;
 import java.util.HashSet;
 
 import static java.lang.System.currentTimeMillis;
@@ -16,42 +17,64 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.junit.Assert.assertEquals;
 
 public class SerializationTest {
-    private TransactionRecord original;
-
+    private TransactionRecord additionsAndDeletions;
+    private TransactionRecord additionsOnly;
+    
     @Before
     public void before() {
-        original = new TransactionRecord();
-        original.setTimestamp(currentTimeMillis());
-        original.setUserName("John Smith");
-        original.setUserId("123-FF-456");
-        original.setCommitMessage("Some message");
-        original.setAdded(new HashSet<>(asList(new Quad(
+        additionsAndDeletions = new TransactionRecord();
+        additionsAndDeletions.setTimestamp(currentTimeMillis());
+        additionsAndDeletions.setUserName("John Smith");
+        additionsAndDeletions.setUserId("123-FF-456");
+        additionsAndDeletions.setCommitMessage("Some message");
+        additionsAndDeletions.setAdded(new HashSet<>(asList(new Quad(
                 createURI("http://example.com/graph1"),
                 createURI("http://example.com/s1"),
                 createURI("http://example.com/p1"),
                 createLiteral("1")))));
-        original.setDeleted(new HashSet<>(asList(new Quad(
+        additionsAndDeletions.setDeleted(new HashSet<>(asList(new Quad(
                 createURI("http://example.com/graph2"),
                 createURI("http://example.com/s2"),
                 createURI("http://example.com/p2"),
                 createLiteral("2")))));
+
+        additionsOnly = new TransactionRecord();
+        additionsOnly.setTimestamp(currentTimeMillis());
+        additionsOnly.setUserName("John Smith");
+        additionsOnly.setUserId("123-FF-456");
+        additionsOnly.setCommitMessage("Some message");
+        additionsOnly.setAdded(new HashSet<>(asList(new Quad(
+                createURI("http://example.com/graph1"),
+                createURI("http://example.com/s1"),
+                createURI("http://example.com/p1"),
+                createLiteral("1")))));
+        additionsOnly.setDeleted(new HashSet<>());
     }
 
     @Test
     public void sparqlSerializationWorks() throws IOException {
-        testSerialization(SparqlTransactionSerializer.INSTANCE, SparqlTransactionDeserializer.INSTANCE);
+        testSerialization(additionsAndDeletions, new SparqlTransactionCodec());
     }
-
 
     @Test
     public void simpleSerializationWorks() throws IOException {
-        testSerialization(SimpleTransactionSerializer.INSTANCE, SimpleTransactionDeserializer.INSTANCE);
+        testSerialization(additionsAndDeletions, new JavaSerializationTransactionCodec());
+    }
+    
+    @Test
+    public void testNoDeletions() throws IOException {
+        testSerialization(additionsOnly, new SparqlTransactionCodec());
     }
 
-    private void testSerialization(TransactionSerializer serializer, TransactionDeserializer deserializer) throws IOException {
+    @Test(expected = IOException.class)
+    public void invalidDataCausesIOException() throws IOException {
+        new SparqlTransactionCodec().read(new ByteArrayInputStream("invalid SPARQL".getBytes()));
+    }
+
+    private void testSerialization(TransactionRecord original, TransactionCodec transactionCodec) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        serializer.write(original, out);
-        TransactionRecord deserialized = deserializer.read(new ByteArrayInputStream(out.toByteArray()));
+        transactionCodec.write(original, out);
+        TransactionRecord deserialized = transactionCodec.read(new ByteArrayInputStream(out.toByteArray()));
         assertEquals(original, deserialized);
     }
 }

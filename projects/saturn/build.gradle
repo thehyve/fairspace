@@ -1,6 +1,7 @@
 buildscript {
     ext {
         jena_version = '3.10.0'
+        milton_version = '2.7.4.4'
         mockitoVersion = '2.22.0'
     }
 }
@@ -23,10 +24,15 @@ application {
 
 repositories {
     mavenCentral()
+
+    maven {
+        url "http://dl.bintray.com/milton/Milton"
+    }
 }
 
 dependencies {
     compile "org.apache.jena:jena-fuseki-main:${jena_version}"
+    compile "io.milton:milton-server-ce:${milton_version}"
     compile "org.cfg4j:cfg4j-core:4.4.1"
     compile 'com.nimbusds:nimbus-jose-jwt:5.7'
 

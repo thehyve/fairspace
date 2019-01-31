@@ -12,7 +12,8 @@
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "schema": "http://schema.org/",
-        "xsd": "http://www.w3.org/TR/xmlschema11-2/#"
+        "xsd": "http://www.w3.org/TR/xmlschema11-2/#",
+        "fhir": "http://www.hl7.org/fhir/v3/"
     },
     "@graph": [
         {
