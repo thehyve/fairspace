@@ -72,7 +72,6 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     @Override
     public void commit() {
-            if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
         if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
             var transaction = new TransactionRecord();
             transaction.setAdded(added);
