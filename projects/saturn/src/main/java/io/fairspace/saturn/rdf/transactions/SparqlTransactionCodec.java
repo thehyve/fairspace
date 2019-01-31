@@ -1,6 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
 
+import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
@@ -20,25 +21,32 @@ public class SparqlTransactionCodec implements TransactionCodec {
 
     @Override
     public void write(TransactionRecord transaction, OutputStream out) throws IOException {
-        var writer = new IndentedWriter(out);
+        try {
+            var writer = new IndentedWriter(out);
 
-        writer.write(TIMESTAMP_PREFIX + transaction.getTimestamp() + "\n") ;
-        if (transaction.getUserName() != null) {
-            writer.write(USER_NAME_PREFIX + transaction.getUserName() + "\n");
-        }
-        if (transaction.getUserId() != null) {
-            writer.write(USER_ID_PREFIX + transaction.getUserId() + "\n");
-        }
-        if (transaction.getCommitMessage() != null) {
-            writer.write(COMMIT_MESSAGE_PREFIX + transaction.getCommitMessage().replace('\n', ' ') + "\n");
-        }
-        writer.write('\n');
+            writer.write(TIMESTAMP_PREFIX + transaction.getTimestamp() + "\n");
+            if (transaction.getUserName() != null) {
+                writer.write(USER_NAME_PREFIX + transaction.getUserName() + "\n");
+            }
+            if (transaction.getUserId() != null) {
+                writer.write(USER_ID_PREFIX + transaction.getUserId() + "\n");
+            }
+            if (transaction.getCommitMessage() != null) {
+                writer.write(COMMIT_MESSAGE_PREFIX + transaction.getCommitMessage().replace('\n', ' ') + "\n");
+            }
+            writer.write('\n');
 
-        var updateDataDelete = new UpdateDataDelete(new QuadDataAcc(new ArrayList<>(transaction.getDeleted())));
-        var updateDataInsert = new UpdateDataInsert(new QuadDataAcc(new ArrayList<>(transaction.getAdded())));
+            var updateDataDelete = new UpdateDataDelete(new QuadDataAcc(new ArrayList<>(transaction.getDeleted())));
+            var updateDataInsert = new UpdateDataInsert(new QuadDataAcc(new ArrayList<>(transaction.getAdded())));
 
-        new UpdateRequest().add(updateDataDelete).add(updateDataInsert).output(writer);
-        writer.write("\n# The End\n");
+            new UpdateRequest().add(updateDataDelete).add(updateDataInsert).output(writer);
+            writer.write("\n# The End\n");
+        } catch (RuntimeIOException e) {
+            if (e.getCause() instanceof IOException) {
+                throw (IOException) e.getCause();
+            }
+            throw new IOException(e);
+        }
     }
 
     @Override
