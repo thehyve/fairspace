@@ -2,12 +2,11 @@ package io.fairspace.saturn.rdf.transactions;
 
 import org.apache.jena.dboe.transaction.txn.TransactionException;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.shared.LockMRSW;
 import org.apache.jena.sparql.JenaTransactionException;
-import org.apache.jena.system.Txn;
-import org.apache.jena.tdb2.TDB2Factory;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
