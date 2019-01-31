@@ -1,7 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
 
-import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
