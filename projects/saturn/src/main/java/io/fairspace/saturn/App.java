@@ -70,8 +70,6 @@ public class App {
         }
 
         fusekiServerBuilder
-                .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
-                .port(CONFIG.port())
                 .build()
                 .start();
 

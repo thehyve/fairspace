@@ -92,11 +92,11 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         }
     }
 
-    private void logTransaction() {
+    private void logTransaction() throws IOException {
         var transaction = new TransactionRecord();
         transaction.setAdded(added);
         transaction.setDeleted(deleted);
-        transaction.setTimestamp(currentTimeMillis()
+        transaction.setTimestamp(currentTimeMillis());
 
         if (userInfoProvider != null) {
             var userInfo = userInfoProvider.get();

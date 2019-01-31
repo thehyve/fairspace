@@ -26,7 +26,7 @@ public class TxnLogDatasetGraphTest {
     @Before
     public void before() {
         transactions = new ArrayList<>();
-        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), transactions::add, null));
+        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), transactions::add, null, null));
     }
 
 
