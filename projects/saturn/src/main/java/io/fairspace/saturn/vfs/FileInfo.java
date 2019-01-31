@@ -1,4 +1,4 @@
-package io.fairspace.saturn.webdav2.vfs;
+package io.fairspace.saturn.vfs;
 
 import lombok.Builder;
 import lombok.Value;

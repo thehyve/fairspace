@@ -1,12 +1,9 @@
-package io.fairspace.saturn.webdav2.vfs.managed;
+package io.fairspace.saturn.vfs.managed;
 
-import lombok.Builder;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -26,19 +23,24 @@ public class ManagedFileSystemTest {
     }
 
     @Test
-    public void list() {
+    public void list() throws IOException {
+        fs.mkdir("aaa/bbb/ccc");
+        fs.mkdir("aaa/bbb/ccc/ddd");
+        var children = fs.list("aaa/bbb");
+        assertEquals(1, children.size());
     }
 
     @Test
     public void mkdir() throws IOException {
-        fs.mkdir("/aaa/bbb/ccc");
-        var stat = fs.stat("/aaa/bbb/ccc");
-        assertEquals("/aaa/bbb/ccc", stat.getPath());
+        fs.mkdir("aaa/bbb/ccc");
+        var stat = fs.stat("aaa/bbb/ccc");
+        assertEquals("aaa/bbb/ccc", stat.getPath());
         assertEquals(true, stat.isDirectory());
     }
 
     @Test
-    public void write() {
+    public void write() throws IOException {
+
     }
 
     @Test
@@ -53,7 +55,10 @@ public class ManagedFileSystemTest {
     public void move() {
     }
 
-    @Test
-    public void delete() {
+    @Test(expected = FileNotFoundException.class)
+    public void delete() throws IOException {
+        fs.mkdir("dir");
+        fs.delete("dir");
+        fs.stat("dir");
     }
 }

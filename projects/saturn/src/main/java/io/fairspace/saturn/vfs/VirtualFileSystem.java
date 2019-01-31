@@ -1,4 +1,4 @@
-package io.fairspace.saturn.webdav2.vfs;
+package io.fairspace.saturn.vfs;
 
 import java.io.Closeable;
 import java.io.IOException;
