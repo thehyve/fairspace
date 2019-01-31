@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringBufferInputStream;
 import java.util.HashSet;
 
 import static java.lang.System.currentTimeMillis;
@@ -63,6 +64,11 @@ public class SerializationTest {
     @Test
     public void testNoDeletions() throws IOException {
         testSerialization(additionsOnly, new SparqlTransactionCodec());
+    }
+
+    @Test(expected = IOException.class)
+    public void invalidDataCausesIOException() throws IOException {
+        new SparqlTransactionCodec().read(new ByteArrayInputStream("invalid SPARQL".getBytes()));
     }
 
     private void testSerialization(TransactionRecord original, TransactionCodec transactionCodec) throws IOException {
