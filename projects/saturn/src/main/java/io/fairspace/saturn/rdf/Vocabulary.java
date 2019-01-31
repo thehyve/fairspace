@@ -4,13 +4,15 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.util.FileManager;
 
+import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static org.apache.jena.system.Txn.executeWrite;
 
 public class Vocabulary {
     public static void init(DatasetGraph dsg, Node vocabularyGraph) {
         executeWrite(dsg, () -> {
             if (!dsg.containsGraph(vocabularyGraph)) {
-                dsg.addGraph(vocabularyGraph, FileManager.get().loadModel("vocabulary.jsonld").getGraph());
+                withCommitMessage("Initialize the vocabulary", () ->
+                        dsg.addGraph(vocabularyGraph, FileManager.get().loadModel("vocabulary.jsonld").getGraph()));
             }
         });
     }

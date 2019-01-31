@@ -24,7 +24,7 @@ public class SaturnDatasetFactory {
 
         // Add transaction log
         var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), new SparqlTransactionCodec());
-        var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog);
+        var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog, null);
 
         // Add property inversion
         var vocabularyGraph = createURI(config.vocabularyURI());

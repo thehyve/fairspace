@@ -12,17 +12,20 @@ import org.apache.jena.sparql.core.QuadAction;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static java.lang.System.currentTimeMillis;
 
 public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private final TransactionLog transactionLog;
+    private final Supplier<String> commitMessageProvider;
     private Set<Quad> added;   // Quads added in current transaction
     private Set<Quad> deleted; // Quads deleted in current transaction
 
-    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {
+    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<String> commitMessageProvider) {
         super(dsg);
         this.transactionLog = transactionLog;
+        this.commitMessageProvider = commitMessageProvider;
     }
 
     /**
@@ -77,6 +80,13 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         t.setDeleted(deleted);
         t.setTimestamp(currentTimeMillis());
         // TODO: Set user info and commit message
+        if (commitMessageProvider != null) {
+            var commitMessage = commitMessageProvider.get();
+            if (commitMessage != null) {
+                t.setCommitMessage(commitMessage.replace('\n', ' ').trim());
+            }
+        }
+
         added = null;
         deleted = null;
         try {
