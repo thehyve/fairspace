@@ -1,12 +1,21 @@
 package io.fairspace.saturn.rdf;
 
-import lombok.Data;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.QuadAction;
 
-@Data
-class DelegatingDatasetChanges extends AbstractDatasetChanges {
+public class DelegatingDatasetChanges extends AbstractDatasetChanges {
     private GraphChangeListener changeListener;
+
+    public DelegatingDatasetChanges() {
+    }
+
+    public DelegatingDatasetChanges(GraphChangeListener changeListener) {
+        this.changeListener = changeListener;
+    }
+
+    public void setChangeListener(GraphChangeListener changeListener) {
+        this.changeListener = changeListener;
+    }
 
     @Override
     public void change(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
