@@ -10,3 +10,7 @@ metadata:
 data:
   application.yaml: |-
     saturn:
+      port: 8080
+      datasetPath: /data/db
+      transactionLogPath: /data/files/log
+      vocabularyURI: {{ template "workspace.url" . }}/ontology#
