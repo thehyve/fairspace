@@ -39,7 +39,7 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
         switch (action) {
             case ADD:
                 // A new inversion rule added?
-                    if (graph.equals(vocabularyGraphNode) && predicate.equals(inverseOf)) {
+                if (graph.equals(vocabularyGraphNode) && predicate.equals(inverseOf)) {
                     checkConflicts(subject, object);
                     checkConflicts(object, subject);
                     propertiesMap.put(subject, object);
