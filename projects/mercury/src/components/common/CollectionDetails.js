@@ -15,7 +15,7 @@ import ConfirmationDialog from './ConfirmationDialog';
 import PermissionsContainer from "../permissions/PermissionsContainer";
 import {canManage} from '../../utils/permissionUtils';
 
-const ICONS = {
+export const ICONS = {
     LOCAL_STORAGE: 'folder_open',
     AZURE_BLOB_STORAGE: 'cloud_open',
     S3_BUCKET: 'cloud_open',
@@ -86,7 +86,7 @@ class CollectionDetails extends React.Component {
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
         const canManageCollection = canManage(collection);
 
-        if (loading || !collection.creator) {
+        if (loading) {
             return <LoadingInlay />;
         }
 
