@@ -2,7 +2,6 @@
     "@context": {
         "dbpedia": "http://dbpedia.org/ontology#",
         "dc": "http://purl.org/dc/elements/1.1/",
-        "fihr": "http://hl7.org/fhir/STU3/#",
         "foaf": "http://xmlns.com/foaf/0.1/#",
         "fs": "http://fairspace.io/ontology#",
         "icdo3": "http://fairspace.io/ontology#",
