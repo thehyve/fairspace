@@ -16,12 +16,9 @@ import {findById} from "../../utils/arrayUtils";
 import Config from "../../services/Config/Config";
 
 class CollectionBrowser extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            addingNewCollection: false
-        };
-    }
+    state = {
+        addingNewCollection: false
+    };
 
     componentDidMount() {
         this.props.fetchCollectionsIfNeeded();
@@ -33,11 +30,8 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionClick = (collection) => {
-        const {selectedCollectionId, selectCollection, deselectCollection} = this.props;
-        // If this collection is already selected, deselect
-        if (selectedCollectionId && selectedCollectionId === collection.id) {
-            deselectCollection();
-        } else {
+        const {selectedCollectionId, selectCollection} = this.props;
+        if (selectedCollectionId !== collection.id) {
             selectCollection(collection.id);
         }
     }
