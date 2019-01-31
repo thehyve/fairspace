@@ -131,10 +131,11 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void end() {
         if (isInWriteTransaction()) {
-            abort();
-        } else {
-            super.end();
+            added = null;
+            deleted = null;
         }
+
+        super.end();
     }
 
     private boolean isInWriteTransaction() {
