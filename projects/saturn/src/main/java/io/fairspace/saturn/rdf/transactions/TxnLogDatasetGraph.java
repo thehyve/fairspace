@@ -10,11 +10,11 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.QuadAction;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static io.fairspace.saturn.rdf.transactions.Panic.panic;
 import static java.lang.System.currentTimeMillis;
 
 @Slf4j
@@ -72,61 +72,41 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     @Override
     public void commit() {
-        try {
             if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
-                logTransaction();
+        if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
+            var transaction = new TransactionRecord();
+            transaction.setAdded(added);
+            transaction.setDeleted(deleted);
+            transaction.setTimestamp(currentTimeMillis());
+
+            if (userInfoProvider != null) {
+                var userInfo = userInfoProvider.get();
+                if (userInfo != null) {
+                    transaction.setUserId(userInfo.getUserId());
+                    transaction.setUserName(userInfo.getFullName());
+                }
             }
+
+            if (commitMessageProvider != null) {
+                var commitMessage = commitMessageProvider.get();
+                if (commitMessage != null) {
+                    transaction.setCommitMessage(commitMessage.replace('\n', ' ').trim());
+                }
+            }
+
+            added = null;
+            deleted = null;
+
+            var persisted = false;
+            try {
+                transactionLog.log(transaction);
+                persisted = true;
+                super.commit();
+            } catch (Throwable throwable) {
+                panic(throwable, transaction, persisted);
+            }
+        } else {
             super.commit();
-        } catch (Throwable t) {
-            log.error("Error committing a transaction.", t);
-
-            // Just in case
-            System.err.println("Catastrophic failure. Error committing a transaction.");
-            System.err.println("The system is probably in inconsistent state and requires recovery.");
-            t.printStackTrace();
-            System.err.println("Shutting down");
-            System.err.flush();
-
-            // If the system is unstable it's better to shut it down.
-            System.exit(1);
-        }
-    }
-
-    private void logTransaction() throws IOException {
-        var transaction = new TransactionRecord();
-        transaction.setAdded(added);
-        transaction.setDeleted(deleted);
-        transaction.setTimestamp(currentTimeMillis());
-
-        if (userInfoProvider != null) {
-            var userInfo = userInfoProvider.get();
-            if (userInfo != null) {
-                transaction.setUserId(userInfo.getUserId());
-                transaction.setUserName(userInfo.getFullName());
-            }
-        }
-
-        if (commitMessageProvider != null) {
-            var commitMessage = commitMessageProvider.get();
-            if (commitMessage != null) {
-                transaction.setCommitMessage(commitMessage.replace('\n', ' ').trim());
-            }
-        }
-
-        added = null;
-        deleted = null;
-
-        try {
-            transactionLog.log(transaction);
-        } catch (IOException e) {
-            log.error("Error saving a transaction to the transaction log.", e);
-            log.error("The lost transaction: \n" + transaction);
-
-            // Just in case
-            System.err.println("Error saving a transaction to the transaction log:\n");
-            System.err.println(transaction);
-
-            throw e;
         }
     }
 
@@ -136,6 +116,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             added = null;
             deleted = null;
         }
+
         super.abort();
     }
 
