@@ -13,7 +13,7 @@ import * as constants from '../../constants';
 
 class MetadataProperty extends React.Component {
     state = {
-        hovered: false
+        hoveredIndex: null
     };
 
     // Function to save a certain value.
@@ -54,19 +54,19 @@ class MetadataProperty extends React.Component {
             .catch(e => ErrorDialog.showError(e, "Error while deleting metadata"));
     };
 
-    setHover = (hovered) => {
-        this.setState({hovered});
+    setHoveredIndex = (hoveredIndex) => {
+        this.setState({hoveredIndex});
     }
 
     renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
         const {editable, property} = this.props;
-        const visibility = this.state.hovered ? 'visible' : 'hidden';
+        const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
 
         return (
             <div
                 key={idx}
-                onMouseEnter={() => this.setHover(true)}
-                onMouseLeave={() => this.setHover(false)}
+                onMouseEnter={() => this.setHoveredIndex(idx)}
+                onMouseLeave={() => this.setHoveredIndex(null)}
             >
                 <ListItem>
                     <ListItemText>
@@ -80,14 +80,13 @@ class MetadataProperty extends React.Component {
                     {
                         editable
                             ? (
-                                <ListItemSecondaryAction
-                                    style={{visibility}}
-                                >
+                                <ListItemSecondaryAction>
                                     <IconButton
                                         size="small"
                                         aria-label="Delete"
                                         title="Delete"
                                         onClick={this.handleDelete(idx)}
+                                        style={{visibility}}
                                     >
                                         <ClearIcon />
                                     </IconButton>
