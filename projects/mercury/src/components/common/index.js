@@ -1,15 +1,12 @@
 export {default as AuthorizationCheck} from "./AuthorizationCheck";
 export {default as BreadCrumbs} from "./BreadCrumbs";
-export {default as ClickHandler} from './ClickHandler';
 export {default as ConfirmationDialog} from './ConfirmationDialog';
 export {default as DateTime} from './DateTime';
 export {default as ErrorDialog} from "./ErrorDialog";
 export {default as ErrorMessage} from "./ErrorMessage";
-export {default as GenericCollectionsScreen} from "./GenericCollectionsScreen";
 export {default as CollectionEditor} from "./CollectionEditor";
 export {default as LoadingInlay} from './LoadingInlay';
 export {default as LoadingOverlay} from './LoadingOverlay';
-export {default as withHovered} from './WithHovered';
 export {default as ButtonWithVerification} from './buttons/ButtonWithVerification';
 export {default as RenameButton} from './buttons/RenameButton';
 export {default as CreateDirectoryButton} from './buttons/CreateDirectoryButton';

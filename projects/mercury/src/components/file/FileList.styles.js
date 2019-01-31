@@ -1,17 +1,18 @@
 const styles = theme => ({
     fileListContainer: {
-        width: '100%',
-        overflowX: 'auto'
-    },
-    tableRow: {
-        '&:hover': {
-            backgroundColor: theme.palette.primary[50],
-            cursor: 'pointer'
-        }
+        "width": '100%',
+        "overflowX": 'auto',
+        '-webkit-touch-callout': 'none', /* iOS Safari */
+        '-webkit-user-select': 'none', /* Safari */
+        '-khtml-user-select': 'none', /* Konqueror HTML */
+        '-moz-user-select': 'none', /* Firefox */
+        '-ms-user-select': 'none', /* Internet Explorer/Edge */
+        'user-select': 'none', /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
     },
     tableRowSelected: {
         '&&': {
-            backgroundColor: theme.palette.primary[100]
+            backgroundColor: theme.palette.primary[50]
         }
     }
 });

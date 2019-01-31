@@ -13,7 +13,14 @@ const defaultHomeEntry = menuEntries[0];
 
 function getBreadCrumbLink(text, path, linkClass) {
     return (
-        <Button component={Link} to={path} key={path} variant="text" className={linkClass}>
+        <Button
+            component={Link}
+            to={path}
+            key={path}
+            variant="text"
+            className={linkClass}
+            style={{textTransform: 'none'}}
+        >
             {text}
         </Button>
     );
@@ -28,14 +35,17 @@ function determineHomeEntry(homeUrl, classes) {
     // default to the first entry in the list.
     const entry = menuEntries.find(e => e.url === homeUrl) || defaultHomeEntry;
 
-    // Return a breadcrumb link for the given entry
-    return getBreadCrumbLink((
-        <span>
+    const children = (
+        <>
             <Icon className={classes.icon}>
                 {entry.icon}
             </Icon>
             {entry.label}
-        </span>), entry.url, classes.link);
+        </>
+    );
+
+    // Return a breadcrumb link for the given entry
+    return getBreadCrumbLink(children, entry.url, classes.link);
 }
 
 /**

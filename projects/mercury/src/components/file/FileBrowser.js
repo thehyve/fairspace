@@ -1,18 +1,15 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
-import {connect} from 'react-redux';
+
 import {
-    ErrorDialog, ErrorMessage, BreadCrumbs,
-    LoadingInlay, GenericCollectionsScreen
+    ErrorDialog, ErrorMessage,
+    LoadingInlay
 } from "../common";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
-import permissionUtils from '../../utils/permissionUtils';
-import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
-import * as fileActions from "../../actions/fileActions";
-import * as collectionActions from "../../actions/collectionActions";
+import {canWrite} from '../../utils/permissionUtils';
 import FileAPI from "../../services/FileAPI";
-import {splitPathIntoArray, joinPaths} from "../../utils/fileUtils";
+import {joinPaths} from "../../utils/fileUtils";
 
 class FileBrowser extends React.Component {
     componentDidMount() {
@@ -26,24 +23,6 @@ class FileBrowser extends React.Component {
         // do not bother fetching the files
         if (openedCollection.id) {
             fetchFilesIfNeeded(openedCollection, openedPath);
-        }
-    }
-
-    componentDidUpdate(prevProps) {
-        const {
-            selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath
-        } = this.props;
-        if (prevProps.openedCollection.id !== openedCollection.id) {
-            selectCollection(openedCollection.id);
-        }
-
-        const hasCollectionDetails = openedCollection.id;
-        const hasNewOpenedCollection = prevProps.openedCollection.id !== openedCollection.id;
-        const hasNewOpenedPath = prevProps.openedPath !== openedPath;
-
-        if (hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
-            fetchFilesIfNeeded(openedCollection, openedPath);
-            openPath(`/${openedCollection.location}${openedPath === '/' ? '' : openedPath}`);
         }
     }
 
@@ -114,60 +93,33 @@ class FileBrowser extends React.Component {
         const {loading, error} = this.props;
 
         if (error) {
-            return this.renderError(error);
+            return (<ErrorMessage message="An error occurred while loading files" />);
         }
 
         return (
-            <GenericCollectionsScreen
-                breadCrumbs={this.renderBreadcrumbs()}
-                buttons={loading ? null : this.renderButtons()}
-                main={loading ? this.renderLoading() : this.renderFiles()}
-            />
+            <>
+                {loading ? <LoadingInlay /> : this.renderFiles()}
+                {loading ? null : this.renderButtons()}
+            </>
         );
-    }
-
-    renderBreadcrumbs() {
-        const {openedCollection, openedPath, loading} = this.props;
-
-        if (loading) {
-            return <BreadCrumbs />;
-        }
-
-        const segments = [
-            {segment: `${openedCollection.id}`, label: openedCollection.name}
-        ];
-
-        if (openedPath) {
-            const toBreadcrumb = segment => ({segment, label: segment});
-            const pathParts = splitPathIntoArray(openedPath);
-            segments.push(...pathParts.map(toBreadcrumb));
-        }
-
-        return <BreadCrumbs segments={segments} />;
     }
 
     renderButtons() {
         const {openedCollection, openedPath} = this.props;
+
         return (
             <FileOperations
                 openedCollection={openedCollection}
                 openedPath={openedPath}
-                disabled={!permissionUtils.canWrite(openedCollection)}
+                disabled={!canWrite(openedCollection)}
                 existingFiles={this.props.files ? this.props.files.map(file => file.basename) : []}
             />
         );
     }
 
-    renderError() {
-        return (<ErrorMessage message="An error occurred while loading files" />);
-    }
-
-    renderLoading() {
-        return <LoadingInlay />;
-    }
-
     renderFiles() {
         const doesCollectionExist = this.props.openedCollection && this.props.openedCollection.id;
+
         if (!doesCollectionExist) {
             return 'Collection does not exist.';
         }
@@ -180,31 +132,10 @@ class FileBrowser extends React.Component {
                 onPathDoubleClick={this.handlePathDoubleClick}
                 onRename={this.handlePathRename}
                 onDelete={this.handlePathDelete}
-                readonly={!permissionUtils.canWrite(this.props.openedCollection)}
+                readonly={!canWrite(this.props.openedCollection)}
             />
         );
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
-    const {openedCollectionId, openedPath} = ownProps;
-    const filesPerCollection = state.cache.filesByCollectionAndPath[openedCollectionId] || {};
-    const files = filesPerCollection[openedPath] || {};
-    const getCollection = collectionId => (state.cache.collections.data && state.cache.collections.data.find(collection => collection.id === collectionId)) || {};
-
-    return {
-        loading: files.pending || state.cache.collections.pending || state.cache.collections.data.length === 0,
-        error: files.error || state.cache.collections.error,
-        files: files.data,
-        selectedPaths: state.collectionBrowser.selectedPaths,
-        openedCollection: openedCollectionId ? getCollection(openedCollectionId) : {}
-    };
-};
-
-const mapDispatchToProps = {
-    ...collectionActions,
-    ...fileActions,
-    ...collectionBrowserActions
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(FileBrowser));
+export default withRouter(FileBrowser);
