@@ -16,7 +16,7 @@ import static org.apache.jena.riot.RDFFormat.JSONLD;
 @Slf4j
 public class ModelUtils {
     public static Model readModel(HttpServletRequest req) throws IOException {
-        Model model = createDefaultModel();
+        var model = createDefaultModel();
         RDFDataMgr.read(model, req.getInputStream(), JSONLD.getLang());
         return model;
     }

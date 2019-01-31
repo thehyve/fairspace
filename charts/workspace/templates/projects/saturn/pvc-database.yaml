@@ -1,0 +1,28 @@
+{{- if and .Values.saturn.persistence.database.enabled (not .Values.saturn.persistence.database.existingClaim) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "saturn.fullname" . }}-database
+  labels:
+    app: saturn
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.saturn.persistence.database.annotations }}
+  annotations:
+{{ toYaml .Values.saturn.persistence.database.annotations | indent 4 }}
+{{- end }}
+spec:
+  accessModes:
+    - {{ .Values.saturn.persistence.database.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.saturn.persistence.database.size | quote }}
+{{- if .Values.saturn.persistence.database.storageClass }}
+{{- if (eq "-" .Values.saturn.persistence.database.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.saturn.persistence.database.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end -}}

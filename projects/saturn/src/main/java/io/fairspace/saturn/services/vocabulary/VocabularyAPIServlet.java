@@ -13,8 +13,8 @@ import static io.fairspace.saturn.services.ModelUtils.writeModel;
 public class VocabularyAPIServlet extends HttpServlet {
     private final VocabularyAPI api;
 
-    public VocabularyAPIServlet(RDFConnection rdfConnection) {
-        this.api = new VocabularyAPI(rdfConnection);
+    public VocabularyAPIServlet(RDFConnection rdfConnection, String vocabularyUri) {
+        this.api = new VocabularyAPI(rdfConnection, vocabularyUri);
     }
 
     @Override

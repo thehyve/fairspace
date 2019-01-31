@@ -24,9 +24,10 @@ public class MetadataAPITest {
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
     private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
     private static final Resource S3 = createResource("http://fairspace.io/iri/S3");
-    private static final Property P = createProperty("http://fairspace.io/ontology/P");
-    private static final Statement STMT1 = createStatement(S1, P, S2);
-    private static final Statement STMT2 = createStatement(S2, P, S3);
+    private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
+    private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
+    private static final Statement STMT1 = createStatement(S1, P1, S2);
+    private static final Statement STMT2 = createStatement(S2, P1, S3);
 
     @Before
     public void setUp() {
@@ -49,7 +50,7 @@ public class MetadataAPITest {
         assertEquals(1, m2.size());
         assertTrue(m2.contains(STMT1));
 
-        Model m3 = api.get(null, P.getURI(), null);
+        Model m3 = api.get(null, P1.getURI(), null);
         assertEquals(2, m3.size());
         assertTrue(m3.contains(STMT1));
         assertTrue(m3.contains(STMT2));
@@ -81,7 +82,7 @@ public class MetadataAPITest {
         assertFalse(ds.getDefaultModel().contains(STMT1));
         assertTrue(ds.getDefaultModel().contains(STMT2));
 
-        api.delete(null, P.getURI(), null);
+        api.delete(null, P1.getURI(), null);
 
         assertTrue(ds.getDefaultModel().isEmpty());
     }
@@ -100,13 +101,14 @@ public class MetadataAPITest {
     public void patch() {
         executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
-        Statement newStmt1 = createStatement(S1, P, S3);
-        Statement newStmt2 = createStatement(S2, P, S1);
+        Statement newStmt1 = createStatement(S1, P1, S3);
+        Statement newStmt2 = createStatement(S2, P1, S1);
+        Statement newStmt3 = createStatement(S1, P2, S3);
 
-        api.patch(createDefaultModel().add(newStmt1).add(newStmt2));
-
+        api.patch(createDefaultModel().add(newStmt1).add(newStmt2).add(newStmt3));
         assertTrue(ds.getDefaultModel().contains(newStmt1));
         assertTrue(ds.getDefaultModel().contains(newStmt2));
+        assertTrue(ds.getDefaultModel().contains(newStmt3));
         assertFalse(ds.getDefaultModel().contains(STMT1));
         assertFalse(ds.getDefaultModel().contains(STMT2));
     }
@@ -116,13 +118,15 @@ public class MetadataAPITest {
         String query = MetadataAPI.createPatchQuery(asList(STMT1, STMT2));
         assertEquals("DELETE WHERE \n" +
                 "{\n" +
-                "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P> ?o1 .\n" +
-                "  <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P> ?o2 .\n" +
-                "}\n" +
-                ";\n" +
+                "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> ?o1 .\n" +
+                "} ;\n" +
+                "DELETE WHERE \n" +
+                "{\n" +
+                "  <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P1> ?o2 .\n" +
+                "} ;\n" +
                 "INSERT DATA {\n" +
-                "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P> <http://fairspace.io/iri/S2> .\n" +
-                "  <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P> <http://fairspace.io/iri/S3> .\n" +
+                "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> <http://fairspace.io/iri/S2> .\n" +
+                "  <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P1> <http://fairspace.io/iri/S3> .\n" +
                 "}\n", query);
     }
 }

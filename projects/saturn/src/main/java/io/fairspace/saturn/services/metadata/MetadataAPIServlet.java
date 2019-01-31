@@ -1,7 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import javax.servlet.ServletException;
@@ -16,7 +14,7 @@ import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 
-@Slf4j
+
 public class MetadataAPIServlet extends HttpServlet {
     private static final String METHOD_PATCH = "PATCH";
 
@@ -39,7 +37,7 @@ public class MetadataAPIServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Model result = api.get(req.getParameter("subject"), req.getParameter("predicate"), req.getParameter("object"));
+        var result = api.get(req.getParameter("subject"), req.getParameter("predicate"), req.getParameter("object"));
         writeModel(result, resp);
     }
 

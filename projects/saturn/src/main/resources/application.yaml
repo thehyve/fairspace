@@ -1,0 +1,5 @@
+saturn:
+  port: 8080
+  datasetPath: data/db
+  transactionLogPath: data/log
+  vocabularyURI: http://fairspace.io/vocabulary#
