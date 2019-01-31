@@ -1,6 +1,7 @@
 buildscript {
     ext {
         jena_version = '3.10.0'
+        mockitoVersion = '2.22.0'
     }
 }
 
@@ -30,4 +31,6 @@ dependencies {
     compile 'com.nimbusds:nimbus-jose-jwt:5.7'
 
     testCompile "junit:junit:4.12"
+    testCompile "org.mockito:mockito-core:${mockitoVersion}"
+    testCompile "org.mockito:mockito-junit:${mockitoVersion}"
 }
