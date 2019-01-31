@@ -10,6 +10,7 @@ import {splitPathIntoArray} from "../../utils/fileUtils";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
+import * as consts from '../../constants.js';
 
 class FilesPage extends React.Component {
     componentDidUpdate(prevProps) {
@@ -61,7 +62,7 @@ class FilesPage extends React.Component {
                 <>
                     {this.renderBreadcrumbs()}
                     <Grid container spacing={8}>
-                        <Grid item style={{width: '55%'}}>
+                        <Grid item style={{width: consts.MAIN_CONTENT_WIDTH}}>
                             <FileBrowser
                                 fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
                                 openPath={openPath}
@@ -78,7 +79,7 @@ class FilesPage extends React.Component {
                                 deleteFile={deleteFile}
                             />
                         </Grid>
-                        <Grid item style={{width: '45%'}}>
+                        <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
                             <InformationDrawer />
                         </Grid>
                     </Grid>

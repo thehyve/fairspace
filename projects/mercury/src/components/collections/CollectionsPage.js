@@ -4,15 +4,16 @@ import Grid from '@material-ui/core/Grid';
 import {BreadCrumbs} from '../common';
 import InformationDrawer from '../common/InformationDrawer';
 import CollectionBrowser from "./CollectionBrowser";
+import * as consts from '../../constants.js';
 
 const collectionsPage = () => (
     <>
         <BreadCrumbs />
         <Grid container spacing={8}>
-            <Grid item style={{width: '55%'}}>
+            <Grid item style={{width: consts.MAIN_CONTENT_WIDTH}}>
                 <CollectionBrowser />
             </Grid>
-            <Grid item style={{width: '45%'}}>
+            <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
                 <InformationDrawer />
             </Grid>
         </Grid>

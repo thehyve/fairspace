@@ -3,6 +3,10 @@ export const CUT = 'CUT';
 export const COPY = 'COPY';
 export const PATH_SEPARATOR = '/';
 
+// UI
+export const MAIN_CONTENT_WIDTH = '55%';
+export const SIDE_PANEL_WIDTH = '45%';
+
 // URIs
 export const PROPERTY_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
 export const CLASS_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class';
