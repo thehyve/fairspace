@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.nimbusds.jose.JWSAlgorithm.RS256;
+import static io.fairspace.Context.currentRequest;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toSet;
-import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 
 @Slf4j
 public class Security {
@@ -78,16 +78,9 @@ public class Security {
     }
 
     public static UserInfo userInfo() {
-        var connection = getCurrentConnection();
-        if (connection == null) {
-            return null;
-        }
-        var request = connection.getHttpChannel().getRequest();
-        if (request == null) {
-            return null;
-        }
-
-        return (UserInfo) request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE);
+        return (UserInfo) currentRequest()
+                .map(request -> request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE))
+                .orElse(null) ;
     }
 
     private static String getStringClaim(Map<String, ?> claims, String key) {
