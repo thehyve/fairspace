@@ -3,6 +3,7 @@ package io.fairspace.saturn;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
+import io.fairspace.saturn.webdav.milton.MiltonWebDAVServlet;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.cfg4j.provider.ConfigurationProviderBuilder;
@@ -28,12 +29,15 @@ public class App {
         System.out.println("Saturn is starting");
 
         var ds = SaturnDatasetFactory.connect(CONFIG);
+        // The RDF connection is supposed to be threadsafe and can
+        // be reused in all the application
         var connection = new RDFConnectionLocal(ds);
 
         FusekiServer.create()
                 .add("/rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
                 .addServlet("/vocabulary", new VocabularyAPIServlet(connection, CONFIG.vocabularyURI()))
+                .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
                 .port(CONFIG.port())
                 .build()
                 .start();
