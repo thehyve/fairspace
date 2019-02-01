@@ -36,7 +36,6 @@ public class LocalTransactionLogTest {
         deleteDirectory(logDir);
     }
 
-    @Ignore // TODO: Consumes too much system resources. Think about a better test
     @Test
     public void logContinuesNumbering() throws IOException {
         log.log(new TransactionRecord());
@@ -47,6 +46,7 @@ public class LocalTransactionLogTest {
         assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-2").exists());
     }
 
+    @Ignore // TODO: Consumes too much system resources. Think about a better test
     @Test
     public void storageSchemaWorksAsExpected() throws IOException {
         for (int i = 0; i < 1000001; i++) {
