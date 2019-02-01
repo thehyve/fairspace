@@ -20,7 +20,7 @@ public class App {
     public static void main(String[] args) {
         System.out.println("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(config);
+        var ds = SaturnDatasetFactory.connect(config.jena);
         // The RDF connection is supposed to be threadsafe and can
         // be reused in all the application
         var connection = new RDFConnectionLocal(ds);
@@ -28,13 +28,14 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.getVocabularyURI()))
+                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.jena.vocabularyURI))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
                 .addServlet("/health", new HealthServlet())
-                .port(config.getPort());
+                .port(config.port);
 
-        if (config.isAuthEnabled()) {
-            var authenticator = createAuthenticator(config.getJwksUrl(), config.getJwtAlgorithm());
+        var auth = config.auth;
+        if (auth.authEnabled) {
+            var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
             fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
         }
 
@@ -42,7 +43,7 @@ public class App {
                 .build()
                 .start();
 
-        System.out.println("Saturn is running on port " + config.getPort());
+        System.out.println("Saturn is running on port " + config.port);
         System.out.println("Access Fuseki at /rdf");
         System.out.println("Access Metadata at /statements");
         System.out.println("Access Vocabulary API at /vocabulary");

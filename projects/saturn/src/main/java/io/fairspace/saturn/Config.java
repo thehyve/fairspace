@@ -1,28 +1,28 @@
 package io.fairspace.saturn;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 
-@Getter
-@Setter
 public class Config {
-    String vocabularyURI;
+    public int port;
 
-    int port;
+    public Jena jena;
 
-    String datasetPath;
+    public Auth auth;
 
-    String transactionLogPath;
+    public static class Jena {
+        public String datasetPath;
 
-    boolean authEnabled;
+        public String transactionLogPath;
 
-    URL jwksUrl;
+        public String vocabularyURI;
+    }
 
-    String jwtAlgorithm;
+     public static class Auth {
+        public boolean authEnabled;
+
+        public URL jwksUrl;
+
+        public String jwtAlgorithm;
+    }
 }

@@ -1,8 +1,10 @@
 port: 8080
-datasetPath: data/db
-transactionLogPath: data/log
-vocabularyURI: http://fairspace.io/vocabulary#
-authEnabled: false
-jwksUrl: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs
-jwtAlgorithm: RS256
+jena:
+  datasetPath: data/db
+  transactionLogPath: data/log
+  vocabularyURI: http://fairspace.io/vocabulary#
+auth:
+  authEnabled: false
+  jwksUrl: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs
+  jwtAlgorithm: RS256
 
