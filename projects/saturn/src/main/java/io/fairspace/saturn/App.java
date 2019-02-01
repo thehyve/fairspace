@@ -9,21 +9,12 @@ import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.yaml.snakeyaml.Yaml;
 
-import java.nio.file.Paths;
-
-import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
-import static java.util.Collections.singletonList;
 import java.io.File;
 import java.io.FileInputStream;
 
+import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
+
 public class App {
-    private static ConfigFilesProvider configFilesProvider = () -> singletonList(Paths.get("./application.yaml"));
-    private static Config config = new ConfigurationProviderBuilder()
-            .withConfigurationSource(new FallbackConfigurationSource(
-                    new ClasspathConfigurationSource(configFilesProvider),
-                    new FilesConfigurationSource(configFilesProvider)))
-            .build()
-            .bind("saturn", Config.class);
     private static Config config = loadConfig();
 
     public static void main(String[] args) {
@@ -37,13 +28,13 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.vocabularyURI()))
+                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.getVocabularyURI()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
                 .addServlet("/health", new HealthServlet())
-                .port(config.port());
+                .port(config.getPort());
 
-        if (config.authEnabled()) {
-            var authenticator = createAuthenticator(config.jwksUrl(), config.jwtAlgorithm());
+        if (config.isAuthEnabled()) {
+            var authenticator = createAuthenticator(config.getJwksUrl(), config.getJwtAlgorithm());
             fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
         }
 
@@ -51,7 +42,7 @@ public class App {
                 .build()
                 .start();
 
-        System.out.println("Saturn is running on port " + config.port());
+        System.out.println("Saturn is running on port " + config.getPort());
         System.out.println("Access Fuseki at /rdf");
         System.out.println("Access Metadata at /statements");
         System.out.println("Access Vocabulary API at /vocabulary");
@@ -60,7 +51,9 @@ public class App {
     private static Config loadConfig() {
         var settingsFile = new File("application.yaml");
 
-        try(var is = settingsFile.exists() ? new FileInputStream(settingsFile) : App.class.getClassLoader().getResourceAsStream("application.yaml")) {
+        try(var is = settingsFile.exists()
+                ? new FileInputStream(settingsFile)
+                : App.class.getClassLoader().getResourceAsStream("application.yaml")) {
             return new Yaml().loadAs(is, Config.class);
         } catch (Exception e){
             throw new RuntimeException(e);
