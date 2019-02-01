@@ -23,16 +23,16 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it only adds transaction logging and inverse properties inference and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config config) {
+    public static Dataset connect(Config.Jena config) {
         // Create a TDB2 dataset graph
-        var baseDatasetGraph = connectDatasetGraph(config.datasetPath());
+        var baseDatasetGraph = connectDatasetGraph(config.datasetPath);
 
         // Add transaction log
-        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath), new SparqlTransactionCodec());
         var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
         // Add property inversion
-        var vocabularyGraphNode = createURI(config.vocabularyURI());
+        var vocabularyGraphNode = createURI(config.vocabularyURI);
         var dsg = new InvertingDatasetGraph(txnLogDatasetGraph, vocabularyGraphNode);
 
         // Apply the vocabulary
