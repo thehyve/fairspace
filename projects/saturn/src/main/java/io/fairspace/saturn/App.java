@@ -15,7 +15,7 @@ import org.cfg4j.source.files.FilesConfigurationSource;
 
 import java.nio.file.Paths;
 
-import static io.fairspace.saturn.auth.Security.createAuthenticator;
+import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static java.util.Collections.singletonList;
 
 public class App {

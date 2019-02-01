@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import static io.fairspace.Context.currentRequest;
 
-public class Security {
+public class SecurityUtil {
     static final String USER_INFO_REQUEST_ATTRIBUTE = UserInfo.class.getName();
 
     public static Function<HttpServletRequest, UserInfo> createAuthenticator(URL jwksUrl, String algorithm) {

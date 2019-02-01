@@ -13,7 +13,7 @@ import java.text.ParseException;
 import java.util.HashSet;
 import java.util.function.Function;
 
-import static io.fairspace.saturn.auth.Security.createAuthenticator;
+import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SecurityTest {
+public class SecurityUtilTest {
     @Mock
     private JWTProcessor<?> jwtProcessor;
 

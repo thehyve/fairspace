@@ -30,7 +30,7 @@ class JWTAuthenticator {
     }
 
     public UserInfo getUserInfo(HttpServletRequest request) {
-        var storedUserInfo = (UserInfo) request.getAttribute(Security.USER_INFO_REQUEST_ATTRIBUTE);
+        var storedUserInfo = (UserInfo) request.getAttribute(SecurityUtil.USER_INFO_REQUEST_ATTRIBUTE);
         if (storedUserInfo != null) {
             return storedUserInfo;
         }
@@ -61,7 +61,7 @@ class JWTAuthenticator {
                         .map(Object::toString)
                         .collect(toSet()));
 
-        request.setAttribute(Security.USER_INFO_REQUEST_ATTRIBUTE, userInfo);
+        request.setAttribute(SecurityUtil.USER_INFO_REQUEST_ATTRIBUTE, userInfo);
         return userInfo;
     }
 
