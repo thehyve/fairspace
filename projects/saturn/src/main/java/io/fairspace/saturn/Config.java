@@ -1,5 +1,7 @@
 package io.fairspace.saturn;
 
+import java.net.URL;
+
 public interface Config {
     String vocabularyURI();
 
@@ -8,4 +10,10 @@ public interface Config {
     String datasetPath();
 
     String transactionLogPath();
+
+    boolean authEnabled();
+
+    URL jwksUrl();
+
+    String jwtAlgorithm();
 }

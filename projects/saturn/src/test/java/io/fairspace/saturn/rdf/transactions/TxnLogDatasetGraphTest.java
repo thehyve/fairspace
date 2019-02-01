@@ -22,10 +22,11 @@ public class TxnLogDatasetGraphTest {
     private static final Statement statement = createStatement(createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
+
     @Before
     public void before() {
         transactions = new ArrayList<>();
-        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), transactions::add, null));
+        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), transactions::add, null, null));
     }
 
 

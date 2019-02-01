@@ -2,6 +2,7 @@ package io.fairspace.saturn.rdf;
 
 import io.fairspace.saturn.Config;
 import io.fairspace.saturn.commits.CommitMessages;
+import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
@@ -28,7 +29,7 @@ public class SaturnDatasetFactory {
 
         // Add transaction log
         var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), new SparqlTransactionCodec());
-        var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog, CommitMessages::getCommitMessage);
+        var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
         // Add property inversion
         var vocabularyGraphNode = createURI(config.vocabularyURI());

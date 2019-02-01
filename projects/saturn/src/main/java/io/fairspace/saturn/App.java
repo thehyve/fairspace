@@ -1,6 +1,7 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.services.health.HealthServlet;
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
 import io.fairspace.saturn.webdav.milton.MiltonWebDAVServlet;
@@ -14,11 +15,12 @@ import org.cfg4j.source.files.FilesConfigurationSource;
 
 import java.nio.file.Paths;
 
+import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static java.util.Collections.singletonList;
 
 public class App {
     private static ConfigFilesProvider configFilesProvider = () -> singletonList(Paths.get("./application.yaml"));
-    private static Config CONFIG = new ConfigurationProviderBuilder()
+    private static Config config = new ConfigurationProviderBuilder()
             .withConfigurationSource(new FallbackConfigurationSource(
                     new ClasspathConfigurationSource(configFilesProvider),
                     new FilesConfigurationSource(configFilesProvider)))
@@ -28,23 +30,32 @@ public class App {
     public static void main(String[] args) {
         System.out.println("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG);
+        var ds = SaturnDatasetFactory.connect(config);
         // The RDF connection is supposed to be threadsafe and can
         // be reused in all the application
         var connection = new RDFConnectionLocal(ds);
 
-        FusekiServer.create()
-                .add("/rdf", ds)
+        var fusekiServerBuilder = FusekiServer.create()
+                .add("rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, CONFIG.vocabularyURI()))
+                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.vocabularyURI()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
-                .port(CONFIG.port())
+                .addServlet("/health", new HealthServlet())
+                .port(config.port());
+
+        if (config.authEnabled()) {
+            var authenticator = createAuthenticator(config.jwksUrl(), config.jwtAlgorithm());
+            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
+        }
+
+        fusekiServerBuilder
                 .build()
                 .start();
 
-        System.out.println("Saturn is running on port " + CONFIG.port());
+        System.out.println("Saturn is running on port " + config.port());
         System.out.println("Access Fuseki at /rdf");
         System.out.println("Access Metadata at /statements");
         System.out.println("Access Vocabulary API at /vocabulary");
     }
+
 }

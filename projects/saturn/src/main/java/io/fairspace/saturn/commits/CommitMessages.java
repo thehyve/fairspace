@@ -1,7 +1,7 @@
 package io.fairspace.saturn.commits;
 
 
-import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
+import static io.fairspace.Context.currentRequest;
 
 /**
  * Manages commit messages.
@@ -27,15 +27,9 @@ public class CommitMessages {
         if (systemMessage != null) {
            return systemMessage;
         }
-        var connection = getCurrentConnection();
-        if (connection == null) {
-            return null;
-        }
-        var request = connection.getHttpChannel().getRequest();
-        if (request == null) {
-            return null;
-        }
 
-        return request.getHeader(COMMIT_MESSAGE_HEADER);
+        return currentRequest()
+                .map(request -> request.getHeader(COMMIT_MESSAGE_HEADER))
+                .orElse(null);
     }
 }
