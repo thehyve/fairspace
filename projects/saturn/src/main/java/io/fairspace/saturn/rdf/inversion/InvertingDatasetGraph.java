@@ -39,11 +39,11 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
         switch (action) {
             case ADD:
                 // A new inversion rule added?
-                    if (graph.equals(vocabularyGraphNode) && predicate.equals(inverseOf)) {
-                        checkConflicts(subject, object);
-                        checkConflicts(object, subject);
-                        propertiesMap.put(subject, object);
-                        propertiesMap.put(object, subject);
+                if (graph.equals(vocabularyGraphNode) && predicate.equals(inverseOf)) {
+                    checkConflicts(subject, object);
+                    checkConflicts(object, subject);
+                    propertiesMap.put(subject, object);
+                    propertiesMap.put(object, subject);
                 }
                 // Check if an inverse statement should be added as well
                 var toAdd = propertiesMap.get(predicate);
@@ -53,9 +53,9 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 break;
             case DELETE:
                 // An inversion rule removed?
-                    if (graph.equals(vocabularyGraphNode) && predicate.equals(inverseOf)) {
-                        propertiesMap.remove(subject);
-                        propertiesMap.remove(object);
+                if (graph.equals(vocabularyGraphNode) && predicate.equals(inverseOf)) {
+                    propertiesMap.remove(subject);
+                    propertiesMap.remove(object);
                 }
                 // Check if an inverse statement should be removed as well
                 var toDelete = propertiesMap.get(predicate);
@@ -66,11 +66,11 @@ public class InvertingDatasetGraph extends AbstractChangesAwareDatasetGraph {
         }
     }
 
-        private void checkConflicts(Node subject, Node object) {
-            var mapped = propertiesMap.get(subject);
-            if (mapped != null && !mapped.equals(object)) {
-                throw new UnsupportedOperationException("An inverse property for " + subject + " already exists");
-            }
+    private void checkConflicts(Node subject, Node object) {
+        var mapped = propertiesMap.get(subject);
+        if (mapped != null && !mapped.equals(object)) {
+            throw new UnsupportedOperationException("An inverse property for " + subject + " already exists");
         }
+    }
 }
 

@@ -2,6 +2,7 @@ package io.fairspace.saturn.rdf.transactions;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -45,6 +46,7 @@ public class LocalTransactionLogTest {
         assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-2").exists());
     }
 
+    @Ignore // TODO: Consumes too much system resources. Think about a better test
     @Test
     public void storageSchemaWorksAsExpected() throws IOException {
         for (int i = 0; i < 1000001; i++) {

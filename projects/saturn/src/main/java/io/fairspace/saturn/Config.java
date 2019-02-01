@@ -1,11 +1,28 @@
 package io.fairspace.saturn;
 
-public interface Config {
-    String vocabularyURI();
 
-    int port();
+import java.net.URL;
 
-    String datasetPath();
+public class Config {
+    public int port;
 
-    String transactionLogPath();
+    public Jena jena;
+
+    public Auth auth;
+
+    public static class Jena {
+        public String datasetPath;
+
+        public String transactionLogPath;
+
+        public String vocabularyURI;
+    }
+
+     public static class Auth {
+        public boolean authEnabled;
+
+        public URL jwksUrl;
+
+        public String jwtAlgorithm;
+    }
 }

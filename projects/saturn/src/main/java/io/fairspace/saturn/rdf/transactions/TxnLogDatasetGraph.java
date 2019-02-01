@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
@@ -19,13 +20,15 @@ import static java.lang.System.currentTimeMillis;
 @Slf4j
 public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private final TransactionLog transactionLog;
+    private final Supplier<UserInfo> userInfoProvider;
     private final Supplier<String> commitMessageProvider;
     private Set<Quad> added;   // Quads added in current transaction
     private Set<Quad> deleted; // Quads deleted in current transaction
 
-    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<String> commitMessageProvider) {
+    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<UserInfo> userInfoProvider, Supplier<String> commitMessageProvider) {
         super(dsg);
         this.transactionLog = transactionLog;
+        this.userInfoProvider = userInfoProvider;
         this.commitMessageProvider = commitMessageProvider;
     }
 
@@ -74,6 +77,14 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             transaction.setAdded(added);
             transaction.setDeleted(deleted);
             transaction.setTimestamp(currentTimeMillis());
+
+            if (userInfoProvider != null) {
+                var userInfo = userInfoProvider.get();
+                if (userInfo != null) {
+                    transaction.setUserId(userInfo.getUserId());
+                    transaction.setUserName(userInfo.getFullName());
+                }
+            }
 
             if (commitMessageProvider != null) {
                 var commitMessage = commitMessageProvider.get();
