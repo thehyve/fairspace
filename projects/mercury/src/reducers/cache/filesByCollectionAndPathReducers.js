@@ -31,7 +31,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                         pending: true,
                         error: false,
                         invalidated: false,
-                        data: {}
+                        data: []
                     }
                 }
             };

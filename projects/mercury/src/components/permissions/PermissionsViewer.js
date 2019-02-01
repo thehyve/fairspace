@@ -1,82 +1,30 @@
 import React from 'react';
-import Fab from "@material-ui/core/Fab";
-import Icon from "@material-ui/core/Icon";
-import {withStyles} from "@material-ui/core/styles/index";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import {compose} from "redux";
+import {
+    List, ListItem, ListItemSecondaryAction,
+    ListItemText, IconButton, Menu, Button
+} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
-import IconButton from '@material-ui/core/IconButton';
 import MoreIcon from '@material-ui/icons/MoreVert';
-import Menu from "@material-ui/core/Menu";
+
 import {
     ErrorMessage, ConfirmationDialog, LoadingInlay,
-     LoadingOverlay, withHovered
+    LoadingOverlay
 } from "../common";
 import AlterPermissionContainer from "./AlterPermissionContainer";
-import {compareBy, comparing} from "../../utils/comparisionUtils";
 import getDisplayName from "../../utils/userUtils";
 import {findById} from "../../utils/arrayUtils";
+import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
 
-export const styles = () => ({
-    collaboratorList: {
-        width: '100%'
-    },
-    buttonList: {
-        marginTop: '1em'
-    }
-});
-
-
-/**
- * Get permission level
- * @param p
- * @returns {*}
- */
-const permissionLevel = p => ({Manage: 0, Write: 1, Read: 2}[p.access]);
-
-/**
- * Sort and filter permissions
- * @param permissions
- * @returns {*}
- */
-const sortPermissions = (permissions) => {
-    if (permissions) {
-        return permissions
-            .sort(comparing(compareBy(permissionLevel), compareBy('subject')));
-    }
-    return [];
-};
-
-/**
- * Check if collaborator can alter permission. User can alter permission if:
- * - has manage access to a collection
- * - permission is not his/hers
- * @param canManage
- * @param permission
- * @param currentLoggedUser
- * @returns {*|boolean}
- */
-const canAlterPermission = (canManage, permission, currentLoggedUser) => {
-    const isSomeoneElsePermission = currentLoggedUser.id !== permission.subject;
-    return canManage && isSomeoneElsePermission;
-};
-
-export class PermissionsViewer extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            showPermissionDialog: false,
-            showConfirmDeleteDialog: false,
-            selectedUser: null
-        };
-    }
+class PermissionsViewer extends React.Component {
+    state = {
+        showPermissionDialog: false,
+        showConfirmDeleteDialog: false,
+        selectedUser: null
+    };
 
     componentDidMount() {
         const {collectionId, fetchPermissionsIfNeeded} = this.props;
+
         if (collectionId) {
             fetchPermissionsIfNeeded(collectionId);
         }
@@ -84,6 +32,7 @@ export class PermissionsViewer extends React.Component {
 
     componentDidUpdate() {
         const {collectionId, fetchPermissionsIfNeeded} = this.props;
+
         if (collectionId) {
             fetchPermissionsIfNeeded(collectionId);
         }
@@ -115,6 +64,7 @@ export class PermissionsViewer extends React.Component {
     handleDeleteCollaborator = () => {
         const {collectionId, alterPermission} = this.props;
         const {selectedUser} = this.state;
+
         if (selectedUser) {
             alterPermission(selectedUser.subject, collectionId, 'None');
             this.handleCloseConfirmDeleteDialog();
@@ -127,7 +77,7 @@ export class PermissionsViewer extends React.Component {
         });
     };
 
-    handleClick = (event) => {
+    handleMenuClick = (event) => {
         this.setState({anchorEl: event.currentTarget});
     };
 
@@ -135,75 +85,45 @@ export class PermissionsViewer extends React.Component {
         this.setState({anchorEl: null});
     };
 
-    renderAlterPermissionButtons(idx, collaborator) {
+    renderCollaboratorList(permissions) {
         const {canManage, currentUser} = this.props;
 
-        return canAlterPermission(canManage, collaborator, currentUser) ? (
-            <ListItemSecondaryAction
-                onMouseOver={e => this.props.onItemMouseOver(idx, e)}
-                onMouseOut={() => this.props.onItemMouseOut(idx)}
-            >
-                <IconButton
-                    style={{visibility: this.props.hovered !== idx ? 'hidden' : 'visible'}}
-                    onClick={this.handleClick}
-                >
-                    <MoreIcon />
-                </IconButton>
-                <Menu
-                    id="more-menu"
-                    anchorEl={this.state.anchorEl}
-                    open={Boolean(this.state.anchorEl)}
-                >
-                    <MenuItem
-                        onClick={() => this.handleAlterPermission(collaborator)}
-                    >
-                        Change access
-                    </MenuItem>
-                    <MenuItem
-                        onClick={() => this.handleRemoveCollaborator(collaborator)}
-                    >
-                        Delete
-                    </MenuItem>
-                </Menu>
-            </ListItemSecondaryAction>
-        ) : null;
-    }
-
-    renderCollaboratorList(permissions) {
         return sortPermissions(permissions)
-            .map((p, idx) => (
+            .map((p) => (
                 <ListItem
                     key={p.access + p.collectionId + p.subject}
-                    onMouseOver={e => this.props.onItemMouseOver(idx, e)}
-                    onMouseOut={() => this.props.onItemMouseOut(idx)}
                 >
                     <ListItemText primary={getDisplayName(p.user)} secondary={p.access} />
-                    {this.renderAlterPermissionButtons(idx, p)}
+                    <ListItemSecondaryAction>
+                        <IconButton
+                            onClick={this.handleMenuClick}
+                            disabled={!canAlterPermission(canManage, p, currentUser)}
+                        >
+                            <MoreIcon />
+                        </IconButton>
+                        <Menu
+                            id="more-menu"
+                            anchorEl={this.state.anchorEl}
+                            open={Boolean(this.state.anchorEl)}
+                        >
+                            <MenuItem
+                                onClick={() => this.handleAlterPermission(p)}
+                            >
+                                Change access
+                            </MenuItem>
+                            <MenuItem
+                                onClick={() => this.handleRemoveCollaborator(p)}
+                            >
+                                Delete
+                            </MenuItem>
+                        </Menu>
+                    </ListItemSecondaryAction>
                 </ListItem>
             ));
     }
 
-    renderAddCollaboratorButton() {
-        const {classes, canManage} = this.props;
-        return canManage ? (
-            <ListItem className={classes.buttonList}>
-                <ListItemSecondaryAction>
-                    <Fab
-                        mini="true"
-                        color="secondary"
-                        aria-label="Add"
-                        title="Add collaborator"
-                        onClick={() => this.handleAlterPermission()}
-                    >
-                        <Icon>add</Icon>
-                    </Fab>
-                </ListItemSecondaryAction>
-            </ListItem>
-        ) : '';
-    }
-
     renderUserList = (permissions) => {
-        const {users} = this.props;
+        const {users, canManage} = this.props;
 
         // Extend the permissions map with the user itself
         const permissionsWithUsers = permissions.map(p => ({
@@ -211,10 +131,22 @@ export class PermissionsViewer extends React.Component {
             user: findById(users, p.subject)
         }));
 
+        const addButton = canManage ? (
+            <Button
+                variant="text"
+                title="Add a collaborator"
+                aria-label="Add"
+                onClick={() => this.handleAlterPermission()}
+                disabled={!canManage}
+            >
+                Add
+            </Button>
+        ) : null;
+
         return (
-            <List dense>
+            <List dense disablePadding>
                 {this.renderCollaboratorList(permissionsWithUsers)}
-                {this.renderAddCollaboratorButton()}
+                {addButton}
             </List>
         );
     };
@@ -222,6 +154,7 @@ export class PermissionsViewer extends React.Component {
     renderPermissionDialog = () => {
         const {collectionId, currentUser} = this.props;
         const {selectedUser, showPermissionDialog} = this.state;
+
         return (
             <AlterPermissionContainer
                 open={showPermissionDialog}
@@ -237,6 +170,7 @@ export class PermissionsViewer extends React.Component {
         const {selectedUser, showConfirmDeleteDialog} = this.state;
         const fullName = selectedUser && getDisplayName(selectedUser.user);
         const content = `Are you sure you want to remove "${fullName}" from the collaborator list?`;
+
         return (
             <ConfirmationDialog
                 open={showConfirmDeleteDialog}
@@ -250,9 +184,8 @@ export class PermissionsViewer extends React.Component {
     };
 
     render() {
-        const {
-            classes, permissions, error, loading, altering
-        } = this.props;
+        const {permissions, error, loading, altering} = this.props;
+
         if (error) {
             return (<ErrorMessage message="An error occurred loading permissions" />);
         } if (loading) {
@@ -262,17 +195,15 @@ export class PermissionsViewer extends React.Component {
         } if (!permissions) {
             return (<div>No permission found</div>);
         }
+
         return (
-            <div className={classes.collaboratorList}>
+            <>
                 {this.renderPermissionDialog()}
                 {this.renderConfirmationDialog()}
                 {this.renderUserList(permissions)}
-            </div>
+            </>
         );
     }
 }
 
-export default compose(
-    withStyles(styles, {withTheme: true}),
-    withHovered,
-)(PermissionsViewer);
+export default PermissionsViewer;

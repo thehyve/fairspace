@@ -18,10 +18,6 @@ export const selectCollection = collectionId => ({
     collectionId
 });
 
-export const deselectCollection = () => ({
-    type: actionTypes.DESELECT_COLLECTION
-});
-
 export const openPath = path => ({
     type: actionTypes.OPEN_PATH,
     path

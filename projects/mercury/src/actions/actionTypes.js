@@ -19,7 +19,6 @@ export const OPEN_INFODRAWER                        = 'OPEN_INFODRAWER';
 export const CLOSE_INFODRAWER                       = 'CLOSE_INFODRAWER';
 export const OPEN_COLLECTION                        = 'OPEN_COLLECTION';
 export const SELECT_COLLECTION                      = 'SELECT_COLLECTION';
-export const DESELECT_COLLECTION                    = 'DESELECT_COLLECTION';
 export const OPEN_PATH                              = 'OPEN_PATH';
 export const CLOSE_PATH                             = 'CLOSE_PATH';
 export const SELECT_PATH                            = 'SELECT_PATH';

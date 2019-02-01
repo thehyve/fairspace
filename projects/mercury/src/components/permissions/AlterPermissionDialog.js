@@ -165,6 +165,7 @@ export class AlterPermissionDialog extends React.Component {
             user, users, collaborators, currentUser
         } = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
+
         let options = [];
 
         if (users.data && collaborators.data) {
