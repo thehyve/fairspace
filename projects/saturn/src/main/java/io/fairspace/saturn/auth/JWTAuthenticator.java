@@ -10,13 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toSet;
 
 @Slf4j
-class JWTAuthenticator implements Function<HttpServletRequest, UserInfo> {
+class JWTAuthenticator {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String USERNAME_CLAIM = "preferred_username";
@@ -30,8 +29,7 @@ class JWTAuthenticator implements Function<HttpServletRequest, UserInfo> {
         this.jwtProcessor = jwtProcessor;
     }
 
-    @Override
-    public UserInfo apply(HttpServletRequest request) {
+    public UserInfo getUserInfo(HttpServletRequest request) {
         var storedUserInfo = (UserInfo) request.getAttribute(Security.USER_INFO_REQUEST_ATTRIBUTE);
         if (storedUserInfo != null) {
             return storedUserInfo;

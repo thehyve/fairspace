@@ -28,7 +28,7 @@ public class Security {
     }
 
     public static Function<HttpServletRequest, UserInfo> createAuthenticator(JWTProcessor<?> jwtProcessor) {
-        return new JWTAuthenticator(jwtProcessor);
+        return new JWTAuthenticator(jwtProcessor)::getUserInfo;
     }
 
     public static UserInfo userInfo() {
