@@ -18,4 +18,10 @@ public class Config {
     String datasetPath;
 
     String transactionLogPath;
+
+    boolean authEnabled;
+
+    URL jwksUrl;
+
+    String jwtAlgorithm;
 }
