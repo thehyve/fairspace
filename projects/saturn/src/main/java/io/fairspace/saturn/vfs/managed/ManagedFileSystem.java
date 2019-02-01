@@ -17,7 +17,6 @@ import java.util.List;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.UUID.randomUUID;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
