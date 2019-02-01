@@ -2,6 +2,7 @@ package io.fairspace.saturn.rdf.transactions;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -35,6 +36,7 @@ public class LocalTransactionLogTest {
         deleteDirectory(logDir);
     }
 
+    @Ignore // TODO: Consumes too much system resources. Think about a better test
     @Test
     public void logContinuesNumbering() throws IOException {
         log.log(new TransactionRecord());
