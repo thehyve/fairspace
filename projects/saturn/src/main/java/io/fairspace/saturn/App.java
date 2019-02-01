@@ -44,7 +44,7 @@ public class App {
                 .port(config.port());
 
         if (config.authEnabled()) {
-            var authenticator = createAuthenticator(config.jwksUrl(), config.jwksAlgorithm());
+            var authenticator = createAuthenticator(config.jwksUrl(), config.jwtAlgorithm());
             fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
         }
 

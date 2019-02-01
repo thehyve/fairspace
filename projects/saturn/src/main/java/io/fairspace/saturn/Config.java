@@ -15,5 +15,5 @@ public interface Config {
 
     URL jwksUrl();
 
-    String jwksAlgorithm();
+    String jwtAlgorithm();
 }
