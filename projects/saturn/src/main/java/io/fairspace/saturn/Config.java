@@ -1,11 +1,21 @@
 package io.fairspace.saturn;
 
-public interface Config {
-    String vocabularyURI();
+import lombok.Getter;
+import lombok.Setter;
+import org.yaml.snakeyaml.Yaml;
 
-    int port();
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
-    String datasetPath();
+@Getter
+@Setter
+public class Config {
+    String vocabularyURI;
 
-    String transactionLogPath();
+    int port;
+
+    String datasetPath;
+
+    String transactionLogPath;
 }

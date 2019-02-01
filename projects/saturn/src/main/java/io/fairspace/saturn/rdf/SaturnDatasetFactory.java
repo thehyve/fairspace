@@ -24,14 +24,14 @@ public class SaturnDatasetFactory {
      */
     public static Dataset connect(Config config) {
         // Create a TDB2 dataset graph
-        var baseDatasetGraph = connectDatasetGraph(config.datasetPath());
+        var baseDatasetGraph = connectDatasetGraph(config.getDatasetPath());
 
         // Add transaction log
-        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath()), new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(new File(config.getTransactionLogPath()), new SparqlTransactionCodec());
         var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog, CommitMessages::getCommitMessage);
 
         // Add property inversion
-        var vocabularyGraphNode = createURI(config.vocabularyURI());
+        var vocabularyGraphNode = createURI(config.getVocabularyURI());
         var dsg = new InvertingDatasetGraph(txnLogDatasetGraph, vocabularyGraphNode);
 
         // Apply the vocabulary
