@@ -27,7 +27,7 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 public class App {
     private static ConfigFilesProvider configFilesProvider = () -> singletonList(Paths.get("./application.yaml"));
-    private static Config CONFIG = new ConfigurationProviderBuilder()
+    private static Config config = new ConfigurationProviderBuilder()
             .withConfigurationSource(new FallbackConfigurationSource(
                     new ClasspathConfigurationSource(configFilesProvider),
                     new FilesConfigurationSource(configFilesProvider)))
@@ -37,7 +37,7 @@ public class App {
     public static void main(String[] args) {
         System.out.println("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG);
+        var ds = SaturnDatasetFactory.connect(config);
         // The RDF connection is supposed to be threadsafe and can
         // be reused in all the application
         var connection = new RDFConnectionLocal(ds);
@@ -45,13 +45,13 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, CONFIG.vocabularyURI()))
+                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.vocabularyURI()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
                 .addServlet("/health", new HealthServlet())
-                .port(CONFIG.port());
+                .port(config.port());
 
-        if (CONFIG.authEnabled()) {
-            var authenticator = createAuthenticator(CONFIG.jwksUrl());
+        if (config.authEnabled()) {
+            var authenticator = createAuthenticator(config.jwksUrl(), config.jwksAlgorithm());
             fusekiServerBuilder.securityHandler(new ConstraintSecurityHandler() {
                 @Override
                 public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -73,7 +73,7 @@ public class App {
                 .build()
                 .start();
 
-        System.out.println("Saturn is running on port " + CONFIG.port());
+        System.out.println("Saturn is running on port " + config.port());
         System.out.println("Access Fuseki at /rdf");
         System.out.println("Access Metadata at /statements");
         System.out.println("Access Vocabulary API at /vocabulary");

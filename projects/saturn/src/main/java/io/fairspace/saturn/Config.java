@@ -14,4 +14,6 @@ public interface Config {
     boolean authEnabled();
 
     URL jwksUrl();
+
+    String jwksAlgorithm();
 }
