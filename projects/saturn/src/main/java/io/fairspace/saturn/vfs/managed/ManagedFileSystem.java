@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
@@ -63,8 +64,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
                         "CONSTRUCT { ?s ?p ?o .} \n" +
                         "WHERE { ?s ?p ?o ; " +
                         "fs:filePath ?path . \n " +
-                        "FILTER(STRSTARTS(?path, CONCAT(?parentPath, '/')) && !CONTAINS(SUBSTR(?path, STRLEN(?parentPath) + 2), '/')) }");
-        sparql.setLiteral("parentPath", parentPath);
+                        "FILTER(STRSTARTS(?path, ?pathPrefix) && !CONTAINS(SUBSTR(?path, STRLEN(?pathPrefix) + 1), '/')) }");
+        sparql.setLiteral("pathPrefix", parentPath.isEmpty() ? "" : (parentPath + '/'));
         var model = rdf.queryConstruct(sparql.toString());
         var list = new ArrayList<FileInfo>();
         model.listSubjects().forEachRemaining(r -> list.add(info(r)));
@@ -73,17 +74,19 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        var topLevel = splitPath(path).length == 1;
-        var resource = createResource(baseUri + randomUUID());
+        withCommitMessage("Creating directory " + path, () -> {
+            var topLevel = splitPath(path).length == 1;
+            var resource = createResource(baseUri + randomUUID());
 
-        var sparql = new ParameterizedSparqlString(
-                "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "INSERT DATA { ?s a ?type ; \n" +
-                        "         fs:filePath ?path .}");
-        sparql.setIri("s", resource.getURI());
-        sparql.setIri("type", (topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE).getURI());
-        sparql.setLiteral("path", path);
-        rdf.update(sparql.toString());
+            var sparql = new ParameterizedSparqlString(
+                    "PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                            "INSERT DATA { ?s a ?type ; \n" +
+                            "         fs:filePath ?path .}");
+            sparql.setIri("s", resource.getURI());
+            sparql.setIri("type", (topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE).getURI());
+            sparql.setLiteral("path", path);
+            rdf.update(sparql.toString());
+        });
     }
 
     @Override
