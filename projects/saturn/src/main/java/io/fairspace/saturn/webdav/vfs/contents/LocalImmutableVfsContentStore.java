@@ -11,7 +11,7 @@ import java.util.UUID;
 
 /**
  * This content factory will store all files on local disk, while
- * never overwriting existing files. For every new write, a new location is generated
+ * never overwriting existing files. For every new create, a new location is generated
  */
 public class LocalImmutableVfsContentStore implements VfsContentStore {
     private static final String DIRECTORY_SEPARATOR = "/";

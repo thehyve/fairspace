@@ -49,12 +49,12 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
         var sparql = new ParameterizedSparqlString(
                 "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                "CONSTRUCT { ?s ?p ?o .} WHERE { ?s ?p ?o . ?s fs:filePath ?path . }");
+                        "CONSTRUCT { ?s ?p ?o .} WHERE { ?s ?p ?o . ?s fs:filePath ?path . }");
 
         sparql.setLiteral("path", path);
         var model = rdf.queryConstruct(sparql.toString());
         if (model.isEmpty()) {
-           return null;
+            return null;
         }
         var resource = model.listSubjects().next();
         return info(resource);
@@ -93,49 +93,43 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void write(String path, InputStream in) throws IOException {
+    public void create(String path, InputStream in) throws IOException {
         var cis = new CountingInputStream(in);
-        var id = store.write(cis);
+        var blobId = store.write(cis);
 
-        executeWrite(rdf, () -> {
-            var subj = new Resource[1];
-            rdf.querySelect( new ParameterizedSparqlString("PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                    "SELECT ?s WHERE {?s fs:filePath ?path}") {{ setLiteral("path", path);}}.toString(),
-                    row -> { subj[0] = row.getResource("s"); });
+        var resource = createResource(baseUri + randomUUID());
 
-            if (subj[0] != null) {
+        var sparql = new ParameterizedSparqlString(
+                "PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                        "INSERT DATA { ?s a fs:File; fs:filePath ?path; fs:fileSize ?size; fs:blobId ?blobId;}");
+        sparql.setIri("s", resource.getURI());
+        sparql.setLiteral("blobId", blobId);
+        sparql.setLiteral("path", path);
+        sparql.setLiteral("size", cis.getByteCount());
+        rdf.update(sparql.toString());
+    }
+
+    @Override
+    public void modify(String path, InputStream in) throws IOException {
+        var cis = new CountingInputStream(in);
+        var blobId = store.write(cis);
                 var sparql = new ParameterizedSparqlString(
                         "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                                "DELETE WHERE { ?s fs:fileSize ?x1};" +
-                                "DELETE WHERE { ?s fs:blobId ?x2};" +
-                                "INSERT DATA { ?s fs:fileSize ?size; fs:blobId ?blobId;}");
-                sparql.setIri("s", subj[0].getURI());
-                sparql.setLiteral("blobId", id);
+                                "DELETE {?s fs:fileSize ?x1 . ?s fs:blobId ?x2 .} WHERE { ?s fs:filePath ?path };" +
+                                "INSERT { ?s fs:fileSize ?size; fs:blobId ?blobId; } WHERE { ?s fs:filePath ?path }");
+                sparql.setLiteral("blobId", blobId);
                 sparql.setLiteral("path", path);
                 sparql.setLiteral("size", cis.getByteCount());
                 rdf.update(sparql.toString());
-            } else {
-                var resource = createResource(baseUri + randomUUID());
-
-                var sparql = new ParameterizedSparqlString(
-                        "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                                "INSERT DATA { ?s a fs:File; fs:filePath ?path; fs:fileSize ?size; fs:blobId ?blobId;}");
-                sparql.setIri("s", resource.getURI());
-                sparql.setLiteral("blobId", id);
-                sparql.setLiteral("path", path);
-                sparql.setLiteral("size", cis.getByteCount());
-                rdf.update(sparql.toString());
-            }
-        });
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
-        String[] blobId = { null };
+        String[] blobId = {null};
 
         rdf.querySelect(new ParameterizedSparqlString("PREFIX fs: <http://fairspace.io/ontology#>\n" +
                 "SELECT ?blobId WHERE { ?s fs:filePath ?path . ?s fs:blobId ?blobId . } ") {{
-                    setLiteral("path", path);
+            setLiteral("path", path);
         }}.toString(), row -> blobId[0] = row.getLiteral("blobId").getString());
 
         if (blobId[0] == null) {
@@ -171,7 +165,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     private static FileInfo info(Resource resource) {
-        return  FileInfo.builder()
+        return FileInfo.builder()
                 .path(resource.getProperty(FILE_PATH_PROPERTY).getString())
                 .isDirectory(resource.hasProperty(RDF.type, DIRECTORY_TYPE) || resource.hasProperty(RDF.type, COLLECTION_TYPE))
                 .size(resource.hasProperty(FILE_SIZE_PROPERTY) ? resource.getProperty(FILE_SIZE_PROPERTY).getLong() : 0L)

@@ -9,7 +9,7 @@ public interface VfsContentStore {
      * Retrieves the content for a given contentLocation.
      * @param contentLocation location of the contents within the content store.
      *                        Is produced when using putContent
-     * @param out             OutputStream to write the content to
+     * @param out             OutputStream to create the content to
      * @throws IOException
      */
     public void getContent(String contentLocation, OutputStream out) throws IOException;

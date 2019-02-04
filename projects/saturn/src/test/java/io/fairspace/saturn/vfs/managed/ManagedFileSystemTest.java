@@ -1,14 +1,12 @@
 package io.fairspace.saturn.vfs.managed;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jetty.server.UserIdentity;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -66,7 +64,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("dir");
 
         var in = new ByteArrayInputStream(content);
-        fs.write("dir/file", in);
+        fs.create("dir/file", in);
         var os = new ByteArrayOutputStream();
         fs.read("dir/file", os);
         assertArrayEquals(content, os.toByteArray());

@@ -13,7 +13,9 @@ public interface VirtualFileSystem extends Closeable {
 
     void mkdir(String path) throws IOException;
 
-    void write(String path, InputStream in) throws IOException;
+    void create(String path, InputStream in) throws IOException;
+
+    void modify(String path, InputStream in) throws IOException;
 
     void read(String path, OutputStream out) throws IOException;
 

@@ -42,7 +42,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     @Override
     public Resource createNew(String newName, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
         var newPath = normalizePath(info.getPath() + "/" + newName);
-        fs.write(newPath, inputStream);
+        fs.create(newPath, inputStream);
         return getResource(fs, newPath);
     }
 

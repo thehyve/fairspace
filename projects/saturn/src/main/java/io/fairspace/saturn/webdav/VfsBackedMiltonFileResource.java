@@ -44,7 +44,7 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
     @Override
     public void replaceContent(InputStream in, Long length) throws BadRequestException, ConflictException, NotAuthorizedException {
         try {
-            fs.write(info.getPath(), in);
+            fs.modify(info.getPath(), in);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
