@@ -35,9 +35,8 @@ repositories {
 dependencies {
     compile "org.apache.jena:jena-fuseki-main:${jena_version}"
     compile "io.milton:milton-server-ce:${milton_version}"
-    compile "org.cfg4j:cfg4j-core:4.4.1"
     compile 'com.nimbusds:nimbus-jose-jwt:5.7'
-    compile "org.yaml:snakeyaml:1.23"
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.6"
 
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-core:${mockitoVersion}"
