@@ -1,11 +1,13 @@
-# Movies a file from one location to another
+# Moves a file from one location to another
 # param from
 # param to
+
 PREFIX fs: <http://fairspace.io/ontology#>
+
 INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?from };
-INSERT { ?s fs:filePath ?to }
-WHERE {?s fs:filePath ?from };
+INSERT { ?s fs:filePath ?to } WHERE {?s fs:filePath ?from };
 DELETE WHERE { ?s fs:filePath ?from };
+
 INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/'))) };
 INSERT { ?s fs:filePath ?newPath}
 WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/'))) BIND(CONCAT(?to, '/', SUBSTR(?path, STRLEN(?from) + 2)) as ?newPath) };
