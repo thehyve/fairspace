@@ -92,8 +92,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
         var sparql = new ParameterizedSparqlString(
                 "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "INSERT DATA { ?s a ?fs:File ; \n" +
-                        "         fs:filePath ?path ." +
+                        "INSERT DATA { ?s a fs:File ; \n" +
+                        "         fs:filePath ?path; \n" +
                         "         fs:blobId ?blobId}");
         sparql.setIri("s", resource.getURI());
         sparql.setLiteral("blobId", id);
@@ -103,7 +103,18 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
+        String[] blobId = { null };
 
+        rdf.querySelect(new ParameterizedSparqlString("PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                "SELECT ?blobId WHERE { ?s fs:filePath ?path . ?s fs:blobId ?blobId . } ") {{
+                    setLiteral("path", path);
+        }}.toString(), row -> blobId[0] = row.getLiteral("blobId").getString());
+
+        if (blobId[0] == null) {
+            throw new FileNotFoundException(path);
+        }
+
+        store.read(blobId[0], out);
     }
 
     @Override
@@ -120,7 +131,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void delete(String path) throws IOException {
         var sparql = new ParameterizedSparqlString(
                 "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "DELETE WHERE { ?s ?p ?o . ?s fs:filePath ?path . }");
+                        "DELETE WHERE { ?s ?p ?o . ?s fs:filePath ?path . };\n" +
+                        "DELETE { ?s ?p ?o } WHERE {  ?s fs:filePath ?apath . FILTER(STRSTARTS(?apath, CONCAT(?path, '/'))) };");
         sparql.setLiteral("path", path);
         rdf.update(sparql.toString());
     }
