@@ -1,4 +1,4 @@
-package io.fairspace.saturn.webdav.vfs;
+package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.vfs.PathUtils;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
@@ -19,6 +19,10 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
+        return getResource(fs, path);
+    }
+
+    public static Resource getResource(VirtualFileSystem fs, String path) {
         try {
             var info = fs.stat(PathUtils.normalizePath(path.substring("/webdav".length())));
             if (info.isDirectory()) {

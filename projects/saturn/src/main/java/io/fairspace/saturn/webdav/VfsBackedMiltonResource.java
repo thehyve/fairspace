@@ -1,4 +1,4 @@
-package io.fairspace.saturn.webdav.vfs;
+package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.PathUtils;

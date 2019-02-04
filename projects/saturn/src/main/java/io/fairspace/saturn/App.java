@@ -8,7 +8,7 @@ import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
-import io.fairspace.saturn.webdav.vfs.MiltonWebDAVServlet;
+import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 

@@ -1,7 +1,6 @@
-package io.fairspace.saturn.webdav.vfs;
+package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.vfs.FileInfo;
-import io.fairspace.saturn.vfs.PathUtils;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.http.Auth;
 import io.milton.http.Range;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
+import static io.fairspace.saturn.webdav.VfsBackedMiltonResourceFactory.getResource;
 import static java.util.stream.Collectors.toList;
 
 public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource implements FolderResource {
@@ -33,7 +33,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         var newPath = normalizePath(info.getPath() + "/" + newName);
         try {
             fs.mkdir(newPath);
-            return new VfsBackedMiltonDirectoryResource(fs, fs.stat(newPath));
+            return (CollectionResource) getResource(fs, newPath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -43,12 +43,12 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     public Resource createNew(String newName, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
         var newPath = normalizePath(info.getPath() + "/" + newName);
         fs.write(newPath, inputStream);
-        return new VfsBackedMiltonDirectoryResource(fs, fs.stat(newPath));
+        return getResource(fs, newPath);
     }
 
     @Override
     public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
-        return null;
+        return getResource(fs, info.getPath() + "/" + childName);
     }
 
     @Override
