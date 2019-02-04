@@ -14,4 +14,9 @@ public class PathUtils {
     public static String[] splitPath(String path) {
         return normalizePath(path).split("/");
     }
+
+    public static String name(String path) {
+        var parts = splitPath(path);
+        return (parts.length == 0) ? "" :  parts[parts.length - 1];
+    }
 }

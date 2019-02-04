@@ -6,7 +6,9 @@ import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.health.HealthServlet;
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
-import io.fairspace.saturn.webdav.milton.MiltonWebDAVServlet;
+import io.fairspace.saturn.vfs.managed.LocalBlobStore;
+import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
+import io.fairspace.saturn.webdav.vfs.MiltonWebDAVServlet;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
@@ -30,7 +32,7 @@ public class App {
                 .add("rdf", ds)
                 .addServlet("/statements", new MetadataAPIServlet(connection))
                 .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.jena.vocabularyURI))
-                .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
+                .addServlet("/webdav/*", new MiltonWebDAVServlet(new ManagedFileSystem(connection, new LocalBlobStore(new File(config.webDAV.blobStorePath)), "http://example.com/")))
                 .addServlet("/health", new HealthServlet())
                 .port(config.port);
 

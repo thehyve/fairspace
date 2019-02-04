@@ -3,6 +3,9 @@ jena:
   datasetPath: data/db
   transactionLogPath: data/log
   vocabularyURI: http://fairspace.io/vocabulary#
+webDAV:
+  blobStorePath: data/blobs
+
 auth:
   authEnabled: false
   jwksUrl: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs

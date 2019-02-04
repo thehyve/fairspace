@@ -39,6 +39,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public FileInfo stat(String path) throws IOException {
+        if (path.isEmpty()) {
+            return FileInfo.builder().path("").isDirectory(true).build();
+        }
+
         var sparql = new ParameterizedSparqlString(
                 "PREFIX fs: <http://fairspace.io/ontology#>\n" +
                 "CONSTRUCT { ?s ?p ?o .} WHERE { ?s ?p ?o . ?s fs:filePath ?path . }");
@@ -62,9 +66,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
                         "FILTER(STRSTARTS(?path, CONCAT(?parentPath, '/')) && !CONTAINS(SUBSTR(?path, STRLEN(?parentPath) + 2), '/')) }");
         sparql.setLiteral("parentPath", parentPath);
         var model = rdf.queryConstruct(sparql.toString());
-        if (model.isEmpty()) {
-            throw new FileNotFoundException();
-        }
         var list = new ArrayList<FileInfo>();
         model.listSubjects().forEachRemaining(r -> list.add(info(r)));
         return list;

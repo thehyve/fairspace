@@ -10,6 +10,8 @@ public class Config {
 
     public Auth auth;
 
+    public WebDAV webDAV;
+
     public static class Jena {
         public String datasetPath;
 
@@ -24,5 +26,9 @@ public class Config {
         public URL jwksUrl;
 
         public String jwtAlgorithm;
+    }
+
+    public static class WebDAV {
+        public String blobStorePath;
     }
 }
