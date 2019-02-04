@@ -1,0 +1,4 @@
+# param type
+# param path
+PREFIX fs: <http://fairspace.io/ontology#>
+INSERT DATA { ?s a ?type; fs:filePath ?path .}

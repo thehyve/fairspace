@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vfs.managed;
 
+import io.fairspace.saturn.rdf.StoredQueries;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import org.apache.commons.io.input.CountingInputStream;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
+import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
@@ -77,19 +79,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        withCommitMessage("Create directory " + path, () -> {
-            var topLevel = splitPath(path).length == 1;
-            var resource = createResource(baseUri + randomUUID());
-
-            var sparql = new ParameterizedSparqlString(
-                    "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                            "INSERT DATA { ?s a ?type ; \n" +
-                            "         fs:filePath ?path .}");
-            sparql.setIri("s", resource.getURI());
-            sparql.setIri("type", (topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE).getURI());
-            sparql.setLiteral("path", path);
-            rdf.update(sparql.toString());
-        });
+        var topLevel = splitPath(path).length == 1;
+        var resource = createResource(baseUri + randomUUID());
+        withCommitMessage("Create directory " + path,
+                () -> rdf.update(storedQuery("fs_mkdir", resource, topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE, path)));
     }
 
     @Override
@@ -149,34 +142,15 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void move(String from, String to) throws IOException {
-        withCommitMessage("Move data from " + from + " to " + to, () ->
-                rdf.update(new ParameterizedSparqlString(
-                "PREFIX fs: <http://fairspace.io/ontology#> " +
-                        "INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?from };" +
-                        "INSERT { ?s fs:filePath ?to } " +
-                        "WHERE {?s fs:filePath ?from };" +
-                        "DELETE WHERE { ?s fs:filePath ?from };" +
-                        "INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/'))) };" +
-                        "INSERT { ?s fs:filePath ?newPath} " +
-                        "WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/'))) BIND(CONCAT(?to, '/', SUBSTR(?path, STRLEN(?from) + 2)) as ?newPath) };" +
-                        "DELETE { ?s fs:filePath ?path } WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/')))}"
-        ) {{
-            setLiteral("from", from);
-            setLiteral("to", to);
-        }}.toString()));
+        withCommitMessage("Move data from " + from + " to " + to,
+                () -> rdf.update(storedQuery("fs_move", from, to)));
 
     }
 
     @Override
     public void delete(String path) throws IOException {
-        withCommitMessage("Delete " + path, () -> {
-            var sparql = new ParameterizedSparqlString(
-                    "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                            "DELETE WHERE { ?s ?p ?o . ?s fs:filePath ?path . };\n" +
-                            "DELETE { ?s ?p ?o } WHERE {  ?s fs:filePath ?apath . FILTER(STRSTARTS(?apath, CONCAT(?path, '/'))) };");
-            sparql.setLiteral("path", path);
-            rdf.update(sparql.toString());
-        });
+        withCommitMessage("Delete " + path,
+                () -> rdf.update(storedQuery("fs_delete", path)));
     }
 
     @Override
