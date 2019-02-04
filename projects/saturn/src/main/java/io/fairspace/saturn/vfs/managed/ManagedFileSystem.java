@@ -2,6 +2,7 @@ package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import org.apache.commons.io.input.CountingInputStream;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -20,12 +21,14 @@ import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.system.Txn.executeWrite;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     public static final Property COLLECTION_TYPE = createProperty("http://fairspace.io/ontology#Collection");
     public static final Property DIRECTORY_TYPE = createProperty("http://fairspace.io/ontology#Directory");
 
     public static final Property FILE_PATH_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");
+    public static final Property FILE_SIZE_PROPERTY = createProperty("http://fairspace.io/ontology#fileSize");
 
 
     private final RDFConnection rdf;
@@ -47,11 +50,11 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var sparql = new ParameterizedSparqlString(
                 "PREFIX fs: <http://fairspace.io/ontology#>\n" +
                 "CONSTRUCT { ?s ?p ?o .} WHERE { ?s ?p ?o . ?s fs:filePath ?path . }");
-        sparql.setIri("pathProperty", FILE_PATH_PROPERTY.getURI());
+
         sparql.setLiteral("path", path);
         var model = rdf.queryConstruct(sparql.toString());
         if (model.isEmpty()) {
-            throw new FileNotFoundException(path);
+           return null;
         }
         var resource = model.listSubjects().next();
         return info(resource);
@@ -91,18 +94,39 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void write(String path, InputStream in) throws IOException {
-        var id = store.write(in);
-        var resource = createResource(baseUri + randomUUID());
+        var cis = new CountingInputStream(in);
+        var id = store.write(cis);
 
-        var sparql = new ParameterizedSparqlString(
-                "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "INSERT DATA { ?s a fs:File ; \n" +
-                        "         fs:filePath ?path; \n" +
-                        "         fs:blobId ?blobId}");
-        sparql.setIri("s", resource.getURI());
-        sparql.setLiteral("blobId", id);
-        sparql.setLiteral("path", path);
-        rdf.update(sparql.toString());
+        executeWrite(rdf, () -> {
+            var subj = new Resource[1];
+            rdf.querySelect( new ParameterizedSparqlString("PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                    "SELECT ?s WHERE {?s fs:filePath ?path}") {{ setLiteral("path", path);}}.toString(),
+                    row -> { subj[0] = row.getResource("s"); });
+
+            if (subj[0] != null) {
+                var sparql = new ParameterizedSparqlString(
+                        "PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                                "DELETE WHERE { ?s fs:fileSize ?x1};" +
+                                "DELETE WHERE { ?s fs:blobId ?x2};" +
+                                "INSERT DATA { ?s fs:fileSize ?size; fs:blobId ?blobId;}");
+                sparql.setIri("s", subj[0].getURI());
+                sparql.setLiteral("blobId", id);
+                sparql.setLiteral("path", path);
+                sparql.setLiteral("size", cis.getByteCount());
+                rdf.update(sparql.toString());
+            } else {
+                var resource = createResource(baseUri + randomUUID());
+
+                var sparql = new ParameterizedSparqlString(
+                        "PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                                "INSERT DATA { ?s a fs:File; fs:filePath ?path; fs:fileSize ?size; fs:blobId ?blobId;}");
+                sparql.setIri("s", resource.getURI());
+                sparql.setLiteral("blobId", id);
+                sparql.setLiteral("path", path);
+                sparql.setLiteral("size", cis.getByteCount());
+                rdf.update(sparql.toString());
+            }
+        });
     }
 
     @Override
@@ -150,6 +174,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return  FileInfo.builder()
                 .path(resource.getProperty(FILE_PATH_PROPERTY).getString())
                 .isDirectory(resource.hasProperty(RDF.type, DIRECTORY_TYPE) || resource.hasProperty(RDF.type, COLLECTION_TYPE))
+                .size(resource.hasProperty(FILE_SIZE_PROPERTY) ? resource.getProperty(FILE_SIZE_PROPERTY).getLong() : 0L)
                 .build();
     }
 }

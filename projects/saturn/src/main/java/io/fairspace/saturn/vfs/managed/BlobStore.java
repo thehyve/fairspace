@@ -8,4 +8,5 @@ public interface BlobStore {
     String write(InputStream in) throws IOException;
 
     void read(String id, OutputStream out) throws IOException;
+
 }

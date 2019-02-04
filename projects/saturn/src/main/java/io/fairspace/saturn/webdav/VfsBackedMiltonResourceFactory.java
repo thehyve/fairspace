@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.vfs.PathUtils;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -9,6 +8,8 @@ import io.milton.resource.Resource;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 
 public class VfsBackedMiltonResourceFactory implements ResourceFactory {
     private final VirtualFileSystem fs;
@@ -19,12 +20,15 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
-        return getResource(fs, path);
+        return getResource(fs, normalizePath(path.substring("/webdav".length())));
     }
 
     public static Resource getResource(VirtualFileSystem fs, String path) {
         try {
-            var info = fs.stat(PathUtils.normalizePath(path.substring("/webdav".length())));
+            var info = fs.stat(path);
+            if (info == null) {
+                return null;
+            }
             if (info.isDirectory()) {
                 return new VfsBackedMiltonDirectoryResource(fs, info);
             } else {
