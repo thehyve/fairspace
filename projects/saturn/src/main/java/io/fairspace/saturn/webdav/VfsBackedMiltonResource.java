@@ -13,6 +13,8 @@ import io.milton.resource.*;
 import java.io.IOException;
 import java.util.Date;
 
+import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
+
 public abstract class VfsBackedMiltonResource  implements Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource {
     protected final VirtualFileSystem fs;
     protected final FileInfo info;
@@ -45,7 +47,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
     @Override
     public void moveTo(CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
         try {
-            fs.delete(info.getPath());
+            fs.move(info.getPath(), normalizePath(rDest + "/" + name));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

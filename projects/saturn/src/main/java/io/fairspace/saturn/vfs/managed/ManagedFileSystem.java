@@ -77,7 +77,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        withCommitMessage("Creating directory " + path, () -> {
+        withCommitMessage("Create directory " + path, () -> {
             var topLevel = splitPath(path).length == 1;
             var resource = createResource(baseUri + randomUUID());
 
@@ -96,31 +96,34 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void create(String path, InputStream in) throws IOException {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
+        withCommitMessage("Create file " + path, () -> {
+            var resource = createResource(baseUri + randomUUID());
 
-        var resource = createResource(baseUri + randomUUID());
-
-        var sparql = new ParameterizedSparqlString(
-                "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "INSERT DATA { ?s a fs:File; fs:filePath ?path; fs:fileSize ?size; fs:blobId ?blobId;}");
-        sparql.setIri("s", resource.getURI());
-        sparql.setLiteral("blobId", blobId);
-        sparql.setLiteral("path", path);
-        sparql.setLiteral("size", cis.getByteCount());
-        rdf.update(sparql.toString());
+            var sparql = new ParameterizedSparqlString(
+                    "PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                            "INSERT DATA { ?s a fs:File; fs:filePath ?path; fs:fileSize ?size; fs:blobId ?blobId;}");
+            sparql.setIri("s", resource.getURI());
+            sparql.setLiteral("blobId", blobId);
+            sparql.setLiteral("path", path);
+            sparql.setLiteral("size", cis.getByteCount());
+            rdf.update(sparql.toString());
+        });
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
-                var sparql = new ParameterizedSparqlString(
-                        "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                                "DELETE {?s fs:fileSize ?x1 . ?s fs:blobId ?x2 .} WHERE { ?s fs:filePath ?path };" +
-                                "INSERT { ?s fs:fileSize ?size; fs:blobId ?blobId; } WHERE { ?s fs:filePath ?path }");
-                sparql.setLiteral("blobId", blobId);
-                sparql.setLiteral("path", path);
-                sparql.setLiteral("size", cis.getByteCount());
-                rdf.update(sparql.toString());
+        withCommitMessage("Modify file " + path, () -> {
+            var sparql = new ParameterizedSparqlString(
+                    "PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                            "DELETE {?s fs:fileSize ?x1 . ?s fs:blobId ?x2 .} WHERE { ?s fs:filePath ?path };" +
+                            "INSERT { ?s fs:fileSize ?size; fs:blobId ?blobId; } WHERE { ?s fs:filePath ?path }");
+            sparql.setLiteral("blobId", blobId);
+            sparql.setLiteral("path", path);
+            sparql.setLiteral("size", cis.getByteCount());
+            rdf.update(sparql.toString());
+        });
     }
 
     @Override
@@ -146,17 +149,34 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void move(String from, String to) throws IOException {
+        withCommitMessage("Move data from " + from + " to " + to, () ->
+                rdf.update(new ParameterizedSparqlString(
+                "PREFIX fs: <http://fairspace.io/ontology#> " +
+                        "INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?from };" +
+                        "INSERT { ?s fs:filePath ?to } " +
+                        "WHERE {?s fs:filePath ?from };" +
+                        "DELETE WHERE { ?s fs:filePath ?from };" +
+                        "INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/'))) };" +
+                        "INSERT { ?s fs:filePath ?newPath} " +
+                        "WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/'))) BIND(CONCAT(?to, '/', SUBSTR(?path, STRLEN(?from) + 2)) as ?newPath) };" +
+                        "DELETE { ?s fs:filePath ?path } WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/')))}"
+        ) {{
+            setLiteral("from", from);
+            setLiteral("to", to);
+        }}.toString()));
 
     }
 
     @Override
     public void delete(String path) throws IOException {
-        var sparql = new ParameterizedSparqlString(
-                "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "DELETE WHERE { ?s ?p ?o . ?s fs:filePath ?path . };\n" +
-                        "DELETE { ?s ?p ?o } WHERE {  ?s fs:filePath ?apath . FILTER(STRSTARTS(?apath, CONCAT(?path, '/'))) };");
-        sparql.setLiteral("path", path);
-        rdf.update(sparql.toString());
+        withCommitMessage("Delete " + path, () -> {
+            var sparql = new ParameterizedSparqlString(
+                    "PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                            "DELETE WHERE { ?s ?p ?o . ?s fs:filePath ?path . };\n" +
+                            "DELETE { ?s ?p ?o } WHERE {  ?s fs:filePath ?apath . FILTER(STRSTARTS(?apath, CONCAT(?path, '/'))) };");
+            sparql.setLiteral("path", path);
+            rdf.update(sparql.toString());
+        });
     }
 
     @Override
