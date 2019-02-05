@@ -71,11 +71,11 @@ public class ManagedFileSystemTest {
         fs.copy("dir1", "dir2");
         assertNotNull(fs.stat("dir1"));
         assertNotNull(fs.stat("dir2"));
-//        assertNotNull(fs.stat("dir2/subdir"));
-//        assertNotNull(fs.stat("dir2/subdir/file"));
-//        var os = new ByteArrayOutputStream();
-//        fs.read("dir2/subdir/file", os);
-//        assertArrayEquals(content1, os.toByteArray());
+        assertNotNull(fs.stat("dir2/subdir"));
+        assertNotNull(fs.stat("dir2/subdir/file"));
+        var os = new ByteArrayOutputStream();
+        fs.read("dir2/subdir/file", os);
+        assertArrayEquals(content1, os.toByteArray());
     }
 
     @Test

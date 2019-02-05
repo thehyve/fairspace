@@ -31,7 +31,11 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public void copyTo(CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
-
+        try {
+            fs.copy(info.getPath(), normalizePath(toCollection + "/" + name));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

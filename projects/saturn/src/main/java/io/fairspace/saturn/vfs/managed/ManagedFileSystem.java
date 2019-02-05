@@ -110,7 +110,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public void copy(String from, String to) throws IOException {
         withCommitMessage("Copy data from " + from + " to " + to,
-                () -> rdf.update(storedQuery("fs_copy", from, to)));
+                () -> rdf.update(storedQuery("fs_copy", from, to, baseUri)));
     }
 
     @Override
