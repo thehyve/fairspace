@@ -4,11 +4,10 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?param0 };
 INSERT { ?s fs:filePath ?param1 } WHERE {?s fs:filePath ?param0 };
 DELETE WHERE { ?s fs:filePath ?param0 };
 
-INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/'))) };
+DELETE { ?s fs:filePath ?path }
 INSERT { ?s fs:filePath ?newPath}
-WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/'))) BIND(CONCAT(?param1, '/', SUBSTR(?path, STRLEN(?param0) + 2)) as ?newPath) };
-DELETE { ?s fs:filePath ?path } WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/')))}
+WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/')))
+BIND(CONCAT(?param1, '/', SUBSTR(?path, STRLEN(?param0) + 2)) as ?newPath) };
