@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 public class InvertingDatasetGraphTest {
     private static final Node vocabularyGraph = createURI("http://example.com");
     private static final Resource folder = createResource("http://example.com/folder");
-    private static final Resource folder2 = createResource("http://example.com/folder2");
     private static final Resource file = createResource("http://example.com/file");
     private static final Property partOf = createProperty("http://fairspace.io/ontology#partOf");
     private static final Property hasPart = createProperty("http://fairspace.io/ontology#hasPart");

@@ -4,11 +4,8 @@ import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import org.apache.commons.io.input.CountingInputStream;
-import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.vocabulary.RDF;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,9 +26,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public static final Property COLLECTION_TYPE = createProperty("http://fairspace.io/ontology#Collection");
     public static final Property DIRECTORY_TYPE = createProperty("http://fairspace.io/ontology#Directory");
     public static final Property FILE_TYPE = createProperty("http://fairspace.io/ontology#File");
-
-    public static final Property FILE_PATH_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");
-    public static final Property FILE_SIZE_PROPERTY = createProperty("http://fairspace.io/ontology#fileSize");
 
 
     private final RDFConnection rdf;
@@ -64,16 +58,13 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public List<FileInfo> list(String parentPath) throws IOException {
-        var sparql = new ParameterizedSparqlString(
-                "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "CONSTRUCT { ?s ?p ?o .} \n" +
-                        "WHERE { ?s ?p ?o ; " +
-                        "fs:filePath ?path . \n " +
-                        "FILTER(STRSTARTS(?path, ?pathPrefix) && !CONTAINS(SUBSTR(?path, STRLEN(?pathPrefix) + 1), '/')) }");
-        sparql.setLiteral("pathPrefix", parentPath.isEmpty() ? "" : (parentPath + '/'));
-        var model = rdf.queryConstruct(sparql.toString());
         var list = new ArrayList<FileInfo>();
-        model.listSubjects().forEachRemaining(r -> list.add(info(r)));
+        rdf.querySelect(storedQuery("fs_ls", parentPath.isEmpty() ? "" : (parentPath + '/')), row ->
+                list.add(FileInfo.builder()
+                        .path(row.getLiteral("path").getString())
+                        .size(row.getLiteral("size").getLong())
+                        .isDirectory(!row.getResource("type").equals(FILE_TYPE))
+                        .build()));
         return list;
     }
 
@@ -105,7 +96,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void read(String path, OutputStream out) throws IOException {
         var blobId = new Ref<String>();
 
-        rdf.querySelect(storedQuery("fs_get_blobid"),
+        rdf.querySelect(storedQuery("fs_get_blobid", path),
                 row -> blobId.value = row.getLiteral("blobId").getString());
 
         if (blobId.value == null) {
@@ -136,13 +127,5 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public void close() throws IOException {
 
-    }
-
-    private static FileInfo info(Resource resource) {
-        return FileInfo.builder()
-                .path(resource.getProperty(FILE_PATH_PROPERTY).getString())
-                .isDirectory(resource.hasProperty(RDF.type, DIRECTORY_TYPE) || resource.hasProperty(RDF.type, COLLECTION_TYPE))
-                .size(resource.hasProperty(FILE_SIZE_PROPERTY) ? resource.getProperty(FILE_SIZE_PROPERTY).getLong() : 0L)
-                .build();
     }
 }
