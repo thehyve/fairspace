@@ -19,10 +19,7 @@ import java.util.List;
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
-import static java.util.UUID.randomUUID;
-import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     public static final Property COLLECTION_TYPE = createProperty("http://fairspace.io/ontology#Collection");
@@ -65,9 +62,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public void mkdir(String path) throws IOException {
         var topLevel = splitPath(path).length == 1;
-        var resource = createResource(baseUri + randomUUID());
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", resource, topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE, path)));
+                () -> rdf.update(storedQuery("fs_mkdir", baseUri, topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE, path)));
     }
 
     @Override
@@ -75,7 +71,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", createURI(baseUri + randomUUID()), path, cis.getByteCount(), blobId)));
+                rdf.update(storedQuery("fs_create", baseUri, path, cis.getByteCount(), blobId)));
     }
 
     @Override
