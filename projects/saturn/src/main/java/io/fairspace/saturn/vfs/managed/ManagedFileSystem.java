@@ -129,7 +129,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .size(row.getLiteral("size").getLong())
                 .isDirectory(!row.getResource("type").equals(FILE_TYPE))
                 .created(((XSDDateTime)row.getLiteral("created").getValue()).asCalendar().getTimeInMillis())
-                .created(((XSDDateTime)row.getLiteral("modified").getValue()).asCalendar().getTimeInMillis())
+                .modified(((XSDDateTime)row.getLiteral("modified").getValue()).asCalendar().getTimeInMillis())
                 .build();
     }
 

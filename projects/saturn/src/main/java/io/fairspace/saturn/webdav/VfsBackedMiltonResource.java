@@ -89,7 +89,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public Date getModifiedDate() {
-        return null;
+        return new Date(info.getModified());
     }
 
     @Override
