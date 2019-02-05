@@ -30,7 +30,7 @@ public class App {
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds);
 
-        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(config.webDAV.blobStorePath), config.baseURI, SecurityUtil::userInfo));
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), config.baseURI, SecurityUtil::userInfo));
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)

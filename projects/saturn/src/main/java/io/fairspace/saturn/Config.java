@@ -6,12 +6,11 @@ public class Config {
 
     public int port = 8080;
 
-
     public Jena jena = new Jena();
 
     public Auth auth = new Auth();
 
-    public WebDAV webDAV;
+    public WebDAV webDAV = new WebDAV();
 
     public static class Jena {
         public String datasetPath = "data/db";
@@ -21,16 +20,15 @@ public class Config {
         public String vocabularyURI = "http://fairspace.io/vocabulary#";
     }
 
-     public static class Auth {
-         public boolean authEnabled = false;
+    public static class Auth {
+        public boolean authEnabled = false;
 
-         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
+        public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
-         public String jwtAlgorithm = "RS256";
-     }
-
+        public String jwtAlgorithm = "RS256";
+    }
 
     public static class WebDAV {
-        public String blobStorePath;
+        public String blobStorePath = "data/blobs";
     }
 }
