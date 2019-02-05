@@ -46,7 +46,7 @@ public class MiltonWebDAVServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
-            this.servletContext = config.getServletContext();
+        this.servletContext = config.getServletContext();
     }
 
     private static HttpManager setupHttpManager(VirtualFileSystem fs) {
