@@ -1,12 +1,11 @@
 import React from "react";
 import {connect} from 'react-redux';
-import {Table} from "@material-ui/core";
-import TableHead from "@material-ui/core/TableHead/TableHead";
-import TableRow from "@material-ui/core/TableRow/TableRow";
-import TableCell from "@material-ui/core/TableCell/TableCell";
-import TableBody from "@material-ui/core/TableBody/TableBody";
-import {Column, Row} from "simple-flexbox";
 import {withRouter} from 'react-router-dom';
+import {
+    Table, Paper, TableHead, TableRow,
+    TableCell, TableBody
+} from "@material-ui/core";
+
 import {getLabel, navigableLink, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
@@ -38,17 +37,9 @@ class MetadataEntities extends React.Component {
         }
 
         return (
-            <div>
-                <Row>
-                    <Column flexGrow={1} vertical="center" horizontal="start">
-                        {[]}
-                    </Column>
-                    <Column>
-                        <NewMetadataEntityDialog onCreate={this.handleEntityCreation} />
-                    </Column>
-                </Row>
-
-                <div>
+            <>
+                <NewMetadataEntityDialog onCreate={this.handleEntityCreation} />
+                <Paper>
                     <Table style={{marginBottom: 300}}>
                         <TableHead>
                             <TableRow>
@@ -79,10 +70,10 @@ class MetadataEntities extends React.Component {
                             )) : null}
                         </TableBody>
                     </Table>
-                </div>
+                </Paper>
 
                 <LoadingOverlay loading={creatingMetadataEntity} />
-            </div>
+            </>
         );
     }
 }
