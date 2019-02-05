@@ -2,6 +2,7 @@ import * as actionTypes from "../actions/actionTypes";
 
 const defaultState = {
     menuExpanded: true,
+    mouseEnterMenu: false,
     pending: {}
 };
 
@@ -11,6 +12,16 @@ const ui = (state = defaultState, action) => {
             return {
                 ...state,
                 menuExpanded: !state.menuExpanded
+            };
+        case actionTypes.MOUSE_ENTER_MENU:
+            return {
+                ...state,
+                mouseEnterMenu: true
+            };
+        case actionTypes.MOUSE_LEAVE_MENU:
+            return {
+                ...state,
+                mouseEnterMenu: false
             };
         case actionTypes.ALTER_PERMISSION_PENDING:
             return {

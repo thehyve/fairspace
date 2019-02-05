@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import {withRouter} from "react-router-dom";
 import Drawer from "@material-ui/core/Drawer";
 import Divider from "@material-ui/core/Divider";
 import {withStyles} from '@material-ui/core/styles';
@@ -8,33 +9,38 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import {compose} from "redux";
 import {connect} from "react-redux";
-import toggleMenuExpansion from "../../../../actions/uiActions";
+import * as uiActions from "../../../../actions/uiActions";
 import Menu from "./Menu";
 import styles from "./MenuDrawer.styles";
 
-const MenuDrawer = (props) => (
+const MenuDrawer = ({classes, open, toggleMenuExpansion, mouseEnterMenu, mouseLeaveMenu}) => (
     <Drawer
         variant="permanent"
         classes={{
-            paper: classNames(props.classes.drawerPaper, !props.open ? props.classes.drawerPaperClose : props.classes.drawerPaperOpen),
+            paper: classNames(classes.drawerPaper, !open ? classes.drawerPaperClose : classes.drawerPaperOpen),
         }}
     >
-        <div className={props.classes.toolbar}>
-            <IconButton onClick={props.toggleMenuExpansion}>
-                {!props.open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        <div className={classes.toolbar}>
+            <IconButton onClick={toggleMenuExpansion}>
+                {!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
         </div>
         <Divider />
-        <Menu />
+        <div
+            onMouseEnter={mouseEnterMenu}
+            onMouseLeave={mouseLeaveMenu}
+        >
+            <Menu />
+        </div>
     </Drawer>
 );
 
 const mapStateToProps = state => ({
-    open: state.ui.menuExpanded
+    open: state.ui.menuExpanded || state.ui.mouseEnterMenu
 });
 
 const mapDispatchToProps = {
-    toggleMenuExpansion
+    ...uiActions
 };
 
-export default compose(withStyles(styles), connect(mapStateToProps, mapDispatchToProps))(MenuDrawer);
+export default withRouter(compose(withStyles(styles), connect(mapStateToProps, mapDispatchToProps))(MenuDrawer));
