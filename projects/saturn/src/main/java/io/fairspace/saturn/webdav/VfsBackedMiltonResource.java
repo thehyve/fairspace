@@ -13,6 +13,7 @@ import io.milton.resource.*;
 import java.io.IOException;
 import java.util.Date;
 
+import static io.fairspace.saturn.vfs.PathUtils.name;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 
 public abstract class VfsBackedMiltonResource  implements Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource {
@@ -69,7 +70,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public String getName() {
-        return PathUtils.name(info.getPath());
+        return name(info.getPath());
     }
 
     @Override

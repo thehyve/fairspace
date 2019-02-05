@@ -16,6 +16,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
+import static io.milton.common.ContentTypeUtils.findAcceptableContentType;
+import static io.milton.common.ContentTypeUtils.findContentTypes;
+
 public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource implements GetableResource, ReplaceableResource {
     public VfsBackedMiltonFileResource(VirtualFileSystem fs, FileInfo info) {
         super(fs, info);
@@ -33,7 +36,7 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
 
     @Override
     public String getContentType(String accepts) {
-        return null;
+        return findAcceptableContentType(findContentTypes(getName()), accepts);
     }
 
     @Override
