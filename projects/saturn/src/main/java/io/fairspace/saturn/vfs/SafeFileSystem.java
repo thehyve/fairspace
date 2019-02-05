@@ -42,7 +42,7 @@ public class SafeFileSystem implements VirtualFileSystem {
     @Override
     public void mkdir(String path) throws IOException {
         safely(() -> {
-            if (stat(path) != null) {
+            if (exists(path)) {
                 throw new IOException("File already exists: " + path);
             }
             unsafe.mkdir(path);
@@ -56,7 +56,7 @@ public class SafeFileSystem implements VirtualFileSystem {
     @Override
     public void create(String path, InputStream in) throws IOException {
         safely(() -> {
-            if (stat(path) != null) {
+            if (exists(path)) {
                 throw new IOException("File already exists: " + path);
             }
             unsafe.create(path, in);
@@ -87,11 +87,15 @@ public class SafeFileSystem implements VirtualFileSystem {
     @Override
     public void copy(String from, String to) throws IOException {
         safely(() -> {
-            if (stat(from) == null) {
+            if (!exists(from)) {
                 throw new FileNotFoundException(from);
             }
+            var info = stat(to);
+            if (info != null && info.isReadOnly()) {
+                throw new IOException("Cannot copy to " + to);
+            }
             unsafe.copy(from, to);
-            if (stat(to) == null) {
+            if (!exists(to)) {
                 throw new FileNotFoundException("Error copying from " + from + " to " + to);
             }
             return null;
@@ -101,11 +105,15 @@ public class SafeFileSystem implements VirtualFileSystem {
     @Override
     public void move(String from, String to) throws IOException {
         safely(() -> {
-            if (stat(from) == null) {
+            if (!exists(from)) {
                 throw new FileNotFoundException(from);
             }
+            var info = stat(to);
+            if (info != null && info.isReadOnly()) {
+                throw new IOException("Cannot move to " + to);
+            }
             unsafe.move(from, to);
-            if (stat(to) == null) {
+            if (!exists(to)) {
                 throw new FileNotFoundException("Error moving from " + from + " to " + to);
             }
             return null;
@@ -123,6 +131,9 @@ public class SafeFileSystem implements VirtualFileSystem {
                 throw new IOException("File is read-only: " + path);
             }
             unsafe.delete(path);
+            if (exists(path)) {
+                throw new IOException("Error deleting: " + path);
+            }
             return null;
         });
     }
@@ -143,6 +154,10 @@ public class SafeFileSystem implements VirtualFileSystem {
         } catch (Throwable t) {
             throw new IOException(t);
         }
+    }
+
+    private boolean exists(String path) throws IOException {
+        return stat(path) != null;
     }
 
     @FunctionalInterface
