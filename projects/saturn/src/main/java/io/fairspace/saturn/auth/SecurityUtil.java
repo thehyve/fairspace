@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
 import java.util.function.Function;
 
-import static io.fairspace.Context.currentRequest;
+import static io.fairspace.saturn.Context.currentRequest;
 
 public class SecurityUtil {
     static final String USER_INFO_REQUEST_ATTRIBUTE = UserInfo.class.getName();

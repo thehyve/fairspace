@@ -1,4 +1,4 @@
-package io.fairspace;
+package io.fairspace.saturn;
 
 import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.HttpConnection;

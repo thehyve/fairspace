@@ -1,7 +1,7 @@
 package io.fairspace.saturn.commits;
 
 
-import static io.fairspace.Context.currentRequest;
+import static io.fairspace.saturn.Context.currentRequest;
 
 /**
  * Manages commit messages.

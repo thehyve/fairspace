@@ -50,6 +50,7 @@ public class App {
         System.out.println("Access Fuseki at /rdf");
         System.out.println("Access Metadata at /statements");
         System.out.println("Access Vocabulary API at /vocabulary");
+        System.out.println("Access WebDAV API at /webdav");
     }
 
     private static Config loadConfig() {
