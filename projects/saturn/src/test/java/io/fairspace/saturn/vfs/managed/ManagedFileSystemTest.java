@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class ManagedFileSystemTest {
 
     @Test
     public void writeAndRead() throws IOException {
-        var content1 = new byte[] {1, 2, 3};
+        var content1 = new byte[]{1, 2, 3};
         fs.mkdir("dir");
 
         fs.create("dir/file", new ByteArrayInputStream(content1));
@@ -69,13 +70,15 @@ public class ManagedFileSystemTest {
         fs.read("dir/file", os);
         assertArrayEquals(content1, os.toByteArray());
 
-        var content2 = new byte[] {1, 2, 3, 4};
+        var content2 = new byte[]{1, 2, 3, 4};
 
         fs.modify("dir/file", new ByteArrayInputStream(content2));
         assertEquals(content2.length, fs.stat("dir/file").getSize());
         os = new ByteArrayOutputStream();
         fs.read("dir/file", os);
-        assertArrayEquals(content2, os.toByteArray());
+        if (!Arrays.equals(content2, os.toByteArray())) {
+            assertArrayEquals(content2, os.toByteArray());
+        }
     }
 
 
