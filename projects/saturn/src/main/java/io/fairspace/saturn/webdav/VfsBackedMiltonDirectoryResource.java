@@ -22,7 +22,6 @@ import java.util.Map;
 
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.fairspace.saturn.webdav.VfsBackedMiltonResourceFactory.getResource;
-import static io.milton.common.ContentTypeUtils.findAcceptableContentType;
 import static java.util.stream.Collectors.toList;
 import static org.apache.http.entity.ContentType.TEXT_HTML;
 
@@ -94,7 +93,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
 
     @Override
     public String getContentType(String accepts) {
-        return findAcceptableContentType(TEXT_HTML.getMimeType(), accepts);
+        return TEXT_HTML.getMimeType();
     }
 
     @Override
