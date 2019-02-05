@@ -12,8 +12,7 @@ import io.milton.resource.*;
 import java.io.IOException;
 import java.util.Date;
 
-import static io.fairspace.saturn.vfs.PathUtils.name;
-import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
+import static io.fairspace.saturn.vfs.PathUtils.*;
 
 public abstract class VfsBackedMiltonResource  implements Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, Comparable<Resource> {
     protected final VirtualFileSystem fs;
@@ -80,7 +79,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        return true;
+        return method.isWrite ? info.isWriteable() : info.isReadable();
     }
 
     @Override
