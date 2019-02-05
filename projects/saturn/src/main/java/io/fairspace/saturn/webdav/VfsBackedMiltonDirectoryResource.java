@@ -1,10 +1,10 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.vfs.FileInfo;
-import io.fairspace.saturn.vfs.PathUtils;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.http.Auth;
 import io.milton.http.Range;
+import io.milton.http.XmlWriter;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -16,7 +16,6 @@ import io.milton.resource.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -68,22 +67,25 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
 
     @Override
     public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
-        String relativePath = info.getPath();
-        try(var writer = new PrintWriter(out)) {
-
-            writer.println(String.format("<html><head><title>Folder listing for %s</title></head>", relativePath));
-            writer.println("<body>");
-            writer.println(String.format("<h1>Folder listing for %s</h1>", relativePath));
-            writer.println("<ul>");
-
-            for (var child : fs.list(info.getPath())) {
-                // TODO: Determine correct URI to link to
-                writer.println(String.format("<li><a href=\"/webdav/%s\">%s</a></li>", child.getPath(), PathUtils.name(child.getPath())));
-            }
-            writer.println("</ul></body></html>");
-
-            writer.flush();
+        var w = new XmlWriter(out);
+        w.open("html");
+        w.open("head");
+        w.close("head");
+        w.open("body");
+        w.begin("h1").open().writeText(this.getName()).close();
+        w.open("table");
+        for (Resource r : getChildren()) {
+            w.open("tr");
+            w.open("td");;
+            w.begin("a").writeAtt("href", "/webdav/" + ((VfsBackedMiltonResource)r).info.getPath()).open().writeText(r.getName()).close();
+            w.close("td");
+            w.begin("td").open().writeText(r.getModifiedDate() + "").close();
+            w.close("tr");
         }
+        w.close("table");
+        w.close("body");
+        w.close("html");
+        w.flush();
     }
 
     @Override

@@ -42,7 +42,11 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public FileInfo stat(String path) throws IOException {
         if (path.isEmpty()) {
-            return FileInfo.builder().path("").isDirectory(true).build();
+            return FileInfo.builder().path("")
+                    .isReadable(true)
+                    .isWriteable(true)
+                    .isDirectory(true)
+                    .build();
         }
 
         var info = new Ref<FileInfo>();
