@@ -132,7 +132,4 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .modified(((XSDDateTime)row.getLiteral("modified").getValue()).asCalendar().getTimeInMillis())
                 .build();
     }
-
-
-
 }
