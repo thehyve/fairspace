@@ -11,6 +11,14 @@ public final class Ref<T> {
         this.value = value;
     }
 
+    public static <T> Ref<T> ref(T value) {
+        return new Ref<>(value);
+    }
+
+    public static <T> Ref<T> ref() {
+        return new Ref<>();
+    }
+
     @Override
     public String toString() {
         return "Ref(" + value + ")";
