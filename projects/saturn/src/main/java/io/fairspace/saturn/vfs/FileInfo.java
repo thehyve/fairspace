@@ -13,5 +13,6 @@ public class FileInfo {
     long modified;
     boolean isReadable;
     boolean isWriteable;
-    String creator;
+    String createdBy;
+    String modifiedBy;
 }

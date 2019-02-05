@@ -23,10 +23,6 @@ public class ManagedFileSystemTest {
     }
 
     @Test
-    public void stat() {
-    }
-
-    @Test
     public void list() throws IOException {
         fs.mkdir("aaa/bbb/ccc");
         fs.mkdir("aaa/bbb/ccc/ddd");

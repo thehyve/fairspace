@@ -24,9 +24,11 @@ import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 
 public class ManagedFileSystem implements VirtualFileSystem {
-
-
-
+    public static final FileInfo ROOT = FileInfo.builder().path("")
+            .isReadable(true)
+            .isWriteable(true)
+            .isDirectory(true)
+            .build();
     private final RDFConnection rdf;
     private final BlobStore store;
     private final String baseUri;
@@ -42,11 +44,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public FileInfo stat(String path) throws IOException {
         if (path.isEmpty()) {
-            return FileInfo.builder().path("")
-                    .isReadable(true)
-                    .isWriteable(true)
-                    .isDirectory(true)
-                    .build();
+            return ROOT;
         }
 
         var info = new Ref<FileInfo>();
@@ -88,7 +86,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId)));
+                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId, userId())));
     }
 
     @Override
@@ -135,7 +133,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(!row.getResource("type").equals(FS.File))
                 .created(parseXSDDateTime(row.getLiteral("created")))
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
-                .creator(row.getLiteral("creator").getString())
+                .createdBy(row.getLiteral("createdBy").getString())
+                .createdBy(row.getLiteral("modifiedBy").getString())
                 .isReadable(true) // TODO: check
                 .isWriteable(true) // TODO: check
                 .build();
