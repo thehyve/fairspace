@@ -60,14 +60,22 @@ public class ManagedFileSystemTest {
 
     @Test
     public void writeAndRead() throws IOException {
-        var content = new byte[] {1, 2, 3};
+        var content1 = new byte[] {1, 2, 3};
         fs.mkdir("dir");
 
-        var in = new ByteArrayInputStream(content);
-        fs.create("dir/file", in);
+        fs.create("dir/file", new ByteArrayInputStream(content1));
+        assertEquals(content1.length, fs.stat("dir/file").getSize());
         var os = new ByteArrayOutputStream();
         fs.read("dir/file", os);
-        assertArrayEquals(content, os.toByteArray());
+        assertArrayEquals(content1, os.toByteArray());
+
+        var content2 = new byte[] {1, 2, 3, 4};
+
+        fs.modify("dir/file", new ByteArrayInputStream(content2));
+        assertEquals(content2.length, fs.stat("dir/file").getSize());
+        os = new ByteArrayOutputStream();
+        fs.read("dir/file", os);
+        assertArrayEquals(content2, os.toByteArray());
     }
 
 
@@ -79,10 +87,10 @@ public class ManagedFileSystemTest {
     public void move() {
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test
     public void delete() throws IOException {
         fs.mkdir("dir");
         fs.delete("dir");
-        fs.stat("dir");
+        assertNull(fs.stat("dir"));
     }
 }

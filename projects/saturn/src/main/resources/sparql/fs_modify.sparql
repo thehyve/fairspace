@@ -1,0 +1,7 @@
+# param0 - path
+# param1 - size
+# param2 - blob id
+PREFIX fs: <http://fairspace.io/ontology#>
+DELETE {?s fs:fileSize ?x1 . ?s fs:blobId ?x2 .}
+INSERT { ?s fs:fileSize ?param1; fs:blobId ?param2; }
+WHERE { ?s fs:filePath ?param0 }

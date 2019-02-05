@@ -1,0 +1,7 @@
+# param0 - IRI
+# param1 - path
+# param2 - size
+# param3 - blobId
+
+PREFIX fs: <http://fairspace.io/ontology#>
+INSERT DATA { ?param0 a fs:File; fs:filePath ?param1; fs:fileSize ?param2; fs:blobId ?param3; }

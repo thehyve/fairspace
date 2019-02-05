@@ -1,0 +1,3 @@
+# param0 - path
+PREFIX fs: <http://fairspace.io/ontology#>
+SELECT ?iri ?type ?size WHERE { ?iri fs:filePath ?param0 . ?iri a ?type . ?iri fs:fileSize ?size . }

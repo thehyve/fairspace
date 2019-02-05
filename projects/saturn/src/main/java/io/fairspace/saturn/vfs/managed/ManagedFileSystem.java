@@ -1,6 +1,6 @@
 package io.fairspace.saturn.vfs.managed;
 
-import io.fairspace.saturn.rdf.StoredQueries;
+import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import org.apache.commons.io.input.CountingInputStream;
@@ -21,13 +21,14 @@ import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.UUID.randomUUID;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.system.Txn.executeWrite;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     public static final Property COLLECTION_TYPE = createProperty("http://fairspace.io/ontology#Collection");
     public static final Property DIRECTORY_TYPE = createProperty("http://fairspace.io/ontology#Directory");
+    public static final Property FILE_TYPE = createProperty("http://fairspace.io/ontology#File");
 
     public static final Property FILE_PATH_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");
     public static final Property FILE_SIZE_PROPERTY = createProperty("http://fairspace.io/ontology#fileSize");
@@ -49,17 +50,16 @@ public class ManagedFileSystem implements VirtualFileSystem {
             return FileInfo.builder().path("").isDirectory(true).build();
         }
 
-        var sparql = new ParameterizedSparqlString(
-                "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "CONSTRUCT { ?s ?p ?o .} WHERE { ?s ?p ?o . ?s fs:filePath ?path . }");
+        var info = new Ref<FileInfo>();
 
-        sparql.setLiteral("path", path);
-        var model = rdf.queryConstruct(sparql.toString());
-        if (model.isEmpty()) {
-            return null;
-        }
-        var resource = model.listSubjects().next();
-        return info(resource);
+        rdf.querySelect(storedQuery("fs_stat", path), row ->
+                info.value = FileInfo.builder()
+                        .path(path)
+                        .size(row.getLiteral("size").getLong())
+                        .isDirectory(!row.getResource("type").equals(FILE_TYPE))
+                        .build());
+
+        return info.value;
     }
 
     @Override
@@ -89,50 +89,30 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void create(String path, InputStream in) throws IOException {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
-        withCommitMessage("Create file " + path, () -> {
-            var resource = createResource(baseUri + randomUUID());
-
-            var sparql = new ParameterizedSparqlString(
-                    "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                            "INSERT DATA { ?s a fs:File; fs:filePath ?path; fs:fileSize ?size; fs:blobId ?blobId;}");
-            sparql.setIri("s", resource.getURI());
-            sparql.setLiteral("blobId", blobId);
-            sparql.setLiteral("path", path);
-            sparql.setLiteral("size", cis.getByteCount());
-            rdf.update(sparql.toString());
-        });
+        withCommitMessage("Create file " + path, () ->
+                rdf.update(storedQuery("fs_create", createURI(baseUri + randomUUID()), path, cis.getByteCount(), blobId)));
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
-        withCommitMessage("Modify file " + path, () -> {
-            var sparql = new ParameterizedSparqlString(
-                    "PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                            "DELETE {?s fs:fileSize ?x1 . ?s fs:blobId ?x2 .} WHERE { ?s fs:filePath ?path };" +
-                            "INSERT { ?s fs:fileSize ?size; fs:blobId ?blobId; } WHERE { ?s fs:filePath ?path }");
-            sparql.setLiteral("blobId", blobId);
-            sparql.setLiteral("path", path);
-            sparql.setLiteral("size", cis.getByteCount());
-            rdf.update(sparql.toString());
-        });
+        withCommitMessage("Modify file " + path,
+                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId)));
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
-        String[] blobId = {null};
+        var blobId = new Ref<String>();
 
-        rdf.querySelect(new ParameterizedSparqlString("PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                "SELECT ?blobId WHERE { ?s fs:filePath ?path . ?s fs:blobId ?blobId . } ") {{
-            setLiteral("path", path);
-        }}.toString(), row -> blobId[0] = row.getLiteral("blobId").getString());
+        rdf.querySelect(storedQuery("fs_get_blobid"),
+                row -> blobId.value = row.getLiteral("blobId").getString());
 
-        if (blobId[0] == null) {
+        if (blobId.value == null) {
             throw new FileNotFoundException(path);
         }
 
-        store.read(blobId[0], out);
+        store.read(blobId.value, out);
     }
 
     @Override
