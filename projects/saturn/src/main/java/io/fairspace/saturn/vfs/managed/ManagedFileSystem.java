@@ -4,18 +4,17 @@ import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -23,12 +22,9 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 
 public class ManagedFileSystem implements VirtualFileSystem {
-    public static final Property COLLECTION_TYPE = createProperty("http://fairspace.io/ontology#Collection");
-    public static final Property DIRECTORY_TYPE = createProperty("http://fairspace.io/ontology#Directory");
-    public static final Property FILE_TYPE = createProperty("http://fairspace.io/ontology#File");
+
 
 
     private final RDFConnection rdf;
@@ -69,11 +65,14 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void mkdir(String path) throws IOException {
         var topLevel = splitPath(path).length == 1;
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", baseUri, topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE, path, userId())));
+                () -> rdf.update(storedQuery("fs_mkdir", baseUri, topLevel ? FS.Collection : FS.Directory, path, userId())));
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
+        if (splitPath(path).length == 1) {
+            throw new IOException("Cannot create a file in a top level directory");
+        }
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Create file " + path, () ->
@@ -129,7 +128,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return FileInfo.builder()
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
-                .isDirectory(!row.getResource("type").equals(FILE_TYPE))
+                .isDirectory(!row.getResource("type").equals(FS.File))
                 .created(parseXSDDateTime(row.getLiteral("created")))
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
                 .creator(row.getLiteral("creator").getString())
