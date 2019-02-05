@@ -79,7 +79,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        return method.isWrite ? info.isWriteable() : info.isReadable();
+        return !(method.isWrite && info.isReadOnly());
     }
 
     @Override

@@ -11,8 +11,7 @@ public class FileInfo {
     long size;
     long created;
     long modified;
-    boolean isReadable;
-    boolean isWriteable;
+    boolean readOnly;
     String createdBy;
     String modifiedBy;
 }

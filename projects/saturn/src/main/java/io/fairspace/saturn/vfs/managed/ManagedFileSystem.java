@@ -25,8 +25,7 @@ import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     public static final FileInfo ROOT = FileInfo.builder().path("")
-            .isReadable(true)
-            .isWriteable(true)
+            .readOnly(false)
             .isDirectory(true)
             .build();
     private final RDFConnection rdf;
@@ -135,8 +134,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
                 .createdBy(row.getLiteral("createdBy").getString())
                 .createdBy(row.getLiteral("modifiedBy").getString())
-                .isReadable(true) // TODO: check
-                .isWriteable(true) // TODO: check
+                .readOnly(false) // TODO: check
                 .build();
     }
 
