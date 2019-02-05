@@ -4,10 +4,10 @@ export const toggleMenuExpansion = () => ({
     type: actionTypes.TOGGLE_MENU
 });
 
-export const mouseEnterMenu = () => ({
+export const mouseEnteredMenu = () => ({
     type: actionTypes.MOUSE_ENTER_MENU
 });
 
-export const mouseLeaveMenu = () => ({
+export const mouseLeftMenu = () => ({
     type: actionTypes.MOUSE_LEAVE_MENU
 });

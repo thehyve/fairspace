@@ -13,7 +13,7 @@ import * as uiActions from "../../../../actions/uiActions";
 import Menu from "./Menu";
 import styles from "./MenuDrawer.styles";
 
-const MenuDrawer = ({classes, open, toggleMenuExpansion, mouseEnterMenu, mouseLeaveMenu}) => (
+const MenuDrawer = ({classes, open, toggleMenuExpansion, mouseEnteredMenu, mouseLeftMenu}) => (
     <Drawer
         variant="permanent"
         classes={{
@@ -27,8 +27,8 @@ const MenuDrawer = ({classes, open, toggleMenuExpansion, mouseEnterMenu, mouseLe
         </div>
         <Divider />
         <div
-            onMouseEnter={mouseEnterMenu}
-            onMouseLeave={mouseLeaveMenu}
+            onMouseEnter={mouseEnteredMenu}
+            onMouseLeave={mouseLeftMenu}
         >
             <Menu />
         </div>
@@ -36,7 +36,7 @@ const MenuDrawer = ({classes, open, toggleMenuExpansion, mouseEnterMenu, mouseLe
 );
 
 const mapStateToProps = state => ({
-    open: state.ui.menuExpanded || state.ui.mouseEnterMenu
+    open: state.ui.menuExpanded || state.ui.mouseEnteredMenu
 });
 
 const mapDispatchToProps = {
