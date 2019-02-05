@@ -4,6 +4,7 @@ import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import org.apache.commons.io.input.CountingInputStream;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -59,14 +60,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
         rdf.querySelect(storedQuery("fs_ls", parentPath.isEmpty() ? "" : (parentPath + '/')),
                 row -> list.add(fileInfo(row)));
         return list;
-    }
-
-    private FileInfo fileInfo(QuerySolution row) {
-        return FileInfo.builder()
-                .path(row.getLiteral("path").getString())
-                .size(row.getLiteral("size").getLong())
-                .isDirectory(!row.getResource("type").equals(FILE_TYPE))
-                .build();
     }
 
     @Override
@@ -129,4 +122,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void close() throws IOException {
 
     }
+
+    private static FileInfo fileInfo(QuerySolution row) {
+        return FileInfo.builder()
+                .path(row.getLiteral("path").getString())
+                .size(row.getLiteral("size").getLong())
+                .isDirectory(!row.getResource("type").equals(FILE_TYPE))
+                .created(((XSDDateTime)row.getLiteral("created").getValue()).asCalendar().getTimeInMillis())
+                .created(((XSDDateTime)row.getLiteral("modified").getValue()).asCalendar().getTimeInMillis())
+                .build();
+    }
+
+
+
 }

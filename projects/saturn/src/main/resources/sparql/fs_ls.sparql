@@ -1,4 +1,7 @@
+# param0 - path
+
 PREFIX fs: <http://fairspace.io/ontology#>
-SELECT ?iri ?type ?path ?size
-WHERE { ?iri fs:filePath ?path ; a ?type; fs:fileSize ?size;
+
+SELECT ?iri ?type ?path ?size ?created ?modified
+WHERE { ?iri fs:filePath ?path ; a ?type; fs:fileSize ?size; fs:dateCreated ?created; fs:dateModified ?modified
 FILTER(STRSTARTS(?path, ?param0) && !CONTAINS(SUBSTR(?path, STRLEN(?param0) + 1), '/')) }
