@@ -1,3 +1,4 @@
+baseURI: http://localhost
 port: 8080
 jena:
   datasetPath: data/db

@@ -2,8 +2,9 @@
 # param1 - path
 # param2 - size
 # param3 - blobId
+# param4 - creator
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-INSERT { ?iri a fs:File; fs:filePath ?param1; fs:fileSize ?param2; fs:blobId ?param3; fs:dateCreated ?date; fs:dateModified ?date . }
+INSERT { ?iri a fs:File; fs:filePath ?param1; fs:fileSize ?param2; fs:blobId ?param3; fs:creator ?param4; fs:dateCreated ?date; fs:dateModified ?date . }
 WHERE { BIND(IRI(CONCAT(?param0, STRUUID())) as ?iri) BIND(NOW() as ?date) }

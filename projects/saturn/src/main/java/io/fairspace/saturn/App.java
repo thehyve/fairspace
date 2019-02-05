@@ -2,6 +2,7 @@ package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.health.HealthServlet;
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
@@ -26,13 +27,15 @@ public class App {
         var ds = SaturnDatasetFactory.connect(config.jena);
         // The RDF connection is supposed to be threadsafe and can
         // be reused in all the application
-        var connection = new RDFConnectionLocal(ds);
+        var rdf = new RDFConnectionLocal(ds);
+
+        var fs = new ManagedFileSystem(rdf, new LocalBlobStore(config.webDAV.blobStorePath), config.baseURI, SecurityUtil::userInfo);
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
-                .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.jena.vocabularyURI))
-                .addServlet("/webdav/*", new MiltonWebDAVServlet(new ManagedFileSystem(connection, new LocalBlobStore(new File(config.webDAV.blobStorePath)), "http://example.com/")))
+                .addServlet("/statements", new MetadataAPIServlet(rdf))
+                .addServlet("/vocabulary", new VocabularyAPIServlet(rdf, config.jena.vocabularyURI))
+                .addServlet("/webdav/*", new MiltonWebDAVServlet(fs))
                 .addServlet("/health", new HealthServlet())
                 .port(config.port);
 

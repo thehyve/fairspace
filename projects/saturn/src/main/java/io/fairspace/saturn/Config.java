@@ -1,9 +1,12 @@
 package io.fairspace.saturn;
 
 
+import java.io.File;
 import java.net.URL;
 
 public class Config {
+    public String baseURI;
+
     public int port;
 
     public Jena jena;
@@ -29,6 +32,6 @@ public class Config {
     }
 
     public static class WebDAV {
-        public String blobStorePath;
+        public File blobStorePath;
     }
 }

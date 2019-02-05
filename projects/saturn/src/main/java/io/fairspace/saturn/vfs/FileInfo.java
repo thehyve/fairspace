@@ -13,5 +13,5 @@ public class FileInfo {
     long modified;
     boolean isReadable;
     boolean isWriteable;
-    String owner;
+    String creator;
 }

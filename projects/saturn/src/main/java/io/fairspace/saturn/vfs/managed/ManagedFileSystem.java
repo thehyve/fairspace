@@ -1,11 +1,13 @@
 package io.fairspace.saturn.vfs.managed;
 
+import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -13,8 +15,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
@@ -30,11 +34,13 @@ public class ManagedFileSystem implements VirtualFileSystem {
     private final RDFConnection rdf;
     private final BlobStore store;
     private final String baseUri;
+    private final Supplier<UserInfo> userInfoSupplier;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, String baseUri) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, String baseUri, Supplier<UserInfo> userInfoSupplier) {
         this.rdf = rdf;
         this.store = store;
         this.baseUri = baseUri;
+        this.userInfoSupplier = userInfoSupplier;
     }
 
     @Override
@@ -63,7 +69,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void mkdir(String path) throws IOException {
         var topLevel = splitPath(path).length == 1;
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", baseUri, topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE, path)));
+                () -> rdf.update(storedQuery("fs_mkdir", baseUri, topLevel ? COLLECTION_TYPE : DIRECTORY_TYPE, path, userId())));
     }
 
     @Override
@@ -71,7 +77,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", baseUri, path, cis.getByteCount(), blobId)));
+                rdf.update(storedQuery("fs_create", baseUri, path, cis.getByteCount(), blobId, userId())));
     }
 
     @Override
@@ -124,8 +130,21 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
                 .isDirectory(!row.getResource("type").equals(FILE_TYPE))
-                .created(((XSDDateTime)row.getLiteral("created").getValue()).asCalendar().getTimeInMillis())
-                .modified(((XSDDateTime)row.getLiteral("modified").getValue()).asCalendar().getTimeInMillis())
+                .created(parseXSDDateTime(row.getLiteral("created")))
+                .modified(parseXSDDateTime(row.getLiteral("modified")))
+                .creator(row.getLiteral("creator").getString())
                 .build();
+    }
+
+    private String userId() {
+        if (userInfoSupplier != null) {
+            var userInfo = userInfoSupplier.get();
+            return userInfo != null ? userInfo.getUserId() : "";
+        }
+        return "";
+    }
+
+    private static long parseXSDDateTime(Literal literal) {
+        return ((XSDDateTime)literal.getValue()).asCalendar().getTimeInMillis();
     }
 }

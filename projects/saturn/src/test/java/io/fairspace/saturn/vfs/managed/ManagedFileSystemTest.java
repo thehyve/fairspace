@@ -3,7 +3,10 @@ package io.fairspace.saturn.vfs.managed;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -14,9 +17,9 @@ public class ManagedFileSystemTest {
     private ManagedFileSystem fs;
 
     @Before
-    public void before() {
+    public void before() throws URISyntaxException {
         var store = new MemoryBlobStore();
-        fs = new ManagedFileSystem(connect(createTxnMem()), store, "http://example.com/");
+        fs = new ManagedFileSystem(connect(createTxnMem()), store,"http://example.com/", null);
     }
 
     @Test

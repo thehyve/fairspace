@@ -1,7 +1,8 @@
 # param0 - base IRI as string
 # param1 - type
 # param2 - path
+# param3 - creator
 
 PREFIX fs: <http://fairspace.io/ontology#>
-INSERT { ?iri a ?param1; fs:filePath ?param2 ; fs:fileSize 0; fs:dateCreated ?date; fs:dateModified ?date .}
+INSERT { ?iri a ?param1; fs:filePath ?param2; fs:creator ?param3; fs:fileSize 0; fs:dateCreated ?date; fs:dateModified ?date .}
 WHERE { BIND(IRI(CONCAT(?param0, STRUUID())) as ?iri) BIND(NOW() as ?date) }
