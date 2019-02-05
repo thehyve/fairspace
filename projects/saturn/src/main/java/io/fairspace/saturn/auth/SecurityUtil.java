@@ -8,6 +8,7 @@ import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.nimbusds.jwt.proc.JWTProcessor;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.function.Function;
 
@@ -16,13 +17,17 @@ import static io.fairspace.Context.currentRequest;
 public class SecurityUtil {
     static final String USER_INFO_REQUEST_ATTRIBUTE = UserInfo.class.getName();
 
-    public static Function<HttpServletRequest, UserInfo> createAuthenticator(URL jwksUrl, String algorithm) {
+    public static Function<HttpServletRequest, UserInfo> createAuthenticator(String jwksUrl, String algorithm) {
         return createAuthenticator(jwksUrl, JWSAlgorithm.parse(algorithm));
     }
 
-    public static Function<HttpServletRequest, UserInfo> createAuthenticator(URL jwksUrl, JWSAlgorithm algorithm) {
+    public static Function<HttpServletRequest, UserInfo> createAuthenticator(String jwksUrl, JWSAlgorithm algorithm) {
         return createAuthenticator(new DefaultJWTProcessor<>() {{
-            setJWSKeySelector(new JWSVerificationKeySelector<>(algorithm, new RemoteJWKSet<>(jwksUrl)));
+            try {
+                setJWSKeySelector(new JWSVerificationKeySelector<>(algorithm, new RemoteJWKSet<>(new URL(jwksUrl))));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
             setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier<>());
         }});
     }

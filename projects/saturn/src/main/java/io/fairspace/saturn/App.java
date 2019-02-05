@@ -11,12 +11,12 @@ import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 
 public class App {
-    private static Config config = loadConfig();
+    private static final Config config = loadConfig();
 
     public static void main(String[] args) {
         System.out.println("Saturn is starting");
@@ -51,15 +51,14 @@ public class App {
     }
 
     private static Config loadConfig() {
-        var mapper = new ObjectMapper(new YAMLFactory());
         var settingsFile = new File("application.yaml");
-
-        try(var is = settingsFile.exists()
-                ? new FileInputStream(settingsFile)
-                : App.class.getClassLoader().getResourceAsStream("application.yaml")) {
-            return mapper.readValue(is, Config.class);
-        } catch (Exception e){
-            throw new RuntimeException(e);
+        if (settingsFile.exists()) {
+            try {
+                return new ObjectMapper(new YAMLFactory()).readValue(settingsFile, Config.class);
+            } catch (IOException e) {
+                throw new RuntimeException("Error loading configuration", e);
+            }
         }
+        return new Config();
     }
 }
