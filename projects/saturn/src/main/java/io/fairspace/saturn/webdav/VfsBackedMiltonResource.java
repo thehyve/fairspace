@@ -32,6 +32,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public void copyTo(CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
+        checkTarget(toCollection);
         try {
             fs.copy(info.getPath(), normalizePath(toCollection + "/" + name));
         } catch (IOException e) {
@@ -46,11 +47,11 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
     public void moveTo(CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+        checkTarget(rDest);
         try {
             fs.move(info.getPath(), normalizePath(rDest + "/" + name));
         } catch (IOException e) {
@@ -101,5 +102,11 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
     @Override
     public int compareTo(Resource resource) {
         return getName().compareTo(resource.getName());
+    }
+
+    private static void checkTarget(CollectionResource c) throws BadRequestException {
+        if (!(c instanceof VfsBackedMiltonDirectoryResource)) {
+            throw new BadRequestException("Unsupported target resource type");
+        }
     }
 }
