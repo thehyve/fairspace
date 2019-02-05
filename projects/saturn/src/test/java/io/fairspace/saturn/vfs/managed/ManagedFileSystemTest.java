@@ -63,11 +63,35 @@ public class ManagedFileSystemTest {
 
 
     @Test
-    public void copy() {
+    public void copy() throws IOException {
+        var content1 = new byte[]{1, 2, 3};
+        fs.mkdir("dir1");
+        fs.mkdir("dir1/subdir");
+        fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
+        fs.copy("dir1", "dir2");
+        assertNotNull(fs.stat("dir1"));
+        assertNotNull(fs.stat("dir2"));
+//        assertNotNull(fs.stat("dir2/subdir"));
+//        assertNotNull(fs.stat("dir2/subdir/file"));
+//        var os = new ByteArrayOutputStream();
+//        fs.read("dir2/subdir/file", os);
+//        assertArrayEquals(content1, os.toByteArray());
     }
 
     @Test
-    public void move() {
+    public void move() throws IOException {
+        var content1 = new byte[]{1, 2, 3};
+        fs.mkdir("dir1");
+        fs.mkdir("dir1/subdir");
+        fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
+        fs.move("dir1", "dir2");
+        assertNull(fs.stat("dir1"));
+        assertNotNull(fs.stat("dir2"));
+        assertNotNull(fs.stat("dir2/subdir"));
+        assertNotNull(fs.stat("dir2/subdir/file"));
+        var os = new ByteArrayOutputStream();
+        fs.read("dir2/subdir/file", os);
+        assertArrayEquals(content1, os.toByteArray());
     }
 
     @Test
