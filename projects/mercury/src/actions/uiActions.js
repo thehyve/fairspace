@@ -1,7 +1,13 @@
-import {TOGGLE_MENU} from "./actionTypes";
+import * as actionTypes from "./actionTypes";
 
-const toggleMenuExpansion = () => ({
-    type: TOGGLE_MENU
+export const toggleMenuExpansion = () => ({
+    type: actionTypes.TOGGLE_MENU
 });
 
-export default toggleMenuExpansion;
+export const mouseEnteredMenu = () => ({
+    type: actionTypes.MOUSE_ENTER_MENU
+});
+
+export const mouseLeftMenu = () => ({
+    type: actionTypes.MOUSE_LEAVE_MENU
+});

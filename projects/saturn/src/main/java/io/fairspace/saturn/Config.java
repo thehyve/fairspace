@@ -1,37 +1,36 @@
 package io.fairspace.saturn;
 
 
-import java.io.File;
-import java.net.URL;
-
 public class Config {
-    public String baseURI;
+    public String baseURI = "http://localhost";
 
-    public int port;
+    public int port = 8080;
 
-    public Jena jena;
 
-    public Auth auth;
+    public Jena jena = new Jena();
+
+    public Auth auth = new Auth();
 
     public WebDAV webDAV;
 
     public static class Jena {
-        public String datasetPath;
+        public String datasetPath = "data/db";
 
-        public String transactionLogPath;
+        public String transactionLogPath = "data/log";
 
-        public String vocabularyURI;
+        public String vocabularyURI = "http://fairspace.io/vocabulary#";
     }
 
      public static class Auth {
-        public boolean authEnabled;
+         public boolean authEnabled = false;
 
-        public URL jwksUrl;
+         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
-        public String jwtAlgorithm;
-    }
+         public String jwtAlgorithm = "RS256";
+     }
+
 
     public static class WebDAV {
-        public File blobStorePath;
+        public String blobStorePath;
     }
 }

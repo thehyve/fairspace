@@ -1,5 +1,8 @@
 import React from 'react';
+import {connect} from "react-redux";
+import {withRouter} from 'react-router-dom';
 import {withStyles} from '@material-ui/core/styles';
+
 import styles from './Layout.styles';
 import TopBar from "./TopBar/TopBar";
 import Footer from './Footer/Footer';
@@ -7,7 +10,7 @@ import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../Routes";
 
-const Layout = ({classes}) => {
+const Layout = ({classes, menuExpanded}) => {
     // If an error is to be shown, it should be underneath the
     // AppBar. This method take care of it
     const transformError = errorContent => (
@@ -24,7 +27,7 @@ const Layout = ({classes}) => {
             <TopBar classes={classes} />
             <AuthorizationCheck transformError={transformError}>
                 <MenuDrawer />
-                <main style={{overflow: 'scroll', height: '100vh'}} className={classes.main}>
+                <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                     <Routes />
                 </main>
             </AuthorizationCheck>
@@ -33,4 +36,10 @@ const Layout = ({classes}) => {
     );
 };
 
-export default withStyles(styles)(Layout);
+
+const mapStateToProps = state => ({
+    menuExpanded: state.ui.menuExpanded
+});
+
+// export default withStyles(styles)(Layout);
+export default withRouter(connect(mapStateToProps)(withStyles(styles)(Layout)));

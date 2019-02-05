@@ -9,8 +9,10 @@ const styles = theme => ({
     main: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
-        padding: '84px 10px 0 0',
+        padding: '84px 10px 0 80px',
         minWidth: 0, // So the Typography noWrap works
+        overflow: 'scroll',
+        height: '100vh'
     },
     toolbar: theme.mixins.toolbar,
 });

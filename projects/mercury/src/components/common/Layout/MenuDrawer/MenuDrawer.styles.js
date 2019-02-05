@@ -6,7 +6,7 @@ const styles = theme => ({
         flexGrow: 1,
         zIndex: 1,
         overflow: 'hidden',
-        position: 'relative',
+        position: 'absolute',
         display: 'flex',
     },
     appBar: {
