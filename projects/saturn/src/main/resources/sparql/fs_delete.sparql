@@ -1,3 +1,3 @@
 PREFIX fs: <http://fairspace.io/ontology#>
-DELETE WHERE { ?s ?p ?o . ?s fs:filePath ?path . };
-DELETE { ?s ?p ?o } WHERE {  ?s fs:filePath ?apath . FILTER(STRSTARTS(?apath, CONCAT(?path, '/'))) };
+DELETE WHERE { ?s ?p ?o . ?s fs:filePath ?param0 . };
+DELETE { ?s ?p ?o } WHERE { ?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/'))) };

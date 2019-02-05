@@ -22,29 +22,30 @@ public class StoredQueries {
 
         for (var i = 0; i < args.length; i++) {
             var arg = args[i];
+            var param = "param" + i;
 
             if (arg instanceof RDFNode) {
-                sparql.setParam(i, (RDFNode) arg);
+                sparql.setParam(param, (RDFNode) arg);
             } else if (arg instanceof Node) {
-                sparql.setParam(i, (Node) arg);
+                sparql.setParam(param, (Node) arg);
             } else if (arg instanceof String) {
-                sparql.setLiteral(i, (String) arg);
-            } if (arg instanceof IRI) {
-                sparql.setIri(i, (IRI) arg);
+                sparql.setLiteral(param, (String) arg);
+            } else if (arg instanceof IRI) {
+                sparql.setIri(param, (IRI) arg);
             } else if (arg instanceof URL) {
-                sparql.setIri(i, (URL) arg);
+                sparql.setIri(param, (URL) arg);
             } else if (arg instanceof Boolean) {
-                sparql.setLiteral(i, (Boolean) arg);
+                sparql.setLiteral(param, (Boolean) arg);
             } else if (arg instanceof Long) {
-                sparql.setLiteral(i, (Long) arg);
+                sparql.setLiteral(param, (Long) arg);
             } else if (arg instanceof Integer) {
-                sparql.setLiteral(i, (Integer) arg);
+                sparql.setLiteral(param, (Integer) arg);
             } else if (arg instanceof Float) {
-                sparql.setLiteral(i, (Float) arg);
+                sparql.setLiteral(param, (Float) arg);
             } else if (arg instanceof Double) {
-                sparql.setLiteral(i, (Double) arg);
+                sparql.setLiteral(param, (Double) arg);
             } else if (arg instanceof Calendar) {
-                sparql.setLiteral(i, (Calendar) arg);
+                sparql.setLiteral(param, (Calendar) arg);
             } else {
                 throw new IllegalArgumentException();
             }

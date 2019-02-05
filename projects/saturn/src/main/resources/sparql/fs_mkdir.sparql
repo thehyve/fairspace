@@ -1,4 +1,6 @@
-# param type
-# param path
+# param0 - uri
+# param1 - type
+# param2 - path
+
 PREFIX fs: <http://fairspace.io/ontology#>
-INSERT DATA { ?s a ?type; fs:filePath ?path .}
+INSERT DATA { ?param0 a ?param1; fs:filePath ?param2 .}

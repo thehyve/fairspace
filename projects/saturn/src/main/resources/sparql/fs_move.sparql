@@ -1,14 +1,14 @@
 # Moves a file from one location to another
-# param from
-# param to
+# param0 - from
+# param1 - to
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?from };
-INSERT { ?s fs:filePath ?to } WHERE {?s fs:filePath ?from };
-DELETE WHERE { ?s fs:filePath ?from };
+INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?param0 };
+INSERT { ?s fs:filePath ?param1 } WHERE {?s fs:filePath ?param0 };
+DELETE WHERE { ?s fs:filePath ?param0 };
 
-INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/'))) };
+INSERT { ?s ?p ?o } WHERE { ?s ?p ?o . ?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/'))) };
 INSERT { ?s fs:filePath ?newPath}
-WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/'))) BIND(CONCAT(?to, '/', SUBSTR(?path, STRLEN(?from) + 2)) as ?newPath) };
-DELETE { ?s fs:filePath ?path } WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?from, '/')))}
+WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/'))) BIND(CONCAT(?param1, '/', SUBSTR(?path, STRLEN(?param0) + 2)) as ?newPath) };
+DELETE { ?s fs:filePath ?path } WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/')))}
