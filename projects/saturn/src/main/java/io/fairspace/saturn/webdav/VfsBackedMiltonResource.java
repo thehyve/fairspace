@@ -1,7 +1,6 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.vfs.FileInfo;
-import io.fairspace.saturn.vfs.PathUtils;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.http.Auth;
 import io.milton.http.Request;

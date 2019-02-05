@@ -132,6 +132,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .created(parseXSDDateTime(row.getLiteral("created")))
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
                 .creator(row.getLiteral("creator").getString())
+                .isReadable(true) // TODO: check
+                .isWriteable(true) // TODO: check
                 .build();
     }
 
