@@ -60,6 +60,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         try {
             return fs.list(info.getPath()).stream()
                     .map(f -> f.isDirectory() ? new VfsBackedMiltonDirectoryResource(fs, f) : new VfsBackedMiltonFileResource(fs, f))
+                    .sorted()
                     .collect(toList());
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -16,7 +16,7 @@ import java.util.Date;
 import static io.fairspace.saturn.vfs.PathUtils.name;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 
-public abstract class VfsBackedMiltonResource  implements Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource {
+public abstract class VfsBackedMiltonResource  implements Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, Comparable<Resource> {
     protected final VirtualFileSystem fs;
     protected final FileInfo info;
 
@@ -96,5 +96,10 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
     @Override
     public String checkRedirect(Request request) throws NotAuthorizedException, BadRequestException {
         return null;
+    }
+
+    @Override
+    public int compareTo(Resource resource) {
+        return getName().compareTo(resource.getName());
     }
 }
