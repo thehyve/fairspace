@@ -4,8 +4,9 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-INSERT { ?s fs:filePath ?param1 } WHERE {?s fs:filePath ?param0 };
-DELETE WHERE { ?s fs:filePath ?param0 };
+DELETE { ?s fs:filePath ?param0 }
+INSERT { ?s fs:filePath ?param1 }
+WHERE { ?s fs:filePath ?param0 };
 
 DELETE { ?s fs:filePath ?path }
 INSERT { ?s fs:filePath ?newPath}
