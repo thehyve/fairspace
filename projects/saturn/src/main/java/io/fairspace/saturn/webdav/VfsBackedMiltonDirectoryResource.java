@@ -3,7 +3,6 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.PathUtils;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
-import io.fairspace.saturn.webdav.vfs.resources.VfsResource;
 import io.milton.http.Auth;
 import io.milton.http.Range;
 import io.milton.http.exceptions.BadRequestException;
@@ -23,7 +22,9 @@ import java.util.Map;
 
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.fairspace.saturn.webdav.VfsBackedMiltonResourceFactory.getResource;
+import static io.milton.common.ContentTypeUtils.findAcceptableContentType;
 import static java.util.stream.Collectors.toList;
+import static org.apache.http.entity.ContentType.TEXT_HTML;
 
 public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource implements FolderResource {
     public VfsBackedMiltonDirectoryResource(VirtualFileSystem fs, FileInfo info) {
@@ -68,21 +69,21 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     @Override
     public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
         String relativePath = info.getPath();
-        PrintWriter writer = new PrintWriter(out);
+        try(var writer = new PrintWriter(out)) {
 
-        writer.println(String.format("<html><head><title>Folder listing for %s</title></head>", relativePath));
-        writer.println("<body>");
-        writer.println(String.format("<h1>Folder listing for %s</h1>", relativePath));
-        writer.println("<ul>");
+            writer.println(String.format("<html><head><title>Folder listing for %s</title></head>", relativePath));
+            writer.println("<body>");
+            writer.println(String.format("<h1>Folder listing for %s</h1>", relativePath));
+            writer.println("<ul>");
 
-        for (var child: fs.list(info.getPath())) {
-            // TODO: Determine correct URI to link to
-            writer.println(String.format("<li><a href=\"/webdav/%s\">%s</a></li>", child.getPath(), PathUtils.name(child.getPath())));
+            for (var child : fs.list(info.getPath())) {
+                // TODO: Determine correct URI to link to
+                writer.println(String.format("<li><a href=\"/webdav/%s\">%s</a></li>", child.getPath(), PathUtils.name(child.getPath())));
+            }
+            writer.println("</ul></body></html>");
+
+            writer.flush();
         }
-        writer.println("</ul></body></html>");
-
-        writer.flush();
-        writer.close();
     }
 
     @Override
@@ -92,7 +93,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
 
     @Override
     public String getContentType(String accepts) {
-        return null;
+        return findAcceptableContentType(TEXT_HTML.getMimeType(), accepts);
     }
 
     @Override
