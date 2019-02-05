@@ -7,6 +7,7 @@ import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.health.HealthServlet;
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
+import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
@@ -29,7 +30,7 @@ public class App {
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds);
 
-        var fs = new ManagedFileSystem(rdf, new LocalBlobStore(config.webDAV.blobStorePath), config.baseURI, SecurityUtil::userInfo);
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(config.webDAV.blobStorePath), config.baseURI, SecurityUtil::userInfo));
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
