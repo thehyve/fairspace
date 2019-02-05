@@ -4,6 +4,7 @@ import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import org.apache.commons.io.input.CountingInputStream;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -46,12 +47,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
         var info = new Ref<FileInfo>();
 
-        rdf.querySelect(storedQuery("fs_stat", path), row ->
-                info.value = FileInfo.builder()
-                        .path(path)
-                        .size(row.getLiteral("size").getLong())
-                        .isDirectory(!row.getResource("type").equals(FILE_TYPE))
-                        .build());
+        rdf.querySelect(storedQuery("fs_stat", path),
+                row -> info.value = fileInfo(row));
 
         return info.value;
     }
@@ -59,13 +56,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public List<FileInfo> list(String parentPath) throws IOException {
         var list = new ArrayList<FileInfo>();
-        rdf.querySelect(storedQuery("fs_ls", parentPath.isEmpty() ? "" : (parentPath + '/')), row ->
-                list.add(FileInfo.builder()
-                        .path(row.getLiteral("path").getString())
-                        .size(row.getLiteral("size").getLong())
-                        .isDirectory(!row.getResource("type").equals(FILE_TYPE))
-                        .build()));
+        rdf.querySelect(storedQuery("fs_ls", parentPath.isEmpty() ? "" : (parentPath + '/')),
+                row -> list.add(fileInfo(row)));
         return list;
+    }
+
+    private FileInfo fileInfo(QuerySolution row) {
+        return FileInfo.builder()
+                .path(row.getLiteral("path").getString())
+                .size(row.getLiteral("size").getLong())
+                .isDirectory(!row.getResource("type").equals(FILE_TYPE))
+                .build();
     }
 
     @Override
@@ -108,14 +109,14 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void copy(String from, String to) throws IOException {
-
+        withCommitMessage("Copy data from " + from + " to " + to,
+                () -> rdf.update(storedQuery("fs_copy", from, to)));
     }
 
     @Override
     public void move(String from, String to) throws IOException {
         withCommitMessage("Move data from " + from + " to " + to,
                 () -> rdf.update(storedQuery("fs_move", from, to)));
-
     }
 
     @Override
