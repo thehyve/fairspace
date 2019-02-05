@@ -1,26 +1,14 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.webdav.vfs.resources.VfsResourceFactory;
-import io.fairspace.saturn.webdav.vfs.resources.rdf.DirectoryRdfResource;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.Resource;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VfsBackedMiltonResourceFactoryTest {
     private String contextPath = "/testing";
 
-    @Mock
-    private VfsResourceFactory resourceFactory;
+//    @Mock
+//    private VfsResourceFactory resourceFactory;
 
 //    @Test
 //    public void testGetResource() throws NotAuthorizedException, BadRequestException {
