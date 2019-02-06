@@ -77,7 +77,7 @@ public class ManagedFileSystemTest {
     }
 
     @Test
-    public void move() throws IOException {
+    public void moveDir() throws IOException {
         fs.mkdir("dir1");
         fs.mkdir("dir1/subdir");
         fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
@@ -90,6 +90,20 @@ public class ManagedFileSystemTest {
         fs.read("dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
     }
+
+    @Test
+    public void moveFile() throws IOException {
+        fs.mkdir("dir1");
+        fs.create("dir1/file1", new ByteArrayInputStream(content1));
+        fs.mkdir("dir2");
+        fs.move("dir1/file1", "dir2/file2");
+        assertNull(fs.stat("dir1/file1"));
+        assertNotNull(fs.stat("dir2/file2"));
+        var os = new ByteArrayOutputStream();
+        fs.read("dir2/file2", os);
+        assertArrayEquals(content1, os.toByteArray());
+    }
+
 
     @Test
     public void deleteDir() throws IOException {

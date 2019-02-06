@@ -1,3 +1,5 @@
+# Creates a directory
+#
 # param0 - base IRI as string
 # param1 - type
 # param2 - path

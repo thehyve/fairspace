@@ -1,4 +1,4 @@
-# Moves a file from one location to another
+# Moves a file or a directory from one location to another
 # param0 - from
 # param1 - to
 

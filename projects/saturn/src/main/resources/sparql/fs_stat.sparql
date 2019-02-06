@@ -1,3 +1,4 @@
+# Returns file info
 # param0 - path
 PREFIX fs: <http://fairspace.io/ontology#>
 SELECT ?iri ?path ?type ?size ?created ?modified ?createdBy ?modifiedBy

@@ -1,4 +1,5 @@
-# Moves a file from one location to another
+# Moves a file or a directory from one location to another
+#
 # param0 - from
 # param1 - to
 # param2 - base uri
@@ -12,6 +13,7 @@ INSERT { ?tempNewIRI ?p ?o } WHERE { ?s ?p ?o ; fs:tempNewIRI ?tempNewIRI . };
 DELETE { ?tempNewIRI fs:filePath ?param0 } INSERT { ?tempNewIRI fs:filePath ?param1 } WHERE { ?s fs:tempNewIRI ?tempNewIRI . };
 DELETE WHERE { ?s fs:tempNewIRI ?o };
 
+# Move directory content if needed
 INSERT { ?s fs:tempNewIRI ?tempNewIRI }
 WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/')))
 BIND(IRI(CONCAT(?param2, STRUUID())) as ?tempNewIRI) };
@@ -22,4 +24,5 @@ DELETE { ?tempNewIRI fs:filePath ?path }
 INSERT { ?tempNewIRI ?p ?o ; fs:filePath ?newPath . }
 WHERE { ?s fs:tempNewIRI ?tempNewIRI ; fs:filePath ?path . BIND(CONCAT(?param1, '/', SUBSTR(?path, STRLEN(?param0) + 2)) as ?newPath) };
 
+# Cleanup
 DELETE WHERE { ?s fs:tempNewIRI ?o };
