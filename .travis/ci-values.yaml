@@ -18,17 +18,28 @@ workspace:
     domain: workspace.ci.fairway.app
     tls:
       certificate:
-        dns01Provider: azuredns-ci
+        dns01Provider: gke
   enableExperimentalFeatures: true
+ configurationScripts:
+    keycloak:
+      enabled: true
+      image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.1
+      pullPolicy: IfNotPresent
+    rabbitmq:
+      enabled: true
+      image: eu.gcr.io/fairspace-207108/rabbitmq-configuration:0.1.0
+      pullPolicy: IfNotPresent
 
 pluto:
   image:
+    image: eu.gcr.io/fairspace-207108/pluto
     pullPolicy: Always
   rabbitmq:
     password: "PaF6ZMbDZmgrztJY"
 
 titan:
   image:
+    image: eu.gcr.io/fairspace-207108/titan
     pullPolicy: Always
   rabbitmq:
     password: "L3bE8yGJp7um2PVk"
@@ -38,11 +49,13 @@ titan:
 # Specific settings for Saturn subchart
 saturn:
   image:
+    image: eu.gcr.io/fairspace-207108/saturn
     pullPolicy: Always
 
 # Specific settings for Ceres subchart
 ceres:
   image:
+    image: eu.gcr.io/fairspace-207108/ceres
     pullPolicy: Always
   rabbitmq:
     password: "hx6SQUBe99EBr8dM"
@@ -50,6 +63,7 @@ ceres:
 # Specific settings for Neptune subchart
 neptune:
   image:
+    image: eu.gcr.io/fairspace-207108/neptune
     pullPolicy: Always
   rabbitmq:
     password: "4uXa4BFkHTuNxFAF"
@@ -57,10 +71,14 @@ neptune:
 # Specific settings for Mercury subchart
 mercury:
   image:
+    image: eu.gcr.io/fairspace-207108/mercury
     pullPolicy: Always
 
 # Specific settings for Callisto subchart
 callisto:
+  image:
+    image: eu.gcr.io/fairspace-207108/callisto
+
   rabbitmq:
     password: "6hfdJUr7RW6LTFgB"
 
@@ -76,7 +94,7 @@ callisto:
 # Specific settings for JupyterHub subchart
 jupyterhub:
   rbac:
-    enabled: false
+    enabled: true
   auth:
       custom:
           config:
@@ -86,11 +104,14 @@ jupyterhub:
               session_url: https://workspace.ci.fairway.app/account/tokens
   singleuser:
     image:
+      name: eu.gcr.io/fairspace-207108/jupyterhub-singleuser
       tag: 0.5.4-SNAPSHOT-simple
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.ci.fairway.app
   hub:
-      extraEnv:
-          JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
+    image:
+      name: eu.gcr.io/fairspace-207108/jupyterhub-hub
+    extraEnv:
+      JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
   proxy:
       secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"
