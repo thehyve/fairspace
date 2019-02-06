@@ -37,7 +37,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("aaa/bbb/ccc");
         var stat = fs.stat("aaa/bbb/ccc");
         assertEquals("aaa/bbb/ccc", stat.getPath());
-        assertEquals(true, stat.isDirectory());
+        assertTrue(stat.isDirectory());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("dir1/subdir");
         fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
         fs.move("dir1", "dir2");
-        assertNull(fs.stat("dir1"));
+        assertFalse(fs.exists("dir1"));
         assertTrue(fs.exists("dir2"));
         assertTrue(fs.exists("dir2/subdir"));
         assertTrue(fs.exists("dir2/subdir/file"));
@@ -113,8 +113,8 @@ public class ManagedFileSystemTest {
         fs.mkdir("dir2");
         fs.mkdir("dir2/subdir2");
         fs.move("dir1", "dir2");
-        assertNull(fs.stat("dir1"));
-        assertNull(fs.stat("dir2/subdir2"));
+        assertFalse(fs.exists("dir1"));
+        assertFalse(fs.exists("dir2/subdir2"));
         assertTrue(fs.exists("dir2"));
         assertTrue(fs.exists("dir2/subdir"));
         assertTrue(fs.exists("dir2/subdir/file"));
@@ -130,7 +130,7 @@ public class ManagedFileSystemTest {
         fs.create("dir1/file1", new ByteArrayInputStream(content1));
         fs.mkdir("dir2");
         fs.move("dir1/file1", "dir2/file2");
-        assertNull(fs.stat("dir1/file1"));
+        assertFalse(fs.exists("dir1/file1"));
         assertTrue(fs.exists("dir2/file2"));
         var os = new ByteArrayOutputStream();
         fs.read("dir2/file2", os);
@@ -146,9 +146,9 @@ public class ManagedFileSystemTest {
 
         fs.delete("dir");
 
-        assertNull(fs.stat("dir"));
-        assertNull(fs.stat("dir/subdir"));
-        assertNull(fs.stat("dir/file"));
+        assertFalse(fs.exists("dir"));
+        assertFalse(fs.exists("dir/subdir"));
+        assertFalse(fs.exists("dir/file"));
     }
 
     @Test
@@ -158,6 +158,6 @@ public class ManagedFileSystemTest {
 
         fs.delete("dir/file");
 
-        assertNull(fs.stat("dir/file"));
+        assertFalse(fs.exists("dir/file"));
     }
 }
