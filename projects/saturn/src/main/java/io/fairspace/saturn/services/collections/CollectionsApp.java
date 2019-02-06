@@ -7,6 +7,9 @@ import org.apache.jena.rdfconnection.RDFConnection;
 import spark.servlet.SparkApplication;
 
 import static javax.servlet.http.HttpServletResponse.*;
+import org.apache.http.entity.ContentType;
+
+import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
 public class CollectionsApp implements SparkApplication {
@@ -26,7 +29,7 @@ public class CollectionsApp implements SparkApplication {
                 if (iri != null) {
                     var collection = service.get(iri);
                     if (collection != null) {
-                        res.type("application/json");
+                        res.type(APPLICATION_JSON.asString());
                         return mapper.writeValueAsString(collection);
                     } else {
                         return null; // 404
@@ -40,7 +43,7 @@ public class CollectionsApp implements SparkApplication {
                 var template = mapper.readValue(req.body(), Collection.class);
                 var result = service.create(template);
                 res.status(SC_CREATED);
-                res.type("application/json");
+                res.type(APPLICATION_JSON.asString());
                 return mapper.writeValueAsString(result);
             });
             patch("/", (req, res) -> {
@@ -52,7 +55,7 @@ public class CollectionsApp implements SparkApplication {
                     return null;
                 }
 
-                res.type("application/json");
+                res.type(APPLICATION_JSON.asString());
                 return mapper.writeValueAsString(result);
             });
             delete("/", (req, res) -> {

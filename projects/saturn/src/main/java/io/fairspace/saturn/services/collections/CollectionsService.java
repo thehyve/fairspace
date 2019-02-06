@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.util.Ref;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.ArrayList;
@@ -16,25 +17,26 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 public class CollectionsService {
     private final RDFConnection rdf;
 
-    private final String baseCollectionURI;
+    private final String baseIRI;
     private final Supplier<UserInfo> userInfoSupplier;
 
 
-    public CollectionsService(RDFConnection rdf, String baseCollectionURI, Supplier<UserInfo> userInfoSupplier) {
+    public CollectionsService(RDFConnection rdf, String baseIRI, Supplier<UserInfo> userInfoSupplier) {
         this.rdf = rdf;
-        this.baseCollectionURI = baseCollectionURI;
+        this.baseIRI = baseIRI;
         this.userInfoSupplier = userInfoSupplier;
     }
 
     public Collection create(Collection template) {
-        if (template.getId() != null) {
+        if (template.getUri() != null) {
             throw new IllegalArgumentException("Id shouldn't be set");
         }
 
         var collection = new Collection();
-        collection.setId(baseCollectionURI + randomUUID());
+        collection.setUri(baseIRI + randomUUID());
         collection.setName(template.getName());
         collection.setDescription(template.getDescription() != null ? template.getDescription() : "");
+        collection.setType(template.getType());
         collection.setCreator("");
         if (userInfoSupplier != null) {
             var userInfo = userInfoSupplier.get();
@@ -44,7 +46,8 @@ public class CollectionsService {
         }
 
         withCommitMessage("Create collection " + collection.getName(),
-                () -> rdf.update(storedQuery("coll_create", createResource(collection.getId()), collection.getName(), collection.getDescription(), collection.getCreator())));
+                () -> rdf.update(storedQuery("coll_create",
+                        createResource(collection.getUri()), collection.getName(), collection.getDescription(), collection.getType(), collection.getCreator())));
 
 
         return collection;
@@ -53,14 +56,8 @@ public class CollectionsService {
     public Collection get(String iri) {
         var result = new Ref<Collection>();
 
-        rdf.querySelect(storedQuery("coll_get", createResource(iri)), row -> {
-            var collection = new Collection();
-            collection.setId(iri);
-            collection.setName(row.getLiteral("name").getString());
-            collection.setDescription(row.getLiteral("description").getString());
-            collection.setCreator(row.getLiteral("createdBy").getString());
-            result.value = collection;
-        });
+        rdf.querySelect(storedQuery("coll_get", createResource(iri)),
+                row -> result.value = toCollection(row));
 
         return result.value;
     }
@@ -68,14 +65,8 @@ public class CollectionsService {
     public List<Collection> list() {
         var result = new ArrayList<Collection>();
 
-        rdf.querySelect(storedQuery("coll_list"), row -> {
-            var collection = new Collection();
-            collection.setId(row.getResource("iri").toString());
-            collection.setName(row.getLiteral("name").getString());
-            collection.setDescription(row.getLiteral("description").getString());
-            collection.setCreator(row.getLiteral("createdBy").getString());
-            result.add(collection);
-        });
+        rdf.querySelect(storedQuery("coll_list"),
+                row -> result.add(toCollection(row)));
 
         return result;
     }
@@ -86,10 +77,18 @@ public class CollectionsService {
     }
 
     public Collection update(Collection collection) {
-        withCommitMessage("Update collection " + collection.getId(),
-                () -> rdf.update(storedQuery("coll_update", createResource(collection.getId()), collection.getName(), collection.getDescription())));
-        return get(collection.getId());
+        withCommitMessage("Update collection " + collection.getUri(),
+                () -> rdf.update(storedQuery("coll_update", createResource(collection.getUri()), collection.getName(), collection.getDescription())));
+        return get(collection.getUri());
     }
 
-
+    private static Collection toCollection(QuerySolution row) {
+        var collection = new Collection();
+        collection.setUri(row.getResource("iri").toString());
+        collection.setType(row.getLiteral("type").getString());
+        collection.setName(row.getLiteral("name").getString());
+        collection.setDescription(row.getLiteral("description").getString());
+        collection.setCreator(row.getLiteral("createdBy").getString());
+        return collection;
+    }
 }
