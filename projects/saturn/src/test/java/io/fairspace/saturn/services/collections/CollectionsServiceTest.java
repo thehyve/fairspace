@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 public class CollectionsServiceTest {
 
     @Test
-    public void create() {
+    public void basicFunctionality() {
         var service = new CollectionsService(connect(createTxnMem()), "http://example.com/iri/",
                 () -> new UserInfo("userId", null, null, null));
 

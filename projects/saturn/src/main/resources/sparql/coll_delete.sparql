@@ -2,4 +2,12 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-DELETE WHERE { ?param0 ?s ?p; a fs:Collection; }
+# Delete files and folders
+DELETE { ?s ?p ?o } WHERE {
+?param0 fs:filePath ?collPath .
+?s ?p ?o;
+fs:filePath ?path .
+FILTER(STRSTARTS(?path, CONCAT(?collPath, '/'))) };
+
+# Delete the collection
+DELETE WHERE { ?param0 ?s ?p; a fs:Collection; };
