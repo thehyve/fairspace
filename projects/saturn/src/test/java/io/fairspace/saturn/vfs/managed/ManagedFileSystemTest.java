@@ -14,6 +14,9 @@ import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
 public class ManagedFileSystemTest {
+    private final byte[] content1 = new byte[]{1, 2, 3};
+    private final byte[] content2 = new byte[]{1, 2, 3, 4};
+
     private ManagedFileSystem fs;
 
     @Before
@@ -40,7 +43,6 @@ public class ManagedFileSystemTest {
 
     @Test
     public void writeAndRead() throws IOException {
-        var content1 = new byte[]{1, 2, 3};
         fs.mkdir("dir");
 
         fs.create("dir/file", new ByteArrayInputStream(content1));
@@ -48,8 +50,6 @@ public class ManagedFileSystemTest {
         var os = new ByteArrayOutputStream();
         fs.read("dir/file", os);
         assertArrayEquals(content1, os.toByteArray());
-
-        var content2 = new byte[]{1, 2, 3, 4};
 
         fs.modify("dir/file", new ByteArrayInputStream(content2));
         assertEquals(content2.length, fs.stat("dir/file").getSize());
@@ -63,7 +63,6 @@ public class ManagedFileSystemTest {
 
     @Test
     public void copy() throws IOException {
-        var content1 = new byte[]{1, 2, 3};
         fs.mkdir("dir1");
         fs.mkdir("dir1/subdir");
         fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
@@ -79,7 +78,6 @@ public class ManagedFileSystemTest {
 
     @Test
     public void move() throws IOException {
-        var content1 = new byte[]{1, 2, 3};
         fs.mkdir("dir1");
         fs.mkdir("dir1/subdir");
         fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
@@ -94,10 +92,25 @@ public class ManagedFileSystemTest {
     }
 
     @Test
-    public void delete() throws IOException {
+    public void deleteDir() throws IOException {
         fs.mkdir("dir");
+        fs.mkdir("dir/subdir");
+        fs.create("dir/file", new ByteArrayInputStream(content1));
+
         fs.delete("dir");
+
         assertNull(fs.stat("dir"));
+        assertNull(fs.stat("dir/subdir"));
+        assertNull(fs.stat("dir/file"));
     }
 
+    @Test
+    public void deleteFile() throws IOException {
+        fs.mkdir("dir");
+        fs.create("dir/file", new ByteArrayInputStream(content1));
+
+        fs.delete("dir/file");
+
+        assertNull(fs.stat("dir/file"));
+    }
 }

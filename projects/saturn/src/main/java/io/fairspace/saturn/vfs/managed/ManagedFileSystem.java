@@ -24,7 +24,7 @@ import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 
 public class ManagedFileSystem implements VirtualFileSystem {
-    public static final FileInfo ROOT = FileInfo.builder().path("")
+    private static final FileInfo ROOT = FileInfo.builder().path("")
             .readOnly(false)
             .isDirectory(true)
             .build();
