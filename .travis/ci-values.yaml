@@ -20,7 +20,7 @@ workspace:
       certificate:
         dns01Provider: gke
   enableExperimentalFeatures: true
- configurationScripts:
+  configurationScripts:
     keycloak:
       enabled: true
       image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.1
