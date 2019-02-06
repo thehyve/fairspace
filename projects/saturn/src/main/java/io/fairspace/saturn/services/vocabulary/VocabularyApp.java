@@ -11,10 +11,10 @@ import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.*;
 
 public class VocabularyApp implements SparkApplication {
-    private final VocabularyAPI api;
+    private final VocabularyService api;
 
     public VocabularyApp(RDFConnection rdfConnection, String baseURI) {
-        this.api = new VocabularyAPI(rdfConnection, baseURI);
+        this.api = new VocabularyService(rdfConnection, baseURI);
     }
 
     @Override

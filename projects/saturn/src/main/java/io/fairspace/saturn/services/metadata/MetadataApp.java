@@ -13,10 +13,10 @@ import static spark.Spark.*;
 public class MetadataApp implements SparkApplication {
     private static final String METHOD_PATCH = "PATCH";
 
-    private final MetadataAPI api;
+    private final MetadataService api;
 
     public MetadataApp(RDFConnection rdfConnection) {
-        this.api = new MetadataAPI(rdfConnection);
+        this.api = new MetadataService(rdfConnection);
     }
 
     @Override

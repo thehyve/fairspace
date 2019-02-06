@@ -16,10 +16,10 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
-class MetadataAPI {
+class MetadataService {
     private final RDFConnection rdfConnection;
 
-    MetadataAPI(RDFConnection rdfConnection) {
+    MetadataService(RDFConnection rdfConnection) {
         this.rdfConnection = rdfConnection;
     }
 

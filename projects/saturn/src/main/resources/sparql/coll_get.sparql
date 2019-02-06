@@ -5,4 +5,4 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT ?iri ?name ?description ?type ?createdBy
 WHERE { ?param0 a fs:Collection; rdfs:label ?name; rdfs:comment ?description; fs:collectionType ?type; fs:createdBy ?createdBy.
-BIND(?param as ?iri) }
+BIND(?param0 as ?iri) }

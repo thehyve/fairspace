@@ -16,9 +16,9 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.*;
 
-public class MetadataAPITest {
+public class MetadataServiceTest {
     private Dataset ds;
-    private MetadataAPI api;
+    private MetadataService api;
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
     private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
@@ -31,7 +31,7 @@ public class MetadataAPITest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new MetadataAPI(new RDFConnectionLocal(ds));
+        api = new MetadataService(new RDFConnectionLocal(ds));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class MetadataAPITest {
 
     @Test
     public void createPatchQuery() {
-        String query = MetadataAPI.createPatchQuery(asList(STMT1, STMT2));
+        String query = MetadataService.createPatchQuery(asList(STMT1, STMT2));
         assertEquals("DELETE WHERE \n" +
                 "{\n" +
                 "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> ?o1 .\n" +
