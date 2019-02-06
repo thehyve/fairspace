@@ -6,9 +6,8 @@ import io.fairspace.saturn.auth.SecurityUtil;
 import org.apache.jena.rdfconnection.RDFConnection;
 import spark.servlet.SparkApplication;
 
-import static javax.servlet.http.HttpServletResponse.*;
-import org.apache.http.entity.ContentType;
-
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
@@ -16,8 +15,8 @@ public class CollectionsApp implements SparkApplication {
     private final CollectionsService service;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public CollectionsApp(RDFConnection rdf) {
-        this.service = new CollectionsService(rdf, "http://localhost:8080/" , SecurityUtil::userInfo);
+    public CollectionsApp(RDFConnection rdf, String baseURI) {
+        this.service = new CollectionsService(rdf, baseURI, SecurityUtil::userInfo);
     }
 
     @Override

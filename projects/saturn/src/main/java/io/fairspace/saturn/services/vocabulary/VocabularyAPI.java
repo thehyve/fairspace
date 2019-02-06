@@ -9,9 +9,9 @@ class VocabularyAPI {
     private final RDFConnection rdfConnection;
     private final String vocabularyUri;
 
-    VocabularyAPI(RDFConnection rdfConnection, String vocabularyUri) {
+    VocabularyAPI(RDFConnection rdfConnection, String baseURI) {
         this.rdfConnection = rdfConnection;
-        this.vocabularyUri = vocabularyUri;
+        this.vocabularyUri = baseURI + "vocabulary";
     }
 
     Model getVocabulary() {

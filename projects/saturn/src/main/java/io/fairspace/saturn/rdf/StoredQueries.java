@@ -6,7 +6,6 @@ import org.apache.jena.iri.IRI;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.RDFNode;
 
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;

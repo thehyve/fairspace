@@ -33,7 +33,7 @@ public class SaturnDatasetFactory {
         var txnLogDatasetGraph = new TxnLogDatasetGraph(baseDatasetGraph, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
         // Add property inversion
-        var vocabularyGraphNode = createURI(config.vocabularyURI);
+        var vocabularyGraphNode = createURI(config.baseURI + "vocabulary");
         var dsg = new InvertingDatasetGraph(txnLogDatasetGraph, vocabularyGraphNode);
 
         // Apply the vocabulary

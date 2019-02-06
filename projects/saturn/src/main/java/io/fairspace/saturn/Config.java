@@ -2,8 +2,6 @@ package io.fairspace.saturn;
 
 
 public class Config {
-    public String baseURI = "http://localhost";
-
     public int port = 8080;
 
     public Jena jena = new Jena();
@@ -13,11 +11,11 @@ public class Config {
     public WebDAV webDAV = new WebDAV();
 
     public static class Jena {
+        public String baseURI = "http://localhost/iri/";
+
         public String datasetPath = "data/db";
 
         public String transactionLogPath = "data/log";
-
-        public String vocabularyURI = "http://fairspace.io/vocabulary#";
     }
 
     public static class Auth {
