@@ -16,6 +16,7 @@ env:
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
      - NEXUS_USERNAME="travis-fairspace"
+     - GCP_PROJECT="fairspace-207108"
      - RELEASE_CONTEXT="FairspaceDemoCluster"
      - SNAPSHOT_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
      - RELEASE_CLUSTER_NAME="fairspacedemocluster"
