@@ -2,11 +2,15 @@ package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.health.HealthServlet;
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
-import io.fairspace.saturn.webdav.milton.MiltonWebDAVServlet;
+import io.fairspace.saturn.vfs.SafeFileSystem;
+import io.fairspace.saturn.vfs.managed.LocalBlobStore;
+import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
+import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
@@ -24,13 +28,15 @@ public class App {
         var ds = SaturnDatasetFactory.connect(config.jena);
         // The RDF connection is supposed to be threadsafe and can
         // be reused in all the application
-        var connection = new RDFConnectionLocal(ds);
+        var rdf = new RDFConnectionLocal(ds);
+
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), config.baseURI, SecurityUtil::userInfo));
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
-                .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/vocabulary", new VocabularyAPIServlet(connection, config.jena.vocabularyURI))
-                .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav", connection))
+                .addServlet("/statements", new MetadataAPIServlet(rdf))
+                .addServlet("/vocabulary", new VocabularyAPIServlet(rdf, config.jena.vocabularyURI))
+                .addServlet("/webdav/*", new MiltonWebDAVServlet(fs))
                 .addServlet("/health", new HealthServlet())
                 .port(config.port);
 
@@ -48,6 +54,7 @@ public class App {
         System.out.println("Access Fuseki at /rdf");
         System.out.println("Access Metadata at /statements");
         System.out.println("Access Vocabulary API at /vocabulary");
+        System.out.println("Access WebDAV API at /webdav");
     }
 
     private static Config loadConfig() {

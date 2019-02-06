@@ -1,8 +1,8 @@
 package io.fairspace.saturn.rdf;
 
 import io.fairspace.saturn.Config;
-import io.fairspace.saturn.commits.CommitMessages;
 import io.fairspace.saturn.auth.SecurityUtil;
+import io.fairspace.saturn.commits.CommitMessages;
 import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
@@ -12,6 +12,7 @@ import org.apache.jena.query.DatasetFactory;
 
 import java.io.File;
 
+import static io.fairspace.saturn.rdf.Vocabulary.initVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
 
@@ -36,7 +37,7 @@ public class SaturnDatasetFactory {
         var dsg = new InvertingDatasetGraph(txnLogDatasetGraph, vocabularyGraphNode);
 
         // Apply the vocabulary
-        Vocabulary.init(dsg, vocabularyGraphNode);
+        initVocabulary(dsg, vocabularyGraphNode);
 
         // Create a dataset
         return DatasetFactory.wrap(dsg);

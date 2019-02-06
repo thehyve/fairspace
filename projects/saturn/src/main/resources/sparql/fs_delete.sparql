@@ -1,0 +1,8 @@
+# Deletes a file or a directory
+#
+# param0 - path
+
+PREFIX fs: <http://fairspace.io/ontology#>
+DELETE WHERE { ?s ?p ?o ; fs:filePath ?param0 . };
+# Delete directory content
+DELETE { ?s ?p ?o } WHERE { ?s ?p ?o; fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/'))) };

@@ -1,0 +1,58 @@
+# Moves a file or a directory from one location to another.
+# Completely overwrites the target.
+#
+# param0 - from
+# param1 - to
+# param2 - base uri
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+# Delete an existing "to" resource
+DELETE { ?s ?p ?o }
+WHERE { ?s fs:filePath ?param1 };
+
+# Create the target resource
+INSERT { ?newIRI fs:filePath ?param1 }
+WHERE {
+    ?s fs:filePath ?param0 .
+    BIND(IRI(CONCAT(?param2, STRUUID())) as ?newIRI)
+};
+
+# Copy statements
+INSERT { ?newIRI ?p ?o }
+WHERE {
+    ?newIRI fs:filePath ?param1 .
+
+    ?s ?p ?o ;
+    fs:filePath ?param0 .
+    FILTER( ?p != fs:filePath) # filePath has changed
+};
+
+# Delete target's children
+DELETE { ?s ?p ?o }
+WHERE {
+  ?s fs:filePath ?path .
+  FILTER(STRSTARTS(?path, CONCAT(?param1, '/')))
+  ?s ?p ?o .
+};
+
+# Create children
+INSERT { ?newIRI fs:filePath ?newPath }
+WHERE {
+    ?s fs:filePath ?oldPath .
+
+    FILTER(STRSTARTS(?oldPath, CONCAT(?param0, '/')))
+    BIND(IRI(CONCAT(?param2, STRUUID())) as ?newIRI)
+    BIND(CONCAT(?param1, '/', SUBSTR(?oldPath, STRLEN(?param0) + 2)) as ?newPath)
+};
+
+# Copy children's statements
+INSERT { ?newIRI ?p ?o }
+WHERE {
+    ?newIRI fs:filePath ?newPath .
+    FILTER(STRSTARTS(?newPath, CONCAT(?param1, '/')))
+    BIND(CONCAT(?param0, '/', SUBSTR(?newPath, STRLEN(?param1) + 2)) as ?oldPath)
+    ?s fs:filePath ?oldPath .
+    ?s ?p ?o .
+    FILTER((?p != fs:filePath)) # filePath has changed
+};

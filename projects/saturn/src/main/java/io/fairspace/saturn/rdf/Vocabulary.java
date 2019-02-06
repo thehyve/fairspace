@@ -8,12 +8,12 @@ import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static org.apache.jena.system.Txn.executeWrite;
 
 public class Vocabulary {
-    public static void init(DatasetGraph dsg, Node vocabularyGraph) {
-        executeWrite(dsg, () -> {
-            if (!dsg.containsGraph(vocabularyGraph)) {
-                withCommitMessage("Initialize the vocabulary", () ->
-                        dsg.addGraph(vocabularyGraph, FileManager.get().loadModel("vocabulary.jsonld").getGraph()));
-            }
-        });
+    public static void initVocabulary(DatasetGraph dsg, Node vocabularyGraph) {
+        withCommitMessage("Initialize the vocabulary", () ->
+                executeWrite(dsg, () -> {
+                    if (!dsg.containsGraph(vocabularyGraph)) {
+                        dsg.addGraph(vocabularyGraph, FileManager.get().loadModel("vocabulary.jsonld").getGraph());
+                    }
+                }));
     }
 }

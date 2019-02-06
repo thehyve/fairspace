@@ -1,0 +1,6 @@
+# Returns file's blob id by path
+# param0 - path
+
+PREFIX fs: <http://fairspace.io/ontology#>
+SELECT ?blobId
+WHERE { ?s fs:filePath ?param0 . ?s fs:blobId ?blobId . }
