@@ -156,8 +156,9 @@ public class SafeFileSystem implements VirtualFileSystem {
         }
     }
 
-    private boolean exists(String path) throws IOException {
-        return stat(path) != null;
+    @Override
+    public boolean exists(String path) throws IOException {
+        return safely(() -> unsafe.exists(path));
     }
 
     @FunctionalInterface
