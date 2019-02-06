@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -20,7 +19,7 @@ public class ManagedFileSystemTest {
     private ManagedFileSystem fs;
 
     @Before
-    public void before() throws URISyntaxException {
+    public void before()  {
         var store = new MemoryBlobStore();
         fs = new ManagedFileSystem(connect(createTxnMem()), store,"http://example.com/", null);
     }
