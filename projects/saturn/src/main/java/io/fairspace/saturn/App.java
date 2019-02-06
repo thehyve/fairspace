@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.health.HealthServlet;
 import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
 import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
@@ -34,6 +35,7 @@ public class App {
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
+                .addFilter("/api/*", new SaturnSparkFilter(new CollectionsApp(rdf)))
                 .addServlet("/statements", new MetadataAPIServlet(rdf))
                 .addServlet("/vocabulary", new VocabularyAPIServlet(rdf, config.jena.vocabularyURI))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet(fs))

@@ -1,0 +1,7 @@
+# param0 - IRI
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?name ?description ?createdBy
+WHERE { ?param0 a fs:Collection; rdfs:label ?name; rdfs:comment ?description; fs:createdBy ?createdBy; }

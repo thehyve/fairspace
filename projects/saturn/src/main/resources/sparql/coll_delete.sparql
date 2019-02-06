@@ -1,0 +1,5 @@
+# param0 - IRI
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+DELETE WHERE { ?param0 ?s ?p; a fs:Collection; }
