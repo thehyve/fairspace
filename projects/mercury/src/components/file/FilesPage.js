@@ -10,9 +10,23 @@ import {splitPathIntoArray} from "../../utils/fileUtils";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
-import * as consts from '../../constants.js';
+import * as consts from '../../constants';
 
 class FilesPage extends React.Component {
+    componentDidMount() {
+        const {
+            fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath
+        } = this.props;
+        fetchCollectionsIfNeeded();
+        selectCollection(openedCollection.id);
+
+        // If the collection has not been fetched yet,
+        // do not bother fetching the files
+        if (openedCollection.id) {
+            fetchFilesIfNeeded(openedCollection, openedPath);
+        }
+    }
+
     componentDidUpdate(prevProps) {
         const {
             selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath
@@ -54,9 +68,11 @@ class FilesPage extends React.Component {
 
     render() {
         {
-            const {openedCollection, fetchFilesIfNeeded,
-                selectCollection, openPath, fetchCollectionsIfNeeded, openedCollectionId,
-                openedPath, files, selectedPaths, selectPath, deselectPath, renameFile, deleteFile} = this.props;
+            const {
+                openedCollection, fetchFilesIfNeeded,
+                openPath, openedCollectionId,
+                openedPath, files, selectedPaths, selectPath, deselectPath, renameFile, deleteFile
+            } = this.props;
 
             return (
                 <>
@@ -64,9 +80,7 @@ class FilesPage extends React.Component {
                     <Grid container spacing={8}>
                         <Grid item style={{width: consts.MAIN_CONTENT_WIDTH}}>
                             <FileBrowser
-                                fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
                                 openPath={openPath}
-                                selectCollection={selectCollection}
                                 fetchFilesIfNeeded={fetchFilesIfNeeded}
                                 openedCollection={openedCollection}
                                 openedCollectionId={openedCollectionId}
