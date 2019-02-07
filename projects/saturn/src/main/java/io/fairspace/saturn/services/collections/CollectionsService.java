@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 

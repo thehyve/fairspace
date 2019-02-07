@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 
 public class ManagedFileSystem implements VirtualFileSystem {
