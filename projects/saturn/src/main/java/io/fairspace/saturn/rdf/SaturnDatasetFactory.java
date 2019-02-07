@@ -45,8 +45,8 @@ public class SaturnDatasetFactory {
         }
 
         // Add property inversion
-        var vocabularyGraphNode = createURI(config.vocabularyURI);
-        dsg = new InvertingDatasetGraph(dsg, vocabularyGraphNode);
+        var vocabularyGraphNode = createURI(config.baseURI + "vocabulary");
+        var dsg = new InvertingDatasetGraph(txnLogDatasetGraph, vocabularyGraphNode);
 
         // Apply the vocabulary
         initVocabulary(dsg, vocabularyGraphNode);

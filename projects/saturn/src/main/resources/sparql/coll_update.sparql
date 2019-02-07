@@ -1,0 +1,19 @@
+# Updates a collection
+#
+# param0 - IRI
+# param1 - name
+# param2 - description
+# param3 - directory name
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+DELETE { ?param0 rdfs:label ?name; rdfs:comment ?comment; fs:filePath ?oldPath; }
+INSERT { ?param0 rdfs:label ?param1; rdfs:comment ?param2; fs:filePath ?param3; }
+WHERE { ?param0 a fs:Collection; rdfs:label ?name; rdfs:comment ?comment; fs:filePath ?oldPath; BIND(NOW() as ?date) };
+
+# Move the children
+DELETE { ?s fs:filePath ?path }
+INSERT { ?s fs:filePath ?newPath}
+WHERE { ?param0 fs:filePath ?oldPath. ?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?oldPath, '/')))
+BIND(CONCAT(?param3, '/', SUBSTR(?path, STRLEN(?oldPath) + 2)) as ?newPath) };

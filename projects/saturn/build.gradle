@@ -40,6 +40,7 @@ dependencies {
     compile "io.milton:milton-server-ce:${milton_version}"
     compile 'com.nimbusds:nimbus-jose-jwt:5.7'
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.6"
+    compile "com.sparkjava:spark-core:2.7.2"
 
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-core:${mockitoVersion}"

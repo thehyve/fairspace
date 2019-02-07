@@ -1,6 +1,8 @@
 package io.fairspace.saturn.commits;
 
 
+import java.util.function.Supplier;
+
 import static io.fairspace.saturn.Context.currentRequest;
 
 /**
@@ -17,6 +19,15 @@ public class CommitMessages {
         systemCommitMessage.set(message);
         try {
             action.run();
+        } finally {
+            systemCommitMessage.set(null);
+        }
+    }
+
+    public static <T> T withCommitMessage(String message, Supplier<T> action) {
+        systemCommitMessage.set(message);
+        try {
+            return action.get();
         } finally {
             systemCommitMessage.set(null);
         }
