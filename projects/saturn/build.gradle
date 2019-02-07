@@ -35,6 +35,8 @@ repositories {
 
 dependencies {
     compile "org.apache.jena:jena-fuseki-main:${jena_version}"
+    compile "org.apache.jena:jena-text:${jena_version}"
+    compile "org.apache.jena:jena-text-es:${jena_version}"
     compile "io.milton:milton-server-ce:${milton_version}"
     compile 'com.nimbusds:nimbus-jose-jwt:5.7'
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.6"

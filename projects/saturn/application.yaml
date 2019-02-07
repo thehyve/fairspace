@@ -1,0 +1,21 @@
+baseURI: "http://localhost"
+port: 8080
+jena:
+  baseURI: "http://localhost/iri/"
+  datasetPath: "data/db"
+  transactionLogPath: "data/log"
+  elasticSearch:
+    enabled: false
+    settings:
+      hostToPortMapping:
+        localhost: 9300
+      clusterName: "elasticsearch"
+      shards: 1
+      replicas: 1
+      indexName: "fairspace"
+auth:
+  authEnabled: false
+  jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
+  jwtAlgorithm: "RS256"
+webDAV:
+  blobStorePath: "data/blobs"
