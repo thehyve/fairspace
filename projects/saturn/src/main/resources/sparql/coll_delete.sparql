@@ -3,11 +3,15 @@
 PREFIX fs: <http://fairspace.io/ontology#>
 
 # Delete files and folders
-DELETE { ?s ?p ?o } WHERE {
-?param0 fs:filePath ?collPath .
+INSERT { ?s fs:dateDeleted ?date } WHERE {
+?param0 fs:filePath ?collPath;
+a fs:Collection.
 ?s ?p ?o;
 fs:filePath ?path .
-FILTER(STRSTARTS(?path, CONCAT(?collPath, '/'))) };
+FILTER(STRSTARTS(?path, CONCAT(?collPath, '/')))
+BIND(NOW() as ?date)
+};
 
 # Delete the collection
-DELETE WHERE { ?param0 ?s ?p; a fs:Collection; };
+INSERT { ?param0 fs:dateDeleted ?date; }
+WHERE { ?param0 a fs:Collection. BIND(NOW() as ?date)};
