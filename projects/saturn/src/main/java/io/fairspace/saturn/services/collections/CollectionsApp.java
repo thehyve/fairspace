@@ -6,8 +6,7 @@ import io.fairspace.saturn.auth.SecurityUtil;
 import org.apache.jena.rdfconnection.RDFConnection;
 import spark.servlet.SparkApplication;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
@@ -41,9 +40,14 @@ public class CollectionsApp implements SparkApplication {
             put("/", (req, res) -> {
                 var template = mapper.readValue(req.body(), Collection.class);
                 var result = service.create(template);
-                res.status(SC_CREATED);
-                res.type(APPLICATION_JSON.asString());
-                return mapper.writeValueAsString(result);
+                if (result == null) {
+                    res.status(SC_CONFLICT);
+                    return "";
+                } else {
+                    res.status(SC_CREATED);
+                    res.type(APPLICATION_JSON.asString());
+                    return mapper.writeValueAsString(result);
+                }
             });
             patch("/", (req, res) -> {
                 var collection = mapper.readValue(req.body(), Collection.class);

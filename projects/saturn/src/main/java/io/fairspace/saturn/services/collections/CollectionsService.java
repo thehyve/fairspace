@@ -5,8 +5,6 @@ import io.fairspace.saturn.util.Ref;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -16,6 +14,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.system.Txn.calculateWrite;
 
 public class CollectionsService {
     private final RDFConnection rdf;
@@ -35,7 +34,7 @@ public class CollectionsService {
         validate(template.getCreator() == null, "Field creator must not be left empty");
         validate(template.getDirectoryName() != null, "Field directoryName must be set");
         validate(isDirectoryNameValid(template.getDirectoryName()), "Invalid directoryName");
-        validate(template.getPrettyName() != null, "Field prettyName must be set");
+        validate(template.getPrettyName() != null && !template.getPrettyName().isEmpty(), "Field prettyName must be set");
         validate(template.getType() != null, "Field type must be set");
 
 
@@ -53,17 +52,23 @@ public class CollectionsService {
             }
         }
 
-        withCommitMessage("Create collection " + collection.getPrettyName(),
-                () -> rdf.update(storedQuery("coll_create",
-                        createResource(collection.getUri()),
-                        collection.getPrettyName(),
-                        collection.getDirectoryName(),
-                        collection.getDescription(),
-                        collection.getType(),
-                        collection.getCreator())));
+        return withCommitMessage("Create collection " + collection.getPrettyName(), () ->
+                calculateWrite(rdf, () -> {
+                    var exists = new Ref<>(false);
+                    rdf.querySelect(storedQuery("fs_stat", collection.getDirectoryName()), row -> exists.value = true);
+                    if (exists.value) {
+                        return null;
+                    }
 
-
-        return collection;
+                    rdf.update(storedQuery("coll_create",
+                            createResource(collection.getUri()),
+                            collection.getPrettyName(),
+                            collection.getDirectoryName(),
+                            collection.getDescription(),
+                            collection.getType(),
+                            collection.getCreator()));
+                    return collection;
+                }));
     }
 
     public Collection get(String iri) {
@@ -89,13 +94,30 @@ public class CollectionsService {
                 () -> rdf.update(storedQuery("coll_delete", createResource(iri))));
     }
 
-    public Collection update(Collection collection) {
-        withCommitMessage("Update collection " + collection.getUri(),
-                () -> rdf.update(storedQuery("coll_update",
-                        createResource(collection.getUri()),
-                        collection.getPrettyName(),
-                        collection.getDescription())));
-        return get(collection.getUri());
+    public Collection update(Collection patch) {
+        validate(patch.getUri() != null, "No URI");
+        validate(patch.getCreator() == null, "Field creator must not be left empty");
+
+
+        return withCommitMessage("Update collection " + patch.getPrettyName(), () ->
+                calculateWrite(rdf, () -> {
+                    var existing = get(patch.getUri());
+                    if (existing == null) {
+                        return null;
+                    }
+
+                    validate(patch.getType() == null || patch.getType().equals(existing.getType()),
+                            "Cannot change collection's type");
+
+                    rdf.update(storedQuery("coll_update",
+                            createResource(patch.getUri()),
+                            patch.getPrettyName() != null ? patch.getPrettyName() : existing.getPrettyName(),
+                            patch.getDescription() != null ? patch.getDescription() : existing.getDescription(),
+                            patch.getDirectoryName() != null ? patch.getDirectoryName() : existing.getDirectoryName()));
+
+                    return get(patch.getUri());
+                })
+        );
     }
 
     private static Collection toCollection(QuerySolution row) {
@@ -111,7 +133,8 @@ public class CollectionsService {
 
     private static boolean isDirectoryNameValid(String name) {
         return name.indexOf('\u0000') < 0
-                && name.length() < 128
-                && new File(name).getParent() == null;
+                && name.indexOf('/') < 0
+                && name.indexOf('\\') < 0
+                && name.length() < 128;
     }
 }
