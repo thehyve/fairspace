@@ -1,9 +1,8 @@
 import React from 'react';
-import Icon from "@material-ui/core/Icon";
-import IconButton from "@material-ui/core/IconButton";
-import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
-import Badge from "@material-ui/core/Badge";
 import {connect} from 'react-redux';
+import {Icon, IconButton, Badge} from "@material-ui/core";
+import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
+
 import {CreateDirectoryButton, UploadButton, ErrorDialog, LoadingOverlay} from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
@@ -11,7 +10,7 @@ import {uniqueName} from "../../utils/fileUtils";
 
 function FileOperations(props) {
     const {
-        numClipboardItems, disabled, creatingDirectory,
+        clipboardItemsCount, disabled, creatingDirectory,
         openedPath, selectedPaths, openedCollection,
         fetchFilesIfNeeded, uploadFiles, createDirectory,
         cut, copy, paste, existingFiles
@@ -78,6 +77,9 @@ function FileOperations(props) {
         return children;
     }
 
+    const buttonColor = disabled ? 'default' : 'secondary';
+    const noSelectedPath = selectedPaths.length === 0;
+
     return creatingDirectory
         ? <LoadingOverlay loading={creatingDirectory} />
         : (
@@ -86,7 +88,8 @@ function FileOperations(props) {
                     aria-label="Copy"
                     title="Copy"
                     onClick={handleCopy}
-                    disabled={selectedPaths.length === 0 || disabled}
+                    disabled={noSelectedPath || disabled}
+                    color={buttonColor}
                 >
                     <ContentCopy />
                 </IconButton>
@@ -94,7 +97,8 @@ function FileOperations(props) {
                     aria-label="Cut"
                     title="Cut"
                     onClick={handleCut}
-                    disabled={selectedPaths.length === 0 || disabled}
+                    disabled={noSelectedPath || disabled}
+                    color={buttonColor}
                 >
                     <ContentCut />
                 </IconButton>
@@ -102,31 +106,38 @@ function FileOperations(props) {
                     aria-label="Paste"
                     title="Paste"
                     onClick={handlePaste}
-                    disabled={numClipboardItems === 0 || disabled}
+                    disabled={clipboardItemsCount === 0 || disabled}
+                    color={buttonColor}
                 >
                     {addBadgeIfNotEmpty(
-                        numClipboardItems,
+                        clipboardItemsCount,
                         <ContentPaste />
                     )}
                 </IconButton>
                 <CreateDirectoryButton
-                    aria-label="Create directory"
-                    title="Create directory"
-                    onCreate={name => handleCreateDirectory(name)}
-                    disabled={disabled}
+                    onCreate={handleCreateDirectory}
                 >
-                    <Icon>create_new_folder</Icon>
+                    <IconButton
+                        aria-label="Create directory"
+                        title="Create directory"
+                        disabled={disabled}
+                        color={buttonColor}
+                    >
+                        <Icon>create_new_folder</Icon>
+                    </IconButton>
                 </CreateDirectoryButton>
-
                 <UploadButton
-                    color="primary"
-                    aria-label="Upload"
-                    title="Upload"
-                    onUpload={files => handleUpload(files)}
+                    onUpload={handleUpload}
                     onDidUpload={refreshFiles}
-                    disabled={disabled}
                 >
-                    <Icon>cloud_upload</Icon>
+                    <IconButton
+                        title="Upload"
+                        aria-label="Upload"
+                        disabled={disabled}
+                        color={buttonColor}
+                    >
+                        <Icon>cloud_upload</Icon>
+                    </IconButton>
                 </UploadButton>
             </>
         );
@@ -134,7 +145,7 @@ function FileOperations(props) {
 
 const mapStateToProps = state => ({
     selectedPaths: state.collectionBrowser.selectedPaths,
-    numClipboardItems: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
+    clipboardItemsCount: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
     creatingDirectory: state.cache.filesByCollectionAndPath.creatingDirectory
 });
 

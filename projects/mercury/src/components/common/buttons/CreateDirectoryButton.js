@@ -1,37 +1,14 @@
 import React from 'react';
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
+import {
+    Dialog, DialogTitle, DialogContent,
+    DialogActions, Button, TextField
+} from "@material-ui/core";
 
 class CreateDirectoryButton extends React.Component {
-    constructor(props) {
-        super(props);
-        const {
-            onCreate,
-            children,
-            ...componentProps
-        } = props;
-
-        this.onCreate = onCreate;
-        this.componentProps = componentProps;
-
-        this.state = {
-            creating: false,
-            name: ''
-        };
-    }
-
-    componentWillReceiveProps(props) {
-        if (props.onCreate) this.onCreate = props.onCreate;
-
-        this.setState({
-            creating: false
-        });
-    }
+    state = {
+        creating: false,
+        name: ''
+    };
 
     openDialog = (e) => {
         e.stopPropagation();
@@ -45,28 +22,23 @@ class CreateDirectoryButton extends React.Component {
 
     createDirectory = (e) => {
         e.stopPropagation();
-        if (this.onCreate) {
-            this
-                .onCreate(this.state.name)
-                .then(shouldClose => shouldClose && this.closeDialog.bind(this));
-        }
-    }
 
-    handleInputChange = (event) => {
-        const newValues = {};
-        newValues[event.target.name] = event.target.value;
-        this.setState(newValues);
+        this.props.onCreate(this.state.name)
+            .then(shouldClose => shouldClose && this.closeDialog());
     }
 
     render() {
+        const {children} = this.props;
+        const {creating, name} = this.state;
+
         return (
-            <div style={{display: 'inline'}}>
-                <IconButton {...this.componentProps} onClick={this.openDialog}>
-                    {this.props.children}
-                </IconButton>
+            <>
+                <span onClick={this.openDialog}>
+                    {children}
+                </span>
 
                 <Dialog
-                    open={this.state.creating}
+                    open={creating}
                     onClick={e => e.stopPropagation()}
                     onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
@@ -78,18 +50,18 @@ class CreateDirectoryButton extends React.Component {
                             margin="dense"
                             id="name"
                             label="Name"
-                            value={this.state.name}
+                            value={name}
                             name="name"
-                            onChange={this.handleInputChange}
+                            onChange={event => this.setState({name: event.target.value})}
                             fullWidth
                         />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.closeDialog} color="secondary">Close</Button>
-                        <Button onClick={this.createDirectory} color="primary" disabled={!this.state.name}>Create</Button>
+                        <Button onClick={this.createDirectory} color="primary" disabled={!name}>Create</Button>
                     </DialogActions>
                 </Dialog>
-            </div>
+            </>
         );
     }
 }
