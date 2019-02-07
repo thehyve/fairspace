@@ -1,6 +1,8 @@
 package io.fairspace.saturn;
 
 
+import org.apache.jena.query.text.es.ESSettings;
+
 public class Config {
     public String baseURI = "http://localhost";
 
@@ -18,6 +20,13 @@ public class Config {
         public String transactionLogPath = "data/log";
 
         public String vocabularyURI = "http://fairspace.io/vocabulary#";
+
+        public ElasticSearch elasticSearch = new ElasticSearch();
+
+        public static class ElasticSearch {
+            public boolean enabled = false;
+            public ESSettings settings = new ESSettings.Builder().hostAndPort("localhost", 9300).build();
+        }
     }
 
     public static class Auth {
