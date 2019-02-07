@@ -5,12 +5,15 @@ import io.fairspace.saturn.util.Ref;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
@@ -28,9 +31,13 @@ public class CollectionsService {
     }
 
     public Collection create(Collection template) {
-        if (template.getUri() != null) {
-            throw new IllegalArgumentException("Id shouldn't be set");
-        }
+        validate(template.getUri() == null, "Field uri must not be left empty");
+        validate(template.getCreator() == null, "Field creator must not be left empty");
+        validate(template.getDirectoryName() != null, "Field directoryName must be set");
+        validate(isDirectoryNameValid(template.getDirectoryName()), "Invalid directoryName");
+        validate(template.getPrettyName() != null, "Field prettyName must be set");
+        validate(template.getType() != null, "Field type must be set");
+
 
         var collection = new Collection();
         collection.setUri(baseIRI + randomUUID());
@@ -100,5 +107,11 @@ public class CollectionsService {
         collection.setDescription(row.getLiteral("description").getString());
         collection.setCreator(row.getLiteral("createdBy").getString());
         return collection;
+    }
+
+    private static boolean isDirectoryNameValid(String name) {
+        return name.indexOf('\u0000') < 0
+                && name.length() < 128
+                && new File(name).getParent() == null;
     }
 }

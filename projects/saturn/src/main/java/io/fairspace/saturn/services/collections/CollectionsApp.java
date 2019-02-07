@@ -68,5 +68,9 @@ public class CollectionsApp implements SparkApplication {
             res.body("Invalid request body");
             res.status(SC_BAD_REQUEST);
         });
+        exception(IllegalArgumentException.class, (e, req, res) -> {
+            res.body(e.getMessage());
+            res.status(SC_BAD_REQUEST);
+        });
     }
 }
