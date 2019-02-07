@@ -34,7 +34,8 @@ public class CollectionsService {
 
         var collection = new Collection();
         collection.setUri(baseIRI + randomUUID());
-        collection.setName(template.getName());
+        collection.setPrettyName(template.getPrettyName());
+        collection.setDirectoryName(template.getDirectoryName());
         collection.setDescription(template.getDescription() != null ? template.getDescription() : "");
         collection.setType(template.getType());
         collection.setCreator("");
@@ -45,9 +46,14 @@ public class CollectionsService {
             }
         }
 
-        withCommitMessage("Create collection " + collection.getName(),
+        withCommitMessage("Create collection " + collection.getPrettyName(),
                 () -> rdf.update(storedQuery("coll_create",
-                        createResource(collection.getUri()), collection.getName(), collection.getDescription(), collection.getType(), collection.getCreator())));
+                        createResource(collection.getUri()),
+                        collection.getPrettyName(),
+                        collection.getDirectoryName(),
+                        collection.getDescription(),
+                        collection.getType(),
+                        collection.getCreator())));
 
 
         return collection;
@@ -78,7 +84,10 @@ public class CollectionsService {
 
     public Collection update(Collection collection) {
         withCommitMessage("Update collection " + collection.getUri(),
-                () -> rdf.update(storedQuery("coll_update", createResource(collection.getUri()), collection.getName(), collection.getDescription())));
+                () -> rdf.update(storedQuery("coll_update",
+                        createResource(collection.getUri()),
+                        collection.getPrettyName(),
+                        collection.getDescription())));
         return get(collection.getUri());
     }
 
@@ -86,7 +95,8 @@ public class CollectionsService {
         var collection = new Collection();
         collection.setUri(row.getResource("iri").toString());
         collection.setType(row.getLiteral("type").getString());
-        collection.setName(row.getLiteral("name").getString());
+        collection.setPrettyName(row.getLiteral("name").getString());
+        collection.setDirectoryName(row.getLiteral("path").getString());
         collection.setDescription(row.getLiteral("description").getString());
         collection.setCreator(row.getLiteral("createdBy").getString());
         return collection;

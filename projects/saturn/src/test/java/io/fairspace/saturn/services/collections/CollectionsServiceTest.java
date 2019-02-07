@@ -18,14 +18,16 @@ public class CollectionsServiceTest {
         assertTrue(service.list().isEmpty());
 
         var c1 = new Collection();
-        c1.setName("c1");
+        c1.setPrettyName("c1");
+        c1.setDirectoryName("dir1");
         c1.setDescription("descr");
         c1.setType("LOCAL");
 
         var created1 = service.create(c1);
         assertTrue(created1.getUri().startsWith("http://example.com/iri/"));
-        assertEquals(c1.getName(), created1.getName());
+        assertEquals(c1.getPrettyName(), created1.getPrettyName());
         assertEquals(c1.getDescription(), created1.getDescription());
+        assertEquals(c1.getDirectoryName(), created1.getDirectoryName());
         assertEquals(c1.getType(), created1.getType());
         assertEquals("userId", created1.getCreator());
 
@@ -36,16 +38,17 @@ public class CollectionsServiceTest {
 
         var patch = new Collection();
         patch.setUri(created1.getUri());
-        patch.setName("new name");
+        patch.setPrettyName("new name");
         patch.setDescription("new descr");
         service.update(patch);
 
         var updated = service.get(created1.getUri());
-        assertEquals("new name", updated.getName());
+        assertEquals("new name", updated.getPrettyName());
         assertEquals("new descr", updated.getDescription());
 
         var c2 = new Collection();
-        c2.setName("c2");
+        c2.setPrettyName("c2");
+        c2.setDirectoryName("dir2");
         c2.setDescription("blah");
         c2.setType("LOCAL");
         var created2 = service.create(c2);
