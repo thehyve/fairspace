@@ -12,7 +12,8 @@ import io.milton.resource.*;
 import java.io.IOException;
 import java.util.Date;
 
-import static io.fairspace.saturn.vfs.PathUtils.*;
+import static io.fairspace.saturn.vfs.PathUtils.name;
+import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 
 public abstract class VfsBackedMiltonResource  implements Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, Comparable<Resource> {
     protected final VirtualFileSystem fs;

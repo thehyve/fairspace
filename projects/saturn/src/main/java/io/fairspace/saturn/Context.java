@@ -4,7 +4,6 @@ import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.HttpConnection;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;

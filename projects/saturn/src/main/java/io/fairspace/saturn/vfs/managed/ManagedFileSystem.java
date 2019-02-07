@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.StoredQueries.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static java.util.UUID.randomUUID;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -64,9 +66,20 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        var topLevel = splitPath(path).length == 1;
+        var isCollection = splitPath(path).length == 1;
+        if (isCollection) {
+            // TODO: Should be denied but very convenient for testing
+            withCommitMessage("Create collection " + path, () ->
+                    rdf.update(storedQuery("coll_create",
+                    createResource(baseUri + randomUUID()),
+                    path,
+                    path,
+                    "Describe me",
+                    "LOCAL",
+                    userId())));
+        }
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", baseUri, topLevel ? FS.Collection : FS.Directory, path, userId())));
+                () -> rdf.update(storedQuery("fs_mkdir", baseUri, isCollection ? FS.Collection : FS.Directory, path, userId())));
     }
 
     @Override

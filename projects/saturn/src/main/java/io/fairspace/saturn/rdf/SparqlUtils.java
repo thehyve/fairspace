@@ -6,18 +6,16 @@ import org.apache.jena.iri.IRI;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.RDFNode;
 
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class StoredQueries {
-    private static final ConcurrentHashMap<String, String> queries = new ConcurrentHashMap<>();
+public class SparqlUtils {
+    private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
 
-    public static String storedQuery(String name, Object... args) {
-        var template = queries.computeIfAbsent(name, StoredQueries::load);
+    public static String formatQuery(String template, Object... args) {
         var sparql = new ParameterizedSparqlString(template);
 
         for (var i = 0; i < args.length; i++) {
@@ -54,9 +52,14 @@ public class StoredQueries {
         return sparql.toString();
     }
 
+    public static String storedQuery(String name, Object... args) {
+        var template = storedQueries.computeIfAbsent(name, SparqlUtils::load);
+        return formatQuery(template, args);
+    }
+
     private static String load(String name) {
         try {
-            return IOUtils.toString(StoredQueries.class.getResourceAsStream("/sparql/" + name + ".sparql"), "UTF-8");
+            return IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), "UTF-8");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -4,14 +4,14 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 
-class VocabularyAPI {
+class VocabularyService {
 
     private final RDFConnection rdfConnection;
     private final String vocabularyUri;
 
-    VocabularyAPI(RDFConnection rdfConnection, String vocabularyUri) {
+    VocabularyService(RDFConnection rdfConnection, String baseURI) {
         this.rdfConnection = rdfConnection;
-        this.vocabularyUri = vocabularyUri;
+        this.vocabularyUri = baseURI + "vocabulary";
     }
 
     Model getVocabulary() {

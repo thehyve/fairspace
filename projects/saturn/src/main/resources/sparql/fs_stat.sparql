@@ -1,6 +1,7 @@
 # Returns file info
 # param0 - path
 PREFIX fs: <http://fairspace.io/ontology#>
+
 SELECT ?iri ?path ?type ?size ?created ?modified ?createdBy ?modifiedBy
 WHERE { ?iri fs:filePath ?param0; a ?type; fs:fileSize ?size; fs:dateCreated ?created; fs:dateModified ?modified; fs:createdBy ?createdBy; fs:modifiedBy ?modifiedBy.
 BIND(?param0 as ?path) FILTER NOT EXISTS { ?iri fs:dateDeleted ?dateDeleted } }

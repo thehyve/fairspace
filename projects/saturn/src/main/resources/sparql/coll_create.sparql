@@ -1,0 +1,26 @@
+# Creates a collection
+#
+# param0 - IRI
+# param1 - pretty name
+# param2 - directory name
+# param3 - description
+# param4 - type
+# param5 - creator
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+INSERT {
+  ?param0 a fs:Collection;
+  rdfs:label ?param1;
+  fs:filePath ?param2;
+  rdfs:comment ?param3;
+  fs:collectionType ?param4;
+  fs:fileSize 0;
+  fs:createdBy ?param5;
+  fs:dateCreated ?date;
+  fs:modifiedBy ?param5;
+  fs:dateModified ?date . }
+WHERE { BIND(NOW() as ?date) };
+
+
