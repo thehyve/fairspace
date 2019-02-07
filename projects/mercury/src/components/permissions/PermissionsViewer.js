@@ -19,7 +19,8 @@ class PermissionsViewer extends React.Component {
     state = {
         showPermissionDialog: false,
         showConfirmDeleteDialog: false,
-        selectedUser: null
+        selectedUser: null,
+        selectedPermission: null
     };
 
     componentDidMount() {
@@ -72,54 +73,67 @@ class PermissionsViewer extends React.Component {
     };
 
     handleCloseConfirmDeleteDialog = () => {
+        this.setState({showConfirmDeleteDialog: false});
+    };
+
+    handleMenuClick = (event, permission) => {
         this.setState({
-            showConfirmDeleteDialog: false,
+            anchorEl: event.currentTarget,
+            selectedPermission: permission
         });
     };
 
-    handleMenuClick = (event) => {
-        this.setState({anchorEl: event.currentTarget});
-    };
-
-    closeMenu = () => {
-        this.setState({anchorEl: null});
+    handleMenuClose = () => {
+        this.setState({
+            anchorEl: null,
+            selectedPermission: null
+        });
     };
 
     renderCollaboratorList(permissions) {
         const {canManage, currentUser} = this.props;
+        const {anchorEl, selectedPermission} = this.state;
+
+        const selectedPermissionKey = selectedPermission
+            ? selectedPermission.access + selectedPermission.collectionId + selectedPermission.subject
+            : null;
 
         return sortPermissions(permissions)
-            .map((p) => (
-                <ListItem
-                    key={p.access + p.collectionId + p.subject}
-                >
-                    <ListItemText primary={getDisplayName(p.user)} secondary={p.access} />
-                    <ListItemSecondaryAction>
-                        <IconButton
-                            onClick={this.handleMenuClick}
-                            disabled={!canAlterPermission(canManage, p, currentUser)}
-                        >
-                            <MoreIcon />
-                        </IconButton>
-                        <Menu
-                            id="more-menu"
-                            anchorEl={this.state.anchorEl}
-                            open={Boolean(this.state.anchorEl)}
-                        >
-                            <MenuItem
-                                onClick={() => this.handleAlterPermission(p)}
+            .map((p) => {
+                const key = p.access + p.collectionId + p.subject;
+                return (
+                    <ListItem
+                        key={key}
+                    >
+                        <ListItemText primary={getDisplayName(p.user)} secondary={p.access} />
+                        <ListItemSecondaryAction>
+                            <IconButton
+                                onClick={e => this.handleMenuClick(e, p)}
+                                disabled={!canAlterPermission(canManage, p, currentUser)}
                             >
-                                Change access
-                            </MenuItem>
-                            <MenuItem
-                                onClick={() => this.handleRemoveCollaborator(p)}
+                                <MoreIcon />
+                            </IconButton>
+                            <Menu
+                                id="more-menu"
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl) && key === selectedPermissionKey}
+                                onClose={this.handleMenuClose}
                             >
-                                Delete
-                            </MenuItem>
-                        </Menu>
-                    </ListItemSecondaryAction>
-                </ListItem>
-            ));
+                                <MenuItem
+                                    onClick={() => this.handleAlterPermission(p)}
+                                >
+                                    Change access
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={() => this.handleRemoveCollaborator(p)}
+                                >
+                                    Delete
+                                </MenuItem>
+                            </Menu>
+                        </ListItemSecondaryAction>
+                    </ListItem>
+                );
+            });
     }
 
     renderUserList = (permissions) => {
