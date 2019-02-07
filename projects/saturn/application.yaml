@@ -1,9 +1,9 @@
 baseURI: "http://localhost"
 port: 8080
 jena:
+  baseURI: "http://localhost/iri/"
   datasetPath: "data/db"
   transactionLogPath: "data/log"
-  vocabularyURI: "http://fairspace.io/vocabulary#"
   elasticSearch:
     enabled: false
     settings:
