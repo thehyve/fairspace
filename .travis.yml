@@ -58,6 +58,8 @@ jobs:
   include:
     - stage: build
       name: Build projects
+      install:
+      - 'if [[ "$SHOULD_RELEASE" ]] && [[ "$DEPLOY_PLATFORM" = "GCP" ]] ; then ci/gcp/install.sh ; ci/gcp/login.sh ; fi'
       script:
       - .travis/build.sh projects/oidc-auth
       - .travis/build.sh projects/callisto
