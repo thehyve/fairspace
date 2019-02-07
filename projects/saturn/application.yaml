@@ -5,14 +5,14 @@ jena:
   transactionLogPath: "data/log"
   vocabularyURI: "http://fairspace.io/vocabulary#"
   elasticSearch:
-    enabled: true
+    enabled: false
     settings:
       hostToPortMapping:
         localhost: 9300
       clusterName: "elasticsearch"
       shards: 1
       replicas: 1
-      indexName: "fs"
+      indexName: "fairspace"
 auth:
   authEnabled: false
   jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
