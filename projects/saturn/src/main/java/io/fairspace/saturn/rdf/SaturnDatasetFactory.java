@@ -26,7 +26,8 @@ public class SaturnDatasetFactory {
      * We're playing Russian dolls here.
      * The original TDB2 dataset graph, which in fact consists of a number of wrappers itself (Jena uses wrappers everywhere),
      * is wrapped with a number of wrapper classes, each adding a new feature.
-     * Currently it only adds transaction logging and inverse properties inference and applies default vocabulary if needed.
+     * Currently it adds transaction logging, ElasticSearch indexing (if enabled),
+     * inverse properties' inference, and applies default vocabulary if needed.
      */
     public static Dataset connect(Config.Jena config) {
         // Create a TDB2 dataset graph
@@ -36,8 +37,10 @@ public class SaturnDatasetFactory {
         var txnLog = new LocalTransactionLog(new File(config.transactionLogPath), new SparqlTransactionCodec());
         dsg = new TxnLogDatasetGraph(dsg, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
+        // ElasticSearch
         if (config.elasticSearch.enabled) {
-            dsg = TextDatasetFactory.create(dsg, createESIndex(new TextIndexConfig(new AutoEntityDefinition()), config.elasticSearch.settings));
+            var textIndex = createESIndex(new TextIndexConfig(new AutoEntityDefinition()), config.elasticSearch.settings);
+            dsg = TextDatasetFactory.create(dsg, textIndex);
         }
 
         // Add property inversion
