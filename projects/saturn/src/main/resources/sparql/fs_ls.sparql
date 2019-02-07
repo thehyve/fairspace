@@ -5,4 +5,6 @@ PREFIX fs: <http://fairspace.io/ontology#>
 
 SELECT ?iri ?type ?path ?size ?created ?modified ?createdBy ?modifiedBy
 WHERE { ?iri fs:filePath ?path ; a ?type; fs:fileSize ?size; fs:dateCreated ?created; fs:dateModified ?modified; fs:createdBy ?createdBy; fs:modifiedBy ?modifiedBy.
-FILTER(STRSTARTS(?path, ?param0) && !CONTAINS(SUBSTR(?path, STRLEN(?param0) + 1), '/')) }
+FILTER(STRSTARTS(?path, ?param0) && !CONTAINS(SUBSTR(?path, STRLEN(?param0) + 1), '/'))
+FILTER NOT EXISTS { ?iri fs:dateDeleted ?dateDeleted }
+}

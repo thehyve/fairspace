@@ -8,8 +8,9 @@ export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
 
 # If we are building a PR, use the target branch as 'commit range'.
 # As it is used with `git diff ...`, it will trigger all files that
-# have updated in the complete pull request
-if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
+# have updated in the complete pull request. We also need to do this
+# in branches that have just one commit.
+if [[ "$TRAVIS_PULL_REQUEST" != "false" ]] || [[ -z "$TRAVIS_COMMIT_RANGE" ]] ; then
   COMMIT_TRIGGER=$TRAVIS_BRANCH
 else
   COMMIT_TRIGGER=$TRAVIS_COMMIT_RANGE

@@ -130,7 +130,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public void delete(String path) throws IOException {
         withCommitMessage("Delete " + path,
-                () -> rdf.update(storedQuery("fs_delete", path)));
+                () -> rdf.update(storedQuery("fs_delete", path, userId())));
     }
 
     @Override
