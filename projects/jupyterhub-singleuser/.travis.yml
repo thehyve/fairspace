@@ -22,6 +22,7 @@ env:
 
 before_install:
 - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
+- 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export DEPLOY_PLATFORM="gcp"; fi'
 - source ./ci/setup_env.sh
 
 jobs:
@@ -30,6 +31,8 @@ jobs:
     name: Build and optionally push docker image
     services:
     - docker
+    install:
+    - 'if [[ "$SHOULD_RELEASE" ]] && [[ "$DEPLOY_PLATFORM" = "GCP" ]] ; then ci/gcp/install.sh ; ci/gcp/login.sh ; fi'
     script:
     - ./ci/docker/build.sh
     - 'if [[ $SHOULD_RELEASE ]]; then ./ci/docker/release.sh; fi'
