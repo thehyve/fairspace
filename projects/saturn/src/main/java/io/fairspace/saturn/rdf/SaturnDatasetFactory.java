@@ -5,6 +5,7 @@ import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.commits.CommitMessages;
 import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
 import io.fairspace.saturn.rdf.search.AutoEntityDefinition;
+import io.fairspace.saturn.rdf.search.SmartTextDocProducer;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
@@ -40,7 +41,7 @@ public class SaturnDatasetFactory {
         // ElasticSearch
         if (config.elasticSearch.enabled) {
             var textIndex = createESIndex(new TextIndexConfig(new AutoEntityDefinition()), config.elasticSearch.settings);
-            dsg = TextDatasetFactory.create(dsg, textIndex);
+            dsg = TextDatasetFactory.create(dsg, textIndex, true, new SmartTextDocProducer(textIndex));
         }
 
         // Add property inversion
