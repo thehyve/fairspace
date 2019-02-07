@@ -9,5 +9,14 @@ export default createMuiTheme({
     palette: {
         primary: indigo,
         secondary: pink
+    },
+    props: {
+        MuiPaper: {
+            square: true,
+            elevation: 1
+        },
+        MuiMenu: {
+            elevation: 2
+        }
     }
 });

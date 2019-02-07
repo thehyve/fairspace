@@ -1,4 +1,4 @@
-FROM fairspace.azurecr.io/fairspace/jupyterhub-singleuser-base:0.3.2
+FROM eu.gcr.io/fairspace-207108/jupyterhub-singleuser-base:0.3.2
 
 USER root
 

@@ -15,8 +15,14 @@ if [[ $SHOULD_RELEASE ]]; then
        "$BUILD_SCRIPTS_DIR/az/login.sh"
   fi
 
+  echo "Adding helm repositories ..."
+  "$BUILD_SCRIPTS_DIR/helm/add_repos.sh"
+
+  echo "Installing kubectl ..."
   "$BUILD_SCRIPTS_DIR/k8s/install_kubectl.sh"
   export PATH="$HOME/downloads/v${KUBECTL_VERSION}:$PATH"
+
+  echo "Configuring kubectl"
   "$BUILD_SCRIPTS_DIR/k8s/config_kubectl.sh"
   "$BUILD_SCRIPTS_DIR/k8s/switch_context.sh"
 
