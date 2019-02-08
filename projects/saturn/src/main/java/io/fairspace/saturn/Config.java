@@ -7,8 +7,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.query.text.es.ESSettings;
 
 public class Config {
-    public String baseURI = "http://localhost";
-
     public int port = 8080;
 
     public Jena jena = new Jena();
