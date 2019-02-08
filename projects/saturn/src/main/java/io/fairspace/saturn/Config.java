@@ -27,7 +27,7 @@ public class Config {
         public ElasticSearch elasticSearch = new ElasticSearch();
 
         public static class ElasticSearch {
-            public boolean enabled = false;
+            public boolean enabled = true;
             public ESSettings settings = new ESSettings.Builder()
                     .clusterName("fairspace")
                     .hostAndPort("localhost", 9300)

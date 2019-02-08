@@ -9,10 +9,9 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
-    baseURI: {{ template "workspace.url" . }}/iri/
     port: 8080
     jena:
-      baseURI: "http://localhost/iri/"
+      baseURI: {{ template "workspace.url" . }}/iri/
       datasetPath: "/data/db"
       transactionLogPath: "/data/store/log"
       elasticSearch:
