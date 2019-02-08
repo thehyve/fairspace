@@ -9,12 +9,24 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
+    baseURI: {{ template "workspace.url" . }}/iri/
     port: 8080
     jena:
-      datasetPath: /data/db
-      transactionLogPath: /data/files/log
-      vocabularyURI: {{ template "workspace.url" . }}/ontology#
+      baseURI: "http://localhost/iri/"
+      datasetPath: "/data/db"
+      transactionLogPath: "/data/store/log"
+      elasticSearch:
+        enabled: false
+        settings:
+          hostToPortMapping:
+            localhost: 9300
+          clusterName: "elasticsearch"
+          shards: 1
+          replicas: 1
+          indexName: "fairspace"
     auth:
       authEnabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
-      jwtAlgorithm: RS256
+      jwtAlgorithm: "RS256"
+    webDAV:
+      blobStorePath: "/data/store/blobs"
