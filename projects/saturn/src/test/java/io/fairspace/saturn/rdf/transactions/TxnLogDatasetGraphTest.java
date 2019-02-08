@@ -7,6 +7,7 @@ import org.apache.jena.sparql.core.Quad;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,24 @@ public class TxnLogDatasetGraphTest {
     @Before
     public void before() {
         transactions = new ArrayList<>();
-        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), transactions::add, null, null));
+        var transactionLog = new TransactionLog() {
+
+            @Override
+            public void log(TransactionRecord transaction) throws IOException {
+                transactions.add(transaction);
+            }
+
+            @Override
+            public long size() throws IOException {
+                return transactions.size();
+            }
+
+            @Override
+            public TransactionRecord get(long index) throws IOException {
+                return transactions.get((int) index);
+            }
+        };
+        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), transactionLog, null, null));
     }
 
 

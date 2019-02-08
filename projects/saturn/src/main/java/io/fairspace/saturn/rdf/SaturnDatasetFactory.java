@@ -15,9 +15,8 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
 
-import java.io.File;
-
 import static io.fairspace.saturn.rdf.Vocabulary.initVocabulary;
+import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.text.es.TextESDatasetFactory.createESIndex;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
@@ -33,11 +32,18 @@ public class SaturnDatasetFactory {
      * inverse properties' inference, and applies default vocabulary if needed.
      */
     public static Dataset connect(Config.Jena config) {
+        var restoreNeeded = !config.datasetPath.exists();
+
         // Create a TDB2 dataset graph
-        var dsg = connectDatasetGraph(config.datasetPath);
+        var dsg = connectDatasetGraph(config.datasetPath.getAbsolutePath());
+
+        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
+
+        if (restoreNeeded) {
+            restore(dsg, txnLog);
+        }
 
         // Add transaction log
-        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath), new SparqlTransactionCodec());
         dsg = new TxnLogDatasetGraph(dsg, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
         // ElasticSearch

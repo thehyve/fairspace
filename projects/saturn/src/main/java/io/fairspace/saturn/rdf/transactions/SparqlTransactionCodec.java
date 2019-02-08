@@ -2,14 +2,11 @@ package io.fairspace.saturn.rdf.transactions;
 
 
 import org.apache.jena.atlas.io.IndentedWriter;
-import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 import org.apache.jena.sparql.modify.request.UpdateDataInsert;
 import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateRequest;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class SparqlTransactionCodec implements TransactionCodec {
@@ -35,10 +32,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
             }
             writer.write('\n');
 
-            var updateDataDelete = new UpdateDataDelete(new QuadDataAcc(new ArrayList<>(transaction.getDeleted())));
-            var updateDataInsert = new UpdateDataInsert(new QuadDataAcc(new ArrayList<>(transaction.getAdded())));
-
-            new UpdateRequest().add(updateDataDelete).add(updateDataInsert).output(writer);
+            transaction.asUpdateRequest().output(writer);
             writer.write("\n# The End\n");
         } catch (RuntimeException e) {
             throw new IOException(e);

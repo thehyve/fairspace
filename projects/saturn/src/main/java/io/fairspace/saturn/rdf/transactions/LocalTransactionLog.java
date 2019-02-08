@@ -1,9 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -74,14 +71,30 @@ public class LocalTransactionLog implements TransactionLog {
     @Override
     public void log(TransactionRecord transaction) throws IOException {
         var transactionNumber = counter.getAndIncrement();
+        var f = file(transactionNumber);
+        try (var out = new BufferedOutputStream(new FileOutputStream(f))) {
+            transactionCodec.write(transaction, out);
+        }
+    }
+
+    @Override
+    public long size() {
+        return counter.get();
+    }
+
+    @Override
+    public TransactionRecord get(long index) throws IOException {
+        try (var in = new BufferedInputStream(new FileInputStream(file(index)))) {
+            return transactionCodec.read(in);
+        }
+    }
+
+    private File file(long transactionNumber) {
         var volumeNumber = transactionNumber / CHAPTERS_PER_VOLUME / RECORDS_PER_CHAPTER + 1;
         var volume = new File(directory, VOLUME_PREFIX + volumeNumber);
         var chapterNumber = transactionNumber / RECORDS_PER_CHAPTER + 1;
         var chapter = new File(volume, CHAPTER_PREFIX + chapterNumber);
         chapter.mkdirs();
-        var record = new File(chapter, RECORD_PREFIX + (transactionNumber + 1));
-        try (var out = new BufferedOutputStream(new FileOutputStream(record))) {
-            transactionCodec.write(transaction, out);
-        }
+        return new File(chapter, RECORD_PREFIX + (transactionNumber + 1));
     }
 }
