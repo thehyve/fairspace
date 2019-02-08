@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.query.text.es.ESSettings;
 
+import java.io.File;
+
 public class Config {
     public int port = 8080;
 
@@ -18,9 +20,9 @@ public class Config {
     public static class Jena {
         public String baseURI = "http://fairspace.io/iri/";
 
-        public String datasetPath = "data/db";
+        public File datasetPath = new File("data/db");
 
-        public String transactionLogPath = "data/log";
+        public File transactionLogPath = new File("data/log");
 
         public ElasticSearch elasticSearch = new ElasticSearch();
 
