@@ -41,5 +41,6 @@ const mapStateToProps = state => ({
     menuExpanded: state.ui.menuExpanded
 });
 
-// export default withStyles(styles)(Layout);
+// withRouter is needed here to rerender on route changes:
+// https://github.com/ReactTraining/react-router/blob/master/packages/react-router/docs/api/withRouter.md#important-note
 export default withRouter(connect(mapStateToProps)(withStyles(styles)(Layout)));

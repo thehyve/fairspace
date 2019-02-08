@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import {BreadCrumbs} from '../common';
 import InformationDrawer from '../common/InformationDrawer';
 import CollectionBrowser from "./CollectionBrowser";
-import * as consts from '../../constants.js';
+import * as consts from '../../constants';
 
 const collectionsPage = () => (
     <>

@@ -10,6 +10,7 @@ import {getLabel, navigableLink, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import {ErrorMessage, ErrorDialog, LoadingInlay, LoadingOverlay} from "../common";
+import history from '../../history';
 
 class MetadataEntities extends React.Component {
     componentDidMount() {
@@ -20,7 +21,7 @@ class MetadataEntities extends React.Component {
         this.props.createMetadataEntity(type, id)
             .then((res) => {
                 this.props.fetchAllEntitiesIfNeeded();
-                this.props.history.push(relativeLink(res.value));
+                history.push(relativeLink(res.value));
             })
             .catch(e => ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`));
     }

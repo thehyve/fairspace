@@ -1,5 +1,4 @@
 import React from 'react';
-import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
@@ -14,6 +13,7 @@ import * as collectionBrowserActions from "../../actions/collectionBrowserAction
 import * as collectionActions from "../../actions/collectionActions";
 import {findById} from "../../utils/arrayUtils";
 import Config from "../../services/Config/Config";
+import history from '../../history';
 
 class CollectionBrowser extends React.Component {
     state = {
@@ -37,7 +37,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionDoubleClick = (collection) => {
-        this.props.history.push(`/collections/${collection.id}`);
+        history.push(`/collections/${collection.id}`);
     }
 
     handleAddCollection = (name, description, type) => {
@@ -123,4 +123,4 @@ const mapDispatchToProps = {
     ...collectionBrowserActions
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CollectionBrowser));
+export default connect(mapStateToProps, mapDispatchToProps)(CollectionBrowser);

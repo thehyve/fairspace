@@ -1,7 +1,8 @@
 import React from 'react';
 import {Provider} from "react-redux";
-import {BrowserRouter as Router} from "react-router-dom";
+import {Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
+
 import {fetchAuthorizations, fetchUser} from "../actions/accountActions";
 import {fetchUsers, fetchWorkspace} from "../actions/workspaceActions";
 import configureStore from "../store/configureStore";
@@ -9,6 +10,7 @@ import Config from "../services/Config/Config";
 import theme from './App.theme';
 import Layout from "./common/Layout/Layout";
 import {LoadingInlay, ErrorDialog} from './common';
+import history from '../history';
 
 class App extends React.Component {
     cancellable = {
@@ -50,7 +52,7 @@ class App extends React.Component {
                 <MuiThemeProvider theme={theme}>
                     <Provider store={this.store}>
                         <ErrorDialog>
-                            <Router>
+                            <Router history={history}>
                                 <Layout />
                             </Router>
                         </ErrorDialog>

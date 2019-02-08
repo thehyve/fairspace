@@ -1,5 +1,4 @@
 import React from 'react';
-import {withRouter} from "react-router-dom";
 
 import {
     ErrorDialog, ErrorMessage,
@@ -10,6 +9,7 @@ import FileOperations from "./FileOperations";
 import {canWrite} from '../../utils/permissionUtils';
 import FileAPI from "../../services/FileAPI";
 import {joinPaths} from "../../utils/fileUtils";
+import history from '../../history';
 
 class FileBrowser extends React.Component {
     handlePathClick = (path) => {
@@ -61,7 +61,7 @@ class FileBrowser extends React.Component {
         const basePath = this.props.openedPath || '';
         const separator = basePath.endsWith('/') ? '' : '/';
         const fullPath = `/collections/${this.props.openedCollection.id}${basePath}${separator}${path}`;
-        this.props.history.push(fullPath);
+        history.push(fullPath);
         this.props.openPath(`/${this.props.openedCollection.location}${basePath}${separator}${path}`);
     }
 
@@ -108,4 +108,4 @@ class FileBrowser extends React.Component {
     }
 }
 
-export default withRouter(FileBrowser);
+export default FileBrowser;
