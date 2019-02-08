@@ -1,28 +1,28 @@
 # Moves a file or a directory from one location to another
-# param0 - from
-# param1 - to
+# 0 - from
+# 1 - to
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
 # Delete an existing "to" resource
 DELETE { ?s ?p ?o }
-WHERE { ?s fs:filePath ?param1 };
+WHERE { ?s fs:filePath ?1 };
 
 # Move the main resource
-DELETE { ?s fs:filePath ?param0 }
-INSERT { ?s fs:filePath ?param1 }
-WHERE { ?s fs:filePath ?param0 };
+DELETE { ?s fs:filePath ?0 }
+INSERT { ?s fs:filePath ?1 }
+WHERE { ?s fs:filePath ?0 };
 
 # Delete target's children
 DELETE { ?s ?p ?o }
 WHERE {
   ?s fs:filePath ?path .
-  FILTER(STRSTARTS(?path, CONCAT(?param1, '/')))
+  FILTER(STRSTARTS(?path, CONCAT(?1, '/')))
   ?s ?p ?o .
 };
 
 # Move the children
 DELETE { ?s fs:filePath ?path }
 INSERT { ?s fs:filePath ?newPath}
-WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?param0, '/')))
-BIND(CONCAT(?param1, '/', SUBSTR(?path, STRLEN(?param0) + 2)) as ?newPath) };
+WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?0, '/')))
+BIND(CONCAT(?1, '/', SUBSTR(?path, STRLEN(?0) + 2)) as ?newPath) };
