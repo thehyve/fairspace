@@ -1,10 +1,10 @@
 port: 8080
 jena:
-  baseURI: "http://localhost/iri/"
+  baseURI: "http://fairspace.io/iri/"
   datasetPath: "data/db"
   transactionLogPath: "data/log"
   elasticSearch:
-    enabled: false
+    required: false
     settings:
       hostToPortMapping:
         localhost: 9300

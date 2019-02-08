@@ -15,10 +15,10 @@ data:
       datasetPath: "/data/db"
       transactionLogPath: "/data/store/log"
       elasticSearch:
-        enabled: false
+        required: false
         settings:
           hostToPortMapping:
-            localhost: 9300
+            localhost: 9300 # TODO: fix me
           clusterName: "elasticsearch"
           shards: 1
           replicas: 1

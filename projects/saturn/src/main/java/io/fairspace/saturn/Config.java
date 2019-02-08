@@ -16,7 +16,7 @@ public class Config {
     public WebDAV webDAV = new WebDAV();
 
     public static class Jena {
-        public String baseURI = "http://localhost/iri/";
+        public String baseURI = "http://fairspace.io/iri/";
 
         public String datasetPath = "data/db";
 
@@ -25,7 +25,7 @@ public class Config {
         public ElasticSearch elasticSearch = new ElasticSearch();
 
         public static class ElasticSearch {
-            public boolean enabled = true;
+            public boolean required = true;
             public ESSettings settings = new ESSettings.Builder()
                     .clusterName("fairspace")
                     .hostAndPort("localhost", 9300)

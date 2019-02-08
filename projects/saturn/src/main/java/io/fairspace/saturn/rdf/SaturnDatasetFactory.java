@@ -9,6 +9,7 @@ import io.fairspace.saturn.rdf.search.SmartTextDocProducer;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
@@ -21,6 +22,7 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.text.es.TextESDatasetFactory.createESIndex;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
 
+@Slf4j
 public class SaturnDatasetFactory {
     /**
      * Returns a dataset to work with.
@@ -39,9 +41,14 @@ public class SaturnDatasetFactory {
         dsg = new TxnLogDatasetGraph(dsg, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
         // ElasticSearch
-        if (config.elasticSearch.enabled) {
+        try {
             var textIndex = createESIndex(new TextIndexConfig(new AutoEntityDefinition()), config.elasticSearch.settings);
             dsg = TextDatasetFactory.create(dsg, textIndex, true, new SmartTextDocProducer(textIndex));
+        } catch (Exception e) {
+            log.error("Error connecting to ElasticSearch", e);
+            if (config.elasticSearch.required) {
+                throw e; // Terminates Saturn
+            }
         }
 
         // Add property inversion
