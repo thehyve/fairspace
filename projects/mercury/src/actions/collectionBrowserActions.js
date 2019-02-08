@@ -1,13 +1,5 @@
 import * as actionTypes from "./actionTypes";
 
-export const openInfoDrawer = () => ({
-    type: actionTypes.OPEN_INFODRAWER
-});
-
-export const closeInfoDrawer = () => ({
-    type: actionTypes.CLOSE_INFODRAWER
-});
-
 export const openCollection = collectionId => ({
     type: actionTypes.OPEN_COLLECTION,
     collectionId

@@ -5,7 +5,6 @@ const defaultState = {
     selectedPaths: [],
     openedCollectionId: null,
     openedPath: null,
-    infoDrawerOpened: false,
     addingCollection: false,
     deletingCollection: false
 };
@@ -20,13 +19,11 @@ const collectionBrowser = (state = defaultState, action) => {
         case actionTypes.SELECT_COLLECTION:
             return {
                 ...state,
-                infoDrawerOpened: true,
                 selectedCollectionId: action.collectionId
             };
         case actionTypes.SELECT_PATH:
             return {
                 ...state,
-                infoDrawerOpened: true,
                 selectedPaths: (state.selectedPaths || []).concat(action.path)
             };
         case actionTypes.DESELECT_PATH:
@@ -61,16 +58,6 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 addingCollection: false
-            };
-        case actionTypes.OPEN_INFODRAWER:
-            return {
-                ...state,
-                infoDrawerOpened: true
-            };
-        case actionTypes.CLOSE_INFODRAWER:
-            return {
-                ...state,
-                infoDrawerOpened: false
             };
         case actionTypes.OPEN_PATH:
             return {
