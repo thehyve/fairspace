@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.riot.RiotException;
 import spark.servlet.SparkApplication;
@@ -8,11 +9,11 @@ import static io.fairspace.saturn.services.ModelUtils.fromJsonLD;
 import static io.fairspace.saturn.services.ModelUtils.toJsonLD;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
+import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
 public class MetadataApp implements SparkApplication {
-    private static final String METHOD_PATCH = "PATCH";
-
+    private final ObjectMapper mapper = new ObjectMapper();
     private final MetadataService api;
 
     public MetadataApp(RDFConnection rdfConnection) {
@@ -25,6 +26,10 @@ public class MetadataApp implements SparkApplication {
             get("/", (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
                 return toJsonLD(api.get(req.queryParams("subject"), req.queryParams("predicate"), req.queryParams("object")));
+            });
+            get("/entities", (req, res) -> {
+                res.type(APPLICATION_JSON.asString());
+                return mapper.writeValueAsString(api.getByType(req.queryParams("type")));
             });
             put("/", (req, res) -> {
                 api.put(fromJsonLD(req.body()));
@@ -46,6 +51,10 @@ public class MetadataApp implements SparkApplication {
             exception(RiotException.class, (e, req, res) -> {
                 res.status(SC_BAD_REQUEST);
                 res.body("Malformed request body");
+            });
+            exception(IllegalArgumentException.class, (e, req, res) -> {
+                res.status(SC_BAD_REQUEST);
+                res.body(e.getMessage());
             });
         });
     }

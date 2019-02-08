@@ -1,0 +1,6 @@
+# Select by mask
+# 0 - subject
+# 1 - predicate
+# 2 - object
+
+CONSTRUCT { ?0 ?1 ?2 . } WHERE { ?0 ?1 ?2 }

@@ -20,7 +20,11 @@ public class SparqlUtils {
 
         for (var i = 0; i < args.length; i++) {
             var arg = args[i];
-            var param = "param" + i;
+            if (arg == null) {
+                continue;
+            }
+
+            var param = Integer.toString(i);
 
             if (arg instanceof RDFNode) {
                 sparql.setParam(param, (RDFNode) arg);

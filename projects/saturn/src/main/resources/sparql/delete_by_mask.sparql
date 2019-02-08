@@ -1,0 +1,6 @@
+# Delete by mask
+# 0 - subject
+# 1 - predicate
+# 2 - object
+
+DELETE WHERE { ?0 ?1 ?2 }

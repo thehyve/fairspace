@@ -117,11 +117,11 @@ public class MetadataServiceTest {
         String query = MetadataService.createPatchQuery(asList(STMT1, STMT2));
         assertEquals("DELETE WHERE \n" +
                 "{\n" +
-                "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> ?o1 .\n" +
+                "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> ?o .\n" +
                 "} ;\n" +
                 "DELETE WHERE \n" +
                 "{\n" +
-                "  <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P1> ?o2 .\n" +
+                "  <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P1> ?o .\n" +
                 "} ;\n" +
                 "INSERT DATA {\n" +
                 "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> <http://fairspace.io/iri/S2> .\n" +

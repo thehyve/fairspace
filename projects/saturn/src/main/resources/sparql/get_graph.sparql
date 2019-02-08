@@ -1,0 +1,4 @@
+# Get a named graph
+# 0 - graph URI
+
+CONSTRUCT { ?s ?p ?o } WHERE { GRAPH ?0 { ?s ?p ?o } . }

@@ -1,13 +1,13 @@
 # Deletes a file or a directory
 #
-# param0 - path
-# param1 - deletedBy
+# 0 - path
+# 1 - deletedBy
 
 PREFIX fs: <http://fairspace.io/ontology#>
-INSERT { ?s fs:dateDeleted ?date; fs:deletedBy ?param1; } WHERE { ?s fs:filePath ?param0. BIND(NOW() as ?date) };
+INSERT { ?s fs:dateDeleted ?date; fs:deletedBy ?1; } WHERE { ?s fs:filePath ?0. BIND(NOW() as ?date) };
 # Delete directory content
-INSERT { ?s fs:dateDeleted ?date; fs:deletedBy ?param1; }
+INSERT { ?s fs:dateDeleted ?date; fs:deletedBy ?1; }
 WHERE { ?s ?p ?o; fs:filePath ?path .
-FILTER(STRSTARTS(?path, CONCAT(?param0, '/')))
+FILTER(STRSTARTS(?path, CONCAT(?0, '/')))
 FILTER NOT EXISTS { ?s fs:dateDeleted ?dateDeleted }
 BIND(NOW() as ?date) };
