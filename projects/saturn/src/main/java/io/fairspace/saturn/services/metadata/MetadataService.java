@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.metadata;
 import lombok.Value;
 import org.apache.jena.atlas.lib.Pair;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -29,8 +28,10 @@ class MetadataService {
     }
 
     Model get(String subject, String predicate, String object) {
-        var query = prepareQuery("CONSTRUCT { ?s ?p ?o . } WHERE { ?s ?p ?o . }", subject, predicate, object);
-        return rdf.queryConstruct(query);
+        return rdf.queryConstruct(storedQuery("select_by_mask",
+                subject != null ? createURI(subject) : null,
+                predicate != null ? createURI(predicate) : null,
+                object != null ? createURI(object) : null));
     }
 
     void put(Model model) {
@@ -38,8 +39,11 @@ class MetadataService {
     }
 
     void delete(String subject, String predicate, String object) {
-        var query = prepareQuery("DELETE WHERE { ?s ?p ?o . }", subject, predicate, object);
-        rdf.update(query);
+
+        rdf.update(storedQuery("delete_by_mask",
+                subject != null ? createURI(subject) : null,
+                predicate != null ? createURI(predicate) : null,
+                object != null ? createURI(object) : null));
     }
 
     void delete(Model model) {
@@ -77,21 +81,8 @@ class MetadataService {
                 .collect(toList());
     }
 
-    private static String prepareQuery(String template, String subject, String predicate, String object) {
-        var sparql = new ParameterizedSparqlString(template);
-        bindIri(sparql, "s", subject);
-        bindIri(sparql, "p", predicate);
-        bindIri(sparql, "o", object);
-        return sparql.toString();
-    }
-
-    private static void bindIri(ParameterizedSparqlString sparql, String variable, String iri) {
-        if (iri != null) {
-            sparql.setIri(variable, iri);
-        }
-    }
-
-    public List<EntityDTO> getByType(String type) {
+    // TODO: pagination, max results
+    List<EntityDTO> getByType(String type) {
         if (type == null) {
             throw new IllegalArgumentException("No entity type specified");
         }
