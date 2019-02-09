@@ -1,11 +1,9 @@
 # 0 - type
 
-PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?iri ?label ?comment
+CONSTRUCT {?s a ?0; rdfs:label ?l}
 WHERE {
-  ?iri a ?0;
-  OPTIONAL { ?iri rdfs:label ?label }
-  OPTIONAL { ?iri rdfs:comment ?comment }
+    {?s a ?0 }
+    OPTIONAL { ?s rdfs:label ?l}
 }
