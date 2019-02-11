@@ -13,8 +13,8 @@ import static spark.Spark.*;
 public class VocabularyApp implements SparkApplication {
     private final VocabularyService api;
 
-    public VocabularyApp(RDFConnection rdfConnection, String baseURI) {
-        this.api = new VocabularyService(rdfConnection, baseURI);
+    public VocabularyApp(RDFConnection rdfConnection) {
+        this.api = new VocabularyService(rdfConnection);
     }
 
     @Override
