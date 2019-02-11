@@ -22,7 +22,11 @@ public class MetadataApp implements SparkApplication {
         path("/api/meta", () -> {
             get("/", (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
-                return toJsonLD(api.get(req.queryParams("subject"), req.queryParams("predicate"), req.queryParams("object")));
+                return toJsonLD(api.get(
+                        req.queryParams("subject"),
+                        req.queryParams("predicate"),
+                        req.queryParams("object"),
+                        req.queryParams().contains("labels")));
             });
             get("/entities", (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
