@@ -1,6 +1,7 @@
 package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
@@ -34,12 +35,14 @@ public class ManagedFileSystem implements VirtualFileSystem {
     private final BlobStore store;
     private final String baseUri;
     private final Supplier<UserInfo> userInfoSupplier;
+    private final CollectionsService collections;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, String baseUri, Supplier<UserInfo> userInfoSupplier) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, String baseUri, Supplier<UserInfo> userInfoSupplier, CollectionsService collections) {
         this.rdf = rdf;
         this.store = store;
         this.baseUri = baseUri;
         this.userInfoSupplier = userInfoSupplier;
+        this.collections = collections;
     }
 
     @Override

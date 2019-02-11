@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vfs.managed;
 
+import io.fairspace.saturn.services.collections.CollectionsService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +22,9 @@ public class ManagedFileSystemTest {
     @Before
     public void before()  {
         var store = new MemoryBlobStore();
-        fs = new ManagedFileSystem(connect(createTxnMem()), store,"http://example.com/", null);
+        var rdf = connect(createTxnMem());
+        var collections = new CollectionsService(rdf, "http://example.com/", null);
+        fs = new ManagedFileSystem(rdf, store,"http://example.com/", null, collections);
     }
 
     @Test

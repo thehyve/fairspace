@@ -2,8 +2,6 @@ package io.fairspace.saturn.services.collections;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fairspace.saturn.auth.SecurityUtil;
-import org.apache.jena.rdfconnection.RDFConnection;
 import spark.servlet.SparkApplication;
 
 import static javax.servlet.http.HttpServletResponse.*;
@@ -14,8 +12,8 @@ public class CollectionsApp implements SparkApplication {
     private final CollectionsService service;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public CollectionsApp(RDFConnection rdf, String baseURI) {
-        this.service = new CollectionsService(rdf, baseURI, SecurityUtil::userInfo);
+    public CollectionsApp(CollectionsService service) {
+        this.service = service;
     }
 
     @Override
