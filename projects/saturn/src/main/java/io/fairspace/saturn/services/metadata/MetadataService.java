@@ -26,8 +26,9 @@ class MetadataService {
         this.rdf = rdf;
     }
 
-    Model get(String subject, String predicate, String object) {
-        return rdf.queryConstruct(storedQuery("select_by_mask", asURI(subject), asURI(predicate), asURI(object)));
+    Model get(String subject, String predicate, String object, boolean withLabels) {
+        var query = withLabels ? "select_by_mask_with_labels" : "select_by_mask";
+        return rdf.queryConstruct(storedQuery(query, asURI(subject), asURI(predicate), asURI(object)));
     }
 
     void put(Model model) {
