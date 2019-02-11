@@ -30,6 +30,19 @@ Currently it supports the following methods:
 | GET         | -                                         | -                         | Returns JsonLD-encoded vocabulary                                  |
 | PUT         | -                                         | JsonLD-encoded vocabulary | Replaces the vocabulary with the provided model                    |
 
+### High-level collections API
+The high-level metadata API runs on :8080/api/collections.
+Currently it supports the following methods:
+
+| HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                  |
+|-------------|-------------------------------------------|---------------------------|------------------------------------------------------------------- |
+| GET         | -                                         | -                         | Returns a JSON-encoded array of all visible collections            |
+| GET         | iri (URL-encoded)                         | -                         | Returns a JSON-encoded collection                                  |
+| PUT         | -                                         | JSON-encoded collection   | Creates and returns new collection                                 |
+| PATCH       | -                                         | JSON-encoded collection   | Modifies an existing collection and returns the modified version   |
+| DELETE      | iri (URL-encoded)                         | -                         | Deletes a collection             v                                 |
+
+
 ## How to build
 
 `./gradlew clean build`
