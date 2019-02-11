@@ -7,11 +7,9 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 CONSTRUCT {
 ?0 ?1 ?2 ; rdfs:label ?subjectLabel .
-?1 rdfs:label ?predicateLabel .
 ?2 rdfs:label ?objectLabel . }
 WHERE {
   { ?0 ?1 ?2 }
   OPTIONAL { ?0 rdfs:label ?subjectLabel }
-  OPTIONAL { ?1 rdfs:label ?predicateLabel }
   OPTIONAL { ?2 rdfs:label ?objectLabel }
 }
