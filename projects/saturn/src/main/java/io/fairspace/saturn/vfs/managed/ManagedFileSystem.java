@@ -7,9 +7,7 @@ import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.io.input.CountingInputStream;
-import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.io.FileNotFoundException;
@@ -21,6 +19,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
+import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.UUID.randomUUID;
@@ -49,6 +48,12 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public FileInfo stat(String path) throws IOException {
         if (path.isEmpty()) {
             return ROOT;
+        }
+
+        var isCollection = splitPath(path).length == 1;
+
+        if (isCollection) {
+           // var coll = collections.
         }
 
         var info = new Ref<FileInfo>();
@@ -162,7 +167,4 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return "";
     }
 
-    private static long parseXSDDateTime(Literal literal) {
-        return ((XSDDateTime)literal.getValue()).asCalendar().getTimeInMillis();
-    }
 }

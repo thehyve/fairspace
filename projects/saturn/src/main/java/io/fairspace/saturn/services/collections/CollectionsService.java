@@ -5,11 +5,13 @@ import io.fairspace.saturn.util.Ref;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
+import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.UUID.randomUUID;
@@ -128,6 +130,7 @@ public class CollectionsService {
         collection.setDirectoryName(row.getLiteral("path").getString());
         collection.setDescription(row.getLiteral("description").getString());
         collection.setCreator(row.getLiteral("createdBy").getString());
+        collection.setDateCreated(Instant.ofEpochMilli(parseXSDDateTime(row.getLiteral("dateCreated"))));
         return collection;
     }
 

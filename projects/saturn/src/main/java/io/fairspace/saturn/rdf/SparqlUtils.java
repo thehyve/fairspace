@@ -1,9 +1,11 @@
 package io.fairspace.saturn.rdf;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.iri.IRI;
 import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 
 import java.io.IOException;
@@ -67,5 +69,9 @@ public class SparqlUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static long parseXSDDateTime(Literal literal) {
+        return ((XSDDateTime)literal.getValue()).asCalendar().getTimeInMillis();
     }
 }
