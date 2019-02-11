@@ -88,3 +88,6 @@ export const FETCH_WORKSPACE                        = 'FETCH_WORKSPACE';
 export const TOGGLE_MENU                            = 'TOGGLE_MENU';
 export const MOUSE_ENTER_MENU                       = 'MOUSE_ENTER_MENU';
 export const MOUSE_LEAVE_MENU                       = 'MOUSE_LEAVE_MENU';
+
+// Search
+export const OPEN_SEARCH                            = 'OPEN_SEARCH';
