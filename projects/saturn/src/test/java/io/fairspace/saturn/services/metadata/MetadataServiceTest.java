@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -166,7 +167,10 @@ public class MetadataServiceTest {
         executeWrite(ds, () -> ds.getDefaultModel()
                 .add(S1, RDF.type, createResource(FS.uri + "PersonConsent"))
                 .add(LBL_STMT1)
-                .add(S2, RDF.type, createResource(FS.uri + "ResearchProject")));
+                .add(S2, RDF.type, createResource(FS.uri + "ResearchProject"))
+                .add(createResource("http://example.com/unknown"), RDF.type, createResource(FS.uri + "Unknown"))
+                .add(createResource("http://example.com/person"), RDF.type, FOAF.Person)
+        );
 
         var m1 = api.getByType(FS.uri + "PersonConsent");
         assertEquals(2, m1.size());
@@ -178,6 +182,12 @@ public class MetadataServiceTest {
         assertTrue(m2.contains(S1, RDF.type, createResource(FS.uri + "PersonConsent")));
         assertTrue(m2.contains(LBL_STMT1));
         assertTrue(m2.contains(S2, RDF.type, createResource(FS.uri + "ResearchProject")));
+
+        var m3 = api.getByType(FS.uri + "Unknown");
+        assertTrue(m3.isEmpty());
+
+        var m4 = api.getByType(FOAF.Person.toString());
+        assertTrue(m4.isEmpty());
     }
 
     @Test
