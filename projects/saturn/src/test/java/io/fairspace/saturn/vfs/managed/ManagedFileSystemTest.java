@@ -72,46 +72,49 @@ public class ManagedFileSystemTest {
 
     @Test
     public void copyDir() throws IOException {
-        fs.mkdir("dir1");
-        fs.mkdir("dir1/subdir");
-        fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
-        fs.copy("dir1", "dir2");
-        assertTrue(fs.exists("dir1"));
-        assertTrue(fs.exists("dir2"));
-        assertTrue(fs.exists("dir2/subdir"));
-        assertTrue(fs.exists("dir2/subdir/file"));
+        fs.mkdir("coll");
+        fs.mkdir("coll/dir1");
+        fs.mkdir("coll/dir1/subdir");
+        fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
+        fs.copy("coll/dir1", "coll/dir2");
+        assertTrue(fs.exists("coll/dir1"));
+        assertTrue(fs.exists("coll/dir2"));
+        assertTrue(fs.exists("coll/dir2/subdir"));
+        assertTrue(fs.exists("coll/dir2/subdir/file"));
         var os = new ByteArrayOutputStream();
-        fs.read("dir2/subdir/file", os);
+        fs.read("coll/dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
     }
 
     @Test
     public void copyFile() throws IOException {
-        fs.mkdir("dir1");
-        fs.mkdir("dir2");
-        fs.create("dir1/file", new ByteArrayInputStream(content1));
-        fs.copy("dir1/file", "dir2/file");
-        assertTrue(fs.exists("dir1"));
-        assertTrue(fs.exists("dir2"));
-        assertTrue(fs.exists("dir1/file"));
-        assertTrue(fs.exists("dir2/file"));
+        fs.mkdir("coll");
+        fs.mkdir("coll/dir1");
+        fs.mkdir("coll/dir2");
+        fs.create("coll/dir1/file", new ByteArrayInputStream(content1));
+        fs.copy("coll/dir1/file", "coll/dir2/file");
+        assertTrue(fs.exists("coll/dir1"));
+        assertTrue(fs.exists("coll/dir2"));
+        assertTrue(fs.exists("coll/dir1/file"));
+        assertTrue(fs.exists("coll/dir2/file"));
         var os = new ByteArrayOutputStream();
-        fs.read("dir2/file", os);
+        fs.read("coll/dir2/file", os);
         assertArrayEquals(content1, os.toByteArray());
     }
 
     @Test
     public void moveDir() throws IOException {
-        fs.mkdir("dir1");
-        fs.mkdir("dir1/subdir");
-        fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
-        fs.move("dir1", "dir2");
-        assertFalse(fs.exists("dir1"));
-        assertTrue(fs.exists("dir2"));
-        assertTrue(fs.exists("dir2/subdir"));
-        assertTrue(fs.exists("dir2/subdir/file"));
+        fs.mkdir("coll");
+        fs.mkdir("coll/dir1");
+        fs.mkdir("coll/dir1/subdir");
+        fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
+        fs.move("coll/dir1", "coll/dir2");
+        assertFalse(fs.exists("coll/dir1"));
+        assertTrue(fs.exists("coll/dir2"));
+        assertTrue(fs.exists("coll/dir2/subdir"));
+        assertTrue(fs.exists("coll/dir2/subdir/file"));
         var os = new ByteArrayOutputStream();
-        fs.read("dir2/subdir/file", os);
+        fs.read("coll/dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
     }
 

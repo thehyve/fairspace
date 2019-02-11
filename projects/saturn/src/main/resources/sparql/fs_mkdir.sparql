@@ -1,8 +1,8 @@
 # Creates a directory
 #
 # 0 - path
-#  - creator
+# 1 - creator
 
 PREFIX fs: <http://fairspace.io/ontology#>
-INSERT { ?iri a fs:Directory; fs:filePath ?0; fs:createdBy ?1; fs:dateCreated ?date; fs:dateModified ?date; fs:modifiedBy ?2; fs:fileSize 0 .}
+INSERT { ?iri a fs:Directory; fs:filePath ?0; fs:createdBy ?1; fs:dateCreated ?date; fs:dateModified ?date; fs:modifiedBy ?1; fs:fileSize 0 .}
 WHERE { BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?iri) BIND(NOW() as ?date) }
