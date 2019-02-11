@@ -1,9 +1,9 @@
-# 0 - type
+# 0 - type (optional)
 
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 CONSTRUCT {?s a ?0; rdfs:label ?l}
 WHERE {
-    {?s a ?0 }
+    {?s a ?0 . ?0 fs:fairspaceEntity true .}
     OPTIONAL { ?s rdfs:label ?l}
 }

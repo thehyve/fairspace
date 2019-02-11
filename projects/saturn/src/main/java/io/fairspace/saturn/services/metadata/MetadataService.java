@@ -49,11 +49,7 @@ class MetadataService {
 
 
     Model getByType(String type) {
-        if (type == null) {
-            throw new IllegalArgumentException("No entity type specified");
-        }
-
-        return rdf.queryConstruct(storedQuery("entities_by_type", createURI(type)));
+        return rdf.queryConstruct(storedQuery("entities_by_type", asURI(type)));
     }
 
     static String createPatchQuery(Collection<Statement> statements) {
