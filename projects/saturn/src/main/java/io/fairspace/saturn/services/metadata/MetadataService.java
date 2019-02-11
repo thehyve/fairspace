@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import org.apache.jena.atlas.lib.Pair;
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -16,6 +17,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.graph.NodeFactory.createVariable;
 
 class MetadataService {
     private final RDFConnection rdf;
@@ -24,11 +26,9 @@ class MetadataService {
         this.rdf = rdf;
     }
 
-    Model get(String subject, String predicate, String object) {
-        return rdf.queryConstruct(storedQuery("select_by_mask",
-                subject != null ? createURI(subject) : null,
-                predicate != null ? createURI(predicate) : null,
-                object != null ? createURI(object) : null));
+    Model get(String subject, String predicate, String object, boolean withLabels) {
+        var query = withLabels ? "select_by_mask_with_labels" : "select_by_mask";
+        return rdf.queryConstruct(storedQuery(query, asURI(subject), asURI(predicate), asURI(object)));
     }
 
     void put(Model model) {
@@ -36,11 +36,7 @@ class MetadataService {
     }
 
     void delete(String subject, String predicate, String object) {
-
-        rdf.update(storedQuery("delete_by_mask",
-                subject != null ? createURI(subject) : null,
-                predicate != null ? createURI(predicate) : null,
-                object != null ? createURI(object) : null));
+        rdf.update(storedQuery("delete_by_mask", asURI(subject), asURI(predicate), asURI(object)));
     }
 
     void delete(Model model) {
@@ -71,7 +67,7 @@ class MetadataService {
                         Quad.defaultGraphNodeGenerated,                  // Default graph
                         p.getLeft().asNode(),                            // Subject
                         p.getRight().asNode(),                           // Predicate
-                        NodeFactory.createVariable("o"))) // A free variable matching any object
+                        createVariable("o"))) // A free variable matching any object
                 .map(q -> new UpdateDeleteWhere(new QuadAcc(singletonList(q))))
                 .forEach(updateRequest::add);
 
@@ -85,6 +81,10 @@ class MetadataService {
                 .stream()
                 .map(s -> new Quad(Quad.defaultGraphNodeGenerated, s.asTriple()))
                 .collect(toList());
+    }
+
+    private static Node asURI(String uri) {
+        return uri != null ? createURI(uri) : null;
     }
 
 }
