@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
+import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 
 public class App {
     private static final Config config = loadConfig();
@@ -27,20 +28,22 @@ public class App {
     public static void main(String[] args) {
         System.out.println("Saturn is starting");
 
+        setWorkspaceURI(config.jena.baseURI);
+
         var ds = SaturnDatasetFactory.connect(config.jena);
         // The RDF connection is supposed to be threadsafe and can
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds);
 
-        var collections = new CollectionsService(rdf, config.jena.baseURI, SecurityUtil::userInfo);
-        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), config.jena.baseURI, SecurityUtil::userInfo, collections));
+        var collections = new CollectionsService(rdf, SecurityUtil::userInfo);
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), SecurityUtil::userInfo, collections));
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
                         new MetadataApp(rdf),
                         new CollectionsApp(collections),
-                        new VocabularyApp(rdf, config.jena.baseURI),
+                        new VocabularyApp(rdf),
                         new HealthApp()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet(fs))
                 .port(config.port);

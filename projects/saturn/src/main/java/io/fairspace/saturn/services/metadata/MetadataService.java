@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.metadata;
 
 import org.apache.jena.atlas.lib.Pair;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -49,11 +48,7 @@ class MetadataService {
 
 
     Model getByType(String type) {
-        if (type == null) {
-            throw new IllegalArgumentException("No entity type specified");
-        }
-
-        return rdf.queryConstruct(storedQuery("entities_by_type", createURI(type)));
+        return rdf.queryConstruct(storedQuery("entities_by_type", asURI(type)));
     }
 
     static String createPatchQuery(Collection<Statement> statements) {

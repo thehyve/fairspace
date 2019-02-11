@@ -21,6 +21,14 @@ Currently it supports the following methods:
 | DELETE      | -                                                 | JsonLD-encoded statements | Deletes the statements provided                                    |
 | PATCH       | -                                                 | JsonLD-encoded statements | Replaces existing triples with the statements provided             |
 
+An additional `:8080/api/meta/entities` endpoint allows to retrieve labelled FairSpace entities, optionally filtered by type:
+
+
+| HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                      |
+|-------------|---------------------------------------------------|---------------------------|----------------------------------------------------------------------- |
+| GET         | type (optional, URL-encoded)                      | -                         | Returns JsonLD-encoded modetaining FairSpace entities and their labels |
+
+
 ### High-level vocabulary API
 The high-level metadata API runs on :8080/api/vocabulary.
 Currently it supports the following methods:

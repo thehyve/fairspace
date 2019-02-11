@@ -2,6 +2,7 @@ package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
@@ -19,11 +20,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
-import static java.util.UUID.randomUUID;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -32,14 +32,12 @@ public class ManagedFileSystem implements VirtualFileSystem {
             .build();
     private final RDFConnection rdf;
     private final BlobStore store;
-    private final String baseUri;
     private final Supplier<UserInfo> userInfoSupplier;
     private final CollectionsService collections;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, String baseUri, Supplier<UserInfo> userInfoSupplier, CollectionsService collections) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<UserInfo> userInfoSupplier, CollectionsService collections) {
         this.rdf = rdf;
         this.store = store;
-        this.baseUri = baseUri;
         this.userInfoSupplier = userInfoSupplier;
         this.collections = collections;
     }
@@ -48,12 +46,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public FileInfo stat(String path) throws IOException {
         if (path.isEmpty()) {
             return ROOT;
-        }
-
-        var isCollection = splitPath(path).length == 1;
-
-        if (isCollection) {
-           // var coll = collections.
         }
 
         var info = new Ref<FileInfo>();
@@ -79,7 +71,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
             // TODO: Should be denied but very convenient for testing
             withCommitMessage("Create collection " + path, () ->
                     rdf.update(storedQuery("coll_create",
-                    createResource(baseUri + randomUUID()),
+                    generateURI(),
                     path,
                     path,
                     "Describe me",
@@ -87,7 +79,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                     userId())));
         }
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", baseUri, isCollection ? FS.Collection : FS.Directory, path, userId())));
+                () -> rdf.update(storedQuery("fs_mkdir", isCollection ? FS.Collection : FS.Directory, path, userId())));
     }
 
     @Override
@@ -98,7 +90,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", baseUri, path, cis.getByteCount(), blobId, userId())));
+                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userId())));
     }
 
     @Override
@@ -126,7 +118,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public void copy(String from, String to) throws IOException {
         withCommitMessage("Copy data from " + from + " to " + to,
-                () -> rdf.update(storedQuery("fs_copy", from, to, baseUri)));
+                () -> rdf.update(storedQuery("fs_copy", from, to)));
     }
 
     @Override

@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -21,13 +22,11 @@ import static org.apache.jena.system.Txn.calculateWrite;
 public class CollectionsService {
     private final RDFConnection rdf;
 
-    private final String baseIRI;
     private final Supplier<UserInfo> userInfoSupplier;
 
 
-    public CollectionsService(RDFConnection rdf, String baseIRI, Supplier<UserInfo> userInfoSupplier) {
+    public CollectionsService(RDFConnection rdf, Supplier<UserInfo> userInfoSupplier) {
         this.rdf = rdf;
-        this.baseIRI = baseIRI;
         this.userInfoSupplier = userInfoSupplier;
     }
 
@@ -41,7 +40,7 @@ public class CollectionsService {
 
 
         var collection = new Collection();
-        collection.setUri(baseIRI + randomUUID());
+        collection.setUri(generateURI().toString());
         collection.setPrettyName(template.getPrettyName());
         collection.setDirectoryName(template.getDirectoryName());
         collection.setDescription(template.getDescription() != null ? template.getDescription() : "");
