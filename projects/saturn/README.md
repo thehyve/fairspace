@@ -42,6 +42,13 @@ Currently it supports the following methods:
 | PATCH       | -                                         | JSON-encoded collection   | Modifies an existing collection and returns the modified version   |
 | DELETE      | iri (URL-encoded)                         | -                         | Deletes a collection             v                                 |
 
+Currently a collection has the following fields, all represented as strings:
+ - uri
+ - prettyName
+ - directoryName
+ - type
+ - description
+ - creator
 
 ## How to build
 
