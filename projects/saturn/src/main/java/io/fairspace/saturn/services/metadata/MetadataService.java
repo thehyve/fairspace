@@ -27,10 +27,7 @@ class MetadataService {
     }
 
     Model get(String subject, String predicate, String object) {
-        return rdf.queryConstruct(storedQuery("select_by_mask",
-                subject != null ? createURI(subject) : null,
-                predicate != null ? createURI(predicate) : null,
-                object != null ? createURI(object) : null));
+        return rdf.queryConstruct(storedQuery("select_by_mask", asURI(subject), asURI(predicate), asURI(object)));
     }
 
     void put(Model model) {
