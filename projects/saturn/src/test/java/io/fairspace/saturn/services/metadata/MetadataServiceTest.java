@@ -30,8 +30,7 @@ public class MetadataServiceTest {
     private static final Statement STMT2 = createStatement(S2, P1, S3);
 
     private static final Statement LBL_STMT1 = createStatement(S1, RDFS.label, createStringLiteral("subject1"));
-    private static final Statement LBL_STMT2 = createStatement(P1, RDFS.label, createStringLiteral("predicate1"));
-    private static final Statement LBL_STMT3 = createStatement(S2, RDFS.label, createStringLiteral("subject2"));
+    private static final Statement LBL_STMT2 = createStatement(S2, RDFS.label, createStringLiteral("subject2"));
 
     @Before
     public void setUp() {
@@ -71,37 +70,32 @@ public class MetadataServiceTest {
     public void getWithLabels() {
         assertEquals(0, api.get(null, null, null, true).size());
 
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2).add(LBL_STMT1).add(LBL_STMT2).add(LBL_STMT3));
+        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2).add(LBL_STMT1).add(LBL_STMT2));
 
         Model m1 = api.get(null, null, null, true);
-        assertEquals(5, m1.size());
+        assertEquals(4, m1.size());
         assertTrue(m1.contains(STMT1));
         assertTrue(m1.contains(STMT2));
         assertTrue(m1.contains(LBL_STMT1));
         assertTrue(m1.contains(LBL_STMT2));
-        assertTrue(m1.contains(LBL_STMT3));
 
         Model m2 = api.get(S1.getURI(), null, null, true);
-        assertEquals(4, m2.size());
+        assertEquals(3, m2.size());
         assertTrue(m2.contains(STMT1));
         assertTrue(m2.contains(LBL_STMT1));
         assertTrue(m2.contains(LBL_STMT2));
-        assertTrue(m2.contains(LBL_STMT3));
 
         Model m3 = api.get(null, P1.getURI(), null, true);
-        assertEquals(5, m3.size());
+        assertEquals(4, m3.size());
         assertTrue(m3.contains(STMT1));
         assertTrue(m3.contains(STMT2));
         assertTrue(m2.contains(LBL_STMT1));
         assertTrue(m2.contains(LBL_STMT2));
-        assertTrue(m2.contains(LBL_STMT3));
 
         Model m4 = api.get(null, null, S3.getURI(), true);
-        assertEquals(3, m4.size());
+        assertEquals(2, m4.size());
         assertTrue(m4.contains(STMT2));
-        assertFalse(m4.contains(LBL_STMT1));
-        assertTrue(m4.contains(LBL_STMT2));
-        assertTrue(m4.contains(LBL_STMT3));
+        assertFalse(m4.contains(LBL_STMT1));;
 
         Model m5 = api.get(S3.getURI(), null, null, true);
         assertTrue(m5.isEmpty());
