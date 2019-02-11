@@ -13,9 +13,7 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
-import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.system.Txn.calculateWrite;
 
@@ -30,45 +28,32 @@ public class CollectionsService {
         this.userInfoSupplier = userInfoSupplier;
     }
 
-    public Collection create(Collection template) {
-        validate(template.getUri() == null, "Field uri must not be left empty");
-        validate(template.getCreator() == null, "Field creator must not be left empty");
-        validate(template.getDirectoryName() != null, "Field directoryName must be set");
-        validate(isDirectoryNameValid(template.getDirectoryName()), "Invalid directoryName");
-        validate(template.getPrettyName() != null && !template.getPrettyName().isEmpty(), "Field prettyName must be set");
-        validate(template.getType() != null, "Field type must be set");
+    public Collection create(Collection collection) {
+        validate(collection.getUri() == null, "Field uri must not be left empty");
+        validate(collection.getCreator() == null, "Field creator must not be left empty");
+        validate(collection.getDirectoryName() != null, "Field directoryName must be set");
+        validate(isDirectoryNameValid(collection.getDirectoryName()), "Invalid directoryName");
+        validate(collection.getPrettyName() != null && !collection.getPrettyName().isEmpty(), "Field prettyName must be set");
+        validate(collection.getType() != null, "Field type must be set");
 
-
-        var collection = new Collection();
-        collection.setUri(generateURI().toString());
-        collection.setPrettyName(template.getPrettyName());
-        collection.setDirectoryName(template.getDirectoryName());
-        collection.setDescription(template.getDescription() != null ? template.getDescription() : "");
-        collection.setType(template.getType());
-        collection.setCreator("");
-        if (userInfoSupplier != null) {
-            var userInfo = userInfoSupplier.get();
-            if (userInfo != null) {
-                collection.setCreator(userInfo.getUserId());
-            }
+        if (collection.getDescription() == null) {
+            collection.setDescription("");
         }
 
         return withCommitMessage("Create collection " + collection.getPrettyName(), () ->
                 calculateWrite(rdf, () -> {
-                    var exists = new Ref<>(false);
-                    rdf.querySelect(storedQuery("fs_stat", collection.getDirectoryName()), row -> exists.value = true);
-                    if (exists.value) {
+                    if (getByDirectoryName(collection.getDirectoryName()) != null) {
                         return null;
                     }
 
                     rdf.update(storedQuery("coll_create",
-                            createResource(collection.getUri()),
                             collection.getPrettyName(),
                             collection.getDirectoryName(),
                             collection.getDescription(),
                             collection.getType(),
-                            collection.getCreator()));
-                    return collection;
+                            userInfoSupplier.get().getUserId()));
+
+                    return getByDirectoryName(collection.getDirectoryName());
                 }));
     }
 
@@ -76,6 +61,15 @@ public class CollectionsService {
         var result = new Ref<Collection>();
 
         rdf.querySelect(storedQuery("coll_get", createResource(iri)),
+                row -> result.value = toCollection(row));
+
+        return result.value;
+    }
+
+    public Collection getByDirectoryName(String name) {
+        var result = new Ref<Collection>();
+
+        rdf.querySelect(storedQuery("coll_get_by_dir", name),
                 row -> result.value = toCollection(row));
 
         return result.value;

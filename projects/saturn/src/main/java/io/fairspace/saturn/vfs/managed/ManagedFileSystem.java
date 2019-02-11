@@ -1,6 +1,7 @@
 package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
@@ -19,8 +20,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static java.util.stream.Collectors.toList;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -45,6 +48,14 @@ public class ManagedFileSystem implements VirtualFileSystem {
             return ROOT;
         }
 
+        if (isCollection(path)) {
+            var collection = collections.getByDirectoryName(path);
+            if (collection == null) {
+                return null;
+            }
+            return fileInfo(collection);
+        }
+
         var info = new Ref<FileInfo>();
 
         rdf.querySelect(storedQuery("fs_stat", path),
@@ -55,28 +66,33 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public List<FileInfo> list(String parentPath) throws IOException {
+        if (parentPath.isEmpty()) {
+            return collections.list()
+                    .stream()
+                    .map(ManagedFileSystem::fileInfo)
+                    .collect(toList());
+        }
+
         var list = new ArrayList<FileInfo>();
-        rdf.querySelect(storedQuery("fs_ls", parentPath.isEmpty() ? "" : (parentPath + '/')),
+        rdf.querySelect(storedQuery("fs_ls", parentPath + '/'),
                 row -> list.add(fileInfo(row)));
         return list;
     }
 
     @Override
     public void mkdir(String path) throws IOException {
-        var isCollection = splitPath(path).length == 1;
-        if (isCollection) {
+        // ensureNotACollection(path);
+        if (isCollection(path)) {
             // TODO: Should be denied but very convenient for testing
-            withCommitMessage("Create collection " + path, () ->
-                    rdf.update(storedQuery("coll_create",
-                    generateURI(),
-                    path,
-                    path,
-                    "Describe me",
-                    "LOCAL",
-                    userId())));
+            var collection = new Collection();
+            collection.setDirectoryName(path);
+            collection.setPrettyName(path);
+            collection.setType("LOCAL");
+            collections.create(collection);
+        } else {
+            withCommitMessage("Create directory " + path,
+                    () -> rdf.update(storedQuery("fs_mkdir", path, userId())));
         }
-        withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", isCollection ? FS.Collection : FS.Directory, path, userId())));
     }
 
     @Override
@@ -114,20 +130,33 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void copy(String from, String to) throws IOException {
+        ensureNotACollection(from);
+        ensureNotACollection(to);
         withCommitMessage("Copy data from " + from + " to " + to,
                 () -> rdf.update(storedQuery("fs_copy", from, to)));
     }
 
     @Override
     public void move(String from, String to) throws IOException {
+        ensureNotACollection(from);
+        ensureNotACollection(to);
         withCommitMessage("Move data from " + from + " to " + to,
                 () -> rdf.update(storedQuery("fs_move", from, to)));
     }
 
     @Override
     public void delete(String path) throws IOException {
-        withCommitMessage("Delete " + path,
-                () -> rdf.update(storedQuery("fs_delete", path, userId())));
+        // ensureNotACollection(path);
+        if (isCollection(path)) {
+            // TODO: Should be denied but very convenient for testing
+            var collection = collections.getByDirectoryName(path);
+            if (collection != null) {
+                collections.delete(collection.getUri());
+            }
+        } else {
+            withCommitMessage("Delete " + path,
+                    () -> rdf.update(storedQuery("fs_delete", path, userId())));
+        }
     }
 
     @Override
@@ -148,6 +177,19 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .build();
     }
 
+    private static FileInfo fileInfo(Collection collection) {
+        return FileInfo.builder()
+                .path(collection.getDirectoryName())
+                .size(0)
+                .isDirectory(true)
+                .created(collection.getDateCreated().toEpochMilli())
+                .modified(collection.getDateCreated().toEpochMilli())
+                .createdBy(collection.getCreator())
+                .modifiedBy(collection.getCreator())
+                .readOnly(false) // TODO: check
+                .build();
+    }
+
     private String userId() {
         if (userInfoSupplier != null) {
             var userInfo = userInfoSupplier.get();
@@ -156,4 +198,13 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return "";
     }
 
+    private static boolean isCollection(String path) {
+        return splitPath(path).length == 1;
+    }
+
+    private static void ensureNotACollection(String path) throws IOException {
+        if (isCollection(path)) {
+            throw new IOException("Use Collections API for operations on collections");
+        }
+    }
 }

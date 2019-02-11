@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vfs.managed;
 
+import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -25,12 +27,15 @@ public class ManagedFileSystemTest {
         setWorkspaceURI("http://example.com/");
         var store = new MemoryBlobStore();
         var rdf = connect(createTxnMem());
-        var collections = new CollectionsService(rdf, null);
-        fs = new ManagedFileSystem(rdf, store, null, collections);
+        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
+        var collections = new CollectionsService(rdf, userInfoSupplier);
+        fs = new ManagedFileSystem(rdf, store, userInfoSupplier, collections);
     }
 
     @Test
     public void list() throws IOException {
+        fs.mkdir("aaa");
+        fs.mkdir("aaa/bbb");
         fs.mkdir("aaa/bbb/ccc");
         fs.mkdir("aaa/bbb/ccc/ddd");
         var children = fs.list("aaa/bbb");
@@ -112,19 +117,20 @@ public class ManagedFileSystemTest {
 
     @Test
     public void moveDirWithConflicts() throws IOException {
-        fs.mkdir("dir1");
-        fs.mkdir("dir1/subdir");
-        fs.create("dir1/subdir/file", new ByteArrayInputStream(content1));
-        fs.mkdir("dir2");
-        fs.mkdir("dir2/subdir2");
-        fs.move("dir1", "dir2");
-        assertFalse(fs.exists("dir1"));
-        assertFalse(fs.exists("dir2/subdir2"));
-        assertTrue(fs.exists("dir2"));
-        assertTrue(fs.exists("dir2/subdir"));
-        assertTrue(fs.exists("dir2/subdir/file"));
+        fs.mkdir("coll");
+        fs.mkdir("coll/dir1");
+        fs.mkdir("coll/dir1/subdir");
+        fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
+        fs.mkdir("coll/dir2");
+        fs.mkdir("coll/dir2/subdir2");
+        fs.move("coll/dir1", "coll/dir2");
+        assertFalse(fs.exists("coll/dir1"));
+        assertFalse(fs.exists("coll/dir2/subdir2"));
+        assertTrue(fs.exists("coll/dir2"));
+        assertTrue(fs.exists("coll/dir2/subdir"));
+        assertTrue(fs.exists("coll/dir2/subdir/file"));
         var os = new ByteArrayOutputStream();
-        fs.read("dir2/subdir/file", os);
+        fs.read("coll/dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
     }
 
