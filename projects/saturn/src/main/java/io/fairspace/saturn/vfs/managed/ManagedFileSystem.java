@@ -2,7 +2,6 @@ package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.services.collections.CollectionsService;
-import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
@@ -20,9 +19,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.SparqlUtils.generateURI;
-import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 
 public class ManagedFileSystem implements VirtualFileSystem {
