@@ -12,6 +12,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static io.fairspace.saturn.rdf.Vocabulary.initVocabulary;
 import static java.util.Arrays.asList;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -40,9 +41,11 @@ public class MetadataServiceTest {
 
     @Before
     public void setUp() {
+        setWorkspaceURI(baseURI);
         ds = createTxnMem();
         initVocabulary(ds.asDatasetGraph(), createURI(baseURI + "vocabulary"));
-        api = new MetadataService(new RDFConnectionLocal(ds), baseURI);
+        api = new MetadataService(new RDFConnectionLocal(ds));
+
     }
 
     @Test

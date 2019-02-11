@@ -3,7 +3,6 @@
 #
 # 0 - from
 # 1 - to
-# 2 - base uri
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
@@ -15,7 +14,7 @@ WHERE { ?s fs:filePath ?1 };
 INSERT { ?newIRI fs:filePath ?1 }
 WHERE {
     ?s fs:filePath ?0 .
-    BIND(IRI(CONCAT(?2, STRUUID())) as ?newIRI)
+    BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?newIRI)
 };
 
 # Copy statements
@@ -42,7 +41,7 @@ WHERE {
     ?s fs:filePath ?oldPath .
 
     FILTER(STRSTARTS(?oldPath, CONCAT(?0, '/')))
-    BIND(IRI(CONCAT(?2, STRUUID())) as ?newIRI)
+    BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?newIRI)
     BIND(CONCAT(?1, '/', SUBSTR(?oldPath, STRLEN(?0) + 2)) as ?newPath)
 };
 

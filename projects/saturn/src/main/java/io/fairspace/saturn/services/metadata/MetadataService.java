@@ -20,11 +20,9 @@ import static org.apache.jena.graph.NodeFactory.createVariable;
 
 class MetadataService {
     private final RDFConnection rdf;
-    private final String baseURI;
 
-    MetadataService(RDFConnection rdf, String baseURI) {
+    MetadataService(RDFConnection rdf) {
         this.rdf = rdf;
-        this.baseURI = baseURI;
     }
 
     Model get(String subject, String predicate, String object, boolean withLabels) {
@@ -50,7 +48,7 @@ class MetadataService {
 
 
     Model getByType(String type) {
-        return rdf.queryConstruct(storedQuery("entities_by_type", asURI(baseURI + "vocabulary"),  asURI(type)));
+        return rdf.queryConstruct(storedQuery("entities_by_type", asURI(type)));
     }
 
     static String createPatchQuery(Collection<Statement> statements) {

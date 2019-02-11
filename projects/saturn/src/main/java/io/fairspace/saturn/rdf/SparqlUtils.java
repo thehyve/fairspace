@@ -11,8 +11,12 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.UUID.randomUUID;
+import static org.apache.jena.graph.NodeFactory.createURI;
+
 
 public class SparqlUtils {
+    private static String workspaceURI;
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
 
     public static String formatQuery(String template, Object... args) {
@@ -53,6 +57,8 @@ public class SparqlUtils {
             }
         }
 
+        sparql.setNsPrefix("ws", workspaceURI);
+
         return sparql.toString();
     }
 
@@ -67,5 +73,17 @@ public class SparqlUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getWorkspaceURI() {
+        return workspaceURI;
+    }
+
+    public static void setWorkspaceURI(String workspaceURI) {
+        SparqlUtils.workspaceURI = workspaceURI;
+    }
+
+    public static Node generateURI() {
+        return createURI(workspaceURI + randomUUID());
     }
 }
