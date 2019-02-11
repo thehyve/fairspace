@@ -13,8 +13,8 @@ import static spark.Spark.*;
 public class MetadataApp implements SparkApplication {
     private final MetadataService api;
 
-    public MetadataApp(RDFConnection rdfConnection) {
-        this.api = new MetadataService(rdfConnection);
+    public MetadataApp(RDFConnection rdfConnection, String baseURI) {
+        this.api = new MetadataService(rdfConnection, baseURI);
     }
 
     @Override

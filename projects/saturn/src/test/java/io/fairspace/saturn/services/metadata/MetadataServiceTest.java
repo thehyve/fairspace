@@ -1,16 +1,21 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.Vocabulary;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 
+import static io.fairspace.saturn.rdf.Vocabulary.initVocabulary;
 import static java.util.Arrays.asList;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -20,6 +25,8 @@ import static org.junit.Assert.*;
 public class MetadataServiceTest {
     private Dataset ds;
     private MetadataService api;
+
+    private static final String baseURI = "http://example.com/";
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
     private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
@@ -36,7 +43,8 @@ public class MetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new MetadataService(new RDFConnectionLocal(ds));
+        initVocabulary(ds.asDatasetGraph(), createURI(baseURI + "vocabulary"));
+        api = new MetadataService(new RDFConnectionLocal(ds), baseURI);
     }
 
     @Test
@@ -155,6 +163,25 @@ public class MetadataServiceTest {
         assertTrue(ds.getDefaultModel().contains(newStmt3));
         assertFalse(ds.getDefaultModel().contains(STMT1));
         assertFalse(ds.getDefaultModel().contains(STMT2));
+    }
+
+    @Test
+    public void getByType() {
+        executeWrite(ds, () -> ds.getDefaultModel()
+                .add(S1, RDF.type, createResource(FS.uri + "PersonConsent"))
+                .add(LBL_STMT1)
+                .add(S2, RDF.type, createResource(FS.uri + "ResearchProject")));
+
+        var m1 = api.getByType(FS.uri + "PersonConsent");
+        assertEquals(2, m1.size());
+        assertTrue(m1.contains(S1, RDF.type, createResource(FS.uri + "PersonConsent")));
+        assertTrue(m1.contains(LBL_STMT1));
+
+        var m2 = api.getByType(null);
+        assertEquals(3, m2.size());
+        assertTrue(m2.contains(S1, RDF.type, createResource(FS.uri + "PersonConsent")));
+        assertTrue(m2.contains(LBL_STMT1));
+        assertTrue(m2.contains(S2, RDF.type, createResource(FS.uri + "ResearchProject")));
     }
 
     @Test

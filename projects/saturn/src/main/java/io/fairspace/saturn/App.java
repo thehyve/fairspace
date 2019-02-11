@@ -36,7 +36,7 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
-                        new MetadataApp(rdf),
+                        new MetadataApp(rdf, config.jena.baseURI),
                         new CollectionsApp(rdf, config.jena.baseURI),
                         new VocabularyApp(rdf, config.jena.baseURI),
                         new HealthApp()))

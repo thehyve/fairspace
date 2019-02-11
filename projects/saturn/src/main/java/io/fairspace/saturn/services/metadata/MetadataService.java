@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.metadata;
 
 import org.apache.jena.atlas.lib.Pair;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -21,9 +20,11 @@ import static org.apache.jena.graph.NodeFactory.createVariable;
 
 class MetadataService {
     private final RDFConnection rdf;
+    private final String baseURI;
 
-    MetadataService(RDFConnection rdf) {
+    MetadataService(RDFConnection rdf, String baseURI) {
         this.rdf = rdf;
+        this.baseURI = baseURI;
     }
 
     Model get(String subject, String predicate, String object, boolean withLabels) {
@@ -49,7 +50,7 @@ class MetadataService {
 
 
     Model getByType(String type) {
-        return rdf.queryConstruct(storedQuery("entities_by_type", asURI(type)));
+        return rdf.queryConstruct(storedQuery("entities_by_type", asURI(baseURI + "vocabulary"),  asURI(type)));
     }
 
     static String createPatchQuery(Collection<Statement> statements) {
