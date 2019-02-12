@@ -96,6 +96,9 @@ public class SafeFileSystem implements VirtualFileSystem {
     public void copy(String from, String to) throws IOException {
         var normalizedFrom = normalizePath(from);
         var normalizedTo = normalizePath(to);
+        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
+            throw new IOException("Cannot copy a file or a directory to itself");
+        }
         safely(() -> {
             if (!exists(from)) {
                 throw new FileNotFoundException(normalizedFrom);
@@ -116,6 +119,9 @@ public class SafeFileSystem implements VirtualFileSystem {
     public void move(String from, String to) throws IOException {
         var normalizedFrom = normalizePath(from);
         var normalizedTo = normalizePath(to);
+        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
+            throw new IOException("Cannot move a file or a directory to itself");
+        }
         safely(() -> {
             if (!exists(normalizedFrom)) {
                 throw new FileNotFoundException(normalizedFrom);
