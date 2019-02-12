@@ -54,7 +54,7 @@ class SearchPage extends React.Component {
             openPath(`/${openedCollection.location}${openedPath === '/' ? '' : openedPath}`);
         }
 
-        if (this.props.search !== prevProps.search) {
+        if (this.props.location.search !== prevProps.location.search) {
             this.updateSearchResults();
         }
     }
