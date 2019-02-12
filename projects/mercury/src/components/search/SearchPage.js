@@ -2,19 +2,20 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Grid, AppBar, Tabs, Tab} from '@material-ui/core';
 import {withRouter} from 'react-router-dom';
-import queryString from 'query-string';
 
 import CollectionList from '../collections/CollectionList';
 import FileList from '../file/FileList';
 import * as collectionBrowserActions from '../../actions/collectionBrowserActions';
 import * as collectionActions from '../../actions/collectionActions';
 import * as fileActions from '../../actions/fileActions';
+import {buildSearchUrl, getSearchQueryFromString, getSearchTypeFromString} from '../../utils/searchUtils';
 
+// TODO: a lot of the code here is for UX/UI demoing
 class SearchPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedTabIndex: this.getTabIndexFromQuery(),
+            selectedTabIndex: this.getTabIndexFromQuery(props.location.search),
             filteredCollections: [],
             filteredFiles: []
         };
@@ -38,7 +39,8 @@ class SearchPage extends React.Component {
 
     componentDidUpdate(prevProps) {
         const {
-            selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath
+            selectCollection, fetchFilesIfNeeded, openedCollection,
+            openedPath, openPath, location: {search}, collections, files
         } = this.props;
 
         if (prevProps.openedCollection.id !== openedCollection.id) {
@@ -54,24 +56,62 @@ class SearchPage extends React.Component {
             openPath(`/${openedCollection.location}${openedPath === '/' ? '' : openedPath}`);
         }
 
-        if (this.props.location.search !== prevProps.location.search) {
+        if (files.length !== prevProps.files.length
+            || collections.length !== prevProps.collections.length
+            || search !== prevProps.location.search) {
             this.updateSearchResults();
         }
     }
 
     updateSearchResults = () => {
-        const selectedTabIndex = this.getTabIndexFromQuery();
-        this.setState({selectedTabIndex});
+        const {location: {search}, collections, files} = this.props;
+        const selectedTabIndex = this.getTabIndexFromQuery(search);
+        const query = getSearchQueryFromString(search).toLowerCase();
+
+        if (selectedTabIndex === 0) {
+            const filteredCollections = collections.filter(c => c.name.toLowerCase().includes(query));
+            this.setState({
+                selectedTabIndex,
+                filteredCollections
+            });
+        } else {
+            const filteredFiles = files.filter(f => f.basename.toLowerCase().includes(query));
+            this.setState({
+                selectedTabIndex,
+                filteredFiles
+            });
+        }
     }
 
-    getTabIndexFromQuery = () => (queryString.parse(this.props.location.search).type === 'collections' ? 0 : 1);
+    getTabIndexFromQuery = (query) => (getSearchTypeFromString(query) === 'files' ? 1 : 0);
 
     handleTabChange = (e, selectedTabIndex) => {
         this.setState({selectedTabIndex});
         const type = selectedTabIndex === 0 ? 'collections' : 'files';
-        const {q} = queryString.parse(this.props.location.search);
-        this.props.history.push(`/search?type=${type}&q=${q}`);
+        const query = getSearchQueryFromString(this.props.location.search);
+        const searchUrl = buildSearchUrl(type, query);
+        this.props.history.push(searchUrl);
     };
+
+    handleCollectionOpen = (collection) => {
+        this.props.history.push(`/collections/${collection.id}`);
+    }
+
+    handlePathDoubleClick = (path) => {
+        if (path.type === 'directory') {
+            this.openDir(path.basename);
+        } else {
+            // console.log(path);
+        }
+    }
+
+    openDir(path) {
+        const basePath = this.props.openedPath || '';
+        const separator = basePath.endsWith('/') ? '' : '/';
+        const fullPath = `/collections/${this.props.openedCollection.id}${basePath}${separator}${path}`;
+        this.props.history.push(fullPath);
+        this.props.openPath(`/${this.props.openedCollection.location}${basePath}${separator}${path}`);
+    }
 
     render() {
         const {filteredCollections, filteredFiles, selectedTabIndex} = this.state;
@@ -95,7 +135,7 @@ class SearchPage extends React.Component {
                         <CollectionList
                             collections={filteredCollections}
                             onCollectionClick={() => {}}
-                            onCollectionDoubleClick={() => {}}
+                            onCollectionDoubleClick={this.handleCollectionOpen}
                         />
                     )}
                     {selectedTabIndex === 1 && (
@@ -103,7 +143,7 @@ class SearchPage extends React.Component {
                             files={filteredFiles}
                             selectedPaths={[]}
                             onPathClick={() => {}}
-                            onPathDoubleClick={() => {}}
+                            onPathDoubleClick={this.handlePathDoubleClick}
                             onRename={() => {}}
                             onDelete={() => {}}
                         // readonly
@@ -127,14 +167,12 @@ const mapStateToProps = (state, ownProps) => {
         user: state.account.user.data,
         loading: state.cache.collections.pending || state.account.user.pending || state.cache.users.pending,
         error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
-        collections: state.cache.collections.data,
+        collections: state.cache.collections.data || [],
         users: state.cache.users.data,
         selectedCollectionId: state.collectionBrowser.selectedCollectionId,
         addingCollection: state.collectionBrowser.addingCollection,
         deletingCollection: state.collectionBrowser.deletingCollection,
-        // loading: files.pending || state.cache.collections.pending || state.cache.collections.data.length === 0,
-        // error: files.error || state.cache.collections.error,
-        files: files.data,
+        files: files.data || [],
         selectedPaths: state.collectionBrowser.selectedPaths,
         openedCollection: openedCollectionId ? getCollection(openedCollectionId) : {},
         openedCollectionId,

@@ -4,7 +4,8 @@ import {withRouter} from "react-router-dom";
 import {InputBase, withStyles} from '@material-ui/core';
 import {fade} from '@material-ui/core/styles/colorManipulator';
 import SearchIcon from '@material-ui/icons/Search';
-import queryString from 'query-string';
+
+import {buildSearchUrl, getSearchTypeFromString, getSearchQueryFromString} from '../../utils/searchUtils';
 
 const styles = theme => ({
     search: {
@@ -47,7 +48,7 @@ const styles = theme => ({
 
 class SearchBar extends React.Component {
     state = {
-        value: queryString.parse(this.props.location.search).q || ''
+        value: getSearchQueryFromString(this.props.location.search)
     };
 
     handleChange = (event) => {
@@ -57,7 +58,9 @@ class SearchBar extends React.Component {
     handleKeyDown = (event) => {
         // if Enter is pressed and search has value
         if (event.keyCode === 13 && this.state.value) {
-            this.props.history.push(`/search?type=collections&q=${this.state.value}`);
+            const type = getSearchTypeFromString(this.props.location.search);
+            const searchUrl = buildSearchUrl(type, this.state.value);
+            this.props.history.push(searchUrl);
         }
     }
 
