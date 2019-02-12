@@ -47,3 +47,9 @@ dependencies {
     testCompile "org.mockito:mockito-core:${mockitoVersion}"
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled true
+    }
+}
