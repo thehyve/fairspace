@@ -3,6 +3,7 @@ buildscript {
         jena_version = '3.10.0'
         milton_version = '2.7.4.4'
         mockitoVersion = '2.23.0'
+        jacksonVersion = '2.9.6'
     }
 }
 
@@ -39,7 +40,8 @@ dependencies {
     compile "org.apache.jena:jena-text-es:${jena_version}"
     compile "io.milton:milton-server-ce:${milton_version}"
     compile 'com.nimbusds:nimbus-jose-jwt:5.7'
-    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.6"
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     compile "com.sparkjava:spark-core:2.7.2"
 
     testCompile "junit:junit:4.12"

@@ -2,15 +2,19 @@ package io.fairspace.saturn.services.collections;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import spark.servlet.SparkApplication;
 
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
 public class CollectionsApp implements SparkApplication {
     private final CollectionsService service;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .configure(WRITE_DATES_AS_TIMESTAMPS, false);
 
     public CollectionsApp(CollectionsService service) {
         this.service = service;
