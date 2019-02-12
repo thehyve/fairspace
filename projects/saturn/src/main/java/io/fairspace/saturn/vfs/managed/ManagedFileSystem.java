@@ -80,18 +80,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        // ensureNotACollection(path);
-        if (isCollection(path)) {
-            // TODO: Should be denied but very convenient for testing
-            var collection = new Collection();
-            collection.setDirectoryName(path);
-            collection.setPrettyName(path);
-            collection.setType("LOCAL");
-            collections.create(collection);
-        } else {
-            withCommitMessage("Create directory " + path,
-                    () -> rdf.update(storedQuery("fs_mkdir", path, userId())));
-        }
+        withCommitMessage("Create directory " + path,
+                () -> rdf.update(storedQuery("fs_mkdir", path, userId())));
     }
 
     @Override
@@ -145,17 +135,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void delete(String path) throws IOException {
-        // ensureNotACollection(path);
-        if (isCollection(path)) {
-            // TODO: Should be denied but very convenient for testing
-            var collection = collections.getByDirectoryName(path);
-            if (collection != null) {
-                collections.delete(collection.getUri());
-            }
-        } else {
-            withCommitMessage("Delete " + path,
-                    () -> rdf.update(storedQuery("fs_delete", path, userId())));
-        }
+        ensureNotACollection(path);
+
+        withCommitMessage("Delete " + path,
+                () -> rdf.update(storedQuery("fs_delete", path, userId())));
     }
 
     @Override
