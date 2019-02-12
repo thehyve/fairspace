@@ -4,12 +4,13 @@
 # 1 - name
 # 2 - description
 # 3 - directory name
+# 4 - updated by
 
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-DELETE { ?0 rdfs:label ?name; rdfs:comment ?comment; fs:filePath ?oldPath; }
-INSERT { ?0 rdfs:label ?1; rdfs:comment ?2; fs:filePath ?3; }
+DELETE { ?0 rdfs:label ?name; rdfs:comment ?comment; fs:filePath ?oldPath; fs:dateModified ?oldDateModified; fs:modifiedBy ?oldModifiedBy; }
+INSERT { ?0 rdfs:label ?1; rdfs:comment ?2; fs:filePath ?3; fs:dateModified ?date; fs:modifiedBy ?4 ; }
 WHERE { ?0 a fs:Collection; rdfs:label ?name; rdfs:comment ?comment; fs:filePath ?oldPath; BIND(NOW() as ?date) };
 
 # Move the children

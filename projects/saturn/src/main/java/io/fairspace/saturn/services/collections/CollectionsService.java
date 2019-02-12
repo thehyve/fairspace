@@ -100,7 +100,6 @@ public class CollectionsService {
         validate(patch.getUri() != null, "No URI");
         validate(patch.getCreator() == null, "Field creator must not be left empty");
 
-
         return withCommitMessage("Update collection " + patch.getName(), () ->
                 calculateWrite(rdf, () -> {
                     var existing = get(patch.getUri());
@@ -115,7 +114,8 @@ public class CollectionsService {
                             createResource(patch.getUri()),
                             patch.getName() != null ? patch.getName() : existing.getName(),
                             patch.getDescription() != null ? patch.getDescription() : existing.getDescription(),
-                            patch.getLocation() != null ? patch.getLocation() : existing.getLocation()));
+                            patch.getLocation() != null ? patch.getLocation() : existing.getLocation(),
+                            userId()));
 
                     return get(patch.getUri());
                 })
