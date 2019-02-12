@@ -5,7 +5,6 @@ import io.fairspace.saturn.util.Ref;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -123,7 +122,7 @@ public class CollectionsService {
         collection.setDirectoryName(row.getLiteral("path").getString());
         collection.setDescription(row.getLiteral("description").getString());
         collection.setCreator(row.getLiteral("createdBy").getString());
-        collection.setDateCreated(Instant.ofEpochMilli(parseXSDDateTime(row.getLiteral("dateCreated"))));
+        collection.setDateCreated(parseXSDDateTime(row.getLiteral("dateCreated")));
         return collection;
     }
 

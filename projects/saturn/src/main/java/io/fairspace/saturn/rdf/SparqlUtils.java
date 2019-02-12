@@ -10,6 +10,7 @@ import org.apache.jena.rdf.model.RDFNode;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -82,7 +83,7 @@ public class SparqlUtils {
         SparqlUtils.workspaceURI = workspaceURI;
     }
 
-    public static long parseXSDDateTime(Literal literal) {
-        return ((XSDDateTime)literal.getValue()).asCalendar().getTimeInMillis();
+    public static Instant parseXSDDateTime(Literal literal) {
+        return Instant.ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
     }
 }

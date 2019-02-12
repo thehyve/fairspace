@@ -164,8 +164,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .path(collection.getDirectoryName())
                 .size(0)
                 .isDirectory(true)
-                .created(collection.getDateCreated().toEpochMilli())
-                .modified(collection.getDateCreated().toEpochMilli())
+                .created(collection.getDateCreated())
+                .modified(collection.getDateCreated())
                 .createdBy(collection.getCreator())
                 .modifiedBy(collection.getCreator())
                 .readOnly(false) // TODO: check
