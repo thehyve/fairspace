@@ -14,6 +14,7 @@ WHERE { ?s fs:filePath ?1 };
 INSERT { ?newIRI fs:filePath ?1 }
 WHERE {
     ?s fs:filePath ?0 .
+    FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
     BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?newIRI)
 };
 
@@ -24,6 +25,7 @@ WHERE {
 
     ?s ?p ?o ;
     fs:filePath ?0 .
+    FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
     FILTER( ?p != fs:filePath) # filePath has changed
 };
 
@@ -41,6 +43,7 @@ WHERE {
     ?s fs:filePath ?oldPath .
 
     FILTER(STRSTARTS(?oldPath, CONCAT(?0, '/')))
+    FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
     BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?newIRI)
     BIND(CONCAT(?1, '/', SUBSTR(?oldPath, STRLEN(?0) + 2)) as ?newPath)
 };
@@ -53,5 +56,6 @@ WHERE {
     BIND(CONCAT(?0, '/', SUBSTR(?newPath, STRLEN(?1) + 2)) as ?oldPath)
     ?s fs:filePath ?oldPath .
     ?s ?p ?o .
+    FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
     FILTER((?p != fs:filePath)) # filePath has changed
 };
