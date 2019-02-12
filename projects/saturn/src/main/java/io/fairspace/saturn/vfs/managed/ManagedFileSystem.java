@@ -23,12 +23,15 @@ import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
             .readOnly(false)
             .isDirectory(true)
+            .created(ofEpochMilli(0))
+            .modified(ofEpochMilli(0))
             .build();
     private final RDFConnection rdf;
     private final BlobStore store;
