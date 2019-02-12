@@ -60,7 +60,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public Date getCreateDate() {
-        return new Date(info.getCreated());
+        return Date.from(info.getCreated());
     }
 
     @Override
@@ -90,7 +90,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public Date getModifiedDate() {
-        return new Date(info.getModified());
+        return Date.from(info.getModified());
     }
 
     @Override

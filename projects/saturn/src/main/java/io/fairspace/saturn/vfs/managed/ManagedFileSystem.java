@@ -1,14 +1,13 @@
 package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.services.collections.Collection;
+import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
-import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.io.input.CountingInputStream;
-import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.io.FileNotFoundException;
@@ -20,29 +19,44 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.SparqlUtils.generateURI;
+import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static java.time.Instant.ofEpochMilli;
+import static java.util.stream.Collectors.toList;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
             .readOnly(false)
             .isDirectory(true)
+            .created(ofEpochMilli(0))
+            .modified(ofEpochMilli(0))
             .build();
     private final RDFConnection rdf;
     private final BlobStore store;
     private final Supplier<UserInfo> userInfoSupplier;
+    private final CollectionsService collections;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<UserInfo> userInfoSupplier) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<UserInfo> userInfoSupplier, CollectionsService collections) {
         this.rdf = rdf;
         this.store = store;
         this.userInfoSupplier = userInfoSupplier;
+        this.collections = collections;
     }
 
     @Override
     public FileInfo stat(String path) throws IOException {
         if (path.isEmpty()) {
             return ROOT;
+        }
+
+        if (isCollection(path)) {
+            var collection = collections.getByDirectoryName(path);
+            if (collection == null) {
+                return null;
+            }
+            return fileInfo(collection);
         }
 
         var info = new Ref<FileInfo>();
@@ -55,35 +69,31 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public List<FileInfo> list(String parentPath) throws IOException {
+        if (parentPath.isEmpty()) {
+            return collections.list()
+                    .stream()
+                    .map(ManagedFileSystem::fileInfo)
+                    .collect(toList());
+        }
+
         var list = new ArrayList<FileInfo>();
-        rdf.querySelect(storedQuery("fs_ls", parentPath.isEmpty() ? "" : (parentPath + '/')),
+        rdf.querySelect(storedQuery("fs_ls", parentPath + '/'),
                 row -> list.add(fileInfo(row)));
         return list;
     }
 
     @Override
     public void mkdir(String path) throws IOException {
-        var isCollection = splitPath(path).length == 1;
-        if (isCollection) {
-            // TODO: Should be denied but very convenient for testing
-            withCommitMessage("Create collection " + path, () ->
-                    rdf.update(storedQuery("coll_create",
-                    generateURI(),
-                    path,
-                    path,
-                    "Describe me",
-                    "LOCAL",
-                    userId())));
-        }
+        ensureValidPath(path);
+
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", isCollection ? FS.Collection : FS.Directory, path, userId())));
+                () -> rdf.update(storedQuery("fs_mkdir", path, userId())));
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
-        if (splitPath(path).length == 1) {
-            throw new IOException("Cannot create a file in a top level directory");
-        }
+        ensureValidPath(path);
+
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Create file " + path, () ->
@@ -114,18 +124,24 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void copy(String from, String to) throws IOException {
+        ensureValidPath(from);
+        ensureValidPath(to);
         withCommitMessage("Copy data from " + from + " to " + to,
                 () -> rdf.update(storedQuery("fs_copy", from, to)));
     }
 
     @Override
     public void move(String from, String to) throws IOException {
+        ensureValidPath(from);
+        ensureValidPath(to);
         withCommitMessage("Move data from " + from + " to " + to,
                 () -> rdf.update(storedQuery("fs_move", from, to)));
     }
 
     @Override
     public void delete(String path) throws IOException {
+        ensureValidPath(path);
+
         withCommitMessage("Delete " + path,
                 () -> rdf.update(storedQuery("fs_delete", path, userId())));
     }
@@ -139,11 +155,24 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return FileInfo.builder()
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
-                .isDirectory(!row.getResource("type").equals(FS.File))
+                .isDirectory(!row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTime(row.getLiteral("created")))
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
                 .createdBy(row.getLiteral("createdBy").getString())
                 .modifiedBy(row.getLiteral("modifiedBy").getString())
+                .readOnly(false) // TODO: check
+                .build();
+    }
+
+    private static FileInfo fileInfo(Collection collection) {
+        return FileInfo.builder()
+                .path(collection.getDirectoryName())
+                .size(0)
+                .isDirectory(true)
+                .created(collection.getDateCreated())
+                .modified(collection.getDateCreated())
+                .createdBy(collection.getCreator())
+                .modifiedBy(collection.getCreator())
                 .readOnly(false) // TODO: check
                 .build();
     }
@@ -156,7 +185,19 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return "";
     }
 
-    private static long parseXSDDateTime(Literal literal) {
-        return ((XSDDateTime)literal.getValue()).asCalendar().getTimeInMillis();
+    static boolean isCollection(String path) {
+        return !path.isEmpty() && splitPath(path).length == 1;
+    }
+
+    private static void ensureValidPath(String path) throws IOException {
+        if (!path.equals(normalizePath(path))) {
+            throw new AssertionError("Invalid path format: " + path);
+        }
+        if (path.isEmpty()) {
+            throw new IOException("File operations on the root directory are not allowed");
+        }
+        if (isCollection(path)) {
+            throw new IOException("Use Collections API for operations on collections");
+        }
     }
 }

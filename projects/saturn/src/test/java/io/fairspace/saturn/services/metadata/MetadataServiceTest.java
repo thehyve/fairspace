@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -165,25 +164,25 @@ public class MetadataServiceTest {
     @Test
     public void getByType() {
         executeWrite(ds, () -> ds.getDefaultModel()
-                .add(S1, RDF.type, createResource(FS.uri + "PersonConsent"))
+                .add(S1, RDF.type, createResource("http://fairspace.io/ontology#PersonConsent"))
                 .add(LBL_STMT1)
-                .add(S2, RDF.type, createResource(FS.uri + "ResearchProject"))
-                .add(createResource("http://example.com/unknown"), RDF.type, createResource(FS.uri + "Unknown"))
+                .add(S2, RDF.type, createResource("http://fairspace.io/ontology#ResearchProject"))
+                .add(createResource("http://example.com/unknown"), RDF.type, createResource("http://fairspace.io/ontology#Unknown"))
                 .add(createResource("http://example.com/person"), RDF.type, FOAF.Person)
         );
 
-        var m1 = api.getByType(FS.uri + "PersonConsent");
+        var m1 = api.getByType("http://fairspace.io/ontology#PersonConsent");
         assertEquals(2, m1.size());
-        assertTrue(m1.contains(S1, RDF.type, createResource(FS.uri + "PersonConsent")));
+        assertTrue(m1.contains(S1, RDF.type, createResource("http://fairspace.io/ontology#PersonConsent")));
         assertTrue(m1.contains(LBL_STMT1));
 
         var m2 = api.getByType(null);
         assertEquals(3, m2.size());
-        assertTrue(m2.contains(S1, RDF.type, createResource(FS.uri + "PersonConsent")));
+        assertTrue(m2.contains(S1, RDF.type, createResource("http://fairspace.io/ontology#PersonConsent")));
         assertTrue(m2.contains(LBL_STMT1));
-        assertTrue(m2.contains(S2, RDF.type, createResource(FS.uri + "ResearchProject")));
+        assertTrue(m2.contains(S2, RDF.type, createResource("http://fairspace.io/ontology#ResearchProject")));
 
-        var m3 = api.getByType(FS.uri + "Unknown");
+        var m3 = api.getByType("http://fairspace.io/ontology#Unknown");
         assertTrue(m3.isEmpty());
 
         var m4 = api.getByType(FOAF.Person.toString());
