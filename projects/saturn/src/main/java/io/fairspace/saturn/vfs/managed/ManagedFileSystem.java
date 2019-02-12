@@ -6,7 +6,6 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
-import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -168,7 +167,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return FileInfo.builder()
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
-                .isDirectory(!row.getResource("type").equals(FS.File))
+                .isDirectory(!row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTime(row.getLiteral("created")))
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
                 .createdBy(row.getLiteral("createdBy").getString())
