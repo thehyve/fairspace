@@ -80,15 +80,16 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
+        ensureNotACollection(path);
+
         withCommitMessage("Create directory " + path,
                 () -> rdf.update(storedQuery("fs_mkdir", path, userId())));
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
-        if (splitPath(path).length == 1) {
-            throw new IOException("Cannot create a file in a top level directory");
-        }
+        ensureNotACollection(path);
+
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Create file " + path, () ->
