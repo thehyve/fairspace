@@ -39,13 +39,27 @@ public class ManagedFileSystemTest {
     }
 
     @Test
+    public void start() throws IOException {
+        assertEquals("coll", fs.stat("coll").getPath());
+        assertTrue(fs.stat("coll").isDirectory());
+
+        // Other cases are tested elsewhere
+    }
+
+    @Test
     public void list() throws IOException {
+        assertEquals(1, fs.list("").size());
+        assertEquals("coll", fs.list("").get(0).getPath());
+        assertTrue(fs.list("").get(0).isDirectory());
+
         fs.mkdir("coll/aaa");
         fs.mkdir("coll/aaa/bbb");
         fs.mkdir("coll/aaa/bbb/ccc");
         fs.mkdir("coll/aaa/bbb/ccc/ddd");
         var children = fs.list("coll/aaa/bbb");
         assertEquals(1, children.size());
+        assertEquals("coll/aaa/bbb/ccc", children.get(0).getPath());
+        assertTrue(children.get(0).isDirectory());
     }
 
     @Test
