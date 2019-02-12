@@ -10,7 +10,7 @@ For more information see [Fuseki documentation](https://jena.apache.org/document
 
 ### High-level metadata API
 
-The high-level metadata API runs on :8080/api/meta.
+The high-level metadata API runs on :8080/api/meta/.
 Currently it supports the following methods:
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                  |
@@ -21,7 +21,7 @@ Currently it supports the following methods:
 | DELETE      | -                                                 | JsonLD-encoded statements | Deletes the statements provided                                    |
 | PATCH       | -                                                 | JsonLD-encoded statements | Replaces existing triples with the statements provided             |
 
-An additional `:8080/api/meta/entities` endpoint allows to retrieve labelled FairSpace entities, optionally filtered by type:
+An additional `:8080/api/meta/entities/` endpoint allows to retrieve labelled FairSpace entities, optionally filtered by type:
 
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                      |
@@ -30,7 +30,7 @@ An additional `:8080/api/meta/entities` endpoint allows to retrieve labelled Fai
 
 
 ### High-level vocabulary API
-The high-level metadata API runs on :8080/api/vocabulary.
+The high-level metadata API runs on :8080/api/vocabulary/.
 Currently it supports the following methods:
 
 | HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                  |
@@ -39,7 +39,7 @@ Currently it supports the following methods:
 | PUT         | -                                         | JsonLD-encoded vocabulary | Replaces the vocabulary with the provided model                    |
 
 ### High-level collections API
-The high-level metadata API runs on :8080/api/collections.
+The high-level metadata API runs on :8080/api/collections/.
 Currently it supports the following methods:
 
 | HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                  |

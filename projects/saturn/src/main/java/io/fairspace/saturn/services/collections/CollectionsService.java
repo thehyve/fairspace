@@ -15,6 +15,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.system.Txn.calculateWrite;
+import static org.apache.jena.system.Txn.executeWrite;
 
 public class CollectionsService {
     private final RDFConnection rdf;
@@ -84,8 +85,14 @@ public class CollectionsService {
     }
 
     public void delete(String iri) {
-        withCommitMessage("Delete collection " + iri,
-                () -> rdf.update(storedQuery("coll_delete", createResource(iri))));
+        withCommitMessage("Delete collection " + iri, () ->
+                executeWrite(rdf, () -> {
+                    var existing = get(iri);
+                    if (existing == null) { // TODO: Check permissions
+                        throw new IllegalArgumentException("Couldn't delete " + iri);
+                    }
+                    rdf.update(storedQuery("coll_delete", createResource(iri)));
+                }));
     }
 
     public Collection update(Collection patch) {
