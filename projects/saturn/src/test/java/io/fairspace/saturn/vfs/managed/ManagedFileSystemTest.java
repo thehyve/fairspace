@@ -1,6 +1,7 @@
 package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,40 +31,45 @@ public class ManagedFileSystemTest {
         Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
         var collections = new CollectionsService(rdf, userInfoSupplier);
         fs = new ManagedFileSystem(rdf, store, userInfoSupplier, collections);
+        var collection = new Collection();
+        collection.setDirectoryName("coll");
+        collection.setPrettyName("My Collection");
+        collection.setType("LOCAL");
+        collections.create(collection);
     }
 
     @Test
     public void list() throws IOException {
-        fs.mkdir("aaa");
-        fs.mkdir("aaa/bbb");
-        fs.mkdir("aaa/bbb/ccc");
-        fs.mkdir("aaa/bbb/ccc/ddd");
-        var children = fs.list("aaa/bbb");
+        fs.mkdir("coll/aaa");
+        fs.mkdir("coll/aaa/bbb");
+        fs.mkdir("coll/aaa/bbb/ccc");
+        fs.mkdir("coll/aaa/bbb/ccc/ddd");
+        var children = fs.list("coll/aaa/bbb");
         assertEquals(1, children.size());
     }
 
     @Test
     public void mkdir() throws IOException {
-        fs.mkdir("aaa/bbb/ccc");
-        var stat = fs.stat("aaa/bbb/ccc");
-        assertEquals("aaa/bbb/ccc", stat.getPath());
+        fs.mkdir("coll/aaa/bbb/ccc");
+        var stat = fs.stat("coll/aaa/bbb/ccc");
+        assertEquals("coll/aaa/bbb/ccc", stat.getPath());
         assertTrue(stat.isDirectory());
     }
 
     @Test
     public void writeAndRead() throws IOException {
-        fs.mkdir("dir");
+        fs.mkdir("coll/dir");
 
-        fs.create("dir/file", new ByteArrayInputStream(content1));
-        assertEquals(content1.length, fs.stat("dir/file").getSize());
+        fs.create("coll/dir/file", new ByteArrayInputStream(content1));
+        assertEquals(content1.length, fs.stat("coll/dir/file").getSize());
         var os = new ByteArrayOutputStream();
-        fs.read("dir/file", os);
+        fs.read("coll/dir/file", os);
         assertArrayEquals(content1, os.toByteArray());
 
-        fs.modify("dir/file", new ByteArrayInputStream(content2));
-        assertEquals(content2.length, fs.stat("dir/file").getSize());
+        fs.modify("coll/dir/file", new ByteArrayInputStream(content2));
+        assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
         os = new ByteArrayOutputStream();
-        fs.read("dir/file", os);
+        fs.read("coll/dir/file", os);
         if (!Arrays.equals(content2, os.toByteArray())) {
             assertArrayEquals(content2, os.toByteArray());
         }
@@ -72,7 +78,6 @@ public class ManagedFileSystemTest {
 
     @Test
     public void copyDir() throws IOException {
-        fs.mkdir("coll");
         fs.mkdir("coll/dir1");
         fs.mkdir("coll/dir1/subdir");
         fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
@@ -88,7 +93,6 @@ public class ManagedFileSystemTest {
 
     @Test
     public void copyFile() throws IOException {
-        fs.mkdir("coll");
         fs.mkdir("coll/dir1");
         fs.mkdir("coll/dir2");
         fs.create("coll/dir1/file", new ByteArrayInputStream(content1));
@@ -104,7 +108,6 @@ public class ManagedFileSystemTest {
 
     @Test
     public void moveDir() throws IOException {
-        fs.mkdir("coll");
         fs.mkdir("coll/dir1");
         fs.mkdir("coll/dir1/subdir");
         fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
@@ -120,7 +123,6 @@ public class ManagedFileSystemTest {
 
     @Test
     public void moveDirWithConflicts() throws IOException {
-        fs.mkdir("coll");
         fs.mkdir("coll/dir1");
         fs.mkdir("coll/dir1/subdir");
         fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
@@ -140,38 +142,38 @@ public class ManagedFileSystemTest {
 
     @Test
     public void moveFile() throws IOException {
-        fs.mkdir("dir1");
-        fs.create("dir1/file1", new ByteArrayInputStream(content1));
-        fs.mkdir("dir2");
-        fs.move("dir1/file1", "dir2/file2");
-        assertFalse(fs.exists("dir1/file1"));
-        assertTrue(fs.exists("dir2/file2"));
+        fs.mkdir("coll/dir1");
+        fs.create("coll/dir1/file1", new ByteArrayInputStream(content1));
+        fs.mkdir("coll/dir2");
+        fs.move("coll/dir1/file1", "coll/dir2/file2");
+        assertFalse(fs.exists("coll/dir1/file1"));
+        assertTrue(fs.exists("coll/dir2/file2"));
         var os = new ByteArrayOutputStream();
-        fs.read("dir2/file2", os);
+        fs.read("coll/dir2/file2", os);
         assertArrayEquals(content1, os.toByteArray());
     }
 
 
     @Test
     public void deleteDir() throws IOException {
-        fs.mkdir("dir");
-        fs.mkdir("dir/subdir");
-        fs.create("dir/file", new ByteArrayInputStream(content1));
+        fs.mkdir("coll/dir");
+        fs.mkdir("coll/dir/subdir");
+        fs.create("coll/dir/file", new ByteArrayInputStream(content1));
 
-        fs.delete("dir");
+        fs.delete("coll/dir");
 
-        assertFalse(fs.exists("dir"));
-        assertFalse(fs.exists("dir/subdir"));
-        assertFalse(fs.exists("dir/file"));
+        assertFalse(fs.exists("coll/dir"));
+        assertFalse(fs.exists("coll/dir/subdir"));
+        assertFalse(fs.exists("coll/dir/file"));
     }
 
     @Test
     public void deleteFile() throws IOException {
-        fs.mkdir("dir");
-        fs.create("dir/file", new ByteArrayInputStream(content1));
+        fs.mkdir("coll/dir");
+        fs.create("coll/dir/file", new ByteArrayInputStream(content1));
 
-        fs.delete("dir/file");
+        fs.delete("coll/dir/file");
 
-        assertFalse(fs.exists("dir/file"));
+        assertFalse(fs.exists("coll/dir/file"));
     }
 }
