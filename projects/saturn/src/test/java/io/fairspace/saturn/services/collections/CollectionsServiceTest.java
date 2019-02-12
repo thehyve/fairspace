@@ -1,17 +1,24 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.auth.UserInfo;
+import org.junit.Before;
 import org.junit.Test;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.getWorkspaceURI;
+import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
 public class CollectionsServiceTest {
+    @Before
+    public void before() {
+        setWorkspaceURI("http://example.com/iri/");
+    }
 
     @Test
     public void basicFunctionality() {
-        var service = new CollectionsService(connect(createTxnMem()), "http://example.com/iri/",
+        var service = new CollectionsService(connect(createTxnMem()),
                 () -> new UserInfo("userId", null, null, null));
 
         assertTrue(service.list().isEmpty());
@@ -23,7 +30,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
 
         var created1 = service.create(c1);
-        assertTrue(created1.getUri().startsWith("http://example.com/iri/"));
+        assertTrue(created1.getUri().startsWith(getWorkspaceURI()));
         assertEquals(c1.getPrettyName(), created1.getPrettyName());
         assertEquals(c1.getDescription(), created1.getDescription());
         assertEquals(c1.getDirectoryName(), created1.getDirectoryName());

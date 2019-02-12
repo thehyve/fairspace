@@ -14,8 +14,8 @@ public class CollectionsApp implements SparkApplication {
     private final CollectionsService service;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public CollectionsApp(RDFConnection rdf, String baseURI) {
-        this.service = new CollectionsService(rdf, baseURI, SecurityUtil::userInfo);
+    public CollectionsApp(RDFConnection rdf) {
+        this.service = new CollectionsService(rdf, SecurityUtil::userInfo);
     }
 
     @Override

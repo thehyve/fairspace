@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
@@ -20,8 +21,10 @@ public class ManagedFileSystemTest {
 
     @Before
     public void before()  {
+        setWorkspaceURI("http://example.com/");
         var store = new MemoryBlobStore();
-        fs = new ManagedFileSystem(connect(createTxnMem()), store,"http://example.com/", null);
+        fs = new ManagedFileSystem(connect(createTxnMem()), store, null);
+
     }
 
     @Test
