@@ -1,9 +1,10 @@
 # 0 - IRI
+# 1 - deleted by
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
 # Delete files and folders
-INSERT { ?s fs:dateDeleted ?date } WHERE {
+INSERT { ?s fs:dateDeleted ?date; fs:deletedby ?1. } WHERE {
 ?0 fs:filePath ?collPath;
 a fs:Collection.
 ?s ?p ?o;

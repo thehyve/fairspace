@@ -51,7 +51,7 @@ public class CollectionsService {
                             collection.getDirectoryName(),
                             collection.getDescription(),
                             collection.getType(),
-                            userInfoSupplier.get().getUserId()));
+                            userId()));
 
                     return getByDirectoryName(collection.getDirectoryName());
                 }));
@@ -91,7 +91,7 @@ public class CollectionsService {
                     if (existing == null) { // TODO: Check permissions
                         throw new IllegalArgumentException("Couldn't delete " + iri);
                     }
-                    rdf.update(storedQuery("coll_delete", createResource(iri)));
+                    rdf.update(storedQuery("coll_delete", createResource(iri), userId()));
                 }));
     }
 
@@ -138,5 +138,15 @@ public class CollectionsService {
                 && name.indexOf('/') < 0
                 && name.indexOf('\\') < 0
                 && name.length() < 128;
+    }
+
+    private String userId() {
+        if (userInfoSupplier != null) {
+            var userInfo = userInfoSupplier.get();
+            if (userInfo != null) {
+                return userInfo.getUserId();
+            }
+        }
+        return "";
     }
 }
