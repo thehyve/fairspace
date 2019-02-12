@@ -9,8 +9,10 @@ $BUILD_SCRIPTS_DIR/gradle/tag.sh
 # After that, only select columns 2 - 7 (disregarding app name and line,
 # complexity and method coverage)
 # Finally, show the output as a table
+echo "-- Code coverage --"
 sed s/io.fairspace.saturn// ./build/reports/jacoco/test/jacocoTestReport.csv | \
    cut -d "," -f2-7 | \
    column -t -s,
+echo
 
 $BUILD_SCRIPTS_DIR/docker/build.sh

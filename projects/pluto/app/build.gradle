@@ -66,6 +66,14 @@ jacoco {
 	toolVersion = "0.8.2"
 }
 
+jacocoTestReport {
+	reports {
+		xml.enabled false
+		csv.enabled true
+	}
+}
+
+
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
