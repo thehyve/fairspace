@@ -190,4 +190,12 @@ public class ManagedFileSystemTest {
 
         assertFalse(fs.exists("coll/dir/file"));
     }
+
+    @Test
+    public void isCollection() {
+        assertTrue(ManagedFileSystem.isCollection("coll"));
+        assertFalse(ManagedFileSystem.isCollection(""));
+        assertFalse(ManagedFileSystem.isCollection("coll/dir"));
+        assertFalse(ManagedFileSystem.isCollection("coll/dir/subdir"));
+    }
 }

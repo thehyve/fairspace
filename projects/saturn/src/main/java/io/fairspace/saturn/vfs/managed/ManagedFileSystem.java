@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.stream.Collectors.toList;
 
@@ -80,7 +81,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        ensureNotACollection(path);
+        ensureValidPath(path);
 
         withCommitMessage("Create directory " + path,
                 () -> rdf.update(storedQuery("fs_mkdir", path, userId())));
@@ -88,7 +89,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void create(String path, InputStream in) throws IOException {
-        ensureNotACollection(path);
+        ensureValidPath(path);
 
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
@@ -120,23 +121,23 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void copy(String from, String to) throws IOException {
-        ensureNotACollection(from);
-        ensureNotACollection(to);
+        ensureValidPath(from);
+        ensureValidPath(to);
         withCommitMessage("Copy data from " + from + " to " + to,
                 () -> rdf.update(storedQuery("fs_copy", from, to)));
     }
 
     @Override
     public void move(String from, String to) throws IOException {
-        ensureNotACollection(from);
-        ensureNotACollection(to);
+        ensureValidPath(from);
+        ensureValidPath(to);
         withCommitMessage("Move data from " + from + " to " + to,
                 () -> rdf.update(storedQuery("fs_move", from, to)));
     }
 
     @Override
     public void delete(String path) throws IOException {
-        ensureNotACollection(path);
+        ensureValidPath(path);
 
         withCommitMessage("Delete " + path,
                 () -> rdf.update(storedQuery("fs_delete", path, userId())));
@@ -181,11 +182,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return "";
     }
 
-    private static boolean isCollection(String path) {
-        return splitPath(path).length == 1;
+    static boolean isCollection(String path) {
+        return !path.isEmpty() && splitPath(path).length == 1;
     }
 
-    private static void ensureNotACollection(String path) throws IOException {
+    private static void ensureValidPath(String path) throws IOException {
+        if (!path.equals(normalizePath(path))) {
+            throw new AssertionError("Invalid path format: " + path);
+        }
+        if (path.isEmpty()) {
+            throw new IOException("File operations on the root directory are not allowed");
+        }
         if (isCollection(path)) {
             throw new IOException("Use Collections API for operations on collections");
         }
