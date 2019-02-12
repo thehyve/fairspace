@@ -38,6 +38,9 @@ public class CollectionsServiceTest {
         assertEquals("userId", created1.getCreator());
         assertNotNull(created1.getDateCreated());
 
+        assertNotNull(service.getByDirectoryName("dir1"));
+        assertNull(service.getByDirectoryName("dir2"));
+
         assertEquals(1, service.list().size());
         assertTrue(service.list().contains(created1));
 
