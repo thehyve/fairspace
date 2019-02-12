@@ -1,6 +1,7 @@
 package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.services.collections.Access;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.util.Ref;
@@ -24,6 +25,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.time.Instant.ofEpochMilli;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 public class ManagedFileSystem implements VirtualFileSystem {
@@ -59,10 +61,15 @@ public class ManagedFileSystem implements VirtualFileSystem {
             return fileInfo(collection);
         }
 
+        var access = getAccess(path);
+        if (access == Access.None) {
+            return null;
+        }
+
         var info = new Ref<FileInfo>();
 
         rdf.querySelect(storedQuery("fs_stat", path),
-                row -> info.value = fileInfo(row));
+                row -> info.value = fileInfo(row, access.ordinal() < Access.Write.ordinal()));
 
         return info.value;
     }
@@ -76,9 +83,15 @@ public class ManagedFileSystem implements VirtualFileSystem {
                     .collect(toList());
         }
 
+        var access = getAccess(parentPath);
+        if (access == Access.None) {
+            return emptyList();
+        }
+
+
         var list = new ArrayList<FileInfo>();
         rdf.querySelect(storedQuery("fs_ls", parentPath + '/'),
-                row -> list.add(fileInfo(row)));
+                row -> list.add(fileInfo(row, access.ordinal() < Access.Write.ordinal())));
         return list;
     }
 
@@ -151,7 +164,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     }
 
-    private static FileInfo fileInfo(QuerySolution row) {
+    private static FileInfo fileInfo(QuerySolution row, boolean readOnly) {
         return FileInfo.builder()
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
@@ -160,7 +173,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
                 .createdBy(row.getLiteral("createdBy").getString())
                 .modifiedBy(row.getLiteral("modifiedBy").getString())
-                .readOnly(false) // TODO: check
+                .readOnly(false)
                 .build();
     }
 
@@ -173,7 +186,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .modified(collection.getDateCreated())
                 .createdBy(collection.getCreator())
                 .modifiedBy(collection.getCreator())
-                .readOnly(false) // TODO: check
+                .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
                 .build();
     }
 
@@ -199,5 +212,14 @@ public class ManagedFileSystem implements VirtualFileSystem {
         if (isCollection(path)) {
             throw new IOException("Use Collections API for operations on collections");
         }
+    }
+
+    private Collection getCollection(String path) {
+        return collections.getByDirectoryName(splitPath(path)[0]);
+    }
+
+    private Access getAccess(String path) {
+        var c = getCollection(path);
+        return (c == null) ? Access.None : c.getAccess();
     }
 }

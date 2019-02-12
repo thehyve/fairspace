@@ -32,8 +32,8 @@ public class ManagedFileSystemTest {
         var collections = new CollectionsService(rdf, userInfoSupplier);
         fs = new ManagedFileSystem(rdf, store, userInfoSupplier, collections);
         var collection = new Collection();
-        collection.setDirectoryName("coll");
-        collection.setPrettyName("My Collection");
+        collection.setLocation("coll");
+        collection.setName("My Collection");
         collection.setType("LOCAL");
         collections.create(collection);
     }
