@@ -17,6 +17,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.system.Txn.calculateWrite;
 import static org.apache.jena.system.Txn.executeWrite;
 
+// TODO: Check permissions
 public class CollectionsService {
     private final RDFConnection rdf;
 
@@ -31,29 +32,29 @@ public class CollectionsService {
     public Collection create(Collection collection) {
         validate(collection.getUri() == null, "Field uri must not be left empty");
         validate(collection.getCreator() == null, "Field creator must not be left empty");
-        validate(collection.getDirectoryName() != null, "Field directoryName must be set");
-        validate(isDirectoryNameValid(collection.getDirectoryName()), "Invalid directoryName");
-        validate(collection.getPrettyName() != null && !collection.getPrettyName().isEmpty(), "Field prettyName must be set");
+        validate(collection.getLocation() != null, "Field location must be set");
+        validate(isDirectoryNameValid(collection.getLocation()), "Invalid location");
+        validate(collection.getName() != null && !collection.getName().isEmpty(), "Field prettyName must be set");
         validate(collection.getType() != null, "Field type must be set");
 
         if (collection.getDescription() == null) {
             collection.setDescription("");
         }
 
-        return withCommitMessage("Create collection " + collection.getPrettyName(), () ->
+        return withCommitMessage("Create collection " + collection.getName(), () ->
                 calculateWrite(rdf, () -> {
-                    if (getByDirectoryName(collection.getDirectoryName()) != null) {
+                    if (getByDirectoryName(collection.getLocation()) != null) {
                         return null;
                     }
 
                     rdf.update(storedQuery("coll_create",
-                            collection.getPrettyName(),
-                            collection.getDirectoryName(),
+                            collection.getName(),
+                            collection.getLocation(),
                             collection.getDescription(),
                             collection.getType(),
                             userId()));
 
-                    return getByDirectoryName(collection.getDirectoryName());
+                    return getByDirectoryName(collection.getLocation());
                 }));
     }
 
@@ -88,7 +89,7 @@ public class CollectionsService {
         withCommitMessage("Delete collection " + iri, () ->
                 executeWrite(rdf, () -> {
                     var existing = get(iri);
-                    if (existing == null) { // TODO: Check permissions
+                    if (existing == null) {
                         throw new IllegalArgumentException("Couldn't delete " + iri);
                     }
                     rdf.update(storedQuery("coll_delete", createResource(iri), userId()));
@@ -100,7 +101,7 @@ public class CollectionsService {
         validate(patch.getCreator() == null, "Field creator must not be left empty");
 
 
-        return withCommitMessage("Update collection " + patch.getPrettyName(), () ->
+        return withCommitMessage("Update collection " + patch.getName(), () ->
                 calculateWrite(rdf, () -> {
                     var existing = get(patch.getUri());
                     if (existing == null) {
@@ -112,9 +113,9 @@ public class CollectionsService {
 
                     rdf.update(storedQuery("coll_update",
                             createResource(patch.getUri()),
-                            patch.getPrettyName() != null ? patch.getPrettyName() : existing.getPrettyName(),
+                            patch.getName() != null ? patch.getName() : existing.getName(),
                             patch.getDescription() != null ? patch.getDescription() : existing.getDescription(),
-                            patch.getDirectoryName() != null ? patch.getDirectoryName() : existing.getDirectoryName()));
+                            patch.getLocation() != null ? patch.getLocation() : existing.getLocation()));
 
                     return get(patch.getUri());
                 })
@@ -125,11 +126,12 @@ public class CollectionsService {
         var collection = new Collection();
         collection.setUri(row.getResource("iri").toString());
         collection.setType(row.getLiteral("type").getString());
-        collection.setPrettyName(row.getLiteral("name").getString());
-        collection.setDirectoryName(row.getLiteral("path").getString());
+        collection.setName(row.getLiteral("name").getString());
+        collection.setLocation(row.getLiteral("path").getString());
         collection.setDescription(row.getLiteral("description").getString());
         collection.setCreator(row.getLiteral("createdBy").getString());
         collection.setDateCreated(parseXSDDateTime(row.getLiteral("dateCreated")));
+        collection.setAccess(Access.Manage); // TODO: Check
         return collection;
     }
 

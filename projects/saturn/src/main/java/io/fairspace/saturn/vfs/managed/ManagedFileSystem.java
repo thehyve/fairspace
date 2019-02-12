@@ -166,7 +166,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     private static FileInfo fileInfo(Collection collection) {
         return FileInfo.builder()
-                .path(collection.getDirectoryName())
+                .path(collection.getLocation())
                 .size(0)
                 .isDirectory(true)
                 .created(collection.getDateCreated())

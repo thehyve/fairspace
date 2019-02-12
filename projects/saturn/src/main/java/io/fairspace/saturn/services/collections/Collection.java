@@ -9,10 +9,11 @@ import java.time.Instant;
 @EqualsAndHashCode(of = "uri")
 public class Collection {
     private String uri;
-    private String prettyName;
-    private String directoryName;
+    private String name;
+    private String location;
     private String type;
     private String description;
     private String creator;
     private Instant dateCreated;
+    private Access access;
 }

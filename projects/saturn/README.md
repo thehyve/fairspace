@@ -52,11 +52,12 @@ Currently it supports the following methods:
 
 Currently a collection has the following fields, all represented as strings:
  - uri
- - prettyName
- - directoryName
- - type
- - description
+ - name
+ - description 
+ - location
+ - type 
  - creator
+ - dateCreated
 
 ## How to build
 
