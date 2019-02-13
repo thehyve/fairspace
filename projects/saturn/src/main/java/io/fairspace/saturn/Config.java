@@ -18,7 +18,7 @@ public class Config {
     public WebDAV webDAV = new WebDAV();
 
     public static class Jena {
-        public String baseURI = "http://fairspace.io/iri/";
+        public String baseIRI = "http://fairspace.io/iri/";
 
         public File datasetPath = new File("data/db");
 
@@ -27,16 +27,17 @@ public class Config {
         public ElasticSearch elasticSearch = new ElasticSearch();
 
         public static class ElasticSearch {
+            public boolean enabled = false;
             public boolean required = false;
             public ESSettings settings = new ESSettings.Builder()
                     .clusterName("fairspace")
-                    .hostAndPort("localhost", 9300)
+                    .hostAndPort("127.0.0.1", 9300)
                     .build();
         }
     }
 
     public static class Auth {
-        public boolean authEnabled = false;
+        public boolean enabled = false;
 
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 

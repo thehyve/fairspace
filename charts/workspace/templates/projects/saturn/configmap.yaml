@@ -11,10 +11,11 @@ data:
   application.yaml: |-
     port: 8080
     jena:
-      baseURI: {{ template "workspace.url" . }}/iri/
+      baseIRI: {{ template "workspace.url" . }}/iri/
       datasetPath: "/data/db"
       transactionLogPath: "/data/store/log"
       elasticSearch:
+        enabled: false
         required: false
         settings:
           hostToPortMapping:
@@ -24,7 +25,7 @@ data:
           replicas: 1
           indexName: "fairspace"
     auth:
-      authEnabled: true
+      enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: "RS256"
     webDAV:

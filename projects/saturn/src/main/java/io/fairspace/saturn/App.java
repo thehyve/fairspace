@@ -28,7 +28,7 @@ public class App {
     public static void main(String[] args) {
         System.out.println("Saturn is starting");
 
-        setWorkspaceURI(config.jena.baseURI);
+        setWorkspaceURI(config.jena.baseIRI);
 
         var ds = SaturnDatasetFactory.connect(config.jena);
         // The RDF connection is supposed to be threadsafe and can
@@ -49,7 +49,7 @@ public class App {
                 .port(config.port);
 
         var auth = config.auth;
-        if (auth.authEnabled) {
+        if (auth.enabled) {
             var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
             fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
         }

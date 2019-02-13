@@ -67,3 +67,4 @@ Currently a collection has the following fields, all represented as strings:
 ## Starting the service
 The `src` directory contains the actual application.
 The `build/distributions` directory contains the distribution archives.
+Use [application.yaml](application.yaml) to make adjustments to the application's configuration.
