@@ -4,12 +4,14 @@ import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.http.Auth;
 import io.milton.http.Range;
+import io.milton.http.Request;
 import io.milton.http.XmlWriter;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.exceptions.NotFoundException;
 import io.milton.resource.CollectionResource;
+import io.milton.resource.DeletableCollectionResource;
 import io.milton.resource.FolderResource;
 import io.milton.resource.Resource;
 
@@ -24,7 +26,7 @@ import static io.fairspace.saturn.webdav.VfsBackedMiltonResourceFactory.getResou
 import static java.util.stream.Collectors.toList;
 import static org.apache.http.entity.ContentType.TEXT_HTML;
 
-public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource implements FolderResource {
+public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource implements FolderResource, DeletableCollectionResource {
     public VfsBackedMiltonDirectoryResource(VirtualFileSystem fs, FileInfo info) {
         super(fs, info);
     }
@@ -107,5 +109,10 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     @Override
     public Long getContentLength() {
         return null;
+    }
+
+    @Override
+    public boolean isLockedOutRecursive(Request request) {
+        return false;
     }
 }
