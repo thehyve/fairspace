@@ -31,7 +31,7 @@ class MetadataService {
     }
 
     void put(Model model) {
-        rdf.put(model);
+        rdf.load(model);
     }
 
     void delete(String subject, String predicate, String object) {
