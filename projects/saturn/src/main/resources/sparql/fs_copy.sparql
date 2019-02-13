@@ -6,9 +6,6 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-# Delete an existing "to" resource
-DELETE { ?s ?p ?o }
-WHERE { ?s fs:filePath ?1 };
 
 # Create the target resource
 INSERT { ?newIRI fs:filePath ?1 }
@@ -27,14 +24,6 @@ WHERE {
     fs:filePath ?0 .
     FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
     FILTER( ?p != fs:filePath) # filePath has changed
-};
-
-# Delete target's children
-DELETE { ?s ?p ?o }
-WHERE {
-  ?s fs:filePath ?path .
-  FILTER(STRSTARTS(?path, CONCAT(?1, '/')))
-  ?s ?p ?o .
 };
 
 # Create children
