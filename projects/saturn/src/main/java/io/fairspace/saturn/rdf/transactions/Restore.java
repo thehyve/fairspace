@@ -11,14 +11,15 @@ import static org.apache.jena.system.Txn.executeWrite;
 @Slf4j
 public class Restore {
     public static void restore(DatasetGraph dsg, LocalTransactionLog txnLog) {
+        var logSize = txnLog.size();
+
+        if (logSize == 0) {
+            return;
+        }
+
+        log.warn("Your metadata database is gone. Restoring from the transaction log containing {} transactions", logSize);
+
         executeWrite(dsg, () -> {
-            var logSize = txnLog.size();
-
-            if (logSize == 0) {
-                return;
-            }
-
-            log.warn("Your metadata database is gone. Restoring from the transaction log containing {} transactions", logSize);
             var prevProgress = -1L;
             for (var i = 0; i < logSize; i++) {
                 var progress = (100 * i) / logSize;
