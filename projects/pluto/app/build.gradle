@@ -12,6 +12,7 @@ buildscript {
 
 plugins {
 	id 'net.ltgt.apt' version '0.10'
+	id 'io.franzbecker.gradle-lombok' version '2.0'
 }
 
 apply plugin: 'java'
@@ -19,6 +20,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'jacoco'
+apply plugin: 'io.franzbecker.gradle-lombok'
 
 group = 'nl.fairspace.pluto'
 version = System.getenv('VERSION') ?: '0.0.1-SNAPSHOT'
@@ -41,8 +43,6 @@ ext {
 }
 
 dependencies {
-	compileOnly 'org.projectlombok:lombok:1.18.0'
-
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
     compile("org.springframework.boot:spring-boot-starter-actuator")
@@ -53,6 +53,7 @@ dependencies {
 	compile("io.fairspace:oidc-auth-sso:${oidcAuthVersion}")
 	compile("io.fairspace:oidc-auth-bearer-auth:${oidcAuthVersion}")
 	compile("io.fairspace:oidc-auth-zuul:${oidcAuthVersion}")
+	implementation 'com.nimbusds:nimbus-jose-jwt:5.7'
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")

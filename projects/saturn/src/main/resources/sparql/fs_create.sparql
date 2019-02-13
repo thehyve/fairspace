@@ -1,20 +1,19 @@
 # Creates a file
 #
-# 0 - base IRI (string)
-# 1 - path
-# 2 - size
-# 3 - blobId
-# 4 - creator
+# 0 - path
+# 1 - size
+# 2 - blobId
+# 3 - creator
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
 INSERT {
 ?iri a fs:File;
-fs:filePath ?1;
-fs:fileSize ?2;
-fs:blobId ?3;
-fs:createdBy ?4;
+fs:filePath ?0;
+fs:fileSize ?1;
+fs:blobId ?2;
+fs:createdBy ?3;
 fs:dateCreated ?date;
-fs:modifiedBy ?4;
+fs:modifiedBy ?3;
 fs:dateModified ?date . }
-WHERE { BIND(IRI(CONCAT(?0, STRUUID())) as ?iri) BIND(NOW() as ?date) }
+WHERE { BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?iri) BIND(NOW() as ?date) }
