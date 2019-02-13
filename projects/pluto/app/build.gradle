@@ -19,6 +19,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'jacoco'
 apply plugin: 'io.franzbecker.gradle-lombok'
 
 group = 'nl.fairspace.pluto'
@@ -61,6 +62,18 @@ dependencies {
 springBoot {
   buildInfo()
 }
+
+jacoco {
+	toolVersion = "0.8.2"
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled false
+		csv.enabled true
+	}
+}
+
 
 dependencyManagement {
 	imports {

@@ -11,6 +11,7 @@ plugins {
     id 'java'
     id 'io.franzbecker.gradle-lombok' version '2.0'
     id 'application'
+    id 'jacoco'
 }
 
 
@@ -46,4 +47,11 @@ dependencies {
 
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-core:${mockitoVersion}"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled true
+    }
 }
