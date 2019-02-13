@@ -37,7 +37,7 @@ public class MetadataApp implements SparkApplication {
                 return "";
             });
             patch("/", (req, res) -> {
-                api.put(fromJsonLD(req.body()));
+                api.patch(fromJsonLD(req.body()));
                 return "";
             });
             delete("/", (req, res) -> {
