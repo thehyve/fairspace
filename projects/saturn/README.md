@@ -51,7 +51,7 @@ Currently it supports the following methods:
 | DELETE      | iri (URL-encoded)                         | -                         | Deletes a collection             v                                 |
 
 Currently a collection has the following fields, all represented as strings:
- - uri
+ - iri
  - name
  - description 
  - location

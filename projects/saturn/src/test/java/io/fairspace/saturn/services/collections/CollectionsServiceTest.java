@@ -30,7 +30,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
 
         var created1 = service.create(c1);
-        assertTrue(created1.getUri().startsWith(getWorkspaceURI()));
+        assertTrue(created1.getIri().startsWith(getWorkspaceURI()));
         assertEquals(c1.getName(), created1.getName());
         assertEquals(c1.getDescription(), created1.getDescription());
         assertEquals(c1.getLocation(), created1.getLocation());
@@ -44,18 +44,18 @@ public class CollectionsServiceTest {
         assertEquals(1, service.list().size());
         assertTrue(service.list().contains(created1));
 
-        assertEquals(created1, service.get(created1.getUri()));
+        assertEquals(created1, service.get(created1.getIri()));
 
         assertNull("Collection with same directory name cannot be created", service.create(c1));
 
         var patch = new Collection();
-        patch.setUri(created1.getUri());
+        patch.setIri(created1.getIri());
         patch.setName("new name");
         patch.setDescription("new descr");
         patch.setLocation("dir2");
         service.update(patch);
 
-        var updated = service.get(created1.getUri());
+        var updated = service.get(created1.getIri());
         assertEquals("new name", updated.getName());
         assertEquals("new descr", updated.getDescription());
         assertEquals("dir2", updated.getLocation());
@@ -68,7 +68,7 @@ public class CollectionsServiceTest {
         var created2 = service.create(c2);
         assertEquals(2, service.list().size());
 
-        service.delete(created2.getUri());
+        service.delete(created2.getIri());
         assertEquals(1, service.list().size());
     }
 }

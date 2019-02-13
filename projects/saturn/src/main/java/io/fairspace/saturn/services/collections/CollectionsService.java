@@ -30,7 +30,7 @@ public class CollectionsService {
     }
 
     public Collection create(Collection collection) {
-        validate(collection.getUri() == null, "Field uri must not be left empty");
+        validate(collection.getIri() == null, "Field uri must not be left empty");
         validate(collection.getCreator() == null, "Field creator must not be left empty");
         validate(collection.getLocation() != null, "Field location must be set");
         validate(isDirectoryNameValid(collection.getLocation()), "Invalid location");
@@ -97,12 +97,12 @@ public class CollectionsService {
     }
 
     public Collection update(Collection patch) {
-        validate(patch.getUri() != null, "No URI");
+        validate(patch.getIri() != null, "No URI");
         validate(patch.getCreator() == null, "Field creator must not be left empty");
 
         return withCommitMessage("Update collection " + patch.getName(), () ->
                 calculateWrite(rdf, () -> {
-                    var existing = get(patch.getUri());
+                    var existing = get(patch.getIri());
                     if (existing == null) {
                         return null;
                     }
@@ -111,20 +111,20 @@ public class CollectionsService {
                             "Cannot change collection's type");
 
                     rdf.update(storedQuery("coll_update",
-                            createResource(patch.getUri()),
+                            createResource(patch.getIri()),
                             patch.getName() != null ? patch.getName() : existing.getName(),
                             patch.getDescription() != null ? patch.getDescription() : existing.getDescription(),
                             patch.getLocation() != null ? patch.getLocation() : existing.getLocation(),
                             userId()));
 
-                    return get(patch.getUri());
+                    return get(patch.getIri());
                 })
         );
     }
 
     private static Collection toCollection(QuerySolution row) {
         var collection = new Collection();
-        collection.setUri(row.getResource("iri").toString());
+        collection.setIri(row.getResource("iri").toString());
         collection.setType(row.getLiteral("type").getString());
         collection.setName(row.getLiteral("name").getString());
         collection.setLocation(row.getLiteral("path").getString());

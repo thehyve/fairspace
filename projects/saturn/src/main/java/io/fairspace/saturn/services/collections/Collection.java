@@ -6,9 +6,9 @@ import lombok.EqualsAndHashCode;
 import java.time.Instant;
 
 @Data
-@EqualsAndHashCode(of = "uri")
+@EqualsAndHashCode(of = "iri")
 public class Collection {
-    private String uri;
+    private String iri;
     private String name;
     private String location;
     private String type;
