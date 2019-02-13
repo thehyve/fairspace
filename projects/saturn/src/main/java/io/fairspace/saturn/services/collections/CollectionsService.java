@@ -1,11 +1,10 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.auth.UserInfo;
-import io.fairspace.saturn.util.Ref;
+import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -59,30 +58,21 @@ public class CollectionsService {
     }
 
     public Collection get(String iri) {
-        var result = new Ref<Collection>();
-
-        rdf.querySelect(storedQuery("coll_get", createResource(iri)),
-                row -> result.value = toCollection(row));
-
-        return result.value;
+        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
+        rdf.querySelect(storedQuery("coll_get", createResource(iri)), processor);
+        return processor.getSingle().orElse(null);
     }
 
     public Collection getByDirectoryName(String name) {
-        var result = new Ref<Collection>();
-
-        rdf.querySelect(storedQuery("coll_get_by_dir", name),
-                row -> result.value = toCollection(row));
-
-        return result.value;
+        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
+        rdf.querySelect(storedQuery("coll_get_by_dir", name), processor);
+        return processor.getSingle().orElse(null);
     }
 
     public List<Collection> list() {
-        var result = new ArrayList<Collection>();
-
-        rdf.querySelect(storedQuery("coll_list"),
-                row -> result.add(toCollection(row)));
-
-        return result;
+        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
+        rdf.querySelect(storedQuery("coll_list"), processor);
+        return processor.getValues();
     }
 
     public void delete(String iri) {

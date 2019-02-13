@@ -1,10 +1,10 @@
 package io.fairspace.saturn.vfs.managed;
 
 import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import io.fairspace.saturn.services.collections.Access;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
-import io.fairspace.saturn.util.Ref;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import org.apache.commons.io.input.CountingInputStream;
@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -66,12 +65,11 @@ public class ManagedFileSystem implements VirtualFileSystem {
             return null;
         }
 
-        var info = new Ref<FileInfo>();
+        var processor = new QuerySolutionProcessor<>(row -> fileInfo(row, access.ordinal() < Access.Write.ordinal()));
 
-        rdf.querySelect(storedQuery("fs_stat", path),
-                row -> info.value = fileInfo(row, access.ordinal() < Access.Write.ordinal()));
+        rdf.querySelect(storedQuery("fs_stat", path), processor);
 
-        return info.value;
+        return processor.getSingle().orElse(null);
     }
 
     @Override
@@ -88,11 +86,9 @@ public class ManagedFileSystem implements VirtualFileSystem {
             return emptyList();
         }
 
-
-        var list = new ArrayList<FileInfo>();
-        rdf.querySelect(storedQuery("fs_ls", parentPath + '/'),
-                row -> list.add(fileInfo(row, access.ordinal() < Access.Write.ordinal())));
-        return list;
+        var processor = new QuerySolutionProcessor<>(row -> fileInfo(row, access.ordinal() < Access.Write.ordinal()));
+        rdf.querySelect(storedQuery("fs_ls", parentPath + '/'), processor);
+        return processor.getValues();
     }
 
     @Override
@@ -123,16 +119,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
-        var blobId = new Ref<String>();
-
-        rdf.querySelect(storedQuery("fs_get_blobid", path),
-                row -> blobId.value = row.getLiteral("blobId").getString());
-
-        if (blobId.value == null) {
-            throw new FileNotFoundException(path);
-        }
-
-        store.read(blobId.value, out);
+        var processor = new QuerySolutionProcessor<>(row -> row.getLiteral("blobId").getString());
+        rdf.querySelect(storedQuery("fs_get_blobid", path), processor);
+        var blobId = processor.getSingle().orElseThrow(() -> new FileNotFoundException(path));
+        store.read(blobId, out);
     }
 
     @Override
