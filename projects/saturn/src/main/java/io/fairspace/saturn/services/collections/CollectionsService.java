@@ -30,7 +30,7 @@ public class CollectionsService {
     }
 
     public Collection create(Collection collection) {
-        validate(collection.getIri() == null, "Field uri must not be left empty");
+        validate(collection.getIri() == null, "Field iri must not be left empty");
         validate(collection.getCreator() == null, "Field creator must not be left empty");
         validate(collection.getLocation() != null, "Field location must be set");
         validate(isDirectoryNameValid(collection.getLocation()), "Invalid location");
