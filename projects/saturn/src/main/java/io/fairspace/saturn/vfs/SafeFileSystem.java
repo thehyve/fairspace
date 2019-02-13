@@ -103,7 +103,7 @@ public class SafeFileSystem implements VirtualFileSystem {
                 throw new FileNotFoundException(normalizedFrom);
             }
             if (exists(normalizedTo)) {
-                throw new IOException("Cannot move to an existing destination " + normalizedTo);
+                throw new IOException("Cannot copy to an existing destination " + normalizedTo);
             }
             unsafe.copy(normalizedFrom, normalizedTo);
             if (!exists(normalizedTo)) {
