@@ -25,6 +25,11 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
     }
 
     @Override
+    public String getUniqueId() {
+        return info.getPath();
+    }
+
+    @Override
     public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
         fs.read(info.getPath(), out);
     }

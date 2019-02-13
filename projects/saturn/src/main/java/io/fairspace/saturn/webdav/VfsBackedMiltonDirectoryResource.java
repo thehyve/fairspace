@@ -29,6 +29,12 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         super(fs, info);
     }
 
+    // Currently we don't support etags for directories
+    @Override
+    public String getUniqueId() {
+        return null;
+    }
+
 
     @Override
     public CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {

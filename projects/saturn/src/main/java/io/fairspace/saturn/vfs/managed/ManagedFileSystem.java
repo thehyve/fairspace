@@ -166,6 +166,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     private static FileInfo fileInfo(QuerySolution row, boolean readOnly) {
         return FileInfo.builder()
+                .iri(row.getResource("iri").getURI())
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
                 .isDirectory(!row.getLiteral("isDirectory").getBoolean())
@@ -179,6 +180,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     private static FileInfo fileInfo(Collection collection) {
         return FileInfo.builder()
+                .iri(collection.getIri())
                 .path(collection.getLocation())
                 .size(0)
                 .isDirectory(true)
