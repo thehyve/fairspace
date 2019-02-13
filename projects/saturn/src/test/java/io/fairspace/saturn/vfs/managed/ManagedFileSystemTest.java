@@ -136,25 +136,6 @@ public class ManagedFileSystemTest {
     }
 
     @Test
-    public void moveDirWithConflicts() throws IOException {
-        fs.mkdir("coll/dir1");
-        fs.mkdir("coll/dir1/subdir");
-        fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
-        fs.mkdir("coll/dir2");
-        fs.mkdir("coll/dir2/subdir2");
-        fs.move("coll/dir1", "coll/dir2");
-        assertFalse(fs.exists("coll/dir1"));
-        assertFalse(fs.exists("coll/dir2/subdir2"));
-        assertTrue(fs.exists("coll/dir2"));
-        assertTrue(fs.exists("coll/dir2/subdir"));
-        assertTrue(fs.exists("coll/dir2/subdir/file"));
-        var os = new ByteArrayOutputStream();
-        fs.read("coll/dir2/subdir/file", os);
-        assertArrayEquals(content1, os.toByteArray());
-    }
-
-
-    @Test
     public void moveFile() throws IOException {
         fs.mkdir("coll/dir1");
         fs.create("coll/dir1/file1", new ByteArrayInputStream(content1));
@@ -189,6 +170,11 @@ public class ManagedFileSystemTest {
         fs.delete("coll/dir/file");
 
         assertFalse(fs.exists("coll/dir/file"));
+
+        fs.create("coll/dir/file", new ByteArrayInputStream(content2));
+
+        assertTrue(fs.exists("coll/dir/file"));
+        assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
     }
 
     @Test
