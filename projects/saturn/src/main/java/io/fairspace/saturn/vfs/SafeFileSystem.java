@@ -71,7 +71,6 @@ public class SafeFileSystem implements VirtualFileSystem {
             }
             return null;
         });
-
     }
 
     @Override
@@ -103,9 +102,8 @@ public class SafeFileSystem implements VirtualFileSystem {
             if (!exists(from)) {
                 throw new FileNotFoundException(normalizedFrom);
             }
-            var info = stat(normalizedTo);
-            if (info != null && info.isReadOnly()) {
-                throw new IOException("Cannot copy to " + normalizedTo);
+            if (exists(normalizedTo)) {
+                throw new IOException("Cannot move to an existing destination " + normalizedTo);
             }
             unsafe.copy(normalizedFrom, normalizedTo);
             if (!exists(normalizedTo)) {
@@ -126,9 +124,8 @@ public class SafeFileSystem implements VirtualFileSystem {
             if (!exists(normalizedFrom)) {
                 throw new FileNotFoundException(normalizedFrom);
             }
-            var info = stat(to);
-            if (info != null && info.isReadOnly()) {
-                throw new IOException("Cannot move to " + normalizedTo);
+            if (exists(normalizedTo)) {
+                throw new IOException("Cannot move to an existing destination " + normalizedTo);
             }
             unsafe.move(normalizedFrom, normalizedTo);
             if (!exists(normalizedTo)) {
