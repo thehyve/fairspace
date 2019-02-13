@@ -61,18 +61,10 @@ public class SparqlTransactionCodec implements TransactionCodec {
                 }
             }
             var updateRequest = UpdateFactory.create(queryBuilder.toString());
-            var updateDataInsert = (UpdateDataInsert) updateRequest.getOperations()
-                    .stream()
-                    .filter(UpdateDataInsert.class::isInstance)
-                    .findFirst()
-                    .get();
-            transaction.setAdded(new HashSet<>(updateDataInsert.getQuads()));
-            var updateDataDelete = (UpdateDataDelete) updateRequest.getOperations()
-                    .stream()
-                    .filter(UpdateDataDelete.class::isInstance)
-                    .findFirst()
-                    .get();
+            var updateDataDelete = (UpdateDataDelete) updateRequest.getOperations().get(0);
             transaction.setDeleted(new HashSet<>(updateDataDelete.getQuads()));
+            var updateDataInsert = (UpdateDataInsert) updateRequest.getOperations().get(1);
+            transaction.setAdded(new HashSet<>(updateDataInsert.getQuads()));
 
             return transaction;
         } catch (RuntimeException e) {
