@@ -8,6 +8,7 @@ import java.time.Instant;
 @Value
 @Builder
 public class FileInfo {
+    String iri;
     String path;
     boolean isDirectory;
     long size;
