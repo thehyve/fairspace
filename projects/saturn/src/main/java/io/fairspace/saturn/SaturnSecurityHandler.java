@@ -21,7 +21,7 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
 
     @Override
     public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        if (!"/health".equals(pathInContext)) {
+        if (!"/api/health/".equals(pathInContext)) {
             var userInfo = authenticator.apply(request);
             if (userInfo == null) {
                 response.sendError(SC_UNAUTHORIZED);
