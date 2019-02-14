@@ -182,7 +182,7 @@ saturn:
       cpu: 200m
       memory: 512Mi
 
-  probePath: /api/health
+  probePath: /api/health/
   livenessProbe:
     initialDelaySeconds: 20
     periodSeconds: 10
