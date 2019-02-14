@@ -1,7 +1,5 @@
 package io.fairspace.saturn.rdf.transactions;
 
-
-import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 import org.apache.jena.sparql.modify.request.UpdateDataInsert;
 import org.apache.jena.update.UpdateFactory;
@@ -17,9 +15,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
 
     @Override
     public void write(TransactionRecord transaction, OutputStream out) throws IOException {
-        try {
-            var writer = new IndentedWriter(out);
-
+        try (var writer = new OutputStreamWriter(out)) {
             writer.write(TIMESTAMP_PREFIX + transaction.getTimestamp() + "\n");
             if (transaction.getUserName() != null) {
                 writer.write(USER_NAME_PREFIX + transaction.getUserName() + "\n");
@@ -32,10 +28,9 @@ public class SparqlTransactionCodec implements TransactionCodec {
             }
             writer.write('\n');
 
-            transaction.asUpdateRequest().output(writer);
-            writer.write("\n# The End\n");
-        } catch (RuntimeException e) {
-            throw new IOException(e);
+            for (var update : transaction.asUpdateRequest().getOperations()) {
+                writer.append(update.toString().replace('\n', ' ')).append(";\n");
+            }
         }
     }
 
@@ -43,7 +38,9 @@ public class SparqlTransactionCodec implements TransactionCodec {
     public TransactionRecord read(InputStream in) throws IOException {
         try {
             var transaction = new TransactionRecord();
-            var queryBuilder = new StringBuilder();
+            transaction.setDeleted(new HashSet<>());
+            transaction.setAdded(new HashSet<>());
+
             try (var reader = new BufferedReader(new InputStreamReader(in))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -55,16 +52,17 @@ public class SparqlTransactionCodec implements TransactionCodec {
                         transaction.setUserId(line.substring(USER_ID_PREFIX.length()));
                     } else if (line.startsWith(COMMIT_MESSAGE_PREFIX)) {
                         transaction.setCommitMessage(line.substring(COMMIT_MESSAGE_PREFIX.length()));
-                    } else {
-                        queryBuilder.append(line).append('\n');
+                    } else if (!line.isBlank() && !line.startsWith("#")) {
+                        UpdateFactory.create(line).forEach(update -> {
+                            if (update instanceof UpdateDataDelete) {
+                                transaction.getDeleted().addAll(((UpdateDataDelete) update).getQuads());
+                            } else if (update instanceof UpdateDataInsert) {
+                                transaction.getAdded().addAll(((UpdateDataInsert) update).getQuads());
+                            }
+                        });
                     }
                 }
             }
-            var updateRequest = UpdateFactory.create(queryBuilder.toString());
-            var updateDataDelete = (UpdateDataDelete) updateRequest.getOperations().get(0);
-            transaction.setDeleted(new HashSet<>(updateDataDelete.getQuads()));
-            var updateDataInsert = (UpdateDataInsert) updateRequest.getOperations().get(1);
-            transaction.setAdded(new HashSet<>(updateDataInsert.getQuads()));
 
             return transaction;
         } catch (RuntimeException e) {
