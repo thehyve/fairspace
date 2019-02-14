@@ -1,21 +1,22 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.auth.UserInfo;
-import io.fairspace.saturn.util.Ref;
+import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
-import static java.util.UUID.randomUUID;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.system.Txn.calculateWrite;
+import static org.apache.jena.system.Txn.executeWrite;
 
+// TODO: Check permissions
 public class CollectionsService {
     private final RDFConnection rdf;
 
@@ -27,79 +28,71 @@ public class CollectionsService {
         this.userInfoSupplier = userInfoSupplier;
     }
 
-    public Collection create(Collection template) {
-        validate(template.getUri() == null, "Field uri must not be left empty");
-        validate(template.getCreator() == null, "Field creator must not be left empty");
-        validate(template.getDirectoryName() != null, "Field directoryName must be set");
-        validate(isDirectoryNameValid(template.getDirectoryName()), "Invalid directoryName");
-        validate(template.getPrettyName() != null && !template.getPrettyName().isEmpty(), "Field prettyName must be set");
-        validate(template.getType() != null, "Field type must be set");
+    public Collection create(Collection collection) {
+        validate(collection.getIri() == null, "Field iri must not be left empty");
+        validate(collection.getCreator() == null, "Field creator must not be left empty");
+        validate(collection.getLocation() != null, "Field location must be set");
+        validate(isDirectoryNameValid(collection.getLocation()), "Invalid location");
+        validate(collection.getName() != null && !collection.getName().isEmpty(), "Field prettyName must be set");
+        validate(collection.getType() != null, "Field type must be set");
 
-
-        var collection = new Collection();
-        collection.setUri(generateURI().toString());
-        collection.setPrettyName(template.getPrettyName());
-        collection.setDirectoryName(template.getDirectoryName());
-        collection.setDescription(template.getDescription() != null ? template.getDescription() : "");
-        collection.setType(template.getType());
-        collection.setCreator("");
-        if (userInfoSupplier != null) {
-            var userInfo = userInfoSupplier.get();
-            if (userInfo != null) {
-                collection.setCreator(userInfo.getUserId());
-            }
+        if (collection.getDescription() == null) {
+            collection.setDescription("");
         }
 
-        return withCommitMessage("Create collection " + collection.getPrettyName(), () ->
+        return withCommitMessage("Create collection " + collection.getName(), () ->
                 calculateWrite(rdf, () -> {
-                    var exists = new Ref<>(false);
-                    rdf.querySelect(storedQuery("fs_stat", collection.getDirectoryName()), row -> exists.value = true);
-                    if (exists.value) {
+                    if (getByDirectoryName(collection.getLocation()) != null) {
                         return null;
                     }
 
                     rdf.update(storedQuery("coll_create",
-                            createResource(collection.getUri()),
-                            collection.getPrettyName(),
-                            collection.getDirectoryName(),
+                            collection.getName(),
+                            collection.getLocation(),
                             collection.getDescription(),
                             collection.getType(),
-                            collection.getCreator()));
-                    return collection;
+                            userId()));
+
+                    return getByDirectoryName(collection.getLocation());
                 }));
     }
 
     public Collection get(String iri) {
-        var result = new Ref<Collection>();
+        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
+        rdf.querySelect(storedQuery("coll_get", createResource(iri)), processor);
+        return processor.getSingle().orElse(null);
+    }
 
-        rdf.querySelect(storedQuery("coll_get", createResource(iri)),
-                row -> result.value = toCollection(row));
-
-        return result.value;
+    public Collection getByDirectoryName(String name) {
+        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
+        rdf.querySelect(storedQuery("coll_get_by_dir", name), processor);
+        return processor.getSingle().orElse(null);
     }
 
     public List<Collection> list() {
-        var result = new ArrayList<Collection>();
-
-        rdf.querySelect(storedQuery("coll_list"),
-                row -> result.add(toCollection(row)));
-
-        return result;
+        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
+        rdf.querySelect(storedQuery("coll_list"), processor);
+        return processor.getValues();
     }
 
     public void delete(String iri) {
-        withCommitMessage("Delete collection " + iri,
-                () -> rdf.update(storedQuery("coll_delete", createResource(iri))));
+        withCommitMessage("Delete collection " + iri, () ->
+                executeWrite(rdf, () -> {
+                    var existing = get(iri);
+                    if (existing == null) {
+                        throw new IllegalArgumentException("Couldn't delete " + iri);
+                    }
+                    rdf.update(storedQuery("coll_delete", createResource(iri), userId()));
+                }));
     }
 
     public Collection update(Collection patch) {
-        validate(patch.getUri() != null, "No URI");
+        validate(patch.getIri() != null, "No URI");
         validate(patch.getCreator() == null, "Field creator must not be left empty");
 
-
-        return withCommitMessage("Update collection " + patch.getPrettyName(), () ->
+        return withCommitMessage("Update collection " + patch.getName(), () ->
                 calculateWrite(rdf, () -> {
-                    var existing = get(patch.getUri());
+                    var existing = get(patch.getIri());
                     if (existing == null) {
                         return null;
                     }
@@ -108,24 +101,27 @@ public class CollectionsService {
                             "Cannot change collection's type");
 
                     rdf.update(storedQuery("coll_update",
-                            createResource(patch.getUri()),
-                            patch.getPrettyName() != null ? patch.getPrettyName() : existing.getPrettyName(),
+                            createResource(patch.getIri()),
+                            patch.getName() != null ? patch.getName() : existing.getName(),
                             patch.getDescription() != null ? patch.getDescription() : existing.getDescription(),
-                            patch.getDirectoryName() != null ? patch.getDirectoryName() : existing.getDirectoryName()));
+                            patch.getLocation() != null ? patch.getLocation() : existing.getLocation(),
+                            userId()));
 
-                    return get(patch.getUri());
+                    return get(patch.getIri());
                 })
         );
     }
 
     private static Collection toCollection(QuerySolution row) {
         var collection = new Collection();
-        collection.setUri(row.getResource("iri").toString());
+        collection.setIri(row.getResource("iri").toString());
         collection.setType(row.getLiteral("type").getString());
-        collection.setPrettyName(row.getLiteral("name").getString());
-        collection.setDirectoryName(row.getLiteral("path").getString());
+        collection.setName(row.getLiteral("name").getString());
+        collection.setLocation(row.getLiteral("path").getString());
         collection.setDescription(row.getLiteral("description").getString());
         collection.setCreator(row.getLiteral("createdBy").getString());
+        collection.setDateCreated(parseXSDDateTime(row.getLiteral("dateCreated")));
+        collection.setAccess(Access.Manage); // TODO: Check
         return collection;
     }
 
@@ -134,5 +130,15 @@ public class CollectionsService {
                 && name.indexOf('/') < 0
                 && name.indexOf('\\') < 0
                 && name.length() < 128;
+    }
+
+    private String userId() {
+        if (userInfoSupplier != null) {
+            var userInfo = userInfoSupplier.get();
+            if (userInfo != null) {
+                return userInfo.getUserId();
+            }
+        }
+        return "";
     }
 }

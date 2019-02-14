@@ -8,7 +8,7 @@ import java.util.Map;
 
 import static java.util.UUID.randomUUID;
 
-class MemoryBlobStore implements BlobStore {
+public class MemoryBlobStore implements BlobStore {
     private Map<String, byte[]> memo = new HashMap<>();
 
     @Override

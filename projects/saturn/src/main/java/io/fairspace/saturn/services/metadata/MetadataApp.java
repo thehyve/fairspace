@@ -28,7 +28,7 @@ public class MetadataApp implements SparkApplication {
                         req.queryParams("object"),
                         req.queryParams().contains("labels")));
             });
-            get("/entities", (req, res) -> {
+            get("/entities/", (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
                 return toJsonLD(api.getByType(req.queryParams("type")));
             });
@@ -37,7 +37,7 @@ public class MetadataApp implements SparkApplication {
                 return "";
             });
             patch("/", (req, res) -> {
-                api.put(fromJsonLD(req.body()));
+                api.patch(fromJsonLD(req.body()));
                 return "";
             });
             delete("/", (req, res) -> {

@@ -1,18 +1,18 @@
 package io.fairspace.saturn.rdf;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.iri.IRI;
 import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.UUID.randomUUID;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
 
 public class SparqlUtils {
@@ -83,7 +83,7 @@ public class SparqlUtils {
         SparqlUtils.workspaceURI = workspaceURI;
     }
 
-    public static Node generateURI() {
-        return createURI(workspaceURI + randomUUID());
+    public static Instant parseXSDDateTime(Literal literal) {
+        return Instant.ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
     }
 }

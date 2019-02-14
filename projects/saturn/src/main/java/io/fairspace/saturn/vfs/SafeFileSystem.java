@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
+
 /**
  * A guarding wrapper around a VirtualFileSystem
  */
@@ -20,34 +22,37 @@ public class SafeFileSystem implements VirtualFileSystem {
 
     @Override
     public FileInfo stat(String path) throws IOException {
-        return safely(() -> unsafe.stat(path));
+        var normalizedPath = normalizePath(path);
+        return safely(() -> unsafe.stat(normalizedPath));
     }
 
     @Override
     public List<FileInfo> list(String path) throws IOException {
+        var normalizedPath = normalizePath(path);
         return safely(() -> {
-            var info = stat(path);
+            var info = stat(normalizedPath);
 
             if (info == null) {
-                throw new FileNotFoundException(path);
+                throw new FileNotFoundException(normalizedPath);
             }
             if (!info.isDirectory()) {
-                throw new IOException("Not a directory: " + path);
+                throw new IOException("Not a directory: " + normalizedPath);
             }
 
-            return unsafe.list(path);
+            return unsafe.list(normalizedPath);
         });
     }
 
     @Override
     public void mkdir(String path) throws IOException {
+        var normalizedPath = normalizePath(path);
         safely(() -> {
-            if (exists(path)) {
-                throw new IOException("File already exists: " + path);
+            if (exists(normalizedPath)) {
+                throw new IOException("File already exists: " + normalizedPath);
             }
-            unsafe.mkdir(path);
-            if (stat(path) == null) {
-                throw new FileNotFoundException("Error creating directory: " + path);
+            unsafe.mkdir(normalizedPath);
+            if (stat(normalizedPath) == null) {
+                throw new FileNotFoundException("Error creating directory: " + normalizedPath);
             }
             return null;
         });
@@ -55,48 +60,54 @@ public class SafeFileSystem implements VirtualFileSystem {
 
     @Override
     public void create(String path, InputStream in) throws IOException {
+        var normalizedPath = normalizePath(path);
         safely(() -> {
-            if (exists(path)) {
-                throw new IOException("File already exists: " + path);
+            if (exists(normalizedPath)) {
+                throw new IOException("File already exists: " + normalizedPath);
             }
-            unsafe.create(path, in);
-            if (stat(path) == null) {
-                throw new FileNotFoundException("Error creating file: " + path);
+            unsafe.create(normalizedPath, in);
+            if (stat(normalizedPath) == null) {
+                throw new FileNotFoundException("Error creating file: " + normalizedPath);
             }
             return null;
         });
-
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
+        var normalizedPath = normalizePath(path);
         safely(() -> {
-            unsafe.modify(path, in);
+            unsafe.modify(normalizedPath, in);
             return null;
         });
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
+        var normalizedPath = normalizePath(path);
         safely(() -> {
-            unsafe.read(path, out);
+            unsafe.read(normalizedPath, out);
             return null;
         });
     }
 
     @Override
     public void copy(String from, String to) throws IOException {
+        var normalizedFrom = normalizePath(from);
+        var normalizedTo = normalizePath(to);
+        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
+            throw new IOException("Cannot copy a file or a directory to itself");
+        }
         safely(() -> {
             if (!exists(from)) {
-                throw new FileNotFoundException(from);
+                throw new FileNotFoundException(normalizedFrom);
             }
-            var info = stat(to);
-            if (info != null && info.isReadOnly()) {
-                throw new IOException("Cannot copy to " + to);
+            if (exists(normalizedTo)) {
+                throw new IOException("Cannot copy to an existing destination " + normalizedTo);
             }
-            unsafe.copy(from, to);
-            if (!exists(to)) {
-                throw new FileNotFoundException("Error copying from " + from + " to " + to);
+            unsafe.copy(normalizedFrom, normalizedTo);
+            if (!exists(normalizedTo)) {
+                throw new FileNotFoundException("Error copying from " + normalizedFrom + " to " + normalizedTo);
             }
             return null;
         });
@@ -104,17 +115,21 @@ public class SafeFileSystem implements VirtualFileSystem {
 
     @Override
     public void move(String from, String to) throws IOException {
+        var normalizedFrom = normalizePath(from);
+        var normalizedTo = normalizePath(to);
+        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
+            throw new IOException("Cannot move a file or a directory to itself");
+        }
         safely(() -> {
-            if (!exists(from)) {
-                throw new FileNotFoundException(from);
+            if (!exists(normalizedFrom)) {
+                throw new FileNotFoundException(normalizedFrom);
             }
-            var info = stat(to);
-            if (info != null && info.isReadOnly()) {
-                throw new IOException("Cannot move to " + to);
+            if (exists(normalizedTo)) {
+                throw new IOException("Cannot move to an existing destination " + normalizedTo);
             }
-            unsafe.move(from, to);
-            if (!exists(to)) {
-                throw new FileNotFoundException("Error moving from " + from + " to " + to);
+            unsafe.move(normalizedFrom, normalizedTo);
+            if (!exists(normalizedTo)) {
+                throw new FileNotFoundException("Error moving from " + normalizedFrom + " to " + normalizedTo);
             }
             return null;
         });
@@ -122,17 +137,18 @@ public class SafeFileSystem implements VirtualFileSystem {
 
     @Override
     public void delete(String path) throws IOException {
+        var normalizedPath = normalizePath(path);
         safely(() -> {
-            var info = stat(path);
+            var info = stat(normalizedPath);
             if (info == null) {
-                throw new FileNotFoundException(path);
+                throw new FileNotFoundException(normalizedPath);
             }
             if (info.isReadOnly()) {
-                throw new IOException("File is read-only: " + path);
+                throw new IOException("File is read-only: " + normalizedPath);
             }
-            unsafe.delete(path);
-            if (exists(path)) {
-                throw new IOException("Error deleting: " + path);
+            unsafe.delete(normalizedPath);
+            if (exists(normalizedPath)) {
+                throw new IOException("Error deleting: " + normalizedPath);
             }
             return null;
         });
@@ -158,7 +174,8 @@ public class SafeFileSystem implements VirtualFileSystem {
 
     @Override
     public boolean exists(String path) throws IOException {
-        return safely(() -> unsafe.exists(path));
+        var normalizedPath = normalizePath(path);
+        return safely(() -> unsafe.exists(normalizedPath));
     }
 
     @FunctionalInterface

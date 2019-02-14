@@ -7,15 +7,25 @@ import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.property.PropertySource;
+import io.milton.property.PropertySource.PropertyAccessibility;
+import io.milton.property.PropertySource.PropertyMetaData;
 import io.milton.resource.*;
 
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import static io.fairspace.saturn.vfs.PathUtils.name;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
+import static java.util.Collections.singletonList;
 
-public abstract class VfsBackedMiltonResource  implements Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, Comparable<Resource> {
+public abstract class VfsBackedMiltonResource implements
+        Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource, Comparable<Resource> {
+    private static final QName IRI_PROPERTY = new QName("http://fairspace.io/ontology#", "iri");
+    private static final PropertyMetaData IRI_PROPERTY_META = new PropertyMetaData(PropertyAccessibility.READ_ONLY, String.class);
+
     protected final VirtualFileSystem fs;
     protected final FileInfo info;
 
@@ -60,12 +70,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public Date getCreateDate() {
-        return new Date(info.getCreated());
-    }
-
-    @Override
-    public String getUniqueId() {
-        return info.getPath();
+        return Date.from(info.getCreated());
     }
 
     @Override
@@ -90,7 +95,7 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
 
     @Override
     public Date getModifiedDate() {
-        return new Date(info.getModified());
+        return Date.from(info.getModified());
     }
 
     @Override
@@ -107,5 +112,31 @@ public abstract class VfsBackedMiltonResource  implements Resource, PropFindable
         if (!(c instanceof VfsBackedMiltonDirectoryResource)) {
             throw new BadRequestException("Unsupported target resource type");
         }
+    }
+
+    @Override
+    public Object getProperty(QName name) {
+        if (name.equals(IRI_PROPERTY)) {
+            return info.getIri();
+        }
+        return null;
+    }
+
+    @Override
+    public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
+
+    }
+
+    @Override
+    public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
+        if (name.equals(IRI_PROPERTY)) {
+            return IRI_PROPERTY_META;
+        }
+        return null;
+    }
+
+    @Override
+    public List<QName> getAllPropertyNames() {
+        return singletonList(IRI_PROPERTY);
     }
 }

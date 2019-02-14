@@ -47,18 +47,20 @@ public class SaturnDatasetFactory {
         dsg = new TxnLogDatasetGraph(dsg, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
         // ElasticSearch
-        try {
-            var textIndex = createESIndex(new TextIndexConfig(new AutoEntityDefinition()), config.elasticSearch.settings);
-            dsg = TextDatasetFactory.create(dsg, textIndex, true, new SmartTextDocProducer(textIndex));
-        } catch (Exception e) {
-            log.error("Error connecting to ElasticSearch", e);
-            if (config.elasticSearch.required) {
-                throw e; // Terminates Saturn
+        if (config.elasticSearch.enabled) {
+            try {
+                var textIndex = createESIndex(new TextIndexConfig(new AutoEntityDefinition()), config.elasticSearch.settings);
+                dsg = TextDatasetFactory.create(dsg, textIndex, true, new SmartTextDocProducer(textIndex));
+            } catch (Exception e) {
+                log.error("Error connecting to ElasticSearch", e);
+                if (config.elasticSearch.required) {
+                    throw e; // Terminates Saturn
+                }
             }
         }
 
         // Add property inversion
-        var vocabularyGraphNode = createURI(config.baseURI + "vocabulary");
+        var vocabularyGraphNode = createURI(config.baseIRI + "vocabulary");
         dsg = new InvertingDatasetGraph(dsg, vocabularyGraphNode);
 
         // Apply the vocabulary

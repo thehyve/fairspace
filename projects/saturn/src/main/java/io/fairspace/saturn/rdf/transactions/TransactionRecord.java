@@ -10,8 +10,9 @@ import org.apache.jena.update.UpdateRequest;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Set;
+
+import static java.util.Collections.singletonList;
 
 @Data
 public class TransactionRecord implements Serializable {
@@ -41,8 +42,9 @@ public class TransactionRecord implements Serializable {
     }
 
     public UpdateRequest asUpdateRequest() {
-        return new UpdateRequest()
-                .add(new UpdateDataDelete(new QuadDataAcc(new ArrayList<>(deleted))))
-                .add(new UpdateDataInsert(new QuadDataAcc(new ArrayList<>(added))));
+        UpdateRequest updateRequest = new UpdateRequest();
+        deleted.forEach(q -> updateRequest.add(new UpdateDataDelete(new QuadDataAcc(singletonList(q)))));
+        added.forEach(q -> updateRequest.add(new UpdateDataInsert(new QuadDataAcc(singletonList(q)))));
+        return updateRequest;
     }
 }

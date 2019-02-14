@@ -53,6 +53,7 @@ public class MiltonWebDAVServlet extends HttpServlet {
         HttpManagerBuilder builder = new HttpManagerBuilder();
         builder.setResourceFactory(new VfsBackedMiltonResourceFactory(fs));
         builder.setEnableBasicAuth(false);
+        builder.setMultiNamespaceCustomPropertySourceEnabled(true);
         return builder.buildHttpManager();
     }
 }
