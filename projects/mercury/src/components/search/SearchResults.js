@@ -3,23 +3,24 @@ import {Grid, AppBar, Tabs, Tab} from '@material-ui/core';
 
 import CollectionList from '../collections/CollectionList';
 import FileList from '../file/FileList';
+import {COLLECTION_SEARCH_TYPE, FILES_SEARCH_TYPE} from '../../constants';
 
 const searchResults = ({
-    type = 'collections',
+    type,
     onTypeChange,
     collections,
     files,
     onCollectionOpen,
     onFileOpen
 }) => {
-    const selectedTabIndex = type === 'collections' ? 0 : 1;
+    const selectedTabIndex = type === COLLECTION_SEARCH_TYPE ? 0 : 1;
     return (
         <Grid container spacing={8}>
             <Grid item xs={12}>
                 <AppBar square elevation={2} position="static" color="default">
                     <Tabs
                         value={selectedTabIndex}
-                        onChange={(e, idx) => onTypeChange(idx === 0 ? 'collections' : 'files')}
+                        onChange={(e, idx) => onTypeChange(idx === 0 ? COLLECTION_SEARCH_TYPE : FILES_SEARCH_TYPE)}
                         centered
                     >
                         <Tab label="Collections" />

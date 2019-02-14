@@ -4,10 +4,11 @@ import {withRouter} from 'react-router-dom';
 import SearchResults from './SearchResults';
 import {buildSearchUrl, getSearchQueryFromString, getSearchTypeFromString} from '../../utils/searchUtils';
 import {searchCollections, searchFiles} from '../../services/SearchAPI';
+import {COLLECTION_SEARCH_TYPE, FILES_SEARCH_TYPE} from '../../constants';
 
 class SearchPage extends React.Component {
     state = {
-        type: 'collections',
+        type: COLLECTION_SEARCH_TYPE,
         collections: [],
         files: []
     };
@@ -27,12 +28,12 @@ class SearchPage extends React.Component {
         const query = this.getCurrentSearchQuery();
         this.setState({type});
 
-        if (type === 'collections') {
+        if (type === COLLECTION_SEARCH_TYPE) {
             searchCollections(query)
                 .then(collections => {
                     this.setState({collections});
                 });
-        } else if (type === 'files') {
+        } else if (type === FILES_SEARCH_TYPE) {
             searchFiles(query)
                 .then(files => {
                     this.setState({files});
