@@ -45,7 +45,8 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
             fs.mkdir(newPath);
             return (CollectionResource) getResource(fs, newPath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            onException(e);
+            return null;
         }
     }
 
@@ -69,7 +70,8 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
                     .sorted()
                     .collect(toList());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            onException(e);
+            return null;
         }
     }
 
