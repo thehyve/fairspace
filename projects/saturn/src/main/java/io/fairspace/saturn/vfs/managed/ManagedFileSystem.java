@@ -164,7 +164,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
                 .createdBy(row.getLiteral("createdBy").getString())
                 .modifiedBy(row.getLiteral("modifiedBy").getString())
-                .readOnly(false)
+                .readOnly(readOnly)
                 .build();
     }
 
