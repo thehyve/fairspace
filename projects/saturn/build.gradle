@@ -47,6 +47,12 @@ dependencies {
 
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-core:${mockitoVersion}"
+    testCompile group: 'com.mockrunner', name: 'mockrunner', version: '2.0.1', ext: 'pom'
+    testCompile(group: 'com.mockrunner', name: 'mockrunner-servlet', version: '2.0.1') {
+        exclude group: 'org.apache.tomcat'
+    }
+
+
 }
 
 jacocoTestReport {

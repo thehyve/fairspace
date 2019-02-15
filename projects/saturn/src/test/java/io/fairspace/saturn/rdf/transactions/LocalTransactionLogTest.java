@@ -2,7 +2,6 @@ package io.fairspace.saturn.rdf.transactions;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -14,7 +13,7 @@ import java.io.IOException;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalTransactionLogTest {
@@ -46,12 +45,11 @@ public class LocalTransactionLogTest {
         assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-2").exists());
     }
 
-    @Ignore // TODO: Consumes too much system resources. Think about a better test
     @Test
     public void storageSchemaWorksAsExpected() throws IOException {
-        for (int i = 0; i < 1000001; i++) {
+        for (int i = 0; i < 1001; i++) {
             log.log(new TransactionRecord());
         }
-        assertTrue(new File(new File(new File(logDir, "volume-2"), "chapter-1001"), "tx-1000001").exists());
+        assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-2"), "tx-1001").exists());
     }
 }

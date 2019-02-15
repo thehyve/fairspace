@@ -54,7 +54,7 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
         try {
             fs.modify(info.getPath(), in);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            onException(e);
         }
     }
 }
