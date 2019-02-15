@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -199,10 +200,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
             throw new AssertionError("Invalid path format: " + path);
         }
         if (path.isEmpty()) {
-            throw new IOException("File operations on the root directory are not allowed");
+            throw new AccessDeniedException("File operations on the root directory are not allowed");
         }
         if (isCollection(path)) {
-            throw new IOException("Use Collections API for operations on collections");
+            throw new AccessDeniedException("Use Collections API for operations on collections");
         }
     }
 

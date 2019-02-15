@@ -152,6 +152,9 @@ public abstract class VfsBackedMiltonResource implements
         if (e instanceof FileSystemException) {
             throw new ConflictException(this, e.getMessage());
         }
-        throw new BadRequestException(this, e.getMessage());
+        if (e instanceof RuntimeException) {
+            throw (RuntimeException) e;
+        }
+        throw new RuntimeException(e);
     }
 }
