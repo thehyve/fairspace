@@ -17,6 +17,7 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.graph.NodeFactory.createVariable;
+import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 
 class MetadataService {
     private final RDFConnection rdf;
@@ -79,7 +80,11 @@ class MetadataService {
     }
 
     private static Node asURI(String uri) {
-        return uri != null ? createURI(uri) : null;
+        if (uri == null) {
+            return null;
+        }
+        validateIRI(uri);
+        return createURI(uri);
     }
 
 }
