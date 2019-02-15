@@ -3,54 +3,47 @@ import {withRouter} from 'react-router-dom';
 
 import SearchResults from './SearchResults';
 import {buildSearchUrl, getSearchQueryFromString, getSearchTypeFromString} from '../../utils/searchUtils';
-import {searchCollections, searchFiles} from '../../services/SearchAPI';
-import {COLLECTION_SEARCH_TYPE, FILES_SEARCH_TYPE} from '../../constants';
+import {performSearch} from '../../services/SearchAPI';
 
 class SearchPage extends React.Component {
-    state = {
-        type: COLLECTION_SEARCH_TYPE,
-        collections: [],
-        files: []
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            type: getSearchTypeFromString(props.location.search),
+            onGoingSearch: false,
+            results: []
+        };
+    }
 
     componentDidMount() {
-        this.updateSearchResults();
+        this.updateResults();
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.location.search !== prevProps.location.search) {
-            this.updateSearchResults();
+            this.updateResults();
         }
     }
 
-    updateSearchResults = () => {
-        const type = this.getCurrentSearchType();
-        const query = this.getCurrentSearchQuery();
-        this.setState({type});
+    updateResults = () => {
+        const {location: {search}} = this.props;
+        const type = getSearchTypeFromString(search);
 
-        if (type === COLLECTION_SEARCH_TYPE) {
-            searchCollections(query)
-                .then(collections => {
-                    this.setState({collections});
+        if (!this.state.onGoingSearch) {
+            performSearch(search)
+                .then(results => {
+                    this.setState({results, type});
                 });
-        } else if (type === FILES_SEARCH_TYPE) {
-            searchFiles(query)
-                .then(files => {
-                    this.setState({files});
-                });
-        } else {
-            throw Error('Unrecognized search type.');
         }
-    }
-
-    getCurrentSearchType = () => getSearchTypeFromString(this.props.location.search);
-
-    getCurrentSearchQuery = () => getSearchQueryFromString(this.props.location.search);
+    };
 
     handleTypeChange = (type) => {
-        const query = this.getCurrentSearchQuery();
-        const searchUrl = buildSearchUrl(type, query);
-        this.props.history.push(searchUrl);
+        if (type !== this.state.type) {
+            this.setState({results: [], type});
+            const query = getSearchQueryFromString(this.props.location.search);
+            const searchUrl = buildSearchUrl(type, query);
+            this.props.history.push(searchUrl);
+        }
     };
 
     handleCollectionOpen = (collection) => {
@@ -62,15 +55,14 @@ class SearchPage extends React.Component {
     }
 
     render() {
-        const {collections, files, type} = this.state;
+        const {results, type} = this.state;
 
         return (
             <SearchResults
                 type={type}
                 onTypeChange={this.handleTypeChange}
-                collections={collections}
+                results={results}
                 onCollectionOpen={this.handleCollectionOpen}
-                files={files}
                 onFileOpen={this.handlefileOpen}
             />
         );
