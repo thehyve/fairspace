@@ -24,5 +24,6 @@ WHERE {
 # Update the collection
 DELETE { ?0 rdfs:label ?name; rdfs:comment ?comment; fs:filePath ?oldPath; fs:dateModified ?oldDateModified; fs:modifiedBy ?oldModifiedBy; }
 INSERT { ?0 rdfs:label ?1; rdfs:comment ?2; fs:filePath ?3; fs:dateModified ?date; fs:modifiedBy ?4 ; }
-WHERE { ?0 a fs:Collection; rdfs:label ?name; rdfs:comment ?comment; fs:filePath ?oldPath;
+WHERE { { ?0 a fs:Collection; rdfs:label ?name; rdfs:comment ?comment; fs:filePath ?oldPath; }
+OPTIONAL { ?0 fs:dateModified ?oldDateModified; fs:modifiedBy ?oldModifiedBy;}
 BIND(NOW() as ?date) };

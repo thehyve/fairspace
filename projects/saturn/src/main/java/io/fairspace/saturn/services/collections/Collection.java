@@ -15,5 +15,6 @@ public class Collection {
     private String description;
     private String creator;
     private Instant dateCreated;
+    private Instant dateModified;
     private Access access;
 }
