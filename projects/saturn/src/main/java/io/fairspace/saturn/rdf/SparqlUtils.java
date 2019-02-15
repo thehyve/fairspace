@@ -14,10 +14,15 @@ import java.time.Instant;
 import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.UUID.randomUUID;
+import static org.apache.commons.lang.StringUtils.replace;
+
 
 public class SparqlUtils {
     private static String workspaceURI;
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
+    private static final String questionMarkReplacement = randomUUID().toString();
+    private static final String dollarSignReplacement = randomUUID().toString();
 
     public static String formatQuery(String template, Object... args) {
         var sparql = new ParameterizedSparqlString(template);
@@ -35,7 +40,7 @@ public class SparqlUtils {
             } else if (arg instanceof Node) {
                 sparql.setParam(param, (Node) arg);
             } else if (arg instanceof String) {
-                sparql.setLiteral(param, (String) arg);
+                sparql.setLiteral(param, escape((String) arg));
             } else if (arg instanceof IRI) {
                 sparql.setIri(param, (IRI) arg);
             } else if (arg instanceof URL) {
@@ -59,7 +64,7 @@ public class SparqlUtils {
 
         sparql.setNsPrefix("ws", workspaceURI);
 
-        return sparql.toString();
+        return unescape(sparql.toString());
     }
 
     public static String storedQuery(String name, Object... args) {
@@ -85,5 +90,15 @@ public class SparqlUtils {
 
     public static Instant parseXSDDateTime(Literal literal) {
         return Instant.ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
+    }
+
+    // Replaces ? and $ symbols with unique character sequences
+    private static String escape(String s) {
+        return replace(replace(s, "?", questionMarkReplacement), "$", dollarSignReplacement);
+    }
+
+    // Restores ? and $
+    private static String unescape(String s) {
+        return replace(replace(s, questionMarkReplacement, "?"), dollarSignReplacement, "$");
     }
 }
