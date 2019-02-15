@@ -5,7 +5,7 @@ import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.commits.CommitMessages;
 import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
 import io.fairspace.saturn.rdf.search.AutoEntityDefinition;
-import io.fairspace.saturn.rdf.search.SmartTextDocProducer;
+import io.fairspace.saturn.rdf.search.SingleTripleTextDocProducer;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
@@ -46,11 +46,16 @@ public class SaturnDatasetFactory {
         // Add transaction log
         dsg = new TxnLogDatasetGraph(dsg, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
+        // Apply the vocabulary
+        var vocabularyGraphNode = createURI(config.baseIRI + "vocabulary");
+        initVocabulary(dsg, vocabularyGraphNode);
+
         // ElasticSearch
         if (config.elasticSearch.enabled) {
             try {
                 var textIndex = createESIndex(new TextIndexConfig(new AutoEntityDefinition()), config.elasticSearch.settings);
-                dsg = TextDatasetFactory.create(dsg, textIndex, true, new SmartTextDocProducer(textIndex));
+                var textDocProducer = new SingleTripleTextDocProducer(textIndex, !config.elasticSearch.required);
+                dsg = TextDatasetFactory.create(dsg, textIndex, true, textDocProducer);
             } catch (Exception e) {
                 log.error("Error connecting to ElasticSearch", e);
                 if (config.elasticSearch.required) {
@@ -60,11 +65,7 @@ public class SaturnDatasetFactory {
         }
 
         // Add property inversion
-        var vocabularyGraphNode = createURI(config.baseIRI + "vocabulary");
         dsg = new InvertingDatasetGraph(dsg, vocabularyGraphNode);
-
-        // Apply the vocabulary
-        initVocabulary(dsg, vocabularyGraphNode);
 
         // Create a dataset
         return DatasetFactory.wrap(dsg);
