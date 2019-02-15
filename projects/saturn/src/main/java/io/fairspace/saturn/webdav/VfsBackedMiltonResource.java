@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileSystemException;
 import java.util.Date;
 import java.util.List;
 
@@ -143,11 +144,14 @@ public abstract class VfsBackedMiltonResource implements
         return singletonList(IRI_PROPERTY);
     }
 
-    protected void onException(Exception e) throws NotAuthorizedException, BadRequestException {
+    protected void onException(Exception e) throws NotAuthorizedException, BadRequestException, ConflictException {
+        log.error("A WebDAV operation resulted in an error", e);
         if (e instanceof AccessDeniedException) {
             throw new NotAuthorizedException(this, e);
         }
-        log.error("Bad Request caused by", e);
+        if (e instanceof FileSystemException) {
+            throw new ConflictException(this, e.getMessage());
+        }
         throw new BadRequestException(this, e.getMessage());
     }
 }
