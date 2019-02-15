@@ -121,6 +121,7 @@ public class CollectionsService {
         collection.setDescription(row.getLiteral("description").getString());
         collection.setCreator(row.getLiteral("createdBy").getString());
         collection.setDateCreated(parseXSDDateTime(row.getLiteral("dateCreated")));
+        collection.setDateModified(parseXSDDateTime(row.getLiteral("dateModified")));
         collection.setAccess(Access.Manage); // TODO: Check
         return collection;
     }

@@ -58,6 +58,7 @@ Currently a collection has the following fields, all represented as strings:
  - type 
  - creator
  - dateCreated
+ - dateModified
 
 ## How to build
 
