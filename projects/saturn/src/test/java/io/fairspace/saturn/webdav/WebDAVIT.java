@@ -51,7 +51,7 @@ public class WebDAVIT {
 
 
     @Test
-    public void propFindRoot() throws ServletException, IOException {
+    public void testPropFindRoot() throws ServletException, IOException {
         req.setMethod("PROPFIND");
         req.setRequestURL("http://localhost/webdav/");
         milton.service(req, res);
@@ -60,7 +60,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void propFindFSColl207() throws ServletException, IOException {
+    public void testPropFindForColection() throws ServletException, IOException {
         req.setMethod("PROPFIND");
         req.setRequestURL("http://localhost/webdav/coll1");
         milton.service(req, res);
@@ -70,7 +70,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void propFindFSCollWithIRI() throws ServletException, IOException {
+    public void testPropFindWithIRI() throws ServletException, IOException {
         req.setMethod("PROPFIND");
         req.setRequestURL("http://localhost/webdav/coll1");
         req.setContentType("text/xml");
@@ -85,7 +85,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void propFindColl404() throws ServletException, IOException {
+    public void testPropFindMissingDirectoryReturns404() throws ServletException, IOException {
         req.setMethod("PROPFIND");
         req.setRequestURL("http://localhost/webdav/missing");
         milton.service(req, res);
@@ -93,7 +93,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void propMkColl201() throws ServletException, IOException {
+    public void testMkColl() throws ServletException, IOException {
         req.setMethod("MKCOL");
         req.setRequestURL("http://localhost/webdav/coll1/dir");
         milton.service(req, res);
@@ -102,7 +102,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void propMkColl409() throws ServletException, IOException {
+    public void testDirectoryCreationInNonExistingCollection() throws ServletException, IOException {
         req.setMethod("MKCOL");
         req.setRequestURL("http://localhost/webdav/missing/dir");
         milton.service(req, res);
@@ -110,7 +110,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void propMkColl404() throws ServletException, IOException {
+    public void testDirectoryCreationInNonExistingParent() throws ServletException, IOException {
         req.setMethod("MKCOL");
         req.setRequestURL("http://localhost/webdav/coll1/missing/dir");
         milton.service(req, res);
@@ -118,15 +118,8 @@ public class WebDAVIT {
     }
 
     @Test
-    public void deleteColl204() throws ServletException, IOException {
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir");
-        milton.service(req, res);
-
-        assertTrue(fs.exists("coll1/dir"));
-
-        req.resetAll();
-        res.resetAll();
+    public void testDeleteDirectory() throws ServletException, IOException {
+        fs.mkdir("coll1/dir");
 
         req.setMethod("DELETE");
         req.setRequestURL("http://localhost/webdav/coll1/dir");
@@ -138,7 +131,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void deleteColl404() throws ServletException, IOException {
+    public void testDeleteNonExistingDirectory() throws ServletException, IOException {
         req.setMethod("DELETE");
         req.setRequestURL("http://localhost/webdav/coll1/missing");
         milton.service(req, res);
@@ -147,7 +140,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void deleteRoot400() throws ServletException, IOException {
+    public void testDeleteRoot() throws ServletException, IOException {
         req.setMethod("DELETE");
         req.setRequestURL("http://localhost/webdav");
         milton.service(req, res);
@@ -156,7 +149,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void deleteFSColl400() throws ServletException, IOException {
+    public void testDeleteCollection() throws ServletException, IOException {
         req.setMethod("DELETE");
         req.setRequestURL("http://localhost/webdav/coll1");
         milton.service(req, res);
@@ -165,24 +158,9 @@ public class WebDAVIT {
     }
 
     @Test
-    public void moveColl201() throws ServletException, IOException {
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir");
-        milton.service(req, res);
-
-        assertTrue(fs.exists("coll1/dir"));
-
-        req.resetAll();
-        res.resetAll();
-
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir/subdir");
-        milton.service(req, res);
-
-        assertTrue(fs.exists("coll1/dir/subdir"));
-
-        req.resetAll();
-        res.resetAll();
+    public void testMoveDirectory() throws ServletException, IOException {
+        fs.mkdir("coll1/dir");
+        fs.mkdir("coll1/dir/subdir");
 
         req.setMethod("MOVE");
         req.setRequestURL("http://localhost/webdav/coll1/dir");
@@ -198,23 +176,9 @@ public class WebDAVIT {
     }
 
     @Test
-    public void moveColl412() throws ServletException, IOException {
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir1");
-        milton.service(req, res);
-
-        assertTrue(fs.exists("coll1/dir1"));
-
-        req.resetAll();
-        res.resetAll();
-
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir2");
-        milton.service(req, res);
-
-
-        req.resetAll();
-        res.resetAll();
+    public void testMoveDirectoryConflict() throws ServletException, IOException {
+        fs.mkdir("coll1/dir1");
+        fs.mkdir("coll1/dir2");
 
         req.setMethod("MOVE");
         req.setRequestURL("http://localhost/webdav/coll1/dir1");
@@ -229,24 +193,9 @@ public class WebDAVIT {
 
 
     @Test
-    public void copyColl201() throws ServletException, IOException {
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir");
-        milton.service(req, res);
-
-        assertTrue(fs.exists("coll1/dir"));
-
-        req.resetAll();
-        res.resetAll();
-
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir/subdir");
-        milton.service(req, res);
-
-        assertTrue(fs.exists("coll1/dir/subdir"));
-
-        req.resetAll();
-        res.resetAll();
+    public void testCopyDirectory() throws ServletException, IOException {
+        fs.mkdir("coll1/dir");
+        fs.mkdir("coll1/dir/subdir");
 
         req.setMethod("COPY");
         req.setRequestURL("http://localhost/webdav/coll1/dir");
@@ -262,23 +211,10 @@ public class WebDAVIT {
     }
 
     @Test
-    public void copyColl412() throws ServletException, IOException {
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir1");
-        milton.service(req, res);
-
-        assertTrue(fs.exists("coll1/dir1"));
-
-        req.resetAll();
-        res.resetAll();
-
-        req.setMethod("MKCOL");
-        req.setRequestURL("http://localhost/webdav/coll1/dir2");
-        milton.service(req, res);
-
-
-        req.resetAll();
-        res.resetAll();
+    public void testCopyDirectoryConflict() throws ServletException, IOException {
+        fs.mkdir("coll1/dir1");
+        fs.mkdir("coll1/dir1/subdir");
+        fs.mkdir("coll1/dir2");
 
         req.setMethod("COPY");
         req.setRequestURL("http://localhost/webdav/coll1/dir1");
