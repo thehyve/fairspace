@@ -13,6 +13,7 @@ import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
@@ -22,11 +23,12 @@ import java.io.IOException;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 
+@Slf4j
 public class App {
     private static final Config config = loadConfig();
 
     public static void main(String[] args) {
-        System.out.println("Saturn is starting");
+        log.info("Saturn is starting");
 
         setWorkspaceURI(config.jena.baseIRI);
 
@@ -58,12 +60,12 @@ public class App {
                 .build()
                 .start();
 
-        System.out.println("Saturn is running on port " + config.port);
-        System.out.println("Access Fuseki at /rdf");
-        System.out.println("Access Metadata at /api/meta");
-        System.out.println("Access Vocabulary API at /api/vocabulary");
-        System.out.println("Access Collections API at /api/collections");
-        System.out.println("Access WebDAV API at /webdav");
+        log.info("Saturn is running on port " + config.port);
+        log.info("Access Fuseki at /rdf/");
+        log.info("Access Metadata at /api/meta/");
+        log.info("Access Vocabulary API at /api/vocabulary/");
+        log.info("Access Collections API at /api/collections/");
+        log.info("Access WebDAV API at /webdav/");
     }
 
     private static Config loadConfig() {
