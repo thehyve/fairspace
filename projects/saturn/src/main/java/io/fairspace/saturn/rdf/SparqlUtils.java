@@ -25,6 +25,7 @@ public class SparqlUtils {
     private static final String dollarSignReplacement = randomUUID().toString();
 
     public static String formatQuery(String template, Object... args) {
+        // TODO: Replace ParameterizedSparqlString with a more reliable implementation, doing proper escaping of literals an URIs
         var sparql = new ParameterizedSparqlString(template);
 
         for (var i = 0; i < args.length; i++) {
@@ -93,6 +94,7 @@ public class SparqlUtils {
     }
 
     // Replaces ? and $ symbols with unique character sequences
+    // That should have been done by ParameterizedSparqlString, but it only performs security checks.
     private static String escape(String s) {
         return replace(replace(s, "?", questionMarkReplacement), "$", dollarSignReplacement);
     }
