@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import spark.servlet.SparkApplication;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+import static io.fairspace.saturn.services.errors.ErrorHelper.returnError;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
@@ -70,13 +71,7 @@ public class CollectionsApp implements SparkApplication {
             });
         });
 
-        exception(JsonMappingException.class, (e, req, res) -> {
-            res.body("Invalid request body");
-            res.status(SC_BAD_REQUEST);
-        });
-        exception(IllegalArgumentException.class, (e, req, res) -> {
-            res.body(e.getMessage());
-            res.status(SC_BAD_REQUEST);
-        });
+        exception(JsonMappingException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Invalid request body"));
+        exception(IllegalArgumentException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, e.getMessage()));
     }
 }
