@@ -3,13 +3,18 @@ package io.fairspace.saturn.services.collections;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
 import spark.servlet.SparkApplication;
+
+import java.io.FileNotFoundException;
+import java.nio.file.AccessDeniedException;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
+@Slf4j
 public class CollectionsApp implements SparkApplication {
     private final CollectionsService service;
     private final ObjectMapper mapper = new ObjectMapper()
@@ -36,6 +41,7 @@ public class CollectionsApp implements SparkApplication {
                     }
                 } else {
                     var collections = service.list();
+                    res.type(APPLICATION_JSON.asString());
                     return mapper.writeValueAsString(collections);
                 }
             });
@@ -55,17 +61,13 @@ public class CollectionsApp implements SparkApplication {
                 var collection = mapper.readValue(req.body(), Collection.class);
                 var result = service.update(collection);
 
-                if (result == null) {
-                    res.status(400);
-                    return null;
-                }
-
                 res.type(APPLICATION_JSON.asString());
                 return mapper.writeValueAsString(result);
             });
             delete("/", (req, res) -> {
                 var iri = req.queryParams("iri");
                 service.delete(iri);
+                res.status(SC_NO_CONTENT);
                 return "";
             });
         });
@@ -77,6 +79,17 @@ public class CollectionsApp implements SparkApplication {
         exception(IllegalArgumentException.class, (e, req, res) -> {
             res.body(e.getMessage());
             res.status(SC_BAD_REQUEST);
+        });
+        exception(RuntimeException.class, (e, req, res) -> {
+            if (e.getCause() instanceof FileNotFoundException) {
+                res.status(SC_NOT_FOUND);
+            } else if (e.getCause() instanceof AccessDeniedException) {
+                res.status(SC_UNAUTHORIZED);
+            } else {
+                log.error("An unexpected exception", e);
+                res.body(e.getMessage());
+                res.status(SC_INTERNAL_SERVER_ERROR);
+            }
         });
     }
 }

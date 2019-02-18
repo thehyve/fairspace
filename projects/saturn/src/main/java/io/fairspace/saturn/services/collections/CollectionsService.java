@@ -2,9 +2,12 @@ package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
+import java.io.FileNotFoundException;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -18,6 +21,7 @@ import static org.apache.jena.system.Txn.calculateWrite;
 import static org.apache.jena.system.Txn.executeWrite;
 
 // TODO: Check permissions
+@Slf4j
 public class CollectionsService {
     private final RDFConnection rdf;
 
@@ -30,7 +34,7 @@ public class CollectionsService {
     }
 
     public Collection create(Collection collection) {
-        validate(collection.getIri() == null, "Field iri must not be left empty");
+        validate(collection.getIri() == null, "Field iri must be left empty");
         validate(collection.getCreator() == null, "Field creator must be left empty");
         validate(collection.getLocation() != null, "Field location must be set");
         validate(isDirectoryNameValid(collection.getLocation()), "Invalid location");
@@ -44,6 +48,7 @@ public class CollectionsService {
         return withCommitMessage("Create collection " + collection.getName(), () ->
                 calculateWrite(rdf, () -> {
                     if (getByDirectoryName(collection.getLocation()) != null) {
+                        log.info("The provided location has been already taken: {}", collection.getLocation());
                         return null;
                     }
 
@@ -83,7 +88,12 @@ public class CollectionsService {
                 executeWrite(rdf, () -> {
                     var existing = get(iri);
                     if (existing == null) {
-                        throw new IllegalArgumentException("Couldn't delete " + iri);
+                        log.info("Collection not found {}", iri);
+                        throw new RuntimeException(new FileNotFoundException(iri));
+                    }
+                    if (existing.getAccess() != Access.Manage) {
+                        log.info("No enough permissions to delete a collection {}", iri);
+                        throw new RuntimeException(new AccessDeniedException(iri));
                     }
                     rdf.update(storedQuery("coll_delete", createResource(iri), userId()));
                 }));
@@ -91,14 +101,19 @@ public class CollectionsService {
 
     public Collection update(Collection patch) {
         validate(patch.getIri() != null, "No URI");
-        validate(patch.getCreator() == null, "Field creator must not be left empty");
+        validate(patch.getCreator() == null, "Field creator must be left empty");
         validateIRI(patch.getIri());
 
         return withCommitMessage("Update collection " + patch.getName(), () ->
                 calculateWrite(rdf, () -> {
                     var existing = get(patch.getIri());
                     if (existing == null) {
-                        return null;
+                        log.info("Collection not found {}", patch.getIri());
+                        throw new RuntimeException(new FileNotFoundException(patch.getIri()));
+                    }
+                    if (existing.getAccess().ordinal() < Access.Write.ordinal()) {
+                        log.info("No enough permissions to modify a collection {}", patch.getIri());
+                        throw new RuntimeException(new AccessDeniedException(patch.getIri()));
                     }
 
                     validate(patch.getType() == null || patch.getType().equals(existing.getType()),
