@@ -1,7 +1,6 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.auth.UserInfo;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class SaturnSecurityHandlerTest {
 
     @Test
     public void healthEndpointCanBeAccessedWithoutAuth() throws IOException, ServletException {
-        handler.handle("/health", baseRequest, request, response);
+        handler.handle("/api/health/", baseRequest, request, response);
 
         verifyAuthenticated(true);
     }

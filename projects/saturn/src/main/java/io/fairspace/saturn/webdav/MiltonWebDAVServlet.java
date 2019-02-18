@@ -4,11 +4,7 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.config.HttpManagerBuilder;
 import io.milton.http.HttpManager;
-import io.milton.servlet.ServletRequest;
-import io.milton.servlet.ServletResponse;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +13,10 @@ import java.io.IOException;
 
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
+import static java.util.Collections.singletonList;
 
 public class MiltonWebDAVServlet extends HttpServlet {
     private final HttpManager httpManager;
-    private ServletContext servletContext;
-
 
     public MiltonWebDAVServlet(VirtualFileSystem fs) {
         httpManager = setupHttpManager(fs);
@@ -29,13 +24,13 @@ public class MiltonWebDAVServlet extends HttpServlet {
 
     @Override
     public void service(javax.servlet.ServletRequest servletRequest, javax.servlet.ServletResponse servletResponse) throws ServletException, IOException {
-        HttpServletRequest req = (HttpServletRequest) servletRequest;
-        HttpServletResponse resp = (HttpServletResponse) servletResponse;
+        var req = (HttpServletRequest) servletRequest;
+        var resp = (HttpServletResponse) servletResponse;
 
         try {
             setThreadlocals(req, resp);
-            io.milton.http.Request request = new ServletRequest(req, servletContext);
-            io.milton.http.Response response = new ServletResponse(resp);
+            var request = new io.milton.servlet.ServletRequest(req, req.getServletContext());
+            var response = new io.milton.servlet.ServletResponse(resp);
             httpManager.process(request, response);
         } finally {
             clearThreadlocals();
@@ -44,16 +39,11 @@ public class MiltonWebDAVServlet extends HttpServlet {
         }
     }
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        this.servletContext = config.getServletContext();
-    }
-
     private static HttpManager setupHttpManager(VirtualFileSystem fs) {
-        HttpManagerBuilder builder = new HttpManagerBuilder();
-        builder.setResourceFactory(new VfsBackedMiltonResourceFactory(fs));
-        builder.setEnableBasicAuth(false);
-        builder.setMultiNamespaceCustomPropertySourceEnabled(true);
-        return builder.buildHttpManager();
+        return new HttpManagerBuilder() {{
+            setResourceFactory(new VfsBackedMiltonResourceFactory(fs));
+            setMultiNamespaceCustomPropertySourceEnabled(true);
+            setAuthenticationHandlers(singletonList(new SaturnAuthenticationHandler()));
+        }}.buildHttpManager();
     }
 }

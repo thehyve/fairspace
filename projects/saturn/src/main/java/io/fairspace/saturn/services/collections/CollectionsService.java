@@ -12,6 +12,7 @@ import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
+import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.system.Txn.calculateWrite;
 import static org.apache.jena.system.Txn.executeWrite;
@@ -30,7 +31,7 @@ public class CollectionsService {
 
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must not be left empty");
-        validate(collection.getCreator() == null, "Field creator must not be left empty");
+        validate(collection.getCreator() == null, "Field creator must be left empty");
         validate(collection.getLocation() != null, "Field location must be set");
         validate(isDirectoryNameValid(collection.getLocation()), "Invalid location");
         validate(collection.getName() != null && !collection.getName().isEmpty(), "Field prettyName must be set");
@@ -58,6 +59,7 @@ public class CollectionsService {
     }
 
     public Collection get(String iri) {
+        validateIRI(iri);
         var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
         rdf.querySelect(storedQuery("coll_get", createResource(iri)), processor);
         return processor.getSingle().orElse(null);
@@ -76,6 +78,7 @@ public class CollectionsService {
     }
 
     public void delete(String iri) {
+        validateIRI(iri);
         withCommitMessage("Delete collection " + iri, () ->
                 executeWrite(rdf, () -> {
                     var existing = get(iri);
@@ -89,6 +92,7 @@ public class CollectionsService {
     public Collection update(Collection patch) {
         validate(patch.getIri() != null, "No URI");
         validate(patch.getCreator() == null, "Field creator must not be left empty");
+        validateIRI(patch.getIri());
 
         return withCommitMessage("Update collection " + patch.getName(), () ->
                 calculateWrite(rdf, () -> {
@@ -121,6 +125,7 @@ public class CollectionsService {
         collection.setDescription(row.getLiteral("description").getString());
         collection.setCreator(row.getLiteral("createdBy").getString());
         collection.setDateCreated(parseXSDDateTime(row.getLiteral("dateCreated")));
+        collection.setDateModified(parseXSDDateTime(row.getLiteral("dateModified")));
         collection.setAccess(Access.Manage); // TODO: Check
         return collection;
     }

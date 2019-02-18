@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.List;
 
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
@@ -48,7 +49,7 @@ public class SafeFileSystem implements VirtualFileSystem {
         var normalizedPath = normalizePath(path);
         safely(() -> {
             if (exists(normalizedPath)) {
-                throw new IOException("File already exists: " + normalizedPath);
+                throw new FileAlreadyExistsException(normalizedPath);
             }
             unsafe.mkdir(normalizedPath);
             if (stat(normalizedPath) == null) {
@@ -63,7 +64,7 @@ public class SafeFileSystem implements VirtualFileSystem {
         var normalizedPath = normalizePath(path);
         safely(() -> {
             if (exists(normalizedPath)) {
-                throw new IOException("File already exists: " + normalizedPath);
+                throw new FileAlreadyExistsException(normalizedPath);
             }
             unsafe.create(normalizedPath, in);
             if (stat(normalizedPath) == null) {
@@ -103,7 +104,7 @@ public class SafeFileSystem implements VirtualFileSystem {
                 throw new FileNotFoundException(normalizedFrom);
             }
             if (exists(normalizedTo)) {
-                throw new IOException("Cannot copy to an existing destination " + normalizedTo);
+                throw new FileAlreadyExistsException(normalizedTo);
             }
             unsafe.copy(normalizedFrom, normalizedTo);
             if (!exists(normalizedTo)) {
@@ -118,14 +119,14 @@ public class SafeFileSystem implements VirtualFileSystem {
         var normalizedFrom = normalizePath(from);
         var normalizedTo = normalizePath(to);
         if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
-            throw new IOException("Cannot move a file or a directory to itself");
+            throw new FileAlreadyExistsException("Cannot move a file or a directory to itself");
         }
         safely(() -> {
             if (!exists(normalizedFrom)) {
                 throw new FileNotFoundException(normalizedFrom);
             }
             if (exists(normalizedTo)) {
-                throw new IOException("Cannot move to an existing destination " + normalizedTo);
+                throw new FileAlreadyExistsException(normalizedTo);
             }
             unsafe.move(normalizedFrom, normalizedTo);
             if (!exists(normalizedTo)) {

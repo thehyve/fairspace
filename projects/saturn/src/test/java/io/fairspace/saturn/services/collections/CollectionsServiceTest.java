@@ -23,7 +23,7 @@ public class CollectionsServiceTest {
     }
 
     @Test
-    public void basicFunctionality() throws IOException {
+    public void basicFunctionality() throws IOException, InterruptedException {
         var rdf = connect(createTxnMem());
         Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
         var collections = new CollectionsService(rdf, userInfoSupplier);
@@ -46,6 +46,7 @@ public class CollectionsServiceTest {
         assertEquals(c1.getType(), created1.getType());
         assertEquals("userId", created1.getCreator());
         assertNotNull(created1.getDateCreated());
+        assertEquals(created1.getDateCreated(), created1.getDateModified());
 
         assertNotNull(collections.getByDirectoryName("dir1"));
         assertNull(collections.getByDirectoryName("dir2"));
@@ -67,15 +68,22 @@ public class CollectionsServiceTest {
         patch.setLocation("dir2");
         collections.update(patch);
 
-        var updated = collections.get(created1.getIri());
-        assertEquals("new name", updated.getName());
-        assertEquals("new descr", updated.getDescription());
-        assertEquals("dir2", updated.getLocation());
+        var updated1 = collections.get(created1.getIri());
+        assertEquals("new name", updated1.getName());
+        assertEquals("new descr", updated1.getDescription());
+        assertEquals("dir2", updated1.getLocation());
+        assertNotEquals(created1.getDateModified(), updated1.getDateModified());
 
         assertFalse(files.exists("dir1/subdir"));
         assertFalse(files.exists("dir1/subdir/file.txt"));
         assertTrue(files.exists("dir2/subdir"));
         assertTrue(files.exists("dir2/subdir/file.txt"));
+
+        Thread.sleep(100);
+        patch.setDescription("Description");
+        collections.update(patch);
+        var updated2 = collections.get(created1.getIri());
+        assertNotEquals(updated1.getDateModified(), updated2.getDateModified());
 
         var c2 = new Collection();
         c2.setName("c2");

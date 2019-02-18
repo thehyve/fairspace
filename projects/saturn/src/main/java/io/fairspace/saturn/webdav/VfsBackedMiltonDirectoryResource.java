@@ -45,7 +45,8 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
             fs.mkdir(newPath);
             return (CollectionResource) getResource(fs, newPath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            onException(e);
+            return null;
         }
     }
 
@@ -69,7 +70,12 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
                     .sorted()
                     .collect(toList());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                onException(e);
+            } catch (ConflictException ce) {
+                throw new RuntimeException(ce);
+            }
+            return null;
         }
     }
 
@@ -82,7 +88,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         w.open("body");
         w.begin("h1").open().writeText(this.getName()).close();
         w.open("table");
-        for (Resource r : getChildren()) {
+        for (var r : getChildren()) {
             w.open("tr");
             w.open("td");;
             w.begin("a").writeAtt("href", "/webdav/" + ((VfsBackedMiltonResource)r).info.getPath()).open().writeText(r.getName()).close();

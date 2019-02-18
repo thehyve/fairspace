@@ -11,9 +11,12 @@ import io.milton.property.PropertySource;
 import io.milton.property.PropertySource.PropertyAccessibility;
 import io.milton.property.PropertySource.PropertyMetaData;
 import io.milton.resource.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.FileSystemException;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +24,7 @@ import static io.fairspace.saturn.vfs.PathUtils.name;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static java.util.Collections.singletonList;
 
+@Slf4j
 public abstract class VfsBackedMiltonResource implements
         Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource, Comparable<Resource> {
     private static final QName IRI_PROPERTY = new QName("http://fairspace.io/ontology#", "iri");
@@ -45,7 +49,7 @@ public abstract class VfsBackedMiltonResource implements
         try {
             fs.copy(info.getPath(), normalizePath(toCollection + "/" + name));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            onException(e);
         }
     }
 
@@ -54,7 +58,7 @@ public abstract class VfsBackedMiltonResource implements
         try {
             fs.delete(info.getPath());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            onException(e);
         }
     }
 
@@ -64,7 +68,7 @@ public abstract class VfsBackedMiltonResource implements
         try {
             fs.move(info.getPath(), normalizePath(rDest + "/" + name));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            onException(e);
         }
     }
 
@@ -138,5 +142,19 @@ public abstract class VfsBackedMiltonResource implements
     @Override
     public List<QName> getAllPropertyNames() {
         return singletonList(IRI_PROPERTY);
+    }
+
+    protected void onException(Exception e) throws NotAuthorizedException, BadRequestException, ConflictException {
+        log.error("A WebDAV operation resulted in an error", e);
+        if (e instanceof AccessDeniedException) {
+            throw new NotAuthorizedException(this, e);
+        }
+        if (e instanceof FileSystemException) {
+            throw new ConflictException(this, e.getMessage());
+        }
+        if (e instanceof RuntimeException) {
+            throw (RuntimeException) e;
+        }
+        throw new RuntimeException(e);
     }
 }
