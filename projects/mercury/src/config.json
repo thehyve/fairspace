@@ -3,7 +3,7 @@
     "logout": "/logout",
     "userInfo": "/account/user",
     "authorizations": "/account/authorizations",
-    "collections": "/api/collections",
+    "collections": "/api/collections/",
     "permissionsByCollectionId": "/api/collections/%d/permissions",
     "permissions": "/api/collections/permissions",
     "files": "/webdav",

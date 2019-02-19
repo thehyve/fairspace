@@ -24,12 +24,12 @@ app.get('/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`))
 app.get('/account/authorizations', (req, res) => res.send(['user-workspace1', 'ROLE_USER']));
 
 // Collections API
-app.post('/api/collections', (req, res) => res.send());
-app.get('/api/collections', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-list.json`));
-app.get('/api/collections/:id', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-${req.params.id}.json`));
+app.post('/api/collections/', (req, res) => res.send());
+app.get('/api/collections/', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-list.json`));
+app.get('/api/collections/', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-${req.query.iri}.json`));
 app.get('/api/collections/:id/permissions', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-${req.params.id}-permissions.json`));
-app.patch('/api/collections/:id', (req, res) => res.send());
-app.delete('/api/collections/:id', (req, res) => setTimeout(() => res.send(), 3000));
+app.patch('/api/collections/', (req, res) => res.send());
+app.delete('/api/collections/', (req, res) => setTimeout(() => res.send(), 3000));
 app.put('/api/collections/permissions', (req, res) => res.send({
     access: req.body.access,
     collection: req.body.collection,

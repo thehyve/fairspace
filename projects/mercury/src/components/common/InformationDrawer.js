@@ -25,7 +25,7 @@ export class InformationDrawer extends React.Component {
 
     handleCollectionDelete = (collection) => {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
-        deleteCollection(collection.id)
+        deleteCollection(collection.iri)
             .then(fetchCollectionsIfNeeded)
             .catch(err => ErrorDialog.showError(
                 err,

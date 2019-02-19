@@ -41,7 +41,7 @@ class CollectionAPI {
     }
 
     deleteCollection(id) {
-        return fetch(`${Config.get().urls.collections}/${id}`, {
+        return fetch(`${Config.get().urls.collections}?iri=${encodeURIComponent(id)}`, {
             method: 'DELETE',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin'
