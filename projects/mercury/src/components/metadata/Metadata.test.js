@@ -88,7 +88,7 @@ it('shows result when subject provided and data is loaded', () => {
 
     const wrapper = mount(
         <Provider store={store}>
-            <ConnectedMetadata editable subject={collection.uri} />
+            <ConnectedMetadata editable subject={collection.iri} />
         </Provider>
     );
 

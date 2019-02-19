@@ -19,8 +19,8 @@ import ErrorDialog from './ErrorDialog';
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection) => {
         const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = this.props;
-        invalidateMetadata(collection.uri);
-        fetchCombinedMetadataIfNeeded(collection.uri);
+        invalidateMetadata(collection.iri);
+        fetchCombinedMetadataIfNeeded(collection.iri);
     };
 
     handleCollectionDelete = (collection) => {
@@ -65,7 +65,7 @@ export class InformationDrawer extends React.Component {
                 />
                 <Paper style={{padding: 20, marginTop: 10}}>
                     <Metadata
-                        subject={collection.uri}
+                        subject={collection.iri}
                         editable={isMetaDataEditable}
                         style={{width: '100%'}}
                     />
