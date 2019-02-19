@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.AccessDeniedException;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+import static io.fairspace.saturn.services.errors.ErrorHelper.returnError;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
@@ -91,5 +92,7 @@ public class CollectionsApp implements SparkApplication {
                 res.status(SC_INTERNAL_SERVER_ERROR);
             }
         });
+        exception(JsonMappingException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Invalid request body"));
+        exception(IllegalArgumentException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, e.getMessage()));
     }
 }
