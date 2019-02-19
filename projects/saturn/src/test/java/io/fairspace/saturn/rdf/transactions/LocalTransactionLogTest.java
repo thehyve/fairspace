@@ -10,7 +10,7 @@ import java.io.IOException;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class LocalTransactionLogTest {
     private File logDir;
@@ -36,6 +36,7 @@ public class LocalTransactionLogTest {
         newLog.onBegin(null, null, null, 1);
         newLog.onCommit();
 
+        assertEquals(2L, newLog.size());
         assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-1").exists());
         assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-2").exists());
     }
@@ -46,6 +47,17 @@ public class LocalTransactionLogTest {
             log.onBegin(null, null, null, 0);
             log.onCommit();
         }
+        assertEquals(1001L, log.size());
         assertTrue(new File(new File(new File(logDir, "volume-1"), "chapter-2"), "tx-1001").exists());
+    }
+
+    @Test
+    public void doesNotLogAbortedTransactions() throws IOException {
+        log.onBegin(null, null, null, 0);
+        log.onAbort();
+
+        assertEquals(0L, log.size());
+        assertFalse(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-1").exists());
+
     }
 }
