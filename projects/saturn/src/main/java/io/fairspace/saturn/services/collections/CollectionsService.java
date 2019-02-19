@@ -91,7 +91,7 @@ public class CollectionsService {
                     }
                     if (existing.getAccess() != Access.Manage) {
                         log.info("No enough permissions to delete a collection {}", iri);
-                        throw new CollectionAccessDenied(iri);
+                        throw new CollectionAccessDeniedException(iri);
                     }
                     rdf.update(storedQuery("coll_delete", createResource(iri), userId()));
                 }));
@@ -111,7 +111,7 @@ public class CollectionsService {
                     }
                     if (existing.getAccess().ordinal() < Access.Write.ordinal()) {
                         log.info("No enough permissions to modify a collection {}", patch.getIri());
-                        throw new CollectionAccessDenied(patch.getIri());
+                        throw new CollectionAccessDeniedException(patch.getIri());
                     }
 
                     validate(patch.getType() == null || patch.getType().equals(existing.getType()),
