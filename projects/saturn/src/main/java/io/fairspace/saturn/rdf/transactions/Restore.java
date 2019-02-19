@@ -1,10 +1,8 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.update.UpdateExecutionFactory;
-
-import java.io.IOException;
 
 import static org.apache.jena.system.Txn.executeWrite;
 
@@ -28,11 +26,20 @@ public class Restore {
                     prevProgress = progress;
                 }
                 try {
-                    var txn = txnLog.get(i);
-                    UpdateExecutionFactory.create(txn.asUpdateRequest(), dsg).execute();
-                } catch (IOException e) {
+                    txnLog.read(i, new TransactionListener() {
+                        @Override
+                        public void onAdd(Node graph, Node subject, Node predicate, Node object) {
+                            dsg.add(graph, subject, predicate, object);
+                        }
+
+                        @Override
+                        public void onDelete(Node graph, Node subject, Node predicate, Node object) {
+                            dsg.delete(graph, subject, predicate, object);
+                        }
+                    });
+                } catch (Exception e) {
                     log.error("Error applying transaction #" + (i + 1), e);
-                    throw new RuntimeException(e);
+                    throw e;
                 }
             }
             log.info("Progress: 100%");

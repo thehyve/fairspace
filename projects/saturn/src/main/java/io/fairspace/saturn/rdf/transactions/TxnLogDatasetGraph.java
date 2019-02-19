@@ -7,11 +7,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.QuadAction;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.transactions.Panic.panic;
@@ -22,8 +19,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private final TransactionLog transactionLog;
     private final Supplier<UserInfo> userInfoProvider;
     private final Supplier<String> commitMessageProvider;
-    private Set<Quad> added;   // Quads added in current transaction
-    private Set<Quad> deleted; // Quads deleted in current transaction
+
 
     public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<UserInfo> userInfoProvider, Supplier<String> commitMessageProvider) {
         super(dsg);
@@ -37,17 +33,12 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
      */
     @Override
     protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
-        var q = new Quad(graph, subject, predicate, object);
         switch (action) {
             case ADD:
-                if (!deleted.remove(q)) {  // Check if it was previously deleted in same transaction
-                    added.add(q);
-                }
+                transactionLog.onAdd(graph, subject, predicate, object);
                 break;
             case DELETE:
-                if (!added.remove(q)) {    // Check if it was previously added in same transaction
-                    deleted.add(q);
-                }
+                transactionLog.onDelete(graph, subject, predicate, object);
                 break;
         }
     }
@@ -65,44 +56,34 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     public void begin(ReadWrite readWrite) {
         super.begin(readWrite);
         if (readWrite == ReadWrite.WRITE) { // a write transaction => be ready to collect changes
-            added = new HashSet<>();
-            deleted = new HashSet<>();
+            String userName = null;
+            String userId = null;
+            if (userInfoProvider != null) {
+                var userInfo = userInfoProvider.get();
+                if (userInfo != null) {
+                    userId = userInfo.getUserId();
+                    userName = userInfo.getFullName();
+                }
+            }
+            String commitMessage = null;
+
+            if (commitMessageProvider != null) {
+                commitMessage = commitMessageProvider.get();
+            }
+            transactionLog.onBegin(commitMessage, userId, userName, currentTimeMillis());
         }
     }
 
     @Override
     public void commit() {
-        if (isInWriteTransaction() && !(added.isEmpty() && deleted.isEmpty())) {
-            var transaction = new TransactionRecord();
-            transaction.setAdded(added);
-            transaction.setDeleted(deleted);
-            transaction.setTimestamp(currentTimeMillis());
-
-            if (userInfoProvider != null) {
-                var userInfo = userInfoProvider.get();
-                if (userInfo != null) {
-                    transaction.setUserId(userInfo.getUserId());
-                    transaction.setUserName(userInfo.getFullName());
-                }
-            }
-
-            if (commitMessageProvider != null) {
-                var commitMessage = commitMessageProvider.get();
-                if (commitMessage != null) {
-                    transaction.setCommitMessage(commitMessage.replace('\n', ' ').trim());
-                }
-            }
-
-            added = null;
-            deleted = null;
-
+        if (isInWriteTransaction()) {
             var persisted = false;
             try {
-                transactionLog.log(transaction);
+                transactionLog.onCommit();
                 persisted = true;
                 super.commit();
             } catch (Throwable throwable) {
-                panic(throwable, transaction, persisted);
+                panic(throwable, persisted);
             }
         } else {
             super.commit();
@@ -112,21 +93,10 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void abort() {
         if (isInWriteTransaction()) {
-            added = null;
-            deleted = null;
+            transactionLog.onAbort();
         }
 
         super.abort();
-    }
-
-    @Override
-    public void end() {
-        if (isInWriteTransaction()) {
-            added = null;
-            deleted = null;
-        }
-
-        super.end();
     }
 
     private boolean isInWriteTransaction() {

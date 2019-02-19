@@ -8,27 +8,24 @@ class Panic {
             "Catastrophic failure. Shutting down. The system requires admin's intervention.";
 
 
-    static void panic(Throwable reason, TransactionRecord transaction, boolean persistedToLog) {
+    static void panic(Throwable reason, boolean persistedToLog) {
         log.error(ERROR_MSG, reason);
         var statusMsg = persistedToLog
                 ? "The failed transaction has been persisted to the transaction log"
                 : "The failed transaction has NOT been persisted to the transaction log";
 
         log.error(statusMsg);
-        log.error(transaction.toString());
 
 
         // SLF4J has no flush method.
         System.err.println(ERROR_MSG);
         reason.printStackTrace();
         System.err.println(statusMsg);
-        System.err.println(transaction);
 
         System.err.flush();
 
         log.error(ERROR_MSG, reason);
         log.error(statusMsg);
-        log.error(transaction.toString());
         // There's no log.flush() :-(
 
         System.exit(1);
