@@ -75,6 +75,19 @@ class MetadataAPI {
             .then(jsonld.expand);
     }
 
+    /**
+     * Returns all Fairspace entities in the metadata store for the given type
+     *
+     * @returns Promise<jsonld> A promise with an expanded version of the JSON-LD structure, describing the entities.
+     *                          The entities will have an ID, type and optionally an rdfs:label
+     */
+    getAllEntities() {
+        return fetch(Config.get().urls.metadata.entities, MetadataAPI.getParams)
+            .then(failOnHttpError("Failure when retrieving entities"))
+            .then(response => response.json())
+            .then(jsonld.expand);
+    }
+
     toJsonLd(subject, predicate, values) {
         return [
             {
