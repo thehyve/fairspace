@@ -22,7 +22,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
     let collectionId;
     switch (action.type) {
         case actionTypes.FETCH_FILES_PENDING:
-            collectionId = action.meta.collection.id;
+            collectionId = action.meta.collection.iri;
             return {
                 ...state,
                 [collectionId]: {
@@ -36,7 +36,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                 }
             };
         case actionTypes.FETCH_FILES_FULFILLED:
-            collectionId = action.meta.collection.id;
+            collectionId = action.meta.collection.iri;
             return {
                 ...state,
                 [collectionId]: {
@@ -49,7 +49,7 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                 }
             };
         case actionTypes.FETCH_FILES_REJECTED:
-            collectionId = action.meta.collection.id;
+            collectionId = action.meta.collection.iri;
             return {
                 ...state,
                 [collectionId]: {
@@ -73,16 +73,16 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                 ...state,
                 creatingDirectory: false
             };
-            return invalidateFiles(newState, action.meta.collection.id, action.meta.path);
+            return invalidateFiles(newState, action.meta.collection.iri, action.meta.path);
         }
         case actionTypes.INVALIDATE_FETCH_FILES:
         case actionTypes.RENAME_FILE_FULFILLED:
         case actionTypes.DELETE_FILE_FULFILLED:
         case actionTypes.UPLOAD_FILES_FULFILLED:
-            return invalidateFiles(state, action.meta.collection.id, action.meta.path);
+            return invalidateFiles(state, action.meta.collection.iri, action.meta.path);
         case actionTypes.CLIPBOARD_PASTE_FULFILLED: {
             const {sourceDir, destinationDir} = action.meta;
-            return invalidateFiles(state, action.meta.collection.id, sourceDir, destinationDir);
+            return invalidateFiles(state, action.meta.collection.iri, sourceDir, destinationDir);
         }
         default:
             return state;

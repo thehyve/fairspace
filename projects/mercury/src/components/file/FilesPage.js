@@ -83,7 +83,6 @@ class FilesPage extends React.Component {
                                 openPath={openPath}
                                 fetchFilesIfNeeded={fetchFilesIfNeeded}
                                 openedCollection={openedCollection}
-                                openedCollectionId={openedCollectionId}
                                 openedPath={openedPath}
                                 files={files}
                                 selectPath={selectPath}
@@ -105,19 +104,20 @@ class FilesPage extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     const {match: {params}} = ownProps;
-    const openedCollectionId = params.collection;
+    const openedCollectionLocation = params.collection;
     const openedPath = params.path ? `/${params.path}` : '/';
-    const filesPerCollection = state.cache.filesByCollectionAndPath[openedCollectionId] || [];
+
+    const collection = (state.cache.collections.data && state.cache.collections.data.find(c => c.location === openedCollectionLocation)) || {};
+    const filesPerCollection = state.cache.filesByCollectionAndPath[collection.iri] || [];
     const files = filesPerCollection[openedPath] || [];
-    const getCollection = collectionId => (state.cache.collections.data && state.cache.collections.data.find(collection => collection.id === collectionId)) || {};
 
     return {
         loading: files.pending || state.cache.collections.pending || state.cache.collections.data.length === 0,
         error: files.error || state.cache.collections.error,
         files: files.data,
         selectedPaths: state.collectionBrowser.selectedPaths,
-        openedCollection: openedCollectionId ? getCollection(openedCollectionId) : {},
-        openedCollectionId,
+        openedCollection: collection,
+        openedCollectionId: collection.iri,
         openedPath
     };
 };

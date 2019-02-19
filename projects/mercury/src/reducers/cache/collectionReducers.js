@@ -19,7 +19,7 @@ const additionalReducer = (state = defaultState, action) => {
                 ...state,
                 invalidated: true,
                 data: state.data.map((collection) => {
-                    if (collection.id !== action.meta.id) {
+                    if (collection.iri !== action.meta.id) {
                         return collection;
                     }
                     return {
