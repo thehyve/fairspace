@@ -6,6 +6,7 @@ import spark.servlet.SparkApplication;
 
 import static io.fairspace.saturn.services.ModelUtils.fromJsonLD;
 import static io.fairspace.saturn.services.ModelUtils.toJsonLD;
+import static io.fairspace.saturn.services.errors.ErrorHelper.returnError;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.*;
@@ -29,10 +30,7 @@ public class VocabularyApp implements SparkApplication {
                 api.setVocabulary(vocabulary);
                 return "";
             });
-            exception(RiotException.class, (e, req, res) -> {
-                res.status(SC_BAD_REQUEST);
-                res.body("Malformed request body");
-            });
+            exception(RiotException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Malformed request body"));
         });
     }
 }

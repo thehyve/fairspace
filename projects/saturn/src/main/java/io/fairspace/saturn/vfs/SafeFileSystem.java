@@ -97,7 +97,7 @@ public class SafeFileSystem implements VirtualFileSystem {
         var normalizedFrom = normalizePath(from);
         var normalizedTo = normalizePath(to);
         if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
-            throw new IOException("Cannot copy a file or a directory to itself");
+            throw new FileAlreadyExistsException("Cannot copy a file or a directory to itself");
         }
         safely(() -> {
             if (!exists(from)) {

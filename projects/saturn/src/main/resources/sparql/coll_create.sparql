@@ -15,7 +15,6 @@ INSERT {
   fs:filePath ?1;
   rdfs:comment ?2;
   fs:collectionType ?3;
-  fs:fileSize 0;
   fs:createdBy ?4;
   fs:dateCreated ?date;
   fs:modifiedBy ?4;
