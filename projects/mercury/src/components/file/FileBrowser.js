@@ -60,7 +60,7 @@ class FileBrowser extends React.Component {
     openDir(path) {
         const basePath = this.props.openedPath || '';
         const separator = basePath.endsWith('/') ? '' : '/';
-        const fullPath = `/collections/${this.props.openedCollection.id}${basePath}${separator}${path}`;
+        const fullPath = `/collections/${this.props.openedCollection.location}${basePath}${separator}${path}`;
         this.props.history.push(fullPath);
         this.props.openPath(`/${this.props.openedCollection.location}${basePath}${separator}${path}`);
     }
