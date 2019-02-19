@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import SearchResults from './SearchResults';
 import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
 import * as searchActions from '../../actions/searchActions';
+import {ErrorMessage} from "../common";
 
 class SearchPage extends React.Component {
     componentDidMount() {
@@ -39,10 +40,13 @@ class SearchPage extends React.Component {
     render() {
         const {results, searchType, loading, error} = this.props;
 
+        if (error && !loading) {
+            return <ErrorMessage message={error} />;
+        }
+
         return (
             <SearchResults
                 loading={loading}
-                error={error}
                 type={searchType}
                 results={results}
                 onTypeChange={this.handleTypeChange}

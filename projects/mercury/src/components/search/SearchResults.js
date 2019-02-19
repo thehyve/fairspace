@@ -4,7 +4,7 @@ import {Grid, AppBar, Tabs, Tab} from '@material-ui/core';
 import CollectionList from '../collections/CollectionList';
 import FileList from '../file/FileList';
 import {COLLECTION_SEARCH_TYPE, FILES_SEARCH_TYPE} from '../../constants';
-import {LoadingInlay, ErrorMessage} from "../common";
+import {LoadingInlay} from "../common";
 
 const searchResults = ({
     loading,
@@ -13,12 +13,7 @@ const searchResults = ({
     onTypeChange,
     onCollectionOpen,
     onFileOpen,
-    error,
 }) => {
-    if (error && !loading) {
-        return <ErrorMessage message={error} />;
-    }
-
     const selectedTabIndex = type === FILES_SEARCH_TYPE ? 1 : 0;
 
     return (
