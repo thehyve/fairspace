@@ -40,8 +40,8 @@ class CollectionBrowser extends React.Component {
         this.props.history.push(`/collections/${collection.location}`);
     }
 
-    handleAddCollection = (name, description, type) => {
-        this.props.addCollection(name, description, type)
+    handleAddCollection = (name, description, location, type) => {
+        this.props.addCollection(name, description, type, location)
             .then(this.props.fetchCollectionsIfNeeded)
             .then(() => this.setState({addingNewCollection: false}))
             .catch(err => ErrorDialog.showError(

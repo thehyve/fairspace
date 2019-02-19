@@ -33,9 +33,9 @@ export class InformationDrawer extends React.Component {
             ));
     }
 
-    handleUpdateCollection = (name, description) => {
+    handleUpdateCollection = (name, description, location) => {
         if ((name !== this.props.collection.name || description !== this.props.collection.description) && name !== '') {
-            this.props.updateCollection(this.props.collection.iri, name, description)
+            this.props.updateCollection(this.props.collection.iri, name, description, location)
                 .then(() => {
                     const collection = Object.assign(this.props.collection, {name, description});
                     this.handleDetailsChange(collection);

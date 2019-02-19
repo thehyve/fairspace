@@ -83,7 +83,7 @@ it('shows result when subject provided and data is loaded', () => {
     });
 
     const collection = {
-        uri: "http://fairspace.com/iri/collections/1"
+        iri: "http://fairspace.com/iri/collections/1"
     };
 
     const wrapper = mount(

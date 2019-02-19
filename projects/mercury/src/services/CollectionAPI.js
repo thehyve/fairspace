@@ -16,21 +16,21 @@ class CollectionAPI {
             .then(response => response.json());
     }
 
-    addCollection(name, description, type) {
+    addCollection(name, description, type, location) {
         return fetch(Config.get().urls.collections, {
             method: 'POST',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({name, description, type})
+            body: JSON.stringify({name, description, type, location})
         }).then(failOnHttpError("Failure while saving a collection"));
     }
 
-    updateCollection(iri, name, description) {
+    updateCollection(iri, name, description, location) {
         return fetch(`${Config.get().urls.collections}`, {
             method: 'PATCH',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({iri, name, description})
+            body: JSON.stringify({iri, name, description, location})
         }).then(failOnHttpError("Failure while updating a collection"));
     }
 
