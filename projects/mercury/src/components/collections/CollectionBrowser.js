@@ -30,9 +30,9 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionClick = (collection) => {
-        const {selectedCollectionId, selectCollection} = this.props;
-        if (selectedCollectionId !== collection.id) {
-            selectCollection(collection.id);
+        const {selectedCollectionIRI, selectCollection} = this.props;
+        if (selectedCollectionIRI !== collection.iri) {
+            selectCollection(collection.iri);
         }
     }
 
@@ -66,7 +66,7 @@ class CollectionBrowser extends React.Component {
             <>
                 <CollectionList
                     collections={this.props.collections}
-                    selectedCollectionId={this.props.selectedCollectionId}
+                    selectedCollectionIRI={this.props.selectedCollectionIRI}
                     onCollectionClick={this.handleCollectionClick}
                     onCollectionDoubleClick={this.handleCollectionDoubleClick}
                 />
@@ -113,7 +113,7 @@ const mapStateToProps = (state) => ({
     error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
     collections: state.cache.collections.data,
     users: state.cache.users.data,
-    selectedCollectionId: state.collectionBrowser.selectedCollectionId,
+    selectedCollectionIRI: state.collectionBrowser.selectedCollectionIRI,
     addingCollection: state.collectionBrowser.addingCollection,
     deletingCollection: state.collectionBrowser.deletingCollection
 });

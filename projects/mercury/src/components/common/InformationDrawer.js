@@ -111,8 +111,8 @@ function pathHierarchy(fullPath) {
     return paths.reverse();
 }
 
-const mapStateToProps = ({cache: {collections, users}, collectionBrowser: {selectedCollectionId, openedPath, selectedPaths}}) => ({
-    collection: findById(collections.data, selectedCollectionId),
+const mapStateToProps = ({cache: {collections, users}, collectionBrowser: {selectedCollectionIRI, openedPath, selectedPaths}}) => ({
+    collection: collections.data && collections.data.find(c => c.iri === selectedCollectionIRI),
     paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
     loading: users.pending
 });

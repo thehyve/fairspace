@@ -1,7 +1,7 @@
 import * as actionTypes from "../actions/actionTypes";
 
 const defaultState = {
-    selectedCollectionId: null,
+    selectedCollectionIRI: null,
     selectedPaths: [],
     openedCollectionId: null,
     openedPath: null,
@@ -19,7 +19,7 @@ const collectionBrowser = (state = defaultState, action) => {
         case actionTypes.SELECT_COLLECTION:
             return {
                 ...state,
-                selectedCollectionId: action.collectionId
+                selectedCollectionIRI: action.collectionId
             };
         case actionTypes.SELECT_PATH:
             return {
@@ -37,7 +37,7 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 deletingCollection: false,
-                selectedCollectionId: state.selectedCollectionId === action.collectionId ? null : state.selectedCollectionId
+                selectedCollectionIRI: state.selectedCollectionIRI === action.collectionId ? null : state.selectedCollectionIRI
             };
         case actionTypes.DELETE_COLLECTION_REJECTED:
         case actionTypes.DELETE_COLLECTION_INVALIDATE:
