@@ -5,16 +5,6 @@ import failOnHttpError from "../utils/httpUtils";
 import Vocabulary from "./Vocabulary";
 import {PROPERTY_URI, DOMAIN_URI} from '../constants';
 
-const GET_ENTITIES_SPARQL = `
-    PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    CONSTRUCT {?s rdf:type ?t . ?s rdfs:label ?l}
-    WHERE {
-        { ?s rdf:type ?t FILTER(?t in (%types))}
-        OPTIONAL { ?s rdfs:label ?l}
-    }
-`;
-
 class MetadataAPI {
     static getParams = {
         method: 'GET',
@@ -30,7 +20,7 @@ class MetadataAPI {
 
     get(params) {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
-        return fetch(`${Config.get().urls.metadata.extendedStatements}?${query}`, MetadataAPI.getParams)
+        return fetch(`${Config.get().urls.metadata.statements}?labels&${query}`, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(jsonld.expand);
@@ -80,37 +70,10 @@ class MetadataAPI {
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
     getEntitiesByType(type) {
-        return this.getEntitiesByTypes([type]);
-    }
-
-    /**
-     * Returns all entities in the metadata store for the given list of types
-     *
-     * More specifically this method returns all entities x for which a
-     * triple exist <x> <@type> <t> exists where t is in the given list of types
-     *
-     * @param type  URI of the Class that the entities should be a type of
-     * @returns Promise<jsonld> A promise with an expanded version of the JSON-LD structure, describing the entities.
-     *                          The entities will have an ID, type and optionally an rdfs:label
-     */
-    getEntitiesByTypes(types) {
-        const query = GET_ENTITIES_SPARQL.replace('%types', types.map(type => `<${type}>`).join(', '));
-
-        return fetch(Config.get().urls.metadata.query, {
-            method: 'POST',
-            headers: new Headers({'Accept': 'application/ld+json', 'Content-type': 'application/sparql-query'}),
-            credentials: 'same-origin',
-            body: query
-        })
+        return fetch(Config.get().urls.metadata.entities + "?type=" + encodeURIComponent(type), MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(jsonld.expand);
-    }
-
-    getPropertiesByDomain(type) {
-        return this.getVocabulary()
-            .then(subjects => subjects.filter(s => (s['@type'] || []).includes(PROPERTY_URI)
-                && (s[DOMAIN_URI] || []).includes(type)));
     }
 
     toJsonLd(subject, predicate, values) {
@@ -123,14 +86,13 @@ class MetadataAPI {
     }
 
     getSubjectByPath(path) {
-        return fetch(Config.get().urls.metadata.pid + '?value=' + encodeURIComponent(path), {
+        return fetch(Config.get().urls.metadata.pid + '?path=' + encodeURIComponent(path), {
             method: 'GET',
-            headers: new Headers({Accept: 'application/json'}),
+            headers: new Headers({Accept: 'text/plain'}),
             credentials: 'same-origin'
         })
             .then(failOnHttpError("Failure when retrieving metadata"))
-            .then(response => response.json())
-            .then(data => data.id);
+            .then(response => response.text());
     }
 }
 

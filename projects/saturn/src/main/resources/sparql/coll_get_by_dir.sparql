@@ -8,10 +8,10 @@ WHERE {
   ?iri fs:filePath ?0;
     a fs:Collection;
     rdfs:label ?name;
-    fs:filePath ?path;
     rdfs:comment ?description;
     fs:collectionType ?type;
     fs:createdBy ?createdBy;
     fs:dateCreated ?dateCreated;
     fs:dateModified ?dateModified.
-FILTER NOT EXISTS { ?iri fs:dateDeleted ?dateDeleted }}
+FILTER NOT EXISTS { ?iri fs:dateDeleted ?dateDeleted }
+BIND(?0 as ?path)}

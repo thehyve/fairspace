@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.QuerySolutionProcessor;
+import io.fairspace.saturn.services.collections.CollectionsService;
 import org.apache.jena.atlas.lib.Pair;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
@@ -38,7 +40,6 @@ class MetadataService {
     void delete(String subject, String predicate, String object) {
         rdf.update(storedQuery("delete_by_mask", asURI(subject), asURI(predicate), asURI(object)));
     }
-
     void delete(Model model) {
         rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(model.listStatements().toList()))));
     }
@@ -50,6 +51,12 @@ class MetadataService {
 
     Model getByType(String type) {
         return rdf.queryConstruct(storedQuery("entities_by_type", asURI(type)));
+    }
+
+    String iriByPath(String path) {
+        var processor = new QuerySolutionProcessor<>(row -> row.get("iri").asResource().getURI());
+        rdf.querySelect(storedQuery("iri_by_path", path), processor);
+        return processor.getSingle().orElse(null);
     }
 
     static String createPatchQuery(Collection<Statement> statements) {

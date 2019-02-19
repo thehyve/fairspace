@@ -7,6 +7,7 @@ import spark.servlet.SparkApplication;
 import static io.fairspace.saturn.services.ModelUtils.fromJsonLD;
 import static io.fairspace.saturn.services.ModelUtils.toJsonLD;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.*;
 
@@ -31,6 +32,10 @@ public class MetadataApp implements SparkApplication {
             get("/entities/", (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
                 return toJsonLD(api.getByType(req.queryParams("type")));
+            });
+            get("pids", (req, res) -> {
+                res.type(TEXT_PLAIN.getMimeType());
+                return api.iriByPath(req.queryParams("path"));
             });
             put("/", (req, res) -> {
                 api.put(fromJsonLD(req.body()));
