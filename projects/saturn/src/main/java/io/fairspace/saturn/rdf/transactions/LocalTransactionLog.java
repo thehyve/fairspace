@@ -144,7 +144,18 @@ public class LocalTransactionLog implements TransactionLog {
         current.delete();
         try {
             writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(current)));
-        } catch (FileNotFoundException e) {
+            writer.write(TIMESTAMP_PREFIX + timestamp + "\n");
+            if (userName != null) {
+                writer.write(USER_NAME_PREFIX + userName + "\n");
+            }
+            if (userId != null) {
+                writer.write(USER_ID_PREFIX + userId + "\n");
+            }
+            if (commitMessage != null) {
+                writer.write(COMMIT_MESSAGE_PREFIX + commitMessage.replace('\n', ' ') + "\n");
+            }
+            writer.write('\n');
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
