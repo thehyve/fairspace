@@ -6,8 +6,11 @@ import spark.servlet.SparkApplication;
 
 import static io.fairspace.saturn.services.ModelUtils.fromJsonLD;
 import static io.fairspace.saturn.services.ModelUtils.toJsonLD;
+import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.returnError;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.*;
@@ -35,8 +38,14 @@ public class MetadataApp implements SparkApplication {
                 return toJsonLD(api.getByType(req.queryParams("type")));
             });
             get("pids", (req, res) -> {
-                res.type(TEXT_PLAIN.getMimeType());
-                return api.iriByPath(req.queryParams("path"));
+                var iri = api.iriByPath(req.queryParams("path"));
+                if (iri == null) {
+                    res.type(APPLICATION_JSON.getMimeType());
+                    return errorBody(SC_NOT_FOUND, "Path not found");
+                } else {
+                    res.type(TEXT_PLAIN.getMimeType());
+                    return iri;
+                }
             });
             put("/", (req, res) -> {
                 api.put(fromJsonLD(req.body()));
