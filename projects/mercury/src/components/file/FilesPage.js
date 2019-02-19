@@ -18,11 +18,11 @@ class FilesPage extends React.Component {
             fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath
         } = this.props;
         fetchCollectionsIfNeeded();
-        selectCollection(openedCollection.id);
+        selectCollection(openedCollection.iri);
 
         // If the collection has not been fetched yet,
         // do not bother fetching the files
-        if (openedCollection.id) {
+        if (openedCollection.iri) {
             fetchFilesIfNeeded(openedCollection, openedPath);
         }
     }
@@ -32,12 +32,12 @@ class FilesPage extends React.Component {
             selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath
         } = this.props;
 
-        if (prevProps.openedCollection.id !== openedCollection.id) {
-            selectCollection(openedCollection.id);
+        if (prevProps.openedCollection.iri !== openedCollection.iri) {
+            selectCollection(openedCollection.iri);
         }
 
-        const hasCollectionDetails = openedCollection.id;
-        const hasNewOpenedCollection = prevProps.openedCollection.id !== openedCollection.id;
+        const hasCollectionDetails = openedCollection.iri;
+        const hasNewOpenedCollection = prevProps.openedCollection.iri !== openedCollection.iri;
         const hasNewOpenedPath = prevProps.openedPath !== openedPath;
 
         if (hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
@@ -54,7 +54,7 @@ class FilesPage extends React.Component {
         }
 
         const segments = [
-            {segment: `${openedCollection.id}`, label: openedCollection.name}
+            {segment: openedCollection.location, label: openedCollection.name}
         ];
 
         if (openedPath) {

@@ -72,7 +72,7 @@ class FileBrowser extends React.Component {
 
     render() {
         const {loading, error, openedCollection, files, selectedPaths, openedPath} = this.props;
-        const collectionExists = openedCollection && openedCollection.id;
+        const collectionExists = openedCollection && openedCollection.iri;
 
         if (error) {
             return (<ErrorMessage message="An error occurred while loading files" />);

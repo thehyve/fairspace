@@ -13,7 +13,6 @@ import PathMetadata from "../metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
 import {canManage} from '../../utils/permissionUtils';
-import {findById} from "../../utils/arrayUtils";
 import ErrorDialog from './ErrorDialog';
 
 export class InformationDrawer extends React.Component {
@@ -36,7 +35,7 @@ export class InformationDrawer extends React.Component {
 
     handleUpdateCollection = (name, description) => {
         if ((name !== this.props.collection.name || description !== this.props.collection.description) && name !== '') {
-            this.props.updateCollection(this.props.collection.id, name, description)
+            this.props.updateCollection(this.props.collection.iri, name, description)
                 .then(() => {
                     const collection = Object.assign(this.props.collection, {name, description});
                     this.handleDetailsChange(collection);

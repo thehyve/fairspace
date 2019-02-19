@@ -34,7 +34,7 @@ const collectionList = (props) => {
 
                         return (
                             <TableRow
-                                key={collection.id}
+                                key={collection.iri}
                                 hover
                                 onClick={() => onCollectionClick(collection)}
                                 onDoubleClick={() => onCollectionDoubleClick(collection)}
