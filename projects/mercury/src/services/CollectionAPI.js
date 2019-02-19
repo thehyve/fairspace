@@ -25,12 +25,12 @@ class CollectionAPI {
         }).then(failOnHttpError("Failure while saving a collection"));
     }
 
-    updateCollection(id, name, description) {
-        return fetch(`${Config.get().urls.collections}/${id}`, {
+    updateCollection(iri, name, description) {
+        return fetch(`${Config.get().urls.collections}`, {
             method: 'PATCH',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({name, description})
+            body: JSON.stringify({iri, name, description})
         }).then(failOnHttpError("Failure while updating a collection"));
     }
 
