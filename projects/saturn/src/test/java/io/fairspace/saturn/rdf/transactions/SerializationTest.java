@@ -7,7 +7,6 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringBufferInputStream;
 import java.util.HashSet;
 
 import static java.lang.System.currentTimeMillis;
@@ -56,11 +55,7 @@ public class SerializationTest {
         testSerialization(additionsAndDeletions, new SparqlTransactionCodec());
     }
 
-    @Test
-    public void simpleSerializationWorks() throws IOException {
-        testSerialization(additionsAndDeletions, new JavaSerializationTransactionCodec());
-    }
-    
+
     @Test
     public void testNoDeletions() throws IOException {
         testSerialization(additionsOnly, new SparqlTransactionCodec());
