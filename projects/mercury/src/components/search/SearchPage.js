@@ -1,20 +1,12 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
+import {connect} from 'react-redux';
 
 import SearchResults from './SearchResults';
-import {buildSearchUrl, getSearchQueryFromString, getSearchTypeFromString} from '../../utils/searchUtils';
-import {performSearch} from '../../services/SearchAPI';
+import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
+import * as searchActions from '../../actions/searchActions';
 
 class SearchPage extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            type: getSearchTypeFromString(props.location.search),
-            onGoingSearch: false,
-            results: []
-        };
-    }
-
     componentDidMount() {
         this.updateResults();
     }
@@ -26,47 +18,50 @@ class SearchPage extends React.Component {
     }
 
     updateResults = () => {
-        const {location: {search}} = this.props;
-        const type = getSearchTypeFromString(search);
-
-        if (!this.state.onGoingSearch) {
-            performSearch(search)
-                .then(results => {
-                    this.setState({results, type});
-                });
-        }
+        const {location: {search}, performSearch} = this.props;
+        performSearch(search);
     };
 
     handleTypeChange = (type) => {
-        if (type !== this.state.type) {
-            this.setState({results: [], type});
-            const query = getSearchQueryFromString(this.props.location.search);
-            const searchUrl = buildSearchUrl(type, query);
-            this.props.history.push(searchUrl);
-        }
+        const query = getSearchQueryFromString(this.props.location.search);
+        const searchUrl = buildSearchUrl(type, query);
+        this.props.history.push(searchUrl);
     };
 
     handleCollectionOpen = (collection) => {
         this.props.history.push(`/collections/${collection.id}`);
     }
 
-    handlefileOpen = (file) => {
-        // TODO: handle file open (implementation on file browser depends on current opened collection)
+    handleFileOpen = () => {
+        // TODO: handle file open (currently don't have collection info within the file info)
     }
 
     render() {
-        const {results, type} = this.state;
+        const {results, searchType, loading, error} = this.props;
 
         return (
             <SearchResults
-                type={type}
-                onTypeChange={this.handleTypeChange}
+                loading={loading}
+                error={error}
+                type={searchType}
                 results={results}
+                onTypeChange={this.handleTypeChange}
                 onCollectionOpen={this.handleCollectionOpen}
-                onFileOpen={this.handlefileOpen}
+                onFileOpen={this.handleFileOpen}
             />
         );
     }
 }
 
-export default withRouter(SearchPage);
+const mapStateToProps = ({search}) => ({
+    loading: search.pending,
+    searchType: search.searchType,
+    results: search.results,
+    error: search.error
+});
+
+const mapDispatchToProps = {
+    performSearch: searchActions.performSearch
+};
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SearchPage));
