@@ -6,9 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import spark.servlet.SparkApplication;
 
-import java.io.FileNotFoundException;
-import java.nio.file.AccessDeniedException;
-
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static io.fairspace.saturn.services.errors.ErrorHelper.returnError;
 import static javax.servlet.http.HttpServletResponse.*;
@@ -73,26 +70,9 @@ public class CollectionsApp implements SparkApplication {
             });
         });
 
-        exception(JsonMappingException.class, (e, req, res) -> {
-            res.body("Invalid request body");
-            res.status(SC_BAD_REQUEST);
-        });
-        exception(IllegalArgumentException.class, (e, req, res) -> {
-            res.body(e.getMessage());
-            res.status(SC_BAD_REQUEST);
-        });
-        exception(RuntimeException.class, (e, req, res) -> {
-            if (e.getCause() instanceof FileNotFoundException) {
-                res.status(SC_NOT_FOUND);
-            } else if (e.getCause() instanceof AccessDeniedException) {
-                res.status(SC_UNAUTHORIZED);
-            } else {
-                log.error("An unexpected exception", e);
-                res.body(e.getMessage());
-                res.status(SC_INTERNAL_SERVER_ERROR);
-            }
-        });
         exception(JsonMappingException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Invalid request body"));
         exception(IllegalArgumentException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, e.getMessage()));
+        exception(CollectionNotFoundException.class, (e, req, res) -> returnError(res, SC_NOT_FOUND, e.getMessage()));
+        exception(CollectionAccessDenied.class, (e, req, res) -> returnError(res, SC_UNAUTHORIZED, e.getMessage()));
     }
 }

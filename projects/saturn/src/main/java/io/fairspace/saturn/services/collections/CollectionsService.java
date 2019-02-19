@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
-import java.io.FileNotFoundException;
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -89,11 +87,11 @@ public class CollectionsService {
                     var existing = get(iri);
                     if (existing == null) {
                         log.info("Collection not found {}", iri);
-                        throw new RuntimeException(new FileNotFoundException(iri));
+                        throw new CollectionNotFoundException(iri);
                     }
                     if (existing.getAccess() != Access.Manage) {
                         log.info("No enough permissions to delete a collection {}", iri);
-                        throw new RuntimeException(new AccessDeniedException(iri));
+                        throw new CollectionAccessDenied(iri);
                     }
                     rdf.update(storedQuery("coll_delete", createResource(iri), userId()));
                 }));
@@ -109,11 +107,11 @@ public class CollectionsService {
                     var existing = get(patch.getIri());
                     if (existing == null) {
                         log.info("Collection not found {}", patch.getIri());
-                        throw new RuntimeException(new FileNotFoundException(patch.getIri()));
+                        throw new CollectionNotFoundException(patch.getIri());
                     }
                     if (existing.getAccess().ordinal() < Access.Write.ordinal()) {
                         log.info("No enough permissions to modify a collection {}", patch.getIri());
-                        throw new RuntimeException(new AccessDeniedException(patch.getIri()));
+                        throw new CollectionAccessDenied(patch.getIri());
                     }
 
                     validate(patch.getType() == null || patch.getType().equals(existing.getType()),
