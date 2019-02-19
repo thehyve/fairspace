@@ -70,7 +70,7 @@ class FilesPage extends React.Component {
         {
             const {
                 openedCollection, fetchFilesIfNeeded,
-                openPath, openedCollectionId,
+                openPath,
                 openedPath, files, selectedPaths, selectPath, deselectPath, renameFile, deleteFile
             } = this.props;
 

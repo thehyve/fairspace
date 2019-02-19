@@ -13,13 +13,7 @@ class CollectionAPI {
             credentials: 'same-origin'
         })
             .then(failOnHttpError("Failure when retrieving a list of collections"))
-            .then(response => response.json())
-            .then(collections => {
-                collections.forEach(c => {
-                    c.id = c.location;
-                });
-                return collections;
-            });
+            .then(response => response.json());
     }
 
     addCollection(name, description, type) {
