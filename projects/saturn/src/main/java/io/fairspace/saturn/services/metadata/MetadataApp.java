@@ -6,6 +6,7 @@ import spark.servlet.SparkApplication;
 
 import static io.fairspace.saturn.services.ModelUtils.fromJsonLD;
 import static io.fairspace.saturn.services.ModelUtils.toJsonLD;
+import static io.fairspace.saturn.services.errors.ErrorHelper.returnError;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
@@ -54,14 +55,8 @@ public class MetadataApp implements SparkApplication {
                 api.put(fromJsonLD(req.body()));
                 return "";
             });
-            exception(RiotException.class, (e, req, res) -> {
-                res.status(SC_BAD_REQUEST);
-                res.body("Malformed request body");
-            });
-            exception(IllegalArgumentException.class, (e, req, res) -> {
-                res.status(SC_BAD_REQUEST);
-                res.body(e.getMessage());
-            });
+            exception(RiotException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Malformed request body"));
+            exception(IllegalArgumentException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, e.getMessage()));
         });
     }
 }
