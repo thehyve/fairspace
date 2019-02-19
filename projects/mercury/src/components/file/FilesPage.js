@@ -105,7 +105,7 @@ class FilesPage extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     const {match: {params}} = ownProps;
-    const openedCollectionId = parseInt(params.collection, 10);
+    const openedCollectionId = params.collection;
     const openedPath = params.path ? `/${params.path}` : '/';
     const filesPerCollection = state.cache.filesByCollectionAndPath[openedCollectionId] || [];
     const files = filesPerCollection[openedPath] || [];

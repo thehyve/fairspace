@@ -1,42 +1,38 @@
 [
     {
-        "id": 500,
         "location": "Jan_Smit_s_collection-500",
         "name": "Jan Smit's collection 1",
         "description": "Jan Smit's collection, beyond the horizon 01",
-        "uri": "https://workspace.ci.test.fairdev.app/iri/collections/500",
+        "iri": "https://workspace.ci.test.fairdev.app/iri/500",
         "access": "Manage",
         "type": "LOCAL_STORAGE",
         "dateCreated": "2018-09-19T15:48:23.016165Z",
         "creator": "user4-id"
     },
     {
-        "id": 501,
         "location": "Jan_Smit_s_collection-501",
         "name": "Jan Smit's collection 2",
         "description": "Jan Smit's collection, but he only can read",
-        "uri": "https://workspace.ci.test.fairdev.app/iri/collections/503",
+        "iri": "https://workspace.ci.test.fairdev.app/iri/503",
         "access": "Read",
         "type": "S3_BUCKET",
         "dateCreated": "2018-09-19T15:48:23.016165Z",
         "creator": "user4-id"
     },
     {
-        "id": 502,
         "location": "Private_s_collection-502",
         "name": "Private Bioinformatic laboratirum's collection",
         "description": "Beyond the horizon",
-        "uri": "https://workspace.ci.test.fairdev.app/iri/collections/502",
+        "iri": "https://workspace.ci.test.fairdev.app/iri/502",
         "access": "Manage",
         "dateCreated": "2018-09-21T16:11:08.745742Z",
         "creator": "user3-id"
     },
     {
-        "id": 503,
         "location": "Goverment_s_collection-503",
         "name": "Goverment's collection",
         "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        "uri": "https://workspace.ci.test.fairdev.app/iri/collections/503",
+        "iri": "https://workspace.ci.test.fairdev.app/iri/503",
         "access": "Write",
         "dateCreated": "2018-09-21T16:11:08.745742Z",
         "creator": "user2-id"

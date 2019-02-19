@@ -13,17 +13,13 @@ class CollectionAPI {
             credentials: 'same-origin'
         })
             .then(failOnHttpError("Failure when retrieving a list of collections"))
-            .then(response => response.json());
-    }
-
-    getCollection(id) {
-        return fetch(`${Config.get().urls.collections}/${id}`, {
-            method: 'GET',
-            headers: CollectionAPI.getHeaders,
-            credentials: 'same-origin'
-        })
-            .then(failOnHttpError("Failure when retrieving a collection"))
-            .then(response => response.json());
+            .then(response => response.json())
+            .then(collections => {
+                collections.forEach(c => {
+                    c.id = c.location;
+                });
+                return collections;
+            });
     }
 
     addCollection(name, description, type) {
