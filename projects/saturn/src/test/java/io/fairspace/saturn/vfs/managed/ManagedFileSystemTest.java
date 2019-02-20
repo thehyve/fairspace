@@ -3,6 +3,8 @@ package io.fairspace.saturn.vfs.managed;
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,6 +16,8 @@ import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
@@ -21,13 +25,15 @@ public class ManagedFileSystemTest {
     private final byte[] content1 = new byte[]{1, 2, 3};
     private final byte[] content2 = new byte[]{1, 2, 3, 4};
 
+    private Dataset ds;
     private ManagedFileSystem fs;
 
     @Before
     public void before()  {
         setWorkspaceURI("http://example.com/");
         var store = new MemoryBlobStore();
-        var rdf = connect(createTxnMem());
+        ds = createTxnMem();
+        var rdf = connect(ds);
         Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
         var collections = new CollectionsService(rdf, userInfoSupplier);
         fs = new ManagedFileSystem(rdf, store, userInfoSupplier, collections);
@@ -71,6 +77,7 @@ public class ManagedFileSystemTest {
         assertEquals("coll/aaa/bbb/ccc", stat.getPath());
         assertTrue(stat.isDirectory());
         assertNotNull(stat.getIri());
+        assertTrue(ds.getDefaultModel().contains(createResource(stat.getIri()), RDFS.label, createStringLiteral("ccc")));
     }
 
     @Test
@@ -90,6 +97,7 @@ public class ManagedFileSystemTest {
         if (!Arrays.equals(content2, os.toByteArray())) {
             assertArrayEquals(content2, os.toByteArray());
         }
+        assertTrue(ds.getDefaultModel().contains(createResource(fs.stat("coll/dir/file").getIri()), RDFS.label, createStringLiteral("file")));
     }
 
 
@@ -108,6 +116,7 @@ public class ManagedFileSystemTest {
         fs.read("coll/dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
         assertNotEquals(oldIri, fs.stat("coll/dir2").getIri());
+        assertTrue(ds.getDefaultModel().contains(createResource(fs.stat("coll/dir2").getIri()), RDFS.label, createStringLiteral("dir2")));
     }
 
     @Test
@@ -142,6 +151,7 @@ public class ManagedFileSystemTest {
         fs.read("coll/dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
         assertEquals(oldIri, fs.stat("coll/dir2").getIri());
+        assertTrue(ds.getDefaultModel().contains(createResource(oldIri), RDFS.label, createStringLiteral("dir2")));
     }
 
     @Test

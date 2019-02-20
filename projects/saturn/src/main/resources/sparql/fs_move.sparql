@@ -1,16 +1,21 @@
 # Moves a file or a directory from one location to another
 # 0 - from
 # 1 - to
+# 2 - label
 
 PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 # Move the main resource
-DELETE { ?s fs:filePath ?0 }
-INSERT { ?s fs:filePath ?1 }
-WHERE { ?s fs:filePath ?0 };
+DELETE { ?s fs:filePath ?0; rdfs:label ?oldLabel. }
+INSERT { ?s fs:filePath ?1; rdfs:label ?2 . }
+WHERE { ?s fs:filePath ?0; rdfs:label ?oldLabel .
+FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted}) };
 
 # Move the children
 DELETE { ?s fs:filePath ?path }
 INSERT { ?s fs:filePath ?newPath}
-WHERE {?s fs:filePath ?path . FILTER(STRSTARTS(?path, CONCAT(?0, '/')))
+WHERE {?s fs:filePath ?path .
+FILTER(STRSTARTS(?path, CONCAT(?0, '/')))
+FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
 BIND(CONCAT(?1, '/', SUBSTR(?path, STRLEN(?0) + 2)) as ?newPath) };
