@@ -39,9 +39,9 @@ public class LocalTransactionLog implements TransactionLog {
     private final File directory;
     private final TransactionCodec codec;
     private final AtomicLong counter = new AtomicLong();
-    private File current;
+    private File currentFile;
     private OutputStream outputStream;
-    private TransactionListener listener;
+    private TransactionListener writingListener;
 
 
     public LocalTransactionLog(File directory, TransactionCodec codec) {
@@ -55,43 +55,43 @@ public class LocalTransactionLog implements TransactionLog {
 
     @Override
     public void onBegin(String commitMessage, String userId, String userName, long timestamp) throws IOException {
-        current = new File(directory, "current");
-        current.delete();
+        currentFile = new File(directory, "current");
+        currentFile.delete();
 
-        outputStream = new BufferedOutputStream(new FileOutputStream(current));
-        listener = codec.write(outputStream);
-        listener.onBegin(commitMessage, userId, userName, timestamp);
+        outputStream = new BufferedOutputStream(new FileOutputStream(currentFile));
+        writingListener = codec.write(outputStream);
+        writingListener.onBegin(commitMessage, userId, userName, timestamp);
     }
 
     @Override
     public void onAdd(Node graph, Node subject, Node predicate, Node object) throws IOException {
-        listener.onAdd(graph, subject, predicate, object);
+        writingListener.onAdd(graph, subject, predicate, object);
     }
 
     @Override
     public void onDelete(Node graph, Node subject, Node predicate, Node object) throws IOException {
-        listener.onDelete(graph, subject, predicate, object);
+        writingListener.onDelete(graph, subject, predicate, object);
     }
 
     @Override
     public void onCommit() throws IOException {
-        listener.onCommit();
+        writingListener.onCommit();
         outputStream.close();
-        move(current.toPath(), file(counter.get()).toPath(), ATOMIC_MOVE);
+        move(currentFile.toPath(), file(counter.get()).toPath(), ATOMIC_MOVE);
         counter.incrementAndGet();
-        listener = null;
+        writingListener = null;
         outputStream = null;
-        current = null;
+        currentFile = null;
     }
 
     @Override
     public void onAbort() throws IOException {
-        listener.onAbort();
+        writingListener.onAbort();
         outputStream.close();
-        current.delete();
-        listener = null;
+        currentFile.delete();
+        writingListener = null;
         outputStream = null;
-        current = null;
+        currentFile = null;
     }
 
     @Override
