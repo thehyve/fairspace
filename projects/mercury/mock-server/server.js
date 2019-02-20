@@ -36,21 +36,21 @@ app.put('/api/collections/permissions', (req, res) => res.send({
     subject: req.body.subject
 }));
 // Metadata API
-app.get('/api/meta/', (req, res) => {
+app.get('/api/metadata/', (req, res) => {
     const filePath = req.query.subject ? '/metadata/metadata-1.json' : '/metadata/persons.json';
     res.sendFile(mockDataDir + filePath);
 });
 
-app.get('/api/meta/extended/statements',
+app.get('/api/metadata/extended/statements',
     (req, res) => fs.readFile(`${mockDataDir}/metadata/metadata-with-labels.json`,
         (err, data) => {
             res.set('Content-Type', 'application/json');
             res.send(data.toString().replace(/ws:subject/g, req.query.subject));
         }));
 
-app.patch('/api/meta/', (req, res) => res.send());
-app.delete('/api/meta/', (req, res) => res.send());
-app.get('/api/meta/entities/', (req, res) => res.sendFile(`${mockDataDir}/metadata/all-entities.json`));
+app.patch('/api/metadata/', (req, res) => res.send());
+app.delete('/api/metadata/', (req, res) => res.send());
+app.get('/api/metadata/entities/', (req, res) => res.sendFile(`${mockDataDir}/metadata/all-entities.json`));
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
@@ -58,7 +58,7 @@ app.get('/api/workspace/config', (req, res) => res.sendFile(`${mockDataDir}/work
 app.get('/api/workspace/details', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-details.json`));
 
 
-app.get('/api/meta/pid', ({query: {path}}, res) => {
+app.get('/api/metadata/pid', ({query: {path}}, res) => {
     res.send(`http://fairspace.com/${path}`);
 });
 

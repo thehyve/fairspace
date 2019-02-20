@@ -8,9 +8,9 @@
     "permissions": "/api/collections/permissions",
     "files": "/webdav",
     "metadata": {
-      "statements": "/api/meta/",
-      "entities": "/api/meta/entities/",
-      "pid": "/api/meta/pid"
+      "statements": "/api/metadata/",
+      "entities": "/api/metadata/entities/",
+      "pid": "/api/metadata/pid"
     },
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"
