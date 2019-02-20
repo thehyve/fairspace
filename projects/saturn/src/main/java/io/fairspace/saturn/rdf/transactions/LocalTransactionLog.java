@@ -3,7 +3,6 @@ package io.fairspace.saturn.rdf.transactions;
 import org.apache.jena.graph.Node;
 
 import java.io.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static java.nio.file.Files.move;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
@@ -39,8 +38,8 @@ public class LocalTransactionLog implements TransactionLog {
 
     private final File directory;
     private final TransactionCodec codec;
-    private final AtomicLong counter = new AtomicLong();
     private final File currentTransactionFile;
+    private long count;
     private OutputStream outputStream;
     private TransactionListener writingListener;
 
@@ -52,7 +51,7 @@ public class LocalTransactionLog implements TransactionLog {
 
         directory.mkdirs();
 
-        counter.set(numberOfFiles());
+        count = numberOfFiles();
     }
 
     @Override
@@ -78,8 +77,8 @@ public class LocalTransactionLog implements TransactionLog {
     public void onCommit() throws IOException {
         writingListener.onCommit();
         outputStream.close();
-        move(currentTransactionFile.toPath(), file(counter.get()).toPath(), ATOMIC_MOVE);
-        counter.incrementAndGet();
+        move(currentTransactionFile.toPath(), file(count).toPath(), ATOMIC_MOVE);
+        count++;
         writingListener = null;
         outputStream = null;
     }
@@ -95,7 +94,7 @@ public class LocalTransactionLog implements TransactionLog {
 
     @Override
     public long size() {
-        return counter.get();
+        return count;
     }
 
     @Override
