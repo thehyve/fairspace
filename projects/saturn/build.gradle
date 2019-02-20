@@ -51,8 +51,7 @@ dependencies {
     testCompile(group: 'com.mockrunner', name: 'mockrunner-servlet', version: '2.0.1') {
         exclude group: 'org.apache.tomcat'
     }
-
-
+    testCompile 'com.github.stefanbirkner:system-rules:1.19.0'
 }
 
 jacocoTestReport {

@@ -10,7 +10,6 @@ import org.apache.jena.query.TxnType;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.QuadAction;
 
-import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 import static java.lang.System.currentTimeMillis;
@@ -46,7 +45,6 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
                     transactionLog.onDelete(graph, subject, predicate, object);
                     break;
             }
-            return null;
         });
     }
 
@@ -78,10 +76,8 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 commitMessage.value = commitMessageProvider.get();
             }
 
-            critical(() -> {
-                transactionLog.onBegin(commitMessage.value, userId.value, userName.value, currentTimeMillis());
-                return null;
-            });
+            critical(() ->
+                    transactionLog.onBegin(commitMessage.value, userId.value, userName.value, currentTimeMillis()));
         }
     }
 
@@ -91,7 +87,6 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             critical(() -> {
                 transactionLog.onCommit();
                 super.commit();
-                return null;
             });
         } else {
             super.commit();
@@ -101,10 +96,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void abort() {
         if (isInWriteTransaction()) {
-            critical(() -> {
-                transactionLog.onAbort();
-                return null;
-            });
+            critical(transactionLog::onAbort);
         }
 
         super.abort();
@@ -114,9 +106,9 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         return isInTransaction() && transactionMode() == ReadWrite.WRITE;
     }
 
-    private <T> T critical(Callable<T> callable) {
+    private void critical(Action action) {
         try {
-            return callable.call();
+            action.perform();
         } catch (Throwable t) {
             log.error(ERROR_MSG, t);
 
@@ -131,7 +123,11 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             // There's no log.flush() :-(
 
             System.exit(1);
-            return null;
         }
+    }
+
+    @FunctionalInterface
+    private static interface Action {
+        void perform() throws Throwable;
     }
 }
