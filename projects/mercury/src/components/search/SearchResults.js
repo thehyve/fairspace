@@ -15,6 +15,29 @@ const searchResults = ({
     onFileOpen,
 }) => {
     const selectedTabIndex = type === FILES_SEARCH_TYPE ? 1 : 0;
+    const resultsToView = results && results.length === 0
+        ? 'No results found!' // TODO: make ErrorMessage generic and use it as an 'information' message here
+        : (
+            <Grid item xs={12}>
+                {selectedTabIndex === 0 && (
+                    <CollectionList
+                        collections={results}
+                        onCollectionClick={() => {}}
+                        onCollectionDoubleClick={onCollectionOpen}
+                    />
+                )}
+                {selectedTabIndex === 1 && (
+                    <FileList
+                        files={results}
+                        selectedPaths={[]}
+                        onPathClick={() => {}}
+                        onPathDoubleClick={onFileOpen}
+                        onRename={() => {}}
+                        onDelete={() => {}}
+                    />
+                )}
+            </Grid>
+        );
 
     return (
         <Grid container spacing={8}>
@@ -30,33 +53,7 @@ const searchResults = ({
                     </Tabs>
                 </AppBar>
             </Grid>
-
-            {
-                loading
-                    ? <LoadingInlay />
-                    : (
-                        <Grid item xs={12}>
-                            {selectedTabIndex === 0 && (
-                                <CollectionList
-                                    collections={results}
-                                    onCollectionClick={() => {}}
-                                    onCollectionDoubleClick={onCollectionOpen}
-                                />
-                            )}
-                            {selectedTabIndex === 1 && (
-                                <FileList
-                                    files={results}
-                                    selectedPaths={[]}
-                                    onPathClick={() => {}}
-                                    onPathDoubleClick={onFileOpen}
-                                    onRename={() => {}}
-                                    onDelete={() => {}}
-                                />
-                            )}
-                        </Grid>
-                    )
-            }
-
+            {loading ? <LoadingInlay /> : resultsToView}
         </Grid>
     );
 };

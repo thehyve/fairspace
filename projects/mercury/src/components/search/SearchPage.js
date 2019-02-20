@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 
@@ -7,7 +8,8 @@ import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils'
 import * as searchActions from '../../actions/searchActions';
 import {ErrorMessage} from "../common";
 
-class SearchPage extends React.Component {
+// Exporting here to be able to test the component outside of Redux
+export class SearchPage extends React.Component {
     componentDidMount() {
         this.updateResults();
     }
@@ -38,16 +40,16 @@ class SearchPage extends React.Component {
     }
 
     render() {
-        const {results, searchType, loading, error} = this.props;
+        const {results, type, loading, error} = this.props;
 
-        if (error && !loading) {
+        if (!loading && error) {
             return <ErrorMessage message={error} />;
         }
 
         return (
             <SearchResults
                 loading={loading}
-                type={searchType}
+                type={type}
                 results={results}
                 onTypeChange={this.handleTypeChange}
                 onCollectionOpen={this.handleCollectionOpen}
@@ -59,13 +61,20 @@ class SearchPage extends React.Component {
 
 const mapStateToProps = ({search}) => ({
     loading: search.pending,
-    searchType: search.searchType,
+    type: search.searchType,
     results: search.results,
-    error: search.error
+    error: search.error,
 });
 
 const mapDispatchToProps = {
     performSearch: searchActions.performSearch
+};
+
+SearchPage.propTypes = {
+    location: PropTypes.shape({
+        search: PropTypes.string.isRequired
+    }),
+    performSearch: PropTypes.func.isRequired
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SearchPage));

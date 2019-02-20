@@ -20,6 +20,7 @@ const performSearchRejected = error => ({
     }
 });
 
+// eslint-disable-next-line import/prefer-default-export
 export const performSearch = (query) => (dispatch) => {
     const searchType = getSearchTypeFromString(query);
     dispatch(performSearchPending(searchType));
@@ -29,5 +30,3 @@ export const performSearch = (query) => (dispatch) => {
             dispatch(performSearchRejected(err.message));
         });
 };
-
-export default performSearch;
