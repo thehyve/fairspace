@@ -11,23 +11,23 @@ import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 /**
  * Stores transactions in the following directory structure:
  * volume-1
- * chapter-1
- * tx-1
- * ...
- * tx-1000
- * chapter-2
- * tx-1001
- * ...
- * tx-2000
- * ...
- * chapter-1000
- * tx-999001
- * ...
- * tx-1000000
+ *   chapter-1
+ *     tx-1
+ *     ...
+ *     tx-1000
+ *   chapter-2
+ *     tx-1001
+ *     ...
+ *     tx-2000
+ *   ...
+ *   chapter-1000
+ *     tx-999001
+ *     ...
+ *     tx-1000000
  * volume-2
- * chapter-1001
- * tx-1000001
- * ...
+ *   chapter-1001
+ *     tx-1000001
+ *     ...
  */
 public class LocalTransactionLog implements TransactionLog {
     private static final int CHAPTERS_PER_VOLUME = 1000;
