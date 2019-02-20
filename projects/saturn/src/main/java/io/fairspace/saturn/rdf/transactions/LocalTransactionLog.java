@@ -49,21 +49,6 @@ public class LocalTransactionLog implements TransactionLog {
         counter.set(numberOfFiles());
     }
 
-    @Override
-    public long size() {
-        return counter.get();
-    }
-
-    @Override
-    public void read(long index, TransactionListener listener) {
-        try {
-            var reader = new BufferedReader(new InputStreamReader(new FileInputStream(file(index))));
-            SparqlTransactionCodec.read(reader, listener);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private int numberOfFiles() {
         var volumeCount = childCount(directory, VOLUME_PREFIX);
         if (volumeCount == 0) {
@@ -86,6 +71,11 @@ public class LocalTransactionLog implements TransactionLog {
     private static int childCount(File parent, String prefix) {
         var files = parent.list((dir, name) -> name.startsWith(prefix));
         return files == null ? 0 : files.length;
+    }
+
+    @Override
+    public long size() {
+        return counter.get();
     }
 
     private File file(long transactionNumber) {
@@ -143,6 +133,16 @@ public class LocalTransactionLog implements TransactionLog {
         } finally {
             codec = null;
             current = null;
+        }
+    }
+
+    @Override
+    public void read(long index, TransactionListener listener) {
+        try {
+            var reader = new BufferedReader(new InputStreamReader(new FileInputStream(file(index))));
+            SparqlTransactionCodec.read(reader, listener);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
