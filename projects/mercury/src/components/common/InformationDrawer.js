@@ -34,7 +34,8 @@ export class InformationDrawer extends React.Component {
     }
 
     handleUpdateCollection = (name, description, location) => {
-        if ((name !== this.props.collection.name || description !== this.props.collection.description) && name !== '') {
+        if ((name !== this.props.collection.name || description !== this.props.collection.description || location !== this.props.collection.location)
+            && (name !== '') && (location !== '')) {
             this.props.updateCollection(this.props.collection.iri, name, description, location)
                 .then(() => {
                     const collection = Object.assign(this.props.collection, {name, description});
@@ -76,7 +77,7 @@ export class InformationDrawer extends React.Component {
                             defaultExpanded
                         >
                             <ExpansionPanelSummary
-                                expandIcon={<ExpandMoreIcon />}
+                                expandIcon={<ExpandMoreIcon/>}
                             >
                                 <Typography
                                     className={classes.heading}
