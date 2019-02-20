@@ -18,7 +18,7 @@ describe('Search reducers', () => {
         expect(
             reducer(undefined, {
                 type: actionTypes.PERFORM_SEARCH_PENDING,
-                searchType: 'collections',
+                meta: {searchType: 'collections'},
             })
         ).toEqual({
             pending: true,
@@ -34,8 +34,8 @@ describe('Search reducers', () => {
         expect(
             reducer(undefined, {
                 type: actionTypes.PERFORM_SEARCH_FULFILLED,
-                searchType: 'collections',
-                payload: results
+                payload: results,
+                meta: {searchType: 'collections'},
             }).results
         ).toContain('item 1');
     });

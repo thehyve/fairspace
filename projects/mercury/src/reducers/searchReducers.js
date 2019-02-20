@@ -13,7 +13,7 @@ const searchReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pending: true,
-                searchType: action.searchType,
+                searchType: action.meta ? action.meta.searchType : null,
                 results: []
             };
         case actionTypes.PERFORM_SEARCH_FULFILLED:
@@ -21,7 +21,7 @@ const searchReducer = (state = initialState, action) => {
                 ...state,
                 pending: false,
                 error: null,
-                searchType: action.searchType,
+                searchType: action.meta ? action.meta.searchType : null,
                 results: [...action.payload]
             };
         case actionTypes.PERFORM_SEARCH_REJECTED:

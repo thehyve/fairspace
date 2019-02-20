@@ -48,7 +48,6 @@ const sampleFiles = [
 
 const searchFiles = () => Promise.resolve(sampleFiles);
 
-// eslint-disable-next-line import/prefer-default-export
 export const performSearch = (search) => {
     const type = getSearchTypeFromString(search);
     const query = getSearchQueryFromString(search);

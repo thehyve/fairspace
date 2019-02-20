@@ -90,6 +90,7 @@ export const MOUSE_ENTER_MENU                       = 'MOUSE_ENTER_MENU';
 export const MOUSE_LEAVE_MENU                       = 'MOUSE_LEAVE_MENU';
 
 // Search
+export const PERFORM_SEARCH                         = 'PERFORM_SEARCH';
 export const PERFORM_SEARCH_PENDING                 = 'PERFORM_SEARCH_PENDING';
 export const PERFORM_SEARCH_FULFILLED               = 'PERFORM_SEARCH_FULFILLED';
 export const PERFORM_SEARCH_REJECTED                = 'PERFORM_SEARCH_REJECTED';
