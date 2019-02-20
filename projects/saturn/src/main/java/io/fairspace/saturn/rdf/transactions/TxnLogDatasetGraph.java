@@ -127,7 +127,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     }
 
     @FunctionalInterface
-    private static interface Action {
+    private interface Action {
         void perform() throws Throwable;
     }
 }
