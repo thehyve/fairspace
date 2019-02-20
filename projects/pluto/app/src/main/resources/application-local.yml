@@ -21,11 +21,11 @@ spring:
 zuul:
   routes:
     storage:
-      url: http://localhost:5110
+      url: http://localhost:8080
     metadata:
-      url: http://localhost:5120
+      url: http://localhost:8080/api/meta/
     collections:
-      url: http://localhost:5130
+      url: http://localhost:8080/api/collections/
     ui:
       url: http://localhost:3000
 
