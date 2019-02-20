@@ -128,7 +128,7 @@ public class LocalTransactionLog implements TransactionLog {
     @Override
     public void onAbort() {
         try {
-            codec.onCommit();
+            codec.onAbort();
             current.delete();
         } finally {
             codec = null;
