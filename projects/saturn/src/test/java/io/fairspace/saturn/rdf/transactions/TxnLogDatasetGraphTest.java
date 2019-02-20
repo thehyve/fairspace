@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
+
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -36,19 +38,19 @@ public class TxnLogDatasetGraphTest {
 
 
     @Test
-    public void shouldLogNonEmptyWriteTransactions() {
+    public void shouldLogNonEmptyWriteTransactions() throws IOException {
         executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1")
                 .add(statement)
                 .remove(statement));
 
         verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
-        verify(log).onAdd(eq(createURI("http://example.com/g1")), eq(statement.getSubject().asNode()), eq(statement.getPredicate().asNode()), eq(statement.getObject().asNode()));
-        verify(log).onDelete(eq(createURI("http://example.com/g1")), eq(statement.getSubject().asNode()), eq(statement.getPredicate().asNode()), eq(statement.getObject().asNode()));
+        verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onCommit();
     }
 
     @Test
-    public void shouldHandleAbortedTransactions() {
+    public void shouldHandleAbortedTransactions() throws IOException {
         ds.begin(ReadWrite.WRITE);
         ds.getNamedModel("http://example.com/g1")
                 .add(statement)
@@ -56,8 +58,8 @@ public class TxnLogDatasetGraphTest {
         ds.abort();
 
         verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
-        verify(log).onAdd(eq(createURI("http://example.com/g1")), eq(statement.getSubject().asNode()), eq(statement.getPredicate().asNode()), eq(statement.getObject().asNode()));
-        verify(log).onDelete(eq(createURI("http://example.com/g1")), eq(statement.getSubject().asNode()), eq(statement.getPredicate().asNode()), eq(statement.getObject().asNode()));
+        verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();
     }
 }

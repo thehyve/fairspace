@@ -11,22 +11,22 @@ import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 /**
  * Stores transactions in the following directory structure:
  * volume-1
- *   chapter-1
- *     tx-1
- *     ...
- *     tx-1000
- *   chapter-2
- *     tx-1001
- *     ...
- *     tx-2000
- *   ...
- *   chapter-1000
- *     tx-999001
- *     ...
- *     tx-1000000
+ * chapter-1
+ * tx-1
+ * ...
+ * tx-1000
+ * chapter-2
+ * tx-1001
+ * ...
+ * tx-2000
+ * ...
+ * chapter-1000
+ * tx-999001
+ * ...
+ * tx-1000000
  * volume-2
- *   chapter-1001
- *     tx-1000001
+ * chapter-1001
+ * tx-1000001
  * ...
  */
 public class LocalTransactionLog implements TransactionLog {
@@ -37,16 +37,73 @@ public class LocalTransactionLog implements TransactionLog {
     private static final String RECORD_PREFIX = "tx-";
 
     private final File directory;
+    private final TransactionCodec codec;
     private final AtomicLong counter = new AtomicLong();
     private File current;
-    private SparqlTransactionCodec codec;
+    private OutputStream outputStream;
+    private TransactionListener listener;
 
-    public LocalTransactionLog(File directory) {
+
+    public LocalTransactionLog(File directory, TransactionCodec codec) {
         this.directory = directory;
+        this.codec = codec;
 
         directory.mkdirs();
 
         counter.set(numberOfFiles());
+    }
+
+    @Override
+    public void onBegin(String commitMessage, String userId, String userName, long timestamp) throws IOException {
+        current = new File(directory, "current");
+        current.delete();
+
+        outputStream = new BufferedOutputStream(new FileOutputStream(current));
+        listener = codec.write(outputStream);
+        listener.onBegin(commitMessage, userId, userName, timestamp);
+    }
+
+    @Override
+    public void onAdd(Node graph, Node subject, Node predicate, Node object) throws IOException {
+        listener.onAdd(graph, subject, predicate, object);
+    }
+
+    @Override
+    public void onDelete(Node graph, Node subject, Node predicate, Node object) throws IOException {
+        listener.onDelete(graph, subject, predicate, object);
+    }
+
+    @Override
+    public void onCommit() throws IOException {
+        listener.onCommit();
+        outputStream.close();
+        move(current.toPath(), file(counter.get()).toPath(), ATOMIC_MOVE);
+        counter.incrementAndGet();
+        listener = null;
+        outputStream = null;
+        current = null;
+    }
+
+    @Override
+    public void onAbort() throws IOException {
+        listener.onAbort();
+        outputStream.close();
+        current.delete();
+        listener = null;
+        outputStream = null;
+        current = null;
+    }
+
+    @Override
+    public long size() {
+        return counter.get();
+    }
+
+    @Override
+    public void read(long index, TransactionListener listener) throws IOException {
+        try (var in = new BufferedInputStream(new FileInputStream(file(index)))) {
+            codec.read(in, listener);
+        }
     }
 
     private int numberOfFiles() {
@@ -73,11 +130,6 @@ public class LocalTransactionLog implements TransactionLog {
         return files == null ? 0 : files.length;
     }
 
-    @Override
-    public long size() {
-        return counter.get();
-    }
-
     private File file(long transactionNumber) {
         var volumeNumber = transactionNumber / CHAPTERS_PER_VOLUME / RECORDS_PER_CHAPTER + 1;
         var volume = new File(directory, VOLUME_PREFIX + volumeNumber);
@@ -85,64 +137,5 @@ public class LocalTransactionLog implements TransactionLog {
         var chapter = new File(volume, CHAPTER_PREFIX + chapterNumber);
         chapter.mkdirs();
         return new File(chapter, RECORD_PREFIX + (transactionNumber + 1));
-    }
-
-    @Override
-    public void onBegin(String commitMessage, String userId, String userName, long timestamp) {
-        current = new File(directory, "current");
-        current.delete();
-
-        try {
-            var writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(current)));
-            codec = new SparqlTransactionCodec(writer);
-            codec.onBegin(commitMessage, userId, userName, timestamp);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void onAdd(Node graph, Node subject, Node predicate, Node object) {
-        codec.onAdd(graph, subject, predicate, object);
-    }
-
-    @Override
-    public void onDelete(Node graph, Node subject, Node predicate, Node object) {
-        codec.onDelete(graph, subject, predicate, object);
-    }
-
-    @Override
-    public void onCommit() {
-        try {
-            codec.onCommit();
-            move(current.toPath(), file(counter.get()).toPath(), ATOMIC_MOVE);
-            counter.incrementAndGet();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            codec = null;
-            current = null;
-        }
-    }
-
-    @Override
-    public void onAbort() {
-        try {
-            codec.onAbort();
-            current.delete();
-        } finally {
-            codec = null;
-            current = null;
-        }
-    }
-
-    @Override
-    public void read(long index, TransactionListener listener) {
-        try {
-            var reader = new BufferedReader(new InputStreamReader(new FileInputStream(file(index))));
-            SparqlTransactionCodec.read(reader, listener);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -39,7 +39,7 @@ public class Restore {
                     });
                 } catch (Exception e) {
                     log.error("Error applying transaction #" + (i + 1), e);
-                    throw e;
+                    throw new RuntimeException(e);
                 }
             }
             log.info("Progress: 100%");

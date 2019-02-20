@@ -2,6 +2,7 @@ package io.fairspace.saturn.rdf.transactions;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
+import io.fairspace.saturn.util.Ref;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
@@ -9,13 +10,16 @@ import org.apache.jena.query.TxnType;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.QuadAction;
 
+import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.transactions.Panic.panic;
 import static java.lang.System.currentTimeMillis;
 
 @Slf4j
 public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
+    private static final String ERROR_MSG =
+            "Catastrophic failure. Shutting down. The system requires admin's intervention.";
+
     private final TransactionLog transactionLog;
     private final Supplier<UserInfo> userInfoProvider;
     private final Supplier<String> commitMessageProvider;
@@ -33,14 +37,17 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
      */
     @Override
     protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
-        switch (action) {
-            case ADD:
-                transactionLog.onAdd(graph, subject, predicate, object);
-                break;
-            case DELETE:
-                transactionLog.onDelete(graph, subject, predicate, object);
-                break;
-        }
+        critical(() -> {
+            switch (action) {
+                case ADD:
+                    transactionLog.onAdd(graph, subject, predicate, object);
+                    break;
+                case DELETE:
+                    transactionLog.onDelete(graph, subject, predicate, object);
+                    break;
+            }
+            return null;
+        });
     }
 
     @Override
@@ -56,35 +63,36 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     public void begin(ReadWrite readWrite) {
         super.begin(readWrite);
         if (readWrite == ReadWrite.WRITE) { // a write transaction => be ready to collect changes
-            String userName = null;
-            String userId = null;
+            var userName = new Ref<String>();
+            var userId = new Ref<String>();
             if (userInfoProvider != null) {
                 var userInfo = userInfoProvider.get();
                 if (userInfo != null) {
-                    userId = userInfo.getUserId();
-                    userName = userInfo.getFullName();
+                    userId.value = userInfo.getUserId();
+                    userName.value = userInfo.getFullName();
                 }
             }
-            String commitMessage = null;
+            var commitMessage = new Ref<String>();
 
             if (commitMessageProvider != null) {
-                commitMessage = commitMessageProvider.get();
+                commitMessage.value = commitMessageProvider.get();
             }
-            transactionLog.onBegin(commitMessage, userId, userName, currentTimeMillis());
+
+            critical(() -> {
+                transactionLog.onBegin(commitMessage.value, userId.value, userName.value, currentTimeMillis());
+                return null;
+            });
         }
     }
 
     @Override
     public void commit() {
         if (isInWriteTransaction()) {
-            var persisted = false;
-            try {
+            critical(() -> {
                 transactionLog.onCommit();
-                persisted = true;
                 super.commit();
-            } catch (Throwable throwable) {
-                panic(throwable, persisted);
-            }
+                return null;
+            });
         } else {
             super.commit();
         }
@@ -93,7 +101,10 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void abort() {
         if (isInWriteTransaction()) {
-            transactionLog.onAbort();
+            critical(() -> {
+                transactionLog.onAbort();
+                return null;
+            });
         }
 
         super.abort();
@@ -101,5 +112,26 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     private boolean isInWriteTransaction() {
         return isInTransaction() && transactionMode() == ReadWrite.WRITE;
+    }
+
+    private <T> T critical(Callable<T> callable) {
+        try {
+            return callable.call();
+        } catch (Throwable t) {
+            log.error(ERROR_MSG, t);
+
+
+            // SLF4J has no flush method.
+            System.err.println(ERROR_MSG);
+            t.printStackTrace();
+
+            System.err.flush();
+
+            log.error(ERROR_MSG, t);
+            // There's no log.flush() :-(
+
+            System.exit(1);
+            return null;
+        }
     }
 }

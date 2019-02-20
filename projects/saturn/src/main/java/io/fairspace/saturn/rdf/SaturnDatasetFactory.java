@@ -7,6 +7,7 @@ import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
 import io.fairspace.saturn.rdf.search.AutoEntityDefinition;
 import io.fairspace.saturn.rdf.search.SingleTripleTextDocProducer;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
+import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
@@ -36,7 +37,7 @@ public class SaturnDatasetFactory {
         // Create a TDB2 dataset graph
         var dsg = connectDatasetGraph(config.datasetPath.getAbsolutePath());
 
-        var txnLog = new LocalTransactionLog(config.transactionLogPath);
+        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
         if (restoreNeeded) {
             restore(dsg, txnLog);

@@ -3,6 +3,9 @@ package io.fairspace.saturn.rdf.transactions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,16 +14,27 @@ import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
+
+@RunWith(MockitoJUnitRunner.class)
 public class LocalTransactionLogTest {
     private File logDir;
     private LocalTransactionLog log;
 
+    @Mock
+    TransactionListener listener;
+
+    @Mock
+    private TransactionCodec codec;
+
 
     @Before
-    public void before() {
+    public void before() throws IOException {
+        when(codec.write(any())).thenReturn(listener);
         logDir = new File(getTempDirectory(), randomUUID().toString());
-        log = new LocalTransactionLog(logDir);
+        log = new LocalTransactionLog(logDir, codec);
     }
 
     @After
@@ -32,7 +46,7 @@ public class LocalTransactionLogTest {
     public void logContinuesNumbering() throws IOException {
         log.onBegin(null, null, null, 0);
         log.onCommit();
-        var newLog = new LocalTransactionLog(logDir);
+        var newLog = new LocalTransactionLog(logDir, codec);
         newLog.onBegin(null, null, null, 1);
         newLog.onCommit();
 
