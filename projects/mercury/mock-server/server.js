@@ -24,7 +24,7 @@ app.get('/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`))
 app.get('/account/authorizations', (req, res) => res.send(['user-workspace1', 'ROLE_USER']));
 
 // Collections API
-app.post('/api/collections/', (req, res) => res.send());
+app.put('/api/collections/', (req, res) => res.send());
 app.get('/api/collections/', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-list.json`));
 app.get('/api/collections/:id/permissions', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-${req.params.id}-permissions.json`));
 app.patch('/api/collections/', (req, res) => res.send());

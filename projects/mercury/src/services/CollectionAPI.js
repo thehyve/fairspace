@@ -18,7 +18,7 @@ class CollectionAPI {
 
     addCollection(name, description, type, location) {
         return fetch(Config.get().urls.collections, {
-            method: 'POST',
+            method: 'PUT',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
             body: JSON.stringify({name, description, type, location})
