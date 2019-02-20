@@ -1,7 +1,11 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import org.apache.jena.graph.Node;
+
 import java.io.*;
-import java.util.concurrent.atomic.AtomicLong;
+
+import static java.nio.file.Files.move;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 
 /**
  * Stores transactions in the following directory structure:
@@ -22,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * volume-2
  *   chapter-1001
  *     tx-1000001
- * ...
+ *     ...
  */
 public class LocalTransactionLog implements TransactionLog {
     private static final int CHAPTERS_PER_VOLUME = 1000;
@@ -30,18 +34,74 @@ public class LocalTransactionLog implements TransactionLog {
     private static final String VOLUME_PREFIX = "volume-";
     private static final String CHAPTER_PREFIX = "chapter-";
     private static final String RECORD_PREFIX = "tx-";
+    private static final String CURRENT_TRANSACTION_FILE_NAME = "current";
 
     private final File directory;
-    private final TransactionCodec transactionCodec;
-    private final AtomicLong counter = new AtomicLong();
+    private final TransactionCodec codec;
+    private final File currentTransactionFile;
+    private long count;
+    private OutputStream outputStream;
+    private TransactionListener writingListener;
 
-    public LocalTransactionLog(File directory, TransactionCodec transactionCodec) {
+
+    public LocalTransactionLog(File directory, TransactionCodec codec) {
         this.directory = directory;
-        this.transactionCodec = transactionCodec;
+        this.codec = codec;
+        this.currentTransactionFile = new File(directory, CURRENT_TRANSACTION_FILE_NAME);
 
         directory.mkdirs();
 
-        counter.set(numberOfFiles());
+        count = numberOfFiles();
+    }
+
+    @Override
+    public void onBegin(String commitMessage, String userId, String userName, long timestamp) throws IOException {
+        currentTransactionFile.delete();
+
+        outputStream = new BufferedOutputStream(new FileOutputStream(currentTransactionFile));
+        writingListener = codec.write(outputStream);
+        writingListener.onBegin(commitMessage, userId, userName, timestamp);
+    }
+
+    @Override
+    public void onAdd(Node graph, Node subject, Node predicate, Node object) throws IOException {
+        writingListener.onAdd(graph, subject, predicate, object);
+    }
+
+    @Override
+    public void onDelete(Node graph, Node subject, Node predicate, Node object) throws IOException {
+        writingListener.onDelete(graph, subject, predicate, object);
+    }
+
+    @Override
+    public void onCommit() throws IOException {
+        writingListener.onCommit();
+        outputStream.close();
+        move(currentTransactionFile.toPath(), file(count).toPath(), ATOMIC_MOVE);
+        count++;
+        writingListener = null;
+        outputStream = null;
+    }
+
+    @Override
+    public void onAbort() throws IOException {
+        writingListener.onAbort();
+        outputStream.close();
+        currentTransactionFile.delete();
+        writingListener = null;
+        outputStream = null;
+    }
+
+    @Override
+    public long size() {
+        return count;
+    }
+
+    @Override
+    public void read(long index, TransactionListener listener) throws IOException {
+        try (var in = new BufferedInputStream(new FileInputStream(file(index)))) {
+            codec.read(in, listener);
+        }
     }
 
     private int numberOfFiles() {
@@ -66,27 +126,6 @@ public class LocalTransactionLog implements TransactionLog {
     private static int childCount(File parent, String prefix) {
         var files = parent.list((dir, name) -> name.startsWith(prefix));
         return files == null ? 0 : files.length;
-    }
-
-    @Override
-    public void log(TransactionRecord transaction) throws IOException {
-        var transactionNumber = counter.getAndIncrement();
-        var f = file(transactionNumber);
-        try (var out = new BufferedOutputStream(new FileOutputStream(f))) {
-            transactionCodec.write(transaction, out);
-        }
-    }
-
-    @Override
-    public long size() {
-        return counter.get();
-    }
-
-    @Override
-    public TransactionRecord get(long index) throws IOException {
-        try (var in = new BufferedInputStream(new FileInputStream(file(index)))) {
-            return transactionCodec.read(in);
-        }
     }
 
     private File file(long transactionNumber) {

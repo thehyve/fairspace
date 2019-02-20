@@ -2,10 +2,8 @@ package io.fairspace.saturn.rdf.transactions;
 
 import java.io.IOException;
 
-public interface TransactionLog {
-    void log(TransactionRecord transaction) throws IOException;
+public interface TransactionLog extends TransactionListener {
+    long size();
 
-    long size() throws IOException;
-
-    TransactionRecord get(long index) throws IOException;
+    void read(long index, TransactionListener listener) throws IOException;
 }

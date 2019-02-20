@@ -1,24 +1,34 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import io.fairspace.saturn.auth.UserInfo;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.sparql.core.Quad;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.ExpectedSystemExit;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
+import static org.apache.jena.system.Txn.executeRead;
 import static org.apache.jena.system.Txn.executeWrite;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TxnLogDatasetGraphTest {
-    private List<TransactionRecord> transactions;
+    @Rule
+    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
+
+    @Mock
+    private TransactionLog log;
     private Dataset ds;
     private static final Statement statement = createStatement(createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
@@ -26,61 +36,72 @@ public class TxnLogDatasetGraphTest {
 
     @Before
     public void before() {
-        transactions = new ArrayList<>();
-        var transactionLog = new TransactionLog() {
-
-            @Override
-            public void log(TransactionRecord transaction) throws IOException {
-                transactions.add(transaction);
-            }
-
-            @Override
-            public long size() throws IOException {
-                return transactions.size();
-            }
-
-            @Override
-            public TransactionRecord get(long index) throws IOException {
-                return transactions.get((int) index);
-            }
-        };
-        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), transactionLog, null, null));
+        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log,
+                () -> new UserInfo("userId", "userName", "fullName", null),
+                () -> "message"));
     }
 
 
     @Test
-    public void shouldLogNonEmptyWriteTransactions() {
-        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1").add(statement));
+    public void shouldLogWriteTransactions() throws IOException {
+        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1")
+                .add(statement)
+                .remove(statement));
 
-        assertEquals(1, transactions.size());
-        assertEquals(1, transactions.get(0).getAdded().size());
-        assertEquals(0, transactions.get(0).getDeleted().size());
-        assertEquals(new Quad(createURI("http://example.com/g1"), statement.asTriple()), transactions.get(0).getAdded().iterator().next());
-
-        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1").remove(statement));
-
-        assertEquals(2, transactions.size());
-        assertEquals(0, transactions.get(1).getAdded().size());
-        assertEquals(1, transactions.get(1).getDeleted().size());
-        assertEquals(new Quad(createURI("http://example.com/g1"), statement.asTriple()), transactions.get(1).getDeleted().iterator().next());
-
+        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log).onCommit();
+        verifyNoMoreInteractions(log);
     }
 
     @Test
-    public void shouldNotLogEmptyWriteTransactions() {
-        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1").add(statement).remove(statement));
-        assertEquals(0, transactions.size());
+    public void shouldHandleAbortedTransactions() throws IOException {
+        ds.begin(ReadWrite.WRITE);
+        ds.getNamedModel("http://example.com/g1")
+                .add(statement)
+                .remove(statement);
+        ds.abort();
+
+        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log).onAbort();
+        verifyNoMoreInteractions(log);
     }
 
     @Test
-    public void onlyRealChangesAreRecorded() {
-        // Removing a non-existing statement
-        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1").remove(statement));
-        assertEquals(0, transactions.size());
+    public void shouldNotLogReadTransactions() throws IOException {
+        executeRead(ds, () -> ds.getNamedModel("http://example.com/g1").listStatements().toList());
 
-        // Adding same statement twice
-        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1").add(statement));
-        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1").add(statement));
-        assertEquals(1, transactions.size());
+        verifyNoMoreInteractions(log);
+    }
+
+    @Test
+    public void testThatAnExceptionWithinATransactionIsHandledProperly() throws IOException {
+        try {
+            executeWrite(ds, () -> {
+                ds.getNamedModel("http://example.com/g1")
+                        .add(statement)
+                        .remove(statement);
+                throw new RuntimeException();
+            });
+
+        } catch (Exception ignore) {
+        }
+        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log).onAbort();
+    }
+
+    @Test
+    public void errorOnCommitCausesSystemExit() throws IOException {
+        exit.expectSystemExit();
+
+        doThrow(IOException.class).when(log).onCommit();
+
+        executeWrite(ds, () -> {
+        });
     }
 }
