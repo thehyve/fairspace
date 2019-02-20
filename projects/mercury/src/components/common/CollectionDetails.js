@@ -75,8 +75,8 @@ class CollectionDetails extends React.Component {
         this.setState({anchorEl: null});
     };
 
-    handleSave = (name, description) => {
-        this.props.onUpdateCollection(name, description);
+    handleSave = (name, description, location) => {
+        this.props.onUpdateCollection(name, description, location);
         this.setState({editing: false});
     }
 
@@ -148,7 +148,7 @@ class CollectionDetails extends React.Component {
                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                         <CardContent>
                             <PermissionsContainer
-                                collectionId={collection.id}
+                                collectionId={collection.iri}
                                 canManage={canManageCollection}
                             />
                         </CardContent>
@@ -158,6 +158,7 @@ class CollectionDetails extends React.Component {
                     <CollectionEditor
                         name={collection.name}
                         description={collection.description}
+                        location={collection.location}
                         title={`Edit ${collection.name}`}
                         onSave={this.handleSave}
                         onClose={() => this.setState({editing: false})}

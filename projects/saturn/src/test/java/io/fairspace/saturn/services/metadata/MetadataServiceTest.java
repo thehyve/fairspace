@@ -190,6 +190,16 @@ public class MetadataServiceTest {
     }
 
     @Test
+    public void iriByPath() {
+        executeWrite(ds, () -> ds.getDefaultModel()
+                .add(S1, createProperty("http://fairspace.io/ontology#filePath"), createStringLiteral("dir/subdir")));
+
+        assertEquals(S1.getURI(), api.iriByPath("dir/subdir"));
+        assertNull(api.iriByPath("dir/unknown"));
+    }
+
+
+    @Test
     public void createPatchQuery() {
         String query = MetadataService.createPatchQuery(asList(STMT1, STMT2));
         assertEquals("DELETE WHERE \n" +

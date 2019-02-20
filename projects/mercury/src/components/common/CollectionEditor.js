@@ -17,6 +17,7 @@ class CollectionEditor extends React.Component {
         name: this.props.name || '',
         description: this.props.description || '',
         type: this.props.type || 'LOCAL_FILE',
+        location: this.props.location || "dir1"
     };
 
     handleSave = () => {
@@ -25,7 +26,7 @@ class CollectionEditor extends React.Component {
         }
 
         if (this.props.onSave) {
-            this.props.onSave(this.state.name, this.state.description, this.state.type);
+            this.props.onSave(this.state.name, this.state.description, this.state.location, this.state.type);
         }
     }
 
@@ -75,6 +76,17 @@ class CollectionEditor extends React.Component {
                         value={this.state.description}
                         onChange={(event) => this.handleInputChange('description', event.target.value)}
                         fullWidth
+                    />
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="location"
+                        label="Location"
+                        value={this.state.location}
+                        name="location"
+                        onChange={(event) => this.handleInputChange('location', event.target.value)}
+                        fullWidth
+                        required
                     />
                     {this.props.editType
                         ? (

@@ -16,36 +16,26 @@ class CollectionAPI {
             .then(response => response.json());
     }
 
-    getCollection(id) {
-        return fetch(`${Config.get().urls.collections}/${id}`, {
-            method: 'GET',
-            headers: CollectionAPI.getHeaders,
-            credentials: 'same-origin'
-        })
-            .then(failOnHttpError("Failure when retrieving a collection"))
-            .then(response => response.json());
-    }
-
-    addCollection(name, description, type) {
+    addCollection(name, description, type, location) {
         return fetch(Config.get().urls.collections, {
             method: 'POST',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({name, description, type})
+            body: JSON.stringify({name, description, type, location})
         }).then(failOnHttpError("Failure while saving a collection"));
     }
 
-    updateCollection(id, name, description) {
-        return fetch(`${Config.get().urls.collections}/${id}`, {
+    updateCollection(iri, name, description, location) {
+        return fetch(`${Config.get().urls.collections}`, {
             method: 'PATCH',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({name, description})
+            body: JSON.stringify({iri, name, description, location})
         }).then(failOnHttpError("Failure while updating a collection"));
     }
 
     deleteCollection(id) {
-        return fetch(`${Config.get().urls.collections}/${id}`, {
+        return fetch(`${Config.get().urls.collections}?iri=${encodeURIComponent(id)}`, {
             method: 'DELETE',
             headers: CollectionAPI.changeHeaders,
             credentials: 'same-origin'

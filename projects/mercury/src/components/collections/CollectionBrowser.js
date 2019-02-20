@@ -30,18 +30,18 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionClick = (collection) => {
-        const {selectedCollectionId, selectCollection} = this.props;
-        if (selectedCollectionId !== collection.id) {
-            selectCollection(collection.id);
+        const {selectedCollectionIRI, selectCollection} = this.props;
+        if (selectedCollectionIRI !== collection.iri) {
+            selectCollection(collection.iri);
         }
     }
 
     handleCollectionDoubleClick = (collection) => {
-        this.props.history.push(`/collections/${collection.id}`);
+        this.props.history.push(`/collections/${collection.location}`);
     }
 
-    handleAddCollection = (name, description, type) => {
-        this.props.addCollection(name, description, type)
+    handleAddCollection = (name, description, location, type) => {
+        this.props.addCollection(name, description, type, location)
             .then(this.props.fetchCollectionsIfNeeded)
             .then(() => this.setState({addingNewCollection: false}))
             .catch(err => ErrorDialog.showError(
@@ -66,7 +66,7 @@ class CollectionBrowser extends React.Component {
             <>
                 <CollectionList
                     collections={this.props.collections}
-                    selectedCollectionId={this.props.selectedCollectionId}
+                    selectedCollectionIRI={this.props.selectedCollectionIRI}
                     onCollectionClick={this.handleCollectionClick}
                     onCollectionDoubleClick={this.handleCollectionDoubleClick}
                 />
@@ -113,7 +113,7 @@ const mapStateToProps = (state) => ({
     error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
     collections: state.cache.collections.data,
     users: state.cache.users.data,
-    selectedCollectionId: state.collectionBrowser.selectedCollectionId,
+    selectedCollectionIRI: state.collectionBrowser.selectedCollectionIRI,
     addingCollection: state.collectionBrowser.addingCollection,
     deletingCollection: state.collectionBrowser.deletingCollection
 });

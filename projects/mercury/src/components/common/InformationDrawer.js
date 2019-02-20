@@ -13,19 +13,18 @@ import PathMetadata from "../metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
 import {canManage} from '../../utils/permissionUtils';
-import {findById} from "../../utils/arrayUtils";
 import ErrorDialog from './ErrorDialog';
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection) => {
         const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = this.props;
-        invalidateMetadata(collection.uri);
-        fetchCombinedMetadataIfNeeded(collection.uri);
+        invalidateMetadata(collection.iri);
+        fetchCombinedMetadataIfNeeded(collection.iri);
     };
 
     handleCollectionDelete = (collection) => {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
-        deleteCollection(collection.id)
+        deleteCollection(collection.iri)
             .then(fetchCollectionsIfNeeded)
             .catch(err => ErrorDialog.showError(
                 err,
@@ -34,9 +33,9 @@ export class InformationDrawer extends React.Component {
             ));
     }
 
-    handleUpdateCollection = (name, description) => {
+    handleUpdateCollection = (name, description, location) => {
         if ((name !== this.props.collection.name || description !== this.props.collection.description) && name !== '') {
-            this.props.updateCollection(this.props.collection.id, name, description)
+            this.props.updateCollection(this.props.collection.iri, name, description, location)
                 .then(() => {
                     const collection = Object.assign(this.props.collection, {name, description});
                     this.handleDetailsChange(collection);
@@ -65,7 +64,7 @@ export class InformationDrawer extends React.Component {
                 />
                 <Paper style={{padding: 20, marginTop: 10}}>
                     <Metadata
-                        subject={collection.uri}
+                        subject={collection.iri}
                         editable={isMetaDataEditable}
                         style={{width: '100%'}}
                     />
@@ -111,8 +110,8 @@ function pathHierarchy(fullPath) {
     return paths.reverse();
 }
 
-const mapStateToProps = ({cache: {collections, users}, collectionBrowser: {selectedCollectionId, openedPath, selectedPaths}}) => ({
-    collection: findById(collections.data, selectedCollectionId),
+const mapStateToProps = ({cache: {collections, users}, collectionBrowser: {selectedCollectionIRI, openedPath, selectedPaths}}) => ({
+    collection: collections.data && collections.data.find(c => c.iri === selectedCollectionIRI),
     paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
     loading: users.pending
 });

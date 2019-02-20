@@ -10,6 +10,7 @@ let cancelClicked;
 let receivedName;
 let receivedDescription;
 let receivedType;
+let receivedLocation;
 
 beforeEach(() => {
     collectionEditor = (
@@ -19,12 +20,14 @@ beforeEach(() => {
             name="name"
             description="description"
             type="S3_MOUNT"
+            location="location"
             onClose={() => {
                 cancelClicked = true;
             }}
-            onSave={(name, description, type) => {
+            onSave={(name, description, location, type) => {
                 receivedName = name;
                 receivedDescription = description;
+                receivedLocation = location;
                 receivedType = type;
             }}
             editType
@@ -48,9 +51,10 @@ it('applies properties properly', () => {
     expect(wrapper.find(DialogTitle).at(0).childAt(0).text()).toEqual('title');
 
     const edit = wrapper.find(TextField);
-    expect(edit.length).toEqual(2);
-    expect(edit.at(0).prop('value')).toEqual('name');
-    expect(edit.at(1).prop('value')).toEqual('description');
+    expect(edit.length).toEqual(3);
+    expect(edit.at(0).prop('name')).toEqual('name');
+    expect(edit.at(1).prop('name')).toEqual('description');
+    expect(edit.at(2).prop('name')).toEqual('location');
 
     const buttons = wrapper.find(Button);
     expect(buttons.length).toEqual(2);
@@ -68,5 +72,6 @@ it('applies properties properly', () => {
     buttons.at(1).simulate('click');
     expect(receivedName).toEqual('name');
     expect(receivedDescription).toEqual('description');
+    expect(receivedLocation).toEqual('location');
     expect(receivedType).toEqual('S3_MOUNT');
 });

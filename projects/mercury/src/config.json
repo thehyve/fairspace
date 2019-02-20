@@ -3,14 +3,13 @@
     "logout": "/logout",
     "userInfo": "/account/user",
     "authorizations": "/account/authorizations",
-    "collections": "/api/collections",
+    "collections": "/api/collections/",
     "permissionsByCollectionId": "/api/collections/%d/permissions",
     "permissions": "/api/collections/permissions",
-    "files": "/api/storage/webdav",
+    "files": "/webdav",
     "metadata": {
-      "statements": "/api/metadata/statements",
-      "extendedStatements": "/api/metadata/extended/statements",
-      "query": "/api/metadata/query",
+      "statements": "/api/metadata/",
+      "entities": "/api/metadata/entities/",
       "pid": "/api/metadata/pid"
     },
     "users": "/api/workspace/users",

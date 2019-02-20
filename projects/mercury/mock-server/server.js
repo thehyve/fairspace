@@ -24,19 +24,18 @@ app.get('/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`))
 app.get('/account/authorizations', (req, res) => res.send(['user-workspace1', 'ROLE_USER']));
 
 // Collections API
-app.post('/api/collections', (req, res) => res.send());
-app.get('/api/collections', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-list.json`));
-app.get('/api/collections/:id', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-${req.params.id}.json`));
+app.post('/api/collections/', (req, res) => res.send());
+app.get('/api/collections/', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-list.json`));
 app.get('/api/collections/:id/permissions', (req, res) => res.sendFile(`${mockDataDir}/collections/collection-${req.params.id}-permissions.json`));
-app.patch('/api/collections/:id', (req, res) => res.send());
-app.delete('/api/collections/:id', (req, res) => setTimeout(() => res.send(), 3000));
+app.patch('/api/collections/', (req, res) => res.send());
+app.delete('/api/collections/', (req, res) => setTimeout(() => res.send(), 3000));
 app.put('/api/collections/permissions', (req, res) => res.send({
     access: req.body.access,
     collection: req.body.collection,
     subject: req.body.subject
 }));
 // Metadata API
-app.get('/api/metadata/statements', (req, res) => {
+app.get('/api/metadata/', (req, res) => {
     const filePath = req.query.subject ? '/metadata/metadata-1.json' : '/metadata/persons.json';
     res.sendFile(mockDataDir + filePath);
 });
@@ -48,9 +47,9 @@ app.get('/api/metadata/extended/statements',
             res.send(data.toString().replace(/ws:subject/g, req.query.subject));
         }));
 
-app.patch('/api/metadata/statements', (req, res) => res.send());
-app.delete('/api/metadata/statements', (req, res) => res.send());
-app.post('/api/metadata/query', (req, res) => res.sendFile(`${mockDataDir}/metadata/all-entities.json`));
+app.patch('/api/metadata/', (req, res) => res.send());
+app.delete('/api/metadata/', (req, res) => res.send());
+app.get('/api/metadata/entities/', (req, res) => res.sendFile(`${mockDataDir}/metadata/all-entities.json`));
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
@@ -58,8 +57,8 @@ app.get('/api/workspace/config', (req, res) => res.sendFile(`${mockDataDir}/work
 app.get('/api/workspace/details', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-details.json`));
 
 
-app.get('/api/metadata/pid', ({query: {value}}, res) => {
-    res.send({id: `http://fairspace.com${value}`, value});
+app.get('/api/metadata/pid', ({query: {path}}, res) => {
+    res.send(`http://fairspace.com/${path}`);
 });
 
 // Add webdav server on /files
@@ -109,7 +108,7 @@ function fixWebdavDestinationMiddleware(path) {
     };
 }
 
-app.use(fixWebdavDestinationMiddleware('/api/storage/webdav'));
-app.use(webdav.extensions.express('/api/storage/webdav', server));
+app.use(fixWebdavDestinationMiddleware('/webdav'));
+app.use(webdav.extensions.express('/webdav', server));
 
 app.listen(port);
