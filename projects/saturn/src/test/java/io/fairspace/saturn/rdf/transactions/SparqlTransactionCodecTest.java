@@ -33,4 +33,39 @@ public class SparqlTransactionCodecTest {
         verifyNoMoreInteractions(readListener);
     }
 
+    @Test
+    public void testNoMeta() throws IOException {
+        var codec = new SparqlTransactionCodec();
+        var out = new ByteArrayOutputStream();
+        var writeListener = codec.write(out);
+
+        writeListener.onBegin(null, null, null, 123L);
+        writeListener.onCommit();
+
+        var in = new ByteArrayInputStream(out.toByteArray());
+        var readListener = mock(TransactionListener.class);
+        codec.read(in, readListener);
+
+        verify(readListener).onBegin(null, null, null, 123L);
+        verify(readListener).onCommit();
+        verifyNoMoreInteractions(readListener);
+    }
+
+    @Test
+    public void testWriteAndReadAborted() throws IOException {
+        var codec = new SparqlTransactionCodec();
+        var out = new ByteArrayOutputStream();
+        var writeListener = codec.write(out);
+
+        writeListener.onBegin("message", "userId", "userName", 123L);
+        writeListener.onAbort();
+
+        var in = new ByteArrayInputStream(out.toByteArray());
+        var readListener = mock(TransactionListener.class);
+        codec.read(in, readListener);
+
+        verify(readListener).onBegin("message", "userId", "userName", 123L);
+        verify(readListener).onAbort();
+        verifyNoMoreInteractions(readListener);
+    }
 }
