@@ -23,14 +23,14 @@ describe('<SearchPage />', () => {
 
     it('should perform search on component first mount', () => {
         const search = jest.fn();
-        wrapper = shallow(<SearchPage location={{search: ''}} performSearch={search} />);
+        shallow(<SearchPage location={{search: ''}} performSearch={search} />);
         expect(search.mock.calls.length).toEqual(1);
     });
 
     it('should perform search after search query change', () => {
-        wrapper = shallow(<SearchPage location={{search: ''}} performSearch={() => {}} />);
+        const localWrapper = shallow(<SearchPage location={{search: ''}} performSearch={() => {}} />);
         const search = jest.fn();
-        wrapper.setProps(
+        localWrapper.setProps(
             {
                 location: {search: 'A new Search'},
                 performSearch: search
