@@ -102,7 +102,7 @@ Scheme to access workspace components (http or https)
 
 {{/* Storage external hostname */}}
 {{- define "storage.hostname" -}}
-{{- printf "storage.%s" .Values.workspace.ingress.domain -}}
+{{- printf "%s" .Values.workspace.ingress.domain -}}
 {{- end -}}
 
 {{- define "workspace.url" -}}
