@@ -56,6 +56,10 @@ class FileAPI {
             return Promise.reject(Error("No files given"));
         }
 
+        if (path === '/') {
+            path = '';
+        }
+
         const fullPath = this.getFullPath(path);
         const allPromises = files.map(file => this.client.putFileContents(`${fullPath}/${nameMapping.get(file.name)}`, file));
 

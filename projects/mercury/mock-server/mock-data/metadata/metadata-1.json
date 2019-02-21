@@ -1,5 +1,5 @@
 {
-  "@id" : "ws:collections/500",
+  "@id" : "https://workspace.ci.test.fairdev.app/iri/500",
   "@type" : "http://fairspace.io/ontology#Collection",
   "aboutPerson" : {
     "@id": "https://workspace.ci.fairway.app/iri/persons/E2E-TEST",

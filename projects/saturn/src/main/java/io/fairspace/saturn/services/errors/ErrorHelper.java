@@ -12,8 +12,12 @@ public class ErrorHelper {
     public static void returnError(Response response, int status, String message) {
         response.status(status);
         response.type(APPLICATION_JSON.asString());
+        response.body(errorBody(status, message));
+    }
+
+    public static String errorBody(int status, String message) {
         try {
-            response.body(mapper.writeValueAsString(new ErrorDto(status, message)));
+            return mapper.writeValueAsString(new ErrorDto(status, message));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e); // Should never happen
         }

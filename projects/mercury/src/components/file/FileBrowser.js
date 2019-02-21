@@ -60,7 +60,7 @@ class FileBrowser extends React.Component {
     openDir(path) {
         const basePath = this.props.openedPath || '';
         const separator = basePath.endsWith('/') ? '' : '/';
-        const fullPath = `/collections/${this.props.openedCollection.id}${basePath}${separator}${path}`;
+        const fullPath = `/collections/${this.props.openedCollection.location}${basePath}${separator}${path}`;
         this.props.history.push(fullPath);
         this.props.openPath(`/${this.props.openedCollection.location}${basePath}${separator}${path}`);
     }
@@ -72,7 +72,7 @@ class FileBrowser extends React.Component {
 
     render() {
         const {loading, error, openedCollection, files, selectedPaths, openedPath} = this.props;
-        const collectionExists = openedCollection && openedCollection.id;
+        const collectionExists = openedCollection && openedCollection.iri;
 
         if (error) {
             return (<ErrorMessage message="An error occurred while loading files" />);

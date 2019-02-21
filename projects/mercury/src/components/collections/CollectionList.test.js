@@ -20,7 +20,7 @@ describe('CollectionList', () => {
     });
 
     it('renders Creator column', () => {
-        const collections = [{creatorObj: {firstName: 'Mariah', lastName: 'Carey'}, id: '0'}];
+        const collections = [{creatorObj: {firstName: 'Mariah', lastName: 'Carey'}, iri: 'http://example.com/0'}];
         const wrapper = shallow(<CollectionList collections={collections} />);
         const cells = wrapper.dive().find(TableCell);
         expect(cells.at(2).childAt(0).text()).toEqual('Creator');
@@ -29,7 +29,7 @@ describe('CollectionList', () => {
 
     it('renders Created column', () => {
         const date = new Date();
-        const collections = [{dateCreated: date.toUTCString(), id: '0'}];
+        const collections = [{dateCreated: date.toUTCString(), iri: 'http://example.com/0'}];
         const wrapper = shallow(<CollectionList collections={collections} />);
         const cells = wrapper.dive().find(TableCell);
         expect(cells.at(1).childAt(0).text()).toEqual('Created');

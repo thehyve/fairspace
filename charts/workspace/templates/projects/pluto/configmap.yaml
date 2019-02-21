@@ -17,7 +17,7 @@ data:
 
     frontend:
       urls:
-        files: {{ template "storage.url" . }}/api/storage/webdav
+        files: {{ template "storage.url" . }}/webdav
         jupyter: {{ template "jupyterhub.url" . }}
         {{ if ( and .Values.services .Values.services.cbioportal  ) }}cbioportal: {{ .Values.services.cbioportal }}{{ end }}
 
@@ -40,8 +40,8 @@ data:
         ui:
           url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
         storage:
-          url: {{ .Values.pluto.backends.storage | default (printf "http://%s-titan.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+          url: {{ .Values.pluto.backends.storage | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
         collections:
-          url: {{ .Values.pluto.backends.collections | default (printf "http://%s-neptune.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+          url: {{ .Values.pluto.backends.collections | default (printf "http://%s-saturn.%s.svc.cluster.local/api/collections/" .Release.Name .Release.Namespace)}}
         metadata:
-          url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-ceres.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+          url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/meta/" .Release.Name .Release.Namespace)}}

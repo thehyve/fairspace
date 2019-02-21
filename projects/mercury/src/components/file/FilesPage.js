@@ -18,11 +18,11 @@ class FilesPage extends React.Component {
             fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath
         } = this.props;
         fetchCollectionsIfNeeded();
-        selectCollection(openedCollection.id);
+        selectCollection(openedCollection.iri);
 
         // If the collection has not been fetched yet,
         // do not bother fetching the files
-        if (openedCollection.id) {
+        if (openedCollection.iri) {
             fetchFilesIfNeeded(openedCollection, openedPath);
         }
     }
@@ -32,12 +32,12 @@ class FilesPage extends React.Component {
             selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath
         } = this.props;
 
-        if (prevProps.openedCollection.id !== openedCollection.id) {
-            selectCollection(openedCollection.id);
+        if (prevProps.openedCollection.iri !== openedCollection.iri) {
+            selectCollection(openedCollection.iri);
         }
 
-        const hasCollectionDetails = openedCollection.id;
-        const hasNewOpenedCollection = prevProps.openedCollection.id !== openedCollection.id;
+        const hasCollectionDetails = openedCollection.iri;
+        const hasNewOpenedCollection = prevProps.openedCollection.iri !== openedCollection.iri;
         const hasNewOpenedPath = prevProps.openedPath !== openedPath;
 
         if (hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
@@ -54,7 +54,7 @@ class FilesPage extends React.Component {
         }
 
         const segments = [
-            {segment: `${openedCollection.id}`, label: openedCollection.name}
+            {segment: openedCollection.location, label: openedCollection.name}
         ];
 
         if (openedPath) {
@@ -70,7 +70,7 @@ class FilesPage extends React.Component {
         {
             const {
                 openedCollection, fetchFilesIfNeeded,
-                openPath, openedCollectionId,
+                openPath,
                 openedPath, files, selectedPaths, selectPath, deselectPath, renameFile, deleteFile
             } = this.props;
 
@@ -83,7 +83,6 @@ class FilesPage extends React.Component {
                                 openPath={openPath}
                                 fetchFilesIfNeeded={fetchFilesIfNeeded}
                                 openedCollection={openedCollection}
-                                openedCollectionId={openedCollectionId}
                                 openedPath={openedPath}
                                 files={files}
                                 selectPath={selectPath}
@@ -105,19 +104,20 @@ class FilesPage extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     const {match: {params}} = ownProps;
-    const openedCollectionId = parseInt(params.collection, 10);
+    const openedCollectionLocation = params.collection;
     const openedPath = params.path ? `/${params.path}` : '/';
-    const filesPerCollection = state.cache.filesByCollectionAndPath[openedCollectionId] || [];
+
+    const collection = (state.cache.collections.data && state.cache.collections.data.find(c => c.location === openedCollectionLocation)) || {};
+    const filesPerCollection = state.cache.filesByCollectionAndPath[collection.iri] || [];
     const files = filesPerCollection[openedPath] || [];
-    const getCollection = collectionId => (state.cache.collections.data && state.cache.collections.data.find(collection => collection.id === collectionId)) || {};
 
     return {
         loading: files.pending || state.cache.collections.pending || state.cache.collections.data.length === 0,
         error: files.error || state.cache.collections.error,
         files: files.data,
         selectedPaths: state.collectionBrowser.selectedPaths,
-        openedCollection: openedCollectionId ? getCollection(openedCollectionId) : {},
-        openedCollectionId,
+        openedCollection: collection,
+        openedCollectionId: collection.iri,
         openedPath
     };
 };

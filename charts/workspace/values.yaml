@@ -93,7 +93,7 @@ services:
 
 #####################################################################
 # Specific settings for Pluto subchart
-# Default configuration points to titan, mercury and neptune
+# Default configuration points to mercury and saturn
 # in the same workspace
 #####################################################################
 pluto:

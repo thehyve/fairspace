@@ -57,15 +57,18 @@ workspace:
 zuul:
   routes:
     storage:
-      path: /api/storage/**
-      url: http://titan/
+      # The webdav URL is not only used in the request URI, but also in headers (e.g. Destination)
+      # To avoid rewriting these headers, it is suggested that the path on the proxy is the same
+      # as the path on the upstream service for webdav calls.
+      path: /webdav/**
+      url: http://saturn/
       strip-prefix: false
     metadata:
       path: /api/metadata/**
-      url: http://ceres/
+      url: http://saturn/api/meta/
     collections:
       path: /api/collections/**
-      url: http://neptune/
+      url: http://saturn/api/collections/
     ui:
       path: /**
       url: http://mercury/

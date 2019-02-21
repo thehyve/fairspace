@@ -10,7 +10,7 @@ import getDisplayName from "../../utils/userUtils";
 
 const collectionList = (props) => {
     const {
-        collections, selectedCollectionId,
+        collections, selectedCollectionIRI,
         onCollectionClick, onCollectionDoubleClick, classes
     } = props;
 
@@ -30,11 +30,11 @@ const collectionList = (props) => {
                 </TableHead>
                 <TableBody>
                     {collections.map((collection) => {
-                        const selected = selectedCollectionId && (collection.id === selectedCollectionId);
+                        const selected = selectedCollectionIRI && (collection.iri === selectedCollectionIRI);
 
                         return (
                             <TableRow
-                                key={collection.id}
+                                key={collection.iri}
                                 hover
                                 onClick={() => onCollectionClick(collection)}
                                 onDoubleClick={() => onCollectionDoubleClick(collection)}

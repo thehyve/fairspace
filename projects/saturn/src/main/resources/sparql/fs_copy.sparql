@@ -3,12 +3,14 @@
 #
 # 0 - from
 # 1 - to
+# 2 - label
 
 PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 
 # Create the target resource
-INSERT { ?newIRI fs:filePath ?1 }
+INSERT { ?newIRI fs:filePath ?1; rdfs:label ?2 . }
 WHERE {
     ?s fs:filePath ?0 .
     FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
@@ -24,6 +26,7 @@ WHERE {
     fs:filePath ?0 .
     FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
     FILTER( ?p != fs:filePath) # filePath has changed
+    FILTER( ?p != rdfs:label)
 };
 
 # Create children
