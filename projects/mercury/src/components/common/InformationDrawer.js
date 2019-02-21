@@ -34,10 +34,12 @@ export class InformationDrawer extends React.Component {
     }
 
     handleUpdateCollection = (name, description, location) => {
+        // TODO: validation should be part of the child component
         if ((name !== this.props.collection.name || description !== this.props.collection.description || location !== this.props.collection.location)
             && (name !== '') && (location !== '')) {
             this.props.updateCollection(this.props.collection.iri, name, description, location)
                 .then(() => {
+                    // TODO: no need to close object, just use the id in the handleDetailsChange
                     const collection = Object.assign(this.props.collection, {name, description});
                     this.handleDetailsChange(collection);
                 })
@@ -77,7 +79,7 @@ export class InformationDrawer extends React.Component {
                             defaultExpanded
                         >
                             <ExpansionPanelSummary
-                                expandIcon={<ExpandMoreIcon/>}
+                                expandIcon={<ExpandMoreIcon />}
                             >
                                 <Typography
                                     className={classes.heading}
