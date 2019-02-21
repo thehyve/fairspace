@@ -6,6 +6,21 @@ describe('Search Utilities', () => {
         expect(url).toBe('/search?q=findings&type=collections');
     });
 
+    it('should return no query paramters on empty or undefined type and/or query', () => {
+        const url = buildSearchUrl('', '');
+        const url2 = buildSearchUrl(null, undefined);
+        const url3 = buildSearchUrl(undefined, null);
+
+        expect(url).toBe('/search');
+        expect(url2).toBe('/search');
+        expect(url3).toBe('/search');
+    });
+
+    it('should build string even when query is missing', () => {
+        const url = buildSearchUrl('randomType', '');
+        expect(url).toBe('/search?q=&type=randomType');
+    });
+
     it('should get "collections" as a type from string', () => {
         const type = getSearchTypeFromString('/search?q=a&type=collections');
         expect(type).toBe('collections');
