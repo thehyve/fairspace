@@ -37,58 +37,17 @@ pluto:
   rabbitmq:
     password: "PaF6ZMbDZmgrztJY"
 
-titan:
-  image:
-    image: eu.gcr.io/fairspace-207108/titan
-    pullPolicy: Always
-  rabbitmq:
-    password: "L3bE8yGJp7um2PVk"
-  persistence:
-    size: 20Gi
-
 # Specific settings for Saturn subchart
 saturn:
   image:
     image: eu.gcr.io/fairspace-207108/saturn
     pullPolicy: Always
 
-# Specific settings for Ceres subchart
-ceres:
-  image:
-    image: eu.gcr.io/fairspace-207108/ceres
-    pullPolicy: Always
-  rabbitmq:
-    password: "hx6SQUBe99EBr8dM"
-
-# Specific settings for Neptune subchart
-neptune:
-  image:
-    image: eu.gcr.io/fairspace-207108/neptune
-    pullPolicy: Always
-  rabbitmq:
-    password: "4uXa4BFkHTuNxFAF"
-
 # Specific settings for Mercury subchart
 mercury:
   image:
     image: eu.gcr.io/fairspace-207108/mercury
     pullPolicy: Always
-
-# Specific settings for Callisto subchart
-callisto:
-  image:
-    image: eu.gcr.io/fairspace-207108/callisto
-  rabbitmq:
-    password: "6hfdJUr7RW6LTFgB"
-
-  mail:
-    host: email-smtp.us-east-1.amazonaws.com
-    port: 587
-    username: AKIAISXHGXUIMMU75YVA
-    password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
 
 # Specific settings for JupyterHub subchart
 jupyterhub:

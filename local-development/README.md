@@ -73,23 +73,7 @@ You can run pluto as a spring boot application from you IDE with the following p
 * noAuth (optionally, if you want to disable authentication)
 
 ### Saturn
-You can run ceres as a Java application from you IDE by running the main class `io.fairspace.saturn.App`
-
-### Ceres
-You can run ceres as a spring boot application from you IDE with the following profiles:
-* local
-* noAuth (optionally, if you want to disable authentication)
-
-### Neptune
-You can run neptune as a spring boot application from you IDE with the following profiles:
-* local
-* noAuth (optionally, if you want to disable authentication)
-
-### Titan
-You can run titan locally using the `local-config.js` configuration parameters. Run the following command
-```bash
-PORT=5110 CONFIG_FILE=../local-development/local-config.js npm start
-```
+You can run Saturn as a Java application from you IDE by running the main class `io.fairspace.saturn.App`
 
 ### Mercury
 You can run mercury locally using `yarn start`.

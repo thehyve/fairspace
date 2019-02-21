@@ -121,48 +121,17 @@ Scheme to access workspace components (http or https)
 {{ template "workspace.scheme" . }}://{{ template "storage.hostname" . }}
 {{- end -}}
 
-{{- define "neptune.postgres.host" -}}
-{{- printf "%s-%s" .Release.Name .Values.postgresql_neptune.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- define "ceres.postgres.host" -}}
-{{- printf "%s-%s" .Release.Name .Values.postgresql_neptune.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "callisto.fullname" -}}
-{{- .Values.callisto.nameOverride | default (printf "%s-callisto" .Release.Name) -}}
-{{- end -}}
 {{- define "saturn.fullname" -}}
 {{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
-{{- end -}}
-{{- define "ceres.fullname" -}}
-{{- .Values.ceres.nameOverride | default (printf "%s-ceres" .Release.Name) -}}
 {{- end -}}
 {{- define "mercury.fullname" -}}
 {{- .Values.mercury.nameOverride | default (printf "%s-mercury" .Release.Name) -}}
 {{- end -}}
-{{- define "neptune.fullname" -}}
-{{- .Values.neptune.nameOverride | default (printf "%s-neptune" .Release.Name) -}}
-{{- end -}}
 {{- define "pluto.fullname" -}}
 {{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
-{{- end -}}
-{{- define "titan.fullname" -}}
-{{- .Values.titan.nameOverride | default (printf "%s-titan" .Release.Name) -}}
 {{- end -}}
 
 
 {{- define "rabbitmq.pluto.username" -}}
 {{- .Values.pluto.rabbitmq.username | default (printf "%s-pluto" .Release.Name) -}}
-{{- end -}}
-{{- define "rabbitmq.neptune.username" -}}
-{{- .Values.neptune.rabbitmq.username | default (printf "%s-neptune" .Release.Name) -}}
-{{- end -}}
-{{- define "rabbitmq.ceres.username" -}}
-{{- .Values.ceres.rabbitmq.username | default (printf "%s-ceres" .Release.Name) -}}
-{{- end -}}
-{{- define "rabbitmq.titan.username" -}}
-{{- .Values.titan.rabbitmq.username | default (printf "%s-titan" .Release.Name) -}}
-{{- end -}}
-{{- define "rabbitmq.callisto.username" -}}
-{{- .Values.callisto.rabbitmq.username | default (printf "%s-callisto" .Release.Name) -}}
 {{- end -}}

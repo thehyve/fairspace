@@ -45,78 +45,14 @@ pluto:
   services:
     jupyter: https://jupyterhub.workspace.demo.fairway.app
 
-# Specific settings for Titan subchart
-titan:
-  image:
-    image: eu.gcr.io/fairspace-207108/titan
-  auth:
-    tokenUrl: https://keycloak.hyperspace.demo.fairway.app/auth/realms/demo/protocol/openid-connect/token
-    clientId: workspace-demo-pluto
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "UMEfm4fYvq3dAHZP"
-  tracing:
-    enabled: false
-  permissions:
-    collectionPermissionsUrl: https://workspace.demo.fairway.app/api/collections/permissions?location=%s
-
 # Specific settings for Saturn subchart
 saturn:
   image:
     image: eu.gcr.io/fairspace-207108/saturn
 
-# Specific settings for Ceres subchart
-ceres:
-  image:
-    image: eu.gcr.io/fairspace-207108/ceres
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "vv8FjVQm6qsNtGUA"
-  app:
-    oauth2:
-      baseUrl: https://keycloak.hyperspace.demo.fairway.app
-      realm: demo
-    tracing:
-      enabled: false
-    metadata:
-      baseUrl: https://workspace.demo.fairway.app
-
-# Specific settings for Neptune subchart
-neptune:
-  image:
-    image: eu.gcr.io/fairspace-207108/neptune
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "Yn5NvUhRVye2GVP8"
-  app:
-    oauth2:
-      baseUrl: https://keycloak.hyperspace.demo.fairway.app
-      realm: demo
-    tracing:
-      enabled: false
-    metadata:
-      baseUrl: https://workspace.demo.fairway.app
-
 mercury:
   image:
     image: eu.gcr.io/fairspace-207108/mercury
-
-# Specific settings for Callisto subchart
-callisto:
-  image:
-    image: eu.gcr.io/fairspace-207108/callisto
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "TctDN6DBtfHkmGv8"
-
-  mail:
-    host: email-smtp.us-east-1.amazonaws.com
-    port: 587
-    username: AKIAISXHGXUIMMU75YVA
-    password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
