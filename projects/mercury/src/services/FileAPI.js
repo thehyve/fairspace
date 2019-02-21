@@ -1,22 +1,28 @@
-import CreateWebdavClient from "webdav";
+import {createClient} from "webdav";
 import Config from "./Config/Config";
-import {joinPaths, addCounterToFilename} from '../utils/fileUtils';
+import {addCounterToFilename, joinPaths} from '../utils/fileUtils';
+import axios from 'axios';
 
 // Ensure that the window fetch method is used for webdav calls
 // and that is passes along the credentials
-const defaultOptions = {credentials: 'include'};
+const defaultOptions = {credentials: 'include', details: true};
 
-CreateWebdavClient.setFetchMethod((input, init) => {
-    const options = init ? Object.assign({}, init, defaultOptions) : defaultOptions;
-    return fetch(input, options);
-});
+
+axios.interceptors.request.use((config) => {
+    if (config.method === 'propfind') {
+        config.headers['content-type'] = 'application/xml';
+        config.data = '<?xml version="1.0" encoding="utf-8" ?><propfind xmlns:D="DAV:"><allprop/></propfind>';
+    }
+    return config;
+},
+(error) => Promise.reject(error));
 
 class FileAPI {
     constructor(collectionSubDirectory) {
         this.basePath = `/${collectionSubDirectory}`;
 
         const baseUrl = Config.get().urls.files;
-        this.client = CreateWebdavClient(baseUrl);
+        this.client = createClient(baseUrl);
     }
 
     /**
@@ -41,7 +47,7 @@ class FileAPI {
             return Promise.reject(Error("No path specified for directory creation"));
         }
 
-        return this.client.createDirectory(this.getFullPath(path));
+        return this.client.createDirectory(this.getFullPath(path), defaultOptions);
     }
 
     /**
@@ -61,7 +67,7 @@ class FileAPI {
         }
 
         const fullPath = this.getFullPath(path);
-        const allPromises = files.map(file => this.client.putFileContents(`${fullPath}/${nameMapping.get(file.name)}`, file));
+        const allPromises = files.map(file => this.client.putFileContents(`${fullPath}/${nameMapping.get(file.name)}`, file, defaultOptions));
 
         return Promise.all(allPromises).then(() => files);
     }
@@ -75,7 +81,7 @@ class FileAPI {
             return;
         }
 
-        window.location.href = this.client.getFileDownloadLink(this.getFullPath(path));
+        window.location.href = this.client.getFileDownloadLink(this.getFullPath(path), defaultOptions);
     }
 
     /**
@@ -86,7 +92,7 @@ class FileAPI {
     delete(path) {
         if (!path) return Promise.reject(Error("No path specified for deletion"));
 
-        return this.client.deleteFile(this.getFullPath(path));
+        return this.client.deleteFile(this.getFullPath(path), defaultOptions);
     }
 
     /**
@@ -105,7 +111,7 @@ class FileAPI {
 
         // We have to specify the destination ourselves, as the client adds the fullpath
         // to the
-        return this.client.moveFile(this.getFullPath(source), this.getFullPath(destination));
+        return this.client.moveFile(this.getFullPath(source), this.getFullPath(destination), defaultOptions);
     }
 
     /**
@@ -122,7 +128,7 @@ class FileAPI {
             return Promise.reject(Error("No destination specified to copy to"));
         }
 
-        return this.client.copyFile(this.getFullPath(source), this.getFullPath(destination));
+        return this.client.copyFile(this.getFullPath(source), this.getFullPath(destination), defaultOptions);
     }
 
 
