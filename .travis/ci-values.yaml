@@ -1,16 +1,11 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
   domain: hyperspace.ci.fairway.app
-  locationOverrides:
-    rabbitmqhostname: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
   keycloak:
     username: keycloak
     password: keycloak-ci-123
     realm: ci
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
-  rabbitmq:
-    username: rabbitmq
-    password: "X6SXtXV3Jzg4gyVR"
 
 # Settings for the workspace
 workspace:
@@ -25,17 +20,11 @@ workspace:
       enabled: true
       image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.1
       pullPolicy: IfNotPresent
-    rabbitmq:
-      enabled: true
-      image: eu.gcr.io/fairspace-207108/rabbitmq-configuration:0.1.0
-      pullPolicy: IfNotPresent
 
 pluto:
   image:
     image: eu.gcr.io/fairspace-207108/pluto
     pullPolicy: Always
-  rabbitmq:
-    password: "PaF6ZMbDZmgrztJY"
 
 # Specific settings for Saturn subchart
 saturn:

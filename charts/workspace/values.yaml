@@ -18,7 +18,6 @@ hyperspace:
     domain:
     locationOverrides:
         keycloak:
-        rabbitmqhostname: hyperspace-rabbitmq.hyperspace.svc.cluster.local
 
     # TODO: determine better way to handle keycloak credentials
     # Keycloak credentials are needed to setup the workspace (e.g. users, clients)
@@ -35,10 +34,6 @@ hyperspace:
         loginRealm: master
         realm:
         clientSecret:
-
-    rabbitmq:
-      username:
-      password:
 
 # Setup ingress for workspace components
 workspace:
@@ -75,10 +70,6 @@ workspace:
       keycloak:
         enabled: true
         image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.1
-        pullPolicy: IfNotPresent
-      rabbitmq:
-        enabled: true
-        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0
         pullPolicy: IfNotPresent
     enableExperimentalFeatures: false
 
@@ -127,11 +118,6 @@ pluto:
     successThreshold: 1
     timeoutSeconds: 1
   terminationGracePeriodSeconds: 10
-
-  rabbitmq:
-    vhost:
-    username:
-    password:
 
   # Reference to the workspace for informational purposes
   # These values default to the release name and chart version

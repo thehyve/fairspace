@@ -130,8 +130,3 @@ Scheme to access workspace components (http or https)
 {{- define "pluto.fullname" -}}
 {{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
 {{- end -}}
-
-
-{{- define "rabbitmq.pluto.username" -}}
-{{- .Values.pluto.rabbitmq.username | default (printf "%s-pluto" .Release.Name) -}}
-{{- end -}}

@@ -2,7 +2,6 @@
 hyperspace:
   domain: hyperspace.cbiotest.fairway.app
   locationOverrides:
-    rabbitmqhostname: hyperspace-cbiotest-rabbitmq.hyperspace-cbiotest.svc.cluster.local
     keycloak: https://cbioportal-fairspace.thehyve.net:8443
   keycloak:
     username: keycloak
@@ -10,9 +9,6 @@ hyperspace:
     realm: cbio
     clientId: workspace-test-pluto
     clientSecret: baf559f1-1926-44c2-95c9-b635639918b0
-  rabbitmq:
-    username: rabbitmq
-    password: "CDbcdkjd856cdHDH"
 
 # Settings for the workspace
 workspace:
@@ -28,8 +24,6 @@ workspace:
 pluto:
   image:
     pullPolicy: Always
-  rabbitmq:
-    password: "PaF6ZMbDZmgrztJY"
 
 # Specific settings for Mercury subchart
 mercury:

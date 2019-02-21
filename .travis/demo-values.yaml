@@ -1,16 +1,11 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
   domain: hyperspace.demo.fairway.app
-  locationOverrides:
-    rabbitmqhostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
   keycloak:
     username: keycloak
     password: keycloak-demo-123
     realm: demo
     clientSecret: db67da94-fa31-47cd-8c42-0ed295790841
-  rabbitmq:
-    username: rabbitmq
-    password: "gtzb28355LFqxbar"
 
 # Settings for the workspace
 workspace:
@@ -25,10 +20,6 @@ workspace:
       enabled: true
       image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.1
       pullPolicy: IfNotPresent
-    rabbitmq:
-      enabled: true
-      image: eu.gcr.io/fairspace-207108/rabbitmq-configuration:0.1.0
-      pullPolicy: IfNotPresent
 
 # Specific settings for Pluto subchart
 pluto:
@@ -37,9 +28,6 @@ pluto:
   keycloak:
     baseUrl: https://keycloak.hyperspace.demo.fairway.app
     realm: demo
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "FF63EUD3pyrCSeuV"
   tracing:
     enabled: false
   services:
