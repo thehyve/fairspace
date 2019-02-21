@@ -2,17 +2,21 @@ import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
 import * as actionTypes from "../../actions/actionTypes";
 
-const metadataCreateReducer = (state = {}, action) => {
+export const metadataCreateReducer = (state = {data: []}, action) => {
     switch (action.type) {
-        case actionTypes.CREATE_METADATA_ENTITY_FULFILLED:
+        case actionTypes.CREATE_METADATA_ENTITY_FULFILLED: {
+            const metadata = {'@id': action.meta.subject, '@type': [action.meta.type]};
             return {
                 ...state,
-                data: state.data.concat([{'@id': action.meta.subject, '@type': [action.meta.type]}]),
+                data: [...state.data, metadata],
                 invalidated: true,
             };
+        }
         default:
             return state;
     }
 };
 
-export default reduceReducers(promiseReducerFactory(actionTypes.FETCH_ALL_METADATA_ENTITIES, null), metadataCreateReducer);
+const fetchAllMetaEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_COLLECTIONS, null);
+
+export default reduceReducers(fetchAllMetaEntitiesReducer, metadataCreateReducer);
