@@ -17,6 +17,6 @@ export const metadataCreateReducer = (state = {data: []}, action) => {
     }
 };
 
-const fetchAllMetaEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_COLLECTIONS, null);
+const fetchAllMetaEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_ALL_METADATA_ENTITIES, null);
 
 export default reduceReducers(fetchAllMetaEntitiesReducer, metadataCreateReducer);
