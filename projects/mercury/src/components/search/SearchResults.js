@@ -6,6 +6,17 @@ import FileList from '../file/FileList';
 import {COLLECTION_SEARCH_TYPE, FILES_SEARCH_TYPE} from '../../constants';
 import {LoadingInlay} from "../common";
 
+const getSelectedTabIndex = (type) => {
+    switch (type) {
+        case COLLECTION_SEARCH_TYPE:
+            return 0;
+        case FILES_SEARCH_TYPE:
+            return 1;
+        default:
+            return false;
+    }
+};
+
 const searchResults = ({
     loading,
     type,
@@ -14,9 +25,9 @@ const searchResults = ({
     onCollectionOpen,
     onFileOpen,
 }) => {
-    const selectedTabIndex = type === FILES_SEARCH_TYPE ? 1 : 0;
+    const selectedTabIndex = getSelectedTabIndex(type);
     const resultsToView = results && results.length === 0
-        ? 'No results found!' // TODO: make ErrorMessage generic and use it as an 'information' message here
+        ? 'No results found!'
         : (
             <Grid item xs={12}>
                 {selectedTabIndex === 0 && (
