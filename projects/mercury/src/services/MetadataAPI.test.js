@@ -14,7 +14,7 @@ beforeAll(() => {
         urls: {
             metadata: {
                 statements: "/meta/",
-                pid: "/pid",
+                pid: "/pids",
                 entities: "/entities/",
             }
         }
@@ -57,7 +57,7 @@ it('fetches pid with provided parameters', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.getSubjectByPath('/aaa/bbb/ccc');
 
-    expect(window.fetch.mock.calls[0][0]).toEqual(`/pid?path=${encodeURIComponent('/aaa/bbb/ccc')}`);
+    expect(window.fetch.mock.calls[0][0]).toEqual(`/pids?path=${encodeURIComponent('/aaa/bbb/ccc')}`);
     expect(window.fetch.mock.calls[0][1].method).toEqual('GET');
     expect(window.fetch.mock.calls[0][1].headers.map['accept']).toEqual('text/plain');
 });

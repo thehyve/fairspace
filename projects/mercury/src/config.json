@@ -10,7 +10,7 @@
     "metadata": {
       "statements": "/api/metadata/",
       "entities": "/api/metadata/entities/",
-      "pid": "/api/metadata/pid"
+      "pid": "/api/metadata/pids"
     },
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"

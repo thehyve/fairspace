@@ -57,7 +57,7 @@ app.get('/api/workspace/config', (req, res) => res.sendFile(`${mockDataDir}/work
 app.get('/api/workspace/details', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-details.json`));
 
 
-app.get('/api/metadata/pid', ({query: {path}}, res) => {
+app.get('/api/metadata/pids', ({query: {path}}, res) => {
     res.send(`http://fairspace.com/${path}`);
 });
 
