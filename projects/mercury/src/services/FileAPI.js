@@ -33,8 +33,8 @@ class FileAPI {
     list(path) {
         const fullPath = this.getFullPath(path);
 
-        return this.client
-            .getDirectoryContents(fullPath);
+        return this.client.getDirectoryContents(fullPath, defaultOptions)
+            .then(result => result.data);
     }
 
     /**
