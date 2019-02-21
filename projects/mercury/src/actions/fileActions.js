@@ -74,3 +74,12 @@ export const fetchFilesIfNeeded = (collection, path) => dispatchIfNeeded(
         return filesPerCollection[path];
     }
 );
+
+export const statFile = createErrorHandlingPromiseAction((collection, path) => ({
+    type: actionTypes.STAT_FILE,
+    payload: new FileAPI(collection.location).stat(path),
+    meta: {
+        collection,
+        path
+    }
+}));

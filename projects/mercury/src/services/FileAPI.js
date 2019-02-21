@@ -5,7 +5,7 @@ import axios from 'axios';
 
 // Ensure that the window fetch method is used for webdav calls
 // and that is passes along the credentials
-const defaultOptions = {credentials: 'include', details: true};
+const defaultOptions = {credentials: 'include'};
 
 
 axios.interceptors.request.use((config) => {
@@ -25,6 +25,13 @@ class FileAPI {
         this.client = createClient(baseUrl);
     }
 
+    stat(path) {
+        const fullPath = this.getFullPath(path);
+
+        return this.client.stat(fullPath, {credentials: 'include', details: true})
+            .then(result => result.data);
+    }
+
     /**
      * List directory contents
      * @param path      Full path within the collection
@@ -33,7 +40,7 @@ class FileAPI {
     list(path) {
         const fullPath = this.getFullPath(path);
 
-        return this.client.getDirectoryContents(fullPath, defaultOptions)
+        return this.client.getDirectoryContents(fullPath, {credentials: 'include', details: true})
             .then(result => result.data);
     }
 

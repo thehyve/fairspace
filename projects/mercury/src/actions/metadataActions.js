@@ -103,14 +103,3 @@ export const fetchAllEntitiesIfNeeded = () => dispatchIfNeeded(
     () => fetchAllEntities(),
     state => (state && state.cache ? state.cache.allEntities : undefined)
 );
-
-const getUriByPath = createErrorHandlingPromiseAction(path => ({
-    type: actionTypes.FETCH_METADATA_URI_BY_PATH,
-    payload: MetadataAPI.getSubjectByPath(path),
-    meta: {path}
-}));
-
-export const fetchSubjectByPathIfNeeded = path => dispatchIfNeeded(
-    () => getUriByPath(path),
-    state => state && state.cache && state.cache.subjectByPath && state.cache.subjectByPath[path]
-);

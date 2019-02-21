@@ -2,17 +2,17 @@ import * as actionTypes from "../../actions/actionTypes";
 
 export default (state = {}, action) => {
     switch (action.type) {
-        case actionTypes.FETCH_METADATA_URI_BY_PATH_PENDING:
+        case actionTypes.STAT_FILE_PENDING:
             return {
                 ...state,
                 [action.meta.path]: {pending: true}
             };
-        case actionTypes.FETCH_METADATA_URI_BY_PATH_FULFILLED:
+        case actionTypes.STAT_FILE_FULFILLED:
             return {
                 ...state,
-                [action.meta.path]: {data: action.payload}
+                [action.meta.path]: {data: action.payload.props.iri}
             };
-        case actionTypes.FETCH_METADATA_URI_BY_PATH_REJECTED:
+        case actionTypes.STAT_FILE_REJECTED:
             return {
                 ...state,
                 [action.meta.path]: {error: action.payload || true}
