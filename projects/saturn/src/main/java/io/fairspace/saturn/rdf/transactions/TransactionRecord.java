@@ -9,15 +9,12 @@ import org.apache.jena.sparql.modify.request.UpdateDataInsert;
 import org.apache.jena.update.UpdateRequest;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Set;
 
 import static java.util.Collections.singletonList;
 
 @Data
-public class TransactionRecord implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class TransactionRecord {
     private long timestamp;
 
     private String userId;

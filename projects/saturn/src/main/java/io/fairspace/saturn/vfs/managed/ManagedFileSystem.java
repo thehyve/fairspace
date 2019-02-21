@@ -22,8 +22,7 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
-import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -97,7 +96,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(path);
 
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", path, userId())));
+                () -> rdf.update(storedQuery("fs_mkdir", path, userId(), name(path))));
     }
 
     @Override
@@ -107,7 +106,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userId())));
+                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userId(), name(path))));
     }
 
     @Override
@@ -131,7 +130,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(from);
         ensureValidPath(to);
         withCommitMessage("Copy data from " + from + " to " + to,
-                () -> rdf.update(storedQuery("fs_copy", from, to)));
+                () -> rdf.update(storedQuery("fs_copy", from, to, name(to))));
     }
 
     @Override
@@ -139,7 +138,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(from);
         ensureValidPath(to);
         withCommitMessage("Move data from " + from + " to " + to,
-                () -> rdf.update(storedQuery("fs_move", from, to)));
+                () -> rdf.update(storedQuery("fs_move", from, to, name(to))));
     }
 
     @Override
