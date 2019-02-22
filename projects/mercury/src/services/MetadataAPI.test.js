@@ -14,7 +14,6 @@ beforeAll(() => {
         urls: {
             metadata: {
                 statements: "/meta/",
-                pid: "/pids",
                 entities: "/entities/",
             }
         }
@@ -50,14 +49,4 @@ it('retrieves metadata entities using a sparql query', () => {
     MetadataAPI.getEntitiesByType(type);
     expect(window.fetch.mock.calls[0][0]).toEqual("/entities/?type=http%3A%2F%2Fmy-special-entity-type");
     expect(window.fetch.mock.calls[0][1].method).toEqual('GET');
-});
-
-
-it('fetches pid with provided parameters', () => {
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
-    MetadataAPI.getSubjectByPath('/aaa/bbb/ccc');
-
-    expect(window.fetch.mock.calls[0][0]).toEqual(`/pids?path=${encodeURIComponent('/aaa/bbb/ccc')}`);
-    expect(window.fetch.mock.calls[0][1].method).toEqual('GET');
-    expect(window.fetch.mock.calls[0][1].headers.map['accept']).toEqual('text/plain');
 });

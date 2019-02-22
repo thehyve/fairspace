@@ -7,6 +7,10 @@ export const PATH_SEPARATOR = '/';
 export const MAIN_CONTENT_WIDTH = '55%';
 export const SIDE_PANEL_WIDTH = '45%';
 
+// Search
+export const COLLECTION_SEARCH_TYPE = 'collections';
+export const FILES_SEARCH_TYPE = 'files';
+
 // URIs
 export const PROPERTY_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
 export const CLASS_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class';
