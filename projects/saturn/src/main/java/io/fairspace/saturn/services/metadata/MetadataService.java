@@ -53,7 +53,7 @@ class MetadataService {
         return rdf.queryConstruct(storedQuery("entities_by_type", graph, asURI(type)));
     }
 
-    String createPatchQuery(Collection<Statement> statements) {
+    private String createPatchQuery(Collection<Statement> statements) {
         var updateRequest = new UpdateRequest();
 
         statements

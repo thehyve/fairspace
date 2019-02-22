@@ -189,27 +189,4 @@ public class MetadataServiceTest {
         var m4 = api.getByType(FOAF.Person.toString());
         assertTrue(m4.isEmpty());
     }
-
-    @Test
-    public void createPatchQuery() {
-        String query = api.createPatchQuery(asList(STMT1, STMT2));
-        assertEquals("DELETE WHERE \n" +
-                "{\n" +
-                "  GRAPH <http://example.com/graph> {\n" +
-                "    <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> ?o .\n" +
-                "  }\n" +
-                "} ;\n" +
-                "DELETE WHERE \n" +
-                "{\n" +
-                "  GRAPH <http://example.com/graph> {\n" +
-                "    <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P1> ?o .\n" +
-                "  }\n" +
-                "} ;\n" +
-                "INSERT DATA {\n" +
-                "  GRAPH <http://example.com/graph> {\n" +
-                "    <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> <http://fairspace.io/iri/S2> .\n" +
-                "    <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P1> <http://fairspace.io/iri/S3> .\n" +
-                "  }\n" +
-                "}\n", query);
-    }
 }
