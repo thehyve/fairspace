@@ -8,10 +8,11 @@ and providing the SPARQL 1.1 [protocols for query and update](http://www.w3.org/
 It can be accessed programmatically using one of [RDFConnection](https://jena.apache.org/documentation/rdfconnection/) implementations.
 For more information see [Fuseki documentation](https://jena.apache.org/documentation/fuseki2/) 
 
-### High-level metadata API
+### High-level metadata & vocabulary API
 
-The high-level metadata API runs on :8080/api/meta/.
-Currently it supports the following methods:
+The high-level metadata & vocabulary API run on :8080/api/meta/ and :8080/api/vocabulary/.
+The only difference between them is that they work with different named graphs.
+Currently they support the following methods:
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                  |
 |-------------|---------------------------------------------------|---------------------------|------------------------------------------------------------------- |
@@ -21,22 +22,13 @@ Currently it supports the following methods:
 | DELETE      | -                                                 | JsonLD-encoded statements | Deletes the statements provided                                    |
 | PATCH       | -                                                 | JsonLD-encoded statements | Replaces existing triples with the statements provided             |
 
-An additional `:8080/api/meta/entities/` endpoint allows to retrieve labelled FairSpace entities, optionally filtered by type:
+Additional `:8080/api/meta/entities/` and `:8080/api/vocabulary/entities/` endpoints allow to retrieve labelled FairSpace entities, optionally filtered by type:
 
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                      |
 |-------------|---------------------------------------------------|---------------------------|----------------------------------------------------------------------- |
 | GET         | type (optional, URL-encoded)                      | -                         | Returns JsonLD-encoded modetaining FairSpace entities and their labels |
 
-
-### High-level vocabulary API
-The high-level metadata API runs on :8080/api/vocabulary/.
-Currently it supports the following methods:
-
-| HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                  |
-|-------------|-------------------------------------------|---------------------------|------------------------------------------------------------------- |
-| GET         | -                                         | -                         | Returns JsonLD-encoded vocabulary                                  |
-| PUT         | -                                         | JsonLD-encoded vocabulary | Replaces the vocabulary with the provided model                    |
 
 ### High-level collections API
 The high-level metadata API runs on :8080/api/collections/.
