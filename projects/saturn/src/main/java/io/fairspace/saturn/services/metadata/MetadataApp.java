@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.riot.RiotException;
 import spark.servlet.SparkApplication;
@@ -12,15 +13,17 @@ import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.*;
 
 public class MetadataApp implements SparkApplication {
+    private final String basePath;
     private final MetadataService api;
 
-    public MetadataApp(RDFConnection rdfConnection) {
-        this.api = new MetadataService(rdfConnection);
+    public MetadataApp(String basePath, RDFConnection rdfConnection, Node graph) {
+        this.basePath = basePath;
+        this.api = new MetadataService(rdfConnection, graph);
     }
 
     @Override
     public void init() {
-        path("/api/meta", () -> {
+        path(basePath, () -> {
             get("/", (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
                 return toJsonLD(api.get(

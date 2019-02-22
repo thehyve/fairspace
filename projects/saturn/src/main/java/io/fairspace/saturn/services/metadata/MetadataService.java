@@ -21,22 +21,24 @@ import static org.apache.jena.graph.NodeFactory.createVariable;
 
 class MetadataService {
     private final RDFConnection rdf;
+    private final Node graph;
 
-    MetadataService(RDFConnection rdf) {
+    MetadataService(RDFConnection rdf, Node graph) {
         this.rdf = rdf;
+        this.graph = graph;
     }
 
     Model get(String subject, String predicate, String object, boolean withLabels) {
         var query = withLabels ? "select_by_mask_with_labels" : "select_by_mask";
-        return rdf.queryConstruct(storedQuery(query, asURI(subject), asURI(predicate), asURI(object)));
+        return rdf.queryConstruct(storedQuery(query, graph, asURI(subject), asURI(predicate), asURI(object)));
     }
 
     void put(Model model) {
-        rdf.load(model);
+        rdf.load(graph.getURI(), model);
     }
 
     void delete(String subject, String predicate, String object) {
-        rdf.update(storedQuery("delete_by_mask", asURI(subject), asURI(predicate), asURI(object)));
+        rdf.update(storedQuery("delete_by_mask", graph, asURI(subject), asURI(predicate), asURI(object)));
     }
     void delete(Model model) {
         rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(model.listStatements().toList()))));
@@ -48,10 +50,10 @@ class MetadataService {
 
 
     Model getByType(String type) {
-        return rdf.queryConstruct(storedQuery("entities_by_type", asURI(type)));
+        return rdf.queryConstruct(storedQuery("entities_by_type", graph, asURI(type)));
     }
 
-    static String createPatchQuery(Collection<Statement> statements) {
+    private String createPatchQuery(Collection<Statement> statements) {
         var updateRequest = new UpdateRequest();
 
         statements
@@ -59,10 +61,10 @@ class MetadataService {
                 .map(s -> Pair.create(s.getSubject(), s.getPredicate()))
                 .distinct()
                 .map(p -> new Quad(
-                        Quad.defaultGraphNodeGenerated,                  // Default graph
-                        p.getLeft().asNode(),                            // Subject
-                        p.getRight().asNode(),                           // Predicate
-                        createVariable("o"))) // A free variable matching any object
+                        graph,                  // Graph
+                        p.getLeft().asNode(),   // Subject
+                        p.getRight().asNode(),  // Predicate
+                        createVariable("o")))   // A free variable matching any object
                 .map(q -> new UpdateDeleteWhere(new QuadAcc(singletonList(q))))
                 .forEach(updateRequest::add);
 
@@ -71,10 +73,10 @@ class MetadataService {
         return updateRequest.toString();
     }
 
-    private static List<Quad> toQuads(Collection<Statement> statements) {
+    private List<Quad> toQuads(Collection<Statement> statements) {
         return statements
                 .stream()
-                .map(s -> new Quad(Quad.defaultGraphNodeGenerated, s.asTriple()))
+                .map(s -> new Quad(graph, s.asTriple()))
                 .collect(toList());
     }
 
