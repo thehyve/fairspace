@@ -8,7 +8,6 @@ import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
-import io.fairspace.saturn.services.vocabulary.VocabularyApp;
 import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
@@ -22,6 +21,8 @@ import java.io.IOException;
 
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
 public class App {
@@ -43,9 +44,10 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
-                        new MetadataApp(rdf),
+                        new MetadataApp("/api/meta", rdf, defaultGraphIRI),
+                        new MetadataApp("/api/vocabulary", rdf, createURI(config.jena.baseIRI + "vocabulary")),
                         new CollectionsApp(collections),
-                        new VocabularyApp(rdf),
+                        //    new VocabularyApp(rdf),
                         new HealthApp()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet(fs))
                 .port(config.port);

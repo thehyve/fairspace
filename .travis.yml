@@ -64,13 +64,9 @@ jobs:
       - 'if [[ "$SHOULD_RELEASE" ]] && [[ "$DEPLOY_PLATFORM" = "GCP" ]] ; then ci/gcp/install.sh ; ci/gcp/login.sh ; fi'
       script:
       - .travis/build.sh projects/oidc-auth
-#      - .travis/build.sh projects/callisto
       - .travis/build.sh projects/saturn
-#      - .travis/build.sh projects/ceres
       - .travis/build.sh projects/mercury
-#      - .travis/build.sh projects/neptune
       - .travis/build.sh projects/pluto
-      - .travis/build.sh projects/titan
       - .travis/build.sh projects/jupyterhub-hub
       - travis_wait 40 .travis/build.sh projects/jupyterhub-singleuser
     - stage: build

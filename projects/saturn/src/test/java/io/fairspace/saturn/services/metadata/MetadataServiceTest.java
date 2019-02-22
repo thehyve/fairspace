@@ -23,10 +23,12 @@ import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.*;
 
 public class MetadataServiceTest {
+
     private Dataset ds;
     private MetadataService api;
 
     private static final String baseURI = "http://example.com/";
+    public static final String GRAPH = baseURI + "graph";
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
     private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
@@ -44,7 +46,7 @@ public class MetadataServiceTest {
         setWorkspaceURI(baseURI);
         ds = createTxnMem();
         initVocabulary(ds.asDatasetGraph(), createURI(baseURI + "vocabulary"));
-        api = new MetadataService(new RDFConnectionLocal(ds));
+        api = new MetadataService(new RDFConnectionLocal(ds), createURI(GRAPH));
 
     }
 
@@ -52,7 +54,7 @@ public class MetadataServiceTest {
     public void get() {
         assertEquals(0, api.get(null, null, null, false).size());
 
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         Model m1 = api.get(null, null, null, false);
         assertEquals(2, m1.size());
@@ -80,7 +82,7 @@ public class MetadataServiceTest {
     public void getWithLabels() {
         assertEquals(0, api.get(null, null, null, true).size());
 
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2).add(LBL_STMT1).add(LBL_STMT2));
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2).add(LBL_STMT1).add(LBL_STMT2));
 
         Model m1 = api.get(null, null, null, true);
         assertEquals(4, m1.size());
@@ -96,16 +98,15 @@ public class MetadataServiceTest {
         assertTrue(m2.contains(LBL_STMT2));
 
         Model m3 = api.get(null, P1.getURI(), null, true);
-        assertEquals(4, m3.size());
+        assertEquals(3, m3.size());
         assertTrue(m3.contains(STMT1));
         assertTrue(m3.contains(STMT2));
-        assertTrue(m2.contains(LBL_STMT1));
         assertTrue(m2.contains(LBL_STMT2));
 
-        Model m4 = api.get(null, null, S3.getURI(), true);
+        Model m4 = api.get(null, null, S2.getURI(), true);
         assertEquals(2, m4.size());
-        assertTrue(m4.contains(STMT2));
-        assertFalse(m4.contains(LBL_STMT1));;
+        assertTrue(m4.contains(STMT1));
+        assertTrue(m4.contains(LBL_STMT2));
 
         Model m5 = api.get(S3.getURI(), null, null, true);
         assertTrue(m5.isEmpty());
@@ -123,47 +124,47 @@ public class MetadataServiceTest {
 
     @Test
     public void delete() {
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         api.delete(S1.getURI(), null, null);
 
-        assertFalse(ds.getDefaultModel().contains(STMT1));
-        assertTrue(ds.getDefaultModel().contains(STMT2));
+        assertFalse(ds.getNamedModel(GRAPH).contains(STMT1));
+        assertTrue(ds.getNamedModel(GRAPH).contains(STMT2));
 
         api.delete(null, P1.getURI(), null);
 
-        assertTrue(ds.getDefaultModel().isEmpty());
+        assertTrue(ds.getNamedModel(GRAPH).isEmpty());
     }
 
     @Test
     public void deleteModel() {
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         api.delete(createDefaultModel().add(STMT1));
 
-        assertFalse(ds.getDefaultModel().contains(STMT1));
-        assertTrue(ds.getDefaultModel().contains(STMT2));
+        assertFalse(ds.getNamedModel(GRAPH).contains(STMT1));
+        assertTrue(ds.getNamedModel(GRAPH).contains(STMT2));
     }
 
     @Test
     public void patch() {
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         Statement newStmt1 = createStatement(S1, P1, S3);
         Statement newStmt2 = createStatement(S2, P1, S1);
         Statement newStmt3 = createStatement(S1, P2, S3);
 
         api.patch(createDefaultModel().add(newStmt1).add(newStmt2).add(newStmt3));
-        assertTrue(ds.getDefaultModel().contains(newStmt1));
-        assertTrue(ds.getDefaultModel().contains(newStmt2));
-        assertTrue(ds.getDefaultModel().contains(newStmt3));
-        assertFalse(ds.getDefaultModel().contains(STMT1));
-        assertFalse(ds.getDefaultModel().contains(STMT2));
+        assertTrue(ds.getNamedModel(GRAPH).contains(newStmt1));
+        assertTrue(ds.getNamedModel(GRAPH).contains(newStmt2));
+        assertTrue(ds.getNamedModel(GRAPH).contains(newStmt3));
+        assertFalse(ds.getNamedModel(GRAPH).contains(STMT1));
+        assertFalse(ds.getNamedModel(GRAPH).contains(STMT2));
     }
 
     @Test
     public void getByType() {
-        executeWrite(ds, () -> ds.getDefaultModel()
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH)
                 .add(S1, RDF.type, createResource("http://fairspace.io/ontology#PersonConsent"))
                 .add(LBL_STMT1)
                 .add(S2, RDF.type, createResource("http://fairspace.io/ontology#ResearchProject"))
@@ -187,22 +188,5 @@ public class MetadataServiceTest {
 
         var m4 = api.getByType(FOAF.Person.toString());
         assertTrue(m4.isEmpty());
-    }
-
-    @Test
-    public void createPatchQuery() {
-        String query = MetadataService.createPatchQuery(asList(STMT1, STMT2));
-        assertEquals("DELETE WHERE \n" +
-                "{\n" +
-                "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> ?o .\n" +
-                "} ;\n" +
-                "DELETE WHERE \n" +
-                "{\n" +
-                "  <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P1> ?o .\n" +
-                "} ;\n" +
-                "INSERT DATA {\n" +
-                "  <http://fairspace.io/iri/S1> <http://fairspace.io/ontology/P1> <http://fairspace.io/iri/S2> .\n" +
-                "  <http://fairspace.io/iri/S2> <http://fairspace.io/ontology/P1> <http://fairspace.io/iri/S3> .\n" +
-                "}\n", query);
     }
 }

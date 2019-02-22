@@ -45,21 +45,20 @@ for the whole cluster or by providing the credentials manually
 * https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/. 
   Provide the secret name to helm with the `fairspaceImagePullSecret` variable. 
 
-The chart is configured by default to run on a RBAC enabled cluster. If you don't have RBAC enabled
-set the variable `rabbitmq.rbacEnabled` to `false`. 
+The chart is configured by default to run on a RBAC enabled cluster. 
 
 Installing the chart can be done with the following command: 
 
 ```bash
-helm install fairspace/hyperspace -n hyperspace -f hyperspace.yaml [ --set rabbitmq.rbacEnabled=false ] [ --set fairspaceImagePullSecret=... ]
+helm install fairspace/hyperspace -n hyperspace -f hyperspace.yaml [ --set fairspaceImagePullSecret=... ]
 ```
 
 This will install:
 * Keycloak exposed on port 5100
 * Rabbitmq exposed on port 5672 (amqp) and 15672 (management)
 
-#### Setup a workspace in keycloak and rabbitmq
-After setting up hyperspace on minikube, keycloak and rabbitmq have to be configured. 
+#### Setup a workspace in keycloak
+After setting up hyperspace on minikube, keycloak has to be configured. 
 There are scripts to do so. See `/charts/workspace/templates/config/*` for the settings.
 
 ## Starting services locally
@@ -73,23 +72,7 @@ You can run pluto as a spring boot application from you IDE with the following p
 * noAuth (optionally, if you want to disable authentication)
 
 ### Saturn
-You can run ceres as a Java application from you IDE by running the main class `io.fairspace.saturn.App`
-
-### Ceres
-You can run ceres as a spring boot application from you IDE with the following profiles:
-* local
-* noAuth (optionally, if you want to disable authentication)
-
-### Neptune
-You can run neptune as a spring boot application from you IDE with the following profiles:
-* local
-* noAuth (optionally, if you want to disable authentication)
-
-### Titan
-You can run titan locally using the `local-config.js` configuration parameters. Run the following command
-```bash
-PORT=5110 CONFIG_FILE=../local-development/local-config.js npm start
-```
+You can run Saturn as a Java application from you IDE by running the main class `io.fairspace.saturn.App`
 
 ### Mercury
 You can run mercury locally using `yarn start`.
