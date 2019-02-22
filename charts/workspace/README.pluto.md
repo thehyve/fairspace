@@ -18,7 +18,6 @@ keycloak:
 
 backends:
   mercury: http://mercury
-  neptune: http://neptune
 ```
 
 Now install pluto with the following command:
