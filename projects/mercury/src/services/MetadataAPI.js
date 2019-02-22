@@ -1,6 +1,5 @@
 import * as jsonld from 'jsonld/dist/jsonld';
 import Config from "./Config/Config";
-import vocabulary from './vocabulary.json';
 import failOnHttpError from "../utils/httpUtils";
 import Vocabulary from "./Vocabulary";
 
@@ -10,12 +9,6 @@ class MetadataAPI {
         headers: new Headers({Accept: 'application/ld+json'}),
         credentials: 'same-origin'
     };
-
-    constructor() {
-        // Initialize the vocabulary
-        this.vocabularyPromise = jsonld.expand(vocabulary)
-            .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
-    }
 
     get(params) {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
@@ -55,7 +48,12 @@ class MetadataAPI {
     }
 
     getVocabulary() {
-        return this.vocabularyPromise;
+        return Config.waitFor()
+            .then(() => fetch(Config.get().urls.metadata.vocabulary, MetadataAPI.getParams))
+            .then(failOnHttpError("Failure when retrieving the vocabulary"))
+            .then(response => response.json())
+            .then(jsonld.expand)
+            .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
     }
 
     /**

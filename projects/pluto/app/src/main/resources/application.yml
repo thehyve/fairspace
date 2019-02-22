@@ -66,6 +66,9 @@ zuul:
     metadata:
       path: /api/metadata/**
       url: http://saturn/api/meta/
+    vocabulary:
+      path: /api/vocabulary/**
+      url: http://saturn/api/vocabulary/
     collections:
       path: /api/collections/**
       url: http://saturn/api/collections/

@@ -9,7 +9,8 @@
     "files": "/webdav",
     "metadata": {
       "statements": "/api/metadata/",
-      "entities": "/api/metadata/entities/"
+      "entities": "/api/metadata/entities/",
+      "vocabulary": "/api/vocabulary/"
     },
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"
