@@ -2,7 +2,9 @@ import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
 import * as actionTypes from "../../actions/actionTypes";
 
-export const metadataCreateReducer = (state = {data: []}, action) => {
+const defaultState = {data: ['']};
+
+export const metadataCreateReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.CREATE_METADATA_ENTITY_FULFILLED: {
             const metadata = {'@id': action.meta.subject, '@type': [action.meta.type]};

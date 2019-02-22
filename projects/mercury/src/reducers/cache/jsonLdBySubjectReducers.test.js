@@ -2,6 +2,12 @@ import reducer from "./jsonLdBySubjectReducers";
 import {FETCH_METADATA, UPDATE_METADATA} from "../../actions/actionTypes";
 
 describe('metadata retrieval', () => {
+    it('should return the same state unchanged if action type is unknown by reducer', () => {
+        const state = {'say what?': 'you can not touch this'};
+        expect(reducer(state, {
+            type: 'ACTION_THAT_DOES_NOT_EXIST'
+        })).toEqual({'say what?': 'you can not touch this'});
+    });
     it('should store pending state per subject', () => {
         const previousState = {'previous-subject': 'test'};
         const action = {
