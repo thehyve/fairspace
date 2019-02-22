@@ -6,7 +6,6 @@ export const FETCH_USERS                            = 'FETCH_USERS';
 export const FETCH_AUTHORIZATIONS                   = 'FETCH_AUTHORIZATIONS';
 
 // Clipboard
-export const CLIPBOARD_CLEAR                        = 'CLIPBOARD_CLEAR';
 export const CLIPBOARD_CUT                          = 'CLIPBOARD_CUT';
 export const CLIPBOARD_COPY                         = 'CLIPBOARD_COPY';
 export const CLIPBOARD_PASTE                        = 'CLIPBOARD_PASTE';
