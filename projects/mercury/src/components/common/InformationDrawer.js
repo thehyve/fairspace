@@ -39,7 +39,7 @@ export class InformationDrawer extends React.Component {
             && (name !== '') && (location !== '')) {
             this.props.updateCollection(this.props.collection.iri, name, description, location)
                 .then(() => {
-                    // TODO: no need to close object, just use the id in the handleDetailsChange
+                    // TODO: no need to clone object, just use the id in the handleDetailsChange
                     const collection = Object.assign(this.props.collection, {name, description});
                     this.handleDetailsChange(collection);
                 })
