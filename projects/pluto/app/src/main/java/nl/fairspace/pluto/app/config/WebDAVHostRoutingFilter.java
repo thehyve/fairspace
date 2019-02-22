@@ -13,6 +13,7 @@ import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFil
 import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Stream;
 
 /**
  * Forwards request body regardless of HTTP method
@@ -30,7 +31,9 @@ public class WebDAVHostRoutingFilter extends SimpleHostRoutingFilter {
     protected HttpRequest buildHttpRequest(String verb, String uri, InputStreamEntity entity, MultiValueMap<String, String> headers, MultiValueMap<String, String> params, HttpServletRequest request) {
         var req = super.buildHttpRequest(verb, uri, entity, headers, params, request);
 
-        if (!(req instanceof HttpEntityEnclosingRequestBase)) {
+        if (!(req instanceof HttpEntityEnclosingRequestBase)
+                && Stream.of(ExtendedHttpMethod.values()).anyMatch(method ->
+                method.name().equalsIgnoreCase(verb) && method.isWebDAVSpecific())) {
             var entityRequest = new BasicHttpEntityEnclosingRequest(verb, req.getRequestLine().getUri());
             entityRequest.setEntity(entity);
             entityRequest.setHeaders(req.getAllHeaders());

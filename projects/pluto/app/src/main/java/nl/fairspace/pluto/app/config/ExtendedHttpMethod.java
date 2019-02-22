@@ -1,6 +1,15 @@
 package nl.fairspace.pluto.app.config;
 
+import lombok.Getter;
+
 public enum ExtendedHttpMethod {
-    GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE,
-    COPY, LOCK, MKCOL, MOVE, PROPFIND, PROPPATCH, UNLOCK
+    GET(false), HEAD(false), POST(false), PUT(false), PATCH(false), DELETE(false), OPTIONS(false), TRACE(false),
+    COPY(true), LOCK(true), MKCOL(true), MOVE(true), PROPFIND(true), PROPPATCH(true), UNLOCK(true);
+
+    @Getter
+    private final boolean webDAVSpecific;
+
+    ExtendedHttpMethod(boolean webDAVSpecific) {
+        this.webDAVSpecific = webDAVSpecific;
+    }
 }
