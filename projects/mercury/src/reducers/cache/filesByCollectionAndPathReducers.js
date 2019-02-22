@@ -4,7 +4,7 @@ const defaultState = {
     creatingDirectory: false
 };
 
-const invalidateFiles = (state, collectionId, ...paths) => {
+export const invalidateFiles = (state, collectionId, ...paths) => {
     const newPathsState = paths.map(path => ({
         [path]: {
             ...state[collectionId][path],
