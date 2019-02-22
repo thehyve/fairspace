@@ -6,7 +6,7 @@ function failOnHttpError(message) {
                     window.location.href = `/login?redirectUrl=${encodeURI(window.location.href)}`;
                     break;
                 default:
-                    throw Error(`${message} ${response.error}`);
+                    throw Error(`${message} ${response.error || ''}`);
             }
         }
         return response;

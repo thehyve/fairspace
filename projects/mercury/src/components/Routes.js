@@ -8,6 +8,7 @@ import MetadataEntityPage from "./metadata/MetadataEntityPage";
 import MetadataOverviewPage from "./metadata/MetadataOverviewPage";
 import FilesPage from "./file/FilesPage";
 import logout from "../services/logout";
+import SearchPage from './search/SearchPage';
 
 const routes = () => (
     <>
@@ -19,6 +20,7 @@ const routes = () => (
         <Route path="/iri/**" component={MetadataEntityPage} />
         <Route path="/login" render={() => {window.location.href = '/login';}} />
         <Route path="/logout" render={logout} />
+        <Route path="/search" component={SearchPage} />
     </>
 );
 

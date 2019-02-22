@@ -17,6 +17,7 @@
     "jsonld": "^1.2.1",
     "mdi-material-ui": "^5.8.0",
     "prop-types": "^15.6.2",
+    "query-string": "^6.2.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-dropzone": "^8.0.3",

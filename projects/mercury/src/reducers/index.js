@@ -6,6 +6,7 @@ import collectionBrowser from "./collectionBrowserReducers";
 import clipboard from "./clipboardReducers";
 import workspace from './workspaceReducers';
 import ui from "./uiReducers";
+import search from './searchReducers';
 
 export default combineReducers({
     account,
@@ -14,5 +15,6 @@ export default combineReducers({
     collectionBrowser,
     workspace,
     clipboard,
-    ui
+    ui,
+    search
 });

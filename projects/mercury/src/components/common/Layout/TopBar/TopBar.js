@@ -1,10 +1,13 @@
 import React from 'react';
+import {withRouter} from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import {connect} from "react-redux";
+
 import UserMenu from "../UserMenu/UserMenu";
 import logout from "../../../../services/logout";
+import SearchBar from '../../SearchBar';
 
 function TopBar(props) {
     const {classes, workspaceName} = props;
@@ -15,6 +18,7 @@ function TopBar(props) {
                 <Typography variant="h6" color="inherit" noWrap className={classes.flex}>
                     {workspaceName}
                 </Typography>
+                <SearchBar />
                 <UserMenu onLogout={logout} />
             </Toolbar>
         </AppBar>
@@ -28,4 +32,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(TopBar);
+export default withRouter(connect(mapStateToProps)(TopBar));
