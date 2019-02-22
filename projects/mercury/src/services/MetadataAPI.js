@@ -2,6 +2,7 @@ import * as jsonld from 'jsonld/dist/jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
 import Vocabulary from "./Vocabulary";
+import ErrorDialog from "../components/common/ErrorDialog";
 
 class MetadataAPI {
     static getParams = {
@@ -48,16 +49,13 @@ class MetadataAPI {
     }
 
     getVocabulary() {
-        if (!this.vocabularyPromise) {
-            // Initialize the vocabulary
-            this.vocabularyPromise = Config.waitFor()
-                .then(() => fetch(Config.get().urls.metadata.vocabulary, MetadataAPI.getParams))
-                .then(failOnHttpError("Failure when retrieving entities"))
-                .then(response => response.json())
-                .then(jsonld.expand)
-                .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
-        }
-        return this.vocabularyPromise;
+        return Config.waitFor()
+            .then(() => fetch(Config.get().urls.metadata.vocabulary, MetadataAPI.getParams))
+            .then(failOnHttpError("Failure when retrieving the vocabulary"))
+            .then(response => response.json())
+            .then(jsonld.expand)
+            .then(expandedVocabulary => new Vocabulary(expandedVocabulary))
+            .catch(e => ErrorDialog.showError(e, "Error retrieving the vocabulary. Most functions won't work. Try again alter."));
     }
 
     /**
