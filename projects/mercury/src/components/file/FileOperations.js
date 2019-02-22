@@ -56,7 +56,7 @@ function FileOperations(props) {
         return createDirectory(openedCollection, openedPath, name)
             .then(refreshFiles)
             .catch((err) => {
-                if (err.status === 405) {
+                if (err.response.status === 405) {
                     // Directory already exists
                     ErrorDialog.showError(err, "A directory or file with this name already exists. Please choose another name");
                     return false;
