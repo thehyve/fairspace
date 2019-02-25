@@ -67,6 +67,8 @@ export function navigableLink(link) {
         : link;
 }
 
+export const getCollectionAbsolutePath = (col) => (col && col.location ? `/collections/${col.location}` : '');
+
 /**
  * Returns a relative navigable link, excluding the base url
  * @param link
