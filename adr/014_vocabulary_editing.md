@@ -11,11 +11,16 @@
     vocabulary with the metadata itself. 
     
     Ensuring consistency of the vocabulary is a responsibility for the backend application. For that reason, it makes
-    sense to expose a fine-grained API with specific vocabulary methods, such as adding a class, modifying a property etc.
+    sense to expose a fine-grained API with specific vocabulary methods, such as adding a class, modifying a property etc. 
+    instead of only an endpoint to change the full vocabulary.
     
-    The backend must also make sure that the metadata and the vocabulary are consistent. For example, if a class is removed
-    from the vocabulary, there should not be any metadata entities with that class anymore. The other way around is also true.
-    If the user tries to add a metadata entity with an unknown class, it should be prohibited. 
+    The backend must also make sure that the metadata and the vocabulary are consistent. For example, if the user tries to 
+    add a metadata entity with an unknown class or where the datatype is invalid, it should be prohibited.
+    
+    When the vocabulary is being updated, the system will verify that any property (data property or object property) that is 
+    being updated, is not used. If a property is already being used, then any updates to that property will be prohibited for
+    the sake of simplicity. This avoids more complicated checks whether an update would be consistent with existing metadata,
+    that would have severe consequences on performance.  
 
 * **Implementation**: The implementation of the consistency checks is not straightforward. One possible implementation would use
     [RDFS](https://jena.apache.org/documentation/inference/#rdfs) or [OWL](https://jena.apache.org/documentation/inference/#owl) 
@@ -26,22 +31,27 @@
     
     Another approach would be to implement consistency checks ourselves. This would be feasible, as our vocabulary only has a 
     limited set of functionality. The main thing to check for consistency is the domain and range of each property, which is not
-    very complicated. 
+    very complicated.
+
+    Yet another way would be to use the W3C standard [SHACL](https://www.w3.org/TR/shacl/). It provides a way to specify 
+    constraints on an RDF model. Using this standard we can specify the constraints we need on our vocabulary. There is 
+    a library that connects [SHACL validation with Apache Jena](https://github.com/TopQuadrant/shacl).
+    RDF4J also seems to have [built-in support for SHACL validation](https://github.com/eclipse/rdf4j/issues/743). 
     
-    Either way, performing the consistency checks will be a burden for performance and complexity of the system    
+    Either way, performing the consistency checks will be a burden for performance and complexity of the system. However, using
+    SHACL seems to be a straight-forward and standards-compliant way of performing the validation.     
 
 * **Decision**: 
   * The vocabulary is stored in a separate graph in the metadata database.
-  * The vocabulari API provides fine-grained APIs for modifying the vocabulary
+  * The vocabulary is structured based on the [SHACL](https://www.w3.org/TR/shacl/) w3c standard.
+  * The vocabulary API provides fine-grained APIs for modifying the vocabulary
   * The vocabulary API ensures internal consistency of the vocabulary
   * The vocabulary API ensures consistency between the data and the vocabulary by prohibiting any vocabulary changes 
-    that conflict with existing metadata.
+    on properties that are used in the current metadata.
   * The metadata API ensures consistency between the data and the vocabulary by prohibiting any metadata changes changes 
-    that conflict with the vocabulary.
-  * Consistency checks are implemented manually by verifying the domain and range of each property involved in a metadata update.
+    that conflict with the vocabulary, by leveraging existing SHACL validation libraries.
 
 * **Consequences**: 
-  * Modifying the vocabulary on a running instance would require API calls, instead of just deploying a new version
-  * Other parts of the system must be aware of the fact that the vocabulary can change.
+  * Other parts of the system (e.g. metadata api or frontend) must be aware of the fact that the vocabulary can change.
   * The metadata is restricted to the information model described in the vocabulary 
   * The performance will be affected by doing consistency checks for every write to the metadata model or the vocabulary.
