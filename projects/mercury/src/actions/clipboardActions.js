@@ -6,9 +6,6 @@ export const clear = () => ({
     type: actionTypes.CLIPBOARD_CLEAR
 });
 
-const extractBasename = filename => (filename.indexOf('/') > -1
-    ? filename.substring(filename.lastIndexOf('/') + 1) : filename);
-
 const canPaste = clipboard => clipboard.type && clipboard.filenames.length > 0;
 
 const doPaste = (clipboard, collection, destinationDir) => {
@@ -34,13 +31,13 @@ const pasteAction = (clipboard, collection, destinationDir) => ({
 export const cut = (sourcedir, filenames) => ({
     type: actionTypes.CLIPBOARD_CUT,
     sourcedir,
-    filenames: filenames.map(extractBasename)
+    filenames
 });
 
 export const copy = (sourcedir, filenames) => ({
     type: actionTypes.CLIPBOARD_COPY,
     sourcedir,
-    filenames: filenames.map(extractBasename)
+    filenames
 });
 
 export const paste = (collection, destinationDir) => (dispatch, getState) => {

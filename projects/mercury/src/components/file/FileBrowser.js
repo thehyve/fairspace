@@ -26,9 +26,9 @@ class FileBrowser extends React.Component {
 
     handlePathDoubleClick = (path) => {
         if (path.type === 'directory') {
-            this.openDir(path.basename);
+            this.openDir(path.filename);
         } else {
-            this.downloadFile(path.basename);
+            this.downloadFile(path.filename);
         }
     }
 
@@ -37,7 +37,7 @@ class FileBrowser extends React.Component {
             deleteFile, fetchFilesIfNeeded, openedCollection, openedPath
         } = this.props;
 
-        return deleteFile(openedCollection, openedPath, path.basename)
+        return deleteFile(openedCollection, openedPath, path.filename)
             .then(() => fetchFilesIfNeeded(openedCollection, openedPath))
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
@@ -58,15 +58,12 @@ class FileBrowser extends React.Component {
     }
 
     openDir(path) {
-        const basePath = this.props.openedPath || '';
-        const separator = basePath.endsWith('/') ? '' : '/';
-        const fullPath = `/collections/${this.props.openedCollection.location}${basePath}${separator}${path}`;
-        this.props.history.push(fullPath);
-        this.props.openPath(`/${this.props.openedCollection.location}${basePath}${separator}${path}`);
+        this.props.history.push(`/collections/${path}`);
+        this.props.openPath(path);
     }
 
     downloadFile(path) {
-        FileAPI.download(joinPaths(this.props.openedCollection.location, this.props.openedPath || '', path));
+        FileAPI.download(path);
     }
 
     render() {
