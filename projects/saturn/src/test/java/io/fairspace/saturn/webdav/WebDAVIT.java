@@ -145,7 +145,7 @@ public class WebDAVIT {
         req.setRequestURL("http://localhost/webdav");
         milton.service(req, res);
 
-        assertEquals(400, res.getStatus());
+        assertEquals(403, res.getStatus());
     }
 
     @Test

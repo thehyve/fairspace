@@ -22,6 +22,10 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
+        if (normalizePath(path).equals(normalizePath(pathPrefix))) {
+            return getResource(fs, "");
+        }
+
         if (!path.startsWith(pathPrefix)) {
             throw new BadRequestException("Invalid resource path: " + path);
         }
