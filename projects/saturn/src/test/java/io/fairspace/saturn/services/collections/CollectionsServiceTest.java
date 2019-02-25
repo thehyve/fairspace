@@ -1,8 +1,10 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
+import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,19 +19,21 @@ import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
 public class CollectionsServiceTest {
+    private RDFConnection rdf;
+    private CollectionsService collections;
+    private VirtualFileSystem files;
+
     @Before
     public void before() {
         setWorkspaceURI("http://example.com/iri/");
+        rdf = connect(createTxnMem());
+        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
+        collections = new CollectionsService(rdf, userInfoSupplier);
+        files = new ManagedFileSystem(rdf, new MemoryBlobStore(), userInfoSupplier, collections);
     }
 
     @Test
     public void basicFunctionality() throws IOException, InterruptedException {
-        var rdf = connect(createTxnMem());
-        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
-        var collections = new CollectionsService(rdf, userInfoSupplier);
-
-        var files = new ManagedFileSystem(rdf, new MemoryBlobStore(), userInfoSupplier, collections);
-
         assertTrue(collections.list().isEmpty());
 
         var c1 = new Collection();
@@ -48,15 +52,13 @@ public class CollectionsServiceTest {
         assertNotNull(created1.getDateCreated());
         assertEquals(created1.getDateCreated(), created1.getDateModified());
 
-        assertNotNull(collections.getByDirectoryName("dir1"));
-        assertNull(collections.getByDirectoryName("dir2"));
+        assertNotNull(collections.getByLocation("dir1"));
+        assertNull(collections.getByLocation("dir2"));
 
         assertEquals(1, collections.list().size());
         assertTrue(collections.list().contains(created1));
 
         assertEquals(created1, collections.get(created1.getIri()));
-
-        assertNull("Collection with same directory name cannot be created", collections.create(c1));
 
         files.mkdir("dir1/subdir");
         files.create("dir1/subdir/file.txt", new ByteArrayInputStream(new byte[10]));
@@ -95,5 +97,64 @@ public class CollectionsServiceTest {
 
         collections.delete(created2.getIri());
         assertEquals(1, collections.list().size());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void standardCharactersInLocationAreAllowed() {
+        var c1 = new Collection();
+        c1.setName("Az_1-2");
+        c1.setLocation("dir?");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+
+        assertEquals(c1.getLocation(), collections.create(c1).getLocation());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nonStandardCharactersInLocationAreNotAllowed() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir?");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+
+        collections.create(c1);
+    }
+
+    @Test(expected = LocationAlreadyExistsException.class)
+    public void checksForLocationsUniquenessOnCreate() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir1");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+
+        collections.create(c1);
+        collections.create(c1);
+    }
+
+    @Test(expected = LocationAlreadyExistsException.class)
+    public void checksForLocationsUniquenessOnUpdate() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir1");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+
+        c1 = collections.create(c1);
+
+        var c2 = new Collection();
+        c2.setName("c2");
+        c2.setLocation("dir2");
+        c2.setDescription("descr");
+        c2.setType("LOCAL");
+
+        collections.create(c2);
+
+        var patch = new Collection();
+        patch.setIri(c1.getIri());
+        patch.setLocation(c2.getLocation());
+
+        collections.update(patch);
     }
 }
