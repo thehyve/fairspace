@@ -24,7 +24,3 @@ export const deselectPath = path => ({
     type: actionTypes.DESELECT_PATH,
     path
 });
-
-export const closePath = () => ({
-    type: actionTypes.CLOSE_PATH,
-});

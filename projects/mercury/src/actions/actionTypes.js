@@ -9,7 +9,7 @@ export const FETCH_AUTHORIZATIONS                   = 'FETCH_AUTHORIZATIONS';
 export const CLIPBOARD_CUT                          = 'CLIPBOARD_CUT';
 export const CLIPBOARD_COPY                         = 'CLIPBOARD_COPY';
 export const CLIPBOARD_PASTE                        = 'CLIPBOARD_PASTE';
-export const CLIPBOARD_PASTE_PENDING                = 'CLIPBOARD_PASTE_PENDING  ';
+export const CLIPBOARD_PASTE_PENDING                = 'CLIPBOARD_PASTE_PENDING';
 export const CLIPBOARD_PASTE_FULFILLED              = 'CLIPBOARD_PASTE_FULFILLED';
 export const CLIPBOARD_PASTE_REJECTED               = 'CLIPBOARD_PASTE_REJECTED';
 
@@ -17,7 +17,6 @@ export const CLIPBOARD_PASTE_REJECTED               = 'CLIPBOARD_PASTE_REJECTED'
 export const OPEN_COLLECTION                        = 'OPEN_COLLECTION';
 export const SELECT_COLLECTION                      = 'SELECT_COLLECTION';
 export const OPEN_PATH                              = 'OPEN_PATH';
-export const CLOSE_PATH                             = 'CLOSE_PATH';
 export const SELECT_PATH                            = 'SELECT_PATH';
 export const DESELECT_PATH                          = 'DESELECT_PATH';
 

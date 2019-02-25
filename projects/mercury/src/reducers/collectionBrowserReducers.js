@@ -9,9 +9,9 @@ const defaultState = {
     deletingCollection: false
 };
 
-const deselectPath = (state, path) => ({
+export const deselectPath = (state, path) => ({
     ...state,
-    selectedPaths: (state.selectedPaths || []).filter(el => el !== path)
+    selectedPaths: state.selectedPaths.filter(el => el !== path)
 });
 
 const collectionBrowser = (state = defaultState, action) => {
@@ -19,12 +19,14 @@ const collectionBrowser = (state = defaultState, action) => {
         case actionTypes.SELECT_COLLECTION:
             return {
                 ...state,
-                selectedCollectionIRI: action.collectionId
+                selectedCollectionIRI: action.collectionId,
+                selectedPaths: [],
+                openedPath: null
             };
         case actionTypes.SELECT_PATH:
             return {
                 ...state,
-                selectedPaths: (state.selectedPaths || []).concat(action.path)
+                selectedPaths: [...state.selectedPaths, action.path]
             };
         case actionTypes.DESELECT_PATH:
             return deselectPath(state, action.path);
@@ -63,12 +65,6 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 openedPath: action.path,
-                selectedPaths: []
-            };
-        case actionTypes.CLOSE_PATH:
-            return {
-                ...state,
-                openedPath: null,
                 selectedPaths: []
             };
         default:

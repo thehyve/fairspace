@@ -22,7 +22,6 @@ class CollectionBrowser extends React.Component {
 
     componentDidMount() {
         this.props.fetchCollectionsIfNeeded();
-        this.props.closePath();
     }
 
     handleAddCollectionClick = () => {
