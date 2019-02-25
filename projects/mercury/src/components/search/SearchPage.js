@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 
 import SearchResults from './SearchResults';
 import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
-import {getCollectionAbsolutePath} from '../../utils/metadataUtils';
+import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import * as searchActions from '../../actions/searchActions';
 import {ErrorMessage} from "../common";
 

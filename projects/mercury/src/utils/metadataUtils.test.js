@@ -1,4 +1,4 @@
-import {getLabel, navigableLink, getCollectionAbsolutePath} from "./metadataUtils";
+import {getLabel, navigableLink} from "./metadataUtils";
 import {LABEL_URI} from "../constants";
 
 describe('Metadata Utils', () => {
@@ -57,20 +57,5 @@ describe('Metadata Utils', () => {
         it('should not change links outside the metadata', () => {
             expect(navigableLink('http://localhost/collections/300')).toEqual('http://localhost/collections/300');
         });
-    });
-
-    it('should return valid collection absolute path', () => {
-        const collection = {
-            location: "Jan_Smit_s_collection-500",
-            name: "Jan Smit's collection 1",
-            description: "Jan Smit's collection, beyond the horizon 01",
-            iri: "https://workspace.ci.test.fairdev.app/iri/500",
-            access: "Manage",
-            type: "LOCAL_STORAGE",
-            dateCreated: "2018-09-19T15:48:23.016165Z",
-            creator: "user4-id"
-        };
-
-        expect(getCollectionAbsolutePath(collection)).toBe('/collections/Jan_Smit_s_collection-500');
     });
 });
