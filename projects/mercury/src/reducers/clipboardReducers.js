@@ -33,6 +33,7 @@ const clipboard = (state = defaultState, action) => {
         case actionTypes.CLIPBOARD_PASTE_FULFILLED:
             return {
                 ...state,
+                error: false,
                 pending: false,
                 type: null,
                 sourcedir: null,
