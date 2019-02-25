@@ -44,6 +44,7 @@ public class MiltonWebDAVServlet extends HttpServlet {
             setResourceFactory(new VfsBackedMiltonResourceFactory(fs));
             setMultiNamespaceCustomPropertySourceEnabled(true);
             setAuthenticationHandlers(singletonList(new SaturnAuthenticationHandler()));
+            setValueWriters(new NullSafeValueWriters());
         }}.buildHttpManager();
     }
 }

@@ -60,7 +60,7 @@ public class WebDAVIT {
     }
 
     @Test
-    public void testPropFindForColection() throws ServletException, IOException {
+    public void testPropFindForCollection() throws ServletException, IOException {
         req.setMethod("PROPFIND");
         req.setRequestURL("http://localhost/webdav/coll1");
         milton.service(req, res);
@@ -226,5 +226,16 @@ public class WebDAVIT {
         assertTrue(fs.exists("coll1/dir1"));
         assertTrue(fs.exists("coll1/dir2"));
     }
+
+    @Test
+    public void testPropFindReturnsNoEmptyProps() throws ServletException, IOException {
+        req.setMethod("PROPFIND");
+        req.setRequestURL("http://localhost/webdav/coll1");
+        milton.service(req, res);
+        assertEquals(207, res.getStatus());
+        assertFalse(res.getOutputStreamContent().contains("getetag"));
+        assertFalse(res.getOutputStreamContent().contains("getcontentlength"));
+    }
+
 
 }
