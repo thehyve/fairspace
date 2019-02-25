@@ -66,8 +66,7 @@ class FileBrowser extends React.Component {
     }
 
     downloadFile(path) {
-        const fileAPI = new FileAPI(this.props.openedCollection.location);
-        fileAPI.download(joinPaths(this.props.openedPath || '', path));
+        FileAPI.download(joinPaths(this.props.openedCollection.location, this.props.openedPath || '', path));
     }
 
     render() {
