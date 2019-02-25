@@ -6,18 +6,22 @@ import {TYPE_URI} from "../constants";
 const defaultState = {
     creatingMetadataEntity: false
 };
+
 const metadataCombinationReducer = promiseReducerFactory(actionTypes.COMBINE_METADATA, defaultState, action => action.meta.subject);
+
 const metadataUpdateReducer = (state = defaultState, action) => {
     switch (action.type) {
-        case actionTypes.UPDATE_METADATA_FULFILLED:
+        case actionTypes.UPDATE_METADATA_FULFILLED: {
+            const {meta: {subject, predicate, values}} = action;
             return {
                 ...state,
-                [action.meta.subject]: {
-                    ...state[action.meta.subject],
-                    data: state[action.meta.subject].data.map(el => ((el.key === action.meta.predicate) ? {...el, values: action.meta.values} : el)),
+                [subject]: {
+                    ...state[subject],
+                    data: state[subject].data.map(el => ((el.key === predicate) ? {...el, values} : el)),
                     invalidated: true
                 }
             };
+        }
         case actionTypes.CREATE_METADATA_ENTITY_PENDING:
             return {
                 ...state,
