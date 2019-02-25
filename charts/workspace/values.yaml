@@ -138,6 +138,7 @@ pluto:
   backends:
     ui:
     metadata:
+    vocabulary:
     storage:
     collections:
 
