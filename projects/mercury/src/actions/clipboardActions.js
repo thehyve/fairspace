@@ -12,12 +12,10 @@ const extractBasename = filename => (filename.indexOf('/') > -1
 const canPaste = clipboard => clipboard.type && clipboard.filenames.length > 0;
 
 const doPaste = (clipboard, collection, destinationDir) => {
-    const fileAPI = new FileAPI(collection.location);
-
     if (clipboard.type === CUT) {
-        return fileAPI.movePaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
+        return FileAPI.movePaths(collection.location + clipboard.sourcedir, clipboard.filenames, collection.location + destinationDir);
     } if (clipboard.type === COPY) {
-        return fileAPI.copyPaths(clipboard.sourcedir, clipboard.filenames, destinationDir);
+        return FileAPI.copyPaths(collection.location + clipboard.sourcedir, clipboard.filenames, collection.location + destinationDir);
     }
 
     return Promise.reject(Error("Invalid clipboard type"));
