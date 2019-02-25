@@ -49,7 +49,7 @@ public class App {
                         new CollectionsApp(collections),
                         //    new VocabularyApp(rdf),
                         new HealthApp()))
-                .addServlet("/webdav/*", new MiltonWebDAVServlet(fs))
+                .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
                 .port(config.port);
 
         var auth = config.auth;

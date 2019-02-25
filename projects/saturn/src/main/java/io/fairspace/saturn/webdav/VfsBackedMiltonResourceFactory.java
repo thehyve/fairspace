@@ -12,15 +12,20 @@ import java.io.IOException;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 
 public class VfsBackedMiltonResourceFactory implements ResourceFactory {
+    private final String pathPrefix;
     private final VirtualFileSystem fs;
 
-    public VfsBackedMiltonResourceFactory(VirtualFileSystem fs) {
+    public VfsBackedMiltonResourceFactory(String pathPrefix, VirtualFileSystem fs) {
+        this.pathPrefix = pathPrefix;
         this.fs = fs;
     }
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
-        return getResource(fs, normalizePath(path.substring("/webdav".length())));
+        if (!path.startsWith(pathPrefix)) {
+            throw new BadRequestException("Invalid resource path: " + path);
+        }
+        return getResource(fs, normalizePath(path.substring(pathPrefix.length())));
     }
 
     public static Resource getResource(VirtualFileSystem fs, String path) {

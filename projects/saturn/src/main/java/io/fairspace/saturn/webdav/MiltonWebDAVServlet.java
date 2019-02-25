@@ -18,8 +18,8 @@ import static java.util.Collections.singletonList;
 public class MiltonWebDAVServlet extends HttpServlet {
     private final HttpManager httpManager;
 
-    public MiltonWebDAVServlet(VirtualFileSystem fs) {
-        httpManager = setupHttpManager(fs);
+    public MiltonWebDAVServlet(String pathPrefix, VirtualFileSystem fs) {
+        httpManager = setupHttpManager(pathPrefix, fs);
     }
 
     @Override
@@ -39,9 +39,9 @@ public class MiltonWebDAVServlet extends HttpServlet {
         }
     }
 
-    private static HttpManager setupHttpManager(VirtualFileSystem fs) {
+    private static HttpManager setupHttpManager(String pathPrefix, VirtualFileSystem fs) {
         return new HttpManagerBuilder() {{
-            setResourceFactory(new VfsBackedMiltonResourceFactory(fs));
+            setResourceFactory(new VfsBackedMiltonResourceFactory(pathPrefix, fs));
             setMultiNamespaceCustomPropertySourceEnabled(true);
             setAuthenticationHandlers(singletonList(new SaturnAuthenticationHandler()));
         }}.buildHttpManager();

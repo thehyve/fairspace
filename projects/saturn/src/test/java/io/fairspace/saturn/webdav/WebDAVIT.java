@@ -38,7 +38,7 @@ public class WebDAVIT {
         Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
         var collections = new CollectionsService(rdf, userInfoSupplier);
         fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userInfoSupplier, collections));
-        milton = new MiltonWebDAVServlet(fs);
+        milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();
         coll.setName("My Collection");
         coll.setLocation("coll1");
@@ -145,7 +145,7 @@ public class WebDAVIT {
         req.setRequestURL("http://localhost/webdav");
         milton.service(req, res);
 
-        assertEquals(403, res.getStatus());
+        assertEquals(400, res.getStatus());
     }
 
     @Test
@@ -227,4 +227,15 @@ public class WebDAVIT {
         assertTrue(fs.exists("coll1/dir2"));
     }
 
+    @Test
+    public void testCopyDirectoryToAnInvalidDestination() throws ServletException, IOException {
+        fs.mkdir("coll1/dir1");
+
+        req.setMethod("COPY");
+        req.setRequestURL("http://localhost/webdav/coll1/dir1");
+        req.addHeader("Destination", "http://localhost/vebdaw/coll1/dir2");
+        milton.service(req, res);
+
+        assertEquals(400, res.getStatus());
+    }
 }
