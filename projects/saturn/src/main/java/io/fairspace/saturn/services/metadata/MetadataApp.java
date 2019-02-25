@@ -50,7 +50,6 @@ public class MetadataApp implements SparkApplication {
                 } else {
                     api.delete(req.queryParams("subject"), req.queryParams("predicate"), req.queryParams("object"));
                 }
-                api.put(fromJsonLD(req.body()));
                 return "";
             });
             exception(RiotException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Malformed request body"));
