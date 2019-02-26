@@ -9,14 +9,13 @@ import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import {canWrite} from '../../utils/permissionUtils';
 import FileAPI from "../../services/FileAPI";
-import {joinPaths} from "../../utils/fileUtils";
 
 class FileBrowser extends React.Component {
     handlePathClick = (path) => {
         const {selectPath, deselectPath} = this.props;
         const isPathSelected = this.props.selectedPaths.some(el => el === path.filename);
 
-        // If this pathis already selected, deselect
+        // If this path is already selected, deselect
         if (isPathSelected) {
             deselectPath(path.filename);
         } else {
@@ -34,11 +33,11 @@ class FileBrowser extends React.Component {
 
     handlePathDelete = (path) => {
         const {
-            deleteFile, fetchFilesIfNeeded, openedCollection, openedPath
+            deleteFile, fetchFilesIfNeeded, openedPath
         } = this.props;
 
-        return deleteFile(openedCollection, openedPath, path.filename)
-            .then(() => fetchFilesIfNeeded(openedCollection, openedPath))
+        return deleteFile(path.filename)
+            .then(() => fetchFilesIfNeeded(openedPath))
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
             });
@@ -46,11 +45,11 @@ class FileBrowser extends React.Component {
 
     handlePathRename = (path, newName) => {
         const {
-            renameFile, fetchFilesIfNeeded, openedCollection, openedPath
+            renameFile, fetchFilesIfNeeded, openedPath
         } = this.props;
 
-        return renameFile(openedCollection, openedPath, path.basename, newName)
-            .then(() => fetchFilesIfNeeded(openedCollection, openedPath))
+        return renameFile(openedPath, path.basename, newName)
+            .then(() => fetchFilesIfNeeded(openedPath))
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
                 return false;
@@ -58,7 +57,7 @@ class FileBrowser extends React.Component {
     }
 
     openDir(path) {
-        this.props.history.push(`/collections/${path}`);
+        this.props.history.push(`/collections${path}`);
         this.props.openPath(path);
     }
 

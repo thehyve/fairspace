@@ -1,6 +1,6 @@
 import {createClient} from "webdav";
 import Config from "./Config/Config";
-import {addCounterToFilename, joinPaths} from '../utils/fileUtils';
+import {addCounterToFilename, fileName, joinPaths, parentPath} from '../utils/fileUtils';
 import axios from 'axios';
 
 // Ensure that the window fetch method is used for webdav calls
@@ -123,38 +123,33 @@ class FileAPI {
 
 
     /**
-     * Move one or more files from a sourcedir to a destinationdir
-     * @param sourceDir
-     * @param filenames
+     * Move one or more files to a destinationdir
+     * @param filePaths
      * @param destinationDir
      * @returns {*}
      */
-    movePaths(sourceDir, filenames, destinationDir) {
-        return Promise.all(filenames.map((filename) => {
-            const sourceFile = joinPaths(sourceDir || '', filename);
-            const destinationFile = joinPaths(destinationDir || '', filename);
+    movePaths(filePaths, destinationDir) {
+        return Promise.all(filePaths.map((sourceFile) => {
+            const destinationFile = joinPaths(destinationDir, fileName(sourceFile));
             return this.move(sourceFile, destinationFile);
         }));
     }
 
     /**
-     * Copies one or more files from a sourcedir to a destinationdir
-     * @param sourceDir
-     * @param filenames
+     * Copies one or more files from to a destinationdir
+     * @param filePaths
      * @param destinationDir
      * @returns {*}
      */
-    copyPaths(sourceDir, filenames, destinationDir) {
-        return Promise.all(filenames.map((filename) => {
-            const sourceFile = joinPaths(sourceDir || '', filename);
-            let destinationFilename = filename;
-
+    copyPaths(filePaths, destinationDir) {
+        return Promise.all(filePaths.map((sourceFile) => {
+            let destinationFilename = fileName(sourceFile);
             // Copying files to the current directory involves renaming
-            if (destinationDir === sourceDir) {
+            if (destinationDir === parentPath(sourceFile)) {
                 destinationFilename = addCounterToFilename(destinationFilename);
             }
 
-            const destinationFile = joinPaths(destinationDir || '', destinationFilename);
+            const destinationFile = joinPaths(destinationDir, destinationFilename);
 
             return this.copy(sourceFile, destinationFile);
         }));

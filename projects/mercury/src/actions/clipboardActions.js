@@ -8,43 +8,40 @@ export const clear = () => ({
 
 const canPaste = clipboard => clipboard.type && clipboard.filenames.length > 0;
 
-const doPaste = (clipboard, collection, destinationDir) => {
+const doPaste = (clipboard, destinationDir) => {
     if (clipboard.type === CUT) {
-        return FileAPI.movePaths(collection.location + clipboard.sourcedir, clipboard.filenames, collection.location + destinationDir);
+        return FileAPI.movePaths(clipboard.filenames, destinationDir);
     } if (clipboard.type === COPY) {
-        return FileAPI.copyPaths(collection.location + clipboard.sourcedir, clipboard.filenames, collection.location + destinationDir);
+        return FileAPI.copyPaths(clipboard.filenames, destinationDir);
     }
 
     return Promise.reject(Error("Invalid clipboard type"));
 };
 
-const pasteAction = (clipboard, collection, destinationDir) => ({
+const pasteAction = (clipboard, destinationDir) => ({
     type: actionTypes.CLIPBOARD_PASTE,
-    payload: doPaste(clipboard, collection, destinationDir),
+    payload: doPaste(clipboard, destinationDir),
     meta: {
-        collection,
-        destinationDir,
-        sourceDir: clipboard.sourcedir
+        filenames: clipboard.filenames,
+        destinationDir
     }
 });
 
-export const cut = (sourcedir, filenames) => ({
+export const cut = (filenames) => ({
     type: actionTypes.CLIPBOARD_CUT,
-    sourcedir,
     filenames
 });
 
-export const copy = (sourcedir, filenames) => ({
+export const copy = (filenames) => ({
     type: actionTypes.CLIPBOARD_COPY,
-    sourcedir,
     filenames
 });
 
-export const paste = (collection, destinationDir) => (dispatch, getState) => {
+export const paste = (destinationDir) => (dispatch, getState) => {
     const {clipboard} = getState();
 
     if (canPaste(clipboard)) {
-        return dispatch(pasteAction(clipboard, collection, destinationDir));
+        return dispatch(pasteAction(clipboard, destinationDir));
     }
     return Promise.resolve();
 };
