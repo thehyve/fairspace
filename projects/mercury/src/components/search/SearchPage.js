@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 
 import SearchResults from './SearchResults';
 import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
+import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import * as searchActions from '../../actions/searchActions';
 import {ErrorMessage} from "../common";
 
@@ -32,7 +33,7 @@ export class SearchPage extends React.Component {
     };
 
     handleCollectionOpen = (collection) => {
-        this.props.history.push(`/collections/${collection.id}`);
+        this.props.history.push(getCollectionAbsolutePath(collection));
     }
 
     handleFileOpen = () => {
