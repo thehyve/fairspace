@@ -3,7 +3,7 @@ import jsonLdBySubject from './jsonLdBySubjectReducers';
 import vocabulary from "./vocabularyReducers";
 import entitiesByType from "./entitiesByTypeReducers";
 import collections from "./collectionReducers";
-import filesByCollectionAndPath from "./filesByCollectionAndPathReducers";
+import filesByPath from "./filesByPathReducers";
 import users from "./usersReducers";
 import allEntities from "./allEntitiesReducers";
 import subjectByPath from "./subjectByPathReducers";
@@ -16,7 +16,7 @@ export default combineReducers({
     allEntities,
     vocabulary,
     collections,
-    filesByCollectionAndPath,
+    filesByPath,
     subjectByPath,
     permissionsByCollection
 });
