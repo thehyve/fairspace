@@ -19,15 +19,14 @@ export const invalidateFiles = (state, collectionId, ...paths) => {
 };
 
 const filesByCollectionAndPath = (state = defaultState, action) => {
-    let collectionId;
     switch (action.type) {
-        case actionTypes.FETCH_FILES_PENDING:
-            collectionId = action.meta.collection.iri;
+        case actionTypes.FETCH_FILES_PENDING: {
+            const {meta: {collection: {iri}, path}} = action;
             return {
                 ...state,
-                [collectionId]: {
-                    ...state[collectionId],
-                    [action.meta.path]: {
+                [iri]: {
+                    ...state[iri],
+                    [path]: {
                         pending: true,
                         error: false,
                         invalidated: false,
@@ -35,32 +34,37 @@ const filesByCollectionAndPath = (state = defaultState, action) => {
                     }
                 }
             };
-        case actionTypes.FETCH_FILES_FULFILLED:
-            collectionId = action.meta.collection.iri;
+        }
+        case actionTypes.FETCH_FILES_FULFILLED: {
+            const {meta: {collection: {iri}, path}, payload} = action;
             return {
                 ...state,
-                [collectionId]: {
-                    ...state[collectionId],
-                    [action.meta.path]: {
-                        ...state[collectionId][action.meta.path],
+                [iri]: {
+                    ...state[iri],
+                    [path]: {
+                        error: false,
+                        invalidated: false,
                         pending: false,
-                        data: action.payload
+                        data: payload
                     }
                 }
             };
-        case actionTypes.FETCH_FILES_REJECTED:
-            collectionId = action.meta.collection.iri;
+        }
+        case actionTypes.FETCH_FILES_REJECTED: {
+            const {meta: {collection: {iri}, path}, payload} = action;
             return {
                 ...state,
-                [collectionId]: {
-                    ...state[collectionId],
-                    [action.meta.path]: {
-                        ...state[collectionId][action.meta.path],
+                [iri]: {
+                    ...state[iri],
+                    [path]: {
+                        invalidated: true,
+                        data: [],
                         pending: false,
-                        error: action.payload || true
+                        error: payload || true
                     }
                 }
             };
+        }
         case actionTypes.CREATE_DIRECTORY_PENDING:
             return {
                 ...state,
