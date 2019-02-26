@@ -25,8 +25,8 @@ export function uniqueName(fileName, usedNames) {
 }
 
 export const joinPaths = (...paths) => paths
-    .map(p => (p && p !== '/' ? p : ''))
-    .join('/');
+    .map(p => (p && p !== PATH_SEPARATOR ? p : ''))
+    .join(PATH_SEPARATOR);
 
 export const addCounterToFilename = (fileName) => {
     // Parse the filename
@@ -50,11 +50,12 @@ export const addCounterToFilename = (fileName) => {
 };
 
 export function parentPath(path) {
-    const pos = path.lastIndexOf('/');
+    const pos = path.lastIndexOf('/', path.length - 2);
     return (pos > 1) ? path.substring(0, pos) : '';
 }
 
 export function fileName(path) {
-    const pos = path.lastIndexOf('/');
-    return (pos > 0) ? path.substring(pos + 1) : path;
+    const normalizedPath = path.endsWith('/') ? path.substring(0, path.length - 1) : path;
+    const pos = normalizedPath.lastIndexOf('/');
+    return (pos > 0) ? normalizedPath.substring(pos + 1) : normalizedPath;
 }

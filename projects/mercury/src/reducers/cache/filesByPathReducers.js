@@ -12,7 +12,7 @@ function invalidateFiles(state, ...paths) {
         }
     }));
 
-    return Object.assign(state, ...newPathsState)
+    return Object.assign({}, state, ...newPathsState)
 }
 
 function filesByPath(state = defaultState, action) {
