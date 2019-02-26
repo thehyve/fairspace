@@ -1,5 +1,5 @@
 import Config from "./Config";
-import mockResponse from "../../utils/testUtils";
+import {mockResponse} from "../../utils/testUtils";
 
 const initialConfig = {
     urls: {
@@ -14,7 +14,7 @@ const initialConfig = {
 it('merges existing config with external config', () => {
     Config.setConfig(Object.assign({}, initialConfig, {externalConfigurationFiles: ["test"]}));
 
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify({
+    window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify({
         urls: {
             collections: "/new-collections-api",
             otherConfig: {
@@ -42,7 +42,7 @@ it('merges existing config with external config', () => {
 it('performs no calls without external configuration files', () => {
     Config.setConfig(initialConfig);
 
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify({
+    window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify({
         urls: {
             collections: "overwritten"
         }
