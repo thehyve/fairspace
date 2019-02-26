@@ -1,42 +1,52 @@
 {
   "@id" : "https://workspace.ci.test.fairdev.app/iri/500",
   "@type" : "http://fairspace.io/ontology#Collection",
-  "aboutPerson" : {
-    "@id": "https://workspace.ci.fairway.app/iri/persons/E2E-TEST",
-    "label": "e2e-test person"
-  },
-  "description" : "This is a description.",
-  "externalReference" : [ "http://google.com/", "http://a.b.c/", "http://thehyve.nl/" ],
-  "hasPart" : "https://workspace.ci.fairway.app/iri/files/dcea2c50-fccf-42ec-83bb-cc622d5d9294",
+  "aboutPerson" : "ws:persons/00250f50-326c-43bb-99ec-a4436551fdec",
+  "collectionType" : "LOCAL_FILE",
+  "createdBy" : "4547ffa4-c362-4b34-a297-a225d60cb76b",
+  "dateCreated" : "2019-02-26T16:05:05.065+00:00",
+  "dateModified" : "2019-02-26T16:05:05.065+00:00",
+  "externalReference" : "http://google.com/",
+  "filePath" : "Jan_Smit_s_collection-500",
+  "modifiedBy" : "4547ffa4-c362-4b34-a297-a225d60cb76b",
+  "comment" : "",
   "label" : "John Snow's collection",
-  "creator" : "https://workspace.ci.fairway.app/iri/users/2d6c4187-0199-4a0e-981b-b9dc711644e7",
-  "dateCreated" : "2018-11-20T14:53:28.657Z",
   "@context" : {
-    "dateCreated" : {
-      "@id" : "http://schema.org/dateCreated",
+    "dateModified" : {
+      "@id" : "http://fairspace.io/ontology#dateModified",
       "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "comment" : {
+      "@id" : "http://www.w3.org/2000/01/rdf-schema#comment"
+    },
+    "label" : {
+      "@id" : "http://www.w3.org/2000/01/rdf-schema#label"
+    },
+    "collectionType" : {
+      "@id" : "http://fairspace.io/ontology#collectionType"
+    },
+    "dateCreated" : {
+      "@id" : "http://fairspace.io/ontology#dateCreated",
+      "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "aboutPerson" : {
+      "@id" : "http://fairspace.io/ontology#aboutPerson",
+      "@type" : "@id"
     },
     "externalReference" : {
       "@id" : "http://fairspace.io/ontology#externalReference",
       "@type" : "@id"
     },
-    "creator" : {
-      "@id" : "http://schema.org/creator",
-      "@type" : "@id"
+    "modifiedBy" : {
+      "@id" : "http://fairspace.io/ontology#modifiedBy"
     },
-    "hasPart" : {
-      "@id" : "http://fairspace.io/ontology#hasPart",
-      "@type" : "@id"
+    "createdBy" : {
+      "@id" : "http://fairspace.io/ontology#createdBy"
     },
-    "description" : {
-      "@id" : "http://fairspace.io/ontology#description"
+    "filePath" : {
+      "@id" : "http://fairspace.io/ontology#filePath"
     },
-    "label" : {
-      "@id" : "http://www.w3.org/2000/01/rdf-schema#label"
-    },
-    "aboutPerson" : {
-      "@id" : "http://fairspace.io/ontology#aboutPerson",
-      "@type" : "@id"
-    }
+    "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
+    "ws" : "https://workspace.ci.fairway.app/iri/"
   }
 }
