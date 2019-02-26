@@ -16,10 +16,17 @@ import {canManage} from '../../utils/permissionUtils';
 import ErrorDialog from './ErrorDialog';
 
 export class InformationDrawer extends React.Component {
-    handleDetailsChange = (collection) => {
+    handleDetailsChange = (collection, locationChanged) => {
         const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = this.props;
         invalidateMetadata(collection.iri);
         fetchCombinedMetadataIfNeeded(collection.iri);
+
+        // If the location of a collection has changed, the URI where it
+        // can be found may also change. For that reason we need to redirect
+        // the user there.
+        if (locationChanged && this.props.onCollectionLocationChange) {
+            this.props.onCollectionLocationChange(collection);
+        }
     };
 
     handleCollectionDelete = (collection) => {
@@ -36,10 +43,11 @@ export class InformationDrawer extends React.Component {
     handleUpdateCollection = (name, description, location) => {
         if ((name !== this.props.collection.name || description !== this.props.collection.description || location !== this.props.collection.location)
             && (name !== '') && (location !== '')) {
-            this.props.updateCollection(this.props.collection.iri, name, description, location)
+            return this.props.updateCollection(this.props.collection.iri, name, description, location)
                 .then(() => {
-                    const collection = Object.assign(this.props.collection, {name, description});
-                    this.handleDetailsChange(collection);
+                    const locationChanged = this.props.collection.location !== location;
+                    const collection = Object.assign(this.props.collection, {name, description, location});
+                    this.handleDetailsChange(collection, locationChanged);
                 })
                 .catch(e => ErrorDialog.showError(e, "An error occurred while updating collection metadata"));
         }

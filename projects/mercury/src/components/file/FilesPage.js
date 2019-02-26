@@ -11,8 +11,17 @@ import * as collectionBrowserActions from "../../actions/collectionBrowserAction
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
 import * as consts from '../../constants';
+import {getCollectionAbsolutePath} from "../../utils/collectionUtils";
 
-class FilesPage extends React.Component {
+export class FilesPage extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // Binding the method is needed to use the method as an event handler.
+        // Binding it here is the suggested way of doing in React: https://reactjs.org/docs/handling-events.html
+        this.handleCollectionLocationChange = this.handleCollectionLocationChange.bind(this);
+    }
+
     componentDidMount() {
         const {
             fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath
@@ -66,6 +75,13 @@ class FilesPage extends React.Component {
         return <BreadCrumbs segments={segments} />;
     }
 
+    handleCollectionLocationChange(collection) {
+        const {openedPath} = this.props;
+
+        // If the collection location changes, the URI for the current page should change as well
+        this.props.history.push(`${getCollectionAbsolutePath(collection)}${!openedPath || openedPath === '/' ? '' : openedPath}`);
+    }
+
     render() {
         {
             const {
@@ -93,7 +109,7 @@ class FilesPage extends React.Component {
                             />
                         </Grid>
                         <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                            <InformationDrawer />
+                            <InformationDrawer onCollectionLocationChange={this.handleCollectionLocationChange} />
                         </Grid>
                     </Grid>
                 </>
