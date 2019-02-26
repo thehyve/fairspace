@@ -99,11 +99,11 @@ public class CollectionsServiceTest {
         assertEquals(1, collections.list().size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void standardCharactersInLocationAreAllowed() {
         var c1 = new Collection();
-        c1.setName("Az_1-2");
-        c1.setLocation("dir?");
+        c1.setName("c1");
+        c1.setLocation("Az_1-2");
         c1.setDescription("descr");
         c1.setType("LOCAL");
 
