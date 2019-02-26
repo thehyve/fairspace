@@ -23,7 +23,6 @@ import java.util.Map;
 
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.fairspace.saturn.webdav.VfsBackedMiltonResourceFactory.getResource;
-import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
 import static org.apache.http.entity.ContentType.TEXT_HTML;
 
@@ -35,7 +34,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     // Currently we don't support etags for directories
     @Override
     public String getUniqueId() {
-        return randomUUID().toString(); // Results in a new etag every time
+        return null;
     }
 
 
