@@ -17,7 +17,7 @@ class CollectionEditor extends React.Component {
         name: this.props.name || '',
         description: this.props.description || '',
         type: this.props.type || 'LOCAL_FILE',
-        location: this.props.location || "dir1"
+        location: this.props.location || ''
     };
 
     handleSave = () => {
@@ -81,7 +81,8 @@ class CollectionEditor extends React.Component {
                         autoFocus
                         margin="dense"
                         id="location"
-                        label="Location"
+                        label="Directory name"
+                        helperText="Must be unique and contain only alphanumerical characters, '-' abd '_'"
                         value={this.state.location}
                         name="location"
                         onChange={(event) => this.handleInputChange('location', event.target.value)}

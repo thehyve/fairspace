@@ -13,6 +13,7 @@ import CollectionList from "./CollectionList";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as collectionActions from "../../actions/collectionActions";
 import {findById} from "../../utils/arrayUtils";
+import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import Config from "../../services/Config/Config";
 
 class CollectionBrowser extends React.Component {
@@ -36,7 +37,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionDoubleClick = (collection) => {
-        this.props.history.push(`/collections/${collection.location}`);
+        this.props.history.push(getCollectionAbsolutePath(collection));
     }
 
     handleAddCollection = (name, description, location, type) => {
