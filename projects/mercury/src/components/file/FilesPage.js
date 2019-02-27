@@ -6,13 +6,14 @@ import {connect} from 'react-redux';
 import FileBrowser from "./FileBrowser";
 import {BreadCrumbs} from "../common";
 import InformationDrawer from '../common/InformationDrawer';
-import {splitPathIntoArray} from "../../utils/fileUtils";
+import {getDirectoryFromFullpath, splitPathIntoArray} from "../../utils/fileUtils";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
 import * as consts from '../../constants';
+import {getCollectionAbsolutePath} from "../../utils/collectionUtils";
 
-class FilesPage extends React.Component {
+export class FilesPage extends React.Component {
     componentDidMount() {
         const {
             fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath
@@ -59,6 +60,13 @@ class FilesPage extends React.Component {
         return <BreadCrumbs segments={segments} />;
     }
 
+    handleCollectionLocationChange = (collection) => {
+        const {openedPath} = this.props;
+
+        // If the collection location changes, the URI for the current page should change as well
+        this.props.history.push(`${getCollectionAbsolutePath(collection)}${getDirectoryFromFullpath(openedPath)}`);
+    }
+
     render() {
         {
             const {
@@ -86,7 +94,7 @@ class FilesPage extends React.Component {
                             />
                         </Grid>
                         <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                            <InformationDrawer />
+                            <InformationDrawer onCollectionLocationChange={this.handleCollectionLocationChange} />
                         </Grid>
                     </Grid>
                 </>

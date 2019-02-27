@@ -1,4 +1,4 @@
-import {uniqueName, parentPath, fileName} from "./fileUtils";
+import {uniqueName, parentPath, fileName, getDirectoryFromFullpath} from "./fileUtils";
 
 describe('uniqueName', () => {
     it('leaves already unique names untouched', () => {
@@ -39,5 +39,19 @@ describe('fileName', () => {
         expect(fileName('/aaa/bbb/ccc.ext')).toEqual('ccc.ext');
         expect(fileName('ccc.ext')).toEqual('ccc.ext');
         expect(fileName('aaa/bbb.ext/')).toEqual('bbb.ext');
+    });
+});
+
+describe('getDirectoryFromFullpath', () => {
+    it('gets the directory from the full path', () => {
+        expect(getDirectoryFromFullpath('/my-collection/sub-directory')).toEqual('/sub-directory');
+        expect(getDirectoryFromFullpath('/my-collection/sub-directory/nested/others.txt')).toEqual('/sub-directory/nested/others.txt');
+        expect(getDirectoryFromFullpath('/my-collection')).toEqual('/');
+    });
+
+    it('allows the path not to have a leading slash', () => {
+        expect(getDirectoryFromFullpath('my-collection/sub-directory')).toEqual('/sub-directory');
+        expect(getDirectoryFromFullpath('my-collection/sub-directory/nested/others.txt')).toEqual('/sub-directory/nested/others.txt');
+        expect(getDirectoryFromFullpath('my-collection')).toEqual('/');
     });
 });
