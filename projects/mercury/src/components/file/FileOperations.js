@@ -11,7 +11,7 @@ import {joinPaths, uniqueName} from "../../utils/fileUtils";
 export class FileOperations extends React.Component {
 
     refreshFiles() {
-        fileActions.fetchFilesIfNeeded(this.props.openedPath);
+        this.props.fetchFilesIfNeeded(this.props.openedPath);
     }
 
     handleCut(e) {
