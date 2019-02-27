@@ -30,20 +30,20 @@ function filesByPath(state = defaultState, action) {
         case actionTypes.FETCH_FILES_FULFILLED:
             return {
                 ...state,
-                    [action.meta.path]: {
-                        ...state[action.meta.path],
-                        pending: false,
-                        data: action.payload
-                    }
+                [action.meta.path]: {
+                    ...state[action.meta.path],
+                    pending: false,
+                    data: action.payload
+                }
             };
         case actionTypes.FETCH_FILES_REJECTED:
             return {
                 ...state,
-                    [action.meta.path]: {
-                        ...state[action.meta.path],
-                        pending: false,
-                        error: action.payload || true
-                    }
+                [action.meta.path]: {
+                    ...state[action.meta.path],
+                    pending: false,
+                    error: action.payload || true
+                }
             };
         case actionTypes.CREATE_DIRECTORY_PENDING:
             return {

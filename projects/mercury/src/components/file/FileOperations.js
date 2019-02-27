@@ -9,8 +9,9 @@ import * as fileActions from "../../actions/fileActions";
 import {joinPaths, uniqueName} from "../../utils/fileUtils";
 
 export class FileOperations extends React.Component {
+
     refreshFiles() {
-        this.fetchFilesIfNeeded(this.props.openedPath);
+        fileActions.fetchFilesIfNeeded(this.props.openedPath);
     }
 
     handleCut(e) {
@@ -26,7 +27,7 @@ export class FileOperations extends React.Component {
     handlePaste(e) {
         e.stopPropagation();
         this.props.paste(this.props.openedPath)
-            .then(this.props.refreshFiles)
+            .then(() => this.refreshFiles())
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while pasting your contents");
             });
@@ -37,7 +38,7 @@ export class FileOperations extends React.Component {
             const nameMapping = new Map();
             files.forEach(file => nameMapping.set(file.name, uniqueName(file.name, this.props.existingFiles)));
             return this.props.uploadFiles(this.props.openedPath, files, nameMapping)
-                .then(this.props.refreshFiles)
+                .then(() => this.refreshFiles())
                 .catch((err) => {
                     ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
                 });
@@ -47,7 +48,7 @@ export class FileOperations extends React.Component {
 
     handleCreateDirectory(name) {
         return this.props.createDirectory(joinPaths(this.props.openedPath, name))
-            .then(this.props.refreshFiles)
+            .then(() => this.refreshFiles())
             .catch((err) => {
                 if (err.status === 405) {
                     // Directory already exists
@@ -122,7 +123,7 @@ export class FileOperations extends React.Component {
                     </CreateDirectoryButton>
                     <UploadButton
                         onUpload={files => this.handleUpload(files)}
-                        onDidUpload={this.props.refreshFiles}
+                        onDidUpload={() => this.refreshFiles()}
                     >
                         <IconButton
                             title="Upload"
