@@ -2,12 +2,11 @@ const express = require('express');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const webdav = require('webdav-server').v2;
 const bodyParser = require('body-parser');
-const fs = require('fs');
-const mockDataDir = require('path').join(__dirname, '/mock-data');
+const path = require('path');
 
+const mockDataDir = path.join(__dirname, '/mock-data');
+const mockedVocabularyDir = path.join(__dirname, '../../saturn/src/main/resources/vocabulary.jsonld');
 const port = process.env.PORT || 5000;
-
-
 // Start a generic server on port 5000 that serves default API
 const app = express();
 
@@ -34,17 +33,18 @@ app.put('/api/collections/permissions', (req, res) => res.send({
     collection: req.body.collection,
     subject: req.body.subject
 }));
+
 // Metadata API
 app.get('/api/metadata/', (req, res) => {
     const filePath = req.query.subject ? '/metadata/metadata-1.json' : '/metadata/persons.json';
     res.sendFile(mockDataDir + filePath);
 });
-
 app.patch('/api/metadata/', (req, res) => res.send());
 app.delete('/api/metadata/', (req, res) => res.send());
 app.get('/api/metadata/entities/', (req, res) => res.sendFile(`${mockDataDir}/metadata/all-entities.json`));
 
-app.get('/api/vocabulary/', (req, res) => res.sendFile(`${mockDataDir}/metadata/vocabulary.jsonld`));
+// Vocabulary API
+app.get('/api/vocabulary/', (req, res) => res.sendFile(mockedVocabularyDir));
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
