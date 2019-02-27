@@ -24,7 +24,7 @@ export class FilesPage extends React.Component {
         // If the collection has not been fetched yet,
         // do not bother fetching the files
         if (openedCollection.iri) {
-            fetchFilesIfNeeded(openedCollection, openedPath);
+            fetchFilesIfNeeded(openedPath);
         }
     }
 
@@ -42,8 +42,8 @@ export class FilesPage extends React.Component {
         const hasNewOpenedPath = prevProps.openedPath !== openedPath;
 
         if (hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
-            fetchFilesIfNeeded(openedCollection, openedPath);
-            openPath(`/${openedCollection.location}${openedPath === '/' ? '' : openedPath}`);
+            fetchFilesIfNeeded(openedPath);
+            openPath(openedPath);
         }
     }
 
@@ -54,15 +54,8 @@ export class FilesPage extends React.Component {
             return <BreadCrumbs />;
         }
 
-        const segments = [
-            {segment: openedCollection.location, label: openedCollection.name}
-        ];
-
-        if (openedPath) {
-            const toBreadcrumb = segment => ({segment, label: segment});
-            const pathParts = splitPathIntoArray(openedPath);
-            segments.push(...pathParts.map(toBreadcrumb));
-        }
+        const segments = splitPathIntoArray(openedPath).map(segment => ({segment, label: segment}));
+        segments[0].label = openedCollection.name;
 
         return <BreadCrumbs segments={segments} />;
     }
@@ -113,11 +106,10 @@ export class FilesPage extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {match: {params}} = ownProps;
     const openedCollectionLocation = params.collection;
-    const openedPath = params.path ? `/${params.path}` : '/';
+    const openedPath = params.path ? `/${openedCollectionLocation}/${params.path}` : `/${openedCollectionLocation}`;
 
     const collection = (state.cache.collections.data && state.cache.collections.data.find(c => c.location === openedCollectionLocation)) || {};
-    const filesPerCollection = state.cache.filesByCollectionAndPath[collection.iri] || [];
-    const files = filesPerCollection[openedPath] || [];
+    const files = state.cache.filesByPath[openedPath] || [];
 
     return {
         loading: files.pending || state.cache.collections.pending || state.cache.collections.data.length === 0,

@@ -96,7 +96,6 @@ export class InformationDrawer extends React.Component {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <PathMetadata
-                                    collection={collection}
                                     path={path}
                                     editable={canManage(collection) && path === this.props.paths[this.props.paths.length - 1]}
                                     style={{width: '100%'}}
@@ -114,7 +113,7 @@ function pathHierarchy(fullPath) {
     const paths = [];
     let path = fullPath;
     while (path && path.lastIndexOf('/') > 0) {
-        paths.push(path.substring(path.indexOf('/', 1)));
+        paths.push(path);
         path = path.substring(0, path.lastIndexOf('/'));
     }
     return paths.reverse();

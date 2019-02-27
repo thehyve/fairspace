@@ -53,7 +53,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
 
         if (isCollection(path)) {
-            var collection = collections.getByDirectoryName(path);
+            var collection = collections.getByLocation(path);
             if (collection == null) {
                 return null;
             }
@@ -207,7 +207,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     private Collection getCollection(String path) {
-        return collections.getByDirectoryName(splitPath(path)[0]);
+        return collections.getByLocation(splitPath(path)[0]);
     }
 
     private Access getAccess(String path) {
