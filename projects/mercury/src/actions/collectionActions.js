@@ -21,13 +21,13 @@ export const addCollection = (name, description, type, location) => ({
     payload: CollectionAPI.addCollection(name, description, type, location),
 });
 
-export const updateCollection = createErrorHandlingPromiseAction((id, name, description, location) => ({
+export const updateCollection = (id, name, description, location) => ({
     type: actionTypes.UPDATE_COLLECTION,
     payload: CollectionAPI.updateCollection(id, name, description, location),
     meta: {
         id, name, description
     }
-}));
+});
 
 export const deleteCollection = id => ({
     type: actionTypes.DELETE_COLLECTION,
