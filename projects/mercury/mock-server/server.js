@@ -40,18 +40,11 @@ app.get('/api/metadata/', (req, res) => {
     res.sendFile(mockDataDir + filePath);
 });
 
-app.get('/api/metadata/extended/statements',
-    (req, res) => fs.readFile(`${mockDataDir}/metadata/metadata-with-labels.json`,
-        (err, data) => {
-            res.set('Content-Type', 'application/json');
-            res.send(data.toString().replace(/ws:subject/g, req.query.subject));
-        }));
-
 app.patch('/api/metadata/', (req, res) => res.send());
 app.delete('/api/metadata/', (req, res) => res.send());
 app.get('/api/metadata/entities/', (req, res) => res.sendFile(`${mockDataDir}/metadata/all-entities.json`));
 
-app.get('/api/vocabulary/', (req, res) => res.sendFile(`${mockDataDir}/metadata/vocabulary.json`));
+app.get('/api/vocabulary/', (req, res) => res.sendFile(`${mockDataDir}/metadata/vocabulary.jsonld`));
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
