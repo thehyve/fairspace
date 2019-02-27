@@ -6,7 +6,7 @@ describe('FilesPage', () => {
     describe('handling of changed collection location', () => {
         const selectCollection = jest.fn();
         const fetchCollectionsIfNeeded = jest.fn();
-        const openedPath = '/subdirectory/something-else';
+        const openedPath = 'location1/subdirectory/something-else';
         const openedCollection = {
             name: 'My collection',
             description: 'description',
@@ -33,9 +33,10 @@ describe('FilesPage', () => {
             expect(history[0]).toEqual('/collections/new-location/subdirectory/something-else');
         });
 
-        it('can handle an empty openedPath', () => {
+        it('can handle an empty openedPath starting with a slash', () => {
             const history = [];
             const wrapper = shallow(<FilesPage
+                openedPath={'/location1'}
                 openedCollection={openedCollection}
                 history={history}
                 selectCollection={selectCollection}
@@ -46,5 +47,21 @@ describe('FilesPage', () => {
             expect(history.length).toEqual(1);
             expect(history[0]).toEqual('/collections/new-location');
         });
+
+        it('can handle an empty openedPath starting without leading slash', () => {
+            const history = [];
+            const wrapper = shallow(<FilesPage
+                openedPath={'location1'}
+                openedCollection={openedCollection}
+                history={history}
+                selectCollection={selectCollection}
+                fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
+            />);
+
+            wrapper.instance().handleCollectionLocationChange(newCollection);
+            expect(history.length).toEqual(1);
+            expect(history[0]).toEqual('/collections/new-location');
+        });
+
     });
 });
