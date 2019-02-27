@@ -37,6 +37,15 @@ const metadataUpdateReducer = (state = defaultState, action) => {
                 ...state,
                 creatingMetadataEntity: false
             };
+        case actionTypes.INVALIDATE_FETCH_METADATA:
+            return {
+                ...state,
+                [action.meta.subject]: {
+                    ...state[action.meta.subject],
+                    data: [],
+                    invalidated: true
+                }
+            };
         default:
             return state;
     }
