@@ -8,14 +8,7 @@ import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
 import {joinPaths, uniqueName} from "../../utils/fileUtils";
 
-class FileOperations extends React.Component {
-    // const {
-    //     clipboardItemsCount, disabled, creatingDirectory,
-    //     openedPath, selectedPaths,
-    //     fetchFilesIfNeeded, uploadFiles, createDirectory,
-    //     cut, copy, paste, existingFiles
-    // } = props;
-
+export class FileOperations extends React.Component {
     refreshFiles() {
         this.fetchFilesIfNeeded(this.props.openedPath);
     }
@@ -88,7 +81,7 @@ class FileOperations extends React.Component {
                     <IconButton
                         aria-label="Copy"
                         title="Copy"
-                        onClick={this.handleCopy()}
+                        onClick={e => this.handleCopy(e)}
                         disabled={noSelectedPath || this.props.disabled}
                         color={buttonColor}
                     >
@@ -97,7 +90,7 @@ class FileOperations extends React.Component {
                     <IconButton
                         aria-label="Cut"
                         title="Cut"
-                        onClick={this.handleCut()}
+                        onClick={e => this.handleCut(e)}
                         disabled={noSelectedPath || this.props.disabled}
                         color={buttonColor}
                     >
@@ -106,7 +99,7 @@ class FileOperations extends React.Component {
                     <IconButton
                         aria-label="Paste"
                         title="Paste"
-                        onClick={this.handlePaste()}
+                        onClick={e => this.handlePaste(e)}
                         disabled={this.props.clipboardItemsCount === 0 || this.props.disabled}
                         color={buttonColor}
                     >
@@ -116,7 +109,7 @@ class FileOperations extends React.Component {
                         )}
                     </IconButton>
                     <CreateDirectoryButton
-                        onCreate={this.handleCreateDirectory()}
+                        onCreate={name => this.handleCreateDirectory(name)}
                     >
                         <IconButton
                             aria-label="Create directory"
@@ -128,7 +121,7 @@ class FileOperations extends React.Component {
                         </IconButton>
                     </CreateDirectoryButton>
                     <UploadButton
-                        onUpload={this.handleUpload()}
+                        onUpload={files => this.handleUpload(files)}
                         onDidUpload={this.props.refreshFiles}
                     >
                         <IconButton
