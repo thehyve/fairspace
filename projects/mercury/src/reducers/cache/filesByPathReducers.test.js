@@ -1,4 +1,4 @@
-import reducer, {invalidateFiles} from './filesByCollectionAndPathReducers';
+import reducer, {invalidateFiles} from './filesByPathReducers';
 import * as actionTypes from "../../actions/actionTypes";
 import {testNoChangedOnUnknownActionType} from '../../utils/testUtils';
 

@@ -74,5 +74,6 @@ public class CollectionsApp implements SparkApplication {
         exception(IllegalArgumentException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, e.getMessage()));
         exception(CollectionNotFoundException.class, (e, req, res) -> returnError(res, SC_NOT_FOUND, e.getMessage()));
         exception(CollectionAccessDeniedException.class, (e, req, res) -> returnError(res, SC_UNAUTHORIZED, e.getMessage()));
+        exception(LocationAlreadyExistsException.class, (e, req, res) -> returnError(res, SC_CONFLICT, e.getMessage()));
     }
 }

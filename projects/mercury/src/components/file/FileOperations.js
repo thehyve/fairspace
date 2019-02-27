@@ -6,33 +6,33 @@ import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import {CreateDirectoryButton, UploadButton, ErrorDialog, LoadingOverlay} from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
-import {uniqueName} from "../../utils/fileUtils";
+import {joinPaths, uniqueName} from "../../utils/fileUtils";
 
 function FileOperations(props) {
     const {
         clipboardItemsCount, disabled, creatingDirectory,
-        openedPath, selectedPaths, openedCollection,
+        openedPath, selectedPaths,
         fetchFilesIfNeeded, uploadFiles, createDirectory,
         cut, copy, paste, existingFiles
     } = props;
 
     function refreshFiles() {
-        fetchFilesIfNeeded(openedCollection, openedPath);
+        fetchFilesIfNeeded(openedPath);
     }
 
     function handleCut(e) {
         e.stopPropagation();
-        cut(openedPath, selectedPaths);
+        cut(selectedPaths);
     }
 
     function handleCopy(e) {
         e.stopPropagation();
-        copy(openedPath, selectedPaths);
+        copy(selectedPaths);
     }
 
     function handlePaste(e) {
         e.stopPropagation();
-        paste(openedCollection, openedPath)
+        paste(openedPath)
             .then(refreshFiles)
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while pasting your contents");
@@ -43,8 +43,8 @@ function FileOperations(props) {
         if (files && files.length > 0) {
             const nameMapping = new Map();
             files.forEach(file => nameMapping.set(file.name, uniqueName(file.name, existingFiles)));
-            return uploadFiles(openedCollection, openedPath, files, nameMapping)
-                .then(() => files)
+            return uploadFiles(openedPath, files, nameMapping)
+                .then(refreshFiles)
                 .catch((err) => {
                     ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(files));
                 });
@@ -53,7 +53,7 @@ function FileOperations(props) {
     }
 
     function handleCreateDirectory(name) {
-        return createDirectory(openedCollection, openedPath, name)
+        return createDirectory(joinPaths(openedPath, name))
             .then(refreshFiles)
             .catch((err) => {
                 if (err.response.status === 405) {
@@ -146,7 +146,7 @@ function FileOperations(props) {
 const mapStateToProps = state => ({
     selectedPaths: state.collectionBrowser.selectedPaths,
     clipboardItemsCount: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
-    creatingDirectory: state.cache.filesByCollectionAndPath.creatingDirectory
+    creatingDirectory: state.cache.filesByPath.creatingDirectory
 });
 
 const mapDispatchToProps = {

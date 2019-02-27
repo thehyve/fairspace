@@ -11,10 +11,10 @@ export class PathMetadata extends React.Component {
 
 
     load() {
-        const {dispatch, collection, path, subject} = this.props;
+        const {dispatch, path, subject} = this.props;
 
         if (!subject && path) {
-            dispatch(statFile(collection, path));
+            dispatch(statFile(path));
         }
     }
 

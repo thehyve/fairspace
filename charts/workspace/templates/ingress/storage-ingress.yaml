@@ -24,7 +24,7 @@ spec:
     - host: {{ template "storage.hostname" $ }}
       http:
         paths:
-          - path: /
+          - path: /(.*)
             backend:
               serviceName: {{ .Release.Name }}-pluto
               servicePort: 80

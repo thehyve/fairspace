@@ -52,7 +52,7 @@ jupyterhub:
   singleuser:
     image:
       name: eu.gcr.io/fairspace-207108/jupyterhub-singleuser
-      tag: 0.5.4-SNAPSHOT-simple
+      tag: 0.5.7-SNAPSHOT
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.ci.fairway.app
   hub:
