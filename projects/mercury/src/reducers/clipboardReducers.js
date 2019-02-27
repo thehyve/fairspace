@@ -28,9 +28,9 @@ const clipboard = (state = defaultState, action) => {
                 pending: true
             };
         case actionTypes.CLIPBOARD_PASTE_FULFILLED:
-        case actionTypes.CLIPBOARD_CLEAR:
             return {
                 ...state,
+                error: false,
                 pending: false,
                 type: null,
                 filenames: []

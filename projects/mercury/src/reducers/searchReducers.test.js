@@ -1,15 +1,17 @@
 import reducer from './searchReducers';
 import * as actionTypes from "../actions/actionTypes";
+import {testNoChangedOnUnknownActionType} from '../utils/testUtils';
+
+testNoChangedOnUnknownActionType('Search reducers', reducer);
 
 describe('Search reducers', () => {
-    const initialState = {
-        pending: false,
-        searchType: null,
-        results: [],
-        error: null,
-    };
-
     it('should return the initial state when no action is given', () => {
+        const initialState = {
+            pending: false,
+            searchType: null,
+            results: [],
+            error: null,
+        };
         expect(reducer(undefined, {}))
             .toEqual(initialState);
     });

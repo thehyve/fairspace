@@ -41,10 +41,12 @@ export class InformationDrawer extends React.Component {
     }
 
     handleUpdateCollection = (name, description, location) => {
+        // TODO: validation should be part of the child component
         if ((name !== this.props.collection.name || description !== this.props.collection.description || location !== this.props.collection.location)
             && (name !== '') && (location !== '')) {
             return this.props.updateCollection(this.props.collection.iri, name, description, location)
                 .then(() => {
+                    // TODO: no need to clone object, just use the id in the handleDetailsChange
                     const locationChanged = this.props.collection.location !== location;
                     const collection = Object.assign(this.props.collection, {name, description, location});
                     this.handleDetailsChange(collection, locationChanged);
@@ -87,7 +89,7 @@ export class InformationDrawer extends React.Component {
                             defaultExpanded
                         >
                             <ExpansionPanelSummary
-                                expandIcon={<ExpandMoreIcon/>}
+                                expandIcon={<ExpandMoreIcon />}
                             >
                                 <Typography
                                     className={classes.heading}

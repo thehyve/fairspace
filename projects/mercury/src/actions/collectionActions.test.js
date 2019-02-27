@@ -3,7 +3,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import Config from "../services/Config/Config";
 import configFile from "../config";
-import mockResponse from "../utils/testUtils";
+import {mockResponse} from "../utils/testUtils";
 import {UPDATE_COLLECTION} from "./actionTypes";
 import {updateCollection} from "./collectionActions";
 

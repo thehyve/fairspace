@@ -8,6 +8,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import CollectionBrowser from "./CollectionBrowser";
 import Config from "../../services/Config/Config";
+import * as actionTypes from "../../actions/actionTypes";
 
 const middlewares = [thunk, promiseMiddleware()];
 const mockStore = configureStore(middlewares);
@@ -65,11 +66,8 @@ it('renders without crashing', () => {
     ReactDOM.unmountComponentAtNode(div);
 });
 
-it('creates a new collection on button click', () => {
+it('dispatch an action on collection save', () => {
     const wrapper = mount(collectionBrowser);
-
-    // There should be one action for closing the path
-    expect(store.getActions().length).toEqual(1);
 
     const addButton = wrapper.find('[aria-label="Add"]').first();
     addButton.simulate('click');
@@ -77,8 +75,7 @@ it('creates a new collection on button click', () => {
     const saveButton = wrapper.find('[aria-label="Save"]').first();
     saveButton.simulate('click');
 
-    // Expect the collection to be created in storage
-    expect(store.getActions().length).toEqual(2);
+    expect(store.getActions()[0].type).toBe(actionTypes.ADD_COLLECTION_PENDING);
 });
 
 describe('loading state', () => {

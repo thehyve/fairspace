@@ -31,3 +31,15 @@ describe('FileOperations', () => {
             });
     });
 });
+
+describe('handleCreateDirectory', () => {
+    it('should return false for 405 error', () => {
+        const createDirectory = jest.fn(() => Promise.reject(new Error({response: {status: 405}})));
+        const instance = shallow(<FileOperations selectedPaths={[]} createDirectory={createDirectory} />).instance();
+
+        instance.handleCreateDirectory()
+            .then(result => {
+                expect(result).toEqual(false);
+            });
+    });
+});

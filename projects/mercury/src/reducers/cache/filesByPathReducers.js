@@ -5,17 +5,20 @@ const defaultState = {
     creatingDirectory: false
 };
 
-function invalidateFiles(state, ...paths) {
+export const invalidateFiles = (state, ...paths) => {
     const newPathsState = paths.map(path => ({
         [path]: {
-            invalidated: true
+            pending: false,
+            error: false,
+            invalidated: true,
+            data: [],
         }
     }));
 
-    return Object.assign({}, state, ...newPathsState)
-}
+    return Object.assign({}, state, ...newPathsState);
+};
 
-function filesByPath(state = defaultState, action) {
+const filesByPath = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.FETCH_FILES_PENDING:
             return {
@@ -27,15 +30,19 @@ function filesByPath(state = defaultState, action) {
                     data: []
                 }
             };
-        case actionTypes.FETCH_FILES_FULFILLED:
+        case actionTypes.FETCH_FILES_FULFILLED: {
+            const {meta: {path}, payload} = action;
             return {
                 ...state,
-                [action.meta.path]: {
-                    ...state[action.meta.path],
+                [path]: {
+                    ...state[path],
                     pending: false,
-                    data: action.payload
+                    error: false,
+                    invalidated: false,
+                    data: payload
                 }
             };
+        }
         case actionTypes.FETCH_FILES_REJECTED:
             return {
                 ...state,
@@ -73,6 +80,6 @@ function filesByPath(state = defaultState, action) {
         default:
             return state;
     }
-}
+};
 
 export default filesByPath;

@@ -2,10 +2,6 @@ import FileAPI from "../services/FileAPI";
 import * as actionTypes from "./actionTypes";
 import {COPY, CUT} from '../constants';
 
-export const clear = () => ({
-    type: actionTypes.CLIPBOARD_CLEAR
-});
-
 const canPaste = clipboard => clipboard.type && clipboard.filenames.length > 0;
 
 const doPaste = (clipboard, destinationDir) => {
