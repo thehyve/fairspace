@@ -97,6 +97,7 @@ class FileBrowser extends React.Component {
                     openedPath={openedPath}
                     disabled={!canWrite(openedCollection)}
                     existingFiles={this.props.files ? this.props.files.map(file => file.basename) : []}
+                    fetchFilesIfNeeded={this.props.fetchFilesIfNeeded}
                 />
             </>
         );
