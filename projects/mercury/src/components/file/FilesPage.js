@@ -60,7 +60,7 @@ export class FilesPage extends React.Component {
         return <BreadCrumbs segments={segments} />;
     }
 
-    handleCollectionLocationChange(collection) {
+    handleCollectionLocationChange = (collection) => {
         const {openedPath} = this.props;
 
         // Remove the first directory name from the opened path, in order
@@ -108,7 +108,7 @@ export class FilesPage extends React.Component {
                             />
                         </Grid>
                         <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                            <InformationDrawer onCollectionLocationChange={() => this.handleCollectionLocationChange} />
+                            <InformationDrawer onCollectionLocationChange={this.handleCollectionLocationChange} />
                         </Grid>
                     </Grid>
                 </>
