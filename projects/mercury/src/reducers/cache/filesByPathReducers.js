@@ -37,6 +37,8 @@ const filesByPath = (state = defaultState, action) => {
                 [path]: {
                     ...state[path],
                     pending: false,
+                    error: false,
+                    invalidated: false,
                     data: payload
                 }
             };

@@ -8,28 +8,26 @@ describe('Files by collection and path reducers', () => {
     it('should invalidate files and directories', () => {
         const statePre = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: false,
-                    error: false,
-                    invalidated: false,
-                    data: []
-                }
+            "/coll/dir/subdir": {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
             }
         };
 
-        const stateAfterInvalidation = invalidateFiles(statePre, 'https://workspace.ci.test.fairdev.app/iri/500', '/');
+        const stateAfterInvalidation = invalidateFiles(statePre, '/coll/dir/subdir');
 
         const expectedState = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: false,
-                    error: false,
-                    invalidated: true,
-                    data: []
-                }
+
+            "/coll/dir/subdir": {
+                invalidated: true,
+                data: [],
+                error: false,
+                pending: false
             }
+
         };
 
         expect(stateAfterInvalidation).toEqual(expectedState);
@@ -38,42 +36,28 @@ describe('Files by collection and path reducers', () => {
     it('should mark each path as pending', () => {
         const state = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: false,
-                    error: false,
-                    invalidated: false,
-                    data: []
-                }
+            "/coll/dir/file": {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
             }
         };
 
         const action = {
             type: actionTypes.FETCH_FILES_PENDING,
             meta: {
-                collection: {
-                    location: "Jan_Smit_s_collection-500",
-                    name: "Jan Smit's collection 1",
-                    description: "Jan Smit's collection, beyond the horizon 01",
-                    iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                    access: "Manage",
-                    type: "LOCAL_STORAGE",
-                    dateCreated: "2018-09-19T15:48:23.016165Z",
-                    creator: "user4-id"
-                },
-                path: "/"
+                path: "/coll/dir/file"
             }
         };
 
         const expectedState = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: true,
-                    error: false,
-                    invalidated: false,
-                    data: []
-                }
+            "/coll/dir/file": {
+                pending: true,
+                error: false,
+                invalidated: false,
+                data: []
             }
         };
 
@@ -84,29 +68,17 @@ describe('Files by collection and path reducers', () => {
         const action = {
             type: actionTypes.FETCH_FILES_PENDING,
             meta: {
-                collection: {
-                    location: "Jan_Smit_s_collection-500",
-                    name: "Jan Smit's collection 1",
-                    description: "Jan Smit's collection, beyond the horizon 01",
-                    iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                    access: "Manage",
-                    type: "LOCAL_STORAGE",
-                    dateCreated: "2018-09-19T15:48:23.016165Z",
-                    creator: "user4-id"
-                },
-                path: "/"
+                path: "/Jan_Smit_s_collection-500"
             }
         };
 
         const expectedState = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: true,
-                    error: false,
-                    invalidated: false,
-                    data: []
-                }
+            "/Jan_Smit_s_collection-500": {
+                pending: true,
+                error: false,
+                invalidated: false,
+                data: []
             }
         };
 
@@ -127,39 +99,28 @@ describe('Files by collection and path reducers', () => {
                 }
             ],
             meta: {
-                collection: {
-                    location: "Jan_Smit_s_collection-500",
-                    name: "Jan Smit's collection 1",
-                    description: "Jan Smit's collection, beyond the horizon 01",
-                    iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                    access: "Manage",
-                    type: "LOCAL_STORAGE",
-                    dateCreated: "2018-09-19T15:48:23.016165Z",
-                    creator: "user4-id"
-                },
-                path: "/"
+                path: "/Jan_Smit_s_collection-500"
             }
         };
 
         const expectedState = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: false,
-                    error: false,
-                    invalidated: false,
-                    data: [
-                        {
-                            filename: "/Jan_Smit_s_collection-500/dir1",
-                            basename: "dir1",
-                            lastmod: "Tue, 26 Feb 2019 09:12:53 GMT",
-                            size: 0,
-                            type: "directory",
-                            etag: "62831cd6fa9d1b0c4d3d2948f4e9881e"
-                        }
-                    ]
-                }
+            "/Jan_Smit_s_collection-500": {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: [
+                    {
+                        filename: "/Jan_Smit_s_collection-500/dir1",
+                        basename: "dir1",
+                        lastmod: "Tue, 26 Feb 2019 09:12:53 GMT",
+                        size: 0,
+                        type: "directory",
+                        etag: "62831cd6fa9d1b0c4d3d2948f4e9881e"
+                    }
+                ]
             }
+
         };
 
         expect(reducer(undefined, action)).toEqual(expectedState);
@@ -179,38 +140,26 @@ describe('Files by collection and path reducers', () => {
                 }
             ],
             meta: {
-                collection: {
-                    location: "Jan_Smit_s_collection-500",
-                    name: "Jan Smit's collection 1",
-                    description: "Jan Smit's collection, beyond the horizon 01",
-                    iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                    access: "Manage",
-                    type: "LOCAL_STORAGE",
-                    dateCreated: "2018-09-19T15:48:23.016165Z",
-                    creator: "user4-id"
-                },
-                path: "/"
+                path: "/Jan_Smit_s_collection-500"
             }
         };
 
         const expectedState = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: false,
-                    error: false,
-                    invalidated: false,
-                    data: [
-                        {
-                            filename: "/Jan_Smit_s_collection-500/dir1",
-                            basename: "dir1",
-                            lastmod: "Tue, 26 Feb 2019 09:12:53 GMT",
-                            size: 0,
-                            type: "directory",
-                            etag: "62831cd6fa9d1b0c4d3d2948f4e9881e"
-                        }
-                    ]
-                }
+            "/Jan_Smit_s_collection-500": {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: [
+                    {
+                        filename: "/Jan_Smit_s_collection-500/dir1",
+                        basename: "dir1",
+                        lastmod: "Tue, 26 Feb 2019 09:12:53 GMT",
+                        size: 0,
+                        type: "directory",
+                        etag: "62831cd6fa9d1b0c4d3d2948f4e9881e"
+                    }
+                ]
             }
         };
 
@@ -220,14 +169,14 @@ describe('Files by collection and path reducers', () => {
     it('should append files to collection', () => {
         const state = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: true,
-                    error: false,
-                    invalidated: false,
-                    data: []
-                }
+
+            "/Jan_Smit_s_collection-500": {
+                pending: true,
+                error: false,
+                invalidated: false,
+                data: []
             }
+
         };
         const action = {
             type: actionTypes.FETCH_FILES_FULFILLED,
@@ -242,38 +191,26 @@ describe('Files by collection and path reducers', () => {
                 }
             ],
             meta: {
-                collection: {
-                    location: "Jan_Smit_s_collection-500",
-                    name: "Jan Smit's collection 1",
-                    description: "Jan Smit's collection, beyond the horizon 01",
-                    iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                    access: "Manage",
-                    type: "LOCAL_STORAGE",
-                    dateCreated: "2018-09-19T15:48:23.016165Z",
-                    creator: "user4-id"
-                },
-                path: "/"
+                path: "/Jan_Smit_s_collection-500"
             }
         };
 
         const expectedState = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: false,
-                    error: false,
-                    invalidated: false,
-                    data: [
-                        {
-                            filename: "/Jan_Smit_s_collection-500/dir1",
-                            basename: "dir1",
-                            lastmod: "Tue, 26 Feb 2019 09:12:53 GMT",
-                            size: 0,
-                            type: "directory",
-                            etag: "62831cd6fa9d1b0c4d3d2948f4e9881e"
-                        }
-                    ]
-                }
+            "/Jan_Smit_s_collection-500": {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: [
+                    {
+                        filename: "/Jan_Smit_s_collection-500/dir1",
+                        basename: "dir1",
+                        lastmod: "Tue, 26 Feb 2019 09:12:53 GMT",
+                        size: 0,
+                        type: "directory",
+                        etag: "62831cd6fa9d1b0c4d3d2948f4e9881e"
+                    }
+                ]
             }
         };
 
@@ -283,49 +220,34 @@ describe('Files by collection and path reducers', () => {
     it('should handle error properly', () => {
         const state = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: true,
-                    error: false,
-                    invalidated: false,
-                    data: []
-                }
+
+            "/coll/dir": {
+                pending: true,
+                error: false,
+                invalidated: false,
+                data: []
             }
         };
         const action = {
             type: actionTypes.FETCH_FILES_REJECTED,
             payload: {message: 'an error'},
             meta: {
-                collection: {
-                    location: "Jan_Smit_s_collection-500",
-                    name: "Jan Smit's collection 1",
-                    description: "Jan Smit's collection, beyond the horizon 01",
-                    iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                    access: "Manage",
-                    type: "LOCAL_STORAGE",
-                    dateCreated: "2018-09-19T15:48:23.016165Z",
-                    creator: "user4-id"
-                },
-                path: "/sub-dir"
+                path: "/coll/dir/sub-dir"
             },
             error: true
         };
 
         const expectedState = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/": {
-                    pending: true,
-                    error: false,
-                    invalidated: false,
-                    data: []
-                },
-                "/sub-dir": {
-                    pending: false,
-                    error: {message: 'an error'},
-                    invalidated: true,
-                    data: []
-                }
+            "/coll/dir": {
+                pending: true,
+                error: false,
+                invalidated: false,
+                data: []
+            },
+            "/coll/dir/sub-dir": {
+                pending: false,
+                error: {message: 'an error'}
             }
         };
 
@@ -337,30 +259,17 @@ describe('Files by collection and path reducers', () => {
             type: actionTypes.FETCH_FILES_REJECTED,
             payload: {message: 'an error'},
             meta: {
-                collection: {
-                    location: "Jan_Smit_s_collection-500",
-                    name: "Jan Smit's collection 1",
-                    description: "Jan Smit's collection, beyond the horizon 01",
-                    iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                    access: "Manage",
-                    type: "LOCAL_STORAGE",
-                    dateCreated: "2018-09-19T15:48:23.016165Z",
-                    creator: "user4-id"
-                },
-                path: "/sub-dir"
+                path: "/coll/dir/sub-dir"
             },
             error: true
         };
 
         const expectedState = {
             "creatingDirectory": false,
-            "https://workspace.ci.test.fairdev.app/iri/500": {
-                "/sub-dir": {
-                    pending: false,
-                    error: {message: 'an error'},
-                    invalidated: true,
-                    data: []
-                }
+
+            "/coll/dir/sub-dir": {
+                error: {message: 'an error'},
+                pending: false
             }
         };
 
