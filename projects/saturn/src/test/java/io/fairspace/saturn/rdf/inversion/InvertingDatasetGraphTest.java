@@ -23,10 +23,10 @@ import static org.junit.Assert.assertTrue;
 
 public class InvertingDatasetGraphTest {
     private static final Node vocabularyGraph = createURI("http://example.com");
-    private static final Resource folder = createResource("http://example.com/folder");
-    private static final Resource file = createResource("http://example.com/file");
-    private static final Property partOf = createProperty("http://fairspace.io/ontology#partOf");
-    private static final Property hasPart = createProperty("http://fairspace.io/ontology#hasPart");
+    private static final Resource person = createResource("http://example.com/person");
+    private static final Resource material = createResource("http://example.com/material");
+    private static final Property derivesFrom = createProperty("http://fairspace.io/ontology#derivesFrom");
+    private static final Property providesMaterial = createProperty("http://fairspace.io/ontology#providesMaterial");
     private static final Property p1 = createProperty("http://examle.com/p1");
     private static final Property p2 = createProperty("http://examle.com/p2");
     private static final Property p3 = createProperty("http://examle.com/p3");
@@ -49,13 +49,13 @@ public class InvertingDatasetGraphTest {
     @Test
     public void propertyInversionWorks() {
         Model m = ds.getDefaultModel();
-        m.add(folder, hasPart, file);
-        assertTrue(m.contains(folder, hasPart, file));
-        assertTrue(m.contains(file, partOf, folder));
+        m.add(person, providesMaterial, material);
+        assertTrue(m.contains(person, providesMaterial, material));
+        assertTrue(m.contains(material, derivesFrom, person));
 
-        m.remove(file, partOf, folder);
-        assertFalse(m.contains(folder, hasPart, file));
-        assertFalse(m.contains(file, partOf, folder));
+        m.remove(material, derivesFrom, person);
+        assertFalse(m.contains(person, providesMaterial, material));
+        assertFalse(m.contains(material, derivesFrom, person));
     }
 
     @Test
@@ -64,18 +64,18 @@ public class InvertingDatasetGraphTest {
         vocabulary.add(p2, OWL.inverseOf, p1);
 
         Model m = ds.getDefaultModel();
-        m.add(folder, p1, file);
-        assertTrue(m.contains(folder, p1, file));
-        assertTrue(m.contains(file, p2, folder));
+        m.add(person, p1, material);
+        assertTrue(m.contains(person, p1, material));
+        assertTrue(m.contains(material, p2, person));
 
-        m.remove(file, p2, folder);
-        assertFalse(m.contains(folder, p1, file));
-        assertFalse(m.contains(file, p2, folder));
+        m.remove(material, p2, person);
+        assertFalse(m.contains(person, p1, material));
+        assertFalse(m.contains(material, p2, person));
 
         vocabulary.remove(p2, OWL.inverseOf, p1);
-        m.add(folder, p1, file);
-        assertTrue(m.contains(folder, p1, file));
-        assertFalse(m.contains(file, p2, folder));
+        m.add(person, p1, material);
+        assertTrue(m.contains(person, p1, material));
+        assertFalse(m.contains(material, p2, person));
     }
 
     @Test
@@ -84,17 +84,17 @@ public class InvertingDatasetGraphTest {
         vocabulary.add(p2, OWL.inverseOf, p1);
 
         Model m = ds.getDefaultModel();
-        m.add(folder, p1, file);
+        m.add(person, p1, material);
 
         vocabulary.remove(p2, OWL.inverseOf, p1);
 
         // Vocabulary updates do not onChange the graph
-        assertTrue(m.contains(folder, p1, file));
-        assertTrue(m.contains(file, p2, folder));
+        assertTrue(m.contains(person, p1, material));
+        assertTrue(m.contains(material, p2, person));
         // Adding an existing statement does not remove any statements
-        m.add(folder, p1, file);
-        assertTrue(m.contains(folder, p1, file));
-        assertTrue(m.contains(file, p2, folder));
+        m.add(person, p1, material);
+        assertTrue(m.contains(person, p1, material));
+        assertTrue(m.contains(material, p2, person));
     }
 
     @Test
@@ -103,9 +103,9 @@ public class InvertingDatasetGraphTest {
         vocabulary.add(p1, OWL.inverseOf, p1);
 
         Model m = ds.getDefaultModel();
-        m.add(folder, p1, file);
-        assertTrue(m.contains(folder, p1, file));
-        assertTrue(m.contains(file, p1, folder));
+        m.add(person, p1, material);
+        assertTrue(m.contains(person, p1, material));
+        assertTrue(m.contains(material, p1, person));
     }
 
     @Test(expected = UnsupportedOperationException.class)
