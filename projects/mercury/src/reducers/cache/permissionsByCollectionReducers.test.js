@@ -1,13 +1,9 @@
 import reducer from "./permissionsByCollectionReducers";
+import {testNoChangedOnUnknownActionType} from '../../utils/testUtils';
 
-describe('updating permissions', () => {
-    it('should return the same state unchanged if action type is unknown by reducer', () => {
-        const state = {'say what?': 'you can not touch this'};
-        expect(reducer(state, {
-            type: 'ACTION_THAT_DOES_NOT_EXIST'
-        })).toEqual({'say what?': 'you can not touch this'});
-    });
+testNoChangedOnUnknownActionType('Permissions reducers', reducer);
 
+describe('Permissions reducers', () => {
     it('should add collaborators', () => {
         const previousState = {
             500: {

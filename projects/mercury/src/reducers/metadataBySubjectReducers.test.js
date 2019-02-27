@@ -1,14 +1,10 @@
 import reducer from './metadataBySubjectReducers';
 import * as actionTypes from "../actions/actionTypes";
+import {testNoChangedOnUnknownActionType} from '../utils/testUtils';
+
+testNoChangedOnUnknownActionType('Metadata by subject reducers', reducer);
 
 describe('Metadata by subject reducers', () => {
-    it('should return the same state unchanged if action type is unknown by reducer', () => {
-        const state = {'say what?': 'you can not touch this'};
-        expect(reducer(state, {
-            type: 'ACTION_THAT_DOES_NOT_EXIST'
-        })).toEqual({'say what?': 'you can not touch this'});
-    });
-
     it('should update metadata properly', () => {
         const state = {
             "creatingMetadataEntity": false,
