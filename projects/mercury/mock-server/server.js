@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const mockDataDir = path.join(__dirname, '/mock-data');
-const mockVocabulary = path.join(__dirname, '../../saturn/src/main/resources/vocabulary.jsonld');
+const mockedVocabularyDir = path.join(__dirname, '../../saturn/src/main/resources/vocabulary.jsonld');
 const port = process.env.PORT || 5000;
 // Start a generic server on port 5000 that serves default API
 const app = express();
@@ -44,7 +44,7 @@ app.delete('/api/metadata/', (req, res) => res.send());
 app.get('/api/metadata/entities/', (req, res) => res.sendFile(`${mockDataDir}/metadata/all-entities.json`));
 
 // Vocabulary API
-app.get('/api/vocabulary/', (req, res) => res.sendFile(mockVocabulary));
+app.get('/api/vocabulary/', (req, res) => res.sendFile(mockedVocabularyDir));
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
