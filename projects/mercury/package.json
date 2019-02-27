@@ -33,14 +33,15 @@
     "webdav": "^2.5.0"
   },
   "scripts": {
-    "dev": "concurrently \"yarn server\" \"yarn start\" \"yarn test\"",
+    "dev": "concurrently \"yarn server\" \"yarn start\" \"yarn test\" \"cd ../saturn/; ./gradlew run\"",
     "server": "node mock-server/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "test:coverage": "react-scripts test --env=jsdom --coverage",
     "eject": "react-scripts eject",
-    "lint": "./node_modules/.bin/eslint ./src"
+    "lint": "./node_modules/.bin/eslint ./src",
+    "backend": "cd ../saturn/; ./gradlew run"
   },
   "devDependencies": {
     "concurrently": "^4.1.0",
