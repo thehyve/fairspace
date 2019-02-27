@@ -51,6 +51,8 @@ export class InformationDrawer extends React.Component {
                 })
                 .catch(e => ErrorDialog.showError(e, "An error occurred while updating collection metadata"));
         }
+
+        return Promise.resolve();
     }
 
     render() {
