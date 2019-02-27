@@ -1,72 +1,66 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Icon, IconButton, Badge} from "@material-ui/core";
+import {Badge, Icon, IconButton} from "@material-ui/core";
 import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 
-import {CreateDirectoryButton, UploadButton, ErrorDialog, LoadingOverlay} from "../common";
+import {CreateDirectoryButton, ErrorDialog, LoadingOverlay, UploadButton} from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
 import {joinPaths, uniqueName} from "../../utils/fileUtils";
 
-function FileOperations(props) {
-    const {
-        clipboardItemsCount, disabled, creatingDirectory,
-        openedPath, selectedPaths,
-        fetchFilesIfNeeded, uploadFiles, createDirectory,
-        cut, copy, paste, existingFiles
-    } = props;
+export class FileOperations extends React.Component {
 
-    function refreshFiles() {
-        fetchFilesIfNeeded(openedPath);
+    refreshFiles() {
+        this.props.fetchFilesIfNeeded(this.props.openedPath);
     }
 
-    function handleCut(e) {
+    handleCut(e) {
         e.stopPropagation();
-        cut(selectedPaths);
+        this.props.cut(this.props.selectedPaths);
     }
 
-    function handleCopy(e) {
+    handleCopy(e) {
         e.stopPropagation();
-        copy(selectedPaths);
+        this.props.copy(this.props.selectedPaths);
     }
 
-    function handlePaste(e) {
+    handlePaste(e) {
         e.stopPropagation();
-        paste(openedPath)
-            .then(refreshFiles)
+        this.props.paste(this.props.openedPath)
+            .then(() => this.refreshFiles())
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while pasting your contents");
             });
     }
 
-    function handleUpload(files) {
+    handleUpload(files) {
         if (files && files.length > 0) {
             const nameMapping = new Map();
-            files.forEach(file => nameMapping.set(file.name, uniqueName(file.name, existingFiles)));
-            return uploadFiles(openedPath, files, nameMapping)
-                .then(refreshFiles)
+            files.forEach(file => nameMapping.set(file.name, uniqueName(file.name, this.props.existingFiles)));
+            return this.props.uploadFiles(this.props.openedPath, files, nameMapping)
+                .then(() => this.refreshFiles())
                 .catch((err) => {
-                    ErrorDialog.showError(err, "An error occurred while uploading files", () => handleUpload(files));
+                    ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
                 });
         }
         return Promise.resolve([]);
     }
 
-    function handleCreateDirectory(name) {
-        return createDirectory(joinPaths(openedPath, name))
-            .then(refreshFiles)
+    handleCreateDirectory(name) {
+        return this.props.createDirectory(joinPaths(this.props.openedPath, name))
+            .then(() => this.refreshFiles())
             .catch((err) => {
                 if (err.status === 405) {
                     // Directory already exists
                     ErrorDialog.showError(err, "A directory or file with this name already exists. Please choose another name");
                     return false;
                 }
-                ErrorDialog.showError(err, "An error occurred while creating directory", () => handleCreateDirectory(name));
+                ErrorDialog.showError(err, "An error occurred while creating directory", () => this.handleCreateDirectory(name));
                 return true;
             });
     }
 
-    function addBadgeIfNotEmpty(badgeContent, children) {
+    addBadgeIfNotEmpty(badgeContent, children) {
         if (badgeContent) {
             return (
                 <Badge badgeContent={badgeContent} color="primary">
@@ -77,70 +71,72 @@ function FileOperations(props) {
         return children;
     }
 
-    const buttonColor = disabled ? 'default' : 'secondary';
-    const noSelectedPath = selectedPaths.length === 0;
+    render() {
+        const buttonColor = this.props.disabled ? 'default' : 'secondary';
+        const noSelectedPath = this.props.selectedPaths.length === 0;
 
-    return creatingDirectory
-        ? <LoadingOverlay loading={creatingDirectory} />
-        : (
-            <>
-                <IconButton
-                    aria-label="Copy"
-                    title="Copy"
-                    onClick={handleCopy}
-                    disabled={noSelectedPath || disabled}
-                    color={buttonColor}
-                >
-                    <ContentCopy />
-                </IconButton>
-                <IconButton
-                    aria-label="Cut"
-                    title="Cut"
-                    onClick={handleCut}
-                    disabled={noSelectedPath || disabled}
-                    color={buttonColor}
-                >
-                    <ContentCut />
-                </IconButton>
-                <IconButton
-                    aria-label="Paste"
-                    title="Paste"
-                    onClick={handlePaste}
-                    disabled={clipboardItemsCount === 0 || disabled}
-                    color={buttonColor}
-                >
-                    {addBadgeIfNotEmpty(
-                        clipboardItemsCount,
-                        <ContentPaste />
-                    )}
-                </IconButton>
-                <CreateDirectoryButton
-                    onCreate={handleCreateDirectory}
-                >
+        return this.props.creatingDirectory
+            ? <LoadingOverlay loading={this.props.creatingDirectory} />
+            : (
+                <>
                     <IconButton
-                        aria-label="Create directory"
-                        title="Create directory"
-                        disabled={disabled}
+                        aria-label="Copy"
+                        title="Copy"
+                        onClick={e => this.handleCopy(e)}
+                        disabled={noSelectedPath || this.props.disabled}
                         color={buttonColor}
                     >
-                        <Icon>create_new_folder</Icon>
+                        <ContentCopy />
                     </IconButton>
-                </CreateDirectoryButton>
-                <UploadButton
-                    onUpload={handleUpload}
-                    onDidUpload={refreshFiles}
-                >
                     <IconButton
-                        title="Upload"
-                        aria-label="Upload"
-                        disabled={disabled}
+                        aria-label="Cut"
+                        title="Cut"
+                        onClick={e => this.handleCut(e)}
+                        disabled={noSelectedPath || this.props.disabled}
                         color={buttonColor}
                     >
-                        <Icon>cloud_upload</Icon>
+                        <ContentCut />
                     </IconButton>
-                </UploadButton>
-            </>
-        );
+                    <IconButton
+                        aria-label="Paste"
+                        title="Paste"
+                        onClick={e => this.handlePaste(e)}
+                        disabled={this.props.clipboardItemsCount === 0 || this.props.disabled}
+                        color={buttonColor}
+                    >
+                        {this.addBadgeIfNotEmpty(
+                            this.props.clipboardItemsCount,
+                            <ContentPaste />
+                        )}
+                    </IconButton>
+                    <CreateDirectoryButton
+                        onCreate={name => this.handleCreateDirectory(name)}
+                    >
+                        <IconButton
+                            aria-label="Create directory"
+                            title="Create directory"
+                            disabled={this.props.disabled}
+                            color={buttonColor}
+                        >
+                            <Icon>create_new_folder</Icon>
+                        </IconButton>
+                    </CreateDirectoryButton>
+                    <UploadButton
+                        onUpload={files => this.handleUpload(files)}
+                        onDidUpload={() => this.refreshFiles()}
+                    >
+                        <IconButton
+                            title="Upload"
+                            aria-label="Upload"
+                            disabled={this.props.disabled}
+                            color={buttonColor}
+                        >
+                            <Icon>cloud_upload</Icon>
+                        </IconButton>
+                    </UploadButton>
+                </>
+            );
+    }
 }
 
 const mapStateToProps = state => ({
