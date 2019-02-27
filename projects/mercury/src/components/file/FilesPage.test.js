@@ -33,7 +33,7 @@ describe('FilesPage', () => {
             expect(history[0]).toEqual('/collections/new-location/subdirectory/something-else');
         });
 
-        it('can handle an empty openedPath starting with a slash', () => {
+        it('can handle an empty openedPath', () => {
             const history = [];
             const wrapper = shallow(<FilesPage
                 openedPath={'/location1'}
@@ -45,23 +45,7 @@ describe('FilesPage', () => {
 
             wrapper.instance().handleCollectionLocationChange(newCollection);
             expect(history.length).toEqual(1);
-            expect(history[0]).toEqual('/collections/new-location');
+            expect(history[0]).toEqual('/collections/new-location/');
         });
-
-        it('can handle an empty openedPath starting without leading slash', () => {
-            const history = [];
-            const wrapper = shallow(<FilesPage
-                openedPath={'location1'}
-                openedCollection={openedCollection}
-                history={history}
-                selectCollection={selectCollection}
-                fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
-            />);
-
-            wrapper.instance().handleCollectionLocationChange(newCollection);
-            expect(history.length).toEqual(1);
-            expect(history[0]).toEqual('/collections/new-location');
-        });
-
     });
 });

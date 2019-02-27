@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import FileBrowser from "./FileBrowser";
 import {BreadCrumbs} from "../common";
 import InformationDrawer from '../common/InformationDrawer';
-import {splitPathIntoArray} from "../../utils/fileUtils";
+import {getDirectoryFromFullpath, splitPathIntoArray} from "../../utils/fileUtils";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
@@ -63,22 +63,8 @@ export class FilesPage extends React.Component {
     handleCollectionLocationChange = (collection) => {
         const {openedPath} = this.props;
 
-        // Remove the first directory name from the opened path, in order
-        // to remove the previous collection location
-        // If there is a leading slash, remove it
-        const cleanedPath = openedPath.charAt(0) === '/' ? openedPath.substring(1) : openedPath;
-        const firstSlashPosition = cleanedPath.indexOf('/');
-        let subdirectory;
-
-        // Without a slash, we are in the root directory
-        if (firstSlashPosition === -1) {
-            subdirectory = '';
-        } else {
-            subdirectory = openedPath.substring(firstSlashPosition);
-        }
-
         // If the collection location changes, the URI for the current page should change as well
-        this.props.history.push(`${getCollectionAbsolutePath(collection)}${subdirectory}`);
+        this.props.history.push(`${getCollectionAbsolutePath(collection)}${getDirectoryFromFullpath(openedPath)}`);
     }
 
     render() {
