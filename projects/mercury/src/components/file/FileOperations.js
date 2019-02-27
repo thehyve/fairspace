@@ -9,7 +9,6 @@ import * as fileActions from "../../actions/fileActions";
 import {joinPaths, uniqueName} from "../../utils/fileUtils";
 
 export class FileOperations extends React.Component {
-
     refreshFiles() {
         this.props.fetchFilesIfNeeded(this.props.openedPath);
     }
@@ -51,8 +50,8 @@ export class FileOperations extends React.Component {
             .then(() => this.refreshFiles())
             .catch((err) => {
                 if (err.response.status === 405) {
-                    // Directory already exists
-                    ErrorDialog.showError(err, "A directory or file with this name already exists. Please choose another name");
+                    const message = "A directory or file with this name already exists. Please choose another name";
+                    ErrorDialog.showError(err, message, false);
                     return false;
                 }
                 ErrorDialog.showError(err, "An error occurred while creating directory", () => this.handleCreateDirectory(name));
