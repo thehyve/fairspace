@@ -1,6 +1,5 @@
 package io.fairspace.saturn.vfs.managed;
 
-import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import io.fairspace.saturn.services.collections.Access;
 import io.fairspace.saturn.services.collections.Collection;
@@ -36,13 +35,13 @@ public class ManagedFileSystem implements VirtualFileSystem {
             .build();
     private final RDFConnection rdf;
     private final BlobStore store;
-    private final Supplier<UserInfo> userInfoSupplier;
+    private final Supplier<String> userIriSupplier;
     private final CollectionsService collections;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<UserInfo> userInfoSupplier, CollectionsService collections) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<String> userIriSupplier, CollectionsService collections) {
         this.rdf = rdf;
         this.store = store;
-        this.userInfoSupplier = userInfoSupplier;
+        this.userIriSupplier = userIriSupplier;
         this.collections = collections;
     }
 
@@ -96,7 +95,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(path);
 
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", path, userId(), name(path))));
+                () -> rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path))));
     }
 
     @Override
@@ -106,7 +105,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userId(), name(path))));
+                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userIriSupplier.get(), name(path))));
     }
 
     @Override
@@ -114,7 +113,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var cis = new CountingInputStream(in);
         var blobId = store.write(cis);
         withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId, userId())));
+                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId, userIriSupplier.get())));
     }
 
     @Override
@@ -146,7 +145,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(path);
 
         withCommitMessage("Delete " + path,
-                () -> rdf.update(storedQuery("fs_delete", path, userId())));
+                () -> rdf.update(storedQuery("fs_delete", path, userIriSupplier.get())));
     }
 
     @Override
@@ -180,14 +179,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .modifiedBy(collection.getCreator())
                 .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
                 .build();
-    }
-
-    private String userId() {
-        if (userInfoSupplier != null) {
-            var userInfo = userInfoSupplier.get();
-            return userInfo != null ? userInfo.getUserId() : "";
-        }
-        return "";
     }
 
     static boolean isCollection(String path) {

@@ -1,0 +1,8 @@
+# 0 - external id
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+INSERT {
+  ?iri a fs:User;
+       fs:externalId ?0;
+}

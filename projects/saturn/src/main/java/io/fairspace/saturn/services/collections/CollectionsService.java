@@ -21,12 +21,12 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 public class CollectionsService {
     private final RDFConnection rdf;
 
-    private final Supplier<UserInfo> userInfoSupplier;
+    private final Supplier<String> userIriSupplier;
 
 
-    public CollectionsService(RDFConnection rdf, Supplier<UserInfo> userInfoSupplier) {
+    public CollectionsService(RDFConnection rdf, Supplier<String> userIriSupplier) {
         this.rdf = rdf;
-        this.userInfoSupplier = userInfoSupplier;
+        this.userIriSupplier = userIriSupplier;
     }
 
     public Collection create(Collection collection) {
@@ -51,7 +51,7 @@ public class CollectionsService {
                     collection.getLocation(),
                     collection.getDescription(),
                     collection.getType(),
-                    userId()));
+                    userIriSupplier.get()));
 
             return getByLocation(collection.getLocation());
         });
@@ -88,7 +88,7 @@ public class CollectionsService {
                 log.info("No enough permissions to delete a collection {}", iri);
                 throw new CollectionAccessDeniedException(iri);
             }
-            rdf.update(storedQuery("coll_delete", createResource(iri), userId()));
+            rdf.update(storedQuery("coll_delete", createResource(iri),  userIriSupplier.get()));
         });
     }
 
@@ -124,7 +124,7 @@ public class CollectionsService {
                     patch.getName() != null ? patch.getName() : existing.getName(),
                     patch.getDescription() != null ? patch.getDescription() : existing.getDescription(),
                     patch.getLocation() != null ? patch.getLocation() : existing.getLocation(),
-                    userId()));
+                    userIriSupplier.get()));
 
             return get(patch.getIri());
         });
@@ -150,13 +150,4 @@ public class CollectionsService {
                 && name.length() < 128;
     }
 
-    private String userId() {
-        if (userInfoSupplier != null) {
-            var userInfo = userInfoSupplier.get();
-            if (userInfo != null) {
-                return userInfo.getUserId();
-            }
-        }
-        return "";
-    }
 }
