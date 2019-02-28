@@ -36,7 +36,7 @@ export function linkLabel(uri, shortenExternalUris = false) {
  * the last part of the id is returned
  *
  * @param entity    Expanded JSON-LD entity
- * @shortenExternalUris Shorten external URIs
+ * @param shortenExternalUris Shorten external URIs
  * @returns string
  */
 export function getLabel(entity, shortenExternalUris = false) {
@@ -52,28 +52,13 @@ export function getLabel(entity, shortenExternalUris = false) {
 }
 
 /**
- * Returns a navigable link for a given metadata url
- *
- * If the url refers to an entity within our workspace, a special
- * url is constructed to show the page in the frontend.
- * Otherwise, the url is just returned as is
- *
- * @param link          The uri to make navigable
- * @returns string      The navigable URI
- */
-export function navigableLink(link) {
-    return link.startsWith(`${window.location.origin}/iri/collections/`)
-        ? link.replace('/iri/collections/', '/collections/')
-        : link;
-}
-
-/**
  * Returns a relative navigable link, excluding the base url
  * @param link
  * @returns {string}
  */
 export function relativeLink(link) {
-    return new URL(link).pathname;
+    const withoutSchema = link.toString().substring(link.toString().indexOf('//') + 2);
+    return withoutSchema.substring(withoutSchema.indexOf('/'));
 }
 
 export function isDateTimeProperty(property) {

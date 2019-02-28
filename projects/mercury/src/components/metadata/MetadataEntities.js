@@ -6,7 +6,7 @@ import {
     TableCell, TableBody
 } from "@material-ui/core";
 
-import {getLabel, navigableLink, relativeLink} from "../../utils/metadataUtils";
+import {getLabel, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import {ErrorMessage, ErrorDialog, LoadingInlay, LoadingOverlay} from "../common";
@@ -56,13 +56,13 @@ class MetadataEntities extends React.Component {
                                     </TableCell>
                                     <TableCell>
                                         {entity['@type'].map(type => (
-                                            <a href={navigableLink(type)} key={type}>
+                                            <a href={type} key={type}>
                                                 {getLabel(vocabulary.getById(type), true)}
                                             </a>
                                         ))}
                                     </TableCell>
                                     <TableCell>
-                                        <a href={navigableLink(entity['@id'])}>
+                                        <a href={entity['@id']}>
                                             {getLabel(entity)}
                                         </a>
                                     </TableCell>
