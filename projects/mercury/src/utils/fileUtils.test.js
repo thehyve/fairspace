@@ -69,4 +69,9 @@ describe('addCounterToFilename', () => {
         expect(addCounterToFilename('/some/path/file (123).ext')).toEqual('/some/path/file (124).ext');
         expect(addCounterToFilename('/some/path/file (123)')).toEqual('/some/path/file (124)');
     });
+
+    it('Increments the correct counter if there is one already', () => {
+        expect(addCounterToFilename('/some/path/file (123) (123).ext')).toEqual('/some/path/file (123) (124).ext');
+        expect(addCounterToFilename('/some/path/file (123) (123)')).toEqual('/some/path/file (123) (124)');
+    });
 });
