@@ -10,7 +10,6 @@ import {updateMetadata as updateMetadataAction} from "../../actions/metadataActi
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ErrorDialog from "../common/ErrorDialog";
 import * as constants from '../../constants';
-import {shouldPropertyBeHidden} from "../../utils/metadataUtils";
 
 class MetadataProperty extends React.Component {
     state = {
@@ -120,9 +119,6 @@ class MetadataProperty extends React.Component {
     render() {
         const {editable, property} = this.props;
 
-        if (shouldPropertyBeHidden(property)) {
-            return null;
-        }
         // Do not show an add component if no multiples are allowed
         // and there is already a value
         const editableAndNotMachineOnly = editable && !property.machineOnly;
