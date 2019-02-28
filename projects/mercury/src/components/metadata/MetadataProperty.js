@@ -123,7 +123,7 @@ class MetadataProperty extends React.Component {
         const isDirectory = property.domain === constants.DIRECTORY_URI;
         const isManaged = isCollection || isFile || isDirectory;
         if ((property.key === '@type')
-            || (isManaged && property.key === constants.LABEL_URI)
+            || (isManaged && ([constants.LABEL_URI, constants.FILE_PATH_URI, constants.DATE_DELETED_URI, constants.DELETED_BY_URI].includes(property.key)))
             || (isCollection && property.key === constants.COMMENT_URI)) {
             return '';
         }
