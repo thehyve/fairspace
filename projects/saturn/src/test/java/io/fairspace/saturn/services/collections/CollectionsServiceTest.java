@@ -27,9 +27,9 @@ public class CollectionsServiceTest {
     public void before() {
         setWorkspaceURI("http://example.com/iri/");
         rdf = connect(createTxnMem());
-        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
-        collections = new CollectionsService(rdf, userInfoSupplier);
-        files = new ManagedFileSystem(rdf, new MemoryBlobStore(), userInfoSupplier, collections);
+        Supplier<String> userIriSupplier = () -> "http://example.com/user";
+        collections = new CollectionsService(rdf, userIriSupplier);
+        files = new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections);
     }
 
     @Test

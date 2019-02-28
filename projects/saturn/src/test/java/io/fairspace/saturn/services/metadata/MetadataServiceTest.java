@@ -47,7 +47,6 @@ public class MetadataServiceTest {
         ds = createTxnMem();
         initVocabulary(ds.asDatasetGraph(), createURI(baseURI + "vocabulary"));
         api = new MetadataService(new RDFConnectionLocal(ds), createURI(GRAPH));
-
     }
 
     @Test
