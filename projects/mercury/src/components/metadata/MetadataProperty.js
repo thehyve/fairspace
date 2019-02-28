@@ -10,6 +10,7 @@ import {updateMetadata as updateMetadataAction} from "../../actions/metadataActi
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ErrorDialog from "../common/ErrorDialog";
 import * as constants from '../../constants';
+import {shouldBeHidden} from "../../utils/metadataUtils";
 
 class MetadataProperty extends React.Component {
     state = {
@@ -118,13 +119,8 @@ class MetadataProperty extends React.Component {
 
     render() {
         const {editable, property} = this.props;
-        const isCollection = property.domain === constants.COLLECTION_URI;
-        const isFile = property.domain === constants.FILE_URI;
-        const isDirectory = property.domain === constants.DIRECTORY_URI;
-        const isManaged = isCollection || isFile || isDirectory;
-        if ((property.key === '@type')
-            || (isManaged && ([constants.LABEL_URI, constants.FILE_PATH_URI, constants.DATE_DELETED_URI, constants.DELETED_BY_URI].includes(property.key)))
-            || (isCollection && property.key === constants.COMMENT_URI)) {
+
+        if (shouldBeHidden(property.key, property.domain)) {
             return '';
         }
         // Do not show an add component if no multiples are allowed
