@@ -118,15 +118,7 @@ class MetadataProperty extends React.Component {
 
     render() {
         const {editable, property} = this.props;
-        const isCollection = property.domain === constants.COLLECTION_URI;
-        const isFile = property.domain === constants.FILE_URI;
-        const isDirectory = property.domain === constants.DIRECTORY_URI;
-        const isManaged = isCollection || isFile || isDirectory;
-        if ((property.key === '@type')
-            || (isManaged && property.key === constants.LABEL_URI)
-            || (isCollection && property.key === constants.COMMENT_URI)) {
-            return '';
-        }
+
         // Do not show an add component if no multiples are allowed
         // and there is already a value
         const editableAndNotMachineOnly = editable && !property.machineOnly;

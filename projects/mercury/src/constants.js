@@ -36,3 +36,6 @@ export const FAIRSPACE_ENTITY_URI = 'http://fairspace.io/ontology#fairspaceEntit
 export const COLLECTION_URI = 'http://fairspace.io/ontology#Collection';
 export const FILE_URI = 'http://fairspace.io/ontology#File';
 export const DIRECTORY_URI = 'http://fairspace.io/ontology#Directory';
+export const FILE_PATH_URI = 'http://fairspace.io/ontology#filePath';
+export const DATE_DELETED_URI = 'http://fairspace.io/ontology#dateDeleted';
+export const DELETED_BY_URI = 'http://fairspace.io/ontology#deletedBy';

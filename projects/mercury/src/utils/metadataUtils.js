@@ -1,4 +1,15 @@
-import {LABEL_URI} from "../constants";
+import {
+    COLLECTION_URI,
+    COMMENT_URI,
+    DATE_DELETED_URI,
+    DELETED_BY_URI,
+    DIRECTORY_URI,
+    FILE_PATH_URI,
+    FILE_URI,
+    LABEL_URI,
+    TYPE_URI
+} from "../constants";
+
 
 /**
  *
@@ -78,4 +89,26 @@ export function getValues(entity, property) {
 export function getSingleValue(entity, property) {
     const values = getValues(entity, property);
     return (values.length > 0) ? values[0] : undefined;
+}
+
+export function shouldPropertyBeHidden({key, domain}) {
+    const isCollection = domain === COLLECTION_URI;
+    const isFile = domain === FILE_URI;
+    const isDirectory = domain === DIRECTORY_URI;
+    const isManaged = isCollection || isFile || isDirectory;
+
+    switch (key) {
+        case '@type':
+        case TYPE_URI:
+        case FILE_PATH_URI:
+        case DATE_DELETED_URI:
+        case DELETED_BY_URI:
+            return true;
+        case LABEL_URI:
+            return isManaged;
+        case COMMENT_URI:
+            return isCollection;
+        default:
+            return false;
+    }
 }
