@@ -12,8 +12,8 @@ data:
     port: 8080
     jena:
       baseIRI: {{ template "workspace.url" . }}/iri/
-      datasetPath: "/data/db"
-      transactionLogPath: "/data/store/log"
+      datasetPath: "/data/saturn/db"
+      transactionLogPath: "/data/saturn/files/log"
       elasticSearch:
         enabled: false
         required: false
@@ -29,4 +29,4 @@ data:
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: "RS256"
     webDAV:
-      blobStorePath: "/data/store/blobs"
+      blobStorePath: "/data/saturn/files/blobs"
