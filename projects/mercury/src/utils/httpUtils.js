@@ -3,7 +3,7 @@ function failOnHttpError(message) {
         if (response && !response.ok) {
             switch (response.status) {
                 case 401:
-                    window.location.href = `/login?redirectUrl=${encodeURI(window.location.href)}`;
+                    window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
                     break;
                 default:
                     throw Error(`${message} ${response.error || ''}`);
