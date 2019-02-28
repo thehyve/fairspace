@@ -36,9 +36,12 @@ describe('getParentPath', () => {
 
 describe('getFileName', () => {
     it('determines the file name', () => {
+        expect(getFileName('aaa/xxx.something.ext')).toEqual('xxx.something.ext');
+        expect(getFileName('/aaa/xxx.something.ext')).toEqual('xxx.something.ext');
         expect(getFileName('/aaa/bbb/ccc.ext')).toEqual('ccc.ext');
         expect(getFileName('ccc.ext')).toEqual('ccc.ext');
         expect(getFileName('aaa/bbb.ext/')).toEqual('bbb.ext');
+        expect(getFileName('aaa/bbb')).toEqual('bbb');
     });
 });
 
