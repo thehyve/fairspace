@@ -4,7 +4,7 @@ export function splitPathIntoArray(path) {
     return path.split(PATH_SEPARATOR).filter(s => s.length > 0);
 }
 
-export function uniqueName(fileName, usedNames) {
+export function getUniqueName(fileName, usedNames) {
     if (!usedNames.includes(fileName)) {
         usedNames.push(fileName);
         return fileName;
@@ -49,12 +49,12 @@ export const addCounterToFilename = (fileName) => {
     return `${baseName} (${counter})${extension}`;
 };
 
-export function parentPath(path) {
+export function getParentPath(path) {
     const pos = path.lastIndexOf('/', path.length - 2);
     return (pos > 1) ? path.substring(0, pos) : '';
 }
 
-export function fileName(path) {
+export function getFileName(path) {
     const normalizedPath = path.endsWith('/') ? path.substring(0, path.length - 1) : path;
     const pos = normalizedPath.lastIndexOf('/');
     return (pos > 0) ? normalizedPath.substring(pos + 1) : normalizedPath;

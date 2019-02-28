@@ -1,5 +1,5 @@
 import * as actionTypes from "../../actions/actionTypes";
-import {parentPath} from "../../utils/fileUtils";
+import {getParentPath} from "../../utils/fileUtils";
 
 const defaultState = {
     creatingDirectory: false
@@ -64,18 +64,18 @@ const filesByPath = (state = defaultState, action) => {
                 ...state,
                 creatingDirectory: false
             };
-            return invalidateFiles(newState, parentPath(action.meta.path));
+            return invalidateFiles(newState, getParentPath(action.meta.path));
         }
 
 
         case actionTypes.DELETE_FILE_FULFILLED:
-            return invalidateFiles(state, parentPath(action.meta.path));
+            return invalidateFiles(state, getParentPath(action.meta.path));
         case actionTypes.RENAME_FILE_FULFILLED:
         case actionTypes.INVALIDATE_FETCH_FILES:
         case actionTypes.UPLOAD_FILES_FULFILLED:
             return invalidateFiles(state, action.meta.path);
         case actionTypes.CLIPBOARD_PASTE_FULFILLED: {
-            return invalidateFiles(state, action.meta.destinationDir, ...action.meta.filenames.map(parentPath));
+            return invalidateFiles(state, action.meta.destinationDir, ...action.meta.filenames.map(getParentPath));
         }
         default:
             return state;

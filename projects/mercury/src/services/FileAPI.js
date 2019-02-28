@@ -1,6 +1,6 @@
 import {createClient} from "webdav";
 import Config from "./Config/Config";
-import {addCounterToFilename, fileName, joinPaths, parentPath} from '../utils/fileUtils';
+import {addCounterToFilename, getFileName, joinPaths, getParentPath} from '../utils/fileUtils';
 import axios from 'axios';
 
 // Ensure that the window fetch method is used for webdav calls
@@ -15,7 +15,7 @@ axios.interceptors.request.use((config) => {
     }
     return config;
 },
-(error) => Promise.reject(error));
+    (error) => Promise.reject(error));
 
 class FileAPI {
     client() {
@@ -130,7 +130,7 @@ class FileAPI {
      */
     movePaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            const destinationFile = joinPaths(destinationDir, fileName(sourceFile));
+            const destinationFile = joinPaths(destinationDir, getFileName(sourceFile));
             return this.move(sourceFile, destinationFile);
         }));
     }
@@ -143,9 +143,9 @@ class FileAPI {
      */
     copyPaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            let destinationFilename = fileName(sourceFile);
+            let destinationFilename = getFileName(sourceFile);
             // Copying files to the current directory involves renaming
-            if (destinationDir === parentPath(sourceFile)) {
+            if (destinationDir === getParentPath(sourceFile)) {
                 destinationFilename = addCounterToFilename(destinationFilename);
             }
 

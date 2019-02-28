@@ -6,7 +6,7 @@ import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import {CreateDirectoryButton, ErrorDialog, LoadingOverlay, UploadButton} from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
-import {joinPaths, uniqueName} from "../../utils/fileUtils";
+import {joinPaths, getUniqueName} from "../../utils/fileUtils";
 
 export class FileOperations extends React.Component {
     refreshFiles() {
@@ -35,7 +35,7 @@ export class FileOperations extends React.Component {
     handleUpload(files) {
         if (files && files.length > 0) {
             const nameMapping = new Map();
-            files.forEach(file => nameMapping.set(file.name, uniqueName(file.name, this.props.existingFiles)));
+            files.forEach(file => nameMapping.set(file.name, getUniqueName(file.name, this.props.existingFiles)));
             return this.props.uploadFiles(this.props.openedPath, files, nameMapping)
                 .then(() => this.refreshFiles())
                 .catch((err) => {
