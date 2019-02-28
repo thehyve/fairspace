@@ -106,13 +106,13 @@ export function getSingleValue(entity, property) {
     return (values.length > 0) ? values[0] : undefined;
 }
 
-export function shouldBeHidden(propertyURI, domainURI) {
-    const isCollection = domainURI === COLLECTION_URI;
-    const isFile = domainURI === FILE_URI;
-    const isDirectory = domainURI === DIRECTORY_URI;
+export function shouldPropertyBeHidden({key, domain}) {
+    const isCollection = domain === COLLECTION_URI;
+    const isFile = domain === FILE_URI;
+    const isDirectory = domain === DIRECTORY_URI;
     const isManaged = isCollection || isFile || isDirectory;
 
-    switch (propertyURI) {
+    switch (key) {
         case '@type':
         case TYPE_URI:
         case FILE_PATH_URI:

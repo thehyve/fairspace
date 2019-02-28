@@ -1,4 +1,4 @@
-import {getLabel, navigableLink, shouldBeHidden} from "./metadataUtils";
+import {getLabel, navigableLink, shouldPropertyBeHidden} from "./metadataUtils";
 import {
     COLLECTION_URI,
     COMMENT_URI,
@@ -68,52 +68,58 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('shouldBeHidden', () => {
+    describe('shouldPropertyBeHidden', () => {
         it('should never show @type', () => {
-            expect(shouldBeHidden('@type', 'http://example.com')).toBe(true);
-            expect(shouldBeHidden('@type', FILE_URI)).toBe(true);
-            expect(shouldBeHidden('@type', DIRECTORY_URI)).toBe(true);
-            expect(shouldBeHidden('@type', COLLECTION_URI)).toBe(true);
-            expect(shouldBeHidden(TYPE_URI, 'http://example.com')).toBe(true);
-            expect(shouldBeHidden(TYPE_URI, FILE_URI)).toBe(true);
-            expect(shouldBeHidden(TYPE_URI, DIRECTORY_URI)).toBe(true);
-            expect(shouldBeHidden(TYPE_URI, COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden({key: '@type', domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: '@type', domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: '@type', domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: '@type', domain: COLLECTION_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: TYPE_URI, domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: TYPE_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: TYPE_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: TYPE_URI, domain: COLLECTION_URI})).toBe(true);
         });
+
         it('should show comments for everything except to collections', () => {
-            expect(shouldBeHidden(COMMENT_URI, 'http://example.com')).toBe(false);
-            expect(shouldBeHidden(COMMENT_URI, FILE_URI)).toBe(false);
-            expect(shouldBeHidden(COMMENT_URI, DIRECTORY_URI)).toBe(false);
-            expect(shouldBeHidden(COMMENT_URI, COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden({key: COMMENT_URI, domain: 'http://example.com'})).toBe(false);
+            expect(shouldPropertyBeHidden({key: COMMENT_URI, domain: FILE_URI})).toBe(false);
+            expect(shouldPropertyBeHidden({key: COMMENT_URI, domain: DIRECTORY_URI})).toBe(false);
+            expect(shouldPropertyBeHidden({key: COMMENT_URI, domain: COLLECTION_URI})).toBe(true);
         });
+
         it('should not show labels for managed entities', () => {
-            expect(shouldBeHidden(LABEL_URI, 'http://example.com')).toBe(false);
-            expect(shouldBeHidden(LABEL_URI, FILE_URI)).toBe(true);
-            expect(shouldBeHidden(LABEL_URI, DIRECTORY_URI)).toBe(true);
-            expect(shouldBeHidden(LABEL_URI, COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden({key: LABEL_URI, domain: 'http://example.com'})).toBe(false);
+            expect(shouldPropertyBeHidden({key: LABEL_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: LABEL_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: LABEL_URI, domain: COLLECTION_URI})).toBe(true);
         });
+
         it('should never show fs:filePath', () => {
-            expect(shouldBeHidden(FILE_PATH_URI, 'http://example.com')).toBe(true);
-            expect(shouldBeHidden(FILE_PATH_URI, FILE_URI)).toBe(true);
-            expect(shouldBeHidden(FILE_PATH_URI, DIRECTORY_URI)).toBe(true);
-            expect(shouldBeHidden(FILE_PATH_URI, COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden({key: FILE_PATH_URI, domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: FILE_PATH_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: FILE_PATH_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: FILE_PATH_URI, domain: COLLECTION_URI})).toBe(true);
         });
+
         it('should never show fs:dateDeleted', () => {
-            expect(shouldBeHidden(DATE_DELETED_URI, 'http://example.com')).toBe(true);
-            expect(shouldBeHidden(DATE_DELETED_URI, FILE_URI)).toBe(true);
-            expect(shouldBeHidden(DATE_DELETED_URI, DIRECTORY_URI)).toBe(true);
-            expect(shouldBeHidden(DATE_DELETED_URI, COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden({key: DATE_DELETED_URI, domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DATE_DELETED_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DATE_DELETED_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DATE_DELETED_URI, domain: COLLECTION_URI})).toBe(true);
         });
+
         it('should never show fs:deletedBy', () => {
-            expect(shouldBeHidden(DELETED_BY_URI, 'http://example.com')).toBe(true);
-            expect(shouldBeHidden(DELETED_BY_URI, FILE_URI)).toBe(true);
-            expect(shouldBeHidden(DELETED_BY_URI, DIRECTORY_URI)).toBe(true);
-            expect(shouldBeHidden(DELETED_BY_URI, COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden({key: DELETED_BY_URI, domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DELETED_BY_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DELETED_BY_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DELETED_BY_URI, domain: COLLECTION_URI})).toBe(true);
         });
+
         it('should always show regular properties', () => {
-            expect(shouldBeHidden('http://example.com/property', 'http://example.com')).toBe(false);
-            expect(shouldBeHidden('http://example.com/property', FILE_URI)).toBe(false);
-            expect(shouldBeHidden('http://example.com/property', DIRECTORY_URI)).toBe(false);
-            expect(shouldBeHidden('http://example.com/property', COLLECTION_URI)).toBe(false);
+            expect(shouldPropertyBeHidden({key: 'http://example.com/property', domain: 'http://example.com'})).toBe(false);
+            expect(shouldPropertyBeHidden({key: 'http://example.com/property', domain: FILE_URI})).toBe(false);
+            expect(shouldPropertyBeHidden({key: 'http://example.com/property', domain: DIRECTORY_URI})).toBe(false);
+            expect(shouldPropertyBeHidden({key: 'http://example.com/property', domain: COLLECTION_URI})).toBe(false);
         });
     });
 });
