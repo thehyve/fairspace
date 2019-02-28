@@ -44,6 +44,6 @@ data:
         collections:
           url: {{ .Values.pluto.backends.collections | default (printf "http://%s-saturn.%s.svc.cluster.local/api/collections/" .Release.Name .Release.Namespace)}}
         metadata:
-          url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/meta/" .Release.Name .Release.Namespace)}}
+          url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/metadata/" .Release.Name .Release.Namespace)}}
         vocabulary:
           url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/vocabulary/" .Release.Name .Release.Namespace)}}

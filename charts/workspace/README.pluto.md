@@ -69,7 +69,7 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 | `backends.ui` | URL where frontend can be found. It will be proxied on / | `http://mercury` |
 | `backends.storage` | URL where the storage api can be found. Should not include any path, as the path is fixed to `/webdav/`| `http://saturn` |
 | `backends.metadata` | URL where the collections api can be found. Should also include the path to the collections api on the upstream service, if applicable. | `http://saturn/api/collections/` |
-| `backends.collections` | URL where the metadata api can be found. Should also include the path to the metadata api on the upstream service, if applicable. | `http://saturn/api/meta/` |
+| `backends.collections` | URL where the metadata api can be found. Should also include the path to the metadata api on the upstream service, if applicable. | `http://saturn/api/metadata/` |
 
 #### Informational parameters
 | Parameter  | Description  | Default |
