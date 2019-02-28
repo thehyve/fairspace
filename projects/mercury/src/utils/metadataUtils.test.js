@@ -1,4 +1,4 @@
-import {getLabel, navigableLink} from "./metadataUtils";
+import {getLabel, getSingleValue, getValues, navigableLink} from "./metadataUtils";
 import {LABEL_URI} from "../constants";
 
 describe('Metadata Utils', () => {
@@ -58,4 +58,40 @@ describe('Metadata Utils', () => {
             expect(navigableLink('http://localhost/collections/300')).toEqual('http://localhost/collections/300');
         });
     });
+
+    describe('getValues', () => {
+        it('should return an empty array if a property does not exist', () => {
+            expect(getValues({name: 'John'}, 'age')).toEqual([]);
+        });
+
+        it('should support literal properties', () => {
+            expect(getValues({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual([1, 2]);
+        });
+
+        it('should support refernce properties', () => {
+            expect(getValues({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
+                .toEqual(['http://example.com/1', 'http://example.com/2']);
+        });
+    });
+
+    describe('getSingleValue', () => {
+        it('should return undefined if a property does not exist', () => {
+            expect(getSingleValue({name: 'John'}, 'age')).toEqual(undefined);
+        });
+
+        it('should return undefined if a property is empty', () => {
+            expect(getSingleValue({numbers: []}, 'numbers')).toEqual(undefined);
+        });
+
+
+        it('should support literal properties', () => {
+            expect(getSingleValue({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual(1);
+        });
+
+        it('should support refernce properties', () => {
+            expect(getSingleValue({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
+                .toEqual('http://example.com/1');
+        });
+    });
+
 });

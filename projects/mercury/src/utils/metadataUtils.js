@@ -73,7 +73,7 @@ export function navigableLink(link) {
  * @returns {string}
  */
 export function relativeLink(link) {
-    return link.substring(window.location.origin.length);
+    return new URL(link).pathname;
 }
 
 export function isDateTimeProperty(property) {
