@@ -31,8 +31,8 @@ export const joinPaths = (...paths) => paths
 export const addCounterToFilename = (fileName) => {
     // Parse the filename
     const dotPosition = fileName.lastIndexOf('.');
-    let baseName = fileName.substring(0, dotPosition);
-    const extension = fileName.substring(dotPosition + 1);
+    let baseName = (dotPosition >= 0) ? fileName.substring(0, dotPosition) : fileName;
+    const extension = (dotPosition >= 0) ? fileName.substring(dotPosition) : '';
 
     // By default the counter is set to 2
     let counter = 2;
@@ -46,7 +46,7 @@ export const addCounterToFilename = (fileName) => {
         counter = parseInt(matches[1], 10) + 1;
     }
 
-    return `${baseName} (${counter}).${extension}`;
+    return `${baseName} (${counter})${extension}`;
 };
 
 export function parentPath(path) {

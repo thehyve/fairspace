@@ -1,4 +1,4 @@
-import {uniqueName, parentPath, fileName, getDirectoryFromFullpath} from "./fileUtils";
+import {addCounterToFilename, fileName, getDirectoryFromFullpath, parentPath, uniqueName} from "./fileUtils";
 
 describe('uniqueName', () => {
     it('leaves already unique names untouched', () => {
@@ -25,13 +25,13 @@ describe('uniqueName', () => {
 
 
 describe('parentPath', () => {
-   it('determines the parent path', () => {
-       expect(parentPath('/aaa/bbb/ccc.ext')).toEqual('/aaa/bbb');
-       expect(parentPath('aaa/bbb/ccc.ext')).toEqual('aaa/bbb');
-       expect(parentPath('aaa/bbb/')).toEqual('aaa');
-       expect(parentPath('/ccc.ext')).toEqual('');
-       expect(parentPath('ccc.ext')).toEqual('');
-   });
+    it('determines the parent path', () => {
+        expect(parentPath('/aaa/bbb/ccc.ext')).toEqual('/aaa/bbb');
+        expect(parentPath('aaa/bbb/ccc.ext')).toEqual('aaa/bbb');
+        expect(parentPath('aaa/bbb/')).toEqual('aaa');
+        expect(parentPath('/ccc.ext')).toEqual('');
+        expect(parentPath('ccc.ext')).toEqual('');
+    });
 });
 
 describe('fileName', () => {
@@ -53,5 +53,17 @@ describe('getDirectoryFromFullpath', () => {
         expect(getDirectoryFromFullpath('my-collection/sub-directory')).toEqual('/sub-directory');
         expect(getDirectoryFromFullpath('my-collection/sub-directory/nested/others.txt')).toEqual('/sub-directory/nested/others.txt');
         expect(getDirectoryFromFullpath('my-collection')).toEqual('/');
+    });
+});
+
+describe('addCounterToFilename', () => {
+    it('Adds a counter if there is no one', () => {
+        expect(addCounterToFilename('/some/path/file.ext')).toEqual('/some/path/file (2).ext');
+        expect(addCounterToFilename('/some/path/file')).toEqual('/some/path/file (2)');
+    });
+
+    it('Increments a counter if there is one already', () => {
+        expect(addCounterToFilename('/some/path/file (123).ext')).toEqual('/some/path/file (124).ext');
+        expect(addCounterToFilename('/some/path/file (123)')).toEqual('/some/path/file (124)');
     });
 });
