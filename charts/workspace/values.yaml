@@ -200,7 +200,7 @@ saturn:
       ##
       # storageClass: "-"
       accessMode: ReadWriteOnce
-      size: 512Mi
+      size: 50Gi
       mountPath: /data
     files:
       enabled: true
@@ -219,7 +219,7 @@ saturn:
       ##
       # storageClass: "-"
       accessMode: ReadWriteOnce
-      size: 512Mi
+      size: 50Gi
       mountPath: /data
 
 #####################################################################
