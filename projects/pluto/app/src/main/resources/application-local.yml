@@ -23,7 +23,7 @@ zuul:
     storage:
       url: http://localhost:8080
     metadata:
-      url: http://localhost:8080/api/meta/
+      url: http://localhost:8080/api/metadata/
     collections:
       url: http://localhost:8080/api/collections/
     ui:

@@ -10,7 +10,7 @@ For more information see [Fuseki documentation](https://jena.apache.org/document
 
 ### High-level metadata & vocabulary API
 
-The high-level metadata & vocabulary API run on :8080/api/meta/ and :8080/api/vocabulary/.
+The high-level metadata & vocabulary API run on :8080/api/metadata/ and :8080/api/vocabulary/.
 The only difference between them is that they work with different named graphs.
 Currently they support the following methods:
 
@@ -22,7 +22,7 @@ Currently they support the following methods:
 | DELETE      | -                                                 | JsonLD-encoded statements | Deletes the statements provided                                    |
 | PATCH       | -                                                 | JsonLD-encoded statements | Replaces existing triples with the statements provided             |
 
-Additional `:8080/api/meta/entities/` and `:8080/api/vocabulary/entities/` endpoints allow to retrieve labelled FairSpace entities, optionally filtered by type:
+Additional `:8080/api/metadata/entities/` and `:8080/api/vocabulary/entities/` endpoints allow to retrieve labelled FairSpace entities, optionally filtered by type:
 
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                      |

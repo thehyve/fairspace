@@ -44,7 +44,7 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
-                        new MetadataApp("/api/meta", rdf, defaultGraphIRI),
+                        new MetadataApp("/api/metadata", rdf, defaultGraphIRI),
                         new MetadataApp("/api/vocabulary", rdf, createURI(config.jena.baseIRI + "vocabulary")),
                         new CollectionsApp(collections),
                         //    new VocabularyApp(rdf),
@@ -64,7 +64,7 @@ public class App {
 
         log.info("Saturn is running on port " + config.port);
         log.info("Access Fuseki at /rdf/");
-        log.info("Access Metadata at /api/meta/");
+        log.info("Access Metadata at /api/metadata/");
         log.info("Access Vocabulary API at /api/vocabulary/");
         log.info("Access Collections API at /api/collections/");
         log.info("Access WebDAV API at /webdav/");

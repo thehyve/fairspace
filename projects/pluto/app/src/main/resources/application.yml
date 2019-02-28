@@ -65,7 +65,7 @@ zuul:
       strip-prefix: false
     metadata:
       path: /api/metadata/**
-      url: http://saturn/api/meta/
+      url: http://saturn/api/metadata/
     vocabulary:
       path: /api/vocabulary/**
       url: http://saturn/api/vocabulary/

@@ -33,8 +33,9 @@
     "webdav": "^2.5.0"
   },
   "scripts": {
-    "dev": "concurrently \"yarn server\" \"yarn start\" \"yarn test\"",
-    "server": "node mock-server/server.js",
+    "dev": "concurrently \"yarn server:mock\" \"yarn start\" \"yarn test\" \"yarn server\"",
+    "server:mock": "node mock-server/server.js",
+    "server": "cd ../saturn/ && ./gradlew run",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
@@ -49,8 +50,7 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.12.2",
-    "redux-mock-store": "^1.5.3",
-    "webdav-server": "^2.3.22"
+    "redux-mock-store": "^1.5.3"
   },
   "browserslist": [
     ">0.2%",
