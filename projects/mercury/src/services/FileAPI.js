@@ -1,12 +1,12 @@
 import {createClient} from "webdav";
+import axios from 'axios';
+
 import Config from "./Config/Config";
 import {addCounterToFilename, getFileName, joinPaths, getParentPath} from '../utils/fileUtils';
-import axios from 'axios';
 
 // Ensure that the window fetch method is used for webdav calls
 // and that is passes along the credentials
 const defaultOptions = {credentials: 'include'};
-
 
 axios.interceptors.request.use((config) => {
     if (config.method === 'propfind') {
@@ -14,8 +14,7 @@ axios.interceptors.request.use((config) => {
         config.data = '<?xml version="1.0" encoding="utf-8" ?><propfind xmlns:D="DAV:"><allprop/></propfind>';
     }
     return config;
-},
-    (error) => Promise.reject(error));
+}, (error) => Promise.reject(error));
 
 class FileAPI {
     client() {
@@ -56,12 +55,12 @@ class FileAPI {
      * @param nameMapping
      * @returns Promise<any>
      */
-    upload(path, files, nameMapping) {
+    upload(path, files) {
         if (!files) {
             return Promise.reject(Error("No files given"));
         }
 
-        const allPromises = files.map(file => this.client().putFileContents(`${path}/${nameMapping.get(file.name)}`, file, defaultOptions));
+        const allPromises = files.map(({name, value}) => this.client().putFileContents(`${path}/${name}`, value, defaultOptions));
 
         return Promise.all(allPromises).then(() => files);
     }

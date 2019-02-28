@@ -12,24 +12,21 @@ const getBaseNameAndExtension = (fileName) => {
     return {baseName, extension};
 };
 
-
-export function getUniqueName(fileName, usedNames) {
+export function generateUniqueFileName(fileName, usedNames) {
     if (!usedNames.includes(fileName)) {
-        usedNames.push(fileName);
         return fileName;
     }
 
     const {baseName, extension} = getBaseNameAndExtension(fileName);
     let counter = 1;
+    let newName = `${baseName} (${counter})${extension}`;
 
-    while (true) {
-        const newName = `${baseName} (${counter})${extension}`;
-        if (!usedNames.includes(newName)) {
-            usedNames.push(newName);
-            return newName;
-        }
+    while (usedNames.includes(newName)) {
         counter += 1;
+        newName = `${baseName} (${counter})${extension}`;
     }
+
+    return newName;
 }
 
 export const joinPaths = (...paths) => paths

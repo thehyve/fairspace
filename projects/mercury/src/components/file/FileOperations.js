@@ -6,7 +6,7 @@ import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
 import {CreateDirectoryButton, ErrorDialog, LoadingOverlay, UploadButton} from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
-import {joinPaths, getUniqueName} from "../../utils/fileUtils";
+import {joinPaths, generateUniqueFileName} from "../../utils/fileUtils";
 
 export class FileOperations extends React.Component {
     refreshFiles() {
@@ -33,16 +33,16 @@ export class FileOperations extends React.Component {
     }
 
     handleUpload(files) {
-        if (files && files.length > 0) {
-            const nameMapping = new Map();
-            files.forEach(file => nameMapping.set(file.name, getUniqueName(file.name, this.props.existingFiles)));
-            return this.props.uploadFiles(this.props.openedPath, files, nameMapping)
-                .then(() => this.refreshFiles())
-                .catch((err) => {
-                    ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
-                });
-        }
-        return Promise.resolve([]);
+        const updatedFiles = files.map(file => ({
+            value: file,
+            name: generateUniqueFileName(file.name, this.props.existingFiles)
+        }));
+
+        return this.props.uploadFiles(this.props.openedPath, updatedFiles)
+            .then(() => this.refreshFiles())
+            .catch((err) => {
+                ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
+            });
     }
 
     handleCreateDirectory(name) {
