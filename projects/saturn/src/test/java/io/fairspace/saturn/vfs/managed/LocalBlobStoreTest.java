@@ -30,37 +30,33 @@ public class LocalBlobStoreTest {
     }
 
     @Test
-    public void writeAndRead() throws IOException {
-        var id = blobStore.write(new ByteArrayInputStream(contents));
+    public void testReadFully() throws IOException {
+        testReadRange(0, Long.MAX_VALUE, contents);
+    }
 
-        var out = new ByteArrayOutputStream();
+    @Test
+    public void testReadExactSize() throws IOException {
+        testReadRange(0, contents.length, contents);
+    }
 
-        blobStore.read(id, 0, Long.MAX_VALUE, out);
-        assertArrayEquals(contents, out.toByteArray());
+    @Test
+    public void testReadSubRange() throws IOException {
+        testReadRange(2, 3, new byte[] {2, 3, 4});
+    }
 
-        out.reset();
-        blobStore.read(id, 0, contents.length, out);
-        assertArrayEquals(contents, out.toByteArray());
+    @Test
+    public void testReadEmptyRange() throws IOException {
+        testReadRange(2, 0, new byte[0]);
+    }
 
-        out.reset();
-        blobStore.read(id, 2, 3, out);
-        assertArrayEquals(new byte[] {2, 3, 4}, out.toByteArray());
+    @Test
+    public void testReadTail() throws IOException {
+        testReadRange(7, Long.MAX_VALUE, new byte[] {7, 8, 9});
+    }
 
-        out.reset();
-        blobStore.read(id, 7, Long.MAX_VALUE, out);
-        assertArrayEquals(new byte[] {7, 8, 9}, out.toByteArray());
-
-        out.reset();
-        blobStore.read(id, 3, 0, out);
-        assertArrayEquals(new byte[0], out.toByteArray());
-
-        out.reset();
-        blobStore.read(id, contents.length, Long.MAX_VALUE, out);
-        assertArrayEquals(new byte[0], out.toByteArray());
-
-        out.reset();
-        blobStore.read(id, contents.length + 10, Long.MAX_VALUE, out);
-        assertArrayEquals(new byte[0], out.toByteArray());
+    @Test
+    public void testAfterEnd() throws IOException {
+        testReadRange(contents.length, 0, new byte[0]);
     }
 
     @Test
@@ -71,5 +67,12 @@ public class LocalBlobStoreTest {
         }
 
         assertEquals(0, dir.list().length);
+    }
+
+    private void testReadRange(long offset, long length, byte[] expected) throws IOException {
+        var id = blobStore.write(new ByteArrayInputStream(contents));
+        var out = new ByteArrayOutputStream();
+        blobStore.read(id, offset, length, out);
+        assertArrayEquals(expected, out.toByteArray());
     }
 }
