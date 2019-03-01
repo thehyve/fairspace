@@ -33,16 +33,19 @@ export class FileOperations extends React.Component {
     }
 
     handleUpload(files) {
-        const updatedFiles = files.map(file => ({
-            value: file,
-            name: generateUniqueFileName(file.name, this.props.existingFiles)
-        }));
+        if (files && files.length > 0) {
+            const updatedFiles = files.map(file => ({
+                value: file,
+                name: generateUniqueFileName(file.name, this.props.existingFiles)
+            }));
 
-        return this.props.uploadFiles(this.props.openedPath, updatedFiles)
-            .then(() => this.refreshFiles())
-            .catch((err) => {
-                ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
-            });
+            return this.props.uploadFiles(this.props.openedPath, updatedFiles)
+                .then(() => this.refreshFiles())
+                .catch((err) => {
+                    ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
+                });
+        }
+        return Promise.resolve([]);
     }
 
     handleCreateDirectory(name) {
