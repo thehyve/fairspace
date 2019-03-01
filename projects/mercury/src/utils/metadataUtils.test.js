@@ -1,4 +1,5 @@
-import {getLabel, navigableLink, shouldPropertyBeHidden} from "./metadataUtils";
+import nodeCrypto from "crypto";
+import {generateUuid, getLabel, getSingleValue, getValues, linkLabel, relativeLink, shouldPropertyBeHidden} from "./metadataUtils";
 import {
     COLLECTION_URI,
     COMMENT_URI,
@@ -10,7 +11,25 @@ import {
     TYPE_URI
 } from "../constants";
 
+
 describe('Metadata Utils', () => {
+    describe('linkLabel', () => {
+        it('handles IRIs', () => {
+            expect(linkLabel('http://localhost/iri/1234')).toEqual('1234');
+        });
+
+        it('handles collections', () => {
+            expect(linkLabel('http://localhost/collections/coll1')).toEqual('coll1');
+        });
+
+        it('can shorten external URLs', () => {
+            expect(linkLabel('http://example.com/path', false)).toEqual('http://example.com/path');
+            expect(linkLabel('http://example.com/path', true)).toEqual('path');
+            expect(linkLabel('http://example.com/path#hash', false)).toEqual('http://example.com/path#hash');
+            expect(linkLabel('http://example.com/path#hash', true)).toEqual('hash');
+        });
+    });
+
     describe('getLabel', () => {
         it('should return the label if present', () => {
             expect(getLabel({[LABEL_URI]: [{'@value': 'My label'}]})).toEqual('My label');
@@ -49,22 +68,60 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('navigableLink', () => {
-        it('should keep IRI links', () => {
-            expect(navigableLink('http://localhost/iri/test')).toEqual('http://localhost/iri/test');
+    describe('getValues', () => {
+        it('should return an empty array if a property does not exist', () => {
+            expect(getValues({name: 'John'}, 'age')).toEqual([]);
         });
 
-        it('should transform IRI links to a collection to the collection page', () => {
-            expect(navigableLink('http://localhost/iri/collections/412')).toEqual('http://localhost/collections/412');
+        it('should support literal properties', () => {
+            expect(getValues({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual([1, 2]);
         });
 
-        it('should not transform links outside current location', () => {
-            expect(navigableLink('http://other-url/iri/test')).toEqual('http://other-url/iri/test');
-            expect(navigableLink('https://localhost/iri/test')).toEqual('https://localhost/iri/test');
+        it('should support refernce properties', () => {
+            expect(getValues({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
+                .toEqual(['http://example.com/1', 'http://example.com/2']);
+        });
+    });
+
+    describe('getSingleValue', () => {
+        it('should return undefined if a property does not exist', () => {
+            expect(getSingleValue({name: 'John'}, 'age')).toEqual(undefined);
         });
 
-        it('should not change links outside the metadata', () => {
-            expect(navigableLink('http://localhost/collections/300')).toEqual('http://localhost/collections/300');
+        it('should return undefined if a property is empty', () => {
+            expect(getSingleValue({numbers: []}, 'numbers')).toEqual(undefined);
+        });
+
+
+        it('should support literal properties', () => {
+            expect(getSingleValue({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual(1);
+        });
+
+        it('should support reference properties', () => {
+            expect(getSingleValue({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
+                .toEqual('http://example.com/1');
+        });
+    });
+
+    describe('relativeLink', () => {
+        it('should strip the base URL', () => {
+            expect(relativeLink('http://example.com:1234/some/path?query=value#bookmark'))
+                .toEqual('/some/path?query=value#bookmark');
+        });
+
+        it('should also handle simple URLs', () => {
+            expect(relativeLink('http://example.com'))
+                .toEqual('example.com');
+        });
+    });
+
+    describe('generateUuid', () => {
+        it('should generate valid UUIDS', () => {
+            global.crypto = {
+                getRandomValues: nodeCrypto.randomFillSync
+            };
+            const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            expect(UUID_REGEX.test(generateUuid())).toBe(true);
         });
     });
 

@@ -20,12 +20,20 @@ describe('FileOperations', () => {
             .then(() => {
                 expect(uploadFiles.mock.calls.length).toEqual(1);
                 expect(uploadFiles.mock.calls[0][0]).toEqual('opened/Path');
-                expect(uploadFiles.mock.calls[0][1]).toEqual(files);
-                expect(uploadFiles.mock.calls[0][2]).toEqual(new Map([
-                    ["file1.txt", "file1 (1).txt"],
-                    ["file2.txt", "file2 (3).txt"],
-                    ["file3.txt", "file3.txt"]]));
-
+                expect(uploadFiles.mock.calls[0][1]).toEqual(
+                    [{
+                        name: "file1 (1).txt",
+                        value: {name: "file1.txt"}
+                    },
+                    {
+                        name: "file2 (3).txt",
+                        value: {name: "file2.txt"}
+                    },
+                    {
+                        name: "file3.txt",
+                        value: {name: "file3.txt"}
+                    }]
+                );
                 expect(fetchFilesIfNeeded.mock.calls.length).toEqual(1);
                 expect(fetchFilesIfNeeded.mock.calls[0][0]).toEqual('opened/Path');
             });
