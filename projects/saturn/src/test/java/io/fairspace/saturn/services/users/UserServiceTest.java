@@ -12,7 +12,6 @@ import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
 public class UserServiceTest {
-    private final Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
     private RDFConnection rdf;
     private UserService service;
 
@@ -20,7 +19,7 @@ public class UserServiceTest {
     public void before() {
         setWorkspaceURI("http://example.com/iri/");
         rdf = connect(createTxnMem());
-        service = new UserService(rdf, userInfoSupplier);
+        service = new UserService(rdf);
     }
 
 }

@@ -13,21 +13,18 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 
 public class UserService {
-    private static final String ANONYMOUS = "http://fairspace.io/anonymous";
+    private static final String ANONYMOUS = "http://fairspace.io/for-testing-only";
     private final RDFConnection rdf;
-    private final Supplier<UserInfo> userInfoSupplier;
     private final Map<String, String> idToUri = new HashMap<>();
 
-    public UserService(RDFConnection rdf, Supplier<UserInfo> userInfoSupplier) {
+    public UserService(RDFConnection rdf) {
         this.rdf = rdf;
-        this.userInfoSupplier = userInfoSupplier;
 
         rdf.querySelect(storedQuery("users_list"), row ->
                 idToUri.put(row.getLiteral("id").getString(), row.getLiteral("iri").getString()));
     }
 
-    public String getCurrentUserIRI() {
-        var userInfo = userInfoSupplier.get();
+    public String geUserIRI(UserInfo userInfo) {
         if (userInfo == null) {
             return ANONYMOUS;
         }
