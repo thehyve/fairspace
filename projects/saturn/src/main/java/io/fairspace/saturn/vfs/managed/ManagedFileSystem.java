@@ -118,11 +118,11 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void read(String path, OutputStream out) throws IOException {
+    public void read(String path, long offset, long maxLength, OutputStream out) throws IOException {
         var processor = new QuerySolutionProcessor<>(row -> row.getLiteral("blobId").getString());
         rdf.querySelect(storedQuery("fs_get_blobid", path), processor);
         var blobId = processor.getSingle().orElseThrow(() -> new FileNotFoundException(path));
-        store.read(blobId, out);
+        store.read(blobId, offset, maxLength, out);
     }
 
     @Override

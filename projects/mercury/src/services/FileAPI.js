@@ -1,12 +1,13 @@
 import {createClient} from "webdav";
 import axios from 'axios';
-
 import Config from "./Config/Config";
-import {addCounterToFilename, getFileName, joinPaths, getParentPath} from '../utils/fileUtils';
+import {addCounterToFilename, generateUniqueFileName, joinPaths, getParentPath} from '../utils/fileUtils';
 
-// Ensure that the window fetch method is used for webdav calls
-// and that is passes along the credentials
-const defaultOptions = {credentials: 'include'};
+// Ensure that the client passes along the credentials
+const defaultOptions = {withCredentials: true};
+
+// Keep all item properties
+const includeDetails = {...defaultOptions, details: true};
 
 axios.interceptors.request.use((config) => {
     if (config.method === 'propfind') {
@@ -25,7 +26,7 @@ class FileAPI {
     }
 
     stat(path) {
-        return this.client().stat(path, {credentials: 'include', details: true})
+        return this.client().stat(path, includeDetails)
             .then(result => result.data);
     }
 
@@ -35,7 +36,7 @@ class FileAPI {
      * @returns {Promise<T>}
      */
     list(path) {
-        return this.client().getDirectoryContents(path, {credentials: 'include', details: true})
+        return this.client().getDirectoryContents(path, includeDetails)
             .then(result => result.data);
     }
 
@@ -129,7 +130,7 @@ class FileAPI {
      */
     movePaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            const destinationFile = joinPaths(destinationDir, getFileName(sourceFile));
+            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(sourceFile));
             return this.move(sourceFile, destinationFile);
         }));
     }
@@ -142,7 +143,7 @@ class FileAPI {
      */
     copyPaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            let destinationFilename = getFileName(sourceFile);
+            let destinationFilename = generateUniqueFileName(sourceFile);
             // Copying files to the current directory involves renaming
             if (destinationDir === getParentPath(sourceFile)) {
                 destinationFilename = addCounterToFilename(destinationFilename);

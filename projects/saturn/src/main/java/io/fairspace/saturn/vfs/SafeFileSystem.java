@@ -84,10 +84,10 @@ public class SafeFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void read(String path, OutputStream out) throws IOException {
+    public void read(String path, long offset, long maxLength, OutputStream out) throws IOException {
         var normalizedPath = normalizePath(path);
         safely(() -> {
-            unsafe.read(normalizedPath, out);
+            unsafe.read(normalizedPath, offset, maxLength, out);
             return null;
         });
     }
