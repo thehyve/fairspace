@@ -1,11 +1,13 @@
 import {createClient} from "webdav";
+import axios from 'axios';
 import Config from "./Config/Config";
 import {addCounterToFilename, fileName, joinPaths, parentPath} from '../utils/fileUtils';
-import axios from 'axios';
 
-// Ensure that the window fetch method is used for webdav calls
-// and that is passes along the credentials
-const defaultOptions = {credentials: 'include'};
+// Ensure that the client passes along the credentials
+const defaultOptions = {withCredentials: true};
+
+// Keep all item properties
+const includeDetails = {...defaultOptions, details: true};
 
 
 axios.interceptors.request.use((config) => {
@@ -26,7 +28,7 @@ class FileAPI {
     }
 
     stat(path) {
-        return this.client().stat(path, {credentials: 'include', details: true})
+        return this.client().stat(path, includeDetails)
             .then(result => result.data);
     }
 
@@ -36,7 +38,7 @@ class FileAPI {
      * @returns {Promise<T>}
      */
     list(path) {
-        return this.client().getDirectoryContents(path, {credentials: 'include', details: true})
+        return this.client().getDirectoryContents(path, includeDetails)
             .then(result => result.data);
     }
 
