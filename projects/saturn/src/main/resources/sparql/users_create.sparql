@@ -6,3 +6,4 @@ INSERT {
   ?iri a fs:User;
        fs:externalId ?0;
 }
+WHERE { BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?iri) }
