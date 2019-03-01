@@ -41,7 +41,7 @@ public class App {
         var rdf = new RDFConnectionLocal(ds);
 
         var userService = new UserService(rdf);
-        Supplier<String> userIriSupplier = () -> userService.geUserIRI(SecurityUtil.userInfo());
+        Supplier<String> userIriSupplier = () -> userService.getUserIRI(SecurityUtil.userInfo());
         var collections = new CollectionsService(rdf, userIriSupplier);
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), userIriSupplier, collections));
 
@@ -58,7 +58,7 @@ public class App {
         var auth = config.auth;
         if (auth.enabled) {
             var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
-            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::geUserIRI));
+            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
         }
 
         fusekiServerBuilder

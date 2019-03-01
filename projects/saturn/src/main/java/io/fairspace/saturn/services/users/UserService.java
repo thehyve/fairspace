@@ -21,10 +21,10 @@ public class UserService {
         this.rdf = rdf;
 
         rdf.querySelect(storedQuery("users_list"), row ->
-                idToUri.put(row.getLiteral("id").getString(), row.getLiteral("iri").getString()));
+                idToUri.put(row.getLiteral("id").getString(), row.getResource("iri").getURI()));
     }
 
-    public String geUserIRI(UserInfo userInfo) {
+    public String getUserIRI(UserInfo userInfo) {
         if (userInfo == null) {
             return ANONYMOUS;
         }
@@ -41,7 +41,7 @@ public class UserService {
         commit("Store a new user", rdf, () ->
                 rdf.update(storedQuery("users_create", userInfo.getUserId(), userInfo.getFullName(), userInfo.getUserName())));
 
-        var processor = new QuerySolutionProcessor<>(row -> row.getLiteral("iri").getString());
+        var processor = new QuerySolutionProcessor<>(row -> row.getResource("iri").getURI());
         rdf.querySelect(storedQuery("users_by_id", userInfo.getUserId()), processor);
         iri = processor.getSingle().get();
         idToUri.put(userInfo.getUserId(), iri);
