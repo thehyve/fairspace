@@ -1,4 +1,21 @@
-import {addCounterToFilename, getFileName, getDirectoryFromFullpath, getParentPath, generateUniqueFileName} from "./fileUtils";
+import {
+    addCounterToFilename, getFileName, getDirectoryFromFullpath,
+    getParentPath, generateUniqueFileName, getBaseNameAndExtension
+} from './fileUtils';
+
+describe('getBaseNameAndExtension', () => {
+    it('should return the exptected file base name and extension', () => {
+        expect(getBaseNameAndExtension()).toEqual({baseName: '', extension: ''});
+        expect(getBaseNameAndExtension(undefined)).toEqual({baseName: '', extension: ''});
+        expect(getBaseNameAndExtension(null)).toEqual({baseName: '', extension: ''});
+        expect(getBaseNameAndExtension('name.ext')).toEqual({baseName: 'name', extension: '.ext'});
+        expect(getBaseNameAndExtension('name.xxx.ext')).toEqual({baseName: 'name.xxx', extension: '.ext'});
+        expect(getBaseNameAndExtension('name.')).toEqual({baseName: 'name', extension: '.'});
+        expect(getBaseNameAndExtension('name')).toEqual({baseName: 'name', extension: ''});
+        expect(getBaseNameAndExtension('name. xxx.')).toEqual({baseName: 'name. xxx', extension: '.'});
+        expect(getBaseNameAndExtension('name. xxx.ext')).toEqual({baseName: 'name. xxx', extension: '.ext'});
+    });
+});
 
 describe('generateUniqueFileName', () => {
     it('leaves already unique names untouched', () => {
@@ -20,6 +37,13 @@ describe('generateUniqueFileName', () => {
         const result = generateUniqueFileName('name.jpg.exe', usedNames);
         expect(result).toEqual('name.jpg (1).exe');
         expect(usedNames).toEqual(['name.jpg.exe']);
+    });
+
+    it('works with file names with no extesnsions', () => {
+        const usedNames = ['name', 'name.ext'];
+        const result = generateUniqueFileName('name', usedNames);
+        expect(result).toEqual('name (1)');
+        expect(usedNames).toEqual(['name', 'name.ext']);
     });
 });
 

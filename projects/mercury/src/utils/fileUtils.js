@@ -4,7 +4,12 @@ export function splitPathIntoArray(path) {
     return path.split(PATH_SEPARATOR).filter(s => s.length > 0);
 }
 
-const getBaseNameAndExtension = (fileName) => {
+// the extension includes a dot in some cases and is empty in others. That will very much help in reusing logic
+export const getBaseNameAndExtension = (fileName) => {
+    if (!fileName) {
+        return {baseName: '', extension: ''};
+    }
+
     const dotPosition = fileName.lastIndexOf('.');
     const baseName = (dotPosition >= 0) ? fileName.substring(0, dotPosition) : fileName;
     const extension = (dotPosition >= 0) ? fileName.substring(dotPosition) : '';
