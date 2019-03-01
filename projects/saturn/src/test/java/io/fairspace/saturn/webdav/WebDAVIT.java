@@ -36,9 +36,9 @@ public class WebDAVIT {
     public void before() throws IOException {
         setWorkspaceURI("http://example.com/");
         var rdf = connect(createTxnMem());
-        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
-        var collections = new CollectionsService(rdf, userInfoSupplier);
-        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userInfoSupplier, collections));
+        Supplier<String> userIriSupplier = () -> "http://example.com/user";
+        var collections = new CollectionsService(rdf, userIriSupplier);
+        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections));
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();
         coll.setName("My Collection");
