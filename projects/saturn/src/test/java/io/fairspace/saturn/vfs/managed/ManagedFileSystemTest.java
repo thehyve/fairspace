@@ -34,9 +34,9 @@ public class ManagedFileSystemTest {
         var store = new MemoryBlobStore();
         ds = createTxnMem();
         var rdf = connect(ds);
-        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
-        var collections = new CollectionsService(rdf, userInfoSupplier);
-        fs = new ManagedFileSystem(rdf, store, userInfoSupplier, collections);
+        Supplier<String> userIriSupplier = () -> "http://example.com/user";
+        var collections = new CollectionsService(rdf, userIriSupplier);
+        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections);
         var collection = new Collection();
         collection.setLocation("coll");
         collection.setName("My Collection");
