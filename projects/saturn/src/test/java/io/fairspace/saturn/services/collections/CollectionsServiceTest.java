@@ -51,6 +51,7 @@ public class CollectionsServiceTest {
         assertEquals("http://example.com/user", created1.getCreator());
         assertNotNull(created1.getDateCreated());
         assertEquals(created1.getDateCreated(), created1.getDateModified());
+        assertNotNull(created1.getCreator());
 
         assertNotNull(collections.getByLocation("dir1"));
         assertNull(collections.getByLocation("dir2"));
