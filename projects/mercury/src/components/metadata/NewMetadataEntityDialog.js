@@ -1,33 +1,24 @@
 import React from 'react';
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
-import Fab from "@material-ui/core/Fab";
-import List from "@material-ui/core/List/List";
-import ListItem from "@material-ui/core/ListItem/ListItem";
-import ListItemText from "@material-ui/core/ListItemText/ListItemText";
-import Icon from "@material-ui/core/Icon/Icon";
-import Paper from "@material-ui/core/Paper/Paper";
-import TextField from "@material-ui/core/TextField/TextField";
 import {connect} from "react-redux";
+import {
+    Dialog, DialogTitle, DialogContent,
+    DialogActions, Button, List, ListItem,
+    ListItemText, Paper, TextField
+} from "@material-ui/core";
+
 import {generateUuid, getLabel} from "../../utils/metadataUtils";
 import {compareBy} from "../../utils/comparisionUtils";
 import LoadingInlay from '../common/LoadingInlay';
 import {fetchMetadataVocabularyIfNeeded} from "../../actions/metadataActions";
 
 class NewMetadataEntityDialog extends React.Component {
-    constructor(props) {
-        super(props);
+    state = {
+        creating: false,
+        type: null
+    };
 
-        this.state = {
-            creating: false,
-            type: null
-        };
-
-        // Retrieve the metadata vocabulary, if needed
-        props.fetchMetadataVocabularyIfNeeded();
+    componentDidMount() {
+        this.props.fetchMetadataVocabularyIfNeeded();
     }
 
     openDialog = (e) => {
@@ -52,20 +43,20 @@ class NewMetadataEntityDialog extends React.Component {
 
     render() {
         return (
-            <div style={{display: 'inline'}}>
-                <Fab
-                    mini="true"
-                    color="secondary"
+            <>
+                <Button
+                    variant="contained"
+                    color="primary"
                     aria-label="Add"
-                    title="Add"
+                    title="Create a new Metadata"
                     onClick={this.openDialog}
+                    style={{margin: '10px 0'}}
                 >
-                    <Icon>add</Icon>
-                </Fab>
+                    Create
+                </Button>
 
                 <Dialog
                     open={this.state.creating}
-                    onClick={e => e.stopPropagation()}
                     onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
                 >
@@ -124,7 +115,7 @@ class NewMetadataEntityDialog extends React.Component {
                         </Button>
                     </DialogActions>
                 </Dialog>
-            </div>
+            </>
         );
     }
 

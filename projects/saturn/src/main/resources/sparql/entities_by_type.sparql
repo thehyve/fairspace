@@ -1,0 +1,13 @@
+
+# 0 - graph
+# 1 - type (optional)
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+CONSTRUCT {?s a ?1; rdfs:label ?l}
+WHERE {
+    GRAPH ?0 { ?s a ?1 }
+    GRAPH ws:vocabulary {?1 fs:fairspaceEntity true .}
+    OPTIONAL { GRAPH ?0 {?s rdfs:label ?l} }
+}

@@ -18,7 +18,6 @@ keycloak:
 
 backends:
   mercury: http://mercury
-  neptune: http://neptune
 ```
 
 Now install pluto with the following command:
@@ -67,8 +66,10 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 #### Backend parameters
 | Parameter  | Description  | Default |
 |---|---|---|
-| `backends.mercury` | URL where mercury can be found. It will be proxied on /ui/ | `http://mercury` |
-| `backends.neptune` | URL where neptune can be found. | `http://neptune` |
+| `backends.ui` | URL where frontend can be found. It will be proxied on / | `http://mercury` |
+| `backends.storage` | URL where the storage api can be found. Should not include any path, as the path is fixed to `/webdav/`| `http://saturn` |
+| `backends.metadata` | URL where the collections api can be found. Should also include the path to the collections api on the upstream service, if applicable. | `http://saturn/api/collections/` |
+| `backends.collections` | URL where the metadata api can be found. Should also include the path to the metadata api on the upstream service, if applicable. | `http://saturn/api/metadata/` |
 
 #### Informational parameters
 | Parameter  | Description  | Default |

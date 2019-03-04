@@ -1,0 +1,17 @@
+# 0 - directory name
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?iri ?name ?path ?description ?type ?createdBy ?dateCreated ?dateModified
+WHERE {
+  ?iri fs:filePath ?0;
+    a fs:Collection;
+    rdfs:label ?name;
+    rdfs:comment ?description;
+    fs:collectionType ?type;
+    fs:createdBy ?createdBy;
+    fs:dateCreated ?dateCreated;
+    fs:dateModified ?dateModified.
+FILTER NOT EXISTS { ?iri fs:dateDeleted ?dateDeleted }
+BIND(?0 as ?path)}

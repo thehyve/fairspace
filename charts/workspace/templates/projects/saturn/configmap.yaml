@@ -9,4 +9,24 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
-    saturn:
+    port: 8080
+    jena:
+      baseIRI: {{ template "workspace.url" . }}/iri/
+      datasetPath: "/data/saturn/db"
+      transactionLogPath: "/data/saturn/files/log"
+      elasticSearch:
+        enabled: false
+        required: false
+        settings:
+          hostToPortMapping:
+            localhost: 9300 # TODO: fix me
+          clusterName: "elasticsearch"
+          shards: 1
+          replicas: 1
+          indexName: "fairspace"
+    auth:
+      enabled: true
+      jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
+      jwtAlgorithm: "RS256"
+    webDAV:
+      blobStorePath: "/data/saturn/files/blobs"

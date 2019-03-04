@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {mount, shallow} from "enzyme";
-import Button from "@material-ui/core/Button";
-import Fab from "@material-ui/core/Fab";
 import {MemoryRouter} from "react-router-dom";
 import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
@@ -10,6 +8,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import CollectionBrowser from "./CollectionBrowser";
 import Config from "../../services/Config/Config";
+import * as actionTypes from "../../actions/actionTypes";
 
 const middlewares = [thunk, promiseMiddleware()];
 const mockStore = configureStore(middlewares);
@@ -67,29 +66,16 @@ it('renders without crashing', () => {
     ReactDOM.unmountComponentAtNode(div);
 });
 
-it('creates a new collection on button click', () => {
+it('dispatch an action on collection save', () => {
     const wrapper = mount(collectionBrowser);
 
-    // There should be one action for closing the path
-    expect(store.getActions().length).toEqual(1);
-
-    // Setup proper state
-    const addButton = wrapper
-        .find(Fab)
-        .filter('[aria-label="Add"]')
-        .first();
-    // Click on Add button
+    const addButton = wrapper.find('[aria-label="Add"]').first();
     addButton.simulate('click');
 
-    // Click save in the dialog
-    const saveButton = wrapper
-        .find(Button)
-        .filter('[aria-label="Save"]')
-        .first();
+    const saveButton = wrapper.find('[aria-label="Save"]').first();
     saveButton.simulate('click');
 
-    // Expect the collection to be created in storage
-    expect(store.getActions().length).toEqual(2);
+    expect(store.getActions()[0].type).toBe(actionTypes.ADD_COLLECTION_PENDING);
 });
 
 describe('loading state', () => {

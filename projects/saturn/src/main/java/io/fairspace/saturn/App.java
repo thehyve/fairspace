@@ -1,47 +1,84 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.rdf.Vocabulary;
-import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
-import io.fairspace.saturn.services.metadata.MetadataAPIServlet;
-import io.fairspace.saturn.services.vocabulary.VocabularyAPIServlet;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.fairspace.saturn.auth.SecurityUtil;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.services.collections.CollectionsApp;
+import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.health.HealthApp;
+import io.fairspace.saturn.services.metadata.MetadataApp;
+import io.fairspace.saturn.vfs.SafeFileSystem;
+import io.fairspace.saturn.vfs.managed.LocalBlobStore;
+import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
+import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
-import org.apache.jena.sparql.core.DatasetGraph;
 
 import java.io.File;
+import java.io.IOException;
 
-import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
+import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
+import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
+@Slf4j
 public class App {
-    private static final String DEFAULT_DATASET_PATH = "/data/saturn/db";
-    private static final String LOCAL_DATASET_PATH = "db";
+    private static final Config config = loadConfig();
 
     public static void main(String[] args) {
-        System.out.println("Saturn is starting");
+        log.info("Saturn is starting");
 
-        String datasetPath = new File(DEFAULT_DATASET_PATH).exists() ? DEFAULT_DATASET_PATH : LOCAL_DATASET_PATH;
+        setWorkspaceURI(config.jena.baseIRI);
 
-        DatasetGraph dsg = new InvertingDatasetGraph(connectDatasetGraph(datasetPath));
-        Vocabulary.init(dsg);
-        Dataset ds = DatasetFactory.wrap(dsg);
+        var ds = SaturnDatasetFactory.connect(config.jena);
+        // The RDF connection is supposed to be threadsafe and can
+        // be reused in all the application
+        var rdf = new RDFConnectionLocal(ds);
 
+        var collections = new CollectionsService(rdf, SecurityUtil::userInfo);
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), SecurityUtil::userInfo, collections));
 
+        var fusekiServerBuilder = FusekiServer.create()
+                .add("rdf", ds)
+                .addFilter("/api/*", new SaturnSparkFilter(
+                        new MetadataApp("/api/metadata", rdf, defaultGraphIRI),
+                        new MetadataApp("/api/vocabulary", rdf, createURI(config.jena.baseIRI + "vocabulary")),
+                        new CollectionsApp(collections),
+                        //    new VocabularyApp(rdf),
+                        new HealthApp()))
+                .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
+                .port(config.port);
 
-        RDFConnection connection = new RDFConnectionLocal(ds);
+        var auth = config.auth;
+        if (auth.enabled) {
+            var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
+            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
+        }
 
-        FusekiServer.create()
-                .add("/rdf", ds)
-                .addServlet("/statements", new MetadataAPIServlet(connection))
-                .addServlet("/vocabulary", new VocabularyAPIServlet(connection))
-                .port(8080)
+        fusekiServerBuilder
                 .build()
                 .start();
 
-        System.out.println("Fuseki is running on :8080/rdf");
-        System.out.println("Metadata API is running on :8080/statements");
-        System.out.println("Vocabulary API is running on :8080/vocabulary");
+        log.info("Saturn is running on port " + config.port);
+        log.info("Access Fuseki at /rdf/");
+        log.info("Access Metadata at /api/metadata/");
+        log.info("Access Vocabulary API at /api/vocabulary/");
+        log.info("Access Collections API at /api/collections/");
+        log.info("Access WebDAV API at /webdav/");
+    }
+
+    private static Config loadConfig() {
+        var settingsFile = new File("application.yaml");
+        if (settingsFile.exists()) {
+            try {
+                return new ObjectMapper(new YAMLFactory()).readValue(settingsFile, Config.class);
+            } catch (IOException e) {
+                throw new RuntimeException("Error loading configuration", e);
+            }
+        }
+        return new Config();
     }
 }

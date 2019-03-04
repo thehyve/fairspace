@@ -6,7 +6,7 @@ const styles = theme => ({
         flexGrow: 1,
         zIndex: 1,
         overflow: 'hidden',
-        position: 'relative',
+        position: 'absolute',
         display: 'flex',
     },
     appBar: {
@@ -15,21 +15,6 @@ const styles = theme => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-    },
-    appBarShift: {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    menuButton: {
-        marginLeft: 12,
-        marginRight: 36,
-    },
-    hide: {
-        display: 'none',
     },
     drawerPaper: {
         position: 'fixed',
@@ -54,10 +39,7 @@ const styles = theme => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        width: theme.spacing.unit * 7,
-        [theme.breakpoints.up('sm')]: {
-            width: theme.spacing.unit * 9,
-        },
+        width: 62
     },
     toolbar: {
         backgroundColor: '#f0f0f0',

@@ -1,18 +1,17 @@
 import * as actionTypes from "../actions/actionTypes";
 
 const defaultState = {
-    selectedCollectionId: null,
+    selectedCollectionIRI: null,
     selectedPaths: [],
     openedCollectionId: null,
     openedPath: null,
-    infoDrawerOpened: false,
     addingCollection: false,
     deletingCollection: false
 };
 
-const deselectPath = (state, path) => ({
+export const deselectPath = (state, path) => ({
     ...state,
-    selectedPaths: (state.selectedPaths || []).filter(el => el !== path)
+    selectedPaths: state.selectedPaths.filter(el => el !== path)
 });
 
 const collectionBrowser = (state = defaultState, action) => {
@@ -20,20 +19,14 @@ const collectionBrowser = (state = defaultState, action) => {
         case actionTypes.SELECT_COLLECTION:
             return {
                 ...state,
-                infoDrawerOpened: true,
-                selectedCollectionId: action.collectionId
-            };
-        case actionTypes.DESELECT_COLLECTION:
-            return {
-                ...state,
-                infoDrawerOpened: false,
-                selectedCollectionId: null
+                selectedCollectionIRI: action.collectionId,
+                selectedPaths: [],
+                openedPath: null
             };
         case actionTypes.SELECT_PATH:
             return {
                 ...state,
-                infoDrawerOpened: true,
-                selectedPaths: (state.selectedPaths || []).concat(action.path)
+                selectedPaths: [...state.selectedPaths, action.path]
             };
         case actionTypes.DESELECT_PATH:
             return deselectPath(state, action.path);
@@ -46,7 +39,7 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 deletingCollection: false,
-                selectedCollectionId: state.selectedCollectionId === action.collectionId ? null : state.selectedCollectionId
+                selectedCollectionIRI: state.selectedCollectionIRI === action.collectionId ? null : state.selectedCollectionIRI
             };
         case actionTypes.DELETE_COLLECTION_REJECTED:
         case actionTypes.DELETE_COLLECTION_INVALIDATE:
@@ -68,26 +61,10 @@ const collectionBrowser = (state = defaultState, action) => {
                 ...state,
                 addingCollection: false
             };
-        case actionTypes.OPEN_INFODRAWER:
-            return {
-                ...state,
-                infoDrawerOpened: true
-            };
-        case actionTypes.CLOSE_INFODRAWER:
-            return {
-                ...state,
-                infoDrawerOpened: false
-            };
         case actionTypes.OPEN_PATH:
             return {
                 ...state,
                 openedPath: action.path,
-                selectedPaths: []
-            };
-        case actionTypes.CLOSE_PATH:
-            return {
-                ...state,
-                openedPath: null,
                 selectedPaths: []
             };
         default:

@@ -1,59 +1,182 @@
-import {getLabel, navigableLink} from "./metadataUtils";
-import {LABEL_URI} from "../constants";
+import nodeCrypto from "crypto";
+import {generateUuid, getLabel, getSingleValue, getValues, linkLabel, relativeLink, shouldPropertyBeHidden} from "./metadataUtils";
+import {
+    COLLECTION_URI,
+    COMMENT_URI,
+    DATE_DELETED_URI, DELETED_BY_URI,
+    DIRECTORY_URI,
+    FILE_PATH_URI,
+    FILE_URI,
+    LABEL_URI,
+    TYPE_URI
+} from "../constants";
 
-describe('getLabel', () => {
-    it('should return the label if present', () => {
-        expect(getLabel({[LABEL_URI]: [{'@value': 'My label'}]})).toEqual('My label');
+
+describe('Metadata Utils', () => {
+    describe('linkLabel', () => {
+        it('handles IRIs', () => {
+            expect(linkLabel('http://localhost/iri/1234')).toEqual('1234');
+        });
+
+        it('handles collections', () => {
+            expect(linkLabel('http://localhost/collections/coll1')).toEqual('coll1');
+        });
+
+        it('can shorten external URLs', () => {
+            expect(linkLabel('http://example.com/path', false)).toEqual('http://example.com/path');
+            expect(linkLabel('http://example.com/path', true)).toEqual('path');
+            expect(linkLabel('http://example.com/path#hash', false)).toEqual('http://example.com/path#hash');
+            expect(linkLabel('http://example.com/path#hash', true)).toEqual('hash');
+        });
     });
 
-    it('should not fail if json-ld is not properly expanded', () => {
-        expect(getLabel({
-            '@id': 'http://test.com/name',
-            [LABEL_URI]: 'My label'
-        }, true)).toEqual('name');
+    describe('getLabel', () => {
+        it('should return the label if present', () => {
+            expect(getLabel({[LABEL_URI]: [{'@value': 'My label'}]})).toEqual('My label');
+        });
 
-        expect(getLabel({
-            '@id': 'http://test.com/name',
-            [LABEL_URI]: {'@value': 'My label'}
-        }, true)).toEqual('name');
+        it('should not fail if json-ld is not properly expanded', () => {
+            expect(getLabel({
+                '@id': 'http://test.com/name',
+                [LABEL_URI]: 'My label'
+            }, true)).toEqual('name');
 
-        expect(getLabel({
-            '@id': 'http://test.com/name',
-            [LABEL_URI]: ['My label']
-        }, true)).toEqual('name');
+            expect(getLabel({
+                '@id': 'http://test.com/name',
+                [LABEL_URI]: {'@value': 'My label'}
+            }, true)).toEqual('name');
 
-        expect(getLabel({
-            '@id': 'http://test.com/name',
-            [LABEL_URI]: []
-        }, true)).toEqual('name');
+            expect(getLabel({
+                '@id': 'http://test.com/name',
+                [LABEL_URI]: ['My label']
+            }, true)).toEqual('name');
+
+            expect(getLabel({
+                '@id': 'http://test.com/name',
+                [LABEL_URI]: []
+            }, true)).toEqual('name');
+        });
+
+        it('should keep external urls intact if shortenExternalUris is set to false', () => {
+            expect(getLabel({'@id': 'http://test.nl/name#lastname'}, false)).toEqual('http://test.nl/name#lastname');
+        });
+        it('should return part of the url after the pound sign', () => {
+            expect(getLabel({'@id': 'http://test.nl/name#lastname'}, true)).toEqual('lastname');
+        });
+        it('should return part of the url after the last slash if no pound sign present', () => {
+            expect(getLabel({'@id': 'http://test.nl/name'}, true)).toEqual('name');
+        });
     });
 
-    it('should keep external urls intact if shortenExternalUris is set to false', () => {
-        expect(getLabel({'@id': 'http://test.nl/name#lastname'}, false)).toEqual('http://test.nl/name#lastname');
-    });
-    it('should return part of the url after the pound sign', () => {
-        expect(getLabel({'@id': 'http://test.nl/name#lastname'}, true)).toEqual('lastname');
-    });
-    it('should return part of the url after the last slash if no pound sign present', () => {
-        expect(getLabel({'@id': 'http://test.nl/name'}, true)).toEqual('name');
-    });
-});
+    describe('getValues', () => {
+        it('should return an empty array if a property does not exist', () => {
+            expect(getValues({name: 'John'}, 'age')).toEqual([]);
+        });
 
-describe('navigableLink', () => {
-    it('should keep IRI links', () => {
-        expect(navigableLink('http://localhost/iri/test')).toEqual('http://localhost/iri/test');
-    });
+        it('should support literal properties', () => {
+            expect(getValues({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual([1, 2]);
+        });
 
-    it('should transform IRI links to a collection to the collection page', () => {
-        expect(navigableLink('http://localhost/iri/collections/412')).toEqual('http://localhost/collections/412');
+        it('should support refernce properties', () => {
+            expect(getValues({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
+                .toEqual(['http://example.com/1', 'http://example.com/2']);
+        });
     });
 
-    it('should not transform links outside current location', () => {
-        expect(navigableLink('http://other-url/iri/test')).toEqual('http://other-url/iri/test');
-        expect(navigableLink('https://localhost/iri/test')).toEqual('https://localhost/iri/test');
+    describe('getSingleValue', () => {
+        it('should return undefined if a property does not exist', () => {
+            expect(getSingleValue({name: 'John'}, 'age')).toEqual(undefined);
+        });
+
+        it('should return undefined if a property is empty', () => {
+            expect(getSingleValue({numbers: []}, 'numbers')).toEqual(undefined);
+        });
+
+
+        it('should support literal properties', () => {
+            expect(getSingleValue({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual(1);
+        });
+
+        it('should support reference properties', () => {
+            expect(getSingleValue({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
+                .toEqual('http://example.com/1');
+        });
     });
 
-    it('should not change links outside the metadata', () => {
-        expect(navigableLink('http://localhost/collections/300')).toEqual('http://localhost/collections/300');
+    describe('relativeLink', () => {
+        it('should strip the base URL', () => {
+            expect(relativeLink('http://example.com:1234/some/path?query=value#bookmark'))
+                .toEqual('/some/path?query=value#bookmark');
+        });
+
+        it('should also handle simple URLs', () => {
+            expect(relativeLink('http://example.com'))
+                .toEqual('example.com');
+        });
+    });
+
+    describe('generateUuid', () => {
+        it('should generate valid UUIDS', () => {
+            global.crypto = {
+                getRandomValues: nodeCrypto.randomFillSync
+            };
+            const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            expect(UUID_REGEX.test(generateUuid())).toBe(true);
+        });
+    });
+
+    describe('shouldPropertyBeHidden', () => {
+        it('should never show @type', () => {
+            expect(shouldPropertyBeHidden({key: '@type', domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: '@type', domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: '@type', domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: '@type', domain: COLLECTION_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: TYPE_URI, domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: TYPE_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: TYPE_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: TYPE_URI, domain: COLLECTION_URI})).toBe(true);
+        });
+
+        it('should show comments for everything except to collections', () => {
+            expect(shouldPropertyBeHidden({key: COMMENT_URI, domain: 'http://example.com'})).toBe(false);
+            expect(shouldPropertyBeHidden({key: COMMENT_URI, domain: FILE_URI})).toBe(false);
+            expect(shouldPropertyBeHidden({key: COMMENT_URI, domain: DIRECTORY_URI})).toBe(false);
+            expect(shouldPropertyBeHidden({key: COMMENT_URI, domain: COLLECTION_URI})).toBe(true);
+        });
+
+        it('should not show labels for managed entities', () => {
+            expect(shouldPropertyBeHidden({key: LABEL_URI, domain: 'http://example.com'})).toBe(false);
+            expect(shouldPropertyBeHidden({key: LABEL_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: LABEL_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: LABEL_URI, domain: COLLECTION_URI})).toBe(true);
+        });
+
+        it('should never show fs:filePath', () => {
+            expect(shouldPropertyBeHidden({key: FILE_PATH_URI, domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: FILE_PATH_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: FILE_PATH_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: FILE_PATH_URI, domain: COLLECTION_URI})).toBe(true);
+        });
+
+        it('should never show fs:dateDeleted', () => {
+            expect(shouldPropertyBeHidden({key: DATE_DELETED_URI, domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DATE_DELETED_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DATE_DELETED_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DATE_DELETED_URI, domain: COLLECTION_URI})).toBe(true);
+        });
+
+        it('should never show fs:deletedBy', () => {
+            expect(shouldPropertyBeHidden({key: DELETED_BY_URI, domain: 'http://example.com'})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DELETED_BY_URI, domain: FILE_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DELETED_BY_URI, domain: DIRECTORY_URI})).toBe(true);
+            expect(shouldPropertyBeHidden({key: DELETED_BY_URI, domain: COLLECTION_URI})).toBe(true);
+        });
+
+        it('should always show regular properties', () => {
+            expect(shouldPropertyBeHidden({key: 'http://example.com/property', domain: 'http://example.com'})).toBe(false);
+            expect(shouldPropertyBeHidden({key: 'http://example.com/property', domain: FILE_URI})).toBe(false);
+            expect(shouldPropertyBeHidden({key: 'http://example.com/property', domain: DIRECTORY_URI})).toBe(false);
+            expect(shouldPropertyBeHidden({key: 'http://example.com/property', domain: COLLECTION_URI})).toBe(false);
+        });
     });
 });

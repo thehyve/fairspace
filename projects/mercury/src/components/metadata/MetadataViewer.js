@@ -2,7 +2,7 @@ import React from 'react';
 import List from '@material-ui/core/List';
 import {withStyles} from '@material-ui/core/styles';
 import MetadataProperty from "./MetadataProperty";
-import {isDateTimeProperty} from "../../utils/metadataUtils";
+import {isDateTimeProperty, shouldPropertyBeHidden} from "../../utils/metadataUtils";
 
 const styles = {
     root: {
@@ -12,35 +12,30 @@ const styles = {
     }
 };
 
-/**
- * This component will always display correct metadata. If any error occurs it is handled by Metadata
- */
-const MetadataViewer = (props) => {
-    const domainProp = props.properties && props.properties.find(property => property.key === '@type');
-    const domain = domainProp && domainProp.values && domainProp.values[0]
-        ? domainProp.values[0].id : undefined;
-
-    const renderProperty = property => (
-        <MetadataProperty
-            editable={props.editable && !isDateTimeProperty(property)}
-            subject={props.subject}
-            key={property.key}
-            property={property}
-        />
-    );
-
-    if (!props.properties) {
-        return '';
+const MetadataViewer = ({properties, editable, subject, classes}) => {
+    if (!properties) {
+        return null;
     }
 
+    const domainProp = properties.find(property => property.key === '@type');
+    const domain = domainProp && domainProp.values && domainProp.values[0] ? domainProp.values[0].id : undefined;
+
     return (
-        <List dense classes={props.classes}>
+        <List dense classes={classes}>
             {
-                props.properties
+                properties
                     .map((p) => {
-                        const property = p;
-                        property.domain = domain;
-                        return renderProperty(p);
+                        const property = {...p, domain};
+
+                        return shouldPropertyBeHidden(property) ? null
+                            : (
+                                <MetadataProperty
+                                    editable={editable && !isDateTimeProperty(property)}
+                                    subject={subject}
+                                    key={property.key}
+                                    property={property}
+                                />
+                            );
                     })
             }
         </List>

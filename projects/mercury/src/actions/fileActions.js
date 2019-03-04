@@ -11,66 +11,62 @@ export const invalidateFiles = (collection, path) => ({
     }
 });
 
-export const renameFile = (collection, path, currentFilename, newFilename) => {
-    const fileApi = new FileAPI(collection.location);
+export const renameFile = (path, currentFilename, newFilename) => {
     const from = joinPaths(path, currentFilename);
     const to = joinPaths(path, newFilename);
 
     return {
         type: actionTypes.RENAME_FILE,
-        payload: fileApi.move(from, to),
+        payload: FileAPI.move(from, to),
         meta: {
-            collection, path, currentFilename, newFilename
+            path,
+            currentFilename, newFilename
         }
     };
 };
 
-export const deleteFile = (collection, path, basename) => {
-    const fileApi = new FileAPI(collection.location);
-    const filename = joinPaths(path, basename);
-
-    return {
+export const deleteFile = (path) => (
+     {
         type: actionTypes.DELETE_FILE,
-        payload: fileApi.delete(filename),
+        payload: FileAPI.delete(path),
         meta: {
-            collection, path, basename, fullpath: fileApi.getFullPath(filename)
+            path
         }
-    };
-};
+    });
 
-export const uploadFiles = (collection, path, files, nameMapping) => {
-    const fileApi = new FileAPI(collection.location);
+export const uploadFiles = (path, files, nameMapping) => {
     return {
         type: actionTypes.UPLOAD_FILES,
-        payload: fileApi.upload(path, files, nameMapping),
+        payload: FileAPI.upload(path, files, nameMapping),
         meta: {
-            collection, path, files, nameMapping
+            path, files, nameMapping
         }
     };
 };
 
-export const createDirectory = (collection, path, directoryname) => {
-    const fileApi = new FileAPI(collection.location);
+export const createDirectory = (path) => {
     return {
         type: actionTypes.CREATE_DIRECTORY,
-        payload: fileApi.createDirectory(joinPaths(path, directoryname)),
-        meta: {collection, path, directoryname}
+        payload: FileAPI.createDirectory(path),
+        meta: {path}
     };
 };
 
-const fetchFiles = createErrorHandlingPromiseAction((collection, path) => ({
+const fetchFiles = createErrorHandlingPromiseAction((path) => ({
     type: actionTypes.FETCH_FILES,
-    payload: new FileAPI(collection.location).list(path),
+    payload:  FileAPI.list(path),
     meta: {
-        collection,
         path
     }
 }));
 
-export const fetchFilesIfNeeded = (collection, path) => dispatchIfNeeded(
-    () => fetchFiles(collection, path),
-    (state) => {
-        const filesPerCollection = state.cache.filesByCollectionAndPath[collection.id] || {};
-        return filesPerCollection[path];
-    }
+export const fetchFilesIfNeeded = (path) => dispatchIfNeeded(
+    () => fetchFiles(path),
+    (state) => state.cache.filesByPath[path]
 );
+
+export const statFile = createErrorHandlingPromiseAction((path) => ({
+    type: actionTypes.STAT_FILE,
+    payload: FileAPI.stat(path),
+    meta: { path }
+}));

@@ -1,30 +1,28 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
-import Fab from "@material-ui/core/Fab";
+import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
+
 import {
-    BreadCrumbs, ErrorDialog, ErrorMessage,
-    GenericCollectionsScreen, CollectionEditor,
+    ErrorDialog, ErrorMessage,
+    CollectionEditor,
     LoadingInlay, LoadingOverlay
 } from "../common";
 import CollectionList from "./CollectionList";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as collectionActions from "../../actions/collectionActions";
 import {findById} from "../../utils/arrayUtils";
+import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import Config from "../../services/Config/Config";
 
 class CollectionBrowser extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            addingNewCollection: false
-        };
-    }
+    state = {
+        addingNewCollection: false
+    };
 
     componentDidMount() {
         this.props.fetchCollectionsIfNeeded();
-        this.props.closePath();
     }
 
     handleAddCollectionClick = () => {
@@ -32,44 +30,18 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionClick = (collection) => {
-        const {selectedCollectionId, selectCollection, deselectCollection} = this.props;
-        // If this collection is already selected, deselect
-        if (selectedCollectionId && selectedCollectionId === collection.id) {
-            deselectCollection();
-        } else {
-            selectCollection(collection.id);
+        const {selectedCollectionIRI, selectCollection} = this.props;
+        if (selectedCollectionIRI !== collection.iri) {
+            selectCollection(collection.iri);
         }
     }
 
-    handleCollectionDelete = (collection) => {
-        const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
-        deleteCollection(collection.id)
-            .then(fetchCollectionsIfNeeded)
-            .catch(err => ErrorDialog.showError(
-                err,
-                "An error occurred while deleting a collection",
-                this.handleCollectionDelete
-            ));
-    }
-
     handleCollectionDoubleClick = (collection) => {
-        this.props.history.push(`/collections/${collection.id}`);
+        this.props.history.push(getCollectionAbsolutePath(collection));
     }
 
-    renderButtons = () => (
-        <Fab
-            mini="true"
-            color="secondary"
-            aria-label="Add"
-            title="Add collection"
-            onClick={this.handleAddCollectionClick}
-        >
-            <Icon>add</Icon>
-        </Fab>
-    );
-
-    handleAddCollection = (name, description, type) => {
-        this.props.addCollection(name, description, type)
+    handleAddCollection = (name, description, location, type) => {
+        this.props.addCollection(name, description, type, location)
             .then(this.props.fetchCollectionsIfNeeded)
             .then(() => this.setState({addingNewCollection: false}))
             .catch(err => ErrorDialog.showError(
@@ -84,9 +56,8 @@ class CollectionBrowser extends React.Component {
     }
 
     renderCollectionList() {
-        const {
-            users, collections, addingCollection, deletingCollection
-        } = this.props;
+        const {users, collections, addingCollection, deletingCollection} = this.props;
+
         collections.forEach(col => {
             col.creatorObj = findById(users, col.creator);
         });
@@ -95,10 +66,9 @@ class CollectionBrowser extends React.Component {
             <>
                 <CollectionList
                     collections={this.props.collections}
-                    selectedCollectionId={this.props.selectedCollectionId}
+                    selectedCollectionIRI={this.props.selectedCollectionIRI}
                     onCollectionClick={this.handleCollectionClick}
                     onCollectionDoubleClick={this.handleCollectionDoubleClick}
-                    onCollectionDelete={this.handleCollectionDelete}
                 />
                 {this.state.addingNewCollection ? (
                     <CollectionEditor
@@ -122,11 +92,17 @@ class CollectionBrowser extends React.Component {
         }
 
         return (
-            <GenericCollectionsScreen
-                breadCrumbs={<BreadCrumbs />}
-                buttons={this.renderButtons()}
-                main={loading ? <LoadingInlay /> : this.renderCollectionList()}
-            />
+            <>
+                {loading ? <LoadingInlay /> : this.renderCollectionList()}
+                <Button
+                    variant="text"
+                    aria-label="Add"
+                    title="Create a new collection"
+                    onClick={this.handleAddCollectionClick}
+                >
+                    <Icon>add</Icon>
+                </Button>
+            </>
         );
     }
 }
@@ -137,7 +113,7 @@ const mapStateToProps = (state) => ({
     error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
     collections: state.cache.collections.data,
     users: state.cache.users.data,
-    selectedCollectionId: state.collectionBrowser.selectedCollectionId,
+    selectedCollectionIRI: state.collectionBrowser.selectedCollectionIRI,
     addingCollection: state.collectionBrowser.addingCollection,
     deletingCollection: state.collectionBrowser.deletingCollection
 });

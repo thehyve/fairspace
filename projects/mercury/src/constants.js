@@ -3,6 +3,14 @@ export const CUT = 'CUT';
 export const COPY = 'COPY';
 export const PATH_SEPARATOR = '/';
 
+// UI
+export const MAIN_CONTENT_WIDTH = '55%';
+export const SIDE_PANEL_WIDTH = '45%';
+
+// Search
+export const COLLECTION_SEARCH_TYPE = 'collections';
+export const FILES_SEARCH_TYPE = 'files';
+
 // URIs
 export const PROPERTY_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
 export const CLASS_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class';
@@ -28,3 +36,6 @@ export const FAIRSPACE_ENTITY_URI = 'http://fairspace.io/ontology#fairspaceEntit
 export const COLLECTION_URI = 'http://fairspace.io/ontology#Collection';
 export const FILE_URI = 'http://fairspace.io/ontology#File';
 export const DIRECTORY_URI = 'http://fairspace.io/ontology#Directory';
+export const FILE_PATH_URI = 'http://fairspace.io/ontology#filePath';
+export const DATE_DELETED_URI = 'http://fairspace.io/ontology#dateDeleted';
+export const DELETED_BY_URI = 'http://fairspace.io/ontology#deletedBy';

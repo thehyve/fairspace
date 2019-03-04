@@ -1,76 +1,87 @@
 import React from 'react';
-import Typography from "@material-ui/core/Typography";
-import {withStyles} from '@material-ui/core/styles';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import {
+    ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails,
+    Paper, withStyles, Typography
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {connect} from 'react-redux';
+
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "./CollectionDetails";
 import Metadata from "../metadata/Metadata";
-import PermissionsContainer from "../permissions/PermissionsContainer";
 import PathMetadata from "../metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
-import permissionUtils from '../../utils/permissionUtils';
-import {findById} from "../../utils/arrayUtils";
+import * as collectionActions from '../../actions/collectionActions';
+import {canManage} from '../../utils/permissionUtils';
+import ErrorDialog from './ErrorDialog';
 
 export class InformationDrawer extends React.Component {
-    handleDetailsChange = (collection) => {
+    handleDetailsChange = (collection, locationChanged) => {
         const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = this.props;
-        invalidateMetadata(collection.uri);
-        fetchCombinedMetadataIfNeeded(collection.uri);
+        invalidateMetadata(collection.iri);
+        fetchCombinedMetadataIfNeeded(collection.iri);
+
+        // If the location of a collection has changed, the URI where it
+        // can be found may also change. For that reason we need to redirect
+        // the user there.
+        if (locationChanged && this.props.onCollectionLocationChange) {
+            this.props.onCollectionLocationChange(collection);
+        }
     };
 
-    render() {
-        const {classes, collection, collectionAPI} = this.props;
+    handleCollectionDelete = (collection) => {
+        const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
+        deleteCollection(collection.iri)
+            .then(fetchCollectionsIfNeeded)
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while deleting a collection",
+                this.handleCollectionDelete
+            ));
+    }
 
-        if (!collection) {
-            return <Typography variant="h6">No collection</Typography>;
+    handleUpdateCollection = (name, description, location) => {
+        // TODO: validation should be part of the child component
+        if ((name !== this.props.collection.name || description !== this.props.collection.description || location !== this.props.collection.location)
+            && (name !== '') && (location !== '')) {
+            return this.props.updateCollection(this.props.collection.iri, name, description, location)
+                .then(() => {
+                    // TODO: no need to clone object, just use the id in the handleDetailsChange
+                    const locationChanged = this.props.collection.location !== location;
+                    const collection = Object.assign(this.props.collection, {name, description, location});
+                    this.handleDetailsChange(collection, locationChanged);
+                })
+                .catch(e => ErrorDialog.showError(e, "An error occurred while updating collection metadata"));
         }
 
-        const isMetaDataEditable = permissionUtils.canManage(collection)
-            && this.props.paths.length === 0;
+        return Promise.resolve();
+    }
 
+    render() {
+        const {classes, collection, loading} = this.props;
+
+        if (!collection) {
+            return <Typography variant="h6">Please select a collection..</Typography>;
+        }
+
+        const isMetaDataEditable = canManage(collection) && this.props.paths.length === 0;
         const relativePath = path => path.split('/').slice(2).join('/');
 
         return (
             <>
-                <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography className={classes.heading}>Collection Details</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <CollectionDetails
-                            collection={collection}
-                            collectionAPI={collectionAPI}
-                            onDidChangeDetails={this.handleDetailsChange}
-                        />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-                <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography className={classes.heading}>Collaborators:</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <PermissionsContainer
-                            collectionId={collection.id}
-                            canManage={permissionUtils.canManage(collection)}
-                        />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-                <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography className={classes.heading}>Collection metadata</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <Metadata
-                            subject={collection.uri}
-                            editable={isMetaDataEditable}
-                            style={{width: '100%'}}
-                        />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
+                <CollectionDetails
+                    collection={collection}
+                    onUpdateCollection={this.handleUpdateCollection}
+                    onCollectionDelete={this.handleCollectionDelete}
+                    loading={loading}
+                />
+                <Paper style={{padding: 20, marginTop: 10}}>
+                    <Metadata
+                        subject={collection.iri}
+                        editable={isMetaDataEditable}
+                        style={{width: '100%'}}
+                    />
+                </Paper>
                 {
                     this.props.paths.map(path => (
                         <ExpansionPanel
@@ -90,7 +101,7 @@ export class InformationDrawer extends React.Component {
                             <ExpansionPanelDetails>
                                 <PathMetadata
                                     path={path}
-                                    editable={permissionUtils.canManage(collection) && path === this.props.paths[this.props.paths.length - 1]}
+                                    editable={canManage(collection) && path === this.props.paths[this.props.paths.length - 1]}
                                     style={{width: '100%'}}
                                 />
                             </ExpansionPanelDetails>
@@ -112,13 +123,15 @@ function pathHierarchy(fullPath) {
     return paths.reverse();
 }
 
-const mapStateToProps = ({cache: {collections}, collectionBrowser: {selectedCollectionId, openedPath, selectedPaths}}) => ({
-    collection: findById(collections.data, selectedCollectionId),
-    paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath)
+const mapStateToProps = ({cache: {collections, users}, collectionBrowser: {selectedCollectionIRI, openedPath, selectedPaths}}) => ({
+    collection: collections.data && collections.data.find(c => c.iri === selectedCollectionIRI),
+    paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
+    loading: users.pending
 });
 
 const mapDispatchToProps = {
     ...metadataActions,
+    ...collectionActions
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer));

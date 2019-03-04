@@ -1,43 +1,61 @@
 import React from 'react';
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
-import Icon from "@material-ui/core/Icon";
-import {NavLink} from "react-router-dom";
-import {withStyles} from '@material-ui/core/styles';
-import styles from "./Menu.styles";
+import {withRouter, NavLink} from "react-router-dom";
+import {List, ListItem, ListItemIcon, ListItemText, Divider, Icon} from "@material-ui/core";
+
 import Config from '../../../../services/Config/Config';
 
-const Menu = ({classes}) => (
+const Menu = ({location: {pathname}}) => (
     <>
-        <List className={classes.menuItemList}>
-            <ListItem component={NavLink} exact to="/" button>
+        <List>
+            <ListItem
+                component={NavLink}
+                exact
+                to="/"
+                button
+                selected={pathname === '/'}
+            >
                 <ListItemIcon>
                     <Icon>home</Icon>
                 </ListItemIcon>
                 <ListItemText primary="Home" />
             </ListItem>
-            <ListItem component={NavLink} to="/collections" button>
+            <ListItem
+                component={NavLink}
+                to="/collections"
+                button
+                selected={pathname.startsWith('/collections')}
+            >
                 <ListItemIcon>
                     <Icon>folder_open</Icon>
                 </ListItemIcon>
                 <ListItemText primary="Collections" />
             </ListItem>
-            <ListItem component={NavLink} to="/notebooks" button>
+            <ListItem
+                component={NavLink}
+                to="/notebooks"
+                button
+                selected={pathname.startsWith('/notebooks')}
+            >
                 <ListItemIcon>
                     <Icon>bar_chart</Icon>
                 </ListItemIcon>
                 <ListItemText primary="Notebooks" />
             </ListItem>
-            <ListItem button>
+            <ListItem
+                button
+                selected={pathname.startsWith('/workflows')}
+            >
                 <ListItemIcon>
                     <Icon>transform</Icon>
                 </ListItemIcon>
                 <ListItemText primary="Workflows" />
             </ListItem>
-            <ListItem component={NavLink} to="/metadata" button>
+            <ListItem
+                component={NavLink}
+                to="/metadata"
+                button
+                selected={pathname.startsWith('/metadata')}
+            >
                 <ListItemIcon>
                     <Icon>assignment</Icon>
                 </ListItemIcon>
@@ -62,4 +80,4 @@ const Menu = ({classes}) => (
     </>
 );
 
-export default withStyles(styles)(Menu);
+export default withRouter(Menu);

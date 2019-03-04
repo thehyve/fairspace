@@ -1,6 +1,9 @@
 import reducer from "./permissionsByCollectionReducers";
+import {testNoChangedOnUnknownActionType} from '../../utils/testUtils';
 
-describe('updating permissions', () => {
+testNoChangedOnUnknownActionType('Permissions reducers', reducer);
+
+describe('Permissions reducers', () => {
     it('should add collaborators', () => {
         const previousState = {
             500: {

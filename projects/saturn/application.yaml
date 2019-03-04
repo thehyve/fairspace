@@ -1,0 +1,36 @@
+# Application's port
+port: 8080
+jena:
+  # Base IRI for all metadata entities
+  baseIRI: "http://fairspace.io/iri/"
+  # Jena's TDB2 database path
+  datasetPath: "data/db"
+  # Path of the transaction log
+  transactionLogPath: "data/log"
+  elasticSearch:
+    # Enables ElasticSearch integration
+    enabled: false
+    # Makes availability of ElasticSearch mandatory
+    required: false
+    settings:
+      # Map of hosts and ports. The host could also be an IP Address
+      hostToPortMapping:
+        "127.0.0.1": 9300
+      # Name of the Cluster. Defaults to "elasticsearch". Set to "docker-cluster" for a dockerized ES setup.
+      clusterName: "elasticsearch"
+      # Number of shards. Defaults to 1
+      shards: 1
+      # Number of replicas. Defaults to 1
+      replicas: 1
+      # Name of the index. Defaults to "fairspace"
+      indexName: "fairspace"
+auth:
+  # Enables JWT/JWKS authentication. Defaults to false.
+  enabled: false
+  # JWKS URL
+  jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
+  # JWK encryption algorithm. Defaults to "RS256"
+  jwtAlgorithm: "RS256"
+webDAV:
+  # Path of the WebDAV's local blob store
+  blobStorePath: "data/blobs"

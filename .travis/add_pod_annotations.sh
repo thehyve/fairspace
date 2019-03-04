@@ -9,7 +9,7 @@
 #   $COMMIT_ID
 #
 DIR=$(dirname $0)
-PROJECTS=(callisto ceres mercury neptune pluto titan)
+PROJECTS=(mercury pluto saturn)
 
 # If we have no changes at all in any of the projects, we can skip
 # pod annotations

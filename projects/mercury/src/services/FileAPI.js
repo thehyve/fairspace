@@ -1,22 +1,33 @@
-import CreateWebdavClient from "webdav";
+import {createClient} from "webdav";
+import axios from 'axios';
 import Config from "./Config/Config";
-import {joinPaths, addCounterToFilename} from '../utils/fileUtils';
+import {addCounterToFilename, generateUniqueFileName, joinPaths, getParentPath} from '../utils/fileUtils';
 
-// Ensure that the window fetch method is used for webdav calls
-// and that is passes along the credentials
-const defaultOptions = {credentials: 'include'};
+// Ensure that the client passes along the credentials
+const defaultOptions = {withCredentials: true};
 
-CreateWebdavClient.setFetchMethod((input, init) => {
-    const options = init ? Object.assign({}, init, defaultOptions) : defaultOptions;
-    return fetch(input, options);
-});
+// Keep all item properties
+const includeDetails = {...defaultOptions, details: true};
+
+axios.interceptors.request.use((config) => {
+    if (config.method === 'propfind') {
+        config.headers['content-type'] = 'application/xml';
+        config.data = '<?xml version="1.0" encoding="utf-8" ?><propfind xmlns:D="DAV:"><allprop/></propfind>';
+    }
+    return config;
+}, (error) => Promise.reject(error));
 
 class FileAPI {
-    constructor(collectionSubDirectory) {
-        this.basePath = `/${collectionSubDirectory}`;
+    client() {
+        if (!this.webDavClient) {
+            this.webDavClient = createClient(Config.get().urls.files);
+        }
+        return this.webDavClient;
+    }
 
-        const baseUrl = Config.get().urls.files;
-        this.client = CreateWebdavClient(baseUrl);
+    stat(path) {
+        return this.client().stat(path, includeDetails)
+            .then(result => result.data);
     }
 
     /**
@@ -25,10 +36,8 @@ class FileAPI {
      * @returns {Promise<T>}
      */
     list(path) {
-        const fullPath = this.getFullPath(path);
-
-        return this.client
-            .getDirectoryContents(fullPath);
+        return this.client().getDirectoryContents(path, includeDetails)
+            .then(result => result.data);
     }
 
     /**
@@ -37,11 +46,7 @@ class FileAPI {
      * @returns {*}
      */
     createDirectory(path) {
-        if (!path) {
-            return Promise.reject(Error("No path specified for directory creation"));
-        }
-
-        return this.client.createDirectory(this.getFullPath(path));
+        return this.client().createDirectory(path, defaultOptions);
     }
 
     /**
@@ -51,13 +56,12 @@ class FileAPI {
      * @param nameMapping
      * @returns Promise<any>
      */
-    upload(path, files, nameMapping) {
+    upload(path, files) {
         if (!files) {
             return Promise.reject(Error("No files given"));
         }
 
-        const fullPath = this.getFullPath(path);
-        const allPromises = files.map(file => this.client.putFileContents(`${fullPath}/${nameMapping.get(file.name)}`, file));
+        const allPromises = files.map(({name, value}) => this.client().putFileContents(`${path}/${name}`, value, defaultOptions));
 
         return Promise.all(allPromises).then(() => files);
     }
@@ -67,11 +71,7 @@ class FileAPI {
      * @param path
      */
     download(path) {
-        if (!path) {
-            return;
-        }
-
-        window.location.href = this.client.getFileDownloadLink(this.getFullPath(path));
+        window.location.href = this.client().getFileDownloadLink(path, defaultOptions);
     }
 
     /**
@@ -82,7 +82,7 @@ class FileAPI {
     delete(path) {
         if (!path) return Promise.reject(Error("No path specified for deletion"));
 
-        return this.client.deleteFile(this.getFullPath(path));
+        return this.client().deleteFile(path, defaultOptions);
     }
 
     /**
@@ -99,9 +99,9 @@ class FileAPI {
             return Promise.reject(Error("No destination specified to move to"));
         }
 
-        // We have to specify the destination ourselves, as the client adds the fullpath
+        // We have to specify the destination ourselves, as the client() adds the fullpath
         // to the
-        return this.client.moveFile(this.getFullPath(source), this.getFullPath(destination));
+        return this.client().moveFile(source, destination, defaultOptions);
     }
 
     /**
@@ -118,61 +118,42 @@ class FileAPI {
             return Promise.reject(Error("No destination specified to copy to"));
         }
 
-        return this.client.copyFile(this.getFullPath(source), this.getFullPath(destination));
+        return this.client().copyFile(source, destination, defaultOptions);
     }
 
 
     /**
-     * Converts the path within a collection to a path with the base path
-     * @param path
-     * @returns {string|*}
-     */
-    getFullPath(path) {
-        return path ? this.basePath + path : this.basePath;
-    }
-
-    /**
-     * Move one or more files from a sourcedir to a destinationdir
-     * @param sourceDir
-     * @param filenames
+     * Move one or more files to a destinationdir
+     * @param filePaths
      * @param destinationDir
      * @returns {*}
      */
-    movePaths(sourceDir, filenames, destinationDir) {
-        // Moving files to the current directory is a noop
-        if (destinationDir === sourceDir) {
-            return Promise.resolve();
-        }
-
-        return Promise.all(filenames.map((filename) => {
-            const sourceFile = joinPaths(sourceDir || '', filename);
-            const destinationFile = joinPaths(destinationDir || '', filename);
+    movePaths(filePaths, destinationDir) {
+        return Promise.all(filePaths.map((sourceFile) => {
+            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(sourceFile));
             return this.move(sourceFile, destinationFile);
         }));
     }
 
     /**
-     * Copies one or more files from a sourcedir to a destinationdir
-     * @param sourceDir
-     * @param filenames
+     * Copies one or more files from to a destinationdir
+     * @param filePaths
      * @param destinationDir
      * @returns {*}
      */
-    copyPaths(sourceDir, filenames, destinationDir) {
-        return Promise.all(filenames.map((filename) => {
-            const sourceFile = joinPaths(sourceDir || '', filename);
-            let destinationFilename = filename;
-
+    copyPaths(filePaths, destinationDir) {
+        return Promise.all(filePaths.map((sourceFile) => {
+            let destinationFilename = generateUniqueFileName(sourceFile);
             // Copying files to the current directory involves renaming
-            if (destinationDir === sourceDir) {
+            if (destinationDir === getParentPath(sourceFile)) {
                 destinationFilename = addCounterToFilename(destinationFilename);
             }
 
-            const destinationFile = joinPaths(destinationDir || '', destinationFilename);
+            const destinationFile = joinPaths(destinationDir, destinationFilename);
 
             return this.copy(sourceFile, destinationFile);
         }));
     }
 }
 
-export default FileAPI;
+export default new FileAPI();

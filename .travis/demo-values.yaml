@@ -1,113 +1,67 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
-  domain: hyperspace.demo.fairspace.app
-  locationOverrides:
-    rabbitmqhostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
+  domain: hyperspace.demo.fairway.app
   keycloak:
     username: keycloak
     password: keycloak-demo-123
     realm: demo
     clientSecret: db67da94-fa31-47cd-8c42-0ed295790841
-  rabbitmq:
-    username: rabbitmq
-    password: "gtzb28355LFqxbar"
 
 # Settings for the workspace
 workspace:
   ingress:
-    domain: workspace.demo.fairspace.app
+    domain: workspace.demo.fairway.app
     tls:
       certificate:
-        dns01Provider: azuredns-demo
+        dns01Provider: gke
   enableExperimentalFeatures: true
+  configurationScripts:
+    keycloak:
+      enabled: true
+      image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.1
+      pullPolicy: IfNotPresent
 
 # Specific settings for Pluto subchart
 pluto:
+  image:
+    image: eu.gcr.io/fairspace-207108/pluto
   keycloak:
-    baseUrl: https://keycloak.hyperspace.demo.fairspace.app
+    baseUrl: https://keycloak.hyperspace.demo.fairway.app
     realm: demo
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "FF63EUD3pyrCSeuV"
   tracing:
     enabled: false
   services:
-    jupyter: https://jupyterhub.workspace.demo.fairspace.app
-
-# Specific settings for Titan subchart
-titan:
-  auth:
-    tokenUrl: https://keycloak.hyperspace.demo.fairspace.app/auth/realms/demo/protocol/openid-connect/token
-    clientId: workspace-demo-pluto
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "UMEfm4fYvq3dAHZP"
-  tracing:
-    enabled: false
-  permissions:
-    collectionPermissionsUrl: https://workspace.demo.fairspace.app/api/collections/permissions?location=%s
+    jupyter: https://jupyterhub.workspace.demo.fairway.app
 
 # Specific settings for Saturn subchart
 saturn:
+  image:
+    image: eu.gcr.io/fairspace-207108/saturn
 
-# Specific settings for Ceres subchart
-ceres:
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "vv8FjVQm6qsNtGUA"
-  app:
-    oauth2:
-      baseUrl: https://keycloak.hyperspace.demo.fairspace.app
-      realm: demo
-    tracing:
-      enabled: false
-    metadata:
-      baseUrl: https://workspace.demo.fairspace.app
-
-# Specific settings for Neptune subchart
-neptune:
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "Yn5NvUhRVye2GVP8"
-  app:
-    oauth2:
-      baseUrl: https://keycloak.hyperspace.demo.fairspace.app
-      realm: demo
-    tracing:
-      enabled: false
-    metadata:
-      baseUrl: https://workspace.demo.fairspace.app
-
-# Specific settings for Callisto subchart
-callisto:
-  rabbitmq:
-    hostname: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    password: "TctDN6DBtfHkmGv8"
-
-  mail:
-    host: email-smtp.us-east-1.amazonaws.com
-    port: 587
-    username: AKIAISXHGXUIMMU75YVA
-    password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
+mercury:
+  image:
+    image: eu.gcr.io/fairspace-207108/mercury
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
   rbac:
-    enabled: false
+    enabled: true
   auth:
     custom:
       config:
         client_id: workspace-demo-pluto
         client_secret: db67da94-fa31-47cd-8c42-0ed295790841
-        openid_url: https://keycloak.hyperspace.demo.fairspace.app/auth/realms/demo/protocol/openid-connect/
-        session_url: https://workspace.demo.fairspace.app/account/tokens
+        openid_url: https://keycloak.hyperspace.demo.fairway.app/auth/realms/demo/protocol/openid-connect/
+        session_url: https://workspace.demo.fairway.app/account/tokens
   singleuser:
+    image:
+      name: eu.gcr.io/fairspace-207108/jupyterhub-singleuser
+      tag: 0.5.6-simple
     extraEnv:
-      WORKSPACE_URL: https://storage.workspace.demo.fairspace.app
+      WORKSPACE_URL: https://storage.workspace.demo.fairway.app
   hub:
+    image:
+      name: eu.gcr.io/fairspace-207108/jupyterhub-hub
     extraEnv:
       JUPYTERHUB_CRYPT_KEY: 8232144c8cba2105c71ee2f0e28158f2cc4417bfd103764017422393619208fe
   proxy:

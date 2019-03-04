@@ -1,4 +1,15 @@
-import {LABEL_URI} from "../constants";
+import {
+    COLLECTION_URI,
+    COMMENT_URI,
+    DATE_DELETED_URI,
+    DELETED_BY_URI,
+    DIRECTORY_URI,
+    FILE_PATH_URI,
+    FILE_URI,
+    LABEL_URI,
+    TYPE_URI
+} from "../constants";
+
 
 /**
  *
@@ -36,7 +47,7 @@ export function linkLabel(uri, shortenExternalUris = false) {
  * the last part of the id is returned
  *
  * @param entity    Expanded JSON-LD entity
- * @shortenExternalUris Shorten external URIs
+ * @param shortenExternalUris Shorten external URIs
  * @returns string
  */
 export function getLabel(entity, shortenExternalUris = false) {
@@ -52,28 +63,13 @@ export function getLabel(entity, shortenExternalUris = false) {
 }
 
 /**
- * Returns a navigable link for a given metadata url
- *
- * If the url refers to an entity within our workspace, a special
- * url is constructed to show the page in the frontend.
- * Otherwise, the url is just returned as is
- *
- * @param link          The uri to make navigable
- * @returns string      The navigable URI
- */
-export function navigableLink(link) {
-    return link.startsWith(`${window.location.origin}/iri/collections/`)
-        ? link.replace('/iri/collections/', '/collections/')
-        : link;
-}
-
-/**
  * Returns a relative navigable link, excluding the base url
  * @param link
  * @returns {string}
  */
 export function relativeLink(link) {
-    return link.substring(window.location.origin.length);
+    const withoutSchema = link.toString().substring(link.toString().indexOf('//') + 2);
+    return withoutSchema.substring(withoutSchema.indexOf('/'));
 }
 
 export function isDateTimeProperty(property) {
@@ -93,4 +89,26 @@ export function getValues(entity, property) {
 export function getSingleValue(entity, property) {
     const values = getValues(entity, property);
     return (values.length > 0) ? values[0] : undefined;
+}
+
+export function shouldPropertyBeHidden({key, domain}) {
+    const isCollection = domain === COLLECTION_URI;
+    const isFile = domain === FILE_URI;
+    const isDirectory = domain === DIRECTORY_URI;
+    const isManaged = isCollection || isFile || isDirectory;
+
+    switch (key) {
+        case '@type':
+        case TYPE_URI:
+        case FILE_PATH_URI:
+        case DATE_DELETED_URI:
+        case DELETED_BY_URI:
+            return true;
+        case LABEL_URI:
+            return isManaged;
+        case COMMENT_URI:
+            return isCollection;
+        default:
+            return false;
+    }
 }

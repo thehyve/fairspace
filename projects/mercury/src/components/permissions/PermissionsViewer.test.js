@@ -1,7 +1,8 @@
 import React from 'react';
-import {createShallow} from '@material-ui/core/test-utils';
-import Menu from "@material-ui/core/Menu";
-import {PermissionsViewer, styles} from "./PermissionsViewer";
+import {shallow} from "enzyme";
+
+import {IconButton} from "@material-ui/core";
+import PermissionsViewer from "./PermissionsViewer";
 
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
@@ -48,17 +49,6 @@ describe('PermissionsViewer', () => {
     const mockFetchPermissionsFn = jest.fn();
     const mockAlterPermissionFn = jest.fn();
 
-    let shallow;
-
-    beforeAll(() => {
-        shallow = createShallow();
-    });
-
-    /**
-     * Use case 1 :
-     * - current user is the creator of the collection
-     * - current user can manage the collection
-     */
     describe('Use Case 1: Current user is creator and can manage collection', () => {
         let wrapper;
         beforeAll(() => {
@@ -66,7 +56,6 @@ describe('PermissionsViewer', () => {
                 creator={mockCreator}
                 collectionId={500}
                 canManage
-                classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
                 currentUser={mockcurrentUserCreatorCanManage}
@@ -96,20 +85,17 @@ describe('PermissionsViewer', () => {
             });
         });
 
+        // user can see all 4 permissions (one is disabled not hidden)
         it('should enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find(Menu).length).toEqual(3);
+            expect(wrapper.find(IconButton).length).toEqual(4);
         });
+
 
         it('should render add button', () => {
             expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
         });
     });
 
-    /**
-     * Use case 2 :
-     * - current user is NOT the creator of the collection
-     * - current user can NOT manage the collection
-     */
     describe('Use Case 2: Current user is NOT creator and can NOT manage collection', () => {
         let wrapper;
         beforeAll(() => {
@@ -117,7 +103,6 @@ describe('PermissionsViewer', () => {
                 creator={mockCreator}
                 collectionId={500}
                 canManage={false}
-                classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
                 currentUser={mockcurrentUserNotCreatorCannotManage}
@@ -156,11 +141,6 @@ describe('PermissionsViewer', () => {
         });
     });
 
-    /**
-     * Use case 3 :
-     * - current user is NOT the creator of the collection
-     * - current user can manage the collection
-     */
     describe('Use Case 3: Current user is NOT creator and can manage collection', () => {
         let wrapper;
         beforeAll(() => {
@@ -168,7 +148,6 @@ describe('PermissionsViewer', () => {
                 creator={mockCreator}
                 collectionId={500}
                 canManage
-                classes={styles}
                 permissions={mockCollaborators}
                 users={mockUsers}
                 currentUser={mockcurrentUserNotCreatorCanManage}
@@ -200,7 +179,7 @@ describe('PermissionsViewer', () => {
             });
         });
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find(Menu).length).toEqual(3);
+            expect(wrapper.find(IconButton).some('[disabled]')).toBeTruthy();
         });
         it('should render add button', () => {
             expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);

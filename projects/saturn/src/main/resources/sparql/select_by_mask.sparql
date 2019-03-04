@@ -1,0 +1,7 @@
+# Select by mask
+# 0 - graph
+# 1 - subject
+# 2 - predicate
+# 3 - object
+
+CONSTRUCT { ?1 ?2 ?3 . } WHERE { GRAPH ?0 {?1 ?2 ?3} }

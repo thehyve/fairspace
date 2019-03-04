@@ -1,7 +1,7 @@
 language: java
 
 jdk:
-- oraclejdk8
+- oraclejdk11
 
 env:
   global:
@@ -16,8 +16,13 @@ env:
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
      - NEXUS_USERNAME="travis-fairspace"
-     - RELEASE_CONTEXT="FairspaceDemoCluster"
-     - SNAPSHOT_CONTEXT="FairspaceCICluster"
+     - GCP_PROJECT="fairspace-207108"
+     - SNAPSHOT_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
+     - SNAPSHOT_CLUSTER_NAME="fairspacecicluster"
+     - SNAPSHOT_CLUSTER_ZONE="europe-west1-b"
+     - RELEASE_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacedemocluster"
+     - RELEASE_CLUSTER_NAME="fairspacedemocluster"
+     - RELEASE_CLUSTER_ZONE="europe-west1-b"
      - GIT_TAG_FILES_OVERRIDE="charts/workspace/Chart.yaml charts/workspace/values.yaml projects/"
 
      # DOCKER_PASSWORD=
@@ -44,24 +49,24 @@ before_install:
   - export KUBE_CONFIG_ENC_IV=$encrypted_5162cfbd2a53_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - export BUILD_SCRIPTS_DIR=$(pwd)/ci
+  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" CLUSTER_NAME="$SNAPSHOT_CLUSTER_NAME" CLUSTER_ZONE="$SNAPSHOT_CLUSTER_ZONE" ; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE" ; fi'
+  - export INFRASTRUCTURE_PLATFORM="${DEPLOY_PLATFORM:-NONE}"
   - source ./ci/setup_env.sh
-  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT"; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo KUBERNETES_CONTEXT="$RELEASE_CONTEXT"; fi'
   - 'if [[ "$SHOULD_RELEASE" ]]; then export OIDC_AUTH_VERSION=$VERSION; fi'
+  - 'if [[ "$SHOULD_RELEASE" ]] ; then export NEED_INTERNAL_HELM=1 ; fi'
 
 jobs:
   include:
     - stage: build
       name: Build projects
+      install:
+      - 'if [[ "$SHOULD_RELEASE" ]] && [[ "$DEPLOY_PLATFORM" = "GCP" ]] ; then ci/gcp/install.sh ; ci/gcp/login.sh ; fi'
       script:
       - .travis/build.sh projects/oidc-auth
-      - .travis/build.sh projects/callisto
       - .travis/build.sh projects/saturn
-      - .travis/build.sh projects/ceres
       - .travis/build.sh projects/mercury
-      - .travis/build.sh projects/neptune
       - .travis/build.sh projects/pluto
-      - .travis/build.sh projects/titan
       - .travis/build.sh projects/jupyterhub-hub
       - travis_wait 40 .travis/build.sh projects/jupyterhub-singleuser
     - stage: build

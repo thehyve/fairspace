@@ -1,8 +1,8 @@
 import {connect} from 'react-redux';
 import React from "react";
-import {fetchSubjectByPathIfNeeded} from "../../actions/metadataActions";
 import ErrorMessage from "../common/ErrorMessage";
 import Metadata from "./Metadata";
+import {statFile} from "../../actions/fileActions";
 
 export class PathMetadata extends React.Component {
     componentDidMount() {
@@ -14,7 +14,7 @@ export class PathMetadata extends React.Component {
         const {dispatch, path, subject} = this.props;
 
         if (!subject && path) {
-            dispatch(fetchSubjectByPathIfNeeded(path));
+            dispatch(statFile(path));
         }
     }
 

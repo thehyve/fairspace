@@ -1,6 +1,6 @@
 import React from 'react';
-import {Route, withRouter} from "react-router-dom";
-import {connect} from 'react-redux';
+import {Route} from "react-router-dom";
+
 import Home from "./Home";
 import Collections from "./collections/CollectionsPage";
 import Notebooks from "./Notebooks";
@@ -8,9 +8,10 @@ import MetadataEntityPage from "./metadata/MetadataEntityPage";
 import MetadataOverviewPage from "./metadata/MetadataOverviewPage";
 import FilesPage from "./file/FilesPage";
 import logout from "../services/logout";
+import SearchPage from './search/SearchPage';
 
-const routes = ({menuExpanded}) => (
-    <div style={{marginLeft: menuExpanded ? 230 : 60}}>
+const routes = () => (
+    <>
         <Route path="/" exact component={Home} />
         <Route path="/collections" exact component={Collections} />
         <Route path="/collections/:collection/:path(.*)?" component={FilesPage} />
@@ -19,11 +20,8 @@ const routes = ({menuExpanded}) => (
         <Route path="/iri/**" component={MetadataEntityPage} />
         <Route path="/login" render={() => {window.location.href = '/login';}} />
         <Route path="/logout" render={logout} />
-    </div>
+        <Route path="/search" component={SearchPage} />
+    </>
 );
 
-const mapStateToProps = state => ({
-    menuExpanded: state.ui.menuExpanded
-});
-
-export default withRouter(connect(mapStateToProps)(routes));
+export default routes;

@@ -16,18 +16,18 @@ export const fetchCollectionsIfNeeded = () => dispatchIfNeeded(
     state => (state && state.cache ? state.cache.collections : undefined)
 );
 
-export const addCollection = (name, description, type) => ({
+export const addCollection = (name, description, type, location) => ({
     type: actionTypes.ADD_COLLECTION,
-    payload: CollectionAPI.addCollection(name, description, type),
+    payload: CollectionAPI.addCollection(name, description, type, location),
 });
 
-export const updateCollection = createErrorHandlingPromiseAction((id, name, description) => ({
+export const updateCollection = (id, name, description, location) => ({
     type: actionTypes.UPDATE_COLLECTION,
-    payload: CollectionAPI.updateCollection(id, name, description),
+    payload: CollectionAPI.updateCollection(id, name, description, location),
     meta: {
         id, name, description
     }
-}));
+});
 
 export const deleteCollection = id => ({
     type: actionTypes.DELETE_COLLECTION,

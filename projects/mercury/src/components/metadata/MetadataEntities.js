@@ -1,13 +1,12 @@
 import React from "react";
 import {connect} from 'react-redux';
-import {Table} from "@material-ui/core";
-import TableHead from "@material-ui/core/TableHead/TableHead";
-import TableRow from "@material-ui/core/TableRow/TableRow";
-import TableCell from "@material-ui/core/TableCell/TableCell";
-import TableBody from "@material-ui/core/TableBody/TableBody";
-import {Column, Row} from "simple-flexbox";
 import {withRouter} from 'react-router-dom';
-import {getLabel, navigableLink, relativeLink} from "../../utils/metadataUtils";
+import {
+    Table, Paper, TableHead, TableRow,
+    TableCell, TableBody
+} from "@material-ui/core";
+
+import {getLabel, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import {ErrorMessage, ErrorDialog, LoadingInlay, LoadingOverlay} from "../common";
@@ -26,13 +25,6 @@ class MetadataEntities extends React.Component {
             .catch(e => ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`));
     }
 
-    handleEntityNavigation(entity, e) {
-        e.preventDefault();
-        const link = navigableLink(entity['@id']);
-        this.props.history.push(relativeLink(link));
-    }
-
-
     render() {
         const {
             loading, creatingMetadataEntity, error, entities, vocabulary
@@ -45,17 +37,9 @@ class MetadataEntities extends React.Component {
         }
 
         return (
-            <div>
-                <Row>
-                    <Column flexGrow={1} vertical="center" horizontal="start">
-                        {[]}
-                    </Column>
-                    <Column>
-                        <NewMetadataEntityDialog onCreate={this.handleEntityCreation} />
-                    </Column>
-                </Row>
-
-                <div>
+            <>
+                <NewMetadataEntityDialog onCreate={this.handleEntityCreation} />
+                <Paper>
                     <Table style={{marginBottom: 300}}>
                         <TableHead>
                             <TableRow>
@@ -72,13 +56,13 @@ class MetadataEntities extends React.Component {
                                     </TableCell>
                                     <TableCell>
                                         {entity['@type'].map(type => (
-                                            <a href={navigableLink(type)} key={type}>
+                                            <a href={type} key={type}>
                                                 {getLabel(vocabulary.getById(type), true)}
                                             </a>
                                         ))}
                                     </TableCell>
                                     <TableCell>
-                                        <a href={navigableLink(entity['@id'])}>
+                                        <a href={entity['@id']}>
                                             {getLabel(entity)}
                                         </a>
                                     </TableCell>
@@ -86,10 +70,10 @@ class MetadataEntities extends React.Component {
                             )) : null}
                         </TableBody>
                     </Table>
-                </div>
+                </Paper>
 
                 <LoadingOverlay loading={creatingMetadataEntity} />
-            </div>
+            </>
         );
     }
 }

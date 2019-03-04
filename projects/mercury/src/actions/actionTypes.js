@@ -6,22 +6,17 @@ export const FETCH_USERS                            = 'FETCH_USERS';
 export const FETCH_AUTHORIZATIONS                   = 'FETCH_AUTHORIZATIONS';
 
 // Clipboard
-export const CLIPBOARD_CLEAR                        = 'CLIPBOARD_CLEAR';
 export const CLIPBOARD_CUT                          = 'CLIPBOARD_CUT';
 export const CLIPBOARD_COPY                         = 'CLIPBOARD_COPY';
 export const CLIPBOARD_PASTE                        = 'CLIPBOARD_PASTE';
-export const CLIPBOARD_PASTE_PENDING                = 'CLIPBOARD_PASTE_PENDING  ';
+export const CLIPBOARD_PASTE_PENDING                = 'CLIPBOARD_PASTE_PENDING';
 export const CLIPBOARD_PASTE_FULFILLED              = 'CLIPBOARD_PASTE_FULFILLED';
 export const CLIPBOARD_PASTE_REJECTED               = 'CLIPBOARD_PASTE_REJECTED';
 
 // Collection browser
-export const OPEN_INFODRAWER                        = 'OPEN_INFODRAWER';
-export const CLOSE_INFODRAWER                       = 'CLOSE_INFODRAWER';
 export const OPEN_COLLECTION                        = 'OPEN_COLLECTION';
 export const SELECT_COLLECTION                      = 'SELECT_COLLECTION';
-export const DESELECT_COLLECTION                    = 'DESELECT_COLLECTION';
 export const OPEN_PATH                              = 'OPEN_PATH';
-export const CLOSE_PATH                             = 'CLOSE_PATH';
 export const SELECT_PATH                            = 'SELECT_PATH';
 export const DESELECT_PATH                          = 'DESELECT_PATH';
 
@@ -42,6 +37,10 @@ export const DELETE_COLLECTION_REJECTED             = 'DELETE_COLLECTION_REJECTE
 export const DELETE_COLLECTION_INVALIDATE           = 'DELETE_COLLECTION_INVALIDATE';
 
 // Files
+export const STAT_FILE                              = 'STAT_FILE';
+export const STAT_FILE_PENDING                      = 'STAT_FILE_PENDING';
+export const STAT_FILE_FULFILLED                    = 'STAT_FILE_FULFILLED';
+export const STAT_FILE_REJECTED                     = 'STAT_FILE_REJECTED';
 export const FETCH_FILES                            = 'FETCH_FILES';
 export const FETCH_FILES_PENDING                    = 'FETCH_FILES_PENDING';
 export const FETCH_FILES_FULFILLED                  = 'FETCH_FILES_FULFILLED';
@@ -72,10 +71,6 @@ export const CREATE_METADATA_ENTITY                 = 'CREATE_METADATA_ENTITY';
 export const CREATE_METADATA_ENTITY_PENDING         = 'CREATE_METADATA_ENTITY_PENDING';
 export const CREATE_METADATA_ENTITY_FULFILLED       = 'CREATE_METADATA_ENTITY_FULFILLED';
 export const CREATE_METADATA_ENTITY_REJECTED        = 'CREATE_METADATA_ENTITY_REJECTED';
-export const FETCH_METADATA_URI_BY_PATH             = 'FETCH_METADATA_URI_BY_PATH';
-export const FETCH_METADATA_URI_BY_PATH_PENDING     = 'FETCH_METADATA_URI_BY_PATH_PENDING';
-export const FETCH_METADATA_URI_BY_PATH_FULFILLED   = 'FETCH_METADATA_URI_BY_PATH_FULFILLED';
-export const FETCH_METADATA_URI_BY_PATH_REJECTED    = 'FETCH_METADATA_URI_BY_PATH_REJECTED';
 
 // Permissions
 export const FETCH_PERMISSIONS                      = 'FETCH_PERMISSIONS';
@@ -89,3 +84,11 @@ export const FETCH_WORKSPACE                        = 'FETCH_WORKSPACE';
 
 // UI
 export const TOGGLE_MENU                            = 'TOGGLE_MENU';
+export const MOUSE_ENTER_MENU                       = 'MOUSE_ENTER_MENU';
+export const MOUSE_LEAVE_MENU                       = 'MOUSE_LEAVE_MENU';
+
+// Search
+export const PERFORM_SEARCH                         = 'PERFORM_SEARCH';
+export const PERFORM_SEARCH_PENDING                 = 'PERFORM_SEARCH_PENDING';
+export const PERFORM_SEARCH_FULFILLED               = 'PERFORM_SEARCH_FULFILLED';
+export const PERFORM_SEARCH_REJECTED                = 'PERFORM_SEARCH_REJECTED';

@@ -86,10 +86,7 @@ const fetchEntitiesByType = createErrorHandlingPromiseAction(type => ({
 const fetchAllEntities = createErrorHandlingPromiseAction(dispatch => ({
     type: actionTypes.FETCH_ALL_METADATA_ENTITIES,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
-        .then(({value: vocabulary}) => MetadataAPI.getEntitiesByTypes(
-            vocabulary.getFairspaceClasses()
-                .map(entry => entry['@id'])
-        ))
+        .then(_ => MetadataAPI.getAllEntities())
 }));
 
 export const fetchCombinedMetadataIfNeeded = subject => dispatchIfNeeded(
@@ -105,15 +102,4 @@ export const fetchEntitiesIfNeeded = type => dispatchIfNeeded(
 export const fetchAllEntitiesIfNeeded = () => dispatchIfNeeded(
     () => fetchAllEntities(),
     state => (state && state.cache ? state.cache.allEntities : undefined)
-);
-
-const getUriByPath = createErrorHandlingPromiseAction(path => ({
-    type: actionTypes.FETCH_METADATA_URI_BY_PATH,
-    payload: MetadataAPI.getSubjectByPath(path),
-    meta: {path}
-}));
-
-export const fetchSubjectByPathIfNeeded = path => dispatchIfNeeded(
-    () => getUriByPath(path),
-    state => state && state.cache && state.cache.subjectByPath && state.cache.subjectByPath[path]
 );

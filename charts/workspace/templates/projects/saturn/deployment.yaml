@@ -36,8 +36,10 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /opt/config
-          - name: data
+          - name: database
             mountPath: /data/saturn/db
+          - name: files
+            mountPath: /data/saturn/files
           livenessProbe:
             httpGet:
               path: {{ .Values.saturn.probePath }}
@@ -67,10 +69,17 @@ spec:
       - name: config-volume
         configMap:
           name: {{ template "saturn.fullname" . }}
-      - name: data
-        {{- if .Values.saturn.persistence.enabled }}
+      - name: database
+        {{- if .Values.saturn.persistence.database.enabled }}
         persistentVolumeClaim:
-          claimName: {{ .Values.saturn.persistence.existingClaim | default (include "saturn.fullname" .) }}
+          claimName: {{ .Values.saturn.persistence.database.existingDatabaseClaim | default (printf "%s-database" (include "saturn.fullname" .)) }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+      - name: files
+        {{- if .Values.saturn.persistence.files.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.saturn.persistence.files.existingClaim | default (printf "%s-files" (include "saturn.fullname" .)) }}
         {{- else }}
         emptyDir: {}
         {{- end }}

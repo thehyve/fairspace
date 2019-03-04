@@ -1,0 +1,28 @@
+{{- if and .Values.saturn.persistence.files.enabled (not .Values.saturn.persistence.files.existingClaim) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "saturn.fullname" . }}-files
+  labels:
+    app: saturn
+    chart: {{ template "workspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.saturn.persistence.files.annotations }}
+  annotations:
+{{ toYaml .Values.saturn.persistence.files.annotations | indent 4 }}
+{{- end }}
+spec:
+  accessModes:
+    - {{ .Values.saturn.persistence.files.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.saturn.persistence.files.size | quote }}
+{{- if .Values.saturn.persistence.files.storageClass }}
+{{- if (eq "-" .Values.saturn.persistence.files.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.saturn.persistence.files.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end -}}

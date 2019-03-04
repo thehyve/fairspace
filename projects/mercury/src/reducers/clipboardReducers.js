@@ -3,7 +3,6 @@ import {COPY, CUT} from '../constants';
 
 const defaultState = {
     type: null,
-    sourcedir: null,
     filenames: [],
     pending: false,
     error: false
@@ -15,14 +14,12 @@ const clipboard = (state = defaultState, action) => {
             return {
                 ...state,
                 type: CUT,
-                sourcedir: action.sourcedir,
                 filenames: action.filenames
             };
         case actionTypes.CLIPBOARD_COPY:
             return {
                 ...state,
                 type: COPY,
-                sourcedir: action.sourcedir,
                 filenames: action.filenames
             };
         case actionTypes.CLIPBOARD_PASTE_PENDING:
@@ -31,12 +28,11 @@ const clipboard = (state = defaultState, action) => {
                 pending: true
             };
         case actionTypes.CLIPBOARD_PASTE_FULFILLED:
-        case actionTypes.CLIPBOARD_CLEAR:
             return {
                 ...state,
+                error: false,
                 pending: false,
                 type: null,
-                sourcedir: null,
                 filenames: []
             };
         case actionTypes.CLIPBOARD_PASTE_REJECTED:

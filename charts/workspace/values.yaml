@@ -18,7 +18,6 @@ hyperspace:
     domain:
     locationOverrides:
         keycloak:
-        rabbitmqhostname: hyperspace-rabbitmq.hyperspace.svc.cluster.local
 
     # TODO: determine better way to handle keycloak credentials
     # Keycloak credentials are needed to setup the workspace (e.g. users, clients)
@@ -36,10 +35,6 @@ hyperspace:
         realm:
         clientSecret:
 
-    rabbitmq:
-      username:
-      password:
-
 # Setup ingress for workspace components
 workspace:
     ingress:
@@ -51,7 +46,7 @@ workspace:
           storage:
             kubernetes.io/ingress.class: nginx
             nginx.ingress.kubernetes.io/proxy-body-size: 10g
-            nginx.ingress.kubernetes.io/rewrite-target: /zuul
+            nginx.ingress.kubernetes.io/rewrite-target: /zuul/$1
           jupyter:
             kubernetes.io/ingress.class: nginx
             nginx.ingress.kubernetes.io/proxy-body-size: 10g
@@ -76,10 +71,6 @@ workspace:
         enabled: true
         image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.1
         pullPolicy: IfNotPresent
-      rabbitmq:
-        enabled: true
-        image: fairspace.azurecr.io/fairspace/rabbitmq-configuration:0.1.0
-        pullPolicy: IfNotPresent
     enableExperimentalFeatures: false
 
 # Generic settings for tracing
@@ -93,7 +84,7 @@ services:
 
 #####################################################################
 # Specific settings for Pluto subchart
-# Default configuration points to titan, mercury and neptune
+# Default configuration points to mercury and saturn
 # in the same workspace
 #####################################################################
 pluto:
@@ -128,11 +119,6 @@ pluto:
     timeoutSeconds: 1
   terminationGracePeriodSeconds: 10
 
-  rabbitmq:
-    vhost:
-    username:
-    password:
-
   # Reference to the workspace for informational purposes
   # These values default to the release name and chart version
   # The name is also used in the default setting for requiredAuthority and clientId
@@ -152,6 +138,7 @@ pluto:
   backends:
     ui:
     metadata:
+    vocabulary:
     storage:
     collections:
 
@@ -182,7 +169,7 @@ saturn:
       cpu: 200m
       memory: 512Mi
 
-  probePath: /rdf
+  probePath: /api/health/
   livenessProbe:
     initialDelaySeconds: 20
     periodSeconds: 10
@@ -196,239 +183,44 @@ saturn:
 
   ## Persist data to a persistent volume
   persistence:
-    enabled: true
+    database:
+      enabled: true
 
-    ## A manually managed Persistent Volume and Claim
-    ## Requires persistence.enabled: true
-    ## If defined, PVC must be created manually before volume will be bound
-    # existingClaim:
+      ## A manually managed Persistent Volume and Claim
+      ## Requires persistence.enabled: true
+      ## If defined, PVC must be created manually before volume will be bound
+      # existingClaim:
 
-    ## database data Persistent Volume Storage Class
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-    ##   GKE, AWS & OpenStack)
-    ##
-    # storageClass: "-"
-    accessMode: ReadWriteOnce
-    size: 512Mi
-    mountPath: /data
+      ## database data Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      ##
+      # storageClass: "-"
+      accessMode: ReadWriteOnce
+      size: 50Gi
+      mountPath: /data
+    files:
+      enabled: true
 
-  rabbitmq:
-    vhost:
-    username:
-    password:
+      ## A manually managed Persistent Volume and Claim
+      ## Requires persistence.enabled: true
+      ## If defined, PVC must be created manually before volume will be bound
+      # existingClaim:
 
-
-#####################################################################
-# Specific settings for Ceres subchart
-#####################################################################
-ceres:
-  replicaCount: 1
-  rollingUpdate:
-    maxSurge: 0%
-    maxUnavailable: 100%
-  image:
-    image: fairspace.azurecr.io/fairspace/ceres
-    tag: RELEASEVERSION
-    pullPolicy: IfNotPresent
-
-  service:
-    name: ceres
-    type: ClusterIP
-    externalPort: 80
-    internalPort: 8080
-
-  resources:
-    limits:
-      cpu: 1
-      memory: 1024Mi
-    requests:
-      cpu: 200m
-      memory: 512Mi
-
-  probePath: /actuator/health
-  livenessProbe:
-    initialDelaySeconds: 20
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  readinessProbe:
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  terminationGracePeriodSeconds: 10
-
-  ## Persist data to a persistent volume
-  persistence:
-    enabled: true
-
-    ## A manually managed Persistent Volume and Claim
-    ## Requires persistence.enabled: true
-    ## If defined, PVC must be created manually before volume will be bound
-    # existingClaim:
-
-    ## database data Persistent Volume Storage Class
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-    ##   GKE, AWS & OpenStack)
-    ##
-    # storageClass: "-"
-    accessMode: ReadWriteOnce
-    size: 512Mi
-    subPath: "ceres-db"
-    mountPath: /data/ceres
-
-  rabbitmq:
-    vhost:
-    username:
-    password:
-
-#####################################################################
-# Specific settings for Neptune subchart
-#####################################################################
-neptune:
-  replicaCount: 1
-
-  image:
-    image: fairspace.azurecr.io/fairspace/neptune
-    tag: RELEASEVERSION
-    pullPolicy: IfNotPresent
-
-  service:
-    type: ClusterIP
-    externalPort: 80
-    internalPort: 8080
-
-  resources:
-    limits:
-      cpu: 1
-      memory: 512Mi
-    requests:
-      cpu: 50m
-      memory: 192Mi
-  probePath: /actuator/health
-  livenessProbe:
-    initialDelaySeconds: 20
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  readinessProbe:
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  terminationGracePeriodSeconds: 10
-
-  rabbitmq:
-    vhost:
-    username:
-    password:
-
-  ceres:
-    url:
-
-  titan:
-    url:
-
-#####################################################################
-# Specific settings for Titan subchart
-#####################################################################
-titan:
-  replicaCount: 1
-  rollingUpdate:
-    maxSurge: 0%
-    maxUnavailable: 100%
-  image:
-    image: fairspace.azurecr.io/fairspace/titan
-    tag: RELEASEVERSION
-    pullPolicy: IfNotPresent
-  service:
-    name: titan
-    type: ClusterIP
-    externalPort: 80
-  resources:
-    limits:
-      cpu: 500m
-      memory: 256Mi
-    requests:
-      cpu: 100m
-
-  # Authentication parameters
-  rabbitmq:
-    exchange: storage
-    vhost:
-    username:
-    password:
-  auth:
-    enabled: true
-    tokenUrl:
-    clientId:
-  persistence:
-    enabled: true
-    mountPath: /data
-    rootPath: /data
-
-    ## A manually managed Persistent Volume and Claim
-    ## Requires persistence.enabled: true
-    ## If defined, PVC must be created manually before volume will be bound
-    # existingClaim:
-
-    ## database data Persistent Volume Storage Class
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-    ##   GKE, AWS & OpenStack)
-    ##
-    # storageClass: "-"
-    accessMode: ReadWriteOnce
-    size: 10Gi
-    subPath: titan
-
-  collections:
-    collectionUrl:
-
-#####################################################################
-# Specific settings for Callisto subchart
-#####################################################################
-callisto:
-  replicaCount: 1
-
-  image:
-    image: fairspace.azurecr.io/fairspace/callisto
-    tag: RELEASEVERSION
-    pullPolicy: IfNotPresent
-
-  resources:
-    limits:
-      cpu: 200m
-      memory: 512Mi
-    requests:
-      cpu: 100m
-      memory: 384Mi
-  terminationGracePeriodSeconds: 10
-
-  rabbitmq:
-    vhost:
-    username:
-    password:
-
-  # Please note that mail settings are copied into the application.yaml configuration
-  # file for spring. This means you can add any mail settings accepted by Spring mail
-  # See e.g. https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-email.html
-  # for more information.
-  mail:
-    host:
-    port:
-    username:
-    password:
-
-  app:
-    mail:
-      from: info@fairspace.com
+      ## database data Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      ##
+      # storageClass: "-"
+      accessMode: ReadWriteOnce
+      size: 50Gi
+      mountPath: /data
 
 #####################################################################
 # Specific settings for Mercury subchart
@@ -506,21 +298,6 @@ jupyterhub:
     # length as the actual values
     # Ensure to override this value with a 64-character hex string when installing
     secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
-
-#####################################################################
-# Specific settings for databases
-#####################################################################
-postgresql_neptune:
-  postgresqlUsername: postgres
-  postgresqlPassword: test123
-  postgresqlDatabase: neptune
-  nameOverride: postgresql-neptune
-
-postgresql_ceres:
-  postgresqlUsername: postgres
-  postgresqlPassword: test123
-  postgresqlDatabase: ceres
-  nameOverride: postgresql-ceres
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}

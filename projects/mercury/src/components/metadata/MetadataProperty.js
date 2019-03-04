@@ -1,30 +1,31 @@
 import React from 'react';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import ClearIcon from '@material-ui/icons/Clear';
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import {connect} from 'react-redux';
-import ListItemText from "@material-ui/core/ListItemText";
-import {compose} from "redux";
+import {
+    List, ListItem, Typography, IconButton,
+    ListItemSecondaryAction, ListItemText
+} from '@material-ui/core';
+import ClearIcon from '@material-ui/icons/Clear';
+
 import {updateMetadata as updateMetadataAction} from "../../actions/metadataActions";
 import ValueComponentFactory from "./values/ValueComponentFactory";
 import ErrorDialog from "../common/ErrorDialog";
-import withHovered from "../common/WithHovered";
 import * as constants from '../../constants';
 
-function MetadataProperty({
-    editable, subject, property, updateMetadata, onItemMouseOut, onItemMouseOver, hovered
-}) {
+class MetadataProperty extends React.Component {
+    state = {
+        hoveredIndex: null
+    };
+
     // Function to save a certain value.
     // Calling it with an index provides you with a function that
     // will save a given value (if it has changed) along with the other
     // unchanged values.
     // E.g. handleSave(1) will return a function `value => { ... }` that
     // can be used as a callback for the component for index 1
-    const handleSave = index => (newEntry) => {
+    handleSave = index => (newEntry) => {
+        const {subject, property, updateMetadata} = this.props;
         const currentEntry = property.values[index];
+
         if (currentEntry.value !== newEntry.value) {
             const updatedValues = property.values.map((el, idx) => ((idx === index) ? newEntry : el));
             return updateMetadata(subject, property.key, updatedValues)
@@ -33,7 +34,9 @@ function MetadataProperty({
         return Promise.resolve();
     };
 
-    const handleAdd = (newEntry) => {
+    handleAdd = (newEntry) => {
+        const {subject, property, updateMetadata} = this.props;
+
         if (newEntry.value || newEntry.id) {
             const updatedValues = [...property.values, newEntry];
 
@@ -43,60 +46,69 @@ function MetadataProperty({
         return Promise.resolve();
     };
 
-    const handleDelete = index => () => {
+    handleDelete = index => () => {
+        const {subject, property, updateMetadata} = this.props;
         const updatedValues = property.values.filter((el, idx) => idx !== index);
+
         return updateMetadata(subject, property.key, updatedValues)
             .catch(e => ErrorDialog.showError(e, "Error while deleting metadata"));
     };
 
-    // Render the given entry as a list item
-    const renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => (
-        <ListItem
-            key={idx}
-            onMouseOver={e => onItemMouseOver(idx, e)}
-            onMouseOut={() => onItemMouseOut(idx)}
-        >
-            <ListItemText>
-                <PropertyValueComponent
-                    property={property}
-                    entry={entry}
-                    onSave={handleSave(idx)}
-                    aria-labelledby={labelledBy}
-                />
-            </ListItemText>
-            {
-                editable
-                    ? (
-                        <ListItemSecondaryAction
-                            onMouseOver={e => onItemMouseOver(idx, e)}
-                            onMouseOut={() => onItemMouseOut(idx)}
-                        >
-                            <IconButton
-                                style={{
-                                    visibility: hovered !== idx ? 'hidden' : 'visible'
-                                }}
-                                size="small"
-                                aria-label="Delete"
-                                title="Delete"
-                                onClick={handleDelete(idx)}
-                            >
-                                <ClearIcon />
-                            </IconButton>
-                        </ListItemSecondaryAction>
-                    ) : null
-            }
-        </ListItem>
-    );
+    setHoveredIndex = (hoveredIndex) => {
+        this.setState({hoveredIndex});
+    }
 
-    const renderAddComponent = (labelledBy) => {
+    renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
+        const {editable, property} = this.props;
+        const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
+
+        return (
+            <div
+                key={idx}
+                onMouseEnter={() => this.setHoveredIndex(idx)}
+                onMouseLeave={() => this.setHoveredIndex(null)}
+            >
+                <ListItem>
+                    <ListItemText>
+                        <PropertyValueComponent
+                            property={property}
+                            entry={entry}
+                            onSave={this.handleSave(idx)}
+                            aria-labelledby={labelledBy}
+                        />
+                    </ListItemText>
+                    {
+                        editable
+                            ? (
+                                <ListItemSecondaryAction>
+                                    <IconButton
+                                        size="small"
+                                        aria-label="Delete"
+                                        title="Delete"
+                                        onClick={this.handleDelete(idx)}
+                                        style={{visibility}}
+                                    >
+                                        <ClearIcon />
+                                    </IconButton>
+                                </ListItemSecondaryAction>
+                            ) : null
+                    }
+                </ListItem>
+            </div>
+        );
+    };
+
+    renderAddComponent = (labelledBy) => {
+        const {property} = this.props;
         const ValueAddComponent = ValueComponentFactory.addComponent(property);
+
         return (
             <ListItem key={property.values.length}>
                 <ListItemText>
                     <ValueAddComponent
                         property={property}
                         placeholder="Add new"
-                        onSave={handleAdd}
+                        onSave={this.handleAdd}
                         aria-labelledby={labelledBy}
                     />
                 </ListItemText>
@@ -104,40 +116,35 @@ function MetadataProperty({
         );
     };
 
-    const isCollection = property.domain === constants.COLLECTION_URI;
-    const isFile = property.domain === constants.FILE_URI;
-    const isDirectory = property.domain === constants.DIRECTORY_URI;
-    const isManaged = isCollection || isFile || isDirectory;
-    if ((property.key === '@type')
-        || (isManaged && property.key === constants.LABEL_URI)
-        || (isCollection && property.key === constants.COMMENT_URI)) {
-        return '';
+    render() {
+        const {editable, property} = this.props;
+
+        // Do not show an add component if no multiples are allowed
+        // and there is already a value
+        const editableAndNotMachineOnly = editable && !property.machineOnly;
+        const canAdd = editableAndNotMachineOnly && (property.allowMultiple || property.values.length === 0);
+        const labelId = `label-${property.key}`;
+
+        const ValueComponent = (editableAndNotMachineOnly && property.range !== constants.RESOURCE_URI)
+            ? ValueComponentFactory.editComponent(property)
+            : ValueComponentFactory.readOnlyComponent();
+
+        return (
+            <ListItem disableGutters key={property.key} style={{display: 'block'}}>
+                <Typography variant="body1" component="label" id={labelId}>
+                    {property.label}
+                </Typography>
+                <List dense>
+                    {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
+                    {canAdd ? this.renderAddComponent(labelId) : null}
+                </List>
+            </ListItem>
+        );
     }
-    // Do not show an add component if no multiples are allowed
-    // and there is already a value
-    const editableAndNotMachineOnly = editable && !property.machineOnly;
-    const canAdd = editableAndNotMachineOnly && (property.allowMultiple || property.values.length === 0);
-    const labelId = `label-${property.key}`;
-
-    const ValueComponent = (editableAndNotMachineOnly && property.range !== constants.RESOURCE_URI)
-        ? ValueComponentFactory.editComponent(property)
-        : ValueComponentFactory.readOnlyComponent();
-
-    return (
-        <ListItem disableGutters key={property.key} style={{display: 'block'}}>
-            <Typography variant="body1" component="label" id={labelId}>
-                {property.label}
-            </Typography>
-            <List dense>
-                {property.values.map((entry, idx) => renderEntry(entry, idx, ValueComponent, labelId))}
-                {canAdd ? renderAddComponent(labelId) : null}
-            </List>
-        </ListItem>
-    );
 }
 
 const mapDispatchToProps = {
     updateMetadata: updateMetadataAction
 };
 
-export default compose(connect(null, mapDispatchToProps), withHovered)(MetadataProperty);
+export default connect(null, mapDispatchToProps)(MetadataProperty);
