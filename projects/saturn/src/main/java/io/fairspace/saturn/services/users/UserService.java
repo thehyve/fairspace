@@ -41,6 +41,14 @@ public class UserService {
         });
     }
 
+    /**
+     * Returns a URI for the provided userInfo.
+     * First tries to find an exiting fs:User entity which externalId  equals to userInfo.getUserId()
+     * If no existing entry is found, creates a new one and stores userInfo in it.
+     * Also updates an existing one if one of the userInfo's fileds changed.
+     * @param userInfo
+     * @return
+     */
     public String getUserIRI(UserInfo userInfo) {
         if (userInfo == null) {
             return ANONYMOUS;
@@ -74,8 +82,8 @@ public class UserService {
 
     private void updateUser(String iri, UserInfo userInfo) {
         commit("Update a new user, id: " + userInfo.getUserId(), rdf, () -> {
-                rdf.update(storedQuery("users_update", createURI(iri), userInfo.getUserId(), userInfo.getFullName(),
-                        userInfo.getUserName(), encodeAuthorities(userInfo.getAuthorities())));
+                rdf.update(storedQuery("users_update", createURI(iri), userInfo.getUserName(), userInfo.getFullName(),
+                        encodeAuthorities(userInfo.getAuthorities())));
             idToUserInfo.put(userInfo.getUserId(), userInfo);
         });
     }

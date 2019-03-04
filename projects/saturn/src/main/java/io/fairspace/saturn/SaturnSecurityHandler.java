@@ -17,9 +17,14 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
     private final Function<HttpServletRequest, UserInfo> authenticator;
     private final Consumer<UserInfo> userCallback ;
 
-    SaturnSecurityHandler(Function<HttpServletRequest, UserInfo> authenticator, Consumer<UserInfo> userCallback) {
+    /**
+     *
+     * @param authenticator Authenticator returning a UserInfo for an incoming request
+     * @param onAuthenticate An optional callback, called on successful authentication
+     */
+    SaturnSecurityHandler(Function<HttpServletRequest, UserInfo> authenticator, Consumer<UserInfo> onAuthenticate) {
         this.authenticator = authenticator;
-        this.userCallback = userCallback;
+        this.userCallback = onAuthenticate;
     }
 
     @Override
