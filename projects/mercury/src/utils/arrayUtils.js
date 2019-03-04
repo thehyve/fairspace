@@ -13,4 +13,4 @@ export function findById(itemList, itemId) {
  * @param array
  * @returns {*}
  */
-export const flattenShallow = array => array.reduce((acc, val) => acc.concat(val), []);
+export const flattenShallow = array => [].concat(...array);

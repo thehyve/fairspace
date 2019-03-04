@@ -1,11 +1,8 @@
 import {compareBy, comparing} from "./comparisionUtils";
 
-const MANAGE = 'Manage';
-const WRITE = 'Write';
-const READ = 'Read';
-
-export const canRead = (collection) => collection
-    && (collection.access === MANAGE || collection.access === WRITE || collection.access === READ);
+export const MANAGE = 'Manage';
+export const WRITE = 'Write';
+export const READ = 'Read';
 
 export const canWrite = (collection) => collection
     && (collection.access === MANAGE || collection.access === WRITE);
