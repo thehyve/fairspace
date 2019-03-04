@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
+import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -41,7 +42,7 @@ public class App {
         var rdf = new RDFConnectionLocal(ds);
 
         var userService = new UserService(rdf);
-        Supplier<String> userIriSupplier = () -> userService.getUserIRI(SecurityUtil.userInfo());
+        Supplier<String> userIriSupplier = () -> userService.setCurrentUserAndGetIRI(userInfo());
         var collections = new CollectionsService(rdf, userIriSupplier);
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), userIriSupplier, collections));
 
@@ -58,7 +59,7 @@ public class App {
         var auth = config.auth;
         if (auth.enabled) {
             var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
-            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
+            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::setCurrentUserAndGetIRI));
         }
 
         fusekiServerBuilder
