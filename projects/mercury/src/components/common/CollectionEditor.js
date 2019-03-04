@@ -12,6 +12,8 @@ import FormControl from "@material-ui/core/FormControl/FormControl";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 
 class CollectionEditor extends React.Component {
+    static LOCATION_REGEX = /[^a-z0-9_-]+/gi;
+
     state = {
         editing: true,
         name: this.props.name || '',
@@ -41,6 +43,32 @@ class CollectionEditor extends React.Component {
         this.setState({[name]: value});
     }
 
+    handleNameChange = (event) => {
+        const shouldUpdateLocation = this.shouldUpdateLocationOnNameChange();
+        const newName = event.target.value;
+
+        this.handleInputChange('name', newName);
+
+        if (shouldUpdateLocation) {
+            this.handleInputChange('location', this.nameToLocation(newName));
+        }
+    }
+
+    /**
+     * Creates a new location based on the name
+     * @param name
+     * @returns {string}
+     */
+    nameToLocation = (name) => name.replace(CollectionEditor.LOCATION_REGEX, '_');
+
+    /**
+     * Determines whether the location should be updated when the name changes.
+     *
+     * Returns true if the user has not changed the location.
+     * @type {function}
+     */
+    shouldUpdateLocationOnNameChange = () => this.nameToLocation(this.state.name) === this.state.location;
+
     isInputValid = () => !!this.state.name && !!this.state.location;
 
     render() {
@@ -62,7 +90,7 @@ class CollectionEditor extends React.Component {
                         label="Name"
                         value={this.state.name}
                         name="name"
-                        onChange={(event) => this.handleInputChange('name', event.target.value)}
+                        onChange={(event) => this.handleNameChange(event)}
                         fullWidth
                         required
                     />
