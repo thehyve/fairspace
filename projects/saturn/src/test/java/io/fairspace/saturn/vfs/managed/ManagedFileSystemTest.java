@@ -78,6 +78,8 @@ public class ManagedFileSystemTest {
         assertTrue(stat.isDirectory());
         assertNotNull(stat.getIri());
         assertTrue(ds.getDefaultModel().contains(createResource(stat.getIri()), RDFS.label, createStringLiteral("ccc")));
+        assertEquals( "http://example.com/user", stat.getCreatedBy());
+        assertEquals( "http://example.com/user", stat.getModifiedBy());
     }
 
     @Test

@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.joining;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class UserService {
-    private static final String ANONYMOUS = "http://fairspace.io/for-testing-only";
+    private static final String ANONYMOUS = "http://fairspace.io/iri/test-user";
     private final RDFConnection rdf;
     private final Map<String, String> idToIri = new ConcurrentHashMap<>();
     private final Map<String, UserInfo> idToUserInfo = new ConcurrentHashMap<>();
@@ -24,6 +24,10 @@ public class UserService {
     public UserService(RDFConnection rdf) {
         this.rdf = rdf;
 
+        loadUsers();
+    }
+
+    private void loadUsers() {
         rdf.querySelect(storedQuery("users_list"), row -> {
             var id = row.getLiteral("externalId").getString();
             var iri = row.getResource("iri").getURI();
@@ -37,7 +41,7 @@ public class UserService {
         });
     }
 
-    public String setCurrentUserAndGetIRI(UserInfo userInfo) {
+    public String getUserIRI(UserInfo userInfo) {
         if (userInfo == null) {
             return ANONYMOUS;
         }
