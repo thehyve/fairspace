@@ -36,28 +36,28 @@ public class UserServiceTest {
 
     @Test
     public void shouldCreateAnIRIForANewUserAndThenReuseIt() {
-        var iri = service.setCurrentUserAndGetIRI(userInfo);
+        var iri = service.getUserIRI(userInfo);
         assertTrue(iri.startsWith(getWorkspaceURI()));
-        assertEquals(iri, service.setCurrentUserAndGetIRI(userInfo));
+        assertEquals(iri, service.getUserIRI(userInfo));
 ;
     }
 
     @Test
     public void shouldKeepUsersBetweenRestarts() {
-        var iri = service.setCurrentUserAndGetIRI(userInfo);
+        var iri = service.getUserIRI(userInfo);
 
         service = new UserService(rdf); // Emulates restart
 
-        assertEquals(iri, service.setCurrentUserAndGetIRI(userInfo));
+        assertEquals(iri, service.getUserIRI(userInfo));
     }
 
     @Test
     public void shouldUpdateMetadataWhenNeeded() {
-        var iri = service.setCurrentUserAndGetIRI(userInfo);
+        var iri = service.getUserIRI(userInfo);
         assertTrue(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("name1")));
 
         var updatedUserInfo = new UserInfo("id1", "user1", "name2", new HashSet<>(asList("role1", "role2")));
-        assertEquals(iri, service.setCurrentUserAndGetIRI(updatedUserInfo));
+        assertEquals(iri, service.getUserIRI(updatedUserInfo));
 
         assertFalse(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("name1")));
         assertTrue(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("name2")));

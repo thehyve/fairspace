@@ -2,7 +2,6 @@ package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -42,7 +41,7 @@ public class App {
         var rdf = new RDFConnectionLocal(ds);
 
         var userService = new UserService(rdf);
-        Supplier<String> userIriSupplier = () -> userService.setCurrentUserAndGetIRI(userInfo());
+        Supplier<String> userIriSupplier = () -> userService.getUserIRI(userInfo());
         var collections = new CollectionsService(rdf, userIriSupplier);
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), userIriSupplier, collections));
 
@@ -59,7 +58,7 @@ public class App {
         var auth = config.auth;
         if (auth.enabled) {
             var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
-            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::setCurrentUserAndGetIRI));
+            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
         }
 
         fusekiServerBuilder
