@@ -15,8 +15,7 @@ import static io.milton.http.values.HrefList.asList;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.assertFalse;
 
@@ -39,7 +38,11 @@ public class UserServiceTest {
         var iri = service.getUserIRI(userInfo);
         assertTrue(iri.startsWith(getWorkspaceURI()));
         assertEquals(iri, service.getUserIRI(userInfo));
-;
+
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral(userInfo.getFullName())));
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#externalId"), createStringLiteral(userInfo.getUserId())));
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#userName"), createStringLiteral(userInfo.getUserName())));
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#authorities"), createStringLiteral("role1,role2")));
     }
 
     @Test
@@ -56,12 +59,17 @@ public class UserServiceTest {
         var iri = service.getUserIRI(userInfo);
         assertTrue(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("name1")));
 
-        var updatedUserInfo = new UserInfo("id1", "user1", "name2", new HashSet<>(asList("role1", "role2")));
+        var updatedUserInfo = new UserInfo("id1", "user2", "name2", new HashSet<>(asList("role1", "role2", "role3")));
         assertEquals(iri, service.getUserIRI(updatedUserInfo));
+
+        assertFalse(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#userName"), createStringLiteral("user1")));
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#userName"), createStringLiteral("user2")));
 
         assertFalse(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("name1")));
         assertTrue(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("name2")));
 
+        assertFalse(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#authorities"), createStringLiteral("role1,role2")));
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#authorities"), createStringLiteral("role1,role2,role3")));
     }
 
 }
