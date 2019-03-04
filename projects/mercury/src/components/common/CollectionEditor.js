@@ -41,7 +41,7 @@ class CollectionEditor extends React.Component {
         this.setState({[name]: value});
     }
 
-    isInputValid = () => !!this.state.name;
+    isInputValid = () => !!this.state.name && !!this.state.location;
 
     render() {
         return (
@@ -67,7 +67,6 @@ class CollectionEditor extends React.Component {
                         required
                     />
                     <TextField
-                        autoFocus
                         margin="dense"
                         multiline
                         id="description"
@@ -78,11 +77,10 @@ class CollectionEditor extends React.Component {
                         fullWidth
                     />
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="location"
-                        label="Directory name"
-                        helperText="Must be unique and contain only alphanumerical characters, '-' abd '_'"
+                        label="Collection identifier"
+                        helperText="This identifier does not allow special characters and has to be unique. It will be used in Jupyterlab as the directory name for files in this collections"
                         value={this.state.location}
                         name="location"
                         onChange={(event) => this.handleInputChange('location', event.target.value)}
