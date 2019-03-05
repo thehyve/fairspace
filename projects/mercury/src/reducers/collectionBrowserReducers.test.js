@@ -108,7 +108,7 @@ describe('Collection browser reducers', () => {
             reducer(state, {
                 type: actionTypes.DELETE_FILE_FULFILLED,
                 meta: {
-                    fullpath: '/some_collection/dir1'
+                    path: '/some_collection/dir1'
                 }
             })
         ).toEqual({
