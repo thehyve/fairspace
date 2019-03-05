@@ -41,7 +41,7 @@ public class SaturnSecurityHandlerTest {
     public void healthEndpointCanBeAccessedWithoutAuth() throws IOException, ServletException {
         handler.handle("/api/health/", baseRequest, request, response);
 
-        verify(baseRequest).getResponse();
+        verifyIfRequestWasPassedToSuper(true);
     }
 
 
@@ -64,7 +64,11 @@ public class SaturnSecurityHandlerTest {
     }
 
     private void verifyAuthenticated(boolean success) {
-        verify(baseRequest, times(success ? 1 : 0)).getResponse(); // Called in super.handle
+        verifyIfRequestWasPassedToSuper(success);
         verify(userCallback, times(success ? 1 : 0)).accept(any());
+    }
+
+    private void verifyIfRequestWasPassedToSuper(boolean success) {
+        verify(baseRequest, times(success ? 1 : 0)).getResponse(); // Called in super.handle
     }
 }
