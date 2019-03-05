@@ -3,6 +3,7 @@ import shutil
 from tempfile import NamedTemporaryFile
 from tornado import web
 
+from notebook.services.contents.filemanager import FileContentsManager
 from notebook.services.contents.largefilemanager import LargeFileManager
 
 
@@ -53,4 +54,4 @@ class AtomicLargeFileManager(LargeFileManager):
                 self.run_post_save_hook(model=model, os_path=os_path)
             return model
         else:
-            return super().save(model, path)
+            return FileContentsManager.save(self, model, path)
