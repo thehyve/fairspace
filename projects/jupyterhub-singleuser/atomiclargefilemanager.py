@@ -20,7 +20,7 @@ class AtomicLargeFileManager(LargeFileManager):
                 raise web.HTTPError(400, u'No file type provided')
             if model['type'] != 'file':
                 raise web.HTTPError(400, u'File type "{}" is not supported for large file transfer'.format(model['type']))
-            if 'content' not in model and model['type'] != 'directory':
+            if 'content' not in model:
                 raise web.HTTPError(400, u'No file content provided')
 
             temp_file = NamedTemporaryFile(delete=False)
