@@ -41,7 +41,6 @@ class AtomicLargeFileManager(LargeFileManager):
                 if chunk == -1:
                     os_path = self._get_os_path(path)
                     shutil.move(temp_path, os_path)
-
                     self.run_post_save_hook(model=model, os_path=os_path)
             except web.HTTPError:
                 raise
