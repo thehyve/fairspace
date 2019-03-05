@@ -1,5 +1,5 @@
 import React from 'react';
-import {navigableLink, isDateTimeProperty} from "../../../utils/metadataUtils";
+import {isDateTimeProperty} from "../../../utils/metadataUtils";
 import DateTime from "../../common/DateTime";
 import {RESOURCE_URI} from "../../../constants";
 
@@ -21,7 +21,7 @@ const ReferringValue = ({property, entry}) => {
 
     if (entry.id) {
         return (
-            <a href={navigableLink(entry.id)}>
+            <a href={entry.id}>
                 {displayValue}
             </a>
         );

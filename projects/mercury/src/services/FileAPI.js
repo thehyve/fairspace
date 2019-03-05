@@ -1,7 +1,7 @@
 import {createClient} from "webdav";
 import axios from 'axios';
 import Config from "./Config/Config";
-import {addCounterToFilename, fileName, joinPaths, parentPath} from '../utils/fileUtils';
+import {addCounterToFilename, generateUniqueFileName, joinPaths, getParentPath} from '../utils/fileUtils';
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
@@ -9,15 +9,13 @@ const defaultOptions = {withCredentials: true};
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
-
 axios.interceptors.request.use((config) => {
     if (config.method === 'propfind') {
         config.headers['content-type'] = 'application/xml';
         config.data = '<?xml version="1.0" encoding="utf-8" ?><propfind xmlns:D="DAV:"><allprop/></propfind>';
     }
     return config;
-},
-(error) => Promise.reject(error));
+}, (error) => Promise.reject(error));
 
 class FileAPI {
     client() {
@@ -58,12 +56,12 @@ class FileAPI {
      * @param nameMapping
      * @returns Promise<any>
      */
-    upload(path, files, nameMapping) {
+    upload(path, files) {
         if (!files) {
             return Promise.reject(Error("No files given"));
         }
 
-        const allPromises = files.map(file => this.client().putFileContents(`${path}/${nameMapping.get(file.name)}`, file, defaultOptions));
+        const allPromises = files.map(({name, value}) => this.client().putFileContents(`${path}/${name}`, value, defaultOptions));
 
         return Promise.all(allPromises).then(() => files);
     }
@@ -132,7 +130,7 @@ class FileAPI {
      */
     movePaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            const destinationFile = joinPaths(destinationDir, fileName(sourceFile));
+            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(sourceFile));
             return this.move(sourceFile, destinationFile);
         }));
     }
@@ -145,9 +143,9 @@ class FileAPI {
      */
     copyPaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            let destinationFilename = fileName(sourceFile);
+            let destinationFilename = generateUniqueFileName(sourceFile);
             // Copying files to the current directory involves renaming
-            if (destinationDir === parentPath(sourceFile)) {
+            if (destinationDir === getParentPath(sourceFile)) {
                 destinationFilename = addCounterToFilename(destinationFilename);
             }
 
