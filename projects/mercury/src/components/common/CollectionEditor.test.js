@@ -4,6 +4,7 @@ import {shallow} from "enzyme";
 import CollectionEditor from "./CollectionEditor";
 
 let collectionEditor;
+let wrapper;
 let saveCallback;
 let closeCallback;
 
@@ -19,8 +20,6 @@ it('renders without crashing', () => {
 });
 
 describe('automatic location entry', () => {
-    let wrapper;
-
     beforeEach(() => {
         collectionEditor = (
             <CollectionEditor
@@ -36,12 +35,12 @@ describe('automatic location entry', () => {
     });
 
     describe('location generation from name', () => {
-        it('keeps name with only characters', () => expect(wrapper.instance().nameToLocation('MyCollection')).toEqual('MyCollection'));
-        it('replaces spaces', () => expect(wrapper.instance().nameToLocation('My Collection')).toEqual('My_Collection'));
-        it('replaces multiple spaces with a single underscore', () => expect(wrapper.instance().nameToLocation('My  Collection')).toEqual('My_Collection'));
-        it('allows characters, numbers, underscores and dashes', () => expect(wrapper.instance().nameToLocation('My-special_Collection-01234')).toEqual('My-special_Collection-01234'));
-        it('strips other characters', () => expect(wrapper.instance().nameToLocation('a!@#$%^&*?()~,.<>;\':"[]{}a')).toEqual('a_a'));
-        it('strips unicode characters', () => expect(wrapper.instance().nameToLocation('•∞₩ⓘˍ')).toEqual('_'));
+        it('keeps name with only characters', () => expect(wrapper.instance().convertToSafeDirectoryName('MyCollection')).toEqual('MyCollection'));
+        it('replaces spaces', () => expect(wrapper.instance().convertToSafeDirectoryName('My Collection')).toEqual('My_Collection'));
+        it('replaces multiple spaces with a single underscore', () => expect(wrapper.instance().convertToSafeDirectoryName('My  Collection')).toEqual('My_Collection'));
+        it('allows characters, numbers, underscores and dashes', () => expect(wrapper.instance().convertToSafeDirectoryName('My-special_Collection-01234')).toEqual('My-special_Collection-01234'));
+        it('strips other characters', () => expect(wrapper.instance().convertToSafeDirectoryName('a!@#$%^&*?()~,.<>;\':"[]{}a')).toEqual('a_a'));
+        it('strips unicode characters', () => expect(wrapper.instance().convertToSafeDirectoryName('•∞₩ⓘˍ')).toEqual('_'));
     });
 
     it('fills the location based on the name', () => {
@@ -102,11 +101,29 @@ describe('saving', () => {
                 editType
             />
         );
+        wrapper = shallow(collectionEditor);
+    });
+
+    describe('isInputValid', () => {
+        it('marks input as valid if name and location are properly filled', () => expect(wrapper.instance().isInputValid()).toBe(true));
+        it('marks input as invalid if name is empty', () => {
+            wrapper.instance().handleInputChange('name', '');
+            expect(wrapper.instance().isInputValid()).toBe(false);
+        });
+        it('marks input as invalid if location is empty', () => {
+            wrapper.instance().handleInputChange('location', '');
+            expect(wrapper.instance().isInputValid()).toBe(false);
+        });
+        it('marks input as invalid if location contains invalid characters', () => {
+            const invalidCharacters = ['.', '#', '!', '$', '(', ')', '~', ';', '會'];
+            invalidCharacters.forEach(c => {
+                wrapper.instance().handleInputChange('location', c);
+                expect(wrapper.instance().isInputValid()).toBe(false);
+            });
+        });
     });
 
     it('invokes the save callback with existing parameters if nothing is entered', () => {
-        const wrapper = shallow(collectionEditor);
-
         wrapper.instance().handleSave();
 
         // Make sure it is properly saved
@@ -115,8 +132,6 @@ describe('saving', () => {
     });
 
     it('invokes the save callback with parameters entered by the user', () => {
-        const wrapper = shallow(collectionEditor);
-
         // Enter data into each field
         wrapper.instance().handleInputChange('name', name);
         wrapper.instance().handleInputChange('description', description);
@@ -130,8 +145,6 @@ describe('saving', () => {
     });
 
     it('does not invoke the save callback when no name is present', () => {
-        const wrapper = shallow(collectionEditor);
-
         // Enter data into each field
         wrapper.instance().handleInputChange('name', '');
         wrapper.instance().handleInputChange('description', description);
@@ -144,8 +157,6 @@ describe('saving', () => {
     });
 
     it('does not invoke the save callback when no name is present', () => {
-        const wrapper = shallow(collectionEditor);
-
         // Enter data into each field
         wrapper.instance().handleInputChange('name', name);
         wrapper.instance().handleInputChange('description', description);

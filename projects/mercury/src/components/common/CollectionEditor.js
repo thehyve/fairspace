@@ -12,7 +12,7 @@ import FormControl from "@material-ui/core/FormControl/FormControl";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 
 class CollectionEditor extends React.Component {
-    static LOCATION_REGEX = /[^a-z0-9_-]+/gi;
+    static NON_SAFE_CHARACTERS_REGEX = /[^a-z0-9_-]+/gi;
 
     state = {
         editing: true,
@@ -50,16 +50,16 @@ class CollectionEditor extends React.Component {
         this.handleInputChange('name', newName);
 
         if (shouldUpdateLocation) {
-            this.handleInputChange('location', this.nameToLocation(newName));
+            this.handleInputChange('location', this.convertToSafeDirectoryName(newName));
         }
     }
 
     /**
-     * Creates a new location based on the name
+     * Converts the given collection name to a safe directory name
      * @param name
      * @returns {string}
      */
-    nameToLocation = (name) => name.replace(CollectionEditor.LOCATION_REGEX, '_');
+    convertToSafeDirectoryName = (name) => name.replace(CollectionEditor.NON_SAFE_CHARACTERS_REGEX, '_');
 
     /**
      * Determines whether the location should be updated when the name changes.
@@ -67,9 +67,17 @@ class CollectionEditor extends React.Component {
      * Returns true if the user has not changed the location.
      * @type {function}
      */
-    shouldUpdateLocationOnNameChange = () => this.nameToLocation(this.state.name) === this.state.location;
+    shouldUpdateLocationOnNameChange = () => this.convertToSafeDirectoryName(this.state.name) === this.state.location;
 
-    isInputValid = () => !!this.state.name && !!this.state.location;
+    /**
+     * Checks whether the input is valid. Check whether the name and location are given
+     * and that the location does not contain any unsafe characters.
+     *
+     * Please note that the location may still be invalid, if another collection uses the same
+     * location. This will be checked when actually submitting the form.
+     * @returns {boolean}
+     */
+    isInputValid = () => !!this.state.name && !!this.state.location && !this.state.location.match(CollectionEditor.NON_SAFE_CHARACTERS_REGEX);
 
     render() {
         return (
