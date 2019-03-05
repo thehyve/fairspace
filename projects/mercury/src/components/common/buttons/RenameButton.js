@@ -1,44 +1,24 @@
 import React from 'react';
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
+import {
+    Dialog, DialogTitle, DialogContent,
+    DialogActions, Button, TextField
+} from "@material-ui/core";
 
 class RenameButton extends React.Component {
-    constructor(props) {
-        super(props);
-        const {
-            currentName,
-            onRename,
-            children,
-            ...componentProps
-        } = props;
-
-        this.currentName = currentName;
-        this.onRename = onRename;
-        this.componentProps = componentProps;
-
-        this.state = {
-            renaming: false,
-            name: currentName
-        };
-    }
+    state = {
+        name: '',
+        renaming: false,
+    };
 
     componentWillReceiveProps(props) {
         if (!this.state.renaming) {
-            this.onRename = props.onRename;
-            this.currentName = props.currentName;
-
-            this.setState({name: this.currentName});
+            this.setState({name: props.currentName});
         }
     }
 
     openDialog = (e) => {
         e.stopPropagation();
-        this.setState({renaming: true, name: this.currentName});
+        this.setState({renaming: true});
     }
 
     closeDialog = (e) => {
@@ -48,29 +28,22 @@ class RenameButton extends React.Component {
 
     handleRename = (e) => {
         e.stopPropagation();
-
-        if (this.onRename) {
-            this
-                .onRename(this.state.name)
-                .then(shouldClose => shouldClose && this.closeDialog);
-        }
-    }
-
-    handleInputChange = (event) => {
-        const newValues = {};
-        newValues[event.target.name] = event.target.value;
-        this.setState(newValues);
+        this.props.onRename(this.state.name)
+            .then(shouldClose => shouldClose && this.closeDialog());
     }
 
     render() {
+        const {children, currentName} = this.props;
+        const {renaming, name} = this.state;
+
         return (
-            <div>
-                <IconButton {...this.componentProps} onClick={this.openDialog}>
-                    {this.props.children}
-                </IconButton>
+            <>
+                <span onClick={this.openDialog}>
+                    {children}
+                </span>
 
                 <Dialog
-                    open={this.state.renaming}
+                    open={renaming}
                     onClick={e => e.stopPropagation()}
                     onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
@@ -78,20 +51,17 @@ class RenameButton extends React.Component {
                     <DialogTitle
                         id="form-dialog-title"
                     >
-                        Rename
-                        {this.currentName}
+                        {`Rename ${currentName}`}
                     </DialogTitle>
                     <DialogContent>
-                        Enter a new name for
-                        {this.currentName}
                         <TextField
                             autoFocus
                             margin="dense"
                             id="name"
                             label="Name"
-                            value={this.state.name}
+                            value={name}
                             name="name"
-                            onChange={this.handleInputChange}
+                            onChange={event => this.setState({name: event.target.value})}
                             fullWidth
                         />
                     </DialogContent>
@@ -105,13 +75,13 @@ class RenameButton extends React.Component {
                         <Button
                             onClick={this.handleRename}
                             color="primary"
-                            disabled={!this.state.name || this.state.name === this.currentName}
+                            disabled={!name || name === currentName}
                         >
                             Rename
                         </Button>
                     </DialogActions>
                 </Dialog>
-            </div>
+            </>
         );
     }
 }

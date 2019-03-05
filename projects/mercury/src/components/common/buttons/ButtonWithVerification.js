@@ -1,30 +1,11 @@
 import React from 'react';
-import IconButton from "@material-ui/core/IconButton";
+
 import ConfirmationDialog from '../ConfirmationDialog';
 
 class ButtonWithVerification extends React.Component {
     state = {
         verifying: false
     };
-
-    constructor(props) {
-        super(props);
-        const {
-            onClick,
-            dialogText,
-            ...componentProps
-        } = props;
-
-        this.dialogText = dialogText || 'Are you sure?';
-        this.onClick = onClick;
-        this.componentProps = componentProps;
-    }
-
-    componentDidMount() {
-        this.setState({
-            verifying: false
-        });
-    }
 
     openDialog = (e) => {
         e.stopPropagation();
@@ -37,21 +18,17 @@ class ButtonWithVerification extends React.Component {
     }
 
     handleClick = (e) => {
+        this.props.onClick(e);
         this.closeDialog(e);
-        if (this.onClick) {
-            window.setImmediate(() => this.onClick(e));
-        }
     }
-
 
     renderConfirmationDialog() {
         if (this.state.verifying) {
-            const content = `${this.props['aria-label']}?`;
             return (
                 <ConfirmationDialog
-                    open={this.state.verifying}
+                    open
                     title="Confirmation"
-                    content={content}
+                    content={`Are you sure you want to remove ${this.props.file}`}
                     onAgree={this.handleClick}
                     onDisagree={this.closeDialog}
                     onClose={this.closeDialog}
@@ -63,17 +40,14 @@ class ButtonWithVerification extends React.Component {
     }
 
     render() {
+        const {children} = this.props;
         return (
-            <div style={{visibility: this.props.visibility}}>
-                <IconButton
-                    {...this.componentProps}
-                    onClick={this.openDialog}
-                    disabled={this.props.disabled}
-                >
-                    {this.props.children}
-                </IconButton>
+            <>
+                <span onClick={this.openDialog}>
+                    {children}
+                </span>
                 {this.renderConfirmationDialog()}
-            </div>
+            </>
         );
     }
 }
