@@ -1,0 +1,9 @@
+# 0 - vocabulary graph
+# 1 - predicate URI
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+ASK WHERE {
+    GRAPH ?0 { ?1 a rdf:Property; fs:machineOnly true . }
+}

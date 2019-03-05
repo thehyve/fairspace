@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.Vocabulary;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.riot.RiotException;
@@ -16,9 +17,9 @@ public class MetadataApp implements SparkApplication {
     private final String basePath;
     private final MetadataService api;
 
-    public MetadataApp(String basePath, RDFConnection rdfConnection, Node graph) {
+    public MetadataApp(String basePath, RDFConnection rdfConnection, Node graph, Vocabulary vocabulary) {
         this.basePath = basePath;
-        this.api = new MetadataService(rdfConnection, graph);
+        this.api = new MetadataService(rdfConnection, graph, vocabulary);
     }
 
     @Override
