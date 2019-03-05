@@ -25,6 +25,11 @@ describe('generateUniqueFileName', () => {
         expect(usedNames).toEqual([]);
     });
 
+    it('leaves already unique names untouched (undefined used names)', () => {
+        const result = generateUniqueFileName('name.ext', undefined);
+        expect(result).toEqual('name.ext');
+    });
+
     it('returns a new name if needed', () => {
         const usedNames = ['name.ext', 'name (1).ext', 'name (2).ext'];
         const result = generateUniqueFileName('name.ext', usedNames);

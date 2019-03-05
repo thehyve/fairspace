@@ -1,41 +1,16 @@
 import ReactDOM from "react-dom";
 import React from "react";
-import Button from "@material-ui/core/Button/Button";
 import {shallow} from "enzyme";
-import {DialogTitle, Select, TextField} from "@material-ui/core";
 import CollectionEditor from "./CollectionEditor";
 
 let collectionEditor;
-let cancelClicked;
-let receivedName;
-let receivedDescription;
-let receivedType;
-let receivedLocation;
+let wrapper;
+let saveCallback;
+let closeCallback;
 
 beforeEach(() => {
-    collectionEditor = (
-        <CollectionEditor
-            editing
-            title="title"
-            name="name"
-            description="description"
-            type="S3_MOUNT"
-            location="location"
-            onClose={() => {
-                cancelClicked = true;
-            }}
-            onSave={(name, description, location, type) => {
-                receivedName = name;
-                receivedDescription = description;
-                receivedLocation = location;
-                receivedType = type;
-            }}
-            editType
-        />
-    );
-
-    cancelClicked = false;
-    receivedName = receivedDescription = receivedType = '';
+    saveCallback = jest.fn();
+    closeCallback = jest.fn();
 });
 
 it('renders without crashing', () => {
@@ -44,34 +19,152 @@ it('renders without crashing', () => {
     ReactDOM.unmountComponentAtNode(div);
 });
 
+describe('automatic location entry', () => {
+    beforeEach(() => {
+        collectionEditor = (
+            <CollectionEditor
+                editing
+                title="title"
+                onClose={closeCallback}
+                onSave={saveCallback}
+                editType
+            />
+        );
 
-it('applies properties properly', () => {
-    const wrapper = shallow(collectionEditor);
+        wrapper = shallow(collectionEditor);
+    });
 
-    expect(wrapper.find(DialogTitle).at(0).childAt(0).text()).toEqual('title');
+    describe('location generation from name', () => {
+        it('keeps name with only characters', () => expect(wrapper.instance().convertToSafeDirectoryName('MyCollection')).toEqual('MyCollection'));
+        it('replaces spaces', () => expect(wrapper.instance().convertToSafeDirectoryName('My Collection')).toEqual('My_Collection'));
+        it('replaces multiple spaces with a single underscore', () => expect(wrapper.instance().convertToSafeDirectoryName('My  Collection')).toEqual('My_Collection'));
+        it('allows characters, numbers, underscores and dashes', () => expect(wrapper.instance().convertToSafeDirectoryName('My-special_Collection-01234')).toEqual('My-special_Collection-01234'));
+        it('strips other characters', () => expect(wrapper.instance().convertToSafeDirectoryName('a!@#$%^&*?()~,.<>;\':"[]{}a')).toEqual('a_a'));
+        it('strips unicode characters', () => expect(wrapper.instance().convertToSafeDirectoryName('•∞₩ⓘˍ')).toEqual('_'));
+    });
 
-    const edit = wrapper.find(TextField);
-    expect(edit.length).toEqual(3);
-    expect(edit.at(0).prop('name')).toEqual('name');
-    expect(edit.at(1).prop('name')).toEqual('description');
-    expect(edit.at(2).prop('name')).toEqual('location');
+    it('fills the location based on the name', () => {
+        // Enter a new name
+        wrapper.instance().handleNameChange({target: {value: 'MyCollection'}});
 
-    const buttons = wrapper.find(Button);
-    expect(buttons.length).toEqual(2);
-    expect(buttons.at(0).childAt(0).text()).toEqual('Cancel');
-    expect(buttons.at(1).childAt(0).text()).toEqual('Save');
+        // Make sure the location is changed along
+        expect(wrapper.instance().state.location).toEqual('MyCollection');
+    });
 
-    const select = wrapper.find(Select);
-    expect(select.length).toEqual(1);
-    expect(select.at(0).prop('value')).toEqual('S3_MOUNT');
+    it('fills the location with only safe character', () => {
+        // Enter a new name
+        wrapper.instance().handleNameChange({target: {value: 'John Snow\'s collection'}});
 
-    cancelClicked = false;
-    buttons.at(0).simulate('click');
-    expect(cancelClicked).toEqual(true);
+        // Make sure the location is changed along
+        expect(wrapper.instance().state.location).toEqual('John_Snow_s_collection');
+    });
+    it('updates the location based on the name if the location was not changed by the user', () => {
+        // Enter a name
+        wrapper.instance().handleNameChange({target: {value: 'John Snow\'s collection'}});
+        expect(wrapper.instance().state.location).toEqual('John_Snow_s_collection');
 
-    buttons.at(1).simulate('click');
-    expect(receivedName).toEqual('name');
-    expect(receivedDescription).toEqual('description');
-    expect(receivedLocation).toEqual('location');
-    expect(receivedType).toEqual('S3_MOUNT');
+        // Enter a new name
+        wrapper.instance().handleNameChange({target: {value: 'Someone elses collection'}});
+        expect(wrapper.instance().state.location).toEqual('Someone_elses_collection');
+    });
+    it('does not update the location based on the name if the location was changed by the user', () => {
+        // Enter a name and change the location
+        wrapper.instance().handleNameChange({target: {value: 'John Snow\'s collection'}});
+        wrapper.instance().handleInputChange('location', 'my-custom-location');
+
+        // Enter a new name
+        wrapper.instance().handleNameChange({target: {value: 'Someone elses collection'}});
+        expect(wrapper.instance().state.location).toEqual('my-custom-location');
+    });
+});
+
+describe('saving', () => {
+    const originalName = 'Collection';
+    const originalDescription = 'description';
+    const originalLocation = 'location';
+
+    const name = 'New collection';
+    const description = 'new-description';
+    const location = 'new-location';
+
+    beforeEach(() => {
+        collectionEditor = (
+            <CollectionEditor
+                editing
+                title="title"
+                name={originalName}
+                description={originalDescription}
+                type="LOCAL_FILE"
+                location={originalLocation}
+                onClose={closeCallback}
+                onSave={saveCallback}
+                editType
+            />
+        );
+        wrapper = shallow(collectionEditor);
+    });
+
+    describe('isInputValid', () => {
+        it('marks input as valid if name and location are properly filled', () => expect(wrapper.instance().isInputValid()).toBe(true));
+        it('marks input as invalid if name is empty', () => {
+            wrapper.instance().handleInputChange('name', '');
+            expect(wrapper.instance().isInputValid()).toBe(false);
+        });
+        it('marks input as invalid if location is empty', () => {
+            wrapper.instance().handleInputChange('location', '');
+            expect(wrapper.instance().isInputValid()).toBe(false);
+        });
+        it('marks input as invalid if location contains invalid characters', () => {
+            const invalidCharacters = ['.', '#', '!', '$', '(', ')', '~', ';', '會'];
+            invalidCharacters.forEach(c => {
+                wrapper.instance().handleInputChange('location', c);
+                expect(wrapper.instance().isInputValid()).toBe(false);
+            });
+        });
+    });
+
+    it('invokes the save callback with existing parameters if nothing is entered', () => {
+        wrapper.instance().handleSave();
+
+        // Make sure it is properly saved
+        expect(saveCallback.mock.calls.length).toEqual(1);
+        expect(saveCallback.mock.calls[0]).toEqual([originalName, originalDescription, originalLocation, 'LOCAL_FILE']);
+    });
+
+    it('invokes the save callback with parameters entered by the user', () => {
+        // Enter data into each field
+        wrapper.instance().handleInputChange('name', name);
+        wrapper.instance().handleInputChange('description', description);
+        wrapper.instance().handleInputChange('location', location);
+
+        wrapper.instance().handleSave();
+
+        // Make sure it is properly saved
+        expect(saveCallback.mock.calls.length).toEqual(1);
+        expect(saveCallback.mock.calls[0]).toEqual([name, description, location, 'LOCAL_FILE']);
+    });
+
+    it('does not invoke the save callback when no name is present', () => {
+        // Enter data into each field
+        wrapper.instance().handleInputChange('name', '');
+        wrapper.instance().handleInputChange('description', description);
+        wrapper.instance().handleInputChange('location', location);
+
+        wrapper.instance().handleSave();
+
+        // Make sure it is properly saved
+        expect(saveCallback.mock.calls.length).toEqual(0);
+    });
+
+    it('does not invoke the save callback when no name is present', () => {
+        // Enter data into each field
+        wrapper.instance().handleInputChange('name', name);
+        wrapper.instance().handleInputChange('description', description);
+        wrapper.instance().handleInputChange('location', '');
+
+        wrapper.instance().handleSave();
+
+        // Make sure it is properly saved
+        expect(saveCallback.mock.calls.length).toEqual(0);
+    });
 });

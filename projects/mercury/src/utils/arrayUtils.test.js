@@ -1,7 +1,7 @@
 import {findById} from "./arrayUtils";
 
-describe('collectionUtils', () => {
-    describe('getCollectionById', () => {
+describe('arrayUtils', () => {
+    describe('findById', () => {
         const mockCollectionsNoId = [{}];
         const mockCollections = [
             {
