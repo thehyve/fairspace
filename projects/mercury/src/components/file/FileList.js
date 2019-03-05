@@ -37,7 +37,7 @@ class FileList extends React.Component {
         const selectedFilenames = selectedPaths || [];
 
         return (
-            <Paper className={classes.fileListContainer}>
+            <Paper className={classes.root}>
                 <Table padding="dense">
                     <TableHead>
                         <TableRow>
