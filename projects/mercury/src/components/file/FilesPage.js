@@ -79,7 +79,7 @@ export class FilesPage extends React.Component {
                 <>
                     {this.renderBreadcrumbs()}
                     <Grid container spacing={8}>
-                        <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.TABLE_MAX_HEIGHT}}>
+                        <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                             <FileBrowser
                                 openPath={openPath}
                                 fetchFilesIfNeeded={fetchFilesIfNeeded}
