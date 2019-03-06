@@ -35,6 +35,7 @@ public class UserService {
                     id,
                     row.getLiteral("userName").getString(),
                     row.getLiteral("fullName").getString(),
+                    row.getLiteral("email").getString(),
                     decodeAuthorities(row.getLiteral("authorities").getString()));
             idToIri.put(id, iri);
             idToUserInfo.put(id, userInfo);
@@ -70,7 +71,7 @@ public class UserService {
     private String createUser(UserInfo userInfo) {
         return commit("Store a new user, id: " + userInfo.getUserId(), rdf, () -> {
             rdf.update(storedQuery("users_create",
-                    userInfo.getUserId(), userInfo.getUserName(), userInfo.getFullName(), encodeAuthorities(userInfo.getAuthorities())));
+                    userInfo.getUserId(), userInfo.getUserName(), userInfo.getFullName(), userInfo.getEmail(), encodeAuthorities(userInfo.getAuthorities())));
             var processor = new QuerySolutionProcessor<>(row -> row.getResource("iri").getURI());
             rdf.querySelect(storedQuery("users_iri_by_id", userInfo.getUserId()), processor);
             var iri = processor.getSingle().get();
@@ -82,7 +83,7 @@ public class UserService {
 
     private void updateUser(String iri, UserInfo userInfo) {
         commit("Update a new user, id: " + userInfo.getUserId(), rdf, () -> {
-                rdf.update(storedQuery("users_update", createURI(iri), userInfo.getUserName(), userInfo.getFullName(),
+                rdf.update(storedQuery("users_update", createURI(iri), userInfo.getUserName(), userInfo.getFullName(), userInfo.getEmail(),
                         encodeAuthorities(userInfo.getAuthorities())));
             idToUserInfo.put(userInfo.getUserId(), userInfo);
         });

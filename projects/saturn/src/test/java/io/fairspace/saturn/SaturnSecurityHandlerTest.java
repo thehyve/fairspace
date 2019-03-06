@@ -56,7 +56,7 @@ public class SaturnSecurityHandlerTest {
 
     @Test
     public void otherEndpointsCanBeAccessedWithValidAuth() throws IOException, ServletException {
-        when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null));
+        when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null, null));
 
         handler.handle("/api", baseRequest, request, response);
 

@@ -1,7 +1,8 @@
 # 0 - iri
 # 1 - userName
 # 2 - fullName
-# 3 - authorities
+# 3 - email
+# 4 - authorities
 
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -10,16 +11,19 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 DELETE {
   ?0 fs:userName ?oldUserName;
      rdfs:label ?oldFullName;
+     fs:email ?oldEmail;
      fs:authorities ?oldAuthorities;
 }
 INSERT {
   ?0 fs:userName ?1;
      rdfs:label ?2;
-     fs:authorities ?3;
+     fs:email ?3;
+     fs:authorities ?4;
 }
 WHERE {
   ?0 a fs:User;
      fs:userName ?oldUserName;
+     fs:email ?oldEmail;
      rdfs:label ?oldFullName;
      fs:authorities ?oldAuthorities;
 }
