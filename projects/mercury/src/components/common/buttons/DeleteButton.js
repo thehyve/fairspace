@@ -8,7 +8,7 @@ class DeleteButton extends React.Component {
     };
 
     openDialog = (e) => {
-        e.stopPropagation();
+        if (e) e.stopPropagation();
         this.setState({verifying: true});
     }
 
@@ -17,7 +17,7 @@ class DeleteButton extends React.Component {
         this.setState({verifying: false});
     }
 
-    handleClick = (e) => {
+    handleAgreeClick = (e) => {
         this.closeDialog(e);
         this.props.onClick(e);
     }
@@ -30,7 +30,7 @@ class DeleteButton extends React.Component {
                 open
                 title="Confirmation"
                 content={`Are you sure you want to remove ${file}?`}
-                onAgree={this.handleClick}
+                onAgree={this.handleAgreeClick}
                 onDisagree={this.closeDialog}
                 onClose={this.closeDialog}
             />
