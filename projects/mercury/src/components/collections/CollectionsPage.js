@@ -10,7 +10,7 @@ const collectionsPage = () => (
     <>
         <BreadCrumbs />
         <Grid container spacing={8}>
-            <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.TABLE_MAX_HEIGHT}}>
+            <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                 <CollectionBrowser />
             </Grid>
             <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
