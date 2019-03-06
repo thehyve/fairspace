@@ -1,45 +1,35 @@
 package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.auth.UserInfo;
-import io.fairspace.saturn.rdf.QuerySolutionProcessor;
+import io.fairspace.saturn.rdf.beans.BeanPersister;
+import io.fairspace.saturn.rdf.beans.PersistentEntity;
+import io.fairspace.saturn.rdf.beans.RDFProperty;
+import io.fairspace.saturn.rdf.beans.RDFType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.jena.rdfconnection.RDFConnection;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
-import static io.milton.http.values.HrefList.asList;
-import static java.util.stream.Collectors.joining;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class UserService {
     private static final String ANONYMOUS = "http://fairspace.io/iri/test-user";
     private final RDFConnection rdf;
-    private final Map<String, String> idToIri = new ConcurrentHashMap<>();
-    private final Map<String, UserInfo> idToUserInfo = new ConcurrentHashMap<>();
+    private final BeanPersister persister;
+    private final Map<String, User> usersById = new ConcurrentHashMap<>();
 
     public UserService(RDFConnection rdf) {
         this.rdf = rdf;
+        this.persister = new BeanPersister(rdf);
 
         loadUsers();
     }
 
     private void loadUsers() {
-        rdf.querySelect(storedQuery("users_list"), row -> {
-            var id = row.getLiteral("externalId").getString();
-            var iri = row.getResource("iri").getURI();
-            var userInfo = new UserInfo(
-                    id,
-                    row.getLiteral("userName").getString(),
-                    row.getLiteral("fullName").getString(),
-                    row.getLiteral("email").getString(),
-                    decodeAuthorities(row.getLiteral("authorities").getString()));
-            idToIri.put(id, iri);
-            idToUserInfo.put(id, userInfo);
-        });
+        persister.list(User.class).forEach(user -> usersById.put(user.getExternalId(), user));
     }
 
     /**
@@ -55,45 +45,38 @@ public class UserService {
             return ANONYMOUS;
         }
 
-        var existingIri = idToIri.get(userInfo.getUserId());
-        if (existingIri != null) {
-            var savedUserInfo = idToUserInfo.get(userInfo.getUserId());
-            if (!savedUserInfo.equals(userInfo)) {
-                updateUser(existingIri, userInfo);
+        var user = usersById.get(userInfo.getUserId());
+        if (user != null) {
+            if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
+                user.setName(userInfo.getFullName());
+                user.setEmail(userInfo.getEmail());
+                commit("Update user info, id: " + userInfo.getUserId(), rdf, () -> persister.write(user));
             }
-
-            return existingIri;
+            return user.getIri().getURI();
+        } else {
+            var newUser = new User();
+            newUser.setExternalId(userInfo.getUserId());
+            newUser.setName(userInfo.getFullName());
+            newUser.setEmail(userInfo.getEmail());
+            commit("Store a new user, id: " + userInfo.getUserId(), rdf, () -> {
+                persister.write(newUser);
+                usersById.put(newUser.getExternalId(), newUser);
+            });
+            return newUser.getIri().getURI();
         }
-
-        return createUser(userInfo);
     }
 
-    private String createUser(UserInfo userInfo) {
-        return commit("Store a new user, id: " + userInfo.getUserId(), rdf, () -> {
-            rdf.update(storedQuery("users_create",
-                    userInfo.getUserId(), userInfo.getUserName(), userInfo.getFullName(), userInfo.getEmail(), encodeAuthorities(userInfo.getAuthorities())));
-            var processor = new QuerySolutionProcessor<>(row -> row.getResource("iri").getURI());
-            rdf.querySelect(storedQuery("users_iri_by_id", userInfo.getUserId()), processor);
-            var iri = processor.getSingle().get();
-            idToIri.put(userInfo.getUserId(), iri);
-            idToUserInfo.put(userInfo.getUserId(), userInfo);
-            return iri;
-        });
-    }
+    @RDFType("http://fairspace.io/ontology#User")
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    private static class User extends PersistentEntity {
+        @RDFProperty("http://fairspace.io/ontology#externalId")
+        private String externalId;
 
-    private void updateUser(String iri, UserInfo userInfo) {
-        commit("Update a new user, id: " + userInfo.getUserId(), rdf, () -> {
-                rdf.update(storedQuery("users_update", createURI(iri), userInfo.getUserName(), userInfo.getFullName(), userInfo.getEmail(),
-                        encodeAuthorities(userInfo.getAuthorities())));
-            idToUserInfo.put(userInfo.getUserId(), userInfo);
-        });
-    }
+        @RDFProperty("http://www.w3.org/2000/01/rdf-schema#label")
+        private String name;
 
-    private static String encodeAuthorities(Set<String> authorities) {
-        return authorities.stream().sorted().collect(joining(","));
-    }
-
-    private static Set<String> decodeAuthorities(String s) {
-        return new HashSet<>(asList(s.split(",")));
+        @RDFProperty("http://fairspace.io/ontology#email")
+        private String email;
     }
 }

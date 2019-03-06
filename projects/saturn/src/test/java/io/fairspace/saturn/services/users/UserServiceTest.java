@@ -41,8 +41,7 @@ public class UserServiceTest {
 
         assertTrue(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral(userInfo.getFullName())));
         assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#externalId"), createStringLiteral(userInfo.getUserId())));
-        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#userName"), createStringLiteral(userInfo.getUserName())));
-        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#authorities"), createStringLiteral("role1,role2")));
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#email"), createStringLiteral(userInfo.getEmail())));
     }
 
     @Test
@@ -62,14 +61,11 @@ public class UserServiceTest {
         var updatedUserInfo = new UserInfo("id1", "user2", "name2", "user2@host.com", new HashSet<>(asList("role1", "role2", "role3")));
         assertEquals(iri, service.getUserIRI(updatedUserInfo));
 
-        assertFalse(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#userName"), createStringLiteral("user1")));
-        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#userName"), createStringLiteral("user2")));
-
         assertFalse(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("name1")));
         assertTrue(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("name2")));
 
-        assertFalse(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#authorities"), createStringLiteral("role1,role2")));
-        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#authorities"), createStringLiteral("role1,role2,role3")));
+        assertFalse(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#email"), createStringLiteral(userInfo.getEmail())));
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#email"), createStringLiteral(updatedUserInfo.getEmail())));
     }
 
 }
