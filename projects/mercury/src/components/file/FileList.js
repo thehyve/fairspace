@@ -9,8 +9,7 @@ import filesize from 'filesize';
 import {DateTime} from "../common";
 import styles from './FileList.styles';
 
-const fileList = ({classes, files, selectedPaths, onPathClick,
-    onPathDoubleClick}) => {
+const fileList = ({classes, files, selectedPaths = [], onPathClick, onPathDoubleClick}) => {
     if (!files || files.length === 0 || files[0] === null) {
         return (
             <Grid container>
@@ -20,8 +19,6 @@ const fileList = ({classes, files, selectedPaths, onPathClick,
             </Grid>
         );
     }
-
-    const selectedFilenames = selectedPaths || [];
 
     return (
         <Paper className={classes.root}>
@@ -36,7 +33,7 @@ const fileList = ({classes, files, selectedPaths, onPathClick,
                 </TableHead>
                 <TableBody>
                     {files.map((file) => {
-                        const selected = selectedFilenames.includes(file.filename);
+                        const selected = selectedPaths.includes(file.filename);
 
                         return (
                             <TableRow
@@ -45,8 +42,6 @@ const fileList = ({classes, files, selectedPaths, onPathClick,
                                 className={selected ? classes.tableRowSelected : ''}
                                 onClick={() => onPathClick(file)}
                                 onDoubleClick={() => onPathDoubleClick(file)}
-                                // onMouseEnter={() => this.toggleHover(file.filename)}
-                                // onMouseLeave={() => this.toggleHover('')}
                             >
                                 <TableCell>
                                     <Icon>
