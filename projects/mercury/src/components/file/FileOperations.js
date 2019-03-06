@@ -134,7 +134,7 @@ export class FileOperations extends React.Component {
                         </DeleteButton>
                     </div>
 
-                    <div className={classNames(classes.buttonsContainer, classes.buttonsShadow)}>
+                    <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}>
                         <IconButton
                             aria-label="Copy"
                             title="Copy"
