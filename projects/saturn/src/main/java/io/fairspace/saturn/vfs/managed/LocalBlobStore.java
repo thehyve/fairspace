@@ -16,7 +16,7 @@ public class LocalBlobStore implements BlobStore {
     @Override
     public String write(InputStream in) throws IOException {
         if (!dir.exists() && !dir.mkdirs()) {
-            throw new IOException("Cannot initialize the local blob store");
+            throw new IOException("Cannot initializeDefault the local blob store");
         }
         var id = randomUUID().toString();
         var dest = new File(dir, id);

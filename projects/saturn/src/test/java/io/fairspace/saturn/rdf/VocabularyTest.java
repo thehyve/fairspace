@@ -4,6 +4,7 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
@@ -75,6 +76,30 @@ public class VocabularyTest {
     @Test(expected = NullPointerException.class)
     public void testMachineOnlyPredicateFailsOnNull() {
         vocabulary.isMachineOnlyPredicate(null);
+    }
+
+
+    @Test
+    public void testVocabularyInitialization() {
+        assertTrue(vocabularyModel.isEmpty());
+
+        vocabulary.initializeDefault("simple-vocabulary.jsonld");
+
+        // Verify the model has been loaded into the vocabulary graph
+        Resource classResource = createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#Class");
+        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, classResource));
+        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Directory"), RDF.type, classResource));
+    }
+
+    @Test
+    public void testVocabularyInitializationIsNoopWhenVocabularyAlreadyExists() {
+        vocabularyModel.add(createResource("http://some-data"), RDF.type, RDF.Property);
+
+        vocabulary.initializeDefault("simple-vocabulary.jsonld");
+
+        // Verify the model has not been loaded into the vocabulary graph
+        assertFalse(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"));
+        assertTrue(vocabularyModel.isIsomorphicWith(ModelFactory.createDefaultModel().add(createResource("http://some-data"), RDF.type, RDF.Property)));
     }
 
     private Resource setupVocabularyWithMachineOnlyPredicates() {
