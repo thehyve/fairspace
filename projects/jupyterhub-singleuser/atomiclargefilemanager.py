@@ -8,7 +8,7 @@ from notebook.services.contents.largefilemanager import LargeFileManager
 
 
 class AtomicLargeFileManager(LargeFileManager):
-    """Handle large file upload atomically."""
+    """Handle large file upload atomically. First saves a file to a temporary location and then copies it to the final destination."""
 
     def save(self, model, path=''):
         """Save the file model and return the model with no content."""
