@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     Dialog, DialogTitle, DialogContent,
     DialogActions, Button, TextField
@@ -85,5 +86,9 @@ class RenameButton extends React.Component {
         );
     }
 }
+
+RenameButton.propTypes = {
+    onRename: PropTypes.func.isRequired
+};
 
 export default RenameButton;
