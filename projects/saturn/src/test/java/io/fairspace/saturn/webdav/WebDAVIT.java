@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.ServletException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.function.Supplier;
 
@@ -249,5 +250,27 @@ public class WebDAVIT {
         assertFalse(res.getOutputStreamContent().contains("getcontentlength"));
     }
 
+    @Test
+    public void shouldNotSendAcceptRangesHeader() throws ServletException, IOException {
+        req.setMethod("OPTIONS");
+        req.setRequestURL("http://localhost/webdav/");
+        milton.service(req, res);
+        assertEquals(200, res.getStatus());
+        assertNull(res.getHeader("Accept-Ranges"));
+    }
+
+    @Test
+    public void shouldIgnoreRangeHeaders() throws ServletException, IOException {
+        fs.create("coll1/dir1/file.txt", new ByteArrayInputStream("123".getBytes()));
+
+        req.setMethod("GET");
+        req.setRequestURL("http://localhost/webdav/coll1/dir1/file.txt");
+        req.setHeader("Range", "bytes=0-1");
+        milton.service(req, res);
+        assertEquals(200, res.getStatus());
+        assertEquals("3", res.getHeader("Content-Length"));
+        assertNull(res.getHeader("Content-Range"));
+        assertEquals("123", res.getOutputStreamContent());
+    }
 
 }
