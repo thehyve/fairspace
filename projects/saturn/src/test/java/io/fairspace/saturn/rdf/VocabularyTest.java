@@ -70,9 +70,11 @@ public class VocabularyTest {
         assertTrue(vocabulary.isMachineOnlyPredicate(resource2.getURI()));
         assertFalse(vocabulary.isMachineOnlyPredicate(resource3.getURI()));
         assertFalse(vocabulary.isMachineOnlyPredicate(unknownResource.getURI()));
+    }
 
-        // Also return false if null is given, as we do not recognize it as machine only
-        assertFalse(vocabulary.isMachineOnlyPredicate(null));
+    @Test(expected = NullPointerException.class)
+    public void testMachineOnlyPredicateFailsOnNull() {
+        vocabulary.isMachineOnlyPredicate(null);
     }
 
     private Resource setupVocabularyWithMachineOnlyPredicates() {

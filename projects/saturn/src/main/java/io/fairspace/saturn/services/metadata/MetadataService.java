@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -61,11 +62,12 @@ class MetadataService {
      * @param model
      */
     void put(Model model) {
-        if(containsMachineOnlyPredicates(model)) {
-            throw new IllegalArgumentException("The given model contains one or more statements with machine-only predicates. This is not allowed.");
-        }
-        rdf.load(graph.getURI(), model);
+        commit("Store metadata", rdf, () -> {
+            ensureNoMachineOnlyPredicates(model);
+            rdf.load(graph.getURI(), model);
+        });
     }
+
 
     /**
      * Deletes the statements in the database, based on the combination of subject, predicate and object
@@ -81,10 +83,12 @@ class MetadataService {
      * @param object    Object URI to filter the delete query on. Literal values are not supported
      */
     void delete(String subject, String predicate, String object) {
-        if(vocabulary.isMachineOnlyPredicate(predicate)) {
-            throw new IllegalArgumentException("The given predicate is marked as machine-only. It cannot be used directly.");
-        }
-        rdf.update(storedQuery("delete_not_machineonly_by_mask", graph, asURI(subject), asURI(predicate), asURI(object), vocabulary.getVocabularyGraph()));
+        commit("Delete metadata", rdf, () -> {
+            if (predicate != null && vocabulary.isMachineOnlyPredicate(predicate)) {
+                throw new IllegalArgumentException("The given predicate is marked as machine-only. It cannot be used directly.");
+            }
+            rdf.update(storedQuery("delete_not_machineonly_by_mask", graph, asURI(subject), asURI(predicate), asURI(object), vocabulary.getVocabularyGraph()));
+        });
     }
 
     /**
@@ -94,11 +98,11 @@ class MetadataService {
      * @param model
      */
     void delete(Model model) {
-        if(containsMachineOnlyPredicates(model)) {
-            throw new IllegalArgumentException("The given model contains one or more statements with machine-only predicates. This is not allowed.");
-        }
+        commit("Delete metadata", rdf, () -> {
+            ensureNoMachineOnlyPredicates(model);
 
-        rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(model.listStatements().toList()))));
+            rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(model.listStatements().toList()))));
+        });
     }
 
     /**
@@ -116,11 +120,11 @@ class MetadataService {
      * @param model
      */
     void patch(Model model) {
-        if(containsMachineOnlyPredicates(model)) {
-            throw new IllegalArgumentException("The given model contains one or more statements with machine-only predicates. This is not allowed.");
-        }
+        commit("Update metadata", rdf, () -> {
+            ensureNoMachineOnlyPredicates(model);
 
-        rdf.update(createPatchQuery(model.listStatements().toList()));
+            rdf.update(createPatchQuery(model.listStatements().toList()));
+        });
     }
 
     /**
@@ -158,6 +162,18 @@ class MetadataService {
         Iterable<Resource> resourceIterator = machineOnlyPredicates::listSubjects;
         return StreamSupport.stream(resourceIterator.spliterator(), false)
                 .anyMatch(resource -> model.listResourcesWithProperty(model.createProperty(resource.getURI())).hasNext());
+    }
+
+    /**
+     * Ensures that the given model does not contain any machine-only predicates.
+     *
+     * If the model does contain a machine-only predicate, an IllegalArgumentException is thrown
+     * @param model
+     */
+    private void ensureNoMachineOnlyPredicates(Model model) {
+        if (containsMachineOnlyPredicates(model)) {
+            throw new IllegalArgumentException("The given model contains one or more statements with machine-only predicates. This is not allowed.");
+        }
     }
 
     private String createPatchQuery(Collection<Statement> statements) {

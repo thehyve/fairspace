@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf;
 
+import lombok.NonNull;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -34,10 +35,7 @@ public class Vocabulary {
                 }));
     }
 
-    public boolean isMachineOnlyPredicate(String predicateUri) {
-        if(predicateUri == null) {
-            return false;
-        }
+    public boolean isMachineOnlyPredicate(@NonNull String predicateUri) {
         return rdfConnection.queryAsk(storedQuery("is_machine_only_property", vocabularyGraph, createURI(predicateUri)));
     }
 
