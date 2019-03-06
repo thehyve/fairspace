@@ -8,7 +8,11 @@ from notebook.services.contents.largefilemanager import LargeFileManager
 
 
 class AtomicLargeFileManager(LargeFileManager):
-    """Handle large file upload atomically. First saves a file to a temporary location and then copies it to the final destination."""
+    """Handles large file uploads atomically.
+     The only difference with LargeFileManager is that it first saves a file to a temporary location
+     and then copies it to the final destination.
+     That makes partially uploaded files invisible to the user and fixes WebDAV integration issues
+     """
 
     def save(self, model, path=''):
         """Save the file model and return the model with no content."""
