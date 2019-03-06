@@ -1,4 +1,4 @@
-package io.fairspace.saturn.rdf.beans;
+package io.fairspace.saturn.rdf.dao;
 
 public class PersistenceException extends RuntimeException {
     public PersistenceException() {

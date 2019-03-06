@@ -1,12 +1,12 @@
-package io.fairspace.saturn.rdf.beans;
+package io.fairspace.saturn.rdf.dao;
 
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Transactional;
 import org.apache.jena.sparql.modify.request.QuadAcc;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataInsert;
@@ -23,9 +23,12 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.getWorkspaceURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static java.lang.String.format;
+import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
@@ -34,53 +37,81 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.graph.NodeFactory.createVariable;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
+import static org.apache.jena.system.Txn.calculateWrite;
 import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
 
-public class BeanPersister {
-    private static final Property DATE_DELETED = createProperty("http://fairspace.io/ontology#dateDeleted");
-    private final RDFConnection rdf;
+public class DAO {
+    private static final String NO_VALUE_ERROR = "No value for required field %s in entity %s";
+    private static final String UNINITIALIZED_COLLECTION_ERROR = "An uninitialized collection field %s in class %s";
+    private static final String NO_RDF_TYPE_ERROR = "No RDF type specified for %s";
+    private static final String CASTING_ERROR = "Cannot cast %s to %s";
 
-    public BeanPersister(RDFConnection rdf) {
+    private final RDFConnection rdf;
+    private final Supplier<String> userIriSupplier;
+
+    public DAO(RDFConnection rdf, Supplier<String> userIriSupplier) {
         this.rdf = rdf;
+        this.userIriSupplier = userIriSupplier;
     }
 
-    public void write(PersistentEntity entity) {
-        safely(() -> {
+    public Transactional transactional() {
+        return rdf;
+    }
+
+    public <T extends PersistentEntity> T write(T entity) {
+        return safely(() -> {
             var type = getRdfType(entity.getClass());
-            var existing = entity.getIri() != null;
-            var entityNode = createURI(existing ? entity.getIri().toString() : getWorkspaceURI() + randomUUID());
+
+            if (entity instanceof BasicPersistentEntity) {
+                var basicEntity = (BasicPersistentEntity) entity;
+                var user = createURI(userIriSupplier.get());
+                basicEntity.setDateModified(now());
+                basicEntity.setModifiedBy(user);
+
+                if (entity.getIri() == null) {
+                    basicEntity.setDateCreated(basicEntity.getDateModified());
+                    basicEntity.setCreatedBy(user);
+                }
+            }
+
+            if (entity.getIri() == null) {
+                entity.setIri(createURI(getWorkspaceURI() + randomUUID()));
+            }
+
             var update = new UpdateRequest();
 
-            setProperty(update, existing, entityNode, RDF.type.asNode(), type);
+            setProperty(update, entity.getIri(), RDF.type.asNode(), type);
 
-            for (var field : entity.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(RDFProperty.class)) {
-                    var propertyNode = createURI(field.getAnnotation(RDFProperty.class).value());
-                    field.setAccessible(true);
-                    var value = field.get(entity);
+            for (Class<?> c = entity.getClass(); c != null; c = c.getSuperclass()) {
+                for (var field : c.getDeclaredFields()) {
+                    var annotation = field.getAnnotation(RDFProperty.class);
+                    if (annotation != null) {
+                        var propertyNode = createURI(annotation.value());
+                        field.setAccessible(true);
+                        var value = field.get(entity);
 
-                    setProperty(update, existing, entityNode, propertyNode, value);
+                        if (value == null && annotation.required()) {
+                            throw new PersistenceException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
+                        }
+
+                        setProperty(update, entity.getIri(), propertyNode, value);
+                    }
                 }
             }
 
             rdf.update(update.toString());
 
-            if (!existing) {
-                entity.setIri(entityNode);
-            }
-
-            return null;
+            return entity;
         });
     }
 
-    private void setProperty(UpdateRequest update, boolean existing, Node entityNode, Node propertyNode, Object value) {
-        if (existing) {
-            update.add(new UpdateDeleteWhere(new QuadAcc(singletonList(new Quad(
-                    defaultGraphIRI,
-                    entityNode,
-                    propertyNode,
-                    createVariable("o"))))));
-        }
+    private void setProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
+       update.add(new UpdateDeleteWhere(new QuadAcc(singletonList(new Quad(
+            defaultGraphIRI,
+            entityNode,
+            propertyNode,
+            createVariable("o"))))));
+
         if (value instanceof Iterable) {
             ((Iterable<?>) value).forEach(item -> addProperty(update, entityNode, propertyNode, item));
         } else if (value != null) {
@@ -117,35 +148,40 @@ public class BeanPersister {
     }
 
     private <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException, NoSuchMethodException {
-        if (resource.hasProperty(DATE_DELETED) || !resource.hasProperty(RDF.type, createResource(getRdfType(type).getURI()))) {
+        if (!resource.hasProperty(RDF.type, createResource(getRdfType(type).getURI()))) {
             return null;
         }
         var ctor = type.getDeclaredConstructor();
         ctor.setAccessible(true);
         var entity = ctor.newInstance();
         entity.setIri(resource.asNode());
-        for (var field : entity.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(RDFProperty.class)) {
-                var property = createProperty(field.getAnnotation(RDFProperty.class).value());
+        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+            for (var field : c.getDeclaredFields()) {
+                var annotation = field.getAnnotation(RDFProperty.class);
+                if (annotation != null) {
+                    var property = createProperty(annotation.value());
 
-                if (Collection.class.isAssignableFrom(field.getType())) {
-                    field.setAccessible(true);
-                    var collection = (Collection) field.get(entity);
-                    if (collection == null) {
-                        throw new PersistenceException("An uninitialized collection field " + field.getName());
-                    }
-
-                    var parameterizedType = (ParameterizedType) field.getGenericType();
-                    var valueType = getRawType(parameterizedType.getActualTypeArguments()[0]);
-
-                    resource.listProperties(property).forEachRemaining(stmt ->
-                            collection.add(nodeToType(stmt.getObject(), valueType)));
-                } else {
-                    var stmt = resource.getProperty(property);
-                    if (stmt != null) {
+                    if (Collection.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
-                        var value = nodeToType(stmt.getObject(), field.getType());
-                        field.set(entity, value);
+                        var collection = (Collection) field.get(entity);
+                        if (collection == null) {
+                            throw new PersistenceException(format(UNINITIALIZED_COLLECTION_ERROR, field.getName(), type.getName()));
+                        }
+
+                        var parameterizedType = (ParameterizedType) field.getGenericType();
+                        var valueType = getRawType(parameterizedType.getActualTypeArguments()[0]);
+
+                        resource.listProperties(property).forEachRemaining(stmt ->
+                                collection.add(nodeToType(stmt.getObject(), valueType)));
+                    } else {
+                        var stmt = resource.getProperty(property);
+                        if (stmt != null) {
+                            field.setAccessible(true);
+                            var value = nodeToType(stmt.getObject(), field.getType());
+                            field.set(entity, value);
+                        } else if (annotation.required()) {
+                                throw new PersistenceException(format(NO_VALUE_ERROR, field.getName(), resource.getURI()));
+                        }
                     }
                 }
             }
@@ -192,7 +228,7 @@ public class BeanPersister {
             }
         }
 
-        throw new PersistenceException("Cannot cast " + object + " to " + type.getSimpleName());
+        throw new PersistenceException(format(CASTING_ERROR, object, type.getName()));
     }
 
     public <T extends PersistentEntity> List<T> list(Class<T> type) {
@@ -205,7 +241,14 @@ public class BeanPersister {
             var entities = new ArrayList<T>();
             Iterable<Resource> subjects = model::listSubjects;
             for (var resource : subjects) {
-                entities.add(createEntity(type, resource));
+                var entity = createEntity(type, resource);
+                if (entity != null) {
+                    if (entity instanceof BasicPersistentEntity && ((BasicPersistentEntity) entity).getDateDeleted() != null) {
+                        continue;
+                    }
+
+                    entities.add(entity);
+                }
             }
 
             return entities;
@@ -220,12 +263,22 @@ public class BeanPersister {
         rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri));
     }
 
-    // TODO: soft deletion
+    public <T extends BasicPersistentEntity> T markAsDeleted(T entity) {
+        return calculateWrite(rdf, ()-> {
+            var existing = (T) read(entity.getClass(), entity.getIri());
+            if (existing != null) {
+                existing.setDateDeleted(now());
+                existing.setDeletedBy(createURI(userIriSupplier.get()));
+                return write(existing);
+            }
+            return null;
+        });
+    }
 
     private static Node getRdfType(Class<? extends PersistentEntity> type) {
         return ofNullable(type.getAnnotation(RDFType.class))
                 .map(annotation -> createURI(annotation.value()))
-                .orElseThrow(() -> new PersistenceException("No RDF type for " + type));
+                .orElseThrow(() -> new PersistenceException(format(NO_RDF_TYPE_ERROR, type.getName())));
     }
 
     private static <T> T safely(Callable<T> action) {

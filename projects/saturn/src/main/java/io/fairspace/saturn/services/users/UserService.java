@@ -1,10 +1,10 @@
 package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.auth.UserInfo;
-import io.fairspace.saturn.rdf.beans.BeanPersister;
-import io.fairspace.saturn.rdf.beans.PersistentEntity;
-import io.fairspace.saturn.rdf.beans.RDFProperty;
-import io.fairspace.saturn.rdf.beans.RDFType;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.dao.PersistentEntity;
+import io.fairspace.saturn.rdf.dao.RDFProperty;
+import io.fairspace.saturn.rdf.dao.RDFType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -17,26 +17,24 @@ import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 
 public class UserService {
     private static final String ANONYMOUS = "http://fairspace.io/iri/test-user";
-    private final RDFConnection rdf;
-    private final BeanPersister persister;
+    private final DAO dao;
     private final Map<String, User> usersById = new ConcurrentHashMap<>();
 
     public UserService(RDFConnection rdf) {
-        this.rdf = rdf;
-        this.persister = new BeanPersister(rdf);
+        this.dao = new DAO(rdf, () -> null);
 
         loadUsers();
     }
 
     private void loadUsers() {
-        persister.list(User.class).forEach(user -> usersById.put(user.getExternalId(), user));
+        dao.list(User.class).forEach(user -> usersById.put(user.getExternalId(), user));
     }
 
     /**
      * Returns a URI for the provided userInfo.
      * First tries to find an exiting fs:User entity which externalId  equals to userInfo.getUserId()
      * If no existing entry is found, creates a new one and stores userInfo in it.
-     * Also updates an existing one if one of the userInfo's fileds changed.
+     * Also updates an existing one if one of the userInfo's fields changed.
      * @param userInfo
      * @return
      */
@@ -50,7 +48,7 @@ public class UserService {
             if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
                 user.setName(userInfo.getFullName());
                 user.setEmail(userInfo.getEmail());
-                commit("Update user info, id: " + userInfo.getUserId(), rdf, () -> persister.write(user));
+                commit("Update user with id " + userInfo.getUserId(), dao.transactional(), () -> dao.write(user));
             }
             return user.getIri().getURI();
         } else {
@@ -58,11 +56,15 @@ public class UserService {
             newUser.setExternalId(userInfo.getUserId());
             newUser.setName(userInfo.getFullName());
             newUser.setEmail(userInfo.getEmail());
-            commit("Store a new user, id: " + userInfo.getUserId(), rdf, () -> {
-                persister.write(newUser);
+            return commit("Store a new user with id " + userInfo.getUserId(), dao.transactional(), () -> {
+                var createdInMeantime = usersById.get(userInfo.getUserId());
+                if(createdInMeantime != null) {
+                    return createdInMeantime;
+                }
+                dao.write(newUser);
                 usersById.put(newUser.getExternalId(), newUser);
-            });
-            return newUser.getIri().getURI();
+                return newUser;
+            }).getIri().getURI();
         }
     }
 
@@ -70,10 +72,10 @@ public class UserService {
     @EqualsAndHashCode(callSuper = true)
     @Data
     private static class User extends PersistentEntity {
-        @RDFProperty("http://fairspace.io/ontology#externalId")
+        @RDFProperty(value = "http://fairspace.io/ontology#externalId", required = true)
         private String externalId;
 
-        @RDFProperty("http://www.w3.org/2000/01/rdf-schema#label")
+        @RDFProperty(value = "http://www.w3.org/2000/01/rdf-schema#label", required = true)
         private String name;
 
         @RDFProperty("http://fairspace.io/ontology#email")

@@ -1,4 +1,4 @@
-package io.fairspace.saturn.rdf.beans;
+package io.fairspace.saturn.rdf.dao;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,4 +14,6 @@ public @interface RDFProperty {
      * @return The property IRI
      */
     String value();
+
+    boolean required() default false;
 }
