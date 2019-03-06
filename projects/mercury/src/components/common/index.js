@@ -7,7 +7,7 @@ export {default as ErrorMessage} from "./ErrorMessage";
 export {default as CollectionEditor} from "./CollectionEditor";
 export {default as LoadingInlay} from './LoadingInlay';
 export {default as LoadingOverlay} from './LoadingOverlay';
-export {default as ButtonWithVerification} from './buttons/ButtonWithVerification';
+export {default as DeleteButton} from './buttons/DeleteButton';
 export {default as RenameButton} from './buttons/RenameButton';
 export {default as CreateDirectoryButton} from './buttons/CreateDirectoryButton';
 export {default as UploadButton} from './buttons/UploadButton';

@@ -8,7 +8,7 @@ import classNames from 'classnames';
 
 import {
     CreateDirectoryButton, ErrorDialog, LoadingOverlay,
-    UploadButton, RenameButton, ButtonWithVerification
+    UploadButton, RenameButton, DeleteButton
 } from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
@@ -131,7 +131,7 @@ export class FileOperations extends React.Component {
                                 <Icon>border_color</Icon>
                             </IconButton>
                         </RenameButton>
-                        <ButtonWithVerification
+                        <DeleteButton
                             file={selectedItem.basename}
                             onClick={() => onDelete(selectedItem)}
                         >
@@ -143,7 +143,7 @@ export class FileOperations extends React.Component {
                                 <Icon>delete</Icon>
                             </IconButton>
 
-                        </ButtonWithVerification>
+                        </DeleteButton>
                     </div>
 
                     <div className={classNames(classes.buttonsContainer, classes.buttonsShadow)}>
