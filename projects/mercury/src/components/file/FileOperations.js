@@ -13,19 +13,7 @@ import {
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
 import {joinPaths, generateUniqueFileName} from "../../utils/fileUtils";
-
-const styles = {
-    buttonsContainer: {
-        "display": 'inline-block',
-        "& button": {
-            padding: 10
-        }
-    },
-    buttonsShadow: {
-        boxShadow: '0px 1px 1px -1px rgba(0,0,0,0.2), 0px 0px 0px 0px rgba(0,0,0,0.14), 0px 1px 1px 0px rgba(0,0,0,0.12)',
-        borderRadius: '4px',
-    }
-};
+import styles from './FileOperations.styles';
 
 export class FileOperations extends React.Component {
     refreshFiles() {
@@ -110,7 +98,7 @@ export class FileOperations extends React.Component {
         return (
             <Grid container justify="space-between">
                 <Grid item>
-                    <div className={classNames(classes.buttonsContainer, classes.buttonsShadow)} style={{marginRight: 8}}>
+                    <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)} style={{marginRight: 8}}>
                         <IconButton
                             onClick={() => onDownload(selectedItem.filename)}
                             title={`Download ${selectedItem.basename}`}
