@@ -170,4 +170,37 @@ describe('Collection browser reducers', () => {
             selectedPaths: []
         });
     });
+
+    it('should reset selected paths after file rename success', () => {
+        const state = {
+            addingCollection: false,
+            deletingCollection: false,
+            openedCollectionId: null,
+            openedPath: null,
+            selectedCollectionIRI: null,
+            selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+        };
+
+        expect(reducer(state, {type: actionTypes.RENAME_FILE_FULFILLED}))
+            .toEqual({
+                addingCollection: false,
+                deletingCollection: false,
+                openedCollectionId: null,
+                openedPath: null,
+                selectedCollectionIRI: null,
+                selectedPaths: []
+            });
+    });
+
+    it('should reset selected paths after file rename success (empty state)', () => {
+        expect(reducer(undefined, {type: actionTypes.RENAME_FILE_FULFILLED}))
+            .toEqual({
+                addingCollection: false,
+                deletingCollection: false,
+                openedCollectionId: null,
+                openedPath: null,
+                selectedCollectionIRI: null,
+                selectedPaths: []
+            });
+    });
 });
