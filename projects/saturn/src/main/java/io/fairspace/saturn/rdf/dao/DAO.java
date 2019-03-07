@@ -44,29 +44,29 @@ import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
 
 /**
  * A simple Data Access Object for objects extending io.fairspace.saturn.rdf.dao.PersistentEntity.
- *
+ * <p>
  * No lazy loading, no caching, no bytecode manipulation - as simple as it can be.
  * Entity classes must be annotated with @io.fairspace.saturn.rdf.dao.RDFType and have a zero-arguments constructor.
  * Each persistent property must be annotated with @io.fairspace.saturn.rdf.dao.RDFProperty.
  * References to other entities should be stored as org.apache.jena.graph.Node values and can be created using
  * org.apache.jena.graph.NodeFactory.createURI
- *
- *
+ * <p>
+ * <p>
  * Supported field types:
  * - All primitive types and their object wrappers, e.g. java.lang.Long
  * - java.lang.String
  * - java.time.Instant
  * - org.apache.jena.graph.Node
- * - Collections (descendants of java.util.Collection's) of the above types.
- *
+ * - Collections (descendants of java.util.Collection) of the above types.
+ * <p>
  * All collection fields must be initialized on object initialization:
  * private final Set<Node> items = new HashSet<>();
- *
+ * <p>
  * Lists (java.util.List) can be used, but order of elements is not preserved.
- *
+ * <p>
  * Scalar fields can be marked as required (see @RDFProperty), in that case DAO checks if they are initialized during
  * serialization and deserialization and throws a DAOException in case of violation.
- *
+ * <p>
  * For LifecycleAwarePersistentEntity's descendants, DAO automatically updates related fields (dateCreated, etc).
  */
 public class DAO {
@@ -85,10 +85,14 @@ public class DAO {
         this.userIriSupplier = userIriSupplier;
     }
 
-    public Transactional transactional() {
-        return rdf;
-    }
-
+    /**
+     * Writes (creates or updates) an entity.
+     * This method can modify the entity passed as an argument. It it has bo IRI it will be automatically assigned.
+     * This method also updates the relevant fields of LifecycleAwarePersistentEntity
+     * @param entity
+     * @param <T>
+     * @return the entity passed as an argument
+     */
     public <T extends PersistentEntity> T write(T entity) {
         return safely(() -> {
             var type = getRdfType(entity.getClass());
@@ -130,49 +134,99 @@ public class DAO {
         });
     }
 
-    private void setProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
-        update.add(new UpdateDeleteWhere(new QuadAcc(singletonList(new Quad(
-                defaultGraphIRI,
-                entityNode,
-                propertyNode,
-                createVariable("o"))))));
-
-        if (value instanceof Iterable) {
-            ((Iterable<?>) value).forEach(item -> addProperty(update, entityNode, propertyNode, item));
-        } else if (value != null) {
-            addProperty(update, entityNode, propertyNode, value);
-        }
-    }
-
-    private void addProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
-        update.add(new UpdateDataInsert(new QuadDataAcc(singletonList(new Quad(
-                defaultGraphIRI,
-                entityNode,
-                propertyNode,
-                valueToNode(value))))));
-    }
-
-    private Node valueToNode(Object value) {
-        if (value instanceof Node) {
-            return (Node) value;
-        }
-        if (value instanceof String) {
-            return createStringLiteral(value.toString()).asNode();
-        }
-        if (value instanceof Instant) {
-            var zdt = ZonedDateTime.ofInstant((Instant) value, ZoneId.systemDefault());
-            var call = GregorianCalendar.from(zdt);
-            return createTypedLiteral(call).asNode();
-        }
-        return createTypedLiteral(value).asNode();
-    }
-
+    /**
+     * Reads an entity
+     * @param type
+     * @param iri
+     * @param <T>
+     * @return The found entity or null if no entity was found or it was marked as deleted
+     */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri) {
         return construct(type, storedQuery("select_by_mask", defaultGraphIRI, iri))
                 .stream().findFirst().orElse(null);
     }
 
-    private <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws Exception {
+    /**
+     * Deletes an entity
+     * @param entity
+     */
+    public void delete(PersistentEntity entity) {
+        delete(entity.getIri());
+    }
+
+    /**
+     * Deletes an entity
+     * @param iri
+     */
+    public void delete(Node iri) {
+        rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri));
+    }
+
+    /**
+     * Marks an entity as deleted and updates its dateDeleted and deletedBy fields
+     * @param entity
+     * @return the entity passed as an argument if no entity was found or it was already marked as deleted
+     */
+    public <T extends LifecycleAwarePersistentEntity> T markAsDeleted(T entity) {
+        return calculateWrite(rdf, () -> {
+            var existing = (T) read(entity.getClass(), entity.getIri());
+            if (existing != null) {
+                existing.setDateDeleted(now());
+                existing.setDeletedBy(createURI(userIriSupplier.get()));
+                return write(existing);
+            }
+            return null;
+        });
+    }
+
+    /**
+     * Lists entities of a specific type (except to marked as deleted)
+     * @param type
+     * @param <T>
+     * @return
+     */
+    public <T extends PersistentEntity> List<T> list(Class<T> type) {
+        return construct(type, storedQuery("select_by_type", defaultGraphIRI, getRdfType(type)));
+    }
+
+    /**
+     * Execustes a SPARQL CONSTRUCT query and lists entities of a specific type (except to marked as deleted)
+     * in the resulting model
+     * @param type
+     * @param query
+     * @param <T>
+     * @return
+     */
+    public <T extends PersistentEntity> List<T> construct(Class<T> type, String query) {
+        return safely(() -> {
+            var model = rdf.queryConstruct(query);
+            var entities = new ArrayList<T>();
+            Iterable<Resource> subjects = model::listSubjects;
+            for (var resource : subjects) {
+                var entity = createEntity(type, resource);
+                if (entity != null) {
+                    if (entity instanceof LifecycleAwarePersistentEntity && ((LifecycleAwarePersistentEntity) entity).getDateDeleted() != null) {
+                        continue;
+                    }
+
+                    entities.add(entity);
+                }
+            }
+
+            return entities;
+        });
+    }
+
+    /**
+     *
+     * @return The underlying transactional
+     */
+    public Transactional transactional() {
+        return rdf;
+    }
+
+
+    private static <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws Exception {
         var typeResource = createResource(getRdfType(type).getURI());
         if (!resource.hasProperty(RDF.type, typeResource)) {
             throw new DAOException(format(WRONG_ENTITY_TYPE_ERROR, resource.getURI(), typeResource.getURI()));
@@ -212,7 +266,7 @@ public class DAO {
         return entity;
     }
 
-    private void processFields(Class<?> type, ThrowingBiConsumer<Field, RDFProperty, Exception> action) throws Exception {
+    private static void processFields(Class<?> type, ThrowingBiConsumer<Field, RDFProperty, Exception> action) throws Exception {
         for (Class<?> c = type; c != null; c = c.getSuperclass()) {
             for (var field : c.getDeclaredFields()) {
                 var annotation = field.getAnnotation(RDFProperty.class);
@@ -221,6 +275,59 @@ public class DAO {
                     action.accept(field, annotation);
                 }
             }
+        }
+    }
+
+    private static void setProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
+        update.add(new UpdateDeleteWhere(new QuadAcc(singletonList(new Quad(
+                defaultGraphIRI,
+                entityNode,
+                propertyNode,
+                createVariable("o"))))));
+
+        if (value instanceof Iterable) {
+            ((Iterable<?>) value).forEach(item -> addProperty(update, entityNode, propertyNode, item));
+        } else if (value != null) {
+            addProperty(update, entityNode, propertyNode, value);
+        }
+    }
+
+    private static void addProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
+        update.add(new UpdateDataInsert(new QuadDataAcc(singletonList(new Quad(
+                defaultGraphIRI,
+                entityNode,
+                propertyNode,
+                valueToNode(value))))));
+    }
+
+    private static Node valueToNode(Object value) {
+        if (value instanceof Node) {
+            return (Node) value;
+        }
+        if (value instanceof String) {
+            return createStringLiteral(value.toString()).asNode();
+        }
+        if (value instanceof Instant) {
+            var zdt = ZonedDateTime.ofInstant((Instant) value, ZoneId.systemDefault());
+            var call = GregorianCalendar.from(zdt);
+            return createTypedLiteral(call).asNode();
+        }
+        return createTypedLiteral(value).asNode();
+    }
+
+    private static Node getRdfType(Class<? extends PersistentEntity> type) {
+        return ofNullable(type.getAnnotation(RDFType.class))
+                .map(annotation -> createURI(annotation.value()))
+                .orElseThrow(() -> new DAOException(format(NO_RDF_TYPE_ERROR, type.getName())));
+    }
+
+    private static <T> T safely(Callable<T> action) {
+        try {
+            return action.call();
+        } catch (DAOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DAOException(e);
         }
     }
 
@@ -264,65 +371,5 @@ public class DAO {
         }
 
         throw new DAOException(format(CASTING_ERROR, object, type.getName()));
-    }
-
-    public <T extends PersistentEntity> List<T> list(Class<T> type) {
-        return construct(type, storedQuery("select_by_type", defaultGraphIRI, getRdfType(type)));
-    }
-
-    public <T extends PersistentEntity> List<T> construct(Class<T> type, String query) {
-        return safely(() -> {
-            var model = rdf.queryConstruct(query);
-            var entities = new ArrayList<T>();
-            Iterable<Resource> subjects = model::listSubjects;
-            for (var resource : subjects) {
-                var entity = createEntity(type, resource);
-                if (entity != null) {
-                    if (entity instanceof LifecycleAwarePersistentEntity && ((LifecycleAwarePersistentEntity) entity).getDateDeleted() != null) {
-                        continue;
-                    }
-
-                    entities.add(entity);
-                }
-            }
-
-            return entities;
-        });
-    }
-
-    public void delete(PersistentEntity entity) {
-        delete(entity.getIri());
-    }
-
-    public void delete(Node iri) {
-        rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri));
-    }
-
-    public <T extends LifecycleAwarePersistentEntity> T markAsDeleted(T entity) {
-        return calculateWrite(rdf, () -> {
-            var existing = (T) read(entity.getClass(), entity.getIri());
-            if (existing != null) {
-                existing.setDateDeleted(now());
-                existing.setDeletedBy(createURI(userIriSupplier.get()));
-                return write(existing);
-            }
-            return null;
-        });
-    }
-
-    private static Node getRdfType(Class<? extends PersistentEntity> type) {
-        return ofNullable(type.getAnnotation(RDFType.class))
-                .map(annotation -> createURI(annotation.value()))
-                .orElseThrow(() -> new DAOException(format(NO_RDF_TYPE_ERROR, type.getName())));
-    }
-
-    private static <T> T safely(Callable<T> action) {
-        try {
-            return action.call();
-        } catch (DAOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new DAOException(e);
-        }
     }
 }
