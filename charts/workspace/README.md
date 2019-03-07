@@ -1,6 +1,6 @@
 # A Helm chart for VRE workspaces
 This helm chart will install and setup a single VRE workspace. It includes
-an instance of JupyterHub and Minio.
+an instance of JupyterHub.
 
 Contains:
 - JupyterHub with Python 3 and R kernels and JupyterLab extension
@@ -8,19 +8,20 @@ Contains:
 - Pluto
 - Saturn
 
-## Prerequisites
 A workspace within Fairspace is always associated with a hyperspace. The
 hyperspace contains shared components, such as Keycloak for authentication.
 The connection to the hyperspace should be configured when installing this chart.
 
-Additionally, the following requirements should be met.
-- If ingress is enabled, an active ingress controller should be present in the cluster. 
-- If a TLS certificate is to be obtained automatically, an installation of `cert-manager` should be present in the cluster. See
-  https://cert-manager.readthedocs.io/en/latest/getting-started/2-installing.html#with-helm for the easiest way to set it up. Please
-  note that the certificate that is being created, relies on a dns01 challenge provider being configured properly, as well as on a 
-  certificate issuer being setup. See the [cert-manager docs](https://cert-manager.readthedocs.io) for more information.
+## Prerequisites
+
+Install [the Google Cloud SDK](https://cloud.google.com/sdk/install), ensure
+that your Google account has access to the fairspace-207108 GCP project,
+and log in using `gcloud auth login`.
 
 ## How to install
+
+### On GCP/GKE
+
 First create a configuration file with settings for the workspace to install. For example:
 
 ```yaml
@@ -46,24 +47,20 @@ pluto:
 
 ```
 
-After that, you can install the chart using helm. More details on the parameters can be found below.
+Then use the procedure at <https://wiki.thehyve.nl/display/VRE/Deploying+Fairspace+on+GCP>
+for deploying the application.
 
-```
-helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
-helm repo update
-helm install --name=melanoma-workspace chartmuseum/workspace --namespace=workspaces -f config.yaml
-```
+### On Minikube
 
-## Install on minikube
 By default, on minikube one would want to run the system without TLS and ingresses. An example
-configuration file would be something like
+configuration file would be something like:
 
 ```yaml
 # Provide your own hyperspace settings here
 hyperspace:
     tls: false
     locationOverrides:
-        keycloak: http://192.168.99.100:30867 
+        keycloak: http://192.168.99.100:30867
     keycloak:
         username: keycloak
         password: abcdefghi
@@ -82,31 +79,9 @@ pluto:
         realm: hyperspace
 ```
 
-It can be installed in the same way as above.
-```
-helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
-helm repo update
-helm install --name=workspace chartmuseum/workspace --namespace=workspace -f config.yaml
-```
-
-## Using the configuration scripts
-
-You can use a configuration script to create a configuraion file and perform initial setup:
-
-`./config.sh`
-
-After that you can adjust the configuration:
-
-`vi <workspace-name>-config.yaml`
-
-Finally, you can use the installation script to actually install the workspace. Please note that you 
-must use the exact same workspace name as in the configuration script.
-
-`./install.sh`
-
-## Configuration
-Use `helm ... -f config.yaml` to override default configuration parameters from `values.yaml`. This section
-describes the most important settings for a workspace. See the `values.yaml` file for more settings.
+We currently don't have a tested script for Minikube deployments. The steps should largely be
+the same as the ones for GCP, except for configuration of GCP-specific resources, and cert-manager
+installation.
 
 #### Workspace parameters
 | Parameter  | Description  | Default |
@@ -138,31 +113,20 @@ describes the most important settings for a workspace. See the `values.yaml` fil
 | `pluto.keycloak.realm`   | Keycloak realm that is used for this hyperspace.  |   |
 | `pluto.keycloak.redirectAfterLogoutUrl`   | URL to redirect the user to after logging out  |   |
 
-#### Minio parameters
-| Parameter  | Description  | Default |
-|---|---|---|
-| `minio.accessKey` | Default access key (5 to 20 characters) for Minio | IFGZ2M0W8LB0C92FYA3J |
-| `minio.secretKey` | Default secret key (8 to 40 characters) for Minio | xzow1FrinP+oJYEpHP3s6NzayewFFOgAf/nudLSB |
-| `minio.persistence.enabled` | Use persistent volume to store data | true |
-
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:
 
 * Jupyterhub
-Settings for jupyterhub should be in the section `jupyterhub`. 
-See [Jupyterhub docs](http://zero-to-jupyterhub.readthedocs.io/en/latest/user-environment.html) for more information on the specific settings
+Settings for Jupyterhub should be in the section `jupyterhub`.
+See [the Jupyterhub docs](http://zero-to-jupyterhub.readthedocs.io/en/latest/user-environment.html) for more information on the specific settings
 
 * Pluto
-Settings for pluto should be in the section `pluto`. 
-See [Pluto README](https://github.com/fairspace/pluto/blob/master/README.md) for more information on the specific settings
+Settings for Pluto should be in the section `pluto`.
+See [the Pluto README](https://github.com/fairspace/workspace/blob/dev/projects/pluto/README.md) for more information on the specific settings
 
 * Mercury
-Settings for mercury should be in the section `mercury`. 
-See [Mercury README](https://github.com/fairspace/mercury/blob/master/README.md) for more information on the specific settings
-
-* Minio
-Setting for minio should be in the section `minio`.
-See [Minio README](https://github.com/kubernetes/charts/blob/master/stable/minio/README.md) for more information on the specific settings
+Settings for Mercury should be in the section `mercury`.
+See [the Mercury README](https://github.com/fairspace/workspace/blob/dev/projects/mercury/README.md) for more information on the specific settings
 
 ## Image pull secrets
 When pulling docker images from a private repository, k8s needs credentials to do so. This can be configured using [image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry).
@@ -186,29 +150,27 @@ To use the secret for installing a workspace, follow these steps:
       hub:
         imagePullSecret:
           enabled: true
-          registry: fairspace.azurecr.io
+          registry: eu.gcr.io
           username: ...
           email: ...
           password: ...
       singleuser:
         imagePullSecret:
           enabled: true
-          registry: fairspace.azurecr.io
+          registry: eu.gcr.io
           username: ...
           email: ...
           password: ...
   ```
-  Please note that the version of the helm chart currently in use (0.7) does not allow for setting the imagePullSecret for the `hub`. That has to 
-  be set manually.  
+  Please note that the version of the Jupyterhub helm chart currently in use (0.7) does not allow for setting the imagePullSecret for the
+  `hub`. That has to be set manually.
 
 ## Upgrading installations
-Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades 
-of the chart, as the random values may be computed again. 
+Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades
+of the chart, as the random values may be computed again.
 
-Other properties may contain default values, which is not advised to use. For those reasons it is strongly advised to define values for at
-least the following properties:
+Other properties may contain default values, which is not advised to use. For those reasons it is strongly advised to define
+values for at least the following properties:
 
 * `hyperspace.keycloak.password`
 * `hyperspace.keycloak.clientSecret`
-* `minio.accessKey`
-* `minio.secretKey`

@@ -17,8 +17,8 @@ export const getBaseNameAndExtension = (fileName) => {
     return {baseName, extension};
 };
 
-export function generateUniqueFileName(fileName, usedNames) {
-    if (!usedNames.includes(fileName)) {
+export function generateUniqueFileName(fileName, usedNames = []) {
+    if (!usedNames || !usedNames.includes(fileName)) {
         return fileName;
     }
 

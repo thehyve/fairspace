@@ -21,7 +21,7 @@ public class MemoryBlobStore implements BlobStore {
     }
 
     @Override
-    public void read(String id, long offset, long maxLength, OutputStream out) throws IOException {
-        IOUtils.copy(new ByteArrayInputStream(memo.get(id), (int) offset, (int) Math.min(maxLength, Integer.MAX_VALUE)), out);
+    public void read(String id, OutputStream out) throws IOException {
+        IOUtils.copy(new ByteArrayInputStream(memo.get(id)), out);
     }
 }
