@@ -42,6 +42,33 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.apache.jena.system.Txn.calculateWrite;
 import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
 
+/**
+ * A simple Data Access Object for objects extending io.fairspace.saturn.rdf.dao.PersistentEntity.
+ *
+ * No lazy loading, no caching, no bytecode manipulation - as simple as it can be.
+ * Entity classes must be annotated with @io.fairspace.saturn.rdf.dao.RDFType and have a zero-arguments constructor.
+ * Each persistent property must be annotated with @io.fairspace.saturn.rdf.dao.RDFProperty.
+ * References to other entities should be stored as org.apache.jena.graph.Node values and can be created using
+ * org.apache.jena.graph.NodeFactory.createURI
+ *
+ *
+ * Supported field types:
+ * - All primitive types and their object wrappers, e.g. java.lang.Long
+ * - java.lang.String
+ * - java.time.Instant
+ * - org.apache.jena.graph.Node
+ * - Collections (descendants of java.util.Collection's) of the above types.
+ *
+ * All collection fields must be initialized on object initialization:
+ * private final Set<Node> items = new HashSet<>();
+ *
+ * Lists (java.util.List) can be used, but order of elements is not preserved.
+ *
+ * Scalar fields can be marked as required (see @RDFProperty), in that case DAO checks if they are initialized during
+ * serialization and deserialization and throws a DAOException in case of violation.
+ *
+ * For LifecycleAwarePersistentEntity's descendants, DAO automatically updates related fields (dateCreated, etc).
+ */
 public class DAO {
     private static final String NO_VALUE_ERROR = "No value for required field %s in entity %s";
     private static final String UNINITIALIZED_COLLECTION_ERROR = "An uninitialized collection field %s in class %s";
@@ -66,8 +93,8 @@ public class DAO {
         return safely(() -> {
             var type = getRdfType(entity.getClass());
 
-            if (entity instanceof BasicPersistentEntity) {
-                var basicEntity = (BasicPersistentEntity) entity;
+            if (entity instanceof LifecycleAwarePersistentEntity) {
+                var basicEntity = (LifecycleAwarePersistentEntity) entity;
                 var user = createURI(userIriSupplier.get());
                 basicEntity.setDateModified(now());
                 basicEntity.setModifiedBy(user);
@@ -91,7 +118,7 @@ public class DAO {
                 var value = field.get(entity);
 
                 if (value == null && annotation.required()) {
-                    throw new PersistenceException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
+                    throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
                 }
 
                 setProperty(update, entity.getIri(), propertyNode, value);
@@ -148,7 +175,7 @@ public class DAO {
     private <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws Exception {
         var typeResource = createResource(getRdfType(type).getURI());
         if (!resource.hasProperty(RDF.type, typeResource)) {
-            throw new PersistenceException(format(WRONG_ENTITY_TYPE_ERROR, resource.getURI(), typeResource.getURI()));
+            throw new DAOException(format(WRONG_ENTITY_TYPE_ERROR, resource.getURI(), typeResource.getURI()));
         }
         var ctor = type.getDeclaredConstructor();
         ctor.setAccessible(true);
@@ -162,7 +189,7 @@ public class DAO {
             if (Collection.class.isAssignableFrom(field.getType())) {
                 var collection = (Collection) field.get(entity);
                 if (collection == null) {
-                    throw new PersistenceException(format(UNINITIALIZED_COLLECTION_ERROR, field.getName(), type.getName()));
+                    throw new DAOException(format(UNINITIALIZED_COLLECTION_ERROR, field.getName(), type.getName()));
                 }
 
                 var parameterizedType = (ParameterizedType) field.getGenericType();
@@ -171,14 +198,14 @@ public class DAO {
                 stmts.forEach(stmt -> collection.add(nodeToType(stmt.getObject(), valueType)));
             } else {
                 if (stmts.size() > 1) {
-                    throw new PersistenceException(format(TOO_MANY_VALUES_ERROR, field.getName(), resource.getURI()));
+                    throw new DAOException(format(TOO_MANY_VALUES_ERROR, field.getName(), resource.getURI()));
                 }
 
                 if (!stmts.isEmpty()) {
                     var value = nodeToType(stmts.get(0).getObject(), field.getType());
                     field.set(entity, value);
                 } else if (annotation.required()) {
-                    throw new PersistenceException(format(NO_VALUE_ERROR, field.getName(), resource.getURI()));
+                    throw new DAOException(format(NO_VALUE_ERROR, field.getName(), resource.getURI()));
                 }
             }
         });
@@ -236,7 +263,7 @@ public class DAO {
             }
         }
 
-        throw new PersistenceException(format(CASTING_ERROR, object, type.getName()));
+        throw new DAOException(format(CASTING_ERROR, object, type.getName()));
     }
 
     public <T extends PersistentEntity> List<T> list(Class<T> type) {
@@ -251,7 +278,7 @@ public class DAO {
             for (var resource : subjects) {
                 var entity = createEntity(type, resource);
                 if (entity != null) {
-                    if (entity instanceof BasicPersistentEntity && ((BasicPersistentEntity) entity).getDateDeleted() != null) {
+                    if (entity instanceof LifecycleAwarePersistentEntity && ((LifecycleAwarePersistentEntity) entity).getDateDeleted() != null) {
                         continue;
                     }
 
@@ -271,7 +298,7 @@ public class DAO {
         rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri));
     }
 
-    public <T extends BasicPersistentEntity> T markAsDeleted(T entity) {
+    public <T extends LifecycleAwarePersistentEntity> T markAsDeleted(T entity) {
         return calculateWrite(rdf, () -> {
             var existing = (T) read(entity.getClass(), entity.getIri());
             if (existing != null) {
@@ -286,16 +313,16 @@ public class DAO {
     private static Node getRdfType(Class<? extends PersistentEntity> type) {
         return ofNullable(type.getAnnotation(RDFType.class))
                 .map(annotation -> createURI(annotation.value()))
-                .orElseThrow(() -> new PersistenceException(format(NO_RDF_TYPE_ERROR, type.getName())));
+                .orElseThrow(() -> new DAOException(format(NO_RDF_TYPE_ERROR, type.getName())));
     }
 
     private static <T> T safely(Callable<T> action) {
         try {
             return action.call();
-        } catch (PersistenceException e) {
+        } catch (DAOException e) {
             throw e;
         } catch (Exception e) {
-            throw new PersistenceException(e);
+            throw new DAOException(e);
         }
     }
 }

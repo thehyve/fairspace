@@ -8,9 +8,12 @@ import java.time.Instant;
 
 import static lombok.AccessLevel.PACKAGE;
 
+/**
+ * Defines some standard fields, automatically managed by DAO and enables soft deletion.
+ */
 @Getter
 @Setter(PACKAGE)
-public abstract class BasicPersistentEntity extends PersistentEntity {
+public abstract class LifecycleAwarePersistentEntity extends PersistentEntity {
     @RDFProperty(value = "http://fairspace.io/ontology#dateCreated", required = true)
     private Instant dateCreated;
 

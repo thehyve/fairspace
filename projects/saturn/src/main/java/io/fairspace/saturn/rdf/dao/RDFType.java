@@ -6,6 +6,9 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.TYPE;
 
+/**
+ * Defines an associated rdf:type for an entity class
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = TYPE)
 public @interface RDFType {

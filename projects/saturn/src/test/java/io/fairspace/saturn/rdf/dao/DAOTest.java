@@ -29,7 +29,7 @@ public class DAOTest {
     private DAO dao;
     private Entity entity;
     private EntityEx entityEx;
-    private Basic basicEntity;
+    private LifecycleAware basicEntity;
 
     @Before
     public void before() {
@@ -38,7 +38,7 @@ public class DAOTest {
         dao = new DAO(connect(dataset), () -> "http://example.com/" + randomUUID());
         entity = new Entity();
         entityEx = new EntityEx();
-        basicEntity = new Basic();
+        basicEntity = new LifecycleAware();
     }
 
     @Test
@@ -153,19 +153,19 @@ public class DAOTest {
 
     @Test
     public void testList() {
-        assertEquals(0, dao.list(Basic.class).size());
+        assertEquals(0, dao.list(LifecycleAware.class).size());
 
-        dao.write(new Basic());
-        dao.write(new Basic());
-        dao.write(new Basic());
+        dao.write(new LifecycleAware());
+        dao.write(new LifecycleAware());
+        dao.write(new LifecycleAware());
 
-        var entities = dao.list(Basic.class);
+        var entities = dao.list(LifecycleAware.class);
 
         assertEquals(3, entities.size());
         dao.delete(entities.get(0));
         dao.markAsDeleted(entities.get(1));
 
-        assertEquals(1, dao.list(Basic.class).size());
+        assertEquals(1, dao.list(LifecycleAware.class).size());
     }
 
     @Test
@@ -231,12 +231,12 @@ public class DAOTest {
         assertNull(dao.markAsDeleted(entity3));
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = DAOException.class)
     public void testWriteUninitializedRequiredField() {
         dao.write(new WithRequired());
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = DAOException.class)
     public void testReadWithoutRequiredField() {
         var e = new WithRequired();
         e.setRequiredField("xxx");
@@ -245,25 +245,25 @@ public class DAOTest {
         dao.read(WithRequired.class, e.getIri());
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = DAOException.class)
     public void testReadWithoutType() {
         dao.write(entity);
         dataset.getDefaultModel().removeAll(createResource(entity.getIri().getURI()), RDF.type, null);
         dao.read(Entity.class, entity.getIri());
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = DAOException.class)
     public void testNoDefaultConstructor() {
         testWriteAndRead(new NoDefaultConstructor(1));
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = DAOException.class)
     public void testUnknownType() {
         entity.setUnknown(new StringBuilder());
         testWriteAndRead(entity);
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = DAOException.class)
     public void testTooManyValues() {
         entity.setIntPrimitiveValue(1);
         dao.write(entity);
@@ -271,7 +271,7 @@ public class DAOTest {
         dao.read(Entity.class, entity.getIri());
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = DAOException.class)
     public void testReadingIntoUninitializedCollection() {
         var e = new NullableCollectionHolder();
         e.setItems(new ArrayList<>());
@@ -365,7 +365,7 @@ public class DAOTest {
     @Data
     @EqualsAndHashCode(callSuper = true)
     @RDFType("http://example.com/iri/BasicEntity")
-    private static class Basic extends BasicPersistentEntity {
+    private static class LifecycleAware extends LifecycleAwarePersistentEntity {
     }
 
     @Data

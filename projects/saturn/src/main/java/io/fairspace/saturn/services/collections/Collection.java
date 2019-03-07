@@ -1,17 +1,15 @@
 package io.fairspace.saturn.services.collections;
 
-import io.fairspace.saturn.rdf.dao.BasicPersistentEntity;
+import io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity;
 import io.fairspace.saturn.rdf.dao.RDFProperty;
 import io.fairspace.saturn.rdf.dao.RDFType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.Instant;
-
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @RDFType("http://fairspace.io/ontology#Collection")
-public class Collection extends BasicPersistentEntity {
+public class Collection extends LifecycleAwarePersistentEntity {
     @RDFProperty(value = "http://www.w3.org/2000/01/rdf-schema#label", required = true)
     private String name;
 
