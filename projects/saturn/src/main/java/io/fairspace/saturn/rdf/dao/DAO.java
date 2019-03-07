@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf.dao;
 
+import com.pivovarit.function.ThrowingBiConsumer;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
@@ -14,6 +15,7 @@ import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.vocabulary.RDF;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -45,6 +47,7 @@ public class DAO {
     private static final String UNINITIALIZED_COLLECTION_ERROR = "An uninitialized collection field %s in class %s";
     private static final String NO_RDF_TYPE_ERROR = "No RDF type specified for %s";
     private static final String CASTING_ERROR = "Cannot cast %s to %s";
+    private static final String TOO_MANY_VALUES_ERROR = "More than one value for scalar field %s in resource %s";
 
     private final RDFConnection rdf;
     private final Supplier<String> userIriSupplier;
@@ -82,22 +85,17 @@ public class DAO {
 
             setProperty(update, entity.getIri(), RDF.type.asNode(), type);
 
-            for (Class<?> c = entity.getClass(); c != null; c = c.getSuperclass()) {
-                for (var field : c.getDeclaredFields()) {
-                    var annotation = field.getAnnotation(RDFProperty.class);
-                    if (annotation != null) {
-                        var propertyNode = createURI(annotation.value());
-                        field.setAccessible(true);
-                        var value = field.get(entity);
+            processFields(entity.getClass(), (field, annotation) -> {
+                var propertyNode = createURI(annotation.value());
+                field.setAccessible(true);
+                var value = field.get(entity);
 
-                        if (value == null && annotation.required()) {
-                            throw new PersistenceException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
-                        }
-
-                        setProperty(update, entity.getIri(), propertyNode, value);
-                    }
+                if (value == null && annotation.required()) {
+                    throw new PersistenceException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
                 }
-            }
+
+                setProperty(update, entity.getIri(), propertyNode, value);
+            });
 
             rdf.update(update.toString());
 
@@ -106,11 +104,11 @@ public class DAO {
     }
 
     private void setProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
-       update.add(new UpdateDeleteWhere(new QuadAcc(singletonList(new Quad(
-            defaultGraphIRI,
-            entityNode,
-            propertyNode,
-            createVariable("o"))))));
+        update.add(new UpdateDeleteWhere(new QuadAcc(singletonList(new Quad(
+                defaultGraphIRI,
+                entityNode,
+                propertyNode,
+                createVariable("o"))))));
 
         if (value instanceof Iterable) {
             ((Iterable<?>) value).forEach(item -> addProperty(update, entityNode, propertyNode, item));
@@ -147,7 +145,7 @@ public class DAO {
                 .stream().findFirst().orElse(null);
     }
 
-    private <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException, NoSuchMethodException {
+    private <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws Exception {
         if (!resource.hasProperty(RDF.type, createResource(getRdfType(type).getURI()))) {
             return null;
         }
@@ -155,38 +153,48 @@ public class DAO {
         ctor.setAccessible(true);
         var entity = ctor.newInstance();
         entity.setIri(resource.asNode());
+        processFields(type, (field, annotation) -> {
+            var property = createProperty(annotation.value());
+
+            var stmts = resource.listProperties(property).toList();
+
+            if (Collection.class.isAssignableFrom(field.getType())) {
+                field.setAccessible(true);
+                var collection = (Collection) field.get(entity);
+                if (collection == null) {
+                    throw new PersistenceException(format(UNINITIALIZED_COLLECTION_ERROR, field.getName(), type.getName()));
+                }
+
+                var parameterizedType = (ParameterizedType) field.getGenericType();
+                var valueType = getRawType(parameterizedType.getActualTypeArguments()[0]);
+
+                stmts.forEach(stmt -> collection.add(nodeToType(stmt.getObject(), valueType)));
+            } else {
+                if (stmts.size() > 1) {
+                    throw new PersistenceException(format(TOO_MANY_VALUES_ERROR, field.getName(), resource.getURI()));
+                }
+
+                if (!stmts.isEmpty()) {
+                    field.setAccessible(true);
+                    var value = nodeToType(stmts.get(0).getObject(), field.getType());
+                    field.set(entity, value);
+                } else if (annotation.required()) {
+                    throw new PersistenceException(format(NO_VALUE_ERROR, field.getName(), resource.getURI()));
+                }
+            }
+        });
+        return entity;
+    }
+
+    private void processFields(Class<?> type, ThrowingBiConsumer<Field, RDFProperty, Exception> action) throws Exception {
         for (Class<?> c = type; c != null; c = c.getSuperclass()) {
             for (var field : c.getDeclaredFields()) {
                 var annotation = field.getAnnotation(RDFProperty.class);
                 if (annotation != null) {
-                    var property = createProperty(annotation.value());
-
-                    if (Collection.class.isAssignableFrom(field.getType())) {
-                        field.setAccessible(true);
-                        var collection = (Collection) field.get(entity);
-                        if (collection == null) {
-                            throw new PersistenceException(format(UNINITIALIZED_COLLECTION_ERROR, field.getName(), type.getName()));
-                        }
-
-                        var parameterizedType = (ParameterizedType) field.getGenericType();
-                        var valueType = getRawType(parameterizedType.getActualTypeArguments()[0]);
-
-                        resource.listProperties(property).forEachRemaining(stmt ->
-                                collection.add(nodeToType(stmt.getObject(), valueType)));
-                    } else {
-                        var stmt = resource.getProperty(property);
-                        if (stmt != null) {
-                            field.setAccessible(true);
-                            var value = nodeToType(stmt.getObject(), field.getType());
-                            field.set(entity, value);
-                        } else if (annotation.required()) {
-                                throw new PersistenceException(format(NO_VALUE_ERROR, field.getName(), resource.getURI()));
-                        }
-                    }
+                    action.accept(field, annotation);
                 }
             }
         }
-        return entity;
     }
 
     private static Object nodeToType(RDFNode object, Class<?> type) {
@@ -264,7 +272,7 @@ public class DAO {
     }
 
     public <T extends BasicPersistentEntity> T markAsDeleted(T entity) {
-        return calculateWrite(rdf, ()-> {
+        return calculateWrite(rdf, () -> {
             var existing = (T) read(entity.getClass(), entity.getIri());
             if (existing != null) {
                 existing.setDateDeleted(now());

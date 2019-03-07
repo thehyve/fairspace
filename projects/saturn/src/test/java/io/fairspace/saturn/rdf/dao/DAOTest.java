@@ -3,6 +3,7 @@ package io.fairspace.saturn.rdf.dao;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,11 +16,13 @@ import static java.lang.Thread.sleep;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
 public class DAOTest {
 
+    private Dataset dataset;
     private DAO dao;
     private Entity entity;
     private EntityEx entityEx;
@@ -28,7 +31,8 @@ public class DAOTest {
     @Before
     public void before() {
         setWorkspaceURI("http://example.com/iri/");
-        dao = new DAO(connect(createTxnMem()), () -> "http://example.com/" + randomUUID());
+        dataset = createTxnMem();
+        dao = new DAO(connect(dataset), () -> "http://example.com/" + randomUUID());
         entity = new Entity();
         entityEx = new EntityEx();
         basicEntity = new Basic();
@@ -65,7 +69,79 @@ public class DAOTest {
     }
 
     @Test
-    public void testListProperty() {
+    public void testFloatPrimitiveProperty() {
+        entity.setFloatPrimitiveValue(1.2345f);
+        testWriteAndRead(entity);
+    }
+    
+    @Test
+    public void testFloatObjectProperty() {
+        entity.setFloatObjectValue(1.2345f);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testLongPrimitiveProperty() {
+        entity.setLongPrimitiveValue(123L);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testLongObjectProperty() {
+        entity.setLongObjectValue(123L);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testIntPrimitiveProperty() {
+        entity.setIntPrimitiveValue(123);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testIntObjectProperty() {
+        entity.setIntObjectValue(123);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testShortPrimitiveProperty() {
+        entity.setShortPrimitiveValue((short)123);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testShortObjectProperty() {
+        entity.setShortObjectValue((short)123);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testCharPrimitiveProperty() {
+        entity.setCharPrimitiveValue((char)123);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testCharObjectProperty() {
+        entity.setCharacterObjectValue((char)123);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testBytePrimitiveProperty() {
+        entity.setBytePrimitiveValue((byte)123);
+        testWriteAndRead(entity);
+    }
+
+    @Test
+    public void testByteObjectProperty() {
+        entity.setByteObjectValue((byte)123);
+        testWriteAndRead(entity);
+    }
+    
+    @Test
+    public void testSetProperty() {
         entity.getTags().add("aaa");
         entity.getTags().add("bbb");
         entity.getTags().add("ccc");
@@ -73,14 +149,20 @@ public class DAOTest {
     }
 
     @Test
-    public void testSet() {
-        assertEquals(0, dao.list(Entity.class).size());
+    public void testList() {
+        assertEquals(0, dao.list(Basic.class).size());
 
-        dao.write(new Entity());
-        dao.write(new Entity());
-        dao.write(new Entity());
+        dao.write(new Basic());
+        dao.write(new Basic());
+        dao.write(new Basic());
 
-        assertEquals(3, dao.list(Entity.class).size());
+        var entities = dao.list(Basic.class);
+
+        assertEquals(3, entities.size());
+        dao.delete(entities.get(0));
+        dao.markAsDeleted(entities.get(1));
+
+        assertEquals(1, dao.list(Basic.class).size());
     }
 
     @Test
@@ -116,7 +198,7 @@ public class DAOTest {
     }
 
     @Test
-    public void testBasicPersistenceEntityLifecycle() throws InterruptedException {
+    public void testBasicPersistenceEntityLifecycle() {
         dao.write(basicEntity);
 
         var entity1 = dao.read(basicEntity.getClass(), basicEntity.getIri());
@@ -143,6 +225,7 @@ public class DAOTest {
         assertNotNull(entity3.getDateDeleted());
         assertNotNull(entity3.getDeletedBy());
         assertNull(dao.read(basicEntity.getClass(), basicEntity.getIri()));
+        assertNull(dao.markAsDeleted(entity3));
     }
 
     @Test(expected = PersistenceException.class)
@@ -150,6 +233,33 @@ public class DAOTest {
         dao.write(new WithRequired());
     }
 
+    @Test(expected = PersistenceException.class)
+    public void testReadWithoutRequiredField() {
+        var e = new WithRequired();
+        e.setRequiredField("xxx");
+        dao.write(e);
+        dataset.getDefaultModel().removeAll(createResource(e.getIri().getURI()), createProperty("http://example.com/iri/requiredField"), null);
+        dao.read(WithRequired.class, e.getIri());
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testNoDefaultConstructor() {
+        testWriteAndRead(new NoDefaultConstructor(1));
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testUnknownType() {
+        entity.setUnknown(new StringBuilder());
+        testWriteAndRead(entity);
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testTooManyValues() {
+        entity.setIntPrimitiveValue(1);
+        dao.write(entity);
+        dataset.getDefaultModel().add(createResource(entity.getIri().getURI()), createProperty("http://example.com/iri/intPrimitiveValue"), createTypedLiteral(2));
+        dao.read(Entity.class, entity.getIri());
+    }
 
     private void testWriteAndRead(PersistentEntity entity) {
         dao.write(entity);
@@ -170,6 +280,48 @@ public class DAOTest {
         @RDFProperty("http://example.com/iri/doubleObjectValue")
         private Double doubleObjectValue;
 
+        @RDFProperty("http://example.com/iri/floatPrimitiveValue")
+        private float floatPrimitiveValue;
+
+        @RDFProperty("http://example.com/iri/floatObjectValue")
+        private Float floatObjectValue;
+
+        @RDFProperty("http://example.com/iri/longPrimitiveValue")
+        private long longPrimitiveValue;
+
+        @RDFProperty("http://example.com/iri/longObjectValue")
+        private Long longObjectValue;
+
+        @RDFProperty("http://example.com/iri/intPrimitiveValue")
+        private int intPrimitiveValue;
+
+        @RDFProperty("http://example.com/iri/integerObjectValue")
+        private Integer intObjectValue;
+
+        @RDFProperty("http://example.com/iri/shortPrimitiveValue")
+        private short shortPrimitiveValue;
+
+        @RDFProperty("http://example.com/iri/shortObjectValue")
+        private Short shortObjectValue;
+
+        @RDFProperty("http://example.com/iri/charPrimitiveValue")
+        private char charPrimitiveValue;
+
+        @RDFProperty("http://example.com/iri/characterObjectValue")
+        private Character characterObjectValue;
+
+        @RDFProperty("http://example.com/iri/bytePrimitiveValue")
+        private byte bytePrimitiveValue;
+
+        @RDFProperty("http://example.com/iri/byteObjectValue")
+        private Byte byteObjectValue;
+
+        @RDFProperty("http://example.com/iri/booleanPrimitiveValue")
+        private boolean booleanPrimitiveValue;
+
+        @RDFProperty("http://example.com/iri/booleanObjectValue")
+        private Boolean booleanObjectValue;
+
         @RDFProperty("http://example.com/iri/nodeValue")
         private Node nodeValue;
 
@@ -178,6 +330,9 @@ public class DAOTest {
 
         @RDFProperty("http://example.com/iri/tags")
         private final Set<String> tags = new HashSet<>();
+
+        @RDFProperty("http://example.com/iri/unknown")
+        private Object unknown;
     }
 
     @Data
@@ -200,5 +355,14 @@ public class DAOTest {
     private static class WithRequired extends PersistentEntity {
         @RDFProperty(value = "http://example.com/iri/requiredField", required = true)
         private String requiredField;
+    }
+
+    @RDFType("http://example.com/iri/NoDefaultConstructor")
+    private class NoDefaultConstructor extends PersistentEntity {
+        final int value;
+
+        private NoDefaultConstructor(int value) {
+            this.value = value;
+        }
     }
 }
