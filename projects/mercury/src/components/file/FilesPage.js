@@ -68,38 +68,37 @@ export class FilesPage extends React.Component {
     }
 
     render() {
-        {
-            const {
-                openedCollection, fetchFilesIfNeeded,
-                openPath,
-                openedPath, files, selectedPaths, selectPath, deselectPath, renameFile, deleteFile
-            } = this.props;
+        const {
+            openedCollection, fetchFilesIfNeeded, openPath, openedPath, files, selectedPaths, selectPath,
+            deselectPath, renameFile, deleteFile, selectPaths, deselectAllPaths,
+        } = this.props;
 
-            return (
-                <>
-                    {this.renderBreadcrumbs()}
-                    <Grid container spacing={8}>
-                        <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
-                            <FileBrowser
-                                openPath={openPath}
-                                fetchFilesIfNeeded={fetchFilesIfNeeded}
-                                openedCollection={openedCollection}
-                                openedPath={openedPath}
-                                files={files}
-                                selectPath={selectPath}
-                                selectedPaths={selectedPaths}
-                                deselectPath={deselectPath}
-                                renameFile={renameFile}
-                                deleteFile={deleteFile}
-                            />
-                        </Grid>
-                        <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                            <InformationDrawer onCollectionLocationChange={this.handleCollectionLocationChange} />
-                        </Grid>
+        return (
+            <>
+                {this.renderBreadcrumbs()}
+                <Grid container spacing={8}>
+                    <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
+                        <FileBrowser
+                            openPath={openPath}
+                            fetchFilesIfNeeded={fetchFilesIfNeeded}
+                            openedCollection={openedCollection}
+                            openedPath={openedPath}
+                            files={files}
+                            selectPath={selectPath}
+                            selectedPaths={selectedPaths}
+                            deselectPath={deselectPath}
+                            renameFile={renameFile}
+                            deleteFile={deleteFile}
+                            onSelectAll={() => selectPaths(files.map(f => f.filename))}
+                            onDeselectAll={deselectAllPaths}
+                        />
                     </Grid>
-                </>
-            );
-        }
+                    <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
+                        <InformationDrawer onCollectionLocationChange={this.handleCollectionLocationChange} />
+                    </Grid>
+                </Grid>
+            </>
+        );
     }
 }
 

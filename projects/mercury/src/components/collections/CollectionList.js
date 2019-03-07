@@ -38,7 +38,7 @@ const collectionList = (props) => {
                                 hover
                                 onClick={() => onCollectionClick(collection)}
                                 onDoubleClick={() => onCollectionDoubleClick(collection)}
-                                className={selected ? classes.tableRowSelected : classes.tableRow}
+                                selected={selected}
                             >
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row">
                                     {collection.name}
