@@ -42,7 +42,7 @@ public class UserService {
             if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
                 user.setName(userInfo.getFullName());
                 user.setEmail(userInfo.getEmail());
-                commit("Update user with id " + userInfo.getUserId(), dao.transactional(), () -> dao.write(user));
+                commit("Update user with id " + userInfo.getUserId(), dao, () -> dao.write(user));
             }
             return user;
         } else {
@@ -50,7 +50,7 @@ public class UserService {
             newUser.setExternalId(userInfo.getUserId());
             newUser.setName(userInfo.getFullName());
             newUser.setEmail(userInfo.getEmail());
-            return commit("Store a new user with id " + userInfo.getUserId(), dao.transactional(), () -> {
+            return commit("Store a new user with id " + userInfo.getUserId(), dao, () -> {
                 var createdInMeantime = usersById.get(userInfo.getUserId());
                 if(createdInMeantime != null) {
                     return createdInMeantime;

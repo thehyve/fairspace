@@ -400,6 +400,7 @@ public class DAOTest {
 
     @RDFType("http://example.com/iri/NullableCollectionHolder")
     @Data
+    @EqualsAndHashCode(callSuper = true)
     private static class NullableCollectionHolder extends PersistentEntity {
         @RDFProperty("http://example.com/iri/items")
         private Collection<Integer> items;

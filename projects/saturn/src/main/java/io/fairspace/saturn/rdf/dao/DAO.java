@@ -1,6 +1,7 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
+import lombok.experimental.Delegate;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
@@ -69,7 +70,7 @@ import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
  * <p>
  * For LifecycleAwarePersistentEntity's descendants, DAO automatically updates related fields (dateCreated, etc).
  */
-public class DAO {
+public class DAO implements Transactional {
     private static final String NO_VALUE_ERROR = "No value for required field %s in entity %s";
     private static final String UNINITIALIZED_COLLECTION_ERROR = "An uninitialized collection field %s in class %s";
     private static final String NO_RDF_TYPE_ERROR = "No RDF type specified for %s";
@@ -77,6 +78,7 @@ public class DAO {
     private static final String TOO_MANY_VALUES_ERROR = "More than one value for scalar field %s in resource %s";
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
+    @Delegate(types = Transactional.class)
     private final RDFConnection rdf;
     private final Supplier<String> userIriSupplier;
 
@@ -216,15 +218,6 @@ public class DAO {
             return entities;
         });
     }
-
-    /**
-     *
-     * @return The underlying transactional
-     */
-    public Transactional transactional() {
-        return rdf;
-    }
-
 
     private static <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws Exception {
         var typeResource = createResource(getRdfType(type).getURI());
