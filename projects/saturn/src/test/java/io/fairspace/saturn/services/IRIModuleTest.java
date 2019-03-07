@@ -21,6 +21,16 @@ public class IRIModuleTest {
         assertEquals(obj, mapper.readValue(s, Entity.class));
     }
 
+    @Test
+    public void serializeAndDeserializeNull() throws IOException {
+        var obj = new Entity();
+        var mapper = new ObjectMapper().registerModule(new IRIModule());
+        var s = mapper.writeValueAsString(obj);
+        assertEquals("{\"iri\":null}", s);
+        assertEquals(obj, mapper.readValue(s, Entity.class));
+    }
+
+
     @Data
     public static class Entity {
         private Node iri;

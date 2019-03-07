@@ -4,10 +4,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -243,6 +246,13 @@ public class DAOTest {
     }
 
     @Test(expected = PersistenceException.class)
+    public void testReadWithoutType() {
+        dao.write(entity);
+        dataset.getDefaultModel().removeAll(createResource(entity.getIri().getURI()), RDF.type, null);
+        dao.read(Entity.class, entity.getIri());
+    }
+
+    @Test(expected = PersistenceException.class)
     public void testNoDefaultConstructor() {
         testWriteAndRead(new NoDefaultConstructor(1));
     }
@@ -260,6 +270,15 @@ public class DAOTest {
         dataset.getDefaultModel().add(createResource(entity.getIri().getURI()), createProperty("http://example.com/iri/intPrimitiveValue"), createTypedLiteral(2));
         dao.read(Entity.class, entity.getIri());
     }
+
+    @Test(expected = PersistenceException.class)
+    public void testReadingIntoUninitializedCollection() {
+        var e = new NullableCollectionHolder();
+        e.setItems(new ArrayList<>());
+        e.getItems().add(1);
+        testWriteAndRead(e);
+    }
+
 
     private void testWriteAndRead(PersistentEntity entity) {
         dao.write(entity);
@@ -364,5 +383,12 @@ public class DAOTest {
         private NoDefaultConstructor(int value) {
             this.value = value;
         }
+    }
+
+    @RDFType("http://example.com/iri/NullableCollectionHolder")
+    @Data
+    private static class NullableCollectionHolder extends PersistentEntity {
+        @RDFProperty("http://example.com/iri/items")
+        private Collection<Integer> items;
     }
 }

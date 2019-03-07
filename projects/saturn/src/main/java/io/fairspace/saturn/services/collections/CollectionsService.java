@@ -12,7 +12,6 @@ import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 // TODO: Check permissions
 @Slf4j
@@ -20,12 +19,9 @@ public class CollectionsService {
     private final RDFConnection rdf;
     private final DAO dao;
 
-    private final Supplier<String> userIriSupplier;
-
 
     public CollectionsService(RDFConnection rdf, Supplier<String> userIriSupplier) {
         this.rdf = rdf;
-        this.userIriSupplier = userIriSupplier;
         this.dao = new DAO(rdf, userIriSupplier);
     }
 
@@ -123,14 +119,16 @@ public class CollectionsService {
             }
 
             var updated = dao.write(existing);
-            rdf.update(storedQuery("fs_move", oldLocation, updated.getLocation(), ""));
+            if (!updated.getLocation().equals(oldLocation)) {
+                rdf.update(storedQuery("fs_move", oldLocation, updated.getLocation(), ""));
+            }
             return updated;
         });
     }
 
     private Collection applyPermissions(Collection c) {
         if (c != null) {
-            c.setAccess(Access.Manage); // Call permissions service
+            c.setAccess(Access.Manage); // TODO: Call permissions service
         }
         return c;
     }
@@ -140,5 +138,4 @@ public class CollectionsService {
                 && !name.isEmpty()
                 && name.length() < 128;
     }
-
 }

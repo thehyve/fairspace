@@ -48,6 +48,7 @@ public class DAO {
     private static final String NO_RDF_TYPE_ERROR = "No RDF type specified for %s";
     private static final String CASTING_ERROR = "Cannot cast %s to %s";
     private static final String TOO_MANY_VALUES_ERROR = "More than one value for scalar field %s in resource %s";
+    private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
     private final RDFConnection rdf;
     private final Supplier<String> userIriSupplier;
@@ -87,7 +88,6 @@ public class DAO {
 
             processFields(entity.getClass(), (field, annotation) -> {
                 var propertyNode = createURI(annotation.value());
-                field.setAccessible(true);
                 var value = field.get(entity);
 
                 if (value == null && annotation.required()) {
@@ -146,8 +146,9 @@ public class DAO {
     }
 
     private <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws Exception {
-        if (!resource.hasProperty(RDF.type, createResource(getRdfType(type).getURI()))) {
-            return null;
+        var typeResource = createResource(getRdfType(type).getURI());
+        if (!resource.hasProperty(RDF.type, typeResource)) {
+            throw new PersistenceException(format(WRONG_ENTITY_TYPE_ERROR, resource.getURI(), typeResource.getURI()));
         }
         var ctor = type.getDeclaredConstructor();
         ctor.setAccessible(true);
@@ -159,7 +160,6 @@ public class DAO {
             var stmts = resource.listProperties(property).toList();
 
             if (Collection.class.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
                 var collection = (Collection) field.get(entity);
                 if (collection == null) {
                     throw new PersistenceException(format(UNINITIALIZED_COLLECTION_ERROR, field.getName(), type.getName()));
@@ -175,7 +175,6 @@ public class DAO {
                 }
 
                 if (!stmts.isEmpty()) {
-                    field.setAccessible(true);
                     var value = nodeToType(stmts.get(0).getObject(), field.getType());
                     field.set(entity, value);
                 } else if (annotation.required()) {
@@ -191,6 +190,7 @@ public class DAO {
             for (var field : c.getDeclaredFields()) {
                 var annotation = field.getAnnotation(RDFProperty.class);
                 if (annotation != null) {
+                    field.setAccessible(true);
                     action.accept(field, annotation);
                 }
             }
