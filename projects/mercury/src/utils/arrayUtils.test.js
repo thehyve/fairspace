@@ -1,4 +1,4 @@
-import {findById} from "./arrayUtils";
+import {findById, flattenShallow} from "./arrayUtils";
 
 describe('arrayUtils', () => {
     describe('findById', () => {
@@ -32,6 +32,20 @@ describe('arrayUtils', () => {
         it('should return undefined if collections is null does not have id property', () => {
             const res = findById(null, 509);
             expect(res).toBeUndefined();
+        });
+    });
+
+    describe('flattenShallow', () => {
+        it('flattens an array of arrays', () => {
+            expect(flattenShallow([[1, 2], [], [3, 4], [5]])).toEqual([1, 2, 3, 4, 5]);
+        });
+
+        it('does not break on empty arrays', () => {
+            expect(flattenShallow([])).toEqual([]);
+        });
+
+        it('goes only one level deep', () => {
+            expect(flattenShallow([[[1, 2, 3]], [[4, 5]]])).toEqual([[1, 2, 3], [4, 5]]);
         });
     });
 });
