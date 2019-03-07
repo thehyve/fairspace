@@ -44,7 +44,7 @@ public class CollectionsService {
                 throw new LocationAlreadyExistsException(collection.getLocation());
             }
 
-            return dao.write(collection);
+            return applyPermissions(dao.write(collection));
         });
     }
 

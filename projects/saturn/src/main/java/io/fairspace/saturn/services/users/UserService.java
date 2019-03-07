@@ -2,11 +2,6 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.dao.PersistentEntity;
-import io.fairspace.saturn.rdf.dao.RDFProperty;
-import io.fairspace.saturn.rdf.dao.RDFType;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.Map;
@@ -16,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 
 public class UserService {
-    private static final String ANONYMOUS = "http://fairspace.io/iri/test-user";
     private final DAO dao;
     private final Map<String, User> usersById = new ConcurrentHashMap<>();
 
@@ -39,10 +33,6 @@ public class UserService {
      * @return
      */
     public String getUserIRI(UserInfo userInfo) {
-        if (userInfo == null) {
-            return ANONYMOUS;
-        }
-
         var user = usersById.get(userInfo.getUserId());
         if (user != null) {
             if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
@@ -68,17 +58,4 @@ public class UserService {
         }
     }
 
-    @RDFType("http://fairspace.io/ontology#User")
-    @EqualsAndHashCode(callSuper = true)
-    @Data
-    private static class User extends PersistentEntity {
-        @RDFProperty(value = "http://fairspace.io/ontology#externalId", required = true)
-        private String externalId;
-
-        @RDFProperty(value = "http://www.w3.org/2000/01/rdf-schema#label", required = true)
-        private String name;
-
-        @RDFProperty("http://fairspace.io/ontology#email")
-        private String email;
-    }
 }
