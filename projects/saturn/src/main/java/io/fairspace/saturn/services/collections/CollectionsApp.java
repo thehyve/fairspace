@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.collections;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.fairspace.saturn.rdf.dao.DAOException;
 import io.fairspace.saturn.services.IRIModule;
 import lombok.extern.slf4j.Slf4j;
 import spark.servlet.SparkApplication;
@@ -74,6 +75,7 @@ public class CollectionsApp implements SparkApplication {
 
         exception(JsonMappingException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Invalid request body"));
         exception(IllegalArgumentException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, e.getMessage()));
+        exception(DAOException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Bad request"));
         exception(CollectionNotFoundException.class, (e, req, res) -> returnError(res, SC_NOT_FOUND, e.getMessage()));
         exception(CollectionAccessDeniedException.class, (e, req, res) -> returnError(res, SC_UNAUTHORIZED, e.getMessage()));
         exception(LocationAlreadyExistsException.class, (e, req, res) -> returnError(res, SC_CONFLICT, e.getMessage()));
