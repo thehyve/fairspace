@@ -78,7 +78,7 @@ public class CollectionsService {
                 log.info("No enough permissions to delete a collection {}", iri);
                 throw new CollectionAccessDeniedException(iri);
             }
-            rdf.update(storedQuery("coll_delete", createResource(iri),  userIriSupplier.get()));
+            dao.markAsDeleted(existing);
         });
     }
 
