@@ -53,7 +53,7 @@ const fileList = ({classes, files, onPathClick, onPathDoubleClick, onSelectAll, 
                         <TableRow
                             hover
                             key={item.filename}
-                            className={selected ? classes.tableRowSelected : ''}
+                            selected={selected}
                             onClick={() => onPathClick(item)}
                             onDoubleClick={() => onPathDoubleClick(item)}
                         >
