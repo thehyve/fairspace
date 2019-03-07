@@ -15,7 +15,8 @@ onto minikube to have a more real-life scenario.
 You need to be able to download images from the Fairspace docker registry.
 Install [the Google Cloud SDK](https://cloud.google.com/sdk/install), ensure
 that your Google account has access to the fairspace-207108 GCP project,
-and log in using `gcloud auth login`.
+log in using `gcloud auth login`, and configure Docker for access to the GCP
+registries using `gcloud auth configure-docker`.
 
 Then run `docker-compose up -d` in the current directory to setup and configure
 a hyperspace for local development. This will also configure keycloak.

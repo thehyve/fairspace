@@ -16,7 +16,8 @@ The connection to the hyperspace should be configured when installing this chart
 
 Install [the Google Cloud SDK](https://cloud.google.com/sdk/install), ensure
 that your Google account has access to the fairspace-207108 GCP project,
-and log in using `gcloud auth login`.
+log in using `gcloud auth login`, and configure Docker for access to the GCP
+registries using `gcloud auth configure-docker`.
 
 ## How to install
 
