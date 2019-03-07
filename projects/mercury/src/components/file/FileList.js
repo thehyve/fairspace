@@ -2,14 +2,14 @@ import React from 'react';
 import {
     Table, TableHead, TableRow, TableCell,
     TableBody, Typography, Icon,
-    withStyles, Paper, Grid
+    withStyles, Paper, Grid, Checkbox
 } from "@material-ui/core";
 import filesize from 'filesize';
 
 import {DateTime} from "../common";
 import styles from './FileList.styles';
 
-const fileList = ({classes, files, selectedPaths = [], onPathClick, onPathDoubleClick}) => {
+const fileList = ({classes, files, onPathClick, onPathDoubleClick, onSelectAll, onDeselectAll}) => {
     if (!files || files.length === 0 || files[0] === null) {
         return (
             <Grid container>
@@ -20,46 +20,59 @@ const fileList = ({classes, files, selectedPaths = [], onPathClick, onPathDouble
         );
     }
 
+    const handleAllSelectionChange = (event) => {
+        if (event.target.checked) {
+            onSelectAll();
+        } else {
+            onDeselectAll();
+        }
+    };
+
+    const numOfSelected = files.filter(f => f.selected).length;
+    const allItemsSelected = files.length === numOfSelected;
+
     return (
         <Paper className={classes.root}>
             <Table padding="dense">
                 <TableHead>
                     <TableRow>
-                        <TableCell />
+                        <TableCell padding="checkbox">
+                            <Checkbox
+                                indeterminate={numOfSelected > 0 && numOfSelected < files.length}
+                                checked={allItemsSelected}
+                                onChange={handleAllSelectionChange}
+                            />
+                        </TableCell>
                         <TableCell>Name</TableCell>
                         <TableCell align="right">Size</TableCell>
                         <TableCell align="right">Last Modified</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {files.map((file) => {
-                        const selected = selectedPaths.includes(file.filename);
-
-                        return (
-                            <TableRow
-                                hover
-                                key={file.filename}
-                                className={selected ? classes.tableRowSelected : ''}
-                                onClick={() => onPathClick(file)}
-                                onDoubleClick={() => onPathDoubleClick(file)}
-                            >
-                                <TableCell>
-                                    <Icon>
-                                        {file.type === 'directory' ? 'folder_open' : 'note_open'}
-                                    </Icon>
-                                </TableCell>
-                                <TableCell component="th" scope="row">
-                                    {file.basename}
-                                </TableCell>
-                                <TableCell padding="none" align="right">
-                                    {file.type === 'file' ? filesize(file.size) : ''}
-                                </TableCell>
-                                <TableCell align="right">
-                                    {file.lastmod ? <DateTime value={file.lastmod} /> : null}
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
+                    {files.map(({item, selected}) => (
+                        <TableRow
+                            hover
+                            key={item.filename}
+                            className={selected ? classes.tableRowSelected : ''}
+                            onClick={() => onPathClick(item)}
+                            onDoubleClick={() => onPathDoubleClick(item)}
+                        >
+                            <TableCell>
+                                <Icon>
+                                    {item.type === 'directory' ? 'folder_open' : 'note_open'}
+                                </Icon>
+                            </TableCell>
+                            <TableCell component="th" scope="row">
+                                {item.basename}
+                            </TableCell>
+                            <TableCell padding="none" align="right">
+                                {item.type === 'file' ? filesize(item.size) : ''}
+                            </TableCell>
+                            <TableCell align="right">
+                                {item.lastmod ? <DateTime value={item.lastmod} /> : null}
+                            </TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
         </Paper>

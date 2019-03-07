@@ -28,6 +28,16 @@ const collectionBrowser = (state = defaultState, action) => {
                 ...state,
                 selectedPaths: [...state.selectedPaths, action.path]
             };
+        case actionTypes.SET_SELECTED_PATHS:
+            return {
+                ...state,
+                selectedPaths: [...action.paths]
+            };
+        case actionTypes.DESELECT_ALL_PATHS:
+            return {
+                ...state,
+                selectedPaths: []
+            };
         case actionTypes.DESELECT_PATH:
             return deselectPath(state, action.path);
         case actionTypes.DELETE_COLLECTION_PENDING:

@@ -203,4 +203,59 @@ describe('Collection browser reducers', () => {
                 selectedPaths: []
             });
     });
+
+    it('should set selected paths correctly', () => {
+        const state = {
+            selectedPaths: ['/some_collection/something']
+        };
+
+        const action = {
+            type: actionTypes.SET_SELECTED_PATHS,
+            paths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+        };
+
+        expect(reducer(state, action))
+            .toEqual({
+                selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+            });
+    });
+
+    it('should set selected paths correctly (no paths selected prior)', () => {
+        const state = {
+            selectedPaths: []
+        };
+        const action = {
+            type: actionTypes.SET_SELECTED_PATHS,
+            paths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+        };
+
+        expect(reducer(state, action))
+            .toEqual({
+                selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+            });
+    });
+
+    it('should deselect all paths correctly', () => {
+        const state = {
+            selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+        };
+        const action = {type: actionTypes.DESELECT_ALL_PATHS};
+
+        expect(reducer(state, action))
+            .toEqual({
+                selectedPaths: []
+            });
+    });
+
+    it('should deselect all paths correctly (empty selected paths already)', () => {
+        const state = {
+            selectedPaths: []
+        };
+        const action = {type: actionTypes.DESELECT_ALL_PATHS};
+
+        expect(reducer(state, action))
+            .toEqual({
+                selectedPaths: []
+            });
+    });
 });

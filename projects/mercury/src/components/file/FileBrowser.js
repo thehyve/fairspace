@@ -66,7 +66,11 @@ class FileBrowser extends React.Component {
     }
 
     render() {
-        const {loading, error, openedCollection, files, selectedPaths, openedPath, fetchFilesIfNeeded} = this.props;
+        const {
+            loading, error, openedCollection, files = [],
+            selectedPaths, openedPath, fetchFilesIfNeeded,
+            onSelectAll, onDeselectAll
+        } = this.props;
         const collectionExists = openedCollection && openedCollection.iri;
 
         if (error) {
@@ -77,15 +81,21 @@ class FileBrowser extends React.Component {
             return <LoadingInlay />;
         }
 
+        const filesWithSelectionState = files.map(item => ({
+            item,
+            selected: selectedPaths.includes(item.filename)
+        }));
+
         return (
             <>
                 {collectionExists
                     ? (
                         <FileList
-                            files={files}
-                            selectedPaths={selectedPaths}
+                            files={filesWithSelectionState}
                             onPathClick={this.handlePathClick}
                             onPathDoubleClick={this.handlePathDoubleClick}
+                            onSelectAll={onSelectAll}
+                            onDeselectAll={onDeselectAll}
                         />
                     ) : 'Collection does not exist.'
                 }
