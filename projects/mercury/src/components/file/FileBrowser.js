@@ -67,9 +67,8 @@ class FileBrowser extends React.Component {
 
     render() {
         const {
-            loading, error, openedCollection, files = [],
-            selectedPaths, openedPath, fetchFilesIfNeeded,
-            onSelectAll, onDeselectAll
+            loading, error, openedCollection, files = [], selectedPaths, openedPath,
+            fetchFilesIfNeeded, onSelectAll, onDeselectAll,
         } = this.props;
         const collectionExists = openedCollection && openedCollection.iri;
 
@@ -86,16 +85,24 @@ class FileBrowser extends React.Component {
             selected: selectedPaths.includes(item.filename)
         }));
 
+        const allSelectionChangeHandler = (selectAll) => {
+            if (selectAll) {
+                onSelectAll();
+            } else {
+                onDeselectAll();
+            }
+        };
+
         return (
             <>
                 {collectionExists
                     ? (
                         <FileList
+                            selectionEnabled
                             files={filesWithSelectionState}
                             onPathClick={this.handlePathClick}
                             onPathDoubleClick={this.handlePathDoubleClick}
-                            onSelectAll={onSelectAll}
-                            onDeselectAll={onDeselectAll}
+                            onAllSelection={allSelectionChangeHandler}
                         />
                     ) : 'Collection does not exist.'
                 }
