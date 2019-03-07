@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.getWorkspaceURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static java.lang.Thread.sleep;
 import static java.util.UUID.randomUUID;
@@ -44,6 +45,18 @@ public class DAOTest {
     @Test
     public void testReadUnknown() {
         assertNull(dao.read(Entity.class, createURI("http://example.com/iri/unknown")));
+    }
+
+    @Test
+    public void testIriGeneration() {
+        assertNull(entity.getIri());
+        dao.write(entity);
+        var iri = entity.getIri();
+        assertNotNull(iri);
+        assertTrue(iri.getURI().startsWith(getWorkspaceURI()));
+        dao.write(entity);
+        assertEquals(iri, entity.getIri());
+        assertNotEquals(iri, dao.write(new Entity()).getIri());
     }
 
 

@@ -33,6 +33,10 @@ public class UserService {
      * @return
      */
     public String getUserIRI(UserInfo userInfo) {
+        return  getUser(userInfo).getIri().getURI();
+    }
+
+    private User getUser(UserInfo userInfo) {
         var user = usersById.get(userInfo.getUserId());
         if (user != null) {
             if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
@@ -40,7 +44,7 @@ public class UserService {
                 user.setEmail(userInfo.getEmail());
                 commit("Update user with id " + userInfo.getUserId(), dao.transactional(), () -> dao.write(user));
             }
-            return user.getIri().getURI();
+            return user;
         } else {
             var newUser = new User();
             newUser.setExternalId(userInfo.getUserId());
@@ -54,8 +58,7 @@ public class UserService {
                 dao.write(newUser);
                 usersById.put(newUser.getExternalId(), newUser);
                 return newUser;
-            }).getIri().getURI();
+            });
         }
     }
-
 }
