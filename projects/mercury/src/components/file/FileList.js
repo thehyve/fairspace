@@ -36,7 +36,7 @@ const fileList = ({classes, files, onPathClick, onPathDoubleClick, onSelectAll, 
             <Table padding="dense">
                 <TableHead>
                     <TableRow>
-                        <TableCell padding="checkbox">
+                        <TableCell padding="none">
                             <Checkbox
                                 indeterminate={numOfSelected > 0 && numOfSelected < files.length}
                                 checked={allItemsSelected}
@@ -57,13 +57,23 @@ const fileList = ({classes, files, onPathClick, onPathDoubleClick, onSelectAll, 
                             onClick={() => onPathClick(item)}
                             onDoubleClick={() => onPathDoubleClick(item)}
                         >
-                            <TableCell>
-                                <Icon>
-                                    {item.type === 'directory' ? 'folder_open' : 'note_open'}
-                                </Icon>
+                            <TableCell padding="none">
+                                <Checkbox checked={selected} />
                             </TableCell>
-                            <TableCell component="th" scope="row">
-                                {item.basename}
+                            <TableCell>
+                                <Grid
+                                    container
+                                    spacing={16}
+                                    alignItems="center"
+                                >
+                                    <Grid item>
+                                        <Icon>
+                                            {item.type === 'directory' ? 'folder_open' : 'note_open'}
+                                        </Icon></Grid>
+                                    <Grid item>
+                                        {item.basename}
+                                    </Grid>
+                                </Grid>
                             </TableCell>
                             <TableCell padding="none" align="right">
                                 {item.type === 'file' ? filesize(item.size) : ''}
