@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import java.time.Instant;
 
 @Data
-@EqualsAndHashCode(of = {}, callSuper = false)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @RDFType("http://fairspace.io/ontology#Collection")
 public class Collection extends BasicPersistentEntity {
     @RDFProperty(value = "http://www.w3.org/2000/01/rdf-schema#label", required = true)
