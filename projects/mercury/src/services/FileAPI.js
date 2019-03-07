@@ -1,7 +1,7 @@
 import {createClient} from "webdav";
 import axios from 'axios';
 import Config from "./Config/Config";
-import {addCounterToFilename, generateUniqueFileName, joinPaths, getParentPath} from '../utils/fileUtils';
+import {addCounterToFilename, generateUniqueFileName, joinPaths, getParentPath, getFileName} from '../utils/fileUtils';
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
@@ -131,7 +131,7 @@ class FileAPI {
      */
     movePaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(sourceFile));
+            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(getFileName(sourceFile)));
             return this.move(sourceFile, destinationFile);
         }));
     }
@@ -144,7 +144,7 @@ class FileAPI {
      */
     copyPaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            let destinationFilename = generateUniqueFileName(sourceFile);
+            let destinationFilename = generateUniqueFileName(getFileName(sourceFile));
             // Copying files to the current directory involves renaming
             if (destinationDir === getParentPath(sourceFile)) {
                 destinationFilename = addCounterToFilename(destinationFilename);
