@@ -42,12 +42,12 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
 
         var created1 = collections.create(c1);
-        assertTrue(created1.getIri().startsWith(getWorkspaceURI()));
+        assertTrue(created1.getIri().getURI().startsWith(getWorkspaceURI()));
         assertEquals(c1.getName(), created1.getName());
         assertEquals(c1.getDescription(), created1.getDescription());
         assertEquals(c1.getLocation(), created1.getLocation());
         assertEquals(c1.getType(), created1.getType());
-        assertEquals("http://example.com/user", created1.getCreator());
+        assertEquals("http://example.com/user", created1.getCreatedBy().getURI());
         assertNotNull(created1.getDateCreated());
         assertEquals(created1.getDateCreated(), created1.getDateModified());
 
@@ -57,7 +57,7 @@ public class CollectionsServiceTest {
         assertEquals(1, collections.list().size());
         assertTrue(collections.list().contains(created1));
 
-        assertEquals(created1, collections.get(created1.getIri()));
+        assertEquals(created1, collections.get(created1.getIri().getURI()));
 
         files.mkdir("dir1/subdir");
         files.create("dir1/subdir/file.txt", new ByteArrayInputStream(new byte[10]));
@@ -69,7 +69,7 @@ public class CollectionsServiceTest {
         patch.setLocation("dir2");
         collections.update(patch);
 
-        var updated1 = collections.get(created1.getIri());
+        var updated1 = collections.get(created1.getIri().getURI());
         assertEquals("new name", updated1.getName());
         assertEquals("new descr", updated1.getDescription());
         assertEquals("dir2", updated1.getLocation());
@@ -83,7 +83,7 @@ public class CollectionsServiceTest {
         Thread.sleep(100);
         patch.setDescription("Description");
         collections.update(patch);
-        var updated2 = collections.get(created1.getIri());
+        var updated2 = collections.get(created1.getIri().getURI());
         assertNotEquals(updated1.getDateModified(), updated2.getDateModified());
 
         var c2 = new Collection();
@@ -94,7 +94,7 @@ public class CollectionsServiceTest {
         var created2 = collections.create(c2);
         assertEquals(2, collections.list().size());
 
-        collections.delete(created2.getIri());
+        collections.delete(created2.getIri().getURI());
         assertEquals(1, collections.list().size());
     }
 
@@ -129,6 +129,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
 
         collections.create(c1);
+        c1.setIri(null);
         collections.create(c1);
     }
 

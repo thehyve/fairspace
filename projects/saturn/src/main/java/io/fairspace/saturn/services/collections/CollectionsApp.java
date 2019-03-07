@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.collections;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.fairspace.saturn.services.IRIModule;
 import lombok.extern.slf4j.Slf4j;
 import spark.servlet.SparkApplication;
 
@@ -16,6 +17,7 @@ import static spark.Spark.*;
 public class CollectionsApp implements SparkApplication {
     private final CollectionsService service;
     private final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new IRIModule())
             .registerModule(new JavaTimeModule())
             .configure(WRITE_DATES_AS_TIMESTAMPS, false);
 
