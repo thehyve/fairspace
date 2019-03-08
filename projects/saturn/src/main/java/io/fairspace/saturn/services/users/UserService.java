@@ -15,7 +15,7 @@ public class UserService {
     private final Map<String, User> usersById = new ConcurrentHashMap<>();
 
     public UserService(RDFConnection rdf) {
-        this.dao = new DAO(rdf, () -> null);
+        this.dao = new DAO(rdf, null);
 
         loadUsers();
     }
