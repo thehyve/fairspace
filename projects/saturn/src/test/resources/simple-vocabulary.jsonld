@@ -1,0 +1,84 @@
+{
+    "@context": {
+        "fs": "http://fairspace.io/ontology#",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "xsd": "http://www.w3.org/TR/xmlschema11-2/#"
+    },
+    "@graph": [
+        {
+            "@id": "fs:Directory",
+            "@type": "rdf:Class",
+            "fs:fairspaceEntity": false,
+            "rdfs:comment": "A directory.",
+            "rdfs:label": "Directory"
+        },
+        {
+            "@id": "fs:Collection",
+            "@type": "rdf:Class",
+            "fs:classInfix": "collections",
+            "fs:fairspaceEntity": false,
+            "rdfs:comment": "A specific collection in Fairspace.",
+            "rdfs:label": "Collection"
+        },
+        {
+            "@id": "rdfs:label",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "rdfs:comment": "Human readable name.",
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Directory"
+                },
+                {
+                    "@id": "fs:Collection"
+                }
+            ],
+            "rdfs:label": "Name",
+            "rdfs:range": [
+                {
+                    "@id": "xsd:string"
+                }
+            ]
+        },
+        {
+            "@id": "fs:belongsTo",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": true,
+            "owl:inverseOf": {
+                "@id": "fs:hasPart"
+            },
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Directory"
+                }
+            ],
+            "rdfs:label": "Collection",
+            "rdfs:range": [
+                {
+                    "@id": "fs:Collection"
+                }
+            ]
+        },
+        {
+            "@id": "fs:hasPart",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "owl:inverseOf": {
+                "@id": "fs:belongsTo"
+            },
+            "rdfs:domain": [
+                {
+                    "@id": "fs:Collection"
+                }
+            ],
+            "rdfs:label": "Has part",
+            "rdfs:range": [
+                {
+                    "@id": "fs:Directory"
+                }
+            ]
+        }
+    ]
+}

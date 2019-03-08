@@ -1,7 +1,0 @@
-# Delete by mask
-# 0 - graph
-# 1 - subject
-# 2 - predicate
-# 3 - object
-
-DELETE WHERE { GRAPH ?0 {?1 ?2 ?3} }
