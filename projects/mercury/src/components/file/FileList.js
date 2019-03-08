@@ -11,7 +11,7 @@ import styles from './FileList.styles';
 
 class FileList extends React.Component {
     state = {
-        hoveredFileName: null
+        hoveredFileName: ''
     }
 
     toggleHover = (hoveredFileName) => {
@@ -62,7 +62,7 @@ class FileList extends React.Component {
                     <TableBody>
                         {files.map((file) => {
                             const item = selectionEnabled ? file.item : file;
-                            const visibility = this.state.hoveredFileName === item.filename || file.selected ? 'visible' : 'hidden';
+                            const checkboxVisibility = this.state.hoveredFileName === item.filename || file.selected ? 'visible' : 'hidden';
 
                             return (
                                 <TableRow
@@ -79,7 +79,7 @@ class FileList extends React.Component {
                                                 padding="none"
                                                 onClick={() => onPathClick(item)}
                                             >
-                                                <Checkbox style={{visibility}} checked={file.selected} />
+                                                <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
                                             </TableCell>
                                         ) : null
                                     }
