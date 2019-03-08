@@ -62,7 +62,7 @@ class CollectionBrowser extends React.Component {
         const {users, collections, addingCollection, deletingCollection} = this.props;
 
         collections.forEach(col => {
-            col.creatorObj = findById(users, col.creator);
+            col.creatorObj = findById(users, col.createdBy);
         });
 
         return (

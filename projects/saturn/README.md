@@ -47,9 +47,11 @@ Currently a collection has the following fields, all represented as strings:
  - name
  - description 
  - location
- - type 
- - creator
+ - type
+ - access
+ - createdBy
  - dateCreated
+ - modifiedBy
  - dateModified
 
 ## How to build
