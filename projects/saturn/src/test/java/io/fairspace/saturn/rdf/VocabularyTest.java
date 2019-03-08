@@ -55,12 +55,11 @@ public class VocabularyTest {
         setupVocabularyWithMachineOnlyPredicates();
 
         // Test method
-        Model machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
+        List<String> machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
 
         // Verify outcome
-        List list = IteratorUtils.toList(machineOnlyPredicates.listSubjects());
-        assertEquals(1, list.size());
-        assertTrue(list.contains(resource2));
+        assertEquals(1, machineOnlyPredicates.size());
+        assertTrue(machineOnlyPredicates.contains(resource2.getURI()));
     }
 
     @Test

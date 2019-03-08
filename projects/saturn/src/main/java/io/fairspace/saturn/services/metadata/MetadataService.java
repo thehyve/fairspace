@@ -156,12 +156,11 @@ class MetadataService {
         if(model == null || model.isEmpty())
             return false;
 
-        Model machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
+        List<String> machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
 
         // See if any of the predicates is present in the given model
-        Iterable<Resource> resourceIterator = machineOnlyPredicates::listSubjects;
-        return StreamSupport.stream(resourceIterator.spliterator(), false)
-                .anyMatch(resource -> model.listResourcesWithProperty(model.createProperty(resource.getURI())).hasNext());
+        return machineOnlyPredicates.stream()
+                .anyMatch(predicateURI -> model.listResourcesWithProperty(model.createProperty(predicateURI)).hasNext());
     }
 
     /**

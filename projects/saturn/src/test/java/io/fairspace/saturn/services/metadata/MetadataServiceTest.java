@@ -16,6 +16,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -300,10 +304,8 @@ public class MetadataServiceTest {
 
     @Test
     public void testHasMachineOnlyPredicates() {
-        Model machineOnlyModel = createDefaultModel();
-        machineOnlyModel.add(P1, RDF.type, RDF.Property);
-        machineOnlyModel.add(MACHINE_ONLY_PROPERTY, RDF.type, RDF.Property);
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyModel);
+        List<String> machineOnlyPredicates = Arrays.asList(MACHINE_ONLY_PROPERTY.getURI(), P1.getURI());
+        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyPredicates);
 
         // An empty model should pass
         Model testModel = createDefaultModel();
@@ -322,10 +324,8 @@ public class MetadataServiceTest {
 
     @Test
     public void testHasMachineOnlyPredicatesRecognizesMachineOnlyStatements() {
-        Model machineOnlyModel = createDefaultModel();
-        machineOnlyModel.add(P1, RDF.type, RDF.Property);
-        machineOnlyModel.add(MACHINE_ONLY_PROPERTY, RDF.type, RDF.Property);
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyModel);
+        List<String> machineOnlyPredicates = Arrays.asList(MACHINE_ONLY_PROPERTY.getURI(), P1.getURI());
+        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyPredicates);
 
         // Create a model that contains one machine only statement between several non-machine-only
         Model testModel = createDefaultModel();
@@ -344,7 +344,7 @@ public class MetadataServiceTest {
 
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyVocabulary() {
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(createDefaultModel());
+        when(vocabulary.getMachineOnlyPredicates()).thenReturn(Collections.emptyList());
 
         // Create a model that contains one machine only statement between several non-machine-only
         Model testModel = createDefaultModel();
@@ -371,7 +371,7 @@ public class MetadataServiceTest {
      * Instruct the mocks to pretend there are no machine-only predicates
      */
     private void setNoMachineOnlyPredicates() {
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(createDefaultModel());
+        when(vocabulary.getMachineOnlyPredicates()).thenReturn(Collections.emptyList());
         when(vocabulary.isMachineOnlyPredicate(any())).thenReturn(false);
     }
 
@@ -380,11 +380,9 @@ public class MetadataServiceTest {
      */
     private void setMachineOnlyPredicate(String predicateUri) {
         Resource predicateResource = createResource(predicateUri);
+        List<String> machineOnlyPredicates = Collections.singletonList(predicateUri);
 
-        Model machineOnlyModel = createDefaultModel();
-        machineOnlyModel.add(predicateResource, RDF.type, RDF.Property);
-
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyModel);
+        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyPredicates);
         when(vocabulary.isMachineOnlyPredicate(anyString()))
                 .thenAnswer(invocation -> predicateUri.equals(invocation.getArgument(0)));
 

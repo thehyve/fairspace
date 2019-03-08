@@ -8,6 +8,9 @@ import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.util.FileManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -34,8 +37,21 @@ public class Vocabulary {
         });
     }
 
-    public Model getMachineOnlyPredicates() {
-        return rdfConnection.queryConstruct(storedQuery("machine_only_properties", vocabularyGraph));
+    /**
+     * Returns a list with all predicate URIs that are marked machine-only in the vocabulary
+     * @return
+     */
+    public List<String> getMachineOnlyPredicates() {
+        List<String> machineOnlyPredicates = new ArrayList<>();
+
+        rdfConnection.querySelect(
+                storedQuery("machine_only_properties", vocabularyGraph),
+                querySolution -> {
+                    machineOnlyPredicates.add(querySolution.getResource("property").getURI());
+                }
+        );
+
+        return machineOnlyPredicates;
     }
 
     public boolean isMachineOnlyPredicate(@NonNull String predicateUri) {
