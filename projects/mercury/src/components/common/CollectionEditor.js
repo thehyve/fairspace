@@ -12,6 +12,8 @@ import FormControl from "@material-ui/core/FormControl/FormControl";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 
 class CollectionEditor extends React.Component {
+    static NON_SAFE_CHARACTERS_REGEX = /[^a-z0-9_-]+/gi;
+
     state = {
         editing: true,
         name: this.props.name || '',
@@ -41,7 +43,41 @@ class CollectionEditor extends React.Component {
         this.setState({[name]: value});
     }
 
-    isInputValid = () => !!this.state.name;
+    handleNameChange = (event) => {
+        const shouldUpdateLocation = this.shouldUpdateLocationOnNameChange();
+        const newName = event.target.value;
+
+        this.handleInputChange('name', newName);
+
+        if (shouldUpdateLocation) {
+            this.handleInputChange('location', this.convertToSafeDirectoryName(newName));
+        }
+    }
+
+    /**
+     * Converts the given collection name to a safe directory name
+     * @param name
+     * @returns {string}
+     */
+    convertToSafeDirectoryName = (name) => name.replace(CollectionEditor.NON_SAFE_CHARACTERS_REGEX, '_');
+
+    /**
+     * Determines whether the location should be updated when the name changes.
+     *
+     * Returns true if the user has not changed the location.
+     * @type {function}
+     */
+    shouldUpdateLocationOnNameChange = () => this.convertToSafeDirectoryName(this.state.name) === this.state.location;
+
+    /**
+     * Checks whether the input is valid. Check whether the name and location are given
+     * and that the location does not contain any unsafe characters.
+     *
+     * Please note that the location may still be invalid, if another collection uses the same
+     * location. This will be checked when actually submitting the form.
+     * @returns {boolean}
+     */
+    isInputValid = () => !!this.state.name && !!this.state.location && !this.state.location.match(CollectionEditor.NON_SAFE_CHARACTERS_REGEX);
 
     render() {
         return (
@@ -62,12 +98,11 @@ class CollectionEditor extends React.Component {
                         label="Name"
                         value={this.state.name}
                         name="name"
-                        onChange={(event) => this.handleInputChange('name', event.target.value)}
+                        onChange={(event) => this.handleNameChange(event)}
                         fullWidth
                         required
                     />
                     <TextField
-                        autoFocus
                         margin="dense"
                         multiline
                         id="description"
@@ -78,11 +113,10 @@ class CollectionEditor extends React.Component {
                         fullWidth
                     />
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="location"
-                        label="Directory name"
-                        helperText="Must be unique and contain only alphanumerical characters, '-' abd '_'"
+                        label="Collection identifier"
+                        helperText="This identifier does not allow special characters and has to be unique. It will be used in Jupyterlab as the directory name for files in this collections"
                         value={this.state.location}
                         name="location"
                         onChange={(event) => this.handleInputChange('location', event.target.value)}

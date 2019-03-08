@@ -19,7 +19,7 @@ const collectionList = (props) => {
     }
 
     return (
-        <Paper className={classes.collectionListContainer}>
+        <Paper className={classes.root}>
             <Table padding="dense">
                 <TableHead>
                     <TableRow>
@@ -38,7 +38,7 @@ const collectionList = (props) => {
                                 hover
                                 onClick={() => onCollectionClick(collection)}
                                 onDoubleClick={() => onCollectionDoubleClick(collection)}
-                                className={selected ? classes.tableRowSelected : classes.tableRow}
+                                selected={selected}
                             >
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row">
                                     {collection.name}

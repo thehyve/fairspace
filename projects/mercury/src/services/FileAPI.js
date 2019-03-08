@@ -1,12 +1,13 @@
 import {createClient} from "webdav";
-import Config from "./Config/Config";
-import {addCounterToFilename, fileName, joinPaths, parentPath} from '../utils/fileUtils';
 import axios from 'axios';
+import Config from "./Config/Config";
+import {addCounterToFilename, generateUniqueFileName, joinPaths, getParentPath, getFileName} from '../utils/fileUtils';
 
-// Ensure that the window fetch method is used for webdav calls
-// and that is passes along the credentials
-const defaultOptions = {credentials: 'include'};
+// Ensure that the client passes along the credentials
+const defaultOptions = {withCredentials: true};
 
+// Keep all item properties
+const includeDetails = {...defaultOptions, details: true};
 
 axios.interceptors.request.use((config) => {
     if (config.method === 'propfind') {
@@ -14,8 +15,7 @@ axios.interceptors.request.use((config) => {
         config.data = '<?xml version="1.0" encoding="utf-8" ?><propfind xmlns:D="DAV:"><allprop/></propfind>';
     }
     return config;
-},
-(error) => Promise.reject(error));
+}, (error) => Promise.reject(error));
 
 class FileAPI {
     client() {
@@ -26,7 +26,7 @@ class FileAPI {
     }
 
     stat(path) {
-        return this.client().stat(path, {credentials: 'include', details: true})
+        return this.client().stat(path, includeDetails)
             .then(result => result.data);
     }
 
@@ -36,7 +36,7 @@ class FileAPI {
      * @returns {Promise<T>}
      */
     list(path) {
-        return this.client().getDirectoryContents(path, {credentials: 'include', details: true})
+        return this.client().getDirectoryContents(path, includeDetails)
             .then(result => result.data);
     }
 
@@ -56,12 +56,12 @@ class FileAPI {
      * @param nameMapping
      * @returns Promise<any>
      */
-    upload(path, files, nameMapping) {
+    upload(path, files) {
         if (!files) {
             return Promise.reject(Error("No files given"));
         }
 
-        const allPromises = files.map(file => this.client().putFileContents(`${path}/${nameMapping.get(file.name)}`, file, defaultOptions));
+        const allPromises = files.map(({name, value}) => this.client().putFileContents(`${path}/${name}`, value, defaultOptions));
 
         return Promise.all(allPromises).then(() => files);
     }
@@ -71,7 +71,8 @@ class FileAPI {
      * @param path
      */
     download(path) {
-        window.location.href = this.client().getFileDownloadLink(path, defaultOptions);
+        const file = this.client().getFileDownloadLink(path, defaultOptions);
+        window.open(file);
     }
 
     /**
@@ -130,7 +131,7 @@ class FileAPI {
      */
     movePaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            const destinationFile = joinPaths(destinationDir, fileName(sourceFile));
+            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(getFileName(sourceFile)));
             return this.move(sourceFile, destinationFile);
         }));
     }
@@ -143,9 +144,9 @@ class FileAPI {
      */
     copyPaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            let destinationFilename = fileName(sourceFile);
+            let destinationFilename = generateUniqueFileName(getFileName(sourceFile));
             // Copying files to the current directory involves renaming
-            if (destinationDir === parentPath(sourceFile)) {
+            if (destinationDir === getParentPath(sourceFile)) {
                 destinationFilename = addCounterToFilename(destinationFilename);
             }
 

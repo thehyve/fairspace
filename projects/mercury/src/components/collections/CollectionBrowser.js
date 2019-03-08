@@ -44,11 +44,14 @@ class CollectionBrowser extends React.Component {
         this.props.addCollection(name, description, type, location)
             .then(this.props.fetchCollectionsIfNeeded)
             .then(() => this.setState({addingNewCollection: false}))
-            .catch(err => ErrorDialog.showError(
-                err,
-                "An error occurred while creating a collection",
-                this.handleAddCollectionClick
-            ));
+            .catch(err => {
+                const message = err && err.message ? err.message : "An error occurred while creating a collection";
+                ErrorDialog.showError(
+                    err,
+                    message,
+                    this.handleAddCollectionClick
+                );
+            });
     }
 
     handleCancelAddCollection = () => {
@@ -73,7 +76,6 @@ class CollectionBrowser extends React.Component {
                 {this.state.addingNewCollection ? (
                     <CollectionEditor
                         title="Add collection"
-                        name={`${this.props.user.fullName}'s collection`}
                         onSave={this.handleAddCollection}
                         onClose={this.handleCancelAddCollection}
                         editType={Config.get().enableExperimentalFeatures}

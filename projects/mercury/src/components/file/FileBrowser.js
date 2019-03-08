@@ -66,7 +66,10 @@ class FileBrowser extends React.Component {
     }
 
     render() {
-        const {loading, error, openedCollection, files, selectedPaths, openedPath} = this.props;
+        const {
+            loading, error, openedCollection, files = [], selectedPaths, openedPath,
+            fetchFilesIfNeeded, onSelectAll, onDeselectAll,
+        } = this.props;
         const collectionExists = openedCollection && openedCollection.iri;
 
         if (error) {
@@ -77,28 +80,44 @@ class FileBrowser extends React.Component {
             return <LoadingInlay />;
         }
 
+        const filesWithSelectionState = files.map(item => ({
+            item,
+            selected: selectedPaths.includes(item.filename)
+        }));
+
+        const allSelectionChangeHandler = (selectAll) => {
+            if (selectAll) {
+                onSelectAll();
+            } else {
+                onDeselectAll();
+            }
+        };
+
         return (
             <>
                 {collectionExists
                     ? (
                         <FileList
-                            files={files}
-                            selectedPaths={selectedPaths}
+                            selectionEnabled
+                            files={filesWithSelectionState}
                             onPathClick={this.handlePathClick}
                             onPathDoubleClick={this.handlePathDoubleClick}
-                            onRename={this.handlePathRename}
-                            onDelete={this.handlePathDelete}
-                            readonly={!canWrite(openedCollection)}
+                            onAllSelection={allSelectionChangeHandler}
                         />
                     ) : 'Collection does not exist.'
                 }
-                <FileOperations
-                    openedCollection={openedCollection}
-                    openedPath={openedPath}
-                    disabled={!canWrite(openedCollection)}
-                    existingFiles={this.props.files ? this.props.files.map(file => file.basename) : []}
-                    fetchFilesIfNeeded={this.props.fetchFilesIfNeeded}
-                />
+                <div style={{marginTop: 8}}>
+                    <FileOperations
+                        openedCollection={openedCollection}
+                        openedPath={openedPath}
+                        onRename={this.handlePathRename}
+                        onDelete={this.handlePathDelete}
+                        onDownload={this.downloadFile}
+                        disabled={!canWrite(openedCollection)}
+                        existingFiles={files ? files.map(file => file.basename) : []}
+                        fetchFilesIfNeeded={fetchFilesIfNeeded}
+                    />
+                </div>
             </>
         );
     }

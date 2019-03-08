@@ -4,24 +4,34 @@ export function splitPathIntoArray(path) {
     return path.split(PATH_SEPARATOR).filter(s => s.length > 0);
 }
 
-export function uniqueName(fileName, usedNames) {
-    if (!usedNames.includes(fileName)) {
-        usedNames.push(fileName);
+// the extension includes a dot in some cases and is empty in others. That will very much help in reusing logic
+export const getBaseNameAndExtension = (fileName) => {
+    if (!fileName) {
+        return {baseName: '', extension: ''};
+    }
+
+    const dotPosition = fileName.lastIndexOf('.');
+    const baseName = (dotPosition >= 0) ? fileName.substring(0, dotPosition) : fileName;
+    const extension = (dotPosition >= 0) ? fileName.substring(dotPosition) : '';
+
+    return {baseName, extension};
+};
+
+export function generateUniqueFileName(fileName, usedNames = []) {
+    if (!usedNames || !usedNames.includes(fileName)) {
         return fileName;
     }
-    const dotPos = fileName.lastIndexOf('.');
-    const name = (dotPos >= 0) ? fileName.substring(0, dotPos) : fileName;
-    const ext = (dotPos >= 0) ? fileName.substring(dotPos) : '';
-    let index = 1;
 
-    while (true) {
-        const newName = `${name} (${index})${ext}`;
-        if (!usedNames.includes(newName)) {
-            usedNames.push(newName);
-            return newName;
-        }
-        index += 1;
+    const {baseName, extension} = getBaseNameAndExtension(fileName);
+    let counter = 1;
+    let newName = `${baseName} (${counter})${extension}`;
+
+    while (usedNames.includes(newName)) {
+        counter += 1;
+        newName = `${baseName} (${counter})${extension}`;
     }
+
+    return newName;
 }
 
 export const joinPaths = (...paths) => paths
@@ -29,32 +39,26 @@ export const joinPaths = (...paths) => paths
     .join(PATH_SEPARATOR);
 
 export const addCounterToFilename = (fileName) => {
-    // Parse the filename
-    const dotPosition = fileName.lastIndexOf('.');
-    let baseName = fileName.substring(0, dotPosition);
-    const extension = fileName.substring(dotPosition + 1);
-
-    // By default the counter is set to 2
-    let counter = 2;
+    const {baseName, extension} = getBaseNameAndExtension(fileName);
 
     // Verify if the filename already contains a counter
     // If so, update the counter in the filename
-    const counterMatch = / \((\d+)\)$/;
-    const matches = baseName.match(counterMatch);
-    if (matches) {
-        baseName = baseName.substring(0, baseName.length - matches[0].length);
-        counter = parseInt(matches[1], 10) + 1;
+    const matchesCounter = baseName.match(/ \((\d+)\)$/);
+    if (matchesCounter) {
+        const newBaseName = baseName.substring(0, baseName.length - matchesCounter[0].length);
+        const counter = parseInt(matchesCounter[1], 10) + 1;
+        return `${newBaseName} (${counter})${extension}`;
     }
 
-    return `${baseName} (${counter}).${extension}`;
+    return `${baseName} (${2})${extension}`;
 };
 
-export function parentPath(path) {
+export function getParentPath(path) {
     const pos = path.lastIndexOf('/', path.length - 2);
     return (pos > 1) ? path.substring(0, pos) : '';
 }
 
-export function fileName(path) {
+export function getFileName(path) {
     const normalizedPath = path.endsWith('/') ? path.substring(0, path.length - 1) : path;
     const pos = normalizedPath.lastIndexOf('/');
     return (pos > 0) ? normalizedPath.substring(pos + 1) : normalizedPath;

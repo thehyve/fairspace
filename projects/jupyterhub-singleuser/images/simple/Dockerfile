@@ -2,6 +2,8 @@ FROM jupyter/base-notebook
 
 USER root
 
+ADD atomiclargefilemanager.py /usr/local/lib/python3.6/dist-packages/notebook/services/contents/
+
 # wdfs
 RUN apt-get update
 RUN apt-get install -y apt-utils
@@ -20,6 +22,7 @@ EXPOSE 80
 RUN echo "$NB_USER ALL=(ALL) NOPASSWD: /usr/sbin/nginx" >> /etc/sudoers
 
 ADD start /
+ADD config.py /
 RUN chmod a+rx /start
 
 USER $NB_USER

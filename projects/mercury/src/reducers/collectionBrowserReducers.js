@@ -28,6 +28,16 @@ const collectionBrowser = (state = defaultState, action) => {
                 ...state,
                 selectedPaths: [...state.selectedPaths, action.path]
             };
+        case actionTypes.SET_SELECTED_PATHS:
+            return {
+                ...state,
+                selectedPaths: [...action.paths]
+            };
+        case actionTypes.DESELECT_ALL_PATHS:
+            return {
+                ...state,
+                selectedPaths: []
+            };
         case actionTypes.DESELECT_PATH:
             return deselectPath(state, action.path);
         case actionTypes.DELETE_COLLECTION_PENDING:
@@ -48,7 +58,12 @@ const collectionBrowser = (state = defaultState, action) => {
                 deletingCollection: false
             };
         case actionTypes.DELETE_FILE_FULFILLED:
-            return deselectPath(state, action.meta.fullpath);
+            return deselectPath(state, action.meta.path);
+        case actionTypes.RENAME_FILE_FULFILLED:
+            return {
+                ...state,
+                selectedPaths: [],
+            };
         case actionTypes.ADD_COLLECTION_PENDING:
             return {
                 ...state,
