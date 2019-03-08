@@ -14,7 +14,7 @@ dependencies {
 
     implementation "org.springframework:spring-core:${springVersion}"
     implementation "org.springframework:spring-context:${springVersion}"
-    implementation "org.springframework:spring-dao:${springVersion}"
+    implementation "org.springframework:spring-beans:${springVersion}"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
     testCompile "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
