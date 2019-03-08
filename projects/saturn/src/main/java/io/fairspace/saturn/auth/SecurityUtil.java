@@ -17,7 +17,7 @@ import static java.util.Collections.singleton;
 
 public class SecurityUtil {
     static final String USER_INFO_REQUEST_ATTRIBUTE = UserInfo.class.getName();
-    private static final UserInfo DUMMY_USER = new UserInfo("123", "test-dummy", "John", "user@example.com", singleton("for-testing-only"));
+    private static final UserInfo DUMMY_USER = new UserInfo("123", "test-dummy", "John", "user@example.com", singleton("for-local-development-only"));
 
     public static Function<HttpServletRequest, UserInfo> createAuthenticator(String jwksUrl, String algorithm) {
         return createAuthenticator(jwksUrl, JWSAlgorithm.parse(algorithm));
