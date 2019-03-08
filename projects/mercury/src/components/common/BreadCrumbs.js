@@ -1,10 +1,10 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Link from 'react-router-dom/Link';
-import {withStyles} from '@material-ui/core/styles';
-import Icon from '@material-ui/core/Icon';
+import {withRouter, Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
-import {withRouter} from "react-router-dom";
+import Button from '@material-ui/core/Button';
+import Icon from '@material-ui/core/Icon';
+import {withStyles} from '@material-ui/core/styles';
+
 import {flattenShallow} from "../../utils/arrayUtils";
 import menuitems from "../../menuitems";
 

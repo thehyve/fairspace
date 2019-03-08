@@ -71,7 +71,8 @@ class FileAPI {
      * @param path
      */
     download(path) {
-        window.location.href = this.client().getFileDownloadLink(path, defaultOptions);
+        const file = this.client().getFileDownloadLink(path, defaultOptions);
+        window.open(file);
     }
 
     /**

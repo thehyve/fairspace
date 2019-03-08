@@ -1,7 +1,8 @@
 const styles = theme => ({
-    fileListContainer: {
-        "width": '100%',
-        "overflowX": 'auto',
+    root: {
+        'width': '100%',
+        'maxHeight': 'inherit',
+        'overflowX': 'auto',
         '-webkit-touch-callout': 'none', /* iOS Safari */
         '-webkit-user-select': 'none', /* Safari */
         '-khtml-user-select': 'none', /* Konqueror HTML */

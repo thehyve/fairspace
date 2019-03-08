@@ -51,7 +51,10 @@ export class InformationDrawer extends React.Component {
                     const collection = Object.assign(this.props.collection, {name, description, location});
                     this.handleDetailsChange(collection, locationChanged);
                 })
-                .catch(e => ErrorDialog.showError(e, "An error occurred while updating collection metadata"));
+                .catch(err => {
+                    const message = err && err.message ? err.message : "An error occurred while creating a collection";
+                    ErrorDialog.showError(err, message);
+                });
         }
 
         return Promise.resolve();

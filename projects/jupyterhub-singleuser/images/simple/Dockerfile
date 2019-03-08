@@ -2,6 +2,8 @@ FROM jupyter/base-notebook
 
 USER root
 
+ADD atomiclargefilemanager.py /usr/local/lib/python3.6/dist-packages/notebook/services/contents/
+
 # wdfs
 RUN apt-get update
 RUN apt-get install -y apt-utils

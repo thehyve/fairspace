@@ -8,6 +8,7 @@ describe('FileOperations', () => {
         const fetchFilesIfNeeded = jest.fn();
 
         const wrapper = shallow(<FileOperations
+            classes={{}}
             selectedPaths={[]}
             uploadFiles={uploadFiles}
             fetchFilesIfNeeded={fetchFilesIfNeeded}
@@ -43,7 +44,7 @@ describe('FileOperations', () => {
 describe('handleCreateDirectory', () => {
     it('should return false for 405 error', () => {
         const createDirectory = jest.fn(() => Promise.reject(new Error({response: {status: 405}})));
-        const instance = shallow(<FileOperations selectedPaths={[]} createDirectory={createDirectory} />).instance();
+        const instance = shallow(<FileOperations selectedPaths={[]} createDirectory={createDirectory} classes={{}} />).instance();
 
         instance.handleCreateDirectory()
             .then(result => {

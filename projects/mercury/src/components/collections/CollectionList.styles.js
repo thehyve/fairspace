@@ -1,6 +1,7 @@
 const styles = theme => ({
-    collectionListContainer: {
+    root: {
         "width": '100%',
+        'maxHeight': 'inherit',
         "overflowX": 'auto',
         '-webkit-touch-callout': 'none', /* iOS Safari */
         '-webkit-user-select': 'none', /* Safari */

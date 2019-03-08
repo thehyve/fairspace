@@ -19,7 +19,7 @@ const collectionList = (props) => {
     }
 
     return (
-        <Paper className={classes.collectionListContainer}>
+        <Paper className={classes.root}>
             <Table padding="dense">
                 <TableHead>
                     <TableRow>
