@@ -19,7 +19,6 @@ public class CollectionsService {
     private final RDFConnection rdf;
     private final DAO dao;
 
-
     public CollectionsService(RDFConnection rdf, Supplier<String> userIriSupplier) {
         this.rdf = rdf;
         this.dao = new DAO(rdf, userIriSupplier);
@@ -74,6 +73,7 @@ public class CollectionsService {
                 log.info("No enough permissions to delete a collection {}", iri);
                 throw new CollectionAccessDeniedException(iri);
             }
+
             dao.markAsDeleted(existing);
         });
     }

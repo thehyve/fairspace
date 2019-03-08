@@ -67,5 +67,4 @@ public class UserServiceTest {
         assertFalse(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#email"), createStringLiteral(userInfo.getEmail())));
         assertTrue(ds.getDefaultModel().contains(createResource(iri), createProperty("http://fairspace.io/ontology#email"), createStringLiteral(updatedUserInfo.getEmail())));
     }
-
 }

@@ -29,6 +29,7 @@ public class UserService {
      * First tries to find an exiting fs:User entity which externalId  equals to userInfo.getUserId()
      * If no existing entry is found, creates a new one and stores userInfo in it.
      * Also updates an existing one if one of the userInfo's fields changed.
+
      * @param userInfo
      * @return
      */
