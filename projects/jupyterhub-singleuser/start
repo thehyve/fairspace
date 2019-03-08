@@ -20,4 +20,4 @@ http {
 " > ~/.nginx.conf
 
 sudo nginx -c ~/.nginx.conf
-wdfs http://localhost/webdav/ ~/collections/ & jupyter-labhub --config=/config.py
+wdfs http://localhost/webdav/ ~/collections/ & jupyter-labhub
