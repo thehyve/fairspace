@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.collections;
 
-import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
@@ -51,7 +50,6 @@ public class CollectionsServiceTest {
         assertEquals("http://example.com/user", created1.getCreator());
         assertNotNull(created1.getDateCreated());
         assertEquals(created1.getDateCreated(), created1.getDateModified());
-        assertNotNull(created1.getCreator());
 
         assertNotNull(collections.getByLocation("dir1"));
         assertNull(collections.getByLocation("dir2"));
