@@ -25,14 +25,15 @@ const fileList = ({classes, files, onPathClick, onPathDoubleClick, selectionEnab
     if (selectionEnabled) {
         const numOfSelected = files.filter(f => f.selected).length;
         const allItemsSelected = files.length === numOfSelected;
-        checkboxHeader =
+        checkboxHeader = (
             <TableCell padding="none">
                 <Checkbox
                     indeterminate={numOfSelected > 0 && numOfSelected < files.length}
                     checked={allItemsSelected}
                     onChange={(event) => onAllSelection(event.target.checked)}
                 />
-            </TableCell>;
+            </TableCell>
+        );
     }
 
     return (
@@ -41,7 +42,8 @@ const fileList = ({classes, files, onPathClick, onPathDoubleClick, selectionEnab
                 <TableHead>
                     <TableRow>
                         {checkboxHeader}
-                        <TableCell>Name</TableCell>
+                        <TableCell padding="none" />
+                        <TableCell style={{padding: 10}}>Name</TableCell>
                         <TableCell align="right">Size</TableCell>
                         <TableCell align="right">Last Modified</TableCell>
                     </TableRow>
@@ -59,36 +61,30 @@ const fileList = ({classes, files, onPathClick, onPathDoubleClick, selectionEnab
                             >
                                 {
                                     selectionEnabled ? (
-                                        <TableCell padding="none">
+                                        <TableCell
+                                            padding="none"
+                                        >
                                             <Checkbox checked={file.selected} />
                                         </TableCell>
                                     ) : null
                                 }
 
-                                <TableCell>
-                                    <Grid
-                                        container
-                                        spacing={16}
-                                        alignItems="center"
-                                    >
-                                        <Grid item>
-                                            <Icon>
-                                                {item.type === 'directory' ? 'folder_open' : 'note_open'}
-                                            </Icon>
-                                        </Grid>
-                                        <Grid item>
-                                            {item.basename}
-                                        </Grid>
-                                    </Grid>
+                                <TableCell align="left" padding="checkbox">
+                                    <Icon>
+                                        {item.type === 'directory' ? 'folder_open' : 'note_open'}
+                                    </Icon>
+                                </TableCell>
+                                <TableCell style={{padding: 10}}>
+                                    {item.basename}
                                 </TableCell>
                                 <TableCell padding="none" align="right">
                                     {item.type === 'file' ? filesize(item.size) : ''}
                                 </TableCell>
-                                <TableCell align="right">
+                                <TableCell padding="checkbox" align="right">
                                     {item.lastmod ? <DateTime value={item.lastmod} /> : null}
                                 </TableCell>
                             </TableRow>
-                        )
+                        );
                     })}
                 </TableBody>
             </Table>
