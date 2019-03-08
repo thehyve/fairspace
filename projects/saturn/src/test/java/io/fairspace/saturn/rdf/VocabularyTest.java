@@ -101,7 +101,7 @@ public class VocabularyTest {
         assertTrue(vocabularyModel.isIsomorphicWith(ModelFactory.createDefaultModel().add(createResource("http://some-data"), RDF.type, RDF.Property)));
     }
 
-    private Resource setupVocabularyWithMachineOnlyPredicates() {
+    private void setupVocabularyWithMachineOnlyPredicates() {
         // Setup model
         vocabularyModel.add(resource1, RDF.type, RDF.Property);
         vocabularyModel.add(resource2, RDF.type, RDF.Property);
@@ -109,7 +109,6 @@ public class VocabularyTest {
 
         vocabularyModel.add(resource1, machineOnly, createTypedLiteral(false));
         vocabularyModel.add(resource2, machineOnly, createTypedLiteral(true));
-        return resource2;
     }
 
 }

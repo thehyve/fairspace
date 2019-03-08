@@ -1,20 +1,25 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.Vocabulary;
+import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
+import io.fairspace.saturn.services.metadata.validation.ValidationResult;
+import lombok.AllArgsConstructor;
 import org.apache.jena.atlas.lib.Pair;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.modify.request.*;
+import org.apache.jena.sparql.modify.request.QuadAcc;
+import org.apache.jena.sparql.modify.request.QuadDataAcc;
+import org.apache.jena.sparql.modify.request.UpdateDataDelete;
+import org.apache.jena.sparql.modify.request.UpdateDataInsert;
+import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
 import org.apache.jena.update.UpdateRequest;
-import org.apache.jena.vocabulary.RDF;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.StreamSupport;
+import java.util.function.Function;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -24,15 +29,15 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.graph.NodeFactory.createVariable;
 
+@AllArgsConstructor
 class MetadataService {
     private final RDFConnection rdf;
     private final Node graph;
-    private Vocabulary vocabulary;
+    private final Node vocabularyGraph;
+    private final MetadataRequestValidator validator;
 
-    MetadataService(RDFConnection rdf, Node graph, Vocabulary vocabulary) {
-        this.rdf = rdf;
-        this.graph = graph;
-        this.vocabulary = vocabulary;
+    MetadataService(RDFConnection rdf, Node graph, Node vocabularyGraph) {
+        this(rdf, graph, vocabularyGraph, null);
     }
 
     /**
@@ -63,11 +68,10 @@ class MetadataService {
      */
     void put(Model model) {
         commit("Store metadata", rdf, () -> {
-            ensureNoMachineOnlyPredicates(model);
+            ensureValidParameters(validator -> validator.validatePut(model));
             rdf.load(graph.getURI(), model);
         });
     }
-
 
     /**
      * Deletes the statements in the database, based on the combination of subject, predicate and object
@@ -84,10 +88,8 @@ class MetadataService {
      */
     void delete(String subject, String predicate, String object) {
         commit("Delete metadata", rdf, () -> {
-            if (predicate != null && vocabulary.isMachineOnlyPredicate(predicate)) {
-                throw new IllegalArgumentException("The given predicate is marked as machine-only. It cannot be used directly.");
-            }
-            rdf.update(storedQuery("delete_not_machineonly_by_mask", graph, asURI(subject), asURI(predicate), asURI(object), vocabulary.getVocabularyGraph()));
+            ensureValidParameters(validator -> validator.validateDelete(subject, predicate, object));
+            rdf.update(storedQuery("delete_not_machineonly_by_mask", graph, asURI(subject), asURI(predicate), asURI(object), vocabularyGraph));
         });
     }
 
@@ -99,8 +101,7 @@ class MetadataService {
      */
     void delete(Model model) {
         commit("Delete metadata", rdf, () -> {
-            ensureNoMachineOnlyPredicates(model);
-
+            ensureValidParameters(validator -> validator.validateDelete(model));
             rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(model.listStatements().toList()))));
         });
     }
@@ -121,8 +122,7 @@ class MetadataService {
      */
     void patch(Model model) {
         commit("Update metadata", rdf, () -> {
-            ensureNoMachineOnlyPredicates(model);
-
+            ensureValidParameters(validator -> validator.validatePatch(model));
             rdf.update(createPatchQuery(model.listStatements().toList()));
         });
     }
@@ -146,32 +146,18 @@ class MetadataService {
     }
 
     /**
-     * Verifies whether the given model contains any triples with a machine-only predicate
+     * Runs the given validationLogic the validator and throws an IllegalArgumentException if the validation fails
      *
-     * Whether a predicate is machine-only, is specified in the vocabulary.
-     * @param model
-     * @return true iff the given model contains one or more triples with a machine-only predicate
+     * If no validator is specified, the method does nothing
+     * 
+     * @param validationLogic   Logic to be called on the validator. For example: validator -> validator.validatePut(model)
      */
-    boolean containsMachineOnlyPredicates(Model model) {
-        if(model == null || model.isEmpty())
-            return false;
-
-        List<String> machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
-
-        // See if any of the predicates is present in the given model
-        return machineOnlyPredicates.stream()
-                .anyMatch(predicateURI -> model.listResourcesWithProperty(model.createProperty(predicateURI)).hasNext());
-    }
-
-    /**
-     * Ensures that the given model does not contain any machine-only predicates.
-     *
-     * If the model does contain a machine-only predicate, an IllegalArgumentException is thrown
-     * @param model
-     */
-    private void ensureNoMachineOnlyPredicates(Model model) {
-        if (containsMachineOnlyPredicates(model)) {
-            throw new IllegalArgumentException("The given model contains one or more statements with machine-only predicates. This is not allowed.");
+    void ensureValidParameters(Function<MetadataRequestValidator, ValidationResult> validationLogic) {
+        if(validator != null) {
+            ValidationResult validationResult = validationLogic.apply(validator);
+            if(!validationResult.isValid()) {
+                throw new IllegalArgumentException(validationResult.getMessage());
+            }
         }
     }
 

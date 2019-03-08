@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.Vocabulary;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -13,12 +12,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -34,18 +28,9 @@ import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataServiceTest {
-    private Dataset ds;
-    private MetadataService api;
-
-    @Mock
-    private Vocabulary vocabulary;
-
     private static final String baseURI = "http://example.com/";
     private static final String vocabularyURI = baseURI + "vocabulary";
     private static final String GRAPH = baseURI + "graph";
@@ -65,12 +50,15 @@ public class MetadataServiceTest {
     private static final Statement LBL_STMT1 = createStatement(S1, RDFS.label, createStringLiteral("subject1"));
     private static final Statement LBL_STMT2 = createStatement(S2, RDFS.label, createStringLiteral("subject2"));
 
+    private Dataset ds;
+    private MetadataService api;
+
     @Before
     public void setUp() {
         setWorkspaceURI(baseURI);
         ds = createTxnMem();
         RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new MetadataService(rdf, createURI(GRAPH), vocabulary);
+        api = new MetadataService(rdf, createURI(GRAPH), createURI(vocabularyURI));
     }
 
     @Test
@@ -137,8 +125,6 @@ public class MetadataServiceTest {
 
     @Test
     public void testPutWillAddStatements() {
-        setNoMachineOnlyPredicates();
-
         Model delta = createDefaultModel().add(STMT1).add(STMT2);
 
         api.put(delta);
@@ -149,8 +135,6 @@ public class MetadataServiceTest {
 
     @Test
     public void testPutWillNotRemoveExistingStatements() {
-        setNoMachineOnlyPredicates();
-
         // Prepopulate the model
         final Statement EXISTING1 = createStatement(S1, P1, S3);
         final Statement EXISTING2 = createStatement(S2, P2, createPlainLiteral("test"));
@@ -169,19 +153,8 @@ public class MetadataServiceTest {
         assertTrue(model.contains(STMT2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testPutShouldFailOnMachineOnlyPredicates() {
-        setMachineOnlyPredicate(MACHINE_ONLY_PROPERTY.getURI());
-
-        // Put new statements
-        Model delta = createDefaultModel().add(STMT1).add(MACHINE_ONLY_STATEMENT).add(STMT2);
-        api.put(delta);
-    }
-
     @Test
     public void delete() {
-        setNoMachineOnlyPredicates();
-
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         api.delete(S1.getURI(), null, null);
@@ -206,15 +179,8 @@ public class MetadataServiceTest {
         assertTrue(ds.getNamedModel(GRAPH).contains(MACHINE_ONLY_STATEMENT));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void deleteShouldFailOnMachineOnlyPredicate() {
-        setMachineOnlyPredicate(MACHINE_ONLY_PROPERTY.getURI());
-        api.delete(null, MACHINE_ONLY_PROPERTY.getURI(), null);
-    }
-
     @Test
     public void deleteModel() {
-        setNoMachineOnlyPredicates();
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         api.delete(createDefaultModel().add(STMT1));
@@ -223,18 +189,8 @@ public class MetadataServiceTest {
         assertTrue(ds.getNamedModel(GRAPH).contains(STMT2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void deleteModelShouldNotDeleteMachineOnlyTriples() {
-        setMachineOnlyPredicate(MACHINE_ONLY_PROPERTY.getURI());
-
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
-
-        api.delete(createDefaultModel().add(STMT1).add(MACHINE_ONLY_STATEMENT));
-    }
-
     @Test
     public void patch() {
-        setNoMachineOnlyPredicates();
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         Statement newStmt1 = createStatement(S1, P1, S3);
@@ -247,15 +203,6 @@ public class MetadataServiceTest {
         assertTrue(ds.getNamedModel(GRAPH).contains(newStmt3));
         assertFalse(ds.getNamedModel(GRAPH).contains(STMT1));
         assertFalse(ds.getNamedModel(GRAPH).contains(STMT2));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void patchShouldNotAcceptMachineOnlyTriples() {
-        setMachineOnlyPredicate(MACHINE_ONLY_PROPERTY.getURI());
-
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
-
-        api.patch(createDefaultModel().add(MACHINE_ONLY_STATEMENT));
     }
 
     @Test
@@ -302,89 +249,11 @@ public class MetadataServiceTest {
         assertTrue(m4.isEmpty());
     }
 
-    @Test
-    public void testHasMachineOnlyPredicates() {
-        List<String> machineOnlyPredicates = Arrays.asList(MACHINE_ONLY_PROPERTY.getURI(), P1.getURI());
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyPredicates);
-
-        // An empty model should pass
-        Model testModel = createDefaultModel();
-        assertFalse(api.containsMachineOnlyPredicates(testModel));
-
-        // A machine-only property may be used as subject or object
-        testModel.add(P1, RDF.type, RDF.Property);
-        testModel.add(MACHINE_ONLY_PROPERTY, RDF.value, P1);
-
-        // Other statements are allowed as well
-        testModel.add(S1, P2, S2);
-        testModel.add(S2, P2, S1);
-
-        assertFalse(api.containsMachineOnlyPredicates(testModel));
-    }
-
-    @Test
-    public void testHasMachineOnlyPredicatesRecognizesMachineOnlyStatements() {
-        List<String> machineOnlyPredicates = Arrays.asList(MACHINE_ONLY_PROPERTY.getURI(), P1.getURI());
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyPredicates);
-
-        // Create a model that contains one machine only statement between several non-machine-only
-        Model testModel = createDefaultModel();
-        testModel.add(S1, P2, S2);
-        testModel.add(S2, P2, S1);
-        testModel.add(S3, P2, S1);
-
-        testModel.add(S3, MACHINE_ONLY_PROPERTY, S1);
-
-        testModel.add(S2, P2, S3);
-        testModel.add(S1, P2, S3);
-        testModel.add(S3, P2, S2);
-
-        assertTrue(api.containsMachineOnlyPredicates(testModel));
-    }
-
-    @Test
-    public void testHasMachineOnlyPredicatesOnEmptyVocabulary() {
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(Collections.emptyList());
-
-        // Create a model that contains one machine only statement between several non-machine-only
-        Model testModel = createDefaultModel();
-        testModel.add(S1, P2, S2);
-        testModel.add(S2, P2, S1);
-        testModel.add(S3, P2, S1);
-
-        testModel.add(S3, MACHINE_ONLY_PROPERTY, S1);
-
-        testModel.add(S2, P2, S3);
-        testModel.add(S1, P2, S3);
-        testModel.add(S3, P2, S2);
-
-        assertFalse(api.containsMachineOnlyPredicates(testModel));
-    }
-
-    @Test
-    public void testHasMachineOnlyPredicatesOnEmptyModel() {
-        assertFalse(api.containsMachineOnlyPredicates(createDefaultModel()));
-        assertFalse(api.containsMachineOnlyPredicates(null));
-    }
-
     /**
-     * Instruct the mocks to pretend there are no machine-only predicates
-     */
-    private void setNoMachineOnlyPredicates() {
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(Collections.emptyList());
-        when(vocabulary.isMachineOnlyPredicate(any())).thenReturn(false);
-    }
-
-    /**
-     * Instruct the mocks to pretend there is one machine-only predicate, the one specified in the parameter
+     * Store the machine-only predicate in the database
      */
     private void setMachineOnlyPredicate(String predicateUri) {
         Resource predicateResource = createResource(predicateUri);
-        List<String> machineOnlyPredicates = Collections.singletonList(predicateUri);
-
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyPredicates);
-        when(vocabulary.isMachineOnlyPredicate(anyString()))
-                .thenAnswer(invocation -> predicateUri.equals(invocation.getArgument(0)));
 
         // Actually update the database itself, as the delete method depends on it
         executeWrite(ds, () -> ds.getNamedModel(vocabularyURI)
