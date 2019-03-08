@@ -56,13 +56,13 @@ const fileList = ({classes, files, onPathClick, onPathDoubleClick, selectionEnab
                                 hover
                                 key={item.filename}
                                 selected={selectionEnabled && file.selected}
-                                onClick={() => onPathClick(item)}
                                 onDoubleClick={() => onPathDoubleClick(item)}
                             >
                                 {
                                     selectionEnabled ? (
                                         <TableCell
                                             padding="none"
+                                            onClick={() => onPathClick(item)}
                                         >
                                             <Checkbox checked={file.selected} />
                                         </TableCell>
