@@ -2,7 +2,7 @@ FROM eu.gcr.io/fairspace-207108/jupyterhub-singleuser-base:0.3.2
 
 USER root
 
-ADD atomiclargefilemanager.py /usr/local/lib/python3.6/dist-packages/notebook/services/contents/
+ADD atomiclargefilemanager.py /opt/conda/lib/python3.7/site-packages/notebook/services/contents/
 
 # wdfs
 RUN apt-get update
