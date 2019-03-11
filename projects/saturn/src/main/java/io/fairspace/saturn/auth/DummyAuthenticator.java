@@ -11,7 +11,8 @@ public class DummyAuthenticator implements Function<HttpServletRequest, UserInfo
             new UserInfo("123", "test-dummy", "John", "user@example.com", emptySet());
 
     @Override
-    public UserInfo apply(HttpServletRequest httpServletRequest) {
+    public UserInfo apply(HttpServletRequest request) {
+        request.setAttribute(SecurityUtil.USER_INFO_REQUEST_ATTRIBUTE, DUMMY_USER);
         return DUMMY_USER;
     }
 }
