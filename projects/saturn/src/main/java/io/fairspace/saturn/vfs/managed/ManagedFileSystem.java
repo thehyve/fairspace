@@ -218,7 +218,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return (c == null) ? Access.None : c.getAccess();
     }
 
-    private  BlobInfo write(InputStream in) throws IOException {
+    private BlobInfo write(InputStream in) throws IOException {
         var cis = new CountingInputStream(in);
         MessageDigestCalculatingInputStream md;
         try {
