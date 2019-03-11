@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.collections;
 
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
@@ -27,7 +28,7 @@ public class CollectionsServiceTest {
         setWorkspaceURI("http://example.com/iri/");
         rdf = connect(createTxnMem());
         Supplier<String> userIriSupplier = () -> "http://example.com/user";
-        collections = new CollectionsService(rdf, userIriSupplier);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier));
         files = new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections);
     }
 

@@ -1,11 +1,12 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.rdf.dao.DAO;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.BiConsumer;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -16,12 +17,12 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 // TODO: Check permissions
 @Slf4j
 public class CollectionsService {
-    private final RDFConnection rdf;
     private final DAO dao;
+    @Getter @Setter
+    private BiConsumer<String, String> onLocationChangeListener;
 
-    public CollectionsService(RDFConnection rdf, Supplier<String> userIriSupplier) {
-        this.rdf = rdf;
-        this.dao = new DAO(rdf, userIriSupplier);
+    public CollectionsService(DAO dao) {
+        this.dao = dao;
     }
 
     public Collection create(Collection collection) {
@@ -34,7 +35,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        return commit("Create collection " + collection.getName(), rdf, () -> {
+        return commit("Create collection " + collection.getName(), dao, () -> {
             if (getByLocation(collection.getLocation()) != null) {
                 throw new LocationAlreadyExistsException(collection.getLocation());
             }
@@ -63,7 +64,7 @@ public class CollectionsService {
 
     public void delete(String iri) {
         validateIRI(iri);
-        commit("Delete collection " + iri, rdf, () -> {
+        commit("Delete collection " + iri, dao, () -> {
             var existing = get(iri);
             if (existing == null) {
                 log.info("Collection not found {}", iri);
@@ -83,7 +84,7 @@ public class CollectionsService {
 
         validateIRI(patch.getIri().getURI());
 
-        return commit("Update collection " + patch.getName(), rdf, () -> {
+        return commit("Update collection " + patch.getName(), dao, () -> {
             var existing = get(patch.getIri().getURI());
             if (existing == null) {
                 log.info("Collection not found {}", patch.getIri());
@@ -120,7 +121,10 @@ public class CollectionsService {
 
             var updated = dao.write(existing);
             if (!updated.getLocation().equals(oldLocation)) {
-                rdf.update(storedQuery("fs_move", oldLocation, updated.getLocation(), ""));
+                var listener = onLocationChangeListener;
+                if (listener != null) {
+                    listener.accept(oldLocation, updated.getLocation());
+                }
             }
             return updated;
         });

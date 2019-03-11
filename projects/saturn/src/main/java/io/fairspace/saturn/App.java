@@ -49,7 +49,7 @@ public class App {
 
         var userService = new UserService(new DAO(rdf, null));
         Supplier<String> userIriSupplier = () -> userService.getUserIRI(userInfo());
-        var collections = new CollectionsService(rdf, userIriSupplier);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), userIriSupplier, collections));
 
         // Setup and initialize vocabularies
