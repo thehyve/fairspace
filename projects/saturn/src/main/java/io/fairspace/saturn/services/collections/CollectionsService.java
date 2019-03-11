@@ -39,25 +39,25 @@ public class CollectionsService {
                 throw new LocationAlreadyExistsException(collection.getLocation());
             }
 
-            return applyPermissions(dao.write(collection));
+            return addPermissionsToObject(dao.write(collection));
         });
     }
 
     public Collection get(String iri) {
-        return applyPermissions(dao.read(Collection.class, createURI(iri)));
+        return addPermissionsToObject(dao.read(Collection.class, createURI(iri)));
     }
 
     public Collection getByLocation(String location) {
         return dao.construct(Collection.class, storedQuery("coll_get_by_dir", location))
                 .stream()
                 .findFirst()
-                .map(this::applyPermissions)
+                .map(this::addPermissionsToObject)
                 .orElse(null);
     }
 
     public List<Collection> list() {
         var result = dao.list(Collection.class);
-        result.forEach(this::applyPermissions);
+        result.forEach(this::addPermissionsToObject);
         return result;
     }
 
@@ -126,7 +126,7 @@ public class CollectionsService {
         });
     }
 
-    private Collection applyPermissions(Collection c) {
+    private Collection addPermissionsToObject(Collection c) {
         if (c != null) {
             c.setAccess(Access.Manage); // TODO: Call permissions service
         }
