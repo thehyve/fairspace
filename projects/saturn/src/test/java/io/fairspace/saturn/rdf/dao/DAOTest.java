@@ -239,7 +239,7 @@ public class DAOTest {
         assertNull(entity2.getDeletedBy());
 
         var entity3 = dao.markAsDeleted(entity2);
-        ensureResentInstant(entity3.getDateDeleted());
+        ensureRecentInstant(entity3.getDateDeleted());
         assertNotNull(entity3.getDeletedBy());
         assertNull(dao.read(basicEntity.getClass(), basicEntity.getIri()));
         assertNull(dao.markAsDeleted(entity3));
