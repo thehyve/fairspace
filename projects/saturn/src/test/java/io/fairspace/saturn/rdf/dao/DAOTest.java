@@ -245,7 +245,7 @@ public class DAOTest {
         assertNull(dao.markAsDeleted(entity3));
     }
 
-   private static void ensureResentInstant(Instant instant) {
+   private static void ensureRecentInstant(Instant instant) {
         assertNotNull(instant);
         assertTrue(instant.isAfter(now().minusSeconds(1)));
         assertTrue(now().equals(instant) || instant.isBefore(now()));
