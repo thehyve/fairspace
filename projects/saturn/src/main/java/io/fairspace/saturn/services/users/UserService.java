@@ -33,7 +33,7 @@ public class UserService {
      * @return
      */
     public String getUserIRI(UserInfo userInfo) {
-        return  getUser(userInfo).getIri().getURI();
+        return getUser(userInfo).getIri().getURI();
     }
 
     private User getUser(UserInfo userInfo) {
