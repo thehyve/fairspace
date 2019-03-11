@@ -46,11 +46,7 @@ class CollectionBrowser extends React.Component {
             .then(() => this.setState({addingNewCollection: false}))
             .catch(err => {
                 const message = err && err.message ? err.message : "An error occurred while creating a collection";
-                ErrorDialog.showError(
-                    err,
-                    message,
-                    this.handleAddCollectionClick
-                );
+                ErrorDialog.showError(err, message);
             });
     }
 
