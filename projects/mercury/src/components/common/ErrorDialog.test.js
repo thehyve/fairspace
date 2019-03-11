@@ -10,7 +10,7 @@ it('shows error dialog when no subject provided', () => {
             <div id="2">ola</div>
         </ErrorDialog>
     );
-    ErrorDialog.showError("test", "Fail test", null, null,false);
+    ErrorDialog.showError("test", "Fail test", null, false);
     const resultHeader = wrapper.find(Dialog);
     expect(resultHeader.length).toEqual(1);
 });
