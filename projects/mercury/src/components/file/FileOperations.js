@@ -94,6 +94,7 @@ export class FileOperations extends React.Component {
         const noSelectedPath = selectedPaths.length === 0;
         const moreThanOneItemSelected = selectedPaths.length > 1;
         const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
+        const disabledForMoreThanOneSelection = allOperationsDisabled || noSelectedPath || moreThanOneItemSelected;
 
         return (
             <Grid container justify="space-between">
@@ -103,18 +104,19 @@ export class FileOperations extends React.Component {
                             onClick={() => onDownload(selectedItem.filename)}
                             title={`Download ${selectedItem.basename}`}
                             aria-label={`Download ${selectedItem.basename}`}
-                            disabled={allOperationsDisabled || noSelectedPath || moreThanOneItemSelected || selectedItem.type !== 'file'}
+                            disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file'}
                         >
                             <Download />
                         </IconButton>
                         <RenameButton
                             currentName={selectedItem.basename}
                             onRename={newName => onRename(selectedItem, newName)}
+                            disabled={disabledForMoreThanOneSelection}
                         >
                             <IconButton
                                 title={`Rename ${selectedItem.basename}`}
                                 aria-label={`Rename ${selectedItem.basename}`}
-                                disabled={allOperationsDisabled || noSelectedPath || moreThanOneItemSelected}
+                                disabled={disabledForMoreThanOneSelection}
                             >
                                 <Icon>border_color</Icon>
                             </IconButton>
@@ -122,11 +124,12 @@ export class FileOperations extends React.Component {
                         <DeleteButton
                             file={selectedItem.basename}
                             onClick={() => onDelete(selectedItem)}
+                            disabled={disabledForMoreThanOneSelection}
                         >
                             <IconButton
                                 title={`Delete ${selectedItem.basename}`}
                                 aria-label={`Delete ${selectedItem.basename}`}
-                                disabled={allOperationsDisabled || noSelectedPath || moreThanOneItemSelected}
+                                disabled={disabledForMoreThanOneSelection}
                             >
                                 <Icon>delete</Icon>
                             </IconButton>
