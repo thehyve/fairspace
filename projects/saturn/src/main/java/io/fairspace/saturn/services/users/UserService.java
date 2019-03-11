@@ -37,28 +37,40 @@ public class UserService {
     }
 
     private User getUser(UserInfo userInfo) {
-        var user = usersById.get(userInfo.getUserId());
+        var user = findUser(userInfo);
         if (user != null) {
             if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
-                user.setName(userInfo.getFullName());
-                user.setEmail(userInfo.getEmail());
-                commit("Update user with id " + userInfo.getUserId(), dao, () -> dao.write(user));
+                updateUser(user, userInfo);
             }
             return user;
         } else {
-            var newUser = new User();
-            newUser.setExternalId(userInfo.getUserId());
-            newUser.setName(userInfo.getFullName());
-            newUser.setEmail(userInfo.getEmail());
-            return commit("Store a new user with id " + userInfo.getUserId(), dao, () -> {
-                var createdInMeantime = usersById.get(userInfo.getUserId());
-                if(createdInMeantime != null) {
-                    return createdInMeantime;
-                }
-                dao.write(newUser);
-                usersById.put(newUser.getExternalId(), newUser);
-                return newUser;
-            });
+            return createUser(userInfo);
         }
+    }
+
+    private User findUser(UserInfo userInfo) {
+        return usersById.get(userInfo.getUserId());
+    }
+
+    private User createUser(UserInfo userInfo) {
+        var newUser = new User();
+        newUser.setExternalId(userInfo.getUserId());
+        newUser.setName(userInfo.getFullName());
+        newUser.setEmail(userInfo.getEmail());
+        return commit("Store a new user with id " + userInfo.getUserId(), dao, () -> {
+            var createdInMeantime = findUser(userInfo);
+            if(createdInMeantime != null) {
+                return createdInMeantime;
+            }
+            dao.write(newUser);
+            usersById.put(newUser.getExternalId(), newUser);
+            return newUser;
+        });
+    }
+
+    private void updateUser(User user, UserInfo userInfo) {
+        user.setName(userInfo.getFullName());
+        user.setEmail(userInfo.getEmail());
+        commit("Update user with id " + userInfo.getUserId(), dao, () -> dao.write(user));
     }
 }
