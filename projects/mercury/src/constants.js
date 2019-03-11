@@ -6,7 +6,7 @@ export const PATH_SEPARATOR = '/';
 // UI
 export const MAIN_CONTENT_WIDTH = '55%';
 export const SIDE_PANEL_WIDTH = '45%';
-export const MAIN_CONTENT_MAX_HEIGHT = 600;
+export const MAIN_CONTENT_MAX_HEIGHT = '65vh';
 
 // Search
 export const COLLECTION_SEARCH_TYPE = 'collections';
