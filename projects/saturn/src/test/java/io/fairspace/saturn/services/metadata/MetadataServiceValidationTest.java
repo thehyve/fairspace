@@ -48,18 +48,13 @@ public class MetadataServiceValidationTest {
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
     private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
-    private static final Resource S3 = createResource("http://fairspace.io/iri/S3");
     private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
-    private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
 
     private static final Property MACHINE_ONLY_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");
 
     private static final Statement STMT1 = createStatement(S1, P1, S2);
-    private static final Statement STMT2 = createStatement(S2, P1, S3);
-    private static final Statement MACHINE_ONLY_STATEMENT = createStatement(S1, MACHINE_ONLY_PROPERTY, S3);
 
     private static final Statement LBL_STMT1 = createStatement(S1, RDFS.label, createStringLiteral("subject1"));
-    private static final Statement LBL_STMT2 = createStatement(S2, RDFS.label, createStringLiteral("subject2"));
 
     private Dataset ds;
     private MetadataService api;
@@ -135,17 +130,5 @@ public class MetadataServiceValidationTest {
     public void deleteModelShouldNotAcceptMachineOnlyTriples() {
         when(validator.validateDelete(any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.delete(createDefaultModel());
-    }
-
-    /**
-     * Store the machine-only predicate in the database
-     */
-    private void setMachineOnlyPredicate(String predicateUri) {
-        Resource predicateResource = createResource(predicateUri);
-
-        // Actually update the database itself, as the delete method depends on it
-        executeWrite(ds, () -> ds.getNamedModel(vocabularyURI)
-                .add(predicateResource, RDF.type, RDF.Property)
-                .add(predicateResource, createProperty("http://fairspace.io/ontology#machineOnly"), createTypedLiteral(true)));
     }
 }
