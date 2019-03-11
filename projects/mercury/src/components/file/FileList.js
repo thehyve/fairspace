@@ -54,7 +54,7 @@ class FileList extends React.Component {
                         <TableRow>
                             {checkboxHeader}
                             <TableCell padding="none" />
-                            <TableCell style={{padding: 10}}>Name</TableCell>
+                            <TableCell padding="none">Name</TableCell>
                             <TableCell align="right">Size</TableCell>
                             <TableCell align="right">Last Modified</TableCell>
                         </TableRow>
@@ -89,7 +89,7 @@ class FileList extends React.Component {
                                             {item.type === 'directory' ? 'folder_open' : 'note_open'}
                                         </Icon>
                                     </TableCell>
-                                    <TableCell style={{padding: 10}}>
+                                    <TableCell padding="none">
                                         {item.basename}
                                     </TableCell>
                                     <TableCell padding="none" align="right">
