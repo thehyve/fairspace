@@ -29,8 +29,8 @@ public class DAOTest {
     private Dataset dataset;
     private DAO dao;
     private Entity entity;
-    private EntityEx entityEx;
-    private LifecycleAware basicEntity;
+    private EntityWithInheritedProperties entityWithInheritedProperties;
+    private LifecycleAwareEntity basicEntity;
 
     @Before
     public void before() {
@@ -38,8 +38,8 @@ public class DAOTest {
         dataset = createTxnMem();
         dao = new DAO(connect(dataset), () -> "http://example.com/" + randomUUID());
         entity = new Entity();
-        entityEx = new EntityEx();
-        basicEntity = new LifecycleAware();
+        entityWithInheritedProperties = new EntityWithInheritedProperties();
+        basicEntity = new LifecycleAwareEntity();
     }
 
     @Test
@@ -166,19 +166,19 @@ public class DAOTest {
 
     @Test
     public void testList() {
-        assertEquals(0, dao.list(LifecycleAware.class).size());
+        assertEquals(0, dao.list(LifecycleAwareEntity.class).size());
 
-        dao.write(new LifecycleAware());
-        dao.write(new LifecycleAware());
-        dao.write(new LifecycleAware());
+        dao.write(new LifecycleAwareEntity());
+        dao.write(new LifecycleAwareEntity());
+        dao.write(new LifecycleAwareEntity());
 
-        var entities = dao.list(LifecycleAware.class);
+        var entities = dao.list(LifecycleAwareEntity.class);
 
         assertEquals(3, entities.size());
         dao.delete(entities.get(0));
         dao.markAsDeleted(entities.get(1));
 
-        assertEquals(1, dao.list(LifecycleAware.class).size());
+        assertEquals(1, dao.list(LifecycleAwareEntity.class).size());
     }
 
     @Test
@@ -208,9 +208,9 @@ public class DAOTest {
 
     @Test
     public void testInheritance() {
-        entityEx.setStringValue("str1");
-        entityEx.setNewProperty("str2");
-        testWriteAndRead(entityEx);
+        entityWithInheritedProperties.setStringValue("str1");
+        entityWithInheritedProperties.setNewProperty("str2");
+        testWriteAndRead(entityWithInheritedProperties);
     }
 
     @Test
@@ -376,8 +376,8 @@ public class DAOTest {
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    @RDFType("http://example.com/iri/EntityEx")
-    private static class EntityEx extends Entity {
+    @RDFType("http://example.com/iri/EntityWithInheritedProperties")
+    private static class EntityWithInheritedProperties extends Entity {
         @RDFProperty("http://example.com/iri/newProperty")
         private String newProperty;
     }
@@ -385,7 +385,7 @@ public class DAOTest {
     @Data
     @EqualsAndHashCode(callSuper = true)
     @RDFType("http://example.com/iri/BasicEntity")
-    private static class LifecycleAware extends LifecycleAwarePersistentEntity {
+    private static class LifecycleAwareEntity extends LifecycleAwarePersistentEntity {
     }
 
     @Data
