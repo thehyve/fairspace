@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.dao.DAO;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.Map;
 import java.util.Objects;
@@ -14,8 +13,8 @@ public class UserService {
     private final DAO dao;
     private final Map<String, User> usersById = new ConcurrentHashMap<>();
 
-    public UserService(RDFConnection rdf) {
-        this.dao = new DAO(rdf, null);
+    public UserService(DAO dao) {
+        this.dao = dao;
 
         loadUsers();
     }

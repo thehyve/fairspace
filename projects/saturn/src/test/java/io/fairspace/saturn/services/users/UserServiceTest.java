@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.rdf.dao.DAO;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.vocabulary.RDFS;
@@ -30,7 +31,7 @@ public class UserServiceTest {
         setWorkspaceURI("http://example.com/iri/");
         ds = createTxnMem();
         rdf = connect(ds);
-        service = new UserService(rdf);
+        service = new UserService(new DAO(rdf, null));
     }
 
     @Test
@@ -48,7 +49,7 @@ public class UserServiceTest {
     public void shouldKeepUsersBetweenRestarts() {
         var iri = service.getUserIRI(userInfo);
 
-        service = new UserService(rdf); // Emulates restart
+        service = new UserService(new DAO(rdf, null)); // Emulates restart
 
         assertEquals(iri, service.getUserIRI(userInfo));
     }

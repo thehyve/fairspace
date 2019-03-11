@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.Vocabulary;
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
@@ -45,7 +46,7 @@ public class App {
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds);
 
-        var userService = new UserService(rdf);
+        var userService = new UserService(new DAO(rdf, null));
         Supplier<String> userIriSupplier = () -> userService.getUserIRI(userInfo());
         var collections = new CollectionsService(rdf, userIriSupplier);
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), userIriSupplier, collections));
