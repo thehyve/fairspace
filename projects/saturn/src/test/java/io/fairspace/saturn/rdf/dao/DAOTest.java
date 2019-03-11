@@ -220,7 +220,7 @@ public class DAOTest {
         var entity1 = dao.read(basicEntity.getClass(), basicEntity.getIri());
 
         assertNotNull(entity1.getIri());
-        ensureResentInstant(entity1.getDateCreated());
+        ensureRecentInstant(entity1.getDateCreated());
         assertEquals(entity1.getDateCreated(), entity1.getDateModified());
         assertNull(entity1.getDateDeleted());
         assertNotNull(entity1.getCreatedBy());
