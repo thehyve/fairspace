@@ -7,7 +7,9 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import lombok.AllArgsConstructor;
 import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -26,6 +29,7 @@ import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -103,18 +107,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void create(String path, InputStream in) throws IOException {
         ensureValidPath(path);
 
-        var cis = new CountingInputStream(in);
-        var blobId = store.write(cis);
+        var blobInfo = write(in);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userId(), name(path))));
+                rdf.update(storedQuery("fs_create", path, blobInfo.size, blobInfo.id, userId(), name(path), blobInfo.md5)));
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
-        var cis = new CountingInputStream(in);
-        var blobId = store.write(cis);
+        var blobInfo = write(in);
+
         withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId, userId())));
+                () -> rdf.update(storedQuery("fs_modify", path, blobInfo.size, blobInfo.id, userId(), blobInfo.md5)));
     }
 
     @Override
@@ -213,5 +216,26 @@ public class ManagedFileSystem implements VirtualFileSystem {
     private Access getAccess(String path) {
         var c = getCollection(path);
         return (c == null) ? Access.None : c.getAccess();
+    }
+
+    private  BlobInfo write(InputStream in) throws IOException {
+        var cis = new CountingInputStream(in);
+        MessageDigestCalculatingInputStream md;
+        try {
+            md = new MessageDigestCalculatingInputStream(cis);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
+        var id = store.write(md);
+
+        return new BlobInfo(id, cis.getByteCount(), encodeHexString(md.getMessageDigest().digest()));
+    }
+
+    @AllArgsConstructor
+    private static class BlobInfo {
+        String id;
+        long size;
+        String md5;
     }
 }

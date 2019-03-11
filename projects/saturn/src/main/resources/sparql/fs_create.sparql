@@ -5,6 +5,7 @@
 # 2 - blobId
 # 3 - creator
 # 4 - label
+# 5 - md5
 
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -18,6 +19,7 @@ INSERT {
         fs:dateCreated ?date;
         fs:modifiedBy ?3;
         fs:dateModified ?date;
-        rdfs:label ?4.
+        rdfs:label ?4;
+        fs:md5 ?5 .
 }
 WHERE { BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?iri) BIND(NOW() as ?date) }
