@@ -16,7 +16,7 @@ import java.util.Set;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.getWorkspaceURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
-import static java.lang.Thread.sleep;
+import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -183,7 +183,7 @@ public class DAOTest {
 
     @Test
     public void testInstantProperty() {
-        entity.setInstantValue(Instant.now());
+        entity.setInstantValue(now());
         dao.write(entity);
         // There can be some rounding within 1 ms
         assertEquals(entity.getInstantValue().toEpochMilli(), dao.read(Entity.class, entity.getIri()).getInstantValue().toEpochMilli());
@@ -220,7 +220,7 @@ public class DAOTest {
         var entity1 = dao.read(basicEntity.getClass(), basicEntity.getIri());
 
         assertNotNull(entity1.getIri());
-        assertNotNull(entity1.getDateCreated());
+        ensureResentInstant(entity1.getDateCreated());
         assertEquals(entity1.getDateCreated(), entity1.getDateModified());
         assertNull(entity1.getDateDeleted());
         assertNotNull(entity1.getCreatedBy());
@@ -232,17 +232,24 @@ public class DAOTest {
         dao.write(entity1);
         var entity2 = dao.read(basicEntity.getClass(), basicEntity.getIri());
         assertEquals(t1, entity2.getDateCreated());
-        assertTrue(entity2.getDateModified().compareTo(t1) > 0);
+        assertTrue(entity2.getDateModified().isAfter(t1));
+        ensureResentInstant(entity2.getDateModified());
         assertNotNull(entity2.getModifiedBy());
         assertNotEquals(entity2.getCreatedBy(), entity2.getModifiedBy());
         assertNull(entity2.getDeletedBy());
 
         var entity3 = dao.markAsDeleted(entity2);
-        assertNotNull(entity3.getDateDeleted());
+        ensureResentInstant(entity3.getDateDeleted());
         assertNotNull(entity3.getDeletedBy());
         assertNull(dao.read(basicEntity.getClass(), basicEntity.getIri()));
         assertNull(dao.markAsDeleted(entity3));
     }
+
+   private static void ensureResentInstant(Instant instant) {
+        assertNotNull(instant);
+        assertTrue(instant.isAfter(now().minusSeconds(1)));
+        assertTrue(now().equals(instant) || instant.isBefore(now()));
+   }
 
     @Test(expected = DAOException.class)
     public void testWriteUninitializedRequiredField() {
