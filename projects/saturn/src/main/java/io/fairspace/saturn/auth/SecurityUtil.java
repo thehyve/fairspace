@@ -13,11 +13,9 @@ import java.net.URL;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.Context.currentRequest;
-import static java.util.Collections.singleton;
 
 public class SecurityUtil {
     static final String USER_INFO_REQUEST_ATTRIBUTE = UserInfo.class.getName();
-    private static final UserInfo DUMMY_USER = new UserInfo("123", "test-dummy", "John", "user@example.com", singleton("for-local-development-only"));
 
     public static Function<HttpServletRequest, UserInfo> createAuthenticator(String jwksUrl, String algorithm) {
         return createAuthenticator(jwksUrl, JWSAlgorithm.parse(algorithm));
@@ -41,6 +39,6 @@ public class SecurityUtil {
     public static UserInfo userInfo() {
         return currentRequest()
                 .map(request -> (UserInfo) request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE))
-                .orElse(DUMMY_USER) ;
+                .orElse(null);
     }
 }

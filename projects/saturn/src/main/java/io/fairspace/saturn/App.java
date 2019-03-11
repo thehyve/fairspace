@@ -2,6 +2,7 @@ package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.Vocabulary;
 import io.fairspace.saturn.rdf.dao.DAO;
@@ -69,10 +70,11 @@ public class App {
                 .port(config.port);
 
         var auth = config.auth;
-        if (auth.enabled) {
-            var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
-            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
+        if (!auth.enabled) {
+            log.warn("Authentication is disabled");
         }
+        var authenticator = auth.enabled ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm) : new DummyAuthenticator();
+        fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
 
         fusekiServerBuilder
                 .build()
