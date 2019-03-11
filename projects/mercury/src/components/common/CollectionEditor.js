@@ -14,6 +14,8 @@ import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 class CollectionEditor extends React.Component {
     static NON_SAFE_CHARACTERS_REGEX = /[^a-z0-9_-]+/gi;
 
+    static MAX_LOCATION_LENGTH = 127;
+
     state = {
         editing: true,
         name: this.props.name || '',
@@ -59,7 +61,10 @@ class CollectionEditor extends React.Component {
      * @param name
      * @returns {string}
      */
-    convertToSafeDirectoryName = (name) => name.replace(CollectionEditor.NON_SAFE_CHARACTERS_REGEX, '_');
+    convertToSafeDirectoryName = (name) => {
+        const safeName = name.replace(CollectionEditor.NON_SAFE_CHARACTERS_REGEX, '_');
+        return safeName.length <= CollectionEditor.MAX_LOCATION_LENGTH ? safeName : safeName.substring(0, CollectionEditor.MAX_LOCATION_LENGTH);
+    };
 
     /**
      * Determines whether the location should be updated when the name changes.
