@@ -18,8 +18,10 @@ class RenameButton extends React.Component {
     }
 
     openDialog = (e) => {
-        e.stopPropagation();
-        this.setState({renaming: true});
+        if (e) e.stopPropagation();
+        if (!this.props.disabled) {
+            this.setState({renaming: true});
+        }
     }
 
     closeDialog = (e) => {
@@ -34,17 +36,12 @@ class RenameButton extends React.Component {
     }
 
     render() {
-        const {children, currentName} = this.props;
+        const {children, currentName, disabled} = this.props;
         const {renaming, name} = this.state;
-
-        return (
-            <>
-                <span onClick={this.openDialog}>
-                    {children}
-                </span>
-
+        const dialog = disabled && !renaming ? null
+            : (
                 <Dialog
-                    open={renaming}
+                    open
                     onClick={e => e.stopPropagation()}
                     onClose={this.closeDialog}
                     aria-labelledby="form-dialog-title"
@@ -76,19 +73,32 @@ class RenameButton extends React.Component {
                         <Button
                             onClick={this.handleRename}
                             color="primary"
-                            disabled={!name || name === currentName}
+                            disabled={disabled || !name || name === currentName}
                         >
                             Rename
                         </Button>
                     </DialogActions>
                 </Dialog>
+            );
+
+        return (
+            <>
+                <span onClick={this.openDialog}>
+                    {children}
+                </span>
+                {dialog}
             </>
         );
     }
 }
 
 RenameButton.propTypes = {
-    onRename: PropTypes.func.isRequired
+    onRename: PropTypes.func.isRequired,
+    disabled: PropTypes.bool
+};
+
+RenameButton.defaultProps = {
+    disabled: false
 };
 
 export default RenameButton;
