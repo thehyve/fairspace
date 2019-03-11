@@ -9,5 +9,6 @@ public class UserInfo {
     String userId;
     String userName;
     String fullName;
+    String email;
     Set<String> authorities;
 }

@@ -8,15 +8,23 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 class SaturnSecurityHandler extends ConstraintSecurityHandler {
     private final Function<HttpServletRequest, UserInfo> authenticator;
+    private final Consumer<UserInfo> userCallback ;
 
-    SaturnSecurityHandler(Function<HttpServletRequest, UserInfo> authenticator) {
+    /**
+     *
+     * @param authenticator Authenticator returning a UserInfo for an incoming request
+     * @param onAuthenticate An optional callback, called on successful authentication
+     */
+    SaturnSecurityHandler(Function<HttpServletRequest, UserInfo> authenticator, Consumer<UserInfo> onAuthenticate) {
         this.authenticator = authenticator;
+        this.userCallback = onAuthenticate;
     }
 
     @Override
@@ -28,6 +36,10 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
                 baseRequest.setHandled(true);
                 return;
             }
+            if (userCallback != null) {
+                userCallback.accept(userInfo);
+            }
+
             // TODO: Check roles
         }
         super.handle(pathInContext, baseRequest, request, response);

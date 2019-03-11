@@ -11,7 +11,7 @@ describe('Collection Utils', () => {
                 access: "Manage",
                 type: "LOCAL_STORAGE",
                 dateCreated: "2018-09-19T15:48:23.016165Z",
-                creator: "user4-id"
+                createdBy: "user4-id"
             };
 
             expect(getCollectionAbsolutePath(collection)).toBe('/collections/Jan_Smit_s_collection-500');
@@ -25,7 +25,7 @@ describe('Collection Utils', () => {
                 access: "Manage",
                 type: "LOCAL_STORAGE",
                 dateCreated: "2018-09-19T15:48:23.016165Z",
-                creator: "user4-id"
+                createdBy: "user4-id"
             };
 
             expect(getCollectionAbsolutePath(collection)).toBe('');

@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import com.pivovarit.function.ThrowingRunnable;
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import io.fairspace.saturn.util.Ref;
@@ -106,9 +107,9 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         return isInTransaction() && transactionMode() == ReadWrite.WRITE;
     }
 
-    private void critical(Action action) {
+    private void critical(ThrowingRunnable<Exception> action) {
         try {
-            action.perform();
+            action.run();
         } catch (Throwable t) {
             log.error(ERROR_MSG, t);
 
@@ -124,10 +125,5 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
             System.exit(1);
         }
-    }
-
-    @FunctionalInterface
-    private interface Action {
-        void perform() throws Throwable;
     }
 }
