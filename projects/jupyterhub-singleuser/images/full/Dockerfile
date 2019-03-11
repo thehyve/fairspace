@@ -2,8 +2,6 @@ FROM eu.gcr.io/fairspace-207108/jupyterhub-singleuser-base:0.3.2
 
 USER root
 
-ADD atomiclargefilemanager.py /usr/local/lib/python3.6/dist-packages/notebook/services/contents/
-
 # wdfs
 RUN apt-get update
 RUN apt-get install -y apt-utils
@@ -24,6 +22,11 @@ RUN echo "$NB_USER ALL=(ALL) NOPASSWD: /usr/sbin/nginx" >> /etc/sudoers
 ADD start /
 ADD config.py /
 RUN chmod a+rx /start
+
+ADD atomiclargefilemanager.py /opt/conda/lib/python3.7/site-packages/notebook/services/contents/
+RUN echo "" >> /etc/jupyter/jupyter_notebook_config.py
+RUN echo "from notebook.services.contents.atomiclargefilemanager import AtomicLargeFileManager" >> /etc/jupyter/jupyter_notebook_config.py
+RUN echo "c.NotebookApp.contents_manager_class = AtomicLargeFileManager" >> /etc/jupyter/jupyter_notebook_config.py
 
 USER $NB_USER
 RUN mkdir /home/jovyan/collections
