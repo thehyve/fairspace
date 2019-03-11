@@ -233,7 +233,7 @@ public class DAOTest {
         var entity2 = dao.read(basicEntity.getClass(), basicEntity.getIri());
         assertEquals(t1, entity2.getDateCreated());
         assertTrue(entity2.getDateModified().isAfter(t1));
-        ensureResentInstant(entity2.getDateModified());
+        ensureRecentInstant(entity2.getDateModified());
         assertNotNull(entity2.getModifiedBy());
         assertNotEquals(entity2.getCreatedBy(), entity2.getModifiedBy());
         assertNull(entity2.getDeletedBy());
@@ -245,7 +245,7 @@ public class DAOTest {
         assertNull(dao.markAsDeleted(entity3));
     }
 
-   private static void ensureResentInstant(Instant instant) {
+   private static void ensureRecentInstant(Instant instant) {
         assertNotNull(instant);
         assertTrue(instant.isAfter(now().minusSeconds(1)));
         assertTrue(now().equals(instant) || instant.isBefore(now()));
