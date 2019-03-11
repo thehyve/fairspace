@@ -43,6 +43,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
         this.store = store;
         this.userIriSupplier = userIriSupplier;
         this.collections = collections;
+        collections.setOnLocationChangeListener((oldLocation, newLocation) ->
+                rdf.update(storedQuery("fs_move", oldLocation, newLocation, "")));
     }
 
     @Override
@@ -169,14 +171,14 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     private static FileInfo fileInfo(Collection collection) {
         return FileInfo.builder()
-                .iri(collection.getIri())
+                .iri(collection.getIri().getURI())
                 .path(collection.getLocation())
                 .size(0)
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .createdBy(collection.getCreator())
-                .modifiedBy(collection.getCreator())
+                .createdBy(collection.getCreatedBy().getURI())
+                .modifiedBy(collection.getModifiedBy().getURI())
                 .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
                 .build();
     }

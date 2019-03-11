@@ -22,6 +22,7 @@ class JWTAuthenticator {
     private static final String FULLNAME_CLAIM = "name";
     private static final String SUBJECT_CLAIM = "sub";
     private static final String AUTHORITIES_CLAIM = "authorities";
+    private static final String EMAIL_CLAIM = "email";
 
     private final JWTProcessor<?> jwtProcessor;
 
@@ -56,6 +57,7 @@ class JWTAuthenticator {
                 getStringClaim(claims, SUBJECT_CLAIM),
                 getStringClaim(claims, USERNAME_CLAIM),
                 getStringClaim(claims, FULLNAME_CLAIM),
+                getStringClaim(claims, EMAIL_CLAIM),
                 ((List<?>) claims.getOrDefault(AUTHORITIES_CLAIM, emptyList()))
                         .stream()
                         .map(Object::toString)

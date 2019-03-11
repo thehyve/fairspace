@@ -6,13 +6,10 @@ import io.milton.resource.Resource;
 
 import java.util.List;
 
-import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
-
 /**
  * Relies on top-level authentication performed by JWTAuthenticator
  */
 public class SaturnAuthenticationHandler implements AuthenticationHandler {
-
     @Override
     public boolean supports(Resource r, Request request) {
         return true;
@@ -20,8 +17,7 @@ public class SaturnAuthenticationHandler implements AuthenticationHandler {
 
     @Override
     public Object authenticate(Resource resource, Request request) {
-        var auth = userInfo();
-        return auth != null ? auth : "Anonymous (for local development only)";
+        return "Authenticated";
     }
 
     @Override

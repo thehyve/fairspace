@@ -1,98 +1,76 @@
 package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.auth.UserInfo;
-import io.fairspace.saturn.rdf.QuerySolutionProcessor;
-import org.apache.jena.rdfconnection.RDFConnection;
+import io.fairspace.saturn.rdf.dao.DAO;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
-import static io.milton.http.values.HrefList.asList;
-import static java.util.stream.Collectors.joining;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class UserService {
-    private static final String ANONYMOUS = "http://fairspace.io/iri/test-user";
-    private final RDFConnection rdf;
-    private final Map<String, String> idToIri = new ConcurrentHashMap<>();
-    private final Map<String, UserInfo> idToUserInfo = new ConcurrentHashMap<>();
+    private final DAO dao;
+    private final Map<String, User> usersById = new ConcurrentHashMap<>();
 
-    public UserService(RDFConnection rdf) {
-        this.rdf = rdf;
+    public UserService(DAO dao) {
+        this.dao = dao;
 
         loadUsers();
     }
 
     private void loadUsers() {
-        rdf.querySelect(storedQuery("users_list"), row -> {
-            var id = row.getLiteral("externalId").getString();
-            var iri = row.getResource("iri").getURI();
-            var userInfo = new UserInfo(
-                    id,
-                    row.getLiteral("userName").getString(),
-                    row.getLiteral("fullName").getString(),
-                    decodeAuthorities(row.getLiteral("authorities").getString()));
-            idToIri.put(id, iri);
-            idToUserInfo.put(id, userInfo);
-        });
+        dao.list(User.class).forEach(user -> usersById.put(user.getExternalId(), user));
     }
 
     /**
      * Returns a URI for the provided userInfo.
      * First tries to find an exiting fs:User entity which externalId  equals to userInfo.getUserId()
      * If no existing entry is found, creates a new one and stores userInfo in it.
-     * Also updates an existing one if one of the userInfo's fileds changed.
+     * Also updates an existing one if one of the userInfo's fields changed.
+
      * @param userInfo
      * @return
      */
     public String getUserIRI(UserInfo userInfo) {
-        if (userInfo == null) {
-            return ANONYMOUS;
-        }
+        return getUser(userInfo).getIri().getURI();
+    }
 
-        var existingIri = idToIri.get(userInfo.getUserId());
-        if (existingIri != null) {
-            var savedUserInfo = idToUserInfo.get(userInfo.getUserId());
-            if (!savedUserInfo.equals(userInfo)) {
-                updateUser(existingIri, userInfo);
+    private User getUser(UserInfo userInfo) {
+        var user = findUser(userInfo);
+        if (user != null) {
+            if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
+                updateUser(user, userInfo);
             }
-
-            return existingIri;
+            return user;
+        } else {
+            return createUser(userInfo);
         }
-
-        return createUser(userInfo);
     }
 
-    private String createUser(UserInfo userInfo) {
-        return commit("Store a new user, id: " + userInfo.getUserId(), rdf, () -> {
-            rdf.update(storedQuery("users_create",
-                    userInfo.getUserId(), userInfo.getUserName(), userInfo.getFullName(), encodeAuthorities(userInfo.getAuthorities())));
-            var processor = new QuerySolutionProcessor<>(row -> row.getResource("iri").getURI());
-            rdf.querySelect(storedQuery("users_iri_by_id", userInfo.getUserId()), processor);
-            var iri = processor.getSingle().get();
-            idToIri.put(userInfo.getUserId(), iri);
-            idToUserInfo.put(userInfo.getUserId(), userInfo);
-            return iri;
+    private User findUser(UserInfo userInfo) {
+        return usersById.get(userInfo.getUserId());
+    }
+
+    private User createUser(UserInfo userInfo) {
+        var newUser = new User();
+        newUser.setExternalId(userInfo.getUserId());
+        newUser.setName(userInfo.getFullName());
+        newUser.setEmail(userInfo.getEmail());
+        return commit("Store a new user with id " + userInfo.getUserId(), dao, () -> {
+            var createdInMeantime = findUser(userInfo);
+            if(createdInMeantime != null) {
+                return createdInMeantime;
+            }
+            dao.write(newUser);
+            usersById.put(newUser.getExternalId(), newUser);
+            return newUser;
         });
     }
 
-    private void updateUser(String iri, UserInfo userInfo) {
-        commit("Update a new user, id: " + userInfo.getUserId(), rdf, () -> {
-                rdf.update(storedQuery("users_update", createURI(iri), userInfo.getUserName(), userInfo.getFullName(),
-                        encodeAuthorities(userInfo.getAuthorities())));
-            idToUserInfo.put(userInfo.getUserId(), userInfo);
-        });
-    }
-
-    private static String encodeAuthorities(Set<String> authorities) {
-        return authorities.stream().sorted().collect(joining(","));
-    }
-
-    private static Set<String> decodeAuthorities(String s) {
-        return new HashSet<>(asList(s.split(",")));
+    private void updateUser(User user, UserInfo userInfo) {
+        user.setName(userInfo.getFullName());
+        user.setEmail(userInfo.getEmail());
+        commit("Update user with id " + userInfo.getUserId(), dao, () -> dao.write(user));
     }
 }

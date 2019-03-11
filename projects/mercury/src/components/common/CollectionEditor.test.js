@@ -20,6 +20,8 @@ it('renders without crashing', () => {
 });
 
 describe('automatic location entry', () => {
+    const longName = 'aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrrssssstttttuuuuuuvvvvvvwwwwwwxxxxxyyyyyzzzzz';
+
     beforeEach(() => {
         collectionEditor = (
             <CollectionEditor
@@ -41,6 +43,9 @@ describe('automatic location entry', () => {
         it('allows characters, numbers, underscores and dashes', () => expect(wrapper.instance().convertToSafeDirectoryName('My-special_Collection-01234')).toEqual('My-special_Collection-01234'));
         it('strips other characters', () => expect(wrapper.instance().convertToSafeDirectoryName('a!@#$%^&*?()~,.<>;\':"[]{}a')).toEqual('a_a'));
         it('strips unicode characters', () => expect(wrapper.instance().convertToSafeDirectoryName('•∞₩ⓘˍ')).toEqual('_'));
+
+        it('truncates at 127 characters', () => expect(wrapper.instance().convertToSafeDirectoryName('a'.repeat(128)).length).toEqual(127));
+        it('uses the first 127 characters', () => expect(wrapper.instance().convertToSafeDirectoryName(longName)).toEqual(longName.substring(0, 127)));
     });
 
     it('fills the location based on the name', () => {

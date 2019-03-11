@@ -46,11 +46,7 @@ class CollectionBrowser extends React.Component {
             .then(() => this.setState({addingNewCollection: false}))
             .catch(err => {
                 const message = err && err.message ? err.message : "An error occurred while creating a collection";
-                ErrorDialog.showError(
-                    err,
-                    message,
-                    this.handleAddCollectionClick
-                );
+                ErrorDialog.showError(err, message);
             });
     }
 
@@ -62,7 +58,7 @@ class CollectionBrowser extends React.Component {
         const {users, collections, addingCollection, deletingCollection} = this.props;
 
         collections.forEach(col => {
-            col.creatorObj = findById(users, col.creator);
+            col.creatorObj = findById(users, col.createdBy);
         });
 
         return (

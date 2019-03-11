@@ -1,6 +1,6 @@
 package io.fairspace.saturn.vfs.managed;
 
-import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import org.apache.jena.query.Dataset;
@@ -35,7 +35,7 @@ public class ManagedFileSystemTest {
         ds = createTxnMem();
         var rdf = connect(ds);
         Supplier<String> userIriSupplier = () -> "http://example.com/user";
-        var collections = new CollectionsService(rdf, userIriSupplier);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
         fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections);
         var collection = new Collection();
         collection.setLocation("coll");

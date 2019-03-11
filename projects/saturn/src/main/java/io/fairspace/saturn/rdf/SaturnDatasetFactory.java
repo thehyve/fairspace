@@ -10,14 +10,13 @@ import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
 
-import static io.fairspace.saturn.rdf.Vocabulary.initVocabulary;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
-import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.text.es.TextESDatasetFactory.createESIndex;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
 
@@ -31,7 +30,7 @@ public class SaturnDatasetFactory {
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled),
      * inverse properties' inference, and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config) {
+    public static Dataset connect(Config.Jena config, Node vocabularyGraphNode) {
         var restoreNeeded = !config.datasetPath.exists();
 
         // Create a TDB2 dataset graph
@@ -45,10 +44,6 @@ public class SaturnDatasetFactory {
 
         // Add transaction log
         dsg = new TxnLogDatasetGraph(dsg, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
-
-        // Apply the vocabulary
-        var vocabularyGraphNode = createURI(config.baseIRI + "vocabulary");
-        initVocabulary(dsg, vocabularyGraphNode);
 
         // ElasticSearch
         if (config.elasticSearch.enabled) {
