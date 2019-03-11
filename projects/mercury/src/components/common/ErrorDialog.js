@@ -25,12 +25,12 @@ class ErrorDialog extends React.Component {
         ErrorDialog.instance = this;
     }
 
-    static showError(error, message, onRetry, printToConsole = true) {
+    static showError(error, message, onRetry, onDismiss, printToConsole = true) {
         if (printToConsole) {
             console.error(message, error);
         }
         if (ErrorDialog.instance) {
-            ErrorDialog.instance.setState({error: true, stackTrace: error, message, onRetry});
+            ErrorDialog.instance.setState({error: true, stackTrace: error, message, onRetry, onDismiss});
         }
     }
 
@@ -40,12 +40,15 @@ class ErrorDialog extends React.Component {
 
     handleClose = () => {
         this.setState({error: false, onRetry: null});
+
+        if (this.state.onDismiss) {
+            this.state.onDismiss();
+        }
     };
 
     handleRetry = () => {
-        const retry = this.state.onRetry;
         this.setState({error: false, onRetry: null});
-        retry();
+        this.state.onRetry();
     };
 
     render() {
