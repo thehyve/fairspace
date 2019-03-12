@@ -5,7 +5,7 @@ import {InputBase, withStyles} from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
 import styles from './SearchBar.styles';
-import {buildSearchUrl, getSearchTypeFromString, getSearchQueryFromString} from '../../utils/searchUtils';
+import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
 
 class SearchBar extends React.Component {
     state = {
@@ -19,7 +19,6 @@ class SearchBar extends React.Component {
     handleKeyDown = (event) => {
         // if Enter is pressed and search has value
         if (event.keyCode === 13 && this.state.value) {
-            const type = getSearchTypeFromString(this.props.location.search);
             const searchUrl = buildSearchUrl(this.state.value);
             this.props.history.push(searchUrl);
         }
