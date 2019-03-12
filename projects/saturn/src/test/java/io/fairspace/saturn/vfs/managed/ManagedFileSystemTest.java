@@ -15,9 +15,10 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
+import static org.apache.commons.codec.digest.DigestUtils.md5;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
@@ -87,6 +88,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir");
 
         fs.create("coll/dir/file", new ByteArrayInputStream(content1));
+        assertEquals("coll/dir/file", fs.stat("coll/dir/file").getPath());
         assertEquals(content1.length, fs.stat("coll/dir/file").getSize());
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir/file", os);
@@ -99,9 +101,17 @@ public class ManagedFileSystemTest {
         if (!Arrays.equals(content2, os.toByteArray())) {
             assertArrayEquals(content2, os.toByteArray());
         }
-        assertTrue(ds.getDefaultModel().contains(createResource(fs.stat("coll/dir/file").getIri()), RDFS.label, createStringLiteral("file")));
     }
 
+    @Test
+    public void checksumCalculation() throws IOException {
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        var resource = createResource(fs.stat("coll/file").getIri());
+        assertEquals(encodeHexString(md5(content1)), ds.getDefaultModel().getProperty(resource, createProperty("http://fairspace.io/ontology#md5")).getString());
+
+        fs.modify("coll/file", new ByteArrayInputStream(content2));
+        assertEquals(encodeHexString(md5(content2)), ds.getDefaultModel().getProperty(resource, createProperty("http://fairspace.io/ontology#md5")).getString());
+    }
 
     @Test
     public void copyDir() throws IOException {

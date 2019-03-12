@@ -321,6 +321,16 @@
             ]
         },
         {
+            "@id": "fs:md5",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:machineOnly": true,
+            "rdfs:comment": "MD5 chcksum",
+            "rdfs:domain": [{ "@id": "fs:File" }],
+            "rdfs:label": "MD5",
+            "rdfs:range": [{"@id": "xsd:string"}]
+        },
+        {
             "@id": "fs:derivesFrom",
             "@type": "rdf:Property",
             "fs:allowMultiple": false,
