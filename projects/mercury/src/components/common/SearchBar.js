@@ -20,7 +20,7 @@ class SearchBar extends React.Component {
         // if Enter is pressed and search has value
         if (event.keyCode === 13 && this.state.value) {
             const type = getSearchTypeFromString(this.props.location.search);
-            const searchUrl = buildSearchUrl(type, this.state.value);
+            const searchUrl = buildSearchUrl(this.state.value);
             this.props.history.push(searchUrl);
         }
     }

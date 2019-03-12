@@ -1,6 +1,8 @@
 import elasticsearch from "elasticsearch";
 import Config from "./Config/Config";
-import {COLLECTION_SEARCH_TYPE, COLLECTION_URI, DIRECTORY_URI, FILE_URI, FILES_SEARCH_TYPE} from '../constants';
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from '../constants';
+
+const ES_INDEX = 'fairspace';
 
 export class SearchAPI {
     constructor(client, index) {
@@ -41,11 +43,7 @@ export class SearchAPI {
         });
     };
 
-    searchCollections = (query) => this.searchForTypes(query, [COLLECTION_URI]);
-
-    searchFiles = (query) => this.searchForTypes(query, [DIRECTORY_URI, FILE_URI]);
-
-    searchAll = (query) => this.searchForTypes(query);
+    searchAll = (query) => this.searchForTypes(query, [DIRECTORY_URI, FILE_URI, COLLECTION_URI]);
 
     /**
      * Performs a search query
@@ -53,15 +51,8 @@ export class SearchAPI {
      * @param query
      * @returns {Promise}
      */
-    performSearch = (query, type) => {
-        switch (type) {
-            case COLLECTION_SEARCH_TYPE:
-                return this.searchCollections(query);
-            case FILES_SEARCH_TYPE:
-                return this.searchFiles(query);
-            default:
-                return this.searchAll(query);
-        }
+    performSearch = (query) => {
+        return this.searchAll(query);
     };
 }
 
@@ -71,7 +62,7 @@ export class SearchAPI {
 let api;
 export default () => {
     if (!api) {
-        api = new SearchAPI(new elasticsearch.Client(Config.get().elasticsearch));
+        api = new SearchAPI(new elasticsearch.Client(Config.get().elasticsearch), ES_INDEX);
     }
 
     return api;
