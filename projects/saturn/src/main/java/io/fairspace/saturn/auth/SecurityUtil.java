@@ -37,8 +37,8 @@ public class SecurityUtil {
     }
 
     public static UserInfo userInfo() {
-        return (UserInfo) currentRequest()
-                .map(request -> request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE))
-                .orElse(null) ;
+        return currentRequest()
+                .map(request -> (UserInfo) request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE))
+                .orElse(null);
     }
 }

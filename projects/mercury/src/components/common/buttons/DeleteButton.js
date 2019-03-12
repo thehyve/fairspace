@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import ConfirmationDialog from '../ConfirmationDialog';
 
@@ -9,7 +10,9 @@ class DeleteButton extends React.Component {
 
     openDialog = (e) => {
         if (e) e.stopPropagation();
-        this.setState({verifying: true});
+        if (!this.props.disabled) {
+            this.setState({verifying: true});
+        }
     }
 
     closeDialog = (e) => {
@@ -23,9 +26,9 @@ class DeleteButton extends React.Component {
     }
 
     render() {
-        const {children, file} = this.props;
+        const {children, file, disabled} = this.props;
         const {verifying} = this.state;
-        const dialog = verifying ? (
+        const dialog = verifying && !disabled ? (
             <ConfirmationDialog
                 open
                 title="Confirmation"
@@ -46,5 +49,14 @@ class DeleteButton extends React.Component {
         );
     }
 }
+
+DeleteButton.propTypes = {
+    onClick: PropTypes.func.isRequired,
+    disabled: PropTypes.bool
+};
+
+DeleteButton.defaultProps = {
+    disabled: false
+};
 
 export default DeleteButton;

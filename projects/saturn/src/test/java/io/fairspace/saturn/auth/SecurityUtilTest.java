@@ -42,6 +42,7 @@ public class SecurityUtilTest {
                 .subject("subj")
                 .claim("name", "John Smith")
                 .claim("preferred_username", "user1")
+                .claim("email", "user@example.com")
                 .claim("authorities", asList("role1", "role2"))
                 .build();
         when(jwtProcessor.process(eq("token"), any())).thenReturn(claimSet);
@@ -51,6 +52,7 @@ public class SecurityUtilTest {
         assertEquals("subj", userInfo.getUserId());
         assertEquals("John Smith", userInfo.getFullName());
         assertEquals("user1", userInfo.getUserName());
+        assertEquals("user@example.com", userInfo.getEmail());
         assertEquals(new HashSet<>(asList("role1", "role2")), userInfo.getAuthorities());
     }
 

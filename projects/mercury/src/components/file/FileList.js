@@ -77,6 +77,7 @@ class FileList extends React.Component {
                                         selectionEnabled ? (
                                             <TableCell
                                                 padding="none"
+                                                onDoubleClick={(e) => e.stopPropagation()}
                                                 onClick={() => onPathClick(item)}
                                             >
                                                 <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
