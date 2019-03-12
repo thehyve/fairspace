@@ -36,7 +36,7 @@ public class DAOTest {
     public void before() {
         setWorkspaceURI("http://example.com/iri/");
         dataset = createTxnMem();
-        dao = new DAO(connect(dataset), () -> "http://example.com/" + randomUUID());
+        dao = new DAO(connect(dataset), () -> createURI("http://example.com/" + randomUUID()));
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();
