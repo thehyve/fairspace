@@ -7,12 +7,14 @@ import SearchResults from './SearchResults';
 import {getSearchQueryFromString} from '../../utils/searchUtils';
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import * as searchActions from '../../actions/searchActions';
+import * as metadataActions from '../../actions/metadataActions';
 import {ErrorMessage} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
 
 // Exporting here to be able to test the component outside of Redux
 export class SearchPage extends React.Component {
     componentDidMount() {
+        this.props.fetchVocabularyIfNeeded();
         this.updateResults();
     }
 
@@ -40,11 +42,11 @@ export class SearchPage extends React.Component {
         if (resultType === COLLECTION_URI) {
             this.props.history.push(getCollectionAbsolutePath(hit._source.filePath[0]));
         } else if (resultType === DIRECTORY_URI) {
-            // TODO: handle directory open (currently don't have collection info within the file info)
+            // TODO: handle directory open. See VRE-580
         } else if (resultType === FILE_URI) {
-            // TODO: handle file open (currently don't have collection info within the file info)
+            // TODO: handle file open. See VRE-580
         } else {
-            // TODO: handle metadata open
+            // TODO: handle metadata open. Out of scope for now
         }
     }
 
@@ -60,26 +62,30 @@ export class SearchPage extends React.Component {
                 loading={loading}
                 results={results}
                 onResultDoubleClick={this.handleResultDoubleClick}
+                vocabulary={this.props.vocabulary}
             />
         );
     }
 }
 
-const mapStateToProps = ({search}) => ({
-    loading: search.pending,
+const mapStateToProps = ({search, cache: {vocabulary}}) => ({
+    loading: search.pending || !vocabulary || vocabulary.pending,
     results: search.results,
     error: search.error,
+    vocabulary: vocabulary && vocabulary.data
 });
 
 const mapDispatchToProps = {
-    performSearch: searchActions.performSearch
+    performSearch: searchActions.performSearch,
+    fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded
 };
 
 SearchPage.propTypes = {
     location: PropTypes.shape({
         search: PropTypes.string.isRequired
     }),
-    performSearch: PropTypes.func.isRequired
+    performSearch: PropTypes.func.isRequired,
+    fetchVocabularyIfNeeded: PropTypes.func.isRequired
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SearchPage));

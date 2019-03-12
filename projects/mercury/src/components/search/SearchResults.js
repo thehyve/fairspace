@@ -2,14 +2,26 @@ import React from 'react';
 import {Grid, Paper, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import * as PropTypes from "prop-types";
 import {LoadingInlay} from "../common";
+import SearchResultHighlights from "./SearchResultHighlights";
 
 /* eslint-disable no-underscore-dangle */
 const searchResults = ({
     loading,
     results,
-    onResultDoubleClick
+    onResultDoubleClick,
+    vocabulary
 }) => {
     let contents;
+
+    const generateTypeLabel = (typeUri) => {
+        // If vocabulary has not been loaded, we can not
+        // retrieve the label. Just return the URI in that (rare) case
+        if (!vocabulary) {
+            return typeUri;
+        }
+
+        return vocabulary.getLabelForPredicate(typeUri);
+    }
 
     if (loading) {
         contents = <LoadingInlay />;
@@ -21,9 +33,10 @@ const searchResults = ({
                 <Table padding="dense">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Name</TableCell>
+                            <TableCell>Label</TableCell>
                             <TableCell>Type</TableCell>
                             <TableCell>Description</TableCell>
+                            <TableCell>Match</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -37,10 +50,13 @@ const searchResults = ({
                                     {hit._source.label}
                                 </TableCell>
                                 <TableCell padding="none">
-                                    {hit._source.type}
+                                    {generateTypeLabel(hit._source.type)}
                                 </TableCell>
                                 <TableCell>
                                     {hit._source.comment}
+                                </TableCell>
+                                <TableCell>
+                                    <SearchResultHighlights highlights={hit.highlight} />
                                 </TableCell>
                             </TableRow>
                         ))}

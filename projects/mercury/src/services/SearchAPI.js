@@ -38,12 +38,15 @@ export class SearchAPI {
         return this.client.search({
             index: this.index,
             body: {
-                query: esQuery
+                query: esQuery,
+                highlight: {
+                    fields: {
+                        "*": {}
+                    }
+                }
             }
         });
     };
-
-    searchAll = (query) => this.searchForTypes(query, [DIRECTORY_URI, FILE_URI, COLLECTION_URI]);
 
     /**
      * Performs a search query
@@ -52,7 +55,7 @@ export class SearchAPI {
      * @returns {Promise}
      */
     performSearch = (query) => {
-        return this.searchAll(query);
+        return this.searchForTypes(query, [DIRECTORY_URI, FILE_URI, COLLECTION_URI]);
     };
 }
 

@@ -57,6 +57,10 @@ const vocabularyJsonLd = [
         '@id': 'http://fairspace.io/ontology#File',
         '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class',
         [LABEL_URI]: [{'@value': 'File'}]
+    },
+    {
+        '@id': 'http://fairspace.io/ontology#Unknown',
+        '@type': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class',
     }
 ];
 const vocabulary = new Vocabulary(vocabularyJsonLd);
@@ -300,4 +304,21 @@ describe('combination of vocabulary and metadata', () => {
             expect(result[0].values[1].label).toEqual(undefined);
         });
     });
+
+    describe('getLabelForPredicate', () => {
+        it('returns the label for a known predicate', () => {
+            expect(vocabulary.getLabelForPredicate('http://www.w3.org/2000/01/rdf-schema#label')).toEqual('Name');
+        });
+
+        it('returns the uri if no label is known for a predicate', () => {
+            const uri = 'http://fairspace.io/ontology#Unknown';
+            expect(vocabulary.getLabelForPredicate(uri)).toEqual(uri);
+        });
+
+        it('returns the uri if the predicate itself is unknown', () => {
+            const uri = 'http://fairspace.io/ontology#NonExisting';
+            expect(vocabulary.getLabelForPredicate(uri)).toEqual(uri);
+        });
+
+    })
 });
