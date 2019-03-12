@@ -131,7 +131,7 @@
                     "@id": "fs:Analysis"
                 }
             ],
-            "rdfs:label": "Name",
+            "rdfs:label": "Label",
             "rdfs:range": [
                 {
                     "@id": "xsd:string"
