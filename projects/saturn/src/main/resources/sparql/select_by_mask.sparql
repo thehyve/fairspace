@@ -4,4 +4,4 @@
 # 2 - predicate
 # 3 - object
 
-CONSTRUCT { ?1 ?2 ?3 . } WHERE { GRAPH ?0 {?1 ?2 ?3} }
+CONSTRUCT { %2$s %3$s %4$s . } WHERE { GRAPH %1$s {%2$s %3$s %4$s} }

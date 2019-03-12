@@ -14,26 +14,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
-import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataServiceTest {
-    private static final String baseURI = "http://example.com/";
-    private static final String vocabularyURI = baseURI + "vocabulary";
-    private static final String GRAPH = baseURI + "graph";
+    private static final String vocabularyURI = "http://fairspace.io/iri/vocabulary";
+    private static final String GRAPH = "http://fairspace.io/iri/graph";
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
     private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
@@ -55,7 +46,6 @@ public class MetadataServiceTest {
 
     @Before
     public void setUp() {
-        setWorkspaceURI(baseURI);
         ds = createTxnMem();
         api = new MetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(vocabularyURI));
     }

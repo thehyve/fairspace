@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -31,7 +30,6 @@ public class ManagedFileSystemTest {
 
     @Before
     public void before()  {
-        setWorkspaceURI("http://example.com/");
         var store = new MemoryBlobStore();
         ds = createTxnMem();
         var rdf = connect(ds);

@@ -8,17 +8,17 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 
 DELETE {
-  ?0 fs:userName ?oldUserName;
+  %1$s fs:userName ?oldUserName;
      rdfs:label ?oldFullName;
      fs:authorities ?oldAuthorities;
 }
 INSERT {
-  ?0 fs:userName ?1;
-     rdfs:label ?2;
-     fs:authorities ?3;
+  %1$s fs:userName %2$s;
+     rdfs:label %3$s;
+     fs:authorities %4$s;
 }
 WHERE {
-  ?0 a fs:User;
+  %1$s a fs:User;
      fs:userName ?oldUserName;
      rdfs:label ?oldFullName;
      fs:authorities ?oldAuthorities;

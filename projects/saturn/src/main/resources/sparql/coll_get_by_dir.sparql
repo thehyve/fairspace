@@ -4,6 +4,6 @@ PREFIX fs: <http://fairspace.io/ontology#>
 
 CONSTRUCT { ?s ?p ?o . }
 WHERE {
-  ?s fs:filePath ?0; a fs:Collection; ?p ?o.
+  ?s fs:filePath %1$s; a fs:Collection; ?p ?o.
   FILTER NOT EXISTS { ?s fs:dateDeleted ?dateDeleted }
 }

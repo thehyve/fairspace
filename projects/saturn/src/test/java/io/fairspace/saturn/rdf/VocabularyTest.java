@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -16,21 +15,17 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabularyTest {
-    private static final String baseURI = "http://example.com/";
     private static final Resource resource1 = createResource("http://property1");
     private static final Resource resource2 = createResource("http://property2");
     private static final Resource resource3 = createResource("http://property3");
-    private static final Resource unknownResource= createResource("http://unknownResource");
+    private static final Resource unknownResource = createResource("http://unknown-resource.com");
     private static final Property machineOnly = createProperty("http://fairspace.io/ontology#machineOnly");
 
     private Vocabulary vocabulary;
@@ -38,11 +33,10 @@ public class VocabularyTest {
 
     @Before
     public void setUp() {
-        setWorkspaceURI(baseURI); // TODO: Remove this global variable
         Dataset dataset = createTxnMem();
         RDFConnectionLocal rdf = new RDFConnectionLocal(dataset);
 
-        Node vocabularyUri = createURI(baseURI + "vocabulary");
+        Node vocabularyUri = createURI("http://fairspace.io/iri/vocabulary");
         vocabularyModel = dataset.getNamedModel(vocabularyUri.getURI());
 
         // Create object under test
