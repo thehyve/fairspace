@@ -8,8 +8,7 @@ describe('Search reducers', () => {
     it('should return the initial state when no action is given', () => {
         const initialState = {
             pending: false,
-            searchType: null,
-            results: [],
+            results: {},
             error: null,
         };
         expect(reducer(undefined, {}))
@@ -24,21 +23,20 @@ describe('Search reducers', () => {
             })
         ).toEqual({
             pending: true,
-            searchType: 'collections',
-            results: [],
+            results: {},
             error: null,
         });
     });
 
     it('should update results on search success', () => {
-        const results = ['item 1', 'item 2'];
+        const results = {hits: ['item 1', 'item 2']};
 
         expect(
             reducer(undefined, {
                 type: actionTypes.PERFORM_SEARCH_FULFILLED,
                 payload: results,
                 meta: {searchType: 'collections'},
-            }).results
+            }).results.hits
         ).toContain('item 1');
     });
 });
