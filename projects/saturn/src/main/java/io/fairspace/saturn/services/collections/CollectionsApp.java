@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import spark.servlet.SparkApplication;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-import static io.fairspace.saturn.services.errors.ErrorHelper.returnError;
+import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
@@ -73,11 +73,11 @@ public class CollectionsApp implements SparkApplication {
             });
         });
 
-        exception(JsonMappingException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Invalid request body"));
-        exception(IllegalArgumentException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, e.getMessage()));
-        exception(DAOException.class, (e, req, res) -> returnError(res, SC_BAD_REQUEST, "Bad request"));
-        exception(CollectionNotFoundException.class, (e, req, res) -> returnError(res, SC_NOT_FOUND, e.getMessage()));
-        exception(CollectionAccessDeniedException.class, (e, req, res) -> returnError(res, SC_UNAUTHORIZED, e.getMessage()));
-        exception(LocationAlreadyExistsException.class, (e, req, res) -> returnError(res, SC_CONFLICT, e.getMessage()));
+        exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
+        exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
+        exception(DAOException.class, exceptionHandler(SC_BAD_REQUEST, "Bad request"));
+        exception(CollectionNotFoundException.class, exceptionHandler(SC_NOT_FOUND, null));
+        exception(CollectionAccessDeniedException.class, exceptionHandler(SC_UNAUTHORIZED, null));
+        exception(LocationAlreadyExistsException.class, exceptionHandler(SC_CONFLICT, null));
     }
 }
