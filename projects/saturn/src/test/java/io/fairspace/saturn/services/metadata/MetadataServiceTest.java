@@ -57,8 +57,7 @@ public class MetadataServiceTest {
     public void setUp() {
         setWorkspaceURI(baseURI);
         ds = createTxnMem();
-        RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new MetadataService(rdf, createURI(GRAPH), createURI(vocabularyURI));
+        api = new MetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(vocabularyURI));
     }
 
     @Test

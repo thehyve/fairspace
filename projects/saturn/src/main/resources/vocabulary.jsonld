@@ -219,7 +219,7 @@
                 { "@id": "fs:File" }
             ],
             "rdfs:label": "Creator",
-            "rdfs:range":  { "@id": "xsd:string" }
+            "rdfs:range":  { "@id": "fs:User" }
         },
         {
             "@id": "fs:modifiedBy",
@@ -233,7 +233,7 @@
                 { "@id": "fs:File" }
             ],
             "rdfs:label": "Modified By",
-            "rdfs:range":  { "@id": "xsd:string" }
+            "rdfs:range":  { "@id": "fs:User" }
         },
         {
             "@id": "fs:deletedBy",
@@ -247,7 +247,7 @@
                 { "@id": "fs:File" }
             ],
             "rdfs:label": "Deleted By",
-            "rdfs:range":  { "@id": "xsd:string" }
+            "rdfs:range":  { "@id": "fs:User" }
         },
         {
             "@id": "fs:dateCreated",

@@ -1,6 +1,6 @@
 package io.fairspace.saturn.vfs.managed;
 
-import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import org.apache.jena.query.Dataset;
@@ -35,9 +35,9 @@ public class ManagedFileSystemTest {
         var store = new MemoryBlobStore();
         ds = createTxnMem();
         var rdf = connect(ds);
-        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
-        var collections = new CollectionsService(rdf, userInfoSupplier);
-        fs = new ManagedFileSystem(rdf, store, userInfoSupplier, collections);
+        Supplier<String> userIriSupplier = () -> "http://example.com/user";
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
+        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections);
         var collection = new Collection();
         collection.setLocation("coll");
         collection.setName("My Collection");
@@ -79,6 +79,8 @@ public class ManagedFileSystemTest {
         assertTrue(stat.isDirectory());
         assertNotNull(stat.getIri());
         assertTrue(ds.getDefaultModel().contains(createResource(stat.getIri()), RDFS.label, createStringLiteral("ccc")));
+        assertEquals( "http://example.com/user", stat.getCreatedBy());
+        assertEquals( "http://example.com/user", stat.getModifiedBy());
     }
 
     @Test

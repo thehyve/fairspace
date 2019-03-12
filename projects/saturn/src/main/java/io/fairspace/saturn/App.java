@@ -2,13 +2,15 @@ package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.fairspace.saturn.auth.SecurityUtil;
+import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.Vocabulary;
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
@@ -19,8 +21,10 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
+import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -43,8 +47,10 @@ public class App {
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds);
 
-        var collections = new CollectionsService(rdf, SecurityUtil::userInfo);
-        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), SecurityUtil::userInfo, collections));
+        var userService = new UserService(new DAO(rdf, null));
+        Supplier<String> userIriSupplier = () -> userService.getUserIRI(userInfo());
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), userIriSupplier, collections));
 
         // Setup and initialize vocabularies
         Vocabulary vocabulary = new Vocabulary(rdf, vocabularyGraphNode);
@@ -59,16 +65,16 @@ public class App {
                         new MetadataApp("/api/metadata", rdf, defaultGraphIRI, vocabulary),
                         new MetadataApp("/api/vocabulary", rdf, createURI(config.jena.baseIRI + "vocabulary"), metaVocabulary),
                         new CollectionsApp(collections),
-                        //    new VocabularyApp(rdf),
                         new HealthApp()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
                 .port(config.port);
 
         var auth = config.auth;
-        if (auth.enabled) {
-            var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
-            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
+        if (!auth.enabled) {
+            log.warn("Authentication is disabled");
         }
+        var authenticator = auth.enabled ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm) : new DummyAuthenticator();
+        fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
 
         fusekiServerBuilder
                 .build()

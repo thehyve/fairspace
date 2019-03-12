@@ -9,14 +9,10 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.modify.request.QuadAcc;
-import org.apache.jena.sparql.modify.request.QuadDataAcc;
-import org.apache.jena.sparql.modify.request.UpdateDataDelete;
-import org.apache.jena.sparql.modify.request.UpdateDataInsert;
-import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.modify.request.*;
 import org.apache.jena.update.UpdateRequest;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -27,7 +23,6 @@ import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.graph.NodeFactory.createVariable;
 
 @AllArgsConstructor
 class MetadataService {
@@ -161,7 +156,7 @@ class MetadataService {
         }
     }
 
-    private String createPatchQuery(Collection<Statement> statements) {
+    private UpdateRequest createPatchQuery(Collection<Statement> statements) {
         var updateRequest = new UpdateRequest();
 
         statements
@@ -172,13 +167,13 @@ class MetadataService {
                         graph,                  // Graph
                         p.getLeft().asNode(),   // Subject
                         p.getRight().asNode(),  // Predicate
-                        createVariable("o")))   // A free variable matching any object
+                        Var.alloc("o")))        // A free variable matching any object
                 .map(q -> new UpdateDeleteWhere(new QuadAcc(singletonList(q))))
                 .forEach(updateRequest::add);
 
         updateRequest.add(new UpdateDataInsert(new QuadDataAcc(toQuads(statements))));
 
-        return updateRequest.toString();
+        return updateRequest;
     }
 
     private List<Quad> toQuads(Collection<Statement> statements) {
