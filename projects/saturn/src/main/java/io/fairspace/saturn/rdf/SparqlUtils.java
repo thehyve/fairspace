@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf;
 
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
@@ -35,14 +36,11 @@ public class SparqlUtils {
         return format(template, (Object[]) params);
     }
 
+    @SneakyThrows(IOException.class)
     private static String load(String name) {
-        try {
-            return "PREFIX ws: " + stringForNode(createURI(CONFIG.jena.baseIRI)) + "\n" +
-                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
-            IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), "UTF-8");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return "PREFIX ws: " + stringForNode(createURI(CONFIG.jena.baseIRI)) +
+                "\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+                IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), "UTF-8");
     }
 
     public static Node generateIri() {
@@ -54,12 +52,11 @@ public class SparqlUtils {
     }
 
     private static String stringify(Object value) {
-
         if (value instanceof Node) {
             if (((Node) value).isURI()) {
                 validateIRI(((Node) value).getURI());
             }
-            return stringForNode((Node)value);
+            return stringForNode((Node) value);
         }
         if (value instanceof String) {
             return stringForString((String) value);
