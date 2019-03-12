@@ -7,7 +7,8 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
-import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.query.QuerySolution;
@@ -109,7 +110,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
         var blobInfo = write(in);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, blobInfo.size, blobInfo.id, userId(), name(path), blobInfo.md5)));
+                rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userId(), name(path), blobInfo.getMd5())));
     }
 
     @Override
@@ -117,7 +118,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         var blobInfo = write(in);
 
         withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, blobInfo.size, blobInfo.id, userId(), blobInfo.md5)));
+                () -> rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userId(), blobInfo.getMd5())));
     }
 
     @Override
@@ -218,21 +219,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return (c == null) ? Access.None : c.getAccess();
     }
 
+    @SneakyThrows(NoSuchAlgorithmException.class)
     private BlobInfo write(InputStream in) throws IOException {
-        var cis = new CountingInputStream(in);
-        MessageDigestCalculatingInputStream md;
-        try {
-            md = new MessageDigestCalculatingInputStream(cis);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        var countingInputStream = new CountingInputStream(in);
+        var messageDigestCalculatingInputStream = new MessageDigestCalculatingInputStream(countingInputStream);
 
-        var id = store.write(md);
+        var id = store.write(messageDigestCalculatingInputStream);
 
-        return new BlobInfo(id, cis.getByteCount(), encodeHexString(md.getMessageDigest().digest()));
+        return new BlobInfo(id, countingInputStream.getByteCount(), encodeHexString(messageDigestCalculatingInputStream.getMessageDigest().digest()));
     }
 
-    @AllArgsConstructor
+    @Value
     private static class BlobInfo {
         String id;
         long size;

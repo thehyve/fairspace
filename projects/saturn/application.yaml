@@ -9,7 +9,7 @@ jena:
   transactionLogPath: "data/log"
   elasticSearch:
     # Enables ElasticSearch integration
-    enabled: false
+    enabled: true
     # Makes availability of ElasticSearch mandatory
     required: false
     settings:
@@ -23,7 +23,7 @@ jena:
       # Number of replicas. Defaults to 1
       replicas: 1
       # Name of the index. Defaults to "fairspace"
-      indexName: "fairspace"
+      indexName: "fairspace9"
 auth:
   # Enables JWT/JWKS authentication. Defaults to false.
   enabled: false
