@@ -1,0 +1,145 @@
+{
+  "took": 6,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 2,
+    "max_score": 4.521685,
+    "hits": [
+      {
+        "_index": "fairspace",
+        "_type": "iri",
+        "_id": "http://fairspace.io/iri/0df9a97a-45aa-9a98-b428-2ba35bd61c2c",
+        "_score": 4.59,
+        "_source": {
+          "inverseOf": [],
+          "classInfix": [],
+          "fairspaceEntity": [],
+          "multiLine": [],
+          "filePath": [
+            "aa/Test update directory/update.txt"
+          ],
+          "range": [],
+          "dateModified": [
+            "2019-03-12T09:31:34.101+01:00"
+          ],
+          "label": [
+            "update.txt"
+          ],
+          "type": [
+            "http://fairspace.io/ontology#File"
+          ],
+          "createdBy": [
+            ""
+          ],
+          "dateCreated": [
+            "2019-03-14T15:31:34.101+01:00"
+          ],
+          "modifiedBy": [
+            ""
+          ],
+          "fileSize": [
+            "3814"
+          ]
+        },
+        "highlight": {
+          "label": [
+            "<em>update</em>.txt"
+          ]
+        }
+      },
+      {
+        "_index": "fairspace",
+        "_type": "iri",
+        "_id": "http://fairspace.io/iri/a97a0df9-9a98-45aa-b428-2bdba3561c2c",
+        "_score": 4.521685,
+        "_source": {
+          "inverseOf": [],
+          "classInfix": [],
+          "fairspaceEntity": [],
+          "multiLine": [],
+          "filePath": [
+            "aa/Test update directory"
+          ],
+          "range": [],
+          "dateModified": [
+            "2019-03-12T09:31:34.101+01:00"
+          ],
+          "label": [
+            "Test update directory"
+          ],
+          "type": [
+            "http://fairspace.io/ontology#Directory"
+          ],
+          "createdBy": [
+            ""
+          ],
+          "dateCreated": [
+            "2019-03-12T09:31:34.101+01:00"
+          ],
+          "modifiedBy": [
+            ""
+          ],
+          "fileSize": [
+            "0"
+          ]
+        },
+        "highlight": {
+          "label": [
+            "<em>Test</em> update directory"
+          ]
+        }
+      },
+      {
+        "_index": "fairspace",
+        "_type": "iri",
+        "_id": "http://fairspace.io/iri/ba5bd9ed-82f9-429f-85a6-d642a9519bb4",
+        "_score": 4.402738,
+        "_source": {
+          "inverseOf": [],
+          "classInfix": [],
+          "fairspaceEntity": [],
+          "multiLine": [],
+          "range": [],
+          "label": [
+            "Collection update"
+          ],
+          "type": [
+            "http://fairspace.io/ontology#Collection"
+          ],
+          "filePath": [
+            "aa"
+          ],
+          "comment": [
+            "Description for test 人物"
+          ],
+          "collectionType": [
+            "LOCAL"
+          ],
+          "createdBy": [
+            ""
+          ],
+          "dateCreated": [
+            "2019-03-12T09:29:33.172+01:00"
+          ],
+          "modifiedBy": [
+            ""
+          ],
+          "dateModified": [
+            "2019-03-12T09:29:33.172+01:00"
+          ]
+        },
+        "highlight": {
+          "comment": [
+            "Description for <em>test</em> 人物"
+          ]
+        }
+      }
+    ]
+  }
+}
