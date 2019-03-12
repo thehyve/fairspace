@@ -18,7 +18,7 @@
 
   "elasticsearch": {
     "host": "/api/search",
-    "log": "trace"
+    "log": "error"
   },
   "externalConfigurationFiles": [
     "/api/workspace/config"
