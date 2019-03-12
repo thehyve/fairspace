@@ -21,6 +21,7 @@ describe('FilesPage', () => {
         it('updates url after collection location has changed', () => {
             const history = [];
             const wrapper = shallow(<FilesPage
+                fetchFilesIfNeeded={() => {}}
                 openedPath={openedPath}
                 openedCollection={openedCollection}
                 history={history}
@@ -36,7 +37,8 @@ describe('FilesPage', () => {
         it('can handle an empty openedPath', () => {
             const history = [];
             const wrapper = shallow(<FilesPage
-                openedPath={'/location1'}
+                fetchFilesIfNeeded={() => {}}
+                openedPath="/location1"
                 openedCollection={openedCollection}
                 history={history}
                 selectCollection={selectCollection}
