@@ -50,6 +50,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
         this.collections = collections;
         collections.setOnLocationChangeListener((oldLocation, newLocation) ->
                 rdf.update(storedQuery("fs_move", oldLocation, newLocation, "")));
+        collections.setOnCollectionDeletedListener(location ->
+                rdf.update(storedQuery("fs_delete", location, userIriSupplier.get())));
     }
 
     @Override

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -20,6 +21,8 @@ public class CollectionsService {
     private final DAO dao;
     @Getter @Setter
     private BiConsumer<String, String> onLocationChangeListener;
+    @Getter @Setter
+    private Consumer<String> onCollectionDeletedListener;
 
     public CollectionsService(DAO dao) {
         this.dao = dao;
@@ -76,6 +79,10 @@ public class CollectionsService {
             }
 
             dao.markAsDeleted(existing);
+            var listener = onCollectionDeletedListener;
+            if (listener != null) {
+                listener.accept(existing.getLocation());
+            }
         });
     }
 

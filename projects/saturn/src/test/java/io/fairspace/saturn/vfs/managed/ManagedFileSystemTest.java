@@ -26,6 +26,7 @@ public class ManagedFileSystemTest {
     private final byte[] content1 = new byte[]{1, 2, 3};
     private final byte[] content2 = new byte[]{1, 2, 3, 4};
 
+    private CollectionsService collections;
     private Dataset ds;
     private ManagedFileSystem fs;
 
@@ -36,7 +37,7 @@ public class ManagedFileSystemTest {
         ds = createTxnMem();
         var rdf = connect(ds);
         Supplier<String> userIriSupplier = () -> "http://example.com/user";
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier));
         fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections);
         var collection = new Collection();
         collection.setLocation("coll");
@@ -208,6 +209,21 @@ public class ManagedFileSystemTest {
 
         assertTrue(fs.exists("coll/dir/file"));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
+    }
+
+    @Test
+    public void filesAreDeletedAfterDeletingACollection() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        collections.delete(collections.getByLocation("coll").getIri().getURI());
+
+        var collection = new Collection();
+        collection.setLocation("coll");
+        collection.setName("A new Collection");
+        collection.setType("LOCAL");
+        collections.create(collection);
+
+        assertEquals(0, fs.list("coll").size());
     }
 
     @Test
