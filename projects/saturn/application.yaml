@@ -23,7 +23,7 @@ jena:
       # Number of replicas. Defaults to 1
       replicas: 1
       # Name of the index. Defaults to "fairspace"
-      indexName: "fairspace9"
+      indexName: "fairspace"
 auth:
   # Enables JWT/JWKS authentication. Defaults to false.
   enabled: false
