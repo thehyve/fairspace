@@ -12,13 +12,17 @@ import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 public class ErrorHelper {
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    @SneakyThrows(JsonProcessingException.class)
     public static <T extends Exception> ExceptionHandler<T> exceptionHandler(int status, String message) {
         return (e, req, res) -> {
             log.error("{} Error handling request {} {}", status, req.requestMethod(), req.uri(), e);
             res.status(status);
             res.type(APPLICATION_JSON.asString());
-            res.body(mapper.writeValueAsString(new ErrorDto(status, message != null ? message : e.getMessage())));
+            res.body(errorBody(status, message != null ? message : e.getMessage()));
         };
+    }
+
+    @SneakyThrows(JsonProcessingException.class)
+    private static String errorBody(int status, String message) {
+        return mapper.writeValueAsString(new ErrorDto(status, message));
     }
 }
