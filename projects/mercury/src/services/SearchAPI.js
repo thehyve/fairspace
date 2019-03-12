@@ -1,63 +1,78 @@
+import elasticsearch from "elasticsearch";
 import Config from "./Config/Config";
-import failOnHttpError from "../utils/httpUtils";
-import {COLLECTION_SEARCH_TYPE, FILES_SEARCH_TYPE} from '../constants';
-import {getSearchQueryFromString, getSearchTypeFromString} from '../utils/searchUtils';
+import {COLLECTION_SEARCH_TYPE, COLLECTION_URI, DIRECTORY_URI, FILE_URI, FILES_SEARCH_TYPE} from '../constants';
 
-const searchCollections = () => (
-    fetch(Config.get().urls.collections, {
-        method: 'GET',
-        headers: new Headers({Accept: 'application/json'}),
-        credentials: 'same-origin'
-    })
-        .then(failOnHttpError("Failure when searching collections"))
-        .then(response => response.json())
-);
-
-const sampleFiles = [
-    {
-        filename: "/Jan_Smit_s_collection-500/dir1",
-        basename: "dir1",
-        lastmod: "Fri, 15 Feb 2019 09:40:16 GMT",
-        size: 0,
-        type: "directory"
-    },
-    {
-        filename: "/Jan_Smit_s_collection-500/sub-dir",
-        basename: "sub-dir",
-        lastmod: "Fri, 15 Feb 2019 09:40:16 GMT",
-        size: 0,
-        type: "directory"
-    },
-    {
-        filename: "/Jan_Smit_s_collection-500/file1.txt",
-        basename: "file1.txt",
-        lastmod: "Fri, 15 Feb 2019 09:40:16 GMT",
-        size: 0,
-        type: "file",
-        mime: "text/plain"
-    },
-    {
-        filename: "/Jan_Smit_s_collection-500/file2.txt",
-        basename: "file2.txt",
-        lastmod: "Fri, 15 Feb 2019 09:40:16 GMT",
-        size: 0,
-        type: "file",
-        mime: "text/plain"
+export class SearchAPI {
+    constructor(client, index) {
+        this.client = client;
+        this.index = index;
     }
-];
 
-const searchFiles = () => Promise.resolve(sampleFiles);
+    /**
+     * Searches ES with the qiven query string on the specified types
+     * @param query
+     * @param types     List of class URIs to search for. If empty, it returns all types
+     * @return Promise
+     */
+    searchForTypes = (query, types) => {
+        const esQuery = {
+            bool: {
+                must: [{
+                    query_string: {query}
+                }]
+            }
+        };
 
-export const performSearch = (search) => {
-    const type = getSearchTypeFromString(search);
-    const query = getSearchQueryFromString(search);
+        if (types && Array.isArray(types)) {
+            esQuery.bool.filter = [
+                {
+                    terms: {
+                        "type.keyword": types
+                    }
+                }
+            ];
+        }
 
-    switch (type) {
-        case COLLECTION_SEARCH_TYPE:
-            return searchCollections(query);
-        case FILES_SEARCH_TYPE:
-            return searchFiles(query);
-        default:
-            return Promise.resolve([]);
+        return this.client.search({
+            index: this.index,
+            body: {
+                query: esQuery
+            }
+        });
+    };
+
+    searchCollections = (query) => this.searchForTypes(query, [COLLECTION_URI]);
+
+    searchFiles = (query) => this.searchForTypes(query, [DIRECTORY_URI, FILE_URI]);
+
+    searchAll = (query) => this.searchForTypes(query);
+
+    /**
+     * Performs a search query
+     * @param type
+     * @param query
+     * @returns {Promise}
+     */
+    performSearch = (query, type) => {
+        switch (type) {
+            case COLLECTION_SEARCH_TYPE:
+                return this.searchCollections(query);
+            case FILES_SEARCH_TYPE:
+                return this.searchFiles(query);
+            default:
+                return this.searchAll(query);
+        }
+    };
+}
+
+// Expose the API as a singleton.
+// Please note that the client is instantiated only when needed. That way, we are
+// sure that the configuration has been loaded already.
+let api;
+export default () => {
+    if (!api) {
+        api = new SearchAPI(new elasticsearch.Client(Config.get().elasticsearch));
     }
+
+    return api;
 };

@@ -1,12 +1,12 @@
-import * as searchAPI from "../services/SearchAPI";
+import searchAPI from "../services/SearchAPI";
 import * as actionTypes from "./actionTypes";
-import {getSearchTypeFromString} from '../utils/searchUtils';
 import {createErrorHandlingPromiseAction} from "../utils/redux";
 
-export const performSearch = createErrorHandlingPromiseAction((query) => ({
+export const performSearch = createErrorHandlingPromiseAction((query, searchType) => ({
     type: actionTypes.PERFORM_SEARCH,
-    payload: searchAPI.performSearch(query),
+    payload: searchAPI().performSearch(query, searchType),
     meta: {
-        searchType: getSearchTypeFromString(query)
+        searchType,
+        query
     }
 }));

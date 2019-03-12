@@ -4,7 +4,7 @@ import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import SearchResults from './SearchResults';
-import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
+import {buildSearchUrl, getSearchQueryFromString, getSearchTypeFromString} from '../../utils/searchUtils';
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import * as searchActions from '../../actions/searchActions';
 import {ErrorMessage} from "../common";
@@ -23,7 +23,11 @@ export class SearchPage extends React.Component {
 
     updateResults = () => {
         const {location: {search}, performSearch} = this.props;
-        performSearch(search);
+
+        const type = getSearchTypeFromString(search);
+        const query = getSearchQueryFromString(search);
+
+        performSearch(query, type);
     };
 
     handleTypeChange = (type) => {
