@@ -66,13 +66,17 @@ class FileAPI {
         return Promise.all(allPromises).then(() => files);
     }
 
-    /**
-     * Downloads the file given by path. Downloading is done by redirecting the user to the file
-     * @param path
-     */
-    download(path) {
-        const file = this.client().getFileDownloadLink(path, defaultOptions);
-        window.open(file);
+    download = (path) => {
+        const link = this.client().getFileDownloadLink(path, defaultOptions);
+        const el = document.createElement('a');
+        el.href = link;
+        el.setAttribute('download', getFileName(path));
+        el.click();
+    }
+
+    open(path) {
+        const link = this.client().getFileDownloadLink(path, defaultOptions);
+        window.open(link);
     }
 
     /**
