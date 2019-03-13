@@ -45,6 +45,7 @@ dependencies {
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     compile "com.sparkjava:spark-core:2.7.2"
     compile 'com.pivovarit:throwing-function:1.5.0'
+    compile 'com.google.guava:guava:27.1-jre'
 
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-core:${mockitoVersion}"

@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vfs.managed;
 
+import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -37,8 +38,9 @@ public class ManagedFileSystemTest {
         ds = createTxnMem();
         var rdf = connect(ds);
         Supplier<String> userIriSupplier = () -> "http://example.com/user";
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier));
-        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections);
+        var eventBus = new EventBus();
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
         var collection = new Collection();
         collection.setLocation("coll");
         collection.setName("My Collection");

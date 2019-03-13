@@ -1,8 +1,8 @@
 package io.fairspace.saturn.webdav;
 
+import com.google.common.eventbus.EventBus;
 import com.mockrunner.mock.web.MockHttpServletRequest;
 import com.mockrunner.mock.web.MockHttpServletResponse;
-import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -34,12 +34,13 @@ public class WebDAVIT {
     private MockHttpServletResponse res;
 
     @Before
-    public void before() throws IOException {
+    public void before() {
         setWorkspaceURI("http://example.com/");
         var rdf = connect(createTxnMem());
         Supplier<String> userIriSupplier = () -> "http://example.com/user";
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
-        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections));
+        var eventBus = new EventBus();
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus));
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();
         coll.setName("My Collection");

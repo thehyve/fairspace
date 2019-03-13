@@ -2,6 +2,7 @@ package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.Vocabulary;
@@ -47,10 +48,13 @@ public class App {
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds);
 
+        var eventBus = new EventBus();
+
         var userService = new UserService(new DAO(rdf, null));
         Supplier<String> userIriSupplier = () -> userService.getUserIRI(userInfo());
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
-        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), userIriSupplier, collections));
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        var blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus));
 
         // Setup and initialize vocabularies
         Vocabulary vocabulary = new Vocabulary(rdf, vocabularyGraphNode);

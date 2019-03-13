@@ -1,9 +1,9 @@
 package io.fairspace.saturn.vfs.managed;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
-import io.fairspace.saturn.services.collections.Access;
-import io.fairspace.saturn.services.collections.Collection;
-import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.collections.*;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import lombok.SneakyThrows;
@@ -43,15 +43,12 @@ public class ManagedFileSystem implements VirtualFileSystem {
     private final Supplier<String> userIriSupplier;
     private final CollectionsService collections;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<String> userIriSupplier, CollectionsService collections) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<String> userIriSupplier, CollectionsService collections, EventBus eventBus) {
         this.rdf = rdf;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
         this.collections = collections;
-        collections.setOnLocationChangeListener((oldLocation, newLocation) ->
-                rdf.update(storedQuery("fs_move", oldLocation, newLocation, "")));
-        collections.setOnCollectionDeletedListener(location ->
-                rdf.update(storedQuery("fs_delete", location, userIriSupplier.get())));
+        eventBus.register(this);
     }
 
     @Override
@@ -159,6 +156,16 @@ public class ManagedFileSystem implements VirtualFileSystem {
     @Override
     public void close() throws IOException {
 
+    }
+
+    @Subscribe
+    public void onCollectionDeleted(CollectionDeletedEvent e) {
+        rdf.update(storedQuery("fs_delete", e.getCollection().getLocation(), userIriSupplier.get()));
+    }
+
+    @Subscribe
+    public void onCollectionMoved(CollectionMovedEvent e) {
+        rdf.update(storedQuery("fs_move", e.getOldLocation(), e.getCollection().getLocation(), e.getCollection().getName()));
     }
 
     private static FileInfo fileInfo(QuerySolution row, boolean readOnly) {
