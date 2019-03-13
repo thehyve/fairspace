@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import MaterialReactSelect from "../../common/MaterialReactSelect";
 import {fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
 import {getLabel} from "../../../utils/metadataUtils";
+import {compareBy} from "../../../utils/comparisionUtils";
 
 function LookupEntity({
     entities, property, onSave, dispatch, ...otherProps
@@ -25,13 +26,7 @@ function LookupEntity({
         return option;
     });
 
-    options.sort((a, b) => {
-        if (a.disabled > b.disabled) {
-            return 1;
-        } if (a.disabled < b.disabled) {
-            return -1;
-        } return 0;
-    });
+    options.sort(compareBy('disabled'));
 
     // Prevent saving any labels used for UI
     const handleSave = (selected) => {

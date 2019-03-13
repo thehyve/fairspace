@@ -131,7 +131,7 @@
                     "@id": "fs:Analysis"
                 }
             ],
-            "rdfs:label": "Name",
+            "rdfs:label": "Label",
             "rdfs:range": [
                 {
                     "@id": "xsd:string"
@@ -219,7 +219,7 @@
                 { "@id": "fs:File" }
             ],
             "rdfs:label": "Creator",
-            "rdfs:range":  { "@id": "xsd:string" }
+            "rdfs:range":  { "@id": "fs:User" }
         },
         {
             "@id": "fs:modifiedBy",
@@ -233,7 +233,7 @@
                 { "@id": "fs:File" }
             ],
             "rdfs:label": "Modified By",
-            "rdfs:range":  { "@id": "xsd:string" }
+            "rdfs:range":  { "@id": "fs:User" }
         },
         {
             "@id": "fs:deletedBy",
@@ -247,7 +247,7 @@
                 { "@id": "fs:File" }
             ],
             "rdfs:label": "Deleted By",
-            "rdfs:range":  { "@id": "xsd:string" }
+            "rdfs:range":  { "@id": "fs:User" }
         },
         {
             "@id": "fs:dateCreated",
@@ -319,6 +319,16 @@
                     "@id": "xsd:long"
                 }
             ]
+        },
+        {
+            "@id": "fs:md5",
+            "@type": "rdf:Property",
+            "fs:allowMultiple": false,
+            "fs:machineOnly": true,
+            "rdfs:comment": "MD5 chcksum",
+            "rdfs:domain": [{ "@id": "fs:File" }],
+            "rdfs:label": "MD5",
+            "rdfs:range": [{"@id": "xsd:string"}]
         },
         {
             "@id": "fs:derivesFrom",

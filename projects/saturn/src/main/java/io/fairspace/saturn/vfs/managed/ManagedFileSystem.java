@@ -1,13 +1,15 @@
 package io.fairspace.saturn.vfs.managed;
 
-import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import io.fairspace.saturn.services.collections.Access;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import lombok.SneakyThrows;
+import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -26,6 +29,7 @@ import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -36,14 +40,16 @@ public class ManagedFileSystem implements VirtualFileSystem {
             .build();
     private final RDFConnection rdf;
     private final BlobStore store;
-    private final Supplier<UserInfo> userInfoSupplier;
+    private final Supplier<String> userIriSupplier;
     private final CollectionsService collections;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<UserInfo> userInfoSupplier, CollectionsService collections) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<String> userIriSupplier, CollectionsService collections) {
         this.rdf = rdf;
         this.store = store;
-        this.userInfoSupplier = userInfoSupplier;
+        this.userIriSupplier = userIriSupplier;
         this.collections = collections;
+        collections.setOnLocationChangeListener((oldLocation, newLocation) ->
+                rdf.update(storedQuery("fs_move", oldLocation, newLocation, "")));
     }
 
     @Override
@@ -96,25 +102,24 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(path);
 
         withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", path, userId(), name(path))));
+                () -> rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path))));
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
         ensureValidPath(path);
 
-        var cis = new CountingInputStream(in);
-        var blobId = store.write(cis);
+        var blobInfo = write(in);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userId(), name(path))));
+                rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5())));
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
-        var cis = new CountingInputStream(in);
-        var blobId = store.write(cis);
+        var blobInfo = write(in);
+
         withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId, userId())));
+                () -> rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5())));
     }
 
     @Override
@@ -146,7 +151,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(path);
 
         withCommitMessage("Delete " + path,
-                () -> rdf.update(storedQuery("fs_delete", path, userId())));
+                () -> rdf.update(storedQuery("fs_delete", path, userIriSupplier.get())));
     }
 
     @Override
@@ -170,24 +175,16 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     private static FileInfo fileInfo(Collection collection) {
         return FileInfo.builder()
-                .iri(collection.getIri())
+                .iri(collection.getIri().getURI())
                 .path(collection.getLocation())
                 .size(0)
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .createdBy(collection.getCreator())
-                .modifiedBy(collection.getCreator())
+                .createdBy(collection.getCreatedBy().getURI())
+                .modifiedBy(collection.getModifiedBy().getURI())
                 .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
                 .build();
-    }
-
-    private String userId() {
-        if (userInfoSupplier != null) {
-            var userInfo = userInfoSupplier.get();
-            return userInfo != null ? userInfo.getUserId() : "";
-        }
-        return "";
     }
 
     static boolean isCollection(String path) {
@@ -213,5 +210,22 @@ public class ManagedFileSystem implements VirtualFileSystem {
     private Access getAccess(String path) {
         var c = getCollection(path);
         return (c == null) ? Access.None : c.getAccess();
+    }
+
+    @SneakyThrows(NoSuchAlgorithmException.class)
+    private BlobInfo write(InputStream in) throws IOException {
+        var countingInputStream = new CountingInputStream(in);
+        var messageDigestCalculatingInputStream = new MessageDigestCalculatingInputStream(countingInputStream);
+
+        var id = store.write(messageDigestCalculatingInputStream);
+
+        return new BlobInfo(id, countingInputStream.getByteCount(), encodeHexString(messageDigestCalculatingInputStream.getMessageDigest().digest()));
+    }
+
+    @Value
+    private static class BlobInfo {
+        String id;
+        long size;
+        String md5;
     }
 }

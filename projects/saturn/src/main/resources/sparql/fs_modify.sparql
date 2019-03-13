@@ -4,9 +4,10 @@
 # 1 - size
 # 2 - blob id
 # 3 - modified by
+# 4 - md5
 PREFIX fs: <http://fairspace.io/ontology#>
-DELETE { ?s fs:fileSize ?x1 ; fs:blobId ?x2; fs:dateCreated ?x3; fs:dateModified ?x4; fs:modifiedBy ?x5 .}
-INSERT { ?s fs:fileSize ?1; fs:blobId ?2; fs:dateCreated ?date; fs:modifiedBy ?3; fs:dateModified ?date }
-WHERE { ?s fs:filePath ?0 ; fs:fileSize ?x1 ; fs:blobId ?x2; fs:dateCreated ?x3; fs:dateModified ?x4; fs:modifiedBy ?x5 .
+DELETE { ?s fs:fileSize ?x1 ; fs:blobId ?x2; fs:dateCreated ?x3; fs:dateModified ?x4; fs:modifiedBy ?x5; fs:md5 ?x6 .}
+INSERT { ?s fs:fileSize ?1; fs:blobId ?2; fs:dateCreated ?date; fs:modifiedBy ?3; fs:dateModified ?date;  fs:md5 ?4 }
+WHERE { ?s fs:filePath ?0 ; fs:fileSize ?x1 ; fs:blobId ?x2; fs:dateCreated ?x3; fs:dateModified ?x4; fs:modifiedBy ?x5; fs:md5 ?x6 .
 FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
 BIND(NOW() as ?date) }
