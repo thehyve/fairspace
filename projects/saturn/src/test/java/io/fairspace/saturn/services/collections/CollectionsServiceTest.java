@@ -27,7 +27,7 @@ public class CollectionsServiceTest {
 
     @Before
     public void before() {
-        setWorkspaceURI("hodettp://example.com/iri/");
+        setWorkspaceURI("http://example.com/iri/");
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         collections = new CollectionsService(new DAO(rdf, userIriSupplier));
