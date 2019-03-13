@@ -84,7 +84,7 @@ export class FileOperations extends React.Component {
     render() {
         const {
             disabled: allOperationsDisabled, selectedPaths, creatingDirectory,
-            clipboardItemsCount, onRename, selectedItems, onDelete, classes
+            clipboardItemsCount, onRename, selectedItems, onDelete, classes, getDownloadLink
         } = this.props;
 
         if (creatingDirectory) {
@@ -105,7 +105,7 @@ export class FileOperations extends React.Component {
                             aria-label={`Download ${selectedItem.basename}`}
                             disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file'}
                             component="a"
-                            href={FileAPI.getDownloadLink(selectedItem.filename)}
+                            href={getDownloadLink(selectedItem.filename)}
                             download
                         >
                             <Download />

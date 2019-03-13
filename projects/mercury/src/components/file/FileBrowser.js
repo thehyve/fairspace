@@ -110,6 +110,7 @@ class FileBrowser extends React.Component {
                         disabled={!canWrite(openedCollection)}
                         existingFiles={files ? files.map(file => file.basename) : []}
                         fetchFilesIfNeeded={fetchFilesIfNeeded}
+                        getDownloadLink={FileAPI.getDownloadLink}
                     />
                 </div>
             </>
