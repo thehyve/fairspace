@@ -58,7 +58,7 @@ dependencies {
 	compile("io.fairspace:oidc-auth-sso:${oidcAuthVersion}")
 	compile("io.fairspace:oidc-auth-bearer-auth:${oidcAuthVersion}")
 	compile("io.fairspace:oidc-auth-zuul:${oidcAuthVersion}")
-	compile 'com.github.spotbugs:spotbugs:3.1.12'
+
 	spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 	implementation 'com.nimbusds:nimbus-jose-jwt:5.7'
 
