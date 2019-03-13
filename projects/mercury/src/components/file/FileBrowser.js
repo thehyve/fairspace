@@ -58,7 +58,6 @@ class FileBrowser extends React.Component {
 
     openDir(path) {
         this.props.history.push(`/collections${path}`);
-        this.props.openPath(path);
     }
 
     downloadFile(path) {
