@@ -80,9 +80,9 @@ public class DAO implements Transactional {
 
     @Delegate(types = Transactional.class)
     private final RDFConnection rdf;
-    private final Supplier<String> userIriSupplier;
+    private final Supplier<Node> userIriSupplier;
 
-    public DAO(RDFConnection rdf, Supplier<String> userIriSupplier) {
+    public DAO(RDFConnection rdf, Supplier<Node> userIriSupplier) {
         this.rdf = rdf;
         this.userIriSupplier = userIriSupplier;
     }
@@ -101,7 +101,7 @@ public class DAO implements Transactional {
 
             if (entity instanceof LifecycleAwarePersistentEntity) {
                 var basicEntity = (LifecycleAwarePersistentEntity) entity;
-                var user = createURI(userIriSupplier.get());
+                var user = userIriSupplier.get();
                 basicEntity.setDateModified(now());
                 basicEntity.setModifiedBy(user);
 
@@ -174,7 +174,7 @@ public class DAO implements Transactional {
             var existing = (T) read(entity.getClass(), entity.getIri());
             if (existing != null) {
                 existing.setDateDeleted(now());
-                existing.setDeletedBy(createURI(userIriSupplier.get()));
+                existing.setDeletedBy(userIriSupplier.get());
                 return write(existing);
             }
             return null;

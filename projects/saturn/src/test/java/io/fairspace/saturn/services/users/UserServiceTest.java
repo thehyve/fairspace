@@ -67,7 +67,7 @@ public class UserServiceTest {
         service = new UserService(dao);
 
         var iri = service.getUserIRI(userInfo);
-        assertEquals(IRI.getURI(), iri);
+        assertEquals(IRI, iri);
         verify(dao, times(0)).write(any());
     }
 

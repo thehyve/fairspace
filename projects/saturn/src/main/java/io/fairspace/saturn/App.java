@@ -17,6 +17,7 @@ import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
@@ -48,7 +49,7 @@ public class App {
         var rdf = new RDFConnectionLocal(ds);
 
         var userService = new UserService(new DAO(rdf, null));
-        Supplier<String> userIriSupplier = () -> userService.getUserIRI(userInfo());
+        Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), userIriSupplier, collections));
 

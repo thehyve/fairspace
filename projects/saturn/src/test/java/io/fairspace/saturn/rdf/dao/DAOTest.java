@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.rdf.SparqlUtils.getWorkspaceURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static java.time.Instant.now;
@@ -36,7 +37,7 @@ public class DAOTest {
     public void before() {
         setWorkspaceURI("http://example.com/iri/");
         dataset = createTxnMem();
-        dao = new DAO(connect(dataset), () -> "http://example.com/" + randomUUID());
+        dao = new DAO(connect(dataset), () -> createURI("http://example.com/" + randomUUID()));
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();
@@ -244,12 +245,6 @@ public class DAOTest {
         assertNull(dao.read(basicEntity.getClass(), basicEntity.getIri()));
         assertNull(dao.markAsDeleted(entity3));
     }
-
-   private static void ensureRecentInstant(Instant instant) {
-        assertNotNull(instant);
-        assertTrue(instant.isAfter(now().minusSeconds(1)));
-        assertTrue(now().equals(instant) || instant.isBefore(now()));
-   }
 
     @Test(expected = DAOException.class)
     public void testWriteUninitializedRequiredField() {
