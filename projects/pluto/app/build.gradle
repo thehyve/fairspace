@@ -61,6 +61,7 @@ dependencies {
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
+	testCompile('org.mockito:mockito-core:2.23.0')
 }
 
 springBoot {

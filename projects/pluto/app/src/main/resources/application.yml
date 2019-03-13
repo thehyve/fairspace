@@ -50,9 +50,13 @@ security:
     - /api/*
 
 workspace:
-  usersUri: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/users
   name: Workspace
   version: 0.0.0
+
+keycloak:
+  workspace-login-group: workspace-users
+  groupUri: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/groups/?max=1&search=${keycloak.workspace-login-group}
+  usersUriPattern: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/groups/%s/members
 
 zuul:
   routes:
