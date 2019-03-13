@@ -14,7 +14,7 @@ public class SparqlUtilsTest {
         assertEquals("PREFIX ws: <http://fairspace.io/iri/>\n" +
                         "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
                         "\"123\"^^xsd:long",
-                storedQuery("stored1", 123L));
+                storedQuery("test_formatting", 123L));
     }
 
     @Test
@@ -22,7 +22,7 @@ public class SparqlUtilsTest {
         assertEquals("PREFIX ws: <http://fairspace.io/iri/>\n" +
                         "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
                         "\"\\\"'<>?$%\"",
-                storedQuery("stored1", "\"'<>?$%"));
+                storedQuery("test_formatting", "\"'<>?$%"));
     }
 
     @Test
@@ -30,7 +30,7 @@ public class SparqlUtilsTest {
         assertEquals("PREFIX ws: <http://fairspace.io/iri/>\n" +
                         "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
                         "<http://example.com/path/subpath#hash>",
-                storedQuery("stored1", createURI("http://example.com/path/subpath#hash")));
+                storedQuery("test_formatting", createURI("http://example.com/path/subpath#hash")));
     }
 
     @Test
@@ -38,11 +38,11 @@ public class SparqlUtilsTest {
         assertEquals("PREFIX ws: <http://fairspace.io/iri/>\n" +
                         "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
                         "\"1970-01-01T00:00:00Z\"^^xsd:dateTime",
-                storedQuery("stored1", ofEpochMilli(0L)));
+                storedQuery("test_formatting", ofEpochMilli(0L)));
     }
 
     @Test(expected = IRIException.class)
     public void invalidIrisAreProhibited() {
-        storedQuery("stored1", createURI("http://example.com>/path/subpath#hash"));
+        storedQuery("test_formatting", createURI("http://example.com>/path/subpath#hash"));
     }
 }
