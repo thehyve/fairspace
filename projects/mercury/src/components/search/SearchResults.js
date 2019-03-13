@@ -4,7 +4,6 @@ import * as PropTypes from "prop-types";
 import {LoadingInlay} from "../common";
 import SearchResultHighlights from "./SearchResultHighlights";
 
-/* eslint-disable no-underscore-dangle */
 const searchResults = ({
     loading,
     results,
@@ -21,11 +20,11 @@ const searchResults = ({
         }
 
         return vocabulary.getLabelForPredicate(typeUri);
-    }
+    };
 
     if (loading) {
         contents = <LoadingInlay />;
-    } else if (!results || !results.hits || results.hits.total === 0) {
+    } else if (!results || results.total === 0) {
         contents = 'No results found!';
     } else {
         contents = (
@@ -40,23 +39,23 @@ const searchResults = ({
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {results.hits.hits.map((hit) => (
+                        {results.results.map((result) => (
                             <TableRow
                                 hover
-                                key={hit._id}
-                                onDoubleClick={() => onResultDoubleClick(hit)}
+                                key={result.id}
+                                onDoubleClick={() => onResultDoubleClick(result)}
                             >
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                    {hit._source.label}
+                                    {result.label}
                                 </TableCell>
                                 <TableCell padding="none">
-                                    {generateTypeLabel(hit._source.type)}
+                                    {generateTypeLabel(result.type)}
                                 </TableCell>
                                 <TableCell>
-                                    {hit._source.comment}
+                                    {result.comment}
                                 </TableCell>
                                 <TableCell>
-                                    <SearchResultHighlights highlights={hit.highlight} />
+                                    <SearchResultHighlights highlights={result.highlight} />
                                 </TableCell>
                             </TableRow>
                         ))}
