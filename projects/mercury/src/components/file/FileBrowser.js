@@ -107,7 +107,6 @@ class FileBrowser extends React.Component {
                         openedPath={openedPath}
                         onRename={this.handlePathRename}
                         onDelete={this.handlePathDelete}
-                        onDownload={FileAPI.download}
                         disabled={!canWrite(openedCollection)}
                         existingFiles={files ? files.map(file => file.basename) : []}
                         fetchFilesIfNeeded={fetchFilesIfNeeded}

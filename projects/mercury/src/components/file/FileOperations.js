@@ -14,6 +14,7 @@ import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
 import {joinPaths, generateUniqueFileName} from "../../utils/fileUtils";
 import styles from './FileOperations.styles';
+import FileAPI from '../../services/FileAPI';
 
 export class FileOperations extends React.Component {
     refreshFiles() {
@@ -83,8 +84,7 @@ export class FileOperations extends React.Component {
     render() {
         const {
             disabled: allOperationsDisabled, selectedPaths, creatingDirectory,
-            clipboardItemsCount, onRename, selectedItems,
-            onDelete, classes, onDownload
+            clipboardItemsCount, onRename, selectedItems, onDelete, classes
         } = this.props;
 
         if (creatingDirectory) {
@@ -101,10 +101,12 @@ export class FileOperations extends React.Component {
                 <Grid item>
                     <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)} style={{marginRight: 8}}>
                         <IconButton
-                            onClick={() => onDownload(selectedItem.filename)}
                             title={`Download ${selectedItem.basename}`}
                             aria-label={`Download ${selectedItem.basename}`}
                             disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file'}
+                            component="a"
+                            href={FileAPI.getDownloadLink(selectedItem.filename)}
+                            download
                         >
                             <Download />
                         </IconButton>

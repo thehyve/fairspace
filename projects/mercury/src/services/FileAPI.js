@@ -66,18 +66,19 @@ class FileAPI {
         return Promise.all(allPromises).then(() => files);
     }
 
-    download = (path) => {
-        const link = this.client().getFileDownloadLink(path, defaultOptions);
-        const el = document.createElement('a');
-        el.href = link;
-        el.setAttribute('download', getFileName(path));
-        el.click();
-    }
-
+    /**
+     * It will calls the browser API to open the file if it's 'openable' otherwise the browser will show download dialog
+     * @param path
+     */
     open(path) {
-        const link = this.client().getFileDownloadLink(path, defaultOptions);
+        const link = this.getDownloadLink(path);
         window.open(link);
     }
+
+    /**
+     * It creates a full download like to the path provided
+     */
+    getDownloadLink = (path = '') => this.client().getFileDownloadLink(path, defaultOptions);
 
     /**
      * Deletes the file given by path
