@@ -13,8 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.getWorkspaceURI;
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
@@ -27,7 +25,6 @@ public class CollectionsServiceTest {
 
     @Before
     public void before() {
-        setWorkspaceURI("http://example.com/iri/");
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         collections = new CollectionsService(new DAO(rdf, userIriSupplier));
@@ -45,7 +42,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
 
         var created1 = collections.create(c1);
-        assertTrue(created1.getIri().getURI().startsWith(getWorkspaceURI()));
+        assertTrue(created1.getIri().isURI());
         assertEquals(c1.getName(), created1.getName());
         assertEquals(c1.getDescription(), created1.getDescription());
         assertEquals(c1.getLocation(), created1.getLocation());

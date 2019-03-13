@@ -18,7 +18,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
@@ -36,7 +35,6 @@ public class WebDAVIT {
 
     @Before
     public void before() throws IOException {
-        setWorkspaceURI("http://example.com/");
         var rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier));

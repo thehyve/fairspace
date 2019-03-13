@@ -6,5 +6,5 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
 SELECT ?property
 WHERE {
-    GRAPH ?0 { ?property a rdf:Property; fs:machineOnly true . }
+    GRAPH %1$s { ?property a rdf:Property; fs:machineOnly true . }
 }
