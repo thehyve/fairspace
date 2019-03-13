@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -53,6 +54,7 @@ public class DAOTest {
         assertNotNull(iri);
         assertTrue(iri.isURI());
         validateIRI(iri.getURI());
+        assertTrue(iri.getURI().startsWith(CONFIG.jena.baseIRI));
         dao.write(entity);
         assertEquals(iri, entity.getIri());
         assertNotEquals(iri, dao.write(new Entity()).getIri());
