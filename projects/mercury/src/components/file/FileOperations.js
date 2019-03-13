@@ -14,7 +14,6 @@ import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
 import {joinPaths, generateUniqueFileName} from "../../utils/fileUtils";
 import styles from './FileOperations.styles';
-import FileAPI from '../../services/FileAPI';
 
 export class FileOperations extends React.Component {
     refreshFiles() {
