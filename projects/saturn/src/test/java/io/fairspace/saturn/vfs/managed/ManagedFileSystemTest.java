@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
+import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
@@ -81,8 +82,8 @@ public class ManagedFileSystemTest {
         assertTrue(stat.isDirectory());
         assertNotNull(stat.getIri());
         assertTrue(ds.getDefaultModel().contains(createResource(stat.getIri()), RDFS.label, createStringLiteral("ccc")));
-        assertNotNull(stat.getCreated());
-        assertNotNull(stat.getModified());
+        ensureRecentInstant(stat.getCreated());
+        ensureRecentInstant(stat.getModified());
     }
 
     @Test
@@ -96,8 +97,8 @@ public class ManagedFileSystemTest {
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir/file", os);
         assertArrayEquals(content1, os.toByteArray());
-        assertNotNull(stat.getCreated());
-        assertNotNull(stat.getModified());
+        ensureRecentInstant(stat.getCreated());
+        ensureRecentInstant(stat.getModified());
 
         fs.modify("coll/dir/file", new ByteArrayInputStream(content2));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
