@@ -25,7 +25,9 @@ const searchReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pending: false,
-                error: action.payload.error
+
+                // eslint-disable-next-line prefer-template
+                error: "Error retrieving search results" + (action.payload ? ": " + action.payload.message : "")
             };
         default:
             return state;
