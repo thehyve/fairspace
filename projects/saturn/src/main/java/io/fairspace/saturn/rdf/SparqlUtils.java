@@ -10,18 +10,18 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
+import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.apache.jena.riot.out.NodeFmtLib.str;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
-import static org.apache.jena.sparql.util.FmtUtils.stringForNode;
-import static org.apache.jena.sparql.util.FmtUtils.stringForString;
-
 
 public class SparqlUtils {
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
@@ -31,15 +31,17 @@ public class SparqlUtils {
         var params = new Object[args.length];
         for (int i = 0; i < args.length; i++) {
             var arg = args[i];
-            params[i] = arg != null ? stringify(arg) : "?" + i;
+            if (arg instanceof Node && ((Node)arg).isURI()) {
+                validateIRI(((Node) arg).getURI());
+            }
+            params[i] = arg != null ? toString(arg) : "?" + i;
         }
         return format(template, (Object[]) params);
     }
 
     @SneakyThrows(IOException.class)
     private static String load(String name) {
-        return "PREFIX ws: " + stringForNode(createURI(CONFIG.jena.baseIRI)) +
-                "\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+        return "PREFIX ws: " + str(createURI(CONFIG.jena.baseIRI)) + '\n' +
                 IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), "UTF-8");
     }
 
@@ -51,20 +53,21 @@ public class SparqlUtils {
         return Instant.ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
     }
 
-    private static String stringify(Object value) {
+    private static String toString(Object value) {
+        return str(toNode(value));
+    }
+
+    private static Node toNode(Object value) {
         if (value instanceof Node) {
-            if (((Node) value).isURI()) {
-                validateIRI(((Node) value).getURI());
-            }
-            return stringForNode((Node) value);
+            return (Node) value;
         }
         if (value instanceof String) {
-            return stringForString((String) value);
+            return createLiteral((String) value);
         }
-        if (value instanceof Instant) {
-            value = GregorianCalendar.from(ZonedDateTime.ofInstant((Instant) value, ZoneId.systemDefault()));
-        }
+        return createTypedLiteral(value instanceof Instant ? toCalendar((Instant) value) : value).asNode();
+    }
 
-        return stringForNode(createTypedLiteral(value).asNode());
+    private static Calendar toCalendar(Instant value) {
+        return GregorianCalendar.from(ZonedDateTime.ofInstant(value, ZoneId.systemDefault()));
     }
 }

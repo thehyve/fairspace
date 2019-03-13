@@ -56,7 +56,7 @@ public class App {
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
                         new MetadataApp("/api/metadata", rdf, defaultGraphIRI, vocabulary),
-                        new MetadataApp("/api/vocabulary", rdf, createURI(CONFIG.jena.baseIRI + "vocabulary"), metaVocabulary),
+                        new MetadataApp("/api/vocabulary", rdf, vocabularyGraphNode, metaVocabulary),
                         new CollectionsApp(collections),
                         new HealthApp()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
