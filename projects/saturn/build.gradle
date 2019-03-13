@@ -12,8 +12,8 @@ plugins {
     id 'io.franzbecker.gradle-lombok' version '2.0'
     id 'application'
     id 'jacoco'
+    id  'com.github.spotbugs' version '1.6.10'
 }
-
 
 group 'io.fairspace'
 version '1.0-SNAPSHOT'
@@ -44,6 +44,7 @@ dependencies {
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     compile "com.sparkjava:spark-core:2.7.2"
+    compile 'com.github.spotbugs:spotbugs:3.1.12'
     compile 'com.pivovarit:throwing-function:1.5.0'
 
     testCompile "junit:junit:4.12"
@@ -53,11 +54,28 @@ dependencies {
         exclude group: 'org.apache.tomcat'
     }
     testCompile 'com.github.stefanbirkner:system-rules:1.19.0'
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 }
 
 jacocoTestReport {
     reports {
         xml.enabled false
         csv.enabled true
+    }
+}
+
+apply plugin: 'com.github.spotbugs'
+
+spotbugs {
+  toolVersion = '3.1.12'
+  effort = "max"
+  reportLevel = "low"
+  ignoreFailures = true
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
     }
 }
