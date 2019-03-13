@@ -4,6 +4,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
@@ -24,7 +26,7 @@ public class CollectionsServiceTest {
     @Before
     public void before() {
         rdf = connect(createTxnMem());
-        Supplier<String> userIriSupplier = () -> "http://example.com/user";
+        Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         collections = new CollectionsService(new DAO(rdf, userIriSupplier));
         files = new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections);
     }

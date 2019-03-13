@@ -9,6 +9,7 @@ import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
+import org.apache.jena.graph.Node;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
@@ -34,7 +36,7 @@ public class WebDAVIT {
     @Before
     public void before() throws IOException {
         var rdf = connect(createTxnMem());
-        Supplier<String> userIriSupplier = () -> "http://example.com/user";
+        Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
         fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections));
         milton = new MiltonWebDAVServlet("/webdav/", fs);

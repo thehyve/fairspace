@@ -4,6 +4,7 @@ import {
     Paper, withStyles, Typography
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 
 import styles from './InformationDrawer.styles';
@@ -14,6 +15,7 @@ import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
 import {canManage} from '../../utils/permissionUtils';
 import ErrorDialog from './ErrorDialog';
+import {getPathInfoFromParams} from "../../utils/fileUtils";
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection, locationChanged) => {
@@ -126,15 +128,23 @@ function pathHierarchy(fullPath) {
     return paths.reverse();
 }
 
-const mapStateToProps = ({cache: {collections, users}, collectionBrowser: {selectedCollectionIRI, openedPath, selectedPaths}}) => ({
-    collection: collections.data && collections.data.find(c => c.iri === selectedCollectionIRI),
-    paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
-    loading: users.pending
-});
+const mapStateToProps = ({cache: {collections, users},
+    collectionBrowser: {selectedPaths, selectedCollectionLocation}}, ownProps) => {
+    const {match: {params}} = ownProps;
+    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
+    const location = collectionLocation || selectedCollectionLocation;
+    const collection = (collections.data && collections.data.find(c => c.location === location));
+
+    return {
+        collection,
+        paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
+        loading: users.pending
+    };
+};
 
 const mapDispatchToProps = {
     ...metadataActions,
     ...collectionActions
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer)));

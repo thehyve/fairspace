@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import FileBrowser from "./FileBrowser";
 import {BreadCrumbs} from "../common";
 import InformationDrawer from '../common/InformationDrawer';
-import {getDirectoryFromFullpath, splitPathIntoArray} from "../../utils/fileUtils";
+import {getDirectoryFromFullpath, splitPathIntoArray, getPathInfoFromParams} from "../../utils/fileUtils";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
@@ -15,35 +15,15 @@ import {getCollectionAbsolutePath} from "../../utils/collectionUtils";
 
 export class FilesPage extends React.Component {
     componentDidMount() {
-        const {
-            fetchCollectionsIfNeeded, selectCollection, fetchFilesIfNeeded, openedCollection, openedPath
-        } = this.props;
+        const {fetchCollectionsIfNeeded, fetchFilesIfNeeded, openedPath} = this.props;
         fetchCollectionsIfNeeded();
-        selectCollection(openedCollection.iri);
-
-        // If the collection has not been fetched yet,
-        // do not bother fetching the files
-        if (openedCollection.iri) {
-            fetchFilesIfNeeded(openedPath);
-        }
+        fetchFilesIfNeeded(openedPath);
     }
 
     componentDidUpdate(prevProps) {
-        const {
-            selectCollection, fetchFilesIfNeeded, openedCollection, openedPath, openPath
-        } = this.props;
-
-        if (prevProps.openedCollection.iri !== openedCollection.iri) {
-            selectCollection(openedCollection.iri);
-        }
-
-        const hasCollectionDetails = openedCollection.iri;
-        const hasNewOpenedCollection = prevProps.openedCollection.iri !== openedCollection.iri;
-        const hasNewOpenedPath = prevProps.openedPath !== openedPath;
-
-        if (hasCollectionDetails && (hasNewOpenedCollection || hasNewOpenedPath)) {
+        const {fetchFilesIfNeeded, openedPath} = this.props;
+        if (prevProps.openedPath !== openedPath) {
             fetchFilesIfNeeded(openedPath);
-            openPath(openedPath);
         }
     }
 
@@ -69,7 +49,7 @@ export class FilesPage extends React.Component {
 
     render() {
         const {
-            openedCollection, fetchFilesIfNeeded, openPath, openedPath, files, selectedPaths, selectPath,
+            openedCollection, fetchFilesIfNeeded, openedPath, files, selectedPaths, selectPath,
             deselectPath, renameFile, deleteFile, selectPaths, deselectAllPaths,
         } = this.props;
 
@@ -79,7 +59,6 @@ export class FilesPage extends React.Component {
                 <Grid container spacing={8}>
                     <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                         <FileBrowser
-                            openPath={openPath}
                             fetchFilesIfNeeded={fetchFilesIfNeeded}
                             openedCollection={openedCollection}
                             openedPath={openedPath}
@@ -104,10 +83,8 @@ export class FilesPage extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     const {match: {params}} = ownProps;
-    const openedCollectionLocation = params.collection;
-    const openedPath = params.path ? `/${openedCollectionLocation}/${params.path}` : `/${openedCollectionLocation}`;
-
-    const collection = (state.cache.collections.data && state.cache.collections.data.find(c => c.location === openedCollectionLocation)) || {};
+    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
+    const collection = (state.cache.collections.data && state.cache.collections.data.find(c => c.location === collectionLocation)) || {};
     const files = state.cache.filesByPath[openedPath] || [];
 
     return {
@@ -116,7 +93,6 @@ const mapStateToProps = (state, ownProps) => {
         files: files.data,
         selectedPaths: state.collectionBrowser.selectedPaths,
         openedCollection: collection,
-        openedCollectionId: collection.iri,
         openedPath
     };
 };

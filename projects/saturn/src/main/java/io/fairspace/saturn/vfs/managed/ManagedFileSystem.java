@@ -10,6 +10,7 @@ import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -40,10 +41,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
             .build();
     private final RDFConnection rdf;
     private final BlobStore store;
-    private final Supplier<String> userIriSupplier;
+    private final Supplier<Node> userIriSupplier;
     private final CollectionsService collections;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<String> userIriSupplier, CollectionsService collections) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections) {
         this.rdf = rdf;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
@@ -167,8 +168,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(!row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTime(row.getLiteral("created")))
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
-                .createdBy(row.getLiteral("createdBy").getString())
-                .modifiedBy(row.getLiteral("modifiedBy").getString())
                 .readOnly(readOnly)
                 .build();
     }
@@ -181,8 +180,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .createdBy(collection.getCreatedBy().getURI())
-                .modifiedBy(collection.getModifiedBy().getURI())
                 .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
                 .build();
     }
