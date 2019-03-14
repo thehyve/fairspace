@@ -83,8 +83,7 @@ export class FileOperations extends React.Component {
     render() {
         const {
             disabled: allOperationsDisabled, selectedPaths, creatingDirectory,
-            clipboardItemsCount, onRename, selectedItems,
-            onDelete, classes, onDownload
+            clipboardItemsCount, onRename, selectedItems, onDelete, classes, getDownloadLink
         } = this.props;
 
         if (creatingDirectory) {
@@ -101,10 +100,12 @@ export class FileOperations extends React.Component {
                 <Grid item>
                     <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)} style={{marginRight: 8}}>
                         <IconButton
-                            onClick={() => onDownload(selectedItem.filename)}
                             title={`Download ${selectedItem.basename}`}
                             aria-label={`Download ${selectedItem.basename}`}
                             disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file'}
+                            component="a"
+                            href={getDownloadLink(selectedItem.filename)}
+                            download
                         >
                             <Download />
                         </IconButton>

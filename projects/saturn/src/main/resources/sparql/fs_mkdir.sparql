@@ -9,11 +9,11 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 INSERT {
     ?iri a fs:Directory;
-        fs:filePath ?0;
-        fs:createdBy ?1;
+        fs:filePath %1$s;
+        fs:createdBy %2$s;
         fs:dateCreated ?date;
         fs:dateModified ?date;
-        fs:modifiedBy ?1;
+        fs:modifiedBy %2$s;
         fs:fileSize 0;
-        rdfs:label ?2 .}
+        rdfs:label %3$s .}
 WHERE { BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?iri) BIND(NOW() as ?date) }

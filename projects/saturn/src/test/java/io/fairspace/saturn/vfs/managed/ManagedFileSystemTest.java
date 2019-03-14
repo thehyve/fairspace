@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -15,9 +16,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
@@ -33,11 +35,10 @@ public class ManagedFileSystemTest {
 
     @Before
     public void before()  {
-        setWorkspaceURI("http://example.com/");
         var store = new MemoryBlobStore();
         ds = createTxnMem();
         var rdf = connect(ds);
-        Supplier<String> userIriSupplier = () -> "http://example.com/user";
+        Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
         collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
         fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
@@ -82,8 +83,8 @@ public class ManagedFileSystemTest {
         assertTrue(stat.isDirectory());
         assertNotNull(stat.getIri());
         assertTrue(ds.getDefaultModel().contains(createResource(stat.getIri()), RDFS.label, createStringLiteral("ccc")));
-        assertEquals( "http://example.com/user", stat.getCreatedBy());
-        assertEquals( "http://example.com/user", stat.getModifiedBy());
+        ensureRecentInstant(stat.getCreated());
+        ensureRecentInstant(stat.getModified());
     }
 
     @Test
@@ -91,11 +92,14 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir");
 
         fs.create("coll/dir/file", new ByteArrayInputStream(content1));
-        assertEquals("coll/dir/file", fs.stat("coll/dir/file").getPath());
-        assertEquals(content1.length, fs.stat("coll/dir/file").getSize());
+        var stat = fs.stat("coll/dir/file");
+        assertEquals("coll/dir/file", stat.getPath());
+        assertEquals(content1.length, stat.getSize());
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir/file", os);
         assertArrayEquals(content1, os.toByteArray());
+        ensureRecentInstant(stat.getCreated());
+        ensureRecentInstant(stat.getModified());
 
         fs.modify("coll/dir/file", new ByteArrayInputStream(content2));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
@@ -114,6 +118,30 @@ public class ManagedFileSystemTest {
 
         fs.modify("coll/file", new ByteArrayInputStream(content2));
         assertEquals(encodeHexString(md5(content2)), ds.getDefaultModel().getProperty(resource, createProperty("http://fairspace.io/ontology#md5")).getString());
+    }
+
+    @Test
+    public void directoryLifecycleMetadata() throws IOException {
+        fs.mkdir("coll/dir");
+        var dir = createResource(fs.stat("coll/dir").getIri());
+        var user = createResource("http://example.com/user");
+        assertTrue(ds.getDefaultModel().contains(dir, createProperty("http://fairspace.io/ontology#createdBy"), user));
+        assertTrue(ds.getDefaultModel().contains(dir, createProperty("http://fairspace.io/ontology#modifiedBy"), user));
+
+        fs.delete("coll/dir");
+        assertTrue(ds.getDefaultModel().contains(dir, createProperty("http://fairspace.io/ontology#deletedBy"), user));
+    }
+
+    @Test
+    public void fileLifecycleMetadata() throws IOException {
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        var file = createResource(fs.stat("coll/file").getIri());
+        var user = createResource("http://example.com/user");
+        assertTrue(ds.getDefaultModel().contains(file, createProperty("http://fairspace.io/ontology#createdBy"), user));
+        assertTrue(ds.getDefaultModel().contains(file, createProperty("http://fairspace.io/ontology#modifiedBy"), user));
+
+        fs.delete("coll/file");
+        assertTrue(ds.getDefaultModel().contains(file, createProperty("http://fairspace.io/ontology#deletedBy"), user));
     }
 
     @Test

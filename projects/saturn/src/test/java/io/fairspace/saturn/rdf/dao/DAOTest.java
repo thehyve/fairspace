@@ -14,14 +14,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.getWorkspaceURI;
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static io.fairspace.saturn.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
+import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 import static org.junit.Assert.*;
 
 public class DAOTest {
@@ -34,9 +35,8 @@ public class DAOTest {
 
     @Before
     public void before() {
-        setWorkspaceURI("http://example.com/iri/");
         dataset = createTxnMem();
-        dao = new DAO(connect(dataset), () -> "http://example.com/" + randomUUID());
+        dao = new DAO(connect(dataset), () -> createURI("http://example.com/" + randomUUID()));
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();
@@ -53,7 +53,9 @@ public class DAOTest {
         dao.write(entity);
         var iri = entity.getIri();
         assertNotNull(iri);
-        assertTrue(iri.getURI().startsWith(getWorkspaceURI()));
+        assertTrue(iri.isURI());
+        validateIRI(iri.getURI());
+        assertTrue(iri.getURI().startsWith(CONFIG.jena.baseIRI));
         dao.write(entity);
         assertEquals(iri, entity.getIri());
         assertNotEquals(iri, dao.write(new Entity()).getIri());
@@ -244,12 +246,6 @@ public class DAOTest {
         assertNull(dao.read(basicEntity.getClass(), basicEntity.getIri()));
         assertNull(dao.markAsDeleted(entity3));
     }
-
-   private static void ensureRecentInstant(Instant instant) {
-        assertNotNull(instant);
-        assertTrue(instant.isAfter(now().minusSeconds(1)));
-        assertTrue(now().equals(instant) || instant.isBefore(now()));
-   }
 
     @Test(expected = DAOException.class)
     public void testWriteUninitializedRequiredField() {

@@ -7,7 +7,7 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-DELETE {GRAPH ?0 {?1 ?2 ?3}} WHERE {
-    GRAPH ?0 {?1 ?2 ?3}
-    FILTER NOT EXISTS { GRAPH ?4 { ?2 fs:machineOnly true } }
+DELETE {GRAPH %1$s {%2$s %3$s %4$s}} WHERE {
+    GRAPH %1$s {%2$s %3$s %4$s}
+    FILTER NOT EXISTS { GRAPH %5$s { %3$s fs:machineOnly true } }
 }

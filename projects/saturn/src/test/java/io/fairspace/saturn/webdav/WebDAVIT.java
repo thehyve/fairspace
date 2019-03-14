@@ -10,6 +10,7 @@ import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
+import org.apache.jena.graph.Node;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
@@ -35,9 +36,8 @@ public class WebDAVIT {
 
     @Before
     public void before() {
-        setWorkspaceURI("http://example.com/");
         var rdf = connect(createTxnMem());
-        Supplier<String> userIriSupplier = () -> "http://example.com/user";
+        Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
         fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus));

@@ -14,6 +14,7 @@ describe('FileOperations', () => {
             fetchFilesIfNeeded={fetchFilesIfNeeded}
             openedPath="opened/Path"
             existingFiles={['file1.txt', 'file2.txt', 'file2 (1).txt', 'file2 (2).txt']}
+            getDownloadLink={() => {}}
         />);
 
         const files = [{name: 'file1.txt'}, {name: 'file2.txt'}, {name: 'file3.txt'}];
@@ -44,7 +45,14 @@ describe('FileOperations', () => {
 describe('handleCreateDirectory', () => {
     it('should return false for 405 error', () => {
         const createDirectory = jest.fn(() => Promise.reject(new Error({response: {status: 405}})));
-        const instance = shallow(<FileOperations selectedPaths={[]} createDirectory={createDirectory} classes={{}} />).instance();
+        const instance = shallow(
+            <FileOperations
+                selectedPaths={[]}
+                createDirectory={createDirectory}
+                classes={{}}
+                getDownloadLink={() => {}}
+            />
+        ).instance();
 
         instance.handleCreateDirectory()
             .then(result => {
