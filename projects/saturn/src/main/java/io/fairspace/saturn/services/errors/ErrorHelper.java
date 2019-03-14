@@ -22,7 +22,7 @@ public class ErrorHelper {
     }
 
     @SneakyThrows(JsonProcessingException.class)
-    private static String errorBody(int status, String message) {
+    public static String errorBody(int status, String message) {
         return mapper.writeValueAsString(new ErrorDto(status, message));
     }
 }
