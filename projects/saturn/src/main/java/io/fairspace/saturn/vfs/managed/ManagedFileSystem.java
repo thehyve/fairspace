@@ -6,7 +6,11 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import lombok.SneakyThrows;
+import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -15,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -25,6 +30,7 @@ import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -35,10 +41,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
             .build();
     private final RDFConnection rdf;
     private final BlobStore store;
-    private final Supplier<String> userIriSupplier;
+    private final Supplier<Node> userIriSupplier;
     private final CollectionsService collections;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<String> userIriSupplier, CollectionsService collections) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections) {
         this.rdf = rdf;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
@@ -104,18 +110,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void create(String path, InputStream in) throws IOException {
         ensureValidPath(path);
 
-        var cis = new CountingInputStream(in);
-        var blobId = store.write(cis);
+        var blobInfo = write(in);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userIriSupplier.get(), name(path))));
+                rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5())));
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
-        var cis = new CountingInputStream(in);
-        var blobId = store.write(cis);
+        var blobInfo = write(in);
+
         withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId, userIriSupplier.get())));
+                () -> rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5())));
     }
 
     @Override
@@ -163,8 +168,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(!row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTime(row.getLiteral("created")))
                 .modified(parseXSDDateTime(row.getLiteral("modified")))
-                .createdBy(row.getLiteral("createdBy").getString())
-                .modifiedBy(row.getLiteral("modifiedBy").getString())
                 .readOnly(readOnly)
                 .build();
     }
@@ -177,8 +180,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .createdBy(collection.getCreatedBy().getURI())
-                .modifiedBy(collection.getModifiedBy().getURI())
                 .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
                 .build();
     }
@@ -206,5 +207,22 @@ public class ManagedFileSystem implements VirtualFileSystem {
     private Access getAccess(String path) {
         var c = getCollection(path);
         return (c == null) ? Access.None : c.getAccess();
+    }
+
+    @SneakyThrows(NoSuchAlgorithmException.class)
+    private BlobInfo write(InputStream in) throws IOException {
+        var countingInputStream = new CountingInputStream(in);
+        var messageDigestCalculatingInputStream = new MessageDigestCalculatingInputStream(countingInputStream);
+
+        var id = store.write(messageDigestCalculatingInputStream);
+
+        return new BlobInfo(id, countingInputStream.getByteCount(), encodeHexString(messageDigestCalculatingInputStream.getMessageDigest().digest()));
+    }
+
+    @Value
+    private static class BlobInfo {
+        String id;
+        long size;
+        String md5;
     }
 }

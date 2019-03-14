@@ -11,6 +11,8 @@ import org.apache.jena.sparql.core.QuadAction;
 
 import static org.apache.jena.query.text.TextQueryFuncs.graphNodeToString;
 import static org.apache.jena.query.text.TextQueryFuncs.subjectToString;
+import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
+import static org.apache.jena.sparql.core.Quad.defaultGraphNodeGenerated;
 
 /**
  * An implementation of TextDocProducer which allows to index URI objects
@@ -31,6 +33,9 @@ public class SingleTripleTextDocProducer extends AbstractDatasetChanges implemen
     @Override
     public void change(QuadAction qaction, Node g, Node s, Node p, Node o) {
         if (qaction != QuadAction.ADD && qaction != QuadAction.DELETE) {
+            return;
+        }
+        if (!g.equals(defaultGraphIRI) && !g.equals(defaultGraphNodeGenerated)) {
             return;
         }
 

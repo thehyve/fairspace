@@ -3,6 +3,6 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 SELECT ?blobId
-WHERE { ?s fs:filePath ?0; fs:blobId ?blobId .
+WHERE { ?s fs:filePath %1$s; fs:blobId ?blobId .
 FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
 }

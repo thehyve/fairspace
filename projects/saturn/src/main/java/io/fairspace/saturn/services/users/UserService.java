@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.rdf.dao.DAO;
+import org.apache.jena.graph.Node;
 
 import java.util.Map;
 import java.util.Objects;
@@ -32,8 +33,8 @@ public class UserService {
      * @param userInfo
      * @return
      */
-    public String getUserIRI(UserInfo userInfo) {
-        return getUser(userInfo).getIri().getURI();
+    public Node getUserIRI(UserInfo userInfo) {
+        return getUser(userInfo).getIri();
     }
 
     private User getUser(UserInfo userInfo) {
