@@ -37,7 +37,7 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionDoubleClick = (collection) => {
-        this.props.history.push(getCollectionAbsolutePath(collection));
+        this.props.history.push(getCollectionAbsolutePath(collection.location));
     }
 
     handleAddCollection = (name, description, location, type) => {

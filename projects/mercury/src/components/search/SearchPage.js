@@ -4,14 +4,17 @@ import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import SearchResults from './SearchResults';
-import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
+import {getSearchQueryFromString} from '../../utils/searchUtils';
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import * as searchActions from '../../actions/searchActions';
+import * as metadataActions from '../../actions/metadataActions';
 import {ErrorMessage} from "../common";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
 
 // Exporting here to be able to test the component outside of Redux
 export class SearchPage extends React.Component {
     componentDidMount() {
+        this.props.fetchVocabularyIfNeeded();
         this.updateResults();
     }
 
@@ -23,25 +26,31 @@ export class SearchPage extends React.Component {
 
     updateResults = () => {
         const {location: {search}, performSearch} = this.props;
-        performSearch(search);
+
+        const query = getSearchQueryFromString(search);
+
+        performSearch(query);
     };
 
-    handleTypeChange = (type) => {
-        const query = getSearchQueryFromString(this.props.location.search);
-        const searchUrl = buildSearchUrl(type, query);
-        this.props.history.push(searchUrl);
-    };
-
-    handleCollectionOpen = (collection) => {
-        this.props.history.push(getCollectionAbsolutePath(collection));
-    }
-
-    handleFileOpen = () => {
-        // TODO: handle file open (currently don't have collection info within the file info)
+    /**
+     * Handles a click on a search result.
+     * @param result   The clicked search result. For the format, see the ES api
+     */
+    handleResultDoubleClick = (result) => {
+        const resultType = result.type[0];
+        if (resultType === COLLECTION_URI) {
+            this.props.history.push(getCollectionAbsolutePath(result.filePath[0]));
+        } else if (resultType === DIRECTORY_URI) {
+            // TODO: handle directory open. See VRE-580
+        } else if (resultType === FILE_URI) {
+            // TODO: handle file open. See VRE-580
+        } else {
+            // TODO: handle metadata open. Out of scope for now
+        }
     }
 
     render() {
-        const {results, type, loading, error} = this.props;
+        const {results, vocabulary, loading, error} = this.props;
 
         if (!loading && error) {
             return <ErrorMessage message={error} />;
@@ -50,32 +59,32 @@ export class SearchPage extends React.Component {
         return (
             <SearchResults
                 loading={loading}
-                type={type}
                 results={results}
-                onTypeChange={this.handleTypeChange}
-                onCollectionOpen={this.handleCollectionOpen}
-                onFileOpen={this.handleFileOpen}
+                onResultDoubleClick={this.handleResultDoubleClick}
+                vocabulary={vocabulary}
             />
         );
     }
 }
 
-const mapStateToProps = ({search}) => ({
-    loading: search.pending,
-    type: search.searchType,
+const mapStateToProps = ({search, cache: {vocabulary}}) => ({
+    loading: search.pending || !vocabulary || vocabulary.pending,
     results: search.results,
     error: search.error,
+    vocabulary: vocabulary && vocabulary.data
 });
 
 const mapDispatchToProps = {
-    performSearch: searchActions.performSearch
+    performSearch: searchActions.performSearch,
+    fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded
 };
 
 SearchPage.propTypes = {
     location: PropTypes.shape({
         search: PropTypes.string.isRequired
     }),
-    performSearch: PropTypes.func.isRequired
+    performSearch: PropTypes.func.isRequired,
+    fetchVocabularyIfNeeded: PropTypes.func.isRequired
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SearchPage));

@@ -9,6 +9,7 @@
     "body-parser": "^1.18.3",
     "classnames": "^2.2.6",
     "deepmerge": "^3.0.0",
+    "elasticsearch": "^15.4.1",
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.7.1",
     "express": "^4.16.4",

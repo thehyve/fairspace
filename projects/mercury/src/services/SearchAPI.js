@@ -1,63 +1,115 @@
+import elasticsearch from "elasticsearch";
 import Config from "./Config/Config";
-import failOnHttpError from "../utils/httpUtils";
-import {COLLECTION_SEARCH_TYPE, FILES_SEARCH_TYPE} from '../constants';
-import {getSearchQueryFromString, getSearchTypeFromString} from '../utils/searchUtils';
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from '../constants';
 
-const searchCollections = () => (
-    fetch(Config.get().urls.collections, {
-        method: 'GET',
-        headers: new Headers({Accept: 'application/json'}),
-        credentials: 'same-origin'
-    })
-        .then(failOnHttpError("Failure when searching collections"))
-        .then(response => response.json())
-);
+const ES_INDEX = 'fairspace';
 
-const sampleFiles = [
-    {
-        filename: "/Jan_Smit_s_collection-500/dir1",
-        basename: "dir1",
-        lastmod: "Fri, 15 Feb 2019 09:40:16 GMT",
-        size: 0,
-        type: "directory"
-    },
-    {
-        filename: "/Jan_Smit_s_collection-500/sub-dir",
-        basename: "sub-dir",
-        lastmod: "Fri, 15 Feb 2019 09:40:16 GMT",
-        size: 0,
-        type: "directory"
-    },
-    {
-        filename: "/Jan_Smit_s_collection-500/file1.txt",
-        basename: "file1.txt",
-        lastmod: "Fri, 15 Feb 2019 09:40:16 GMT",
-        size: 0,
-        type: "file",
-        mime: "text/plain"
-    },
-    {
-        filename: "/Jan_Smit_s_collection-500/file2.txt",
-        basename: "file2.txt",
-        lastmod: "Fri, 15 Feb 2019 09:40:16 GMT",
-        size: 0,
-        type: "file",
-        mime: "text/plain"
+/* eslint-disable no-underscore-dangle */
+export class SearchAPI {
+    constructor(client, index) {
+        this.client = client;
+        this.index = index;
     }
-];
 
-const searchFiles = () => Promise.resolve(sampleFiles);
+    /**
+     * Searches ES with the qiven query string on the specified types
+     * @param query
+     * @param types     List of class URIs to search for. If empty, it returns all types
+     * @return Promise
+     */
+    searchForTypes = (query, types) => {
+        // Create basic query
+        const esQuery = {
+            bool: {
+                must: [{
+                    query_string: {query}
+                }]
+            }
+        };
 
-export const performSearch = (search) => {
-    const type = getSearchTypeFromString(search);
-    const query = getSearchQueryFromString(search);
+        // Add types filter, if specified
+        if (types && Array.isArray(types)) {
+            esQuery.bool.filter = [
+                {
+                    terms: {
+                        "type.keyword": types
+                    }
+                }
+            ];
+        }
 
-    switch (type) {
-        case COLLECTION_SEARCH_TYPE:
-            return searchCollections(query);
-        case FILES_SEARCH_TYPE:
-            return searchFiles(query);
-        default:
-            return Promise.resolve([]);
+        // Send the query to the backend and transform the results
+        return this.client.search({
+            index: this.index,
+            body: {
+                query: esQuery,
+                highlight: {
+                    fields: {
+                        "*": {}
+                    }
+                }
+            }
+        }).then(this.transformESResult);
+    };
+
+    /**
+     * Performs a search query
+     * @param type
+     * @param query
+     * @returns {Promise}
+     */
+    performSearch = (query) => this.searchForTypes(query, [DIRECTORY_URI, FILE_URI, COLLECTION_URI]);
+
+    /**
+     * Transforms the search result into a format that can be used internally. The format looks like this:
+     *
+     * {
+     *   "total": 190023,           // The total number of results for this query
+     *   "items": [               // The current list of results (can be only a subset of all results)
+     *      ...                     // See {transformESHit(hit)} for more details
+     *   ]
+     * }
+     *
+     * @param esJson    The json object as returned by ElasticSearch
+     */
+    transformESResult = (esJson) => ({
+        total: esJson && esJson.hits && esJson.hits.total ? esJson.hits.total : 0,
+        items: esJson && esJson.hits && esJson.hits.hits ? esJson.hits.hits.map(this.transformESHit) : []
+    });
+
+    /**
+     * Transforms a hit in the search result into a format that can be used internally. The format looks like this:
+     *
+     *     {
+     *       "_id": "...",          // The identifier for this hit. Refers to the _id field from ES
+     *       "_score":  "...",      // A score for the match between the query and the result.
+     *                              // See https://www.compose.com/articles/how-scoring-works-in-elasticsearch/
+     *       "label": "test",       // All fields available for the search result
+     *       "type": "xyz",
+     *       "comment": "ajs",
+     *       ...,
+     *       "_highlight": {        // Information on the fragment to highlight to show where the result matched.
+     *         "key": value         // The key is the field name that is matched, the value is an HTML fragment to display
+     *     }                        // See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-highlighting.html
+     *
+     * Please note that this format is not capable of returning source fields called 'id', 'score' or 'highlight'
+     */
+    transformESHit = (hit) => (hit ? {
+        ...hit._source,
+        id: hit._id,
+        score: hit._score,
+        highlight: hit.highlight
+    } : {});
+}
+
+// Expose the API as a singleton.
+// Please note that the client is instantiated only when needed. That way, we are
+// sure that the configuration has been loaded already.
+let api;
+export default () => {
+    if (!api) {
+        api = new SearchAPI(new elasticsearch.Client(Config.get().elasticsearch), ES_INDEX);
     }
+
+    return api;
 };

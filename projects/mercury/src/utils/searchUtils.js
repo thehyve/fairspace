@@ -2,7 +2,13 @@ import queryString from 'query-string';
 
 import {COLLECTION_SEARCH_TYPE} from '../constants';
 
-export const buildSearchUrl = (type, query) => {
+/**
+ * Builds a search URL with the given query and type
+ * @param query
+ * @param type  Type to search for. Can be left blank
+ * @returns {string}
+ */
+export const buildSearchUrl = (query, type) => {
     if (!type && !query) {
         return '/search';
     }
