@@ -2,7 +2,7 @@ import * as actionTypes from "../actions/actionTypes";
 
 const initialState = {
     pending: false,
-    results: {results: [], total: 0},
+    results: {items: [], total: 0},
     error: null
 };
 

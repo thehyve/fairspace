@@ -65,7 +65,7 @@ export class SearchAPI {
      *
      * {
      *   "total": 190023,           // The total number of results for this query
-     *   "results": [               // The current list of results (can be only a subset of all results)
+     *   "items": [               // The current list of results (can be only a subset of all results)
      *      ...                     // See {transformESHit(hit)} for more details
      *   ]
      * }
@@ -74,7 +74,7 @@ export class SearchAPI {
      */
     transformESResult = (esJson) => ({
         total: esJson && esJson.hits && esJson.hits.total ? esJson.hits.total : 0,
-        results: esJson && esJson.hits && esJson.hits.hits ? esJson.hits.hits.map(this.transformESHit) : []
+        items: esJson && esJson.hits && esJson.hits.hits ? esJson.hits.hits.map(this.transformESHit) : []
     });
 
     /**

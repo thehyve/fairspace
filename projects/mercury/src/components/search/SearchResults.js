@@ -39,7 +39,7 @@ const searchResults = ({
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {results.results.map((result) => (
+                        {results.items.map((result) => (
                             <TableRow
                                 hover
                                 key={result.id}

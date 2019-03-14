@@ -57,8 +57,8 @@ describe('Search API', () => {
             return searchAPI.performSearch()
                 .then(result => {
                     expect(result.total).toEqual(123);
-                    expect(result.results.length).toEqual(1);
-                    expect(result.results[0]).toEqual({
+                    expect(result.items.length).toEqual(1);
+                    expect(result.items[0]).toEqual({
                         label: "update.txt",
                         id: "http://fairspace.io/iri/0df9a97a-45aa-9a98-b428-2ba35bd61c2c",
                         score: 4.59,
@@ -78,13 +78,13 @@ describe('Search API', () => {
                 expect(searchAPI.transformESResult({noData: "fake", hits: {otherData: "fake", total: 219381, hits: []}}))
                     .toEqual({
                         total: 219381,
-                        results: []
+                        items: []
                     });
             });
 
             it('handles missing values gracefully', () => {
-                expect(searchAPI.transformESResult({})).toEqual({total: 0, results: []});
-                expect(searchAPI.transformESResult()).toEqual({total: 0, results: []});
+                expect(searchAPI.transformESResult({})).toEqual({total: 0, items: []});
+                expect(searchAPI.transformESResult()).toEqual({total: 0, items: []});
             });
         });
         describe('es hit transformation', () => {
