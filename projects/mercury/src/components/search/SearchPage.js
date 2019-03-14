@@ -50,7 +50,7 @@ export class SearchPage extends React.Component {
     }
 
     render() {
-        const {results, loading, error} = this.props;
+        const {results, vocabulary, loading, error} = this.props;
 
         if (!loading && error) {
             return <ErrorMessage message={error} />;
@@ -61,7 +61,7 @@ export class SearchPage extends React.Component {
                 loading={loading}
                 results={results}
                 onResultDoubleClick={this.handleResultDoubleClick}
-                vocabulary={this.props.vocabulary}
+                vocabulary={vocabulary}
             />
         );
     }
