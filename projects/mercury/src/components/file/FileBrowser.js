@@ -27,7 +27,7 @@ class FileBrowser extends React.Component {
         if (path.type === 'directory') {
             this.openDir(path.filename);
         } else {
-            this.downloadFile(path.filename);
+            FileAPI.open(path.filename);
         }
     }
 
@@ -58,11 +58,6 @@ class FileBrowser extends React.Component {
 
     openDir(path) {
         this.props.history.push(`/collections${path}`);
-        this.props.openPath(path);
-    }
-
-    downloadFile(path) {
-        FileAPI.download(path);
     }
 
     render() {
@@ -112,10 +107,10 @@ class FileBrowser extends React.Component {
                         openedPath={openedPath}
                         onRename={this.handlePathRename}
                         onDelete={this.handlePathDelete}
-                        onDownload={this.downloadFile}
                         disabled={!canWrite(openedCollection)}
                         existingFiles={files ? files.map(file => file.basename) : []}
                         fetchFilesIfNeeded={fetchFilesIfNeeded}
+                        getDownloadLink={FileAPI.getDownloadLink}
                     />
                 </div>
             </>

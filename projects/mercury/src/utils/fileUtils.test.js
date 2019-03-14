@@ -1,6 +1,7 @@
 import {
     addCounterToFilename, getFileName, getDirectoryFromFullpath,
-    getParentPath, generateUniqueFileName, getBaseNameAndExtension
+    getParentPath, generateUniqueFileName, getBaseNameAndExtension,
+    getPathInfoFromParams
 } from './fileUtils';
 
 describe('getBaseNameAndExtension', () => {
@@ -102,5 +103,22 @@ describe('addCounterToFilename', () => {
     it('Increments the correct counter if there is one already', () => {
         expect(addCounterToFilename('/some/path/file (123) (123).ext')).toEqual('/some/path/file (123) (124).ext');
         expect(addCounterToFilename('/some/path/file (123) (123)')).toEqual('/some/path/file (123) (124)');
+    });
+});
+
+describe('getPathInfoFromParams', () => {
+    expect(getPathInfoFromParams({collection: '', path: ''})).toEqual({
+        collectionLocation: '',
+        openedPath: '/'
+    });
+
+    expect(getPathInfoFromParams({collection: undefined, path: undefined})).toEqual({
+        collectionLocation: undefined,
+        openedPath: '/'
+    });
+
+    expect(getPathInfoFromParams({collection: 'collectionX', path: 'something/something'})).toEqual({
+        collectionLocation: 'collectionX',
+        openedPath: '/collectionX/something/something'
     });
 });

@@ -67,13 +67,18 @@ class FileAPI {
     }
 
     /**
-     * Downloads the file given by path. Downloading is done by redirecting the user to the file
+     * It will calls the browser API to open the file if it's 'openable' otherwise the browser will show download dialog
      * @param path
      */
-    download(path) {
-        const file = this.client().getFileDownloadLink(path, defaultOptions);
-        window.open(file);
+    open(path) {
+        const link = this.getDownloadLink(path);
+        window.open(link);
     }
+
+    /**
+     * It creates a full download like to the path provided
+     */
+    getDownloadLink = (path = '') => this.client().getFileDownloadLink(path, defaultOptions);
 
     /**
      * Deletes the file given by path

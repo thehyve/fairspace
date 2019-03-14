@@ -1,9 +1,9 @@
 import os
 import shutil
-
-from tempfile import NamedTemporaryFile
-
 from notebook.services.contents.largefilemanager import LargeFileManager
+from os import makedirs
+from os.path import expanduser
+from uuid import uuid4
 
 
 class AtomicLargeFileManager(LargeFileManager):
@@ -27,9 +27,7 @@ class AtomicLargeFileManager(LargeFileManager):
         if 'chunk' in model:
             path = path.strip('/')
             if path not in self._active_uploads:
-                temp_file = NamedTemporaryFile(delete=False)
-                self._active_uploads[path] = temp_file.name
-                temp_file.close()
+                self._active_uploads[path] = self._temp_file()
 
         try:
             return super().save(model, path)
@@ -48,3 +46,8 @@ class AtomicLargeFileManager(LargeFileManager):
             shutil.move(temp, os_path)
 
         return super().run_post_save_hook(model, os_path)
+
+    def _temp_file(self):
+        temp_dir = expanduser('~/.partial_uploads/')
+        makedirs(temp_dir, exist_ok=True)
+        return temp_dir + str(uuid4())

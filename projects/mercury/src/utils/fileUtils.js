@@ -85,3 +85,10 @@ export function getDirectoryFromFullpath(path) {
 
     return cleanedPath.substring(firstSlashPosition);
 }
+
+export const getPathInfoFromParams = ({collection, path}) => (
+    {
+        collectionLocation: collection,
+        openedPath: `/${collection || ''}${path ? `/${path}` : ''}`
+    }
+);

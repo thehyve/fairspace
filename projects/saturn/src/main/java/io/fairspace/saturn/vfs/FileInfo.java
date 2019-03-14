@@ -15,6 +15,4 @@ public class FileInfo {
     Instant created;
     Instant modified;
     boolean readOnly;
-    String createdBy;
-    String modifiedBy;
 }

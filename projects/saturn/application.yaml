@@ -9,7 +9,7 @@ jena:
   transactionLogPath: "data/log"
   elasticSearch:
     # Enables ElasticSearch integration
-    enabled: false
+    enabled: true
     # Makes availability of ElasticSearch mandatory
     required: false
     settings:

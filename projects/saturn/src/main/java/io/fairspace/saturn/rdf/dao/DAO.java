@@ -28,14 +28,13 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.getWorkspaceURI;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.graph.NodeFactory.createVariable;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -80,9 +79,9 @@ public class DAO implements Transactional {
 
     @Delegate(types = Transactional.class)
     private final RDFConnection rdf;
-    private final Supplier<String> userIriSupplier;
+    private final Supplier<Node> userIriSupplier;
 
-    public DAO(RDFConnection rdf, Supplier<String> userIriSupplier) {
+    public DAO(RDFConnection rdf, Supplier<Node> userIriSupplier) {
         this.rdf = rdf;
         this.userIriSupplier = userIriSupplier;
     }
@@ -101,7 +100,7 @@ public class DAO implements Transactional {
 
             if (entity instanceof LifecycleAwarePersistentEntity) {
                 var basicEntity = (LifecycleAwarePersistentEntity) entity;
-                var user = createURI(userIriSupplier.get());
+                var user = userIriSupplier.get();
                 basicEntity.setDateModified(now());
                 basicEntity.setModifiedBy(user);
 
@@ -112,7 +111,7 @@ public class DAO implements Transactional {
             }
 
             if (entity.getIri() == null) {
-                entity.setIri(createURI(getWorkspaceURI() + randomUUID()));
+                entity.setIri(generateIri());
             }
 
             var update = new UpdateRequest();
@@ -144,7 +143,7 @@ public class DAO implements Transactional {
      * @return The found entity or null if no entity was found or it was marked as deleted
      */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri) {
-        return construct(type, storedQuery("select_by_mask", defaultGraphIRI, iri))
+        return construct(type, storedQuery("select_by_mask", defaultGraphIRI, iri, null, null))
                 .stream().findFirst().orElse(null);
     }
 
@@ -161,7 +160,7 @@ public class DAO implements Transactional {
      * @param iri
      */
     public void delete(Node iri) {
-        rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri));
+        rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri, null, null));
     }
 
     /**
@@ -174,7 +173,7 @@ public class DAO implements Transactional {
             var existing = (T) read(entity.getClass(), entity.getIri());
             if (existing != null) {
                 existing.setDateDeleted(now());
-                existing.setDeletedBy(createURI(userIriSupplier.get()));
+                existing.setDeletedBy(userIriSupplier.get());
                 return write(existing);
             }
             return null;
