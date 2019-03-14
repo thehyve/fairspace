@@ -8,7 +8,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.util.FileManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
@@ -38,16 +37,11 @@ public class Vocabulary {
      * @return
      */
     public List<String> getMachineOnlyPredicates() {
-        List<String> machineOnlyPredicates = new ArrayList<>();
+        var processor = new QuerySolutionProcessor<>(row -> row.getResource("property").getURI());
 
-        rdfConnection.querySelect(
-                storedQuery("machine_only_properties", vocabularyGraph),
-                querySolution -> {
-                    machineOnlyPredicates.add(querySolution.getResource("property").getURI());
-                }
-        );
+        rdfConnection.querySelect(storedQuery("machine_only_properties", vocabularyGraph), processor);
 
-        return machineOnlyPredicates;
+        return processor.getValues();
     }
 
     public boolean isMachineOnlyPredicate(@NonNull String predicateUri) {
