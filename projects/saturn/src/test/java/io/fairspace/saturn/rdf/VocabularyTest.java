@@ -15,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
+import static io.fairspace.saturn.rdf.Vocabulary.createVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -22,6 +23,7 @@ import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabularyTest {
+    private static final Node VOCABULARY_URI = createURI("http://fairspace.io/iri/vocabulary");
     private static final Resource resource1 = createResource("http://property1");
     private static final Resource resource2 = createResource("http://property2");
     private static final Resource resource3 = createResource("http://property3");
@@ -30,17 +32,15 @@ public class VocabularyTest {
 
     private Vocabulary vocabulary;
     private Model vocabularyModel;
+    private RDFConnectionLocal rdf;
+
 
     @Before
     public void setUp() {
         Dataset dataset = createTxnMem();
-        RDFConnectionLocal rdf = new RDFConnectionLocal(dataset);
+        rdf = new RDFConnectionLocal(dataset);
 
-        Node vocabularyUri = createURI("http://fairspace.io/iri/vocabulary");
-        vocabularyModel = dataset.getNamedModel(vocabularyUri.getURI());
-
-        // Create object under test
-        vocabulary = new Vocabulary(rdf, vocabularyUri);
+        vocabularyModel = dataset.getNamedModel(VOCABULARY_URI.getURI());
     }
 
 
@@ -76,7 +76,7 @@ public class VocabularyTest {
     public void testVocabularyInitialization() {
         assertTrue(vocabularyModel.isEmpty());
 
-        vocabulary.initializeDefault("simple-vocabulary.jsonld");
+        vocabulary = createVocabulary(rdf, VOCABULARY_URI, "simple-vocabulary.jsonld");
 
         // Verify the model has been loaded into the vocabulary graph
         Resource classResource = createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#Class");
@@ -88,7 +88,7 @@ public class VocabularyTest {
     public void testVocabularyInitializationIsNoopWhenVocabularyAlreadyExists() {
         vocabularyModel.add(createResource("http://some-data"), RDF.type, RDF.Property);
 
-        vocabulary.initializeDefault("simple-vocabulary.jsonld");
+        vocabulary = createVocabulary(rdf, VOCABULARY_URI, "simple-vocabulary.jsonld");
 
         // Verify the model has not been loaded into the vocabulary graph
         assertFalse(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"));
@@ -96,6 +96,8 @@ public class VocabularyTest {
     }
 
     private void setupVocabularyWithMachineOnlyPredicates() {
+        vocabulary = createVocabulary(rdf, VOCABULARY_URI, "empty-vocabulary.jsonld");
+
         // Setup model
         vocabularyModel.add(resource1, RDF.type, RDF.Property);
         vocabularyModel.add(resource2, RDF.type, RDF.Property);
