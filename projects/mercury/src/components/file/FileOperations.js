@@ -12,8 +12,9 @@ import {
 } from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
-import {joinPaths, generateUniqueFileName} from "../../utils/fileUtils";
+import {joinPaths, generateUniqueFileName, getParentPath} from "../../utils/fileUtils";
 import styles from './FileOperations.styles';
+import {CUT} from '../../constants';
 
 export class FileOperations extends React.Component {
     refreshFiles() {
@@ -83,7 +84,8 @@ export class FileOperations extends React.Component {
     render() {
         const {
             disabled: allOperationsDisabled, selectedPaths, creatingDirectory,
-            clipboardItemsCount, onRename, selectedItems, onDelete, classes, getDownloadLink
+            clipboardItemsCount, onRename, selectedItems, onDelete, classes, getDownloadLink,
+            openedPath, currentClipbaordType, filenamesInClipboard
         } = this.props;
 
         if (creatingDirectory) {
@@ -93,6 +95,7 @@ export class FileOperations extends React.Component {
         const noSelectedPath = selectedPaths.length === 0;
         const moreThanOneItemSelected = selectedPaths.length > 1;
         const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
+        const selectedItemOnOpenedPathAndActionIsCut = currentClipbaordType === CUT && filenamesInClipboard && filenamesInClipboard.map(f => getParentPath(f)).includes(openedPath);
         const disabledForMoreThanOneSelection = allOperationsDisabled || noSelectedPath || moreThanOneItemSelected;
 
         return (
@@ -159,7 +162,7 @@ export class FileOperations extends React.Component {
                             aria-label="Paste"
                             title="Paste"
                             onClick={e => this.handlePaste(e)}
-                            disabled={allOperationsDisabled || clipboardItemsCount === 0}
+                            disabled={allOperationsDisabled || selectedItemOnOpenedPathAndActionIsCut || clipboardItemsCount === 0}
                         >
                             {this.addBadgeIfNotEmpty(
                                 clipboardItemsCount,
@@ -213,6 +216,8 @@ const mapStateToProps = (state, ownProps) => {
         selectedPaths,
         selectedItems,
         clipboardItemsCount: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
+        filenamesInClipboard: state.clipboard.filenames,
+        currentClipbaordType: state.clipboard.type,
         creatingDirectory: state.cache.filesByPath.creatingDirectory
     };
 };
