@@ -9,6 +9,7 @@ import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import {getParentPath} from '../../utils/fileUtils';
 import * as searchActions from '../../actions/searchActions';
 import * as metadataActions from '../../actions/metadataActions';
+import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import {ErrorMessage} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
 
@@ -38,6 +39,9 @@ export class SearchPage extends React.Component {
      */
     handleResultDoubleClick = (result) => {
         const navigationPath = getCollectionAbsolutePath(this.getPathOfResult(result));
+        // TODO: why do we have to have a slash here, there's some kind of data inconsistency somewhere
+        // eslint-disable-next-line prefer-template
+        this.props.selectPath('/' + result.filePath[0]);
         this.props.history.push(navigationPath);
     }
 
@@ -83,7 +87,8 @@ const mapStateToProps = ({search, cache: {vocabulary}}) => ({
 
 const mapDispatchToProps = {
     performSearch: searchActions.performSearch,
-    fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded
+    fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded,
+    selectPath: collectionBrowserActions.selectPath
 };
 
 SearchPage.propTypes = {
