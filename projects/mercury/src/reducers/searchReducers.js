@@ -2,7 +2,7 @@ import * as actionTypes from "../actions/actionTypes";
 
 const initialState = {
     pending: false,
-    results: {},
+    results: {items: [], total: 0},
     error: null
 };
 
@@ -25,7 +25,7 @@ const searchReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pending: false,
-                error: action.payload.error
+                error: "Error retrieving search results"
             };
         default:
             return state;

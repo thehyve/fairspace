@@ -34,13 +34,12 @@ export class SearchPage extends React.Component {
 
     /**
      * Handles a click on a search result.
-     * @param hit   The clicked search result. For the format, see the ES api
+     * @param result   The clicked search result. For the format, see the ES api
      */
-    handleResultDoubleClick = (hit) => {
-        /* eslint-disable no-underscore-dangle */
-        const resultType = hit._source.type[0];
+    handleResultDoubleClick = (result) => {
+        const resultType = result.type[0];
         if (resultType === COLLECTION_URI) {
-            this.props.history.push(getCollectionAbsolutePath(hit._source.filePath[0]));
+            this.props.history.push(getCollectionAbsolutePath(result.filePath[0]));
         } else if (resultType === DIRECTORY_URI) {
             // TODO: handle directory open. See VRE-580
         } else if (resultType === FILE_URI) {
@@ -51,7 +50,7 @@ export class SearchPage extends React.Component {
     }
 
     render() {
-        const {results, loading, error} = this.props;
+        const {results, vocabulary, loading, error} = this.props;
 
         if (!loading && error) {
             return <ErrorMessage message={error} />;
@@ -62,7 +61,7 @@ export class SearchPage extends React.Component {
                 loading={loading}
                 results={results}
                 onResultDoubleClick={this.handleResultDoubleClick}
-                vocabulary={this.props.vocabulary}
+                vocabulary={vocabulary}
             />
         );
     }
