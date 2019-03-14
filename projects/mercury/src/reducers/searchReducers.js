@@ -2,7 +2,7 @@ import * as actionTypes from "../actions/actionTypes";
 
 const initialState = {
     pending: false,
-    results: {},
+    results: {results: [], total: 0},
     error: null
 };
 
@@ -25,9 +25,7 @@ const searchReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pending: false,
-
-                // eslint-disable-next-line prefer-template
-                error: "Error retrieving search results" + (action.payload ? ": " + action.payload.message : "")
+                error: "Error retrieving search results"
             };
         default:
             return state;
