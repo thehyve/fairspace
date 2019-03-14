@@ -36,23 +36,23 @@ repositories {
 }
 
 dependencies {
-    compile "org.apache.jena:jena-fuseki-main:${jena_version}"
-    compile "org.apache.jena:jena-text:${jena_version}"
-    compile "org.apache.jena:jena-text-es:${jena_version}"
-    compile "io.milton:milton-server-ce:${milton_version}"
-    compile 'com.nimbusds:nimbus-jose-jwt:5.7'
-    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-    compile "com.sparkjava:spark-core:2.7.2"
-    compile 'com.pivovarit:throwing-function:1.5.0'
+    implementation "org.apache.jena:jena-fuseki-main:${jena_version}"
+    implementation "org.apache.jena:jena-text:${jena_version}"
+    implementation "org.apache.jena:jena-text-es:${jena_version}"
+    implementation "io.milton:milton-server-ce:${milton_version}"
+    implementation 'com.nimbusds:nimbus-jose-jwt:5.7'
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    implementation "com.sparkjava:spark-core:2.7.2"
+    implementation 'com.pivovarit:throwing-function:1.5.0'
 
-    testCompile "junit:junit:4.12"
-    testCompile "org.mockito:mockito-core:${mockitoVersion}"
-    testCompile group: 'com.mockrunner', name: 'mockrunner', version: '2.0.1', ext: 'pom'
-    testCompile(group: 'com.mockrunner', name: 'mockrunner-servlet', version: '2.0.1') {
+    testImplementation "junit:junit:4.12"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation group: 'com.mockrunner', name: 'mockrunner', version: '2.0.1', ext: 'pom'
+    testImplementation(group: 'com.mockrunner', name: 'mockrunner-servlet', version: '2.0.1') {
         exclude group: 'org.apache.tomcat'
     }
-    testCompile 'com.github.stefanbirkner:system-rules:1.19.0'
+    testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 }
 
