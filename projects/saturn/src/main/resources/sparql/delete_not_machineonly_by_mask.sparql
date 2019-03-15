@@ -3,11 +3,10 @@
 # 1 - subject
 # 2 - predicate
 # 3 - object
-# 4 - vocabulary graph
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
 DELETE {GRAPH %1$s {%2$s %3$s %4$s}} WHERE {
     GRAPH %1$s {%2$s %3$s %4$s}
-    FILTER NOT EXISTS { GRAPH %5$s { %3$s fs:machineOnly true } }
+    FILTER NOT EXISTS { GRAPH ws:vocabulary { %3$s fs:machineOnly true } }
 }

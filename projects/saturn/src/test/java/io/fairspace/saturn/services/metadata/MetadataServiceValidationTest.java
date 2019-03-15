@@ -32,7 +32,6 @@ public class MetadataServiceValidationTest {
     MetadataRequestValidator validator;
 
     private static final ValidationResult INVALID_VALIDATION_RESULT = new ValidationResult(false, "Test error");
-    private static final String vocabularyURI = "http://fairspace.io/iri/vocabulary";
     private static final String GRAPH = "http://fairspace.io/iri/graph";
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
@@ -52,7 +51,7 @@ public class MetadataServiceValidationTest {
     public void setUp() {
         ds = createTxnMem();
         RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new MetadataService(rdf, createURI(GRAPH), createURI(vocabularyURI), validator);
+        api = new MetadataService(rdf, createURI(GRAPH), validator);
     }
 
     @Test
