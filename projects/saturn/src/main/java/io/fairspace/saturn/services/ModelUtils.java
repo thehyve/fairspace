@@ -13,7 +13,7 @@ import static org.apache.jena.riot.RDFFormat.JSONLD;
 
 @Slf4j
 public class ModelUtils {
-    public static final String JSON_LD = JSONLD.getLang().getHeaderString();
+    public static final String JSON_LD_HEADER_STRING = JSONLD.getLang().getHeaderString();
 
     public static String toJsonLD(Model model) {
         var writer = new StringWriter();

@@ -31,30 +31,30 @@ public class MetadataApp implements SparkApplication {
     @Override
     public void init() {
         path(basePath, () -> {
-            get("/", JSON_LD, (req, res) -> {
-                res.type(JSON_LD);
+            get("/", JSON_LD_HEADER_STRING, (req, res) -> {
+                res.type(JSON_LD_HEADER_STRING);
                 return toJsonLD(api.get(
                         req.queryParams("subject"),
                         req.queryParams("predicate"),
                         req.queryParams("object"),
                         req.queryParams().contains("labels")));
             });
-            get("/entities/", JSON_LD, (req, res) -> {
+            get("/entities/", JSON_LD_HEADER_STRING, (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
                 return toJsonLD(api.getByType(req.queryParams("type")));
             });
             put("/", (req, res) -> {
-                validateContentType(req, JSON_LD);
+                validateContentType(req, JSON_LD_HEADER_STRING);
                 api.put(fromJsonLD(req.body()));
                 return "";
             });
             patch("/", (req, res) -> {
-                validateContentType(req, JSON_LD);
+                validateContentType(req, JSON_LD_HEADER_STRING);
                 api.patch(fromJsonLD(req.body()));
                 return "";
             });
             delete("/", (req, res) -> {
-                if (JSON_LD.equals(req.contentType())) {
+                if (JSON_LD_HEADER_STRING.equals(req.contentType())) {
                     api.delete(fromJsonLD(req.body()));
                 } else {
                     api.delete(req.queryParams("subject"), req.queryParams("predicate"), req.queryParams("object"));
