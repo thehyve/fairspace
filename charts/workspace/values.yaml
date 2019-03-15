@@ -300,5 +300,16 @@ jupyterhub:
     # Ensure to override this value with a 64-character hex string when installing
     secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
 
+#####################################################################
+# Specific settings for ElasticSearch
+#####################################################################
+elasticsearch:
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: standard
+  data:
+    exposeHttp: true
+
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}
