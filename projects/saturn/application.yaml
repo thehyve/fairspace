@@ -17,7 +17,7 @@ jena:
       hostToPortMapping:
         "127.0.0.1": 9300
       # Name of the Cluster. Defaults to "elasticsearch". Set to "docker-cluster" for a dockerized ES setup.
-      clusterName: "elasticsearch"
+      clusterName: "docker-cluster"
       # Number of shards. Defaults to 1
       shards: 1
       # Number of replicas. Defaults to 1

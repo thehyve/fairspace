@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
+import lombok.AllArgsConstructor;
+import org.apache.jena.riot.RiotException;
 import io.fairspace.saturn.rdf.Vocabulary;
 import io.fairspace.saturn.services.PayloadParsingException;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
@@ -17,16 +19,10 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.*;
 
+@AllArgsConstructor
 public class MetadataApp implements SparkApplication {
     private final String basePath;
     private final MetadataService api;
-
-    public MetadataApp(String basePath, RDFConnection rdfConnection, Node graph, Vocabulary vocabulary) {
-        this.basePath = basePath;
-
-        MetadataRequestValidator validator = new ProtectMachineOnlyPredicatesValidator(vocabulary);
-        this.api = new MetadataService(rdfConnection, graph, vocabulary.getVocabularyGraph(), validator);
-    }
 
     @Override
     public void init() {

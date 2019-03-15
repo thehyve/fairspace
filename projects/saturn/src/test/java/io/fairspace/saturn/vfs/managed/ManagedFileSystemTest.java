@@ -1,7 +1,10 @@
 package io.fairspace.saturn.vfs.managed;
 
+import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
+import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
+import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -28,6 +31,7 @@ public class ManagedFileSystemTest {
     private final byte[] content1 = new byte[]{1, 2, 3};
     private final byte[] content2 = new byte[]{1, 2, 3, 4};
 
+    private CollectionsService collections;
     private Dataset ds;
     private ManagedFileSystem fs;
 
@@ -37,8 +41,9 @@ public class ManagedFileSystemTest {
         ds = createTxnMem();
         var rdf = connect(ds);
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier));
-        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections);
+        var eventBus = new EventBus();
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
         var collection = new Collection();
         collection.setLocation("coll");
         collection.setName("My Collection");
@@ -236,6 +241,27 @@ public class ManagedFileSystemTest {
 
         assertTrue(fs.exists("coll/dir/file"));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
+    }
+
+    @Test
+    public void filesAreDeletedAfterDeletingACollection() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        fs.onCollectionDeleted(new CollectionDeletedEvent(collections.getByLocation("coll")));
+
+        assertEquals(0, fs.list("coll").size());
+    }
+
+    @Test
+    public void filesAreMovedAfterMovingACollection() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        var c = collections.getByLocation("coll");
+        c.setLocation("newLocation");
+        fs.onCollectionMoved(new CollectionMovedEvent(c, "coll"));
+
+        assertEquals(0, fs.list("coll").size());
+        assertEquals(2, fs.list("newLocation").size());
     }
 
     @Test

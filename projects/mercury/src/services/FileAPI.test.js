@@ -20,3 +20,9 @@ it('uploads multiple files', () => {
     expect(result).resolves.toEqual(files);
     expect(FileAPI.webDavClient.putFileContents.mock.calls.length).toEqual(3);
 });
+
+it('ignores cut-and-paste into same folder', () => {
+    FileAPI.webDavClient = {moveFile: jest.fn(() => Promise.resolve())};
+    FileAPI.move('/coll/path/file.ext', '/coll/path/file.ext')
+        .then(() => expect(FileAPI.webDavClient.moveFile.mock.calls.length).toEqual(0));
+});

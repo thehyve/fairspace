@@ -1,15 +1,13 @@
 import React from "react";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {
-    Table, Paper, TableHead, TableRow,
-    TableCell, TableBody
-} from "@material-ui/core";
+import {Paper, Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
 
 import {getLabel, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
-import {ErrorMessage, ErrorDialog, LoadingInlay, LoadingOverlay} from "../common";
+import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
+import MetadataLink from "./MetadataLink";
 
 class MetadataEntities extends React.Component {
     componentDidMount() {
@@ -62,9 +60,9 @@ class MetadataEntities extends React.Component {
                                         ))}
                                     </TableCell>
                                     <TableCell>
-                                        <a href={entity['@id']}>
+                                        <MetadataLink uri={entity['@id']}>
                                             {getLabel(entity)}
-                                        </a>
+                                        </MetadataLink>
                                     </TableCell>
                                 </TableRow>
                             )) : null}

@@ -133,6 +133,7 @@ pluto:
       secret:
     redirectAfterLogoutUrl: https://fairspace.com
     requiredAuthority:
+    loginGroupName:
 
   # Where to find the backends for this proxy
   backends:

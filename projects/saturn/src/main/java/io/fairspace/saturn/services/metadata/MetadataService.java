@@ -25,15 +25,11 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
 @AllArgsConstructor
+public
 class MetadataService {
     private final RDFConnection rdf;
     private final Node graph;
-    private final Node vocabularyGraph;
     private final MetadataRequestValidator validator;
-
-    MetadataService(RDFConnection rdf, Node graph, Node vocabularyGraph) {
-        this(rdf, graph, vocabularyGraph, null);
-    }
 
     /**
      * Returns a model with statements from the metadata database, based on the given selection criteria
@@ -84,7 +80,7 @@ class MetadataService {
     void delete(String subject, String predicate, String object) {
         commit("Delete metadata", rdf, () -> {
             ensureValidParameters(validator -> validator.validateDelete(subject, predicate, object));
-            rdf.update(storedQuery("delete_not_machineonly_by_mask", graph, asURI(subject), asURI(predicate), asURI(object), vocabularyGraph));
+            rdf.update(storedQuery("delete_not_machineonly_by_mask", graph, asURI(subject), asURI(predicate), asURI(object)));
         });
     }
 
