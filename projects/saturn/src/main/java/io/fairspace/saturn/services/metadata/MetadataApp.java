@@ -1,14 +1,8 @@
 package io.fairspace.saturn.services.metadata;
 
-import lombok.AllArgsConstructor;
-import org.apache.jena.riot.RiotException;
-import io.fairspace.saturn.rdf.Vocabulary;
 import io.fairspace.saturn.services.PayloadParsingException;
-import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
-import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
 import io.fairspace.saturn.util.UnsupportedMediaTypeException;
-import org.apache.jena.graph.Node;
-import org.apache.jena.rdfconnection.RDFConnection;
+import lombok.AllArgsConstructor;
 import spark.servlet.SparkApplication;
 
 import static io.fairspace.saturn.services.ModelUtils.*;
