@@ -15,6 +15,9 @@ data:
         base-url: {{ template "keycloak.baseUrl" . }}
         realm: {{ .Values.hyperspace.keycloak.realm }}
 
+    keycloak:
+      workspace-login-group: {{ .Values.pluto.keycloak.loginGroupName | default (printf "%s-users" (include "workspace.name" .)) }}
+
     frontend:
       urls:
         files: {{ template "storage.url" . }}/webdav

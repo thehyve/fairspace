@@ -13,7 +13,7 @@ services:
       - "5100:8080"
 
   keycloak-config:
-    image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.0
+    image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.1
     networks:
       - local-development
     environment:
