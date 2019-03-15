@@ -2,3 +2,6 @@ dependencies:
 - name: jupyterhub
   version: "0.7"
   repository: https://jupyterhub.github.io/helm-chart/
+- name: elasticsearch
+  version: "1.21.2"
+  repository: https://kubernetes-charts.storage.googleapis.com
