@@ -101,7 +101,7 @@ public class KeycloakUserList {
      * Returns the keycloak group identifier
      * @return
      */
-    private String getGroupId() {
+    String getGroupId() {
         // Retrieve the groupId, if it has not been retrieved before
         // As it will never change, we will cache it forever
         if(groupId == null) {
@@ -120,7 +120,14 @@ public class KeycloakUserList {
             ResponseEntity<List<GroupInfo>> groupResponse = restTemplate.exchange(config.getGroupUri(), HttpMethod.GET, request, parameterizedTypeReference);
 
             if(groupResponse.getStatusCode().is2xxSuccessful() && groupResponse.getBody().size() > 0) {
-                groupId = groupResponse.getBody().get(0).getId();
+                // Keycloak may return multiple groups, as there may be groups with similar names to the one
+                // being sought. For example, if we search for 'group-workspace', then it may return 'group-workspace2' as well
+                // For that reason we search the list to find the group with a matching name.
+                groupId = groupResponse.getBody().stream()
+                        .filter(groupInfo -> config.getWorkspaceLoginGroup().equals(groupInfo.getName()))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("None of the returned groups from keycloak matches the requested name"))
+                        .getId();
             } else {
                 log.warn("Could not retrieve group identifier from keycloak on url {}: status {}", config.getGroupUri(), groupResponse.getStatusCodeValue());
                 throw new IllegalStateException("Could not retrieve group identifier from keycloak");

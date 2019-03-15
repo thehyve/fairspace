@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,24 +28,23 @@ public class KeycloakUserListTest {
     @Mock
     RestTemplate restTemplate;
 
-    KeycloakConfig config = new KeycloakConfig(
-            "http://get-users/%s?%s",
-            "group-name",
-            "http://get-groups"
-    );
+    KeycloakConfig config = new KeycloakConfig();
 
     KeycloakUserList keycloakUserList;
 
     @Before
     public void setUp() throws Exception {
         keycloakUserList = new KeycloakUserList(restTemplate, config);
+        config.setUsersUriPattern("http://get-users/%s?%s");
+        config.setGroupUri("http://get-groups");
+        config.setWorkspaceLoginGroup("group-name");
     }
 
     @Test
     public void testUserResponse() {
         String groupId = "group-id";
         String userUri = getUserUri(groupId);
-        mockGroupResponse(groupId, "name");
+        mockGroupResponse(groupId, "group-name");
         mockUserResponse(userUri, "users");
 
         ResponseEntity<String> userListResponse = keycloakUserList.getUsers("");
@@ -54,12 +54,23 @@ public class KeycloakUserListTest {
         assertEquals("users", userListResponse.getBody());
     }
 
+    @Test
+    public void testWhetherQueryStringIsForwarded() {
+        String groupId = "group-id";
+        String query = "first=1&max=4";
+        String userUri = getUserUri(groupId, query);
+        mockGroupResponse(groupId, "group-name");
+        mockUserResponse(userUri, "users");
+
+        keycloakUserList.getUsers(query);
+        verify(restTemplate).exchange(eq(userUri), eq(HttpMethod.GET), any(), any(Class.class));
+    }
 
     @Test
     public void testWhetherGroupIdIsRetrievedAndCached() {
         String groupId = "group-id";
         String userUri = getUserUri(groupId);
-        mockGroupResponse(groupId, "name");
+        mockGroupResponse(groupId, "group-name");
         mockUserResponse(userUri, "users");
 
         keycloakUserList.getUsers("");
@@ -86,15 +97,16 @@ public class KeycloakUserListTest {
     }
 
     @Test
-    public void testWhetherQueryStringIsForwarded() {
-        String groupId = "group-id";
-        String query = "first=1&max=4";
-        String userUri = getUserUri(groupId, query);
-        mockGroupResponse(groupId, "name");
-        mockUserResponse(userUri, "users");
+    public void testMultipleGroupsResponse() {
+        mockGroupResponse(new ArrayList<>() {{
+            this.add(new KeycloakUserList.GroupInfo("id-1", "other-name"));
+            this.add(new KeycloakUserList.GroupInfo("id-2", "group-name"));
+            this.add(new KeycloakUserList.GroupInfo("id-3", "additional-name"));
+        }});
 
-        keycloakUserList.getUsers(query);
-        verify(restTemplate).exchange(eq(userUri), eq(HttpMethod.GET), any(), any(Class.class));
+        // Ensure that the correct groupId is extracted from the list of groups returned
+        // because its name matches the requested name
+        assertEquals("id-2", keycloakUserList.getGroupId());
     }
 
     private void mockUserResponse(String userUri, String users) {
@@ -103,11 +115,18 @@ public class KeycloakUserListTest {
     }
 
     private void mockGroupResponse(String id, String name) {
-        ResponseEntity<List<KeycloakUserList.GroupInfo>> groupResponse = ResponseEntity.ok(
+        mockGroupResponse(
                 Collections.singletonList(new KeycloakUserList.GroupInfo(id, name))
+        );
+    }
+
+    private void mockGroupResponse(List<KeycloakUserList.GroupInfo> responseList) {
+        ResponseEntity<List<KeycloakUserList.GroupInfo>> groupResponse = ResponseEntity.ok(
+                responseList
         );
         doReturn(groupResponse).when(restTemplate).exchange(eq(config.getGroupUri()), eq(HttpMethod.GET), any(), any(ParameterizedTypeReference.class));
     }
+
 
     private String getUserUri(String groupName) {
         return getUserUri(groupName, "");

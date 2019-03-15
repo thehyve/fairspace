@@ -1,15 +1,16 @@
 package nl.fairspace.pluto.app.config.dto;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "keycloak")
 @Component
-@Value
+@Data
 public class KeycloakConfig {
-    String usersUriPattern;
-    String workspaceLoginGroup;
-    String groupUri;
+    private String usersUriPattern;
+    private String workspaceLoginGroup;
+    private String groupUri;
 }
 
