@@ -83,20 +83,13 @@ export class FileOperations extends React.Component {
 
     render() {
         const {
-            disabled: allOperationsDisabled, selectedPaths, creatingDirectory,
-            clipboardItemsCount, onRename, selectedItems, onDelete, classes, getDownloadLink,
-            openedPath, currentClipbaordType, filenamesInClipboard
+            allOperationsDisabled, creatingDirectory, clipboardItemsCount, onRename, onDelete,
+            classes, getDownloadLink, selectedItem, disabledForMoreThanOneSelection, isPasteDisabled, noSelectedPath
         } = this.props;
 
         if (creatingDirectory) {
             return (<LoadingOverlay loading={creatingDirectory} />);
         }
-
-        const noSelectedPath = selectedPaths.length === 0;
-        const moreThanOneItemSelected = selectedPaths.length > 1;
-        const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
-        const selectedItemOnOpenedPathAndActionIsCut = currentClipbaordType === CUT && filenamesInClipboard && filenamesInClipboard.map(f => getParentPath(f)).includes(openedPath);
-        const disabledForMoreThanOneSelection = allOperationsDisabled || noSelectedPath || moreThanOneItemSelected;
 
         return (
             <Grid container justify="space-between">
@@ -162,7 +155,7 @@ export class FileOperations extends React.Component {
                             aria-label="Paste"
                             title="Paste"
                             onClick={e => this.handlePaste(e)}
-                            disabled={allOperationsDisabled || selectedItemOnOpenedPathAndActionIsCut || clipboardItemsCount === 0}
+                            disabled={isPasteDisabled}
                         >
                             {this.addBadgeIfNotEmpty(
                                 clipboardItemsCount,
@@ -205,20 +198,29 @@ export class FileOperations extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {match: {params}} = ownProps;
+    const {match: {params}, disabled: allOperationsDisabled} = ownProps;
+    const {collectionBrowser: {selectedPaths}, cache: {filesByPath}, clipboard} = state;
     const openedCollectionLocation = params.collection;
     const openedPath = params.path ? `/${openedCollectionLocation}/${params.path}` : `/${openedCollectionLocation}`;
-    const {collectionBrowser: {selectedPaths}} = state;
-    const filesOfCurrentPath = (state.cache.filesByPath[openedPath] || {}).data || [];
+    const filesOfCurrentPath = (filesByPath[openedPath] || {}).data || [];
     const selectedItems = filesOfCurrentPath.filter(f => selectedPaths.includes(f.filename)) || [];
+    const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
+    const noSelectedPath = selectedPaths.length === 0;
+    const moreThanOneItemSelected = selectedPaths.length > 1;
+    const filenamesInClipboard = clipboard.filenames;
+    const clipboardItemsCount = clipboard.filenames ? clipboard.filenames.length : 0;
+    const isClipboardItemsOnOpenedPath = filenamesInClipboard && filenamesInClipboard.map(f => getParentPath(f)).includes(openedPath);
+    const isPasteDisabled = allOperationsDisabled || clipboardItemsCount === 0 || (isClipboardItemsOnOpenedPath && clipboard.type === CUT);
+    const disabledForMoreThanOneSelection = allOperationsDisabled || noSelectedPath || moreThanOneItemSelected;
 
     return {
+        creatingDirectory: filesByPath.creatingDirectory,
         selectedPaths,
-        selectedItems,
-        clipboardItemsCount: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
-        filenamesInClipboard: state.clipboard.filenames,
-        currentClipbaordType: state.clipboard.type,
-        creatingDirectory: state.cache.filesByPath.creatingDirectory
+        selectedItem,
+        clipboardItemsCount,
+        disabledForMoreThanOneSelection,
+        noSelectedPath,
+        isPasteDisabled
     };
 };
 
