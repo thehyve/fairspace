@@ -84,7 +84,7 @@ export class FileOperations extends React.Component {
     render() {
         const {
             allOperationsDisabled, creatingDirectory, clipboardItemsCount, onRename, onDelete,
-            classes, getDownloadLink, selectedItem, disabledForMoreThanOneSelection, isPasteDisabled, noSelectedPath
+            classes, getDownloadLink, selectedItem = {}, disabledForMoreThanOneSelection, isPasteDisabled, noSelectedPath
         } = this.props;
 
         if (creatingDirectory) {
