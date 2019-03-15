@@ -2,8 +2,7 @@ import * as actionTypes from "../actions/actionTypes";
 
 const initialState = {
     pending: false,
-    searchType: null,
-    results: [],
+    results: {items: [], total: 0},
     error: null
 };
 
@@ -13,22 +12,20 @@ const searchReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pending: true,
-                searchType: action.meta ? action.meta.searchType : null,
-                results: []
+                results: {}
             };
         case actionTypes.PERFORM_SEARCH_FULFILLED:
             return {
                 ...state,
                 pending: false,
                 error: null,
-                searchType: action.meta ? action.meta.searchType : null,
-                results: [...action.payload]
+                results: {...action.payload}
             };
         case actionTypes.PERFORM_SEARCH_REJECTED:
             return {
                 ...state,
                 pending: false,
-                error: action.payload.error
+                error: "Error retrieving search results"
             };
         default:
             return state;

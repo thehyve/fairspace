@@ -2,5 +2,8 @@
   "urls": {
     "jupyter": "https://www.google.com/search?q=jupyterhub",
     "cbioportal": "https://cbioportal-server.com"
+  },
+  "elasticsearch": {
+    "host": "http://localhost:3000/api/search"
   }
 }

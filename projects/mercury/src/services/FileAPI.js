@@ -1,7 +1,7 @@
 import {createClient} from "webdav";
 import axios from 'axios';
 import Config from "./Config/Config";
-import {addCounterToFilename, generateUniqueFileName, joinPaths, getParentPath, getFileName} from '../utils/fileUtils';
+import {addCounterToFilename, generateUniqueFileName, getFileName, getParentPath, joinPaths} from '../utils/fileUtils';
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
@@ -103,6 +103,10 @@ class FileAPI {
         }
         if (!destination) {
             return Promise.reject(Error("No destination specified to move to"));
+        }
+
+        if (source === destination) {
+            return Promise.resolve();
         }
 
         // We have to specify the destination ourselves, as the client() adds the fullpath

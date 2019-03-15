@@ -9,7 +9,7 @@ describe('<SearchPage />', () => {
     let wrapper;
 
     beforeEach(() => {
-        wrapper = shallow(<SearchPage location={{search: ''}} performSearch={() => {}} />);
+        wrapper = shallow(<SearchPage fetchVocabularyIfNeeded={() => {}} location={{search: ''}} performSearch={() => {}} />);
     });
 
     it('should render <SearchResults /> when receiving results', () => {
@@ -23,12 +23,18 @@ describe('<SearchPage />', () => {
 
     it('should perform search on component first mount', () => {
         const search = jest.fn();
-        shallow(<SearchPage location={{search: ''}} performSearch={search} />);
+        shallow(<SearchPage fetchVocabularyIfNeeded={() => {}} location={{search: ''}} performSearch={search} />);
         expect(search.mock.calls.length).toEqual(1);
     });
 
+    it('should fetch vocabulary on component first mount', () => {
+        const fetchVocabularyIfNeeded = jest.fn();
+        shallow(<SearchPage fetchVocabularyIfNeeded={fetchVocabularyIfNeeded} location={{search: ''}} performSearch={() => {}} />);
+        expect(fetchVocabularyIfNeeded.mock.calls.length).toEqual(1);
+    });
+
     it('should perform search after search query change', () => {
-        const localWrapper = shallow(<SearchPage location={{search: ''}} performSearch={() => {}} />);
+        const localWrapper = shallow(<SearchPage fetchVocabularyIfNeeded={() => {}} location={{search: ''}} performSearch={() => {}} />);
         const search = jest.fn();
         localWrapper.setProps(
             {

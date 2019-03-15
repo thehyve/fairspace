@@ -31,22 +31,14 @@ import java.nio.charset.Charset;
 @Profile("!noAuth")
 @RequestMapping("/api/workspace")
 public class WorkspaceResource {
-    @Value("${workspace.usersUri}")
-    URI usersUri;
-
-    @Autowired(required = false)
-    OAuthAuthenticationToken token;
-
     @Autowired
     FrontendConfig frontendConfig;
 
     @Autowired
     WorkspaceDetails workspaceDetails;
 
-    private final RestTemplate restTemplate = new RestTemplate() {{
-        getMessageConverters()
-                .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-    }};
+    @Autowired
+    KeycloakUserList keycloakUserList;
 
     /**
      * GET  /config: returns a map with configuration options relevant for the frontend
@@ -64,36 +56,11 @@ public class WorkspaceResource {
      * The call is being forwarded to the keycloak api for retrieving users
      *
      * @return a list with information on all users in the system.
-     * @see <https://www.keycloak.org/docs-api/3.4/rest-api/index.html#_users_resource>
+     * @see <https://www.keycloak.org/docs-api/4.0/rest-api/index.html#_getusersinrole>
      */
     @GetMapping(value = "/users", produces = "application/json")
     public ResponseEntity<String> getUsers(HttpServletRequest incomingRequest) {
-        // Forward the request, without any headers except for the Authorization
-        // header. Keycloak will not return a valid response if some headers are
-        // forwarded (e.g. Host or X-Forwarded-Host)
-        HttpHeaders headers = new HttpHeaders();
-
-        if(token != null) {
-            log.trace("Adding authorization header for user retrieval: {}",token.getAccessToken());
-            headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
-        }
-
-        HttpEntity<Object> request = new HttpEntity<>(headers);
-
-        // Pass along the full query string
-        String uri = usersUri + "?" + incomingRequest.getQueryString();
-
-        // Send the request upstream
-        try {
-            log.trace("Retrieving users from {}", uri);
-            return restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
-        } catch(HttpClientErrorException e) {
-            log.warn("Client error while retrieving list of users from Auth provider", e);
-            return ResponseEntity.status(e.getStatusCode()).build();
-        } catch(Exception e) {
-            log.error("An exception occurred while retrieving list of users from Auth provider", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return keycloakUserList.getUsers(incomingRequest.getQueryString());
     }
 
     /**

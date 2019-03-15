@@ -1,1 +1,1 @@
-export const getCollectionAbsolutePath = (col) => (col && col.location ? `/collections/${col.location}` : '');
+export const getCollectionAbsolutePath = (location) => (location ? `/collections/${location}` : '');

@@ -80,6 +80,15 @@ class Vocabulary {
     }
 
     /**
+     * Returns a human readable label for the given predicate or the uri if no label is specified
+     * @param uri
+     * @returns {String}
+     */
+    getLabelForPredicate(uri) {
+        return Vocabulary.getFirstPredicateValue(this.getById(uri), constants.LABEL_URI) || uri;
+    }
+
+    /**
      * Converts a JSON-LD structure into a list of properties and values
      * @param metadata Expanded JSON-LD metadata about a single subject. The subject must have a '@type' property
      * @param predicates List of predicates that should be included

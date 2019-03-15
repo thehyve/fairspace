@@ -1,10 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.Vocabulary;
-import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
-import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
-import org.apache.jena.graph.Node;
-import org.apache.jena.rdfconnection.RDFConnection;
+import lombok.AllArgsConstructor;
 import org.apache.jena.riot.RiotException;
 import spark.servlet.SparkApplication;
 
@@ -15,16 +11,10 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.*;
 
+@AllArgsConstructor
 public class MetadataApp implements SparkApplication {
     private final String basePath;
     private final MetadataService api;
-
-    public MetadataApp(String basePath, RDFConnection rdfConnection, Node graph, Vocabulary vocabulary) {
-        this.basePath = basePath;
-
-        MetadataRequestValidator validator = new ProtectMachineOnlyPredicatesValidator(vocabulary);
-        this.api = new MetadataService(rdfConnection, graph, vocabulary.getVocabularyGraph(), validator);
-    }
 
     @Override
     public void init() {

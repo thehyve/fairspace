@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 
 // Add a delay to make the loading visible
-app.use((req, res, next) => setTimeout(next, 1000));
+// app.use((req, res, next) => setTimeout(next, 1000));
 
 // parse application/json
 app.use(bodyParser.json());
@@ -26,5 +26,14 @@ app.get('/api/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/works
 app.get('/api/workspace/config', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-config.json`));
 app.get('/api/workspace/details', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-details.json`));
 
+// Search (ElasticSearch) API
+app.post('/api/search/fairspace/_search', (req, res) => {
+    const specialSearches = ['no-results', 'no-highlights'];
+    const query = req.body.query.bool.must[0].query_string.query;
+
+    const filename = specialSearches.indexOf(query) > -1 ? query : 'generic-results';
+
+    res.sendFile(`${mockDataDir}/search/${filename}.json`);
+});
 
 app.listen(port);

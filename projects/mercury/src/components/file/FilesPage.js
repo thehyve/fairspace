@@ -44,7 +44,7 @@ export class FilesPage extends React.Component {
         const {openedPath} = this.props;
 
         // If the collection location changes, the URI for the current page should change as well
-        this.props.history.push(`${getCollectionAbsolutePath(collection)}${getDirectoryFromFullpath(openedPath)}`);
+        this.props.history.push(`${getCollectionAbsolutePath(collection.location)}${getDirectoryFromFullpath(openedPath)}`);
     }
 
     render() {

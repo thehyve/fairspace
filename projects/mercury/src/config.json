@@ -15,6 +15,11 @@
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"
   },
+
+  "elasticsearch": {
+    "host": "/api/search",
+    "log": "error"
+  },
   "externalConfigurationFiles": [
     "/api/workspace/config"
   ],

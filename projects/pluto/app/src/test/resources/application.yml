@@ -29,9 +29,13 @@ security:
     - /echo-token
 
 workspace:
-  usersUri: http://users-uri
   name: Test Workspace
   version: 1.2.3-TEST
+
+keycloak:
+  workspace-login-group: workspace-users
+  groupUri: http://group-uri
+  usersUriPattern: http://users-uri/%s?%s
 
 zuul:
   routes:
