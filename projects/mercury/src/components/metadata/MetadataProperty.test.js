@@ -12,7 +12,7 @@ import {STRING_URI} from "../../constants";
 import Config from "../../services/Config/Config";
 import MetadataProperty from "./MetadataProperty";
 
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 const subject = 'https://thehyve.nl';

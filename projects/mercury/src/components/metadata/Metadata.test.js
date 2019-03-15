@@ -10,7 +10,7 @@ import MetadataViewer from "./MetadataViewer";
 import Config from "../../services/Config/Config";
 import {PROPERTY_URI, LABEL_URI, DOMAIN_URI, CLASS_URI} from '../../constants';
 
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 beforeAll(() => {

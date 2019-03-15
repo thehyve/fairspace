@@ -6,7 +6,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import {AlterPermissionDialog, styles} from "./AlterPermissionDialog";
 
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 describe('AlterPermissionDialog', () => {

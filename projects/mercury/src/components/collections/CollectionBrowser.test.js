@@ -10,7 +10,7 @@ import CollectionBrowser from "./CollectionBrowser";
 import Config from "../../services/Config/Config";
 import * as actionTypes from "../../actions/actionTypes";
 
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 let store;
