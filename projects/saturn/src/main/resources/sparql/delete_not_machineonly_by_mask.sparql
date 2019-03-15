@@ -8,6 +8,5 @@ PREFIX fs: <http://fairspace.io/ontology#>
 
 DELETE {GRAPH %1$s {%2$s %3$s %4$s}} WHERE {
     GRAPH %1$s {%2$s %3$s %4$s}
-    # TODO: machine-only fields should be defined in metavocabulary (user-defined fields cannot be machine-only)
     FILTER NOT EXISTS { GRAPH ws:vocabulary { %3$s fs:machineOnly true } }
 }
