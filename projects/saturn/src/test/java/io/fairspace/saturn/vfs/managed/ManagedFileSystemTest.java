@@ -3,6 +3,8 @@ package io.fairspace.saturn.vfs.managed;
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
+import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
+import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -245,15 +247,21 @@ public class ManagedFileSystemTest {
     public void filesAreDeletedAfterDeletingACollection() throws IOException {
         fs.mkdir("coll/dir");
         fs.create("coll/file", new ByteArrayInputStream(content1));
-        collections.delete(collections.getByLocation("coll").getIri().getURI());
-
-        var collection = new Collection();
-        collection.setLocation("coll");
-        collection.setName("A new Collection");
-        collection.setType("LOCAL");
-        collections.create(collection);
+        fs.onCollectionDeleted(new CollectionDeletedEvent(collections.getByLocation("coll")));
 
         assertEquals(0, fs.list("coll").size());
+    }
+
+    @Test
+    public void filesAreMovedAfterMovingACollection() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        var c = collections.getByLocation("coll");
+        c.setLocation("newLocation");
+        fs.onCollectionMoved(new CollectionMovedEvent(c, "coll"));
+
+        assertEquals(0, fs.list("coll").size());
+        assertEquals(2, fs.list("newLocation").size());
     }
 
     @Test
