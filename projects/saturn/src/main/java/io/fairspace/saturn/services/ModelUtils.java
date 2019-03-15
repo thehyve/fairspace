@@ -3,7 +3,6 @@ package io.fairspace.saturn.services;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RiotException;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -21,15 +20,13 @@ public class ModelUtils {
         return writer.toString();
     }
 
-    public static Model fromJsonLD(String json) {
+    public static Model fromJsonLD(String json) throws PayloadParsingException {
         try {
             var model = createDefaultModel();
             RDFDataMgr.read(model, new StringReader(json), null, JSONLD.getLang());
             return model;
-        } catch (RiotException e) {
-            throw e;
         } catch (Exception e) {
-            throw new RiotException(e);
+            throw new PayloadParsingException(e);
         }
     }
 }

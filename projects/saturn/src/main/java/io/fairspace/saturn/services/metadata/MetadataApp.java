@@ -1,12 +1,12 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.rdf.Vocabulary;
+import io.fairspace.saturn.services.PayloadParsingException;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
 import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.riot.RiotException;
 import spark.servlet.SparkApplication;
 
 import static io.fairspace.saturn.services.ModelUtils.*;
@@ -62,7 +62,7 @@ public class MetadataApp implements SparkApplication {
                 return "";
             });
             notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
-            exception(RiotException.class, exceptionHandler(SC_BAD_REQUEST, "Malformed request body"));
+            exception(PayloadParsingException.class, exceptionHandler(SC_BAD_REQUEST, "Malformed request body"));
             exception(UnsupportedMediaTypeException.class, exceptionHandler(SC_UNSUPPORTED_MEDIA_TYPE, null));
             exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
         });
