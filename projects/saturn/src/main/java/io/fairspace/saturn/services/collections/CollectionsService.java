@@ -1,12 +1,11 @@
 package io.fairspace.saturn.services.collections;
 
+import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -15,15 +14,11 @@ import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
 // TODO: Check permissions
+@RequiredArgsConstructor
 @Slf4j
 public class CollectionsService {
     private final DAO dao;
-    @Getter @Setter
-    private BiConsumer<String, String> onLocationChangeListener;
-
-    public CollectionsService(DAO dao) {
-        this.dao = dao;
-    }
+    private final EventBus eventBus;
 
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");
@@ -40,7 +35,9 @@ public class CollectionsService {
                 throw new LocationAlreadyExistsException(collection.getLocation());
             }
 
-            return addPermissionsToObject(dao.write(collection));
+            addPermissionsToObject(dao.write(collection));
+            eventBus.post(new CollectionCreatedEvent(collection));
+            return collection;
         });
     }
 
@@ -65,17 +62,19 @@ public class CollectionsService {
     public void delete(String iri) {
         validateIRI(iri);
         commit("Delete collection " + iri, dao, () -> {
-            var existing = get(iri);
-            if (existing == null) {
+            var collection = get(iri);
+            if (collection == null) {
                 log.info("Collection not found {}", iri);
                 throw new CollectionNotFoundException(iri);
             }
-            if (existing.getAccess() != Access.Manage) {
+            if (collection.getAccess() != Access.Manage) {
                 log.info("No enough permissions to delete a collection {}", iri);
                 throw new CollectionAccessDeniedException(iri);
             }
 
-            dao.markAsDeleted(existing);
+            dao.markAsDeleted(collection);
+
+            eventBus.post(new CollectionDeletedEvent(collection));
         });
     }
 
@@ -121,10 +120,7 @@ public class CollectionsService {
 
             var updated = dao.write(existing);
             if (!updated.getLocation().equals(oldLocation)) {
-                var listener = onLocationChangeListener;
-                if (listener != null) {
-                    listener.accept(oldLocation, updated.getLocation());
-                }
+                eventBus.post(new CollectionMovedEvent(updated, oldLocation));
             }
             return updated;
         });
