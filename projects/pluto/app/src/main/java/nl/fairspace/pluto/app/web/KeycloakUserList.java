@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nl.fairspace.pluto.app.config.dto.KeycloakConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -34,11 +34,8 @@ import java.util.List;
 @Profile("!noAuth")
 @Component
 public class KeycloakUserList {
-    @Value("${keycloak.usersUriPattern}")
-    String usersUriPattern;
-
-    @Value("${keycloak.groupUri}")
-    String groupUri;
+    @Autowired
+    KeycloakConfig config;
 
     @Autowired(required = false)
     OAuthAuthenticationToken token;
@@ -47,28 +44,19 @@ public class KeycloakUserList {
     private String groupId = null;
 
     public KeycloakUserList() {
-        this(new RestTemplate() {{
+        this.restTemplate = new RestTemplate() {{
             getMessageConverters()
                     .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-        }});
+        }};
     }
 
     /**
-     * Constructor which enables injecting a custom restTemplate
+     * Constructor which enables injecting a custom restTemplate and configuration
      * @param restTemplate
      */
-    KeycloakUserList(RestTemplate restTemplate) {
+    KeycloakUserList(RestTemplate restTemplate, KeycloakConfig config) {
         this.restTemplate = restTemplate;
-    }
-
-    /**
-     * Constructor which enables injecting a custom restTemplate and uri patterns
-     * @param restTemplate
-     */
-    KeycloakUserList(RestTemplate restTemplate, String usersUriPattern, String groupUri) {
-        this.restTemplate = restTemplate;
-        this.usersUriPattern = usersUriPattern;
-        this.groupUri = groupUri;
+        this.config = config;
     }
 
     /**
@@ -87,7 +75,7 @@ public class KeycloakUserList {
         HttpHeaders headers = new HttpHeaders();
 
         if(token != null) {
-            log.trace("Adding authorization header for user retrieval: {}",token.getAccessToken());
+            log.trace("Adding authorization header for user retrieval");
             headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken());
         }
 
@@ -96,7 +84,7 @@ public class KeycloakUserList {
         // Send the request upstream
         try {
             // Pass along the full query string
-            String uri = String.format(usersUriPattern, getGroupId()) + "?" + queryString;
+            String uri = String.format(config.getUsersUriPattern(), getGroupId(), queryString);
 
             log.trace("Retrieving users from {}", uri);
             return restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
@@ -117,7 +105,7 @@ public class KeycloakUserList {
         // Retrieve the groupId, if it has not been retrieved before
         // As it will never change, we will cache it forever
         if(groupId == null) {
-            log.info("Retrieve group identifier for keycloak user group at {}", groupUri);
+            log.info("Retrieve group identifier for keycloak user group at {}", config.getGroupUri());
 
             HttpHeaders headers = new HttpHeaders();
 
@@ -128,13 +116,13 @@ public class KeycloakUserList {
 
             HttpEntity<Object> request = new HttpEntity<>(headers);
 
-            ParameterizedTypeReference<List<GroupInfo>> parameterizedTypeReference = new ParameterizedTypeReference<List<GroupInfo>>(){};
-            ResponseEntity<List<GroupInfo>> groupResponse = restTemplate.exchange(groupUri, HttpMethod.GET, request, parameterizedTypeReference);
+            ParameterizedTypeReference<List<GroupInfo>> parameterizedTypeReference = new ParameterizedTypeReference<>(){};
+            ResponseEntity<List<GroupInfo>> groupResponse = restTemplate.exchange(config.getGroupUri(), HttpMethod.GET, request, parameterizedTypeReference);
 
             if(groupResponse.getStatusCode().is2xxSuccessful() && groupResponse.getBody().size() > 0) {
                 groupId = groupResponse.getBody().get(0).getId();
             } else {
-                log.warn("Could not retrieve group identifier from keycloak on url {}: status {}", groupUri, groupResponse.getStatusCodeValue());
+                log.warn("Could not retrieve group identifier from keycloak on url {}: status {}", config.getGroupUri(), groupResponse.getStatusCodeValue());
                 throw new IllegalStateException("Could not retrieve group identifier from keycloak");
             }
         }

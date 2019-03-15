@@ -56,7 +56,9 @@ workspace:
 keycloak:
   workspace-login-group: workspace-users
   groupUri: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/groups/?max=1&search=${keycloak.workspace-login-group}
-  usersUriPattern: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/groups/%s/members
+
+  # The URI pattern has 2 parameters: the groupId and a query string
+  usersUriPattern: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/groups/%s/members?%s
 
 zuul:
   routes:

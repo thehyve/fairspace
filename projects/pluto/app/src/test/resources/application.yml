@@ -35,7 +35,7 @@ workspace:
 keycloak:
   workspace-login-group: workspace-users
   groupUri: http://group-uri
-  usersUriPattern: http://users-uri/%s
+  usersUriPattern: http://users-uri/%s?%s
 
 zuul:
   routes:
