@@ -6,8 +6,10 @@ import {connect} from 'react-redux';
 import SearchResults from './SearchResults';
 import {getSearchQueryFromString} from '../../utils/searchUtils';
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
+import {getParentPath} from '../../utils/fileUtils';
 import * as searchActions from '../../actions/searchActions';
 import * as metadataActions from '../../actions/metadataActions';
+import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import {ErrorMessage} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
 
@@ -26,7 +28,6 @@ export class SearchPage extends React.Component {
 
     updateResults = () => {
         const {location: {search}, performSearch} = this.props;
-
         const query = getSearchQueryFromString(search);
 
         performSearch(query);
@@ -37,15 +38,25 @@ export class SearchPage extends React.Component {
      * @param result   The clicked search result. For the format, see the ES api
      */
     handleResultDoubleClick = (result) => {
-        const resultType = result.type[0];
-        if (resultType === COLLECTION_URI) {
-            this.props.history.push(getCollectionAbsolutePath(result.filePath[0]));
-        } else if (resultType === DIRECTORY_URI) {
-            // TODO: handle directory open. See VRE-580
-        } else if (resultType === FILE_URI) {
-            // TODO: handle file open. See VRE-580
-        } else {
-            // TODO: handle metadata open. Out of scope for now
+        const navigationPath = getCollectionAbsolutePath(this.getPathOfResult(result));
+        // TODO: why do we have to have a slash here, there's some kind of data inconsistency somewhere
+        // eslint-disable-next-line prefer-template
+        this.props.selectPath('/' + result.filePath[0]);
+        this.props.history.push(navigationPath);
+    }
+
+    getPathOfResult = (result) => {
+        const type = result.type[0];
+
+        switch (type) {
+            case COLLECTION_URI:
+            case DIRECTORY_URI:
+                return result.filePath[0];
+            case FILE_URI:
+                return getParentPath(result.filePath[0]);
+            default:
+                // TODO: handle metadata open. Out of scope for now
+                return '';
         }
     }
 
@@ -76,7 +87,8 @@ const mapStateToProps = ({search, cache: {vocabulary}}) => ({
 
 const mapDispatchToProps = {
     performSearch: searchActions.performSearch,
-    fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded
+    fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded,
+    selectPath: collectionBrowserActions.selectPath
 };
 
 SearchPage.propTypes = {
