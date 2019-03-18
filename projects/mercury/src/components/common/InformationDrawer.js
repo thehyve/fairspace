@@ -1,7 +1,11 @@
 import React from 'react';
 import {
-    ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails,
-    Paper, withStyles, Typography
+    ExpansionPanel,
+    ExpansionPanelDetails,
+    ExpansionPanelSummary,
+    Paper,
+    Typography,
+    withStyles
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
@@ -33,7 +37,7 @@ export class InformationDrawer extends React.Component {
 
     handleCollectionDelete = (collection) => {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
-        deleteCollection(collection.iri)
+        deleteCollection(collection.iri, collection.location)
             .then(fetchCollectionsIfNeeded)
             .catch(err => ErrorDialog.showError(
                 err,

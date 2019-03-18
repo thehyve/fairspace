@@ -77,6 +77,8 @@ const filesByPath = (state = defaultState, action) => {
         case actionTypes.CLIPBOARD_PASTE_FULFILLED: {
             return invalidateFiles(state, action.meta.destinationDir, ...action.meta.filenames.map(getParentPath));
         }
+        case actionTypes.DELETE_COLLECTION_PENDING:
+            return invalidateFiles(state, `/${action.meta.location}`);
         default:
             return state;
     }
