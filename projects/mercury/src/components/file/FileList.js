@@ -19,7 +19,10 @@ class FileList extends React.Component {
     }
 
     render() {
-        const {classes, files, onPathClick, onPathDoubleClick, selectionEnabled, onAllSelection} = this.props;
+        const {
+            classes, files, onPathCheck, onPathDoubleClick,
+            selectionEnabled, onAllSelection, onPathHighlight
+        } = this.props;
 
         if (!files || files.length === 0 || files[0] === null) {
             return (
@@ -69,6 +72,7 @@ class FileList extends React.Component {
                                     hover
                                     key={item.filename}
                                     selected={selectionEnabled && file.selected}
+                                    onClick={() => onPathHighlight(item)}
                                     onDoubleClick={() => onPathDoubleClick(item)}
                                     onMouseEnter={() => this.toggleHover(item.filename)}
                                     onMouseLeave={() => this.toggleHover('')}
@@ -78,7 +82,7 @@ class FileList extends React.Component {
                                             <TableCell
                                                 padding="none"
                                                 onDoubleClick={(e) => e.stopPropagation()}
-                                                onClick={() => onPathClick(item)}
+                                                onClick={(e) => {e.stopPropagation(); onPathCheck(item);}}
                                             >
                                                 <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
                                             </TableCell>
