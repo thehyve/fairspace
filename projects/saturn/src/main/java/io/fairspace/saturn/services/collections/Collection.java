@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.collections;
 import io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity;
 import io.fairspace.saturn.rdf.dao.RDFProperty;
 import io.fairspace.saturn.rdf.dao.RDFType;
+import io.fairspace.saturn.services.permissions.Access;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
