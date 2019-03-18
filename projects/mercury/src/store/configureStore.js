@@ -15,7 +15,7 @@ const configureStore = () => {
     const store = createStore(
         rootReducer,
         uiState,
-        composeEnhancers(applyMiddleware(thunk, promiseMiddleware()))
+        composeEnhancers(applyMiddleware(thunk, promiseMiddleware))
     );
 
     store.subscribe(() => {
