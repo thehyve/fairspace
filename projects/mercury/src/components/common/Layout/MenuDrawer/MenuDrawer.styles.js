@@ -1,27 +1,11 @@
-
-const drawerWidth = 240;
-
 const styles = theme => ({
-    root: {
-        flexGrow: 1,
-        zIndex: 1,
-        overflow: 'hidden',
-        position: 'absolute',
-        display: 'flex',
-    },
-    appBar: {
-        zIndex: theme.zIndex.drawer + 1,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
     drawerPaper: {
         position: 'fixed',
         whiteSpace: 'nowrap',
-        width: drawerWidth,
+        width: 240,
         marginTop: '65px',
-        height: '92vh',
+        height: '90vh',
+        overflow: 'hidden',
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
@@ -34,7 +18,6 @@ const styles = theme => ({
         }),
     },
     drawerPaperClose: {
-        overflowX: 'hidden',
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -48,10 +31,6 @@ const styles = theme => ({
         justifyContent: 'flex-end',
         padding: '0 8px',
         ...theme.mixins.toolbar,
-    },
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing.unit * 3,
     }
 });
 
