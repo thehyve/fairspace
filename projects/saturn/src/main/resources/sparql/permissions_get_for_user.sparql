@@ -1,0 +1,5 @@
+# Get user's permission
+# 0 - the resource
+# 1 - the user
+
+SELECT ?access WHERE { GRAPH ws:permissions { %1$s ?access %2$s}}
