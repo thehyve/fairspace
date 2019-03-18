@@ -20,7 +20,7 @@ class FileList extends React.Component {
 
     render() {
         const {
-            classes, files, onPathCheck, onPathDoubleClick,
+            classes, files, onPathCheckboxClick, onPathDoubleClick,
             selectionEnabled, onAllSelection, onPathHighlight
         } = this.props;
 
@@ -82,7 +82,7 @@ class FileList extends React.Component {
                                             <TableCell
                                                 padding="none"
                                                 onDoubleClick={(e) => e.stopPropagation()}
-                                                onClick={(e) => {e.stopPropagation(); onPathCheck(item);}}
+                                                onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(item);}}
                                             >
                                                 <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
                                             </TableCell>

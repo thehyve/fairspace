@@ -11,7 +11,7 @@ import {canWrite} from '../../utils/permissionUtils';
 import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
-    handlePathClick = (path) => {
+    handlePathCheckboxClick = (path) => {
         const {selectedPaths, selectPath, deselectPath} = this.props;
         const isPathSelected = selectedPaths.some(el => el === path.filename);
 
@@ -103,7 +103,7 @@ class FileBrowser extends React.Component {
                         <FileList
                             selectionEnabled
                             files={filesWithSelectionState}
-                            onPathCheck={this.handlePathClick}
+                            onPathCheckboxClick={this.handlePathCheckboxClick}
                             onPathHighlight={this.handlePathHighlight}
                             onPathDoubleClick={this.handlePathDoubleClick}
                             onAllSelection={allSelectionChangeHandler}
