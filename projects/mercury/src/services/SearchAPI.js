@@ -108,7 +108,7 @@ export class SearchAPI {
 let api;
 export default () => {
     if (!api) {
-        const config = Config.get().elasticsearch;
+        let config = Config.get().elasticsearch;
 
         // ES cannot handle relative urls, as it will default to localhost in that case
         if (config.host.startsWith("/")) {
