@@ -61,15 +61,20 @@ workspace:
                 dns01Provider: clouddns
 
     testuser:
-        password: fairspace123
+      username:
+      password: fairspace123
     coordinator:
-        password: fairspace123
+      username:
+      password: fairspace123
+    datasteward:
+      username:
+      password: fairspace123
 
     # Scripts for setting up keycloak for a workspace
     configurationScripts:
       keycloak:
         enabled: true
-        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.1
+        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.2
         pullPolicy: IfNotPresent
     enableExperimentalFeatures: false
     elasticsearch:

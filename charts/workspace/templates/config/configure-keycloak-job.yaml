@@ -58,6 +58,16 @@ spec:
               secretKeyRef:
                 name: "{{ template "workspace.fullname" . }}-coordinator"
                 key: password
+          - name: DATASTEWARD_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: "{{ template "workspace.fullname" . }}-datasteward"
+                key: username
+          - name: DATASTEWARD_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{ template "workspace.fullname" . }}-datasteward"
+                key: password
           - name: CLIENT_SECRET
             valueFrom:
               secretKeyRef:
