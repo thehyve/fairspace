@@ -37,10 +37,10 @@ public class PermissionsApp extends BaseApp {
 
             path("/readonly/", () -> {
                 get("/", (req, res) ->
-                        mapper.writeValueAsString(new ValueDto<>(permissionsService.isReadOnly(getIri(req)))));
+                        mapper.writeValueAsString(new ValueDto<>(permissionsService.isWriteRestricted(getIri(req)))));
 
                 put("/", (req, res) -> {
-                    permissionsService.setReadOnly(getIri(req), (Boolean) mapper.readValue(req.body(), ValueDto.class).getValue());
+                    permissionsService.setWriteRestricted(getIri(req), (Boolean) mapper.readValue(req.body(), ValueDto.class).getValue());
                     return "";
                 });
             });

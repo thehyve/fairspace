@@ -3,4 +3,4 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-ASK WHERE { GRAPH ws:permissions { %1$s fs:readOnly true . }}
+ASK WHERE { GRAPH ws:permissions { %1$s fs:writeRestricted true . }}

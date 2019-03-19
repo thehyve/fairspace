@@ -31,8 +31,10 @@ public class PermissionsServiceImpl implements PermissionsService {
     @Override
     public void setPermission(Node resource, Node user, Access access) {
         commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
-            validate(!user.equals(userIriSupplier.get()), "A user may not change his own permissions");
             ensureHasAccess(resource, Access.Manage);
+            validate(!user.equals(userIriSupplier.get()), "A user may not change his own permissions");
+            validate(access != Access.Read || isCollection(resource), "Metadata entities can not be marked as read-only");
+            validate(access != Access.Write || isCollection(resource) || isWriteRestricted(resource), "Should be marked as write-restricted first");
 
             if (access == Access.None) {
                 rdf.update(storedQuery("permissions_delete", resource, user));
@@ -44,15 +46,20 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public Access getPermission(Node resource) {
+        return calculateRead(rdf, () -> {
+            validate(!isDirectory(resource) && !isFile(resource), "Retrieving permissions for a file or a directory is not supported");
             var processor = new QuerySolutionProcessor<>(PermissionsServiceImpl::getAccess);
             rdf.querySelect(storedQuery("permissions_get_for_user", resource, userIriSupplier.get()), processor);
-            return processor.getSingle().orElse(Access.None);
+            return processor.getSingle().orElseGet(() -> defaultAccess(resource));
+        });
     }
 
     @Override
     public Map<Node, Access> getPermissions(Node resource) {
         return calculateRead(rdf, () -> {
             ensureHasAccess(resource, Access.Read);
+
+
             var result = new HashMap<Node, Access>();
             rdf.querySelect(storedQuery("permissions_get_all", resource), row ->
                     result.put(row.getResource("user").asNode(), getAccess(row)));
@@ -61,17 +68,24 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public boolean isReadOnly(Node resource) {
+    public boolean isWriteRestricted(Node resource) {
         return calculateRead(rdf, () -> {
             ensureHasAccess(resource, Access.Read);
-            return rdf.queryAsk(storedQuery("permissions_is_readonly", resource));
+            return isWriteRestrictedUnsafe(resource);
         });
     }
 
+    private boolean isWriteRestrictedUnsafe(Node resource) {
+            return rdf.queryAsk(storedQuery("permissions_is_restricted", resource));
+    }
+
     @Override
-    public void setReadOnly(Node resource, boolean readOnly) {
-        commit(format("Setting fs:readOnly attribute of resource %s to %s", resource, readOnly), rdf, () ->
-                rdf.update(storedQuery("permissions_set_readonly", resource, readOnly)));
+    public void setWriteRestricted(Node resource, boolean restricted) {
+        commit(format("Setting fs:readOnly attribute of resource %s to %s", resource, restricted), rdf, () -> {
+            ensureHasAccess(resource, Access.Manage);
+            validate(!isCollection(resource), "Illegal operation");
+            rdf.update(storedQuery("permissions_set_restricted", resource, restricted));
+        });
     }
 
     private static Access getAccess(QuerySolution row) {
@@ -87,5 +101,21 @@ public class PermissionsServiceImpl implements PermissionsService {
         if (getPermission(resource).ordinal() < access.ordinal()) {
             throw new IllegalArgumentException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource));
         }
+    }
+
+    private boolean isCollection(Node resource) {
+        return rdf.queryAsk(storedQuery("is_collection", resource));
+    }
+
+    private boolean isDirectory(Node resource) {
+        return rdf.queryAsk(storedQuery("is_directory", resource));
+    }
+
+    private boolean isFile(Node resource) {
+        return rdf.queryAsk(storedQuery("is_file", resource));
+    }
+
+    private Access defaultAccess(Node resource) {
+        return isCollection(resource) ? Access.None : isWriteRestrictedUnsafe(resource) ? Access.Read : Access.Write;
     }
 }

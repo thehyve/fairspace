@@ -14,7 +14,7 @@ public interface PermissionsService {
 
     Map<Node, Access> getPermissions(Node resource);
 
-    boolean isReadOnly(Node resource);
+    boolean isWriteRestricted(Node resource);
 
-    void setReadOnly(Node resource, boolean readOnly);
+    void setWriteRestricted(Node resource, boolean restricted);
 }
