@@ -15,7 +15,7 @@ const styles = theme => ({
 });
 
 const TopBar = ({classes, workspaceName}) => (
-    <AppBar className={classes.root} position="fixed">
+    <AppBar className={classes.root} position="sticky">
         <Toolbar>
             <Typography variant="h6" color="inherit" noWrap className={classes.title}>
                 {workspaceName}
