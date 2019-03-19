@@ -53,11 +53,6 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public Access getPermission(Node resource) {
-        return getPermissionWithoutChecks(resource, userIriSupplier.get());
-    }
-
-    @Override
     public Map<Node, Access> getPermissions(Node resource) {
         return calculateRead(rdf, () -> {
             ensureHasAccess(resource, Access.Read);

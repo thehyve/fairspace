@@ -1,25 +1,25 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.services.BaseApp;
 import io.fairspace.saturn.services.PayloadParsingException;
-import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import lombok.AllArgsConstructor;
-import spark.servlet.SparkApplication;
 
 import static io.fairspace.saturn.services.ModelUtils.*;
-import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
 import static io.fairspace.saturn.util.ValidationUtils.validateContentType;
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.*;
 
 @AllArgsConstructor
-public class MetadataApp implements SparkApplication {
+public class MetadataApp extends BaseApp {
     private final String basePath;
     private final MetadataService api;
 
     @Override
     public void init() {
+        super.init();
+
         path(basePath, () -> {
             get("/", JSON_LD_HEADER_STRING, (req, res) -> {
                 res.type(JSON_LD_HEADER_STRING);
@@ -51,10 +51,7 @@ public class MetadataApp implements SparkApplication {
                 }
                 return "";
             });
-            notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
             exception(PayloadParsingException.class, exceptionHandler(SC_BAD_REQUEST, "Malformed request body"));
-            exception(UnsupportedMediaTypeException.class, exceptionHandler(SC_UNSUPPORTED_MEDIA_TYPE, null));
-            exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
         });
     }
 }

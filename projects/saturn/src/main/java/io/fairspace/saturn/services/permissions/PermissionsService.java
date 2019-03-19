@@ -12,8 +12,6 @@ public interface PermissionsService {
 
     Access getPermission(Node resource, Node user);
 
-    Access getPermission(Node resource);
-
     Map<Node, Access> getPermissions(Node resource);
 
     boolean isReadOnly(Node resource);

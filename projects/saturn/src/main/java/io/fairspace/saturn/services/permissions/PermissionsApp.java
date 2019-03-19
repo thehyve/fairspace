@@ -1,45 +1,57 @@
 package io.fairspace.saturn.services.permissions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fairspace.saturn.services.IRIModule;
+import io.fairspace.saturn.services.BaseApp;
 import lombok.AllArgsConstructor;
-import spark.servlet.SparkApplication;
+import org.apache.jena.graph.Node;
+import spark.Request;
 
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static spark.Spark.*;
 
 @AllArgsConstructor
-public class PermissionsApp implements SparkApplication {
-    private final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new IRIModule());
-
+public class PermissionsApp extends BaseApp {
     private final PermissionsService permissionsService;
 
     @Override
     public void init() {
-        path("api/permissions", () -> {
+        super.init();
+
+        path("/api/permissions", () -> {
             get("/", (req, res) -> {
-                validate(req.queryParams("iri") != null, "Query parameter \"iri\" is mandatory");
-                var iri = createURI( req.queryParams("iri"));
-
                 if (req.queryParams("user") != null) {
-                    return permissionsService.getPermission(iri, createURI(req.queryParams("iri")));
+                    var user = createURI(req.queryParams("user"));
+                    var access = permissionsService.getPermission(getIri(req), user);
+                    return mapper.writeValueAsString(new PermissionDto(user, access));
                 }
 
-                if (req.queryParams().contains("all")) {
-                    return permissionsService.getPermissions(iri);
-                }
-
-                return permissionsService.getPermission(iri);
+                return mapper.writeValueAsString(permissionsService.getPermissions(getIri(req))
+                        .entrySet()
+                        .stream()
+                        .map(e -> new PermissionDto(e.getKey(), e.getValue())));
             });
 
             put("/", (req, res) -> {
                 var dto = mapper.readValue(req.body(), PermissionDto.class);
-                permissionsService.setPermission(dto.getResource(), dto.getUser(), dto.getAccess());
+                permissionsService.setPermission(getIri(req), dto.getUser(), dto.getAccess());
                 return "";
             });
 
+            path("/readonly/", () -> {
+                get("/", (req, res) ->
+                        mapper.writeValueAsString(new ReadOnlyDto(permissionsService.isReadOnly(getIri(req)))));
+
+                put("/", (req, res) -> {
+                    permissionsService.setReadOnly(getIri(req), mapper.readValue(req.body(), ReadOnlyDto.class).isReadOnly());
+                    return "";
+                });
+            });
         });
+    }
+
+    private Node getIri(Request request) {
+        var param = request.queryParams("iri");
+        validate(param != null, "Query parameter \"iri\" is mandatory");
+        return createURI(param);
     }
 }

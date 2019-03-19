@@ -10,6 +10,8 @@ import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
+import io.fairspace.saturn.services.permissions.PermissionsApp;
+import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
@@ -51,6 +53,7 @@ public class App {
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus));
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
 
         // Setup and initialize vocabularies
         var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
@@ -65,6 +68,7 @@ public class App {
                         new MetadataApp("/api/metadata", metadataService),
                         new MetadataApp("/api/vocabulary", vocabularyService),
                         new CollectionsApp(collections),
+                        new PermissionsApp(permissions),
                         new HealthApp()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
                 .port(CONFIG.port);
