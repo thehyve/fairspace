@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ReadOnlyDto {
-    private boolean readOnly;
+public class ValueDto<T> {
+    private T value;
 }

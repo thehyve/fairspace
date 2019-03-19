@@ -31,8 +31,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     @Override
     public void setPermission(Node resource, Node user, Access access) {
         commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
+            validate(!user.equals(userIriSupplier.get()), "A user may not change his own permissions");
             ensureHasAccess(resource, Access.Manage);
-            validate(user != userIriSupplier.get(), "A user may not change his own permissions");
 
             if (access == Access.None) {
                 rdf.update(storedQuery("permissions_delete", resource, user));
@@ -43,13 +43,10 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public Access getPermission(Node resource, Node user) {
-        return calculateRead(rdf, () -> {
-            if (!user.equals(userIriSupplier.get())) {
-                ensureHasAccess(resource, Access.Read);
-            }
-            return getPermissionWithoutChecks(resource, user);
-        });
+    public Access getPermission(Node resource) {
+            var processor = new QuerySolutionProcessor<>(PermissionsServiceImpl::getAccess);
+            rdf.querySelect(storedQuery("permissions_get_for_user", resource, userIriSupplier.get()), processor);
+            return processor.getSingle().orElse(Access.None);
     }
 
     @Override
@@ -87,14 +84,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     private void ensureHasAccess(Node resource, Access access) {
-        if (getPermissionWithoutChecks(resource, userIriSupplier.get()).ordinal() < access.ordinal()) {
-            throw new IllegalArgumentException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access, resource));
+        if (getPermission(resource).ordinal() < access.ordinal()) {
+            throw new IllegalArgumentException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource));
         }
-    }
-
-    private Access getPermissionWithoutChecks(Node resource, Node user) {
-        var processor = new QuerySolutionProcessor<>(PermissionsServiceImpl::getAccess);
-        rdf.querySelect(storedQuery("permissions_get_for_user", resource, user), processor);
-        return processor.getSingle().orElse(Access.None);
     }
 }

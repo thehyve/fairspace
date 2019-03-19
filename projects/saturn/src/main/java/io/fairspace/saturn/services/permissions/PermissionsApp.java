@@ -19,16 +19,14 @@ public class PermissionsApp extends BaseApp {
 
         path("/api/permissions", () -> {
             get("/", (req, res) -> {
-                if (req.queryParams("user") != null) {
-                    var user = createURI(req.queryParams("user"));
-                    var access = permissionsService.getPermission(getIri(req), user);
-                    return mapper.writeValueAsString(new PermissionDto(user, access));
+                if (req.queryParams().contains("all")) {
+                    return mapper.writeValueAsString(permissionsService.getPermissions(getIri(req))
+                            .entrySet()
+                            .stream()
+                            .map(e -> new PermissionDto(e.getKey(), e.getValue())));
                 }
 
-                return mapper.writeValueAsString(permissionsService.getPermissions(getIri(req))
-                        .entrySet()
-                        .stream()
-                        .map(e -> new PermissionDto(e.getKey(), e.getValue())));
+                return mapper.writeValueAsString(new ValueDto<>(permissionsService.getPermission(getIri(req))));
             });
 
             put("/", (req, res) -> {
@@ -39,17 +37,17 @@ public class PermissionsApp extends BaseApp {
 
             path("/readonly/", () -> {
                 get("/", (req, res) ->
-                        mapper.writeValueAsString(new ReadOnlyDto(permissionsService.isReadOnly(getIri(req)))));
+                        mapper.writeValueAsString(new ValueDto<>(permissionsService.isReadOnly(getIri(req)))));
 
                 put("/", (req, res) -> {
-                    permissionsService.setReadOnly(getIri(req), mapper.readValue(req.body(), ReadOnlyDto.class).isReadOnly());
+                    permissionsService.setReadOnly(getIri(req), (Boolean) mapper.readValue(req.body(), ValueDto.class).getValue());
                     return "";
                 });
             });
         });
     }
 
-    private Node getIri(Request request) {
+    private static Node getIri(Request request) {
         var param = request.queryParams("iri");
         validate(param != null, "Query parameter \"iri\" is mandatory");
         return createURI(param);

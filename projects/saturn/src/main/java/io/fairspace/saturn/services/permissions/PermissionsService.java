@@ -10,7 +10,7 @@ public interface PermissionsService {
 
     void setPermission(Node resource, Node user, Access access);
 
-    Access getPermission(Node resource, Node user);
+    Access getPermission(Node resource);
 
     Map<Node, Access> getPermissions(Node resource);
 

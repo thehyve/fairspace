@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 
 public class PermissionsServiceImplTest {
     private static final Node RESOURCE = createURI("http://example.com/resource");
-    private final Node USER = createURI("http://example.com/user1");
+    private Node USER = createURI("http://example.com/user1");
     private Dataset ds;
     private PermissionsService service;
 
@@ -38,13 +38,13 @@ public class PermissionsServiceImplTest {
     @Test
     public void testSetPermission() {
         var user = createURI("http://example.com/user2");
-        assertEquals(Access.None, service.getPermission(RESOURCE, user));
+        assertNull(service.getPermissions(RESOURCE).get(user));
         service.setPermission(RESOURCE, user, Access.Read);
-        assertEquals(Access.Read, service.getPermission(RESOURCE, user));
+        assertEquals(Access.Read, service.getPermissions(RESOURCE).get(user));
         service.setPermission(RESOURCE, user, Access.Write);
-        assertEquals(Access.Write, service.getPermission(RESOURCE, user));
+        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(user));
         service.setPermission(RESOURCE, user, Access.None);
-        assertEquals(Access.None, service.getPermission(RESOURCE, user));
+        assertNull(service.getPermissions(RESOURCE).get(user));
     }
 
     @Test
