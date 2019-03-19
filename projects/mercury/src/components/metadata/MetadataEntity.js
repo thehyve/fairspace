@@ -7,7 +7,7 @@ import {fetchCombinedMetadataIfNeeded} from "../../actions/metadataActions";
 import MetadataProperty from "./MetadataProperty";
 import {isDateTimeProperty, propertiesToShow} from "../../utils/metadataUtils";
 
-export class Metadata extends React.Component {
+export class MetadataEntity extends React.Component {
     componentDidMount() {
         this.load();
     }
@@ -80,4 +80,4 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-export default connect(mapStateToProps)(Metadata);
+export default connect(mapStateToProps)(MetadataEntity);
