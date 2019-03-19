@@ -51,4 +51,4 @@ data:
         vocabulary:
           url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/vocabulary/" .Release.Name .Release.Namespace)}}
         elasticsearch:
-          url: {{ if .Values.workspace.elasticsearch.host }}{{ printf "http://%s:%d" .Values.workspace.elasticsearch.host (int64 .Values.workspace.elasticsearch.restport) }}{{ else }}{{ printf "http://%s-elasticsearch-client.%s.svc.cluster.local:%d" .Release.Name .Release.Namespace (int64 .Values.workspace.elasticsearch.restport) }}{{ end }}
+          url: {{ template "workspace.elasticsearch.resturl" . }}

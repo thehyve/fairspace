@@ -19,7 +19,7 @@ data:
         required: false
         settings:
           hostToPortMapping:
-            {{ .Values.workspace.elasticsearch.host | default (printf "%s-elasticsearch-discovery.%s.svc.cluster.local" .Release.Name .Release.Namespace) }}: {{ .Values.workspace.elasticsearch.transportport }}
+            {{ template "workspace.elasticsearch.transportbaseurl" . }}: {{ .Values.workspace.elasticsearch.transportport }}
           clusterName: "elasticsearch"
           shards: 1
           replicas: 1
