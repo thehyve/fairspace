@@ -2,10 +2,10 @@
 const styles = theme => ({
     main: {
         backgroundColor: theme.palette.background.default,
-        padding: '84px 10px 0 80px',
+        padding: '14px 10px 0 80px',
         minWidth: 0, // So the Typography noWrap works
         overflowY: 'scroll',
-        height: 'calc(100vh - 120px)'
+        height: 'calc(100vh - 115px)'
     }
 });
 
