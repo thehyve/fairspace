@@ -7,8 +7,7 @@ const styles = theme => ({
         minWidth: 0, // So the Typography noWrap works
         overflowY: 'scroll',
         height: 'calc(100vh - 120px)'
-    },
-    toolbar: theme.mixins.toolbar,
+    }
 });
 
 export default styles;

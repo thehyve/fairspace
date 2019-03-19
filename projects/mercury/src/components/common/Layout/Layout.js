@@ -24,7 +24,7 @@ const Layout = ({classes, menuExpanded, workspaceName, version}) => {
     // The topbar is shown even if the user has no proper authorization
     return (
         <>
-            <TopBar classes={classes} workspaceName={workspaceName} />
+            <TopBar workspaceName={workspaceName} />
             <AuthorizationCheck transformError={transformError}>
                 <MenuDrawer />
                 <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
