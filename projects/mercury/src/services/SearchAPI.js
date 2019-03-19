@@ -112,10 +112,13 @@ export default () => {
 
         // ES cannot handle relative urls, as it will default to localhost in that case
         if (config.host.startsWith("/")) {
-            config.host = window.location.origin + config.host;
+            config = {
+                ...config,
+                host: window.location.origin + config.host
+            };
         }
 
-        api = new SearchAPI(config, ES_INDEX);
+        api = new SearchAPI(new elasticsearch.Client(config), ES_INDEX);
     }
 
     return api;
