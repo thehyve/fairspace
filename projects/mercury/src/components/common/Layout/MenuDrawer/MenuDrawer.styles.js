@@ -4,7 +4,6 @@ const styles = theme => ({
         whiteSpace: 'nowrap',
         width: 240,
         marginTop: '65px',
-        height: '90vh',
         overflow: 'hidden',
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
