@@ -65,7 +65,7 @@ Currently a collection has the following fields, all represented as strings:
 | PUT         | iri (URL-encoded)                         | {"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">}    | Sets user's permissions for a specific resource                                                      |
 
 
- The API for marking entities as read-only runs on :8080/api/permissions/readonly.
+ The API for marking entities as read-only runs on :8080/api/permissions/restricted/.
 
 | HTTP Method | Query Parameters                          | Request Body               | Effect & response                                                            |
 |-------------|-------------------------------------------|----------------------------|----------------------------------------------------------------------------- |

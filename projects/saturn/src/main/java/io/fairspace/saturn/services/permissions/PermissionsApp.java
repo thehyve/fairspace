@@ -7,6 +7,7 @@ import spark.Request;
 
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
 @AllArgsConstructor
@@ -18,7 +19,8 @@ public class PermissionsApp extends BaseApp {
         super.init();
 
         path("/api/permissions", () -> {
-            get("/", (req, res) -> {
+            get("/", APPLICATION_JSON.asString(), (req, res) -> {
+                res.type(APPLICATION_JSON.asString());
                 if (req.queryParams().contains("all")) {
                     return mapper.writeValueAsString(permissionsService.getPermissions(getIri(req))
                             .entrySet()
@@ -35,9 +37,11 @@ public class PermissionsApp extends BaseApp {
                 return "";
             });
 
-            path("/readonly/", () -> {
-                get("/", (req, res) ->
-                        mapper.writeValueAsString(new ValueDto<>(permissionsService.isWriteRestricted(getIri(req)))));
+            path("/restricted/", () -> {
+                get("/", APPLICATION_JSON.asString(), (req, res) -> {
+                    res.type(APPLICATION_JSON.asString());
+                    return mapper.writeValueAsString(new ValueDto<>(permissionsService.isWriteRestricted(getIri(req))));
+                });
 
                 put("/", (req, res) -> {
                     permissionsService.setWriteRestricted(getIri(req), (Boolean) mapper.readValue(req.body(), ValueDto.class).getValue());
