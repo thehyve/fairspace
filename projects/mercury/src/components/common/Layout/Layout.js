@@ -10,7 +10,7 @@ import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../Routes";
 
-const Layout = ({classes, menuExpanded}) => {
+const Layout = ({classes, menuExpanded, workspaceName, version}) => {
     // If an error is to be shown, it should be underneath the
     // AppBar. This method take care of it
     const transformError = errorContent => (
@@ -24,22 +24,27 @@ const Layout = ({classes, menuExpanded}) => {
     // The topbar is shown even if the user has no proper authorization
     return (
         <>
-            <TopBar classes={classes} />
+            <TopBar workspaceName={workspaceName} />
             <AuthorizationCheck transformError={transformError}>
                 <MenuDrawer />
                 <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                     <Routes />
                 </main>
             </AuthorizationCheck>
-            <Footer />
+            <Footer workspaceName={workspaceName} version={version} />
         </>
     );
 };
 
 
-const mapStateToProps = state => ({
-    menuExpanded: state.ui.menuExpanded
-});
+const mapStateToProps = state => {
+    const {name, version} = {...state.workspace.data};
 
-// export default withStyles(styles)(Layout);
+    return {
+        menuExpanded: state.ui.menuExpanded,
+        workspaceName: name,
+        version
+    };
+};
+
 export default withRouter(connect(mapStateToProps)(withStyles(styles)(Layout)));
