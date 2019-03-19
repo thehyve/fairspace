@@ -1,8 +1,11 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import MetadataViewer from "./MetadataViewer";
+import List from '@material-ui/core/List';
+
 import {ErrorMessage, LoadingInlay} from "../common";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadataActions";
+import MetadataProperty from "./MetadataProperty";
+import {isDateTimeProperty, propertiesToShow} from "../../utils/metadataUtils";
 
 export class Metadata extends React.Component {
     componentDidMount() {
@@ -24,24 +27,34 @@ export class Metadata extends React.Component {
     }
 
     render() {
-        // putting dispatch here to avoid it being passed down to children
-        const {
-            subject, metadata, error, loading, editable, dispatch, ...otherProps
-        } = this.props;
+        const {subject, metadata, error, loading, editable} = this.props;
 
         if (error) {
             return <ErrorMessage message={error.message} />;
-        } if (loading) {
+        }
+
+        if (loading) {
             return <LoadingInlay />;
         }
 
+        if (!metadata) {
+            return null;
+        }
+
         return (
-            <MetadataViewer
-                {...otherProps}
-                editable={editable}
-                subject={subject}
-                properties={metadata}
-            />
+            <List dense>
+                {
+                    propertiesToShow(metadata)
+                        .map((p) => (
+                            <MetadataProperty
+                                editable={editable && !isDateTimeProperty(p)}
+                                subject={subject}
+                                key={p.key}
+                                property={p}
+                            />
+                        ))
+                }
+            </List>
         );
     }
 }

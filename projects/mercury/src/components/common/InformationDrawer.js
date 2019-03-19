@@ -88,7 +88,6 @@ export class InformationDrawer extends React.Component {
                     <Metadata
                         subject={collection.iri}
                         editable={isMetaDataEditable}
-                        style={{width: '100%'}}
                     />
                 </Paper>
                 {

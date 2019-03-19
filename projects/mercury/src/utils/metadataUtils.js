@@ -91,7 +91,7 @@ export function getSingleValue(entity, property) {
     return (values.length > 0) ? values[0] : undefined;
 }
 
-export function shouldPropertyBeHidden({key, domain}) {
+export const shouldPropertyBeHidden = (key, domain) => {
     const isCollection = domain === COLLECTION_URI;
     const isFile = domain === FILE_URI;
     const isDirectory = domain === DIRECTORY_URI;
@@ -111,4 +111,11 @@ export function shouldPropertyBeHidden({key, domain}) {
         default:
             return false;
     }
-}
+};
+
+export const propertiesToShow = (properties = []) => {
+    const domainKey = properties.find(property => property.key === '@type');
+    const domainValue = domainKey && domainKey.values && domainKey.values[0] ? domainKey.values[0].id : undefined;
+
+    return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
+};
