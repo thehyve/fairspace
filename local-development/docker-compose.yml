@@ -34,10 +34,11 @@ services:
       - local-development
     container_name: elasticsearch
     environment:
-      - cluster.name=fairspace-localdev
+      - cluster.name=elasticsearch
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Djava.net.preferIPv4Stack=true"
     ports:
       - "9200:9200"
+      - "9300:9300"
 
 networks:
   local-development:
