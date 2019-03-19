@@ -15,7 +15,7 @@ data:
       datasetPath: "/data/saturn/db"
       transactionLogPath: "/data/saturn/files/log"
       elasticSearch:
-        enabled: false
+        enabled: {{ .Values.workspace.elasticsearch.enabled }}
         required: false
         settings:
           hostToPortMapping:
