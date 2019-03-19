@@ -139,14 +139,14 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 {{- end -}}
 
-{{- define "workspace.elasticsearch.transportbaseurl" -}}
-{{- if .Values.workspace.elasticsearch.host -}}
-{{- printf "http://%s" .Values.workspace.elasticsearch.host -}}
-{{- else -}}
-{{- printf "http://%s-elasticsearch-discovery.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
-{{- end -}}
-{{- end -}}
-
 {{- define "workspace.elasticsearch.resturl" -}}
 {{- template "workspace.elasticsearch.restbaseurl" . -}}:{{- int64 .Values.workspace.elasticsearch.restport -}}
+{{- end -}}
+
+{{- define "workspace.elasticsearch.transporthost" -}}
+{{- if .Values.workspace.elasticsearch.host -}}
+{{- .Values.workspace.elasticsearch.host -}}
+{{- else -}}
+{{- printf "%s-elasticsearch-discovery.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
+{{- end -}}
 {{- end -}}
