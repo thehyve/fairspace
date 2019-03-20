@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
@@ -9,6 +8,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.time.Instant;
@@ -34,6 +34,10 @@ class MetadataEntityLifeCycleManager {
     private final Supplier<Node> userIriSupplier;
     private final PermissionsService permissionsService;
 
+    private static final Property createdBy = ResourceFactory.createProperty(CREATED_BY_IRI);
+    private static final Property dateCreated = ResourceFactory.createProperty(DATE_CREATED_IRI);
+
+
     /**
      * Stores statements regarding the lifecycle of the entities in this model
      *
@@ -48,7 +52,7 @@ class MetadataEntityLifeCycleManager {
      *
      * @param model
      */
-    void store(Model model) {
+    void updateLifecycleMetadata(Model model) {
         if(model == null || model.isEmpty()) {
             return;
         }
@@ -57,18 +61,14 @@ class MetadataEntityLifeCycleManager {
         // for which new information should be stored
         Set<String> newEntities = determineNewEntities(model);
 
-        // If there are new entities, store creation information for them
+        // If there are new entities, updateLifecycleMetadata creation information for them
         // as well as permissions
         if (!newEntities.isEmpty()) {
             rdf.load(graph.getURI(), generateCreationInformation(newEntities));
 
             if(permissionsService != null) {
                 newEntities.forEach(uri ->
-                        permissionsService.setPermission(
-                                createURI(uri),
-                                userIriSupplier.get(),
-                                Access.Manage
-                        )
+                        permissionsService.createResource(createURI(uri))
                 );
             }
         }
@@ -82,9 +82,6 @@ class MetadataEntityLifeCycleManager {
     private Model generateCreationInformation(Set<String> entities) {
         Model model = ModelFactory.createDefaultModel();
         Resource user = model.createResource(userIriSupplier.get().getURI());
-
-        Property createdBy = model.createProperty(CREATED_BY_IRI);
-        Property dateCreated = model.createProperty(DATE_CREATED_IRI);
         Literal now = now();
 
         entities.forEach(uri -> {

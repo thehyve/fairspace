@@ -67,7 +67,7 @@ class MetadataService {
             ensureValidParameters(validator -> validator.validatePut(model));
 
             // Store information on the lifecycle of the entities
-            lifeCycleManager.store(model);
+            lifeCycleManager.updateLifecycleMetadata(model);
 
             // Store the actual update
             rdf.load(graph.getURI(), model);
@@ -126,7 +126,7 @@ class MetadataService {
             ensureValidParameters(validator -> validator.validatePatch(model));
 
             // Store information on the lifecycle of the entities
-            lifeCycleManager.store(model);
+            lifeCycleManager.updateLifecycleMetadata(model);
 
             rdf.update(createPatchQuery(model.listStatements().toList()));
         });

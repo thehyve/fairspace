@@ -60,7 +60,7 @@ public class MetadataEntityLifeCycleManagerTest {
         delta.add(resource, property, "test");
         delta.add(otherResource, property, "other-literal");
 
-        lifeCycleManager.store(delta);
+        lifeCycleManager.updateLifecycleMetadata(delta);
 
         assertTrue(model.contains(resource, createdBy, userResource));
         assertTrue(model.contains(otherResource, createdBy, userResource));
@@ -74,7 +74,7 @@ public class MetadataEntityLifeCycleManagerTest {
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, otherResource);
 
-        lifeCycleManager.store(delta);
+        lifeCycleManager.updateLifecycleMetadata(delta);
 
         assertTrue(model.contains(otherResource, createdBy, userResource));
 
@@ -91,7 +91,7 @@ public class MetadataEntityLifeCycleManagerTest {
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, "test");
 
-        lifeCycleManager.store(delta);
+        lifeCycleManager.updateLifecycleMetadata(delta);
 
         assertFalse(model.contains(resource, createdBy, userResource));
         assertFalse(model.contains(resource, dateCreated));
@@ -99,8 +99,8 @@ public class MetadataEntityLifeCycleManagerTest {
 
     @Test
     public void testStorageOfEmptyModel() {
-        lifeCycleManager.store(ModelFactory.createDefaultModel());
-        lifeCycleManager.store(null);
+        lifeCycleManager.updateLifecycleMetadata(ModelFactory.createDefaultModel());
+        lifeCycleManager.updateLifecycleMetadata(null);
 
         assertTrue(model.isEmpty());
     }
@@ -110,19 +110,10 @@ public class MetadataEntityLifeCycleManagerTest {
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, otherResource);
 
-        lifeCycleManager.store(delta);
+        lifeCycleManager.updateLifecycleMetadata(delta);
 
-        verify(permissionsService).setPermission(
-                NodeFactory.createURI(resource.getURI()),
-                user,
-                Access.Manage
-        );
-
-        verify(permissionsService).setPermission(
-                NodeFactory.createURI(otherResource.getURI()),
-                user,
-                Access.Manage
-        );
+        verify(permissionsService).createResource(NodeFactory.createURI(resource.getURI()));
+        verify(permissionsService).createResource(NodeFactory.createURI(otherResource.getURI()));
     }
 
     @Test
@@ -132,6 +123,6 @@ public class MetadataEntityLifeCycleManagerTest {
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, otherResource);
 
-        lifeCycleManager.store(delta);
+        lifeCycleManager.updateLifecycleMetadata(delta);
     }
 }

@@ -131,7 +131,7 @@ public class MetadataServiceTest {
     public void testPutHandlesLifecycleForEntitities() {
         Model delta = createDefaultModel().add(STMT1).add(STMT2);
         api.put(delta);
-        verify(lifeCycleManager).store(delta);
+        verify(lifeCycleManager).updateLifecycleMetadata(delta);
     }
 
 
@@ -211,7 +211,7 @@ public class MetadataServiceTest {
     public void testPatchHandlesLifecycleForEntitities() {
         Model delta = createDefaultModel().add(STMT1).add(STMT2);
         api.patch(delta);
-        verify(lifeCycleManager).store(delta);
+        verify(lifeCycleManager).updateLifecycleMetadata(delta);
     }
 
     @Test
