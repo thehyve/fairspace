@@ -31,6 +31,9 @@ public class MetadataServiceValidationTest {
     @Mock
     MetadataRequestValidator validator;
 
+    @Mock
+    private MetadataEntityLifeCycleManager lifeCycleManager;
+
     private static final ValidationResult INVALID_VALIDATION_RESULT = new ValidationResult(false, "Test error");
     private static final String GRAPH = "http://fairspace.io/iri/graph";
 
@@ -51,7 +54,7 @@ public class MetadataServiceValidationTest {
     public void setUp() {
         ds = createTxnMem();
         RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new MetadataService(rdf, createURI(GRAPH), validator);
+        api = new MetadataService(rdf, createURI(GRAPH), lifeCycleManager, validator);
     }
 
     @Test

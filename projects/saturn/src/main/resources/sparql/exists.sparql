@@ -1,0 +1,7 @@
+# Select by mask
+# 0 - graph
+# 1 - subject
+# 2 - predicate
+# 3 - object
+
+ASK WHERE { GRAPH %1$s {%2$s %3$s %4$s} }
