@@ -14,10 +14,13 @@ import static lombok.AccessLevel.PACKAGE;
 @Getter
 @Setter(PACKAGE)
 public abstract class LifecycleAwarePersistentEntity extends PersistentEntity {
-    @RDFProperty(value = "http://fairspace.io/ontology#dateCreated", required = true)
+    public static final String DATE_CREATED_IRI = "http://fairspace.io/ontology#dateCreated";
+    public static final String CREATED_BY_IRI = "http://fairspace.io/ontology#createdBy";
+
+    @RDFProperty(value = DATE_CREATED_IRI, required = true)
     private Instant dateCreated;
 
-    @RDFProperty(value = "http://fairspace.io/ontology#createdBy", required = true)
+    @RDFProperty(value = CREATED_BY_IRI, required = true)
     private Node createdBy;
 
     @RDFProperty(value = "http://fairspace.io/ontology#dateModified", required = true)
