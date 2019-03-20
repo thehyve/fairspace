@@ -2,6 +2,9 @@ package io.fairspace.saturn.services.collections;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
@@ -10,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.function.Supplier;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -25,16 +27,18 @@ public class CollectionsServiceTest {
     private CollectionsService collections;
     @Mock
     private EventBus eventBus;
+    @Mock
+    private PermissionsService permissions;
 
     @Before
     public void before() {
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus, permissions);
     }
 
     @Test
-    public void basicFunctionality() throws IOException, InterruptedException {
+    public void basicFunctionality() throws InterruptedException {
         assertTrue(collections.list().isEmpty());
 
         var c1 = new Collection();
@@ -44,6 +48,10 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
 
         var created1 = collections.create(c1);
+
+        verify(permissions).createResource(created1.getIri());
+        when(permissions.getPermission(eq(created1.getIri()))).thenReturn(Access.Manage);
+
         verify(eventBus, times(1)).post(new CollectionCreatedEvent(created1));
         assertTrue(created1.getIri().isURI());
         assertEquals(c1.getName(), created1.getName());
@@ -89,6 +97,8 @@ public class CollectionsServiceTest {
         c2.setDescription("blah");
         c2.setType("LOCAL");
         var created2 = collections.create(c2);
+        verify(permissions).createResource(created2.getIri());
+        when(permissions.getPermission(eq(created2.getIri()))).thenReturn(Access.Manage);
         assertEquals(2, collections.list().size());
 
         collections.delete(created2.getIri().getURI());
@@ -162,11 +172,72 @@ public class CollectionsServiceTest {
             var patch = new Collection();
             patch.setIri(c1.getIri());
             patch.setLocation(c2.getLocation());
-
+            when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Manage);
             collections.update(patch);
         } finally {
             verify(eventBus, times(2)).post(any(CollectionCreatedEvent.class));
             verifyNoMoreInteractions(eventBus);
         }
+    }
+
+    @Test
+    public void collectionsWithNonePermissionAreInvisible() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+        c1 = collections.create(c1);
+
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.None);
+
+        assertNull(collections.get(c1.getIri().getURI()));
+        assertNull(collections.getByLocation(c1.getLocation()));
+        assertTrue(collections.list().isEmpty());
+    }
+
+    @Test
+    public void collectionsWithWritePermissionCanBeModified() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+        c1 = collections.create(c1);
+
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Write);
+
+        c1.setDescription("new description");
+        collections.update(c1);
+        assertEquals("new description", collections.get(c1.getIri().getURI()).getDescription());
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void collectionsWithoutWritePermissionCannotBeModified() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+        c1 = collections.create(c1);
+
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Read);
+
+        c1.setDescription("new description");
+        collections.update(c1);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void collectionsWithoutManagePermissionCannotBeDeleted() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+        c1 = collections.create(c1);
+
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Write);
+
+        collections.delete(c1.getIri().getURI());
     }
 }

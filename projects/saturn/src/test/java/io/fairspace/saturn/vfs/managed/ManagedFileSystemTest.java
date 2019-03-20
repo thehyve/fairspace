@@ -6,6 +6,7 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDFS;
@@ -42,7 +43,7 @@ public class ManagedFileSystemTest {
         var rdf = connect(ds);
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus, new PermissionsServiceImpl(rdf, userIriSupplier));
         fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
         var collection = new Collection();
         collection.setLocation("coll");
