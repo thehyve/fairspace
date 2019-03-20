@@ -52,8 +52,8 @@ public class PermissionsApp extends BaseApp {
     }
 
     private static Node getIri(Request request) {
-        var param = request.queryParams("iri");
-        validate(param != null, "Query parameter \"iri\" is mandatory");
-        return createURI(param);
+        var iri = request.queryParams("iri");
+        validate(iri != null, "Query parameter \"iri\" is mandatory");
+        return createURI(iri);
     }
 }
