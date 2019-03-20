@@ -33,7 +33,6 @@ class MetadataAPI {
         }
 
         const request = (values.length === 0)
-            // eslint-disable-next-line prefer-template
             ? fetch(Config.get().urls.metadata.statements
                 + '?subject=' + encodeURIComponent(subject)
                 + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE', credentials: 'same-origin'})

@@ -40,7 +40,6 @@ export class SearchPage extends React.Component {
     handleResultDoubleClick = (result) => {
         const navigationPath = getCollectionAbsolutePath(this.getPathOfResult(result));
         // TODO: why do we have to have a slash here, there's some kind of data inconsistency somewhere
-        // eslint-disable-next-line prefer-template
         this.props.selectPath('/' + result.filePath[0]);
         this.props.history.push(navigationPath);
     }
