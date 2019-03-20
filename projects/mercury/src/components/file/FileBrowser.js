@@ -11,9 +11,9 @@ import {canWrite} from '../../utils/permissionUtils';
 import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
-    handlePathClick = (path) => {
-        const {selectPath, deselectPath} = this.props;
-        const isPathSelected = this.props.selectedPaths.some(el => el === path.filename);
+    handlePathCheckboxClick = (path) => {
+        const {selectedPaths, selectPath, deselectPath} = this.props;
+        const isPathSelected = selectedPaths.some(el => el === path.filename);
 
         // If this path is already selected, deselect
         if (isPathSelected) {
@@ -21,6 +21,14 @@ class FileBrowser extends React.Component {
         } else {
             selectPath(path.filename);
         }
+    }
+
+    // A highlighting of a path means only this path would be selected/checked
+    handlePathHighlight = (path) => {
+        const {onDeselectAll, selectPath} = this.props;
+
+        onDeselectAll();
+        selectPath(path.filename);
     }
 
     handlePathDoubleClick = (path) => {
@@ -95,7 +103,8 @@ class FileBrowser extends React.Component {
                         <FileList
                             selectionEnabled
                             files={filesWithSelectionState}
-                            onPathClick={this.handlePathClick}
+                            onPathCheckboxClick={this.handlePathCheckboxClick}
+                            onPathHighlight={this.handlePathHighlight}
                             onPathDoubleClick={this.handlePathDoubleClick}
                             onAllSelection={allSelectionChangeHandler}
                         />

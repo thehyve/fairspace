@@ -1,12 +1,12 @@
 const styles = theme => ({
-    footer: {
+    root: {
         backgroundColor: theme.palette.primary.main,
-        position: 'fixed',
-        left: 0,
-        bottom: 0,
         padding: theme.spacing.unit,
         width: '100%',
         textAlign: 'center',
+        position: 'fixed',
+        left: 0,
+        bottom: 0,
         zIndex: theme.zIndex.drawer + 1
     },
     text: {

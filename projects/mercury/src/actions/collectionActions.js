@@ -29,7 +29,10 @@ export const updateCollection = (id, name, description, location) => ({
     }
 });
 
-export const deleteCollection = id => ({
+export const deleteCollection = (iri, location) => ({
     type: actionTypes.DELETE_COLLECTION,
-    payload: CollectionAPI.deleteCollection(id),
+    payload: CollectionAPI.deleteCollection(iri),
+    meta: {
+        location
+    }
 });

@@ -1,35 +1,29 @@
 import React from 'react';
-import {withRouter} from "react-router-dom";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import {connect} from "react-redux";
+import {AppBar, Toolbar, Typography, withStyles} from "@material-ui/core";
 
 import UserMenu from "../UserMenu/UserMenu";
 import logout from "../../../../services/logout";
 import SearchBar from '../../SearchBar';
 
-function TopBar(props) {
-    const {classes, workspaceName} = props;
+const styles = theme => ({
+    root: {
+        zIndex: theme.zIndex.drawer + 1
+    },
+    title: {
+        flexGrow: 1
+    }
+});
 
-    return (
-        <AppBar position="fixed" className={classes.appBar}>
-            <Toolbar>
-                <Typography variant="h6" color="inherit" noWrap className={classes.flex}>
-                    {workspaceName}
-                </Typography>
-                <SearchBar />
-                <UserMenu onLogout={logout} />
-            </Toolbar>
-        </AppBar>
-    );
-}
+const TopBar = ({classes, workspaceName}) => (
+    <AppBar className={classes.root} position="sticky">
+        <Toolbar>
+            <Typography variant="h6" color="inherit" noWrap className={classes.title}>
+                {workspaceName}
+            </Typography>
+            <SearchBar />
+            <UserMenu onLogout={logout} />
+        </Toolbar>
+    </AppBar>
+);
 
-function mapStateToProps(state) {
-    const data = {...state.workspace.data};
-    return {
-        workspaceName: data ? data.name : ''
-    };
-}
-
-export default withRouter(connect(mapStateToProps)(TopBar));
+export default withStyles(styles)(TopBar);

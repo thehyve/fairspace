@@ -31,5 +31,7 @@ zuul:
       url: http://localhost:8080/api/collections/
     ui:
       url: http://localhost:3000
+    elasticsearch:
+      url: http://localhost:9200
 
   include-debug-header: true

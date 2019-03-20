@@ -8,7 +8,7 @@ import {mockResponse} from "../utils/testUtils";
 import {FETCH_METADATA} from "./actionTypes";
 
 const subject = 'my-subject';
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 beforeAll(() => {

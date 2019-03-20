@@ -27,5 +27,18 @@ services:
     - ".:/config"
     command:
       - "/config/keycloak/run-config.sh"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.6.1
+    networks:
+      - local-development
+    container_name: elasticsearch
+    environment:
+      - cluster.name=elasticsearch
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Djava.net.preferIPv4Stack=true"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
 networks:
   local-development:

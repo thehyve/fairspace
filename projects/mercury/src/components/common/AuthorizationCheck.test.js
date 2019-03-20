@@ -7,7 +7,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import AuthorizationCheck from './AuthorizationCheck';
 
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 it('renders without crashing', () => {
