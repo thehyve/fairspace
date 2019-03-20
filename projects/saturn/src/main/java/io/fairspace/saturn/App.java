@@ -60,10 +60,9 @@ public class App {
         var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
         var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "metavocabulary.jsonld");
 
-        // TODO: Add permissionsService implementation when VRE-490 is done
-        var lifeCyleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, null);
-        var metadataService = new MetadataService(rdf, defaultGraphIRI, lifeCyleManager, new ProtectMachineOnlyPredicatesValidator(vocabulary));
-        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, lifeCyleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
+        var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
+        var metadataService = new MetadataService(rdf, defaultGraphIRI, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(vocabulary));
+        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
