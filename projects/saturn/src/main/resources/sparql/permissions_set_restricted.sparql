@@ -1,8 +1,9 @@
-# Sets a permission
+# # Marks an entity as write-restricted or not
 # 0 - the resource
 # 1 - the value (true or false)
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
 DELETE { GRAPH ws:permissions { %1$s fs:writeRestricted ?value}} WHERE { GRAPH ws:permissions { %1$s fs:writeRestricted ?value}} ;
+DELETE { GRAPH ws:permissions { %1$s fs:write ?user}} WHERE { GRAPH ws:permissions { %1$s fs:write ?user}} ;
 INSERT DATA { GRAPH ws:permissions {%1$s fs:writeRestricted %2$s } }
