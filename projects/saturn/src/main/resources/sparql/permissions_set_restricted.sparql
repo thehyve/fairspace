@@ -5,5 +5,10 @@
 PREFIX fs: <http://fairspace.io/ontology#>
 
 DELETE { GRAPH ws:permissions { %1$s fs:writeRestricted ?value}} WHERE { GRAPH ws:permissions { %1$s fs:writeRestricted ?value}} ;
+
+# If we change fs:writeRestricted from true to false then all fs:write permissions should be removed.
+# If change in the opposite direction (from false to true) the next statement is a no-op as there must be no fs:write permissions anyway
 DELETE { GRAPH ws:permissions { %1$s fs:write ?user}} WHERE { GRAPH ws:permissions { %1$s fs:write ?user}} ;
+
+
 INSERT DATA { GRAPH ws:permissions {%1$s fs:writeRestricted %2$s } }
