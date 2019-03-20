@@ -61,7 +61,6 @@ const breadCrumbs = ({segments, match, classes, homeUrl}) => {
     // Ensure we only have the first part of the url
     let homePath = match.path;
     if (homePath !== '/') {
-        // eslint-disable-next-line prefer-template
         homePath = '/' + homePath.split('/')[1];
     }
     if (homeUrl) {
@@ -77,7 +76,6 @@ const breadCrumbs = ({segments, match, classes, homeUrl}) => {
         let currentPath = stripTrailingSlash(homePath);
         segments.forEach(segment => {
             if (segment.segment && segment.label) {
-                // eslint-disable-next-line prefer-template
                 currentPath += stripTrailingSlash('/' + segment.segment);
                 breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, classes.link));
             }
