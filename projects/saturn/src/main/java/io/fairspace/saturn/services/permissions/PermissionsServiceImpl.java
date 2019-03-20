@@ -35,7 +35,8 @@ public class PermissionsServiceImpl implements PermissionsService {
             validate(!user.equals(userIriSupplier.get()), "A user may not change his own permissions");
             if (!isCollection(resource)) {
                 validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
-                validate(access != Access.Write || isWriteRestricted(resource),
+                isSpecifyingWriteAccessOnNonRestrictedResource = access == Access.Write && !isWriteRestricted(resource);
+                validate(!isSpecifyingWriteAccessOnNonRestrictedResource),
                         "Regular metadata entities must be marked as write-restricted before granting permissions");
             }
 
