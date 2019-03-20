@@ -38,10 +38,12 @@ export class SearchPage extends React.Component {
      * @param result   The clicked search result. For the format, see the ES api
      */
     handleResultDoubleClick = (result) => {
+        const {history, selectPath, deselectAllPaths} = this.props;
         const navigationPath = getCollectionAbsolutePath(this.getPathOfResult(result));
-        // TODO: why do we have to have a slash here, there's some kind of data inconsistency somewhere
-        this.props.selectPath('/' + result.filePath[0]);
-        this.props.history.push(navigationPath);
+
+        history.push(navigationPath);
+        deselectAllPaths();
+        selectPath('/' + result.filePath[0]);
     }
 
     getPathOfResult = (result) => {
@@ -87,7 +89,8 @@ const mapStateToProps = ({search, cache: {vocabulary}}) => ({
 const mapDispatchToProps = {
     performSearch: searchActions.performSearch,
     fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded,
-    selectPath: collectionBrowserActions.selectPath
+    selectPath: collectionBrowserActions.selectPath,
+    deselectAllPaths: collectionBrowserActions.deselectAllPaths
 };
 
 SearchPage.propTypes = {
