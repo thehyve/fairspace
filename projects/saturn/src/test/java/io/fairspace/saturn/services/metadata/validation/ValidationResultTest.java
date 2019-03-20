@@ -30,6 +30,18 @@ public class ValidationResultTest {
     }
 
     @Test
+    public void testMergeExceptionClassProperty() {
+        ValidationResult success = new ValidationResult(false, "Forbidden message", ForbiddenException.class);
+        ValidationResult failure = new ValidationResult(false, "Other message");
+
+        // Keep first class by default
+        assertEquals(success.getExceptionClass(), success.merge(failure).getExceptionClass());
+
+        // Overwrite first class if empty
+        assertEquals(success.getExceptionClass(), failure.merge(success).getExceptionClass());
+    }
+
+    @Test
     public void testMergeValidationMessages() {
         ValidationResult defaultValid = ValidationResult.VALID;
         ValidationResult success = new ValidationResult(true, "Succesful message");
