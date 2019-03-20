@@ -40,20 +40,20 @@ class MetadataEntityLifeCycleManager {
 
     /**
      * Stores statements regarding the lifecycle of the entities in this model
-     *
+     * <p>
      * The lifecycle statements consist of:
-     *   - a triple for the creator of an entity (see {@value io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity#CREATED_BY_IRI})
-     *   - a triple for the date this entity was created (see {@value io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity#DATE_CREATED_IRI})
-     *
+     * - a triple for the creator of an entity (see {@value io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity#CREATED_BY_IRI})
+     * - a triple for the date this entity was created (see {@value io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity#DATE_CREATED_IRI})
+     * <p>
      * In addition, the current user will get manage permissions on this entity as well, through the {@link PermissionsService}
-     *
+     * <p>
      * Please note that this method will check the database for existence of the entities. For that reason, this method must be called
      * before actually inserting new triples.
      *
      * @param model
      */
     void updateLifecycleMetadata(Model model) {
-        if(model == null || model.isEmpty()) {
+        if (model == null || model.isEmpty()) {
             return;
         }
 
@@ -66,7 +66,7 @@ class MetadataEntityLifeCycleManager {
         if (!newEntities.isEmpty()) {
             rdf.load(graph.getURI(), generateCreationInformation(newEntities));
 
-            if(permissionsService != null) {
+            if (permissionsService != null) {
                 newEntities.forEach(uri ->
                         permissionsService.createResource(createURI(uri))
                 );
@@ -76,6 +76,7 @@ class MetadataEntityLifeCycleManager {
 
     /**
      * Generates a model with creation information for the list of entities given
+     *
      * @param entities
      * @return
      */
@@ -95,6 +96,7 @@ class MetadataEntityLifeCycleManager {
 
     /**
      * Returns a literal representing the current time
+     *
      * @return
      */
     private Literal now() {
@@ -105,6 +107,7 @@ class MetadataEntityLifeCycleManager {
 
     /**
      * Returns a list of all entities in the model that are not known in the graph yet
+     *
      * @return
      */
     private Set<String> determineNewEntities(Model model) {
@@ -119,8 +122,9 @@ class MetadataEntityLifeCycleManager {
 
     /**
      * Verifies whether a certain entity exists in the database
-     *
+     * <p>
      * An entity exists if there is any triples with the given URI as subject
+     *
      * @param uri
      * @return
      */
@@ -130,6 +134,7 @@ class MetadataEntityLifeCycleManager {
 
     /**
      * Returns a set of all URIs that are used in the model
+     *
      * @param model
      * @return
      */
@@ -138,7 +143,7 @@ class MetadataEntityLifeCycleManager {
 
         model.listStatements().forEachRemaining(statement -> {
             modelUris.add(statement.getSubject().getURI());
-            if(statement.getObject().isURIResource()) {
+            if (statement.getObject().isURIResource()) {
                 modelUris.add(statement.getResource().getURI());
             }
         });
