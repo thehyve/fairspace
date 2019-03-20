@@ -80,8 +80,10 @@ public class PermissionsServiceImpl implements PermissionsService {
     public void setWriteRestricted(Node resource, boolean restricted) {
         commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), rdf, () -> {
             ensureHasAccess(resource, Access.Manage);
-            validate(!isCollection(resource), "Illegal operation");
-            rdf.update(storedQuery("permissions_set_restricted", resource, restricted));
+            validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
+            if (restricted != isWriteRestricted(resource)) {
+                rdf.update(storedQuery("permissions_set_restricted", resource, restricted));
+            }
         });
     }
 
