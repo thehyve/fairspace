@@ -128,7 +128,7 @@ class MetadataEntityLifeCycleManager {
      * @return
      */
     private boolean exists(String uri) {
-        return !rdf.queryConstruct(storedQuery("select_by_mask", graph, createURI(uri), null, null)).isEmpty();
+        return rdf.queryAsk(storedQuery("exists", graph, createURI(uri), null, null));
     }
 
     /**
