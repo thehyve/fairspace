@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.permissions;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
@@ -19,6 +20,7 @@ public class PermissionsServiceImplTest {
     private static final Node USER1 = createURI("http://example.com/user1");
     private static final Node USER2 = createURI("http://example.com/user2");
     private static final Node USER3 = createURI("http://example.com/user3");
+    public static final Resource COLLECTION = createResource("http://fairspace.io/ontology#Collection");
 
     private Dataset ds;
     private PermissionsService service;
@@ -43,6 +45,8 @@ public class PermissionsServiceImplTest {
         assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.None);
         assertNull(service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER3, Access.Manage);
+        assertEquals(Access.Manage, service.getPermissions(RESOURCE).get(USER3));
     }
 
 
@@ -53,8 +57,7 @@ public class PermissionsServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testMetadataEntitiesMustBeMarkedAsRestrictedBeforeGrantingWritePermissions() {
-        var user = createURI("http://example.com/user2");
-        service.setPermission(RESOURCE, user, Access.Write);
+        service.setPermission(RESOURCE, USER2, Access.Write);
     }
 
     @Test
@@ -96,7 +99,7 @@ public class PermissionsServiceImplTest {
     @Test
     public void testDefaultPermissionForCollections() {
         var coll = createResource("http://example.com/collection");
-        ds.getDefaultModel().add(coll, RDF.type, createResource("http://fairspace.io/ontology#Collection"));
+        ds.getDefaultModel().add(coll, RDF.type, COLLECTION);
         assertEquals(Access.None, service.getPermission(coll.asNode()));
     }
 
@@ -117,14 +120,40 @@ public class PermissionsServiceImplTest {
         service.setPermission(RESOURCE, USER2, Access.Read);
     }
 
+    @Test
+    public void testCanGrantPermissionsOnCollections() {
+        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, COLLECTION);
+        assertFalse(service.getPermissions(RESOURCE).containsKey(USER2));
+        service.setPermission(RESOURCE, USER2, Access.Read);
+        assertEquals(Access.Read, service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER2, Access.Write);
+        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER2, Access.None);
+        assertFalse(service.getPermissions(RESOURCE).containsKey(USER2));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testCollectionsCanNotBeMarkedAsRestricted() {
-        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, createResource("http://fairspace.io/ontology#Collection"));
+        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, COLLECTION);
         service.setWriteRestricted(RESOURCE, true);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testWriteAccessToEntitiesCanNotBeGrantedBeforeMarkingThemRestricted() {
         service.setPermission(RESOURCE, USER2, Access.Write);
+    }
+
+    @Test
+    public void testSettingPermissionToNoneIfNoPermissionIsPresent() {
+        service.setPermission(RESOURCE, USER2, Access.None);
+        assertFalse(service.getPermissions(RESOURCE).containsKey(USER2));
+    }
+
+    @Test
+    public void testSettingWriteRestrictedToTrueTwiceShouldNotClearPermissions() {
+        service.setWriteRestricted(RESOURCE, true);
+        service.setPermission(RESOURCE, USER2, Access.Write);
+        service.setWriteRestricted(RESOURCE, true);
+        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
     }
 }
