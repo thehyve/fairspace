@@ -4,7 +4,7 @@ import * as actionTypes from "../../actions/actionTypes";
 
 const defaultState = {};
 const permissionByCollectionReducer = promiseReducerFactory(
-    actionTypes.FETCH_PERMISSIONS, defaultState, action => action.meta.collectionId
+    actionTypes.FETCH_PERMISSIONS, defaultState, action => action.meta.iri
 );
 
 // Functions to modify the permission cache after altering the permissions
@@ -25,8 +25,8 @@ const updatePermissionsReducer = (state = defaultState, action) => {
         case actionTypes.ALTER_PERMISSION_FULFILLED:
             return {
                 ...state,
-                [action.meta.collectionId]:
-                    updatePermissions(state[action.meta.collectionId], action.meta)
+                [action.meta.iri]:
+                    updatePermissions(state[action.meta.iri], action.meta)
             };
         default:
             return state;

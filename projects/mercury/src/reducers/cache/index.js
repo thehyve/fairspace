@@ -7,7 +7,7 @@ import filesByPath from "./filesByPathReducers";
 import users from "./usersReducers";
 import allEntities from "./allEntitiesReducers";
 import subjectByPath from "./subjectByPathReducers";
-import permissionsByCollection from "./permissionsByCollectionReducers";
+import permissionsByIri from "./permissionsByIriReducers";
 
 export default combineReducers({
     jsonLdBySubject,
@@ -18,5 +18,5 @@ export default combineReducers({
     collections,
     filesByPath,
     subjectByPath,
-    permissionsByCollection
+    permissionsByIri
 });

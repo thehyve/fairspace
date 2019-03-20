@@ -2,11 +2,11 @@ import PermissionAPI from '../services/PermissionAPI';
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {ALTER_PERMISSION, FETCH_PERMISSIONS} from "./actionTypes";
 
-export const fetchPermissions = createErrorHandlingPromiseAction((collectionId, useCache = true) => ({
+export const fetchPermissions = createErrorHandlingPromiseAction((iri, useCache = true) => ({
     type: FETCH_PERMISSIONS,
-    payload: PermissionAPI.getCollectionPermissions(collectionId, useCache),
+    payload: PermissionAPI.getPermissions(iri, useCache),
     meta: {
-        collectionId
+        iri
     }
 }));
 
@@ -23,12 +23,12 @@ export const fetchPermissionsIfNeeded = (collectionId, useCache = false) => disp
     state => (state && state.cache && state.cache.permissionsByCollection ? state.cache.permissionsByCollection[collectionId] : undefined)
 );
 
-export const alterPermission = createErrorHandlingPromiseAction((userId, collectionId, access) => ({
+export const alterPermission = createErrorHandlingPromiseAction((userId, iri, access) => ({
     type: ALTER_PERMISSION,
-    payload: PermissionAPI.alterCollectionPermission(userId, collectionId, access),
+    payload: PermissionAPI.alterPermission(userId, iri, access),
     meta: {
         subject: userId,
-        collectionId,
+        iri,
         access
     }
 }));

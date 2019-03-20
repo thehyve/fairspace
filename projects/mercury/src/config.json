@@ -4,8 +4,7 @@
     "userInfo": "/account/user",
     "authorizations": "/account/authorizations",
     "collections": "/api/collections/",
-    "permissionsByCollectionId": "/api/collections/%d/permissions",
-    "permissions": "/api/collections/permissions",
+    "permissions": "/api/permissions/",
     "files": "/webdav",
     "metadata": {
       "statements": "/api/metadata/",
