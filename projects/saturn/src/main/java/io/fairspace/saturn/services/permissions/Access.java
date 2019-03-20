@@ -1,4 +1,4 @@
-package io.fairspace.saturn.services.collections;
+package io.fairspace.saturn.services.permissions;
 
 public enum Access {
     None,

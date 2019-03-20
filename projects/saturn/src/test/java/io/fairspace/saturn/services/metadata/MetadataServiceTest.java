@@ -12,6 +12,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -20,6 +21,7 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataServiceTest {
@@ -44,10 +46,13 @@ public class MetadataServiceTest {
     private Dataset ds;
     private MetadataService api;
 
+    @Mock
+    private MetadataEntityLifeCycleManager lifeCycleManager;
+
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new MetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), null);
+        api = new MetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), lifeCycleManager,null);
     }
 
     @Test
@@ -123,6 +128,14 @@ public class MetadataServiceTest {
     }
 
     @Test
+    public void testPutHandlesLifecycleForEntitities() {
+        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        api.put(delta);
+        verify(lifeCycleManager).updateLifecycleMetadata(delta);
+    }
+
+
+    @Test
     public void testPutWillNotRemoveExistingStatements() {
         // Prepopulate the model
         final Statement EXISTING1 = createStatement(S1, P1, S3);
@@ -192,6 +205,13 @@ public class MetadataServiceTest {
         assertTrue(ds.getNamedModel(GRAPH).contains(newStmt3));
         assertFalse(ds.getNamedModel(GRAPH).contains(STMT1));
         assertFalse(ds.getNamedModel(GRAPH).contains(STMT2));
+    }
+
+    @Test
+    public void testPatchHandlesLifecycleForEntitities() {
+        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        api.patch(delta);
+        verify(lifeCycleManager).updateLifecycleMetadata(delta);
     }
 
     @Test

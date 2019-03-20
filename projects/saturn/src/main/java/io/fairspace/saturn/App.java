@@ -9,6 +9,7 @@ import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
+import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.metadata.validation.DataStewardAccessValidator;
@@ -55,17 +56,20 @@ public class App {
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus));
 
-        // Setup and initialize vocabularies
+        // TODO: Add permissionsService implementation when VRE-490 is done
+        var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, null);
+
+                // Setup and initialize vocabularies
         var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
         var metadataValidator = new ProtectMachineOnlyPredicatesValidator(vocabulary);
-        var metadataService = new MetadataService(rdf, defaultGraphIRI, metadataValidator);
+        var metadataService = new MetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
 
         var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "metavocabulary.jsonld");
         var vocabularyValidator = new ComposedValidator(
                 new DataStewardAccessValidator(CONFIG.auth.dataStewardRole, SecurityUtil::userInfo),
                 new ProtectMachineOnlyPredicatesValidator(metaVocabulary)
         );
-        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, vocabularyValidator);
+        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, lifeCycleManager, vocabularyValidator);
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)

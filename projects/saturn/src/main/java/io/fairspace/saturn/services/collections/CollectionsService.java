@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.collections;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.services.permissions.Access;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
