@@ -28,7 +28,7 @@ public class PermissionsApp extends BaseApp {
                             .map(e -> new PermissionDto(e.getKey(), e.getValue())));
                 }
 
-                return mapper.writeValueAsString(new ValueDto<>(permissionsService.getPermission(getIri(req))));
+                return mapper.writeValueAsString(new AccessDto(permissionsService.getPermission(getIri(req))));
             });
 
             put("/", (req, res) -> {
@@ -40,11 +40,11 @@ public class PermissionsApp extends BaseApp {
             path("/restricted/", () -> {
                 get("/", APPLICATION_JSON.asString(), (req, res) -> {
                     res.type(APPLICATION_JSON.asString());
-                    return mapper.writeValueAsString(new ValueDto<>(permissionsService.isWriteRestricted(getIri(req))));
+                    return mapper.writeValueAsString(new RestrictedDto(permissionsService.isWriteRestricted(getIri(req))));
                 });
 
                 put("/", (req, res) -> {
-                    permissionsService.setWriteRestricted(getIri(req), (Boolean) mapper.readValue(req.body(), ValueDto.class).getValue());
+                    permissionsService.setWriteRestricted(getIri(req), mapper.readValue(req.body(), RestrictedDto.class).isRestricted());
                     return "";
                 });
             });

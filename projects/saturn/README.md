@@ -60,17 +60,17 @@ Currently a collection has the following fields, all represented as strings:
  
 | HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                                                                                                        |
 |-------------|-------------------------------------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET         | iri (URL-encoded)                         | -                         | Returns current user's permissions as {"value": <one of "None", "Read", "Write", "Manage">}                                                              |
+| GET         | iri (URL-encoded)                         | -                         | Returns current user's permissions as {"access": <one of "None", "Read", "Write", "Manage">}                                                              |
 | GET         | iri (URL-encoded), all                    | -                         | Returns a JSON array of all users' permissions for a specific resource [{"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">}, ...] |
 | PUT         | iri (URL-encoded)                         | {"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">}    | Sets user's permissions for a specific resource                                                      |
 
 
  The API for marking entities as read-only runs on :8080/api/permissions/restricted/.
 
-| HTTP Method | Query Parameters                          | Request Body               | Effect & response                                                            |
-|-------------|-------------------------------------------|----------------------------|----------------------------------------------------------------------------- |
-| GET         | iri (URL-encoded)                         | -                          | Answers whether an entity is marked as read-only: {"value": <true or false>} |
-| PUT         | iri (URL-encoded)                         | {"value": <true or false>} | Marks an entity as (not) read-only                                           |
+| HTTP Method | Query Parameters                          | Request Body                    | Effect & response                                                                 |
+|-------------|-------------------------------------------|---------------------------------|---------------------------------------------------------------------------------- |
+| GET         | iri (URL-encoded)                         | -                               | Answers whether an entity is marked as read-only: {"restricted": <true or false>} |
+| PUT         | iri (URL-encoded)                         | {"restricted": <true or false>} | Marks an entity as (not) write-restricted                                         |
 
 
 ## How to build

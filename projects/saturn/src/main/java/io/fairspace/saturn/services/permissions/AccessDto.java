@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ValueDto<T> {
-    private T value;
+public class AccessDto {
+    private Access access;
 }
