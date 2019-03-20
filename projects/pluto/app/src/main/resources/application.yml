@@ -84,6 +84,9 @@ zuul:
     notebooks:
       path: /api/notebooks/**
       url: http://jupyterhub/
+    elasticsearch:
+      path: /api/search/*/_search
+      url: http://elasticsearch/
   ignored-patterns:
   - /actuator/**
   - /account/**

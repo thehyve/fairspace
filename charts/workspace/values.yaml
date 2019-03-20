@@ -61,17 +61,26 @@ workspace:
                 dns01Provider: clouddns
 
     testuser:
-        password: fairspace123
+      username:
+      password: fairspace123
     coordinator:
-        password: fairspace123
+      username:
+      password: fairspace123
+    datasteward:
+      username:
+      password: fairspace123
 
     # Scripts for setting up keycloak for a workspace
     configurationScripts:
       keycloak:
         enabled: true
-        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.1
+        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.2
         pullPolicy: IfNotPresent
     enableExperimentalFeatures: false
+    elasticsearch:
+        enabled: true
+        restport: 9200
+        transportport: 9300
 
 # Generic settings for tracing
 tracing:
@@ -299,6 +308,17 @@ jupyterhub:
     # length as the actual values
     # Ensure to override this value with a 64-character hex string when installing
     secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
+
+#####################################################################
+# Specific settings for ElasticSearch
+#####################################################################
+elasticsearch:
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: standard
+  data:
+    exposeHttp: true
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}

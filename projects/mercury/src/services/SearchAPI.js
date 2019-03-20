@@ -108,7 +108,17 @@ export class SearchAPI {
 let api;
 export default () => {
     if (!api) {
-        api = new SearchAPI(new elasticsearch.Client(Config.get().elasticsearch), ES_INDEX);
+        let config = Config.get().elasticsearch;
+
+        // ES cannot handle relative urls, as it will default to localhost in that case
+        if (config.host.startsWith("/")) {
+            config = {
+                ...config,
+                host: window.location.origin + config.host
+            };
+        }
+
+        api = new SearchAPI(new elasticsearch.Client(config), ES_INDEX);
     }
 
     return api;
