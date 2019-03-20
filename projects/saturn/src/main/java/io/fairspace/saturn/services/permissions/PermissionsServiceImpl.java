@@ -73,19 +73,12 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public boolean isWriteRestricted(Node resource) {
-        return calculateRead(rdf, () -> {
-            ensureHasAccess(resource, Access.Read);
-            return isWriteRestrictedUnsafe(resource);
-        });
-    }
-
-    private boolean isWriteRestrictedUnsafe(Node resource) {
-            return rdf.queryAsk(storedQuery("permissions_is_restricted", resource));
+        return rdf.queryAsk(storedQuery("permissions_is_restricted", resource));
     }
 
     @Override
     public void setWriteRestricted(Node resource, boolean restricted) {
-        commit(format("Setting fs:readOnly attribute of resource %s to %s", resource, restricted), rdf, () -> {
+        commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), rdf, () -> {
             ensureHasAccess(resource, Access.Manage);
             validate(!isCollection(resource), "Illegal operation");
             rdf.update(storedQuery("permissions_set_restricted", resource, restricted));
@@ -120,6 +113,6 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     private Access defaultAccess(Node resource) {
-        return isCollection(resource) ? Access.None : isWriteRestrictedUnsafe(resource) ? Access.Read : Access.Write;
+        return isCollection(resource) ? Access.None : isWriteRestricted(resource) ? Access.Read : Access.Write;
     }
 }
