@@ -33,8 +33,11 @@ public class PermissionsServiceImpl implements PermissionsService {
         commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
             ensureHasAccess(resource, Access.Manage);
             validate(!user.equals(userIriSupplier.get()), "A user may not change his own permissions");
-            validate(access != Access.Read || isCollection(resource), "Metadata entities can not be marked as read-only");
-            validate(access != Access.Write || isCollection(resource) || isWriteRestricted(resource), "Should be marked as write-restricted first");
+            if (!isCollection(resource)) {
+                validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
+                validate(access != Access.Write || isWriteRestricted(resource),
+                        "Regular metadata entities must be marked as write-restricted before granting permissions");
+            }
 
             if (access == Access.None) {
                 rdf.update(storedQuery("permissions_delete", resource, user));
@@ -48,6 +51,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     public Access getPermission(Node resource) {
         return calculateRead(rdf, () -> {
             validate(!isDirectory(resource) && !isFile(resource), "Retrieving permissions for a file or a directory is not supported");
+
             var processor = new QuerySolutionProcessor<>(PermissionsServiceImpl::getAccess);
             rdf.querySelect(storedQuery("permissions_get_for_user", resource, userIriSupplier.get()), processor);
             return processor.getSingle().orElseGet(() -> defaultAccess(resource));
