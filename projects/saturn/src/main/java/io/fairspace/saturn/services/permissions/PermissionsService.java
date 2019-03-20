@@ -11,7 +11,11 @@ public interface PermissionsService {
      * This method should be only called by other high-level APIs and must not be directly exposed as an API endpoint.
      * @param resource
      */
-    void createResource(Node resource);
+    void createResource(Node resource, Node authority);
+
+    default void createResource(Node resource) {
+        createResource(resource, resource);
+    }
 
     /**
      * Sets permission for a specific user and resource.

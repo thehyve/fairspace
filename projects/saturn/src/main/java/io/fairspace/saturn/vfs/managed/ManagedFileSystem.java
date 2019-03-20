@@ -8,6 +8,7 @@ import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import lombok.SneakyThrows;
@@ -35,6 +36,7 @@ import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
+import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -47,12 +49,14 @@ public class ManagedFileSystem implements VirtualFileSystem {
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
     private final CollectionsService collections;
+    private final PermissionsService permissions;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus, PermissionsService permissions) {
         this.rdf = rdf;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
         this.collections = collections;
+        this.permissions = permissions;
         eventBus.register(this);
     }
 
@@ -105,8 +109,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void mkdir(String path) throws IOException {
         ensureValidPath(path);
 
-        withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path))));
+        withCommitMessage("Create directory " + path, () -> {
+            rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
+            initPermissions(path);
+        });
     }
 
     @Override
@@ -114,8 +120,15 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(path);
 
         var blobInfo = write(in);
-        withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5())));
+        withCommitMessage("Create file " + path, () -> {
+            rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
+            initPermissions(path);
+        });
+    }
+
+    private void initPermissions(String path) throws IOException {
+        var iri = createURI(stat(path).getIri());
+        permissions.createResource(iri, getCollection(path).getIri());
     }
 
     @Override

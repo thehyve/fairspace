@@ -1,0 +1,8 @@
+# Sets a permission
+# 0 - the resource
+# 1 - the authority
+# 2 - the user
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+INSERT DATA { GRAPH ws:permissions {%1$s fs:authority %2$s; fs:manage %3$s } }

@@ -40,7 +40,7 @@ public class WebDAVIT {
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
-        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus));
+        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus, permissions));
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();
         coll.setName("My Collection");

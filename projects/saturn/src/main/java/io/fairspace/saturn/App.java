@@ -53,8 +53,8 @@ public class App {
         Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
-        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus));
         var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions));
 
         // Setup and initialize vocabularies
         var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
