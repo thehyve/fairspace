@@ -34,6 +34,7 @@
   },
   "scripts": {
     "dev": "concurrently \"yarn server:mock\" \"yarn start\" \"yarn test\" \"yarn server\"",
+    "dev:real": "concurrently \"yarn start\" \"yarn test\" \"yarn server\"",
     "server:mock": "node mock-server/server.js",
     "server": "cd ../saturn/ && ./gradlew run",
     "start": "react-scripts start",
