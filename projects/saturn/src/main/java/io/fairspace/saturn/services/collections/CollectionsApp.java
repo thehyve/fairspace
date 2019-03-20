@@ -66,7 +66,6 @@ public class CollectionsApp extends BaseApp {
         });
 
         exception(CollectionNotFoundException.class, exceptionHandler(SC_NOT_FOUND, null));
-        exception(CollectionAccessDeniedException.class, exceptionHandler(SC_UNAUTHORIZED, null));
         exception(LocationAlreadyExistsException.class, exceptionHandler(SC_CONFLICT, null));
     }
 }

@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
+import io.fairspace.saturn.services.AccessDeniedException;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
@@ -99,7 +100,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private void ensureHasAccess(Node resource, Access access) {
         if (getPermission(resource).ordinal() < access.ordinal()) {
-            throw new IllegalArgumentException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource));
+            throw new AccessDeniedException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource));
         }
     }
 

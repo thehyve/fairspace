@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.permissions;
 
+import io.fairspace.saturn.services.AccessDeniedException;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -155,5 +156,10 @@ public class PermissionsServiceImplTest {
         service.setPermission(RESOURCE, USER2, Access.Write);
         service.setWriteRestricted(RESOURCE, true);
         assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void testSettingPermissionsWithoutManageAccess() {
+        service.setPermission(createURI("http://example.com/not-my-resource"), USER1, Access.Write);
     }
 }
