@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.collections;
 
-import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -10,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -24,17 +23,17 @@ public class CollectionsServiceTest {
     private RDFConnection rdf;
     private CollectionsService collections;
     @Mock
-    private EventBus eventBus;
+    private Consumer<Object> eventListener;
 
     @Before
     public void before() {
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener);
     }
 
     @Test
-    public void basicFunctionality() throws IOException, InterruptedException {
+    public void basicFunctionality() throws InterruptedException {
         assertTrue(collections.list().isEmpty());
 
         var c1 = new Collection();
@@ -44,7 +43,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
 
         var created1 = collections.create(c1);
-        verify(eventBus, times(1)).post(new CollectionCreatedEvent(created1));
+        verify(eventListener, times(1)).accept(new CollectionCreatedEvent(created1));
         assertTrue(created1.getIri().isURI());
         assertEquals(c1.getName(), created1.getName());
         assertEquals(c1.getDescription(), created1.getDescription());
@@ -69,7 +68,7 @@ public class CollectionsServiceTest {
         patch.setDescription("new descr");
         patch.setLocation("dir2");
         collections.update(patch);
-        verify(eventBus, times(1)).post(new CollectionMovedEvent(created1, "dir1"));
+        verify(eventListener, times(1)).accept(new CollectionMovedEvent(created1, "dir1"));
 
         var updated1 = collections.get(created1.getIri().getURI());
         assertEquals("new name", updated1.getName());
@@ -93,7 +92,7 @@ public class CollectionsServiceTest {
 
         collections.delete(created2.getIri().getURI());
         assertEquals(1, collections.list().size());
-        verify(eventBus, times(1)).post(new CollectionDeletedEvent(created2));
+        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(created2));
     }
 
     @Test
@@ -118,7 +117,7 @@ public class CollectionsServiceTest {
 
             collections.create(c1);
         } finally {
-            verifyNoMoreInteractions(eventBus);
+            verifyNoMoreInteractions(eventListener);
         }
     }
 
@@ -135,8 +134,8 @@ public class CollectionsServiceTest {
             c1.setIri(null);
             collections.create(c1);
         } finally {
-            verify(eventBus, times(1)).post(any(CollectionCreatedEvent.class));
-            verifyNoMoreInteractions(eventBus);
+            verify(eventListener, times(1)).accept(any(CollectionCreatedEvent.class));
+            verifyNoMoreInteractions(eventListener);
         }
     }
 
@@ -165,8 +164,8 @@ public class CollectionsServiceTest {
 
             collections.update(patch);
         } finally {
-            verify(eventBus, times(2)).post(any(CollectionCreatedEvent.class));
-            verifyNoMoreInteractions(eventBus);
+            verify(eventListener, times(2)).accept(any(CollectionCreatedEvent.class));
+            verifyNoMoreInteractions(eventListener);
         }
     }
 }

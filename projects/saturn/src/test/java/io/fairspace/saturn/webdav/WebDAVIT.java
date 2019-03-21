@@ -39,7 +39,7 @@ public class WebDAVIT {
         var rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post);
         fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus));
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();

@@ -42,7 +42,7 @@ public class ManagedFileSystemTest {
         var rdf = connect(ds);
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post);
         fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
         var collection = new Collection();
         collection.setLocation("coll");
