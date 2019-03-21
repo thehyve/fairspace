@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
+import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
@@ -179,8 +179,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
                 .isDirectory(!row.getLiteral("isDirectory").getBoolean())
-                .created(parseXSDDateTime(row.getLiteral("created")))
-                .modified(parseXSDDateTime(row.getLiteral("modified")))
+                .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
+                .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
                 .readOnly(readOnly)
                 .build();
     }
