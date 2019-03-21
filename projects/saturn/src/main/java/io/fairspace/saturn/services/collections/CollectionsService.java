@@ -16,6 +16,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
@@ -73,6 +74,7 @@ public class CollectionsService {
                 .stream()
                 .map(this::addPermissionsToObject)
                 .filter(Objects::nonNull)
+                .sorted(comparing(Collection::getName))
                 .collect(toList());
     }
 
