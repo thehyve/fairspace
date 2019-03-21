@@ -49,8 +49,12 @@ public class SparqlUtils {
         return createURI(CONFIG.jena.baseIRI + randomUUID());
     }
 
-    public static Instant parseXSDDateTime(Literal literal) {
+    public static Instant parseXSDDateTimeLiteral(Literal literal) {
         return Instant.ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
+    }
+
+    public static Literal toXSDDateTimeLiteral(Instant instant) {
+        return createTypedLiteral(GregorianCalendar.from(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())));
     }
 
     private static String toString(Object value) {
