@@ -1,4 +1,0 @@
-pyyaml>=3.13
-Jinja2>=2.10
-argparse
-subprocess
