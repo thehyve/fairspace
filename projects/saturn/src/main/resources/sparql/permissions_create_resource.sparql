@@ -5,4 +5,5 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
+DELETE WHERE { GRAPH ws:permissions {%1$s ?p ?o } } ;
 INSERT DATA { GRAPH ws:permissions {%1$s fs:authority %2$s; fs:manage %3$s } }

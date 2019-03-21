@@ -6,6 +6,7 @@ import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDFS;
@@ -31,7 +32,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ManagedFileSystemTest {
@@ -39,9 +40,11 @@ public class ManagedFileSystemTest {
     private final byte[] content2 = new byte[]{1, 2, 3, 4};
     @Mock
     private CollectionsService collections;
+    @Mock
+    private PermissionsService permissions;
+
     private Dataset ds;
     private ManagedFileSystem fs;
-
 
     @Before
     public void before()  {
@@ -50,7 +53,8 @@ public class ManagedFileSystemTest {
         var rdf = connect(ds);
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
-        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
+        when(permissions.getPermission(any())).thenReturn(Access.Manage);
+        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus, permissions);
         var collection = new Collection();
         collection.setLocation("coll");
         collection.setIri(createURI("http://example.com/123"));
@@ -61,12 +65,24 @@ public class ManagedFileSystemTest {
     }
 
     @Test
-    public void stat() throws IOException {
+    public void statCollection() throws IOException {
         assertEquals("coll", fs.stat("coll").getPath());
         assertTrue(fs.stat("coll").isDirectory());
         assertNotNull(fs.stat("coll").getIri());
 
-        // Other cases are tested elsewhere
+        verify(permissions, never()).getPermission(createURI(fs.stat("coll").getIri()));
+    }
+
+    @Test
+    public void statDirectory() throws IOException {
+        fs.mkdir("coll/aaa");
+        var stat = fs.stat("coll/aaa");
+        assertEquals("coll/aaa", stat.getPath());
+        assertTrue(stat.isDirectory());
+        assertNotNull(stat.getIri());
+
+        verify(permissions).createResource(createURI(stat.getIri()), collections.getByLocation("coll").getIri());
+        verify(permissions, times(2)).getPermission(createURI(stat.getIri()));
     }
 
     @Test
