@@ -1,0 +1,5 @@
+# 0 - resource
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+SELECT ?authority WHERE { GRAPH ws:permissions {%1$s fs:authority ?authority}}

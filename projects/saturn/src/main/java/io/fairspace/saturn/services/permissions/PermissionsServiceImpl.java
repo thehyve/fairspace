@@ -25,8 +25,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     private final Supplier<Node> userIriSupplier;
 
     @Override
-    public void createResource(Node resource) {
-        rdf.update(storedQuery("permissions_set", resource, userIriSupplier.get(), toNode(Access.Manage)));
+    public void createResource(Node resource, Node authority) {
+        rdf.update(storedQuery("permissions_create_resource", resource, authority, userIriSupplier.get()));
     }
 
     @Override
@@ -52,22 +52,21 @@ public class PermissionsServiceImpl implements PermissionsService {
     @Override
     public Access getPermission(Node resource) {
         return calculateRead(rdf, () -> {
-            validate(!isDirectory(resource) && !isFile(resource), "Retrieving permissions for a file or a directory is not supported");
-
+            var authority = getAuthority(resource);
             var processor = new QuerySolutionProcessor<>(PermissionsServiceImpl::getAccess);
-            rdf.querySelect(storedQuery("permissions_get_for_user", resource, userIriSupplier.get()), processor);
-            return processor.getSingle().orElseGet(() -> defaultAccess(resource));
+            rdf.querySelect(storedQuery("permissions_get_for_user", authority, userIriSupplier.get()), processor);
+            return processor.getSingle().orElseGet(() -> defaultAccess(authority));
         });
     }
 
     @Override
     public Map<Node, Access> getPermissions(Node resource) {
         return calculateRead(rdf, () -> {
-            ensureHasAccess(resource, Access.Read);
-
+            var authority = getAuthority(resource);
+            ensureHasAccess(authority, Access.Read);
 
             var result = new HashMap<Node, Access>();
-            rdf.querySelect(storedQuery("permissions_get_all", resource), row ->
+            rdf.querySelect(storedQuery("permissions_get_all", authority), row ->
                     result.put(row.getResource("user").asNode(), getAccess(row)));
             return result;
         });
@@ -108,15 +107,14 @@ public class PermissionsServiceImpl implements PermissionsService {
         return rdf.queryAsk(storedQuery("is_collection", resource));
     }
 
-    private boolean isDirectory(Node resource) {
-        return rdf.queryAsk(storedQuery("is_directory", resource));
-    }
-
-    private boolean isFile(Node resource) {
-        return rdf.queryAsk(storedQuery("is_file", resource));
-    }
 
     private Access defaultAccess(Node resource) {
         return isCollection(resource) ? Access.None : isWriteRestricted(resource) ? Access.Read : Access.Write;
+    }
+
+    private Node getAuthority(Node resource) {
+        var processor = new QuerySolutionProcessor<>(row -> row.getResource("authority").asNode());
+        rdf.querySelect(storedQuery("permissions_get_authority", resource), processor);
+        return processor.getSingle().orElse(resource);
     }
 }

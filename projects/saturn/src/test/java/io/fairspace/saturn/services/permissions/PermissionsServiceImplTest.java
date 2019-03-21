@@ -21,7 +21,7 @@ public class PermissionsServiceImplTest {
     private static final Node USER1 = createURI("http://example.com/user1");
     private static final Node USER2 = createURI("http://example.com/user2");
     private static final Node USER3 = createURI("http://example.com/user3");
-    public static final Resource COLLECTION = createResource("http://fairspace.io/ontology#Collection");
+    private static final Resource COLLECTION = createResource("http://fairspace.io/ontology#Collection");
 
     private Dataset ds;
     private PermissionsService service;
@@ -83,18 +83,12 @@ public class PermissionsServiceImplTest {
         assertFalse(service.isWriteRestricted(RESOURCE));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNoPermissionsForFiles() {
-        var file = createResource("http://example.com/file");
-        ds.getDefaultModel().add(file, RDF.type, createResource("http://fairspace.io/ontology#File"));
-        service.getPermission(file.asNode());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNoPermissionsForDirectories() {
-        var dir = createResource("http://example.com/dir");
-        ds.getDefaultModel().add(dir, RDF.type, createResource("http://fairspace.io/ontology#Directory"));
-        service.getPermission(dir.asNode());
+    @Test
+    public void testGettingPermissionsForFiles() {
+        service.createResource(createURI("http://example.com/collection"));
+        service.createResource(createURI("http://example.com/file"), createURI("http://example.com/collection"));
+        ds.getDefaultModel().add(createResource("http://example.com/collection"), RDF.type, createResource("http://fairspace.io/ontology#Collection"));
+        assertEquals(Access.Manage, service.getPermission(createURI("http://example.com/file")));
     }
 
     @Test

@@ -4,23 +4,28 @@ import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
-// TODO: Check permissions
 @RequiredArgsConstructor
 @Slf4j
 public class CollectionsService {
     private final DAO dao;
     private final EventBus eventBus;
+    private final PermissionsService permissions;
 
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");
@@ -33,11 +38,10 @@ public class CollectionsService {
         }
 
         return commit("Create collection " + collection.getName(), dao, () -> {
-            if (getByLocation(collection.getLocation()) != null) {
-                throw new LocationAlreadyExistsException(collection.getLocation());
-            }
-
-            addPermissionsToObject(dao.write(collection));
+            ensureLocationIsNotUsed(collection.getLocation());
+            dao.write(collection);
+            permissions.createResource(collection.getIri());
+            collection.setAccess(Access.Manage);
             eventBus.post(new CollectionCreatedEvent(collection));
             return collection;
         });
@@ -48,17 +52,30 @@ public class CollectionsService {
     }
 
     public Collection getByLocation(String location) {
-        return dao.construct(Collection.class, storedQuery("coll_get_by_dir", location))
-                .stream()
-                .findFirst()
+        return getByLocationWithoutAccess(location)
                 .map(this::addPermissionsToObject)
                 .orElse(null);
     }
 
+    private Optional<Collection> getByLocationWithoutAccess(String location) {
+        return dao.construct(Collection.class, storedQuery("coll_get_by_dir", location))
+                .stream()
+                .findFirst();
+    }
+
+    private void ensureLocationIsNotUsed(String location) {
+        if(getByLocationWithoutAccess(location).isPresent()) {
+            throw new LocationAlreadyExistsException(location);
+        }
+    }
+
     public List<Collection> list() {
-        var result = dao.list(Collection.class);
-        result.forEach(this::addPermissionsToObject);
-        return result;
+        return dao.list(Collection.class)
+                .stream()
+                .map(this::addPermissionsToObject)
+                .filter(Objects::nonNull)
+                .sorted(comparing(Collection::getName))
+                .collect(toList());
     }
 
     public void delete(String iri) {
@@ -100,10 +117,7 @@ public class CollectionsService {
                     "Cannot change collection's type");
 
             if (patch.getLocation() != null && !patch.getLocation().equals(existing.getLocation())) {
-                var conflicting = getByLocation(patch.getLocation());
-                if (conflicting != null) {
-                    throw new LocationAlreadyExistsException(patch.getLocation());
-                }
+                ensureLocationIsNotUsed(patch.getLocation());
                 validate(isLocationValid(patch.getLocation()), "Invalid location");
             }
 
@@ -130,7 +144,10 @@ public class CollectionsService {
 
     private Collection addPermissionsToObject(Collection c) {
         if (c != null) {
-            c.setAccess(Access.Manage); // TODO: Call permissions service
+            c.setAccess(permissions.getPermission(c.getIri()));
+            if(c.getAccess() == Access.None) {
+                return null;
+            }
         }
         return c;
     }
