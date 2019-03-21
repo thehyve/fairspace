@@ -25,7 +25,8 @@ public class PermissionsApp extends BaseApp {
                     return mapper.writeValueAsString(permissionsService.getPermissions(getIri(req))
                             .entrySet()
                             .stream()
-                            .map(e -> new PermissionDto(e.getKey(), e.getValue())));
+                            .map(e -> new PermissionDto(e.getKey(), e.getValue()))
+                            .toArray());
                 }
 
                 return mapper.writeValueAsString(new AccessDto(permissionsService.getPermission(getIri(req))));
