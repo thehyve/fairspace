@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.collections;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +71,7 @@ public class CollectionsService {
             }
             if (collection.getAccess() != Access.Manage) {
                 log.info("No enough permissions to delete a collection {}", iri);
-                throw new CollectionAccessDeniedException(iri);
+                throw new AccessDeniedException("Insufficient permissions for collection " + iri);
             }
 
             dao.markAsDeleted(collection);
@@ -92,7 +93,7 @@ public class CollectionsService {
             }
             if (existing.getAccess().ordinal() < Access.Write.ordinal()) {
                 log.info("No enough permissions to modify a collection {}", patch.getIri());
-                throw new CollectionAccessDeniedException(patch.getIri().getURI());
+                throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
             }
 
             validate(patch.getType() == null || patch.getType().equals(existing.getType()),

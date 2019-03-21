@@ -1,0 +1,9 @@
+# Sets a permission
+# 0 - the resource
+# 1 - the user
+# 2 - the permission level (read, write, manage)
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+DELETE { GRAPH ws:permissions { %1$s ?p %2$s}} WHERE { GRAPH ws:permissions { %1$s ?p %2$s}} ;
+INSERT DATA { GRAPH ws:permissions {%1$s %3$s %2$s } }

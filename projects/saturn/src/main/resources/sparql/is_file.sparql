@@ -1,0 +1,5 @@
+# 0 - iri
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+ASK { %1$s a fs:File }
