@@ -8,7 +8,7 @@ import org.apache.jena.graph.Node;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermissionDto {
+public class PermissionDto implements AccessInfo {
     private Node user;
     private Access access;
 }

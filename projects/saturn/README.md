@@ -49,6 +49,9 @@ Currently a collection has the following fields, all represented as strings:
  - location
  - type
  - access
+ - canRead
+ - canWrite
+ - canManage
  - createdBy
  - dateCreated
  - modifiedBy
@@ -60,8 +63,8 @@ Currently a collection has the following fields, all represented as strings:
  
 | HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                                                                                                        |
 |-------------|-------------------------------------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET         | iri (URL-encoded)                         | -                         | Returns current user's permissions as {"access": <one of "None", "Read", "Write", "Manage">}                                                              |
-| GET         | iri (URL-encoded), all                    | -                         | Returns a JSON array of all users' permissions for a specific resource [{"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">}, ...] |
+| GET         | iri (URL-encoded)                         | -                         | Returns current user's permissions as {"access": <one of "None", "Read", "Write", "Manage">, "canRead": <true or false>, "canWrite": <true or false>, "canManage": <true or false>}                                                              |
+| GET         | iri (URL-encoded), all                    | -                         | Returns a JSON array of all users' permissions for a specific resource [{"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">, "canRead": <true or false>, "canWrite": <true or false>, "canManage": <true or false>}, ...] |
 | PUT         | iri (URL-encoded)                         | {"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">}    | Sets user's permissions for a specific resource                                                      |
 
 
