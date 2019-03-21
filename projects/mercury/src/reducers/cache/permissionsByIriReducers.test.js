@@ -1,4 +1,4 @@
-import reducer from "./permissionsByCollectionReducers";
+import reducer from "./permissionsByIriReducers";
 import {testNoChangedOnUnknownActionType} from '../../utils/testUtils';
 
 testNoChangedOnUnknownActionType('Permissions reducers', reducer);
