@@ -3,28 +3,20 @@ package io.fairspace.saturn.services.metadata;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity.CREATED_BY_IRI;
 import static io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity.DATE_CREATED_IRI;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 
 @AllArgsConstructor
 public
@@ -83,7 +75,7 @@ class MetadataEntityLifeCycleManager {
     private Model generateCreationInformation(Set<String> entities) {
         Model model = ModelFactory.createDefaultModel();
         Resource user = model.createResource(userIriSupplier.get().getURI());
-        Literal now = now();
+        Literal now = toXSDDateTimeLiteral(Instant.now());
 
         entities.forEach(uri -> {
             Resource resource = model.createResource(uri);
@@ -92,17 +84,6 @@ class MetadataEntityLifeCycleManager {
         });
 
         return model;
-    }
-
-    /**
-     * Returns a literal representing the current time
-     *
-     * @return
-     */
-    private Literal now() {
-        var zdt = ZonedDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
-        var call = GregorianCalendar.from(zdt);
-        return createTypedLiteral(call);
     }
 
     /**
