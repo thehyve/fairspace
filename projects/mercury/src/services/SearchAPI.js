@@ -18,12 +18,17 @@ export class SearchAPI {
      * @return Promise
      */
     searchForTypes = (query, types) => {
-        // Create basic query
+        // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
                 must: [{
                     query_string: {query}
-                }]
+                }],
+                must_not: {
+                    exists: {
+                        field: "dateDeleted"
+                    }
+                }
             }
         };
 
