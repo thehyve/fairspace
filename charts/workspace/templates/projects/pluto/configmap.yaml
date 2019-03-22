@@ -16,7 +16,7 @@ data:
         realm: {{ .Values.hyperspace.keycloak.realm }}
 
     keycloak:
-      workspace-login-group: {{ .Values.pluto.keycloak.loginGroupName | default (printf "%s-users" (include "workspace.name" .)) }}
+      workspace-login-group: {{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}
 
     frontend:
       urls:
@@ -31,7 +31,7 @@ data:
     security:
       oidc:
         redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}
-        required-authority: {{ .Values.pluto.keycloak.requiredAuthority | default (printf "user-%s" (include "workspace.name" .)) }}
+        required-authority: {{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}
 
     spring:
       zipkin:
