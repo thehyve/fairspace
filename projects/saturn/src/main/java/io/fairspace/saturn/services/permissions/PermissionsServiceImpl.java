@@ -98,7 +98,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     private void ensureHasAccess(Node resource, Access access) {
-        if (getPermission(resource).ordinal() < access.ordinal()) {
+        if (getPermission(resource).compareTo(access) < 0) {
             throw new AccessDeniedException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource));
         }
     }

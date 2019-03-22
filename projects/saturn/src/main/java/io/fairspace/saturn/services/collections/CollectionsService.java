@@ -86,7 +86,7 @@ public class CollectionsService {
                 log.info("Collection not found {}", iri);
                 throw new CollectionNotFoundException(iri);
             }
-            if (collection.getAccess() != Access.Manage) {
+            if (!collection.getAccess().canManage()) {
                 log.info("No enough permissions to delete a collection {}", iri);
                 throw new AccessDeniedException("Insufficient permissions for collection " + iri);
             }
@@ -108,7 +108,7 @@ public class CollectionsService {
                 log.info("Collection not found {}", patch.getIri());
                 throw new CollectionNotFoundException(patch.getIri().getURI());
             }
-            if (existing.getAccess().ordinal() < Access.Write.ordinal()) {
+            if (!existing.getAccess().canWrite()) {
                 log.info("No enough permissions to modify a collection {}", patch.getIri());
                 throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
             }
