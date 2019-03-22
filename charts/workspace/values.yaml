@@ -70,6 +70,16 @@ workspace:
       username:
       password: fairspace123
 
+    keycloak:
+      # Roles defining the keycloak roles for this workspace
+      roles:
+        user:
+        datasteward:
+
+      # Groups to retrieve a list of users from
+      groups:
+        user:
+
     # Scripts for setting up keycloak for a workspace
     configurationScripts:
       keycloak:
@@ -130,7 +140,7 @@ pluto:
 
   # Reference to the workspace for informational purposes
   # These values default to the release name and chart version
-  # The name is also used in the default setting for requiredAuthority and clientId
+  # The name is also used in the default setting for clientId
   workspace:
     name:
     version: 0.0.0-RELEASEVERSION
@@ -141,8 +151,6 @@ pluto:
       id:
       secret:
     redirectAfterLogoutUrl: https://fairspace.com
-    requiredAuthority:
-    loginGroupName:
 
   # Where to find the backends for this proxy
   backends:

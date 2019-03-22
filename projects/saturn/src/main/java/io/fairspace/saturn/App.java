@@ -2,6 +2,8 @@ package io.fairspace.saturn;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.auth.DummyAuthenticator;
+import io.fairspace.saturn.auth.SecurityUtil;
+import io.fairspace.saturn.auth.VocabularyAuthorizationVerifier;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
@@ -58,18 +60,17 @@ public class App {
 
         // Setup and initialize vocabularies
         var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
-        var metadataService = new MetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
-        var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "metavocabulary.jsonld");
+        var metadataService = new MetadataService(rdf, defaultGraphIRI, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(vocabulary));
 
-        var metadataService = new MetadataService(rdf, defaultGraphIRI, new ProtectMachineOnlyPredicatesValidator(vocabulary));
-        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
-        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, lifeCycleManager, vocabularyValidator);
+        var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "metavocabulary.jsonld");
+        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
+        var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
-                        new MetadataApp("/api/metadata", metadataService),
-                        new MetadataApp("/api/vocabulary", vocabularyService),
+                        new MetadataApp("/api/metadata", metadataService, null),
+                        new MetadataApp("/api/vocabulary", vocabularyService, vocabularyAuthorizationVerifier),
                         new CollectionsApp(collections),
                         new HealthApp()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
