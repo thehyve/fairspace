@@ -25,12 +25,23 @@ pluto:
   image:
     image: eu.gcr.io/fairspace-207108/pluto
     pullPolicy: Always
-
+    
 # Specific settings for Saturn subchart
 saturn:
   image:
     image: eu.gcr.io/fairspace-207108/saturn
     pullPolicy: Always
+  mail:
+    from: info@fairspace.com
+    user: AKIAISXHGXUIMMU75YVA
+    password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
+    transport.protocol: smtp
+    smtp:
+      host: email-smtp.us-east-1.amazonaws.com
+      port: 587
+      auth: true
+      starttls.enable: true
+
 
 # Specific settings for Mercury subchart
 mercury:
