@@ -192,7 +192,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(!row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
                 .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
-                .readOnly(access.ordinal() < Access.Write.ordinal())
+                .readOnly(!access.canWrite())
                 .build();
     }
 
@@ -204,7 +204,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
+                .readOnly(!collection.getAccess().canWrite())
                 .build();
     }
 
