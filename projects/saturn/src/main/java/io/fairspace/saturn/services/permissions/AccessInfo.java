@@ -5,18 +5,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public interface AccessInfo {
     Access getAccess();
 
-    @JsonProperty("canRead")
+    @JsonProperty
     default boolean canRead() {
-        return getAccess().compareTo(Access.Read) >= 0;
+        return getAccess().canRead();
     }
 
-    @JsonProperty("canWrite")
+    @JsonProperty
     default boolean canWrite() {
-        return getAccess().compareTo(Access.Write) >= 0;
+        return getAccess().canWrite();
     }
 
-    @JsonProperty("canManage")
+    @JsonProperty
     default boolean canManage() {
-        return getAccess().compareTo(Access.Manage) >= 0;
+        return getAccess().canManage();
     }
 }
