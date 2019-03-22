@@ -9,7 +9,7 @@ import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
 import MetadataLink from "./MetadataLink";
 
-class MetadataEntities extends React.Component {
+class MetadataList extends React.Component {
     componentDidMount() {
         this.props.fetchAllEntitiesIfNeeded();
     }
@@ -88,4 +88,4 @@ const mapDispatchToProps = {
     ...metadataActions
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(MetadataEntities));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(MetadataList));

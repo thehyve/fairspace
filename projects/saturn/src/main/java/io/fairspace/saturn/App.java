@@ -52,7 +52,7 @@ public class App {
         var userService = new UserService(new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
         var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus, permissions);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions));
 

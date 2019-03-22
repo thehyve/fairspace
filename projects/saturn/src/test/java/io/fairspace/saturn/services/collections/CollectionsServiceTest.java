@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.collections;
 
-import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
@@ -13,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -26,7 +26,7 @@ public class CollectionsServiceTest {
     private RDFConnection rdf;
     private CollectionsService collections;
     @Mock
-    private EventBus eventBus;
+    private Consumer<Object> eventListener;
     @Mock
     private PermissionsService permissions;
 
@@ -34,14 +34,14 @@ public class CollectionsServiceTest {
     public void before() {
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus, permissions);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener, permissions);
     }
 
     @Test
-    public void serviceReturnsAnEmptyListIfNoCollectionsExist() throws InterruptedException {
+    public void serviceReturnsAnEmptyListIfNoCollectionsExist() {
         assertTrue(collections.list().isEmpty());
     }
-    
+
     @Test
     public void creationOfACollectionTriggersACallToPermissionsAPI() {
         var created = collections.create(newCollection());
@@ -51,7 +51,7 @@ public class CollectionsServiceTest {
     @Test
     public void creationOfACollectionTriggersAnEvent() {
         var created = collections.create(newCollection());
-        verify(eventBus, times(1)).post(new CollectionCreatedEvent(created));
+        verify(eventListener, times(1)).accept(new CollectionCreatedEvent(created));
     }
 
     public void newlyCreatedCollectionIsProperlyInitialized() {
@@ -78,7 +78,7 @@ public class CollectionsServiceTest {
 
         assertEquals(created, collections.get(created.getIri().getURI()));
     }
-    
+
     private Collection newCollection() {
         var c = new Collection();
         c.setName("c1");
@@ -87,18 +87,18 @@ public class CollectionsServiceTest {
         c.setType("LOCAL");
         return c;
     }
-    
+
     @Test
     public void changingLocationEmitsAnEvent() {
         var created1 = collections.create(newCollection());
-        
+
         when(permissions.getPermission(eq(created1.getIri()))).thenReturn(Access.Manage);
 
         var patch = new Collection();
         patch.setIri(created1.getIri());
         patch.setLocation("dir2");
         collections.update(patch);
-        verify(eventBus, times(1)).post(new CollectionMovedEvent(created1, "dir1"));
+        verify(eventListener, times(1)).accept(new CollectionMovedEvent(created1, "dir1"));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class CollectionsServiceTest {
         patch.setDescription("new descr");
         patch.setLocation("dir2");
         collections.update(patch);
-        verify(eventBus, times(1)).post(new CollectionMovedEvent(c, "dir1"));
+        verify(eventListener, times(1)).accept(new CollectionMovedEvent(c, "dir1"));
 
         var updated = collections.get(c.getIri().getURI());
         assertEquals("new name", updated.getName());
@@ -132,7 +132,7 @@ public class CollectionsServiceTest {
         assertNull(collections.get(c.getIri().getURI()));
         assertNull(collections.getByLocation(c.getLocation()));
         assertTrue(collections.list().isEmpty());
-        verify(eventBus, times(1)).post(new CollectionDeletedEvent(c));
+        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
     }
 
     @Test
@@ -140,7 +140,7 @@ public class CollectionsServiceTest {
         var c = collections.create(newCollection());
         when(permissions.getPermission(eq(c.getIri()))).thenReturn(Access.Manage);
         collections.delete(c.getIri().getURI());
-        verify(eventBus, times(1)).post(new CollectionDeletedEvent(c));
+        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class CollectionsServiceTest {
 
             collections.create(c1);
         } finally {
-            verifyNoMoreInteractions(eventBus);
+            verifyNoMoreInteractions(eventListener);
         }
     }
 
@@ -182,8 +182,8 @@ public class CollectionsServiceTest {
             c1.setIri(null);
             collections.create(c1);
         } finally {
-            verify(eventBus, times(1)).post(any(CollectionCreatedEvent.class));
-            verifyNoMoreInteractions(eventBus);
+            verify(eventListener, times(1)).accept(any(CollectionCreatedEvent.class));
+            verifyNoMoreInteractions(eventListener);
         }
     }
 
@@ -212,8 +212,8 @@ public class CollectionsServiceTest {
             when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Manage);
             collections.update(patch);
         } finally {
-            verify(eventBus, times(2)).post(any(CollectionCreatedEvent.class));
-            verifyNoMoreInteractions(eventBus);
+            verify(eventListener, times(2)).accept(any(CollectionCreatedEvent.class));
+            verifyNoMoreInteractions(eventListener);
         }
     }
 
