@@ -10,11 +10,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.modify.request.QuadAcc;
-import org.apache.jena.sparql.modify.request.QuadDataAcc;
-import org.apache.jena.sparql.modify.request.UpdateDataDelete;
-import org.apache.jena.sparql.modify.request.UpdateDataInsert;
-import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
+import org.apache.jena.sparql.modify.request.*;
 import org.apache.jena.update.UpdateRequest;
 
 import java.util.Collection;

@@ -6,6 +6,7 @@ import com.mockrunner.mock.web.MockHttpServletResponse;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
@@ -39,7 +40,7 @@ public class WebDAVIT {
         var rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, new PermissionsServiceImpl(rdf, userIriSupplier));
         fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus));
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();

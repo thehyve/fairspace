@@ -1,6 +1,9 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
@@ -24,75 +27,120 @@ public class CollectionsServiceTest {
     private CollectionsService collections;
     @Mock
     private Consumer<Object> eventListener;
+    @Mock
+    private PermissionsService permissions;
 
     @Before
     public void before() {
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener, permissions);
     }
 
     @Test
-    public void basicFunctionality() throws InterruptedException {
+    public void serviceReturnsAnEmptyListIfNoCollectionsExist() {
         assertTrue(collections.list().isEmpty());
+    }
 
-        var c1 = new Collection();
-        c1.setName("c1");
-        c1.setLocation("dir1");
-        c1.setDescription("descr");
-        c1.setType("LOCAL");
+    @Test
+    public void creationOfACollectionTriggersACallToPermissionsAPI() {
+        var created = collections.create(newCollection());
+        verify(permissions).createResource(created.getIri());
+    }
 
-        var created1 = collections.create(c1);
-        verify(eventListener, times(1)).accept(new CollectionCreatedEvent(created1));
-        assertTrue(created1.getIri().isURI());
-        assertEquals(c1.getName(), created1.getName());
-        assertEquals(c1.getDescription(), created1.getDescription());
-        assertEquals(c1.getLocation(), created1.getLocation());
-        assertEquals(c1.getType(), created1.getType());
-        assertEquals("http://example.com/user", created1.getCreatedBy().getURI());
-        assertNotNull(created1.getDateCreated());
-        assertEquals(created1.getDateCreated(), created1.getDateModified());
+    @Test
+    public void creationOfACollectionTriggersAnEvent() {
+        var created = collections.create(newCollection());
+        verify(eventListener, times(1)).accept(new CollectionCreatedEvent(created));
+    }
 
+    public void newlyCreatedCollectionIsProperlyInitialized() {
+        var prototype = newCollection();
+        var created = collections.create(prototype);
+        assertTrue(created.getIri().isURI());
+        assertEquals(prototype.getName(), created.getName());
+        assertEquals(prototype.getDescription(), created.getDescription());
+        assertEquals(prototype.getLocation(), created.getLocation());
+        assertEquals(prototype.getType(), created.getType());
+        assertEquals("http://example.com/user", created.getCreatedBy().getURI());
+        assertNotNull(created.getDateCreated());
+        assertEquals(created.getDateCreated(), created.getDateModified());
+        assertEquals(Access.Manage, created.getAccess());
+    }
+
+    public void newlyCreatedCollectionIsAccessible() {
+        var created = collections.create(newCollection());
         assertNotNull(collections.getByLocation("dir1"));
         assertNull(collections.getByLocation("dir2"));
 
         assertEquals(1, collections.list().size());
-        assertTrue(collections.list().contains(created1));
+        assertTrue(collections.list().contains(created));
 
-        assertEquals(created1, collections.get(created1.getIri().getURI()));
+        assertEquals(created, collections.get(created.getIri().getURI()));
+    }
 
+    private Collection newCollection() {
+        var c = new Collection();
+        c.setName("c1");
+        c.setLocation("dir1");
+        c.setDescription("descr");
+        c.setType("LOCAL");
+        return c;
+    }
+
+    @Test
+    public void changingLocationEmitsAnEvent() {
+        var created1 = collections.create(newCollection());
+
+        when(permissions.getPermission(eq(created1.getIri()))).thenReturn(Access.Manage);
 
         var patch = new Collection();
         patch.setIri(created1.getIri());
+        patch.setLocation("dir2");
+        collections.update(patch);
+        verify(eventListener, times(1)).accept(new CollectionMovedEvent(created1, "dir1"));
+    }
+
+    @Test
+    public void updatesWorkAsExpected() {
+        var c = collections.create(newCollection());
+
+        when(permissions.getPermission(eq(c.getIri()))).thenReturn(Access.Manage);
+
+        var patch = new Collection();
+        patch.setIri(c.getIri());
         patch.setName("new name");
         patch.setDescription("new descr");
         patch.setLocation("dir2");
         collections.update(patch);
-        verify(eventListener, times(1)).accept(new CollectionMovedEvent(created1, "dir1"));
+        verify(eventListener, times(1)).accept(new CollectionMovedEvent(c, "dir1"));
 
-        var updated1 = collections.get(created1.getIri().getURI());
-        assertEquals("new name", updated1.getName());
-        assertEquals("new descr", updated1.getDescription());
-        assertEquals("dir2", updated1.getLocation());
-        assertNotEquals(created1.getDateModified(), updated1.getDateModified());
+        var updated = collections.get(c.getIri().getURI());
+        assertEquals("new name", updated.getName());
+        assertEquals("new descr", updated.getDescription());
+        assertEquals("dir2", updated.getLocation());
+        assertNotEquals(c.getDateModified(), updated.getDateModified());
+    }
 
-        Thread.sleep(100);
-        patch.setDescription("Description");
-        collections.update(patch);
-        var updated2 = collections.get(created1.getIri().getURI());
-        assertNotEquals(updated1.getDateModified(), updated2.getDateModified());
+    @Test
+    public void deletedCollectionIsNoLongerVisible() {
+        var c = collections.create(newCollection());
 
-        var c2 = new Collection();
-        c2.setName("c2");
-        c2.setLocation("dir3");
-        c2.setDescription("blah");
-        c2.setType("LOCAL");
-        var created2 = collections.create(c2);
-        assertEquals(2, collections.list().size());
+        when(permissions.getPermission(eq(c.getIri()))).thenReturn(Access.Manage);
 
-        collections.delete(created2.getIri().getURI());
-        assertEquals(1, collections.list().size());
-        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(created2));
+        collections.delete(c.getIri().getURI());
+        assertNull(collections.get(c.getIri().getURI()));
+        assertNull(collections.getByLocation(c.getLocation()));
+        assertTrue(collections.list().isEmpty());
+        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
+    }
+
+    @Test
+    public void deletionEmitsAnEvent() {
+        var c = collections.create(newCollection());
+        when(permissions.getPermission(eq(c.getIri()))).thenReturn(Access.Manage);
+        collections.delete(c.getIri().getURI());
+        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
     }
 
     @Test
@@ -161,11 +209,72 @@ public class CollectionsServiceTest {
             var patch = new Collection();
             patch.setIri(c1.getIri());
             patch.setLocation(c2.getLocation());
-
+            when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Manage);
             collections.update(patch);
         } finally {
             verify(eventListener, times(2)).accept(any(CollectionCreatedEvent.class));
             verifyNoMoreInteractions(eventListener);
         }
+    }
+
+    @Test
+    public void collectionsWithNonePermissionAreInvisible() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+        c1 = collections.create(c1);
+
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.None);
+
+        assertNull(collections.get(c1.getIri().getURI()));
+        assertNull(collections.getByLocation(c1.getLocation()));
+        assertTrue(collections.list().isEmpty());
+    }
+
+    @Test
+    public void collectionsWithWritePermissionCanBeModified() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+        c1 = collections.create(c1);
+
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Write);
+
+        c1.setDescription("new description");
+        collections.update(c1);
+        assertEquals("new description", collections.get(c1.getIri().getURI()).getDescription());
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void collectionsWithoutWritePermissionCannotBeModified() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+        c1 = collections.create(c1);
+
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Read);
+
+        c1.setDescription("new description");
+        collections.update(c1);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void collectionsWithoutManagePermissionCannotBeDeleted() {
+        var c1 = new Collection();
+        c1.setName("c1");
+        c1.setLocation("dir");
+        c1.setDescription("descr");
+        c1.setType("LOCAL");
+        c1 = collections.create(c1);
+
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Write);
+
+        collections.delete(c1.getIri().getURI());
     }
 }
