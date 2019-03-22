@@ -8,6 +8,18 @@ and providing the SPARQL 1.1 [protocols for query and update](http://www.w3.org/
 It can be accessed programmatically using one of [RDFConnection](https://jena.apache.org/documentation/rdfconnection/) implementations.
 For more information see [Fuseki documentation](https://jena.apache.org/documentation/fuseki2/) 
 
+### Authentication
+The application will verify the authentication by checking the provided JWT token in the `Authorization` header. The 
+signature of the token will be validated against the public keys provided by Keycloak. The URL to 
+find the keys can be configured by setting the `auth.jwksUrl` configuration property in `application.yaml`.
+
+#### Disabled authentication 
+When running the application on localhost, you may want to disabled authentication, so keycloak
+is not needed. However, parts of the application contain checks to prevent unauthorized access
+(e.g. vocabulary editing is only allowed for users with the datasteward role). For that reason, 
+you can specify a list of user-roles for the current user in the `x-fairspace-authorities` HTTP header
+sent with the request. See also the `DummyAuthenticator` class for details. 
+
 ### High-level metadata & vocabulary API
 
 The high-level metadata & vocabulary API run on :8080/api/metadata/ and :8080/api/vocabulary/.
