@@ -26,7 +26,6 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.io.File;
 import java.util.function.Supplier;
@@ -61,6 +60,7 @@ public class App {
         m.setRecipient(Message.RecipientType.TO, new InternetAddress("pavel.mikhailovskii@gmail.com"));
         m.setSubject("Hi, it's a test");
         m.setText("Body");
+        m.setFrom(new InternetAddress("pavel@thehyve.nl"));
         mailService.send(m);
         var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus, permissions);

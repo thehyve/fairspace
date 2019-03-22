@@ -35,5 +35,11 @@ webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
 mail:
-  "mail.smtp.host": "127.0.0.1"
-  "mail.smtp.auth": "false"
+  mail.from: info@fairspace.com
+  mail.user: AKIAISXHGXUIMMU75YVA
+  mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
+  mail.transport.protocol: smtp
+  mail.smtp.host: email-smtp.us-east-1.amazonaws.com
+  mail.smtp.port: 587
+  mail.smtp.auth: true
+  mail.smtp.starttls.enable: true
