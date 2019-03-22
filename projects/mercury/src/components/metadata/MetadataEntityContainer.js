@@ -1,13 +1,12 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import List from '@material-ui/core/List';
 
 import {ErrorMessage, LoadingInlay} from "../common";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadataActions";
-import MetadataProperty from "./MetadataProperty";
+import MetaEntity from "./MetaEntity";
 import {isDateTimeProperty, propertiesToShow} from "../../utils/metadataUtils";
 
-export class MetadataEntity extends React.Component {
+export class MetadataEntityContainer extends React.Component {
     componentDidMount() {
         this.load();
     }
@@ -27,7 +26,7 @@ export class MetadataEntity extends React.Component {
     }
 
     render() {
-        const {subject, metadata, error, loading, editable} = this.props;
+        const {subject, properties, error, loading, editable} = this.props;
 
         if (error) {
             return <ErrorMessage message={error.message} />;
@@ -37,25 +36,11 @@ export class MetadataEntity extends React.Component {
             return <LoadingInlay />;
         }
 
-        if (!metadata) {
+        if (!properties) {
             return null;
         }
 
-        return (
-            <List dense>
-                {
-                    propertiesToShow(metadata)
-                        .map((p) => (
-                            <MetadataProperty
-                                editable={editable && !isDateTimeProperty(p)}
-                                subject={subject}
-                                key={p.key}
-                                property={p}
-                            />
-                        ))
-                }
-            </List>
-        );
+        return <MetaEntity subject={subject} properties={properties} editable={editable} />;
     }
 }
 
@@ -74,10 +59,16 @@ const mapStateToProps = (state, ownProps) => {
         };
     }
 
+    const properties = propertiesToShow(metadata.data)
+        .map(p => ({
+            ...p,
+            editable: !isDateTimeProperty(p)
+        }));
+
     return {
         loading: metadata.pending || vocabulary.pending,
-        metadata: metadata.data
+        properties
     };
 };
 
-export default connect(mapStateToProps)(MetadataEntity);
+export default connect(mapStateToProps)(MetadataEntityContainer);

@@ -5,7 +5,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import List from '@material-ui/core/List';
 
-import ConnectedMetadata, {MetadataEntity} from "./MetadataEntity";
+import ConnectedMetadata, {MetadataEntityContainer} from "./MetadataEntityContainer";
 import Vocabulary from "../../services/Vocabulary";
 import Config from "../../services/Config/Config";
 import {PROPERTY_URI, LABEL_URI, DOMAIN_URI, CLASS_URI} from '../../constants';
@@ -83,7 +83,7 @@ it('render properties', () => {
         }
     ];
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-    const wrapper = shallow(<MetadataEntity
+    const wrapper = shallow(<MetadataEntityContainer
         metadata={metadata}
         subject={subject}
         dispatch={() => {}}
@@ -110,7 +110,7 @@ it('shows result when subject provided and data is loaded', () => {
         iri: "http://fairspace.com/iri/collections/1"
     };
 
-    const wrapper = shallow(<MetadataEntity
+    const wrapper = shallow(<MetadataEntityContainer
         metadata={metadata}
         editable
         subject={collection.iri}
@@ -170,6 +170,6 @@ it('tries to load the metadata and the vocabulary', () => {
     });
 
     const dispatch = jest.fn();
-    mount(<MetadataEntity subject="John" store={store} dispatch={dispatch} />);
+    mount(<MetadataEntityContainer subject="John" store={store} dispatch={dispatch} />);
     expect(dispatch.mock.calls.length).toEqual(1);
 });

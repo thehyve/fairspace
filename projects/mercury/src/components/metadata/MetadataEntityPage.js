@@ -3,14 +3,14 @@ import {Paper} from '@material-ui/core';
 
 import BreadCrumbs from "../common/BreadCrumbs";
 import MetadataEntityHeader from './MetadataEntityHeader';
-import MetadataEntity from './MetadataEntity';
+import MetadataEntityContainer from './MetadataEntityContainer';
 
 const metadataEntityPage = () => (
     <>
         <BreadCrumbs homeUrl="/metadata" />
         <MetadataEntityHeader subject={window.location.href} />
         <Paper style={{paddingLeft: 20}}>
-            <MetadataEntity
+            <MetadataEntityContainer
                 editable
                 subject={window.location.href}
             />
