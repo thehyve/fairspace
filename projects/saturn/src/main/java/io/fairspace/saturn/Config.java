@@ -7,6 +7,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.query.text.es.ESSettings;
 
 import java.io.File;
+import java.util.Properties;
 
 public class Config {
     public int port = 8080;
@@ -16,6 +17,8 @@ public class Config {
     public Auth auth = new Auth();
 
     public WebDAV webDAV = new WebDAV();
+
+    public Properties mail = new Properties();
 
     public static class Jena {
         public String baseIRI = "http://fairspace.io/iri/";

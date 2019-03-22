@@ -34,3 +34,6 @@ auth:
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
+mail:
+  "mail.smtp.host": "127.0.0.1"
+  "mail.smtp.auth": "false"
