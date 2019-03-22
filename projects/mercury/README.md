@@ -30,3 +30,5 @@ You can also run eslint manually by doing:
 
 ### Search
 In order for the search functionality to work, docker has to be installed and running on your machine. If you are having an issue running the search, try to stop the container running the Elasticsearch image (docker ps to see running containers and docker stop <CONTAINER_ID>) and rerun the app again.
+
+Please note that the data in ElasticSearch is not persistent. This means that every time you restart ElasticSearch, all data will be lost, and no results will be found. Only newly created entities will be visible in search
