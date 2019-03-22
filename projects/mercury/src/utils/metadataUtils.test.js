@@ -186,7 +186,7 @@ describe('Metadata Utils', () => {
 
 
     describe('propertiesToShow', () => {
-        it('should get properties to show correctly', () => {
+        it('should hide the type of an entity', () => {
             const properties = [{
                 key: "@type",
                 values: [{id: "http://fairspace.io/ontology#Collection", comment: "A specific collection in Fairspace."}]
