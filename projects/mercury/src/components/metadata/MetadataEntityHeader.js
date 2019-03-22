@@ -4,7 +4,7 @@ import {Paper} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import {linkLabel} from "../../utils/metadataUtils";
 
-const entityInformation = (props) => {
+const metadataEntityHeader = (props) => {
     const {subject, typeInfo} = props;
     return (
         <Paper style={{padding: 20}}>
@@ -35,4 +35,4 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-export default connect(mapStateToProps)(entityInformation);
+export default connect(mapStateToProps)(metadataEntityHeader);

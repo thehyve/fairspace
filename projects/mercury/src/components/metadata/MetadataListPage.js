@@ -1,10 +1,10 @@
 import React from 'react';
 import Paper from "@material-ui/core/Paper";
-import MetadataEntities from "./MetadataEntities";
+import MetadataList from "./MetadataList";
 import SearchBar from "../common/SearchBar";
 import BreadCrumbs from "../common/BreadCrumbs";
 
-const MetadataOverviewPage = () => (
+const MetadataListPage = () => (
     <>
         <BreadCrumbs />
         <Paper>
@@ -14,8 +14,8 @@ const MetadataOverviewPage = () => (
                 disableUnderline
             />
         </Paper>
-        <MetadataEntities />
+        <MetadataList />
     </>
 );
 
-export default MetadataOverviewPage;
+export default MetadataListPage;
