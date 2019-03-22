@@ -13,6 +13,8 @@ import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
+import io.fairspace.saturn.services.permissions.PermissionsApp;
+import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
@@ -51,12 +53,12 @@ public class App {
 
         var userService = new UserService(new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus));
 
-        // TODO: Add permissionsService implementation when VRE-490 is done
-        var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, null);
+        var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
         // Setup and initialize vocabularies
         var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
@@ -69,9 +71,11 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
-                        new MetadataApp("/api/metadata", metadataService, null),
-                        new MetadataApp("/api/vocabulary", vocabularyService, vocabularyAuthorizationVerifier),
+                        new MetadataApp("/api/metadata", metadataService),
+                        new MetadataApp("/api/vocabulary", vocabularyService)
+                            .withAuthorizationVerifier("/api/vocabulary/*", vocabularyAuthorizationVerifier),
                         new CollectionsApp(collections),
+                        new PermissionsApp(permissions),
                         new HealthApp()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
                 .port(CONFIG.port);

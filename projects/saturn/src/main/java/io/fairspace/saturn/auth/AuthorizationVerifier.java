@@ -6,8 +6,8 @@ import spark.Request;
 public interface AuthorizationVerifier {
     /**
      * Verifies the authorization on the given request.
-     * Throws a {@link ForbiddenException} if the user does not have proper authorization
      * @param request
+     * @return
      */
     AuthorizationResult verify(@NonNull Request request);
 }

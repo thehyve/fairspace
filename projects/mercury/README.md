@@ -2,8 +2,7 @@
 This application contains a portal UI for within a workspace. The UI is based on [Material UI](https://material-ui.com/).
 
 ### Running the app in development mode
-The app needs a backend to communicate with. For convenience, there are 2 npm/yarn scripts
-to use for local development:
+The app needs a backend to communicate with. For convenience, there are 2 npm/yarn scripts to use for local development:
 
 `yarn server` starts the backend server at port 5000. It can be configured in the file `server/server.js`
 `yarn dev` starts the server and the app itself (`yarn start`) concurrently. To open the app point to http://localhost:3000/
@@ -28,3 +27,8 @@ You can also run eslint manually by doing:
 ```
 .\node_modules\.bin\eslint <DIRECTORY/FILE LOCATION>
 ```
+
+### Search
+In order for the search functionality to work, docker has to be installed and running on your machine. If you are having an issue running the search, try to stop the container running the Elasticsearch image (docker ps to see running containers and docker stop <CONTAINER_ID>) and rerun the app again.
+
+Please note that the data in ElasticSearch is not persistent. This means that every time you restart ElasticSearch, all data will be lost, and no results will be found. Only newly created entities will be visible in search
