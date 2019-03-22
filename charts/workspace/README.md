@@ -95,9 +95,6 @@ installation.
 | `workspace.ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for workspace  | true  |
 | `workspace.ingress.tls.secretNameOverride`  | If set, this secret name is used for loading certificates for TLS. | `tls-<release name>` |
 | `workspace.ingress.tls.certificate.obtain`  | If set, a `Certificate` object will be created, such that [cert-manager](https://cert-manager.readthedocs.io/en/latest/) will request a certificate automatically. | true |
-| `workspace.keycloak.roles.user` | Role that the user must have if he wants to login to this workspace. | `user-<workspace-name>` |
-| `workspace.keycloak.roles.datasteward` | Role that the user must have if he wants to manage the vocabulary. | `datasteward-<workspace-name>` |
-| `workspace.keycloak.groups.user` | Members of this group will show up in the collaborator dropdown. These users normally always have the required authority to login. | `<workspace-name>-users` |
 
 #### Hyperspace parameters
 | Parameter  | Description  | Default |

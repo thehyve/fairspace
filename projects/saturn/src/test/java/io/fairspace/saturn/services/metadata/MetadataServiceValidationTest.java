@@ -1,8 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.services.metadata.validation.ForbiddenException;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
-import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ValidationResult;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -37,7 +35,6 @@ public class MetadataServiceValidationTest {
     private MetadataEntityLifeCycleManager lifeCycleManager;
 
     private static final ValidationResult INVALID_VALIDATION_RESULT = new ValidationResult(false, "Test error");
-    private static final ValidationResult FORBIDDEN_VALIDATION_RESULT = new ValidationResult(false, "Forbidden", ForbiddenException.class);
     private static final String GRAPH = "http://fairspace.io/iri/graph";
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
@@ -69,7 +66,7 @@ public class MetadataServiceValidationTest {
         assertTrue(model.contains(LBL_STMT1));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testPutShouldFailOnValidationError() {
         when(validator.validatePut(any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.put(createDefaultModel());
@@ -84,8 +81,8 @@ public class MetadataServiceValidationTest {
         assertTrue(model.contains(LBL_STMT1));
     }
 
-    @Test(expected = ValidationException.class)
-    public void patchShouldFailOnValidationError() {
+    @Test(expected = IllegalArgumentException.class)
+    public void patchShouldNotAcceptMachineOnlyTriples() {
         when(validator.validatePatch(any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.patch(createDefaultModel());
     }
@@ -102,9 +99,9 @@ public class MetadataServiceValidationTest {
         assertTrue(!model.contains(LBL_STMT1));
     }
 
-    @Test(expected = ValidationException.class)
-    public void deleteShouldFailOnValidationError() {
-        when(validator.validateDelete(any(), eq(MACHINE_ONLY_PROPERTY.getURI()), any())).thenReturn(INVALID_VALIDATION_RESULT);
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteShouldFailOnMachineOnlyPredicate() {
+        when(validator.validateDelete(any(), eq(MACHINE_ONLY_PROPERTY.getURI()), any())).thenReturn(new ValidationResult(false, "Test"));
         api.delete(null, MACHINE_ONLY_PROPERTY.getURI(), null);
     }
 
@@ -119,15 +116,9 @@ public class MetadataServiceValidationTest {
         assertFalse(model.contains(LBL_STMT1));
     }
 
-    @Test(expected = ValidationException.class)
-    public void deleteModelShouldFailOnValidationError() {
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteModelShouldNotAcceptMachineOnlyTriples() {
         when(validator.validateDelete(any())).thenReturn(INVALID_VALIDATION_RESULT);
-        api.delete(createDefaultModel());
-    }
-
-    @Test(expected = ForbiddenException.class)
-    public void deleteModelShouldFailWithForbiddenExceptionIfValidationReturnsForbidden() {
-        when(validator.validateDelete(any())).thenReturn(FORBIDDEN_VALIDATION_RESULT);
         api.delete(createDefaultModel());
     }
 }

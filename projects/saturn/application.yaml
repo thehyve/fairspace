@@ -31,8 +31,6 @@ auth:
   jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
   # JWK encryption algorithm. Defaults to "RS256"
   jwtAlgorithm: "RS256"
-  # Role name for data stewards, who are allowed to modify the vocabulary
-  dataStewardRole: "datasteward"
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"

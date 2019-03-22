@@ -1,8 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.PayloadParsingException;
-import io.fairspace.saturn.services.metadata.validation.ForbiddenException;
-import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import lombok.AllArgsConstructor;
 import spark.servlet.SparkApplication;
@@ -57,8 +55,6 @@ public class MetadataApp implements SparkApplication {
             exception(PayloadParsingException.class, exceptionHandler(SC_BAD_REQUEST, "Malformed request body"));
             exception(UnsupportedMediaTypeException.class, exceptionHandler(SC_UNSUPPORTED_MEDIA_TYPE, null));
             exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
-            exception(ValidationException.class, exceptionHandler(SC_BAD_REQUEST, null));
-            exception(ForbiddenException.class, exceptionHandler(SC_FORBIDDEN, null));
         });
     }
 }

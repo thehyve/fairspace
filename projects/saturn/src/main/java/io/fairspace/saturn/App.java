@@ -2,7 +2,6 @@ package io.fairspace.saturn;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.auth.DummyAuthenticator;
-import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
@@ -11,8 +10,6 @@ import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
 import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.DataStewardAccessValidator;
 import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.SafeFileSystem;
@@ -59,16 +56,13 @@ public class App {
         // TODO: Add permissionsService implementation when VRE-490 is done
         var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, null);
 
-                // Setup and initialize vocabularies
+        // Setup and initialize vocabularies
         var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
-        var metadataValidator = new ProtectMachineOnlyPredicatesValidator(vocabulary);
         var metadataService = new MetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
-
         var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "metavocabulary.jsonld");
-        var vocabularyValidator = new ComposedValidator(
-                new DataStewardAccessValidator(CONFIG.auth.dataStewardRole, SecurityUtil::userInfo),
-                new ProtectMachineOnlyPredicatesValidator(metaVocabulary)
-        );
+
+        var metadataService = new MetadataService(rdf, defaultGraphIRI, new ProtectMachineOnlyPredicatesValidator(vocabulary));
+        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
         var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, lifeCycleManager, vocabularyValidator);
 
         var fusekiServerBuilder = FusekiServer.create()
