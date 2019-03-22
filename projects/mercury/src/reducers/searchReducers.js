@@ -6,6 +6,13 @@ const initialState = {
     error: null
 };
 
+const determineErrorMessage = (payload) => {
+    switch (payload.status) {
+        case 400: return "Oops, we're unable to parse this query. Please only use alphanumeric characters.";
+        default: return "Error retrieving search results";
+    }
+}
+
 const searchReducer = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.PERFORM_SEARCH_PENDING:
@@ -25,7 +32,7 @@ const searchReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pending: false,
-                error: "Error retrieving search results"
+                error: determineErrorMessage(action.payload)
             };
         default:
             return state;
