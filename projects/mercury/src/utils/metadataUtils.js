@@ -93,8 +93,8 @@ export function getSingleValue(entity, property) {
 
 /**
  * Returns whether a property should be shown to the user
- * @param {property key} key
- * @param {property value} domain
+ * @param {string} key property key
+ * @param {string} domain property domain
  */
 export const shouldPropertyBeHidden = (key, domain) => {
     const isCollection = domain === COLLECTION_URI;
@@ -120,7 +120,7 @@ export const shouldPropertyBeHidden = (key, domain) => {
 
 /**
  * Returns a filtered list of only properties to be shown to the user
- * @param {the list of properties} properties
+ * @param {Object[]} properties the list of properties
  */
 export const propertiesToShow = (properties = []) => {
     const domainKey = properties.find(property => property.key === '@type');
