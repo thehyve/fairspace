@@ -18,9 +18,9 @@ export const fetchPermissions = createErrorHandlingPromiseAction((iri, useCache 
  * @param useCache
  * @returns {Function}
  */
-export const fetchPermissionsIfNeeded = (collectionId, useCache = false) => dispatchIfNeeded(
-    () => fetchPermissions(collectionId, useCache),
-    state => (state && state.cache && state.cache.permissionsByCollection ? state.cache.permissionsByCollection[collectionId] : undefined)
+export const fetchPermissionsIfNeeded = (iri, useCache = false) => dispatchIfNeeded(
+    () => fetchPermissions(iri, useCache),
+    state => (state && state.cache && state.cache.permissionsByIri ? state.cache.permissionsByIri[iri] : undefined)
 );
 
 export const alterPermission = createErrorHandlingPromiseAction((userId, iri, access) => ({

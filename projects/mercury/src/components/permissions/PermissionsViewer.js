@@ -174,7 +174,7 @@ class PermissionsViewer extends React.Component {
                 open={showPermissionDialog}
                 onClose={this.handleShareWithDialogClose}
                 user={selectedUser}
-                collectionId={collectionId}
+                iri={collectionId}
                 currentUser={currentUser}
             />
         );
