@@ -3,12 +3,12 @@ import {mount, shallow} from "enzyme";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
+import {List} from '@material-ui/core';
 
 import ConnectedMetadata, {MetadataEntityContainer} from "./MetadataEntityContainer";
 import Vocabulary from "../../services/Vocabulary";
 import Config from "../../services/Config/Config";
 import {PROPERTY_URI, LABEL_URI, DOMAIN_URI, CLASS_URI} from '../../constants';
-import MetaEntity from "./MetaEntity";
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
@@ -91,7 +91,7 @@ it('shows result when subject provided and data is loaded', () => {
         dispatch={() => {}}
     />);
 
-    expect(wrapper.find(MetaEntity).length).toEqual(1);
+    expect(wrapper.find(List).length).toEqual(1);
 });
 
 it('shows a message if no metadata was found', () => {

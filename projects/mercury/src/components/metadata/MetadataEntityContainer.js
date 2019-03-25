@@ -1,12 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Paper} from '@material-ui/core';
+import {Paper, List} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../common";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadataActions";
-import MetaEntity from "./MetaEntity";
 import MetaEntityHeader from './MetaEntityHeader';
 import {isDateTimeProperty, propertiesToShow, linkLabel} from "../../utils/metadataUtils";
+
+import MetadataProperty from "./MetadataProperty";
 
 export class MetadataEntityContainer extends React.Component {
     componentDidMount() {
@@ -38,7 +39,20 @@ export class MetadataEntityContainer extends React.Component {
             return <LoadingInlay />;
         }
 
-        const entity = <MetaEntity subject={subject} properties={properties} editable={editable} />;
+        const entity = (
+            <List dense>
+                {
+                    properties.map((p) => (
+                        <MetadataProperty
+                            editable={editable && p.editable}
+                            subject={subject}
+                            key={p.key}
+                            property={p}
+                        />
+                    ))
+                }
+            </List>
+        );
 
         return showHeader ? (
             <>
