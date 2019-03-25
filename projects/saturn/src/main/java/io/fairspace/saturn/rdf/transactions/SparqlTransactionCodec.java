@@ -18,7 +18,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
     private static final String TIMESTAMP_PREFIX = "# Timestamp: ";
     private static final String USER_NAME_PREFIX = "# User Name: ";
     private static final String USER_ID_PREFIX = "# User ID: ";
-    private static final String COMMIT_MESSAGE_PREFIX = "# Commit Message: ";
+    private static final String COMMIT_MESSAGE_PREFIX = "# Commit MessageBuilder: ";
     private static final String COMMITTED = "# Committed";
     private static final String ABORTED = "# Aborted";
 

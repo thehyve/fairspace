@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.mail.MailComposer;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -9,13 +10,20 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashMap;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PermissionsServiceImplTest {
     private static final Node RESOURCE = createURI("http://example.com/resource");
     private static final Node USER1 = createURI("http://example.com/user1");
@@ -26,11 +34,21 @@ public class PermissionsServiceImplTest {
     private Dataset ds;
     private PermissionsService service;
 
+    @Mock
+    private MailComposer.MessageBuilder messageBuilder;
+
+    @Mock
+    private MailComposer mailComposer;
+
     @Before
     public void setUp() {
         ds = DatasetFactory.create();
-        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> USER1);
+        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> USER1, mailComposer);
         service.createResource(RESOURCE);
+
+        when(mailComposer.newMessage(any())).thenReturn(messageBuilder);
+        when(messageBuilder.append(any())).thenReturn(messageBuilder);
+        when(messageBuilder.appendLink(any())).thenReturn(messageBuilder);
     }
 
     @Test
@@ -43,6 +61,8 @@ public class PermissionsServiceImplTest {
         assertNull(service.getPermissions(RESOURCE).get(USER2));
         service.setWriteRestricted(RESOURCE, true);
         service.setPermission(RESOURCE, USER2, Access.Write);
+        verify(mailComposer).newMessage(any());
+        verify(messageBuilder).send(USER2);
         assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.None);
         assertNull(service.getPermissions(RESOURCE).get(USER2));
@@ -106,7 +126,8 @@ public class PermissionsServiceImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testUserCannotModifyHisOwnPermission() { ;
+    public void testUserCannotModifyHisOwnPermission() {
+        ;
         service.setPermission(RESOURCE, USER1, Access.Write);
     }
 

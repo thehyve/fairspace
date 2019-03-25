@@ -7,6 +7,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
+import io.fairspace.saturn.services.mail.MailComposer;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
@@ -24,9 +25,6 @@ import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import java.io.File;
 import java.util.function.Supplier;
 
@@ -39,7 +37,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
 public class App {
-    public static void main(String[] args) throws MessagingException {
+    public static void main(String[] args) {
         log.info("Saturn is starting");
 
         var vocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "vocabulary");
@@ -56,13 +54,9 @@ public class App {
         var userService = new UserService(new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
         var mailService = new MailService(CONFIG.mail);
-        var m = mailService.newMessage();
-        m.setRecipient(Message.RecipientType.TO, new InternetAddress("pavel.mikhailovskii@gmail.com"));
-        m.setSubject("Hi, it's a test");
-        m.setText("Body");
-        m.setFrom(new InternetAddress("pavel@thehyve.nl"));
-        mailService.send(m);
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
+        var mailComposer = new MailComposer(mailService, rdf);
+
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, mailComposer);
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus, permissions);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions));

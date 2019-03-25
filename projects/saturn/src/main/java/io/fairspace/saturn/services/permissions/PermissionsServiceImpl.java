@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.mail.MailComposer;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
@@ -23,6 +24,7 @@ import static org.apache.jena.system.Txn.calculateRead;
 public class PermissionsServiceImpl implements PermissionsService {
     private final RDFConnection rdf;
     private final Supplier<Node> userIriSupplier;
+    private final MailComposer mailComposer;
 
     @Override
     public void createResource(Node resource, Node authority) {
@@ -31,9 +33,10 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void setPermission(Node resource, Node user, Access access) {
+        var managingUser = userIriSupplier.get();
         commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
             ensureHasAccess(resource, Access.Manage);
-            validate(!user.equals(userIriSupplier.get()), "A user may not change his own permissions");
+            validate(!user.equals(managingUser), "A user may not change his own permissions");
             if (!isCollection(resource)) {
                 validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
                 var isSpecifyingWriteAccessOnNonRestrictedResource = access == Access.Write && !isWriteRestricted(resource);
@@ -47,6 +50,24 @@ public class PermissionsServiceImpl implements PermissionsService {
                 rdf.update(storedQuery("permissions_set", resource, user, toNode(access)));
             }
         });
+
+        if (access != Access.None) {
+            mailComposer.newMessage("You've been granted a new permission")
+                    .append("User ")
+                    .appendLink(managingUser)
+                    .append(" granted you ")
+                    .append(access)
+                    .append(" permission to resource ")
+                    .appendLink(resource)
+                    .send(user);
+        } else {
+            mailComposer.newMessage("A permission has been revoked")
+                    .append("User ")
+                    .appendLink(managingUser)
+                    .append(" revoked your permissions for resource ")
+                    .appendLink(resource)
+                    .send(user);
+        }
     }
 
     @Override

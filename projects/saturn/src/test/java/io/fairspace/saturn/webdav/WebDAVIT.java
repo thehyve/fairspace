@@ -6,6 +6,7 @@ import com.mockrunner.mock.web.MockHttpServletResponse;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.mail.MailComposer;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
@@ -14,6 +15,9 @@ import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
 import org.apache.jena.graph.Node;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletException;
 import java.io.ByteArrayInputStream;
@@ -24,7 +28,10 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class WebDAVIT {
 
     private MiltonWebDAVServlet milton;
@@ -35,12 +42,21 @@ public class WebDAVIT {
 
     private MockHttpServletResponse res;
 
+    @Mock
+    private MailComposer.MessageBuilder messageBuilder;
+
+    @Mock
+    private MailComposer mailComposer;
+
     @Before
     public void before() {
         var rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
+//        when(mailComposer.newMessage(any())).thenReturn(messageBuilder);
+//        when(messageBuilder.append(any())).thenReturn(messageBuilder);
+//        when(messageBuilder.appendLink(any())).thenReturn(messageBuilder);
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, mailComposer);
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus, permissions);
         fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus, permissions));
         milton = new MiltonWebDAVServlet("/webdav/", fs);
