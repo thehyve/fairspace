@@ -28,9 +28,7 @@ export class MetadataEntityContainer extends React.Component {
     }
 
     render() {
-        const {
-            subject, label, typeInfo, properties, editable = true, error, loading, showHeader = false
-        } = this.props;
+        const {subject, label, typeInfo, properties, editable, error, loading, showHeader} = this.props;
 
         if (error) {
             return <ErrorMessage message={error.message} />;
@@ -38,10 +36,6 @@ export class MetadataEntityContainer extends React.Component {
 
         if (loading) {
             return <LoadingInlay />;
-        }
-
-        if (!properties) {
-            return null;
         }
 
         const entity = <MetaEntity subject={subject} properties={properties} editable={editable} />;
@@ -60,7 +54,7 @@ export class MetadataEntityContainer extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject, cache: {vocabulary}} = state;
     const subject = ownProps.subject || window.location.href;
-    const metadata = metadataBySubject[subject];
+    const metadata = metadataBySubject[subject] || {};
     const hasNoMetadata = !metadata || !metadata.data || metadata.data.length === 0;
     const hasOtherErrors = (metadata && metadata.error) || !vocabulary || vocabulary.error;
     const typeProp = metadata && metadata.data && metadata.data.find(prop => prop.key === '@type');
@@ -68,28 +62,23 @@ const mapStateToProps = (state, ownProps) => {
     const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
     const typeInfo = (typeLabel && comment) ? `${typeLabel} - ${comment}` : (typeLabel || comment);
     const label = linkLabel(subject);
-
-    if (hasNoMetadata || hasOtherErrors) {
-        const message = hasOtherErrors ? 'An error occurred while loading metadata.' : '(404) No such resource.';
-        return {
-            error: new Error(message),
-            subject,
-            label
-        };
-    }
-
-    const properties = propertiesToShow(metadata.data)
+    const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
+    const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
+    const properties = hasNoMetadata ? [] : propertiesToShow(metadata.data)
         .map(p => ({
             ...p,
-            editable: !isDateTimeProperty(p)
+            editable: editable && !isDateTimeProperty(p)
         }));
 
     return {
-        loading: metadata.pending || vocabulary.pending,
+        loading: metadata.pending || (vocabulary && vocabulary.pending),
         properties,
         subject,
         typeInfo,
-        label
+        label,
+        error,
+        showHeader: ownProps.showHeader || false,
+        editable,
     };
 };
 
