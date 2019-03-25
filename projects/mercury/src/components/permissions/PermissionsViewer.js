@@ -24,18 +24,18 @@ class PermissionsViewer extends React.Component {
     };
 
     componentDidMount() {
-        const {collectionId, fetchPermissionsIfNeeded} = this.props;
+        const {iri, fetchPermissionsIfNeeded} = this.props;
 
-        if (collectionId) {
-            fetchPermissionsIfNeeded(collectionId);
+        if (iri) {
+            fetchPermissionsIfNeeded(iri);
         }
     }
 
     componentDidUpdate() {
-        const {collectionId, fetchPermissionsIfNeeded} = this.props;
+        const {iri, fetchPermissionsIfNeeded} = this.props;
 
-        if (collectionId) {
-            fetchPermissionsIfNeeded(collectionId);
+        if (iri) {
+            fetchPermissionsIfNeeded(iri);
         }
     }
 
@@ -63,11 +63,11 @@ class PermissionsViewer extends React.Component {
     };
 
     handleDeleteCollaborator = () => {
-        const {collectionId, alterPermission} = this.props;
+        const {iri, alterPermission} = this.props;
         const {selectedUser} = this.state;
 
         if (selectedUser) {
-            alterPermission(selectedUser.subject, collectionId, 'None');
+            alterPermission(selectedUser.subject, iri, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
@@ -95,12 +95,12 @@ class PermissionsViewer extends React.Component {
         const {anchorEl, selectedPermission} = this.state;
 
         const selectedPermissionKey = selectedPermission
-            ? selectedPermission.access + selectedPermission.collectionId + selectedPermission.subject
+            ? selectedPermission.access + selectedPermission.iri + selectedPermission.subject
             : null;
 
         return sortPermissions(permissions)
             .map((p) => {
-                const key = p.access + p.collectionId + p.subject;
+                const key = p.access + p.iri + p.subject;
                 return (
                     <ListItem
                         key={key}
@@ -166,7 +166,7 @@ class PermissionsViewer extends React.Component {
     };
 
     renderPermissionDialog = () => {
-        const {collectionId, currentUser} = this.props;
+        const {iri, currentUser} = this.props;
         const {selectedUser, showPermissionDialog} = this.state;
 
         return (
@@ -174,7 +174,7 @@ class PermissionsViewer extends React.Component {
                 open={showPermissionDialog}
                 onClose={this.handleShareWithDialogClose}
                 user={selectedUser}
-                iri={collectionId}
+                iri={iri}
                 currentUser={currentUser}
             />
         );

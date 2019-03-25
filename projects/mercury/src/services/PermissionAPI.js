@@ -9,7 +9,7 @@ class PermissionAPI {
 
     /**
      * Retrieves a list of permissions for a specific collection.
-     * @param collectionId The id of the collection.
+     * @param iri The id of the resource.
      * @returns A Promise returning an array of user permissions, not including users with None permissions.
      */
     getPermissions(iri, useCache = true) {
@@ -25,7 +25,7 @@ class PermissionAPI {
 
     alterPermission(userId, iri, access) {
         if (!userId || !iri || !access) {
-            return Promise.reject(Error("No userId, collectionId or access given"));
+            return Promise.reject(Error("No userId, IRI or access given"));
         }
         return fetch(`${Config.get().urls.permissions}?${queryString.stringify({iri})}`, {
             method: 'PUT',

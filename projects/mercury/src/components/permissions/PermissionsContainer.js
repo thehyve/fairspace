@@ -9,7 +9,7 @@ const mapStateToProps = (state, ownProps) => {
         ui: {pending: {alterPermission}}
     } = state;
 
-    const collectionPermission = permissionsByIri[ownProps.collectionId] || {pending: true};
+    const collectionPermission = permissionsByIri[ownProps.iri] || {pending: true};
 
     return {
         loading: user.pending || users.pending || collectionPermission.pending,

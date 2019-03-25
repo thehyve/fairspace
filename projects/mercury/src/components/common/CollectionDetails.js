@@ -148,7 +148,7 @@ class CollectionDetails extends React.Component {
                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                         <CardContent>
                             <PermissionsContainer
-                                collectionId={collection.iri}
+                                iri={collection.iri}
                                 canManage={canManageCollection}
                             />
                         </CardContent>

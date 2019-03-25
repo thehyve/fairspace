@@ -14,7 +14,7 @@ export const fetchPermissions = createErrorHandlingPromiseAction((iri, useCache 
  * Method to retrieve permissions from the backend when the data is not available or invalidated
  * Please note that by default it does not use the browser cache (i.e. explicitly reloading from the backend)
  *
- * @param collectionId
+ * @param iri
  * @param useCache
  * @returns {Function}
  */
