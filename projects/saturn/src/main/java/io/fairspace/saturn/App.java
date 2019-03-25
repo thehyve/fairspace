@@ -2,6 +2,8 @@ package io.fairspace.saturn;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.auth.DummyAuthenticator;
+import io.fairspace.saturn.auth.SecurityUtil;
+import io.fairspace.saturn.auth.VocabularyAuthorizationVerifier;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
@@ -56,19 +58,22 @@ public class App {
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus));
 
+        var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
+
         // Setup and initialize vocabularies
         var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
-        var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "metavocabulary.jsonld");
-
-        var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
         var metadataService = new MetadataService(rdf, defaultGraphIRI, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(vocabulary));
+
+        var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "metavocabulary.jsonld");
         var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
+        var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
                         new MetadataApp("/api/metadata", metadataService),
-                        new MetadataApp("/api/vocabulary", vocabularyService),
+                        new MetadataApp("/api/vocabulary", vocabularyService)
+                            .withAuthorizationVerifier("/api/vocabulary/*", vocabularyAuthorizationVerifier),
                         new CollectionsApp(collections),
                         new PermissionsApp(permissions),
                         new HealthApp()))
