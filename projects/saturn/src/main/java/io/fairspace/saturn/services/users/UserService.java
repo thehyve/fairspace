@@ -8,11 +8,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 
 public class UserService {
     private final DAO dao;
-    private final Map<String, User> usersById = new ConcurrentHashMap<>();
+    private final Map<Node, User> usersById = new ConcurrentHashMap<>();
 
     public UserService(DAO dao) {
         this.dao = dao;
@@ -21,7 +22,7 @@ public class UserService {
     }
 
     private void loadUsers() {
-        dao.list(User.class).forEach(user -> usersById.put(user.getExternalId(), user));
+        dao.list(User.class).forEach(user -> usersById.put(user.getIri(), user));
     }
 
     /**
@@ -50,12 +51,12 @@ public class UserService {
     }
 
     private User findUser(UserInfo userInfo) {
-        return usersById.get(userInfo.getUserId());
+        return usersById.get(generateIri(userInfo.getUserId()));
     }
 
     private User createUser(UserInfo userInfo) {
         var newUser = new User();
-        newUser.setExternalId(userInfo.getUserId());
+        newUser.setIri(generateIri(userInfo.getUserId()));
         newUser.setName(userInfo.getFullName());
         newUser.setEmail(userInfo.getEmail());
         return commit("Store a new user with id " + userInfo.getUserId(), dao, () -> {
@@ -64,7 +65,7 @@ public class UserService {
                 return createdInMeantime;
             }
             dao.write(newUser);
-            usersById.put(newUser.getExternalId(), newUser);
+            usersById.put(newUser.getIri(), newUser);
             return newUser;
         });
     }

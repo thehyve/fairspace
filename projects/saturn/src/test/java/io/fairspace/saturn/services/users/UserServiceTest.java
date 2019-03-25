@@ -9,9 +9,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashSet;
+import java.util.Set;
 
-import static io.milton.http.values.HrefList.asList;
 import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertEquals;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -21,8 +20,8 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
-    private static final Node IRI = createURI("http://example.com/iri/123");
-    private static final UserInfo userInfo = new UserInfo("id1", "user1", "name1", "user1@host.com", new HashSet<>(asList("role1", "role2")));
+    private static final Node IRI = createURI("http://fairspace.io/iri/123");
+    private static final UserInfo userInfo = new UserInfo("123", "user1", "name1", "user1@host.com", Set.of("role1", "role2"));
     private static User user;
 
     @Mock
@@ -34,7 +33,6 @@ public class UserServiceTest {
     public static void before() {
         user = new User();
         user.setIri(IRI);
-        user.setExternalId(userInfo.getUserId());
         user.setName(userInfo.getFullName());
         user.setEmail(userInfo.getEmail());
 
@@ -53,7 +51,7 @@ public class UserServiceTest {
                 e.getIri().equals(IRI)
                 && e instanceof User
                 && ((User)e).getName().equals(userInfo.getFullName())
-                && ((User)e).getExternalId().equals(userInfo.getUserId())
+                && e.getIri().getURI().endsWith(userInfo.getUserId())
                 && ((User)e).getEmail().equals(userInfo.getEmail())));
 
         assertEquals(iri, service.getUserIRI(userInfo));
@@ -77,12 +75,11 @@ public class UserServiceTest {
         when(dao.list(eq(User.class))).thenReturn(singletonList(user));
         service = new UserService(dao);
 
-        var updatedUserInfo = new UserInfo("id1", "user2", "name2", "user2@host.com", new HashSet<>(asList("role1", "role2", "role3")));
+        var updatedUserInfo = new UserInfo("123", "user2", "name2", "user2@host.com", Set.of("role1", "role2", "role3"));
         service.getUserIRI(updatedUserInfo);
 
         var updatedUser = new User();
         updatedUser.setIri(IRI);
-        updatedUser.setExternalId(updatedUserInfo.getUserId());
         updatedUser.setName(updatedUserInfo.getFullName());
         updatedUser.setEmail(updatedUserInfo.getEmail());
 
