@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.collections;
 
-import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
@@ -11,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -24,7 +24,7 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 @Slf4j
 public class CollectionsService {
     private final DAO dao;
-    private final EventBus eventBus;
+    private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
 
     public Collection create(Collection collection) {
@@ -42,7 +42,7 @@ public class CollectionsService {
             dao.write(collection);
             permissions.createResource(collection.getIri());
             collection.setAccess(Access.Manage);
-            eventBus.post(new CollectionCreatedEvent(collection));
+            eventListener.accept(new CollectionCreatedEvent(collection));
             return collection;
         });
     }
@@ -86,14 +86,14 @@ public class CollectionsService {
                 log.info("Collection not found {}", iri);
                 throw new CollectionNotFoundException(iri);
             }
-            if (collection.getAccess() != Access.Manage) {
+            if (!collection.getAccess().canManage()) {
                 log.info("No enough permissions to delete a collection {}", iri);
                 throw new AccessDeniedException("Insufficient permissions for collection " + iri);
             }
 
             dao.markAsDeleted(collection);
 
-            eventBus.post(new CollectionDeletedEvent(collection));
+            eventListener.accept(new CollectionDeletedEvent(collection));
         });
     }
 
@@ -108,7 +108,7 @@ public class CollectionsService {
                 log.info("Collection not found {}", patch.getIri());
                 throw new CollectionNotFoundException(patch.getIri().getURI());
             }
-            if (existing.getAccess().ordinal() < Access.Write.ordinal()) {
+            if (!existing.getAccess().canWrite()) {
                 log.info("No enough permissions to modify a collection {}", patch.getIri());
                 throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
             }
@@ -136,7 +136,7 @@ public class CollectionsService {
 
             var updated = dao.write(existing);
             if (!updated.getLocation().equals(oldLocation)) {
-                eventBus.post(new CollectionMovedEvent(updated, oldLocation));
+                eventListener.accept(new CollectionMovedEvent(updated, oldLocation));
             }
             return updated;
         });

@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ValidationResult;
 import lombok.AllArgsConstructor;
 import org.apache.jena.atlas.lib.Pair;
@@ -10,11 +11,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.modify.request.QuadAcc;
-import org.apache.jena.sparql.modify.request.QuadDataAcc;
-import org.apache.jena.sparql.modify.request.UpdateDataDelete;
-import org.apache.jena.sparql.modify.request.UpdateDataInsert;
-import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
+import org.apache.jena.sparql.modify.request.*;
 import org.apache.jena.update.UpdateRequest;
 
 import java.util.Collection;
@@ -161,7 +158,7 @@ class MetadataService {
         if(validator != null) {
             ValidationResult validationResult = validationLogic.apply(validator);
             if(!validationResult.isValid()) {
-                throw new IllegalArgumentException(validationResult.getMessage());
+                throw new ValidationException(validationResult.getMessage());
             }
         }
     }

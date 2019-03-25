@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;

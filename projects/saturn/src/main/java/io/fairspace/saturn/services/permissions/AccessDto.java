@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccessDto {
+public class AccessDto implements AccessInfo {
     private Access access;
 }

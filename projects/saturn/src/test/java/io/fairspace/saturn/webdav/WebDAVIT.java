@@ -57,7 +57,7 @@ public class WebDAVIT {
 //        when(messageBuilder.append(any())).thenReturn(messageBuilder);
 //        when(messageBuilder.appendLink(any())).thenReturn(messageBuilder);
         var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, mailComposer);
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus, permissions);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus, permissions));
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();

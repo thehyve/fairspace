@@ -8,6 +8,18 @@ and providing the SPARQL 1.1 [protocols for query and update](http://www.w3.org/
 It can be accessed programmatically using one of [RDFConnection](https://jena.apache.org/documentation/rdfconnection/) implementations.
 For more information see [Fuseki documentation](https://jena.apache.org/documentation/fuseki2/) 
 
+### Authentication
+The application will verify the authentication by checking the provided JWT token in the `Authorization` header. The 
+signature of the token will be validated against the public keys provided by Keycloak. The URL to 
+find the keys can be configured by setting the `auth.jwksUrl` configuration property in `application.yaml`.
+
+#### Disabled authentication 
+When running the application on localhost, you may want to disabled authentication, so keycloak
+is not needed. However, parts of the application contain checks to prevent unauthorized access
+(e.g. vocabulary editing is only allowed for users with the datasteward role). For that reason, 
+you can specify a list of user-roles for the current user in the `x-fairspace-authorities` HTTP header
+sent with the request. See also the `DummyAuthenticator` class for details. 
+
 ### High-level metadata & vocabulary API
 
 The high-level metadata & vocabulary API run on :8080/api/metadata/ and :8080/api/vocabulary/.
@@ -49,6 +61,9 @@ Currently a collection has the following fields, all represented as strings:
  - location
  - type
  - access
+ - canRead
+ - canWrite
+ - canManage
  - createdBy
  - dateCreated
  - modifiedBy
@@ -60,8 +75,8 @@ Currently a collection has the following fields, all represented as strings:
  
 | HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                                                                                                        |
 |-------------|-------------------------------------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET         | iri (URL-encoded)                         | -                         | Returns current user's permissions as {"access": <one of "None", "Read", "Write", "Manage">}                                                              |
-| GET         | iri (URL-encoded), all                    | -                         | Returns a JSON array of all users' permissions for a specific resource [{"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">}, ...] |
+| GET         | iri (URL-encoded)                         | -                         | Returns current user's permissions as {"access": <one of "None", "Read", "Write", "Manage">, "canRead": <true or false>, "canWrite": <true or false>, "canManage": <true or false>}                                                              |
+| GET         | iri (URL-encoded), all                    | -                         | Returns a JSON array of all users' permissions for a specific resource [{"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">, "canRead": <true or false>, "canWrite": <true or false>, "canManage": <true or false>}, ...] |
 | PUT         | iri (URL-encoded)                         | {"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">}    | Sets user's permissions for a specific resource                                                      |
 
 
