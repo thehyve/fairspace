@@ -25,8 +25,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     private final Supplier<Node> userIriSupplier;
 
     @Override
-    public void createResource(Node resource, Node authority) {
-        rdf.update(storedQuery("permissions_create_resource", resource, authority, userIriSupplier.get()));
+    public void createResource(Node resource) {
+        rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
     }
 
     @Override
@@ -113,8 +113,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     private Node getAuthority(Node resource) {
-        var processor = new QuerySolutionProcessor<>(row -> row.getResource("authority").asNode());
-        rdf.querySelect(storedQuery("permissions_get_authority", resource), processor);
+        var processor = new QuerySolutionProcessor<>(row -> row.getResource("collection").asNode());
+        rdf.querySelect(storedQuery("get_parent_collection", resource), processor);
         return processor.getSingle().orElse(resource);
     }
 }

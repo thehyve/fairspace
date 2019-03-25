@@ -81,8 +81,7 @@ public class ManagedFileSystemTest {
         assertTrue(stat.isDirectory());
         assertNotNull(stat.getIri());
 
-        verify(permissions).createResource(createURI(stat.getIri()), collections.getByLocation("coll").getIri());
-        verify(permissions, times(2)).getPermission(createURI(stat.getIri()));
+        verify(permissions).getPermission(createURI(stat.getIri()));
     }
 
     @Test
