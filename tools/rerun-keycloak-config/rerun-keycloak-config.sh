@@ -38,16 +38,6 @@ mkdir -p "${chartname}/templates" "${chartname}/charts"
 cp ../../charts/workspace/values.yaml "$chartname"
 cp ../../charts/workspace/templates/_helpers.tpl "$chartname/templates"
 
-# Need to remove the hook, because otherwise helm will be unable to deploy
-# the job by itself, since helm considers jobs with hooks to be unmanaged.
-# See https://github.com/helm/helm/issues/4670 for additional information.
-grep -v "helm.sh/hook" ../../charts/workspace/templates/config/configure-keycloak-job.yaml \
-   | grep -v "^annotations:" \
-   | sed "s/{{\.Release\.Name}}\-keycloak\-config\-map/$releasename-keycloak-config-map/" \
-   | sed "s/name: \"{{ template \"workspace\.fullname\" \. }}\-/name: \"$releasename-/" \
-   | sed "s/name: \"{{ \.Release\.Name }}\-/name: \"$releasename-/" \
-   > "$chartname/templates/configure-keycloak-job.yaml"
-
 cat > "$chartname/Chart.yaml" << EOF
 apiVersion: v1
 appVersion: "1.0"
@@ -56,17 +46,10 @@ name: $chartname
 version: 0.1
 EOF
 
-echo "Checking whether we first need to remove old manual config helm chart ..."
-if   helm list -q | grep -q "^${chartname}$"
-then echo "Removing old manual config helm chart ..."
-     helm delete --purge "$chartname"
-else echo "No need to remove old manual config helm chart."
-fi
-
-echo "Deploying new version of manual config helm chart ..."
-helm upgrade --install "$chartname" "$chartname" --namespace "$namespace" --values "$valuesfile"
-
-echo "Cleaning up temporary helm chart"
-rm -rf "$chartname"
+echo "Deploying keycloak config job..."
+helm install --debug --dry-run "./keycloak-manconf-${releasename}" --name keycloak-manconf \
+   --values "$valuesfile" --namespace "$namespace" | \
+   awk '/^# Source:.*\/configure\-keycloak\-job\.yaml$/{p=1;next}p' |
+   kubectl apply -f - --namespace "$namespace"
 
 echo "Script finished. You can use \"fr logs keycloak-manconf-${releasename}-keycloak-configuration\" to monitor progress of the job."
