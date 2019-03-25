@@ -114,6 +114,21 @@ it('shows a message if no metadata was found', () => {
     expect(wrapper.text()).toContain("An error occurred");
 });
 
+it('shows error when no subject provided', () => {
+    const store = mockStore({
+        metadataBySubject: {},
+        cache: {
+            vocabulary:
+            {
+                data: new Vocabulary(vocabulary)
+            }
+        }
+    });
+    const wrapper = mount(<ConnectedMetadata subject={null} store={store} />);
+
+    expect(wrapper.text()).toContain("An error occurred");
+});
+
 it('tries to load the metadata and the vocabulary', () => {
     const store = mockStore({
         cache: {
