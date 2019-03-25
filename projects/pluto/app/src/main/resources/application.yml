@@ -78,6 +78,9 @@ zuul:
     collections:
       path: /api/collections/**
       url: http://saturn/api/collections/
+    permissions:
+      path: /api/permissions/**
+      url: http://saturn/api/permissions/
     ui:
       path: /**
       url: http://mercury/

@@ -159,6 +159,7 @@ pluto:
     vocabulary:
     storage:
     collections:
+    permissions:
 
 #####################################################################
 # Specific settings for Saturn subchart
