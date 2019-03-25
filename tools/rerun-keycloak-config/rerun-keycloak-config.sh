@@ -34,7 +34,7 @@ fi
 chartname="$(echo "keycloak-manconf-${releasename}" | cut -c 1-63)"
 
 echo "Dynamically creating temporary helm chart $chartname for configuration job ..."
-helm create "$chartname"
+mkdir -p "${chartname}/templates" "${chartname}/charts"
 cp ../../charts/workspace/values.yaml "$chartname"
 cp ../../charts/workspace/templates/_helpers.tpl "$chartname/templates"
 
@@ -47,10 +47,6 @@ grep -v "helm.sh/hook" ../../charts/workspace/templates/config/configure-keycloa
    | sed "s/name: \"{{ template \"workspace\.fullname\" \. }}\-/name: \"$releasename-/" \
    | sed "s/name: \"{{ \.Release\.Name }}\-/name: \"$releasename-/" \
    > "$chartname/templates/configure-keycloak-job.yaml"
-
-for file in deployment.yaml ingress.yaml service.yaml NOTES.txt
-do rm "$chartname/templates/$file"
-done
 
 cat > "$chartname/Chart.yaml" << EOF
 apiVersion: v1
