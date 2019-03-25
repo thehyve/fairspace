@@ -3,6 +3,7 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.http.Auth;
+import io.milton.http.HttpManager;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -20,8 +21,8 @@ import java.nio.file.FileSystemException;
 import java.util.Date;
 import java.util.List;
 
-import static io.fairspace.saturn.vfs.PathUtils.name;
-import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
+import static io.fairspace.saturn.vfs.PathUtils.*;
+import static io.milton.common.Utils.getDecodedDestination;
 import static java.util.Collections.singletonList;
 
 @Slf4j
@@ -33,7 +34,7 @@ public abstract class VfsBackedMiltonResource implements
     protected final VirtualFileSystem fs;
     protected final FileInfo info;
 
-    protected VfsBackedMiltonResource(VirtualFileSystem fs, FileInfo info) {
+    VfsBackedMiltonResource(VirtualFileSystem fs, FileInfo info) {
         this.fs = fs;
         this.info = info;
     }
@@ -55,6 +56,7 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public void delete() throws NotAuthorizedException, ConflictException, BadRequestException {
+        ensureIsWriteable();
         try {
             fs.delete(info.getPath());
         } catch (IOException e) {
@@ -89,7 +91,12 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        return !(method.isWrite && info.isReadOnly());
+        // This method is called twice for COPY and MOVE operations, for each side of an operation.
+        // Unfortunately, there's no simple and reliable way to understand on which side you currently are.
+        // That would require comparison of the request's URL with the resource's path, taking the path prefix into account, etc.
+        // Luckily, methods like copyTo can throw NotAuthorizedException, making it possible to implement the necessary checks in those methods.
+        // See ensureIsWriteable and its usages.
+        return true;
     }
 
     @Override
@@ -112,10 +119,11 @@ public abstract class VfsBackedMiltonResource implements
         return getName().compareTo(resource.getName());
     }
 
-    private static void checkTarget(CollectionResource c) throws BadRequestException {
+    private static void checkTarget(CollectionResource c) throws BadRequestException, NotAuthorizedException {
         if (!(c instanceof VfsBackedMiltonDirectoryResource)) {
             throw new BadRequestException("Unsupported target resource type");
         }
+        ((VfsBackedMiltonDirectoryResource) c).ensureIsWriteable();
     }
 
     @Override
@@ -144,7 +152,7 @@ public abstract class VfsBackedMiltonResource implements
         return singletonList(IRI_PROPERTY);
     }
 
-    protected void onException(Exception e) throws NotAuthorizedException, BadRequestException, ConflictException {
+    void onException(Exception e) throws NotAuthorizedException, BadRequestException, ConflictException {
         log.error("A WebDAV operation resulted in an error", e);
         if (e instanceof AccessDeniedException) {
             throw new NotAuthorizedException(this, e);
@@ -156,5 +164,11 @@ public abstract class VfsBackedMiltonResource implements
             throw (RuntimeException) e;
         }
         throw new RuntimeException(e);
+    }
+
+    void ensureIsWriteable() throws NotAuthorizedException {
+        if (info.isReadOnly()) {
+            throw new NotAuthorizedException(this);
+        }
     }
 }
