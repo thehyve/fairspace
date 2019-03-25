@@ -150,7 +150,7 @@ pluto:
     client:
       id:
       secret:
-    redirectAfterLogoutUrl: https://fairspace.com
+    redirectAfterLogoutUrl:
 
   # Where to find the backends for this proxy
   backends:
