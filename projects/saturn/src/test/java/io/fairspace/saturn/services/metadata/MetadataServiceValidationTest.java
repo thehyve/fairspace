@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ValidationResult;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -66,7 +67,7 @@ public class MetadataServiceValidationTest {
         assertTrue(model.contains(LBL_STMT1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void testPutShouldFailOnValidationError() {
         when(validator.validatePut(any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.put(createDefaultModel());
@@ -81,7 +82,7 @@ public class MetadataServiceValidationTest {
         assertTrue(model.contains(LBL_STMT1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void patchShouldNotAcceptMachineOnlyTriples() {
         when(validator.validatePatch(any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.patch(createDefaultModel());
@@ -99,7 +100,7 @@ public class MetadataServiceValidationTest {
         assertTrue(!model.contains(LBL_STMT1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void deleteShouldFailOnMachineOnlyPredicate() {
         when(validator.validateDelete(any(), eq(MACHINE_ONLY_PROPERTY.getURI()), any())).thenReturn(new ValidationResult(false, "Test"));
         api.delete(null, MACHINE_ONLY_PROPERTY.getURI(), null);
@@ -116,7 +117,7 @@ public class MetadataServiceValidationTest {
         assertFalse(model.contains(LBL_STMT1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void deleteModelShouldNotAcceptMachineOnlyTriples() {
         when(validator.validateDelete(any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.delete(createDefaultModel());

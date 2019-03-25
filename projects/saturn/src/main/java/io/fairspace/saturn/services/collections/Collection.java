@@ -4,13 +4,14 @@ import io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity;
 import io.fairspace.saturn.rdf.dao.RDFProperty;
 import io.fairspace.saturn.rdf.dao.RDFType;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.AccessInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @RDFType("http://fairspace.io/ontology#Collection")
-public class Collection extends LifecycleAwarePersistentEntity {
+public class Collection extends LifecycleAwarePersistentEntity implements AccessInfo {
     @RDFProperty(value = "http://www.w3.org/2000/01/rdf-schema#label", required = true)
     private String name;
 

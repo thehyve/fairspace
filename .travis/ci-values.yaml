@@ -18,7 +18,7 @@ workspace:
   configurationScripts:
     keycloak:
       enabled: true
-      image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.1
+      image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.2
       pullPolicy: IfNotPresent
 
 pluto:

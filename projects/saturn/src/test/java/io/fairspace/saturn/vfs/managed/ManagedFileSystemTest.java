@@ -1,16 +1,19 @@
 package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
-import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.permissions.Access;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,6 +22,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -26,14 +30,18 @@ import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ManagedFileSystemTest {
     private final byte[] content1 = new byte[]{1, 2, 3};
     private final byte[] content2 = new byte[]{1, 2, 3, 4};
-
+    @Mock
     private CollectionsService collections;
     private Dataset ds;
     private ManagedFileSystem fs;
+
 
     @Before
     public void before()  {
@@ -42,13 +50,14 @@ public class ManagedFileSystemTest {
         var rdf = connect(ds);
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus);
         fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
         var collection = new Collection();
         collection.setLocation("coll");
-        collection.setName("My Collection");
-        collection.setType("LOCAL");
-        collections.create(collection);
+        collection.setIri(createURI("http://example.com/123"));
+        collection.setAccess(Access.Manage);
+
+        when(collections.list()).thenReturn(singletonList(collection));
+        when(collections.getByLocation(any())).thenReturn(collection);
     }
 
     @Test

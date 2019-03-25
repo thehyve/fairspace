@@ -42,6 +42,8 @@ public class Config {
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
         public String jwtAlgorithm = "RS256";
+
+        public String dataStewardRole = "datasteward";
     }
 
     public static class WebDAV {
