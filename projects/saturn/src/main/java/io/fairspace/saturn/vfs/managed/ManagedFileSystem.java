@@ -67,7 +67,9 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
 
         if (isCollection(path)) {
-            return ofNullable(collections.getByLocation(path)).map(ManagedFileSystem::fileInfo).orElse(null);
+            return ofNullable(collections.getByLocation(path))
+                    .map(ManagedFileSystem::fileInfo)
+                    .orElse(null);
         }
 
         var processor = new QuerySolutionProcessor<>(this::fileInfo);
