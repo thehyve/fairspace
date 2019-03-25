@@ -49,7 +49,14 @@ export class SearchAPI {
                     }
                 }
             }
-        }).then(this.transformESResult);
+        })
+            .then(this.transformESResult)
+            .catch((error) => {
+                switch (error.status) {
+                    case 400: throw new Error("Oops, we're unable to parse this query. Please only use alphanumeric characters.");
+                    default: throw new Error("Error retrieving search results");
+                }
+            });
     };
 
     /**
