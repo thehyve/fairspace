@@ -38,10 +38,10 @@ webDAV:
   blobStorePath: "data/blobs"
 mail:
   mail.from: info@fairspace.com
-  mail.user: AKIAISXHGXUIMMU75YVA
-  mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
+  mail.user:
+  mail.password:
   mail.transport.protocol: smtp
-  mail.smtp.host: email-smtp.us-east-1.amazonaws.com
+  mail.smtp.host:
   mail.smtp.port: 587
   mail.smtp.auth: true
   mail.smtp.starttls.enable: true
