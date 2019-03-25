@@ -47,6 +47,7 @@ export class SearchAPI {
         return this.client.search({
             index: this.index,
             body: {
+                size: 50,
                 query: esQuery,
                 highlight: {
                     fields: {
