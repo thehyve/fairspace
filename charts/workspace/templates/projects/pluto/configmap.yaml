@@ -30,7 +30,7 @@ data:
 
     security:
       oidc:
-        redirect-after-logout-uri: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "workspace.url" .) }}
+        redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "workspace.url" .) }}
         required-authority: {{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}
 
     spring:
