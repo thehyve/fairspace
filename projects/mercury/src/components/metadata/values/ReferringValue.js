@@ -18,7 +18,7 @@ const ReferringValue = ({property, entry}) => {
         return extractedVal;
     }
 
-    const displayValue = (property.range === RESOURCE_URI) ? entry.id : extractDisplayValue(entry);
+    const displayValue = (property.className === RESOURCE_URI) ? entry.id : extractDisplayValue(entry);
 
     if (entry.id) {
         return (

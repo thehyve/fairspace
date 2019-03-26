@@ -12,6 +12,27 @@ import {
 
 
 /**
+ * Returns the value of the given property on the first entry of the predicate for the metadat
+ * @param metadataEntry     An expanded metadata object with keys being the predicates
+ * @param predicate         The predicate to search for
+ * @param property          The property to return for the found object. Mostly '@id' or '@value' are used
+ * @param defaultValue      A default value to be returned if no value could be found for the metadata entry
+ * @returns {*}
+ */
+export const getFirstPredicateProperty = (metadataEntry, predicate, property, defaultValue) => {
+    return metadataEntry && metadataEntry[predicate] && metadataEntry[predicate][0] ? metadataEntry[predicate][0][property] : defaultValue;
+};
+
+export const getFirstPredicateValue = (metadataEntry, predicate, defaultValue) => {
+    return getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
+};
+
+export const getFirstPredicateId = (metadataEntry, predicate, defaultValue) => {
+    return getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
+};
+
+
+/**
  *
  * @param uri the URI to generate a label for
  * @param shortenExternalUris if true will generate a short label even if a URI doesn't belong to the current workspace
@@ -43,23 +64,18 @@ export function linkLabel(uri, shortenExternalUris = false) {
 /**
  * Returns the label for the given entity.
  *
- * If an rdfs:label is present, that label is used. Otherwise
- * the last part of the id is returned
+ * If an rdfs:label is present, that label is used.
+ * If an sh:name is present, that label is used
+ * Otherwise the last part of the id is returned
  *
  * @param entity    Expanded JSON-LD entity
  * @param shortenExternalUris Shorten external URIs
  * @returns string
  */
 export function getLabel(entity, shortenExternalUris = false) {
-    if (
-        Array.isArray(entity[LABEL_URI])
-        && entity[LABEL_URI].length > 0
-        && entity[LABEL_URI][0]['@value']
-    ) {
-        return entity[LABEL_URI][0]['@value'];
-    }
-    const id = entity['@id'];
-    return id && linkLabel(id, shortenExternalUris);
+    return getFirstPredicateValue(entity, LABEL_URI)
+        || getFirstPredicateValue(entity, 'http://www.w3.org/ns/shacl#name')
+        || (entity && entity['@id'] && linkLabel(entity['@id'], shortenExternalUris));
 }
 
 /**
@@ -73,22 +89,13 @@ export function relativeLink(link) {
 }
 
 export function isDateTimeProperty(property) {
-    return property.range === 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
+    return property.datatype === 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
 }
 
 export function generateUuid() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g,
         // eslint-disable-next-line
         c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
-}
-
-export function getValues(entity, property) {
-    return (entity[property] || []).map(v => v['@value'] || v['@id']);
-}
-
-export function getSingleValue(entity, property) {
-    const values = getValues(entity, property);
-    return (values.length > 0) ? values[0] : undefined;
 }
 
 /**

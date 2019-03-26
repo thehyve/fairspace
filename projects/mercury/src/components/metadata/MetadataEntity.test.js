@@ -8,7 +8,6 @@ import List from '@material-ui/core/List';
 import ConnectedMetadata, {MetadataEntity} from "./MetadataEntity";
 import Vocabulary from "../../services/Vocabulary";
 import Config from "../../services/Config/Config";
-import {PROPERTY_URI, LABEL_URI, DOMAIN_URI, CLASS_URI} from '../../constants';
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
@@ -24,46 +23,6 @@ beforeAll(() => {
 
     return Config.init();
 });
-
-const vocabulary = [
-    {
-        "@id": "@type",
-        '@type': PROPERTY_URI,
-        [LABEL_URI]: [{'@value': 'Type'}],
-        [DOMAIN_URI]: [
-            {"@id": "http://fairspace.io/ontology#Collection"}
-        ]
-    },
-    {
-        '@id': 'http://www.w3.org/2000/01/rdf-schema#label',
-        '@type': PROPERTY_URI,
-        [LABEL_URI]: [{'@value': 'Name'}],
-        [DOMAIN_URI]: [{'@id': 'http://fairspace.io/ontology#Collection'}]
-    },
-    {
-        '@id': 'http://fairspace.io/ontology#description',
-        '@type': PROPERTY_URI,
-        [LABEL_URI]: [{'@value': 'Description'}],
-        [DOMAIN_URI]: [{'@id': 'http://fairspace.io/ontology#Collection'}]
-    },
-    {
-        '@id': 'http://schema.org/Creator',
-        '@type': PROPERTY_URI,
-        [LABEL_URI]: [{'@value': 'Creator'}],
-        [DOMAIN_URI]: []
-    },
-    {
-        '@id': 'http://schema.org/CreatedDate',
-        '@type': PROPERTY_URI,
-        [LABEL_URI]: [{'@value': 'Created date'}],
-        [DOMAIN_URI]: [{'@id': 'http://fairspace.io/ontology#Collection'}]
-    },
-    {
-        '@id': 'http://fairspace.io/ontology#Collection',
-        '@type': CLASS_URI,
-        [LABEL_URI]: [{'@value': 'Collection'}]
-    }
-];
 
 it('render properties', () => {
     const metadata = [
@@ -130,7 +89,7 @@ it('shows a message if no metadata was found', () => {
         cache: {
             vocabulary:
             {
-                data: new Vocabulary(vocabulary)
+                data: new Vocabulary([])
             }
         }
     });
@@ -146,7 +105,7 @@ it('shows error when no subject provided', () => {
         cache: {
             vocabulary:
             {
-                data: new Vocabulary(vocabulary)
+                data: new Vocabulary([])
             }
         }
     });
@@ -164,7 +123,7 @@ it('tries to load the metadata and the vocabulary', () => {
                 }
             },
             vocabulary: {
-                data: new Vocabulary(vocabulary)
+                data: new Vocabulary([])
             }
         }
     });

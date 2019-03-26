@@ -14,8 +14,8 @@ class MetadataList extends React.Component {
         this.props.fetchAllEntitiesIfNeeded();
     }
 
-    handleEntityCreation = (type, id) => {
-        this.props.createMetadataEntity(type, id)
+    handleEntityCreation = (shape, id) => {
+        this.props.createMetadataEntity(shape, id)
             .then((res) => {
                 this.props.fetchAllEntitiesIfNeeded();
                 this.props.history.push(relativeLink(res.value));
