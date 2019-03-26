@@ -112,6 +112,11 @@ public class PermissionsServiceImpl implements PermissionsService {
         return isCollection(resource) ? Access.None : isWriteRestricted(resource) ? Access.Read : Access.Write;
     }
 
+    /**
+
+     * @param resource
+     * @return an authoritative resource for the given resource: currently either the parent collection (for files and directories) or the resource itself
+     */
     private Node getAuthority(Node resource) {
         var processor = new QuerySolutionProcessor<>(row -> row.getResource("collection").asNode());
         rdf.querySelect(storedQuery("get_parent_collection", resource), processor);
