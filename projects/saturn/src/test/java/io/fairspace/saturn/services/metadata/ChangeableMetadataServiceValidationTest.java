@@ -35,14 +35,13 @@ public class ChangeableMetadataServiceValidationTest {
     @Mock
     private MetadataEntityLifeCycleManager lifeCycleManager;
 
-    private static final ValidationResult INVALID_VALIDATION_RESULT = new ValidationResult(false, "Test error");
+    private static final ValidationResult INVALID_VALIDATION_RESULT = new ValidationResult("Test error");
     private static final String GRAPH = "http://fairspace.io/iri/graph";
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
     private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
     private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
 
-    private static final Property MACHINE_ONLY_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");
 
     private static final Statement STMT1 = createStatement(S1, P1, S2);
 
@@ -75,7 +74,8 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testPatchShouldSucceedOnValidationSuccess() {
-        when(validator.validatePatch(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validatePut(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
         api.patch(createDefaultModel().add(LBL_STMT1));
 
         Model model = ds.getNamedModel(GRAPH);
@@ -84,26 +84,16 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test(expected = ValidationException.class)
     public void patchShouldNotAcceptMachineOnlyTriples() {
-        when(validator.validatePatch(any())).thenReturn(INVALID_VALIDATION_RESULT);
+        when(validator.validatePut(any())).thenReturn(INVALID_VALIDATION_RESULT);
+        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
         api.patch(createDefaultModel());
     }
 
-
-    @Test
-    public void testDeleteShouldSucceedOnValidationSuccess() {
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
-
-        when(validator.validateDelete(any(), any(), any())).thenReturn(ValidationResult.VALID);
-        api.delete(S1.getURI(), null, null);
-
-        Model model = ds.getNamedModel(GRAPH);
-        assertTrue(!model.contains(LBL_STMT1));
-    }
-
     @Test(expected = ValidationException.class)
-    public void deleteShouldFailOnMachineOnlyPredicate() {
-        when(validator.validateDelete(any(), eq(MACHINE_ONLY_PROPERTY.getURI()), any())).thenReturn(new ValidationResult(false, "Test"));
-        api.delete(null, MACHINE_ONLY_PROPERTY.getURI(), null);
+    public void patchShouldNotDeleteMachineOnlyTriples() {
+        when(validator.validatePut(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validateDelete(any())).thenReturn(INVALID_VALIDATION_RESULT);
+        api.patch(createDefaultModel());
     }
 
     @Test

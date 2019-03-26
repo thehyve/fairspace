@@ -23,18 +23,8 @@ public class ComposedValidator implements MetadataRequestValidator{
     }
 
     @Override
-    public ValidationResult validatePatch(Model model) {
-        return validateComposed(validator -> validator.validatePatch(model));
-    }
-
-    @Override
     public ValidationResult validateDelete(Model model) {
         return validateComposed(validator -> validator.validateDelete(model));
-    }
-
-    @Override
-    public ValidationResult validateDelete(String subject, String predicate, String object) {
-        return validateComposed(validator -> validator.validateDelete(subject, predicate, object));
     }
 
     /**
@@ -42,16 +32,8 @@ public class ComposedValidator implements MetadataRequestValidator{
      * @param validationLogic   Logic to be called on each validator. For example: validator -> validator.validatePut(model)
      */
     ValidationResult validateComposed(Function<MetadataRequestValidator, ValidationResult> validationLogic) {
-        ValidationResult composedValidationResult = ValidationResult.VALID;
-
-        for(MetadataRequestValidator validator: validators) {
-            ValidationResult validationResult = validationLogic.apply(validator);
-            if(!validationResult.isValid()) {
-                composedValidationResult = composedValidationResult.merge(validationResult);
-            }
-        }
-
-        return composedValidationResult;
+        return validators.stream()
+                .map(validationLogic)
+                .reduce(ValidationResult.VALID, ValidationResult::merge);
     }
-
 }
