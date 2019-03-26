@@ -120,10 +120,11 @@ public abstract class VfsBackedMiltonResource implements
     }
 
     private static void checkTarget(CollectionResource c) throws BadRequestException, NotAuthorizedException {
-        if (!(c instanceof VfsBackedMiltonDirectoryResource)) {
-            throw new BadRequestException("Unsupported target resource type");
+        if (c instanceof VfsBackedMiltonDirectoryResource) {
+            ((VfsBackedMiltonDirectoryResource) c).ensureIsWriteable();
         }
-        ((VfsBackedMiltonDirectoryResource) c).ensureIsWriteable();
+
+        throw new BadRequestException("Unsupported target resource type");
     }
 
     @Override
