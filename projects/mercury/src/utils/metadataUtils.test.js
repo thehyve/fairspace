@@ -1,13 +1,20 @@
 import nodeCrypto from "crypto";
 import {
-    generateUuid, getLabel, getSingleValue, getValues,
-    linkLabel, relativeLink, shouldPropertyBeHidden,
+    generateUuid,
+    getFirstPredicateId,
+    getFirstPredicateValue,
+    getLabel,
+    getValues,
+    linkLabel,
     propertiesToShow,
+    relativeLink,
+    shouldPropertyBeHidden,
 } from "./metadataUtils";
 import {
     COLLECTION_URI,
     COMMENT_URI,
-    DATE_DELETED_URI, DELETED_BY_URI,
+    DATE_DELETED_URI,
+    DELETED_BY_URI,
     DIRECTORY_URI,
     FILE_PATH_URI,
     FILE_URI,
@@ -37,6 +44,10 @@ describe('Metadata Utils', () => {
     describe('getLabel', () => {
         it('should return the label if present', () => {
             expect(getLabel({[LABEL_URI]: [{'@value': 'My label'}]})).toEqual('My label');
+        });
+
+        it('should return the shacl name if no label is present', () => {
+            expect(getLabel({'http://www.w3.org/ns/shacl#name': [{'@value': 'My label'}]})).toEqual('My label');
         });
 
         it('should not fail if json-ld is not properly expanded', () => {
@@ -72,37 +83,31 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('getValues', () => {
-        it('should return an empty array if a property does not exist', () => {
-            expect(getValues({name: 'John'}, 'age')).toEqual([]);
-        });
-
-        it('should support literal properties', () => {
-            expect(getValues({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual([1, 2]);
-        });
-
-        it('should support refernce properties', () => {
-            expect(getValues({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
-                .toEqual(['http://example.com/1', 'http://example.com/2']);
-        });
-    });
-
-    describe('getSingleValue', () => {
+    describe('getFirstPredicateValue', () => {
         it('should return undefined if a property does not exist', () => {
-            expect(getSingleValue({name: 'John'}, 'age')).toEqual(undefined);
+            expect(getFirstPredicateValue({name: 'John'}, 'age')).toEqual(undefined);
         });
 
         it('should return undefined if a property is empty', () => {
-            expect(getSingleValue({numbers: []}, 'numbers')).toEqual(undefined);
+            expect(getFirstPredicateValue({numbers: []}, 'numbers')).toEqual(undefined);
         });
 
-
         it('should support literal properties', () => {
-            expect(getSingleValue({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual(1);
+            expect(getFirstPredicateValue({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual(1);
+        });
+    });
+
+    describe('getFirstPredicateId', () => {
+        it('should return undefined if a property does not exist', () => {
+            expect(getFirstPredicateId({name: 'John'}, 'age')).toEqual(undefined);
+        });
+
+        it('should return undefined if a property is empty', () => {
+            expect(getFirstPredicateId({numbers: []}, 'numbers')).toEqual(undefined);
         });
 
         it('should support reference properties', () => {
-            expect(getSingleValue({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
+            expect(getFirstPredicateId({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
                 .toEqual('http://example.com/1');
         });
     });

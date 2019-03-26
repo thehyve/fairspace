@@ -12,31 +12,42 @@ export const MAIN_CONTENT_MAX_HEIGHT = '65vh';
 export const COLLECTION_SEARCH_TYPE = 'collections';
 export const FILES_SEARCH_TYPE = 'files';
 
+// Metadata schemas
+export const SHACL_NS = 'http://www.w3.org/ns/shacl#';
+export const XMLSCHEMA_NS = 'http://www.w3.org/2001/XMLSchema#';
+export const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+export const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
+export const FAIRSPACE_NS = 'http://fairspace.io/ontology#';
+
+
 // URIs
-export const PROPERTY_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property';
-export const CLASS_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Class';
-export const LABEL_URI = 'http://www.w3.org/2000/01/rdf-schema#label';
-export const COMMENT_URI = 'http://www.w3.org/2000/01/rdf-schema#comment';
-export const DOMAIN_URI = 'http://www.w3.org/2000/01/rdf-schema#domain';
-export const RANGE_URI = 'http://www.w3.org/2000/01/rdf-schema#range';
-export const TYPE_URI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+export const TYPE_URI = RDF_NS + 'type';
+export const LABEL_URI = RDFS_NS + 'label';
+export const COMMENT_URI = RDFS_NS + 'comment';
 
-export const STRING_URI = 'http://www.w3.org/TR/xmlschema11-2/#string';
-export const BOOLEAN_URI = 'http://www.w3.org/TR/xmlschema11-2/#boolean';
-export const DATETIME_URI = 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
-export const DATE_URI = 'http://www.w3.org/TR/xmlschema11-2/#date';
-export const TIME_URI = 'http://www.w3.org/TR/xmlschema11-2/#time';
-export const INTEGER_URI = 'http://www.w3.org/TR/xmlschema11-2/#integer';
-export const DECIMAL_URI = 'http://www.w3.org/TR/xmlschema11-2/#decimal';
-export const RESOURCE_URI = 'http://www.w3.org/2000/01/rdf-schema#Resource';
+export const SHACL_NAME = SHACL_NS + 'name';
+export const SHACL_PATH = SHACL_NS + 'path';
+export const SHACL_TARGET_CLASS = SHACL_NS + 'targetClass';
+export const SHACL_PROPERTY = SHACL_NS + 'property';
+export const SHACL_CLASS = SHACL_NS + 'class';
+export const SHACL_DATATYPE = SHACL_NS + 'datatype';
+export const SHACL_MAX_COUNT = SHACL_NS + 'maxCount';
+export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
 
-export const ALLOW_MULTIPLE_URI = 'http://fairspace.io/ontology#allowMultiple';
-export const MACHINE_ONLY_URI = 'http://fairspace.io/ontology#machineOnly';
-export const MULTILINE_PROPERTY_URI = 'http://fairspace.io/ontology#multiLine';
-export const FAIRSPACE_ENTITY_URI = 'http://fairspace.io/ontology#fairspaceEntity';
-export const COLLECTION_URI = 'http://fairspace.io/ontology#Collection';
-export const FILE_URI = 'http://fairspace.io/ontology#File';
-export const DIRECTORY_URI = 'http://fairspace.io/ontology#Directory';
-export const FILE_PATH_URI = 'http://fairspace.io/ontology#filePath';
-export const DATE_DELETED_URI = 'http://fairspace.io/ontology#dateDeleted';
-export const DELETED_BY_URI = 'http://fairspace.io/ontology#deletedBy';
+export const STRING_URI = XMLSCHEMA_NS + 'string';
+export const BOOLEAN_URI = XMLSCHEMA_NS + 'boolean';
+export const DATETIME_URI = XMLSCHEMA_NS + 'dateTime';
+export const DATE_URI = XMLSCHEMA_NS + 'date';
+export const TIME_URI = XMLSCHEMA_NS + 'time';
+export const INTEGER_URI = XMLSCHEMA_NS + 'integer';
+export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
+export const RESOURCE_URI = RDFS_NS + 'Resource';
+
+export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
+export const SHOW_IN_CATALOG_URI = FAIRSPACE_NS + 'showInCatalog';
+export const COLLECTION_URI = FAIRSPACE_NS + 'Collection';
+export const FILE_URI = FAIRSPACE_NS + 'File';
+export const DIRECTORY_URI = FAIRSPACE_NS + 'Directory';
+export const FILE_PATH_URI = FAIRSPACE_NS + 'filePath';
+export const DATE_DELETED_URI = FAIRSPACE_NS + 'dateDeleted';
+export const DELETED_BY_URI = FAIRSPACE_NS + 'deletedBy';

@@ -30,7 +30,7 @@ public class SaturnDatasetFactory {
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled),
      * inverse properties' inference, and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config, Node vocabularyGraphNode) {
+    public static Dataset connect(Config.Jena config, Node inferenceGraphNode) {
         var restoreNeeded = !config.datasetPath.exists();
 
         // Create a TDB2 dataset graph
@@ -60,7 +60,7 @@ public class SaturnDatasetFactory {
         }
 
         // Add property inversion
-        dsg = new InvertingDatasetGraph(dsg, vocabularyGraphNode);
+        dsg = new InvertingDatasetGraph(dsg, inferenceGraphNode);
 
         // Create a dataset
         return DatasetFactory.wrap(dsg);

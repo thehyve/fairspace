@@ -11,7 +11,10 @@ import SwitchValue from "./SwitchValue";
 import ResourceValue from "./ResourceValue";
 
 const getInputComponent = (property) => {
-    switch (property.range) {
+    // The datatype determines the type of input element
+    // If no datatype is specified, the field will be treated
+    // as referring to another class
+    switch (property.datatype) {
         case constants.STRING_URI:
             return StringValue;
         case constants.INTEGER_URI:

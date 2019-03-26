@@ -20,10 +20,9 @@ is not needed. However, parts of the application contain checks to prevent unaut
 you can specify a list of user-roles for the current user in the `x-fairspace-authorities` HTTP header
 sent with the request. See also the `DummyAuthenticator` class for details. 
 
-### High-level metadata & vocabulary API
+### High-level metadata
 
-The high-level metadata & vocabulary API run on :8080/api/metadata/ and :8080/api/vocabulary/.
-The only difference between them is that they work with different named graphs.
+The high-level metadata API runs on :8080/api/metadata/.
 Currently they support the following methods:
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                  |
@@ -41,6 +40,32 @@ Additional `:8080/api/metadata/entities/` and `:8080/api/vocabulary/entities/` e
 |-------------|---------------------------------------------------|---------------------------|----------------------------------------------------------------------- |
 | GET         | type (optional, URL-encoded)                      | -                         | Returns JsonLD-encoded modetaining FairSpace entities and their labels |
 
+### Vocabulary API
+
+The vocabulary consists of 3 different parts:
+ - a meta vocabulary describing the structure of the user and system vocabularies
+ - a system vocabulary describing the structure of fixed metadata classes (e.g File, Collection etc.)
+ - a user vocabulary describing the structure of all other metadata classes. This vocabulary can be updated by data stewards
+ 
+Please note:
+- The system vocabulary may contain properties being marked as `fs:machineOnly`. These are properties for which the user is
+  not allowed to add metadata. Metadata with such a property can only be added by our system itself (e.g. other APIs)
+- The user vocabulary may contain classes which are marked as `fs:showInCatalog`. These are classes
+  for which the UI should allow creating new entities
+
+The APIs run on :8080/api/vocabulary/{meta,system,user}/. The data for those vocabularies
+are stored in separate graphs internally. Also, the meta and system vocabularies are read only,
+where the user vocabulary  can be updated
+
+Currently they support the following methods:
+
+| HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                  |
+|-------------|---------------------------------------------------|---------------------------|------------------------------------------------------------------- |
+| GET         | subject, predicate, object, labels (all optional) | -                         | Returns JsonLD-encoded statements matching the query parameters. The `labels` parameter adds resource labels (rdfs:label) to the response |
+| PUT         | -                                                 | JsonLD-encoded statements | Adds statements to the default model                               |
+| DELETE      | subject, predicate, object (all optional)         | -                         | Deletes statements matching the query parameters                   |
+| DELETE      | -                                                 | JsonLD-encoded statements | Deletes the statements provided                                    |
+| PATCH       | -                                                 | JsonLD-encoded statements | Replaces existing triples with the statements provided             |
 
 ### High-level collections API
 The high-level metadata API runs on :8080/api/collections/.
