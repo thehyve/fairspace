@@ -11,11 +11,11 @@ security:
     clientId: web_app
     clientSecret: web_app
     scope: openid
-    token-uri: http://localhost:8531/certs
-    auth-uri: http://localhost:8531/auth
-    jwk-key-set-uri: http://localhost:8531/certs
-    logout-uri: https://test.logout.url/%s
-    redirect-after-logout-uri: https://test.redirect.after.logout.url
+    token-url: http://localhost:8531/certs
+    auth-url: http://localhost:8531/auth
+    jwk-key-set-url: http://localhost:8531/certs
+    logout-url: https://test.logout.url/%s
+    redirect-after-logout-url: https://test.redirect.after.logout.url
     required-authority: user-workspace
   urls:
     permitAll:

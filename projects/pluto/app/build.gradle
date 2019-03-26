@@ -44,13 +44,13 @@ repositories {
 
 ext {
 	springCloudVersion = 'Finchley.RC2'
-	oidcAuthVersion = System.getenv('OIDC_AUTH_VERSION') ?:'0.1.1-SNAPSHOT'
+	oidcAuthVersion = System.getenv('OIDC_AUTH_VERSION') ?:'0.6.1-SNAPSHOT'
 }
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
-    compile("org.springframework.boot:spring-boot-starter-actuator")
+  compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile('org.springframework.session:spring-session-core')
 	compile('org.springframework.cloud:spring-cloud-starter-sleuth')
 	compile('org.springframework.cloud:spring-cloud-sleuth-zipkin')

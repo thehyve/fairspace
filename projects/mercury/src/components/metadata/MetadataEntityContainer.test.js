@@ -3,9 +3,9 @@ import {mount, shallow} from "enzyme";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
-import List from '@material-ui/core/List';
+import {List} from '@material-ui/core';
 
-import ConnectedMetadata, {MetadataEntity} from "./MetadataEntity";
+import ConnectedMetadata, {MetadataEntityContainer} from "./MetadataEntityContainer";
 import Vocabulary from "../../services/Vocabulary";
 import Config from "../../services/Config/Config";
 import {PROPERTY_URI, LABEL_URI, DOMAIN_URI, CLASS_URI} from '../../constants';
@@ -83,8 +83,8 @@ it('render properties', () => {
         }
     ];
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-    const wrapper = shallow(<MetadataEntity
-        metadata={metadata}
+    const wrapper = shallow(<MetadataEntityContainer
+        properties={metadata}
         subject={subject}
         dispatch={() => {}}
     />);
@@ -110,8 +110,8 @@ it('shows result when subject provided and data is loaded', () => {
         iri: "http://fairspace.com/iri/collections/1"
     };
 
-    const wrapper = shallow(<MetadataEntity
-        metadata={metadata}
+    const wrapper = shallow(<MetadataEntityContainer
+        properties={metadata}
         editable
         subject={collection.iri}
         dispatch={() => {}}
@@ -137,7 +137,7 @@ it('shows a message if no metadata was found', () => {
 
     const wrapper = mount(<ConnectedMetadata subject="http://fairspace.com/iri/collections/1" store={store} />);
 
-    expect(wrapper.text()).toContain("(404) No such resource.");
+    expect(wrapper.text()).toContain("An error occurred");
 });
 
 it('shows error when no subject provided', () => {
@@ -152,7 +152,7 @@ it('shows error when no subject provided', () => {
     });
     const wrapper = mount(<ConnectedMetadata subject={null} store={store} />);
 
-    expect(wrapper.text()).toContain("An error occurred while loading metadata");
+    expect(wrapper.text()).toContain("An error occurred");
 });
 
 it('tries to load the metadata and the vocabulary', () => {
@@ -170,6 +170,6 @@ it('tries to load the metadata and the vocabulary', () => {
     });
 
     const dispatch = jest.fn();
-    mount(<MetadataEntity subject="John" store={store} dispatch={dispatch} />);
+    mount(<MetadataEntityContainer subject="John" properties={[]} store={store} dispatch={dispatch} />);
     expect(dispatch.mock.calls.length).toEqual(1);
 });

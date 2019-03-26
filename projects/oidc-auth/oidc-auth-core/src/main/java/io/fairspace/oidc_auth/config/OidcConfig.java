@@ -7,12 +7,12 @@ import java.net.URI;
 
 @Data
 public class OidcConfig {
-    private URI tokenUri;
-    private URI authUri;
-    private URI jwkKeySetUri;
+    private URI tokenUrl;
+    private URI authUrl;
+    private URI jwkKeySetUrl;
     private JWSAlgorithm accessTokenJwkAlgorithm = JWSAlgorithm.RS256;
-    private String logoutUri;
-    private URI redirectAfterLogoutUri;
+    private String logoutUrl;
+    private URI redirectAfterLogoutUrl;
     private String clientId;
     private String clientSecret;
     private String scope;

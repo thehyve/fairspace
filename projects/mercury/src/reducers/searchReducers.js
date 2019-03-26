@@ -25,7 +25,7 @@ const searchReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pending: false,
-                error: "Error retrieving search results"
+                error: action.payload.message
             };
         default:
             return state;

@@ -18,6 +18,14 @@ describe('Search API', () => {
             expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query).toEqual('my-query');
         }));
 
+    it('filters deleted entities from ES results', () => searchAPI.performSearch('my-query')
+        .then(() => {
+            expect(mockClient.search.mock.calls.length).toEqual(1);
+            expect(mockClient.search.mock.calls[0][0].body.query.bool.must_not.exists.field).toEqual(
+                "dateDeleted"
+            );
+        }));
+
     it('filters ES results based on types', () => searchAPI.performSearch('my-query')
         .then(() => {
             expect(mockClient.search.mock.calls.length).toEqual(1);
