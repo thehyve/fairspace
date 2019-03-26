@@ -7,6 +7,7 @@ server:
   error:
     whitelabel:
       enabled: false
+  max-http-header-size: 65535
 
 frontend:
   urls: {}
@@ -22,11 +23,11 @@ spring:
 
 security:
   oidc:
-    auth-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
-    logout-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
-    token-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
-    jwk-key-set-uri: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
-    redirect-after-logout-uri: https://fairspace.com
+    auth-url: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/auth
+    logout-url: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
+    token-url: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/token
+    jwk-key-set-url: ${app.oauth2.base-url}/auth/realms/${app.oauth2.realm}/protocol/openid-connect/certs
+    redirect-after-logout-url: https://fairspace.com
     clientId: web_app
     clientSecret: web_app
     scope: openid
