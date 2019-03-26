@@ -68,6 +68,7 @@ class ReadableMetadataService {
      * @return
      */
     Model getByType(String type) {
+        System.out.println(storedQuery("entities_by_type", graph, asURI(type)));
         return rdf.queryConstruct(storedQuery("entities_by_type", graph, asURI(type)));
     }
 

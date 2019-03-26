@@ -117,6 +117,9 @@ public class ReadableMetadataServiceTest {
         Resource personConsent = createResource("http://fairspace.io/ontology#PersonConsent");
         Resource researchProject = createResource("http://fairspace.io/ontology#ResearchProject");
         Property showInCatalog = createProperty("http://fairspace.io/ontology#showInCatalog");
+        Property targetClass = createProperty("http://www.w3.org/ns/shacl#targetClass");
+        Resource personConsentShape = createProperty("http://fairspace.io/ontology#PersonConsentShape");
+        Resource researchShape = createProperty("http://fairspace.io/ontology#ResearchProjectShape");
 
         // Setup the model
         executeWrite(ds, () -> {
@@ -129,10 +132,19 @@ public class ReadableMetadataServiceTest {
 
             // Mark personConsent and researchProject as fairspace entities
             ds.getNamedModel(userVocabularyURI)
+                    .add(personConsentShape, targetClass, personConsent)
+                    .add(personConsentShape, showInCatalog, createTypedLiteral(true))
+                    .add(researchShape, targetClass, researchProject)
+                    .add(researchShape, showInCatalog, createTypedLiteral(true))
                     .add(personConsent, showInCatalog, createTypedLiteral(true))
-                    .add(researchProject, showInCatalog, createTypedLiteral(true))
                     .add(FOAF.Person, showInCatalog, createTypedLiteral(false));
         });
+
+        System.out.println("--- Statements in " + GRAPH);
+        ds.getNamedModel(GRAPH).listStatements().forEachRemaining(System.out::println);
+        System.out.println("--- Statements in " + userVocabularyURI);
+        ds.getNamedModel(userVocabularyURI).listStatements().forEachRemaining(System.out::println);
+
 
         // Test whether entities of a single type can be retrieved, including the label
         var m1 = api.getByType("http://fairspace.io/ontology#PersonConsent");
