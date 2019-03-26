@@ -32,12 +32,5 @@ data:
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     mail:
-      mail.from: {{ .Values.workspace.saturn.mail.from }}
-      mail.user: {{ .Values.workspace.saturn.mail.user }}
-      mail.password: {{ .Values.workspace.saturn.mail.password }}
-      mail.transport.protocol: {{ .Values.workspace.saturn.mail.transport.ptotocol }}
-      mail.smtp.host: {{ .Values.workspace.saturn.mail.smtp.host }}
-      mail.smtp.port: {{ .Values.workspace.saturn.mail.smtp.port }}
-      mail.smtp.auth: {{ .Values.workspace.saturn.mail.smtp.auth }}
-      mail.smtp.starttls.enable: {{ .Values.workspace.saturn.mail.smtp.starttls.enable }}
+{{ toYaml .Values.workspace.saturn.mail | indent 6 }}
 
