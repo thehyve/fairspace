@@ -65,6 +65,32 @@ const vocabulary = [
     }
 ];
 
+it('render properties', () => {
+    const metadata = [
+        {
+            key: "http://fairspace.io/ontology#createdBy",
+            label: "Creator",
+            values: [
+                {
+                    id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
+                    label: "John"
+                }
+            ],
+            range: "http://fairspace.io/ontology#User",
+            allowMultiple: false,
+            machineOnly: true,
+            multiLine: false
+        }
+    ];
+    const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
+    const wrapper = shallow(<MetadataEntityContainer
+        properties={metadata}
+        subject={subject}
+        dispatch={() => {}}
+    />);
+    expect(wrapper.find(List).children().length).toBe(1);
+});
+
 it('shows result when subject provided and data is loaded', () => {
     const metadata = [{
         key: "@type",
