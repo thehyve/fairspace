@@ -35,7 +35,7 @@ foaf:PersonShape a fs:ClassShape ;
 fs:PersonConsentShape a fs:ClassShape ;
     sh:closed true ; 
     sh:description "A research consent given by person." ;
-    sh:name "PersonConsent" ;
+    sh:name "Person Consent" ;
     sh:targetClass fs:PersonConsent ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:showInCatalog true ;
@@ -460,7 +460,7 @@ fs:eventSubjectShape a fs:RelationShape ;
     sh:path fs:eventSubject .
 
 fs:associatedAnalysisShape a fs:RelationShape ; 
-    sh:name "Analysed by " ;
+    sh:name "Analysed by" ;
     sh:description "The files associated to the analysis" ;
     sh:class fs:Analysis ; 
     sh:maxCount 1 ;
