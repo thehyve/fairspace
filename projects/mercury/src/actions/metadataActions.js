@@ -1,9 +1,8 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import MetadataAPI from "../services/MetadataAPI";
-import {TYPE_URI} from "../constants";
+import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
 import {getFirstPredicateId} from "../utils/metadataUtils";
-import * as constants from "../constants";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
@@ -31,11 +30,11 @@ export const createMetadataEntity = (shape, id) => {
                     throw Error(`Metadata entity already exists: ${subject}`);
                 }
             })
-            .then(() => MetadataAPI.update(subject, TYPE_URI, [{id: type}]))
+            .then(() => MetadataAPI.update(subject, constants.TYPE_URI, [{id: type}]))
             .then(() => subject),
         meta: {
             subject,
-            type: type
+            type
         }
     };
 };

@@ -4,7 +4,6 @@ import {
     getFirstPredicateId,
     getFirstPredicateValue,
     getLabel,
-    getValues,
     linkLabel,
     propertiesToShow,
     relativeLink,
