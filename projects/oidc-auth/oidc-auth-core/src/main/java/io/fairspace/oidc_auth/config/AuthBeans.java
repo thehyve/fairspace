@@ -60,8 +60,8 @@ public class AuthBeans {
         // OAuth 2.0 server's JWK set, published at a well-known URL. The RemoteJWKSet
         // object caches the retrieved keys to speed up subsequent look-ups and can
         // also gracefully handle key-rollover
-        log.info("Using remote key set from URL {}", oidcConfig.getJwkKeySetUri().toString());
-        JWKSource keySource = new RemoteJWKSet(oidcConfig.getJwkKeySetUri().toURL());
+        log.info("Using remote key set from URL {}", oidcConfig.getJwkKeySetUrl().toString());
+        JWKSource keySource = new RemoteJWKSet(oidcConfig.getJwkKeySetUrl().toURL());
 
         // Configure the JWT processor with a key selector to feed matching public
         // RSA keys sourced from the JWK set URL

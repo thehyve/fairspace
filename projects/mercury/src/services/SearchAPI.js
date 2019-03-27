@@ -47,6 +47,7 @@ export class SearchAPI {
         return this.client.search({
             index: this.index,
             body: {
+                size: 50,
                 query: esQuery,
                 highlight: {
                     fields: {
@@ -54,7 +55,14 @@ export class SearchAPI {
                     }
                 }
             }
-        }).then(this.transformESResult);
+        })
+            .then(this.transformESResult)
+            .catch((error) => {
+                switch (error.status) {
+                    case 400: throw new Error("Oops, we're unable to parse this query. Please only use alphanumeric characters.");
+                    default: throw new Error("Error retrieving search results");
+                }
+            });
     };
 
     /**
