@@ -125,7 +125,7 @@ class MetadataProperty extends React.Component {
         const canAdd = editableAndNotMachineOnly && (property.allowMultiple || property.values.length === 0);
         const labelId = `label-${property.key}`;
 
-        const ValueComponent = (editableAndNotMachineOnly && property.range !== constants.RESOURCE_URI)
+        const ValueComponent = (editableAndNotMachineOnly && property.className !== constants.RESOURCE_URI)
             ? ValueComponentFactory.editComponent(property)
             : ValueComponentFactory.readOnlyComponent();
 

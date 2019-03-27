@@ -21,29 +21,20 @@ import static spark.Spark.patch;
 import static spark.Spark.path;
 import static spark.Spark.put;
 
-@AllArgsConstructor
 @Slf4j
-public class MetadataApp extends BaseApp {
-    private final String basePath;
-    private final MetadataService api;
+public class ChangeableMetadataApp extends ReadableMetadataApp {
+    protected final ChangeableMetadataService api;
+
+    public ChangeableMetadataApp(String basePath, ChangeableMetadataService api) {
+        super(basePath, api);
+        this.api = api;
+    }
 
     @Override
     public void init() {
         super.init();
 
         path(basePath, () -> {
-            get("/", JSON_LD_HEADER_STRING, (req, res) -> {
-                res.type(JSON_LD_HEADER_STRING);
-                return toJsonLD(api.get(
-                        req.queryParams("subject"),
-                        req.queryParams("predicate"),
-                        req.queryParams("object"),
-                        req.queryParams().contains("labels")));
-            });
-            get("/entities/", JSON_LD_HEADER_STRING, (req, res) -> {
-                res.type(JSONLD.getLang().getHeaderString());
-                return toJsonLD(api.getByType(req.queryParams("type")));
-            });
             put("/", (req, res) -> {
                 validateContentType(req, JSON_LD_HEADER_STRING);
                 api.put(fromJsonLD(req.body()));

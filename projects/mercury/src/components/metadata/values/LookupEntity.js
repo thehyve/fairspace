@@ -10,7 +10,7 @@ function LookupEntity({
     entities, property, onSave, dispatch, ...otherProps
 }) {
     // Ensure that the entities for lookup have been retrieved
-    dispatch(fetchEntitiesIfNeeded(property.range));
+    dispatch(fetchEntitiesIfNeeded(property.className));
 
     // Transform the entities to ensure a label is present
     const options = entities.map((entity) => {
@@ -50,8 +50,8 @@ LookupEntity.propTypes = {
 };
 
 const mapStateToProps = (state, ownProps) => {
-    if (state.cache && state.cache.entitiesByType) {
-        const entities = state.cache.entitiesByType[ownProps.property.range];
+    if (state.cache && state.cache.entitiesByType && ownProps.property.className) {
+        const entities = state.cache.entitiesByType[ownProps.property.className];
         if (entities && entities.data && !entities.pending && !entities.error) {
             return {entities: entities.data};
         }

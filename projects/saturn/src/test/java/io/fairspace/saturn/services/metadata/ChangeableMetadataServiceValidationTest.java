@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MetadataServiceValidationTest {
+public class ChangeableMetadataServiceValidationTest {
     @Mock
     MetadataRequestValidator validator;
 
@@ -49,13 +49,13 @@ public class MetadataServiceValidationTest {
     private static final Statement LBL_STMT1 = createStatement(S1, RDFS.label, createStringLiteral("subject1"));
 
     private Dataset ds;
-    private MetadataService api;
+    private ChangeableMetadataService api;
 
     @Before
     public void setUp() {
         ds = createTxnMem();
         RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new MetadataService(rdf, createURI(GRAPH), lifeCycleManager, validator);
+        api = new ChangeableMetadataService(rdf, createURI(GRAPH), lifeCycleManager, validator);
     }
 
     @Test

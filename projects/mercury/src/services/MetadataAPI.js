@@ -46,12 +46,25 @@ class MetadataAPI {
         return request.then(failOnHttpError("Failure when updating metadata"));
     }
 
+    /**
+     * Retrieves the vocabulary (user and system) and instantiates a Vocabulary object with it
+     * @returns {Promise<Vocabulary | never>}
+     */
     getVocabulary() {
+        // TODO: store the user and system vocabulary separately to allow
+        //       easy vocabulary editing for the user vocabulary
         return Config.waitFor()
-            .then(() => fetch(Config.get().urls.metadata.vocabulary, MetadataAPI.getParams))
-            .then(failOnHttpError("Failure when retrieving the vocabulary"))
-            .then(response => response.json())
-            .then(jsonld.expand)
+            .then(() => Promise.all([
+                fetch(Config.get().urls.vocabulary.user, MetadataAPI.getParams)
+                    .then(failOnHttpError("Failure when retrieving the user vocabulary"))
+                    .then(response => response.json())
+                    .then(jsonld.expand),
+                fetch(Config.get().urls.vocabulary.system, MetadataAPI.getParams)
+                    .then(failOnHttpError("Failure when retrieving the system vocabulary"))
+                    .then(response => response.json())
+                    .then(jsonld.expand)
+            ]))
+            .then(([userVocabulary, systemVocabulary]) => [...userVocabulary, ...systemVocabulary])
             .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
     }
 

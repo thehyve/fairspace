@@ -98,7 +98,7 @@ public class AuthEndpoints {
     }
 
     private String getAuthProviderLogoutUrl() {
-        return String.format(configuration.getLogoutUri(), configuration.getRedirectAfterLogoutUri());
+        return String.format(configuration.getLogoutUrl(), configuration.getRedirectAfterLogoutUrl());
     }
 
 

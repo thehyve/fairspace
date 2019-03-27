@@ -110,14 +110,4 @@ public class MetadataEntityLifeCycleManagerTest {
         verify(permissionsService).createResource(NodeFactory.createURI(resource.getURI()));
         verify(permissionsService).createResource(NodeFactory.createURI(otherResource.getURI()));
     }
-
-    @Test
-    public void testAbsenceOfPermissionsService() {
-        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, () -> user, null);
-
-        Model delta = ModelFactory.createDefaultModel();
-        delta.add(resource, property, otherResource);
-
-        lifeCycleManager.updateLifecycleMetadata(delta);
-    }
 }

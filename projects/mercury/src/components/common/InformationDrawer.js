@@ -13,7 +13,7 @@ import {connect} from 'react-redux';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "./CollectionDetails";
-import MetadataEntity from "../metadata/MetadataEntity";
+import MetadataEntityContainer from "../metadata/MetadataEntityContainer";
 import PathMetadata from "../metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
@@ -85,7 +85,7 @@ export class InformationDrawer extends React.Component {
                     loading={loading}
                 />
                 <Paper style={{padding: 20, marginTop: 10}}>
-                    <MetadataEntity
+                    <MetadataEntityContainer
                         subject={collection.iri}
                         editable={isMetaDataEditable}
                     />
