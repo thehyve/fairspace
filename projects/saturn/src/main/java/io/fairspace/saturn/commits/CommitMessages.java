@@ -1,6 +1,8 @@
 package io.fairspace.saturn.commits;
 
 
+import com.pivovarit.function.ThrowingRunnable;
+
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.Context.currentRequest;
@@ -15,7 +17,7 @@ public class CommitMessages {
 
     private static final ThreadLocal<String> systemCommitMessage = new ThreadLocal<>();
 
-    public static void withCommitMessage(String message, Runnable action) {
+    public static <E extends Exception> void withCommitMessage(String message, ThrowingRunnable<E> action) throws E {
         systemCommitMessage.set(message);
         try {
             action.run();

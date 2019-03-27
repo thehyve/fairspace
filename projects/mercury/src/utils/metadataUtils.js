@@ -19,18 +19,13 @@ import {
  * @param defaultValue      A default value to be returned if no value could be found for the metadata entry
  * @returns {*}
  */
-export const getFirstPredicateProperty = (metadataEntry, predicate, property, defaultValue) => {
-    return metadataEntry && metadataEntry[predicate] && metadataEntry[predicate][0] ? metadataEntry[predicate][0][property] : defaultValue;
-};
+export const getFirstPredicateProperty = (metadataEntry, predicate, property, defaultValue) =>
+    // eslint-disable-next-line implicit-arrow-linebreak
+    (metadataEntry && metadataEntry[predicate] && metadataEntry[predicate][0] ? metadataEntry[predicate][0][property] : defaultValue);
 
-export const getFirstPredicateValue = (metadataEntry, predicate, defaultValue) => {
-    return getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
-};
+export const getFirstPredicateValue = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
 
-export const getFirstPredicateId = (metadataEntry, predicate, defaultValue) => {
-    return getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
-};
-
+export const getFirstPredicateId = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
 
 /**
  *

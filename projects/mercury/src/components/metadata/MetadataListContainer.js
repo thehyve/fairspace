@@ -13,8 +13,8 @@ class MetadataListContainer extends React.Component {
         this.props.fetchAllEntitiesIfNeeded();
     }
 
-    handleEntityCreation = (type, id) => {
-        this.props.createMetadataEntity(type, id)
+    handleEntityCreation = (shape, id) => {
+        this.props.createMetadataEntity(shape, id)
             .then((res) => {
                 this.props.fetchAllEntitiesIfNeeded();
                 this.props.history.push(relativeLink(res.value));
@@ -50,7 +50,7 @@ const mapStateToProps = ({metadataBySubject, cache: {allEntities, vocabulary}}) 
         id: e['@id'],
         label: getLabel(e),
         type: e['@type'],
-        typeLabel: getLabel(vocabularyData.getById(e['@type']), true)
+        typeLabel: getLabel(vocabularyData.determineShapeForType(e['@type'][0]), true)
     }));
 
     return ({

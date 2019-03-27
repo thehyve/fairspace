@@ -20,7 +20,7 @@ class Vocabulary {
      * @param expandedMetadata Metadata in expanded json-ld format with actual metadata about one subject
      * @param subject Subject to combine the metadata for. If not provided, the metadata is expected to contain
      *                information on a single entity
-     * @returns A promise resolving in an array with metadata. Each element will look like this:
+     * @returns [Any] A promise resolving in an array with metadata. Each element will look like this:
      * {
      *      key: "http://fairspace.io/ontology#description",
      *      label: "Description",
@@ -79,7 +79,7 @@ class Vocabulary {
     /**
      * Returns a human readable label for the given predicate or the uri if no label is specified
      * @param uri
-     * @returns {String}
+     * @returns {string}
      */
     getLabelForPredicate(uri) {
         return getFirstPredicateValue(this.determineShapeForProperty(uri), constants.SHACL_NAME) || uri;
@@ -89,6 +89,7 @@ class Vocabulary {
      * Converts a JSON-LD structure into a list of properties and values
      * @param metadata Expanded JSON-LD metadata about a single subject. The subject must have a '@type' property
      * @param propertyShapes List of propertyShapes that should be included
+     * @param allMetadata All known metadata to be processed. Is used to retrieve labels for associated entities
      * @returns {Array}
      */
     convertMetadataIntoPropertyList(metadata, propertyShapes = [], allMetadata = []) {
@@ -141,8 +142,7 @@ class Vocabulary {
 
     /**
      * Returns a list of property shapes that are in the shape of the given types
-     * @param vocabulary
-     * @param type
+     * @param types
      */
     determinePropertyShapesForTypes(types) {
         return Array.from(new Set(
@@ -163,7 +163,7 @@ class Vocabulary {
 
     /**
      * Determines the SHACL shape to be applied to the given type
-     * @param type
+     * @param propertyUri
      */
     determineShapeForProperty(propertyUri) {
         return this.vocabulary
@@ -182,7 +182,7 @@ class Vocabulary {
         }
 
         const propertyShapes = shape[constants.SHACL_PROPERTY];
-        const propertyShapeIds = propertyShapes ? propertyShapes.map(shape => shape['@id']) : [];
+        const propertyShapeIds = propertyShapes ? propertyShapes.map(propertyShape => propertyShape['@id']) : [];
 
         return this.vocabulary
             .filter(entry => propertyShapeIds.includes(entry['@id']));
@@ -193,7 +193,7 @@ class Vocabulary {
      * @param predicate
      * @param values
      * @param propertyShape
-     * @returns {{key: string, label: string, values: [], range: string, allowMultiple: boolean}}
+     * @returns {{key: string, label: string, values: [], datatype: string, className: string, allowMultiple: boolean, machineOnly: boolean, multiLine: boolean}}
      * @private
      */
     static generatePropertyEntry(predicate, values, propertyShape) {

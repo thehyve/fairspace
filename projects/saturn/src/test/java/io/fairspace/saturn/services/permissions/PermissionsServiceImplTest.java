@@ -4,6 +4,7 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
@@ -13,7 +14,7 @@ import org.junit.Test;
 import java.util.HashMap;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
 
 public class PermissionsServiceImplTest {
@@ -21,7 +22,7 @@ public class PermissionsServiceImplTest {
     private static final Node USER1 = createURI("http://example.com/user1");
     private static final Node USER2 = createURI("http://example.com/user2");
     private static final Node USER3 = createURI("http://example.com/user3");
-    public static final Resource COLLECTION = createResource("http://fairspace.io/ontology#Collection");
+    private static final Resource COLLECTION = createResource("http://fairspace.io/ontology#Collection");
 
     private Dataset ds;
     private PermissionsService service;
@@ -83,18 +84,20 @@ public class PermissionsServiceImplTest {
         assertFalse(service.isWriteRestricted(RESOURCE));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNoPermissionsForFiles() {
+    @Test
+    public void testGettingPermissionsForFiles() {
+        var collection = createResource("http://example.com/collection");
         var file = createResource("http://example.com/file");
-        ds.getDefaultModel().add(file, RDF.type, createResource("http://fairspace.io/ontology#File"));
-        service.getPermission(file.asNode());
-    }
+        var filePath = createProperty("http://fairspace.io/ontology#filePath");
+        ds.getDefaultModel()
+                .add(collection, RDF.type, createResource("http://fairspace.io/ontology#Collection"))
+                .add(collection, filePath, createPlainLiteral("collectionPath"))
+                .add(file, filePath, createPlainLiteral("collectionPath/filePath"));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNoPermissionsForDirectories() {
-        var dir = createResource("http://example.com/dir");
-        ds.getDefaultModel().add(dir, RDF.type, createResource("http://fairspace.io/ontology#Directory"));
-        service.getPermission(dir.asNode());
+
+        service.createResource(collection.asNode());
+
+        assertEquals(Access.Manage, service.getPermission(createURI("http://example.com/file")));
     }
 
     @Test

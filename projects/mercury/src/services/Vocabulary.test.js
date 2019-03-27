@@ -21,7 +21,7 @@ describe('combination of vocabulary and metadata', () => {
 
         const result = vocabulary.combine(metadata);
         expect(result.length).toEqual(4);
-        expect(result[0].values.length).toEqual(0)
+        expect(result[0].values.length).toEqual(0);
         expect(result[1].values.length).toEqual(0);
         expect(result[2].values.length).toEqual(0);
         expect(result[3].values.length).toEqual(0);
@@ -251,7 +251,5 @@ describe('combination of vocabulary and metadata', () => {
             const uri = 'http://fairspace.io/ontology#NonExisting';
             expect(vocabulary.getLabelForPredicate(uri)).toEqual(uri);
         });
-
-    })
+    });
 });
-
