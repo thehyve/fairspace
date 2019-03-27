@@ -14,7 +14,7 @@ import {fetchMetadataVocabularyIfNeeded} from "../../actions/metadataActions";
 class NewMetadataEntityDialog extends React.Component {
     state = {
         creating: false,
-        type: null
+        shape: null
     };
 
     componentDidMount() {
@@ -23,7 +23,8 @@ class NewMetadataEntityDialog extends React.Component {
 
     openDialog = (e) => {
         e.stopPropagation();
-        this.setState({creating: true, id: generateUuid(), type: undefined});
+
+        this.setState({creating: true, id: generateUuid(), shape: undefined});
     }
 
     closeDialog = (e) => {
@@ -34,7 +35,7 @@ class NewMetadataEntityDialog extends React.Component {
     createEntity = (e) => {
         e.stopPropagation();
         this.setState({creating: false});
-        this.props.onCreate(this.state.type, this.state.id);
+        this.props.onCreate(this.state.shape, this.state.id);
     }
 
     handleInputChange = (event) => {
@@ -51,6 +52,7 @@ class NewMetadataEntityDialog extends React.Component {
                     title="Create a new Metadata"
                     onClick={this.openDialog}
                     style={{margin: '10px 0'}}
+                    disabled={!this.props.shapes}
                 >
                     Create
                 </Button>
@@ -76,16 +78,16 @@ class NewMetadataEntityDialog extends React.Component {
                         />
                         <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
                             {
-                                this.props.types.length
+                                this.props.shapes.length
                                     ? (
                                         <List>
                                             {
-                                                this.props.types.sort(compareBy(getLabel)).map(t => (
+                                                this.props.shapes.sort(compareBy(getLabel)).map(t => (
                                                     <ListItem
                                                         key={t['@id']}
                                                         button
-                                                        selected={this.state.type === t}
-                                                        onClick={() => this.setState({type: t})}
+                                                        selected={this.state.shape === t}
+                                                        onClick={() => this.setState({shape: t})}
                                                     >
                                                         <ListItemText
                                                             primary={getLabel(t)}
@@ -124,13 +126,13 @@ class NewMetadataEntityDialog extends React.Component {
     }
 
     canCreate() {
-        return this.state.type && this.state.id && this.hasValidId();
+        return this.state.shape && this.state.id && this.hasValidId();
     }
 }
 
 const mapStateToProps = state => ({
     loading: state.cache.vocabulary.pending,
-    types: state.cache && state.cache.vocabulary && state.cache.vocabulary.data && state.cache.vocabulary.data.getFairspaceClasses()
+    shapes: state.cache && state.cache.vocabulary && state.cache.vocabulary.data && state.cache.vocabulary.data.getFairspaceClasses()
 });
 
 const mapDispatchToProps = {

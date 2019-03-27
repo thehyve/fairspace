@@ -9,9 +9,11 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
-import io.fairspace.saturn.services.metadata.MetadataApp;
+import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
+import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
 import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
-import io.fairspace.saturn.services.metadata.MetadataService;
+import io.fairspace.saturn.services.metadata.ReadableMetadataApp;
+import io.fairspace.saturn.services.metadata.ReadableMetadataService;
 import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
@@ -40,10 +42,11 @@ public class App {
     public static void main(String[] args) {
         log.info("Saturn is starting");
 
-        var vocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "vocabulary");
-        var metaVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "metavocabulary");
+        var userVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "user-vocabulary");
+        var systemVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "system-vocabulary");
+        var metaVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "meta-vocabulary");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, vocabularyGraphNode);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, userVocabularyGraphNode);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
@@ -61,19 +64,25 @@ public class App {
         var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
         // Setup and initialize vocabularies
-        var vocabulary = createVocabulary(rdf, vocabularyGraphNode, "vocabulary.jsonld");
-        var metadataService = new MetadataService(rdf, defaultGraphIRI, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(vocabulary));
+        var userVocabulary = createVocabulary(rdf, userVocabularyGraphNode, "default-vocabularies/user-vocabulary.ttl");
+        var systemVocabulary = createVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
+        var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
 
-        var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "metavocabulary.jsonld");
-        var vocabularyService = new MetadataService(rdf, vocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
+        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(systemVocabulary));
+        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
+        var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
+        var metaVocabularyService = new ReadableMetadataService(rdf, metaVocabularyGraphNode);
+
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
-                        new MetadataApp("/api/metadata", metadataService),
-                        new MetadataApp("/api/vocabulary", vocabularyService)
-                            .withAuthorizationVerifier("/api/vocabulary/*", vocabularyAuthorizationVerifier),
+                        new ChangeableMetadataApp("/api/metadata", metadataService),
+                        new ChangeableMetadataApp("/api/vocabulary/user", userVocabularyService)
+                            .withAuthorizationVerifier("/api/vocabulary/user/*", vocabularyAuthorizationVerifier),
+                        new ReadableMetadataApp("/api/vocabulary/system", systemVocabularyService),
+                        new ReadableMetadataApp("/api/vocabulary/meta", metaVocabularyService),
                         new CollectionsApp(collections),
                         new PermissionsApp(permissions),
                         new HealthApp()))

@@ -4,10 +4,11 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
 
 CONSTRUCT {?s a %2$s; rdfs:label ?l}
 WHERE {
     GRAPH %1$s { ?s a %2$s }
-    GRAPH ws:vocabulary {%2$s fs:fairspaceEntity true .}
+    GRAPH ws:user-vocabulary { ?t sh:targetClass %2$s ; fs:showInCatalog true .}
     OPTIONAL { GRAPH %1$s {?s rdfs:label ?l} }
 }

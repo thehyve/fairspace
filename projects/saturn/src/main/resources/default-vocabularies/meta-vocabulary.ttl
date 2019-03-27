@@ -1,0 +1,120 @@
+@prefix fs: <http://fairspace.io/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+fs:ClassShapeMeta a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "Meta shape of classes." ;
+    sh:name "Class Shape Meta" ;
+    sh:property [
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:maxLength 128 ;
+        sh:minCount 1 ;
+        sh:path sh:name
+    ], [
+        # This means every value for predicate sh:property should have this type.
+        sh:class sh:PropertyShape ;
+        sh:minCount 1 ;
+        sh:path sh:property
+    ], [
+        sh:value true ;
+        sh:path sh:closed
+    ], [
+        sh:class fs:Class ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:path sh:targetClass
+    ], [
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:path sh:description
+    ] ;
+    sh:targetClass fs:ClassShape ;
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+
+fs:PropertyShapeMeta a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "Meta shape of FS defined properties." ;
+    sh:name "Property Shape Meta" ;
+    sh:property [
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:maxLength 128 ;
+        sh:minCount 1 ;
+        sh:path sh:name
+    ], [
+        sh:datatype xsd:integer ;
+        sh:path sh:minCount
+    ], [
+        sh:datatype xsd:integer ;
+        sh:path sh:maxCount
+    ], [
+        sh:path sh:in
+    ], [
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:path sh:description
+    ], [
+        sh:path sh:datatype ;
+        # direct controlled vocabulary approach
+        sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long )  ;
+
+        # indirect via typing in (meta)vocabulary
+        sh:class fs:Datatype
+    ], [
+        sh:path sh:message
+    ], [
+        sh:datatype xsd:integer ;
+        sh:path sh:maxLength
+    ], [
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:path sh:path
+    ], [
+        sh:path fs:machineOnly
+    ] ;
+    sh:targetClass fs:PropertyShape ;
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+
+fs:RelationShapeMeta a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "Meta shape of FS defined relations." ;
+    sh:name "Relation Shape Meta" ;
+    sh:property [
+        sh:datatype xsd:integer ;
+        sh:path sh:minCount
+    ], [
+        sh:class fs:Class ;
+        sh:path sh:class
+    ], [
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:path sh:description
+    ], [
+        sh:path sh:message
+    ], [
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:path sh:path
+    ], [
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:maxLength 128 ;
+        sh:minCount 1 ;
+        sh:path sh:name
+    ], [
+        sh:datatype xsd:integer ;
+        sh:path sh:maxCount
+    ], [
+        sh:path fs:machineOnly
+    ] ;
+    sh:targetClass fs:RelationShape ;
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
