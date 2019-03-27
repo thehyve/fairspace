@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.http.entity.ContentType.TEXT_HTML;
 
 public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource implements FolderResource, DeletableCollectionResource {
-    public VfsBackedMiltonDirectoryResource(VirtualFileSystem fs, FileInfo info) {
+    VfsBackedMiltonDirectoryResource(VirtualFileSystem fs, FileInfo info) {
         super(fs, info);
     }
 
@@ -40,6 +40,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
 
     @Override
     public CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
+        ensureIsWriteable();
         var newPath = normalizePath(info.getPath() + "/" + newName);
         try {
             fs.mkdir(newPath);
@@ -52,6 +53,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
 
     @Override
     public Resource createNew(String newName, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
+        ensureIsWriteable();
         var newPath = normalizePath(info.getPath() + "/" + newName);
         fs.create(newPath, inputStream);
         return getResource(fs, newPath);

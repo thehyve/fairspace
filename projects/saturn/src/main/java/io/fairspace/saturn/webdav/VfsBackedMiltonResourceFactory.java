@@ -15,7 +15,7 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
     private final String pathPrefix;
     private final VirtualFileSystem fs;
 
-    public VfsBackedMiltonResourceFactory(String pathPrefix, VirtualFileSystem fs) {
+    VfsBackedMiltonResourceFactory(String pathPrefix, VirtualFileSystem fs) {
         this.pathPrefix = pathPrefix;
         this.fs = fs;
     }
@@ -32,7 +32,7 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
         return getResource(fs, normalizePath(path.substring(pathPrefix.length())));
     }
 
-    public static Resource getResource(VirtualFileSystem fs, String path) {
+    static Resource getResource(VirtualFileSystem fs, String path) {
         try {
             var info = fs.stat(path);
             if (info == null) {

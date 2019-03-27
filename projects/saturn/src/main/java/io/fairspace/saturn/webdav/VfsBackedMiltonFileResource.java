@@ -20,7 +20,7 @@ import static io.milton.common.ContentTypeUtils.findAcceptableContentType;
 import static io.milton.common.ContentTypeUtils.findContentTypes;
 
 public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource implements GetableResource, ReplaceableResource {
-    public VfsBackedMiltonFileResource(VirtualFileSystem fs, FileInfo info) {
+    VfsBackedMiltonFileResource(VirtualFileSystem fs, FileInfo info) {
         super(fs, info);
     }
 
@@ -51,6 +51,7 @@ public class VfsBackedMiltonFileResource extends VfsBackedMiltonResource impleme
 
     @Override
     public void replaceContent(InputStream in, Long length) throws BadRequestException, ConflictException, NotAuthorizedException {
+        ensureIsWriteable();
         try {
             fs.modify(info.getPath(), in);
         } catch (IOException e) {
