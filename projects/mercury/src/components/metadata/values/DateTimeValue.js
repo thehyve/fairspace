@@ -5,15 +5,13 @@ class DateTimeValue extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {value: props.entry.value};
+        this.state = {value: props.entry.value || ''};
     }
 
     handleChange = (e) => {
-        this.setState({value: e.target.value});
-    }
-
-    handleSave = () => {
-        this.props.onSave({value: this.delocalize(this.state.value)});
+        const {value} = e.target;
+        this.setState({value: this.localize(value)});
+        this.props.onChange(this.delocalize(value));
     }
 
     localize = (dt) => (dt && dt.endsWith('Z') ? dt.substring(0, dt.length - 1) : dt);
@@ -21,18 +19,15 @@ class DateTimeValue extends React.Component {
     delocalize = (dt) => (dt ? `${dt}Z` : dt);
 
     render() {
-        const {
-            entry, property, style, onSave, ...otherProps
-        } = this.props;
+        const {entry, property, style, onSave, ...otherProps} = this.props;
 
         return (
             <TextField
                 {...otherProps}
                 multiline={false}
-                value={this.localize(this.state.value)}
+                value={this.state.value}
                 type="datetime-local"
-                onChange={this.handleChange.bind}
-                onBlur={this.handleSave.bind}
+                onChange={this.handleChange}
                 margin="normal"
                 style={{...style, marginTop: 0, width: '100%'}}
             />

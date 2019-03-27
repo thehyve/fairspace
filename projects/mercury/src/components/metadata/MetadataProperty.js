@@ -1,14 +1,11 @@
 import React from 'react';
-import {connect} from 'react-redux';
 import {
     List, ListItem, Typography, IconButton,
     ListItemSecondaryAction, ListItemText
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 
-import {updateMetadata as updateMetadataAction} from "../../actions/metadataActions";
 import ValueComponentFactory from "./values/ValueComponentFactory";
-import ErrorDialog from "../common/ErrorDialog";
 import * as constants from '../../constants';
 
 class MetadataProperty extends React.Component {
@@ -16,50 +13,12 @@ class MetadataProperty extends React.Component {
         hoveredIndex: null
     };
 
-    // Function to save a certain value.
-    // Calling it with an index provides you with a function that
-    // will save a given value (if it has changed) along with the other
-    // unchanged values.
-    // E.g. handleSave(1) will return a function `value => { ... }` that
-    // can be used as a callback for the component for index 1
-    handleSave = index => (newEntry) => {
-        const {subject, property, updateMetadata} = this.props;
-        const currentEntry = property.values[index];
-
-        if (currentEntry.value !== newEntry.value) {
-            const updatedValues = property.values.map((el, idx) => ((idx === index) ? newEntry : el));
-            return updateMetadata(subject, property.key, updatedValues)
-                .catch(e => ErrorDialog.showError(e, "Error while saving metadata"));
-        }
-        return Promise.resolve();
-    };
-
-    handleAdd = (newEntry) => {
-        const {subject, property, updateMetadata} = this.props;
-
-        if (newEntry.value || newEntry.id) {
-            const updatedValues = [...property.values, newEntry];
-
-            return updateMetadata(subject, property.key, updatedValues)
-                .catch(e => ErrorDialog.showError(e, "Error while adding metadata"));
-        }
-        return Promise.resolve();
-    };
-
-    handleDelete = index => () => {
-        const {subject, property, updateMetadata} = this.props;
-        const updatedValues = property.values.filter((el, idx) => idx !== index);
-
-        return updateMetadata(subject, property.key, updatedValues)
-            .catch(e => ErrorDialog.showError(e, "Error while deleting metadata"));
-    };
-
     setHoveredIndex = (hoveredIndex) => {
         this.setState({hoveredIndex});
     }
 
     renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
-        const {editable, property} = this.props;
+        const {editable, property, onChange, onDelete} = this.props;
         const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
 
         return (
@@ -73,7 +32,7 @@ class MetadataProperty extends React.Component {
                         <PropertyValueComponent
                             property={property}
                             entry={entry}
-                            onSave={this.handleSave(idx)}
+                            onChange={(value) => onChange(value, idx)}
                             aria-labelledby={labelledBy}
                         />
                     </ListItemText>
@@ -85,7 +44,7 @@ class MetadataProperty extends React.Component {
                                         size="small"
                                         aria-label="Delete"
                                         title="Delete"
-                                        onClick={this.handleDelete(idx)}
+                                        onClick={() => onDelete(idx)}
                                         style={{visibility}}
                                     >
                                         <ClearIcon />
@@ -99,7 +58,7 @@ class MetadataProperty extends React.Component {
     };
 
     renderAddComponent = (labelledBy) => {
-        const {property} = this.props;
+        const {property, onChange} = this.props;
         const ValueAddComponent = ValueComponentFactory.addComponent(property);
 
         return (
@@ -108,7 +67,7 @@ class MetadataProperty extends React.Component {
                     <ValueAddComponent
                         property={property}
                         placeholder="Add new"
-                        onSave={this.handleAdd}
+                        onChange={(value) => onChange(value)}
                         aria-labelledby={labelledBy}
                     />
                 </ListItemText>
@@ -143,8 +102,4 @@ class MetadataProperty extends React.Component {
     }
 }
 
-const mapDispatchToProps = {
-    updateMetadata: updateMetadataAction
-};
-
-export default connect(null, mapDispatchToProps)(MetadataProperty);
+export default MetadataProperty;
