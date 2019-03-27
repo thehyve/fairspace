@@ -29,15 +29,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -68,7 +67,9 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
 
         if (isCollection(path)) {
-            return ofNullable(collections.getByLocation(path)).map(ManagedFileSystem::fileInfo).orElse(null);
+            return ofNullable(collections.getByLocation(path))
+                    .map(ManagedFileSystem::fileInfo)
+                    .orElse(null);
         }
 
         var processor = new QuerySolutionProcessor<>(this::fileInfo);
@@ -97,10 +98,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void mkdir(String path) throws IOException {
         ensureValidPath(path);
 
-        commit("Create directory " + path, rdf, () -> {
-            rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
-            initPermissions(path);
-        });
+        withCommitMessage("Create directory " + path, () ->
+                rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path))));
     }
 
     @Override
@@ -108,23 +107,15 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(path);
 
         var blobInfo = write(in);
-        commit("Create file " + path, rdf, () -> {
-            rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
-            initPermissions(path);
-        });
-    }
-
-    @SneakyThrows(IOException.class)
-    private void initPermissions(String path) {
-        var iri = createURI(stat(path).getIri());
-        permissions.createResource(iri, getCollection(path).getIri());
+        withCommitMessage("Create file " + path, () ->
+                rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5())));
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        commit("Modify file " + path, rdf,
+        withCommitMessage("Modify file " + path,
                 () -> rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5())));
     }
 
@@ -140,27 +131,23 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void copy(String from, String to) throws IOException {
         ensureValidPath(from);
         ensureValidPath(to);
-        commit("Copy data from " + from + " to " + to, rdf, () -> {
-            rdf.update(storedQuery("fs_copy", from, to, name(to)));
-            initPermissions(to);
-        });
+        withCommitMessage("Copy data from " + from + " to " + to, () ->
+                rdf.update(storedQuery("fs_copy", from, to, name(to))));
     }
 
     @Override
     public void move(String from, String to) throws IOException {
         ensureValidPath(from);
         ensureValidPath(to);
-        commit("Move data from " + from + " to " + to, rdf, () -> {
-            rdf.update(storedQuery("fs_move", from, to, name(to)));
-            initPermissions(to);
-        });
+        withCommitMessage("Move data from " + from + " to " + to, () ->
+                rdf.update(storedQuery("fs_move", from, to, name(to))));
     }
 
     @Override
     public void delete(String path) throws IOException {
         ensureValidPath(path);
 
-        commit("Delete " + path, rdf, () ->
+        withCommitMessage("Delete " + path, () ->
                 rdf.update(storedQuery("fs_delete", path, userIriSupplier.get())));
     }
 
@@ -192,7 +179,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(!row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
                 .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
-                .readOnly(access.ordinal() < Access.Write.ordinal())
+                .readOnly(!access.canWrite())
                 .build();
     }
 
@@ -204,7 +191,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
+                .readOnly(!collection.getAccess().canWrite())
                 .build();
     }
 
@@ -222,10 +209,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
         if (isCollection(path)) {
             throw new AccessDeniedException("Use Collections API for operations on collections");
         }
-    }
-
-    private Collection getCollection(String path) {
-        return collections.getByLocation(splitPath(path)[0]);
     }
 
     @SneakyThrows(NoSuchAlgorithmException.class)

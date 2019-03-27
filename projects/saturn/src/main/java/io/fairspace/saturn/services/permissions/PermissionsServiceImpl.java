@@ -27,8 +27,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     private final MailComposer mailComposer;
 
     @Override
-    public void createResource(Node resource, Node authority) {
-        rdf.update(storedQuery("permissions_create_resource", resource, authority, userIriSupplier.get()));
+    public void createResource(Node resource) {
+        rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
     }
 
     @Override
@@ -133,9 +133,14 @@ public class PermissionsServiceImpl implements PermissionsService {
         return isCollection(resource) ? Access.None : isWriteRestricted(resource) ? Access.Read : Access.Write;
     }
 
+    /**
+
+     * @param resource
+     * @return an authoritative resource for the given resource: currently either the parent collection (for files and directories) or the resource itself
+     */
     private Node getAuthority(Node resource) {
-        var processor = new QuerySolutionProcessor<>(row -> row.getResource("authority").asNode());
-        rdf.querySelect(storedQuery("permissions_get_authority", resource), processor);
+        var processor = new QuerySolutionProcessor<>(row -> row.getResource("collection").asNode());
+        rdf.querySelect(storedQuery("get_parent_collection", resource), processor);
         return processor.getSingle().orElse(resource);
     }
 }

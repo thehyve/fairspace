@@ -5,6 +5,7 @@ import io.fairspace.saturn.services.mail.MailComposer;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
@@ -17,7 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.HashMap;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -105,9 +106,17 @@ public class PermissionsServiceImplTest {
 
     @Test
     public void testGettingPermissionsForFiles() {
-        service.createResource(createURI("http://example.com/collection"));
-        service.createResource(createURI("http://example.com/file"), createURI("http://example.com/collection"));
-        ds.getDefaultModel().add(createResource("http://example.com/collection"), RDF.type, createResource("http://fairspace.io/ontology#Collection"));
+        var collection = createResource("http://example.com/collection");
+        var file = createResource("http://example.com/file");
+        var filePath = createProperty("http://fairspace.io/ontology#filePath");
+        ds.getDefaultModel()
+                .add(collection, RDF.type, createResource("http://fairspace.io/ontology#Collection"))
+                .add(collection, filePath, createPlainLiteral("collectionPath"))
+                .add(file, filePath, createPlainLiteral("collectionPath/filePath"));
+
+
+        service.createResource(collection.asNode());
+
         assertEquals(Access.Manage, service.getPermission(createURI("http://example.com/file")));
     }
 

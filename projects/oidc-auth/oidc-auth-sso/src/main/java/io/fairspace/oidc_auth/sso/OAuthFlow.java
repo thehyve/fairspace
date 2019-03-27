@@ -56,7 +56,7 @@ public class OAuthFlow {
                 .scope(new Scope(configuration.getScope()))
                 .state(state)
                 .redirectionURI(callback)
-                .endpointURI(configuration.getAuthUri())
+                .endpointURI(configuration.getAuthUrl())
                 .build().toURI();
     }
 
@@ -65,7 +65,7 @@ public class OAuthFlow {
         AuthorizationGrant codeGrant = new AuthorizationCodeGrant(authorizationCode, getAuthorizeUri());
 
         // Make the token request
-        TokenRequest request = new TokenRequest(configuration.getTokenUri(), getClientAuthentication(), codeGrant);
+        TokenRequest request = new TokenRequest(configuration.getTokenUrl(), getClientAuthentication(), codeGrant);
         TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
 
         // On failure, tell the user
@@ -100,7 +100,7 @@ public class OAuthFlow {
         AuthorizationGrant refreshTokenGrant = new RefreshTokenGrant(refreshToken);
 
         // Make the token request
-        TokenRequest request = new TokenRequest(configuration.getTokenUri(), getClientAuthentication(), refreshTokenGrant);
+        TokenRequest request = new TokenRequest(configuration.getTokenUrl(), getClientAuthentication(), refreshTokenGrant);
         TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
 
         if (response.indicatesSuccess()) {

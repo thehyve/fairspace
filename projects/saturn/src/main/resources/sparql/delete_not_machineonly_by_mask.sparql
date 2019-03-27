@@ -8,5 +8,5 @@ PREFIX fs: <http://fairspace.io/ontology#>
 
 DELETE {GRAPH %1$s {%2$s %3$s %4$s}} WHERE {
     GRAPH %1$s {%2$s %3$s %4$s}
-    FILTER NOT EXISTS { GRAPH ws:vocabulary { %3$s fs:machineOnly true } }
+    FILTER NOT EXISTS { GRAPH ws:system-vocabulary { %3$s fs:machineOnly true } }
 }
