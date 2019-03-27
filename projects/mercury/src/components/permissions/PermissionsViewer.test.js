@@ -7,28 +7,28 @@ import PermissionsViewer from "./PermissionsViewer";
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
         {
-            collectionId: 500,
+            iri: 500,
             subject: 'user2-id',
             access: 'Write',
             firstName: 'Michael',
             lastName: 'Jackson'
         },
         {
-            collectionId: 500,
+            iri: 500,
             subject: 'user3-id',
             access: 'Read',
             firstName: 'Bruno',
             lastName: 'Mars'
         },
         {
-            collectionId: 500,
+            iri: 500,
             subject: 'user1-id',
             access: 'Manage',
             firstName: 'Mariah',
             lastName: 'Carey'
         },
         {
-            collectionId: 500,
+            iri: 500,
             subject: 'user4-id',
             access: 'Manage',
             firstName: 'Kurt',
@@ -54,7 +54,7 @@ describe('PermissionsViewer', () => {
         beforeAll(() => {
             wrapper = shallow(<PermissionsViewer
                 creator={mockCreator}
-                collectionId={500}
+                iri={500}
                 canManage
                 permissions={mockCollaborators}
                 users={mockUsers}
@@ -101,7 +101,7 @@ describe('PermissionsViewer', () => {
         beforeAll(() => {
             wrapper = shallow(<PermissionsViewer
                 creator={mockCreator}
-                collectionId={500}
+                iri={500}
                 canManage={false}
                 permissions={mockCollaborators}
                 users={mockUsers}
@@ -146,7 +146,7 @@ describe('PermissionsViewer', () => {
         beforeAll(() => {
             wrapper = shallow(<PermissionsViewer
                 creator={mockCreator}
-                collectionId={500}
+                iri={500}
                 canManage
                 permissions={mockCollaborators}
                 users={mockUsers}

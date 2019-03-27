@@ -12,7 +12,6 @@ import {
 } from "../common";
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import getDisplayName from "../../utils/userUtils";
-import {findById} from "../../utils/arrayUtils";
 import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
 
 class PermissionsViewer extends React.Component {
@@ -142,7 +141,7 @@ class PermissionsViewer extends React.Component {
         // Extend the permissions map with the user itself
         const permissionsWithUsers = permissions.map(p => ({
             ...p,
-            user: findById(users, p.subject)
+            user: users.find(u => p.user.endsWith(u.id))
         }));
 
         const addButton = canManage ? (
