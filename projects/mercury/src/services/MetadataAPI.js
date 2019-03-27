@@ -94,14 +94,9 @@ class MetadataAPI {
         ];
     }
 
-    getSubjectByPath(path) {
-        return fetch(Config.get().urls.metadata.pid + '?path=' + encodeURIComponent(path), {
-            method: 'GET',
-            headers: new Headers({Accept: 'text/plain'}),
-            credentials: 'same-origin'
-        })
-            .then(failOnHttpError("Failure when retrieving metadata"))
-            .then(response => response.text());
+    // TODO: Make the prefix configurable
+    expandIri(id) {
+        return `${window.location.origin.replace('https://', 'http://')}/iri/${id}`;
     }
 }
 

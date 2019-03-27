@@ -13,6 +13,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import MaterialReactSelect from '../common/MaterialReactSelect';
+import MetadataAPI from "../../services/MetadataAPI";
 
 export const styles = () => ({
     root: {
@@ -101,13 +102,6 @@ const getNoOptionMessage = (users) => {
     return noOptionMessage;
 };
 
-/**
- * Convert user to option value
- * @param user
- * @returns {{value}}
- */
-const convertUserToOptionValue = user => (user ? {value: user.subject} : null);
-
 const AccessRights = {
     Read: 'Read',
     Write: 'Write',
@@ -128,7 +122,7 @@ export class AlterPermissionDialog extends React.Component {
         const {user} = this.props;
         this.setState({
             accessRight: user ? user.access : 'Read',
-            selectedUser: user ? convertUserToOptionValue(user) : null,
+            selectedUser: user && user.user.id,
             selectedUserLabel: ''
         });
     };
@@ -153,7 +147,7 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
         const {iri, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser.value, iri, accessRight);
+            alterPermission(MetadataAPI.expandIri(selectedUser.value), iri, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
