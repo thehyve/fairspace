@@ -65,7 +65,7 @@ public class WebDAVIT {
         var rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> currentUser;
         var eventBus = new EventBus();
-        permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
+        permissions = new PermissionsServiceImpl(rdf, userIriSupplier, mailComposer);
         collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         when(mailComposer.newMessage(any())).thenReturn(messageBuilder);
         when(messageBuilder.append(any())).thenReturn(messageBuilder);
