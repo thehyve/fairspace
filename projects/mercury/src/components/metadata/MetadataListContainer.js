@@ -50,7 +50,7 @@ const mapStateToProps = ({metadataBySubject, cache: {allEntities, vocabulary}}) 
         id: e['@id'],
         label: getLabel(e),
         type: e['@type'],
-        typeLabel: getLabel(vocabularyData.getById(e['@type']), true)
+        typeLabel: getLabel(vocabularyData.determineShapeForType(e['@type'][0]), true)
     }));
 
     return ({
