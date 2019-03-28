@@ -5,22 +5,17 @@ class BaseInputValue extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {value: props.entry.value};
+        this.state = {value: props.entry.value || ''};
     }
 
     handleChange = (e) => {
-        this.setState({value: e.target.value});
-    }
-
-    handleSave = () => {
-        const {onSave, transformValue} = this.props;
-        onSave({value: transformValue(this.state.value)});
+        const {value} = e.target;
+        this.setState({value});
+        this.props.onChange(value);
     }
 
     render() {
-        const {
-            entry, property, style, onSave, transformValue, ...otherProps
-        } = this.props;
+        const {entry, property, style, onSave, ...otherProps} = this.props;
 
         return (
             <TextField
@@ -28,7 +23,6 @@ class BaseInputValue extends React.Component {
                 multiline={property.multiLine}
                 value={this.state.value}
                 onChange={this.handleChange}
-                onBlur={this.handleSave}
                 margin="normal"
                 style={{...style, marginTop: 0, width: '100%'}}
             />
@@ -37,8 +31,7 @@ class BaseInputValue extends React.Component {
 }
 
 BaseInputValue.defaultProps = {
-    entry: {value: ''},
-    transformValue: v => v
+    entry: {value: ''}
 };
 
 export default BaseInputValue;

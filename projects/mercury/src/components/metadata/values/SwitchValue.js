@@ -9,14 +9,13 @@ class SwitchValue extends React.Component {
     }
 
     handleChange = (e) => {
-        this.setState({checked: e.target.checked});
-        this.props.onSave({value: e.target.checked});
+        const {checked} = e.target;
+        this.setState({checked});
+        this.props.onChange(checked);
     }
 
     render() {
-        const {
-            entry, property, style, onSave, ...otherProps
-        } = this.props;
+        const {entry, property, style, onSave, ...otherProps} = this.props;
 
         return (
             <Switch

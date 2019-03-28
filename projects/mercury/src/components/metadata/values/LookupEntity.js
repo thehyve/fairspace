@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+
 import MaterialReactSelect from "../../common/MaterialReactSelect";
 import {fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
 import {getLabel} from "../../../utils/metadataUtils";
 import {compareBy} from "../../../utils/comparisionUtils";
 
-function LookupEntity({
-    entities, property, onSave, dispatch, ...otherProps
-}) {
+function LookupEntity({entities, property, onChange, dispatch, ...otherProps}) {
     // Ensure that the entities for lookup have been retrieved
     dispatch(fetchEntitiesIfNeeded(property.className));
 
@@ -16,29 +15,20 @@ function LookupEntity({
     const options = entities.map((entity) => {
         const id = entity['@id'];
         const label = getLabel(entity);
+        const disabled = property.values.some(v => v.id === id);
 
-        const option = {
-            disabled: property.values.some(v => v.id === id),
-            id,
-            label
-        };
-
-        return option;
+        return {disabled, id, label};
     });
 
     options.sort(compareBy('disabled'));
 
-    // Prevent saving any labels used for UI
-    const handleSave = (selected) => {
-        onSave({id: selected.id, label: selected.label});
-    };
-
     return (
+
         <MaterialReactSelect
             style={{width: '100%'}}
             {...otherProps}
             options={options}
-            onChange={handleSave}
+            onChange={onChange}
         />
     );
 }
