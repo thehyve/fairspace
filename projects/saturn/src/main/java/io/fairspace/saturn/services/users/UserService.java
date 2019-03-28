@@ -7,14 +7,17 @@ import org.apache.jena.graph.Node;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 
 public class UserService {
+    private final Supplier<UserInfo> currentUserInfoSupplier;
     private final DAO dao;
     private final Map<String, User> usersById = new ConcurrentHashMap<>();
 
-    public UserService(DAO dao) {
+    public UserService(Supplier<UserInfo> currentUserInfoSupplier, DAO dao) {
+        this.currentUserInfoSupplier = currentUserInfoSupplier;
         this.dao = dao;
 
         loadUsers();
@@ -34,10 +37,22 @@ public class UserService {
      * @return
      */
     public Node getUserIRI(UserInfo userInfo) {
-        return getUser(userInfo).getIri();
+        return getOrCreateUser(userInfo).getIri();
     }
 
-    private User getUser(UserInfo userInfo) {
+    public User getCurrentUser() {
+        return getOrCreateUser(currentUserInfoSupplier.get());
+    }
+
+    public User getUser(Node iri) {
+        return usersById.values()
+                .stream()
+                .filter(user -> user.getIri().equals(iri))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private User getOrCreateUser(UserInfo userInfo) {
         var user = findUser(userInfo);
         if (user != null) {
             if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
