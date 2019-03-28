@@ -136,7 +136,6 @@ public class PermissionsServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testUserCannotModifyHisOwnPermission() {
-        ;
         service.setPermission(RESOURCE, USER1, Access.Write);
     }
 
