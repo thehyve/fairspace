@@ -9,16 +9,20 @@ import ValueComponentFactory from "./values/ValueComponentFactory";
 import * as constants from '../../constants';
 
 class MetadataProperty extends React.Component {
-    state = {
-        hoveredIndex: null
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            hoveredIndex: null,
+            currentValues: props.property.values,
+        };
+    }
 
     setHoveredIndex = (hoveredIndex) => {
         this.setState({hoveredIndex});
     }
 
     renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
-        const {editable, property, onChange, onDelete} = this.props;
+        const {editable, property, onChange} = this.props;
         const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
 
         return (
@@ -44,7 +48,7 @@ class MetadataProperty extends React.Component {
                                         size="small"
                                         aria-label="Delete"
                                         title="Delete"
-                                        onClick={() => onDelete(idx)}
+                                        onClick={() => this.handleDelete(idx)}
                                         style={{visibility}}
                                     >
                                         <ClearIcon />
@@ -57,8 +61,27 @@ class MetadataProperty extends React.Component {
         );
     };
 
-    renderAddComponent = (labelledBy) => {
+    handleAdd = (value) => {
         const {property, onChange} = this.props;
+        if (property.allowMultiple) {
+            this.setState(prevState => ({currentValues: [...prevState.currentValues, value]}));
+        }
+        onChange(value);
+    }
+
+    handleDelete = (index) => {
+        const {property, onDelete} = this.props;
+        if (property.allowMultiple) {
+            this.setState(({currentValues}) => {
+                const arr = [...currentValues.slice(0, index), ...currentValues.slice(index + 1)];
+                return {currentValues: arr};
+            });
+        }
+        onDelete(index);
+    }
+
+    renderAddComponent = (labelledBy) => {
+        const {property} = this.props;
         const ValueAddComponent = ValueComponentFactory.addComponent(property);
 
         return (
@@ -67,7 +90,7 @@ class MetadataProperty extends React.Component {
                     <ValueAddComponent
                         property={property}
                         placeholder="Add new"
-                        onChange={(value) => onChange(value)}
+                        onChange={this.handleAdd}
                         aria-labelledby={labelledBy}
                     />
                 </ListItemText>
@@ -77,6 +100,7 @@ class MetadataProperty extends React.Component {
 
     render() {
         const {editable, property} = this.props;
+        const {currentValues} = this.state;
 
         // Do not show an add component if no multiples are allowed
         // and there is already a value
@@ -94,7 +118,7 @@ class MetadataProperty extends React.Component {
                     {property.label}
                 </Typography>
                 <List dense>
-                    {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
+                    {currentValues.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
                     {canAdd ? this.renderAddComponent(labelId) : null}
                 </List>
             </ListItem>
