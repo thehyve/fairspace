@@ -7,29 +7,25 @@ import PermissionsViewer from "./PermissionsViewer";
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
         {
-            iri: 500,
-            subject: 'user2-id',
+            user: 'http://localhost/iri/user2-id',
             access: 'Write',
             firstName: 'Michael',
             lastName: 'Jackson'
         },
         {
-            iri: 500,
-            subject: 'user3-id',
+            user: 'http://localhost/iri/user3-id',
             access: 'Read',
             firstName: 'Bruno',
             lastName: 'Mars'
         },
         {
-            iri: 500,
-            subject: 'user1-id',
+            user: 'http://localhost/iri/user1-id',
             access: 'Manage',
             firstName: 'Mariah',
             lastName: 'Carey'
         },
         {
-            iri: 500,
-            subject: 'user4-id',
+            user: 'http://localhost/iri/user4-id',
             access: 'Manage',
             firstName: 'Kurt',
             lastName: 'Cobain'
