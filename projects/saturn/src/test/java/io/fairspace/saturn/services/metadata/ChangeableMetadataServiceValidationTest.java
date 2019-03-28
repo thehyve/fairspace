@@ -42,7 +42,6 @@ public class ChangeableMetadataServiceValidationTest {
     private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
     private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
 
-
     private static final Statement STMT1 = createStatement(S1, P1, S2);
 
     private static final Statement LBL_STMT1 = createStatement(S1, RDFS.label, createStringLiteral("subject1"));
@@ -105,6 +104,12 @@ public class ChangeableMetadataServiceValidationTest {
 
         Model model = ds.getNamedModel(GRAPH);
         assertTrue(!model.contains(LBL_STMT1));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void deleteShouldFailOnMachineOnValidationFailure() {
+        when(validator.validateDelete(any())).thenReturn(new ValidationResult("Error"));
+        api.delete(S1.getURI(), P1.getURI(), S2.getURI());
     }
 
     @Test
