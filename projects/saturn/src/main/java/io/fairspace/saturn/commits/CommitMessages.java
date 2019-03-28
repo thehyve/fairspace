@@ -13,7 +13,7 @@ import static io.fairspace.saturn.Context.currentRequest;
  * or by calling withCommitMessage.
  */
 public class CommitMessages {
-    public static final String COMMIT_MESSAGE_HEADER = "Saturn-Commit-MessageBuilder";
+    public static final String COMMIT_MESSAGE_HEADER = "Saturn-Commit-Message";
 
     private static final ThreadLocal<String> systemCommitMessage = new ThreadLocal<>();
 
