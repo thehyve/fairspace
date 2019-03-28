@@ -5,9 +5,8 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 
+import java.util.HashSet;
 import java.util.stream.Stream;
-
-import static io.fairspace.saturn.util.Ref.ref;
 
 
 public class PermissionCheckingValidator implements MetadataRequestValidator {
@@ -31,20 +30,22 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
 
 
     private ValidationResult validateModel(Model model) {
-        var result = ref(ValidationResult.VALID);
+        var resourcesToValidate = new HashSet<Resource>();
 
         model.listStatements().forEachRemaining(stmt -> {
-                    result.value = result.value.merge(validateResource(stmt.getSubject()));
+                    resourcesToValidate.add(stmt.getSubject());
 
                     if (stmt.getObject().isURIResource() &&
                             Stream.of(vocabularies)
                                     .anyMatch(voc -> voc.isInvertiblePredicate(stmt.getPredicate().getURI()))) {
-                        result.value = result.value.merge(validateResource(stmt.getResource()));
+                        resourcesToValidate.add(stmt.getResource());
                     }
                 }
         );
 
-        return result.value;
+        return resourcesToValidate.stream()
+                .map(this::validateResource)
+                .reduce(ValidationResult.VALID, ValidationResult::merge);
     }
 
     private ValidationResult validateResource(Resource resource) {
