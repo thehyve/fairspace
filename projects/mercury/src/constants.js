@@ -19,7 +19,6 @@ export const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
 export const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
 export const FAIRSPACE_NS = 'http://fairspace.io/ontology#';
 
-
 // URIs
 export const TYPE_URI = RDF_NS + 'type';
 export const LABEL_URI = RDFS_NS + 'label';
@@ -51,3 +50,4 @@ export const DIRECTORY_URI = FAIRSPACE_NS + 'Directory';
 export const FILE_PATH_URI = FAIRSPACE_NS + 'filePath';
 export const DATE_DELETED_URI = FAIRSPACE_NS + 'dateDeleted';
 export const DELETED_BY_URI = FAIRSPACE_NS + 'deletedBy';
+export const NIL_URI = FAIRSPACE_NS + 'nil';

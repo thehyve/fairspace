@@ -18,17 +18,15 @@ function LookupEntity({entities, property, onChange, dispatch, ...otherProps}) {
         const disabled = property.values.some(v => v.id === id);
 
         return {disabled, id, label};
-    });
-
-    options.sort(compareBy('disabled'));
+    }).sort(compareBy('disabled'));
 
     return (
-
         <MaterialReactSelect
             style={{width: '100%'}}
             {...otherProps}
             options={options}
-            onChange={onChange}
+            // TODO: I think label is not needed here?
+            onChange={({id, label}) => onChange({id, label})}
         />
     );
 }

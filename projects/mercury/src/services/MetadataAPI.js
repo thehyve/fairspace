@@ -1,6 +1,7 @@
-import * as jsonld from 'jsonld/dist/jsonld';
+import {expand} from 'jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
+import {toJsonLd} from "../utils/metadataUtils";
 import Vocabulary from "./Vocabulary";
 
 class MetadataAPI {
@@ -15,35 +16,25 @@ class MetadataAPI {
         return fetch(`${Config.get().urls.metadata.statements}?labels&${query}`, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
-            .then(jsonld.expand);
+            .then(expand);
     }
 
-    /**
-     * Update values in the metadata store
-     * @param subject   Single URI representing the subject to update
-     * @param predicate Single URI representing the predicate to update
-     * @param values    Array with objects representing the rdf-object for the triples.
-     *                  Each object must have a 'value' key.
-     *                  e.g.: [ {value: 'user 1'}, {value: 'another user'} ]
-     * @returns {*}
-     */
-    update(subject, predicate, values) {
-        if (!subject || !predicate || !values) {
-            return Promise.reject(Error("No subject, predicate or values given"));
+    updateEntity(subject, properties) {
+        if (!subject || !properties) {
+            return Promise.reject(Error("No subject or properties given"));
         }
 
-        const request = (values.length === 0)
-            ? fetch(Config.get().urls.metadata.statements
-                + '?subject=' + encodeURIComponent(subject)
-                + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE', credentials: 'same-origin'})
-            : fetch(Config.get().urls.metadata.statements, {
-                method: 'PATCH',
-                headers: new Headers({'Content-type': 'application/ld+json'}),
-                credentials: 'same-origin',
-                body: JSON.stringify(this.toJsonLd(subject, predicate, values))
-            });
+        const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p]));
 
-        return request.then(failOnHttpError("Failure when updating metadata"));
+        console.log({jsonLd});
+        
+
+        return fetch(Config.get().urls.metadata.statements, {
+            method: 'PATCH',
+            headers: new Headers({'Content-type': 'application/ld+json'}),
+            credentials: 'same-origin',
+            body: JSON.stringify(jsonLd)
+        }).then(failOnHttpError("Failure when updating metadata"));
     }
 
     /**
@@ -58,11 +49,11 @@ class MetadataAPI {
                 fetch(Config.get().urls.vocabulary.user, MetadataAPI.getParams)
                     .then(failOnHttpError("Failure when retrieving the user vocabulary"))
                     .then(response => response.json())
-                    .then(jsonld.expand),
+                    .then(expand),
                 fetch(Config.get().urls.vocabulary.system, MetadataAPI.getParams)
                     .then(failOnHttpError("Failure when retrieving the system vocabulary"))
                     .then(response => response.json())
-                    .then(jsonld.expand)
+                    .then(expand)
             ]))
             .then(([userVocabulary, systemVocabulary]) => [...userVocabulary, ...systemVocabulary])
             .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
@@ -82,7 +73,7 @@ class MetadataAPI {
         return fetch(Config.get().urls.metadata.entities + "?type=" + encodeURIComponent(type), MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(jsonld.expand);
+            .then(expand);
     }
 
     /**
@@ -95,16 +86,7 @@ class MetadataAPI {
         return fetch(Config.get().urls.metadata.entities, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(jsonld.expand);
-    }
-
-    toJsonLd(subject, predicate, values) {
-        return [
-            {
-                '@id': subject,
-                [predicate]: values.map(value => ({'@id': value.id, '@value': value.value}))
-            }
-        ];
+            .then(expand);
     }
 
     getSubjectByPath(path) {

@@ -45,7 +45,6 @@ it('render properties', () => {
     const wrapper = shallow(<MetadataEntityContainer
         properties={metadata}
         subject={subject}
-        dispatch={() => {}}
     />);
     expect(wrapper.find(List).children().length).toBe(1);
 });
@@ -128,7 +127,7 @@ it('tries to load the metadata and the vocabulary', () => {
         }
     });
 
-    const dispatch = jest.fn();
-    mount(<MetadataEntityContainer subject="John" properties={[]} store={store} dispatch={dispatch} />);
-    expect(dispatch.mock.calls.length).toEqual(1);
+    const fetchCombinedMetadataIfNeeded = jest.fn();
+    mount(<MetadataEntityContainer subject="John" properties={[]} store={store} fetchCombinedMetadataIfNeeded={fetchCombinedMetadataIfNeeded} />);
+    expect(fetchCombinedMetadataIfNeeded.mock.calls.length).toEqual(1);
 });

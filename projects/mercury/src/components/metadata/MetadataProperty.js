@@ -102,4 +102,8 @@ class MetadataProperty extends React.Component {
     }
 }
 
+MetadataProperty.defaultProps = {
+    onChange: () => {}
+};
+
 export default MetadataProperty;
