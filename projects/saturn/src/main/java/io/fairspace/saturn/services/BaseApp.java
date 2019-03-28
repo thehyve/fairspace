@@ -16,10 +16,7 @@ import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
-import static spark.Spark.before;
-import static spark.Spark.exception;
-import static spark.Spark.halt;
-import static spark.Spark.notFound;
+import static spark.Spark.*;
 
 @Slf4j
 public abstract class BaseApp implements SparkApplication {
