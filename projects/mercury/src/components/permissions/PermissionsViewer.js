@@ -13,6 +13,7 @@ import {
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import getDisplayName from "../../utils/userUtils";
 import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
+import MetadataAPI from "../../services/MetadataAPI";
 
 class PermissionsViewer extends React.Component {
     state = {
@@ -66,7 +67,7 @@ class PermissionsViewer extends React.Component {
         const {selectedUser} = this.state;
 
         if (selectedUser) {
-            alterPermission(selectedUser.subject, iri, 'None');
+            alterPermission(MetadataAPI.createIri(selectedUser.user.id), iri, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
@@ -141,7 +142,7 @@ class PermissionsViewer extends React.Component {
         // Extend the permissions map with the user itself
         const permissionsWithUsers = permissions.map(p => ({
             ...p,
-            user: users.find(u => p.user.endsWith(u.id))
+            user: users.find(u => p.user === MetadataAPI.createIri(u.id))
         }));
 
         const addButton = canManage ? (
