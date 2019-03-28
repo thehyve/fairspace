@@ -97,6 +97,17 @@ public class ChangeableMetadataServiceValidationTest {
     }
 
     @Test
+    public void testDeleteShouldSucceedOnValidationSuccess() {
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
+
+        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
+        api.delete(S1.getURI(), null, null);
+
+        Model model = ds.getNamedModel(GRAPH);
+        assertTrue(!model.contains(LBL_STMT1));
+    }
+
+    @Test
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
 
