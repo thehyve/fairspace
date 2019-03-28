@@ -2,56 +2,48 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class ValidationResultTest {
     @Test
     public void testMergeValidProperty() {
-        ValidationResult valid = ValidationResult.VALID;
-        ValidationResult failure = new ValidationResult(false, "");
+        var valid = ValidationResult.VALID;
+        var failure = new ValidationResult("failure");
 
-        assertEquals(true, valid.merge(valid).isValid());
-        assertEquals(false, valid.merge(failure).isValid());
-        assertEquals(false, failure.merge(valid).isValid());
-        assertEquals(false, failure.merge(failure).isValid());
+        assertTrue(valid.merge(valid).isValid());
+        assertFalse(valid.merge(failure).isValid());
+        assertFalse(failure.merge(valid).isValid());
+        assertFalse(failure.merge(failure).isValid());
     }
 
-    @Test
-    public void testMergeMessageProperty() {
-        ValidationResult defaultValid = ValidationResult.VALID;
-        ValidationResult success = new ValidationResult(true, "Succesful message");
-        ValidationResult failure = new ValidationResult(false, "Other message");
-
-        // Keep first message by default
-        assertEquals(success.getMessage(), success.merge(failure).getMessage());
-
-        // Overwrite first message if empty
-        assertEquals(success.getMessage(), defaultValid.merge(success).getMessage());
-    }
 
     @Test
     public void testMergeValidationMessages() {
-        ValidationResult defaultValid = ValidationResult.VALID;
-        ValidationResult success = new ValidationResult(true, "Succesful message");
-        ValidationResult failure = new ValidationResult(false, "Other message");
+        var error1 = new ValidationResult("Error 1");
+        var error2 = new ValidationResult("Error 2");
+        var error3 = new ValidationResult("Error 3");
 
-        // Both messages should be kept when merging
-        ValidationResult merged = success.merge(failure);
-        assertEquals(2, merged.getValidationMessages().size());
-        assertEquals(success.getMessage(), merged.getValidationMessages().get(0));
-        assertEquals(failure.getMessage(), merged.getValidationMessages().get(1));
+        // Valid is the group's union
+        assertEquals(ValidationResult.VALID, ValidationResult.VALID.merge(ValidationResult.VALID));
+        assertEquals(error1, error1.merge(ValidationResult.VALID));
+        assertEquals(error1, ValidationResult.VALID.merge(error1));
 
-        // Any empty message should be discarded
-        merged = defaultValid.merge(success);
-        assertEquals(1, merged.getValidationMessages().size());
-        assertEquals(success.getMessage(), merged.getValidationMessages().get(0));
+        // Is commutative
+        assertEquals(error1.merge(error2), error2.merge(error1));
 
-        // Duplicate messages should not be combined
-        merged = success.merge(success);
-        assertEquals(2, merged.getValidationMessages().size());
-        assertEquals(success.getMessage(), merged.getValidationMessages().get(0));
-        assertEquals(success.getMessage(), merged.getValidationMessages().get(1));
+        // Is associative
+        assertEquals((error1.merge(error2)).merge(error3), error1.merge(error2.merge(error3)));
 
+        // Is idempotent
+        assertEquals(error1.merge(error2), error1.merge(error2).merge(error2));
+
+        // All messages are kept
+        var merged = ValidationResult.VALID.merge(error1).merge(error2).merge(error3);
+        assertEquals(3, merged.getValidationMessages().size());
+        assertTrue(merged.getValidationMessages().contains(error1.getMessage()));
+        assertTrue(merged.getValidationMessages().contains(error2.getMessage()));
+        assertTrue(merged.getValidationMessages().contains(error3.getMessage()));
+        assertEquals("Error 1. Error 2. Error 3.", merged.getMessage());
     }
 
 }

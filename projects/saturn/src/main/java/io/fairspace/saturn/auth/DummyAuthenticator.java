@@ -1,7 +1,6 @@
 package io.fairspace.saturn.auth;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
