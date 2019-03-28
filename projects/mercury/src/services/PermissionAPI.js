@@ -27,14 +27,15 @@ class PermissionAPI {
         if (!userId || !iri || !access) {
             return Promise.reject(Error("No userId, IRI or access given"));
         }
+        const payload = {user: userId, access};
         return fetch(`${Config.get().urls.permissions}?${queryString.stringify({iri})}`, {
             method: 'PUT',
             headers: PermissionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({user: userId, access})
+            body: JSON.stringify(payload)
         })
             .then(failOnHttpError("Failure while alter a collection's permission"))
-            .then(response => response.json());
+            .then(() => payload);
     }
 }
 

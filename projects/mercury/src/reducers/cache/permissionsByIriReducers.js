@@ -8,7 +8,7 @@ const permissionByCollectionReducer = promiseReducerFactory(
 );
 
 // Functions to modify the permission cache after altering the permissions
-const removeCollaborator = (collaborators, actionMeta) => (collaborators ? collaborators.filter(collaborator => collaborator.subject !== actionMeta.subject) : []);
+const removeCollaborator = (collaborators, actionMeta) => (collaborators ? collaborators.filter(collaborator => collaborator.user !== actionMeta.user) : []);
 
 const updateCollaborator = (collaborators, actionMeta) => removeCollaborator(collaborators, actionMeta).concat(actionMeta);
 

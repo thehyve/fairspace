@@ -18,7 +18,7 @@ public class Config {
     public WebDAV webDAV = new WebDAV();
 
     public static class Jena {
-        public String baseIRI = "http://fairspace.io/iri/";
+        public String baseIRI = "http://localhost:3000/iri/";
 
         public File datasetPath = new File("data/db");
 

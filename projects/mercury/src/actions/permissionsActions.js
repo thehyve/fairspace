@@ -23,12 +23,8 @@ export const fetchPermissionsIfNeeded = (iri, useCache = false) => dispatchIfNee
     state => (state && state.cache && state.cache.permissionsByIri ? state.cache.permissionsByIri[iri] : undefined)
 );
 
-export const alterPermission = createErrorHandlingPromiseAction((userId, iri, access) => ({
+export const alterPermission = createErrorHandlingPromiseAction((user, iri, access) => ({
     type: ALTER_PERMISSION,
-    payload: PermissionAPI.alterPermission(userId, iri, access),
-    meta: {
-        subject: userId,
-        iri,
-        access
-    }
+    payload: PermissionAPI.alterPermission(user, iri, access),
+    meta: {user, iri, access}
 }));

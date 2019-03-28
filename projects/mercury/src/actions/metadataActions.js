@@ -20,7 +20,7 @@ export const updateMetadata = (subject, predicate, values) => ({
 });
 
 export const createMetadataEntity = (shape, id) => {
-    const subject = MetadataAPI.expandIri(id);
+    const subject = MetadataAPI.createIri(id);
     const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
     return {
         type: actionTypes.CREATE_METADATA_ENTITY,

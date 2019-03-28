@@ -11,28 +11,28 @@ import static org.junit.Assert.assertEquals;
 public class SparqlUtilsTest {
     @Test
     public void plainLiteralsAreProperlyEscaped() {
-        assertEquals("PREFIX ws: <http://fairspace.io/iri/>\n" +
+        assertEquals("PREFIX ws: <http://localhost:3000/iri/>\n" +
                         "\"123\"^^<http://www.w3.org/2001/XMLSchema#long>",
                 storedQuery("test_formatting", 123L));
     }
 
     @Test
     public void stringLiteralsAreProperlyEscaped() {
-        assertEquals("PREFIX ws: <http://fairspace.io/iri/>\n" +
+        assertEquals("PREFIX ws: <http://localhost:3000/iri/>\n" +
                         "\"\\\"'<>?$%\"",
                 storedQuery("test_formatting", "\"'<>?$%"));
     }
 
     @Test
     public void validIrisAreProperlyEscaped() {
-        assertEquals("PREFIX ws: <http://fairspace.io/iri/>\n" +
+        assertEquals("PREFIX ws: <http://localhost:3000/iri/>\n" +
                         "<http://example.com/path/subpath#hash>",
                 storedQuery("test_formatting", createURI("http://example.com/path/subpath#hash")));
     }
 
     @Test
     public void instantsAreProperlyFormatted() {
-        assertEquals("PREFIX ws: <http://fairspace.io/iri/>\n" +
+        assertEquals("PREFIX ws: <http://localhost:3000/iri/>\n" +
                         "\"1970-01-01T00:00:00Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime>",
                 storedQuery("test_formatting", ofEpochMilli(0L)));
     }

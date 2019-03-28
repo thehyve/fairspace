@@ -36,10 +36,10 @@ public class ChangeableMetadataServiceValidationTest {
     private MetadataEntityLifeCycleManager lifeCycleManager;
 
     private static final ValidationResult INVALID_VALIDATION_RESULT = new ValidationResult(false, "Test error");
-    private static final String GRAPH = "http://fairspace.io/iri/graph";
+    private static final String GRAPH = "http://localhost:3000/iri/graph";
 
-    private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
-    private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
+    private static final Resource S1 = createResource("http://localhost:3000/iri/S1");
+    private static final Resource S2 = createResource("http://localhost:3000/iri/S2");
     private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
 
     private static final Property MACHINE_ONLY_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");

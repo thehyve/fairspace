@@ -107,8 +107,7 @@ class MetadataAPI {
         ];
     }
 
-    // TODO: Make the prefix configurable
-    expandIri(id) {
+    createIri(id) {
         return `${window.location.origin.replace('https://', 'http://')}/iri/${id}`;
     }
 }

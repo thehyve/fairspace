@@ -2,7 +2,7 @@
 port: 8080
 jena:
   # Base IRI for all metadata entities
-  baseIRI: "http://fairspace.io/iri/"
+  baseIRI: "http://localhost:3000/iri/"
   # Jena's TDB2 database path
   datasetPath: "data/db"
   # Path of the transaction log
