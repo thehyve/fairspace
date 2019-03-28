@@ -9,7 +9,7 @@ import static io.fairspace.saturn.Context.currentRequest;
 
 /**
  * Manages commit messages.
- * A commit message can be set either externally using Saturn-Commit-MessageBuilder header of the incoming HTTP request
+ * A commit message can be set either externally using Saturn-Commit-Message header of the incoming HTTP request
  * or by calling withCommitMessage.
  */
 public class CommitMessages {
