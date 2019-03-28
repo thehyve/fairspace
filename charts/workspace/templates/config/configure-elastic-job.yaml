@@ -1,0 +1,62 @@
+{{- $scripts := .Values.workspace.configurationScripts.elasticsearch -}}
+{{- if $scripts.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{.Release.Name}}-elastic-configuration"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{.Release.Name}}-elastic-configuration"
+      labels:
+        heritage: {{.Release.Service | quote }}
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    spec:
+      restartPolicy: Never
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{ toYaml . | indent 8 }}
+      {{- end }}
+      initContainers:
+      - name: wait-for-elasticsearch
+        image: "{{ $scripts.initContainer.image }}"
+        imagePullPolicy: {{ $scripts.initContainer.pullPolicy }}
+        command:
+          - sh
+          - -c
+          - |
+            until printf "." && nc -z -w 2 {{ template "workspace.elasticsearch.resthost" . }} {{ .Values.workspace.elasticsearch.restport }}; do
+                sleep 2;
+            done;
+            echo 'ElasticSearch OK ✓'
+      containers:
+      - name: configure-elastic-job
+        image: "{{ $scripts.configurationContainer.image }}"
+        imagePullPolicy: {{ $scripts.configurationContainer.pullPolicy }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/config
+        command:
+          - curl
+        args:
+          - "-X PUT"
+          - "-vv"
+          - "-H"
+          - "Content-Type: application/json"
+          - "-d"
+          - "@/opt/config/es-index-configuration.json"
+          - "{{ template "workspace.elasticsearch.resturl" . }}/{{ .Values.workspace.elasticsearch.indexName }}"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: "{{.Release.Name}}-elastic-config-map"
+{{- end -}}

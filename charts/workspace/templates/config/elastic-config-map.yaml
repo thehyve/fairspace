@@ -1,0 +1,48 @@
+{{- if .Values.workspace.configurationScripts.elasticsearch.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{.Release.Name}}-elastic-config-map"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+data:
+  es-index-configuration.json: |-
+    {
+      "settings":{
+        "analysis":{
+          "analyzer":{
+            "ngram_analyzer":{
+              "type":"custom",
+              "tokenizer":"ngram_tokenizer",
+              "filter":[
+                "lowercase"
+              ]
+            }
+          },
+          "tokenizer":{
+            "ngram_tokenizer":{
+              "type":"ngram",
+              "min_gram":3,
+              "max_gram":3,
+              "token_chars":[
+                "letter",
+                "digit"
+              ]
+            }
+          }
+        }
+      },
+      "mappings":{
+        "iri":{
+          "properties":{
+            "filePath":{
+              "type":"text",
+              "analyzer":"ngram_analyzer"
+            }
+          }
+        }
+      }
+    }
+{{- end -}}

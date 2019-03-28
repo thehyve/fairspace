@@ -80,17 +80,29 @@ workspace:
       groups:
         user:
 
-    # Scripts for setting up keycloak for a workspace
+    # Scripts for setting up elasticsearch and keycloak for a workspace
     configurationScripts:
+      elasticsearch:
+        enabled: true
+        initContainer:
+          image: alpine:3.8
+          pullPolicy: IfNotPresent
+        configurationContainer:
+          image: appropriate/curl:latest
+          pullPolicy: IfNotPresent
       keycloak:
         enabled: true
         image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.2
         pullPolicy: IfNotPresent
+
     enableExperimentalFeatures: false
+
     elasticsearch:
-        enabled: true
-        restport: 9200
-        transportport: 9300
+      enabled: true
+      host:
+      restport: 9200
+      transportport: 9300
+      indexName: fairspace
 
 # Generic settings for tracing
 tracing:
@@ -322,6 +334,9 @@ jupyterhub:
 # Specific settings for ElasticSearch
 #####################################################################
 elasticsearch:
+  # Whether to install ES in the cluster. If set to false
+  # you should provide an alternative elastic search host in workspace.elasticsearch.host
+  install: true
   persistence:
     enabled: true
     size: 20Gi
