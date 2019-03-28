@@ -26,9 +26,6 @@ class MetadataAPI {
 
         const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p]));
 
-        console.log({jsonLd});
-        
-
         return fetch(Config.get().urls.metadata.statements, {
             method: 'PATCH',
             headers: new Headers({'Content-type': 'application/ld+json'}),
