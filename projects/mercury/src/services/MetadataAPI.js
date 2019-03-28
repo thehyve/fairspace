@@ -19,6 +19,34 @@ class MetadataAPI {
             .then(expand);
     }
 
+    /**
+     * Update values in the metadata store
+     * @param subject   Single URI representing the subject to update
+     * @param predicate Single URI representing the predicate to update
+     * @param values    Array with objects representing the rdf-object for the triples.
+     *                  Each object must have a 'value' key.
+     *                  e.g.: [ {value: 'user 1'}, {value: 'another user'} ]
+     * @returns {*}
+     */
+    update(subject, predicate, values) {
+        if (!subject || !predicate || !values) {
+            return Promise.reject(Error("No subject, predicate or values given"));
+        }
+
+        const request = (values.length === 0)
+            ? fetch(Config.get().urls.metadata.statements
+                + '?subject=' + encodeURIComponent(subject)
+                + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE', credentials: 'same-origin'})
+            : fetch(Config.get().urls.metadata.statements, {
+                method: 'PATCH',
+                headers: new Headers({'Content-type': 'application/ld+json'}),
+                credentials: 'same-origin',
+                body: JSON.stringify(toJsonLd(subject, predicate, values))
+            });
+
+        return request.then(failOnHttpError("Failure when updating metadata"));
+    }
+
     updateEntity(subject, properties) {
         if (!subject || !properties) {
             return Promise.reject(Error("No subject or properties given"));
