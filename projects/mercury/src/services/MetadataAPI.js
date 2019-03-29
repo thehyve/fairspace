@@ -106,10 +106,6 @@ class MetadataAPI {
             }
         ];
     }
-
-    createIri(id) {
-        return `${window.location.origin.replace('https://', 'http://')}/iri/${id}`;
-    }
 }
 
 export default new MetadataAPI();

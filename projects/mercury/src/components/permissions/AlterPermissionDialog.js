@@ -13,7 +13,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import MaterialReactSelect from '../common/MaterialReactSelect';
-import MetadataAPI from "../../services/MetadataAPI";
+import {createIri} from "../../utils/metadataUtils";
 
 export const styles = () => ({
     root: {
@@ -147,7 +147,7 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
         const {iri, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(MetadataAPI.createIri(selectedUser), iri, accessRight);
+            alterPermission(createIri(selectedUser), iri, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});

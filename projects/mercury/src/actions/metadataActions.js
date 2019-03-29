@@ -2,7 +2,7 @@ import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux
 import MetadataAPI from "../services/MetadataAPI";
 import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
-import {getFirstPredicateId} from "../utils/metadataUtils";
+import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
@@ -20,7 +20,7 @@ export const updateMetadata = (subject, predicate, values) => ({
 });
 
 export const createMetadataEntity = (shape, id) => {
-    const subject = MetadataAPI.createIri(id);
+    const subject = createIri(id);
     const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
     return {
         type: actionTypes.CREATE_METADATA_ENTITY,
