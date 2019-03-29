@@ -9,6 +9,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
+import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
 import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
@@ -54,9 +55,11 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(new DAO(rdf, null));
+        var userService = new UserService(SecurityUtil::userInfo, new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
+        var mailService = new MailService(CONFIG.mail);
+
+        var permissions = new PermissionsServiceImpl(rdf, userService, mailService);
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions));
