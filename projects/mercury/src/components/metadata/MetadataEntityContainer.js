@@ -52,7 +52,7 @@ export class MetadataEntityContainer extends React.Component {
                 const updatedValues = property.values.map((el, idx) => ((idx === index) ? {value} : el));
                 this.updateState(property.key, updatedValues);
             }
-        } else if (value || value.id) {
+        } else if (value || value.id) { // Value can be a prmitive value or an object with ID
             const updatedValues = [...property.values, value];
             this.updateState(property.key, updatedValues);
         }
