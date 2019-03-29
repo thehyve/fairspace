@@ -241,6 +241,19 @@ saturn:
       size: 50Gi
       mountPath: /data
 
+  mail:
+      from: info@fairspace.com
+      user: user
+      password: password
+      transport:
+        protocol: smtp
+      smtp:
+        host:
+        port:
+        auth:
+        starttls.enable:
+
+
 #####################################################################
 # Specific settings for Mercury subchart
 #####################################################################
