@@ -27,6 +27,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
@@ -38,7 +39,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
         var userVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "user-vocabulary");
