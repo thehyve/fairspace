@@ -19,14 +19,36 @@
 
 fs:FileShape a fs:ClassShape ;
     sh:closed true ; 
-    sh:description "A single file or a directory containing multiple files." ;
+    sh:description "A single file." ;
     sh:name "File" ;
     sh:targetClass fs:File ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
+        fs:aboutPersonShape,
+        fs:aboutMaterialShape,
         fs:associatedAnalysisShape,
         fs:fileSizeShape,
         fs:md5Shape,
+        fs:filePathShape,
+        schema:creatorShape,
+        schema:dateCreatedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        fs:dateModifiedShape,
+        fs:modifiedByShape,
+        rdfs:labelShape,
+        rdfs:commentShape .
+
+fs:DirectoryShape a fs:ClassShape ;
+    sh:closed true ; 
+    sh:description "A directory containing multiple files." ;
+    sh:name "Directory" ;
+    sh:targetClass fs:Directory ; 
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+        fs:aboutPersonShape,
+        fs:aboutMaterialShape,
+        fs:associatedAnalysisShape,
         fs:filePathShape,
         schema:creatorShape,
         schema:dateCreatedShape,
@@ -48,6 +70,7 @@ fs:CollectionShape a fs:ClassShape ;
         fs:aboutPersonShape,
         fs:aboutMaterialShape,
         fs:partOfProjectShape,
+        fs:filePathShape,
         schema:creatorShape,
         schema:dateCreatedShape,
         fs:deletedByShape,
@@ -183,24 +206,19 @@ fs:RelationShape a rdf:Class ;
     rdfs:subClassOf sh:PropertyShape .
 fs:Class a rdf:Class .
 
-xsd:string a fs:Datatype ;
-    rdfs:label "String" ;
+xsd:string rdfs:label "String" ;
     rdfs:comment "Reference to xsd:string." .
 
-xsd:integer a fs:Datatype ;
-    rdfs:label "Integer" ;
+xsd:integer rdfs:label "Integer" ;
     rdfs:comment "Reference to xsd:integer." .
 
-xsd:long a fs:Datatype ;
-    rdfs:label "Integer(long)" ;
+xsd:long rdfs:label "Integer(long)" ;
     rdfs:comment "Reference to xsd:long." .
 
-xsd:date a fs:Datatype ;
-    rdfs:label "Date" ;
+xsd:date rdfs:label "Date" ;
     rdfs:comment "Reference to xsd:date." .
 
-xsd:dateTime a fs:Datatype ;
-    rdfs:label "Date and time" ;
+xsd:dateTime rdfs:label "Date and time" ;
     rdfs:comment "Reference to xsd:datetime." .
 
 fs:File a fs:Class .

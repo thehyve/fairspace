@@ -15,25 +15,36 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
-        sh:path sh:name
+        sh:path sh:name ; 
+        sh:name "Class name"
     ], [
         # This means every value for predicate sh:property should have this type.
         sh:class sh:PropertyShape ;
         sh:minCount 1 ;
-        sh:path sh:property
+        sh:path sh:property ;
+        sh:name "Properties" ; 
+        sh:description "List of all properties and relations for this class." 
     ], [
         sh:value true ;
-        sh:path sh:closed
+        sh:path sh:closed ; 
+        sh:description "sh:closed should be true."
     ], [
         sh:class fs:Class ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:targetClass
+        sh:path sh:targetClass ; 
+        sh:description "IRI of the class this shape constrains."
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:description
+        sh:path sh:description ;
+        sh:name "Class description"
+    ], [
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        sh:path fs:showInCatalog ;
+        sh:name "Show in catalog"
     ] ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
@@ -47,32 +58,37 @@ fs:PropertyShapeMeta a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
-        sh:path sh:name
+        sh:path sh:name ;
+        sh:name "Property name"
     ], [
         sh:datatype xsd:integer ;
-        sh:path sh:minCount
+        sh:path sh:minCount ;
+        sh:name "Minimum number of values"
     ], [
         sh:datatype xsd:integer ;
-        sh:path sh:maxCount
+        sh:path sh:maxCount ;
+        sh:name "Maximum number of values"
     ], [
-        sh:path sh:in
+        sh:class rdf:List ;
+        sh:path sh:in ;
+        sh:name "Controlled vocabulary"
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:description
+        sh:path sh:description ;
+        sh:name "Property description"
     ], [
         sh:path sh:datatype ;
         # direct controlled vocabulary approach
-        sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long )  ;
-
-        # indirect via typing in (meta)vocabulary
-        sh:class fs:Datatype
+        sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
+        sh:name "Datatype"
     ], [
         sh:path sh:message
     ], [
         sh:datatype xsd:integer ;
-        sh:path sh:maxLength
+        sh:path sh:maxLength ;
+        sh:name "Maximum length (for string only)"
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -89,15 +105,18 @@ fs:RelationShapeMeta a sh:NodeShape ;
     sh:name "Relation Shape Meta" ;
     sh:property [
         sh:datatype xsd:integer ;
-        sh:path sh:minCount
+        sh:path sh:minCount ;
+        sh:name "Minimum number of values"
     ], [
         sh:class fs:Class ;
-        sh:path sh:class
+        sh:path sh:class ;
+        sh:name "Class target"
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:description
+        sh:path sh:description ;
+        sh:name "Property description"
     ], [
         sh:path sh:message
     ], [
@@ -109,10 +128,12 @@ fs:RelationShapeMeta a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
-        sh:path sh:name
+        sh:path sh:name ;
+        sh:name "Property name"
     ], [
         sh:datatype xsd:integer ;
-        sh:path sh:maxCount
+        sh:path sh:maxCount ;
+        sh:name "Maximum number of values"
     ], [
         sh:path fs:machineOnly
     ] ;
