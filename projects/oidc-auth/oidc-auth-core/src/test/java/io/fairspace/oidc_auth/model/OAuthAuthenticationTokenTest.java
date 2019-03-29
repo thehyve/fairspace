@@ -5,15 +5,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.util.SerializationUtils;
 
 public class OAuthAuthenticationTokenTest {
     @Test
-    void testTokenSerialization () throws ClassNotFoundException, IOException {
-        OAuthAuthenticationToken token1 = new OAuthAuthenticationToken("ACCESSTOKEN","REFRESHTOKEN");
-        assert(token1.equals(token1.convertFromBytes(token1.convertToBytes(token1))));
-        Map<String,Object> claimsSet = new HashMap();
+    void testTokenSerialization() throws ClassNotFoundException, IOException {
+        OAuthAuthenticationToken token = new OAuthAuthenticationToken("ACCESSTOKEN", "REFRESHTOKEN");
+        byte[] serialized = SerializationUtils.serialize(token);
+        OAuthAuthenticationToken deserialized = (OAuthAuthenticationToken) SerializationUtils.deserialize(serialized);
+
+        assert (token.equals(deserialized));
+    }
+
+    @Test
+    void testTokenSerializationWithMap() throws ClassNotFoundException, IOException {
+        Map<String, Object> claimsSet = new HashMap();
         claimsSet.put("CLAIM", "OBJECT");
-        OAuthAuthenticationToken token2 = new OAuthAuthenticationToken("foo",claimsSet);
-        assert(token2.equals(token2.convertFromBytes(token2.convertToBytes(token2))));
+        OAuthAuthenticationToken token = new OAuthAuthenticationToken("foo", claimsSet);
+
+        byte[] serialized = SerializationUtils.serialize(token);
+        OAuthAuthenticationToken deserialized = (OAuthAuthenticationToken) SerializationUtils.deserialize(serialized);
+
+        assert (token.equals(deserialized));
+
     }
 }

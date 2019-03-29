@@ -8,14 +8,10 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
-import java.io.IOException;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.SerializationUtils;
 
 import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORITIES_CLAIM;
 
@@ -26,6 +22,8 @@ import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORITIES_CLAIM;
 @ToString(exclude = "claimsSet")
 @Slf4j
 public class OAuthAuthenticationToken implements Serializable {
+    private static final long serialVersionUID = 42L;
+
     public static final String USERNAME_CLAIM = "preferred_username";
     public static final String FULLNAME_CLAIM = "name";
     public static final String FIRSTNAME_CLAIM = "given_name";
@@ -86,11 +84,4 @@ public class OAuthAuthenticationToken implements Serializable {
         return list.stream().map(o -> o.toString()).collect(Collectors.toList());
     }
 
-    public byte[] convertToBytes(Object object) throws IOException {
-        return SerializationUtils.serialize(this);
-    }
-
-    public Object convertFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
-        return SerializationUtils.deserialize(bytes);
-    }
 }

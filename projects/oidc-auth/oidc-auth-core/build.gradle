@@ -15,7 +15,6 @@ dependencies {
     implementation "org.springframework:spring-core:${springVersion}"
     implementation "org.springframework:spring-context:${springVersion}"
     implementation "org.springframework:spring-beans:${springVersion}"
-    implementation "org.apache.commons:commons-lang3:3.8.1"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
     testCompile "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
