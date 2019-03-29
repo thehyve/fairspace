@@ -3,7 +3,6 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.http.Auth;
-import io.milton.http.HttpManager;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -21,8 +20,8 @@ import java.nio.file.FileSystemException;
 import java.util.Date;
 import java.util.List;
 
-import static io.fairspace.saturn.vfs.PathUtils.*;
-import static io.milton.common.Utils.getDecodedDestination;
+import static io.fairspace.saturn.vfs.PathUtils.name;
+import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static java.util.Collections.singletonList;
 
 @Slf4j

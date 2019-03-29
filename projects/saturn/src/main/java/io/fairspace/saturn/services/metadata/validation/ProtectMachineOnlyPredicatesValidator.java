@@ -22,22 +22,8 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
     }
 
     @Override
-    public ValidationResult validatePatch(Model model) {
-        return validateModelAgainstMachineOnlyPredicates(model);
-    }
-
-    @Override
     public ValidationResult validateDelete(Model model) {
         return validateModelAgainstMachineOnlyPredicates(model);
-    }
-
-    @Override
-    public ValidationResult validateDelete(String subject, String predicate, String object) {
-        if (predicate != null && vocabulary.isMachineOnlyPredicate(predicate)) {
-            return new ValidationResult(false, "The given predicate is marked as machine-only. It cannot be used directly.");
-        }
-
-        return ValidationResult.VALID;
     }
 
     /**
@@ -48,7 +34,7 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
      */
     private ValidationResult validateModelAgainstMachineOnlyPredicates(Model model) {
         if (containsMachineOnlyPredicates(model)) {
-            return new ValidationResult(false, "The given model contains one or more statements with machine-only predicates. This is not allowed.");
+            return new ValidationResult("The given model contains one or more statements with machine-only predicates.");
         }
 
         return ValidationResult.VALID;
