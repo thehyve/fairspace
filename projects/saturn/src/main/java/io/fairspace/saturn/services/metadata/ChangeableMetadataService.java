@@ -50,8 +50,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * If any of the fields is null, that field is not included to filter statements to delete. For example, if only
      * subject is given and predicate and object are null, then all statements with the given subject will be deleted.
      *
-     * Statements for which the predicate is marked as 'machineOnly' are never deleted. If the predicate is marked as
-     * machineOnly, an IllegalArgumentException will be thrown
+     * If the set of triples matching the provided wildcard includes any protected triple (e.g. with a predicate marked
+     * as fs:machineOnly) a ValidationException will be thrown.
      *
      * @param subject   Subject URI to filter the delete query on
      * @param predicate Predicate URI to filter the delete query on. Must not be a machineOnly predicate
