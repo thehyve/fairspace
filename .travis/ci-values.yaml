@@ -32,15 +32,14 @@ saturn:
     image: eu.gcr.io/fairspace-207108/saturn
     pullPolicy: Always
   mail:
-    from: info@fairspace.com
-    user: AKIAISXHGXUIMMU75YVA
-    password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
-    transport.protocol: smtp
-    smtp:
-      host: email-smtp.us-east-1.amazonaws.com
-      port: 587
-      auth: true
-      starttls.enable: true
+    mail.from: info@fairspace.com
+    mail.user: AKIAISXHGXUIMMU75YVA
+    mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
+    mail.transport.protocol: smtp
+    mail.smtp.auth: true
+    mail.smtp.host: email-smtp.us-east-1.amazonaws.com
+    mail.smtp.port: 587
+    mail.smtp.starttls.enable: true
 
 
 # Specific settings for Mercury subchart
