@@ -18,18 +18,15 @@ workspace:
   configurationScripts:
     keycloak:
       enabled: true
-      image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.2
       pullPolicy: IfNotPresent
 
 pluto:
   image:
-    image: eu.gcr.io/fairspace-207108/pluto
     pullPolicy: Always
     
 # Specific settings for Saturn subchart
 saturn:
   image:
-    image: eu.gcr.io/fairspace-207108/saturn
     pullPolicy: Always
   mail:
     mail.from: info@fairspace.com
@@ -45,7 +42,6 @@ saturn:
 # Specific settings for Mercury subchart
 mercury:
   image:
-    image: eu.gcr.io/fairspace-207108/mercury
     pullPolicy: Always
 
 # Specific settings for JupyterHub subchart
@@ -61,14 +57,12 @@ jupyterhub:
               session_url: https://workspace.ci.fairway.app/account/tokens
   singleuser:
     image:
-      name: eu.gcr.io/fairspace-207108/jupyterhub-singleuser
       tag: 0.6.1-SNAPSHOT
       pullPolicy: Always
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.ci.fairway.app
   hub:
     image:
-      name: eu.gcr.io/fairspace-207108/jupyterhub-hub
       pullPolicy: Always
     extraEnv:
       JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
