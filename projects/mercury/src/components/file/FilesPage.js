@@ -88,7 +88,7 @@ const mapStateToProps = (state, ownProps) => {
     const files = state.cache.filesByPath[openedPath] || [];
 
     return {
-        loading: files.pending || state.cache.collections.pending || state.cache.collections.data.length === 0,
+        loading: files.pending || state.cache.collections.pending,
         error: files.error || state.cache.collections.error,
         files: files.data,
         selectedPaths: state.collectionBrowser.selectedPaths,
