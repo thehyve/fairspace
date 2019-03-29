@@ -242,16 +242,16 @@ saturn:
       mountPath: /data
 
   mail:
-      from: info@fairspace.com
-      user: user
-      password: password
-      transport:
-        protocol: smtp
-      smtp:
-        host:
-        port:
-        auth:
-        starttls.enable:
+    from: info@fairspace.com
+    user: user
+    password: password
+    transport:
+      protocol: smtp
+    smtp:
+      host: host
+      port: 587
+      auth: true
+      starttls.enable: true
 
 
 #####################################################################
