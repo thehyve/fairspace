@@ -48,6 +48,10 @@ public class Vocabulary {
         return rdfConnection.queryAsk(storedQuery("is_machine_only_property", vocabularyGraph, createURI(predicateUri)));
     }
 
+    public boolean isInvertiblePredicate(@NonNull String predicateUri) {
+        return rdfConnection.queryAsk(storedQuery("is_invertible_property", vocabularyGraph, createURI(predicateUri)));
+    }
+
     public Node getVocabularyGraph() {
         return vocabularyGraph;
     }
