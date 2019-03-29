@@ -1,22 +1,36 @@
 package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.util.HashMap;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PermissionsServiceImplTest {
     private static final Node RESOURCE = createURI("http://example.com/resource");
     private static final Node USER1 = createURI("http://example.com/user1");
@@ -27,10 +41,30 @@ public class PermissionsServiceImplTest {
     private Dataset ds;
     private PermissionsService service;
 
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private MimeMessage message;
+
+    @Mock
+    private MailService mailService;
+
     @Before
     public void setUp() {
+        when(userService.getCurrentUser()).thenReturn(new User() {{
+            setIri(createURI("http://example.com/user1"));
+            setName("John");
+        }});
+        when(userService.getUser(any())).thenAnswer(invocation -> new User() {{
+            setIri(invocation.getArgument(0));
+            setEmail("user@example.com");
+        }});
+        when(mailService.newMessage()).thenReturn(message);
+
         ds = DatasetFactory.create();
-        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> USER1);
+        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
+        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), userService, mailService);
         service.createResource(RESOURCE);
     }
 
@@ -40,10 +74,30 @@ public class PermissionsServiceImplTest {
     }
 
     @Test
-    public void testSetPermission() {
+    public void testSetPermission() throws MessagingException {
         assertNull(service.getPermissions(RESOURCE).get(USER2));
         service.setWriteRestricted(RESOURCE, true);
         service.setPermission(RESOURCE, USER2, Access.Write);
+        verify(mailService).newMessage();
+        verify(message).setText("Your access level for resource LABEL (http://example.com/resource) was set to Write by John.");
+        verify(message).setRecipient(Message.RecipientType.TO, new InternetAddress("user@example.com"));
+        verify(mailService).send(any());
+        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER2, Access.None);
+        assertNull(service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER3, Access.Manage);
+        assertEquals(Access.Manage, service.getPermissions(RESOURCE).get(USER3));
+    }
+
+    @Test
+    public void testSetPermissionFoACollection() throws MessagingException {
+        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, createResource("http://fairspace.io/ontology#Collection"));
+        assertNull(service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER2, Access.Write);
+        verify(mailService).newMessage();
+        verify(message).setText("Your access level for collection LABEL was set to Write by John.");
+        verify(message).setRecipient(Message.RecipientType.TO, new InternetAddress("user@example.com"));
+        verify(mailService).send(any());
         assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.None);
         assertNull(service.getPermissions(RESOURCE).get(USER2));
@@ -115,7 +169,7 @@ public class PermissionsServiceImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testUserCannotModifyHisOwnPermission() { ;
+    public void testUserCannotModifyHisOwnPermission() {
         service.setPermission(RESOURCE, USER1, Access.Write);
     }
 

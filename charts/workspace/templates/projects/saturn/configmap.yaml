@@ -31,3 +31,6 @@ data:
       dataStewardRole: "{{ .Values.workspace.keycloak.roles.datasteward | default (printf "datasteward-%s" (include "workspace.name" .)) }}"
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
+    mail:
+{{ toYaml .Values.workspace.saturn.mail | indent 6 }}
+

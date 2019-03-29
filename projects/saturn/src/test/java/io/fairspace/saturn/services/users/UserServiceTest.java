@@ -42,7 +42,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldCreateAnIRIForANewUserAndThenStoreAndReuseIt() {
-        service = new UserService(dao);
+        service = new UserService(() -> userInfo, dao);
 
         when(dao.write(any(User.class)))
                 .thenAnswer(invocation -> withIri(invocation.getArgument(0)));
@@ -64,7 +64,7 @@ public class UserServiceTest {
     @Test
     public void shouldLoadPreviouslyCreatedUsersOnStart() {
         when(dao.list(eq(User.class))).thenReturn(singletonList(user));
-        service = new UserService(dao);
+        service = new UserService(() -> userInfo, dao);
 
         var iri = service.getUserIRI(userInfo);
         assertEquals(IRI, iri);
@@ -75,7 +75,7 @@ public class UserServiceTest {
     @Test
     public void shouldUpdateMetadataWhenNeeded() {
         when(dao.list(eq(User.class))).thenReturn(singletonList(user));
-        service = new UserService(dao);
+        service = new UserService(() -> userInfo, dao);
 
         var updatedUserInfo = new UserInfo("id1", "user2", "name2", "user2@host.com", new HashSet<>(asList("role1", "role2", "role3")));
         service.getUserIRI(updatedUserInfo);
