@@ -3,7 +3,7 @@ buildscript {
         jena_version = '3.10.0'
         milton_version = '2.7.4.4'
         mockitoVersion = '2.23.0'
-        jacksonVersion = '2.9.6'
+        jacksonVersion = '2.9.8'
     }
 }
 

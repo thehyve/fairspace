@@ -1,10 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -14,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -24,7 +22,6 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChangeableMetadataServiceTest {
-    private static final String systemVocabularyURI = "http://fairspace.io/iri/system-vocabulary";
     private static final String GRAPH = "http://fairspace.io/iri/graph";
 
     private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
@@ -37,10 +34,7 @@ public class ChangeableMetadataServiceTest {
 
     private static final Statement STMT1 = createStatement(S1, P1, S2);
     private static final Statement STMT2 = createStatement(S2, P1, S3);
-    private static final Statement MACHINE_ONLY_STATEMENT = createStatement(S1, MACHINE_ONLY_PROPERTY, S3);
 
-    private static final Statement LBL_STMT1 = createStatement(S1, RDFS.label, createStringLiteral("subject1"));
-    private static final Statement LBL_STMT2 = createStatement(S2, RDFS.label, createStringLiteral("subject2"));
 
     private Dataset ds;
     private ChangeableMetadataService api;
@@ -107,18 +101,6 @@ public class ChangeableMetadataServiceTest {
     }
 
     @Test
-    public void deleteShouldNotRemoveMachineOnlyTriples() {
-        setMachineOnlyPredicate(MACHINE_ONLY_PROPERTY.getURI());
-
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(MACHINE_ONLY_STATEMENT));
-
-        api.delete(S1.getURI(), null, null);
-
-        assertFalse(ds.getNamedModel(GRAPH).contains(STMT1));
-        assertTrue(ds.getNamedModel(GRAPH).contains(MACHINE_ONLY_STATEMENT));
-    }
-
-    @Test
     public void deleteModel() {
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
@@ -145,21 +127,19 @@ public class ChangeableMetadataServiceTest {
     }
 
     @Test
-    public void testPatchHandlesLifecycleForEntitities() {
+    public void patchWithNil() {
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(S1, P1, S2).add(S1, P1, S3));
+
+
+        api.patch(createDefaultModel().add(S1, P1, NIL));
+
+        assertFalse(ds.getNamedModel(GRAPH).contains(S1, P1, (RDFNode) null));
+    }
+
+    @Test
+    public void testPatchHandlesLifecycleForEntities() {
         Model delta = createDefaultModel().add(STMT1).add(STMT2);
         api.patch(delta);
         verify(lifeCycleManager).updateLifecycleMetadata(delta);
-    }
-
-    /**
-     * Store the machine-only predicate in the database
-     */
-    private void setMachineOnlyPredicate(String predicateUri) {
-        Resource predicateResource = createResource(predicateUri);
-
-        // Actually update the database itself, as the delete method depends on it
-        executeWrite(ds, () -> ds.getNamedModel(systemVocabularyURI)
-                .add(predicateResource, RDF.type, RDF.Property)
-                .add(predicateResource, createProperty("http://fairspace.io/ontology#machineOnly"), createTypedLiteral(true)));
     }
 }

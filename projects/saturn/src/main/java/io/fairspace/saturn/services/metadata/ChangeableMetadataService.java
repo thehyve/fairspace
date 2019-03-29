@@ -3,30 +3,27 @@ package io.fairspace.saturn.services.metadata;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ValidationResult;
-import lombok.AllArgsConstructor;
-import org.apache.jena.atlas.lib.Pair;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.modify.request.*;
-import org.apache.jena.update.UpdateRequest;
+import org.apache.jena.sparql.modify.request.QuadDataAcc;
+import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
-import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class ChangeableMetadataService extends ReadableMetadataService {
+    static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
+
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
 
@@ -47,12 +44,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     void put(Model model) {
         commit("Store metadata", rdf, () -> {
             ensureValidParameters(validator -> validator.validatePut(model));
-
-            // Store information on the lifecycle of the entities
-            lifeCycleManager.updateLifecycleMetadata(model);
-
-            // Store the actual update
-            rdf.load(graph.getURI(), model);
+            doPut(model);
         });
     }
 
@@ -70,14 +62,12 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param object    Object URI to filter the delete query on. Literal values are not supported
      */
     void delete(String subject, String predicate, String object) {
-        commit("Delete metadata", rdf, () -> {
-            ensureValidParameters(validator -> validator.validateDelete(subject, predicate, object));
-            rdf.update(storedQuery("delete_not_machineonly_by_mask", graph, asURI(subject), asURI(predicate), asURI(object)));
-        });
+        commit("Delete metadata", rdf, () ->
+                delete(get(subject, predicate, object, false)));
     }
 
     /**
-     * Deletes the statemens in the given model from the database.
+     * Deletes the statements in the given model from the database.
      *
      * If the model contains any statements for which the predicate is marked as 'machineOnly', an IllegalArgumentException will be thrown.
      * @param model
@@ -85,7 +75,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     void delete(Model model) {
         commit("Delete metadata", rdf, () -> {
             ensureValidParameters(validator -> validator.validateDelete(model));
-            rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(model.listStatements().toList()))));
+            doDelete(model);
         });
     }
 
@@ -105,13 +95,29 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void patch(Model model) {
         commit("Update metadata", rdf, () -> {
-            ensureValidParameters(validator -> validator.validatePatch(model));
+            var toDelete = createDefaultModel();
+            model.listStatements().forEachRemaining(stmt ->
+                    toDelete.add(get(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), null, false)));
 
-            // Store information on the lifecycle of the entities
-            lifeCycleManager.updateLifecycleMetadata(model);
+            ensureValidParameters(validator -> validator.validateDelete(toDelete).merge(validator.validatePut(model)));
 
-            rdf.update(createPatchQuery(model.listStatements().toList()));
+            doDelete(toDelete);
+            doPut(model);
         });
+    }
+
+    private void doPut(Model model) {
+        model.removeAll(null, null, NIL);
+
+        // Store information on the lifecycle of the entities
+        lifeCycleManager.updateLifecycleMetadata(model);
+
+        // Store the actual update
+        rdf.load(graph.getURI(), model);
+    }
+
+    private void doDelete(Model model) {
+        rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(model.listStatements().toList()))));
     }
 
     /**
@@ -121,7 +127,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * 
      * @param validationLogic   Logic to be called on the validator. For example: validator -> validator.validatePut(model)
      */
-    void ensureValidParameters(Function<MetadataRequestValidator, ValidationResult> validationLogic) {
+    private void ensureValidParameters(Function<MetadataRequestValidator, ValidationResult> validationLogic) {
         if(validator != null) {
             ValidationResult validationResult = validationLogic.apply(validator);
             if(!validationResult.isValid()) {
@@ -130,31 +136,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         }
     }
 
-    private UpdateRequest createPatchQuery(Collection<Statement> statements) {
-        var updateRequest = new UpdateRequest();
-
-        statements
-                .stream()
-                .map(s -> Pair.create(s.getSubject(), s.getPredicate()))
-                .distinct()
-                .map(p -> new Quad(
-                        graph,                  // Graph
-                        p.getLeft().asNode(),   // Subject
-                        p.getRight().asNode(),  // Predicate
-                        Var.alloc("o")))        // A free variable matching any object
-                .map(q -> new UpdateDeleteWhere(new QuadAcc(singletonList(q))))
-                .forEach(updateRequest::add);
-
-        updateRequest.add(new UpdateDataInsert(new QuadDataAcc(toQuads(statements))));
-
-        return updateRequest;
-    }
-
     private List<Quad> toQuads(Collection<Statement> statements) {
         return statements
                 .stream()
                 .map(s -> new Quad(graph, s.asTriple()))
                 .collect(toList());
     }
-
 }

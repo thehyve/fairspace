@@ -25,7 +25,15 @@ fs:FileShape a fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
         fs:associatedAnalysisShape,
+        fs:fileSizeShape,
+        fs:md5Shape,
         fs:filePathShape,
+        schema:creatorShape,
+        schema:dateCreatedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        fs:dateModifiedShape,
+        fs:modifiedByShape,
         rdfs:labelShape,
         rdfs:commentShape .
 
@@ -36,12 +44,16 @@ fs:CollectionShape a fs:ClassShape ;
     sh:targetClass fs:Collection ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
-        schema:creatorShape,
-        schema:dateCreatedShape,
         fs:hasFileShape,
         fs:aboutPersonShape,
         fs:aboutMaterialShape,
         fs:partOfProjectShape,
+        schema:creatorShape,
+        schema:dateCreatedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        fs:dateModifiedShape,
+        fs:modifiedByShape,
         rdfs:labelShape,
         rdfs:commentShape .
 

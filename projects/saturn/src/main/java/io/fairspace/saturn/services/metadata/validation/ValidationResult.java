@@ -1,25 +1,27 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Set;
+
+import static com.google.common.collect.Sets.union;
+import static java.lang.String.join;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static org.apache.commons.lang3.StringUtils.appendIfMissing;
 
 @Data
-@AllArgsConstructor
 public class ValidationResult {
-    public static final ValidationResult VALID = new ValidationResult(true, "");
+    public static final ValidationResult VALID = new ValidationResult(emptySet());
 
-    private final boolean valid;
-    private final String message;
-    private final List<String> validationMessages;
+    private final Set<String> validationMessages;
 
-    public ValidationResult(boolean valid, String message) {
-        this(valid, message, StringUtils.isEmpty(message) ? Collections.emptyList() : Collections.singletonList(message));
+    private ValidationResult(Set<String> validationMessages) {
+        this.validationMessages = validationMessages;
+    }
+
+    public ValidationResult(String message) {
+        this(singleton(appendIfMissing(message, ".")));
     }
 
     /**
@@ -27,18 +29,19 @@ public class ValidationResult {
      *
      * The merged result:
      * - is valid if both results are valid
-     * - contains the current message, or the other message if the current one is empty
-     * - concatenates the other validation messages to the list of validation messages
+     * - contains validation messages from both results (without duplicates)
      * @param other
      * @return
      */
     public ValidationResult merge(ValidationResult other) {
-        return new ValidationResult(
-                valid && other.valid,
-                StringUtils.isEmpty(message) ? other.message : message,
-                Stream.concat(validationMessages.stream(), other.validationMessages.stream())
-                        .filter(StringUtils::isNotEmpty)
-                        .collect(Collectors.toList())
-        );
+        return new ValidationResult(union(validationMessages, other.validationMessages));
+    }
+
+    public boolean isValid() {
+        return validationMessages.isEmpty();
+    }
+
+    public String getMessage() {
+        return join(" ", validationMessages);
     }
 }
