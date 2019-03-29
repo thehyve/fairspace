@@ -16,7 +16,7 @@ public class DummyAuthenticator implements Function<HttpServletRequest, UserInfo
                 ? emptySet()
                 : Set.of(authoritiesHeader.split(","));
 
-        UserInfo dummyUser = new UserInfo("6e6cde34-45bc-42d8-8cdb-b6e9faf890d3", "test-dummy", "John", "user@example.com", authorities);
+        UserInfo dummyUser = new UserInfo("6e6cde34-45bc-42d8-8cdb-b6e9faf890d3", "test-dummy", "John Snow", "user@example.com", authorities);
 
         request.setAttribute(SecurityUtil.USER_INFO_REQUEST_ATTRIBUTE, dummyUser);
         return dummyUser;

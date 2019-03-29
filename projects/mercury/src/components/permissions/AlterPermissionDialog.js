@@ -48,7 +48,7 @@ export const styles = () => ({
  * @returns {*}
  */
 const applyDisableFilter = (options, collaborators, currentUser) => options.map((option) => {
-    const isAlreadySelected = collaborators.find(c => c.subject === option.value) !== undefined;
+    const isAlreadySelected = collaborators.find(c => c.user === createIri(option.value)) !== undefined;
     const isCurrentUser = option.value === currentUser.id;
     option.disabled = isAlreadySelected || isCurrentUser;
     return option;
@@ -132,7 +132,7 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSelectedUserChange = (selectedOption) => {
-        this.setState({selectedUser: selectedOption.value});
+        this.setState({selectedUser: selectedOption});
     };
 
     handleClose = () => {
@@ -147,7 +147,7 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
         const {iri, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(createIri(selectedUser), iri, accessRight);
+            alterPermission(createIri(selectedUser.value), iri, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
