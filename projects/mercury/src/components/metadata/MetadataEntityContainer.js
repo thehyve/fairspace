@@ -6,7 +6,6 @@ import {ErrorMessage, LoadingInlay} from "../common";
 import * as metadataActions from "../../actions/metadataActions";
 import MetaEntityHeader from './MetaEntityHeader';
 import {isDateTimeProperty, propertiesToShow, linkLabel} from "../../utils/metadataUtils";
-
 import MetadataProperty from "./MetadataProperty";
 import ErrorDialog from "../common/ErrorDialog";
 
@@ -20,7 +19,10 @@ export class MetadataEntityContainer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.subject !== prevProps.subject || this.anyPendingChanges()) {
+        if (this.props.subject !== prevProps.subject) {
+            this.resetChanges();
+            this.load();
+        } else if (this.anyPendingChanges()) {
             this.load();
         }
     }
@@ -65,15 +67,17 @@ export class MetadataEntityContainer extends React.Component {
         const {subject, updateEntity} = this.props;
 
         updateEntity(subject, this.state.propertiesWithUpdatedValues)
-            .then(() => {
-                this.setState({propertiesWithUpdatedValues: {}});
-            })
+            .then(this.resetChanges)
             .catch(e => ErrorDialog.showError(e, "Error while updateing metadata"));
     };
 
     anyPendingChanges = () => Object.keys(this.state.propertiesWithUpdatedValues).length !== 0;
 
     canEditAndChangesExist = () => this.props.editable && this.anyPendingChanges();
+
+    resetChanges = () => {
+        this.setState({propertiesWithUpdatedValues: {}});
+    }
 
     render() {
         const {
@@ -105,7 +109,7 @@ export class MetadataEntityContainer extends React.Component {
                             <MetadataProperty
                                 editable={editable && p.editable}
                                 subject={subject}
-                                key={p.key}
+                                key={subject + p.key}
                                 property={p}
                                 onChange={(value, index) => this.handleChange(p, value, index)}
                                 onDelete={(index) => this.handleDelete(p, index)}

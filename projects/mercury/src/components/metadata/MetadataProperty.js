@@ -22,12 +22,12 @@ class MetadataProperty extends React.Component {
     }
 
     renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
-        const {editable, property, onChange} = this.props;
+        const {editable, property, onChange, subject} = this.props;
         const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
 
         return (
             <div
-                key={idx}
+                key={subject + property.key + entry.value}
                 onMouseEnter={() => this.setHoveredIndex(idx)}
                 onMouseLeave={() => this.setHoveredIndex(null)}
             >
@@ -85,7 +85,7 @@ class MetadataProperty extends React.Component {
         const ValueAddComponent = ValueComponentFactory.addComponent(property);
 
         return (
-            <ListItem key={property.values.length}>
+            <ListItem key="add-component-key">
                 <ListItemText>
                     <ValueAddComponent
                         property={property}
@@ -113,7 +113,7 @@ class MetadataProperty extends React.Component {
             : ValueComponentFactory.readOnlyComponent();
 
         return (
-            <ListItem disableGutters key={property.key} style={{display: 'block'}}>
+            <ListItem disableGutters style={{display: 'block'}}>
                 <Typography variant="body1" component="label" id={labelId}>
                     {property.label}
                 </Typography>
