@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
-    private static final Node IRI = createURI("http://localhost:3000/iri/123");
+    private static final Node IRI = createURI("http://localhost/iri/123");
     private static final UserInfo userInfo = new UserInfo("123", "user1", "name1", "user1@host.com", Set.of("role1", "role2"));
     private static User user;
 

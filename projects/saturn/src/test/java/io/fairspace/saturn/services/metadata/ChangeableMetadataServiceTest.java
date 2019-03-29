@@ -24,11 +24,11 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChangeableMetadataServiceTest {
-    private static final String GRAPH = "http://localhost:3000/iri/graph";
+    private static final String GRAPH = "http://localhost/iri/graph";
 
-    private static final Resource S1 = createResource("http://localhost:3000/iri/S1");
-    private static final Resource S2 = createResource("http://localhost:3000/iri/S2");
-    private static final Resource S3 = createResource("http://localhost:3000/iri/S3");
+    private static final Resource S1 = createResource("http://localhost/iri/S1");
+    private static final Resource S2 = createResource("http://localhost/iri/S2");
+    private static final Resource S3 = createResource("http://localhost/iri/S3");
     private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
     private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
 

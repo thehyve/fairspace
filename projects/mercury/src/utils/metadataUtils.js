@@ -131,4 +131,4 @@ export const propertiesToShow = (properties = []) => {
     return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
 
-export const createIri = (id)  => `${window.location.origin.replace('https://', 'http://')}/iri/${id}`;
+export const createIri = (id)  => `http://${window.location.hostname}/iri/${id}`;

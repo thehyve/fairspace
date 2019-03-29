@@ -132,7 +132,7 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSelectedUserChange = (selectedOption) => {
-        this.setState({selectedUser: selectedOption});
+        this.setState({selectedUser: selectedOption.value});
     };
 
     handleClose = () => {

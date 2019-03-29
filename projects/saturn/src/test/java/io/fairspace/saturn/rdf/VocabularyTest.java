@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabularyTest {
-    private static final Node VOCABULARY_URI = createURI("http://localhost:3000/iri/vocabulary");
+    private static final Node VOCABULARY_URI = createURI("http://localhost/iri/vocabulary");
     private static final Resource resource1 = createResource("http://property1");
     private static final Resource resource2 = createResource("http://property2");
     private static final Resource resource3 = createResource("http://property3");
