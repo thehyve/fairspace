@@ -4,7 +4,11 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
@@ -97,6 +101,18 @@ public class MetadataEntityLifeCycleManagerTest {
         lifeCycleManager.updateLifecycleMetadata(ModelFactory.createDefaultModel());
         lifeCycleManager.updateLifecycleMetadata(null);
 
+        assertTrue(model.isEmpty());
+    }
+
+    @Test
+    public void testStorageOfBlankNodes() {
+        // Try to add the information about the resource
+        Model delta = ModelFactory.createDefaultModel();
+        delta.add(ResourceFactory.createResource(), property, "test");
+
+        lifeCycleManager.updateLifecycleMetadata(delta);
+
+        // Expect no information to be added for blank nodes
         assertTrue(model.isEmpty());
     }
 
