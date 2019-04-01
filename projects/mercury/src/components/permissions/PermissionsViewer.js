@@ -97,17 +97,17 @@ class PermissionsViewer extends React.Component {
             : null;
 
         return sortPermissions(permissions)
-            .map((p) => {
-                const key = p.access + p.user;
+            .map((permission) => {
+                const key = permission.access + permission.user;
                 return (
                     <ListItem
                         key={key}
                     >
-                        <ListItemText primary={getDisplayName(users.find(u => p.user === u.iri))} secondary={p.access} />
+                        <ListItemText primary={getDisplayName(users.find(user => permission.user === user.iri))} secondary={permission.access} />
                         <ListItemSecondaryAction>
                             <IconButton
-                                onClick={e => this.handleMenuClick(e, p)}
-                                disabled={!canAlterPermission(canManage, p, currentUser)}
+                                onClick={e => this.handleMenuClick(e, permission)}
+                                disabled={!canAlterPermission(canManage, permission, currentUser)}
                             >
                                 <MoreIcon />
                             </IconButton>
@@ -118,12 +118,12 @@ class PermissionsViewer extends React.Component {
                                 onClose={this.handleMenuClose}
                             >
                                 <MenuItem
-                                    onClick={() => this.handleAlterPermission(p)}
+                                    onClick={() => this.handleAlterPermission(permission)}
                                 >
                                     Change access
                                 </MenuItem>
                                 <MenuItem
-                                    onClick={() => this.handleRemoveCollaborator(p)}
+                                    onClick={() => this.handleRemoveCollaborator(permission)}
                                 >
                                     Delete
                                 </MenuItem>
