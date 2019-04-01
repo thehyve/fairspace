@@ -2,6 +2,7 @@ import {compareBy, comparing} from "../utils/comparisionUtils";
 import * as constants from "../constants";
 import {SHACL_DESCRIPTION, SHACL_NAME} from "../constants";
 import {getFirstPredicateId, getFirstPredicateValue, getLabel} from "../utils/metadataUtils";
+import {STRING_URI} from "../constants";
 
 class Vocabulary {
     /**
@@ -230,7 +231,7 @@ class Vocabulary {
         const className = getFirstPredicateId(propertyShape, constants.SHACL_CLASS);
         const allowMultiple = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT, 1000) > 1;
         const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
-        const multiLine = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const multiLine = datatype === STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
         const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
         return {
