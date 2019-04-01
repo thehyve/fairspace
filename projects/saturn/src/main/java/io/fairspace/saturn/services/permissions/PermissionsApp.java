@@ -35,7 +35,8 @@ public class PermissionsApp extends BaseApp {
             put("/", (req, res) -> {
                 var dto = mapper.readValue(req.body(), PermissionDto.class);
                 permissionsService.setPermission(getIri(req), dto.getUser(), dto.getAccess());
-                return "";
+                res.type(APPLICATION_JSON.asString());
+                return mapper.writeValueAsString(dto);
             });
 
             path("/restricted/", () -> {

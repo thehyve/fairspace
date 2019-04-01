@@ -35,7 +35,7 @@ class PermissionAPI {
             body: JSON.stringify(payload)
         })
             .then(failOnHttpError("Failure while altering a collection's permission"))
-            .then(() => payload);
+            .then(res => res.json());
     }
 }
 
