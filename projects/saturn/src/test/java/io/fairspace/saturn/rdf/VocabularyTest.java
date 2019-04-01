@@ -16,11 +16,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
-import static io.fairspace.saturn.rdf.Vocabulary.createVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabularyTest {
@@ -30,6 +33,7 @@ public class VocabularyTest {
     private static final Resource resource3 = createResource("http://property3");
     private static final Resource unknownResource = createResource("http://unknown-resource.com");
     private static final Property machineOnly = createProperty("http://fairspace.io/ontology#machineOnly");
+    private static final Resource CLASS_RESOURCE = createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#Class");
 
     private Vocabulary vocabulary;
     private Model vocabularyModel;
@@ -77,23 +81,42 @@ public class VocabularyTest {
     public void testVocabularyInitialization() {
         assertTrue(vocabularyModel.isEmpty());
 
-        vocabulary = createVocabulary(rdf, VOCABULARY_URI, "simple-vocabulary.jsonld");
+        vocabulary = Vocabulary.initializeVocabulary(rdf, VOCABULARY_URI, "simple-vocabulary.jsonld");
 
         // Verify the model has been loaded into the vocabulary graph
-        Resource classResource = createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#Class");
-        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, classResource));
-        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Directory"), RDF.type, classResource));
+        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, CLASS_RESOURCE));
+        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Directory"), RDF.type, CLASS_RESOURCE));
     }
 
     @Test
     public void testVocabularyInitializationIsNoopWhenVocabularyAlreadyExists() {
         vocabularyModel.add(createResource("http://some-data"), RDF.type, RDF.Property);
 
-        vocabulary = createVocabulary(rdf, VOCABULARY_URI, "simple-vocabulary.jsonld");
+        vocabulary = Vocabulary.initializeVocabulary(rdf, VOCABULARY_URI, "simple-vocabulary.jsonld");
 
         // Verify the model has not been loaded into the vocabulary graph
-        assertFalse(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"));
+        assertFalse(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, CLASS_RESOURCE));
         assertTrue(vocabularyModel.isIsomorphicWith(ModelFactory.createDefaultModel().add(createResource("http://some-data"), RDF.type, RDF.Property)));
+    }
+
+    @Test
+    public void testVocabularyRecreation() {
+        vocabulary = Vocabulary.recreateVocabulary(rdf, VOCABULARY_URI, "simple-vocabulary.jsonld");
+
+        // Verify the model has been loaded into the vocabulary graph
+        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, CLASS_RESOURCE));
+        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Directory"), RDF.type, CLASS_RESOURCE));
+    }
+
+    @Test
+    public void testVocabularyRecreationWhenVocabularyAlreadyExists() {
+        vocabularyModel.add(createResource("http://some-data"), RDF.type, RDF.Property);
+
+        vocabulary = Vocabulary.recreateVocabulary(rdf, VOCABULARY_URI, "simple-vocabulary.jsonld");
+
+        // Verify the model has not been loaded into the vocabulary graph
+        assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, CLASS_RESOURCE));
+        assertFalse(vocabularyModel.contains(createResource("http://some-data"), RDF.type, RDF.Property));
     }
 
     @Test
@@ -109,7 +132,7 @@ public class VocabularyTest {
                 .add(property1, OWL.inverseOf, property2)
                 .add(property2, OWL.inverseOf, property1);
 
-        vocabulary = createVocabulary(rdf, VOCABULARY_URI, "empty-vocabulary.jsonld");
+        vocabulary = Vocabulary.initializeVocabulary(rdf, VOCABULARY_URI, "empty-vocabulary.jsonld");
 
         assertTrue(vocabulary.isInvertiblePredicate(property1.getURI()));
         assertTrue(vocabulary.isInvertiblePredicate(property2.getURI()));
@@ -117,7 +140,7 @@ public class VocabularyTest {
     }
 
     private void setupVocabularyWithMachineOnlyPredicates() {
-        vocabulary = createVocabulary(rdf, VOCABULARY_URI, "empty-vocabulary.jsonld");
+        vocabulary = Vocabulary.initializeVocabulary(rdf, VOCABULARY_URI, "empty-vocabulary.jsonld");
 
         // Setup model
         vocabularyModel.add(resource1, RDF.type, RDF.Property);
