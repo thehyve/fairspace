@@ -30,8 +30,8 @@ fs:FileShape a fs:ClassShape ;
         fs:fileSizeShape,
         fs:md5Shape,
         fs:filePathShape,
-        schema:creatorShape,
-        schema:dateCreatedShape,
+        fs:creatorShape,
+        fs:dateCreatedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
         fs:dateModifiedShape,
@@ -50,8 +50,8 @@ fs:DirectoryShape a fs:ClassShape ;
         fs:aboutMaterialShape,
         fs:associatedAnalysisShape,
         fs:filePathShape,
-        schema:creatorShape,
-        schema:dateCreatedShape,
+        fs:creatorShape,
+        fs:dateCreatedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
         fs:dateModifiedShape,
@@ -71,8 +71,8 @@ fs:CollectionShape a fs:ClassShape ;
         fs:aboutMaterialShape,
         fs:partOfProjectShape,
         fs:filePathShape,
-        schema:creatorShape,
-        schema:dateCreatedShape,
+        fs:creatorShape,
+        fs:dateCreatedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
         fs:dateModifiedShape,
@@ -107,13 +107,13 @@ rdfs:commentShape a fs:PropertyShape ;
     sh:maxCount 1 ;
     sh:path rdfs:comment . 
      
-schema:dateCreatedShape a fs:PropertyShape ;
+fs:dateCreatedShape a fs:PropertyShape ;
     sh:name "Date created" ;
     sh:description "Time at point of creation" ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
-    sh:path schema:dateCreated . 
+    sh:path fs:dateCreated .
 
 fs:dateModifiedShape a fs:PropertyShape ;
     sh:name "Modified time" ;
@@ -158,13 +158,13 @@ fs:md5Shape a fs:PropertyShape ;
 
 ## Relation Shapes
 
-schema:creatorShape a fs:RelationShape ; 
-    sh:name "Creator" ;
+fs:createdByShape a fs:RelationShape ;
+    sh:name "Created By" ;
     sh:description "User that created this resource." ;
     sh:class fs:User ; 
     sh:maxCount 1 ;
     fs:machineOnly true ;
-    sh:path schema:creator .
+    sh:path fs:createdBy .
 
 fs:modifiedByShape a fs:RelationShape ; 
     sh:name "Last Modified By" ;
@@ -227,5 +227,5 @@ fs:User a fs:Class .
 fs:Directory a fs:Class ;
     rdfs:subClassOf fs:File .
 
-schema:dateCreated a rdf:Property .
-schema:creator a rdf:Property .
+fs:dateCreated a rdf:Property .
+fs:creator a rdf:Property .
