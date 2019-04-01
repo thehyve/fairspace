@@ -24,14 +24,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileAlreadyExistsException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
@@ -62,24 +63,28 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public FileInfo stat(String path) throws IOException {
-        if (path.isEmpty()) {
+        var normalizedPath = normalizePath(path);
+
+        if (normalizedPath.isEmpty()) {
             return ROOT;
         }
 
-        if (isCollection(path)) {
-            return ofNullable(collections.getByLocation(path))
+        if (isCollection(normalizedPath)) {
+            return ofNullable(collections.getByLocation(normalizedPath))
                     .map(ManagedFileSystem::fileInfo)
                     .orElse(null);
         }
 
         var processor = new QuerySolutionProcessor<>(this::fileInfo);
-        rdf.querySelect(storedQuery("fs_stat", path), processor);
+        rdf.querySelect(storedQuery("fs_stat", normalizedPath), processor);
         return processor.getSingle().orElse(null);
     }
 
     @Override
-    public List<FileInfo> list(String parentPath) throws IOException {
-        if (parentPath.isEmpty()) {
+    public List<FileInfo> list(String path) throws IOException {
+        var normalizedPath = normalizePath(path);
+
+        if (normalizedPath.isEmpty()) {
             return collections.list()
                     .stream()
                     .map(ManagedFileSystem::fileInfo)
@@ -87,7 +92,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
 
         var processor = new QuerySolutionProcessor<>(this::fileInfo);
-        rdf.querySelect(storedQuery("fs_ls", parentPath + '/'), processor);
+        rdf.querySelect(storedQuery("fs_ls", normalizedPath + '/'), processor);
         return processor.getValues()
                 .stream()
                 .filter(Objects::nonNull)
@@ -96,59 +101,109 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        ensureValidPath(path);
+        var normalizedPath = normalizePath(path);
+        ensureValidPath(normalizedPath);
 
-        withCommitMessage("Create directory " + path, () ->
-                rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path))));
+        commit("Create directory " + normalizedPath, rdf, () -> {
+            ensureCanCreate(normalizedPath);
+            rdf.update(storedQuery("fs_mkdir", normalizedPath, userIriSupplier.get(), name(normalizedPath)));
+        });
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
-        ensureValidPath(path);
+        var normalizedPath = normalizePath(path);
+        ensureValidPath(normalizedPath);
 
         var blobInfo = write(in);
-        withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5())));
+
+        commit("Create file " + normalizedPath, rdf, () -> {
+            ensureCanCreate(normalizedPath);
+            rdf.update(storedQuery("fs_create", normalizedPath, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(normalizedPath), blobInfo.getMd5()));
+        });
+    }
+
+    private void ensureCanCreate(String normalizedPath) throws IOException {
+        if (exists(normalizedPath)) {
+            throw new FileAlreadyExistsException(normalizedPath);
+        }
+        if (stat(parentPath(normalizedPath)).isReadOnly()) {
+            throw new IOException("Target path is read-only");
+        }
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5())));
+        var normalizedPath = normalizePath(path);
+
+        commit("Modify file " + path, rdf, () -> {
+            var info = stat(normalizedPath);
+            if (info == null || info.isDirectory()) {
+                throw new FileNotFoundException(normalizedPath);
+            }
+            if (info.isReadOnly()) {
+                throw new IOException("File is read-only: " + normalizedPath);
+            }
+            rdf.update(storedQuery("fs_modify", normalizedPath, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5()));
+        });
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
+        var normalizedPath = normalizePath(path);
         var processor = new QuerySolutionProcessor<>(row -> row.getLiteral("blobId").getString());
-        rdf.querySelect(storedQuery("fs_get_blobid", path), processor);
-        var blobId = processor.getSingle().orElseThrow(() -> new FileNotFoundException(path));
+        rdf.querySelect(storedQuery("fs_get_blobid", normalizedPath), processor);
+        var blobId = processor.getSingle().orElseThrow(() -> new FileNotFoundException(normalizedPath));
         store.read(blobId, out);
     }
 
     @Override
     public void copy(String from, String to) throws IOException {
-        ensureValidPath(from);
-        ensureValidPath(to);
-        withCommitMessage("Copy data from " + from + " to " + to, () ->
-                rdf.update(storedQuery("fs_copy", from, to, name(to))));
+        var normalizedFrom = normalizePath(from);
+        var normalizedTo = normalizePath(to);
+        ensureValidPath(normalizedFrom);
+        ensureValidPath(normalizedTo);
+        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
+            throw new FileAlreadyExistsException("Cannot copy a file or a directory to itself");
+        }
+        commit("Copy data from " + normalizedFrom + " to " + normalizedTo, rdf, () -> {
+            ensureCanCreate(normalizedTo);
+            rdf.update(storedQuery("fs_copy", normalizedFrom, normalizedTo, name(normalizedTo)));
+        });
     }
 
     @Override
     public void move(String from, String to) throws IOException {
-        ensureValidPath(from);
-        ensureValidPath(to);
-        withCommitMessage("Move data from " + from + " to " + to, () ->
-                rdf.update(storedQuery("fs_move", from, to, name(to))));
+        var normalizedFrom = normalizePath(from);
+        var normalizedTo = normalizePath(to);
+        ensureValidPath(normalizedFrom);
+        ensureValidPath(normalizedTo);
+        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
+            throw new FileAlreadyExistsException("Cannot move a file or a directory to itself");
+        }
+        commit("Move data from " + normalizedFrom + " to " + normalizedTo, rdf, () -> {
+            ensureCanCreate(normalizedTo);
+            rdf.update(storedQuery("fs_move", normalizedFrom, normalizedTo, name(normalizedTo)));
+        });
     }
 
     @Override
     public void delete(String path) throws IOException {
-        ensureValidPath(path);
+        var normalizedPath = normalizePath(path);
+        ensureValidPath(normalizedPath);
 
-        withCommitMessage("Delete " + path, () ->
-                rdf.update(storedQuery("fs_delete", path, userIriSupplier.get())));
+        commit("Delete " + normalizedPath, rdf, () -> {
+            var info = stat(normalizedPath);
+            if (info == null) {
+                throw new FileNotFoundException(normalizedPath);
+            }
+            if (info.isReadOnly()) {
+                throw new IOException("Cannot delete " + normalizedPath);
+            }
+            rdf.update(storedQuery("fs_delete", normalizedPath, userIriSupplier.get()));
+        });
     }
 
     @Override

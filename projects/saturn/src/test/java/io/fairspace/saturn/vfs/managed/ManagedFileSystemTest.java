@@ -103,6 +103,8 @@ public class ManagedFileSystemTest {
 
     @Test
     public void mkdir() throws IOException {
+        fs.mkdir("coll/aaa");
+        fs.mkdir("coll/aaa/bbb");
         fs.mkdir("coll/aaa/bbb/ccc");
         var stat = fs.stat("coll/aaa/bbb/ccc");
         assertEquals("coll/aaa/bbb/ccc", stat.getPath());
