@@ -65,6 +65,16 @@ public class ManagedFileSystemTest {
     }
 
     @Test
+    public void statRoot() throws IOException {
+        assertEquals("", fs.stat("/").getPath());
+        assertTrue(fs.stat("").isDirectory());
+        assertNull(fs.stat("").getIri());
+
+        verify(permissions, never()).getPermission(any());
+    }
+
+
+    @Test
     public void statCollection() throws IOException {
         assertEquals("coll", fs.stat("coll").getPath());
         assertTrue(fs.stat("coll").isDirectory());
@@ -115,6 +125,12 @@ public class ManagedFileSystemTest {
         ensureRecentInstant(stat.getModified());
     }
 
+    @Test(expected = IOException.class)
+    public void cannotCreateADirectoryTwice() throws IOException {
+        fs.mkdir("coll/aaa");
+        fs.mkdir("coll/aaa");
+    }
+
     @Test
     public void writeAndRead() throws IOException {
         fs.mkdir("coll/dir");
@@ -136,6 +152,12 @@ public class ManagedFileSystemTest {
         if (!Arrays.equals(content2, os.toByteArray())) {
             assertArrayEquals(content2, os.toByteArray());
         }
+    }
+
+    @Test(expected = IOException.class)
+    public void cannotCreateAFileTwice() throws IOException {
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        fs.create("coll/file", new ByteArrayInputStream(content1));
     }
 
     @Test
@@ -189,6 +211,12 @@ public class ManagedFileSystemTest {
         assertNotEquals(oldIri, fs.stat("coll/dir2").getIri());
         assertTrue(ds.getDefaultModel().contains(createResource(fs.stat("coll/dir2").getIri()), RDFS.label, createStringLiteral("dir2")));
     }
+
+    @Test(expected = IOException.class)
+    public void cannotCopyDirToItself() throws IOException {
+        fs.mkdir("coll/dir1");
+        fs.copy("coll/dir1", "coll/dir1");
+     }
 
     @Test
     public void copyFile() throws IOException {
@@ -267,6 +295,11 @@ public class ManagedFileSystemTest {
 
         assertTrue(fs.exists("coll/dir/file"));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
+    }
+
+    @Test(expected = IOException.class)
+    public void cannotDeleteANonExistingFile() throws IOException {
+        fs.delete("coll/dir/file");
     }
 
     @Test

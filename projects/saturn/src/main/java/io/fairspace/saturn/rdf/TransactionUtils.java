@@ -20,10 +20,6 @@ public class TransactionUtils {
         return withCommitMessage(message, () -> calculateWrite(transactional, () -> sneaky(action)));
     }
 
-    public static <T> T transactionally(Transactional transactional, ThrowingSupplier<T, ?> action) {
-        return calculateRead(transactional, () -> sneaky(action));
-    }
-
     @SneakyThrows(Exception.class)
     private static <R> R sneaky(ThrowingSupplier<R, ?> action) {
         return action.get();
