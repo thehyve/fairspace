@@ -37,10 +37,10 @@ class PermissionsViewer extends React.Component {
         }
     }
 
-    handleAlterPermission = ({iri, user, access}) => {
+    handleAlterPermission = ({user, access}) => {
         this.setState({
             showPermissionDialog: true,
-            selectedPermission: {iri, user, access},
+            selectedPermission: {user, access},
             anchorEl: null
         });
     };
@@ -52,9 +52,9 @@ class PermissionsViewer extends React.Component {
         });
     };
 
-    handleRemoveCollaborator = ({iri, user, access}) => {
+    handleRemoveCollaborator = ({user, access}) => {
         this.setState({
-            selectedPermission: {iri, user, access},
+            selectedPermission: {user, access},
             showConfirmDeleteDialog: true,
             anchorEl: null
         });
