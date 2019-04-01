@@ -13,7 +13,7 @@ class WorkspaceAPI {
         return fetch(Config.get().urls.users, WorkspaceAPI.getConfig)
             .then(failOnHttpError('Error while loading users'))
             .then(response => response.json())
-            .then(users => users.map(u => ({...u, iri: createIri(u.id)})));
+            .then(users => users.map(user => ({...user, iri: createIri(user.id)})));
     }
 
     getWorkspace() {
