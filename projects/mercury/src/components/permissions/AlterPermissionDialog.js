@@ -13,6 +13,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import MaterialReactSelect from '../common/MaterialReactSelect';
+import getDisplayName from "../../utils/userUtils";
+import {AccessRights} from "../../utils/permissionUtils";
 
 export const styles = () => ({
     root: {
@@ -47,8 +49,8 @@ export const styles = () => ({
  * @returns {*}
  */
 const applyDisableFilter = (options, collaborators, currentUser) => options.map((option) => {
-    const isAlreadySelected = collaborators.find(c => c.subject === option.value) !== undefined;
-    const isCurrentUser = option.value === currentUser.id;
+    const isAlreadySelected = collaborators.find(c => c.user === option.value) !== undefined;
+    const isCurrentUser = option.value === currentUser.iri;
     option.disabled = isAlreadySelected || isCurrentUser;
     return option;
 });
@@ -62,7 +64,7 @@ const applyDisableFilter = (options, collaborators, currentUser) => options.map(
 const getUserLabelByUser = (user, options) => {
     let label = '';
     if (options) {
-        const found = options.find(option => option.value === user.subject);
+        const found = options.find(option => option.value === user);
         label = found && found.label;
     }
     return label;
@@ -74,14 +76,11 @@ const getUserLabelByUser = (user, options) => {
  * @returns {Array}
  */
 const transformUserToOptions = (users, collaborators, currentUser) => {
-    if (users.data) {
-        const tmp = users.data.map(r => ({
-            label: `${r.firstName} ${r.lastName}`,
-            value: r.id
-        }));
-        return applyDisableFilter(tmp, collaborators, currentUser);
-    }
-    return [];
+    const tmp = users.data.map(r => ({
+        label: getDisplayName(r),
+        value: r.iri
+    }));
+    return applyDisableFilter(tmp, collaborators, currentUser);
 };
 
 /**
@@ -101,19 +100,6 @@ const getNoOptionMessage = (users) => {
     return noOptionMessage;
 };
 
-/**
- * Convert user to option value
- * @param user
- * @returns {{value}}
- */
-const convertUserToOptionValue = user => (user ? {value: user.subject} : null);
-
-const AccessRights = {
-    Read: 'Read',
-    Write: 'Write',
-    Manage: 'Manage',
-};
-
 export class AlterPermissionDialog extends React.Component {
     constructor(props) {
         super(props);
@@ -125,10 +111,10 @@ export class AlterPermissionDialog extends React.Component {
     }
 
     resetState = () => {
-        const {user} = this.props;
+        const {access, user} = this.props;
         this.setState({
-            accessRight: user ? user.access : 'Read',
-            selectedUser: user ? convertUserToOptionValue(user) : null,
+            accessRight: access || 'Read',
+            selectedUser: user,
             selectedUserLabel: ''
         });
     };
@@ -151,9 +137,9 @@ export class AlterPermissionDialog extends React.Component {
 
     handleSubmit = () => {
         const {selectedUser, accessRight} = this.state;
-        const {collectionId, alterPermission} = this.props;
+        const {iri, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser.value, collectionId, accessRight);
+            alterPermission(selectedUser.value, iri, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
@@ -216,12 +202,12 @@ export class AlterPermissionDialog extends React.Component {
                                 value={accessRight}
                                 onChange={this.handleAccessRightChange}
                             >
-                                {Object.keys(AccessRights).map(access => (
+                                {AccessRights.map(access => (
                                     <FormControlLabel
                                         key={access}
                                         value={access}
                                         control={<Radio />}
-                                        label={AccessRights[access]}
+                                        label={access}
                                     />
                                 ))}
                             </RadioGroup>
@@ -250,10 +236,11 @@ export class AlterPermissionDialog extends React.Component {
 
 AlterPermissionDialog.propTypes = {
     classes: PropTypes.object.isRequired,
-    user: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    collectionId: PropTypes.number,
+    access: PropTypes.string,
+    user: PropTypes.string,
+    iri: PropTypes.string,
 };
 
 export default withStyles(styles, {withTheme: true})(AlterPermissionDialog);

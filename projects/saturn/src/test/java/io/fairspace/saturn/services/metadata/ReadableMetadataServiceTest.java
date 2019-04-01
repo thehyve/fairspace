@@ -27,12 +27,12 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReadableMetadataServiceTest {
-    private static final String userVocabularyURI = "http://fairspace.io/iri/user-vocabulary";
-    private static final String GRAPH = "http://fairspace.io/iri/graph";
+    private static final String userVocabularyURI = "http://localhost/iri/user-vocabulary";
+    private static final String GRAPH = "http://localhost/iri/graph";
 
-    private static final Resource S1 = createResource("http://fairspace.io/iri/S1");
-    private static final Resource S2 = createResource("http://fairspace.io/iri/S2");
-    private static final Resource S3 = createResource("http://fairspace.io/iri/S3");
+    private static final Resource S1 = createResource("http://localhost/iri/S1");
+    private static final Resource S2 = createResource("http://localhost/iri/S2");
+    private static final Resource S3 = createResource("http://localhost/iri/S3");
     private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
 
     private static final Statement STMT1 = createStatement(S1, P1, S2);

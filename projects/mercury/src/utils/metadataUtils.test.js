@@ -7,7 +7,7 @@ import {
     linkLabel,
     propertiesToShow,
     relativeLink,
-    shouldPropertyBeHidden,
+    shouldPropertyBeHidden, url2iri,
 } from "./metadataUtils";
 import {
     COLLECTION_URI,
@@ -213,5 +213,11 @@ describe('Metadata Utils', () => {
 
             expect(propertiesToShow(properties)).toEqual(expected);
         });
+    });
+
+    describe('url2iri', () => {
+       it('Handles URLS', () => {
+           expect(url2iri('scheme://example.com:1234/some/path/?query')).toEqual('http://example.com/some/path/')
+       })
     });
 });

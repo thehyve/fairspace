@@ -12,37 +12,35 @@ import {
 } from "../common";
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import getDisplayName from "../../utils/userUtils";
-import {findById} from "../../utils/arrayUtils";
 import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
 
 class PermissionsViewer extends React.Component {
     state = {
         showPermissionDialog: false,
         showConfirmDeleteDialog: false,
-        selectedUser: null,
         selectedPermission: null
     };
 
     componentDidMount() {
-        const {collectionId, fetchPermissionsIfNeeded} = this.props;
+        const {iri, fetchPermissionsIfNeeded} = this.props;
 
-        if (collectionId) {
-            fetchPermissionsIfNeeded(collectionId);
+        if (iri) {
+            fetchPermissionsIfNeeded(iri);
         }
     }
 
     componentDidUpdate() {
-        const {collectionId, fetchPermissionsIfNeeded} = this.props;
+        const {iri, fetchPermissionsIfNeeded} = this.props;
 
-        if (collectionId) {
-            fetchPermissionsIfNeeded(collectionId);
+        if (iri) {
+            fetchPermissionsIfNeeded(iri);
         }
     }
 
-    handleAlterPermission = (user) => {
+    handleAlterPermission = ({iri, user, access}) => {
         this.setState({
             showPermissionDialog: true,
-            selectedUser: user,
+            selectedPermission: {iri, user, access},
             anchorEl: null
         });
     };
@@ -50,24 +48,24 @@ class PermissionsViewer extends React.Component {
     handleShareWithDialogClose = () => {
         this.setState({
             showPermissionDialog: false,
-            selectedUser: null,
+            selectedPermission: null,
         });
     };
 
-    handleRemoveCollaborator = (collaborator) => {
+    handleRemoveCollaborator = ({iri, user, access}) => {
         this.setState({
-            selectedUser: collaborator,
+            selectedPermission: {iri, user, access},
             showConfirmDeleteDialog: true,
             anchorEl: null
         });
     };
 
     handleDeleteCollaborator = () => {
-        const {collectionId, alterPermission} = this.props;
-        const {selectedUser} = this.state;
+        const {iri, alterPermission} = this.props;
+        const {selectedPermission} = this.state;
 
-        if (selectedUser) {
-            alterPermission(selectedUser.subject, collectionId, 'None');
+        if (selectedPermission) {
+            alterPermission(selectedPermission.user, iri, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
@@ -91,25 +89,25 @@ class PermissionsViewer extends React.Component {
     };
 
     renderCollaboratorList(permissions) {
-        const {canManage, currentUser} = this.props;
+        const {users, canManage, currentUser} = this.props;
         const {anchorEl, selectedPermission} = this.state;
 
         const selectedPermissionKey = selectedPermission
-            ? selectedPermission.access + selectedPermission.collectionId + selectedPermission.subject
+            ? selectedPermission.access + selectedPermission.user
             : null;
 
         return sortPermissions(permissions)
-            .map((p) => {
-                const key = p.access + p.collectionId + p.subject;
+            .map((permission) => {
+                const key = permission.access + permission.user;
                 return (
                     <ListItem
                         key={key}
                     >
-                        <ListItemText primary={getDisplayName(p.user)} secondary={p.access} />
+                        <ListItemText primary={getDisplayName(users.find(user => permission.user === user.iri))} secondary={permission.access} />
                         <ListItemSecondaryAction>
                             <IconButton
-                                onClick={e => this.handleMenuClick(e, p)}
-                                disabled={!canAlterPermission(canManage, p, currentUser)}
+                                onClick={e => this.handleMenuClick(e, permission)}
+                                disabled={!canAlterPermission(canManage, permission, currentUser)}
                             >
                                 <MoreIcon />
                             </IconButton>
@@ -120,12 +118,12 @@ class PermissionsViewer extends React.Component {
                                 onClose={this.handleMenuClose}
                             >
                                 <MenuItem
-                                    onClick={() => this.handleAlterPermission(p)}
+                                    onClick={() => this.handleAlterPermission(permission)}
                                 >
                                     Change access
                                 </MenuItem>
                                 <MenuItem
-                                    onClick={() => this.handleRemoveCollaborator(p)}
+                                    onClick={() => this.handleRemoveCollaborator(permission)}
                                 >
                                     Delete
                                 </MenuItem>
@@ -137,13 +135,7 @@ class PermissionsViewer extends React.Component {
     }
 
     renderUserList = (permissions) => {
-        const {users, canManage} = this.props;
-
-        // Extend the permissions map with the user itself
-        const permissionsWithUsers = permissions.map(p => ({
-            ...p,
-            user: findById(users, p.subject)
-        }));
+        const {canManage} = this.props;
 
         const addButton = canManage ? (
             <Button
@@ -159,30 +151,31 @@ class PermissionsViewer extends React.Component {
 
         return (
             <List dense disablePadding>
-                {this.renderCollaboratorList(permissionsWithUsers)}
+                {this.renderCollaboratorList(permissions)}
                 {addButton}
             </List>
         );
     };
 
     renderPermissionDialog = () => {
-        const {collectionId, currentUser} = this.props;
-        const {selectedUser, showPermissionDialog} = this.state;
+        const {iri, currentUser} = this.props;
+        const {selectedPermission, showPermissionDialog} = this.state;
 
         return (
             <AlterPermissionContainer
                 open={showPermissionDialog}
                 onClose={this.handleShareWithDialogClose}
-                user={selectedUser}
-                collectionId={collectionId}
+                user={selectedPermission && selectedPermission.user}
+                access={selectedPermission && selectedPermission.access}
+                iri={iri}
                 currentUser={currentUser}
             />
         );
     };
 
     renderConfirmationDialog = () => {
-        const {selectedUser, showConfirmDeleteDialog} = this.state;
-        const fullName = selectedUser && getDisplayName(selectedUser.user);
+        const {selectedPermission, showConfirmDeleteDialog} = this.state;
+        const fullName = selectedPermission && getDisplayName(selectedPermission.user);
         const content = `Are you sure you want to remove "${fullName}" from the collaborator list?`;
 
         return (

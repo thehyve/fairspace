@@ -130,3 +130,10 @@ export const propertiesToShow = (properties = []) => {
 
     return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
+
+export const createIri = (id)  => `http://${window.location.hostname}/iri/${id}`;
+
+export const url2iri = (iri) => {
+    const url = new URL(iri);
+    return `http://${url.hostname}${url.pathname}`
+};
