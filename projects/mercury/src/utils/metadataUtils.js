@@ -27,6 +27,8 @@ export const getFirstPredicateValue = (metadataEntry, predicate, defaultValue) =
 
 export const getFirstPredicateId = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
 
+export const getFirstPredicateList = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
+
 /**
  *
  * @param uri the URI to generate a label for

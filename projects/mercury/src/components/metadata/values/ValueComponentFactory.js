@@ -1,6 +1,5 @@
 import ReferringValue from "./ReferringValue";
 import StringValue from "./StringValue";
-import LookupEntity from "./LookupEntity";
 import * as constants from "../../../constants";
 import IntegerValue from "./IntegerValue";
 import DateTimeValue from "./DateTimeValue";
@@ -9,8 +8,16 @@ import DateValue from "./DateValue";
 import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
 import ResourceValue from "./ResourceValue";
+import EntityDropdown from "./EntityDropdown";
+import ControlledVocabularyDropdown from "./ControlledVocabularyDropdown";
 
 const getInputComponent = (property) => {
+    // If the property has a restricted vocabulary
+    // show a dropdown with these values
+    if (property.allowedValues) {
+        return ControlledVocabularyDropdown;
+    }
+
     // The datatype determines the type of input element
     // If no datatype is specified, the field will be treated
     // as referring to another class
@@ -38,6 +45,6 @@ const getInputComponent = (property) => {
 
 export default {
     editComponent: property => getInputComponent(property) || ReferringValue,
-    addComponent: property => getInputComponent(property) || LookupEntity,
+    addComponent: property => getInputComponent(property) || EntityDropdown,
     readOnlyComponent: () => ReferringValue
 };

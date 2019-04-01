@@ -125,9 +125,15 @@ class MetadataProperty extends React.Component {
         const canAdd = editableAndNotMachineOnly && (property.allowMultiple || property.values.length === 0);
         const labelId = `label-${property.key}`;
 
-        const ValueComponent = (editableAndNotMachineOnly && property.className !== constants.RESOURCE_URI)
-            ? ValueComponentFactory.editComponent(property)
-            : ValueComponentFactory.readOnlyComponent();
+        // In some cases, the edit component should not actually allow editing the value.
+        // This is the case if
+        //   - the screen is readonly
+        //   - the field refers to a url
+        //   - it it is taken from a controlled vocabulary
+        const disableEditing = !editableAndNotMachineOnly || property.className === constants.RESOURCE_URI || property.allowedValues;
+        const ValueComponent = disableEditing
+            ? ValueComponentFactory.readOnlyComponent()
+            : ValueComponentFactory.editComponent(property);
 
         return (
             <ListItem disableGutters key={property.key} style={{display: 'block'}}>
