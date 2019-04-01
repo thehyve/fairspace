@@ -142,7 +142,7 @@ class PermissionsViewer extends React.Component {
                 variant="text"
                 title="Add a collaborator"
                 aria-label="Add"
-                onClick={() => this.handleAlterPermission()}
+                onClick={() => this.handleAlterPermission({})}
                 disabled={!canManage}
             >
                 Add
