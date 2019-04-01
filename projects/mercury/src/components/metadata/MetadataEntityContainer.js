@@ -5,7 +5,7 @@ import {Paper, List} from '@material-ui/core';
 import {ErrorMessage, LoadingInlay} from "../common";
 import {fetchCombinedMetadataIfNeeded} from "../../actions/metadataActions";
 import MetaEntityHeader from './MetaEntityHeader';
-import {isDateTimeProperty, propertiesToShow, linkLabel} from "../../utils/metadataUtils";
+import {isDateTimeProperty, propertiesToShow, linkLabel, url2iri} from "../../utils/metadataUtils";
 
 import MetadataProperty from "./MetadataProperty";
 
@@ -64,12 +64,6 @@ export class MetadataEntityContainer extends React.Component {
         ) : entity;
     }
 }
-
-const url2iri = (iri) => {
-    const url = new URL(iri);
-    return `http://${url.hostname}${url.pathname}`
-};
-
 const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject, cache: {vocabulary}} = state;
     const subject = ownProps.subject || url2iri(window.location.href);
