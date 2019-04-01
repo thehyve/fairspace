@@ -9,7 +9,7 @@ export const sortPermissions = (permissions) => {
         return [];
     }
 
-    return permissions.sort(comparing(compareBy(permissionLevel,  false), compareBy('user')));
+    return permissions.sort(comparing(compareBy(permissionLevel,  false), compareBy('userName')));
 };
 
 /**

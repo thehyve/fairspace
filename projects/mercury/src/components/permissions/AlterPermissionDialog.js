@@ -114,7 +114,7 @@ export class AlterPermissionDialog extends React.Component {
         const {access, user} = this.props;
         this.setState({
             accessRight: access || 'Read',
-            selectedUser: user,
+            selectedUser: {value: user},
             selectedUserLabel: ''
         });
     };
@@ -124,7 +124,7 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSelectedUserChange = (selectedOption) => {
-        this.setState({selectedUser: selectedOption.value});
+        this.setState({selectedUser: selectedOption});
     };
 
     handleClose = () => {
@@ -139,7 +139,7 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
         const {iri, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser, iri, accessRight);
+            alterPermission(selectedUser.value, iri, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});

@@ -96,14 +96,16 @@ class PermissionsViewer extends React.Component {
             ? selectedPermission.access + selectedPermission.user
             : null;
 
-        return sortPermissions(permissions)
+        const permissionsWithUserNames = permissions.map(permission => ({...permission, userName: getDisplayName(users.find(user => permission.user === user.iri))}));
+
+        return sortPermissions(permissionsWithUserNames)
             .map((permission) => {
                 const key = permission.access + permission.user;
                 return (
                     <ListItem
                         key={key}
                     >
-                        <ListItemText primary={getDisplayName(users.find(user => permission.user === user.iri))} secondary={permission.access} />
+                        <ListItemText primary={permission.userName} secondary={permission.access} />
                         <ListItemSecondaryAction>
                             <IconButton
                                 onClick={e => this.handleMenuClick(e, permission)}
