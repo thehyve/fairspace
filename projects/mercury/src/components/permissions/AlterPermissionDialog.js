@@ -63,7 +63,7 @@ const applyDisableFilter = (options, collaborators, currentUser) => options.map(
 const getUserLabelByUser = (user, options) => {
     let label = '';
     if (options) {
-        const found = options.find(option => option.value === user.subject);
+        const found = options.find(option => createIri(option.value) === user.user);
         label = found && found.label;
     }
     return label;

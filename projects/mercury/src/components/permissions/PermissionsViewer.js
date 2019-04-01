@@ -67,7 +67,7 @@ class PermissionsViewer extends React.Component {
         const {selectedUser} = this.state;
 
         if (selectedUser) {
-            alterPermission(createIri(selectedUser.user.id), iri, 'None');
+            alterPermission(selectedUser.user, iri, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
@@ -91,21 +91,21 @@ class PermissionsViewer extends React.Component {
     };
 
     renderCollaboratorList(permissions) {
-        const {canManage, currentUser} = this.props;
+        const {users, canManage, currentUser} = this.props;
         const {anchorEl, selectedPermission} = this.state;
 
         const selectedPermissionKey = selectedPermission
-            ? selectedPermission.access + selectedPermission.user.id
+            ? selectedPermission.access + selectedPermission.user
             : null;
 
         return sortPermissions(permissions)
             .map((p) => {
-                const key = p.access + p.user.id;
+                const key = p.access + p.user;
                 return (
                     <ListItem
                         key={key}
                     >
-                        <ListItemText primary={getDisplayName(p.user)} secondary={p.access} />
+                        <ListItemText primary={getDisplayName(users.find(u => p.user === createIri(u.id)))} secondary={p.access} />
                         <ListItemSecondaryAction>
                             <IconButton
                                 onClick={e => this.handleMenuClick(e, p)}
@@ -137,13 +137,7 @@ class PermissionsViewer extends React.Component {
     }
 
     renderUserList = (permissions) => {
-        const {users, canManage} = this.props;
-
-        // Extend the permissions map with the user itself
-        const permissionsWithUsers = permissions.map(p => ({
-            ...p,
-            user: users.find(u => p.user === createIri(u.id))
-        }));
+        const {canManage} = this.props;
 
         const addButton = canManage ? (
             <Button
@@ -159,7 +153,7 @@ class PermissionsViewer extends React.Component {
 
         return (
             <List dense disablePadding>
-                {this.renderCollaboratorList(permissionsWithUsers)}
+                {this.renderCollaboratorList(permissions)}
                 {addButton}
             </List>
         );

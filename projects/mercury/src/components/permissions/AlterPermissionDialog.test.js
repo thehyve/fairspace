@@ -39,8 +39,7 @@ describe('AlterPermissionDialog', () => {
     };
     const mockCollectionId = 500;
     const mockUser = {
-        collectionId: 500,
-        subject: 'user2-id',
+        user: 'http://localhost/iri/user2-id',
         access: 'Write'
     };
 
