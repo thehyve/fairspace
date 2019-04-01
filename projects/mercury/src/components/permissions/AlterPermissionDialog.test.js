@@ -25,13 +25,11 @@ describe('AlterPermissionDialog', () => {
     const mockCollaborators = {
         data: [
             {
-                collectionId: 500,
-                subject: 'user2-id',
+                user: 'http://localhost/iri/user2-id',
                 access: 'Write'
             },
             {
-                collectionId: 500,
-                subject: 'user4-id',
+                user: 'http://localhost/iri/user4-id',
                 access: 'Manage'
             }
         ]
