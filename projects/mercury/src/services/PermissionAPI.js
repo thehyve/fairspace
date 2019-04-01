@@ -23,11 +23,11 @@ class PermissionAPI {
             .then(response => response.json());
     }
 
-    alterPermission(userId, iri, access) {
-        if (!userId || !iri || !access) {
-            return Promise.reject(Error("No userId, IRI or access given"));
+    alterPermission(userIri, iri, access) {
+        if (!userIri || !iri || !access) {
+            return Promise.reject(Error("No userIri, IRI or access given"));
         }
-        const payload = {user: userId, access};
+        const payload = {user: userIri, access};
         return fetch(`${Config.get().urls.permissions}?${queryString.stringify({iri})}`, {
             method: 'PUT',
             headers: PermissionAPI.changeHeaders,
