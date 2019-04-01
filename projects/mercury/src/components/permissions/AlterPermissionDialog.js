@@ -76,14 +76,11 @@ const getUserLabelByUser = (user, options) => {
  * @returns {Array}
  */
 const transformUserToOptions = (users, collaborators, currentUser) => {
-    if (users.data) {
-        const tmp = users.data.map(r => ({
-            label: getDisplayName(r),
-            value: r.id
-        }));
-        return applyDisableFilter(tmp, collaborators, currentUser);
-    }
-    return [];
+    const tmp = users.data.map(r => ({
+        label: getDisplayName(r),
+        value: r.id
+    }));
+    return applyDisableFilter(tmp, collaborators, currentUser);
 };
 
 /**
