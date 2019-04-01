@@ -1,7 +1,7 @@
 package io.fairspace.saturn.rdf.search;
 
-import io.fairspace.saturn.Config;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.query.text.es.ESSettings;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -18,18 +18,18 @@ public class ElasticSearchClientFactory {
     /**
      * Builds a client for connecting to ES with the given configuration
      *
-     * @param configuration
+     * @param esSettings
      * @return
      * @throws UnknownHostException
      * @see org.apache.jena.query.text.es.TextIndexES
      */
-    public static Client build(Config.Jena.ElasticSearch configuration) throws UnknownHostException {
-        log.debug("Initializing the Elastic Search Java Client with settings: " + configuration.settings);
+    public static Client build(ESSettings esSettings) throws UnknownHostException {
+        log.debug("Initializing the Elastic Search Java Client with settings: " + esSettings);
         Settings settings = Settings.builder()
-                .put("cluster.name", configuration.settings.getClusterName()).build();
+                .put("cluster.name", esSettings.getClusterName()).build();
         List<TransportAddress> addresses = new ArrayList<>();
-        for (String host : configuration.settings.getHostToPortMapping().keySet()) {
-            TransportAddress addr = new TransportAddress(InetAddress.getByName(host), configuration.settings.getHostToPortMapping().get(host));
+        for (String host : esSettings.getHostToPortMapping().keySet()) {
+            TransportAddress addr = new TransportAddress(InetAddress.getByName(host), esSettings.getHostToPortMapping().get(host));
             addresses.add(addr);
         }
 

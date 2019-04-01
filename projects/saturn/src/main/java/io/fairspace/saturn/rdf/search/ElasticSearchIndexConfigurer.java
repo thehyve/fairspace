@@ -14,6 +14,8 @@ import org.elasticsearch.common.xcontent.XContentType;
 
 import java.io.IOException;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 @Slf4j
 @Getter
 public class ElasticSearchIndexConfigurer {
@@ -30,7 +32,7 @@ public class ElasticSearchIndexConfigurer {
     /**
      * Configures the specified index with a specific analyzer for filePaths
      */
-    public void configure(ESSettings esSettings) throws IOException {
+    public void configure(ESSettings esSettings) {
         String indexName = esSettings.getIndexName();
         IndicesAdminClient indicesAdminClient = client.admin().indices();
 
@@ -89,7 +91,7 @@ public class ElasticSearchIndexConfigurer {
     }
 
     private String getMappings() throws IOException {
-        return new String(SaturnDatasetFactory.class.getResourceAsStream("/elasticsearch/mappings.json").readAllBytes());
+        return new String(SaturnDatasetFactory.class.getResourceAsStream("/elasticsearch/mappings.json").readAllBytes(), UTF_8);
     }
 
     private Settings.Builder getSettings() throws IOException {

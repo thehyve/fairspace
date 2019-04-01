@@ -23,7 +23,6 @@ import org.elasticsearch.client.Client;
 import java.io.IOException;
 
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
-import static org.apache.jena.query.text.es.TextESDatasetFactory.createESIndex;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
 
 @Slf4j
@@ -55,7 +54,7 @@ public class SaturnDatasetFactory {
         if (config.elasticSearch.enabled) {
             try {
                 // Setup ES client and index
-                Client client = ElasticSearchClientFactory.build(config.elasticSearch);
+                Client client = ElasticSearchClientFactory.build(config.elasticSearch.settings);
                 ElasticSearchIndexConfigurer esConfigurer = new ElasticSearchIndexConfigurer(client);
                 esConfigurer.configure(config.elasticSearch.settings);
 
