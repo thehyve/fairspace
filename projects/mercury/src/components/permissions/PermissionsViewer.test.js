@@ -64,11 +64,11 @@ describe('PermissionsViewer', () => {
         });
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Mariah Carey',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
@@ -111,13 +111,13 @@ describe('PermissionsViewer', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
 
-        it('should order permissions by the access rank (Manage-Write-Read)', () => {
+        it('should order permissions by the access rank (Manage-Write-Read) and name', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Mariah Carey',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
@@ -156,13 +156,13 @@ describe('PermissionsViewer', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
 
-        it('should order permissions by the access rank (Manage-Write-Read)', () => {
+        it('should order permissions by the access rank (Manage-Write-Read) and name', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Mariah Carey',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
