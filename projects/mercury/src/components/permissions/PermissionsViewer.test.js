@@ -35,11 +35,11 @@ describe('PermissionsViewer', () => {
     const mockcurrentUserNotCreatorCanManage = {id: 'user1-id'};
     const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
     const mockUsers = [
-        {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
-        {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
-        {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars'},
-        {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain'},
-        {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
+        {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey', iri: 'http://localhost/iri/user1-id'},
+        {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson', iri: 'http://localhost/iri/user2-id'},
+        {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars', iri: 'http://localhost/iri/user3-id'},
+        {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain', iri: 'http://localhost/iri/user4-id'},
+        {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande', iri: 'http://localhost/iri/user5-id'},
     ];
     const mockCreator = 'user4-id';
     const mockFetchPermissionsFn = jest.fn();

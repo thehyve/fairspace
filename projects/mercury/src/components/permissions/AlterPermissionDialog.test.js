@@ -15,11 +15,11 @@ describe('AlterPermissionDialog', () => {
     const mockfetchUsersFn = jest.fn();
     const mockUsers = {
         data: [
-            {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
-            {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
-            {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars'},
-            {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain'},
-            {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
+            {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey', iri: 'http://localhost/iri/user1-id'},
+            {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson', iri: 'http://localhost/iri/user2-id'},
+            {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars', iri: 'http://localhost/iri/user3-id'},
+            {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain', iri: 'http://localhost/iri/user4-id'},
+            {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande', iri: 'http://localhost/iri/user5-id'},
         ]
     };
     const mockCollaborators = {
@@ -35,7 +35,8 @@ describe('AlterPermissionDialog', () => {
         ]
     };
     const mockCurrentLoggedUser = {
-        id: 'user1-id'
+        id: 'user1-id',
+        iri: 'http://localhost/iri/user1-id'
     };
     const mockCollectionId = 500;
     const mockUser = {
@@ -54,27 +55,27 @@ describe('AlterPermissionDialog', () => {
             {
                 disabled: true,
                 label: "Mariah Carey",
-                value: "user1-id"
+                value: 'http://localhost/iri/user1-id'
             },
             {
                 disabled: true,
                 label: "Michael Jackson",
-                value: "user2-id"
+                value: 'http://localhost/iri/user2-id'
             },
             {
                 disabled: false,
                 label: "Bruno Mars",
-                value: "user3-id"
+                value: 'http://localhost/iri/user3-id'
             },
             {
                 disabled: true,
                 label: "Kurt Cobain",
-                value: "user4-id"
+                value: 'http://localhost/iri/user4-id'
             },
             {
                 disabled: false,
                 label: "Ariana Grande",
-                value: "user5-id"
+                value: 'http://localhost/iri/user5-id'
             }
         ];
 

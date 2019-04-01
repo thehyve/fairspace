@@ -13,7 +13,6 @@ import LoadingInlay from './LoadingInlay';
 import CollectionEditor from "./CollectionEditor";
 import ConfirmationDialog from './ConfirmationDialog';
 import PermissionsContainer from "../permissions/PermissionsContainer";
-import {canManage} from '../../utils/permissionUtils';
 
 export const ICONS = {
     LOCAL_STORAGE: 'folder_open',
@@ -50,14 +49,14 @@ class CollectionDetails extends React.Component {
     };
 
     handleEdit = () => {
-        if (canManage(this.props.collection)) {
+        if (this.props.collection.canManage) {
             this.setState({editing: true});
             this.handleMenuClose();
         }
     }
 
     handleDelete = () => {
-        if (canManage(this.props.collection)) {
+        if (this.props.collection.canManage) {
             this.setState({deleting: true});
             this.handleMenuClose();
         }
@@ -84,7 +83,6 @@ class CollectionDetails extends React.Component {
         const {classes, loading, collection} = this.props;
         const {anchorEl, expanded, editing, deleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
-        const canManageCollection = canManage(collection);
 
         if (loading) {
             return <LoadingInlay />;
@@ -94,7 +92,7 @@ class CollectionDetails extends React.Component {
             <>
                 <Card>
                     <CardHeader
-                        action={!canManageCollection ? null : (
+                        action={!collection.canManage ? null : (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -149,7 +147,7 @@ class CollectionDetails extends React.Component {
                         <CardContent>
                             <PermissionsContainer
                                 iri={collection.iri}
-                                canManage={canManageCollection}
+                                canManage={collection.canManage}
                             />
                         </CardContent>
                     </Collapse>

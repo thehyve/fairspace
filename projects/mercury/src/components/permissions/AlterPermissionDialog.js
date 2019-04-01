@@ -13,8 +13,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import MaterialReactSelect from '../common/MaterialReactSelect';
-import {createIri} from "../../utils/metadataUtils";
 import getDisplayName from "../../utils/userUtils";
+import {AccessRights} from "../../utils/permissionUtils";
 
 export const styles = () => ({
     root: {
@@ -49,8 +49,8 @@ export const styles = () => ({
  * @returns {*}
  */
 const applyDisableFilter = (options, collaborators, currentUser) => options.map((option) => {
-    const isAlreadySelected = collaborators.find(c => c.user === createIri(option.value)) !== undefined;
-    const isCurrentUser = option.value === currentUser.id;
+    const isAlreadySelected = collaborators.find(c => c.user === option.value) !== undefined;
+    const isCurrentUser = option.value === currentUser.iri;
     option.disabled = isAlreadySelected || isCurrentUser;
     return option;
 });
@@ -64,7 +64,7 @@ const applyDisableFilter = (options, collaborators, currentUser) => options.map(
 const getUserLabelByUser = (user, options) => {
     let label = '';
     if (options) {
-        const found = options.find(option => createIri(option.value) === user.user);
+        const found = options.find(option => option.value === user.user);
         label = found && found.label;
     }
     return label;
@@ -78,7 +78,7 @@ const getUserLabelByUser = (user, options) => {
 const transformUserToOptions = (users, collaborators, currentUser) => {
     const tmp = users.data.map(r => ({
         label: getDisplayName(r),
-        value: r.id
+        value: r.iri
     }));
     return applyDisableFilter(tmp, collaborators, currentUser);
 };
@@ -98,12 +98,6 @@ const getNoOptionMessage = (users) => {
         }
     }
     return noOptionMessage;
-};
-
-const AccessRights = {
-    Read: 'Read',
-    Write: 'Write',
-    Manage: 'Manage',
 };
 
 export class AlterPermissionDialog extends React.Component {
@@ -130,7 +124,7 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSelectedUserChange = (selectedOption) => {
-        this.setState({selectedUser: selectedOption});
+        this.setState({selectedUser: selectedOption.value});
     };
 
     handleClose = () => {
@@ -208,12 +202,12 @@ export class AlterPermissionDialog extends React.Component {
                                 value={accessRight}
                                 onChange={this.handleAccessRightChange}
                             >
-                                {Object.keys(AccessRights).map(access => (
+                                {AccessRights.map(access => (
                                     <FormControlLabel
                                         key={access}
                                         value={access}
                                         control={<Radio />}
-                                        label={AccessRights[access]}
+                                        label={access}
                                     />
                                 ))}
                             </RadioGroup>

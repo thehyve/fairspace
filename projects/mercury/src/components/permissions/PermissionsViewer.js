@@ -13,7 +13,6 @@ import {
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import getDisplayName from "../../utils/userUtils";
 import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
-import {createIri} from "../../utils/metadataUtils";
 
 class PermissionsViewer extends React.Component {
     state = {
@@ -105,7 +104,7 @@ class PermissionsViewer extends React.Component {
                     <ListItem
                         key={key}
                     >
-                        <ListItemText primary={getDisplayName(users.find(u => p.user === createIri(u.id)))} secondary={p.access} />
+                        <ListItemText primary={getDisplayName(users.find(u => p.user === u.iri))} secondary={p.access} />
                         <ListItemSecondaryAction>
                             <IconButton
                                 onClick={e => this.handleMenuClick(e, p)}
