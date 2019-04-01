@@ -65,9 +65,14 @@ export class MetadataEntityContainer extends React.Component {
     }
 }
 
+const url2iri = (iri) => {
+    const url = new URL(iri);
+    return `http://${url.hostname}${url.pathname}`
+};
+
 const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject, cache: {vocabulary}} = state;
-    const subject = ownProps.subject || window.location.href;
+    const subject = ownProps.subject || url2iri(window.location.href);
     const metadata = metadataBySubject[subject] || {};
     const hasNoMetadata = !metadata || !metadata.data || metadata.data.length === 0;
     const hasOtherErrors = (metadata && metadata.error) || !vocabulary || vocabulary.error;

@@ -129,6 +129,6 @@ it('tries to load the metadata and the vocabulary', () => {
     });
 
     const dispatch = jest.fn();
-    mount(<MetadataEntityContainer subject="John" properties={[]} store={store} dispatch={dispatch} />);
+    mount(<MetadataEntityContainer subject="http://example.com/john" properties={[]} store={store} dispatch={dispatch} />);
     expect(dispatch.mock.calls.length).toEqual(1);
 });
