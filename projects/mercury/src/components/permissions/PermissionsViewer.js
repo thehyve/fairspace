@@ -18,7 +18,6 @@ class PermissionsViewer extends React.Component {
     state = {
         showPermissionDialog: false,
         showConfirmDeleteDialog: false,
-        selectedUser: null,
         selectedPermission: null
     };
 
@@ -41,7 +40,7 @@ class PermissionsViewer extends React.Component {
     handleAlterPermission = (user) => {
         this.setState({
             showPermissionDialog: true,
-            selectedUser: user,
+            selectedPermission: user,
             anchorEl: null
         });
     };
@@ -49,13 +48,13 @@ class PermissionsViewer extends React.Component {
     handleShareWithDialogClose = () => {
         this.setState({
             showPermissionDialog: false,
-            selectedUser: null,
+            selectedPermission: null,
         });
     };
 
     handleRemoveCollaborator = (collaborator) => {
         this.setState({
-            selectedUser: collaborator,
+            selectedPermission: collaborator,
             showConfirmDeleteDialog: true,
             anchorEl: null
         });
@@ -63,10 +62,10 @@ class PermissionsViewer extends React.Component {
 
     handleDeleteCollaborator = () => {
         const {iri, alterPermission} = this.props;
-        const {selectedUser} = this.state;
+        const {selectedPermission} = this.state;
 
-        if (selectedUser) {
-            alterPermission(selectedUser.user, iri, 'None');
+        if (selectedPermission) {
+            alterPermission(selectedPermission.user, iri, 'None');
             this.handleCloseConfirmDeleteDialog();
         }
     };
@@ -160,13 +159,14 @@ class PermissionsViewer extends React.Component {
 
     renderPermissionDialog = () => {
         const {iri, currentUser} = this.props;
-        const {selectedUser, showPermissionDialog} = this.state;
+        const {selectedPermission, showPermissionDialog} = this.state;
 
         return (
             <AlterPermissionContainer
                 open={showPermissionDialog}
                 onClose={this.handleShareWithDialogClose}
-                user={selectedUser}
+                user={selectedPermission && selectedPermission.user}
+                access={selectedPermission && selectedPermission.access}
                 iri={iri}
                 currentUser={currentUser}
             />
@@ -174,8 +174,8 @@ class PermissionsViewer extends React.Component {
     };
 
     renderConfirmationDialog = () => {
-        const {selectedUser, showConfirmDeleteDialog} = this.state;
-        const fullName = selectedUser && getDisplayName(selectedUser.user);
+        const {selectedPermission, showConfirmDeleteDialog} = this.state;
+        const fullName = selectedPermission && getDisplayName(selectedPermission.user);
         const content = `Are you sure you want to remove "${fullName}" from the collaborator list?`;
 
         return (

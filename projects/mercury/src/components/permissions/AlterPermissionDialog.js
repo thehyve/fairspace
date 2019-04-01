@@ -64,7 +64,7 @@ const applyDisableFilter = (options, collaborators, currentUser) => options.map(
 const getUserLabelByUser = (user, options) => {
     let label = '';
     if (options) {
-        const found = options.find(option => option.value === user.user);
+        const found = options.find(option => option.value === user);
         label = found && found.label;
     }
     return label;
@@ -111,10 +111,10 @@ export class AlterPermissionDialog extends React.Component {
     }
 
     resetState = () => {
-        const {user} = this.props;
+        const {access, user} = this.props;
         this.setState({
-            accessRight: user ? user.access : 'Read',
-            selectedUser: user && user.user,
+            accessRight: access || 'Read',
+            selectedUser: user,
             selectedUserLabel: ''
         });
     };
@@ -124,7 +124,7 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSelectedUserChange = (selectedOption) => {
-        this.setState({selectedUser: selectedOption.value});
+        this.setState({selectedUser: selectedOption});
     };
 
     handleClose = () => {
@@ -139,7 +139,7 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
         const {iri, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser, iri, accessRight);
+            alterPermission(selectedUser.value, iri, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
@@ -236,9 +236,10 @@ export class AlterPermissionDialog extends React.Component {
 
 AlterPermissionDialog.propTypes = {
     classes: PropTypes.object.isRequired,
-    user: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,
+    access: PropTypes.string,
+    user: PropTypes.string,
     iri: PropTypes.string,
 };
 

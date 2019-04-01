@@ -39,7 +39,7 @@ describe('AlterPermissionDialog', () => {
         iri: 'http://localhost/iri/user1-id'
     };
     const mockCollectionId = 500;
-    const mockUser = {
+    const mockPermission = {
         user: 'http://localhost/iri/user2-id',
         access: 'Write'
     };
@@ -82,7 +82,7 @@ describe('AlterPermissionDialog', () => {
         wrapper = shallow(<AlterPermissionDialog
             open={false}
             classes={styles()}
-            user={null}
+            permission={null}
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
@@ -122,7 +122,9 @@ describe('AlterPermissionDialog', () => {
                 <AlterPermissionDialog
                     open={false}
                     classes={styles()}
-                    user={mockUser}
+                    user={mockPermission.user}
+                    access={mockPermission.access}
+                    iri={mockPermission.iri}
                     collectionId={mockCollectionId}
                     collaborators={mockCollaborators}
                     currentUser={mockCurrentLoggedUser}
@@ -134,7 +136,7 @@ describe('AlterPermissionDialog', () => {
         );
 
         // select a user
-        wrapper.setState({selectedUser: mockUser});
+        wrapper.setState({selectedUser: mockPermission.user});
 
         expect(wrapper.find('WithStyles(MaterialReactSelect)')).toHaveLength(0);
         expect(wrapper.find('WithStyles(Typography)').childAt(0).text()).toEqual('Michael Jackson');
