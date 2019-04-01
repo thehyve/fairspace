@@ -95,15 +95,14 @@ class PermissionsViewer extends React.Component {
         const {anchorEl, selectedPermission} = this.state;
 
         const selectedPermissionKey = selectedPermission
-            ? selectedPermission.access + selectedPermission.iri + selectedPermission.subject
+            ? selectedPermission.access + selectedPermission.user.id
             : null;
 
         return sortPermissions(permissions)
             .map((p) => {
-                const key = p.access + p.iri + p.subject;
                 return (
                     <ListItem
-                        key={key}
+                        key={p.access + p.user.id}
                     >
                         <ListItemText primary={getDisplayName(p.user)} secondary={p.access} />
                         <ListItemSecondaryAction>
