@@ -11,7 +11,7 @@ data:
   application.yaml: |-
     port: 8080
     jena:
-      baseIRI: {{ template "workspace.url" . | replace "https" "http" }}/iri/
+      baseIRI: http://{{ template "pluto.hostname" . }}/iri/
       datasetPath: "/data/saturn/db"
       transactionLogPath: "/data/saturn/files/log"
       elasticSearch:
