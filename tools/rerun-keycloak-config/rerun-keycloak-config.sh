@@ -6,6 +6,14 @@
 # 2. Release name of the Workspace
 # 3. Values file of the Workspace
 
+usage () {
+  echo "Usage:"
+  echo "  $0 <namespace> <release-name> <values-file>"
+  echo 
+  echo "Example:"
+  echo "  $0 workspace-ci workspace-ci ../../.travis/ci-values.yaml"
+}
+
 set -e
 
 scriptdir=$(dirname "$0")
@@ -13,18 +21,21 @@ scriptdir=$(dirname "$0")
 namespace=$1
 if [ -z "$namespace" ]
 then echo "Error: no namespace argument provided."
+     usage
      exit 1
 fi
 
 releasename=$2
 if [ -z "$releasename" ]
 then echo "Error: no release name argument provided."
+     usage
      exit 1
 fi
 
 valuesfile=$3
 if [ -z "$valuesfile" ]
 then echo "Error: no values file argument provided."
+     usage
      exit 1
 fi
 if [ ! -f "$valuesfile" ]
