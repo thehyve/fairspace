@@ -26,6 +26,7 @@ export const LABEL_URI = RDFS_NS + 'label';
 export const COMMENT_URI = RDFS_NS + 'comment';
 
 export const SHACL_NAME = SHACL_NS + 'name';
+export const SHACL_DESCRIPTION = SHACL_NS + 'description';
 export const SHACL_PATH = SHACL_NS + 'path';
 export const SHACL_TARGET_CLASS = SHACL_NS + 'targetClass';
 export const SHACL_PROPERTY = SHACL_NS + 'property';

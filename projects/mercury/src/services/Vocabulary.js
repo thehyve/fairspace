@@ -1,5 +1,6 @@
 import {compareBy, comparing} from "../utils/comparisionUtils";
 import * as constants from "../constants";
+import {SHACL_DESCRIPTION, SHACL_NAME} from "../constants";
 import {getFirstPredicateId, getFirstPredicateValue, getLabel} from "../utils/metadataUtils";
 
 class Vocabulary {
@@ -57,7 +58,10 @@ class Vocabulary {
         const properties = this.convertMetadataIntoPropertyList(metadataItem, propertyShapes, expandedMetadata);
         const emptyProperties = this.determineAdditionalEmptyProperties(metadataItem, propertyShapes);
 
-        return [...properties, ...emptyProperties];
+        // An entry with information on the type is returned as well for display purposes
+        const typeProperty = this.generateTypeProperty(metadataItem['@type']);
+
+        return [...properties, ...emptyProperties, typeProperty];
     }
 
     /**
@@ -186,6 +190,30 @@ class Vocabulary {
 
         return this.vocabulary
             .filter(entry => propertyShapeIds.includes(entry['@id']));
+    }
+
+    /**
+     * Generates a property entry for the given type(s)
+     * @param types  Array of uris of the type of an entity
+     * @returns {{allowMultiple: boolean, values: *, label: string, key: string, machineOnly: boolean}}
+     */
+    generateTypeProperty(types) {
+        const typeValues = types.map(type => {
+            const shape = this.determineShapeForType(type);
+            return {
+                id: type,
+                label: getFirstPredicateValue(shape, SHACL_NAME, type),
+                comment: getFirstPredicateValue(shape, SHACL_DESCRIPTION, type)
+            };
+        });
+
+        return {
+            key: '@type',
+            label: 'Type',
+            values: typeValues,
+            allowMultiple: false,
+            machineOnly: true
+        };
     }
 
     /**
