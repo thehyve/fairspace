@@ -14,6 +14,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import MaterialReactSelect from '../common/MaterialReactSelect';
 import {createIri} from "../../utils/metadataUtils";
+import getDisplayName from "../../utils/userUtils";
 
 export const styles = () => ({
     root: {
@@ -77,7 +78,7 @@ const getUserLabelByUser = (user, options) => {
 const transformUserToOptions = (users, collaborators, currentUser) => {
     if (users.data) {
         const tmp = users.data.map(r => ({
-            label: `${r.firstName} ${r.lastName}`,
+            label: getDisplayName(r),
             value: r.id
         }));
         return applyDisableFilter(tmp, collaborators, currentUser);
