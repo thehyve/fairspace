@@ -57,6 +57,7 @@ grep -v "helm.sh/hook" "${scriptdir}/../../charts/workspace/templates/config/con
    | sed "s/{{\.Release\.Name}}\-keycloak\-config\-map/$releasename-keycloak-config-map/g" \
    | sed "s/name:[[:space:]]\{1,\}\"{{[[:space:]]\{1,\}template[[:space:]]\{1,\}\"workspace\.fullname\"[[:space:]]\{1,\}\.[[:space:]]\{1,\}}}\-/name: \"$releasename-/g" \
    | sed "s/name:[[:space:]]\{1,\}\"{{[[:space:]]\{0,\}\.Release\.Name[[:space:]]\{0,\}}}\-/name: \"$releasename-/g" \
+   | sed "s/{{[[:space:]]\{0,\}template[[:space:]]\{1,\}\"workspace\.name\"[[:space:]]\{1,\}\.[[:space:]]\{0,\}}}/$releasename/g" \
    > "$chartname/templates/configure-keycloak-job.yaml"
 
 cat > "$chartname/Chart.yaml" << EOF
