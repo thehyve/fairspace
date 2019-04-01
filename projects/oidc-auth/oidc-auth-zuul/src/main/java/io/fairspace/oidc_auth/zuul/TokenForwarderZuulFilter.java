@@ -36,16 +36,15 @@ public class TokenForwarderZuulFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         OAuthAuthenticationToken token = (OAuthAuthenticationToken) request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
 
-        // If no token was provided, some error occurred in the authorization filters
-        // The request should not get here
+        // If no token was provided, the request is probably not authenticated.
+        // In that case, we can not send along any request header
         if(token == null) {
-            throw new ZuulException("No valid oAuth token provided in the request", 401, "No valid token was found on the request. No token could be forwarded upstream");
+            log.debug("No valid token was found on the request. No token could be forwarded upstream");
+        } else {
+            // Add the token upstream
+            log.debug("Added oAuth token to upstream request");
+            ctx.addZuulRequestHeader("Authorization", "Bearer " + token.getAccessToken());
         }
-
-        // Add the token upstream
-        log.debug("Added oAuth token to upstream request");
-        ctx.addZuulRequestHeader("Authorization", "Bearer " + token.getAccessToken());
-
         return null;
     }
 }
