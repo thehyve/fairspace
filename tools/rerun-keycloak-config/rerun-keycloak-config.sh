@@ -79,6 +79,8 @@ helm install --debug --dry-run "./keycloak-manconf-${releasename}" --name keyclo
    awk '/^# Source:.*\/configure\-keycloak\-job\.yaml$/{p=1;next}p' |
    kubectl apply -f - --namespace "$namespace"
 
+rm -rf "./keycloak-manconf-${releasename}"
+
 echo
 echo "Script finished. You can use \"kubectl describe job ${releasename}-keycloak-configuration -n ${namespace}\""
 echo "to monitor the startup phase of the job. After the job has started, you can use \"fr logs\" to monitor its progress."
