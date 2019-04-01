@@ -100,9 +100,10 @@ class PermissionsViewer extends React.Component {
 
         return sortPermissions(permissions)
             .map((p) => {
+                const key = p.access + p.user.id;
                 return (
                     <ListItem
-                        key={p.access + p.user.id}
+                        key={key}
                     >
                         <ListItemText primary={getDisplayName(p.user)} secondary={p.access} />
                         <ListItemSecondaryAction>
