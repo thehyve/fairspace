@@ -2,37 +2,26 @@
 #
 # Script for rerunning the Keycloak configuration job in helm.
 # Parameters:
-# 1. Namespace
-# 2. Release name of the Workspace
-# 3. Values file of the Workspace
+# 1. Values file of the Workspace
+# 2. Namespace
+# 3. Release name of the Workspace
+# 4. Name of the workspace (optional). It is set to the release name by default
+# 5. Full name of the workspace (optional). It it set to the workspace name by default, which defaults to the
+#    release name.
 
 usage () {
   echo "Usage:"
-  echo "  $0 <namespace> <release-name> <values-file>"
-  echo 
+  echo "  $0 <values-file> <namespace> <releasename> [workspacename] [fullworkspacename]"
+  echo
   echo "Example:"
-  echo "  $0 workspace-ci workspace-ci ../../.travis/ci-values.yaml"
+  echo "  $0 ../../.travis/ci-values.yaml workspace-ci workspace-ci"
 }
 
 set -e
 
 scriptdir=$(dirname "$0")
 
-namespace=$1
-if [ -z "$namespace" ]
-then echo "Error: no namespace argument provided."
-     usage
-     exit 1
-fi
-
-releasename=$2
-if [ -z "$releasename" ]
-then echo "Error: no release name argument provided."
-     usage
-     exit 1
-fi
-
-valuesfile=$3
+valuesfile=$1
 if [ -z "$valuesfile" ]
 then echo "Error: no values file argument provided."
      usage
@@ -41,6 +30,30 @@ fi
 if [ ! -f "$valuesfile" ]
 then echo "Error: values file \"${valuesfile}\" not found."
      exit 1
+fi
+
+namespace=$2
+if [ -z "$namespace" ]
+then echo "Error: no namespace argument provided."
+     usage
+     exit 1
+fi
+
+releasename=$3
+if [ -z "$releasename" ]
+then echo "Error: no release name argument provided."
+     usage
+     exit 1
+fi
+
+if [ -z "$4" ]
+then workspacename=$releasename
+else workspacename=$4
+fi
+
+if [ -z "$5" ]
+then fullworkspacename=$workspacename
+else fullworkspacename=$5
 fi
 
 set -u
@@ -55,9 +68,9 @@ cp "${scriptdir}/../../charts/workspace/templates/_helpers.tpl" "$chartname/temp
 grep -v "helm.sh/hook" "${scriptdir}/../../charts/workspace/templates/config/configure-keycloak-job.yaml" \
    | grep -v "annotations:" \
    | sed "s/{{\.Release\.Name}}\-keycloak\-config\-map/$releasename-keycloak-config-map/g" \
-   | sed "s/name:[[:space:]]\{1,\}\"{{[[:space:]]\{1,\}template[[:space:]]\{1,\}\"workspace\.fullname\"[[:space:]]\{1,\}\.[[:space:]]\{1,\}}}\-/name: \"$releasename-/g" \
+   | sed "s/name:[[:space:]]\{1,\}\"{{[[:space:]]\{1,\}template[[:space:]]\{1,\}\"workspace\.fullname\"[[:space:]]\{1,\}\.[[:space:]]\{1,\}}}\-/name: \"$fullworkspacename-/g" \
    | sed "s/name:[[:space:]]\{1,\}\"{{[[:space:]]\{0,\}\.Release\.Name[[:space:]]\{0,\}}}\-/name: \"$releasename-/g" \
-   | sed "s/{{[[:space:]]\{0,\}template[[:space:]]\{1,\}\"workspace\.name\"[[:space:]]\{1,\}\.[[:space:]]\{0,\}}}/$releasename/g" \
+   | sed "s/{{[[:space:]]\{0,\}template[[:space:]]\{1,\}\"workspace\.name\"[[:space:]]\{1,\}\.[[:space:]]\{0,\}}}/$workspacename/g" \
    > "$chartname/templates/configure-keycloak-job.yaml"
 
 cat > "$chartname/Chart.yaml" << EOF
