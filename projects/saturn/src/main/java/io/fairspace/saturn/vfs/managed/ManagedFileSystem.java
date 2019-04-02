@@ -123,15 +123,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
         });
     }
 
-    private void ensureCanCreate(String normalizedPath) throws IOException {
-        if (exists(normalizedPath)) {
-            throw new FileAlreadyExistsException(normalizedPath);
-        }
-        if (stat(parentPath(normalizedPath)).isReadOnly()) {
-            throw new IOException("Target path is read-only");
-        }
-    }
-
     @Override
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
@@ -252,6 +243,15 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     static boolean isCollection(String path) {
         return !path.isEmpty() && splitPath(path).length == 1;
+    }
+
+    private void ensureCanCreate(String normalizedPath) throws IOException {
+        if (exists(normalizedPath)) {
+            throw new FileAlreadyExistsException(normalizedPath);
+        }
+        if (stat(parentPath(normalizedPath)).isReadOnly()) {
+            throw new IOException("Target path is read-only");
+        }
     }
 
     private static void ensureValidPath(String path) throws IOException {
