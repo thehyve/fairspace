@@ -4,8 +4,7 @@ import {
     getFirstPredicateId,
     getFirstPredicateList,
     getFirstPredicateValue,
-    getLabel,
-    getPredicateList
+    getLabel
 } from "../utils/metadataUtils";
 
 class Vocabulary {
