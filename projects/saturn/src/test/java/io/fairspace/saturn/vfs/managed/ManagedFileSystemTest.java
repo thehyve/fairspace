@@ -66,7 +66,7 @@ public class ManagedFileSystemTest {
 
     @Test
     public void statRoot() throws IOException {
-        assertEquals("", fs.stat("/").getPath());
+        assertEquals("", fs.stat("").getPath());
         assertTrue(fs.stat("").isDirectory());
         assertNull(fs.stat("").getIri());
 

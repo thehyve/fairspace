@@ -292,7 +292,7 @@ public class WebDAVIT {
 
     @Test
     public void shouldIgnoreRangeHeaders() throws ServletException, IOException {
-        fs.mkdir("/coll1/dir1/");
+        fs.mkdir("coll1/dir1");
         fs.create("coll1/dir1/file.txt", new ByteArrayInputStream("123".getBytes()));
 
         req.setMethod("GET");

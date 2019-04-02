@@ -63,28 +63,24 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public FileInfo stat(String path) throws IOException {
-        var normalizedPath = normalizePath(path);
-
-        if (normalizedPath.isEmpty()) {
+        if (path.isEmpty()) {
             return ROOT;
         }
 
-        if (isCollection(normalizedPath)) {
-            return ofNullable(collections.getByLocation(normalizedPath))
+        if (isCollection(path)) {
+            return ofNullable(collections.getByLocation(path))
                     .map(ManagedFileSystem::fileInfo)
                     .orElse(null);
         }
 
         var processor = new QuerySolutionProcessor<>(this::fileInfo);
-        rdf.querySelect(storedQuery("fs_stat", normalizedPath), processor);
+        rdf.querySelect(storedQuery("fs_stat", path), processor);
         return processor.getSingle().orElse(null);
     }
 
     @Override
     public List<FileInfo> list(String path) throws IOException {
-        var normalizedPath = normalizePath(path);
-
-        if (normalizedPath.isEmpty()) {
+        if (path.isEmpty()) {
             return collections.list()
                     .stream()
                     .map(ManagedFileSystem::fileInfo)
@@ -92,7 +88,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
 
         var processor = new QuerySolutionProcessor<>(this::fileInfo);
-        rdf.querySelect(storedQuery("fs_ls", normalizedPath + '/'), processor);
+        rdf.querySelect(storedQuery("fs_ls", path + '/'), processor);
         return processor.getValues()
                 .stream()
                 .filter(Objects::nonNull)
@@ -101,25 +97,23 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        var normalizedPath = normalizePath(path);
-        ensureValidPath(normalizedPath);
+        ensureValidPath(path);
 
-        commit("Create directory " + normalizedPath, rdf, () -> {
-            ensureCanCreate(normalizedPath);
-            rdf.update(storedQuery("fs_mkdir", normalizedPath, userIriSupplier.get(), name(normalizedPath)));
+        commit("Create directory " + path, rdf, () -> {
+            ensureCanCreate(path);
+            rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
         });
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
-        var normalizedPath = normalizePath(path);
-        ensureValidPath(normalizedPath);
+        ensureValidPath(path);
 
         var blobInfo = write(in);
 
-        commit("Create file " + normalizedPath, rdf, () -> {
-            ensureCanCreate(normalizedPath);
-            rdf.update(storedQuery("fs_create", normalizedPath, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(normalizedPath), blobInfo.getMd5()));
+        commit("Create file " + path, rdf, () -> {
+            ensureCanCreate(path);
+            rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
         });
     }
 
@@ -127,29 +121,26 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        var normalizedPath = normalizePath(path);
-
         commit("Modify file " + path, rdf, () -> {
-            var info = stat(normalizedPath);
+            var info = stat(path);
             if (info == null) {
-                throw new FileNotFoundException(normalizedPath);
+                throw new FileNotFoundException(path);
             }
             if (info.isDirectory()) {
-                throw new IOException("Expected a file: " + normalizedPath);
+                throw new IOException("Expected a file: " + path);
             }
             if (info.isReadOnly()) {
-                throw new IOException("File is read-only: " + normalizedPath);
+                throw new IOException("File is read-only: " + path);
             }
-            rdf.update(storedQuery("fs_modify", normalizedPath, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5()));
+            rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5()));
         });
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
-        var normalizedPath = normalizePath(path);
         var processor = new QuerySolutionProcessor<>(row -> row.getLiteral("blobId").getString());
-        rdf.querySelect(storedQuery("fs_get_blobid", normalizedPath), processor);
-        var blobId = processor.getSingle().orElseThrow(() -> new FileNotFoundException(normalizedPath));
+        rdf.querySelect(storedQuery("fs_get_blobid", path), processor);
+        var blobId = processor.getSingle().orElseThrow(() -> new FileNotFoundException(path));
         store.read(blobId, out);
     }
 
@@ -165,18 +156,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void delete(String path) throws IOException {
-        var normalizedPath = normalizePath(path);
-        ensureValidPath(normalizedPath);
+        ensureValidPath(path);
 
-        commit("Delete " + normalizedPath, rdf, () -> {
-            var info = stat(normalizedPath);
+        commit("Delete " + path, rdf, () -> {
+            var info = stat(path);
             if (info == null) {
-                throw new FileNotFoundException(normalizedPath);
+                throw new FileNotFoundException(path);
             }
             if (info.isReadOnly()) {
-                throw new IOException("Cannot delete " + normalizedPath);
+                throw new IOException("Cannot delete " + path);
             }
-            rdf.update(storedQuery("fs_delete", normalizedPath, userIriSupplier.get()));
+            rdf.update(storedQuery("fs_delete", path, userIriSupplier.get()));
         });
     }
 
@@ -229,24 +219,22 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     private void copyOrMove(boolean move, String from, String to) throws IOException {
         var verb = move ? "move" : "copy";
-        var normalizedFrom = normalizePath(from);
-        var normalizedTo = normalizePath(to);
-        ensureValidPath(normalizedFrom);
-        ensureValidPath(normalizedTo);
-        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
+        ensureValidPath(from);
+        ensureValidPath(to);
+        if (from.equals(to) || to.startsWith(from + '/')) {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
-        commit(verb + " data from " + normalizedFrom + " to " + normalizedTo, rdf, () -> {
-            ensureCanCreate(normalizedTo);
-            rdf.update(storedQuery("fs_" + verb, normalizedFrom, normalizedTo, name(normalizedTo)));
+        commit(verb + " data from " + from + " to " + to, rdf, () -> {
+            ensureCanCreate(to);
+            rdf.update(storedQuery("fs_" + verb, from, to, name(to)));
         });
     }
 
-    private void ensureCanCreate(String normalizedPath) throws IOException {
-        if (exists(normalizedPath)) {
-            throw new FileAlreadyExistsException(normalizedPath);
+    private void ensureCanCreate(String path) throws IOException {
+        if (exists(path)) {
+            throw new FileAlreadyExistsException(path);
         }
-        if (stat(parentPath(normalizedPath)).isReadOnly()) {
+        if (stat(parentPath(path)).isReadOnly()) {
             throw new IOException("Target path is read-only");
         }
     }
