@@ -1,0 +1,8 @@
+{
+  "properties":{
+    "filePath":{
+      "type":"text",
+      "analyzer":"ngram_analyzer"
+    }
+  }
+}

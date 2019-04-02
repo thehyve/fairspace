@@ -12,13 +12,13 @@ import {STRING_URI} from "../../constants";
 import Config from "../../services/Config/Config";
 import MetadataProperty from "./MetadataProperty";
 
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 const subject = 'https://thehyve.nl';
 const defaultProperty = {
     key: 'description',
-    range: STRING_URI,
+    datatype: STRING_URI,
     label: 'Description',
     values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
     allowMultiple: true

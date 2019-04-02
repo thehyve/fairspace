@@ -1,6 +1,8 @@
 import {compareBy, comparing} from "../utils/comparisionUtils";
 import * as constants from "../constants";
-import {getSingleValue} from "../utils/metadataUtils";
+import {SHACL_DESCRIPTION, SHACL_NAME} from "../constants";
+import {getFirstPredicateId, getFirstPredicateValue, getLabel} from "../utils/metadataUtils";
+import {STRING_URI} from "../constants";
 
 class Vocabulary {
     /**
@@ -9,9 +11,6 @@ class Vocabulary {
      */
     constructor(vocabulary) {
         this.vocabulary = vocabulary;
-
-        // Cache a version of the vocabulary by id, to do easy lookups
-        this.vocabularyById = this.groupVocabularyById();
     }
 
     /**
@@ -23,7 +22,7 @@ class Vocabulary {
      * @param expandedMetadata Metadata in expanded json-ld format with actual metadata about one subject
      * @param subject Subject to combine the metadata for. If not provided, the metadata is expected to contain
      *                information on a single entity
-     * @returns A promise resolving in an array with metadata. Each element will look like this:
+     * @returns [Any] A promise resolving in an array with metadata. Each element will look like this:
      * {
      *      key: "http://fairspace.io/ontology#description",
      *      label: "Description",
@@ -54,21 +53,24 @@ class Vocabulary {
         }
 
         // Determine properties allowed for the given type
-        const typePredicates = this.determinePredicatesForTypes(metadataItem['@type']);
+        const propertyShapes = this.determinePropertyShapesForTypes(metadataItem['@type']);
 
         // Actually convert the metadata into a list of properties
-        const properties = this.convertMetadataIntoPropertyList(metadataItem, typePredicates, expandedMetadata);
-        const emptyProperties = this.determineAdditionalEmptyProperties(metadataItem, typePredicates);
+        const properties = this.convertMetadataIntoPropertyList(metadataItem, propertyShapes, expandedMetadata);
+        const emptyProperties = this.determineAdditionalEmptyProperties(metadataItem, propertyShapes);
 
-        return [...properties, ...emptyProperties];
+        // An entry with information on the type is returned as well for display purposes
+        const typeProperty = this.generateTypeProperty(metadataItem['@type']);
+
+        return [...properties, ...emptyProperties, typeProperty];
     }
 
     /**
-     * Looks up an entity in the vocabulary
-     * @param id
+     * Looks up an entity shape in the vocabulary for the given type
+     * @param type
      */
-    getById(id) {
-        return this.vocabularyById[id] || {"@id": id};
+    getById(type) {
+        return this.determineShapeForType(type) || {};
     }
 
     /**
@@ -76,28 +78,34 @@ class Vocabulary {
      */
     getFairspaceClasses() {
         return this.vocabulary
-            .filter(entry => entry['@type'].includes(constants.CLASS_URI) && getSingleValue(entry, constants.FAIRSPACE_ENTITY_URI));
+            .filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI));
+    }
+
+    /**
+     * Returns a human readable label for the given predicate or the uri if no label is specified
+     * @param uri
+     * @returns {string}
+     */
+    getLabelForPredicate(uri) {
+        return getFirstPredicateValue(this.determineShapeForProperty(uri), constants.SHACL_NAME) || uri;
     }
 
     /**
      * Converts a JSON-LD structure into a list of properties and values
      * @param metadata Expanded JSON-LD metadata about a single subject. The subject must have a '@type' property
-     * @param predicates List of predicates that should be included
+     * @param propertyShapes List of propertyShapes that should be included
+     * @param allMetadata All known metadata to be processed. Is used to retrieve labels for associated entities
      * @returns {Array}
      */
-    convertMetadataIntoPropertyList(metadata, predicates = [], allMetadata = []) {
+    convertMetadataIntoPropertyList(metadata, propertyShapes = [], allMetadata = []) {
         const prefilledProperties = [];
 
         Object.keys(metadata)
             .forEach(predicateUri => {
-                if (predicateUri !== "@type" && !predicates.find(predicate => predicate['@id'] === predicateUri)) {
-                    return;
-                }
+                const propertyShape = propertyShapes
+                    .find(shape => getFirstPredicateId(shape, constants.SHACL_PATH) === predicateUri);
 
-                // Skip this predicate if it is not in the vocabulary
-                const vocabularyEntry = this.vocabularyById[predicateUri];
-
-                if (predicateUri !== "@type" && !vocabularyEntry) {
+                if (!propertyShape) {
                     return;
                 }
 
@@ -107,17 +115,13 @@ class Vocabulary {
                     return;
                 }
 
-                const values = (predicateUri === "@type")
-                    // @type needs special attention: it is specified as a literal string
-                    // but should be treated as an object
-                    ? this.convertTypeEntries(metadata[predicateUri])
-                    : metadata[predicateUri].map(i => ({
-                        id: i['@id'],
-                        value: i['@value'],
-                        label: Vocabulary.lookupLabel(i['@id'], allMetadata)
-                    }));
+                const values = metadata[predicateUri].map(i => ({
+                    id: i['@id'],
+                    value: i['@value'],
+                    label: Vocabulary.lookupLabel(i['@id'], allMetadata)
+                }));
 
-                prefilledProperties.push(Vocabulary.generatePropertyEntry(predicateUri, values, vocabularyEntry));
+                prefilledProperties.push(Vocabulary.generatePropertyEntry(predicateUri, values, propertyShape));
             });
 
         return prefilledProperties.sort(compareBy('label'));
@@ -126,121 +130,125 @@ class Vocabulary {
     /**
      * Determines a list of properties for which no value is present in the metadata
      * @param metadata
-     * @param predicates
+     * @param propertyShapes
      * @returns {{key, label, values, range, allowMultiple}[]}
      */
-    determineAdditionalEmptyProperties(metadata, predicates = []) {
+    determineAdditionalEmptyProperties(metadata, propertyShapes = []) {
         // Also add an entry for fields not yet entered
-        const additionalProperties = predicates
-            .filter(predicate => !Object.keys(metadata).includes(predicate['@id']))
-            .map((predicate) => {
-                const predicateUri = predicate['@id'];
-                const vocabularyEntry = this.vocabularyById[predicateUri];
-                return Vocabulary.generatePropertyEntry(predicateUri, [], vocabularyEntry);
+        const additionalProperties = propertyShapes
+            .filter(shape => !Object.keys(metadata).includes(getFirstPredicateId(shape, constants.SHACL_PATH)))
+            .map((shape) => {
+                const predicateUri = getFirstPredicateId(shape, constants.SHACL_PATH);
+                return Vocabulary.generatePropertyEntry(predicateUri, [], shape);
             });
 
         return additionalProperties.sort(compareBy('label'));
     }
 
     /**
-     * Groups the vocabulary by resource id
-     *
-     * @param vocabulary json-ld format where labels are specified.
-     * @returns {*}
+     * Returns a list of property shapes that are in the shape of the given types
+     * @param types
      */
-    groupVocabularyById() {
-        return this.vocabulary.reduce((vocabularyById, entry) => {
-            vocabularyById[entry['@id']] = entry;
-            return vocabularyById;
-        }, {});
-    }
-
-    /**
-     * Returns a list of predicates (objects from vocabulary) that is allowed for the given types of object
-     * @param vocabulary
-     * @param type
-     */
-    determinePredicatesForTypes(types) {
+    determinePropertyShapesForTypes(types) {
         return Array.from(new Set(
             types
-                .map(type => this.determinePredicatesForType(type))
+                .map(type => this.determinePropertyShapesForType(type))
                 .reduce((fullList, typeList) => fullList.concat(typeList), [])
         ));
     }
 
     /**
-     * Returns a list of predicates (objects from vocabulary) that is allowed for the given type of object
-     * @param vocabulary
-     * @param type
+     * Determines the SHACL shape to be applied to the given type
+     * @param typeUri
      */
-    determinePredicatesForType(type) {
-        const isProperty = entry => entry['@type'].includes(constants.PROPERTY_URI);
-
-        const isInDomain = entry => entry[constants.DOMAIN_URI] && entry[constants.DOMAIN_URI].find(domainEntry => domainEntry['@id'] === type);
-
-        const predicates = this.vocabulary.filter(entry => isProperty(entry) && isInDomain(entry));
-        return predicates;
+    determineShapeForType(typeUri) {
+        return this.vocabulary
+            .find(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === typeUri);
     }
 
-    convertTypeEntries(values) {
-        return values
-            .map(type => ({
+    /**
+     * Determines the SHACL shape to be applied to the given type
+     * @param propertyUri
+     */
+    determineShapeForProperty(propertyUri) {
+        return this.vocabulary
+            .find(entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri);
+    }
+
+    /**
+     * Returns a list of property shapes that are in the shape of the given type
+     * @param type
+     */
+    determinePropertyShapesForType(type) {
+        const shape = this.determineShapeForType(type);
+
+        if (!shape) {
+            return [];
+        }
+
+        const propertyShapes = shape[constants.SHACL_PROPERTY];
+        const propertyShapeIds = propertyShapes ? propertyShapes.map(propertyShape => propertyShape['@id']) : [];
+
+        return this.vocabulary
+            .filter(entry => propertyShapeIds.includes(entry['@id']));
+    }
+
+    /**
+     * Generates a property entry for the given type(s)
+     * @param types  Array of uris of the type of an entity
+     * @returns {{allowMultiple: boolean, values: *, label: string, key: string, machineOnly: boolean}}
+     */
+    generateTypeProperty(types) {
+        const typeValues = types.map(type => {
+            const shape = this.determineShapeForType(type);
+            return {
                 id: type,
-                label: Vocabulary.getLabel(this.vocabularyById[type]),
-                comment: Vocabulary.getComment(this.vocabularyById[type])
-            }));
+                label: getFirstPredicateValue(shape, SHACL_NAME, type),
+                comment: getFirstPredicateValue(shape, SHACL_DESCRIPTION, type)
+            };
+        });
+
+        return {
+            key: '@type',
+            label: 'Type',
+            values: typeValues,
+            allowMultiple: false,
+            machineOnly: true
+        };
     }
 
     /**
      * Generates a list entry for a single property, with the values specified
      * @param predicate
      * @param values
-     * @param vocabularyEntry
-     * @returns {{key: string, label: string, values: [], range: string, allowMultiple: boolean}}
+     * @param propertyShape
+     * @returns {{key: string, label: string, values: [], datatype: string, className: string, allowMultiple: boolean, machineOnly: boolean, multiLine: boolean}}
      * @private
      */
-    static generatePropertyEntry(predicate, values, vocabularyEntry) {
-        const label = Vocabulary.getLabel(vocabularyEntry);
-        const range = Vocabulary.getFirstPredicateId(vocabularyEntry, constants.RANGE_URI);
-        const allowMultiple = Vocabulary.getFirstPredicateValue(vocabularyEntry, constants.ALLOW_MULTIPLE_URI, false);
-        const machineOnly = Vocabulary.getFirstPredicateValue(vocabularyEntry, constants.MACHINE_ONLY_URI, false);
-        const multiLine = Vocabulary.getFirstPredicateValue(vocabularyEntry, constants.MULTILINE_PROPERTY_URI, false);
+    static generatePropertyEntry(predicate, values, propertyShape) {
+        const label = getFirstPredicateValue(propertyShape, constants.SHACL_NAME);
+        const datatype = getFirstPredicateId(propertyShape, constants.SHACL_DATATYPE);
+        const className = getFirstPredicateId(propertyShape, constants.SHACL_CLASS);
+        const allowMultiple = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT, 1000) > 1;
+        const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
+        const multiLine = datatype === STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
         const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
         return {
             key: predicate,
             label,
             values: sortedValues,
-            range,
+            datatype,
+            className,
             allowMultiple,
             machineOnly,
             multiLine
         };
     }
 
-    static getFirstPredicateValue(vocabularyEntry, predicate, defaultValue) {
-        return this.getFirstPredicateProperty(vocabularyEntry, predicate, '@value', defaultValue);
-    }
-
-    static getFirstPredicateId(vocabularyEntry, predicate, defaultValue) {
-        return this.getFirstPredicateProperty(vocabularyEntry, predicate, '@id', defaultValue);
-    }
-
-    static getFirstPredicateProperty(vocabularyEntry, predicate, property, defaultValue) {
-        return vocabularyEntry && vocabularyEntry[predicate] && vocabularyEntry[predicate][0] ? vocabularyEntry[predicate][0][property] : defaultValue;
-    }
-
-    static getLabel(vocabularyEntry) {
-        return this.getFirstPredicateValue(vocabularyEntry, constants.LABEL_URI, '');
-    }
-
-    static getComment(vocabularyEntry) {
-        return this.getFirstPredicateValue(vocabularyEntry, constants.COMMENT_URI, '');
-    }
-
     static lookupLabel(id, allMetadata) {
         const entry = allMetadata.find(element => element['@id'] === id);
-        return Vocabulary.getFirstPredicateValue(entry, constants.LABEL_URI);
+        return getLabel(entry);
     }
 }
 

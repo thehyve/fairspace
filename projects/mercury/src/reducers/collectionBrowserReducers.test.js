@@ -10,16 +10,14 @@ describe('Collection browser reducers', () => {
             reducer(
                 undefined, {
                     type: actionTypes.SELECT_COLLECTION,
-                    collectionId: 'some-kind-of-id'
+                    location: 'col1'
                 }
             )
         ).toEqual({
             selectedPaths: [],
-            openedCollectionId: null,
-            openedPath: null,
             addingCollection: false,
             deletingCollection: false,
-            selectedCollectionIRI: 'some-kind-of-id'
+            selectedCollectionLocation: 'col1'
         });
     });
 
@@ -33,11 +31,9 @@ describe('Collection browser reducers', () => {
             )
         ).toEqual({
             selectedPaths: ['/some_collection/dir1'],
-            openedCollectionId: null,
-            openedPath: null,
             addingCollection: false,
             deletingCollection: false,
-            selectedCollectionIRI: null
+            selectedCollectionLocation: null
         });
     });
 
@@ -62,9 +58,7 @@ describe('Collection browser reducers', () => {
         ).toEqual({
             addingCollection: false,
             deletingCollection: false,
-            openedCollectionId: null,
-            openedPath: null,
-            selectedCollectionIRI: null,
+            selectedCollectionLocation: null,
             selectedPaths: []
         });
     });
@@ -73,9 +67,7 @@ describe('Collection browser reducers', () => {
         const state = {
             addingCollection: false,
             deletingCollection: false,
-            openedCollectionId: null,
-            openedPath: null,
-            selectedCollectionIRI: null,
+            selectedCollectionLocation: null,
             selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
         };
 
@@ -87,9 +79,7 @@ describe('Collection browser reducers', () => {
         ).toEqual({
             addingCollection: false,
             deletingCollection: false,
-            openedCollectionId: null,
-            openedPath: null,
-            selectedCollectionIRI: null,
+            selectedCollectionLocation: null,
             selectedPaths: ['/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
         });
     });
@@ -98,9 +88,7 @@ describe('Collection browser reducers', () => {
         const state = {
             addingCollection: false,
             deletingCollection: false,
-            openedCollectionId: null,
-            openedPath: null,
-            selectedCollectionIRI: null,
+            selectedCollectionLocation: null,
             selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
         };
 
@@ -108,15 +96,13 @@ describe('Collection browser reducers', () => {
             reducer(state, {
                 type: actionTypes.DELETE_FILE_FULFILLED,
                 meta: {
-                    fullpath: '/some_collection/dir1'
+                    path: '/some_collection/dir1'
                 }
             })
         ).toEqual({
             addingCollection: false,
             deletingCollection: false,
-            openedCollectionId: null,
-            openedPath: null,
-            selectedCollectionIRI: null,
+            selectedCollectionLocation: null,
             selectedPaths: ['/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
         });
     });
@@ -125,9 +111,7 @@ describe('Collection browser reducers', () => {
         const state = {
             addingCollection: false,
             deletingCollection: true,
-            openedCollectionId: null,
-            openedPath: null,
-            selectedCollectionIRI: 'some-kind-of-id',
+            selectedCollectionLocation: 'some-kind-of-id',
             selectedPaths: []
         };
 
@@ -139,35 +123,90 @@ describe('Collection browser reducers', () => {
         ).toEqual({
             addingCollection: false,
             deletingCollection: false,
-            openedCollectionId: null,
-            openedPath: null,
-            selectedCollectionIRI: null,
+            selectedCollectionLocation: null,
             selectedPaths: []
         });
     });
 
-    it('should return the opened path on open path action', () => {
+    it('should reset selected paths after file rename success', () => {
         const state = {
             addingCollection: false,
             deletingCollection: false,
-            openedCollectionId: null,
-            openedPath: null,
-            selectedCollectionIRI: null,
-            selectedPaths: []
+            selectedCollectionLocation: null,
+            selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
         };
 
-        expect(
-            reducer(state, {
-                type: actionTypes.OPEN_PATH,
-                path: 'a/given/path'
-            })
-        ).toEqual({
-            addingCollection: false,
-            deletingCollection: false,
-            openedCollectionId: null,
-            openedPath: 'a/given/path',
-            selectedCollectionIRI: null,
+        expect(reducer(state, {type: actionTypes.RENAME_FILE_FULFILLED}))
+            .toEqual({
+                addingCollection: false,
+                deletingCollection: false,
+                selectedCollectionLocation: null,
+                selectedPaths: []
+            });
+    });
+
+    it('should reset selected paths after file rename success (empty state)', () => {
+        expect(reducer(undefined, {type: actionTypes.RENAME_FILE_FULFILLED}))
+            .toEqual({
+                addingCollection: false,
+                deletingCollection: false,
+                selectedCollectionLocation: null,
+                selectedPaths: []
+            });
+    });
+
+    it('should set selected paths correctly', () => {
+        const state = {
+            selectedPaths: ['/some_collection/something']
+        };
+
+        const action = {
+            type: actionTypes.SET_SELECTED_PATHS,
+            paths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+        };
+
+        expect(reducer(state, action))
+            .toEqual({
+                selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+            });
+    });
+
+    it('should set selected paths correctly (no paths selected prior)', () => {
+        const state = {
             selectedPaths: []
-        });
+        };
+        const action = {
+            type: actionTypes.SET_SELECTED_PATHS,
+            paths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+        };
+
+        expect(reducer(state, action))
+            .toEqual({
+                selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+            });
+    });
+
+    it('should deselect all paths correctly', () => {
+        const state = {
+            selectedPaths: ['/some_collection/dir1', '/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+        };
+        const action = {type: actionTypes.DESELECT_ALL_PATHS};
+
+        expect(reducer(state, action))
+            .toEqual({
+                selectedPaths: []
+            });
+    });
+
+    it('should deselect all paths correctly (empty selected paths already)', () => {
+        const state = {
+            selectedPaths: []
+        };
+        const action = {type: actionTypes.DESELECT_ALL_PATHS};
+
+        expect(reducer(state, action))
+            .toEqual({
+                selectedPaths: []
+            });
     });
 });

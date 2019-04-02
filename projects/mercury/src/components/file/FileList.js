@@ -1,19 +1,17 @@
 import React from 'react';
-
-import {compose} from "redux";
 import {
     Table, TableHead, TableRow, TableCell,
     TableBody, Typography, Icon,
-    withStyles, Paper, Grid
+    withStyles, Paper, Grid, Checkbox
 } from "@material-ui/core";
 import filesize from 'filesize';
 
-import {ButtonWithVerification, RenameButton, DateTime} from "../common";
+import {DateTime} from "../common";
 import styles from './FileList.styles';
 
 class FileList extends React.Component {
     state = {
-        hoveredFileName: null
+        hoveredFileName: ''
     }
 
     toggleHover = (hoveredFileName) => {
@@ -21,8 +19,10 @@ class FileList extends React.Component {
     }
 
     render() {
-        const {classes, files, selectedPaths, onPathClick,
-            onPathDoubleClick, onRename, readonly, onDelete} = this.props;
+        const {
+            classes, files, onPathCheckboxClick, onPathDoubleClick,
+            selectionEnabled, onAllSelection, onPathHighlight
+        } = this.props;
 
         if (!files || files.length === 0 || files[0] === null) {
             return (
@@ -34,88 +34,74 @@ class FileList extends React.Component {
             );
         }
 
-        const selectedFilenames = selectedPaths || [];
+        let checkboxHeader = null;
+
+        if (selectionEnabled) {
+            const numOfSelected = files.filter(f => f.selected).length;
+            const allItemsSelected = files.length === numOfSelected;
+            checkboxHeader = (
+                <TableCell padding="none">
+                    <Checkbox
+                        indeterminate={numOfSelected > 0 && numOfSelected < files.length}
+                        checked={allItemsSelected}
+                        onChange={(event) => onAllSelection(event.target.checked)}
+                    />
+                </TableCell>
+            );
+        }
 
         return (
-            <Paper className={classes.fileListContainer}>
+            <Paper className={classes.root}>
                 <Table padding="dense">
                     <TableHead>
                         <TableRow>
-                            <TableCell />
-                            <TableCell>Name</TableCell>
+                            {checkboxHeader}
+                            <TableCell padding="none" />
+                            <TableCell padding="none">Name</TableCell>
                             <TableCell align="right">Size</TableCell>
                             <TableCell align="right">Last Modified</TableCell>
-                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {files.map((file) => {
-                            const selected = selectedFilenames.includes(file.filename);
-                            const visibility = this.state.hoveredFileName !== file.filename ? 'hidden' : 'visible';
+                            const item = selectionEnabled ? file.item : file;
+                            const checkboxVisibility = this.state.hoveredFileName === item.filename || file.selected ? 'visible' : 'hidden';
 
                             return (
                                 <TableRow
                                     hover
-                                    key={file.filename}
-                                    className={selected ? classes.tableRowSelected : ''}
-                                    onClick={() => onPathClick(file)}
-                                    onDoubleClick={() => onPathDoubleClick(file)}
-                                    onMouseEnter={() => this.toggleHover(file.filename)}
+                                    key={item.filename}
+                                    selected={selectionEnabled && file.selected}
+                                    onClick={() => onPathHighlight(item)}
+                                    onDoubleClick={() => onPathDoubleClick(item)}
+                                    onMouseEnter={() => this.toggleHover(item.filename)}
                                     onMouseLeave={() => this.toggleHover('')}
                                 >
-                                    <TableCell>
+                                    {
+                                        selectionEnabled ? (
+                                            <TableCell
+                                                padding="none"
+                                                onDoubleClick={(e) => e.stopPropagation()}
+                                                onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(item);}}
+                                            >
+                                                <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
+                                            </TableCell>
+                                        ) : null
+                                    }
+
+                                    <TableCell align="left" padding="checkbox">
                                         <Icon>
-                                            {file.type === 'directory' ? 'folder_open' : 'note_open'}
+                                            {item.type === 'directory' ? 'folder_open' : 'note_open'}
                                         </Icon>
                                     </TableCell>
-                                    <TableCell component="th" scope="row">
-                                        {file.basename}
+                                    <TableCell padding="none">
+                                        {item.basename}
                                     </TableCell>
                                     <TableCell padding="none" align="right">
-                                        {file.type === 'file' ? filesize(file.size) : ''}
+                                        {item.type === 'file' ? filesize(item.size) : ''}
                                     </TableCell>
-                                    <TableCell padding="none" align="right">
-                                        {file.lastmod ? <DateTime value={file.lastmod} /> : null}
-                                    </TableCell>
-                                    <TableCell padding="none" align="right">
-                                        <Grid
-                                            container
-                                            style={{visibility}}
-                                        >
-                                            <Grid
-                                                item
-                                                xs={6}
-                                            >
-                                                {onRename
-                                                    ? (
-                                                        <RenameButton
-                                                            currentName={file.basename}
-                                                            aria-label={`Rename ${file.basename}`}
-                                                            title={`Rename ${file.basename}`}
-                                                            onRename={newName => onRename(file, newName)}
-                                                            disabled={readonly}
-                                                        >
-                                                            <Icon fontSize="small">border_color</Icon>
-                                                        </RenameButton>
-                                                    ) : null}
-                                            </Grid>
-                                            <Grid
-                                                item
-                                                xs={6}
-                                            >
-                                                {onDelete
-                                                    ? (
-                                                        <ButtonWithVerification
-                                                            aria-label={`Delete ${file.basename}`}
-                                                            title={`Delete ${file.basename}`}
-                                                            onClick={() => onDelete(file)}
-                                                            disabled={readonly}
-                                                        >
-                                                            <Icon fontSize="small">delete</Icon>
-                                                        </ButtonWithVerification>
-                                                    ) : null}
-                                            </Grid>
-                                        </Grid>
+                                    <TableCell padding="checkbox" align="right">
+                                        {item.lastmod ? <DateTime value={item.lastmod} /> : null}
                                     </TableCell>
                                 </TableRow>
                             );
@@ -127,4 +113,4 @@ class FileList extends React.Component {
     }
 }
 
-export default compose(withStyles(styles))(FileList);
+export default withStyles(styles)(FileList);

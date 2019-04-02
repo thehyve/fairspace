@@ -1,10 +1,8 @@
 import * as actionTypes from "../actions/actionTypes";
 
 const defaultState = {
-    selectedCollectionIRI: null,
+    selectedCollectionLocation: null,
     selectedPaths: [],
-    openedCollectionId: null,
-    openedPath: null,
     addingCollection: false,
     deletingCollection: false
 };
@@ -19,14 +17,23 @@ const collectionBrowser = (state = defaultState, action) => {
         case actionTypes.SELECT_COLLECTION:
             return {
                 ...state,
-                selectedCollectionIRI: action.collectionId,
+                selectedCollectionLocation: action.location,
                 selectedPaths: [],
-                openedPath: null
             };
         case actionTypes.SELECT_PATH:
             return {
                 ...state,
                 selectedPaths: [...state.selectedPaths, action.path]
+            };
+        case actionTypes.SET_SELECTED_PATHS:
+            return {
+                ...state,
+                selectedPaths: [...action.paths]
+            };
+        case actionTypes.DESELECT_ALL_PATHS:
+            return {
+                ...state,
+                selectedPaths: []
             };
         case actionTypes.DESELECT_PATH:
             return deselectPath(state, action.path);
@@ -39,7 +46,7 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 deletingCollection: false,
-                selectedCollectionIRI: state.selectedCollectionIRI === action.collectionId ? null : state.selectedCollectionIRI
+                selectedCollectionLocation: state.selectedCollectionLocation === action.collectionId ? null : state.selectedCollectionLocation
             };
         case actionTypes.DELETE_COLLECTION_REJECTED:
         case actionTypes.DELETE_COLLECTION_INVALIDATE:
@@ -48,7 +55,12 @@ const collectionBrowser = (state = defaultState, action) => {
                 deletingCollection: false
             };
         case actionTypes.DELETE_FILE_FULFILLED:
-            return deselectPath(state, action.meta.fullpath);
+            return deselectPath(state, action.meta.path);
+        case actionTypes.RENAME_FILE_FULFILLED:
+            return {
+                ...state,
+                selectedPaths: [],
+            };
         case actionTypes.ADD_COLLECTION_PENDING:
             return {
                 ...state,
@@ -60,12 +72,6 @@ const collectionBrowser = (state = defaultState, action) => {
             return {
                 ...state,
                 addingCollection: false
-            };
-        case actionTypes.OPEN_PATH:
-            return {
-                ...state,
-                openedPath: action.path,
-                selectedPaths: []
             };
         default:
             return state;

@@ -10,7 +10,7 @@ import getDisplayName from "../../utils/userUtils";
 
 const collectionList = (props) => {
     const {
-        collections, selectedCollectionIRI,
+        collections, selectedCollectionLocation,
         onCollectionClick, onCollectionDoubleClick, classes
     } = props;
 
@@ -19,7 +19,7 @@ const collectionList = (props) => {
     }
 
     return (
-        <Paper className={classes.collectionListContainer}>
+        <Paper className={classes.root}>
             <Table padding="dense">
                 <TableHead>
                     <TableRow>
@@ -30,7 +30,7 @@ const collectionList = (props) => {
                 </TableHead>
                 <TableBody>
                     {collections.map((collection) => {
-                        const selected = selectedCollectionIRI && (collection.iri === selectedCollectionIRI);
+                        const selected = selectedCollectionLocation && (collection.location === selectedCollectionLocation);
 
                         return (
                             <TableRow
@@ -38,7 +38,7 @@ const collectionList = (props) => {
                                 hover
                                 onClick={() => onCollectionClick(collection)}
                                 onDoubleClick={() => onCollectionDoubleClick(collection)}
-                                className={selected ? classes.tableRowSelected : classes.tableRow}
+                                selected={selected}
                             >
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row">
                                     {collection.name}

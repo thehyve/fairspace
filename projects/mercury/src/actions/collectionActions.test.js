@@ -7,7 +7,7 @@ import {mockResponse} from "../utils/testUtils";
 import {UPDATE_COLLECTION} from "./actionTypes";
 import {updateCollection} from "./collectionActions";
 
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 beforeAll(() => {

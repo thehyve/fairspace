@@ -11,15 +11,15 @@ data:
   application.yaml: |-
     port: 8080
     jena:
-      baseIRI: {{ template "workspace.url" . }}/iri/
+      baseIRI: http://{{ template "pluto.hostname" . }}/iri/
       datasetPath: "/data/saturn/db"
       transactionLogPath: "/data/saturn/files/log"
       elasticSearch:
-        enabled: false
+        enabled: {{ .Values.workspace.elasticsearch.enabled }}
         required: false
         settings:
           hostToPortMapping:
-            localhost: 9300 # TODO: fix me
+            {{ template "workspace.elasticsearch.transporthost" . }}: {{ .Values.workspace.elasticsearch.transportport }}
           clusterName: "elasticsearch"
           shards: 1
           replicas: 1
@@ -28,5 +28,9 @@ data:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: "RS256"
+      dataStewardRole: "{{ .Values.workspace.keycloak.roles.datasteward | default (printf "datasteward-%s" (include "workspace.name" .)) }}"
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
+    mail:
+{{ toYaml .Values.saturn.mail | indent 6 }}
+

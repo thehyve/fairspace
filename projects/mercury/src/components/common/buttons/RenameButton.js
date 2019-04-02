@@ -1,44 +1,27 @@
 import React from 'react';
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
+import PropTypes from 'prop-types';
+import {
+    Dialog, DialogTitle, DialogContent,
+    DialogActions, Button, TextField
+} from "@material-ui/core";
 
 class RenameButton extends React.Component {
-    constructor(props) {
-        super(props);
-        const {
-            currentName,
-            onRename,
-            children,
-            ...componentProps
-        } = props;
-
-        this.currentName = currentName;
-        this.onRename = onRename;
-        this.componentProps = componentProps;
-
-        this.state = {
-            renaming: false,
-            name: currentName
-        };
-    }
+    state = {
+        name: '',
+        renaming: false,
+    };
 
     componentWillReceiveProps(props) {
         if (!this.state.renaming) {
-            this.onRename = props.onRename;
-            this.currentName = props.currentName;
-
-            this.setState({name: this.currentName});
+            this.setState({name: props.currentName});
         }
     }
 
     openDialog = (e) => {
-        e.stopPropagation();
-        this.setState({renaming: true, name: this.currentName});
+        if (e) e.stopPropagation();
+        if (!this.props.disabled) {
+            this.setState({renaming: true});
+        }
     }
 
     closeDialog = (e) => {
@@ -48,72 +31,73 @@ class RenameButton extends React.Component {
 
     handleRename = (e) => {
         e.stopPropagation();
-
-        if (this.onRename) {
-            this
-                .onRename(this.state.name)
-                .then(shouldClose => shouldClose && this.closeDialog);
-        }
-    }
-
-    handleInputChange = (event) => {
-        const newValues = {};
-        newValues[event.target.name] = event.target.value;
-        this.setState(newValues);
+        this.props.onRename(this.state.name)
+            .then(shouldClose => shouldClose && this.closeDialog());
     }
 
     render() {
-        return (
-            <div>
-                <IconButton {...this.componentProps} onClick={this.openDialog}>
-                    {this.props.children}
-                </IconButton>
-
-                <Dialog
-                    open={this.state.renaming}
-                    onClick={e => e.stopPropagation()}
-                    onClose={this.closeDialog}
-                    aria-labelledby="form-dialog-title"
+        const {children, currentName, disabled} = this.props;
+        const {renaming, name} = this.state;
+        const dialog = !disabled && renaming ? (
+            <Dialog
+                open
+                onClick={e => e.stopPropagation()}
+                onClose={this.closeDialog}
+                aria-labelledby="form-dialog-title"
+            >
+                <DialogTitle
+                    id="form-dialog-title"
                 >
-                    <DialogTitle
-                        id="form-dialog-title"
+                    {`Rename ${currentName}`}
+                </DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        label="Name"
+                        value={name}
+                        name="name"
+                        onChange={event => this.setState({name: event.target.value})}
+                        fullWidth
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={this.closeDialog}
+                        color="secondary"
+                    >
+                        Close
+                    </Button>
+                    <Button
+                        onClick={this.handleRename}
+                        color="primary"
+                        disabled={disabled || !name || name === currentName}
                     >
                         Rename
-                        {this.currentName}
-                    </DialogTitle>
-                    <DialogContent>
-                        Enter a new name for
-                        {this.currentName}
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="name"
-                            label="Name"
-                            value={this.state.name}
-                            name="name"
-                            onChange={this.handleInputChange}
-                            fullWidth
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button
-                            onClick={this.closeDialog}
-                            color="secondary"
-                        >
-                            Close
-                        </Button>
-                        <Button
-                            onClick={this.handleRename}
-                            color="primary"
-                            disabled={!this.state.name || this.state.name === this.currentName}
-                        >
-                            Rename
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        ) : null;
+
+        return (
+            <>
+                <span onClick={this.openDialog}>
+                    {children}
+                </span>
+                {dialog}
+            </>
         );
     }
 }
+
+RenameButton.propTypes = {
+    onRename: PropTypes.func.isRequired,
+    disabled: PropTypes.bool
+};
+
+RenameButton.defaultProps = {
+    disabled: false
+};
 
 export default RenameButton;

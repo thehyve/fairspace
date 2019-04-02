@@ -5,19 +5,21 @@
 # 2 - blobId
 # 3 - creator
 # 4 - label
+# 5 - md5
 
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 INSERT {
     ?iri a fs:File;
-        fs:filePath ?0;
-        fs:fileSize ?1;
-        fs:blobId ?2;
-        fs:createdBy ?3;
+        fs:filePath %1$s;
+        fs:fileSize %2$s;
+        fs:blobId %3$s;
+        fs:createdBy %4$s;
         fs:dateCreated ?date;
-        fs:modifiedBy ?3;
+        fs:modifiedBy %4$s;
         fs:dateModified ?date;
-        rdfs:label ?4.
+        rdfs:label %5$s;
+        fs:md5 %6$s .
 }
 WHERE { BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?iri) BIND(NOW() as ?date) }

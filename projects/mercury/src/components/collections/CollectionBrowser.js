@@ -30,25 +30,24 @@ class CollectionBrowser extends React.Component {
     }
 
     handleCollectionClick = (collection) => {
-        const {selectedCollectionIRI, selectCollection} = this.props;
-        if (selectedCollectionIRI !== collection.iri) {
-            selectCollection(collection.iri);
+        const {selectedCollectionLocation, selectCollection} = this.props;
+        if (selectedCollectionLocation !== collection.location) {
+            selectCollection(collection.location);
         }
     }
 
     handleCollectionDoubleClick = (collection) => {
-        this.props.history.push(getCollectionAbsolutePath(collection));
+        this.props.history.push(getCollectionAbsolutePath(collection.location));
     }
 
     handleAddCollection = (name, description, location, type) => {
         this.props.addCollection(name, description, type, location)
             .then(this.props.fetchCollectionsIfNeeded)
             .then(() => this.setState({addingNewCollection: false}))
-            .catch(err => ErrorDialog.showError(
-                err,
-                "An error occurred while creating a collection",
-                this.handleAddCollectionClick
-            ));
+            .catch(err => {
+                const message = err && err.message ? err.message : "An error occurred while creating a collection";
+                ErrorDialog.showError(err, message);
+            });
     }
 
     handleCancelAddCollection = () => {
@@ -59,21 +58,20 @@ class CollectionBrowser extends React.Component {
         const {users, collections, addingCollection, deletingCollection} = this.props;
 
         collections.forEach(col => {
-            col.creatorObj = findById(users, col.creator);
+            col.creatorObj = findById(users, col.createdBy);
         });
 
         return (
             <>
                 <CollectionList
                     collections={this.props.collections}
-                    selectedCollectionIRI={this.props.selectedCollectionIRI}
+                    selectedCollectionLocation={this.props.selectedCollectionLocation}
                     onCollectionClick={this.handleCollectionClick}
                     onCollectionDoubleClick={this.handleCollectionDoubleClick}
                 />
                 {this.state.addingNewCollection ? (
                     <CollectionEditor
                         title="Add collection"
-                        name={`${this.props.user.fullName}'s collection`}
                         onSave={this.handleAddCollection}
                         onClose={this.handleCancelAddCollection}
                         editType={Config.get().enableExperimentalFeatures}
@@ -113,7 +111,7 @@ const mapStateToProps = (state) => ({
     error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
     collections: state.cache.collections.data,
     users: state.cache.users.data,
-    selectedCollectionIRI: state.collectionBrowser.selectedCollectionIRI,
+    selectedCollectionLocation: state.collectionBrowser.selectedCollectionLocation,
     addingCollection: state.collectionBrowser.addingCollection,
     deletingCollection: state.collectionBrowser.deletingCollection
 });

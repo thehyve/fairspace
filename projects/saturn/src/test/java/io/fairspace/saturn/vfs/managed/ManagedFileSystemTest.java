@@ -1,12 +1,20 @@
 package io.fairspace.saturn.vfs.managed;
 
-import io.fairspace.saturn.auth.UserInfo;
+import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.services.collections.Collection;
+import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
+import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,43 +22,66 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
+import static org.apache.commons.codec.digest.DigestUtils.md5;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ManagedFileSystemTest {
     private final byte[] content1 = new byte[]{1, 2, 3};
     private final byte[] content2 = new byte[]{1, 2, 3, 4};
+    @Mock
+    private CollectionsService collections;
+    @Mock
+    private PermissionsService permissions;
 
     private Dataset ds;
     private ManagedFileSystem fs;
 
     @Before
     public void before()  {
-        setWorkspaceURI("http://example.com/");
         var store = new MemoryBlobStore();
         ds = createTxnMem();
         var rdf = connect(ds);
-        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
-        var collections = new CollectionsService(rdf, userInfoSupplier);
-        fs = new ManagedFileSystem(rdf, store, userInfoSupplier, collections);
+        Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
+        var eventBus = new EventBus();
+        when(permissions.getPermission(any())).thenReturn(Access.Manage);
+        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus, permissions);
         var collection = new Collection();
         collection.setLocation("coll");
-        collection.setName("My Collection");
-        collection.setType("LOCAL");
-        collections.create(collection);
+        collection.setIri(createURI("http://example.com/123"));
+        collection.setAccess(Access.Manage);
+
+        when(collections.list()).thenReturn(singletonList(collection));
+        when(collections.getByLocation(any())).thenReturn(collection);
     }
 
     @Test
-    public void stat() throws IOException {
+    public void statCollection() throws IOException {
         assertEquals("coll", fs.stat("coll").getPath());
         assertTrue(fs.stat("coll").isDirectory());
         assertNotNull(fs.stat("coll").getIri());
 
-        // Other cases are tested elsewhere
+        verify(permissions, never()).getPermission(createURI(fs.stat("coll").getIri()));
+    }
+
+    @Test
+    public void statDirectory() throws IOException {
+        fs.mkdir("coll/aaa");
+        var stat = fs.stat("coll/aaa");
+        assertEquals("coll/aaa", stat.getPath());
+        assertTrue(stat.isDirectory());
+        assertNotNull(stat.getIri());
+
+        verify(permissions).getPermission(createURI(stat.getIri()));
     }
 
     @Test
@@ -78,6 +109,8 @@ public class ManagedFileSystemTest {
         assertTrue(stat.isDirectory());
         assertNotNull(stat.getIri());
         assertTrue(ds.getDefaultModel().contains(createResource(stat.getIri()), RDFS.label, createStringLiteral("ccc")));
+        ensureRecentInstant(stat.getCreated());
+        ensureRecentInstant(stat.getModified());
     }
 
     @Test
@@ -85,10 +118,14 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir");
 
         fs.create("coll/dir/file", new ByteArrayInputStream(content1));
-        assertEquals(content1.length, fs.stat("coll/dir/file").getSize());
+        var stat = fs.stat("coll/dir/file");
+        assertEquals("coll/dir/file", stat.getPath());
+        assertEquals(content1.length, stat.getSize());
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir/file", os);
         assertArrayEquals(content1, os.toByteArray());
+        ensureRecentInstant(stat.getCreated());
+        ensureRecentInstant(stat.getModified());
 
         fs.modify("coll/dir/file", new ByteArrayInputStream(content2));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
@@ -97,9 +134,41 @@ public class ManagedFileSystemTest {
         if (!Arrays.equals(content2, os.toByteArray())) {
             assertArrayEquals(content2, os.toByteArray());
         }
-        assertTrue(ds.getDefaultModel().contains(createResource(fs.stat("coll/dir/file").getIri()), RDFS.label, createStringLiteral("file")));
     }
 
+    @Test
+    public void checksumCalculation() throws IOException {
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        var resource = createResource(fs.stat("coll/file").getIri());
+        assertEquals(encodeHexString(md5(content1)), ds.getDefaultModel().getProperty(resource, createProperty("http://fairspace.io/ontology#md5")).getString());
+
+        fs.modify("coll/file", new ByteArrayInputStream(content2));
+        assertEquals(encodeHexString(md5(content2)), ds.getDefaultModel().getProperty(resource, createProperty("http://fairspace.io/ontology#md5")).getString());
+    }
+
+    @Test
+    public void directoryLifecycleMetadata() throws IOException {
+        fs.mkdir("coll/dir");
+        var dir = createResource(fs.stat("coll/dir").getIri());
+        var user = createResource("http://example.com/user");
+        assertTrue(ds.getDefaultModel().contains(dir, createProperty("http://fairspace.io/ontology#createdBy"), user));
+        assertTrue(ds.getDefaultModel().contains(dir, createProperty("http://fairspace.io/ontology#modifiedBy"), user));
+
+        fs.delete("coll/dir");
+        assertTrue(ds.getDefaultModel().contains(dir, createProperty("http://fairspace.io/ontology#deletedBy"), user));
+    }
+
+    @Test
+    public void fileLifecycleMetadata() throws IOException {
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        var file = createResource(fs.stat("coll/file").getIri());
+        var user = createResource("http://example.com/user");
+        assertTrue(ds.getDefaultModel().contains(file, createProperty("http://fairspace.io/ontology#createdBy"), user));
+        assertTrue(ds.getDefaultModel().contains(file, createProperty("http://fairspace.io/ontology#modifiedBy"), user));
+
+        fs.delete("coll/file");
+        assertTrue(ds.getDefaultModel().contains(file, createProperty("http://fairspace.io/ontology#deletedBy"), user));
+    }
 
     @Test
     public void copyDir() throws IOException {
@@ -196,6 +265,27 @@ public class ManagedFileSystemTest {
 
         assertTrue(fs.exists("coll/dir/file"));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
+    }
+
+    @Test
+    public void filesAreDeletedAfterDeletingACollection() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        fs.onCollectionDeleted(new CollectionDeletedEvent(collections.getByLocation("coll")));
+
+        assertEquals(0, fs.list("coll").size());
+    }
+
+    @Test
+    public void filesAreMovedAfterMovingACollection() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        var c = collections.getByLocation("coll");
+        c.setLocation("newLocation");
+        fs.onCollectionMoved(new CollectionMovedEvent(c, "coll"));
+
+        assertEquals(0, fs.list("coll").size());
+        assertEquals(2, fs.list("newLocation").size());
     }
 
     @Test

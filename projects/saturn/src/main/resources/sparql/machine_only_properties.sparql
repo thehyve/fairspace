@@ -1,0 +1,9 @@
+# 0 - vocabulary graph
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
+SELECT ?property
+WHERE {
+    GRAPH %1$s { ?t sh:path ?property ; fs:machineOnly true . }
+}

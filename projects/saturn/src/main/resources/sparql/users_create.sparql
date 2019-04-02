@@ -1,0 +1,16 @@
+# 0 - external id
+# 1 - userName
+# 2 - fullName
+# 3 - authorities
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+INSERT {
+  ?iri a fs:User;
+       fs:externalId %1$s;
+       fs:userName %2$s;
+       rdfs:label %3$s;
+       fs:authorities %4$s;
+}
+WHERE { BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?iri) }

@@ -1,12 +1,20 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Badge, Icon, IconButton} from "@material-ui/core";
-import {ContentCopy, ContentCut, ContentPaste} from "mdi-material-ui";
+import {withRouter} from "react-router-dom";
+import {Badge, Icon, IconButton, Grid} from "@material-ui/core";
+import {ContentCopy, ContentCut, ContentPaste, Download} from "mdi-material-ui";
+import {withStyles} from '@material-ui/core/styles';
+import classNames from 'classnames';
 
-import {CreateDirectoryButton, ErrorDialog, LoadingOverlay, UploadButton} from "../common";
+import {
+    CreateDirectoryButton, ErrorDialog, LoadingOverlay,
+    UploadButton, RenameButton, DeleteButton
+} from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
-import {joinPaths, generateUniqueFileName} from "../../utils/fileUtils";
+import {joinPaths, generateUniqueFileName, getParentPath} from "../../utils/fileUtils";
+import styles from './FileOperations.styles';
+import {CUT} from '../../constants';
 
 export class FileOperations extends React.Component {
     refreshFiles() {
@@ -74,82 +82,151 @@ export class FileOperations extends React.Component {
     }
 
     render() {
-        const buttonColor = this.props.disabled ? 'default' : 'secondary';
-        const noSelectedPath = this.props.selectedPaths.length === 0;
+        const {
+            allOperationsDisabled, creatingDirectory, clipboardItemsCount, onRename, onDelete,
+            classes, getDownloadLink, selectedItem = {}, disabledForMoreThanOneSelection, isPasteDisabled, noSelectedPath
+        } = this.props;
 
-        return this.props.creatingDirectory
-            ? <LoadingOverlay loading={this.props.creatingDirectory} />
-            : (
-                <>
-                    <IconButton
-                        aria-label="Copy"
-                        title="Copy"
-                        onClick={e => this.handleCopy(e)}
-                        disabled={noSelectedPath || this.props.disabled}
-                        color={buttonColor}
-                    >
-                        <ContentCopy />
-                    </IconButton>
-                    <IconButton
-                        aria-label="Cut"
-                        title="Cut"
-                        onClick={e => this.handleCut(e)}
-                        disabled={noSelectedPath || this.props.disabled}
-                        color={buttonColor}
-                    >
-                        <ContentCut />
-                    </IconButton>
-                    <IconButton
-                        aria-label="Paste"
-                        title="Paste"
-                        onClick={e => this.handlePaste(e)}
-                        disabled={this.props.clipboardItemsCount === 0 || this.props.disabled}
-                        color={buttonColor}
-                    >
-                        {this.addBadgeIfNotEmpty(
-                            this.props.clipboardItemsCount,
-                            <ContentPaste />
-                        )}
-                    </IconButton>
-                    <CreateDirectoryButton
-                        onCreate={name => this.handleCreateDirectory(name)}
-                    >
+        if (creatingDirectory) {
+            return (<LoadingOverlay loading={creatingDirectory} />);
+        }
+
+        return (
+            <Grid container justify="space-between">
+                <Grid item>
+                    <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)} style={{marginRight: 8}}>
                         <IconButton
-                            aria-label="Create directory"
-                            title="Create directory"
-                            disabled={this.props.disabled}
-                            color={buttonColor}
+                            title={`Download ${selectedItem.basename}`}
+                            aria-label={`Download ${selectedItem.basename}`}
+                            disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file'}
+                            component="a"
+                            href={getDownloadLink(selectedItem.filename)}
+                            download
                         >
-                            <Icon>create_new_folder</Icon>
+                            <Download />
                         </IconButton>
-                    </CreateDirectoryButton>
-                    <UploadButton
-                        onUpload={files => this.handleUpload(files)}
-                        onDidUpload={() => this.refreshFiles()}
-                    >
+                        <RenameButton
+                            currentName={selectedItem.basename}
+                            onRename={newName => onRename(selectedItem, newName)}
+                            disabled={disabledForMoreThanOneSelection}
+                        >
+                            <IconButton
+                                title={`Rename ${selectedItem.basename}`}
+                                aria-label={`Rename ${selectedItem.basename}`}
+                                disabled={disabledForMoreThanOneSelection}
+                            >
+                                <Icon>border_color</Icon>
+                            </IconButton>
+                        </RenameButton>
+                        <DeleteButton
+                            file={selectedItem.basename}
+                            onClick={() => onDelete(selectedItem)}
+                            disabled={disabledForMoreThanOneSelection}
+                        >
+                            <IconButton
+                                title={`Delete ${selectedItem.basename}`}
+                                aria-label={`Delete ${selectedItem.basename}`}
+                                disabled={disabledForMoreThanOneSelection}
+                            >
+                                <Icon>delete</Icon>
+                            </IconButton>
+
+                        </DeleteButton>
+                    </div>
+
+                    <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}>
                         <IconButton
-                            title="Upload"
-                            aria-label="Upload"
-                            disabled={this.props.disabled}
-                            color={buttonColor}
+                            aria-label="Copy"
+                            title="Copy"
+                            onClick={e => this.handleCopy(e)}
+                            disabled={allOperationsDisabled || noSelectedPath}
                         >
-                            <Icon>cloud_upload</Icon>
+                            <ContentCopy />
                         </IconButton>
-                    </UploadButton>
-                </>
-            );
+                        <IconButton
+                            aria-label="Cut"
+                            title="Cut"
+                            onClick={e => this.handleCut(e)}
+                            disabled={allOperationsDisabled || noSelectedPath}
+                        >
+                            <ContentCut />
+                        </IconButton>
+                        <IconButton
+                            aria-label="Paste"
+                            title="Paste"
+                            onClick={e => this.handlePaste(e)}
+                            disabled={isPasteDisabled}
+                        >
+                            {this.addBadgeIfNotEmpty(
+                                clipboardItemsCount,
+                                <ContentPaste />
+                            )}
+                        </IconButton>
+                    </div>
+                </Grid>
+
+                <Grid item>
+                    <div className={classes.buttonsContainer}>
+                        <CreateDirectoryButton
+                            onCreate={name => this.handleCreateDirectory(name)}
+                        >
+                            <IconButton
+                                aria-label="Create directory"
+                                title="Create directory"
+                                disabled={allOperationsDisabled}
+                            >
+                                <Icon>create_new_folder</Icon>
+                            </IconButton>
+                        </CreateDirectoryButton>
+                        <UploadButton
+                            onUpload={files => this.handleUpload(files)}
+                            onDidUpload={() => this.refreshFiles()}
+                        >
+                            <IconButton
+                                title="Upload"
+                                aria-label="Upload"
+                                disabled={allOperationsDisabled}
+                            >
+                                <Icon>cloud_upload</Icon>
+                            </IconButton>
+                        </UploadButton>
+                    </div>
+                </Grid>
+            </Grid>
+        );
     }
 }
 
-const mapStateToProps = state => ({
-    selectedPaths: state.collectionBrowser.selectedPaths,
-    clipboardItemsCount: state.clipboard.filenames ? state.clipboard.filenames.length : 0,
-    creatingDirectory: state.cache.filesByPath.creatingDirectory
-});
+const mapStateToProps = (state, ownProps) => {
+    const {match: {params}, disabled: allOperationsDisabled} = ownProps;
+    const {collectionBrowser: {selectedPaths}, cache: {filesByPath}, clipboard} = state;
+    const openedCollectionLocation = params.collection;
+    const openedPath = params.path ? `/${openedCollectionLocation}/${params.path}` : `/${openedCollectionLocation}`;
+    const filesOfCurrentPath = (filesByPath[openedPath] || {}).data || [];
+    const selectedItems = filesOfCurrentPath.filter(f => selectedPaths.includes(f.filename)) || [];
+    const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
+    const noSelectedPath = selectedPaths.length === 0;
+    const moreThanOneItemSelected = selectedPaths.length > 1;
+    const filenamesInClipboard = clipboard.filenames;
+    const clipboardItemsCount = clipboard.filenames ? clipboard.filenames.length : 0;
+    const isClipboardItemsOnOpenedPath = filenamesInClipboard && filenamesInClipboard.map(f => getParentPath(f)).includes(openedPath);
+    const isPasteDisabled = allOperationsDisabled || clipboardItemsCount === 0 || (isClipboardItemsOnOpenedPath && clipboard.type === CUT);
+    const disabledForMoreThanOneSelection = allOperationsDisabled || noSelectedPath || moreThanOneItemSelected;
+
+    return {
+        creatingDirectory: filesByPath.creatingDirectory,
+        selectedPaths,
+        selectedItem,
+        clipboardItemsCount,
+        disabledForMoreThanOneSelection,
+        noSelectedPath,
+        isPasteDisabled
+    };
+};
 
 const mapDispatchToProps = {
     ...fileActions,
     ...clipboardActions
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(FileOperations);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(FileOperations)));

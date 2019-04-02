@@ -13,6 +13,7 @@ buildscript {
 plugins {
 	id 'net.ltgt.apt' version '0.10'
 	id 'io.franzbecker.gradle-lombok' version '2.0'
+	id 'com.github.spotbugs' version '1.6.10'
 }
 
 apply plugin: 'java'
@@ -43,13 +44,13 @@ repositories {
 
 ext {
 	springCloudVersion = 'Finchley.RC2'
-	oidcAuthVersion = System.getenv('OIDC_AUTH_VERSION') ?:'0.1.1-SNAPSHOT'
+	oidcAuthVersion = System.getenv('OIDC_AUTH_VERSION') ?:'0.6.1-SNAPSHOT'
 }
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
-    compile("org.springframework.boot:spring-boot-starter-actuator")
+  compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile('org.springframework.session:spring-session-core')
 	compile('org.springframework.cloud:spring-cloud-starter-sleuth')
 	compile('org.springframework.cloud:spring-cloud-sleuth-zipkin')
@@ -57,14 +58,33 @@ dependencies {
 	compile("io.fairspace:oidc-auth-sso:${oidcAuthVersion}")
 	compile("io.fairspace:oidc-auth-bearer-auth:${oidcAuthVersion}")
 	compile("io.fairspace:oidc-auth-zuul:${oidcAuthVersion}")
+
+	spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 	implementation 'com.nimbusds:nimbus-jose-jwt:5.7'
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
+	testCompile('org.mockito:mockito-core:2.23.0')
 }
 
 springBoot {
   buildInfo()
+}
+
+apply plugin: 'com.github.spotbugs'
+
+spotbugs {
+  toolVersion = '3.1.12'
+  effort = "max"
+  reportLevel = "low"
+  ignoreFailures = true
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
 }
 
 jacoco {
@@ -77,7 +97,6 @@ jacocoTestReport {
 		csv.enabled true
 	}
 }
-
 
 dependencyManagement {
 	imports {

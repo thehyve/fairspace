@@ -1,7 +1,7 @@
 import {createClient} from "webdav";
 import axios from 'axios';
 import Config from "./Config/Config";
-import {addCounterToFilename, generateUniqueFileName, joinPaths, getParentPath} from '../utils/fileUtils';
+import {addCounterToFilename, generateUniqueFileName, getFileName, getParentPath, joinPaths} from '../utils/fileUtils';
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
@@ -67,12 +67,18 @@ class FileAPI {
     }
 
     /**
-     * Downloads the file given by path. Downloading is done by redirecting the user to the file
+     * It will calls the browser API to open the file if it's 'openable' otherwise the browser will show download dialog
      * @param path
      */
-    download(path) {
-        window.location.href = this.client().getFileDownloadLink(path, defaultOptions);
+    open(path) {
+        const link = this.getDownloadLink(path);
+        window.open(link);
     }
+
+    /**
+     * It creates a full download like to the path provided
+     */
+    getDownloadLink = (path = '') => this.client().getFileDownloadLink(path, defaultOptions);
 
     /**
      * Deletes the file given by path
@@ -97,6 +103,10 @@ class FileAPI {
         }
         if (!destination) {
             return Promise.reject(Error("No destination specified to move to"));
+        }
+
+        if (source === destination) {
+            return Promise.resolve();
         }
 
         // We have to specify the destination ourselves, as the client() adds the fullpath
@@ -130,7 +140,7 @@ class FileAPI {
      */
     movePaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(sourceFile));
+            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(getFileName(sourceFile)));
             return this.move(sourceFile, destinationFile);
         }));
     }
@@ -143,7 +153,7 @@ class FileAPI {
      */
     copyPaths(filePaths, destinationDir) {
         return Promise.all(filePaths.map((sourceFile) => {
-            let destinationFilename = generateUniqueFileName(sourceFile);
+            let destinationFilename = generateUniqueFileName(getFileName(sourceFile));
             // Copying files to the current directory involves renaming
             if (destinationDir === getParentPath(sourceFile)) {
                 destinationFilename = addCounterToFilename(destinationFilename);

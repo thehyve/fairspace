@@ -1,26 +1,39 @@
 package io.fairspace.saturn.webdav;
 
+import com.google.common.eventbus.EventBus;
 import com.mockrunner.mock.web.MockHttpServletRequest;
 import com.mockrunner.mock.web.MockHttpServletResponse;
-import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
+import org.apache.jena.graph.Node;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class WebDAVIT {
 
     private MiltonWebDAVServlet milton;
@@ -31,19 +44,39 @@ public class WebDAVIT {
 
     private MockHttpServletResponse res;
 
+    private PermissionsService permissions;
+
+    private CollectionsService collections;
+
+    private Node collectionIRI;
+
+    private Node defaultUser = createURI("http://example.com/user");
+    private Node anotherUser = createURI("http://example.com/new-user");
+    private Node currentUser = defaultUser;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private MailService mailService;
+
     @Before
-    public void before() throws IOException {
-        setWorkspaceURI("http://example.com/");
+    public void before() {
         var rdf = connect(createTxnMem());
-        Supplier<UserInfo> userInfoSupplier = () -> new UserInfo("userId", null, null, null);
-        var collections = new CollectionsService(rdf, userInfoSupplier);
-        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userInfoSupplier, collections));
+        var eventBus = new EventBus();
+        when(userService.getCurrentUser()).thenAnswer(invocation -> new User() {{ setIri(currentUser); }});
+
+        permissions = new PermissionsServiceImpl(rdf, userService, mailService);
+        collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
+        var collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
+        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus, permissions));
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();
         coll.setName("My Collection");
         coll.setLocation("coll1");
         coll.setType("LOCAL");
         collections.create(coll);
+        collectionIRI = coll.getIri();
 
         req = new MockHttpServletRequestEx();
         res = new MockHttpServletResponse();
@@ -249,5 +282,221 @@ public class WebDAVIT {
         assertFalse(res.getOutputStreamContent().contains("getcontentlength"));
     }
 
+    @Test
+    public void shouldNotSendAcceptRangesHeader() throws ServletException, IOException {
+        req.setMethod("OPTIONS");
+        req.setRequestURL("http://localhost/webdav/");
+        milton.service(req, res);
+        assertEquals(200, res.getStatus());
+        assertNull(res.getHeader("Accept-Ranges"));
+    }
 
+    @Test
+    public void shouldIgnoreRangeHeaders() throws ServletException, IOException {
+        fs.create("coll1/dir1/file.txt", new ByteArrayInputStream("123".getBytes()));
+
+        req.setMethod("GET");
+        req.setRequestURL("http://localhost/webdav/coll1/dir1/file.txt");
+        req.setHeader("Range", "bytes=0-1");
+        milton.service(req, res);
+        assertEquals(200, res.getStatus());
+        assertEquals("3", res.getHeader("Content-Length"));
+        assertNull(res.getHeader("Content-Range"));
+        assertEquals("123", res.getOutputStreamContent());
+    }
+
+    @Test
+    public void testReadingWithoutPermissions() throws ServletException, IOException {
+        currentUser = anotherUser;
+        req.setMethod("PROPFIND");
+        req.setRequestURL("http://localhost/webdav/coll1");
+        milton.service(req, res);
+        assertEquals(404, res.getStatus());
+    }
+
+    @Test
+    public void testWritingWithWritePermission() throws ServletException, IOException {
+        permissions.setPermission(collectionIRI, anotherUser, Access.Write);
+        req.setMethod("PUT");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+
+        currentUser = anotherUser;
+
+        milton.service(req, res);
+
+        assertEquals(201, res.getStatus());
+    }
+
+    @Test
+    public void testWritingWithReadPermission() throws ServletException, IOException {
+        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
+        req.setMethod("PUT");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+
+        currentUser = anotherUser;
+
+        milton.service(req, res);
+
+        assertEquals(403, res.getStatus());
+    }
+
+    @Test
+    public void testWritingWithoutPermissions() throws ServletException, IOException {
+        req.setMethod("PUT");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+
+        currentUser = anotherUser;
+
+        milton.service(req, res);
+
+        assertEquals(403, res.getStatus());
+    }
+
+    @Test
+    public void testMkDirWithWritePermission() throws ServletException, IOException {
+        permissions.setPermission(collectionIRI, anotherUser, Access.Write);
+        req.setMethod("MKCOL");
+        req.setRequestURL("http://localhost/webdav/coll1/dir");
+
+        currentUser = anotherUser;
+
+        milton.service(req, res);
+
+        assertEquals(201, res.getStatus());
+    }
+
+    @Test
+    public void testMkDirWithReadPermission() throws ServletException, IOException {
+        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
+        req.setMethod("MKCOL");
+        req.setRequestURL("http://localhost/webdav/coll1/dir");
+
+        currentUser = anotherUser;
+
+        milton.service(req, res);
+
+        assertEquals(403, res.getStatus());
+    }
+
+    @Test
+    public void testMkDirWithNoPermission() throws ServletException, IOException {
+        req.setMethod("MKCOL");
+        req.setRequestURL("http://localhost/webdav/coll1/dir");
+
+        currentUser = anotherUser;
+
+        milton.service(req, res);
+
+        assertEquals(409, res.getStatus());
+    }
+
+
+    @Test
+    public void testWritingToAReadOnlyCollection() {
+        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
+    }
+
+    @Test
+    public void testCopyingWithWritePermission() throws ServletException, IOException {
+        var newCollection = new Collection();
+        newCollection.setName("Collection 2");
+        newCollection.setLocation("coll2");
+        newCollection.setType("LOCAL");
+        collections.create(newCollection);
+        var newCollectionIRI = newCollection.getIri();
+
+        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
+        permissions.setPermission(newCollectionIRI, anotherUser, Access.Write);
+
+        req.setMethod("PUT");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+        milton.service(req, res);
+
+        currentUser = anotherUser;
+
+        req.setMethod("COPY");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+        req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
+        milton.service(req, res);
+
+        assertEquals(201, res.getStatus());
+    }
+
+    @Test
+    public void testCopyingToAReadOnlyCollection() throws ServletException, IOException {
+        var newCollection = new Collection();
+        newCollection.setName("Collection 2");
+        newCollection.setLocation("coll2");
+        newCollection.setType("LOCAL");
+        collections.create(newCollection);
+        var newCollectionIRI = newCollection.getIri();
+
+        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
+        permissions.setPermission(newCollectionIRI, anotherUser, Access.Read);
+
+        req.setMethod("PUT");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+        milton.service(req, res);
+
+        currentUser = anotherUser;
+
+        req.setMethod("COPY");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+        req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
+        milton.service(req, res);
+
+        assertEquals(403, res.getStatus());
+    }
+
+    @Test
+    public void testMovingWithWritePermission() throws ServletException, IOException {
+        var newCollection = new Collection();
+        newCollection.setName("Collection 2");
+        newCollection.setLocation("coll2");
+        newCollection.setType("LOCAL");
+        collections.create(newCollection);
+        var newCollectionIRI = newCollection.getIri();
+
+        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
+        permissions.setPermission(newCollectionIRI, anotherUser, Access.Write);
+
+        req.setMethod("PUT");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+        milton.service(req, res);
+
+        currentUser = anotherUser;
+
+        req.setMethod("MOVE");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+        req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
+        milton.service(req, res);
+
+        assertEquals(201, res.getStatus());
+    }
+
+    @Test
+    public void testMovingToAReadOnlyCollection() throws ServletException, IOException {
+        var newCollection = new Collection();
+        newCollection.setName("Collection 2");
+        newCollection.setLocation("coll2");
+        newCollection.setType("LOCAL");
+        collections.create(newCollection);
+        var newCollectionIRI = newCollection.getIri();
+
+        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
+        permissions.setPermission(newCollectionIRI, anotherUser, Access.Read);
+
+        req.setMethod("PUT");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+        milton.service(req, res);
+
+        currentUser = anotherUser;
+
+        req.setMethod("MOVE");
+        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
+        req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
+        milton.service(req, res);
+
+        assertEquals(403, res.getStatus());
+    }
 }

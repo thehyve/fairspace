@@ -61,7 +61,6 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 | `keycloak.client.secret` | Client secret for oauth communication. | |
 | `keycloak.realm` | Realm that is used for authentication | |
 | `keycloak.redirectAfterLogoutUrl` | URL to redirect the user to after he logs out from the workspace. | `https://fairspace.com` |
-| `keycloak.requiredAuthority` | Role that the user must have if he wants to login to this workspace. | `user-<workspace-name>` |
 
 #### Backend parameters
 | Parameter  | Description  | Default |

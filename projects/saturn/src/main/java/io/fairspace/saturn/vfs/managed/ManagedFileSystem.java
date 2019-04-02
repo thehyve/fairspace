@@ -1,13 +1,21 @@
 package io.fairspace.saturn.vfs.managed;
 
-import io.fairspace.saturn.auth.UserInfo;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
-import io.fairspace.saturn.services.collections.Access;
 import io.fairspace.saturn.services.collections.Collection;
+import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
+import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import lombok.SneakyThrows;
+import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -16,16 +24,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
+import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
-import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -36,14 +47,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
             .build();
     private final RDFConnection rdf;
     private final BlobStore store;
-    private final Supplier<UserInfo> userInfoSupplier;
+    private final Supplier<Node> userIriSupplier;
     private final CollectionsService collections;
+    private final PermissionsService permissions;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<UserInfo> userInfoSupplier, CollectionsService collections) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus, PermissionsService permissions) {
         this.rdf = rdf;
         this.store = store;
-        this.userInfoSupplier = userInfoSupplier;
+        this.userIriSupplier = userIriSupplier;
         this.collections = collections;
+        this.permissions = permissions;
+        eventBus.register(this);
     }
 
     @Override
@@ -53,22 +67,13 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
 
         if (isCollection(path)) {
-            var collection = collections.getByLocation(path);
-            if (collection == null) {
-                return null;
-            }
-            return fileInfo(collection);
+            return ofNullable(collections.getByLocation(path))
+                    .map(ManagedFileSystem::fileInfo)
+                    .orElse(null);
         }
 
-        var access = getAccess(path);
-        if (access == Access.None) {
-            return null;
-        }
-
-        var processor = new QuerySolutionProcessor<>(row -> fileInfo(row, access.ordinal() < Access.Write.ordinal()));
-
+        var processor = new QuerySolutionProcessor<>(this::fileInfo);
         rdf.querySelect(storedQuery("fs_stat", path), processor);
-
         return processor.getSingle().orElse(null);
     }
 
@@ -81,72 +86,69 @@ public class ManagedFileSystem implements VirtualFileSystem {
                     .collect(toList());
         }
 
-        var access = getAccess(parentPath);
-        if (access == Access.None) {
-            return emptyList();
-        }
-
-        var processor = new QuerySolutionProcessor<>(row -> fileInfo(row, access.ordinal() < Access.Write.ordinal()));
+        var processor = new QuerySolutionProcessor<>(this::fileInfo);
         rdf.querySelect(storedQuery("fs_ls", parentPath + '/'), processor);
-        return processor.getValues();
+        return processor.getValues()
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(toList());
     }
 
     @Override
     public void mkdir(String path) throws IOException {
         ensureValidPath(path);
 
-        withCommitMessage("Create directory " + path,
-                () -> rdf.update(storedQuery("fs_mkdir", path, userId(), name(path))));
+        withCommitMessage("Create directory " + path, () ->
+                rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path))));
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
         ensureValidPath(path);
 
-        var cis = new CountingInputStream(in);
-        var blobId = store.write(cis);
+        var blobInfo = write(in);
         withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, cis.getByteCount(), blobId, userId(), name(path))));
+                rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5())));
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
-        var cis = new CountingInputStream(in);
-        var blobId = store.write(cis);
+        var blobInfo = write(in);
+
         withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, cis.getByteCount(), blobId, userId())));
+                () -> rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5())));
     }
 
     @Override
-    public void read(String path, long offset, long maxLength, OutputStream out) throws IOException {
+    public void read(String path, OutputStream out) throws IOException {
         var processor = new QuerySolutionProcessor<>(row -> row.getLiteral("blobId").getString());
         rdf.querySelect(storedQuery("fs_get_blobid", path), processor);
         var blobId = processor.getSingle().orElseThrow(() -> new FileNotFoundException(path));
-        store.read(blobId, offset, maxLength, out);
+        store.read(blobId, out);
     }
 
     @Override
     public void copy(String from, String to) throws IOException {
         ensureValidPath(from);
         ensureValidPath(to);
-        withCommitMessage("Copy data from " + from + " to " + to,
-                () -> rdf.update(storedQuery("fs_copy", from, to, name(to))));
+        withCommitMessage("Copy data from " + from + " to " + to, () ->
+                rdf.update(storedQuery("fs_copy", from, to, name(to))));
     }
 
     @Override
     public void move(String from, String to) throws IOException {
         ensureValidPath(from);
         ensureValidPath(to);
-        withCommitMessage("Move data from " + from + " to " + to,
-                () -> rdf.update(storedQuery("fs_move", from, to, name(to))));
+        withCommitMessage("Move data from " + from + " to " + to, () ->
+                rdf.update(storedQuery("fs_move", from, to, name(to))));
     }
 
     @Override
     public void delete(String path) throws IOException {
         ensureValidPath(path);
 
-        withCommitMessage("Delete " + path,
-                () -> rdf.update(storedQuery("fs_delete", path, userId())));
+        withCommitMessage("Delete " + path, () ->
+                rdf.update(storedQuery("fs_delete", path, userIriSupplier.get())));
     }
 
     @Override
@@ -154,40 +156,43 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     }
 
-    private static FileInfo fileInfo(QuerySolution row, boolean readOnly) {
+    @Subscribe
+    public void onCollectionDeleted(CollectionDeletedEvent e) {
+        rdf.update(storedQuery("fs_delete", e.getCollection().getLocation(), userIriSupplier.get()));
+    }
+
+    @Subscribe
+    public void onCollectionMoved(CollectionMovedEvent e) {
+        rdf.update(storedQuery("fs_move", e.getOldLocation(), e.getCollection().getLocation(), e.getCollection().getName()));
+    }
+
+    private FileInfo fileInfo(QuerySolution row) {
+        var iri = row.getResource("iri");
+        var access = permissions.getPermission(iri.asNode());
+        if (access == Access.None) {
+            return null;
+        }
         return FileInfo.builder()
-                .iri(row.getResource("iri").getURI())
+                .iri(iri.getURI())
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
                 .isDirectory(!row.getLiteral("isDirectory").getBoolean())
-                .created(parseXSDDateTime(row.getLiteral("created")))
-                .modified(parseXSDDateTime(row.getLiteral("modified")))
-                .createdBy(row.getLiteral("createdBy").getString())
-                .modifiedBy(row.getLiteral("modifiedBy").getString())
-                .readOnly(readOnly)
+                .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
+                .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
+                .readOnly(!access.canWrite())
                 .build();
     }
 
     private static FileInfo fileInfo(Collection collection) {
         return FileInfo.builder()
-                .iri(collection.getIri())
+                .iri(collection.getIri().getURI())
                 .path(collection.getLocation())
                 .size(0)
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .createdBy(collection.getCreator())
-                .modifiedBy(collection.getCreator())
-                .readOnly(collection.getAccess().ordinal() < Access.Read.ordinal())
+                .readOnly(!collection.getAccess().canWrite())
                 .build();
-    }
-
-    private String userId() {
-        if (userInfoSupplier != null) {
-            var userInfo = userInfoSupplier.get();
-            return userInfo != null ? userInfo.getUserId() : "";
-        }
-        return "";
     }
 
     static boolean isCollection(String path) {
@@ -206,12 +211,20 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
     }
 
-    private Collection getCollection(String path) {
-        return collections.getByLocation(splitPath(path)[0]);
+    @SneakyThrows(NoSuchAlgorithmException.class)
+    private BlobInfo write(InputStream in) throws IOException {
+        var countingInputStream = new CountingInputStream(in);
+        var messageDigestCalculatingInputStream = new MessageDigestCalculatingInputStream(countingInputStream);
+
+        var id = store.write(messageDigestCalculatingInputStream);
+
+        return new BlobInfo(id, countingInputStream.getByteCount(), encodeHexString(messageDigestCalculatingInputStream.getMessageDigest().digest()));
     }
 
-    private Access getAccess(String path) {
-        var c = getCollection(path);
-        return (c == null) ? Access.None : c.getAccess();
+    @Value
+    private static class BlobInfo {
+        String id;
+        long size;
+        String md5;
     }
 }

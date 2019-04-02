@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 import React from "react";
 import ErrorMessage from "../common/ErrorMessage";
-import Metadata from "./Metadata";
+import MetadataEntityContainer from "./MetadataEntityContainer";
 import {statFile} from "../../actions/fileActions";
 
 export class PathMetadata extends React.Component {
@@ -32,7 +32,7 @@ export class PathMetadata extends React.Component {
             return (<div>No metadata found</div>);
         }
         return (
-            <Metadata
+            <MetadataEntityContainer
                 subject={subject}
                 {...otherProps}
             />

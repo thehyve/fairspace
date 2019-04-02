@@ -11,6 +11,7 @@ import org.apache.jena.update.UpdateFactory;
 import java.io.*;
 
 import static java.lang.Long.parseLong;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 
 public class SparqlTransactionCodec implements TransactionCodec {
@@ -24,7 +25,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
     @Override
     public TransactionListener write(OutputStream out) throws IOException {
         return new TransactionListener() {
-            OutputStreamWriter writer = new OutputStreamWriter(out);
+            OutputStreamWriter writer = new OutputStreamWriter(out, UTF_8);
 
             @Override
             public void onBegin(String commitMessage, String userId, String userName, long timestamp) throws IOException {
@@ -75,7 +76,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
 
     @Override
     public void read(InputStream in, TransactionListener listener) throws IOException {
-        var reader = new BufferedReader(new InputStreamReader(in));
+        var reader = new BufferedReader(new InputStreamReader(in, UTF_8));
 
         long timestamp = 0L;
         String userName = null;

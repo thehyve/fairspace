@@ -1,162 +1,160 @@
 package io.fairspace.saturn.services.collections;
 
-import io.fairspace.saturn.auth.UserInfo;
-import io.fairspace.saturn.rdf.QuerySolutionProcessor;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTime;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+import static org.apache.jena.graph.NodeFactory.createURI;
 
-// TODO: Check permissions
+@RequiredArgsConstructor
 @Slf4j
 public class CollectionsService {
-    private final RDFConnection rdf;
-
-    private final Supplier<UserInfo> userInfoSupplier;
-
-
-    public CollectionsService(RDFConnection rdf, Supplier<UserInfo> userInfoSupplier) {
-        this.rdf = rdf;
-        this.userInfoSupplier = userInfoSupplier;
-    }
+    private final DAO dao;
+    private final Consumer<Object> eventListener;
+    private final PermissionsService permissions;
 
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");
-        validate(collection.getCreator() == null, "Field creator must be left empty");
-        validate(collection.getLocation() != null, "Field location must be set");
         validate(isLocationValid(collection.getLocation()), "Invalid location");
-        validate(collection.getName() != null && !collection.getName().isEmpty(), "Field prettyName must be set");
+        validate(collection.getName() != null && !collection.getName().isEmpty(), "Field name must be set");
         validate(collection.getType() != null, "Field type must be set");
 
         if (collection.getDescription() == null) {
             collection.setDescription("");
         }
 
-        return commit("Create collection " + collection.getName(), rdf, () -> {
-            if (getByLocation(collection.getLocation()) != null) {
-                throw new LocationAlreadyExistsException(collection.getLocation());
-            }
-
-            rdf.update(storedQuery("coll_create",
-                    collection.getName(),
-                    collection.getLocation(),
-                    collection.getDescription(),
-                    collection.getType(),
-                    userId()));
-
-            return getByLocation(collection.getLocation());
+        return commit("Create collection " + collection.getName(), dao, () -> {
+            ensureLocationIsNotUsed(collection.getLocation());
+            dao.write(collection);
+            permissions.createResource(collection.getIri());
+            collection.setAccess(Access.Manage);
+            eventListener.accept(new CollectionCreatedEvent(collection));
+            return collection;
         });
     }
 
     public Collection get(String iri) {
-        validateIRI(iri);
-        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
-        rdf.querySelect(storedQuery("coll_get", createResource(iri)), processor);
-        return processor.getSingle().orElse(null);
+        return addPermissionsToObject(dao.read(Collection.class, createURI(iri)));
     }
 
     public Collection getByLocation(String location) {
-        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
-        rdf.querySelect(storedQuery("coll_get_by_dir", location), processor);
-        return processor.getSingle().orElse(null);
+        return getByLocationWithoutAccess(location)
+                .map(this::addPermissionsToObject)
+                .orElse(null);
+    }
+
+    private Optional<Collection> getByLocationWithoutAccess(String location) {
+        return dao.construct(Collection.class, storedQuery("coll_get_by_dir", location))
+                .stream()
+                .findFirst();
+    }
+
+    private void ensureLocationIsNotUsed(String location) {
+        if(getByLocationWithoutAccess(location).isPresent()) {
+            throw new LocationAlreadyExistsException(location);
+        }
     }
 
     public List<Collection> list() {
-        var processor = new QuerySolutionProcessor<>(CollectionsService::toCollection);
-        rdf.querySelect(storedQuery("coll_list"), processor);
-        return processor.getValues();
+        return dao.list(Collection.class)
+                .stream()
+                .map(this::addPermissionsToObject)
+                .filter(Objects::nonNull)
+                .sorted(comparing(Collection::getName))
+                .collect(toList());
     }
 
     public void delete(String iri) {
         validateIRI(iri);
-        commit("Delete collection " + iri, rdf, () -> {
-            var existing = get(iri);
-            if (existing == null) {
+        commit("Delete collection " + iri, dao, () -> {
+            var collection = get(iri);
+            if (collection == null) {
                 log.info("Collection not found {}", iri);
                 throw new CollectionNotFoundException(iri);
             }
-            if (existing.getAccess() != Access.Manage) {
+            if (!collection.getAccess().canManage()) {
                 log.info("No enough permissions to delete a collection {}", iri);
-                throw new CollectionAccessDeniedException(iri);
+                throw new AccessDeniedException("Insufficient permissions for collection " + iri);
             }
-            rdf.update(storedQuery("coll_delete", createResource(iri), userId()));
+
+            dao.markAsDeleted(collection);
+
+            eventListener.accept(new CollectionDeletedEvent(collection));
         });
     }
 
     public Collection update(Collection patch) {
         validate(patch.getIri() != null, "No IRI");
-        validate(patch.getCreator() == null, "Field creator must be left empty");
-        validateIRI(patch.getIri());
 
-        return commit("Update collection " + patch.getName(), rdf, () -> {
-            var existing = get(patch.getIri());
+        validateIRI(patch.getIri().getURI());
+
+        return commit("Update collection " + patch.getName(), dao, () -> {
+            var existing = get(patch.getIri().getURI());
             if (existing == null) {
                 log.info("Collection not found {}", patch.getIri());
-                throw new CollectionNotFoundException(patch.getIri());
+                throw new CollectionNotFoundException(patch.getIri().getURI());
             }
-            if (existing.getAccess().ordinal() < Access.Write.ordinal()) {
+            if (!existing.getAccess().canWrite()) {
                 log.info("No enough permissions to modify a collection {}", patch.getIri());
-                throw new CollectionAccessDeniedException(patch.getIri());
+                throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
             }
 
             validate(patch.getType() == null || patch.getType().equals(existing.getType()),
                     "Cannot change collection's type");
 
             if (patch.getLocation() != null && !patch.getLocation().equals(existing.getLocation())) {
-                var conflicting = getByLocation(patch.getLocation());
-                if (conflicting != null) {
-                    throw new LocationAlreadyExistsException(patch.getLocation());
-                }
+                ensureLocationIsNotUsed(patch.getLocation());
                 validate(isLocationValid(patch.getLocation()), "Invalid location");
             }
 
-            rdf.update(storedQuery("coll_update",
-                    createResource(patch.getIri()),
-                    patch.getName() != null ? patch.getName() : existing.getName(),
-                    patch.getDescription() != null ? patch.getDescription() : existing.getDescription(),
-                    patch.getLocation() != null ? patch.getLocation() : existing.getLocation(),
-                    userId()));
+            if (patch.getName() != null) {
+                existing.setName(patch.getName());
+            }
 
-            return get(patch.getIri());
+            if (patch.getDescription() != null) {
+                existing.setDescription(patch.getDescription());
+            }
+
+            var oldLocation = existing.getLocation();
+            if (patch.getLocation() != null) {
+                existing.setLocation(patch.getLocation());
+            }
+
+            var updated = dao.write(existing);
+            if (!updated.getLocation().equals(oldLocation)) {
+                eventListener.accept(new CollectionMovedEvent(updated, oldLocation));
+            }
+            return updated;
         });
     }
 
-    private static Collection toCollection(QuerySolution row) {
-        var collection = new Collection();
-        collection.setIri(row.getResource("iri").toString());
-        collection.setType(row.getLiteral("type").getString());
-        collection.setName(row.getLiteral("name").getString());
-        collection.setLocation(row.getLiteral("path").getString());
-        collection.setDescription(row.getLiteral("description").getString());
-        collection.setCreator(row.getLiteral("createdBy").getString());
-        collection.setDateCreated(parseXSDDateTime(row.getLiteral("dateCreated")));
-        collection.setDateModified(parseXSDDateTime(row.getLiteral("dateModified")));
-        collection.setAccess(Access.Manage); // TODO: Check
-        return collection;
+    private Collection addPermissionsToObject(Collection c) {
+        if (c != null) {
+            c.setAccess(permissions.getPermission(c.getIri()));
+            if(c.getAccess() == Access.None) {
+                return null;
+            }
+        }
+        return c;
     }
 
     private static boolean isLocationValid(String name) {
         return name.matches("[A-Za-z0-9_-]+")
                 && !name.isEmpty()
                 && name.length() < 128;
-    }
-
-    private String userId() {
-        if (userInfoSupplier != null) {
-            var userInfo = userInfoSupplier.get();
-            if (userInfo != null) {
-                return userInfo.getUserId();
-            }
-        }
-        return "";
     }
 }

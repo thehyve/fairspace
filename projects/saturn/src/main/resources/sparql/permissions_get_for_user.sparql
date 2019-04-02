@@ -1,0 +1,14 @@
+# Get user's permission
+# 0 - the resource
+# 1 - the user
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+SELECT * WHERE
+{
+{SELECT (fs:read as ?access) WHERE { GRAPH ws:permissions { %1$s fs:read %2$s }}}
+UNION
+{SELECT (fs:write as ?access) WHERE { GRAPH ws:permissions { %1$s fs:write %2$s }}}
+UNION
+{SELECT (fs:manage as ?access) WHERE { GRAPH ws:permissions { %1$s fs:manage %2$s }}}
+}

@@ -1,3 +1,5 @@
+dist: xenial
+
 language: java
 
 jdk:
@@ -61,7 +63,8 @@ jobs:
     - stage: build
       name: Build projects
       install:
-      - 'if [[ "$SHOULD_RELEASE" ]] && [[ "$DEPLOY_PLATFORM" = "GCP" ]] ; then ci/gcp/install.sh ; ci/gcp/login.sh ; fi'
+      - ci/gcp/install.sh
+      - ci/gcp/login.sh
       script:
       - .travis/build.sh projects/oidc-auth
       - .travis/build.sh projects/saturn
@@ -69,6 +72,10 @@ jobs:
       - .travis/build.sh projects/pluto
       - .travis/build.sh projects/jupyterhub-hub
       - travis_wait 40 .travis/build.sh projects/jupyterhub-singleuser
+      - export SANITIZED_BRANCH=$(echo $TRAVIS_BRANCH | sed 's/\//_/g')
+      - export SPOTBUGS_OUTPUTDIR="${SANITIZED_BRANCH}/${TRAVIS_BUILD_NUMBER}"
+      - "if [ -f projects/pluto/app/build/reports/spotbugs/main.html ] ; then gsutil cp projects/pluto/app/build/reports/spotbugs/main.html gs://fairspace-spotbugs/${SPOTBUGS_OUTPUTDIR}/pluto-output.html ; fi"
+      - "if [ -f projects/saturn/build/reports/spotbugs/main.html ] ; then gsutil cp projects/saturn/build/reports/spotbugs/main.html gs://fairspace-spotbugs/${SPOTBUGS_OUTPUTDIR}/saturn-output.html ; fi"
     - stage: build
       cache: false
       name: Build helm charts

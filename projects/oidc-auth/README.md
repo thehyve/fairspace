@@ -13,7 +13,7 @@ in a Spring application. It has 4 different parts:
 1. Add dependencies to one or more packages. Assuming your project has a common setup with an API gateway 
    (with Zuul) and upstream resource services.
    
-   The packages can be found in the Nexus repository at `https://nexus.jx.test.fairdev.app/repository/maven-releases/`
+   The packages can be found in the Nexus repository at `https://repo.thehyve.nl/content/repositories/fairspace-releases/`
    
    The API gateway would need SSO and Zuul, and optionally also support for direct authentication via 
    the `Authorization` header.

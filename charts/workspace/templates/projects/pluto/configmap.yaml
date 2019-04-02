@@ -15,6 +15,9 @@ data:
         base-url: {{ template "keycloak.baseUrl" . }}
         realm: {{ .Values.hyperspace.keycloak.realm }}
 
+    keycloak:
+      workspace-login-group: {{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}
+
     frontend:
       urls:
         files: {{ template "storage.url" . }}/webdav
@@ -27,8 +30,8 @@ data:
 
     security:
       oidc:
-        redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}
-        required-authority: {{ .Values.pluto.keycloak.requiredAuthority | default (printf "user-%s" (include "workspace.name" .)) }}
+        redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "workspace.url" .) }}
+        required-authority: {{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}
 
     spring:
       zipkin:
@@ -43,7 +46,11 @@ data:
           url: {{ .Values.pluto.backends.storage | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
         collections:
           url: {{ .Values.pluto.backends.collections | default (printf "http://%s-saturn.%s.svc.cluster.local/api/collections/" .Release.Name .Release.Namespace)}}
+        permissions:
+          url: {{ .Values.pluto.backends.permissions | default (printf "http://%s-saturn.%s.svc.cluster.local/api/permissions/" .Release.Name .Release.Namespace)}}
         metadata:
           url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/metadata/" .Release.Name .Release.Namespace)}}
         vocabulary:
           url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/vocabulary/" .Release.Name .Release.Namespace)}}
+        elasticsearch:
+          url: {{ template "workspace.elasticsearch.resturl" . }}

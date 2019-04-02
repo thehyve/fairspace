@@ -29,7 +29,7 @@ public class AuthBeansTest {
     @BeforeEach
     void setUp() throws URISyntaxException {
         oidcConfig = new OidcConfig();
-        oidcConfig.setJwkKeySetUri(new URI("http://test.uri"));
+        oidcConfig.setJwkKeySetUrl(new URI("http://test.uri"));
 
         authBeans = new AuthBeans(oidcConfig);
     }
@@ -63,7 +63,7 @@ public class AuthBeansTest {
     void testJWKAlgorithmConfiguration() throws MalformedURLException, BadJWTException, URISyntaxException {
         // Setup
         oidcConfig = new OidcConfig();
-        oidcConfig.setJwkKeySetUri(new URI("http://test.uri"));
+        oidcConfig.setJwkKeySetUrl(new URI("http://test.uri"));
         oidcConfig.setAccessTokenJwkAlgorithm(JWSAlgorithm.RS512);
 
         authBeans = new AuthBeans(oidcConfig);

@@ -1,84 +1,112 @@
 package io.fairspace.saturn;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.eventbus.EventBus;
+import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.auth.SecurityUtil;
+import io.fairspace.saturn.auth.VocabularyAuthorizationVerifier;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.rdf.Vocabulary;
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
-import io.fairspace.saturn.services.metadata.MetadataApp;
+import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.metadata.*;
+import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
+import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
+import io.fairspace.saturn.services.permissions.PermissionsApp;
+import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
-import static io.fairspace.saturn.rdf.SparqlUtils.setWorkspaceURI;
+import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
+import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
 public class App {
-    private static final Config config = loadConfig();
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
-        setWorkspaceURI(config.jena.baseIRI);
+        var userVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "user-vocabulary");
+        var systemVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "system-vocabulary");
+        var metaVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "meta-vocabulary");
 
-        var ds = SaturnDatasetFactory.connect(config.jena);
-        // The RDF connection is supposed to be threadsafe and can
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, userVocabularyGraphNode);
+
+        // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds);
 
-        var collections = new CollectionsService(rdf, SecurityUtil::userInfo);
-        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, new LocalBlobStore(new File(config.webDAV.blobStorePath)), SecurityUtil::userInfo, collections));
+        var eventBus = new EventBus();
+
+        var userService = new UserService(SecurityUtil::userInfo, new DAO(rdf, null));
+        Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
+        var mailService = new MailService(CONFIG.mail);
+
+        var permissions = new PermissionsServiceImpl(rdf, userService, mailService);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
+        var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
+        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions));
+
+        var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
+
+        // Setup and initialize vocabularies
+        var userVocabulary = Vocabulary.initializeVocabulary(rdf, userVocabularyGraphNode, "default-vocabularies/user-vocabulary.ttl");
+        var systemVocabulary = Vocabulary.recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
+        var metaVocabulary = Vocabulary.recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
+
+        var metadataValidator = new ComposedValidator(
+                new ProtectMachineOnlyPredicatesValidator(systemVocabulary),
+                new PermissionCheckingValidator(permissions, systemVocabulary, userVocabulary));
+
+        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
+        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
+        var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
+        var metaVocabularyService = new ReadableMetadataService(rdf, metaVocabularyGraphNode);
+
+        var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
         var fusekiServerBuilder = FusekiServer.create()
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
-                        new MetadataApp("/api/metadata", rdf, defaultGraphIRI),
-                        new MetadataApp("/api/vocabulary", rdf, createURI(config.jena.baseIRI + "vocabulary")),
+                        new ChangeableMetadataApp("/api/metadata", metadataService),
+                        new ChangeableMetadataApp("/api/vocabulary/user", userVocabularyService)
+                            .withAuthorizationVerifier("/api/vocabulary/user/*", vocabularyAuthorizationVerifier),
+                        new ReadableMetadataApp("/api/vocabulary/system", systemVocabularyService),
+                        new ReadableMetadataApp("/api/vocabulary/meta", metaVocabularyService),
                         new CollectionsApp(collections),
-                        //    new VocabularyApp(rdf),
+                        new PermissionsApp(permissions),
                         new HealthApp()))
                 .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
-                .port(config.port);
+                .port(CONFIG.port);
 
-        var auth = config.auth;
-        if (auth.enabled) {
-            var authenticator = createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm);
-            fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
+        var auth = CONFIG.auth;
+        if (!auth.enabled) {
+            log.warn("Authentication is disabled");
         }
+        var authenticator = auth.enabled ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm) : new DummyAuthenticator();
+        fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
 
         fusekiServerBuilder
                 .build()
                 .start();
 
-        log.info("Saturn is running on port " + config.port);
-        log.info("Access Fuseki at /rdf/");
-        log.info("Access Metadata at /api/metadata/");
-        log.info("Access Vocabulary API at /api/vocabulary/");
-        log.info("Access Collections API at /api/collections/");
-        log.info("Access WebDAV API at /webdav/");
-    }
-
-    private static Config loadConfig() {
-        var settingsFile = new File("application.yaml");
-        if (settingsFile.exists()) {
-            try {
-                return new ObjectMapper(new YAMLFactory()).readValue(settingsFile, Config.class);
-            } catch (IOException e) {
-                throw new RuntimeException("Error loading configuration", e);
-            }
-        }
-        return new Config();
+        log.info("Saturn has started");
     }
 }

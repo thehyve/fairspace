@@ -1,5 +1,7 @@
 package io.fairspace.saturn.vfs;
 
+import com.pivovarit.function.ThrowingSupplier;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,10 +86,10 @@ public class SafeFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void read(String path, long offset, long maxLength, OutputStream out) throws IOException {
+    public void read(String path, OutputStream out) throws IOException {
         var normalizedPath = normalizePath(path);
         safely(() -> {
-            unsafe.read(normalizedPath, offset, maxLength, out);
+            unsafe.read(normalizedPath, out);
             return null;
         });
     }
@@ -163,13 +165,13 @@ public class SafeFileSystem implements VirtualFileSystem {
         });
     }
 
-    private <T> T safely(UnsafeAction<T> action) throws IOException {
+    private <T> T safely(ThrowingSupplier<T, Exception> action) throws IOException {
         try {
-            return action.perform();
+            return action.get();
         } catch (IOException e) {
             throw e;
-        } catch (Throwable t) {
-            throw new IOException(t);
+        } catch (Exception e) {
+            throw new IOException(e);
         }
     }
 
@@ -177,10 +179,5 @@ public class SafeFileSystem implements VirtualFileSystem {
     public boolean exists(String path) throws IOException {
         var normalizedPath = normalizePath(path);
         return safely(() -> unsafe.exists(normalizedPath));
-    }
-
-    @FunctionalInterface
-    interface UnsafeAction<T> {
-        T perform() throws IOException;
     }
 }

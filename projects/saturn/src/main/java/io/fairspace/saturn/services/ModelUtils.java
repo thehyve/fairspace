@@ -12,15 +12,21 @@ import static org.apache.jena.riot.RDFFormat.JSONLD;
 
 @Slf4j
 public class ModelUtils {
+    public static final String JSON_LD_HEADER_STRING = JSONLD.getLang().getHeaderString();
+
     public static String toJsonLD(Model model) {
         var writer = new StringWriter();
         RDFDataMgr.write(writer, model, JSONLD);
         return writer.toString();
     }
 
-    public static Model fromJsonLD(String json) {
-        var model = createDefaultModel();
-        RDFDataMgr.read(model, new StringReader(json), null, JSONLD.getLang());
-        return model;
+    public static Model fromJsonLD(String json) throws PayloadParsingException {
+        try {
+            var model = createDefaultModel();
+            RDFDataMgr.read(model, new StringReader(json), null, JSONLD.getLang());
+            return model;
+        } catch (Exception e) {
+            throw new PayloadParsingException(e);
+        }
     }
 }

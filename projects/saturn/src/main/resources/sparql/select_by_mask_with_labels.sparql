@@ -7,9 +7,9 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 CONSTRUCT {
-?1 ?2 ?3 .
-?3 rdfs:label ?objectLabel . }
+%2$s %3$s %4$s .
+%4$s rdfs:label ?objectLabel . }
 WHERE {
-  GRAPH ?0 { ?1 ?2 ?3 }
-  OPTIONAL { GRAPH ?0  {?3 rdfs:label ?objectLabel} }
+  GRAPH %1$s { %2$s %3$s %4$s }
+  OPTIONAL { GRAPH %1$s  {%4$s rdfs:label ?objectLabel} }
 }

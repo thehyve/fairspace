@@ -1,10 +1,10 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Link from 'react-router-dom/Link';
-import {withStyles} from '@material-ui/core/styles';
-import Icon from '@material-ui/core/Icon';
+import {withRouter, Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
-import {withRouter} from "react-router-dom";
+import Button from '@material-ui/core/Button';
+import Icon from '@material-ui/core/Icon';
+import {withStyles} from '@material-ui/core/styles';
+
 import {flattenShallow} from "../../utils/arrayUtils";
 import menuitems from "../../menuitems";
 
@@ -61,7 +61,6 @@ const breadCrumbs = ({segments, match, classes, homeUrl}) => {
     // Ensure we only have the first part of the url
     let homePath = match.path;
     if (homePath !== '/') {
-        // eslint-disable-next-line prefer-template
         homePath = '/' + homePath.split('/')[1];
     }
     if (homeUrl) {
@@ -77,7 +76,6 @@ const breadCrumbs = ({segments, match, classes, homeUrl}) => {
         let currentPath = stripTrailingSlash(homePath);
         segments.forEach(segment => {
             if (segment.segment && segment.label) {
-                // eslint-disable-next-line prefer-template
                 currentPath += stripTrailingSlash('/' + segment.segment);
                 breadcrumbs.push(getBreadCrumbLink(segment.label, currentPath, classes.link));
             }

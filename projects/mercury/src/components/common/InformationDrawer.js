@@ -1,19 +1,24 @@
 import React from 'react';
 import {
-    ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails,
-    Paper, withStyles, Typography
+    ExpansionPanel,
+    ExpansionPanelDetails,
+    ExpansionPanelSummary,
+    Paper,
+    Typography,
+    withStyles
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "./CollectionDetails";
-import Metadata from "../metadata/Metadata";
+import MetadataEntityContainer from "../metadata/MetadataEntityContainer";
 import PathMetadata from "../metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
-import {canManage} from '../../utils/permissionUtils';
 import ErrorDialog from './ErrorDialog';
+import {getPathInfoFromParams} from "../../utils/fileUtils";
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection, locationChanged) => {
@@ -31,7 +36,7 @@ export class InformationDrawer extends React.Component {
 
     handleCollectionDelete = (collection) => {
         const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
-        deleteCollection(collection.iri)
+        deleteCollection(collection.iri, collection.location)
             .then(fetchCollectionsIfNeeded)
             .catch(err => ErrorDialog.showError(
                 err,
@@ -51,7 +56,10 @@ export class InformationDrawer extends React.Component {
                     const collection = Object.assign(this.props.collection, {name, description, location});
                     this.handleDetailsChange(collection, locationChanged);
                 })
-                .catch(e => ErrorDialog.showError(e, "An error occurred while updating collection metadata"));
+                .catch(err => {
+                    const message = err && err.message ? err.message : "An error occurred while creating a collection";
+                    ErrorDialog.showError(err, message);
+                });
         }
 
         return Promise.resolve();
@@ -64,7 +72,7 @@ export class InformationDrawer extends React.Component {
             return <Typography variant="h6">Please select a collection..</Typography>;
         }
 
-        const isMetaDataEditable = canManage(collection) && this.props.paths.length === 0;
+        const isMetaDataEditable = collection && collection.canManage && this.props.paths.length === 0;
         const relativePath = path => path.split('/').slice(2).join('/');
 
         return (
@@ -76,10 +84,9 @@ export class InformationDrawer extends React.Component {
                     loading={loading}
                 />
                 <Paper style={{padding: 20, marginTop: 10}}>
-                    <Metadata
+                    <MetadataEntityContainer
                         subject={collection.iri}
                         editable={isMetaDataEditable}
-                        style={{width: '100%'}}
                     />
                 </Paper>
                 {
@@ -101,7 +108,7 @@ export class InformationDrawer extends React.Component {
                             <ExpansionPanelDetails>
                                 <PathMetadata
                                     path={path}
-                                    editable={canManage(collection) && path === this.props.paths[this.props.paths.length - 1]}
+                                    editable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
                                     style={{width: '100%'}}
                                 />
                             </ExpansionPanelDetails>
@@ -123,15 +130,23 @@ function pathHierarchy(fullPath) {
     return paths.reverse();
 }
 
-const mapStateToProps = ({cache: {collections, users}, collectionBrowser: {selectedCollectionIRI, openedPath, selectedPaths}}) => ({
-    collection: collections.data && collections.data.find(c => c.iri === selectedCollectionIRI),
-    paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
-    loading: users.pending
-});
+const mapStateToProps = ({cache: {collections, users},
+    collectionBrowser: {selectedPaths, selectedCollectionLocation}}, ownProps) => {
+    const {match: {params}} = ownProps;
+    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
+    const location = collectionLocation || selectedCollectionLocation;
+    const collection = (collections.data && collections.data.find(c => c.location === location));
+
+    return {
+        collection,
+        paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
+        loading: users.pending
+    };
+};
 
 const mapDispatchToProps = {
     ...metadataActions,
     ...collectionActions
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer)));

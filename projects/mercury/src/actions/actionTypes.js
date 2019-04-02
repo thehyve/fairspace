@@ -14,10 +14,10 @@ export const CLIPBOARD_PASTE_FULFILLED              = 'CLIPBOARD_PASTE_FULFILLED
 export const CLIPBOARD_PASTE_REJECTED               = 'CLIPBOARD_PASTE_REJECTED';
 
 // Collection browser
-export const OPEN_COLLECTION                        = 'OPEN_COLLECTION';
 export const SELECT_COLLECTION                      = 'SELECT_COLLECTION';
-export const OPEN_PATH                              = 'OPEN_PATH';
 export const SELECT_PATH                            = 'SELECT_PATH';
+export const SET_SELECTED_PATHS                     = 'SET_SELECTED_PATHS';
+export const DESELECT_ALL_PATHS                     = 'DESELECT_ALL_PATHS';
 export const DESELECT_PATH                          = 'DESELECT_PATH';
 
 // Collections

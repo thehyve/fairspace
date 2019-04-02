@@ -3,7 +3,7 @@ buildscript {
         jena_version = '3.10.0'
         milton_version = '2.7.4.4'
         mockitoVersion = '2.23.0'
-        jacksonVersion = '2.9.6'
+        jacksonVersion = '2.9.8'
     }
 }
 
@@ -12,8 +12,8 @@ plugins {
     id 'io.franzbecker.gradle-lombok' version '2.0'
     id 'application'
     id 'jacoco'
+    id  'com.github.spotbugs' version '1.6.10'
 }
-
 
 group 'io.fairspace'
 version '1.0-SNAPSHOT'
@@ -36,27 +36,46 @@ repositories {
 }
 
 dependencies {
-    compile "org.apache.jena:jena-fuseki-main:${jena_version}"
-    compile "org.apache.jena:jena-text:${jena_version}"
-    compile "org.apache.jena:jena-text-es:${jena_version}"
-    compile "io.milton:milton-server-ce:${milton_version}"
-    compile 'com.nimbusds:nimbus-jose-jwt:5.7'
-    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-    compile "com.sparkjava:spark-core:2.7.2"
+    implementation "org.apache.jena:jena-fuseki-main:${jena_version}"
+    implementation "org.apache.jena:jena-text:${jena_version}"
+    implementation "org.apache.jena:jena-text-es:${jena_version}"
+    implementation "io.milton:milton-server-ce:${milton_version}"
+    implementation 'com.nimbusds:nimbus-jose-jwt:5.7'
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    implementation "com.sparkjava:spark-core:2.7.2"
+    implementation 'com.pivovarit:throwing-function:1.5.0'
+    implementation 'com.google.guava:guava:27.1-jre'
 
-    testCompile "junit:junit:4.12"
-    testCompile "org.mockito:mockito-core:${mockitoVersion}"
-    testCompile group: 'com.mockrunner', name: 'mockrunner', version: '2.0.1', ext: 'pom'
-    testCompile(group: 'com.mockrunner', name: 'mockrunner-servlet', version: '2.0.1') {
+    testImplementation "junit:junit:4.12"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation group: 'com.mockrunner', name: 'mockrunner', version: '2.0.1', ext: 'pom'
+    testImplementation(group: 'com.mockrunner', name: 'mockrunner-servlet', version: '2.0.1') {
         exclude group: 'org.apache.tomcat'
     }
-    testCompile 'com.github.stefanbirkner:system-rules:1.19.0'
+    testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 }
 
 jacocoTestReport {
     reports {
         xml.enabled false
         csv.enabled true
+    }
+}
+
+apply plugin: 'com.github.spotbugs'
+
+spotbugs {
+  toolVersion = '3.1.12'
+  effort = "max"
+  reportLevel = "low"
+  ignoreFailures = true
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
     }
 }

@@ -1,4 +1,4 @@
-import {format} from 'util';
+import queryString from 'query-string';
 import Config from './Config/Config';
 import failOnHttpError from "../utils/httpUtils";
 
@@ -9,12 +9,11 @@ class PermissionAPI {
 
     /**
      * Retrieves a list of permissions for a specific collection.
-     * @param collectionId The id of the collection.
+     * @param iri The id of the resource.
      * @returns A Promise returning an array of user permissions, not including users with None permissions.
      */
-    getCollectionPermissions(collectionId, useCache = true) {
-        const url = format(Config.get().urls.permissionsByCollectionId, collectionId);
-        return fetch(url, {
+    getPermissions(iri, useCache = true) {
+        return fetch(`${Config.get().urls.permissions}?${queryString.stringify({iri, all: true})}`, {
             method: 'GET',
             header: PermissionAPI.getHeaders,
             credentials: 'same-origin',
@@ -24,22 +23,19 @@ class PermissionAPI {
             .then(response => response.json());
     }
 
-    alterCollectionPermission(userId, collectionId, access) {
-        if (!userId || !collectionId || !access) {
-            return Promise.reject(Error("No userId, collectionId or access given"));
+    alterPermission(userIri, iri, access) {
+        if (!userIri || !iri || !access) {
+            return Promise.reject(Error("No userIri, IRI or access given"));
         }
-        return fetch(Config.get().urls.permissions, {
+        const payload = {user: userIri, access};
+        return fetch(`${Config.get().urls.permissions}?${queryString.stringify({iri})}`, {
             method: 'PUT',
             headers: PermissionAPI.changeHeaders,
             credentials: 'same-origin',
-            body: JSON.stringify({subject: userId, collection: collectionId, access})
+            body: JSON.stringify(payload)
         })
-            .then(failOnHttpError("Failure while alter a collection's permission"))
-            .then(response => response.json());
-    }
-
-    removeUserFromCollectionPermission(userId, collectionId) {
-        return this.alterCollectionPermission(userId, collectionId, 'None');
+            .then(failOnHttpError("Failure while altering a collection's permission"))
+            .then(res => res.json());
     }
 }
 

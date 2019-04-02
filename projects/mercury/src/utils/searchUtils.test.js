@@ -2,7 +2,7 @@ import {buildSearchUrl, getSearchTypeFromString, getSearchQueryFromString} from 
 
 describe('Search Utilities', () => {
     it('should build correct search url', () => {
-        const url = buildSearchUrl('collections', 'findings');
+        const url = buildSearchUrl('findings', 'collections');
         expect(url).toBe('/search?q=findings&type=collections');
     });
 
@@ -17,7 +17,7 @@ describe('Search Utilities', () => {
     });
 
     it('should build string even when query is missing', () => {
-        const url = buildSearchUrl('randomType', '');
+        const url = buildSearchUrl('', 'randomType');
         expect(url).toBe('/search?q=&type=randomType');
     });
 

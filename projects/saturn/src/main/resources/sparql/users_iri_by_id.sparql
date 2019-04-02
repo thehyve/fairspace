@@ -1,0 +1,6 @@
+# 0 - external id
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+SELECT ?iri
+WHERE { ?iri a fs:User; fs:externalId %1$s }

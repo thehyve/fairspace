@@ -37,7 +37,7 @@ public class TxnLogDatasetGraphTest {
     @Before
     public void before() {
         ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log,
-                () -> new UserInfo("userId", "userName", "fullName", null),
+                () -> new UserInfo("userId", "userName", "fullName", "email", null),
                 () -> "message"));
     }
 

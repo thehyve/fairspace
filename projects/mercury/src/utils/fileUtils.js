@@ -17,8 +17,8 @@ export const getBaseNameAndExtension = (fileName) => {
     return {baseName, extension};
 };
 
-export function generateUniqueFileName(fileName, usedNames) {
-    if (!usedNames.includes(fileName)) {
+export function generateUniqueFileName(fileName, usedNames = []) {
+    if (!usedNames || !usedNames.includes(fileName)) {
         return fileName;
     }
 
@@ -85,3 +85,10 @@ export function getDirectoryFromFullpath(path) {
 
     return cleanedPath.substring(firstSlashPosition);
 }
+
+export const getPathInfoFromParams = ({collection, path}) => (
+    {
+        collectionLocation: collection,
+        openedPath: `/${collection || ''}${path ? `/${path}` : ''}`
+    }
+);

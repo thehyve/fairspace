@@ -7,13 +7,12 @@ import {
 } from "../common";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
-import {canWrite} from '../../utils/permissionUtils';
 import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
-    handlePathClick = (path) => {
-        const {selectPath, deselectPath} = this.props;
-        const isPathSelected = this.props.selectedPaths.some(el => el === path.filename);
+    handlePathCheckboxClick = (path) => {
+        const {selectedPaths, selectPath, deselectPath} = this.props;
+        const isPathSelected = selectedPaths.some(el => el === path.filename);
 
         // If this path is already selected, deselect
         if (isPathSelected) {
@@ -23,11 +22,19 @@ class FileBrowser extends React.Component {
         }
     }
 
+    // A highlighting of a path means only this path would be selected/checked
+    handlePathHighlight = (path) => {
+        const {onDeselectAll, selectPath} = this.props;
+
+        onDeselectAll();
+        selectPath(path.filename);
+    }
+
     handlePathDoubleClick = (path) => {
         if (path.type === 'directory') {
             this.openDir(path.filename);
         } else {
-            this.downloadFile(path.filename);
+            FileAPI.open(path.filename);
         }
     }
 
@@ -58,15 +65,13 @@ class FileBrowser extends React.Component {
 
     openDir(path) {
         this.props.history.push(`/collections${path}`);
-        this.props.openPath(path);
-    }
-
-    downloadFile(path) {
-        FileAPI.download(path);
     }
 
     render() {
-        const {loading, error, openedCollection, files, selectedPaths, openedPath} = this.props;
+        const {
+            loading, error, openedCollection, files = [], selectedPaths, openedPath,
+            fetchFilesIfNeeded, onSelectAll, onDeselectAll,
+        } = this.props;
         const collectionExists = openedCollection && openedCollection.iri;
 
         if (error) {
@@ -77,28 +82,45 @@ class FileBrowser extends React.Component {
             return <LoadingInlay />;
         }
 
+        const filesWithSelectionState = files.map(item => ({
+            item,
+            selected: selectedPaths.includes(item.filename)
+        }));
+
+        const allSelectionChangeHandler = (selectAll) => {
+            if (selectAll) {
+                onSelectAll();
+            } else {
+                onDeselectAll();
+            }
+        };
+
         return (
             <>
                 {collectionExists
                     ? (
                         <FileList
-                            files={files}
-                            selectedPaths={selectedPaths}
-                            onPathClick={this.handlePathClick}
+                            selectionEnabled
+                            files={filesWithSelectionState}
+                            onPathCheckboxClick={this.handlePathCheckboxClick}
+                            onPathHighlight={this.handlePathHighlight}
                             onPathDoubleClick={this.handlePathDoubleClick}
-                            onRename={this.handlePathRename}
-                            onDelete={this.handlePathDelete}
-                            readonly={!canWrite(openedCollection)}
+                            onAllSelection={allSelectionChangeHandler}
                         />
                     ) : 'Collection does not exist.'
                 }
-                <FileOperations
-                    openedCollection={openedCollection}
-                    openedPath={openedPath}
-                    disabled={!canWrite(openedCollection)}
-                    existingFiles={this.props.files ? this.props.files.map(file => file.basename) : []}
-                    fetchFilesIfNeeded={this.props.fetchFilesIfNeeded}
-                />
+                <div style={{marginTop: 8}}>
+                    <FileOperations
+                        openedCollection={openedCollection}
+                        openedPath={openedPath}
+                        onRename={this.handlePathRename}
+                        onDelete={this.handlePathDelete}
+                        disabled={!openedCollection.canWrite}
+                        existingFiles={files ? files.map(file => file.basename) : []}
+                        fetchFilesIfNeeded={fetchFilesIfNeeded}
+                        getDownloadLink={FileAPI.getDownloadLink}
+                    />
+                </div>
             </>
         );
     }

@@ -1,56 +1,53 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
-  domain: hyperspace.test.fairway.app
-  locationOverrides:
-    keycloak: https://cbioportal-fairspace.thehyve.net:8443
+  domain: hyperspace.test.fairspace.app
   keycloak:
     username: keycloak
-    password: keycloak-ci-123
-    realm: cbio
-    clientSecret: baf559f1-1926-44c2-95c9-b635639918b0
+    password: yJH7qVjAQ469MVNBR9L5
+    realm: test
+    clientSecret: db67da94-fa31-47cd-8c42-0ed295790841
 
 # Settings for the workspace
 workspace:
   ingress:
-    domain: workspace.test.fairway.app
+    domain: workspace.test.fairspace.app
     tls:
       certificate:
-        dns01Provider: azuredns-test
-  configurationScripts:
-    keycloak:
-      enabled: false
+        dns01Provider: gke
 
+# Specific settings for Pluto subchart
 pluto:
-  image:
-    pullPolicy: Always
+  keycloak:
+    baseUrl: https://keycloak.hyperspace.test.fairspace.app
+    realm: test
+  tracing:
+    enabled: false
+  services:
+    jupyter: https://jupyterhub.workspace.test.fairspace.app
 
 # Specific settings for Saturn subchart
 saturn:
 
-# Specific settings for Mercury subchart
 mercury:
-  image:
-    pullPolicy: Always
-
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
   rbac:
-    enabled: false
+    enabled: true
   auth:
-      custom:
-          config:
-              client_id: workspace-test-pluto
-              client_secret: baf559f1-1926-44c2-95c9-b635639918b0
-              openid_url: https://cbioportal-fairspace.thehyve.net:8443/auth/realms/cbio/protocol/openid-connect/
-              session_url: https://workspace.test.fairway.app/account/tokens
+    custom:
+      config:
+        client_id: workspace-pluto
+        client_secret: db67da94-fa31-47cd-8c42-0ed295790841
+        openid_url: https://keycloak.hyperspace.test.fairspace.app/auth/realms/test/protocol/openid-connect/
+        session_url: https://workspace.test.fairspace.app/account/tokens
   singleuser:
     image:
-      tag: 0.5.3-SNAPSHOT-simple
+      tag: 0.5.6-simple
     extraEnv:
-      WORKSPACE_URL: https://workspace.test.fairway.app
+      WORKSPACE_URL: https://storage.workspace.test.fairspace.app
   hub:
-      extraEnv:
-          JUPYTERHUB_CRYPT_KEY: 347947239749dbea93432379223064342aa5754843349978ef78978954397836
+    extraEnv:
+      JUPYTERHUB_CRYPT_KEY: 8232144c8cba2105c71ee2f0e28158f2cc4417bfd103764017422393619208fe
   proxy:
-      secretToken: "505043750470347507534554340b45754037a4840482308908e985805208093a"
+    secretToken: "a09ebe4bd113e5bded426a1335e3f61f53850a395705563b20115bf717a11c93"

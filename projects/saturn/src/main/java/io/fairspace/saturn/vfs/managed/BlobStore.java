@@ -7,5 +7,6 @@ import java.io.OutputStream;
 public interface BlobStore {
     String write(InputStream in) throws IOException;
 
-    void read(String id, long offset, long maxLength, OutputStream out) throws IOException;
+    void read(String id, OutputStream out) throws IOException;
+
 }

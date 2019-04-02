@@ -7,18 +7,21 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.query.text.es.ESSettings;
 
 import java.io.File;
+import java.util.Properties;
 
 public class Config {
     public int port = 8080;
 
-    public Jena jena = new Jena();
+    public final Jena jena = new Jena();
 
-    public Auth auth = new Auth();
+    public final Auth auth = new Auth();
 
-    public WebDAV webDAV = new WebDAV();
+    public final WebDAV webDAV = new WebDAV();
+
+    public final Properties mail = new Properties();
 
     public static class Jena {
-        public String baseIRI = "http://fairspace.io/iri/";
+        public String baseIRI = "http://localhost/iri/";
 
         public File datasetPath = new File("data/db");
 
@@ -42,6 +45,8 @@ public class Config {
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
         public String jwtAlgorithm = "RS256";
+
+        public String dataStewardRole = "datasteward";
     }
 
     public static class WebDAV {

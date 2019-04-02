@@ -2,6 +2,7 @@ import React from 'react';
 import {isDateTimeProperty} from "../../../utils/metadataUtils";
 import DateTime from "../../common/DateTime";
 import {RESOURCE_URI} from "../../../constants";
+import MetadataLink from "../MetadataLink";
 
 function linkLabel(link) {
     return link
@@ -17,13 +18,13 @@ const ReferringValue = ({property, entry}) => {
         return extractedVal;
     }
 
-    const displayValue = (property.range === RESOURCE_URI) ? entry.id : extractDisplayValue(entry);
+    const displayValue = (property.className === RESOURCE_URI) ? entry.id : extractDisplayValue(entry);
 
     if (entry.id) {
         return (
-            <a href={entry.id}>
+            <MetadataLink uri={entry.id}>
                 {displayValue}
-            </a>
+            </MetadataLink>
         );
     }
     return displayValue;

@@ -10,7 +10,7 @@ import CollectionBrowser from "./CollectionBrowser";
 import Config from "../../services/Config/Config";
 import * as actionTypes from "../../actions/actionTypes";
 
-const middlewares = [thunk, promiseMiddleware()];
+const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 let store;
@@ -72,9 +72,18 @@ it('dispatch an action on collection save', () => {
     const addButton = wrapper.find('[aria-label="Add"]').first();
     addButton.simulate('click');
 
-    const saveButton = wrapper.find('[aria-label="Save"]').first();
+    const nameField = wrapper.find('input#name').first();
+    nameField.simulate('focus');
+    nameField.simulate('change', {target: {value: 'New collection'}});
+
+    const locationField = wrapper.find('input#location').first();
+    locationField.simulate('focus');
+    locationField.simulate('change', {target: {value: 'new-collection'}});
+
+    const saveButton = wrapper.find('button[aria-label="Save"]').first();
     saveButton.simulate('click');
 
+    expect(store.getActions().length).toEqual(1);
     expect(store.getActions()[0].type).toBe(actionTypes.ADD_COLLECTION_PENDING);
 });
 
