@@ -152,32 +152,12 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void copy(String from, String to) throws IOException {
-        var normalizedFrom = normalizePath(from);
-        var normalizedTo = normalizePath(to);
-        ensureValidPath(normalizedFrom);
-        ensureValidPath(normalizedTo);
-        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
-            throw new FileAlreadyExistsException("Cannot copy a file or a directory to itself");
-        }
-        commit("Copy data from " + normalizedFrom + " to " + normalizedTo, rdf, () -> {
-            ensureCanCreate(normalizedTo);
-            rdf.update(storedQuery("fs_copy", normalizedFrom, normalizedTo, name(normalizedTo)));
-        });
+        copyOrMove(false, from, to);
     }
 
     @Override
     public void move(String from, String to) throws IOException {
-        var normalizedFrom = normalizePath(from);
-        var normalizedTo = normalizePath(to);
-        ensureValidPath(normalizedFrom);
-        ensureValidPath(normalizedTo);
-        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
-            throw new FileAlreadyExistsException("Cannot move a file or a directory to itself");
-        }
-        commit("Move data from " + normalizedFrom + " to " + normalizedTo, rdf, () -> {
-            ensureCanCreate(normalizedTo);
-            rdf.update(storedQuery("fs_move", normalizedFrom, normalizedTo, name(normalizedTo)));
-        });
+        copyOrMove(true, from, to);
     }
 
     @Override
@@ -243,6 +223,21 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     static boolean isCollection(String path) {
         return !path.isEmpty() && splitPath(path).length == 1;
+    }
+
+    private void copyOrMove(boolean move, String from, String to) throws IOException {
+        var verb = move ? "move" : "copy";
+        var normalizedFrom = normalizePath(from);
+        var normalizedTo = normalizePath(to);
+        ensureValidPath(normalizedFrom);
+        ensureValidPath(normalizedTo);
+        if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
+            throw new FileAlreadyExistsException("Cannot" + verb + "a file or a directory to itself");
+        }
+        commit(verb + " data from " + normalizedFrom + " to " + normalizedTo, rdf, () -> {
+            ensureCanCreate(normalizedTo);
+            rdf.update(storedQuery("fs_" + verb, normalizedFrom, normalizedTo, name(normalizedTo)));
+        });
     }
 
     private void ensureCanCreate(String normalizedPath) throws IOException {
