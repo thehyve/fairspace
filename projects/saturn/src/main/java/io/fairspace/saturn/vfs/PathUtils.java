@@ -1,14 +1,10 @@
 package io.fairspace.saturn.vfs;
 
+import static org.apache.commons.lang3.StringUtils.strip;
+
 public class PathUtils {
     public static String normalizePath(String path) {
-        if (path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        if (path.endsWith("/")) {
-            path = path.substring(0, path.length() - 1);
-        }
-        return path;
+        return strip(path, "/");
     }
 
     public static String[] splitPath(String path) {
