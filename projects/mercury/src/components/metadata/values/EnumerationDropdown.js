@@ -1,7 +1,7 @@
 import React from 'react';
 import Dropdown from "./Dropdown";
 
-function ControlledVocabularyDropdown(props) {
+function EnumerationDropdown(props) {
     return (
         <Dropdown
             entities={props.property.allowedValues}
@@ -10,4 +10,4 @@ function ControlledVocabularyDropdown(props) {
     );
 }
 
-export default ControlledVocabularyDropdown;
+export default EnumerationDropdown;

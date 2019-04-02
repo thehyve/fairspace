@@ -9,13 +9,13 @@ import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
 import ResourceValue from "./ResourceValue";
 import EntityDropdown from "./EntityDropdown";
-import ControlledVocabularyDropdown from "./ControlledVocabularyDropdown";
+import EnumerationDropdown from "./EnumerationDropdown";
 
 const getInputComponent = (property) => {
-    // If the property has a restricted vocabulary
+    // If the property has a restricted set of allowed values
     // show a dropdown with these values
     if (property.allowedValues) {
-        return ControlledVocabularyDropdown;
+        return EnumerationDropdown;
     }
 
     // The datatype determines the type of input element
