@@ -21,7 +21,7 @@ public class Config {
     public final Properties mail = new Properties();
 
     public static class Jena {
-        public String baseIRI = "http://fairspace.io/iri/";
+        public String baseIRI = "http://localhost/iri/";
 
         public File datasetPath = new File("data/db");
 

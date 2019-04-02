@@ -49,6 +49,10 @@ public class SparqlUtils {
         return createURI(CONFIG.jena.baseIRI + randomUUID());
     }
 
+    public static Node generateIri(String id) {
+        return createURI(CONFIG.jena.baseIRI + id);
+    }
+
     public static Instant parseXSDDateTimeLiteral(Literal literal) {
         return Instant.ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
     }

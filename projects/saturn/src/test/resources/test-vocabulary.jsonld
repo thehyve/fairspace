@@ -18,7 +18,6 @@
         {
             "@id": "foaf:Person",
             "@type": "rdf:Class",
-            "fs:classInfix": "persons",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "A person that is subject of research.",
             "rdfs:label": "Person"
@@ -26,7 +25,6 @@
         {
             "@id": "fs:PersonConsent",
             "@type": "rdf:Class",
-            "fs:classInfix": "person-consents",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "A research consent given by person.",
             "rdfs:label": "Person Consent"
@@ -34,7 +32,6 @@
         {
             "@id": "fs:ResearchProject",
             "@type": "rdf:Class",
-            "fs:classInfix": "research-projects",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "A research project.",
             "rdfs:label": "Research Project"
@@ -42,7 +39,6 @@
         {
             "@id": "fs:File",
             "@type": "rdf:Class",
-            "fs:classInfix": "files",
             "fs:fairspaceEntity": false,
             "rdfs:comment": "A single file.",
             "rdfs:label": "File"
@@ -57,7 +53,6 @@
         {
             "@id": "fs:Collection",
             "@type": "rdf:Class",
-            "fs:classInfix": "collections",
             "fs:fairspaceEntity": false,
             "rdfs:comment": "A specific collection in Fairspace.",
             "rdfs:label": "Collection"
@@ -65,7 +60,6 @@
         {
             "@id": "fs:User",
             "@type": "rdf:Class",
-            "fs:classInfix": "users",
             "fs:fairspaceEntity": false,
             "rdfs:comment": "A user of the fairspace application.",
             "rdfs:label": "User"
@@ -73,7 +67,6 @@
         {
             "@id": "osiris:TumorPathologyEvent",
             "@type": "rdf:Class",
-            "fs:classInfix": "tumor-pathology-events",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "A specific tumor event.",
             "rdfs:label": "Tumor Pathology Event"
@@ -81,7 +74,6 @@
         {
             "@id": "osiris:BiologicalSample",
             "@type": "rdf:Class",
-            "fs:classInfix": "biological-samples",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "Sample provided by a patient.",
             "rdfs:label": "Biological Sample"
@@ -89,7 +81,6 @@
         {
             "@id": "fs:Analysis",
             "@type": "rdf:Class",
-            "fs:classInfix": "analyses",
             "fs:fairspaceEntity": true,
             "rdfs:comment": "A specific analysis that produced data.",
             "rdfs:label": "Analysis"

@@ -242,7 +242,7 @@ saturn:
       mountPath: /data
 
   mail:
-    mail.from: info@fairspace.com
+    mail.from: info@fairspace.io
     mail.user: user
     mail.password: password
     mail.transport.protocol: smtp

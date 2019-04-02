@@ -29,7 +29,7 @@ saturn:
   image:
     pullPolicy: Always
   mail:
-    mail.from: info@fairspace.com
+    mail.from: pavel@thehyve.nl
     mail.user: AKIAISXHGXUIMMU75YVA
     mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
     mail.transport.protocol: smtp

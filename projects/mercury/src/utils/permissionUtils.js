@@ -1,22 +1,15 @@
 import {compareBy, comparing} from "./comparisionUtils";
 
-export const MANAGE = 'Manage';
-export const WRITE = 'Write';
-export const READ = 'Read';
+export const AccessRights = ['Read', 'Write', 'Manage'];
 
-export const canWrite = (collection) => collection
-    && (collection.access === MANAGE || collection.access === WRITE);
-
-export const canManage = (collection) => collection && collection.access === MANAGE;
-
-const permissionLevel = p => ({Manage: 0, Write: 1, Read: 2}[p.access]);
+const permissionLevel = p => AccessRights.indexOf(p.access);
 
 export const sortPermissions = (permissions) => {
     if (!permissions) {
         return [];
     }
 
-    return permissions.sort(comparing(compareBy(permissionLevel), compareBy('subject')));
+    return permissions.sort(comparing(compareBy(permissionLevel,  false), compareBy('userName')));
 };
 
 /**
@@ -25,6 +18,6 @@ export const sortPermissions = (permissions) => {
  * - permission is not his/hers
  */
 export const canAlterPermission = (userCanManage, permission, currentLoggedUser) => {
-    const isSomeoneElsePermission = currentLoggedUser.id !== permission.subject;
+    const isSomeoneElsePermission = currentLoggedUser.iri !== permission.user;
     return userCanManage && isSomeoneElsePermission;
 };
