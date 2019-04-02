@@ -131,8 +131,11 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
         commit("Modify file " + path, rdf, () -> {
             var info = stat(normalizedPath);
-            if (info == null || info.isDirectory()) {
+            if (info == null) {
                 throw new FileNotFoundException(normalizedPath);
+            }
+            if (info.isDirectory()) {
+                throw new IOException("Expected a file: " + normalizedPath);
             }
             if (info.isReadOnly()) {
                 throw new IOException("File is read-only: " + normalizedPath);
@@ -232,7 +235,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(normalizedFrom);
         ensureValidPath(normalizedTo);
         if (normalizedFrom.equals(normalizedTo) || normalizedTo.startsWith(normalizedFrom + '/')) {
-            throw new FileAlreadyExistsException("Cannot" + verb + "a file or a directory to itself");
+            throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
         commit(verb + " data from " + normalizedFrom + " to " + normalizedTo, rdf, () -> {
             ensureCanCreate(normalizedTo);
