@@ -31,9 +31,13 @@ public class VocabularyTest {
     private static final Resource resource1 = createResource("http://property1");
     private static final Resource resource2 = createResource("http://property2");
     private static final Resource resource3 = createResource("http://property3");
+    private static final Resource shape1 = createResource("http://shape1");
+    private static final Resource shape2 = createResource("http://shape2");
+    private static final Resource shape3 = createResource("http://shape3");
     private static final Resource unknownResource = createResource("http://unknown-resource.com");
     private static final Property machineOnly = createProperty("http://fairspace.io/ontology#machineOnly");
     private static final Resource CLASS_RESOURCE = createResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#Class");
+    private static final Property SHACL_PATH = createProperty("http://www.w3.org/ns/shacl#path");
 
     private Vocabulary vocabulary;
     private Model vocabularyModel;
@@ -143,12 +147,12 @@ public class VocabularyTest {
         vocabulary = Vocabulary.initializeVocabulary(rdf, VOCABULARY_URI, "empty-vocabulary.jsonld");
 
         // Setup model
-        vocabularyModel.add(resource1, RDF.type, RDF.Property);
-        vocabularyModel.add(resource2, RDF.type, RDF.Property);
-        vocabularyModel.add(resource3, RDF.type, RDF.Property);
+        vocabularyModel.add(shape1, SHACL_PATH, resource1);
+        vocabularyModel.add(shape2, SHACL_PATH, resource2);
+        vocabularyModel.add(shape3, SHACL_PATH, resource3);
 
-        vocabularyModel.add(resource1, machineOnly, createTypedLiteral(false));
-        vocabularyModel.add(resource2, machineOnly, createTypedLiteral(true));
+        vocabularyModel.add(shape1, machineOnly, createTypedLiteral(false));
+        vocabularyModel.add(shape2, machineOnly, createTypedLiteral(true));
     }
 
 }
