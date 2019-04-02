@@ -30,12 +30,12 @@ fs:FileShape a fs:ClassShape ;
         fs:fileSizeShape,
         fs:md5Shape,
         fs:filePathShape,
-        fs:creatorShape,
+        fs:createdByShape,
         fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        fs:dateModifiedShape,
-        fs:modifiedByShape,
         rdfs:labelShape,
         rdfs:commentShape .
 
@@ -50,12 +50,12 @@ fs:DirectoryShape a fs:ClassShape ;
         fs:aboutMaterialShape,
         fs:associatedAnalysisShape,
         fs:filePathShape,
-        fs:creatorShape,
+        fs:createdByShape,
         fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        fs:dateModifiedShape,
-        fs:modifiedByShape,
         rdfs:labelShape,
         rdfs:commentShape .
 
@@ -71,12 +71,12 @@ fs:CollectionShape a fs:ClassShape ;
         fs:aboutMaterialShape,
         fs:partOfProjectShape,
         fs:filePathShape,
-        fs:creatorShape,
+        fs:createdByShape,
         fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        fs:dateModifiedShape,
-        fs:modifiedByShape,
         rdfs:labelShape,
         rdfs:commentShape .
 
@@ -228,4 +228,4 @@ fs:Directory a fs:Class ;
     rdfs:subClassOf fs:File .
 
 fs:dateCreated a rdf:Property .
-fs:creator a rdf:Property .
+fs:createdBy a rdf:Property .
