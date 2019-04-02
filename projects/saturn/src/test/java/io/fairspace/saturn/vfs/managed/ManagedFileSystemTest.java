@@ -95,6 +95,11 @@ public class ManagedFileSystemTest {
     }
 
     @Test
+    public void statNonExisting() throws IOException {
+        assertNull(fs.stat("coll/aaa"));
+    }
+
+    @Test
     public void list() throws IOException {
         assertEquals(1, fs.list("").size());
         assertEquals("coll", fs.list("").get(0).getPath());
@@ -126,6 +131,11 @@ public class ManagedFileSystemTest {
     }
 
     @Test(expected = IOException.class)
+    public void collectionsCannotBeCreatedWithMkdir() throws IOException {
+        fs.mkdir("collx");
+    }
+
+    @Test(expected = IOException.class)
     public void cannotCreateADirectoryTwice() throws IOException {
         fs.mkdir("coll/aaa");
         fs.mkdir("coll/aaa");
@@ -152,6 +162,17 @@ public class ManagedFileSystemTest {
         if (!Arrays.equals(content2, os.toByteArray())) {
             assertArrayEquals(content2, os.toByteArray());
         }
+    }
+
+    @Test(expected = IOException.class)
+    public void modifyANonExistingFile() throws IOException {
+        fs.modify("coll/file", new ByteArrayInputStream(content2));
+    }
+
+    @Test(expected = IOException.class)
+    public void modifyADirectory() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.modify("coll/dir", new ByteArrayInputStream(content2));
     }
 
     @Test(expected = IOException.class)

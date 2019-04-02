@@ -182,7 +182,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void close() throws IOException {
-
     }
 
     @Subscribe
@@ -253,9 +252,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     private static void ensureValidPath(String path) throws IOException {
-        if (!path.equals(normalizePath(path))) {
-            throw new AssertionError("Invalid path format: " + path);
-        }
         if (path.isEmpty()) {
             throw new AccessDeniedException("File operations on the root directory are not allowed");
         }
