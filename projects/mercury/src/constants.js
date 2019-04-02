@@ -34,6 +34,7 @@ export const SHACL_CLASS = SHACL_NS + 'class';
 export const SHACL_DATATYPE = SHACL_NS + 'datatype';
 export const SHACL_MAX_COUNT = SHACL_NS + 'maxCount';
 export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
+export const SHACL_IN = SHACL_NS + 'in';
 
 export const STRING_URI = XMLSCHEMA_NS + 'string';
 export const BOOLEAN_URI = XMLSCHEMA_NS + 'boolean';

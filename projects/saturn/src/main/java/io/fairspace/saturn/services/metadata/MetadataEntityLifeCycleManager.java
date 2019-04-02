@@ -8,6 +8,7 @@ import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -121,7 +122,9 @@ class MetadataEntityLifeCycleManager {
         Set<String> modelUris = new HashSet<>();
 
         model.listStatements().forEachRemaining(statement -> {
-            modelUris.add(statement.getSubject().getURI());
+            if (statement.getSubject().isURIResource()) {
+                modelUris.add(statement.getSubject().getURI());
+            }
             if (statement.getObject().isURIResource()) {
                 modelUris.add(statement.getResource().getURI());
             }

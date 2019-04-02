@@ -1,8 +1,11 @@
 import {compareBy, comparing} from "../utils/comparisionUtils";
 import * as constants from "../constants";
-import {SHACL_DESCRIPTION, SHACL_NAME} from "../constants";
-import {getFirstPredicateId, getFirstPredicateValue, getLabel} from "../utils/metadataUtils";
-import {STRING_URI} from "../constants";
+import {
+    getFirstPredicateId,
+    getFirstPredicateList,
+    getFirstPredicateValue,
+    getLabel
+} from "../utils/metadataUtils";
 
 class Vocabulary {
     /**
@@ -203,8 +206,8 @@ class Vocabulary {
             const shape = this.determineShapeForType(type);
             return {
                 id: type,
-                label: getFirstPredicateValue(shape, SHACL_NAME, type),
-                comment: getFirstPredicateValue(shape, SHACL_DESCRIPTION, type)
+                label: getFirstPredicateValue(shape, constants.SHACL_NAME, type),
+                comment: getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION, type)
             };
         });
 
@@ -231,7 +234,8 @@ class Vocabulary {
         const className = getFirstPredicateId(propertyShape, constants.SHACL_CLASS);
         const allowMultiple = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT, 1000) > 1;
         const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
-        const multiLine = datatype === STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const allowedValues = getFirstPredicateList(propertyShape, constants.SHACL_IN, undefined);
         const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
         return {
@@ -242,7 +246,8 @@ class Vocabulary {
             className,
             allowMultiple,
             machineOnly,
-            multiLine
+            multiLine,
+            allowedValues
         };
     }
 
