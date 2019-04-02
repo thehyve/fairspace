@@ -12,7 +12,6 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
@@ -69,7 +68,7 @@ public class WebDAVIT {
         permissions = new PermissionsServiceImpl(rdf, userService, mailService);
         collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
         var collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
-        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus, permissions));
+        fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus, permissions);
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();
         coll.setName("My Collection");
@@ -293,6 +292,7 @@ public class WebDAVIT {
 
     @Test
     public void shouldIgnoreRangeHeaders() throws ServletException, IOException {
+        fs.mkdir("coll1/dir1");
         fs.create("coll1/dir1/file.txt", new ByteArrayInputStream("123".getBytes()));
 
         req.setMethod("GET");

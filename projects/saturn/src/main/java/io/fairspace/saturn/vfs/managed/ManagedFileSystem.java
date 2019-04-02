@@ -24,14 +24,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileAlreadyExistsException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
@@ -78,8 +79,8 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public List<FileInfo> list(String parentPath) throws IOException {
-        if (parentPath.isEmpty()) {
+    public List<FileInfo> list(String path) throws IOException {
+        if (path.isEmpty()) {
             return collections.list()
                     .stream()
                     .map(ManagedFileSystem::fileInfo)
@@ -87,7 +88,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
 
         var processor = new QuerySolutionProcessor<>(this::fileInfo);
-        rdf.querySelect(storedQuery("fs_ls", parentPath + '/'), processor);
+        rdf.querySelect(storedQuery("fs_ls", path + '/'), processor);
         return processor.getValues()
                 .stream()
                 .filter(Objects::nonNull)
@@ -98,8 +99,10 @@ public class ManagedFileSystem implements VirtualFileSystem {
     public void mkdir(String path) throws IOException {
         ensureValidPath(path);
 
-        withCommitMessage("Create directory " + path, () ->
-                rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path))));
+        commit("Create directory " + path, rdf, () -> {
+            ensureCanCreate(path);
+            rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
+        });
     }
 
     @Override
@@ -107,16 +110,30 @@ public class ManagedFileSystem implements VirtualFileSystem {
         ensureValidPath(path);
 
         var blobInfo = write(in);
-        withCommitMessage("Create file " + path, () ->
-                rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5())));
+
+        commit("Create file " + path, rdf, () -> {
+            ensureCanCreate(path);
+            rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
+        });
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        withCommitMessage("Modify file " + path,
-                () -> rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5())));
+        commit("Modify file " + path, rdf, () -> {
+            var info = stat(path);
+            if (info == null) {
+                throw new FileNotFoundException(path);
+            }
+            if (info.isDirectory()) {
+                throw new IOException("Expected a file: " + path);
+            }
+            if (info.isReadOnly()) {
+                throw new IOException("File is read-only: " + path);
+            }
+            rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5()));
+        });
     }
 
     @Override
@@ -129,31 +146,32 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void copy(String from, String to) throws IOException {
-        ensureValidPath(from);
-        ensureValidPath(to);
-        withCommitMessage("Copy data from " + from + " to " + to, () ->
-                rdf.update(storedQuery("fs_copy", from, to, name(to))));
+        copyOrMove(false, from, to);
     }
 
     @Override
     public void move(String from, String to) throws IOException {
-        ensureValidPath(from);
-        ensureValidPath(to);
-        withCommitMessage("Move data from " + from + " to " + to, () ->
-                rdf.update(storedQuery("fs_move", from, to, name(to))));
+        copyOrMove(true, from, to);
     }
 
     @Override
     public void delete(String path) throws IOException {
         ensureValidPath(path);
 
-        withCommitMessage("Delete " + path, () ->
-                rdf.update(storedQuery("fs_delete", path, userIriSupplier.get())));
+        commit("Delete " + path, rdf, () -> {
+            var info = stat(path);
+            if (info == null) {
+                throw new FileNotFoundException(path);
+            }
+            if (info.isReadOnly()) {
+                throw new IOException("Cannot delete " + path);
+            }
+            rdf.update(storedQuery("fs_delete", path, userIriSupplier.get()));
+        });
     }
 
     @Override
     public void close() throws IOException {
-
     }
 
     @Subscribe
@@ -199,10 +217,29 @@ public class ManagedFileSystem implements VirtualFileSystem {
         return !path.isEmpty() && splitPath(path).length == 1;
     }
 
-    private static void ensureValidPath(String path) throws IOException {
-        if (!path.equals(normalizePath(path))) {
-            throw new AssertionError("Invalid path format: " + path);
+    private void copyOrMove(boolean move, String from, String to) throws IOException {
+        var verb = move ? "move" : "copy";
+        ensureValidPath(from);
+        ensureValidPath(to);
+        if (from.equals(to) || to.startsWith(from + '/')) {
+            throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
+        commit(verb + " data from " + from + " to " + to, rdf, () -> {
+            ensureCanCreate(to);
+            rdf.update(storedQuery("fs_" + verb, from, to, name(to)));
+        });
+    }
+
+    private void ensureCanCreate(String path) throws IOException {
+        if (exists(path)) {
+            throw new FileAlreadyExistsException(path);
+        }
+        if (stat(parentPath(path)).isReadOnly()) {
+            throw new IOException("Target path is read-only");
+        }
+    }
+
+    private static void ensureValidPath(String path) throws IOException {
         if (path.isEmpty()) {
             throw new AccessDeniedException("File operations on the root directory are not allowed");
         }
