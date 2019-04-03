@@ -36,10 +36,10 @@ export class MetadataEntityContainer extends React.Component {
         }
     }
 
-    updateState = (key, updatedValues) => {
+    updateState = (propertyKey, updatedValues) => {
         this.setState(prevState => {
             const propertiesWithUpdatedValues = {...prevState.propertiesWithUpdatedValues};
-            propertiesWithUpdatedValues[key] = updatedValues;
+            propertiesWithUpdatedValues[propertyKey] = updatedValues;
             return {propertiesWithUpdatedValues};
         });
     };
