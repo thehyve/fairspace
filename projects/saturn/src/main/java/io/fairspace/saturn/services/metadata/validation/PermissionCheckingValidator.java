@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 
+import java.util.Set;
+import java.util.function.Function;
+
 @AllArgsConstructor
 public class PermissionCheckingValidator implements MetadataRequestValidator {
     private final PermissionsService permissions;
-    private final AffectedResourcesDetector affectedResourcesDetector;
+    private final Function<Model, Set<Resource>> affectedResourcesDetector;
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
@@ -16,7 +19,7 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
     }
 
     private ValidationResult validateModel(Model model) {
-        return affectedResourcesDetector.getAffectedResources(model)
+        return affectedResourcesDetector.apply(model)
                 .stream()
                 .map(this::validateResource)
                 .reduce(ValidationResult.VALID, ValidationResult::merge);

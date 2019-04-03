@@ -22,10 +22,14 @@ import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
@@ -67,7 +71,7 @@ public class App {
         var systemVocabulary = Vocabulary.recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
         var metaVocabulary = Vocabulary.recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
 
-        var affectedResourcesDetector = new AffectedResourcesDetector(systemVocabulary, userVocabulary);
+        Function<Model, Set<Resource>> affectedResourcesDetector = new AffectedResourcesDetector(systemVocabulary, userVocabulary)::getAffectedResources;
 
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(systemVocabulary),

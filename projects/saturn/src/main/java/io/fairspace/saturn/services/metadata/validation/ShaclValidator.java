@@ -10,6 +10,7 @@ import org.topbraid.spin.constraints.ConstraintViolation;
 
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -20,13 +21,13 @@ public class ShaclValidator implements MetadataRequestValidator {
     private final RDFConnection rdf;
     private final Node dataGraph;
     private final Node shapesGraph;
-    private final AffectedResourcesDetector affectedResourcesDetector;
+    private final Function<Model, Set<Resource>> affectedResourcesDetector;
     private final BiFunction<Model, Model, ValidationEngine> validationEngineFactory;
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        var affectedResources = affectedResourcesDetector.getAffectedResources(modelToRemove);
-        affectedResources.addAll(affectedResourcesDetector.getAffectedResources(modelToAdd));
+        var affectedResources = affectedResourcesDetector.apply(modelToRemove);
+        affectedResources.addAll(affectedResourcesDetector.apply(modelToAdd));
 
         var model = targetModel(affectedResources);
         if (modelToRemove != null) {
