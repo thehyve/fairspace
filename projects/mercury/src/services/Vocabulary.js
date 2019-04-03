@@ -1,6 +1,11 @@
 import {compareBy, comparing} from "../utils/comparisionUtils";
 import * as constants from "../constants";
-import {getFirstPredicateId, getFirstPredicateValue, getLabel} from "../utils/metadataUtils";
+import {
+    getFirstPredicateId,
+    getFirstPredicateList,
+    getFirstPredicateValue,
+    getLabel
+} from "../utils/metadataUtils";
 
 class Vocabulary {
     /**
@@ -57,7 +62,10 @@ class Vocabulary {
         const properties = this.convertMetadataIntoPropertyList(metadataItem, propertyShapes, expandedMetadata);
         const emptyProperties = this.determineAdditionalEmptyProperties(metadataItem, propertyShapes);
 
-        return [...properties, ...emptyProperties];
+        // An entry with information on the type is returned as well for display purposes
+        const typeProperty = this.generateTypeProperty(metadataItem['@type']);
+
+        return [...properties, ...emptyProperties, typeProperty];
     }
 
     /**
@@ -189,6 +197,30 @@ class Vocabulary {
     }
 
     /**
+     * Generates a property entry for the given type(s)
+     * @param types  Array of uris of the type of an entity
+     * @returns {{allowMultiple: boolean, values: *, label: string, key: string, machineOnly: boolean}}
+     */
+    generateTypeProperty(types) {
+        const typeValues = types.map(type => {
+            const shape = this.determineShapeForType(type);
+            return {
+                id: type,
+                label: getFirstPredicateValue(shape, constants.SHACL_NAME, type),
+                comment: getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION, type)
+            };
+        });
+
+        return {
+            key: '@type',
+            label: 'Type',
+            values: typeValues,
+            allowMultiple: false,
+            machineOnly: true
+        };
+    }
+
+    /**
      * Generates a list entry for a single property, with the values specified
      * @param predicate
      * @param values
@@ -202,7 +234,8 @@ class Vocabulary {
         const className = getFirstPredicateId(propertyShape, constants.SHACL_CLASS);
         const allowMultiple = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT, 1000) > 1;
         const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
-        const multiLine = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const allowedValues = getFirstPredicateList(propertyShape, constants.SHACL_IN, undefined);
         const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
 
         return {
@@ -213,7 +246,8 @@ class Vocabulary {
             className,
             allowMultiple,
             machineOnly,
-            multiLine
+            multiLine,
+            allowedValues
         };
     }
 

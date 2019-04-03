@@ -20,8 +20,12 @@ Keycloak configuration scripts, and these have to be applied to an existing work
   If the active branch does not have the rerun-keycloak-config script you can copy the
   tools/rerun-keycloak-config directory from the dev branch to the local directory containing the active
   branch.
-- Run the script like this: `./rerun-keycloak-config.sh <namespace> <releasename> <valuesfile>`. For example:
-  `./rerun-keycloak-config.sh workspace-ci workspace-ci ../../.travis/ci-values.yaml`
+- Run the script like this: `./rerun-keycloak-config.sh <valuesfile> <namespace> <releasename>`. For example:
+  `./rerun-keycloak-config.sh ../../.travis/ci-values.yaml workspace-ci workspace-ci`.
+  By default, the workspace name is set to the release name. If you want to override it, run
+  the script like this: `./rerun-keycloak-config.sh <valuesfile> <namespace> <releasename> <workspacename> <fullworkspacename>`.
+  
+The default values for `workspace name` and `full workspace name` are defined in the [template helpers](https://github.com/fairspace/workspace/blob/dev/charts/workspace/templates/_helpers.tpl) file.
 - The last line of the script output contains instructions about how to monitor the progress
   of the job. It may take a couple of minutes for the keycloak configuration job to finish.
 

@@ -29,7 +29,8 @@ public class ValidationResult {
      *
      * The merged result:
      * - is valid if both results are valid
-     * - contains validation messages from both results (without duplicates)
+     * - contains validation messages from both results (without duplicates), preserving the order
+     * (we always start with an empty or singleton set, and then merge sets using Sets.union which preserves the order).
      * @param other
      * @return
      */

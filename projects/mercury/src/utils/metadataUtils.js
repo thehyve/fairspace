@@ -17,6 +17,8 @@ export const getFirstPredicateValue = (metadataEntry, predicate, defaultValue) =
 
 export const getFirstPredicateId = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
 
+export const getFirstPredicateList = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
+
 /**
  *
  * @param uri the URI to generate a label for
@@ -146,4 +148,11 @@ export const toJsonLd = (subject, predicate, values) => {
         '@id': subject,
         [predicate]: values.map(({id, value}) => ({'@id': id, '@value': value}))
     };
+};
+
+export const createIri = (id) => `http://${window.location.hostname}/iri/${id}`;
+
+export const url2iri = (iri) => {
+    const url = new URL(iri);
+    return `http://${url.hostname}${url.pathname}`
 };

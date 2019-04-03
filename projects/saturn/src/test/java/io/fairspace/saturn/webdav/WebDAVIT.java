@@ -6,27 +6,33 @@ import com.mockrunner.mock.web.MockHttpServletResponse;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
-import io.fairspace.saturn.vfs.SafeFileSystem;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
 import org.apache.jena.graph.Node;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.function.Supplier;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class WebDAVIT {
 
     private MiltonWebDAVServlet milton;
@@ -47,14 +53,22 @@ public class WebDAVIT {
     private Node anotherUser = createURI("http://example.com/new-user");
     private Node currentUser = defaultUser;
 
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private MailService mailService;
+
     @Before
     public void before() {
         var rdf = connect(createTxnMem());
-        Supplier<Node> userIriSupplier = () -> currentUser;
         var eventBus = new EventBus();
-        permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
-        fs = new SafeFileSystem(new ManagedFileSystem(rdf, new MemoryBlobStore(), userIriSupplier, collections, eventBus, permissions));
+        when(userService.getCurrentUser()).thenAnswer(invocation -> new User() {{ setIri(currentUser); }});
+
+        permissions = new PermissionsServiceImpl(rdf, userService, mailService);
+        collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
+        var collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
+        fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus, permissions);
         milton = new MiltonWebDAVServlet("/webdav/", fs);
         var coll = new Collection();
         coll.setName("My Collection");
@@ -278,6 +292,7 @@ public class WebDAVIT {
 
     @Test
     public void shouldIgnoreRangeHeaders() throws ServletException, IOException {
+        fs.mkdir("coll1/dir1");
         fs.create("coll1/dir1/file.txt", new ByteArrayInputStream("123".getBytes()));
 
         req.setMethod("GET");

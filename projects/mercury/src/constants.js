@@ -25,6 +25,7 @@ export const LABEL_URI = RDFS_NS + 'label';
 export const COMMENT_URI = RDFS_NS + 'comment';
 
 export const SHACL_NAME = SHACL_NS + 'name';
+export const SHACL_DESCRIPTION = SHACL_NS + 'description';
 export const SHACL_PATH = SHACL_NS + 'path';
 export const SHACL_TARGET_CLASS = SHACL_NS + 'targetClass';
 export const SHACL_PROPERTY = SHACL_NS + 'property';
@@ -32,6 +33,7 @@ export const SHACL_CLASS = SHACL_NS + 'class';
 export const SHACL_DATATYPE = SHACL_NS + 'datatype';
 export const SHACL_MAX_COUNT = SHACL_NS + 'maxCount';
 export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
+export const SHACL_IN = SHACL_NS + 'in';
 
 export const STRING_URI = XMLSCHEMA_NS + 'string';
 export const BOOLEAN_URI = XMLSCHEMA_NS + 'boolean';

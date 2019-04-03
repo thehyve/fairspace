@@ -19,7 +19,7 @@ class MetadataProperty extends React.Component {
 
     setHoveredIndex = (hoveredIndex) => {
         this.setState({hoveredIndex});
-    }
+    };
 
     renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
         const {editable, property, onChange, subject} = this.props;
@@ -108,9 +108,12 @@ class MetadataProperty extends React.Component {
         const canAdd = editableAndNotMachineOnly && (property.allowMultiple || property.values.length === 0);
         const labelId = `label-${property.key}`;
 
-        const ValueComponent = (editableAndNotMachineOnly && property.className !== constants.RESOURCE_URI)
-            ? ValueComponentFactory.editComponent(property)
-            : ValueComponentFactory.readOnlyComponent();
+        // The edit component should not actually allow editing the value if editable is set to false
+        // or if the property contains settings that disallow editing existing values
+        const disableEditing = !editable || MetadataProperty.disallowEditingOfExistingValues(property);
+        const ValueComponent = disableEditing
+            ? ValueComponentFactory.readOnlyComponent()
+            : ValueComponentFactory.editComponent(property);
 
         return (
             <ListItem disableGutters style={{display: 'block'}}>
@@ -123,6 +126,21 @@ class MetadataProperty extends React.Component {
                 </List>
             </ListItem>
         );
+    }
+
+    /**
+     * Checks whether the configuration of this property disallowed editing of existing values
+     * This is the case if
+     *   - the property is machineOnly
+     *   - the field refers to a url (marked as RESOURCE_URI)
+     *   - the value is taken from a set of allowed values
+     * @param property
+     * @returns {Boolean}
+     */
+    static disallowEditingOfExistingValues(property) {
+        return property.machineOnly
+            || property.className === constants.RESOURCE_URI
+            || property.allowedValues;
     }
 }
 

@@ -15,34 +15,32 @@ describe('AlterPermissionDialog', () => {
     const mockfetchUsersFn = jest.fn();
     const mockUsers = {
         data: [
-            {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
-            {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
-            {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars'},
-            {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain'},
-            {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
+            {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey', iri: 'http://localhost/iri/user1-id'},
+            {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson', iri: 'http://localhost/iri/user2-id'},
+            {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars', iri: 'http://localhost/iri/user3-id'},
+            {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain', iri: 'http://localhost/iri/user4-id'},
+            {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande', iri: 'http://localhost/iri/user5-id'},
         ]
     };
     const mockCollaborators = {
         data: [
             {
-                collectionId: 500,
-                subject: 'user2-id',
+                user: 'http://localhost/iri/user2-id',
                 access: 'Write'
             },
             {
-                collectionId: 500,
-                subject: 'user4-id',
+                user: 'http://localhost/iri/user4-id',
                 access: 'Manage'
             }
         ]
     };
     const mockCurrentLoggedUser = {
-        id: 'user1-id'
+        id: 'user1-id',
+        iri: 'http://localhost/iri/user1-id'
     };
     const mockCollectionId = 500;
-    const mockUser = {
-        collectionId: 500,
-        subject: 'user2-id',
+    const mockPermission = {
+        user: 'http://localhost/iri/user2-id',
         access: 'Write'
     };
 
@@ -57,34 +55,34 @@ describe('AlterPermissionDialog', () => {
             {
                 disabled: true,
                 label: "Mariah Carey",
-                value: "user1-id"
+                value: 'http://localhost/iri/user1-id'
             },
             {
                 disabled: true,
                 label: "Michael Jackson",
-                value: "user2-id"
+                value: 'http://localhost/iri/user2-id'
             },
             {
                 disabled: false,
                 label: "Bruno Mars",
-                value: "user3-id"
+                value: 'http://localhost/iri/user3-id'
             },
             {
                 disabled: true,
                 label: "Kurt Cobain",
-                value: "user4-id"
+                value: 'http://localhost/iri/user4-id'
             },
             {
                 disabled: false,
                 label: "Ariana Grande",
-                value: "user5-id"
+                value: 'http://localhost/iri/user5-id'
             }
         ];
 
         wrapper = shallow(<AlterPermissionDialog
             open={false}
             classes={styles()}
-            user={null}
+            permission={null}
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
@@ -124,7 +122,9 @@ describe('AlterPermissionDialog', () => {
                 <AlterPermissionDialog
                     open={false}
                     classes={styles()}
-                    user={mockUser}
+                    user={mockPermission.user}
+                    access={mockPermission.access}
+                    iri={mockPermission.iri}
                     collectionId={mockCollectionId}
                     collaborators={mockCollaborators}
                     currentUser={mockCurrentLoggedUser}
@@ -136,7 +136,7 @@ describe('AlterPermissionDialog', () => {
         );
 
         // select a user
-        wrapper.setState({selectedUser: mockUser});
+        wrapper.setState({selectedUser: mockPermission.user});
 
         expect(wrapper.find('WithStyles(MaterialReactSelect)')).toHaveLength(0);
         expect(wrapper.find('WithStyles(Typography)').childAt(0).text()).toEqual('Michael Jackson');

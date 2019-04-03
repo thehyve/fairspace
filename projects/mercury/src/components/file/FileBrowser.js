@@ -7,7 +7,6 @@ import {
 } from "../common";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
-import {canWrite} from '../../utils/permissionUtils';
 import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
@@ -116,7 +115,7 @@ class FileBrowser extends React.Component {
                         openedPath={openedPath}
                         onRename={this.handlePathRename}
                         onDelete={this.handlePathDelete}
-                        disabled={!canWrite(openedCollection)}
+                        disabled={!openedCollection.canWrite}
                         existingFiles={files ? files.map(file => file.basename) : []}
                         fetchFilesIfNeeded={fetchFilesIfNeeded}
                         getDownloadLink={FileAPI.getDownloadLink}

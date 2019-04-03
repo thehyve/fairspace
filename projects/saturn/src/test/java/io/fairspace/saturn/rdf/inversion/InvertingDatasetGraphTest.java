@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static io.fairspace.saturn.rdf.Vocabulary.createVocabulary;
+import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -38,7 +38,7 @@ public class InvertingDatasetGraphTest {
     public void before() {
         DatasetGraph dsg = createTxnMem();
         ds = DatasetFactory.wrap(new InvertingDatasetGraph(dsg, vocabularyGraph));
-        createVocabulary(new RDFConnectionLocal(ds), vocabularyGraph, "test-vocabulary.jsonld");
+        initializeVocabulary(new RDFConnectionLocal(ds), vocabularyGraph, "test-vocabulary.jsonld");
 
         ds.begin(ReadWrite.WRITE);
     }

@@ -17,7 +17,6 @@
         {
             "@id": "fs:Collection",
             "@type": "rdf:Class",
-            "fs:classInfix": "collections",
             "fs:fairspaceEntity": false,
             "rdfs:comment": "A specific collection in Fairspace.",
             "rdfs:label": "Collection"

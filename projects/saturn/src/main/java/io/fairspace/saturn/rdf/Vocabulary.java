@@ -20,18 +20,6 @@ public class Vocabulary {
     private final RDFConnection rdfConnection;
     private final Node vocabularyGraph;
 
-
-    public static Vocabulary createVocabulary(RDFConnection rdfConnection, Node vocabularyGraph, String filename) {
-        commit("Initialize the vocabulary for " + vocabularyGraph.getURI(), rdfConnection, () -> {
-            if(rdfConnection.fetch(vocabularyGraph.getURI()).isEmpty()) {
-                log.info("Initializing vocabulary in graph {} with data from {}", vocabularyGraph.getURI(), filename);
-                rdfConnection.load(vocabularyGraph.getURI(), FileManager.get().loadModel(filename));
-            }
-        });
-
-        return new Vocabulary(rdfConnection, vocabularyGraph);
-    }
-
     /**
      * Returns a list with all predicate URIs that are marked machine-only in the vocabulary
      * @return
@@ -54,6 +42,42 @@ public class Vocabulary {
 
     public Node getVocabularyGraph() {
         return vocabularyGraph;
+    }
+
+    /**
+     * Initializes the vocabulary and loads default values from file if the vocabulary is still empty
+     *
+     * @param rdfConnection
+     * @param vocabularyGraph
+     * @param filename
+     * @return
+     */
+    public static Vocabulary initializeVocabulary(RDFConnection rdfConnection, Node vocabularyGraph, String filename) {
+        commit("Initialize the vocabulary for " + vocabularyGraph.getURI(), rdfConnection, () -> {
+            if(rdfConnection.fetch(vocabularyGraph.getURI()).isEmpty()) {
+                log.info("Initializing vocabulary in graph {} with data from {}", vocabularyGraph.getURI(), filename);
+                rdfConnection.load(vocabularyGraph.getURI(), FileManager.get().loadModel(filename));
+            }
+        });
+
+        return new Vocabulary(rdfConnection, vocabularyGraph);
+    }
+
+    /**
+     * Recreates the vocabulary by loading default values from file and removing existing data
+     * @param rdfConnection
+     * @param vocabularyGraph
+     * @param filename
+     * @return
+     */
+    public static Vocabulary recreateVocabulary(RDFConnection rdfConnection, Node vocabularyGraph, String filename) {
+        commit("Recreating the vocabulary for " + vocabularyGraph.getURI(), rdfConnection, () -> {
+            log.info("Recreating vocabulary in graph {} with data from {}", vocabularyGraph.getURI(), filename);
+            rdfConnection.delete(vocabularyGraph.getURI());
+            rdfConnection.load(vocabularyGraph.getURI(), FileManager.get().loadModel(filename));
+        });
+
+        return new Vocabulary(rdfConnection, vocabularyGraph);
     }
 
 }

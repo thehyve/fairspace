@@ -20,11 +20,16 @@ describe('combination of vocabulary and metadata', () => {
         }];
 
         const result = vocabulary.combine(metadata);
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result[0].values.length).toEqual(0);
         expect(result[1].values.length).toEqual(0);
         expect(result[2].values.length).toEqual(0);
         expect(result[3].values.length).toEqual(0);
+        expect(result[4].values).toEqual([{
+            comment: "Collection of files with associated metadata and access rules.",
+            id: "http://fairspace.io/ontology#Collection",
+            label: "Collection"
+        }]);
     });
 
     it('returns nothing without type', () => {
@@ -46,7 +51,7 @@ describe('combination of vocabulary and metadata', () => {
 
         const result = vocabulary.combine(metadata);
 
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
         expect(result[0].label).toEqual("Label");
         expect(result[0].values.length).toEqual(1);
@@ -66,7 +71,7 @@ describe('combination of vocabulary and metadata', () => {
 
         const result = vocabulary.combine(metadata);
 
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result[0].key).toEqual("http://www.schema.org/creator");
         expect(result[0].label).toEqual("Creator");
         expect(result[0].values.length).toEqual(1);
@@ -93,7 +98,7 @@ describe('combination of vocabulary and metadata', () => {
 
         const result = vocabulary.combine(metadata);
 
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
         expect(result[0].label).toEqual('Description');
         expect(result[1].label).toEqual('Creator');
@@ -116,7 +121,7 @@ describe('combination of vocabulary and metadata', () => {
         }];
 
         const result = vocabulary.combine(metadata);
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
         expect(result[0].values.length).toEqual(2);
         expect(result[0].values[0].value).toEqual('My first collection');
@@ -143,7 +148,7 @@ describe('combination of vocabulary and metadata', () => {
         }];
 
         const result = vocabulary.combine(metadata);
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result[0].key).toEqual("http://www.schema.org/creator");
         expect(result[1].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
         expect(result[2].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
@@ -162,7 +167,7 @@ describe('combination of vocabulary and metadata', () => {
         }];
 
         const result = vocabulary.combine(metadata);
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result.map(property => property.key)).not.toContain('http://fairspace.io/ontology#non-existing');
     });
 
@@ -178,7 +183,7 @@ describe('combination of vocabulary and metadata', () => {
         }];
 
         const result = vocabulary.combine(metadata);
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
     });
 
@@ -194,7 +199,7 @@ describe('combination of vocabulary and metadata', () => {
         }];
 
         const result = vocabulary.combine(metadata);
-        expect(result.length).toEqual(4);
+        expect(result.length).toEqual(5);
         expect(result.map(property => property.key)).not.toContain('http://schema.org/Creator');
     });
 

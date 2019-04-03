@@ -21,13 +21,22 @@ workspace:
     keycloak:
       enabled: false
 
+# Specific settings for Pluto
 pluto:
   image:
+    image: fairspace.azurecr.io/fairspace/pluto
     pullPolicy: Always
 
-# Specific settings for Mercury subchart
+# Specific settings for Mercury
 mercury:
   image:
+    image: fairspace.azurecr.io/fairspace/mercury
+    pullPolicy: Always
+
+# Specific settings for Saturn
+saturn:
+  image:
+    image: fairspace.azurecr.io/fairspace/saturn
     pullPolicy: Always
 
 # Specific settings for JupyterHub subchart
@@ -43,11 +52,14 @@ jupyterhub:
               session_url: https://workspace.cbiotest.fairway.app/account/tokens
   singleuser:
     image:
+      name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
       tag: 0.5.3-SNAPSHOT-simple
     extraEnv:
       WORKSPACE_URL: https://workspace.cbiotest.fairway.app
   hub:
-      extraEnv:
-          JUPYTERHUB_CRYPT_KEY: 347947239749dbea93432379223064342aa5754843349978ef78978954397836
+    image:
+      name: fairspace.azurecr.io/fairspace/jupyterhub-hub
+    extraEnv:
+      JUPYTERHUB_CRYPT_KEY: 347947239749dbea93432379223064342aa5754843349978ef78978954397836
   proxy:
       secretToken: "505043750470347507534554340b45754037a4840482308908e985805208093a"

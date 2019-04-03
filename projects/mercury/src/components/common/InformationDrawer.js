@@ -17,7 +17,6 @@ import MetadataEntityContainer from "../metadata/MetadataEntityContainer";
 import PathMetadata from "../metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
-import {canManage} from '../../utils/permissionUtils';
 import ErrorDialog from './ErrorDialog';
 import {getPathInfoFromParams} from "../../utils/fileUtils";
 
@@ -73,7 +72,7 @@ export class InformationDrawer extends React.Component {
             return <Typography variant="h6">Please select a collection..</Typography>;
         }
 
-        const isMetaDataEditable = canManage(collection) && this.props.paths.length === 0;
+        const isMetaDataEditable = collection && collection.canManage && this.props.paths.length === 0;
         const relativePath = path => path.split('/').slice(2).join('/');
 
         return (
@@ -109,7 +108,7 @@ export class InformationDrawer extends React.Component {
                             <ExpansionPanelDetails>
                                 <PathMetadata
                                     path={path}
-                                    editable={canManage(collection) && path === this.props.paths[this.props.paths.length - 1]}
+                                    editable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
                                     style={{width: '100%'}}
                                 />
                             </ExpansionPanelDetails>

@@ -7,21 +7,25 @@ import org.apache.jena.graph.Node;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 
 public class UserService {
+    private final Supplier<UserInfo> currentUserInfoSupplier;
     private final DAO dao;
-    private final Map<String, User> usersById = new ConcurrentHashMap<>();
+    private final Map<Node, User> usersById = new ConcurrentHashMap<>();
 
-    public UserService(DAO dao) {
+    public UserService(Supplier<UserInfo> currentUserInfoSupplier, DAO dao) {
+        this.currentUserInfoSupplier = currentUserInfoSupplier;
         this.dao = dao;
 
         loadUsers();
     }
 
     private void loadUsers() {
-        dao.list(User.class).forEach(user -> usersById.put(user.getExternalId(), user));
+        dao.list(User.class).forEach(user -> usersById.put(user.getIri(), user));
     }
 
     /**
@@ -34,10 +38,22 @@ public class UserService {
      * @return
      */
     public Node getUserIRI(UserInfo userInfo) {
-        return getUser(userInfo).getIri();
+        return getOrCreateUser(userInfo).getIri();
     }
 
-    private User getUser(UserInfo userInfo) {
+    public User getCurrentUser() {
+        return getOrCreateUser(currentUserInfoSupplier.get());
+    }
+
+    public User getUser(Node iri) {
+        return usersById.values()
+                .stream()
+                .filter(user -> user.getIri().equals(iri))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private User getOrCreateUser(UserInfo userInfo) {
         var user = findUser(userInfo);
         if (user != null) {
             if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
@@ -50,12 +66,12 @@ public class UserService {
     }
 
     private User findUser(UserInfo userInfo) {
-        return usersById.get(userInfo.getUserId());
+        return usersById.get(generateIri(userInfo.getUserId()));
     }
 
     private User createUser(UserInfo userInfo) {
         var newUser = new User();
-        newUser.setExternalId(userInfo.getUserId());
+        newUser.setIri(generateIri(userInfo.getUserId()));
         newUser.setName(userInfo.getFullName());
         newUser.setEmail(userInfo.getEmail());
         return commit("Store a new user with id " + userInfo.getUserId(), dao, () -> {
@@ -64,7 +80,7 @@ public class UserService {
                 return createdInMeantime;
             }
             dao.write(newUser);
-            usersById.put(newUser.getExternalId(), newUser);
+            usersById.put(newUser.getIri(), newUser);
             return newUser;
         });
     }

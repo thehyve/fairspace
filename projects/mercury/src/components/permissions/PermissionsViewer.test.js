@@ -7,29 +7,25 @@ import PermissionsViewer from "./PermissionsViewer";
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
         {
-            collectionId: 500,
-            subject: 'user2-id',
+            user: 'http://localhost/iri/user2-id',
             access: 'Write',
             firstName: 'Michael',
             lastName: 'Jackson'
         },
         {
-            collectionId: 500,
-            subject: 'user3-id',
+            user: 'http://localhost/iri/user3-id',
             access: 'Read',
             firstName: 'Bruno',
             lastName: 'Mars'
         },
         {
-            collectionId: 500,
-            subject: 'user1-id',
+            user: 'http://localhost/iri/user1-id',
             access: 'Manage',
             firstName: 'Mariah',
             lastName: 'Carey'
         },
         {
-            collectionId: 500,
-            subject: 'user4-id',
+            user: 'http://localhost/iri/user4-id',
             access: 'Manage',
             firstName: 'Kurt',
             lastName: 'Cobain'
@@ -39,11 +35,11 @@ describe('PermissionsViewer', () => {
     const mockcurrentUserNotCreatorCanManage = {id: 'user1-id'};
     const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
     const mockUsers = [
-        {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey'},
-        {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson'},
-        {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars'},
-        {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain'},
-        {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande'},
+        {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey', iri: 'http://localhost/iri/user1-id'},
+        {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson', iri: 'http://localhost/iri/user2-id'},
+        {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars', iri: 'http://localhost/iri/user3-id'},
+        {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain', iri: 'http://localhost/iri/user4-id'},
+        {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande', iri: 'http://localhost/iri/user5-id'},
     ];
     const mockCreator = 'user4-id';
     const mockFetchPermissionsFn = jest.fn();
@@ -54,7 +50,7 @@ describe('PermissionsViewer', () => {
         beforeAll(() => {
             wrapper = shallow(<PermissionsViewer
                 creator={mockCreator}
-                collectionId={500}
+                iri={500}
                 canManage
                 permissions={mockCollaborators}
                 users={mockUsers}
@@ -68,11 +64,11 @@ describe('PermissionsViewer', () => {
         });
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Mariah Carey',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
@@ -101,7 +97,7 @@ describe('PermissionsViewer', () => {
         beforeAll(() => {
             wrapper = shallow(<PermissionsViewer
                 creator={mockCreator}
-                collectionId={500}
+                iri={500}
                 canManage={false}
                 permissions={mockCollaborators}
                 users={mockUsers}
@@ -115,13 +111,13 @@ describe('PermissionsViewer', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
 
-        it('should order permissions by the access rank (Manage-Write-Read)', () => {
+        it('should order permissions by the access rank (Manage-Write-Read) and name', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Mariah Carey',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
@@ -146,7 +142,7 @@ describe('PermissionsViewer', () => {
         beforeAll(() => {
             wrapper = shallow(<PermissionsViewer
                 creator={mockCreator}
-                collectionId={500}
+                iri={500}
                 canManage
                 permissions={mockCollaborators}
                 users={mockUsers}
@@ -160,13 +156,13 @@ describe('PermissionsViewer', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
 
-        it('should order permissions by the access rank (Manage-Write-Read)', () => {
+        it('should order permissions by the access rank (Manage-Write-Read) and name', () => {
             expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Mariah Carey',
+                primary: 'Kurt Cobain',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
+                primary: 'Mariah Carey',
                 secondary: 'Manage'
             });
             expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({

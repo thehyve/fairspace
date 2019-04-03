@@ -84,7 +84,7 @@ workspace:
     configurationScripts:
       keycloak:
         enabled: true
-        image: fairspace.azurecr.io/fairspace/keycloak-configuration:0.1.2
+        image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.2
         pullPolicy: IfNotPresent
     enableExperimentalFeatures: false
     elasticsearch:
@@ -112,7 +112,7 @@ pluto:
     maxUnavailable: 25%
     maxSurge: 25%
   image:
-    image: fairspace.azurecr.io/fairspace/pluto
+    image: eu.gcr.io/fairspace-207108/pluto
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   service:
@@ -170,7 +170,7 @@ saturn:
     maxSurge: 0%
     maxUnavailable: 100%
   image:
-    image: fairspace.azurecr.io/fairspace/saturn
+    image: eu.gcr.io/fairspace-207108/saturn
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
 
@@ -241,13 +241,24 @@ saturn:
       size: 50Gi
       mountPath: /data
 
+  mail:
+    mail.from: info@fairspace.io
+    mail.user: user
+    mail.password: password
+    mail.transport.protocol: smtp
+    mail.smtp.auth: true
+    mail.smtp.host: host
+    mail.smtp.port: 587
+    mail.smtp.starttls.enable: true
+
+
 #####################################################################
 # Specific settings for Mercury subchart
 #####################################################################
 mercury:
   replicaCount: 1
   image:
-    image: fairspace.azurecr.io/fairspace/mercury
+    image: eu.gcr.io/fairspace-207108/mercury
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   service:
@@ -294,14 +305,14 @@ jupyterhub:
       - offline_access
   singleuser:
     image:
-      name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
+      name: eu.gcr.io/fairspace-207108/jupyterhub-singleuser
       tag: RELEASEVERSION
     defaultUrl: "/lab"
     extraEnv:
       WORKSPACE_URL:
   hub:
     image:
-      name: fairspace.azurecr.io/fairspace/jupyterhub-hub
+      name: eu.gcr.io/fairspace-207108/jupyterhub-hub
       tag: RELEASEVERSION
     ingress:
       enabled: false

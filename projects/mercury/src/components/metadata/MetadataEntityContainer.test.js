@@ -128,6 +128,6 @@ it('tries to load the metadata and the vocabulary', () => {
     });
 
     const fetchCombinedMetadataIfNeeded = jest.fn();
-    mount(<MetadataEntityContainer subject="John" properties={[]} store={store} fetchCombinedMetadataIfNeeded={fetchCombinedMetadataIfNeeded} />);
+    mount(<MetadataEntityContainer subject="http://example.com/john" properties={[]} store={store} fetchCombinedMetadataIfNeeded={fetchCombinedMetadataIfNeeded} />);
     expect(fetchCombinedMetadataIfNeeded.mock.calls.length).toEqual(1);
 });

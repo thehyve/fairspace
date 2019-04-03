@@ -5,7 +5,8 @@ import {Paper, List, Fab} from '@material-ui/core';
 import {ErrorMessage, LoadingInlay} from "../common";
 import * as metadataActions from "../../actions/metadataActions";
 import MetaEntityHeader from './MetaEntityHeader';
-import {isDateTimeProperty, propertiesToShow, linkLabel} from "../../utils/metadataUtils";
+import {isDateTimeProperty, propertiesToShow, linkLabel, url2iri} from "../../utils/metadataUtils";
+
 import MetadataProperty from "./MetadataProperty";
 import ErrorDialog from "../common/ErrorDialog";
 
@@ -130,10 +131,9 @@ export class MetadataEntityContainer extends React.Component {
         ) : entity;
     }
 }
-
 const mapStateToProps = (state, ownProps) => {
     const {metadataBySubject, cache: {vocabulary}} = state;
-    const subject = ownProps.subject || window.location.href;
+    const subject = ownProps.subject || url2iri(window.location.href);
     const metadata = metadataBySubject[subject] || {};
     const hasNoMetadata = !metadata || !metadata.data || metadata.data.length === 0;
     const hasOtherErrors = (metadata && metadata.error) || !vocabulary || vocabulary.error;

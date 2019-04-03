@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -55,14 +55,32 @@ public class ManagedFileSystemTest {
         var eventBus = new EventBus();
         when(permissions.getPermission(any())).thenReturn(Access.Manage);
         fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus, permissions);
-        var collection = new Collection();
-        collection.setLocation("coll");
-        collection.setIri(createURI("http://example.com/123"));
-        collection.setAccess(Access.Manage);
 
-        when(collections.list()).thenReturn(singletonList(collection));
-        when(collections.getByLocation(any())).thenReturn(collection);
+        var collection1 = new Collection();
+        collection1.setLocation("coll");
+        collection1.setIri(createURI("http://example.com/123"));
+        collection1.setAccess(Access.Manage);
+
+        var collection2 = new Collection();
+        collection2.setLocation("read-only");
+        collection2.setIri(createURI("http://example.com/234"));
+        collection2.setAccess(Access.Read);
+
+
+        when(collections.list()).thenReturn(asList(collection1, collection2));
+        when(collections.getByLocation(eq("coll"))).thenReturn(collection1);
+        when(collections.getByLocation(eq("read-only"))).thenReturn(collection2);
     }
+
+    @Test
+    public void statRoot() throws IOException {
+        assertEquals("", fs.stat("").getPath());
+        assertTrue(fs.stat("").isDirectory());
+        assertNull(fs.stat("").getIri());
+
+        verify(permissions, never()).getPermission(any());
+    }
+
 
     @Test
     public void statCollection() throws IOException {
@@ -85,8 +103,13 @@ public class ManagedFileSystemTest {
     }
 
     @Test
+    public void statNonExisting() throws IOException {
+        assertNull(fs.stat("coll/aaa"));
+    }
+
+    @Test
     public void list() throws IOException {
-        assertEquals(1, fs.list("").size());
+        assertEquals(2, fs.list("").size());
         assertEquals("coll", fs.list("").get(0).getPath());
         assertTrue(fs.list("").get(0).isDirectory());
 
@@ -103,6 +126,8 @@ public class ManagedFileSystemTest {
 
     @Test
     public void mkdir() throws IOException {
+        fs.mkdir("coll/aaa");
+        fs.mkdir("coll/aaa/bbb");
         fs.mkdir("coll/aaa/bbb/ccc");
         var stat = fs.stat("coll/aaa/bbb/ccc");
         assertEquals("coll/aaa/bbb/ccc", stat.getPath());
@@ -111,6 +136,23 @@ public class ManagedFileSystemTest {
         assertTrue(ds.getDefaultModel().contains(createResource(stat.getIri()), RDFS.label, createStringLiteral("ccc")));
         ensureRecentInstant(stat.getCreated());
         ensureRecentInstant(stat.getModified());
+    }
+
+    @Test(expected = IOException.class)
+    public void mkdirInAReadOnlyCollection() throws IOException {
+        fs.mkdir("read-only/dir");
+    }
+
+
+    @Test(expected = IOException.class)
+    public void collectionsCannotBeCreatedWithMkdir() throws IOException {
+        fs.mkdir("collx");
+    }
+
+    @Test(expected = IOException.class)
+    public void cannotCreateADirectoryTwice() throws IOException {
+        fs.mkdir("coll/aaa");
+        fs.mkdir("coll/aaa");
     }
 
     @Test
@@ -134,6 +176,28 @@ public class ManagedFileSystemTest {
         if (!Arrays.equals(content2, os.toByteArray())) {
             assertArrayEquals(content2, os.toByteArray());
         }
+    }
+
+    @Test(expected = IOException.class)
+    public void writeToAReadOnlyCollection() throws IOException {
+        fs.create("read-only/file", new ByteArrayInputStream(content1));
+    }
+
+    @Test(expected = IOException.class)
+    public void modifyANonExistingFile() throws IOException {
+        fs.modify("coll/file", new ByteArrayInputStream(content2));
+    }
+
+    @Test(expected = IOException.class)
+    public void modifyADirectory() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.modify("coll/dir", new ByteArrayInputStream(content2));
+    }
+
+    @Test(expected = IOException.class)
+    public void cannotCreateAFileTwice() throws IOException {
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        fs.create("coll/file", new ByteArrayInputStream(content1));
     }
 
     @Test
@@ -188,6 +252,12 @@ public class ManagedFileSystemTest {
         assertTrue(ds.getDefaultModel().contains(createResource(fs.stat("coll/dir2").getIri()), RDFS.label, createStringLiteral("dir2")));
     }
 
+    @Test(expected = IOException.class)
+    public void cannotCopyDirToItself() throws IOException {
+        fs.mkdir("coll/dir1");
+        fs.copy("coll/dir1", "coll/dir1");
+     }
+
     @Test
     public void copyFile() throws IOException {
         fs.mkdir("coll/dir1");
@@ -238,6 +308,10 @@ public class ManagedFileSystemTest {
         assertEquals(oldIri, fs.stat("coll/dir2/file2").getIri());
     }
 
+    @Test(expected = IOException.class)
+    public void moveCollection() throws IOException {
+        fs.move("coll", "new-name");
+    }
 
     @Test
     public void deleteDir() throws IOException {
@@ -265,6 +339,22 @@ public class ManagedFileSystemTest {
 
         assertTrue(fs.exists("coll/dir/file"));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
+    }
+
+    @Test(expected = IOException.class)
+    public void deleteRoot() throws IOException {
+        fs.delete("");
+    }
+
+    @Test(expected = IOException.class)
+    public void deleteCollection() throws IOException {
+        fs.delete("coll");
+    }
+
+
+    @Test(expected = IOException.class)
+    public void cannotDeleteANonExistingFile() throws IOException {
+        fs.delete("coll/dir/file");
     }
 
     @Test

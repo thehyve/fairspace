@@ -5,10 +5,12 @@ import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.auth.VocabularyAuthorizationVerifier;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.rdf.Vocabulary;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
+import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
@@ -16,7 +18,6 @@ import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredic
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vfs.SafeFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
@@ -26,18 +27,18 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
-import static io.fairspace.saturn.rdf.Vocabulary.createVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
         var userVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "user-vocabulary");
@@ -52,19 +53,21 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(new DAO(rdf, null));
+        var userService = new UserService(SecurityUtil::userInfo, new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier);
+        var mailService = new MailService(CONFIG.mail);
+
+        var permissions = new PermissionsServiceImpl(rdf, userService, mailService);
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
-        var fs = new SafeFileSystem(new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions));
+        var fs = new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions);
 
         var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
         // Setup and initialize vocabularies
-        var userVocabulary = createVocabulary(rdf, userVocabularyGraphNode, "default-vocabularies/user-vocabulary.ttl");
-        var systemVocabulary = createVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
-        var metaVocabulary = createVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
+        var userVocabulary = Vocabulary.initializeVocabulary(rdf, userVocabularyGraphNode, "default-vocabularies/user-vocabulary.ttl");
+        var systemVocabulary = Vocabulary.recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
+        var metaVocabulary = Vocabulary.recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
 
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(systemVocabulary),

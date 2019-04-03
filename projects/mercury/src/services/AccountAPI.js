@@ -1,5 +1,6 @@
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
+import {createIri} from "../utils/metadataUtils";
 
 class AccountAPI {
     getUser() {
@@ -8,7 +9,8 @@ class AccountAPI {
             credentials: 'same-origin'
         })
             .then(failOnHttpError("Failure when retrieving username"))
-            .then(response => response.json());
+            .then(response => response.json())
+            .then(user => ({...user, iri: createIri(user.id)}));
     }
 
     getAuthorizations() {

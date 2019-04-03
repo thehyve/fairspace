@@ -1,4 +1,5 @@
 import nodeCrypto from "crypto";
+
 import {
     generateUuid,
     getFirstPredicateId,
@@ -8,7 +9,7 @@ import {
     propertiesToShow,
     relativeLink,
     shouldPropertyBeHidden,
-    toJsonLd,
+    toJsonLd, url2iri,
 } from "./metadataUtils";
 import * as consts from "../constants";
 
@@ -285,6 +286,12 @@ describe('Metadata Utils', () => {
             const jsonLd = toJsonLd();
 
             expect(jsonLd).toEqual(null);
+        });
+    });
+
+    describe('url2iri', () => {
+        it('Handles URLS', () => {
+            expect(url2iri('scheme://example.com:1234/some/path/?query')).toEqual('http://example.com/some/path/');
         });
     });
 });

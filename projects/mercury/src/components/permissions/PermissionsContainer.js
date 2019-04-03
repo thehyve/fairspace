@@ -5,11 +5,11 @@ import {alterPermission as alterPermissionActions, fetchPermissionsIfNeeded} fro
 const mapStateToProps = (state, ownProps) => {
     const {
         account: {user},
-        cache: {users, permissionsByCollection},
+        cache: {users, permissionsByIri},
         ui: {pending: {alterPermission}}
     } = state;
 
-    const collectionPermission = permissionsByCollection[ownProps.collectionId] || {pending: true};
+    const collectionPermission = permissionsByIri[ownProps.iri] || {pending: true};
 
     return {
         loading: user.pending || users.pending || collectionPermission.pending,

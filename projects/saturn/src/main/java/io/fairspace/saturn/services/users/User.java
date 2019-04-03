@@ -9,10 +9,7 @@ import lombok.EqualsAndHashCode;
 @RDFType("http://fairspace.io/ontology#User")
 @EqualsAndHashCode(callSuper = true)
 @Data
-class User extends PersistentEntity {
-    @RDFProperty(value = "http://fairspace.io/ontology#externalId", required = true)
-    private String externalId;
-
+public class User extends PersistentEntity {
     @RDFProperty(value = "http://www.w3.org/2000/01/rdf-schema#label", required = true)
     private String name;
 
