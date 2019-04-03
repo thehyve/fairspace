@@ -23,6 +23,8 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -83,6 +85,18 @@ public class ChangeableMetadataServiceValidationTest {
     public void patchShouldNotAcceptMachineOnlyTriples() {
         when(validator.validate(any(), any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.patch(createDefaultModel());
+    }
+
+    @Test
+    public void patchShouldNotValidateExistingTriples() {
+        when(validator.validatePut(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
+
+        ds.getNamedModel(GRAPH).add(STMT1);
+        api.patch(createDefaultModel().add(STMT1));
+
+        verify(validator).validatePut(argThat(Model::isEmpty));
+        verify(validator).validateDelete(argThat(Model::isEmpty));
     }
 
     @Test
