@@ -76,14 +76,14 @@ public class App {
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(systemVocabulary),
                 new PermissionCheckingValidator(permissions, affectedResourcesDetector),
-                new ShaclValidator(rdf, defaultGraphIRI, systemVocabularyGraphNode, affectedResourcesDetector, ShaclValidationEngineFactory::createEngine),
-                new ShaclValidator(rdf, defaultGraphIRI, userVocabularyGraphNode, affectedResourcesDetector, ShaclValidationEngineFactory::createEngine));
+                new ShaclValidator(rdf, defaultGraphIRI, systemVocabularyGraphNode, affectedResourcesDetector),
+                new ShaclValidator(rdf, defaultGraphIRI, userVocabularyGraphNode, affectedResourcesDetector));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(metaVocabulary),
-                new ShaclValidator(rdf, userVocabularyGraphNode, metaVocabularyGraphNode, affectedResourcesDetector, ShaclValidationEngineFactory::createEngine));
+                new ShaclValidator(rdf, userVocabularyGraphNode, metaVocabularyGraphNode, affectedResourcesDetector));
 
         var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, vocabularyValidator);
         var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
