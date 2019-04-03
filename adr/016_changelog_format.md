@@ -7,7 +7,7 @@ We need to keep track of changes between releases.
 
 * **Decision**: 
 Functional changes should be tracked in a separate markdown file (CHANGELOG.md).
-That file will have the format and follow the principles defined [here](https://keepachangelog.com/en/).
+That file will have the format and follow the principles defined at [keep a changelog](https://keepachangelog.com/en/1.1.0/).
 
 Changes should be described mostly from the end-user perspective. Important architectural and non functional changes can be mentioned as well. To make it clear that those changes don't affect any functionality, I'd propose to tag them with word `Infastructural`, e.g. `- (Infastructural) Logging improvements`. (The word `non-functional` might be confusing for some users).
 A user should be able to understand the impact of the changes without going into technical details or looking into Jira tickets.
