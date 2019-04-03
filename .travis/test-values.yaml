@@ -17,8 +17,6 @@ workspace:
 
 # Specific settings for Pluto subchart
 pluto:
-  image:
-    tag: 0.6.2
   keycloak:
     baseUrl: https://keycloak.hyperspace.test.fairspace.app
     realm: test
@@ -28,13 +26,9 @@ pluto:
     jupyter: https://jupyterhub.workspace.test.fairspace.app
 
 # Specific settings for Saturn subchart
-saturn:
-  image:
-    tag: 0.6.2
+saturn: {}
 
-mercury:
-  image:
-    tag: 0.6.2
+mercury: {}
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
@@ -53,8 +47,6 @@ jupyterhub:
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.test.fairspace.app
   hub:
-    image:
-      tag: 0.6.2
     extraEnv:
       JUPYTERHUB_CRYPT_KEY: 8232144c8cba2105c71ee2f0e28158f2cc4417bfd103764017422393619208fe
   proxy:
