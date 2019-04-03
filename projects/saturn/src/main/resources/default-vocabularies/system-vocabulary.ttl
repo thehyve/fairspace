@@ -88,7 +88,8 @@ fs:UserShape a fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
         rdfs:labelShape,
-        rdfs:commentShape .
+        rdfs:commentShape
+        fs:userEmailShape .
 
 ## Property Shapes
 
@@ -154,6 +155,14 @@ fs:md5Shape a fs:PropertyShape ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
     sh:path fs:md5 .
+
+fs:userEmailShape a fs:PropertyShape ;
+    sh:name "Email" ;
+    sh:description "Email address" ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    fs:machineOnly true ;
+    sh:path fs:email .
 
 
 ## Relation Shapes
