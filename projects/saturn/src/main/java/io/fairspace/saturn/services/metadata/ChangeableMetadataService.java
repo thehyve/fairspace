@@ -36,10 +36,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        commit("Store metadata", rdf, () -> {
-            ensureValidParameters(null, model);
-            doPut(model);
-        });
+        commit("Store metadata", rdf, () -> update(null, model));
     }
 
     /**
@@ -56,8 +53,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param object    Object URI to filter the delete query on. Literal values are not supported
      */
     void delete(String subject, String predicate, String object) {
-        commit("Delete metadata", rdf, () ->
-                delete(get(subject, predicate, object, false)));
+        commit("Delete metadata", rdf, () -> delete(get(subject, predicate, object, false)));
     }
 
     /**
@@ -67,10 +63,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        commit("Delete metadata", rdf, () -> {
-            ensureValidParameters(model, null);
-            doDelete(model);
-        });
+        commit("Delete metadata", rdf, () -> update(model, null));
     }
 
     /**
@@ -98,23 +91,24 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             model.remove(unchanged);
             toDelete.remove(unchanged);
 
-            ensureValidParameters(toDelete, model);
-
-            doDelete(toDelete);
-            doPut(model);
+            update(toDelete, model);
         });
     }
 
-    private void doPut(Model model) {
-        // Store information on the lifecycle of the entities
-        lifeCycleManager.updateLifecycleMetadata(model);
+    private void update(Model modelToRemove, Model modelToAdd) {
+        ensureValidParameters(modelToRemove, modelToAdd);
 
-        // Store the actual update
-        rdf.load(graph.getURI(), model);
-    }
+        if (modelToRemove != null) {
+            rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove.listStatements().toList()))));
+        }
 
-    private void doDelete(Model model) {
-        rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(model.listStatements().toList()))));
+        if (modelToAdd != null) {
+            // Store information on the lifecycle of the entities
+            lifeCycleManager.updateLifecycleMetadata(modelToAdd);
+
+            // Store the actual update
+            rdf.load(graph.getURI(), modelToAdd);
+        }
     }
 
     /**
