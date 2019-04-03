@@ -8,6 +8,8 @@ import org.apache.jena.rdf.model.Resource;
 import java.util.Set;
 import java.util.function.Function;
 
+import static com.google.common.collect.Sets.union;
+
 @AllArgsConstructor
 public class PermissionCheckingValidator implements MetadataRequestValidator {
     private final PermissionsService permissions;
@@ -15,11 +17,9 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        return validateModel(modelToRemove).merge(validateModel(modelToAdd));
-    }
+        var affected = union(affectedResourcesDetector.apply(modelToRemove), affectedResourcesDetector.apply(modelToAdd));
 
-    private ValidationResult validateModel(Model model) {
-        return affectedResourcesDetector.apply(model)
+        return affected
                 .stream()
                 .map(this::validateResource)
                 .reduce(ValidationResult.VALID, ValidationResult::merge);
