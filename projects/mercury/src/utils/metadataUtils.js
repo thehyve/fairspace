@@ -127,17 +127,11 @@ export const propertiesToShow = (properties = []) => {
  * Creates a json-ld object from the given subject, predicate and values
  */
 export const toJsonLd = (subject, predicate, values) => {
-    if (!subject) {
+    if (!subject || !predicate || !values) {
         return null;
     }
 
-    if (!predicate) {
-        return {
-            '@id': subject
-        };
-    }
-
-    if (!values || values.length === 0) {
+    if (values.length === 0) {
         return {
             '@id': subject,
             [predicate]: {'@id': consts.NIL_URI}

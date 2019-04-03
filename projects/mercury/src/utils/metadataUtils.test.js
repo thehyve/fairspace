@@ -242,9 +242,7 @@ describe('Metadata Utils', () => {
             const values = [{id: "some-id"}];
             const jsonLd = toJsonLd(subject, null, values);
 
-            const expected = {"@id": "some-subject"};
-
-            expect(jsonLd).toEqual(expected);
+            expect(jsonLd).toEqual(null);
         });
 
         it('null values', () => {
@@ -252,12 +250,7 @@ describe('Metadata Utils', () => {
             const predicate = "some-predicate";
             const jsonLd = toJsonLd(subject, predicate, null);
 
-            const expected = {
-                "@id": "some-subject",
-                [predicate]: {'@id': consts.NIL_URI}
-            };
-
-            expect(jsonLd).toEqual(expected);
+            expect(jsonLd).toEqual(null);
         });
 
         it('empty values', () => {
@@ -276,7 +269,6 @@ describe('Metadata Utils', () => {
         it('null subject', () => {
             const predicate = "some-predicate";
             const values = [{id: "some-id"}];
-
             const jsonLd = toJsonLd(null, predicate, values);
 
             expect(jsonLd).toEqual(null);
