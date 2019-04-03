@@ -1,6 +1,6 @@
 # Keep track of changes
 
-* **Status**: proposed
+* **Status**: accepted
 
 * **Context**: 
 We need to keep track of changes between releases. 
