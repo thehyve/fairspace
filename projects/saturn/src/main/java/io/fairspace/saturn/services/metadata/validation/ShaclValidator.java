@@ -69,6 +69,7 @@ public class ShaclValidator implements MetadataRequestValidator {
                 .reduce(ValidationResult.VALID, ValidationResult::merge);
     }
 
+    // Copied from org.topbraid.shacl.validation.ValidationUtil.validateModel
     // TODO: Use ValidationUtil.createEngine to be added in SHACL 1.2.0
     private ValidationEngine createEngine(Model dataModel, Model shapesModel) {
         // Ensure that the SHACL, DASH and TOSH graphs are present in the shapes Model
@@ -102,6 +103,10 @@ public class ShaclValidator implements MetadataRequestValidator {
         }
     }
 
+    /**
+     * @param affectedResources
+     * @return a model containing all triples describing the affected resources plus types (rdf:type) of the objects
+     */
     private Model targetModel(Set<Resource> affectedResources) {
         var model = createDefaultModel();
         affectedResources.forEach(r ->
