@@ -22,6 +22,7 @@ export const FAIRSPACE_NS = 'http://fairspace.io/ontology#';
 
 // URIs
 export const TYPE_URI = RDF_NS + 'type';
+export const LIST_URI = RDF_NS + 'List';
 export const LABEL_URI = RDFS_NS + 'label';
 export const COMMENT_URI = RDFS_NS + 'comment';
 

@@ -31,6 +31,9 @@
       },
       {
         "@id": "http://www.w3.org/2000/01/rdf-schema#commentShape"
+      },
+      {
+        "@id": "http://fairspace.io/ontology#listShape"
       }
     ],
     "http://www.w3.org/ns/shacl#targetClass": [
@@ -201,5 +204,32 @@
         "@id": "http://fairspace.io/ontology#hasFile"
       }
     ]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#listShape",
+    "@type": [
+      "http://fairspace.io/ontology#RelationShape"
+    ],
+    "http://www.w3.org/ns/shacl#class": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#description": [
+      {
+        "@value": "A list of values"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#name": [
+      {
+        "@value": "List"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#path": [
+      {
+        "@id": "http://fairspace.io/ontology#list"
+      }
+    ]
   }
+
 ]
