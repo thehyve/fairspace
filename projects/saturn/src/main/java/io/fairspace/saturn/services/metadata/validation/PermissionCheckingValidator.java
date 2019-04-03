@@ -33,7 +33,9 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
         var resourcesToValidate = new HashSet<Resource>();
 
         model.listStatements().forEachRemaining(stmt -> {
-                    resourcesToValidate.add(stmt.getSubject());
+                    if (stmt.getSubject().isURIResource()) {
+                        resourcesToValidate.add(stmt.getSubject());
+                    }
 
                     if (stmt.getObject().isURIResource() &&
                             Stream.of(vocabularies)
