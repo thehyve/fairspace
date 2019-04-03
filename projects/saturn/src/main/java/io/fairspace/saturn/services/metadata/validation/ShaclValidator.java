@@ -27,6 +27,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.topbraid.shacl.util.SHACL2SPINBridge.createConstraintViolations;
 
@@ -66,8 +68,27 @@ public class ShaclValidator implements MetadataRequestValidator {
 
         return violations.stream()
                 .filter(ConstraintViolation::isError)
-                .map(violation -> new ValidationResult(violation.getRoot().getURI() + ": " + violation.getMessage()))
+                .map(ShaclValidator::toValidationResult)
                 .reduce(ValidationResult.VALID, ValidationResult::merge);
+    }
+
+
+    /**
+     * @param affectedResources
+     * @return a model containing all triples describing the affected resources plus types (rdf:type) of the objects
+     */
+    private Model targetModel(Set<Resource> affectedResources) {
+        var model = createDefaultModel();
+        affectedResources.forEach(r ->
+                model.add(rdf.queryConstruct(storedQuery("select_by_mask_with_types", dataGraph, r.asNode(), null, null))));
+        return model;
+    }
+
+    private static ValidationResult toValidationResult(ConstraintViolation violation) {
+        return new ValidationResult(format("%s %s: %s",
+                violation.getRoot().getURI(),
+                violation.getPaths().stream().map(path -> path.getPredicate().toString()).collect(joining(", ")),
+                violation.getMessage()));
     }
 
     // Copied from org.topbraid.shacl.validation.ValidationUtil.validateModel
@@ -102,16 +123,5 @@ public class ShaclValidator implements MetadataRequestValidator {
         catch(InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * @param affectedResources
-     * @return a model containing all triples describing the affected resources plus types (rdf:type) of the objects
-     */
-    private Model targetModel(Set<Resource> affectedResources) {
-        var model = createDefaultModel();
-        affectedResources.forEach(r ->
-                model.add(rdf.queryConstruct(storedQuery("select_by_mask_with_types", dataGraph, r.asNode(), null, null))));
-        return model;
     }
 }
