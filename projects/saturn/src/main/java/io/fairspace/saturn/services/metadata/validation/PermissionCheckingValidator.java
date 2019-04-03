@@ -16,10 +16,6 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
     }
 
     private ValidationResult validateModel(Model model) {
-        if (model == null) {
-            return ValidationResult.VALID;
-        }
-
         return affectedResourcesDetector.getAffectedResources(model)
                 .stream()
                 .map(this::validateResource)

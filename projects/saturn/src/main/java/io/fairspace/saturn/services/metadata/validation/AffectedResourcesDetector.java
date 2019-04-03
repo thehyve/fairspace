@@ -18,16 +18,18 @@ public class AffectedResourcesDetector {
     public Set<Resource> getAffectedResources(Model model) {
         var resources = new HashSet<Resource>();
 
-        model.listStatements().forEachRemaining(stmt -> {
-                    resources.add(stmt.getSubject());
+        if (model != null) {
+            model.listStatements().forEachRemaining(stmt -> {
+                        resources.add(stmt.getSubject());
 
-                    if (stmt.getObject().isURIResource() &&
-                            Stream.of(vocabularies)
-                                    .anyMatch(voc -> voc.isInvertiblePredicate(stmt.getPredicate().getURI()))) {
-                        resources.add(stmt.getResource());
+                        if (stmt.getObject().isURIResource() &&
+                                Stream.of(vocabularies)
+                                        .anyMatch(voc -> voc.isInvertiblePredicate(stmt.getPredicate().getURI()))) {
+                            resources.add(stmt.getResource());
+                        }
                     }
-                }
-        );
+            );
+        }
 
         return resources;
     }

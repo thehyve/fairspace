@@ -12,10 +12,7 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.*;
-import io.fairspace.saturn.services.metadata.validation.AffectedResourcesDetector;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
-import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
+import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
@@ -26,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.sparql.core.Quad;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,10 +72,17 @@ public class App {
 
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(systemVocabulary),
-                new PermissionCheckingValidator(permissions, affectedResourcesDetector));
+                new PermissionCheckingValidator(permissions, affectedResourcesDetector),
+                new ShaclValidator(rdf, defaultGraphIRI, systemVocabularyGraphNode, affectedResourcesDetector),
+                new ShaclValidator(rdf, defaultGraphIRI, userVocabularyGraphNode, affectedResourcesDetector));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
-        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
+
+        var vocabularyValidator = new ComposedValidator(
+                new ProtectMachineOnlyPredicatesValidator(metaVocabulary),
+                new ShaclValidator(rdf, userVocabularyGraphNode, metaVocabularyGraphNode, affectedResourcesDetector));
+
+        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, vocabularyValidator);
         var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
         var metaVocabularyService = new ReadableMetadataService(rdf, metaVocabularyGraphNode);
 
