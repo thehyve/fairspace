@@ -52,7 +52,7 @@ else workspacename=$4
 fi
 
 if [ -z "$5" ]
-then fullworkspacename=$workspacename
+then fullworkspacename="${releasename}-workspace"
 else fullworkspacename=$5
 fi
 
