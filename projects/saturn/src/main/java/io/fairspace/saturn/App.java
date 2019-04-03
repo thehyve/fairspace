@@ -12,6 +12,7 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.*;
+import io.fairspace.saturn.services.metadata.validation.AffectedResourcesDetector;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
 import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
@@ -69,9 +70,11 @@ public class App {
         var systemVocabulary = Vocabulary.recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
         var metaVocabulary = Vocabulary.recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
 
+        var affectedResourcesDetector = new AffectedResourcesDetector(systemVocabulary, userVocabulary);
+
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(systemVocabulary),
-                new PermissionCheckingValidator(permissions, systemVocabulary, userVocabulary));
+                new PermissionCheckingValidator(permissions, affectedResourcesDetector));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
         var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));

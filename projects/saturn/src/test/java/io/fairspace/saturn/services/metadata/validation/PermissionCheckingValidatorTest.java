@@ -39,7 +39,7 @@ public class PermissionCheckingValidatorTest {
 
     @Before
     public void setUp() {
-        validator = new PermissionCheckingValidator(permissions, vocabulary1, vocabulary2);
+        validator = new PermissionCheckingValidator(permissions, new AffectedResourcesDetector(vocabulary1, vocabulary2));
     }
 
     @Test
