@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import io.fairspace.saturn.services.metadata.validation.ValidationResult;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -13,7 +12,6 @@ import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static java.util.stream.Collectors.toList;
@@ -39,7 +37,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void put(Model model) {
         commit("Store metadata", rdf, () -> {
-            ensureValidParameters(validator -> validator.validatePut(model));
+            ensureValidParameters(null, model);
             doPut(model);
         });
     }
@@ -70,7 +68,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void delete(Model model) {
         commit("Delete metadata", rdf, () -> {
-            ensureValidParameters(validator -> validator.validateDelete(model));
+            ensureValidParameters(model, null);
             doDelete(model);
         });
     }
@@ -95,7 +93,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             model.listStatements().forEachRemaining(stmt ->
                     toDelete.add(get(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), null, false)));
 
-            ensureValidParameters(validator -> validator.validateDelete(toDelete).merge(validator.validatePut(model)));
+            ensureValidParameters(toDelete, model);
 
             doDelete(toDelete);
             doPut(model);
@@ -118,12 +116,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * Runs the given validationLogic the validator and throws an IllegalArgumentException if the validation fails
      *
      * If no validator is specified, the method does nothing
-     * 
-     * @param validationLogic   Logic to be called on the validator. For example: validator -> validator.validatePut(model)
      */
-    private void ensureValidParameters(Function<MetadataRequestValidator, ValidationResult> validationLogic) {
+    private void ensureValidParameters(Model toRemove, Model toAdd) {
         if(validator != null) {
-            ValidationResult validationResult = validationLogic.apply(validator);
+            var validationResult = validator.validate(toRemove, toAdd);
             if(!validationResult.isValid()) {
                 throw new ValidationException(validationResult.getMessage());
             }

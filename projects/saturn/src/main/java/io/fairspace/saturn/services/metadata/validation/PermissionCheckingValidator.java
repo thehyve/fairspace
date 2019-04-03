@@ -19,17 +19,15 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
     }
 
     @Override
-    public ValidationResult validatePut(Model model) {
-        return validateModel(model);
+    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
+        return validateModel(modelToRemove).merge(validateModel(modelToAdd));
     }
-
-    @Override
-    public ValidationResult validateDelete(Model model) {
-        return validateModel(model);
-    }
-
 
     private ValidationResult validateModel(Model model) {
+        if (model == null) {
+            return ValidationResult.VALID;
+        }
+
         var resourcesToValidate = new HashSet<Resource>();
 
         model.listStatements().forEachRemaining(stmt -> {

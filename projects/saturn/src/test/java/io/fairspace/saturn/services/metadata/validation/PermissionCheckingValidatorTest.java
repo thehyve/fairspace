@@ -44,7 +44,7 @@ public class PermissionCheckingValidatorTest {
 
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
-        assertEquals(ValidationResult.VALID, validator.validatePut(model));
+        assertEquals(ValidationResult.VALID, validator.validate(null, model));
 
         verifyZeroInteractions(permissions, vocabulary1, vocabulary2);
     }
@@ -55,7 +55,7 @@ public class PermissionCheckingValidatorTest {
 
         when(permissions.getPermission(any())).thenReturn(Access.Read);
 
-        assertFalse(validator.validatePut(model).isValid());
+        assertFalse(validator.validate(null, model).isValid());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class PermissionCheckingValidatorTest {
         when(vocabulary1.isInvertiblePredicate(any())).thenReturn(false);
         when(vocabulary2.isInvertiblePredicate(any())).thenReturn(false);
 
-        assertEquals(ValidationResult.VALID, validator.validatePut(model));
+        assertEquals(ValidationResult.VALID, validator.validate(null, model));
 
         verify(permissions).getPermission(STATEMENT.getSubject().asNode());
         verify(vocabulary1).isInvertiblePredicate(STATEMENT.getPredicate().getURI());
@@ -82,7 +82,7 @@ public class PermissionCheckingValidatorTest {
         when(vocabulary1.isInvertiblePredicate(any())).thenReturn(false);
         when(vocabulary2.isInvertiblePredicate(any())).thenReturn(true);
 
-        assertEquals(ValidationResult.VALID, validator.validatePut(model));
+        assertEquals(ValidationResult.VALID, validator.validate(null, model));
 
         verify(permissions).getPermission(STATEMENT.getSubject().asNode());
         verify(permissions).getPermission(STATEMENT.getObject().asNode());
@@ -100,7 +100,7 @@ public class PermissionCheckingValidatorTest {
         when(vocabulary1.isInvertiblePredicate(any())).thenReturn(false);
         when(vocabulary2.isInvertiblePredicate(any())).thenReturn(true);
 
-        assertFalse(validator.validatePut(model).isValid());
+        assertFalse(validator.validate(null, model).isValid());
 
         verify(permissions).getPermission(STATEMENT.getSubject().asNode());
         verify(permissions).getPermission(STATEMENT.getObject().asNode());

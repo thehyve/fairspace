@@ -16,15 +16,12 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
         this.vocabulary = vocabulary;
     }
 
-    @Override
-    public ValidationResult validatePut(Model model) {
-        return validateModelAgainstMachineOnlyPredicates(model);
-    }
 
     @Override
-    public ValidationResult validateDelete(Model model) {
-        return validateModelAgainstMachineOnlyPredicates(model);
+    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
+        return validateModelAgainstMachineOnlyPredicates(modelToRemove).merge(validateModelAgainstMachineOnlyPredicates(modelToAdd));
     }
+
 
     /**
      * Ensures that the given model does not contain any machine-only predicates.

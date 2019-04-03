@@ -2,9 +2,9 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import org.apache.jena.rdf.model.Model;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
+
+import static java.util.Arrays.asList;
 
 /**
  * This validator checks whether the requested action will modify any machine-only
@@ -14,26 +14,16 @@ public class ComposedValidator implements MetadataRequestValidator{
     private List<MetadataRequestValidator> validators;
 
     public ComposedValidator(MetadataRequestValidator... validators) {
-        this.validators = Arrays.asList(validators);
-    }
-
-    @Override
-    public ValidationResult validatePut(Model model) {
-        return validateComposed(validator -> validator.validatePut(model));
-    }
-
-    @Override
-    public ValidationResult validateDelete(Model model) {
-        return validateComposed(validator -> validator.validateDelete(model));
+        this.validators = asList(validators);
     }
 
     /**
-     * Runs the given validationLogic on each validator and returns the composed result
-     * @param validationLogic   Logic to be called on each validator. For example: validator -> validator.validatePut(model)
+     * Executes each validator and returns the composed result
      */
-    ValidationResult validateComposed(Function<MetadataRequestValidator, ValidationResult> validationLogic) {
+    @Override
+    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
         return validators.stream()
-                .map(validationLogic)
+                .map(v -> v.validate(modelToRemove, modelToAdd))
                 .reduce(ValidationResult.VALID, ValidationResult::merge);
     }
 }
