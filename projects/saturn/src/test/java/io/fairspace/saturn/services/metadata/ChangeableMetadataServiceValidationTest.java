@@ -89,14 +89,13 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void patchShouldNotValidateExistingTriples() {
-        when(validator.validatePut(any())).thenReturn(ValidationResult.VALID);
-        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validate(any(), any())).thenReturn(ValidationResult.VALID);
+        when(validator.validate(any(), any())).thenReturn(ValidationResult.VALID);
 
         ds.getNamedModel(GRAPH).add(STMT1);
         api.patch(createDefaultModel().add(STMT1));
 
-        verify(validator).validatePut(argThat(Model::isEmpty));
-        verify(validator).validateDelete(argThat(Model::isEmpty));
+        verify(validator).validate(argThat(Model::isEmpty), argThat(Model::isEmpty));
     }
 
     @Test
