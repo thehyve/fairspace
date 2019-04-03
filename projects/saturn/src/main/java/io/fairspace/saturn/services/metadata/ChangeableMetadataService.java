@@ -95,6 +95,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             model.listStatements().forEachRemaining(stmt ->
                     toDelete.add(get(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), null, false)));
 
+            var unchanged = toDelete.intersection(model);
+            model.remove(unchanged);
+            toDelete.remove(unchanged);
+
             ensureValidParameters(validator -> validator.validateDelete(toDelete).merge(validator.validatePut(model)));
 
             doDelete(toDelete);
