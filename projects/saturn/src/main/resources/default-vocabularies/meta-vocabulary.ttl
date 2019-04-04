@@ -44,7 +44,8 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:datatype xsd:boolean ;
         sh:maxCount 1 ;
         sh:path fs:showInCatalog ;
-        sh:name "Show in catalog"
+        sh:name "Show in catalog" ;
+        sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
@@ -63,10 +64,14 @@ fs:PropertyShapeMeta a sh:NodeShape ;
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
+        sh:maxInclusive 1 ;
+        sh:lessThanOrEquals sh:maxCount ;
         sh:name "Minimum number of values"
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxCount ;
+        sh:greaterThanOrEquals sh:minCount ;
+        sh:minInclusive 1 ;
         sh:name "Maximum number of values"
     ], [
         sh:class rdf:List ;
@@ -106,7 +111,15 @@ fs:RelationShapeMeta a sh:NodeShape ;
     sh:property [
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
+        sh:maxInclusive 1 ;
+        sh:lessThanOrEquals sh:maxCount ;
         sh:name "Minimum number of values"
+    ], [
+        sh:datatype xsd:integer ;
+        sh:path sh:maxCount ;
+        sh:minInclusive 1 ;
+        sh:greaterThanOrEquals sh:minCount ;
+        sh:name "Maximum number of values"
     ], [
         sh:class fs:Class ;
         sh:path sh:class ;
@@ -130,10 +143,6 @@ fs:RelationShapeMeta a sh:NodeShape ;
         sh:minCount 1 ;
         sh:path sh:name ;
         sh:name "Property name"
-    ], [
-        sh:datatype xsd:integer ;
-        sh:path sh:maxCount ;
-        sh:name "Maximum number of values"
     ], [
         sh:path fs:machineOnly
     ] ;
