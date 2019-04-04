@@ -22,6 +22,7 @@ import static org.apache.jena.system.Txn.calculateRead;
 import static org.junit.Assert.*;
 
 public class ShaclValidatorTest {
+    private static final Model EMPTY = createDefaultModel();
     private static final Resource resource1 = createResource("http://example.com/123");
     private static final Resource resource2 = createResource("http://example.com/234");
 
@@ -43,13 +44,12 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateNoChanges() {
-        assertEquals(ValidationResult.VALID, validator.validate(null, null));
-        assertEquals(ValidationResult.VALID, validator.validate(createDefaultModel(), createDefaultModel()));
+        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, EMPTY));
     }
 
     @Test
     public void validateResourceWithNoType() {
-        var result = validator.validate(null, createDefaultModel()
+        var result = validator.validate(EMPTY, createDefaultModel()
                 .add(resource1, RDFS.label, createTypedLiteral(123)));
 
         assertTrue(result.isValid());
@@ -57,7 +57,7 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceWithInvalidProperties() {
-        var result = validator.validate(null, createDefaultModel()
+        var result = validator.validate(EMPTY, createDefaultModel()
                 .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#User"))
                 .add(resource1, RDFS.label, createTypedLiteral(123))
                 .add(resource1, RDFS.comment, createTypedLiteral(123)));
@@ -70,7 +70,7 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceWithUnknownProperty() {
-        var result = validator.validate(null, createDefaultModel()
+        var result = validator.validate(EMPTY, createDefaultModel()
                 .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#User"))
                 .add(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123)));
 
@@ -80,7 +80,7 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceMissingRequiredProperty() {
-        var result = validator.validate(null, createDefaultModel()
+        var result = validator.validate(EMPTY, createDefaultModel()
                 .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#File")));
 
         assertFalse(result.isValid());
@@ -89,7 +89,7 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceWithWrongObjectsType() {
-        var result = validator.validate(null, createDefaultModel()
+        var result = validator.validate(EMPTY, createDefaultModel()
                 .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#File")));
 
         assertFalse(result.isValid());
