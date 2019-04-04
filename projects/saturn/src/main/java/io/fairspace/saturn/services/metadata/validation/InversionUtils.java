@@ -37,6 +37,10 @@ public class InversionUtils {
         return resources;
     }
 
+    /**
+     * @param rdf
+     * @return A property-to-property map of inverse properties from the user vocabulary
+     */
     public static Map<Property, Property> getInverseProperties(RDFConnection rdf) {
         var result = new HashMap<Property, Property>();
         rdf.querySelect(storedQuery("inverse_properties"), row -> {
