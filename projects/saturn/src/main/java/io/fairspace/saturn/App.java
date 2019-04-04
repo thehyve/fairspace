@@ -5,7 +5,6 @@ import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.auth.VocabularyAuthorizationVerifier;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.rdf.Vocabulary;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -35,6 +34,8 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
+import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
+import static io.fairspace.saturn.rdf.Vocabulary.recreateVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.apache.jena.system.Txn.calculateRead;
@@ -45,8 +46,8 @@ public class App {
         log.info("Saturn is starting");
 
         var userVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "user-vocabulary");
-        var systemVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "system-vocabulary");
-        var metaVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "meta-vocabulary");
+        var systemVocabularyGraphNode = createURI("http://fairspace.io/ontology/system-vocabulary");
+        var metaVocabularyGraphNode = createURI("http://fairspace.io/ontology/meta-vocabulary");
 
         var ds = SaturnDatasetFactory.connect(CONFIG.jena, userVocabularyGraphNode);
 
@@ -68,9 +69,9 @@ public class App {
         var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
         // Setup and initialize vocabularies
-        var userVocabulary = Vocabulary.initializeVocabulary(rdf, userVocabularyGraphNode, "default-vocabularies/user-vocabulary.ttl");
-        var systemVocabulary = Vocabulary.recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
-        var metaVocabulary = Vocabulary.recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
+        var userVocabulary = initializeVocabulary(rdf, userVocabularyGraphNode, "default-vocabularies/user-vocabulary.ttl");
+        var systemVocabulary = recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
+        var metaVocabulary = recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
 
         Function<Model, Set<Resource>> affectedResourcesDetector = new AffectedResourcesDetector(systemVocabulary, userVocabulary)::getAffectedResources;
         Supplier<Model> mergedVocabularySupplier = () -> calculateRead(rdf, () ->
