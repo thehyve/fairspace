@@ -44,25 +44,27 @@ public class ShaclValidator implements MetadataRequestValidator {
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
         var affectedResources = getAffectedResources(rdf, modelToRemove.union(modelToAdd));
 
-        var model = targetModel(affectedResources).remove(modelToRemove).add(modelToAdd);
+        var model = targetModel(affectedResources)
+                .remove(modelToRemove)
+                .add(modelToAdd);
 
-        var validationEngine = createEngine(model, shapesModelSupplier.get());
+        try {
+            var validationEngine = createEngine(model, shapesModelSupplier.get());
 
-        for (var resource: affectedResources) {
-            try {
+            for (var resource : affectedResources) {
                 validationEngine.validateNode(resource.asNode());
-            } catch (InterruptedException e) {
-                return new ValidationResult("SHACL validation was interrupted");
             }
+
+            var report = validationEngine.getReport();
+            var violations = createConstraintViolations(report.getModel());
+
+            return violations.stream()
+                    .filter(ConstraintViolation::isError)
+                    .map(ShaclValidator::toValidationResult)
+                    .reduce(ValidationResult.VALID, ValidationResult::merge);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("SHACL validation was interrupted");
         }
-
-        var report = validationEngine.getReport();
-        var violations = createConstraintViolations(report.getModel());
-
-        return violations.stream()
-                .filter(ConstraintViolation::isError)
-                .map(ShaclValidator::toValidationResult)
-                .reduce(ValidationResult.VALID, ValidationResult::merge);
     }
 
     /**
@@ -85,11 +87,11 @@ public class ShaclValidator implements MetadataRequestValidator {
 
     // Copied from org.topbraid.shacl.validation.ValidationUtil.validateModel
     // TODO: Use ValidationUtil.createEngine to be added in SHACL 1.2.0
-    private ValidationEngine createEngine(Model dataModel, Model shapesModel) {
+    private static ValidationEngine createEngine(Model dataModel, Model shapesModel) throws InterruptedException {
         // Ensure that the SHACL, DASH and TOSH graphs are present in the shapes Model
-        if(!shapesModel.contains(TOSH.hasShape, RDF.type, (RDFNode)null)) { // Heuristic
+        if (!shapesModel.contains(TOSH.hasShape, RDF.type, (RDFNode) null)) { // Heuristic
             Model unionModel = SHACLSystemModel.getSHACLModel();
-            MultiUnion unionGraph = new MultiUnion(new Graph[] {
+            MultiUnion unionGraph = new MultiUnion(new Graph[]{
                     unionModel.getGraph(),
                     shapesModel.getGraph()
             });
@@ -106,14 +108,9 @@ public class ShaclValidator implements MetadataRequestValidator {
         dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 
         ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
-            shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
+        shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
         ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
-        try {
-            engine.applyEntailments();
-            return engine;
-        }
-        catch(InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        engine.applyEntailments();
+        return engine;
     }
 }
