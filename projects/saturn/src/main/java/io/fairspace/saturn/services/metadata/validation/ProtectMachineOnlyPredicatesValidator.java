@@ -45,7 +45,7 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
      * @return true iff the given model contains one or more triples with a machine-only predicate
      */
     boolean containsMachineOnlyPredicates(Model model) {
-        if(model == null || model.isEmpty())
+        if(model.isEmpty())
             return false;
 
         var machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();

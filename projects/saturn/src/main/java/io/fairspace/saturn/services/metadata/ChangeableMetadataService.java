@@ -18,6 +18,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 public class ChangeableMetadataService extends ReadableMetadataService {
+    private static final Model EMPTY = createDefaultModel();
+
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
 
@@ -36,7 +38,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        commit("Store metadata", rdf, () -> update(null, model));
+        commit("Store metadata", rdf, () -> update(EMPTY, model));
     }
 
     /**
@@ -63,7 +65,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        commit("Delete metadata", rdf, () -> update(model, null));
+        commit("Delete metadata", rdf, () -> update(model, EMPTY));
     }
 
     /**
@@ -98,17 +100,13 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     private void update(Model modelToRemove, Model modelToAdd) {
         ensureValidParameters(modelToRemove, modelToAdd);
 
-        if (modelToRemove != null) {
-            rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove.listStatements().toList()))));
-        }
+        rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove.listStatements().toList()))));
 
-        if (modelToAdd != null) {
-            // Store information on the lifecycle of the entities
-            lifeCycleManager.updateLifecycleMetadata(modelToAdd);
+        // Store information on the lifecycle of the entities
+        lifeCycleManager.updateLifecycleMetadata(modelToAdd);
 
-            // Store the actual update
-            rdf.load(graph.getURI(), modelToAdd);
-        }
+        // Store the actual update
+        rdf.load(graph.getURI(), modelToAdd);
     }
 
     /**

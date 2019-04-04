@@ -45,13 +45,7 @@ public class ShaclValidator implements MetadataRequestValidator {
         var affectedResources = affectedResourcesDetector.apply(modelToRemove);
         affectedResources.addAll(affectedResourcesDetector.apply(modelToAdd));
 
-        var model = targetModel(affectedResources);
-        if (modelToRemove != null) {
-            model.remove(modelToRemove);
-        }
-        if (modelToAdd != null) {
-            model.add(modelToAdd);
-        }
+        var model = targetModel(affectedResources).remove(modelToRemove).add(modelToAdd);
 
         var validationEngine = createEngine(model, shapesModelSupplier.get());
 
