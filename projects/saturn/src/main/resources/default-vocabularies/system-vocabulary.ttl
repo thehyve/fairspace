@@ -24,9 +24,6 @@ fs:FileShape a fs:ClassShape ;
     sh:targetClass fs:File ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
-        fs:aboutPersonShape,
-        fs:aboutMaterialShape,
-        fs:associatedAnalysisShape,
         fs:fileSizeShape,
         fs:md5Shape,
         fs:filePathShape,
@@ -46,9 +43,6 @@ fs:DirectoryShape a fs:ClassShape ;
     sh:targetClass fs:Directory ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
-        fs:aboutPersonShape,
-        fs:aboutMaterialShape,
-        fs:associatedAnalysisShape,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -66,10 +60,6 @@ fs:CollectionShape a fs:ClassShape ;
     sh:targetClass fs:Collection ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
-        fs:hasFileShape,
-        fs:aboutPersonShape,
-        fs:aboutMaterialShape,
-        fs:partOfProjectShape,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,

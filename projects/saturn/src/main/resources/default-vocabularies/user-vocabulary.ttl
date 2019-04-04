@@ -15,6 +15,36 @@
 ###   User Shapes    ###
 ########################
 
+## Augmented system class shapes
+fs:FileShape a fs:ClassShape ;
+    sh:property
+        fs:aboutPersonShape,
+        fs:aboutMaterialShape,
+        fs:associatedAnalysisShape .
+
+fs:DirectoryShape a fs:ClassShape ;
+    sh:closed true ;
+    sh:description "A directory containing multiple files." ;
+    sh:name "Directory" ;
+    sh:targetClass fs:Directory ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+        fs:aboutPersonShape,
+        fs:aboutMaterialShape,
+        fs:associatedAnalysisShape .
+
+fs:CollectionShape a fs:ClassShape ;
+    sh:closed true ;
+    sh:description "Collection of files with associated metadata and access rules." ;
+    sh:name "Collection" ;
+    sh:targetClass fs:Collection ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+        fs:aboutPersonShape,
+        fs:aboutMaterialShape,
+        fs:partOfProjectShape .
+
+
 ## User class Shapes
 
 foaf:PersonShape a fs:ClassShape ;
