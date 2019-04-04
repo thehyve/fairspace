@@ -6,10 +6,10 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/#> .
-@prefix osiris: <http://osiris.fairspace.io/ontology/#> .
-@prefix icdo3: <http://icdo3.fairspace.io/ontology/#> .
-@prefix fhir: <http://hl7.org/fhir/STU3/#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix osiris: <http://osiris.fairspace.io/ontology#> .
+@prefix icdo3: <http://icdo3.fairspace.io/ontology#> .
+@prefix fhir: <http://hl7.org/fhir/STU3/> .
 
 ########################
 ###   Fixed Shapes   ###
