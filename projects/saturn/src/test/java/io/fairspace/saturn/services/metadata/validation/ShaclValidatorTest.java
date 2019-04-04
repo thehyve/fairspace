@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -94,5 +95,28 @@ public class ShaclValidatorTest {
 
         assertFalse(result.isValid());
         assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath: Less than 1 values.", result.getMessage());
+    }
+
+    @Test
+    public void canPerformTypChecks() {
+        ds.getDefaultModel()
+                .add(resource2, RDF.type, FOAF.Person);
+
+        var model = createDefaultModel()
+                .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#File"))
+                .add(resource1, createProperty("http://fairspace.io/ontology#filePath"), createStringLiteral("some/path"))
+                .add(resource1, createProperty("http://fairspace.io/ontology#aboutPerson"), resource2);
+
+        var result1 = validator.validate(EMPTY, model);
+
+        assertTrue(result1.isValid());
+
+        ds.getDefaultModel()
+                .remove(resource2, RDF.type, FOAF.Person)
+                .add(resource2, RDF.type, FOAF.Document);
+
+        var result2 = validator.validate(EMPTY, model);
+        assertFalse(result2.isValid());
+        assertEquals("http://example.com/123 http://fairspace.io/ontology#aboutPerson: Value does not have class foaf:Person.", result2.getMessage());
     }
 }
