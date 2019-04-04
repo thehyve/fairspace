@@ -97,7 +97,9 @@ fs:PropertyShapeMeta a sh:NodeShape ;
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:path
+        sh:path sh:path ;
+        sh:nodeKind sh:IRI
+        sh:name "Property identifier"
     ], [
         sh:path fs:machineOnly
     ] ;
@@ -129,20 +131,22 @@ fs:RelationShapeMeta a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:description ;
-        sh:name "Property description"
+        sh:name "Relation description"
     ], [
         sh:path sh:message
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:path
+        sh:path sh:path ;
+        sh:nodeKind sh:IRI ;
+        sh:name "Relation identifier"
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ;
-        sh:name "Property name"
+        sh:name "Relation name"
     ], [
         sh:path fs:machineOnly
     ] ;
