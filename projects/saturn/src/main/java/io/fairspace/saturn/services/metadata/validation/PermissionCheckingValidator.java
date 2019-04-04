@@ -4,23 +4,20 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdfconnection.RDFConnection;
 
-import java.util.Set;
-import java.util.function.Function;
-
-import static com.google.common.collect.Sets.union;
+import static io.fairspace.saturn.services.metadata.validation.InversionUtils.getAffectedResources;
 
 @AllArgsConstructor
 public class PermissionCheckingValidator implements MetadataRequestValidator {
+    private final RDFConnection rdf;
     private final PermissionsService permissions;
-    private final Function<Model, Set<Resource>> affectedResourcesDetector;
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        var affected = union(affectedResourcesDetector.apply(modelToRemove), affectedResourcesDetector.apply(modelToAdd));
-
-        return affected
+        return getAffectedResources(rdf, modelToRemove.union(modelToAdd))
                 .stream()
+                .filter(Resource::isURIResource)
                 .map(this::validateResource)
                 .reduce(ValidationResult.VALID, ValidationResult::merge);
     }

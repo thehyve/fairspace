@@ -24,10 +24,10 @@ import org.topbraid.spin.constraints.ConstraintViolation;
 import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.services.metadata.validation.InversionUtils.getAffectedResources;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -38,12 +38,11 @@ public class ShaclValidator implements MetadataRequestValidator {
     private final RDFConnection rdf;
     private final Node dataGraph;
     private final Supplier<Model> shapesModelSupplier;
-    private final Function<Model, Set<Resource>> affectedResourcesDetector;
+
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        var affectedResources = affectedResourcesDetector.apply(modelToRemove);
-        affectedResources.addAll(affectedResourcesDetector.apply(modelToAdd));
+        var affectedResources = getAffectedResources(rdf, modelToRemove.union(modelToAdd));
 
         var model = targetModel(affectedResources).remove(modelToRemove).add(modelToAdd);
 
@@ -65,7 +64,6 @@ public class ShaclValidator implements MetadataRequestValidator {
                 .map(ShaclValidator::toValidationResult)
                 .reduce(ValidationResult.VALID, ValidationResult::merge);
     }
-
 
     /**
      * @param affectedResources

@@ -2,17 +2,15 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Set;
-import java.util.function.Function;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -23,6 +21,8 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionCheckingValidatorTest {
+    private static final Model EMPTY = createDefaultModel();
+
     private static final Statement STATEMENT = createStatement(
             createResource("http://ex.com/subject"),
             createProperty("http://ex.com/predicate"),
@@ -31,8 +31,6 @@ public class PermissionCheckingValidatorTest {
     @Mock
     private PermissionsService permissions;
 
-    @Mock
-    private Function<Model, Set<Resource>> affectedResourcesDetector;
 
     private PermissionCheckingValidator validator;
 
@@ -40,13 +38,14 @@ public class PermissionCheckingValidatorTest {
 
     @Before
     public void setUp() {
-        validator = new PermissionCheckingValidator(permissions, affectedResourcesDetector);
+        var ds = DatasetFactory.create();
+        validator = new PermissionCheckingValidator(new RDFConnectionLocal(ds), permissions);
     }
 
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
-        when(affectedResourcesDetector.apply(any())).thenReturn(Set.of());
-        assertEquals(ValidationResult.VALID, validator.validate(null, model));
+        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, model));
+
         verifyZeroInteractions(permissions);
     }
 
@@ -55,9 +54,8 @@ public class PermissionCheckingValidatorTest {
         model.add(STATEMENT);
 
         when(permissions.getPermission(any())).thenReturn(Access.Read);
-        when(affectedResourcesDetector.apply(any())).thenReturn(Set.of(STATEMENT.getSubject()));
 
-        assertFalse(validator.validate(null, model).isValid());
+        assertFalse(validator.validate(EMPTY, model).isValid());
     }
 
     @Test
@@ -65,14 +63,13 @@ public class PermissionCheckingValidatorTest {
         model.add(STATEMENT);
 
         when(permissions.getPermission(any())).thenReturn(Access.Write);
-        when(affectedResourcesDetector.apply(any())).thenReturn(Set.of(STATEMENT.getSubject()));
 
-        assertEquals(ValidationResult.VALID, validator.validate(null, model));
+
+        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, model));
 
         verify(permissions).getPermission(STATEMENT.getSubject().asNode());
-        verify(affectedResourcesDetector).apply(null);
-        verify(affectedResourcesDetector).apply(model);
-        verifyNoMoreInteractions(permissions, affectedResourcesDetector);
+
+        verifyNoMoreInteractions(permissions);
     }
 
     @Test
@@ -80,15 +77,13 @@ public class PermissionCheckingValidatorTest {
         model.add(STATEMENT);
 
         when(permissions.getPermission(any())).thenReturn(Access.Write);
-        when(affectedResourcesDetector.apply(any())).thenReturn(Set.of(STATEMENT.getSubject(), STATEMENT.getObject().asResource()));
 
-        assertEquals(ValidationResult.VALID, validator.validate(null, model));
+        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, model));
 
         verify(permissions).getPermission(STATEMENT.getSubject().asNode());
         verify(permissions).getPermission(STATEMENT.getObject().asNode());
-        verify(affectedResourcesDetector).apply(null);
-        verify(affectedResourcesDetector).apply(model);
-        verifyNoMoreInteractions(permissions, affectedResourcesDetector);
+
+        verifyNoMoreInteractions(permissions);
     }
 
     @Test
@@ -97,14 +92,12 @@ public class PermissionCheckingValidatorTest {
 
         when(permissions.getPermission(eq(STATEMENT.getSubject().asNode()))).thenReturn(Access.Write);
         when(permissions.getPermission(eq(STATEMENT.getObject().asNode()))).thenReturn(Access.Read);
-        when(affectedResourcesDetector.apply(any())).thenReturn(Set.of(STATEMENT.getSubject(), STATEMENT.getObject().asResource()));
 
-        assertFalse(validator.validate(null, model).isValid());
+        assertFalse(validator.validate(EMPTY, model).isValid());
 
         verify(permissions).getPermission(STATEMENT.getSubject().asNode());
         verify(permissions).getPermission(STATEMENT.getObject().asNode());
-        verify(affectedResourcesDetector).apply(null);
-        verify(affectedResourcesDetector).apply(model);
-        verifyNoMoreInteractions(permissions, affectedResourcesDetector);
+
+        verifyNoMoreInteractions(permissions);
     }
 }

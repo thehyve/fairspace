@@ -34,11 +34,11 @@ public class ShaclValidatorTest {
     public void setUp() {
         var systemVocabulary = initializeVocabulary(rdf, generateIri("system-vocabulary"), "default-vocabularies/system-vocabulary.ttl");
         var userVocabulary = initializeVocabulary(rdf, generateIri("user-vocabulary"), "default-vocabularies/user-vocabulary.ttl");
-        var affectedResourcesDetector = new AffectedResourcesDetector(systemVocabulary, userVocabulary);
+
         Supplier<Model> mergedVocabularySupplier = () -> calculateRead(rdf, () ->
                 rdf.fetch(systemVocabulary.getVocabularyGraph().getURI())
                         .add(rdf.fetch(userVocabulary.getVocabularyGraph().getURI())));
-        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, mergedVocabularySupplier,  affectedResourcesDetector::getAffectedResources);
+        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, mergedVocabularySupplier);
     }
 
 

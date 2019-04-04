@@ -11,7 +11,10 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.*;
-import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
+import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
+import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
@@ -22,13 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
@@ -73,21 +73,20 @@ public class App {
         var systemVocabulary = recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
         var metaVocabulary = recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
 
-        Function<Model, Set<Resource>> affectedResourcesDetector = new AffectedResourcesDetector(systemVocabulary, userVocabulary)::getAffectedResources;
         Supplier<Model> mergedVocabularySupplier = () -> calculateRead(rdf, () ->
                 rdf.fetch(systemVocabularyGraphNode.getURI())
                         .add(rdf.fetch(userVocabularyGraphNode.getURI())));
 
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(systemVocabulary),
-                new PermissionCheckingValidator(permissions, affectedResourcesDetector),
-                new ShaclValidator(rdf, defaultGraphIRI, mergedVocabularySupplier, affectedResourcesDetector));
+                new PermissionCheckingValidator(rdf, permissions),
+                new ShaclValidator(rdf, defaultGraphIRI, mergedVocabularySupplier));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(metaVocabulary),
-                new ShaclValidator(rdf, userVocabularyGraphNode, () -> rdf.fetch(systemVocabularyGraphNode.getURI()), affectedResourcesDetector));
+                new ShaclValidator(rdf, userVocabularyGraphNode, () -> rdf.fetch(systemVocabularyGraphNode.getURI())));
 
         var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, vocabularyValidator);
         var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
