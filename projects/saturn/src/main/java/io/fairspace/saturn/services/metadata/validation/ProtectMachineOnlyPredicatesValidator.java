@@ -19,33 +19,34 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        return validateModelAgainstMachineOnlyPredicates(modelToRemove).merge(validateModelAgainstMachineOnlyPredicates(modelToAdd));
+        return validateModelAgainstMachineOnlyPredicates(modelToRemove)
+                .merge(validateModelAgainstMachineOnlyPredicates(modelToAdd));
     }
 
 
     /**
      * Ensures that the given model does not contain any machine-only predicates.
-     *
+     * <p>
      * If the model does contain a machine-only predicate, an IllegalArgumentException is thrown
+     *
      * @param model
      */
     private ValidationResult validateModelAgainstMachineOnlyPredicates(Model model) {
-        if (containsMachineOnlyPredicates(model)) {
-            return new ValidationResult("The given model contains one or more statements with machine-only predicates.");
-        }
-
-        return ValidationResult.VALID;
+        return containsMachineOnlyPredicates(model)
+                ? new ValidationResult("The given model contains one or more statements with machine-only predicates.")
+                : ValidationResult.VALID;
     }
 
     /**
      * Verifies whether the given model contains any triples with a machine-only predicate
-     *
+     * <p>
      * Whether a predicate is machine-only, is specified in the vocabulary.
+     *
      * @param model
      * @return true iff the given model contains one or more triples with a machine-only predicate
      */
     boolean containsMachineOnlyPredicates(Model model) {
-        if(model.isEmpty())
+        if (model.isEmpty())
             return false;
 
         var machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
