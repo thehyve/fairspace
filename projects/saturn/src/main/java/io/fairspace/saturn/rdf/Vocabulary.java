@@ -32,10 +32,6 @@ public class Vocabulary {
         return processor.getValues();
     }
 
-    public boolean isMachineOnlyPredicate(@NonNull String predicateUri) {
-        return rdfConnection.queryAsk(storedQuery("is_machine_only_property", vocabularyGraph, createURI(predicateUri)));
-    }
-
     public boolean isInvertiblePredicate(@NonNull String predicateUri) {
         return rdfConnection.queryAsk(storedQuery("is_invertible_property", vocabularyGraph, createURI(predicateUri)));
     }

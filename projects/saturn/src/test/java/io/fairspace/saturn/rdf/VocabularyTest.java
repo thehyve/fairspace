@@ -18,12 +18,8 @@ import java.util.List;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabularyTest {
@@ -64,22 +60,6 @@ public class VocabularyTest {
         assertEquals(1, machineOnlyPredicates.size());
         assertTrue(machineOnlyPredicates.contains(resource2.getURI()));
     }
-
-    @Test
-    public void testIsMachineOnlyPredicate() {
-        setupVocabularyWithMachineOnlyPredicates();
-
-        assertFalse(vocabulary.isMachineOnlyPredicate(resource1.getURI()));
-        assertTrue(vocabulary.isMachineOnlyPredicate(resource2.getURI()));
-        assertFalse(vocabulary.isMachineOnlyPredicate(resource3.getURI()));
-        assertFalse(vocabulary.isMachineOnlyPredicate(unknownResource.getURI()));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testMachineOnlyPredicateFailsOnNull() {
-        vocabulary.isMachineOnlyPredicate(null);
-    }
-
 
     @Test
     public void testVocabularyInitialization() {
