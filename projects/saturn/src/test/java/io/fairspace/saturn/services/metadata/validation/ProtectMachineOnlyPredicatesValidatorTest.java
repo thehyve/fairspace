@@ -37,7 +37,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     private ProtectMachineOnlyPredicatesValidator validator;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         validator = new ProtectMachineOnlyPredicatesValidator(vocabulary);
     }
 
@@ -103,7 +103,6 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyModel() {
         assertFalse(validator.containsMachineOnlyPredicates(createDefaultModel()));
-        assertFalse(validator.containsMachineOnlyPredicates(null));
     }
 
 }
