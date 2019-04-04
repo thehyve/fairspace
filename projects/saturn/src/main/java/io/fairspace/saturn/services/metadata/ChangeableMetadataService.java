@@ -88,16 +88,16 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             model.listStatements().forEachRemaining(stmt ->
                     toDelete.add(get(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), null, false)));
 
-            // Exclude statements already present in the database from validation
-            var unchanged = toDelete.intersection(model);
-            model.remove(unchanged);
-            toDelete.remove(unchanged);
-
             update(toDelete, model);
         });
     }
 
     private void update(Model modelToRemove, Model modelToAdd) {
+        // Exclude statements already present in the database from validation
+        var unchanged = modelToRemove.intersection(modelToAdd);
+        modelToRemove.remove(unchanged);
+        modelToAdd.remove(unchanged);
+
         ensureValidParameters(modelToRemove, modelToAdd);
 
         rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove.listStatements().toList()))));
