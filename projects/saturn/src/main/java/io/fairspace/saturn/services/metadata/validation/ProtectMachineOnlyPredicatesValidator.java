@@ -3,13 +3,13 @@ package io.fairspace.saturn.services.metadata.validation;
 import io.fairspace.saturn.rdf.Vocabulary;
 import org.apache.jena.rdf.model.Model;
 
-import java.util.List;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 
 /**
  * This validator checks whether the requested action will modify any machine-only
  * predicates. If so, the request will not validate
  */
-public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestValidator{
+public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestValidator {
     private Vocabulary vocabulary;
 
     public ProtectMachineOnlyPredicatesValidator(Vocabulary vocabulary) {
@@ -48,10 +48,10 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
         if(model == null || model.isEmpty())
             return false;
 
-        List<String> machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
+        var machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
 
         // See if any of the predicates is present in the given model
         return machineOnlyPredicates.stream()
-                .anyMatch(predicateURI -> model.listResourcesWithProperty(model.createProperty(predicateURI)).hasNext());
+                .anyMatch(predicateURI -> model.listResourcesWithProperty(createProperty(predicateURI)).hasNext());
     }
 }
