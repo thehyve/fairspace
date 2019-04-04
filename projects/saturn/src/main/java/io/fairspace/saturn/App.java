@@ -37,6 +37,7 @@ import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
+import static org.apache.jena.system.Txn.calculateRead;
 
 @Slf4j
 public class App {
@@ -72,18 +73,20 @@ public class App {
         var metaVocabulary = Vocabulary.recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
 
         Function<Model, Set<Resource>> affectedResourcesDetector = new AffectedResourcesDetector(systemVocabulary, userVocabulary)::getAffectedResources;
+        Supplier<Model> mergedVocabularySupplier = () -> calculateRead(rdf, () ->
+                rdf.fetch(systemVocabularyGraphNode.getURI())
+                        .add(rdf.fetch(userVocabularyGraphNode.getURI())));
 
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(systemVocabulary),
                 new PermissionCheckingValidator(permissions, affectedResourcesDetector),
-                new ShaclValidator(rdf, defaultGraphIRI, systemVocabularyGraphNode, affectedResourcesDetector),
-                new ShaclValidator(rdf, defaultGraphIRI, userVocabularyGraphNode, affectedResourcesDetector));
+                new ShaclValidator(rdf, defaultGraphIRI, mergedVocabularySupplier, affectedResourcesDetector));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(metaVocabulary),
-                new ShaclValidator(rdf, userVocabularyGraphNode, metaVocabularyGraphNode, affectedResourcesDetector));
+                new ShaclValidator(rdf, userVocabularyGraphNode, () -> rdf.fetch(systemVocabularyGraphNode.getURI()), affectedResourcesDetector));
 
         var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, vocabularyValidator);
         var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);

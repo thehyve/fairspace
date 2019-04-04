@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.lang.String.format;
@@ -36,7 +37,7 @@ import static org.topbraid.shacl.util.SHACL2SPINBridge.createConstraintViolation
 public class ShaclValidator implements MetadataRequestValidator {
     private final RDFConnection rdf;
     private final Node dataGraph;
-    private final Node shapesGraph;
+    private final Supplier<Model> shapesModelSupplier;
     private final Function<Model, Set<Resource>> affectedResourcesDetector;
 
     @Override
@@ -52,8 +53,7 @@ public class ShaclValidator implements MetadataRequestValidator {
             model.add(modelToAdd);
         }
 
-        var shapesModel = rdf.queryConstruct(storedQuery("select_by_mask", shapesGraph, null, null, null));
-        var validationEngine = createEngine(model, shapesModel);
+        var validationEngine = createEngine(model, shapesModelSupplier.get());
 
         for (var resource: affectedResources) {
             try {
