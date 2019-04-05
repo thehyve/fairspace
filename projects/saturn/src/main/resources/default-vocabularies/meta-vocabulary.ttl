@@ -103,6 +103,12 @@ fs:PropertyShapeMeta a sh:NodeShape ;
     ], [
         sh:path fs:machineOnly
     ] ;
+    sh:or ( 
+        [ sh:path sh:in ; 
+          sh:minCount 1  ] 
+        [ sh:path sh:datatype ; 
+          sh:minCount 1  ]
+      ) ; 
     sh:targetClass fs:PropertyShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
 
