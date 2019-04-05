@@ -48,7 +48,7 @@ it('stores metadata as jsonld (Full entity)', () => {
         hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}]
     });
     expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
-    expect(window.fetch.mock.calls[0][1].body).toEqual(JSON.stringify([
+    const expected = [
         {
             '@id': 'http://thehyve.nl',
             'hasEmployees': [
@@ -56,7 +56,8 @@ it('stores metadata as jsonld (Full entity)', () => {
                 {'@value': 'Ygritte'}
             ]
         }
-    ]));
+    ];
+    expect(window.fetch.mock.calls[0][1].body).toEqual(JSON.stringify(expected));
 });
 
 it('retrieves metadata entities using a sparql query', () => {

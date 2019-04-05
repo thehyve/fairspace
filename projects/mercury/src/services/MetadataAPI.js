@@ -47,6 +47,13 @@ class MetadataAPI {
         return request.then(failOnHttpError("Failure when updating metadata"));
     }
 
+    /**
+     * Update values for all given properties
+     * @param subject   Single URI representing the subject to update
+     * @param properties An object with each key is the iri of the predicate to update
+     * and the value is the array of values
+     * @returns {*}
+     */
     updateEntity(subject, properties) {
         if (!subject || !properties) {
             return Promise.reject(Error("No subject or properties given"));

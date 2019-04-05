@@ -131,6 +131,7 @@ export const toJsonLd = (subject, predicate, values) => {
         return null;
     }
 
+    // if there are no values then send a special nil value as required by the backend
     if (values.length === 0) {
         return {
             '@id': subject,
