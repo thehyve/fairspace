@@ -4,11 +4,7 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,8 +15,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.time.Instant;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity.CREATED_BY_IRI;
-import static io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity.DATE_CREATED_IRI;
+import static io.fairspace.saturn.vocabulary.FS.createdBy;
+import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,8 +37,6 @@ public class MetadataEntityLifeCycleManagerTest {
 
     private Resource resource = ResourceFactory.createResource("http://resource");
     private Property property = ResourceFactory.createProperty("http://property");
-    private Property createdBy = ResourceFactory.createProperty(CREATED_BY_IRI);
-    private Property dateCreated = ResourceFactory.createProperty(DATE_CREATED_IRI);
     private Resource otherResource = ResourceFactory.createResource("http://resource2");
 
     @Before
@@ -64,8 +58,8 @@ public class MetadataEntityLifeCycleManagerTest {
         assertTrue(model.contains(resource, createdBy, userResource));
         assertTrue(model.contains(otherResource, createdBy, userResource));
 
-        String dateCreated = model.getRequiredProperty(resource, this.dateCreated).getString();
-        ensureRecentInstant(Instant.parse(dateCreated));
+        String dateCreatedValue = model.getRequiredProperty(resource, dateCreated).getString();
+        ensureRecentInstant(Instant.parse(dateCreatedValue));
     }
 
     @Test
@@ -77,8 +71,8 @@ public class MetadataEntityLifeCycleManagerTest {
 
         assertTrue(model.contains(otherResource, createdBy, userResource));
 
-        String dateCreated = model.getRequiredProperty(otherResource, this.dateCreated).getString();
-        ensureRecentInstant(Instant.parse(dateCreated));
+        String dateCreatedValue = model.getRequiredProperty(otherResource, dateCreated).getString();
+        ensureRecentInstant(Instant.parse(dateCreatedValue));
     }
 
     @Test
