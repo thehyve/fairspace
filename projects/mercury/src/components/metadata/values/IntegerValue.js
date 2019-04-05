@@ -6,6 +6,7 @@ function IntegerValue(props) {
         <BaseInputValue
             {...props}
             type="number"
+            transformValue={v => parseInt(v, 10)}
         />
     );
 }
