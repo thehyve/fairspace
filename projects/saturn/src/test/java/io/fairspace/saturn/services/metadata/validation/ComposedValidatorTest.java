@@ -36,14 +36,14 @@ public class ComposedValidatorTest {
     private void testCombination(boolean validity1, boolean validity2, boolean expectedResult) {
         reset(validator1, validator2);
 
-        doReturn(validity1 ? ValidationResult.VALID : new ValidationResult("test")).when(validator1).validatePut(any());
-        doReturn(validity2 ? ValidationResult.VALID : new ValidationResult("test")).when(validator2).validatePut(any());
+        doReturn(validity1 ? ValidationResult.VALID : new ValidationResult("test")).when(validator1).validate(any(), any());
+        doReturn(validity2 ? ValidationResult.VALID : new ValidationResult("test")).when(validator2).validate(any(), any());
 
-        ValidationResult result = validator.validateComposed(validator -> validator.validatePut(null));
+        ValidationResult result = validator.validate(null, null);
 
         assertEquals(expectedResult, result.isValid());
-        verify(validator1).validatePut(any());
-        verify(validator2).validatePut(any());
+        verify(validator1).validate(any(), any());
+        verify(validator2).validate(any(), any());
 
     }
 }
