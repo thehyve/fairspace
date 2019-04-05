@@ -12,6 +12,7 @@ import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 
 class MetadataListContainer extends React.Component {
     static CREATION_STATE_CHOOSE_TYPE = 'CHOOSE_TYPE';
+
     static CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
 
     state = {
