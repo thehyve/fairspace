@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Paper, List, Fab} from '@material-ui/core';
+import {Paper, List, Fab, Grid} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../common";
 import * as metadataActions from "../../actions/metadataActions";
@@ -107,7 +107,7 @@ export class MetadataEntityContainer extends React.Component {
         });
 
         const entity = (
-            <>
+            <Grid>
                 <Fab
                     variant="extended"
                     onClick={this.handleSubmit}
@@ -130,7 +130,7 @@ export class MetadataEntityContainer extends React.Component {
                         ))
                     }
                 </List>
-            </>
+            </Grid>
         );
 
         return showHeader ? (

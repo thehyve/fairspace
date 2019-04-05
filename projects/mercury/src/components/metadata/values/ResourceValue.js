@@ -6,7 +6,7 @@ const ResourceValue = ({property, entry, style, onChange, ...otherProps}) => (
         {...otherProps}
         multiline={property.multiLine}
         value={entry.id}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => onChange({id: new URL(e.target.value).toString()})}
         margin="normal"
         style={{...style, marginTop: 0, width: '100%'}}
         type="url"
