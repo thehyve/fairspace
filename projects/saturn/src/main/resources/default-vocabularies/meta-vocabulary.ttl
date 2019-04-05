@@ -25,9 +25,9 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:name "Properties" ; 
         sh:description "List of all properties and relations for this class." 
     ], [
-        sh:value true ;
+        sh:value false ;
         sh:path sh:closed ; 
-        sh:description "sh:closed should be true."
+        sh:description "sh:closed should be false."
     ], [
         sh:class fs:Class ;
         sh:maxCount 1 ;
