@@ -28,7 +28,7 @@ public class PermissionCheckingValidatorTest {
 
     private static final Statement STATEMENT_WITHOUT_INVERSE = createStatement(
             createResource("http://ex.com/subject"),
-            createProperty("http://ex.com/predicate"), // has an inverse
+            createProperty("http://ex.com/predicate"), // does not have an inverse
             createResource("http://ex.com/object"));
 
     private static final Statement STATEMENT_WITH_INVERSE = createStatement(
