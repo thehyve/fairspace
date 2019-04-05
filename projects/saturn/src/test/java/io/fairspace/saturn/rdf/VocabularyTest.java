@@ -1,6 +1,7 @@
 package io.fairspace.saturn.rdf;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -52,6 +53,15 @@ public class VocabularyTest {
         vocabularyModel = dataset.getNamedModel(VOCABULARY_URI.getURI());
     }
 
+    @Test
+    public void testSystemVocabularySyntax() {
+        Vocabulary.recreateVocabulary(rdf, NodeFactory.createURI("http://system-vocabulary"), "default-vocabularies/system-vocabulary.ttl");
+    }
+
+    @Test
+    public void testMetaVocabularySyntax() {
+        Vocabulary.recreateVocabulary(rdf, NodeFactory.createURI("http://meta-vocabulary"), "default-vocabularies/meta-vocabulary.ttl");
+    }
 
     @Test
     public void testGetMachineOnlyPredicates() {

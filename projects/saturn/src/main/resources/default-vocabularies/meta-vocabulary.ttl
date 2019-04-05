@@ -98,7 +98,7 @@ fs:PropertyShapeMeta a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:path ;
-        sh:nodeKind sh:IRI
+        sh:nodeKind sh:IRI ;
         sh:name "Property identifier"
     ], [
         sh:path fs:machineOnly
