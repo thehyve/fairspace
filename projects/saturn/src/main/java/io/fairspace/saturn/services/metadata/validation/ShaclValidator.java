@@ -57,16 +57,20 @@ public class ShaclValidator implements MetadataRequestValidator {
                 validationEngine.validateNode(resource.asNode());
             }
 
-            var report = validationEngine.getReport();
-            var violations = createConstraintViolations(report.getModel());
-
-            return violations.stream()
-                    .filter(ConstraintViolation::isError)
-                    .map(ShaclValidator::toValidationResult)
-                    .reduce(ValidationResult.VALID, ValidationResult::merge);
+            return getValidationResult(validationEngine);
         } catch (InterruptedException e) {
             throw new RuntimeException("SHACL validation was interrupted");
         }
+    }
+
+    private ValidationResult getValidationResult(ValidationEngine validationEngine) {
+        var report = validationEngine.getReport();
+        var violations = createConstraintViolations(report.getModel());
+
+        return violations.stream()
+                .filter(ConstraintViolation::isError)
+                .map(ShaclValidator::toValidationResult)
+                .reduce(ValidationResult.VALID, ValidationResult::merge);
     }
 
     /**
