@@ -11,6 +11,9 @@ import MetaList from './MetaList';
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 
 class MetadataListContainer extends React.Component {
+    static CREATION_STATE_CHOOSE_TYPE = 'CHOOSE_TYPE';
+    static CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
+
     state = {
         shape: null,
         creationState: false
@@ -24,13 +27,13 @@ class MetadataListContainer extends React.Component {
     startCreating = (e) => {
         e.stopPropagation();
 
-        this.setState({creationState: 'CHOOSE_TYPE'});
+        this.setState({creationState: MetadataListContainer.CREATION_STATE_CHOOSE_TYPE});
     };
 
     chooseType = (shape) => {
         this.setState({
             shape,
-            creationState: 'CREATE_ENTITY'
+            creationState: MetadataListContainer.CREATION_STATE_CREATE_ENTITY
         });
     };
 
@@ -74,12 +77,13 @@ class MetadataListContainer extends React.Component {
                 </Button>
 
                 <MetadataTypeChooserDialog
-                    open={this.state.creationState === 'CHOOSE_TYPE'}
+                    open={this.state.creationState === MetadataListContainer.CREATION_STATE_CHOOSE_TYPE}
+                    shapes={this.props.shapes}
                     onChooseShape={this.chooseType}
                     onClose={this.closeDialog}
                 />
                 <NewMetadataEntityDialog
-                    open={this.state.creationState === 'CREATE_ENTITY'}
+                    open={this.state.creationState === MetadataListContainer.CREATION_STATE_CREATE_ENTITY}
                     shape={this.state.shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}

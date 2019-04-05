@@ -1,5 +1,4 @@
 import React from 'react';
-import {connect} from "react-redux";
 import {
     Button,
     Dialog,
@@ -74,7 +73,7 @@ class MetadataTypeChooserDialog extends React.Component {
                         onClick={this.closeDialog}
                         color="secondary"
                     >
-                        Close
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -84,12 +83,8 @@ class MetadataTypeChooserDialog extends React.Component {
 
 MetadataTypeChooserDialog.propTypes = {
     onChooseShape: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired
-}
+    onClose: PropTypes.func.isRequired,
+    shapes: PropTypes.array
+};
 
-const mapStateToProps = state => ({
-    loading: state.cache.vocabulary.pending,
-    shapes: state.cache && state.cache.vocabulary && state.cache.vocabulary.data && state.cache.vocabulary.data.getFairspaceClasses()
-});
-
-export default connect(mapStateToProps)(MetadataTypeChooserDialog);
+export default MetadataTypeChooserDialog;

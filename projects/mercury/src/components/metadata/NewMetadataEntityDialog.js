@@ -1,5 +1,4 @@
 import React from 'react';
-import {connect} from "react-redux";
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 import * as PropTypes from "prop-types";
 
@@ -84,8 +83,4 @@ NewMetadataEntityDialog.propTypes = {
     onClose: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({
-    loading: state.cache.vocabulary.pending,
-});
-
-export default connect(mapStateToProps)(NewMetadataEntityDialog);
+export default NewMetadataEntityDialog;
