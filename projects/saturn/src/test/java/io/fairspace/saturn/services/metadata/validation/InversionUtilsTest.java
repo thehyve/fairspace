@@ -33,6 +33,7 @@ public class InversionUtilsTest {
 
     @Test
     public void testNoInversion() {
+        // Because P1 does not have an inverse, R3 should not be included in the affected resources
         var changes = createDefaultModel().add(R1, P1, R3).add(R2, P1, R3);
         assertEquals(Set.of(R1, R2), InversionUtils.getAffectedResources(rdf, changes));
     }
