@@ -5,13 +5,15 @@ import {withRouter} from 'react-router-dom';
 import {Button} from "@material-ui/core";
 import {getLabel, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
-import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
+import MetadataTypeChooserDialog from "./MetadataTypeChooserDialog";
 import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
 import MetaList from './MetaList';
+import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 
 class MetadataListContainer extends React.Component {
     state = {
-        creating: false
+        shape: null,
+        creationState: false
     };
 
     componentDidMount() {
@@ -19,15 +21,22 @@ class MetadataListContainer extends React.Component {
         this.props.fetchMetadataVocabularyIfNeeded();
     }
 
-    openDialog = (e) => {
+    startCreating = (e) => {
         e.stopPropagation();
 
-        this.setState({creating: true});
+        this.setState({creationState: 'CHOOSE_TYPE'});
+    };
+
+    chooseType = (shape) => {
+        this.setState({
+            shape,
+            creationState: 'CREATE_ENTITY'
+        });
     };
 
     closeDialog = (e) => {
         if (e) e.stopPropagation();
-        this.setState({creating: false});
+        this.setState({creationState: false});
     };
 
     handleEntityCreation = (shape, id) => {
@@ -56,19 +65,26 @@ class MetadataListContainer extends React.Component {
                     variant="contained"
                     color="primary"
                     aria-label="Add"
-                    title="Create a new Metadata"
-                    onClick={this.openDialog}
+                    title="Create a new metadata entity"
+                    onClick={this.startCreating}
                     style={{margin: '10px 0'}}
                     disabled={!this.props.shapes}
                 >
                     Create
                 </Button>
 
+                <MetadataTypeChooserDialog
+                    open={this.state.creationState === 'CHOOSE_TYPE'}
+                    onChooseShape={this.chooseType}
+                    onClose={this.closeDialog}
+                />
                 <NewMetadataEntityDialog
-                    open={this.state.creating}
+                    open={this.state.creationState === 'CREATE_ENTITY'}
+                    shape={this.state.shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}
                 />
+
                 {entities && entities.length > 0 ? <MetaList items={entities} /> : null}
                 <LoadingOverlay loading={creatingMetadataEntity} />
             </>

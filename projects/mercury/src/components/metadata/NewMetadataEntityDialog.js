@@ -1,26 +1,13 @@
 import React from 'react';
 import {connect} from "react-redux";
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    List,
-    ListItem,
-    ListItemText,
-    Paper,
-    TextField
-} from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
+import * as PropTypes from "prop-types";
 
 import {generateUuid, getLabel} from "../../utils/metadataUtils";
-import {compareBy} from "../../utils/comparisionUtils";
-import LoadingInlay from '../common/LoadingInlay';
 
 class NewMetadataEntityDialog extends React.Component {
     state = {
-        id: generateUuid(),
-        shape: null
+        id: generateUuid()
     };
 
     closeDialog = (e) => {
@@ -30,7 +17,7 @@ class NewMetadataEntityDialog extends React.Component {
 
     createEntity = (e) => {
         if (e) e.stopPropagation();
-        this.props.onCreate(this.state.shape, this.state.id);
+        this.props.onCreate(this.props.shape, this.state.id);
     };
 
     handleInputChange = (event) => {
@@ -38,13 +25,17 @@ class NewMetadataEntityDialog extends React.Component {
     };
 
     render() {
+        const typeLabel = getLabel(this.props.shape);
+        const showDialog = this.props.open && this.props.shape !== undefined;
+
         return (
             <Dialog
-                open={this.props.open}
+                open={showDialog}
                 onClose={this.closeDialog}
                 aria-labelledby="form-dialog-title"
             >
-                <DialogTitle id="form-dialog-title">Create new metadata entity</DialogTitle>
+                <DialogTitle id="form-dialog-title">Create new {typeLabel}</DialogTitle>
+
                 <DialogContent>
                     <TextField
                         autoFocus
@@ -58,30 +49,6 @@ class NewMetadataEntityDialog extends React.Component {
                         error={!this.hasValidId()}
                         style={{width: 400}}
                     />
-                    <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
-                        {
-                            this.props.shapes.length
-                                ? (
-                                    <List>
-                                        {
-                                            this.props.shapes.sort(compareBy(getLabel)).map(t => (
-                                                <ListItem
-                                                    key={t['@id']}
-                                                    button
-                                                    selected={this.state.shape === t}
-                                                    onClick={() => this.setState({shape: t})}
-                                                >
-                                                    <ListItemText
-                                                        primary={getLabel(t)}
-                                                    />
-                                                </ListItem>
-                                            ))
-                                        }
-                                    </List>
-                                )
-                                : <LoadingInlay />
-                        }
-                    </Paper>
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -107,13 +74,18 @@ class NewMetadataEntityDialog extends React.Component {
     }
 
     canCreate() {
-        return this.state.shape && this.state.id && this.hasValidId();
+        return this.state.id && this.hasValidId();
     }
 }
 
+NewMetadataEntityDialog.propTypes = {
+    shape: PropTypes.object,
+    onCreate: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired
+};
+
 const mapStateToProps = state => ({
     loading: state.cache.vocabulary.pending,
-    shapes: state.cache && state.cache.vocabulary && state.cache.vocabulary.data && state.cache.vocabulary.data.getFairspaceClasses()
 });
 
 export default connect(mapStateToProps)(NewMetadataEntityDialog);
