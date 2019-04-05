@@ -26,9 +26,9 @@ pluto:
     jupyter: https://jupyterhub.workspace.test.fairspace.app
 
 # Specific settings for Saturn subchart
-saturn:
+saturn: {}
 
-mercury:
+mercury: {}
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
@@ -43,7 +43,7 @@ jupyterhub:
         session_url: https://workspace.test.fairspace.app/account/tokens
   singleuser:
     image:
-      tag: 0.5.6-simple
+      tag: 0.6.0-simple
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.test.fairspace.app
   hub:

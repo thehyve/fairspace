@@ -30,8 +30,6 @@ public class ChangeableMetadataServiceTest {
     private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
     private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
 
-    private static final Property MACHINE_ONLY_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");
-
     private static final Statement STMT1 = createStatement(S1, P1, S2);
     private static final Statement STMT2 = createStatement(S2, P1, S3);
 
