@@ -135,6 +135,7 @@ fs:filePathShape a fs:PropertyShape ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:name "File path" ;
+    sh:datatype xsd:string ;
     sh:description "File path" ;
     fs:machineOnly true ; 
     sh:path fs:filePath .
