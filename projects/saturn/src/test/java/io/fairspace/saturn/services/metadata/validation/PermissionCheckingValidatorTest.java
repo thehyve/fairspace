@@ -95,7 +95,7 @@ public class PermissionCheckingValidatorTest {
     }
 
     @Test
-    public void invertiblePredicateWithoutWritePermissionForSubbjectCausesAFailure() {
+    public void invertiblePredicateWithoutWritePermissionForSubjectCausesAFailure() {
         model.add(STATEMENT_WITH_INVERSE);
 
         when(permissions.getPermission(eq(STATEMENT_WITH_INVERSE.getSubject().asNode()))).thenReturn(Access.Read);
