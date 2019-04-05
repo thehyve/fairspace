@@ -92,7 +92,7 @@ class MetadataProperty extends React.Component {
             : ValueComponentFactory.editComponent(property);
 
         return (
-            <ListItem disableGutters style={{display: 'block'}} key={property.key}>
+            <ListItem disableGutters style={{display: 'block'}}>
                 <Typography variant="body1" component="label" id={labelId}>
                     {property.label}
                 </Typography>
