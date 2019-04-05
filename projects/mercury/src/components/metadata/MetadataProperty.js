@@ -9,25 +9,21 @@ import ValueComponentFactory from "./values/ValueComponentFactory";
 import * as constants from '../../constants';
 
 class MetadataProperty extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            hoveredIndex: null,
-            currentValues: props.property.values,
-        };
-    }
+    state = {
+        hoveredIndex: null
+    };
 
     setHoveredIndex = (hoveredIndex) => {
         this.setState({hoveredIndex});
     };
 
     renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
-        const {editable, property, onChange, subject} = this.props;
+        const {editable, property, onChange, onDelete, subject} = this.props;
         const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
 
         return (
             <div
-                key={subject + property.key + entry.value}
+                key={subject + property.key + entry.id}
                 onMouseEnter={() => this.setHoveredIndex(idx)}
                 onMouseLeave={() => this.setHoveredIndex(null)}
             >
@@ -48,7 +44,7 @@ class MetadataProperty extends React.Component {
                                         size="small"
                                         aria-label="Delete"
                                         title="Delete"
-                                        onClick={() => this.handleDelete(idx)}
+                                        onClick={() => onDelete(idx)}
                                         style={{visibility}}
                                     >
                                         <ClearIcon />
@@ -61,27 +57,8 @@ class MetadataProperty extends React.Component {
         );
     };
 
-    handleAdd = (value) => {
-        const {property, onChange} = this.props;
-        if (property.allowMultiple) {
-            this.setState(prevState => ({currentValues: [...prevState.currentValues, value]}));
-        }
-        onChange(value);
-    }
-
-    handleDelete = (index) => {
-        const {property, onDelete} = this.props;
-        if (property.allowMultiple) {
-            this.setState(({currentValues}) => {
-                const arr = [...currentValues.slice(0, index), ...currentValues.slice(index + 1)];
-                return {currentValues: arr};
-            });
-        }
-        onDelete(index);
-    }
-
     renderAddComponent = (labelledBy) => {
-        const {property} = this.props;
+        const {property, onChange} = this.props;
         const ValueAddComponent = ValueComponentFactory.addComponent(property);
 
         return (
@@ -90,7 +67,7 @@ class MetadataProperty extends React.Component {
                     <ValueAddComponent
                         property={property}
                         placeholder="Add new"
-                        onChange={this.handleAdd}
+                        onChange={onChange}
                         aria-labelledby={labelledBy}
                     />
                 </ListItemText>
@@ -100,7 +77,6 @@ class MetadataProperty extends React.Component {
 
     render() {
         const {editable, property} = this.props;
-        const {currentValues} = this.state;
 
         // Do not show an add component if no multiples are allowed
         // and there is already a value
@@ -116,12 +92,12 @@ class MetadataProperty extends React.Component {
             : ValueComponentFactory.editComponent(property);
 
         return (
-            <ListItem disableGutters style={{display: 'block'}}>
+            <ListItem disableGutters style={{display: 'block'}} key={property.key}>
                 <Typography variant="body1" component="label" id={labelId}>
                     {property.label}
                 </Typography>
                 <List dense>
-                    {currentValues.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
+                    {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
                     {canAdd ? this.renderAddComponent(labelId) : null}
                 </List>
             </ListItem>

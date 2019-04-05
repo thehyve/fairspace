@@ -47,20 +47,20 @@ export class MetadataEntityContainer extends React.Component {
     handleChange = (property, value, index) => {
         // If index is 0 or larger then it's an update, otherwise it's addition
         if (index >= 0) {
-            const currentEntry = property.values[index];
-
-            if (currentEntry.value !== value) {
-                const updatedValues = property.values.map((el, idx) => ((idx === index) ? {value} : el));
-                this.updateState(property.key, updatedValues);
-            }
-        } else if (value.value || value.id) {
+            const pendingValues = this.state.propertiesWithUpdatedValues[property.key];
+            const values = pendingValues || property.values;
+            const updatedValues = values.map((el, idx) => ((idx === index) ? value : el));
+            this.updateState(property.key, updatedValues);
+        } else if (value) {
             const updatedValues = [...property.values, value];
             this.updateState(property.key, updatedValues);
         }
     };
 
     handleDelete = (property, index) => {
-        const updatedValues = property.values.filter((el, idx) => idx !== index);
+        const pendingValues = this.state.propertiesWithUpdatedValues[property.key];
+        const values = pendingValues || property.values;
+        const updatedValues = values.filter((el, idx) => idx !== index);
         this.updateState(property.key, updatedValues);
     };
 
@@ -94,6 +94,18 @@ export class MetadataEntityContainer extends React.Component {
             return <LoadingInlay />;
         }
 
+        const propertiesWithChanges = properties.map(p => {
+            const existingChanges = this.state.propertiesWithUpdatedValues[p.key];
+
+            if (existingChanges) {
+                return {
+                    ...p,
+                    values: existingChanges
+                };
+            }
+            return p;
+        });
+
         const entity = (
             <>
                 <Fab
@@ -106,7 +118,7 @@ export class MetadataEntityContainer extends React.Component {
                 </Fab>
                 <List dense>
                     {
-                        properties.map((p) => (
+                        propertiesWithChanges.map((p) => (
                             <MetadataProperty
                                 editable={editable && p.editable}
                                 subject={subject}

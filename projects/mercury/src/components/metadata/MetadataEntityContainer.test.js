@@ -141,11 +141,7 @@ describe('MetadataEntityContainer', () => {
         wrapper.instance().handleChange(property, updatedValue, 0);
 
         const expected = {
-            'propert-key': [
-                {
-                    value: {someProp: "other value"}
-                }
-            ]
+            'propert-key': [{someProp: "other value"}]
         };
 
         expect(wrapper.state('propertiesWithUpdatedValues')).toEqual(expected);
@@ -165,11 +161,7 @@ describe('MetadataEntityContainer', () => {
         wrapper.instance().handleChange(property, updatedValue, undefined);
 
         const expected = {
-            'propert-key': [
-                {
-                    value: {someProp: "other value"}
-                }
-            ]
+            'propert-key': [{someProp: "other value"}]
         };
 
         expect(wrapper.state('propertiesWithUpdatedValues')).toEqual(expected);
