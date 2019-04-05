@@ -5,6 +5,7 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
@@ -108,7 +109,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     private static Node toNode(Access access) {
-        return createURI("http://fairspace.io/ontology#" + access.name().toLowerCase());
+        return createURI(FS.NS + access.name().toLowerCase());
     }
 
     private void ensureHasAccess(Node resource, Access access) {

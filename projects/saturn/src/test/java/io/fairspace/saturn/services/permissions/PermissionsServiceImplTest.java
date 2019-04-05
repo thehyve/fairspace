@@ -4,10 +4,10 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -24,7 +24,8 @@ import javax.mail.internet.MimeMessage;
 import java.util.HashMap;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -36,7 +37,6 @@ public class PermissionsServiceImplTest {
     private static final Node USER1 = createURI("http://example.com/user1");
     private static final Node USER2 = createURI("http://example.com/user2");
     private static final Node USER3 = createURI("http://example.com/user3");
-    private static final Resource COLLECTION = createResource("http://fairspace.io/ontology#Collection");
 
     private Dataset ds;
     private PermissionsService service;
@@ -142,11 +142,10 @@ public class PermissionsServiceImplTest {
     public void testGettingPermissionsForFiles() {
         var collection = createResource("http://example.com/collection");
         var file = createResource("http://example.com/file");
-        var filePath = createProperty("http://fairspace.io/ontology#filePath");
         ds.getDefaultModel()
                 .add(collection, RDF.type, createResource("http://fairspace.io/ontology#Collection"))
-                .add(collection, filePath, createPlainLiteral("collectionPath"))
-                .add(file, filePath, createPlainLiteral("collectionPath/filePath"));
+                .add(collection, FS.filePath, createPlainLiteral("collectionPath"))
+                .add(file, FS.filePath, createPlainLiteral("collectionPath/filePath"));
 
 
         service.createResource(collection.asNode());
@@ -157,7 +156,7 @@ public class PermissionsServiceImplTest {
     @Test
     public void testDefaultPermissionForCollections() {
         var coll = createResource("http://example.com/collection");
-        ds.getDefaultModel().add(coll, RDF.type, COLLECTION);
+        ds.getDefaultModel().add(coll, RDF.type, FS.Collection);
         assertEquals(Access.None, service.getPermission(coll.asNode()));
     }
 
@@ -180,7 +179,7 @@ public class PermissionsServiceImplTest {
 
     @Test
     public void testCanGrantPermissionsOnCollections() {
-        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, COLLECTION);
+        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, FS.Collection);
         assertFalse(service.getPermissions(RESOURCE).containsKey(USER2));
         service.setPermission(RESOURCE, USER2, Access.Read);
         assertEquals(Access.Read, service.getPermissions(RESOURCE).get(USER2));
@@ -192,7 +191,7 @@ public class PermissionsServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCollectionsCanNotBeMarkedAsRestricted() {
-        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, COLLECTION);
+        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, FS.Collection);
         service.setWriteRestricted(RESOURCE, true);
     }
 
