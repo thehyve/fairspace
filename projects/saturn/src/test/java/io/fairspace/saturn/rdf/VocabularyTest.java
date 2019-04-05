@@ -7,7 +7,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
-import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,26 +100,6 @@ public class VocabularyTest {
         // Verify the model has not been loaded into the vocabulary graph
         assertTrue(vocabularyModel.contains(createResource("http://fairspace.io/ontology#Collection"), RDF.type, CLASS_RESOURCE));
         assertFalse(vocabularyModel.contains(createResource("http://some-data"), RDF.type, RDF.Property));
-    }
-
-    @Test
-    public void testIsInvertiblePredicate() {
-        var property1 = createProperty("http://example.com/property1");
-        var property2 = createProperty("http://example.com/property2");
-        var property3 = createProperty("http://example.com/property3");
-
-        vocabularyModel
-                .add(property1, RDF.type, RDF.Property)
-                .add(property2, RDF.type, RDF.Property)
-                .add(property3, RDF.type, RDF.Property)
-                .add(property1, OWL.inverseOf, property2)
-                .add(property2, OWL.inverseOf, property1);
-
-        vocabulary = Vocabulary.initializeVocabulary(rdf, VOCABULARY_URI, "empty-vocabulary.jsonld");
-
-        assertTrue(vocabulary.isInvertiblePredicate(property1.getURI()));
-        assertTrue(vocabulary.isInvertiblePredicate(property2.getURI()));
-        assertFalse(vocabulary.isInvertiblePredicate(property3.getURI()));
     }
 
     private void setupVocabularyWithMachineOnlyPredicates() {
