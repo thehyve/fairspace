@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -59,7 +60,7 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceWithInvalidProperties() {
         var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#User"))
+                .add(resource1, RDF.type, FS.User)
                 .add(resource1, RDFS.label, createTypedLiteral(123))
                 .add(resource1, RDFS.comment, createTypedLiteral(123)));
 
@@ -72,7 +73,7 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceWithUnknownProperty() {
         var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#User"))
+                .add(resource1, RDF.type, FS.User)
                 .add(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123)));
 
         assertFalse(result.isValid());
@@ -82,7 +83,7 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceMissingRequiredProperty() {
         var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#File")));
+                .add(resource1, RDF.type, FS.File));
 
         assertFalse(result.isValid());
         assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath: Less than 1 values.", result.getMessage());
@@ -91,7 +92,7 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceWithWrongObjectsType() {
         var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#File")));
+                .add(resource1, RDF.type, FS.File));
 
         assertFalse(result.isValid());
         assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath: Less than 1 values.", result.getMessage());
@@ -103,9 +104,9 @@ public class ShaclValidatorTest {
                 .add(resource2, RDF.type, FOAF.Person);
 
         var model = createDefaultModel()
-                .add(resource1, RDF.type, createResource("http://fairspace.io/ontology#File"))
-                .add(resource1, createProperty("http://fairspace.io/ontology#filePath"), createStringLiteral("some/path"))
-                .add(resource1, createProperty("http://fairspace.io/ontology#aboutPerson"), resource2);
+                .add(resource1, RDF.type, FS.File)
+                .add(resource1, FS.filePath, createStringLiteral("some/path"))
+                .add(resource1, createProperty(FS.NS + "aboutPerson"), resource2);
 
         var result1 = validator.validate(EMPTY, model);
 

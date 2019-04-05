@@ -181,18 +181,6 @@ fs:deletedByShape a fs:RelationShape ;
     fs:machineOnly true ;
     sh:path fs:deletedBy .
 
-fs:hasCollectionShape a fs:RelationShape ; 
-    sh:name "Associated collections" ;
-    sh:description "" ;
-    sh:class fs:Collection ; 
-    sh:path fs:hasCollection .
-
-fs:hasFileShape a fs:RelationShape ; 
-    sh:name "Files in this collection" ;
-    sh:description "All files and directories that are in (sub)directories." ; 
-    sh:class fs:File ;
-    sh:path fs:hasFile .
-
 
 ########################
 ### Fixed Vocabulary ###

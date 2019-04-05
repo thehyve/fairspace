@@ -2,6 +2,7 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
@@ -27,7 +28,7 @@ import static java.util.Collections.singletonList;
 @Slf4j
 public abstract class VfsBackedMiltonResource implements
         Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource, Comparable<Resource> {
-    private static final QName IRI_PROPERTY = new QName("http://fairspace.io/ontology#", "iri");
+    private static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
     private static final PropertyMetaData IRI_PROPERTY_META = new PropertyMetaData(PropertyAccessibility.READ_ONLY, String.class);
 
     protected final VirtualFileSystem fs;
