@@ -3,20 +3,22 @@ package io.fairspace.saturn.services.metadata;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
-import static io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity.CREATED_BY_IRI;
-import static io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity.DATE_CREATED_IRI;
+import static io.fairspace.saturn.vocabulary.FS.createdBy;
+import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
 @AllArgsConstructor
@@ -26,9 +28,6 @@ class MetadataEntityLifeCycleManager {
     private final Node graph;
     private final Supplier<Node> userIriSupplier;
     private final PermissionsService permissionsService;
-
-    private static final Property createdBy = ResourceFactory.createProperty(CREATED_BY_IRI);
-    private static final Property dateCreated = ResourceFactory.createProperty(DATE_CREATED_IRI);
 
 
     /**

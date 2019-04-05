@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.rdf.Vocabulary;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProtectMachineOnlyPredicatesValidatorTest {
-    private static final Property MACHINE_ONLY_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");
+    private static final Property MACHINE_ONLY_PROPERTY = FS.filePath;
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
