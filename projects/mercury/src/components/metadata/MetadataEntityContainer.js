@@ -67,7 +67,7 @@ export class MetadataEntityContainer extends React.Component {
 
         updateEntity(subject, this.state.propertiesWithUpdatedValues)
             .then(this.resetChanges)
-            .catch(e => ErrorDialog.showError(e, "Error while updateing metadata"));
+            .catch(e => ErrorDialog.showError(e, "Error while updating metadata"));
     };
 
     anyPendingChanges = () => Object.keys(this.state.propertiesWithUpdatedValues).length !== 0;
