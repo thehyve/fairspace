@@ -226,7 +226,16 @@ class Vocabulary {
      * @returns {boolean}
      */
     contains(id) {
-        return this.vocabulary.some(el => el['@id'] === id);
+        return !!this.get(id);
+    }
+
+    /**
+     * Returns the json-ld entry for the given identifier
+     * @param id
+     * @returns {array}
+     */
+    get(id) {
+        return this.vocabulary.find(el => el['@id'] === id);
     }
 
     /**

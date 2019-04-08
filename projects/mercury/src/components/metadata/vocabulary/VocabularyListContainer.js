@@ -3,21 +3,21 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
-import {getLabel, relativeLink} from "../../utils/metadataUtils";
-import * as vocabularyActions from "../../actions/vocabularyActions";
-import NewMetadataEntityDialog from "../metadata/NewMetadataEntityDialog";
-import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
-import MetaList from '../metadata/MetaList';
+import {getLabel, relativeLink} from "../../../utils/metadataUtils";
+import * as vocabularyActions from "../../../actions/vocabularyActions";
+import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../../common";
+import MetaList from '../common/MetaList';
 import {
     getVocabularyEntities,
     hasVocabularyEntitiesError,
     isVocabularyEntitiesPending
-} from "../../selectors/vocabularySelectors";
+} from "../../../selectors/vocabularySelectors";
 import {
     getMetaVocabulary,
     hasMetaVocabularyError,
     isMetaVocabularyPending
-} from "../../selectors/metaVocabularySelectors";
+} from "../../../selectors/metaVocabularySelectors";
+import NewVocabularyEntityDialog from "./NewVocabularyEntityDialog";
 
 class VocabularyListContainer extends React.Component {
     state = {
@@ -56,7 +56,7 @@ class VocabularyListContainer extends React.Component {
 
         return (
             <>
-                <NewMetadataEntityDialog onCreate={this.handleEntityCreation} />
+                <NewVocabularyEntityDialog onCreate={this.handleEntityCreation} />
                 {entities && entities.length > 0 ? <MetaList items={entities} /> : null}
                 <LoadingOverlay loading={this.state.creating} />
             </>

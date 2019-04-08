@@ -6,7 +6,7 @@ import {getLabel, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
-import MetaList from './MetaList';
+import MetaList from './common/MetaList';
 import {getVocabulary} from "../../selectors/vocabularySelectors";
 
 class MetadataListContainer extends React.Component {

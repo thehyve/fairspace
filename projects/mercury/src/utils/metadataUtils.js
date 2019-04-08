@@ -132,6 +132,19 @@ export const propertiesToShow = (properties = []) => {
     return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
 
+/**
+ * Creates a textual description of the type for the given metadata item
+ * @param metadata
+ * @returns {string}
+ */
+export const getTypeInfo = (metadata) => {
+    const typeProp = metadata && metadata.find(prop => prop.key === '@type');
+    const typeLabel = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
+    const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
+
+    return (typeLabel && comment) ? `${typeLabel} - ${comment}` : (typeLabel || comment);
+}
+
 export const createIri = (id) => `http://${window.location.hostname}/iri/${id}`;
 
 export const url2iri = (iri) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
 
-import MetadataLink from "./MetadataLink";
+import MetadataLink from "../MetadataLink";
 
 const metaList = ({items = []}) => (
     <Paper>

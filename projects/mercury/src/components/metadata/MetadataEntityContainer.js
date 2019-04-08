@@ -9,7 +9,7 @@ import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from
 import {hasVocabularyError, isVocabularyPending} from "../../selectors/vocabularySelectors";
 import {isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../utils/metadataUtils";
 
-import MetaEntityHeader from './MetaEntityHeader';
+import MetaEntityHeader from './common/MetaEntityHeader';
 import MetadataProperty from "./MetadataProperty";
 
 export class MetadataEntityContainer extends React.Component {
