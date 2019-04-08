@@ -3,11 +3,16 @@ import {connect} from 'react-redux';
 import {Paper, List} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../common";
-import {fetchCombinedMetadataIfNeeded} from "../../actions/metadataActions";
+import {
+    fetchMetadataBySubjectIfNeeded,
+    fetchMetadataVocabularyIfNeeded
+} from "../../actions/metadataActions";
 import MetaEntityHeader from './MetaEntityHeader';
 import {isDateTimeProperty, propertiesToShow, linkLabel, url2iri} from "../../utils/metadataUtils";
 
 import MetadataProperty from "./MetadataProperty";
+import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../selectors/metadataSelectors";
+import {hasVocabularyError, isVocabularyPending} from "../../selectors/vocabularySelectors";
 
 export class MetadataEntityContainer extends React.Component {
     componentDidMount() {
@@ -21,10 +26,9 @@ export class MetadataEntityContainer extends React.Component {
     }
 
     load() {
-        const {dispatch, subject} = this.props;
-
-        if (subject) {
-            dispatch(fetchCombinedMetadataIfNeeded(subject));
+        if (this.props.subject) {
+            this.props.fetchMetadataVocabularyIfNeeded();
+            this.props.fetchMetadataBySubjectIfNeeded(this.props.subject);
         }
     }
 
@@ -65,26 +69,25 @@ export class MetadataEntityContainer extends React.Component {
     }
 }
 const mapStateToProps = (state, ownProps) => {
-    const {metadataBySubject, cache: {vocabulary}} = state;
     const subject = ownProps.subject || url2iri(window.location.href);
-    const metadata = metadataBySubject[subject] || {};
-    const hasNoMetadata = !metadata || !metadata.data || metadata.data.length === 0;
-    const hasOtherErrors = (metadata && metadata.error) || !vocabulary || vocabulary.error;
-    const typeProp = metadata && metadata.data && metadata.data.find(prop => prop.key === '@type');
+    const metadata = getCombinedMetadataForSubject(state, subject);
+    const hasNoMetadata = !metadata || metadata.length === 0;
+    const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
+    const typeProp = metadata && metadata.find(prop => prop.key === '@type');
     const typeLabel = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
     const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
     const typeInfo = (typeLabel && comment) ? `${typeLabel} - ${comment}` : (typeLabel || comment);
     const label = linkLabel(subject);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
     const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
-    const properties = hasNoMetadata ? [] : propertiesToShow(metadata.data)
+    const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
             ...p,
             editable: editable && !isDateTimeProperty(p)
         }));
 
     return {
-        loading: metadata.pending || (vocabulary && vocabulary.pending),
+        loading: isMetadataPending(state, subject) || isVocabularyPending(state),
         properties,
         subject,
         typeInfo,
@@ -95,4 +98,9 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-export default connect(mapStateToProps)(MetadataEntityContainer);
+const mapDispatchToProps = {
+    fetchMetadataVocabularyIfNeeded,
+    fetchMetadataBySubjectIfNeeded
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntityContainer);
