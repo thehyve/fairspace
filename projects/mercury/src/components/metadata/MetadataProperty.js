@@ -23,7 +23,7 @@ class MetadataProperty extends React.Component {
 
         return (
             <div
-                key={subject + property.key + entry.id}
+                key={subject + property.key}
                 onMouseEnter={() => this.setHoveredIndex(idx)}
                 onMouseLeave={() => this.setHoveredIndex(null)}
             >
@@ -58,7 +58,7 @@ class MetadataProperty extends React.Component {
     };
 
     renderAddComponent = (labelledBy) => {
-        const {property, onChange} = this.props;
+        const {property, onAdd} = this.props;
         const ValueAddComponent = ValueComponentFactory.addComponent(property);
 
         return (
@@ -67,7 +67,7 @@ class MetadataProperty extends React.Component {
                     <ValueAddComponent
                         property={property}
                         placeholder="Add new"
-                        onChange={onChange}
+                        onChange={onAdd}
                         aria-labelledby={labelledBy}
                     />
                 </ListItemText>
@@ -81,7 +81,7 @@ class MetadataProperty extends React.Component {
         // Do not show an add component if no multiples are allowed
         // and there is already a value
         const editableAndNotMachineOnly = editable && !property.machineOnly;
-        const canAdd = editableAndNotMachineOnly && (property.allowMultiple || property.values.length === 0);
+        const canAdd = editableAndNotMachineOnly && (property.allowMultiple || !property.values || property.values.length === 0);
         const labelId = `label-${property.key}`;
 
         // The edit component should not actually allow editing the value if editable is set to false

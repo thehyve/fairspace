@@ -52,6 +52,10 @@ class MetadataAPI {
      * @param subject   Single URI representing the subject to update
      * @param properties An object with each key is the iri of the predicate to update
      * and the value is the array of values
+     * Each value is an object on its own with one of the following keys
+     *   id: referencing another resource
+     *   value: referencing a literal value
+     * If both keys are specified, the id is stored and the literal value is ignored
      * @returns {*}
      */
     updateEntity(subject, properties) {

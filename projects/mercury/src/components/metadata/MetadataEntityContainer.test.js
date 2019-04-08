@@ -158,7 +158,7 @@ describe('MetadataEntityContainer', () => {
             someProp: 'other value'
         };
 
-        wrapper.instance().handleChange(property, updatedValue, undefined);
+        wrapper.instance().handleAdd(property, updatedValue, undefined);
 
         const expected = {
             'propert-key': [{someProp: "other value"}]

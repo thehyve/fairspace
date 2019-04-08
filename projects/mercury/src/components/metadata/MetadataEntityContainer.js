@@ -37,24 +37,22 @@ export class MetadataEntityContainer extends React.Component {
     }
 
     updateState = (propertyKey, updatedValues) => {
-        this.setState(prevState => {
-            const propertiesWithUpdatedValues = {...prevState.propertiesWithUpdatedValues};
-            propertiesWithUpdatedValues[propertyKey] = updatedValues;
-            return {propertiesWithUpdatedValues};
-        });
+        this.setState(prevState => ({
+            propertiesWithUpdatedValues:
+                {...prevState.propertiesWithUpdatedValues, [propertyKey]: updatedValues}
+        }));
     };
 
     handleChange = (property, value, index) => {
-        // If index is 0 or larger then it's an update, otherwise it's addition
-        if (index >= 0) {
-            const pendingValues = this.state.propertiesWithUpdatedValues[property.key];
-            const values = pendingValues || property.values;
-            const updatedValues = values.map((el, idx) => ((idx === index) ? value : el));
-            this.updateState(property.key, updatedValues);
-        } else if (value) {
-            const updatedValues = [...property.values, value];
-            this.updateState(property.key, updatedValues);
-        }
+        const pendingValues = this.state.propertiesWithUpdatedValues[property.key];
+        const values = pendingValues || property.values;
+        const updatedValues = values.map((el, idx) => ((idx === index) ? value : el));
+        this.updateState(property.key, updatedValues);
+    };
+
+    handleAdd = (property, value) => {
+        const updatedValues = [...property.values, value];
+        this.updateState(property.key, updatedValues);
     };
 
     handleDelete = (property, index) => {
@@ -74,7 +72,7 @@ export class MetadataEntityContainer extends React.Component {
 
     anyPendingChanges = () => Object.keys(this.state.propertiesWithUpdatedValues).length !== 0;
 
-    canEditAndChangesExist = () => this.props.editable && this.anyPendingChanges();
+    shouldShowSubmitButton = () => this.props.editable && this.anyPendingChanges();
 
     resetChanges = () => {
         this.setState({propertiesWithUpdatedValues: {}});
@@ -84,7 +82,7 @@ export class MetadataEntityContainer extends React.Component {
         const {
             subject, label, typeInfo, properties, editable, error, loading, showHeader
         } = this.props;
-        const submitButtonVisibility = this.canEditAndChangesExist() ? 'visible' : 'hidden';
+        const submitButtonVisibility = this.shouldShowSubmitButton() ? 'visible' : 'hidden';
 
         if (error) {
             return <ErrorMessage message={error.message} />;
@@ -94,17 +92,10 @@ export class MetadataEntityContainer extends React.Component {
             return <LoadingInlay />;
         }
 
-        const propertiesWithChanges = properties.map(p => {
-            const existingChanges = this.state.propertiesWithUpdatedValues[p.key];
-
-            if (existingChanges) {
-                return {
-                    ...p,
-                    values: existingChanges
-                };
-            }
-            return p;
-        });
+        const propertiesWithChanges = properties.map(p => ({
+            ...p,
+            values: this.state.propertiesWithUpdatedValues[p.key] || p.values
+        }));
 
         const entity = (
             <Grid>
@@ -125,6 +116,7 @@ export class MetadataEntityContainer extends React.Component {
                                 key={subject + p.key}
                                 property={p}
                                 onChange={(value, index) => this.handleChange(p, value, index)}
+                                onAdd={(value) => this.handleAdd(p, value)}
                                 onDelete={(index) => this.handleDelete(p, index)}
                             />
                         ))
