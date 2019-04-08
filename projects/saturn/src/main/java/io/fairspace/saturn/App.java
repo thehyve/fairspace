@@ -11,10 +11,7 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.*;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
-import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
-import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
+import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
@@ -36,7 +33,6 @@ import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
-import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
@@ -74,7 +70,8 @@ public class App {
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)),
-                new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI)
+                new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
+                new SystemVocabularyProtectingValidator()
         );
         var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
