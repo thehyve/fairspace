@@ -32,7 +32,7 @@ public class Vocabularies {
 
                 var userVocabulary = oldVocabulary.difference(oldSystemVocabulary);
                 if (userVocabulary.isEmpty()) {
-                    userVocabulary = FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl");
+                    userVocabulary = FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", generateIri("").getURI(), null);
                 }
 
                 rdf.put(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));
