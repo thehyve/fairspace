@@ -22,6 +22,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = {
     fetchEntitiesIfNeeded
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(EntityDropdown);
