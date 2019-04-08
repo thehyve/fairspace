@@ -25,10 +25,10 @@ public class Vocabularies {
         this.rdf = rdf;
 
         commit("Initializing the vocabularies", rdf, () -> {
-            var oldSystemVocabulary = detach(rdf.fetch(SYSTEM_VOCABULARY_GRAPH_BACKUP));
+            var oldSystemVocabulary = rdf.fetch(SYSTEM_VOCABULARY_GRAPH_BACKUP);
 
             if (!SYSTEM_VOCABULARY.isIsomorphicWith(oldSystemVocabulary)) {
-                var oldVocabulary = detach(rdf.fetch(VOCABULARY_GRAPH_URI.getURI()));
+                var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
 
                 var userVocabulary = oldVocabulary.difference(oldSystemVocabulary);
                 if (userVocabulary.isEmpty()) {
@@ -39,10 +39,6 @@ public class Vocabularies {
                 rdf.put(SYSTEM_VOCABULARY_GRAPH_BACKUP, SYSTEM_VOCABULARY);
             }
         });
-    }
-
-    private static Model detach(Model m) {
-        return m.listStatements().toModel();
     }
 
     public List<String> getMachineOnlyPredicates(Node vocabularyGraphUri) {
