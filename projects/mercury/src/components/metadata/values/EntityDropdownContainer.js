@@ -12,7 +12,7 @@ import LoadingInlay from "../../common/LoadingInlay";
 import ErrorMessage from "../../common/ErrorMessage";
 import {ErrorDialog} from "../../common";
 
-class EntityDropdown extends React.Component {
+class EntityDropdownContainer extends React.Component {
     state = {
         adding: false,
     };
@@ -76,7 +76,7 @@ class EntityDropdown extends React.Component {
     }
 }
 
-EntityDropdown.propTypes = {
+EntityDropdownContainer.propTypes = {
     property: PropTypes.object.isRequired
 };
 
@@ -101,4 +101,4 @@ const mapDispatchToProps = {
     createMetadataEntity
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EntityDropdown);
+export default connect(mapStateToProps, mapDispatchToProps)(EntityDropdownContainer);
