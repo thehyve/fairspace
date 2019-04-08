@@ -86,6 +86,13 @@ workspace:
         enabled: true
         image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.2
         pullPolicy: IfNotPresent
+        resources:
+            request:
+                cpu: "50m"
+                memory: "512Mi"
+            limits:
+                cpu: "500m"
+                memory: "2048Mi"
     enableExperimentalFeatures: false
     elasticsearch:
         enabled: true
@@ -122,10 +129,10 @@ pluto:
   resources:
     limits:
       cpu: 1
-      memory: 512Mi
+      memory: 1024Mi
     requests:
       cpu: 50m
-      memory: 192Mi
+      memory: 650Mi
   probePath: /actuator/health
   livenessProbe:
     initialDelaySeconds: 20
@@ -183,7 +190,7 @@ saturn:
   resources:
     limits:
       cpu: 1
-      memory: 1024Mi
+      memory: 2048Mi
     requests:
       cpu: 200m
       memory: 512Mi
@@ -310,6 +317,11 @@ jupyterhub:
     defaultUrl: "/lab"
     extraEnv:
       WORKSPACE_URL:
+    cpu:
+      limit: 500m
+      guarantee: 100m
+    memory:
+      limit: 1G
   hub:
     image:
       name: eu.gcr.io/fairspace-207108/jupyterhub-hub
@@ -323,11 +335,20 @@ jupyterhub:
         c.KubeSpawner.cmd = ['/start']
         c.KubeSpawner.singleuser_privileged = True
         c.Authenticator.auto_login = True
+    resources:
+      limits:
+        cpu: 200m
+        memory: 512Mi
   proxy:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 1G
     # The JupyterHub chart requires this value to be set here with the same
     # length as the actual values
     # Ensure to override this value with a 64-character hex string when installing
     secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
+
 
 #####################################################################
 # Specific settings for ElasticSearch
@@ -337,8 +358,25 @@ elasticsearch:
     enabled: true
     size: 20Gi
     storageClass: standard
+  client:
+    resources:
+      requests:
+        memory: "1600Mi"
+      limits:
+        memory: "2048Mi"
   data:
     exposeHttp: true
+    resources:
+      requests:
+        memory: "1600Mi"
+      limits:
+        memory: "2048Mi"
+  master:
+    resources:
+      requests:
+        memory: "1600Mi"
+      limits:
+        memory: "4096Mi"
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}
