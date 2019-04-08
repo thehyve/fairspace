@@ -22,6 +22,7 @@ import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
+import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class App {
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
-        var rdf = new RDFConnectionLocal(ds);
+        var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
 
         var eventBus = new EventBus();
 
