@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -13,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -47,7 +47,7 @@ public class PermissionCheckingValidatorTest {
     @Before
     public void setUp() {
         var rdf = new RDFConnectionLocal(DatasetFactory.create());
-        initializeVocabulary(rdf, createURI(CONFIG.jena.baseIRI + "user-vocabulary"), "default-vocabularies/user-vocabulary.ttl");
+        new Vocabularies(rdf);
         validator = new PermissionCheckingValidator(rdf, permissions);
     }
 

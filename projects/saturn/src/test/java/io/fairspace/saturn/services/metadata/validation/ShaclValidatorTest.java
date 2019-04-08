@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -14,13 +15,9 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.function.Supplier;
-
 import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
-import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.system.Txn.calculateRead;
 import static org.junit.Assert.*;
 
 public class ShaclValidatorTest {
@@ -34,13 +31,8 @@ public class ShaclValidatorTest {
 
     @Before
     public void setUp() {
-        var systemVocabulary = initializeVocabulary(rdf, generateIri("system-vocabulary"), "default-vocabularies/system-vocabulary.ttl");
-        var userVocabulary = initializeVocabulary(rdf, generateIri("user-vocabulary"), "default-vocabularies/user-vocabulary.ttl");
-
-        Supplier<Model> mergedVocabularySupplier = () -> calculateRead(rdf, () ->
-                rdf.fetch(systemVocabulary.getVocabularyGraph().getURI())
-                        .add(rdf.fetch(userVocabulary.getVocabularyGraph().getURI())));
-        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, mergedVocabularySupplier);
+        var vocabularies = new Vocabularies(rdf);
+        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, vocabularies::getCombinedVocabulary);
     }
 
 

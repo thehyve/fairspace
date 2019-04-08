@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.rdf.Vocabulary;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -15,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
@@ -32,19 +32,19 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
 
     @Mock
-    private Vocabulary vocabulary;
+    private Supplier<List<String>> supplier;
 
     private ProtectMachineOnlyPredicatesValidator validator;
 
     @Before
     public void setUp() {
-        validator = new ProtectMachineOnlyPredicatesValidator(vocabulary);
+        validator = new ProtectMachineOnlyPredicatesValidator(supplier);
     }
 
     @Test
     public void testContainsMachineOnlyPredicates() {
         List<String> machineOnlyPredicates = Arrays.asList(MACHINE_ONLY_PROPERTY.getURI(), P1.getURI());
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyPredicates);
+        when(supplier.get()).thenReturn(machineOnlyPredicates);
 
         // An empty model should pass
         Model testModel = createDefaultModel();
@@ -64,7 +64,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     @Test
     public void testHasMachineOnlyPredicatesRecognizesMachineOnlyStatements() {
         List<String> machineOnlyPredicates = Arrays.asList(MACHINE_ONLY_PROPERTY.getURI(), P1.getURI());
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(machineOnlyPredicates);
+        when(supplier.get()).thenReturn(machineOnlyPredicates);
 
         // Create a model that contains one machine only statement between several non-machine-only
         Model testModel = createDefaultModel();
@@ -85,7 +85,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
 
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyVocabulary() {
-        when(vocabulary.getMachineOnlyPredicates()).thenReturn(Collections.emptyList());
+        when(supplier.get()).thenReturn(Collections.emptyList());
 
         // Create a model that contains one machine only statement between several non-machine-only
         Model testModel = createDefaultModel();

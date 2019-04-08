@@ -20,11 +20,11 @@ import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
@@ -34,11 +34,10 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
-import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
-import static io.fairspace.saturn.rdf.Vocabulary.recreateVocabulary;
+import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY_GRAPH_URI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
-import static org.apache.jena.system.Txn.calculateRead;
 
 @Slf4j
 public class App {
@@ -46,8 +45,6 @@ public class App {
         log.info("Saturn is starting");
 
         var userVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "user-vocabulary");
-        var systemVocabularyGraphNode = createURI("http://fairspace.io/ontology/system-vocabulary");
-        var metaVocabularyGraphNode = createURI("http://fairspace.io/ontology/meta-vocabulary");
 
         var ds = SaturnDatasetFactory.connect(CONFIG.jena, userVocabularyGraphNode);
 
@@ -68,25 +65,18 @@ public class App {
 
         var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
-        // Setup and initialize vocabularies
-        var userVocabulary = initializeVocabulary(rdf, userVocabularyGraphNode, "default-vocabularies/user-vocabulary.ttl");
-        var systemVocabulary = recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
-        var metaVocabulary = recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
-
-        Supplier<Model> mergedVocabularySupplier = () -> calculateRead(rdf, () ->
-                rdf.fetch(systemVocabularyGraphNode.getURI())
-                        .add(rdf.fetch(userVocabularyGraphNode.getURI())));
+        var vocabularies = new Vocabularies(rdf);
 
         var metadataValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(systemVocabulary),
+                new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(SYSTEM_VOCABULARY_GRAPH_URI)),
                 new PermissionCheckingValidator(rdf, permissions),
-                new ShaclValidator(rdf, defaultGraphIRI, mergedVocabularySupplier));
+                new ShaclValidator(rdf, defaultGraphIRI, vocabularies::getCombinedVocabulary));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
 
-        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
-        var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
-        var metaVocabularyService = new ReadableMetadataService(rdf, metaVocabularyGraphNode);
+        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)));
+        var systemVocabularyService = new ReadableMetadataService(rdf, createURI(SYSTEM_VOCABULARY_GRAPH_URI));
+        var metaVocabularyService = new ReadableMetadataService(rdf, createURI(META_VOCABULARY_GRAPH_URI));
         var combinedVocabularyService = new MergingReadableMetadataService(systemVocabularyService, userVocabularyService);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
