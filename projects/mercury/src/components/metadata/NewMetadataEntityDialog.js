@@ -19,7 +19,7 @@ class NewMetadataEntityDialog extends React.Component {
         this.props.onCreate(this.props.shape, this.state.id);
     };
 
-    handleInputChange = (event) => this.setState({[event.target.name]: event.target.value});
+    handleInputChange = event => this.setState({id: event.target.value});
 
     render() {
         const typeLabel = getLabel(this.props.shape);

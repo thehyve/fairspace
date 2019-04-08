@@ -5,19 +5,19 @@ import {withRouter} from 'react-router-dom';
 import {Button} from "@material-ui/core";
 import {getLabel, relativeLink} from "../../utils/metadataUtils";
 import * as metadataActions from "../../actions/metadataActions";
-import MetadataTypeChooserDialog from "./MetadataTypeChooserDialog";
+import MetadataShapeChooserDialog from "./MetadataShapeChooserDialog";
 import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
 import MetaList from './MetaList';
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 
 class MetadataListContainer extends React.Component {
-    static CREATION_STATE_CHOOSE_TYPE = 'CHOOSE_TYPE';
+    static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
 
     static CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
 
     state = {
         shape: null,
-        creationState: false
+        creationState: null
     };
 
     componentDidMount() {
@@ -28,10 +28,10 @@ class MetadataListContainer extends React.Component {
     startCreating = (e) => {
         e.stopPropagation();
 
-        this.setState({creationState: MetadataListContainer.CREATION_STATE_CHOOSE_TYPE});
+        this.setState({creationState: MetadataListContainer.CREATION_STATE_CHOOSE_SHAPE});
     };
 
-    chooseType = (shape) => {
+    chooseShape = (shape) => {
         this.setState({
             shape,
             creationState: MetadataListContainer.CREATION_STATE_CREATE_ENTITY
@@ -77,10 +77,10 @@ class MetadataListContainer extends React.Component {
                     Create
                 </Button>
 
-                <MetadataTypeChooserDialog
-                    open={this.state.creationState === MetadataListContainer.CREATION_STATE_CHOOSE_TYPE}
+                <MetadataShapeChooserDialog
+                    open={this.state.creationState === MetadataListContainer.CREATION_STATE_CHOOSE_SHAPE}
                     shapes={this.props.shapes}
-                    onChooseShape={this.chooseType}
+                    onChooseShape={this.chooseShape}
                     onClose={this.closeDialog}
                 />
                 <NewMetadataEntityDialog
