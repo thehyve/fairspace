@@ -35,7 +35,7 @@ class EntityDropdownContainer extends React.Component {
             .then((res) => {
                 this.handleCloseDialog();
                 this.props.fetchEntitiesIfNeeded(this.props.property.className);
-                this.props.onSave({id: res.value});
+                this.props.onChange({id: res.value});
             })
             .catch(e => ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`));
     }
@@ -77,7 +77,10 @@ class EntityDropdownContainer extends React.Component {
 }
 
 EntityDropdownContainer.propTypes = {
-    property: PropTypes.object.isRequired
+    property: PropTypes.object.isRequired,
+    fetchEntitiesIfNeeded: PropTypes.func.isRequired,
+    createMetadataEntity: PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({cache: {entitiesByType, vocabulary}}, ownProps) => {
