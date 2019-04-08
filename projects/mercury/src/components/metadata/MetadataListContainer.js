@@ -10,21 +10,31 @@ import MetaList from './MetaList';
 import {getVocabulary} from "../../selectors/vocabularySelectors";
 
 class MetadataListContainer extends React.Component {
+    state = {
+        creatingMetadataEntity: false
+    };
+
     componentDidMount() {
         this.props.fetchAllEntitiesIfNeeded();
     }
 
     handleEntityCreation = (shape, id) => {
+        this.setState({creatingMetadataEntity: true})
+
         this.props.createMetadataEntity(shape, id)
             .then((res) => {
                 this.props.fetchAllEntitiesIfNeeded();
                 this.props.history.push(relativeLink(res.value));
+                this.setState({creatingMetadataEntity: false})
             })
-            .catch(e => ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`));
+            .catch(e => {
+                ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+                this.setState({creatingMetadataEntity: false});
+            });
     }
 
     render() {
-        const {loading, creatingMetadataEntity, error, entities} = this.props;
+        const {loading, error, entities} = this.props;
 
         if (loading) {
             return <LoadingInlay />;
@@ -38,14 +48,14 @@ class MetadataListContainer extends React.Component {
             <>
                 <NewMetadataEntityDialog onCreate={this.handleEntityCreation} />
                 {entities && entities.length > 0 ? <MetaList items={entities} /> : null}
-                <LoadingOverlay loading={creatingMetadataEntity} />
+                <LoadingOverlay loading={this.state.creatingMetadataEntity} />
             </>
         );
     }
 }
 
 const mapStateToProps = (state) => {
-    const {metadataBySubject, cache: {allEntities}} = state;
+    const {cache: {allEntities}} = state;
     const allEntitiesData = allEntities && allEntities.data ? allEntities.data : [];
     const vocabularyData = getVocabulary(state);
     const entities = allEntitiesData.map(e => ({
@@ -58,8 +68,7 @@ const mapStateToProps = (state) => {
     return ({
         loading: allEntities ? allEntities.pending : true,
         error: allEntities ? allEntities.error : false,
-        entities,
-        creatingMetadataEntity: metadataBySubject.creatingMetadataEntity
+        entities
     });
 };
 
