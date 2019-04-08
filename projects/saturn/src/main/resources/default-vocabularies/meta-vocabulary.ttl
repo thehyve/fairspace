@@ -44,10 +44,12 @@ fs:ClassShapeMeta a sh:NodeShape ;
     ], [
         sh:datatype xsd:boolean ;
         sh:path fs:fixedShape ;
+        fs:machineOnly true ;
         sh:name "Fixed shape" ;
         sh:description "If this is true, a user can not make changes to this shape definiton, except for properties not included in fs:systemProperties."
     ], [
         sh:path fs:systemProperties ;
+        fs:machineOnly true ;
         sh:name "System properties" ;
         sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties."
     ], [
@@ -119,6 +121,7 @@ fs:PropertyShapeMeta a sh:NodeShape ;
     ], [
         sh:datatype xsd:boolean ;
         sh:path fs:fixedShape ;
+        fs:machineOnly true ; 
         sh:name "Fixed shape" ;
         sh:description "If this is true, a user can not make changes to this shape definiton."
     ] ;
@@ -181,6 +184,7 @@ fs:RelationShapeMeta a sh:NodeShape ;
     ], [
         sh:datatype xsd:boolean ;
         sh:path fs:fixedShape ;
+        fs:machineOnly true ; 
         sh:name "Fixed shape" ;
         sh:description "If this is true, a user can not make changes to this shape definiton."
     ] ;
