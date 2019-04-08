@@ -87,6 +87,7 @@ public class App {
         var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
         var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
         var metaVocabularyService = new ReadableMetadataService(rdf, metaVocabularyGraphNode);
+        var combinedVocabularyService = new MergingReadableMetadataService(systemVocabularyService, userVocabularyService);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
@@ -97,6 +98,7 @@ public class App {
                         new ChangeableMetadataApp("/api/vocabulary/user", userVocabularyService)
                             .withAuthorizationVerifier("/api/vocabulary/user/*", vocabularyAuthorizationVerifier),
                         new ReadableMetadataApp("/api/vocabulary/system", systemVocabularyService),
+                        new ReadableMetadataApp("/api/vocabulary/combined", combinedVocabularyService),
                         new ReadableMetadataApp("/api/vocabulary/meta", metaVocabularyService),
                         new CollectionsApp(collections),
                         new PermissionsApp(permissions),

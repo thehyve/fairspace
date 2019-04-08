@@ -73,17 +73,10 @@ class MetadataAPI {
     getVocabulary() {
         // TODO: use the new combined endpoint to retrieve both vocabularies at once
         return Config.waitFor()
-            .then(() => Promise.all([
-                fetch(Config.get().urls.vocabulary.user, MetadataAPI.getParams)
-                    .then(failOnHttpError("Failure when retrieving the user vocabulary"))
-                    .then(response => response.json())
-                    .then(jsonld.expand),
-                fetch(Config.get().urls.vocabulary.system, MetadataAPI.getParams)
-                    .then(failOnHttpError("Failure when retrieving the system vocabulary"))
-                    .then(response => response.json())
-                    .then(jsonld.expand)
-            ]))
-            .then(([userVocabulary, systemVocabulary]) => [...userVocabulary, ...systemVocabulary])
+            .then(() => fetch(Config.get().urls.vocabulary.combined, MetadataAPI.getParams))
+            .then(failOnHttpError("Failure when retrieving the combined vocabulary"))
+            .then(response => response.json())
+            .then(jsonld.expand)
     }
 
     /**
