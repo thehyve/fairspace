@@ -44,7 +44,7 @@ public class App {
     public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, createURI(VOCABULARY_GRAPH_URI));
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, VOCABULARY_GRAPH_URI);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
@@ -68,16 +68,16 @@ public class App {
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(VOCABULARY_GRAPH_URI)),
                 new PermissionCheckingValidator(rdf, permissions),
-                new ShaclValidator(rdf, defaultGraphIRI, createURI(VOCABULARY_GRAPH_URI)));
+                new ShaclValidator(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI));
 
-        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
+        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)),
-                new ShaclValidator(rdf, createURI(VOCABULARY_GRAPH_URI), createURI(META_VOCABULARY_GRAPH_URI))
+                new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI)
         );
-        var userVocabularyService = new ChangeableMetadataService(rdf, createURI(VOCABULARY_GRAPH_URI), lifeCycleManager, vocabularyValidator);
-        var metaVocabularyService = new ReadableMetadataService(rdf, createURI(META_VOCABULARY_GRAPH_URI));
+        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator);
+        var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 

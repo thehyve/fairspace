@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class ChangeableMetadataServiceTest {
     private static final String GRAPH = "http://localhost/iri/graph";
+    private static final String VOCABULARY = "http://localhost/iri/vocabulary";
 
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
@@ -45,7 +46,7 @@ public class ChangeableMetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new ChangeableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), lifeCycleManager,null);
+        api = new ChangeableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager,null);
     }
 
     @Test

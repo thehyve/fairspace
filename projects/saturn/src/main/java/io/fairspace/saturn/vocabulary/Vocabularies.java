@@ -1,6 +1,7 @@
 package io.fairspace.saturn.vocabulary;
 
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.util.FileManager;
@@ -15,8 +16,8 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.system.Txn.calculateRead;
 
 public class Vocabularies {
-    public static final String META_VOCABULARY_GRAPH_URI = FS.NS + "meta-vocabulary";
-    public static final String VOCABULARY_GRAPH_URI = generateIri("vocabulary").getURI();
+    public static final Node META_VOCABULARY_GRAPH_URI = createURI(FS.NS + "meta-vocabulary");
+    public static final Node VOCABULARY_GRAPH_URI = generateIri("vocabulary");
 
     private final RDFConnection rdf;
 
@@ -29,18 +30,18 @@ public class Vocabularies {
         });
     }
 
-    private void initVocabulary(String graphUri, String... files) {
-        if (rdf.fetch(graphUri).isEmpty()) {
+    private void initVocabulary(Node graph, String... files) {
+        if (rdf.fetch(graph.getURI()).isEmpty()) {
             for (var file: files) {
-                var model = FileManager.get().loadModel("default-vocabularies/" + file, graphUri + '#', null);
-                rdf.load(graphUri, model);
+                var model = FileManager.get().loadModel("default-vocabularies/" + file, graph.getURI() + '#', null);
+                rdf.load(graph.getURI(), model);
             }
         }
     }
 
-    public List<String> getMachineOnlyPredicates(String vocabularyGraphUri) {
+    public List<String> getMachineOnlyPredicates(Node vocabularyGraphUri) {
         var processor = new QuerySolutionProcessor<>(row -> row.getResource("property").getURI());
-        rdf.querySelect(storedQuery("machine_only_properties", createURI(vocabularyGraphUri)), processor);
+        rdf.querySelect(storedQuery("machine_only_properties", vocabularyGraphUri), processor);
         return processor.getValues();
     }
 

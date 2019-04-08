@@ -14,6 +14,7 @@ public
 class ReadableMetadataService {
     protected final RDFConnection rdf;
     protected final Node graph;
+    protected final Node vocabulary;
 
     /**
      * Returns a model with statements from the metadata database, based on the given selection criteria
@@ -48,7 +49,7 @@ class ReadableMetadataService {
      * @return
      */
     Model getByType(String type) {
-        return rdf.queryConstruct(storedQuery("entities_by_type", graph, asURI(type)));
+        return rdf.queryConstruct(storedQuery("entities_by_type", graph, vocabulary, asURI(type)));
     }
 
     protected static Node asURI(String uri) {
