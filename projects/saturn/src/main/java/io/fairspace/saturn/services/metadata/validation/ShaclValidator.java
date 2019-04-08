@@ -37,8 +37,7 @@ import static org.topbraid.shacl.util.SHACL2SPINBridge.createConstraintViolation
 public class ShaclValidator implements MetadataRequestValidator {
     private final RDFConnection rdf;
     private final Node dataGraph;
-    private final Supplier<Model> shapesModelSupplier;
-
+    private final Node vocabularyGraph;
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
@@ -51,7 +50,8 @@ public class ShaclValidator implements MetadataRequestValidator {
         addObjectTypes(modelToValidate);
 
         try {
-            var validationEngine = createEngine(modelToValidate, shapesModelSupplier.get());
+            var shapesModel = rdf.fetch(vocabularyGraph.getURI());
+            var validationEngine = createEngine(modelToValidate, shapesModel);
 
             for (var resource : affectedResources) {
                 validationEngine.validateNode(resource.asNode());

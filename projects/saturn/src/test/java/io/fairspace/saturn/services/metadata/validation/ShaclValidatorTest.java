@@ -31,8 +31,8 @@ public class ShaclValidatorTest {
 
     @Before
     public void setUp() {
-        var vocabularies = new Vocabularies(rdf);
-        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, vocabularies::getCombinedVocabulary);
+        new Vocabularies(rdf);
+        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, generateIri("vocabulary"));
     }
 
 

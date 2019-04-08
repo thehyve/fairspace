@@ -15,7 +15,7 @@ import static spark.Spark.path;
 @Slf4j
 public class ReadableMetadataApp extends BaseApp {
     protected final String basePath;
-    protected final MetadataSource metadataSource;
+    protected final ReadableMetadataService api;
 
     @Override
     public void init() {
@@ -24,7 +24,7 @@ public class ReadableMetadataApp extends BaseApp {
         path(basePath, () -> {
             get("/", JSON_LD_HEADER_STRING, (req, res) -> {
                 res.type(JSON_LD_HEADER_STRING);
-                return toJsonLD(metadataSource.get(
+                return toJsonLD(api.get(
                         req.queryParams("subject"),
                         req.queryParams("predicate"),
                         req.queryParams("object"),
@@ -32,7 +32,7 @@ public class ReadableMetadataApp extends BaseApp {
             });
             get("/entities/", JSON_LD_HEADER_STRING, (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
-                return toJsonLD(metadataSource.getByType(req.queryParams("type")));
+                return toJsonLD(api.getByType(req.queryParams("type")));
             });
         });
     }

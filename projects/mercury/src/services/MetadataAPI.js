@@ -54,8 +54,8 @@ class MetadataAPI {
         // TODO: store the user and system vocabulary separately to allow
         //       easy vocabulary editing for the user vocabulary
         return Config.waitFor()
-            .then(() => fetch(Config.get().urls.vocabulary.combined, MetadataAPI.getParams))
-            .then(failOnHttpError("Failure when retrieving the combined vocabulary"))
+            .then(() => fetch(Config.get().urls.vocabulary, MetadataAPI.getParams))
+            .then(failOnHttpError("Failure when retrieving the vocabulary"))
             .then(response => response.json())
             .then(jsonld.expand)
             .then(expandedVocabulary => new Vocabulary(expandedVocabulary));

@@ -35,7 +35,7 @@ import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
@@ -44,9 +44,7 @@ public class App {
     public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
-        var userVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "user-vocabulary");
-
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, userVocabularyGraphNode);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, createURI(VOCABULARY_GRAPH_URI));
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
@@ -68,16 +66,18 @@ public class App {
         var vocabularies = new Vocabularies(rdf);
 
         var metadataValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(SYSTEM_VOCABULARY_GRAPH_URI)),
+                new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(VOCABULARY_GRAPH_URI)),
                 new PermissionCheckingValidator(rdf, permissions),
-                new ShaclValidator(rdf, defaultGraphIRI, vocabularies::getCombinedVocabulary));
+                new ShaclValidator(rdf, defaultGraphIRI, createURI(VOCABULARY_GRAPH_URI)));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
 
-        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)));
-        var systemVocabularyService = new ReadableMetadataService(rdf, createURI(SYSTEM_VOCABULARY_GRAPH_URI));
+        var vocabularyValidator = new ComposedValidator(
+                new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)),
+                new ShaclValidator(rdf, createURI(VOCABULARY_GRAPH_URI), createURI(META_VOCABULARY_GRAPH_URI))
+        );
+        var userVocabularyService = new ChangeableMetadataService(rdf, createURI(VOCABULARY_GRAPH_URI), lifeCycleManager, vocabularyValidator);
         var metaVocabularyService = new ReadableMetadataService(rdf, createURI(META_VOCABULARY_GRAPH_URI));
-        var combinedVocabularyService = new MergingReadableMetadataService(systemVocabularyService, userVocabularyService);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
@@ -85,11 +85,9 @@ public class App {
                 .add("rdf", ds)
                 .addFilter("/api/*", new SaturnSparkFilter(
                         new ChangeableMetadataApp("/api/metadata", metadataService),
-                        new ChangeableMetadataApp("/api/vocabulary/user", userVocabularyService)
-                            .withAuthorizationVerifier("/api/vocabulary/user/*", vocabularyAuthorizationVerifier),
-                        new ReadableMetadataApp("/api/vocabulary/system", systemVocabularyService),
-                        new ReadableMetadataApp("/api/vocabulary/combined", combinedVocabularyService),
-                        new ReadableMetadataApp("/api/vocabulary/meta", metaVocabularyService),
+                        new ChangeableMetadataApp("/api/vocabulary/", userVocabularyService)
+                            .withAuthorizationVerifier("/api/vocabulary/*", vocabularyAuthorizationVerifier),
+                        new ReadableMetadataApp("/api/vocabulary/meta-vocabulary/", metaVocabularyService),
                         new CollectionsApp(collections),
                         new PermissionsApp(permissions),
                         new HealthApp()))
