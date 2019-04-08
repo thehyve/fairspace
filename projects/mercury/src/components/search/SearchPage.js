@@ -12,7 +12,7 @@ import * as metadataActions from '../../actions/metadataActions';
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import {ErrorMessage} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
-import {getVocabulary, isVocabularyPending} from "../../selectors/vocabularySelectors";
+import {getVocabulary, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
 
 // Exporting here to be able to test the component outside of Redux
 export class SearchPage extends React.Component {

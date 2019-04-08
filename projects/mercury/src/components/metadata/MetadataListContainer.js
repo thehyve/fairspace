@@ -8,7 +8,7 @@ import * as metadataActions from "../../actions/metadataActions";
 import MetadataShapeChooserDialog from "./MetadataShapeChooserDialog";
 import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
 import MetaList from './MetaList';
-import {getVocabulary, isVocabularyPending} from "../../selectors/vocabularySelectors";
+import {getVocabulary, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 
 class MetadataListContainer extends React.Component {

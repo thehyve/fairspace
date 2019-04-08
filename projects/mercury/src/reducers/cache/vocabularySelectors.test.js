@@ -1,5 +1,5 @@
-import vocabularyJsonLd from '../services/test.vocabulary.json';
-import {getVocabulary, hasVocabularyError, isVocabularyPending} from "./vocabularySelectors";
+import vocabularyJsonLd from '../../services/test.vocabulary.json';
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "./vocabularyReducers";
 
 describe('retrieving vocabulary from state', () => {
     it('loads the vocabulary from state', () => {

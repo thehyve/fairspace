@@ -9,8 +9,8 @@ import MetaEntityHeader from './MetaEntityHeader';
 import {isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../utils/metadataUtils";
 
 import MetadataProperty from "./MetadataProperty";
-import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../selectors/metadataSelectors";
-import {hasVocabularyError, isVocabularyPending} from "../../selectors/vocabularySelectors";
+import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
+import {hasVocabularyError, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
 import ErrorDialog from "../common/ErrorDialog";
 
 export class MetadataEntityContainer extends React.Component {

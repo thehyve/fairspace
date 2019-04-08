@@ -11,7 +11,7 @@ import NewMetadataEntityDialog from "../NewMetadataEntityDialog";
 import LoadingInlay from "../../common/LoadingInlay";
 import ErrorMessage from "../../common/ErrorMessage";
 import {ErrorDialog} from "../../common";
-import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../selectors/vocabularySelectors";
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 
 class EntityDropdownContainer extends React.Component {
     state = {
