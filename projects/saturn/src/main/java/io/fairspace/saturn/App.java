@@ -84,11 +84,7 @@ public class App {
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
 
-        var vocabularyValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(metaVocabulary),
-                new ShaclValidator(rdf, userVocabularyGraphNode, () -> rdf.fetch(systemVocabularyGraphNode.getURI())));
-
-        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, vocabularyValidator);
+        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
         var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
         var metaVocabularyService = new ReadableMetadataService(rdf, metaVocabularyGraphNode);
         var combinedVocabularyService = new MergingReadableMetadataService(systemVocabularyService, userVocabularyService);

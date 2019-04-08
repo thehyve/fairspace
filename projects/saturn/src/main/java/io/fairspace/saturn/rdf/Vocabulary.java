@@ -2,7 +2,6 @@ package io.fairspace.saturn.rdf;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -12,7 +11,6 @@ import java.util.List;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -30,10 +28,6 @@ public class Vocabulary {
         rdfConnection.querySelect(storedQuery("machine_only_properties", vocabularyGraph), processor);
 
         return processor.getValues();
-    }
-
-    public boolean isInvertiblePredicate(@NonNull String predicateUri) {
-        return rdfConnection.queryAsk(storedQuery("is_invertible_property", vocabularyGraph, createURI(predicateUri)));
     }
 
     public Node getVocabularyGraph() {

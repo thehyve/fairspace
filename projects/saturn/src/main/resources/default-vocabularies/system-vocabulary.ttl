@@ -126,6 +126,7 @@ fs:filePathShape a fs:PropertyShape ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:name "File path" ;
+    sh:datatype xsd:string ;
     sh:description "File path" ;
     fs:machineOnly true ; 
     sh:path fs:filePath .
@@ -180,18 +181,6 @@ fs:deletedByShape a fs:RelationShape ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
     sh:path fs:deletedBy .
-
-fs:hasCollectionShape a fs:RelationShape ; 
-    sh:name "Associated collections" ;
-    sh:description "" ;
-    sh:class fs:Collection ; 
-    sh:path fs:hasCollection .
-
-fs:hasFileShape a fs:RelationShape ; 
-    sh:name "Files in this collection" ;
-    sh:description "All files and directories that are in (sub)directories." ; 
-    sh:class fs:File ;
-    sh:path fs:hasFile .
 
 
 ########################

@@ -44,36 +44,40 @@ public class ShaclValidator implements MetadataRequestValidator {
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
         var affectedResources = getAffectedResources(rdf, modelToRemove.union(modelToAdd));
 
-        var model = targetModel(affectedResources)
+        var modelToValidate = affectedModelSubSet(affectedResources)
                 .remove(modelToRemove)
                 .add(modelToAdd);
 
-        addObjectTypes(model);
+        addObjectTypes(modelToValidate);
 
         try {
-            var validationEngine = createEngine(model, shapesModelSupplier.get());
+            var validationEngine = createEngine(modelToValidate, shapesModelSupplier.get());
 
             for (var resource : affectedResources) {
                 validationEngine.validateNode(resource.asNode());
             }
 
-            var report = validationEngine.getReport();
-            var violations = createConstraintViolations(report.getModel());
-
-            return violations.stream()
-                    .filter(ConstraintViolation::isError)
-                    .map(ShaclValidator::toValidationResult)
-                    .reduce(ValidationResult.VALID, ValidationResult::merge);
+            return getValidationResult(validationEngine);
         } catch (InterruptedException e) {
             throw new RuntimeException("SHACL validation was interrupted");
         }
     }
 
+    private ValidationResult getValidationResult(ValidationEngine validationEngine) {
+        var report = validationEngine.getReport();
+        var violations = createConstraintViolations(report.getModel());
+
+        return violations.stream()
+                .filter(ConstraintViolation::isError)
+                .map(ShaclValidator::toValidationResult)
+                .reduce(ValidationResult.VALID, ValidationResult::merge);
+    }
+
     /**
      * @param affectedResources
-     * @return a model containing all triples describing the affected resources plus types (rdf:type) of the objects
+     * @return a model containing all triples describing the affected resources
      */
-    private Model targetModel(Set<Resource> affectedResources) {
+    private Model affectedModelSubSet(Set<Resource> affectedResources) {
         var model = createDefaultModel();
         affectedResources.forEach(r ->
                 model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, r.asNode(), null, null))));
