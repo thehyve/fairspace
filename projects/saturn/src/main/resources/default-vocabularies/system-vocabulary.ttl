@@ -23,6 +23,19 @@ fs:FileShape a fs:ClassShape ;
     sh:name "File" ;
     sh:targetClass fs:File ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:fixedShape true ;
+    fs:systemProperties 
+        fs:fileSizeShape,
+        fs:md5Shape,
+        fs:filePathShape,
+        fs:createdByShape,
+        fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        rdfs:labelShape,
+        rdfs:commentShape ;
     sh:property
         fs:fileSizeShape,
         fs:md5Shape,
@@ -42,6 +55,17 @@ fs:DirectoryShape a fs:ClassShape ;
     sh:name "Directory" ;
     sh:targetClass fs:Directory ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:fixedShape true ;
+    fs:systemProperties 
+        fs:filePathShape,
+        fs:createdByShape,
+        fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        rdfs:labelShape,
+        rdfs:commentShape ;
     sh:property
         fs:filePathShape,
         fs:createdByShape,
@@ -59,6 +83,17 @@ fs:CollectionShape a fs:ClassShape ;
     sh:name "Collection" ;
     sh:targetClass fs:Collection ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:fixedShape true ;
+    fs:systemProperties 
+        fs:filePathShape,
+        fs:createdByShape,
+        fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        rdfs:labelShape,
+        rdfs:commentShape ;
     sh:property
         fs:filePathShape,
         fs:createdByShape,
@@ -76,6 +111,7 @@ fs:UserShape a fs:ClassShape ;
     sh:name "User" ;
     sh:targetClass fs:User ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:fixedShape true ;
     sh:property
         rdfs:labelShape,
         rdfs:commentShape,
@@ -89,6 +125,7 @@ rdfs:labelShape a fs:PropertyShape ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
+    fs:fixedShape true ;
     sh:path rdfs:label . 
  
 rdfs:commentShape a fs:PropertyShape ;
@@ -96,6 +133,7 @@ rdfs:commentShape a fs:PropertyShape ;
     sh:description "Human friendly description." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
+    fs:fixedShape true ;
     sh:path rdfs:comment . 
      
 fs:dateCreatedShape a fs:PropertyShape ;
@@ -104,6 +142,7 @@ fs:dateCreatedShape a fs:PropertyShape ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:dateCreated .
 
 fs:dateModifiedShape a fs:PropertyShape ;
@@ -112,6 +151,7 @@ fs:dateModifiedShape a fs:PropertyShape ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:dateModified .
 
 fs:dateDeletedShape a fs:PropertyShape ;
@@ -120,6 +160,7 @@ fs:dateDeletedShape a fs:PropertyShape ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:dateDeleted . 
 
 fs:filePathShape a fs:PropertyShape ; 
@@ -128,7 +169,8 @@ fs:filePathShape a fs:PropertyShape ;
     sh:name "File path" ;
     sh:datatype xsd:string ;
     sh:description "File path" ;
-    fs:machineOnly true ; 
+    fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:filePath .
 
 fs:fileSizeShape a fs:PropertyShape ;
@@ -137,6 +179,7 @@ fs:fileSizeShape a fs:PropertyShape ;
     sh:datatype xsd:long ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:fileSize .
 
 fs:md5Shape a fs:PropertyShape ;
@@ -145,6 +188,7 @@ fs:md5Shape a fs:PropertyShape ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:md5 .
 
 fs:userEmailShape a fs:PropertyShape ;
@@ -153,6 +197,7 @@ fs:userEmailShape a fs:PropertyShape ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:email .
 
 
@@ -164,6 +209,7 @@ fs:createdByShape a fs:RelationShape ;
     sh:class fs:User ; 
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:createdBy .
 
 fs:modifiedByShape a fs:RelationShape ; 
@@ -172,6 +218,7 @@ fs:modifiedByShape a fs:RelationShape ;
     sh:class fs:User ; 
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:modifiedBy .
 
 fs:deletedByShape a fs:RelationShape ; 
@@ -180,6 +227,7 @@ fs:deletedByShape a fs:RelationShape ;
     sh:class fs:User ; 
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:deletedBy .
 
 
