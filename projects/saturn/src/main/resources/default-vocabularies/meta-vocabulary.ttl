@@ -45,7 +45,7 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:datatype xsd:boolean ;
         sh:path fs:fixedShape ;
         sh:name "Fixed shape" ;
-        sh:description "If this is true, a user can not make changes to this shape definiton."
+        sh:description "If this is true, a user can not make changes to this shape definiton, except for properties not included in fs:systemProperties."
     ], [
         sh:path fs:systemProperties ;
         sh:name "System properties" ;
