@@ -22,15 +22,23 @@ class MetadataAPI {
         this.configParserFunc = configParserFunc;
     }
 
+    /**
+     * Returns the URL to use for separate statements
+     * @returns {string}
+     */
     getStatementsUrl() {
         return this.configParserFunc(Config.get()).statements;
     }
 
+    /**
+     * Returns the URL to use for retrieving a list of entities
+     * @returns {string}
+     */
     getEntitiesUrl() {
-        return this.configParserFunc(Config.get()).statements;
+        return this.configParserFunc(Config.get()).entities;
     }
 
-    get(params) {
+    get(params = {}) {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
         return fetch(`${this.getStatementsUrl()}?labels&${query}`, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
@@ -67,30 +75,6 @@ class MetadataAPI {
     }
 
     /**
-     * Retrieves the vocabulary (user and system) and instantiates a Vocabulary object with it
-     * @returns {Promise<Vocabulary | never>}
-     */
-    getVocabulary() {
-        // TODO: use the new combined endpoint to retrieve both vocabularies at once
-        return Config.waitFor()
-            .then(() => fetch(Config.get().urls.vocabulary.combined, MetadataAPI.getParams))
-            .then(failOnHttpError("Failure when retrieving the combined vocabulary"))
-            .then(response => response.json())
-            .then(jsonld.expand)
-    }
-
-    /**
-     * Retrieves the meta vocabulary
-     * @returns {Promise<Vocabulary | never>}
-     */
-    getMetaVocabulary() {
-        return fetch(Config.get().urls.vocabulary.meta, MetadataAPI.getParams)
-            .then(failOnHttpError("Failure when retrieving the meta vocabulary"))
-            .then(response => response.json())
-            .then(jsonld.expand);
-    }
-
-    /**
      * Returns all entities in the metadata store for the given type
      *
      * More specifically this method returns all entities x for which a
@@ -101,7 +85,11 @@ class MetadataAPI {
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
     getEntitiesByType(type) {
-        return fetch(Config.get().urls.metadata.entities + "?type=" + encodeURIComponent(type), MetadataAPI.getParams)
+        if (!this.getEntitiesUrl()) {
+            return Promise.reject(new Error("No entities URL provided"));
+        }
+
+        return fetch(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(jsonld.expand);
@@ -114,7 +102,11 @@ class MetadataAPI {
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
     getAllEntities() {
-        return fetch(Config.get().urls.metadata.entities, MetadataAPI.getParams)
+        if (!this.getEntitiesUrl()) {
+            return Promise.reject(new Error("No entities URL provided"));
+        }
+
+        return fetch(this.getEntitiesUrl(), MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(jsonld.expand);

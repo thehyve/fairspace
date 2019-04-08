@@ -14,8 +14,8 @@
       "statements": "/api/vocabulary/combined/",
       "entities": "/api/vocabulary/combined/entities/"
     },
-    "metavocabulary": {
-      "statements": "/api/vocabulary/combined/"
+    "metaVocabulary": {
+      "statements": "/api/vocabulary/meta/"
     },
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"

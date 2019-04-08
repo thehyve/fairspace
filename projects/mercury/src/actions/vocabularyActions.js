@@ -20,27 +20,6 @@ export const updateMetadata = (subject, predicate, values) => ({
     }
 });
 
-export const createMetadataEntity = (shape, id) => {
-    const subject = createIri(id);
-    const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
-    return {
-        type: actionTypes.CREATE_METADATA_ENTITY,
-        payload: MetadataAPI.metadata.get({subject})
-            .then((meta) => {
-                if (meta.length) {
-                    throw Error(`Metadata entity already exists: ${subject}`);
-                }
-            })
-            .then(() => MetadataAPI.metadata.update(subject, constants.TYPE_URI, [{id: type}]))
-            .then(() => subject),
-        meta: {
-            subject,
-            type
-        }
-    };
-};
-
-
 export const createVocabularyEntity = (shape, id) => {
     const subject = createIri(id);
     const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
@@ -59,15 +38,6 @@ export const createVocabularyEntity = (shape, id) => {
         }
     };
 };
-
-
-const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({
-    type: actionTypes.FETCH_METADATA,
-    payload: MetadataAPI.metadata.get({subject}),
-    meta: {
-        subject
-    }
-}));
 
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
     type: actionTypes.FETCH_METADATA_VOCABULARY,
@@ -89,31 +59,26 @@ export const fetchMetaVocabularyIfNeeded = () => dispatchIfNeeded(
     state => (state && state.cache ? state.cache.metaVocabulary : undefined)
 );
 
-export const fetchMetadataBySubjectIfNeeded = subject => dispatchIfNeeded(
-    () => fetchMetadataBySubject(subject),
-    state => (state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined)
-);
-
-const fetchEntitiesByType = createErrorHandlingPromiseAction(type => ({
-    type: actionTypes.FETCH_METADATA_ENTITIES,
-    payload: MetadataAPI.metadata.getEntitiesByType(type),
+const fetchVocabularyEntitiesByType = createErrorHandlingPromiseAction(type => ({
+    type: actionTypes.FETCH_VOCABULARY_ENTITIES,
+    payload: MetadataAPI.vocabulary.getEntitiesByType(type),
     meta: {
         type
     }
 }));
 
-const fetchAllEntities = createErrorHandlingPromiseAction(dispatch => ({
-    type: actionTypes.FETCH_ALL_METADATA_ENTITIES,
+const fetchAllVocabularyEntities = createErrorHandlingPromiseAction(dispatch => ({
+    type: actionTypes.FETCH_ALL_VOCABULARY_ENTITIES,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
-        .then(_ => MetadataAPI.metadata.getAllEntities())
+        .then(_ => MetadataAPI.vocabulary.getAllEntities())
 }));
 
-export const fetchEntitiesIfNeeded = type => dispatchIfNeeded(
-    () => fetchEntitiesByType(type),
-    state => (state && state.cache && state.cache.entitiesByType ? state.cache.entitiesByType[type] : undefined)
+export const fetchVocabularyEntitiesIfNeeded = type => dispatchIfNeeded(
+    () => fetchVocabularyEntitiesByType(type),
+    state => (state && state.cache && state.cache.vocabularyEntitiesByType ? state.cache.vocabularyEntitiesByType[type] : undefined)
 );
 
-export const fetchAllEntitiesIfNeeded = () => dispatchIfNeeded(
-    () => fetchAllEntities(),
-    state => (state && state.cache ? state.cache.allEntities : undefined)
+export const fetchAllVocabularyEntitiesIfNeeded = () => dispatchIfNeeded(
+    () => fetchAllVocabularyEntities(),
+    state => (state && state.cache ? state.cache.allVocabularyEntities : undefined)
 );

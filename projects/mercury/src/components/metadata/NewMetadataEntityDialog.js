@@ -16,7 +16,7 @@ import {
 import {generateUuid, getLabel} from "../../utils/metadataUtils";
 import {compareBy} from "../../utils/comparisionUtils";
 import LoadingInlay from '../common/LoadingInlay';
-import {fetchMetadataVocabularyIfNeeded} from "../../actions/metadataActions";
+import {fetchMetadataVocabularyIfNeeded} from "../../actions/vocabularyActions";
 import {getVocabulary, isVocabularyPending} from "../../selectors/vocabularySelectors";
 
 class NewMetadataEntityDialog extends React.Component {

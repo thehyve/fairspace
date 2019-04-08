@@ -4,11 +4,15 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
 import {getLabel, relativeLink} from "../../utils/metadataUtils";
-import * as metadataActions from "../../actions/metadataActions";
+import * as vocabularyActions from "../../actions/vocabularyActions";
 import NewMetadataEntityDialog from "../metadata/NewMetadataEntityDialog";
 import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
 import MetaList from '../metadata/MetaList';
-import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../selectors/vocabularySelectors";
+import {
+    getVocabularyEntities,
+    hasVocabularyEntitiesError,
+    isVocabularyEntitiesPending
+} from "../../selectors/vocabularySelectors";
 import {
     getMetaVocabulary,
     hasMetaVocabularyError,
@@ -21,7 +25,8 @@ class VocabularyListContainer extends React.Component {
     }
 
     componentDidMount() {
-        this.props.fetchVocabularyIfNeeded();
+        this.props.fetchMetaVocabularyIfNeeded();
+        this.props.fetchEntitiesIfNeeded();
     }
 
     handleEntityCreation = (shape, id) => {
@@ -63,31 +68,33 @@ VocabularyListContainer.propTypes = {
     loading: PropTypes.bool,
     entities: PropTypes.array,
     createVocabularyEntity: PropTypes.func.isRequired,
-    fetchVocabularyIfNeeded: PropTypes.func.isRequired
+    fetchEntitiesIfNeeded: PropTypes.func.isRequired,
+    fetchMetaVocabularyIfNeeded: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => {
-    const vocabulary = getVocabulary(state);
+    const vocabularyEntities = getVocabularyEntities(state);
     const metaVocabulary = getMetaVocabulary(state);
 
-    const entities = vocabulary.vocabulary.map(e => ({
+    const entities = vocabularyEntities.map(e => ({
         id: e['@id'],
         label: getLabel(e),
         type: e['@type'],
-        typeLabel: getLabel(metaVocabulary.determineShapeForType(e['@type'][0]), true)
+        typeLabel: e['@type'] ? getLabel(metaVocabulary.determineShapeForType(e['@type'][0]), true) : ''
     }));
 
     return ({
-        loading: isVocabularyPending(state) || isMetaVocabularyPending(state),
-        error: hasVocabularyError(state) || hasMetaVocabularyError(state),
+        loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
+        error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
         entities
     });
 };
 
 
 const mapDispatchToProps = {
-    createVocabularyEntity: metadataActions.createVocabularyEntity,
-    fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded
+    createVocabularyEntity: vocabularyActions.createVocabularyEntity,
+    fetchEntitiesIfNeeded: vocabularyActions.fetchAllVocabularyEntitiesIfNeeded,
+    fetchMetaVocabularyIfNeeded: vocabularyActions.fetchMetaVocabularyIfNeeded
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(VocabularyListContainer));

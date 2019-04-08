@@ -1,18 +1,16 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Paper, List} from '@material-ui/core';
+import {List, Paper} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../common";
-import {
-    fetchMetadataBySubjectIfNeeded,
-    fetchMetadataVocabularyIfNeeded
-} from "../../actions/metadataActions";
-import MetaEntityHeader from './MetaEntityHeader';
-import {isDateTimeProperty, propertiesToShow, linkLabel, url2iri} from "../../utils/metadataUtils";
-
-import MetadataProperty from "./MetadataProperty";
+import {fetchMetadataBySubjectIfNeeded} from "../../actions/metadataActions";
+import {fetchMetadataVocabularyIfNeeded} from "../../actions/vocabularyActions";
 import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../selectors/metadataSelectors";
 import {hasVocabularyError, isVocabularyPending} from "../../selectors/vocabularySelectors";
+import {isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../utils/metadataUtils";
+
+import MetaEntityHeader from './MetaEntityHeader';
+import MetadataProperty from "./MetadataProperty";
 
 export class MetadataEntityContainer extends React.Component {
     componentDidMount() {

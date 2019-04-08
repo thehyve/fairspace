@@ -4,9 +4,9 @@ import * as actionTypes from "../../actions/actionTypes";
 
 const defaultState = {data: ['']};
 
-export const metadataCreateReducer = (state = defaultState, action) => {
+export const vocabularyCreateReducer = (state = defaultState, action) => {
     switch (action.type) {
-        case actionTypes.CREATE_METADATA_ENTITY_FULFILLED: {
+        case actionTypes.CREATE_VOCABULARY_ENTITY_FULFILLED: {
             const metadata = {'@id': action.meta.subject, '@type': [action.meta.type]};
             return {
                 ...state,
@@ -19,6 +19,6 @@ export const metadataCreateReducer = (state = defaultState, action) => {
     }
 };
 
-const fetchAllMetaEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_ALL_METADATA_ENTITIES, null);
+const fetchAllVocabularyEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_ALL_VOCABULARY_ENTITIES, null);
 
-export default reduceReducers(fetchAllMetaEntitiesReducer, metadataCreateReducer);
+export default reduceReducers(fetchAllVocabularyEntitiesReducer, vocabularyCreateReducer);
