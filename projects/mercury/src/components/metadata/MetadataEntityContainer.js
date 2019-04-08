@@ -1,35 +1,88 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Paper, List} from '@material-ui/core';
+import {Paper, List, Fab, Grid} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../common";
-import {fetchCombinedMetadataIfNeeded} from "../../actions/metadataActions";
+import * as metadataActions from "../../actions/metadataActions";
 import MetaEntityHeader from './MetaEntityHeader';
 import {isDateTimeProperty, propertiesToShow, linkLabel, url2iri} from "../../utils/metadataUtils";
 
 import MetadataProperty from "./MetadataProperty";
+import ErrorDialog from "../common/ErrorDialog";
 
 export class MetadataEntityContainer extends React.Component {
+    state = {
+        propertiesWithUpdatedValues: {}
+    };
+
     componentDidMount() {
         this.load();
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.subject !== prevProps.subject) {
+            this.resetChanges();
+            this.load();
+        } else if (this.anyPendingChanges()) {
             this.load();
         }
     }
 
     load() {
-        const {dispatch, subject} = this.props;
+        const {subject, fetchCombinedMetadataIfNeeded} = this.props;
 
         if (subject) {
-            dispatch(fetchCombinedMetadataIfNeeded(subject));
+            fetchCombinedMetadataIfNeeded(subject);
         }
     }
 
+    updateState = (propertyKey, updatedValues) => {
+        this.setState(prevState => ({
+            propertiesWithUpdatedValues:
+                {...prevState.propertiesWithUpdatedValues, [propertyKey]: updatedValues}
+        }));
+    };
+
+    handleChange = (property, value, index) => {
+        const pendingValues = this.state.propertiesWithUpdatedValues[property.key];
+        const values = pendingValues || property.values;
+        const updatedValues = values.map((el, idx) => ((idx === index) ? value : el));
+        this.updateState(property.key, updatedValues);
+    };
+
+    handleAdd = (property, value) => {
+        const updatedValues = [...property.values, value];
+        this.updateState(property.key, updatedValues);
+    };
+
+    handleDelete = (property, index) => {
+        const pendingValues = this.state.propertiesWithUpdatedValues[property.key];
+        const values = pendingValues || property.values;
+        const updatedValues = values.filter((el, idx) => idx !== index);
+        this.updateState(property.key, updatedValues);
+    };
+
+    handleSubmit = () => {
+        const {subject, updateEntity} = this.props;
+
+        updateEntity(subject, this.state.propertiesWithUpdatedValues)
+            .then(this.resetChanges)
+            .catch(e => ErrorDialog.showError(e, "Error while updateing metadata"));
+    };
+
+    anyPendingChanges = () => Object.keys(this.state.propertiesWithUpdatedValues).length !== 0;
+
+    shouldShowSubmitButton = () => this.props.editable && this.anyPendingChanges();
+
+    resetChanges = () => {
+        this.setState({propertiesWithUpdatedValues: {}});
+    }
+
     render() {
-        const {subject, label, typeInfo, properties, editable, error, loading, showHeader} = this.props;
+        const {
+            subject, label, typeInfo, properties, editable, error, loading, showHeader
+        } = this.props;
+        const submitButtonVisibility = this.shouldShowSubmitButton() ? 'visible' : 'hidden';
 
         if (error) {
             return <ErrorMessage message={error.message} />;
@@ -39,19 +92,37 @@ export class MetadataEntityContainer extends React.Component {
             return <LoadingInlay />;
         }
 
+        const propertiesWithChanges = properties.map(p => ({
+            ...p,
+            values: this.state.propertiesWithUpdatedValues[p.key] || p.values
+        }));
+
         const entity = (
-            <List dense>
-                {
-                    properties.map((p) => (
-                        <MetadataProperty
-                            editable={editable && p.editable}
-                            subject={subject}
-                            key={p.key}
-                            property={p}
-                        />
-                    ))
-                }
-            </List>
+            <Grid>
+                <Fab
+                    variant="extended"
+                    onClick={this.handleSubmit}
+                    color="primary"
+                    style={{visibility: submitButtonVisibility}}
+                >
+                    Update
+                </Fab>
+                <List dense>
+                    {
+                        propertiesWithChanges.map((p) => (
+                            <MetadataProperty
+                                editable={editable && p.editable}
+                                subject={subject}
+                                key={subject + p.key}
+                                property={p}
+                                onChange={(value, index) => this.handleChange(p, value, index)}
+                                onAdd={(value) => this.handleAdd(p, value)}
+                                onDelete={(index) => this.handleDelete(p, index)}
+                            />
+                        ))
+                    }
+                </List>
+            </Grid>
         );
 
         return showHeader ? (
@@ -95,4 +166,12 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-export default connect(mapStateToProps)(MetadataEntityContainer);
+const mapDispatchToProps = {
+    ...metadataActions
+};
+
+MetadataEntityContainer.defaultProps = {
+    fetchCombinedMetadataIfNeeded: () => {}
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntityContainer);

@@ -15,6 +15,7 @@ import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -112,7 +113,7 @@ public class WebDAVIT {
                 "</propfind>");
         milton.service(req, res);
         assertEquals(207, res.getStatus());
-        assertTrue(res.getOutputStreamContent().contains("xmlns:ns1=\"http://fairspace.io/ontology#\""));
+        assertTrue(res.getOutputStreamContent().contains("xmlns:ns1=\"" + FS.NS +"\""));
         assertTrue(res.getOutputStreamContent().contains("<d:prop><ns1:iri>" + fs.stat("coll1").getIri() + "</ns1:iri>"));
     }
 

@@ -13,6 +13,7 @@
     "vocabulary": {
       "user": "/api/vocabulary/user/",
       "system": "/api/vocabulary/system/",
+      "combined": "/api/vocabulary/combined/",
       "meta": "/api/vocabulary/meta/"
     },
     "users": "/api/workspace/users",

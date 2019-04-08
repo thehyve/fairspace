@@ -9,7 +9,7 @@ This repository contains the Workspace-related components of Fairspace:
   information.
 - Pluto: the API gateway. See [the Pluto README](/projects/pluto/README.md) for more
   information.
-- Saturn: the backend component. See [the Saturn README](projects/pluto/README.md) for more
+- Saturn: the backend component. See [the Saturn README](projects/saturn/README.md) for more
   information.
 - The OIDC authentication library. See [the OIDC-Auth README](projects/oidc-auth/README.md) for
   more information.

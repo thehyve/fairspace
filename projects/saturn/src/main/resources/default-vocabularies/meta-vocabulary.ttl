@@ -25,9 +25,9 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:name "Properties" ; 
         sh:description "List of all properties and relations for this class." 
     ], [
-        sh:value true ;
+        sh:value false ;
         sh:path sh:closed ; 
-        sh:description "sh:closed should be true."
+        sh:description "sh:closed should be false."
     ], [
         sh:class fs:Class ;
         sh:maxCount 1 ;
@@ -103,6 +103,12 @@ fs:PropertyShapeMeta a sh:NodeShape ;
     ], [
         sh:path fs:machineOnly
     ] ;
+    sh:or ( 
+        [ sh:path sh:in ; 
+          sh:minCount 1  ] 
+        [ sh:path sh:datatype ; 
+          sh:minCount 1  ]
+      ) ; 
     sh:targetClass fs:PropertyShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
 

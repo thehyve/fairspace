@@ -6,19 +6,36 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/#> .
-@prefix osiris: <http://osiris.fairspace.io/ontology/#> .
-@prefix icdo3: <http://icdo3.fairspace.io/ontology/#> .
-@prefix fhir: <http://hl7.org/fhir/STU3/#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix osiris: <http://osiris.fairspace.io/ontology#> .
+@prefix icdo3: <http://icdo3.fairspace.io/ontology#> .
+@prefix fhir: <http://hl7.org/fhir/STU3/> .
 
 ########################
 ###   User Shapes    ###
 ########################
 
+## Augmented system class shapes
+fs:FileShape sh:property
+    fs:aboutPersonShape,
+    fs:aboutMaterialShape,
+    fs:associatedAnalysisShape .
+
+fs:DirectoryShape sh:property
+    fs:aboutPersonShape,
+    fs:aboutMaterialShape,
+    fs:associatedAnalysisShape .
+
+fs:CollectionShape sh:property
+    fs:aboutPersonShape,
+    fs:aboutMaterialShape,
+    fs:partOfProjectShape .
+
+
 ## User class Shapes
 
 foaf:PersonShape a fs:ClassShape ;
-    sh:closed true ;
+    sh:closed false ;
     sh:description "A person that is subject of research." ;
     sh:name "Person" ;
     sh:targetClass foaf:Person ; 
@@ -33,7 +50,7 @@ foaf:PersonShape a fs:ClassShape ;
         rdfs:commentShape .
 
 fs:PersonConsentShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "A research consent given by person." ;
     sh:name "Person Consent" ;
     sh:targetClass fs:PersonConsent ; 
@@ -46,7 +63,7 @@ fs:PersonConsentShape a fs:ClassShape ;
         rdfs:commentShape .
 
 fs:ResearchProjectShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "A research project." ;
     sh:name "Research Project" ;
     sh:targetClass fs:ResearchProject ; 
@@ -61,7 +78,7 @@ fs:ResearchProjectShape a fs:ClassShape ;
         rdfs:commentShape .
 
 osiris:TumorPathologyEventShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "Description for osiris:TumorPathologyEvent" ;
     sh:name "Tumor Pathology Event" ;
     sh:targetClass osiris:TumorPathologyEvent ; 
@@ -84,7 +101,7 @@ osiris:TumorPathologyEventShape a fs:ClassShape ;
         rdfs:commentShape .
 
 osiris:BiologicalSampleShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "Description for osiris:BiologicalSample" ;
     sh:name "Biological Sample" ;
     sh:targetClass osiris:BiologicalSample ; 
@@ -104,7 +121,7 @@ osiris:BiologicalSampleShape a fs:ClassShape ;
         rdfs:commentShape .
 
 fs:AnalysisShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "Description for fs:Analysis" ;
     sh:name "Analysis" ;
     sh:targetClass fs:Analysis ; 
