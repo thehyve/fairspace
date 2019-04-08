@@ -1,7 +1,6 @@
 import * as jsonld from 'jsonld/dist/jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
-import Vocabulary from "./Vocabulary";
 
 class MetadataAPI {
     static getParams = {
@@ -51,8 +50,7 @@ class MetadataAPI {
      * @returns {Promise<Vocabulary | never>}
      */
     getVocabulary() {
-        // TODO: store the user and system vocabulary separately to allow
-        //       easy vocabulary editing for the user vocabulary
+        // TODO: use the new combined endpoint to retrieve both vocabularies at once
         return Config.waitFor()
             .then(() => Promise.all([
                 fetch(Config.get().urls.vocabulary.user, MetadataAPI.getParams)
@@ -65,7 +63,6 @@ class MetadataAPI {
                     .then(jsonld.expand)
             ]))
             .then(([userVocabulary, systemVocabulary]) => [...userVocabulary, ...systemVocabulary])
-            .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
     }
 
     /**

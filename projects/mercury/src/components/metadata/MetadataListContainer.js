@@ -7,6 +7,7 @@ import * as metadataActions from "../../actions/metadataActions";
 import NewMetadataEntityDialog from "./NewMetadataEntityDialog";
 import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../common";
 import MetaList from './MetaList';
+import {getVocabulary} from "../../selectors/vocabularySelectors";
 
 class MetadataListContainer extends React.Component {
     componentDidMount() {
@@ -43,9 +44,10 @@ class MetadataListContainer extends React.Component {
     }
 }
 
-const mapStateToProps = ({metadataBySubject, cache: {allEntities, vocabulary}}) => {
+const mapStateToProps = (state) => {
+    const {metadataBySubject, cache: {allEntities}} = state;
     const allEntitiesData = allEntities && allEntities.data ? allEntities.data : [];
-    const vocabularyData = vocabulary ? vocabulary.data : undefined;
+    const vocabularyData = getVocabulary(state);
     const entities = allEntitiesData.map(e => ({
         id: e['@id'],
         label: getLabel(e),

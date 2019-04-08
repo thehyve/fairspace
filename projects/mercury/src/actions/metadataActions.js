@@ -39,7 +39,7 @@ export const createMetadataEntity = (shape, id) => {
     };
 };
 
-const fetchJsonLdBySubject = createErrorHandlingPromiseAction(subject => ({
+const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({
     type: actionTypes.FETCH_METADATA,
     payload: MetadataAPI.get({subject}),
     meta: {
@@ -57,19 +57,10 @@ export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
     state => (state && state.cache ? state.cache.vocabulary : undefined)
 );
 
-export const fetchJsonLdBySubjectIfNeeded = subject => dispatchIfNeeded(
-    () => fetchJsonLdBySubject(subject),
+export const fetchMetadataBySubjectIfNeeded = subject => dispatchIfNeeded(
+    () => fetchMetadataBySubject(subject),
     state => (state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined)
 );
-
-const combineMetadataForSubject = createErrorHandlingPromiseAction((subject, dispatch) => ({
-    type: actionTypes.COMBINE_METADATA,
-    payload: Promise.all([
-        dispatch(fetchJsonLdBySubjectIfNeeded(subject)),
-        dispatch(fetchMetadataVocabularyIfNeeded())
-    ]).then(([jsonLd, vocabulary]) => vocabulary.value.combine(jsonLd.value, subject)),
-    meta: {subject}
-}));
 
 const fetchEntitiesByType = createErrorHandlingPromiseAction(type => ({
     type: actionTypes.FETCH_METADATA_ENTITIES,
@@ -84,11 +75,6 @@ const fetchAllEntities = createErrorHandlingPromiseAction(dispatch => ({
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
         .then(_ => MetadataAPI.getAllEntities())
 }));
-
-export const fetchCombinedMetadataIfNeeded = subject => dispatchIfNeeded(
-    () => combineMetadataForSubject(subject),
-    state => (state && state.metadataBySubject ? state.metadataBySubject[subject] : undefined)
-);
 
 export const fetchEntitiesIfNeeded = type => dispatchIfNeeded(
     () => fetchEntitiesByType(type),

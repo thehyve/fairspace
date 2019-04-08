@@ -45,7 +45,8 @@ it('render properties', () => {
     const wrapper = shallow(<MetadataEntityContainer
         properties={metadata}
         subject={subject}
-        dispatch={() => {}}
+        fetchMetadataVocabularyIfNeeded={() => {}}
+        fetchMetadataBySubjectIfNeeded={() => {}}
     />);
     expect(wrapper.find(List).children().length).toBe(1);
 });
@@ -73,7 +74,8 @@ it('shows result when subject provided and data is loaded', () => {
         properties={metadata}
         editable
         subject={collection.iri}
-        dispatch={() => {}}
+        fetchMetadataVocabularyIfNeeded={() => {}}
+        fetchMetadataBySubjectIfNeeded={() => {}}
     />);
 
     expect(wrapper.find(List).length).toEqual(1);
@@ -128,7 +130,16 @@ it('tries to load the metadata and the vocabulary', () => {
         }
     });
 
-    const dispatch = jest.fn();
-    mount(<MetadataEntityContainer subject="http://example.com/john" properties={[]} store={store} dispatch={dispatch} />);
-    expect(dispatch.mock.calls.length).toEqual(1);
+    const fetchVocabulary = jest.fn();
+    const fetchMetadata = jest.fn();
+    mount(<MetadataEntityContainer
+        subject="http://example.com/john"
+        properties={[]}
+        store={store}
+        fetchMetadataVocabularyIfNeeded={fetchVocabulary}
+        fetchMetadataBySubjectIfNeeded={fetchMetadata}
+    />);
+
+    expect(fetchMetadata.mock.calls.length).toEqual(1);
+    expect(fetchVocabulary.mock.calls.length).toEqual(1);
 });

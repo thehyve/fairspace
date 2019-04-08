@@ -129,7 +129,7 @@ export const shouldPropertyBeHidden = (key, domain) => {
 export const propertiesToShow = (properties = []) => {
     const domainKey = properties.find(property => property.key === '@type');
     const domainValue = domainKey && domainKey.values && domainKey.values[0] ? domainKey.values[0].id : undefined;
-
+    console.log("Properties to show: ", properties, domainValue);
     return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
 

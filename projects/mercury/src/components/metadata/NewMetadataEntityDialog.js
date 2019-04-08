@@ -1,15 +1,23 @@
 import React from 'react';
 import {connect} from "react-redux";
 import {
-    Dialog, DialogTitle, DialogContent,
-    DialogActions, Button, List, ListItem,
-    ListItemText, Paper, TextField
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    List,
+    ListItem,
+    ListItemText,
+    Paper,
+    TextField
 } from "@material-ui/core";
 
 import {generateUuid, getLabel} from "../../utils/metadataUtils";
 import {compareBy} from "../../utils/comparisionUtils";
 import LoadingInlay from '../common/LoadingInlay';
 import {fetchMetadataVocabularyIfNeeded} from "../../actions/metadataActions";
+import {getVocabulary, isVocabularyPending} from "../../selectors/vocabularySelectors";
 
 class NewMetadataEntityDialog extends React.Component {
     state = {
@@ -131,8 +139,8 @@ class NewMetadataEntityDialog extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    loading: state.cache.vocabulary.pending,
-    shapes: state.cache && state.cache.vocabulary && state.cache.vocabulary.data && state.cache.vocabulary.data.getFairspaceClasses()
+    loading: isVocabularyPending(state),
+    shapes: getVocabulary(state).getFairspaceClasses()
 });
 
 const mapDispatchToProps = {
