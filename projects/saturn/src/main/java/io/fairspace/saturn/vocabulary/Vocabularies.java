@@ -2,10 +2,8 @@ package io.fairspace.saturn.vocabulary;
 
 import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.util.FileManager;
-import org.elasticsearch.common.recycler.Recycler;
 
 import java.util.List;
 
@@ -13,7 +11,6 @@ import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.system.Txn.calculateRead;
 
 public class Vocabularies {
     public static final Node META_VOCABULARY_GRAPH_URI = createURI(FS.NS + "meta-vocabulary");
