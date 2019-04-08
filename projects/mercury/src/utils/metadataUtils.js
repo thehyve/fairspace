@@ -1,14 +1,4 @@
-import {
-    COLLECTION_URI,
-    COMMENT_URI,
-    DATE_DELETED_URI,
-    DELETED_BY_URI,
-    DIRECTORY_URI,
-    FILE_PATH_URI,
-    FILE_URI,
-    LABEL_URI,
-    TYPE_URI
-} from "../constants";
+import * as consts from "../constants";
 
 
 /**
@@ -70,7 +60,7 @@ export function linkLabel(uri, shortenExternalUris = false) {
  * @returns string
  */
 export function getLabel(entity, shortenExternalUris = false) {
-    return getFirstPredicateValue(entity, LABEL_URI)
+    return getFirstPredicateValue(entity, consts.LABEL_URI)
         || getFirstPredicateValue(entity, 'http://www.w3.org/ns/shacl#name')
         || (entity && entity['@id'] && linkLabel(entity['@id'], shortenExternalUris));
 }
@@ -101,21 +91,21 @@ export function generateUuid() {
  * @param {string} domain property domain
  */
 export const shouldPropertyBeHidden = (key, domain) => {
-    const isCollection = domain === COLLECTION_URI;
-    const isFile = domain === FILE_URI;
-    const isDirectory = domain === DIRECTORY_URI;
+    const isCollection = domain === consts.COLLECTION_URI;
+    const isFile = domain === consts.FILE_URI;
+    const isDirectory = domain === consts.DIRECTORY_URI;
     const isManaged = isCollection || isFile || isDirectory;
 
     switch (key) {
         case '@type':
-        case TYPE_URI:
-        case FILE_PATH_URI:
-        case DATE_DELETED_URI:
-        case DELETED_BY_URI:
+        case consts.TYPE_URI:
+        case consts.FILE_PATH_URI:
+        case consts.DATE_DELETED_URI:
+        case consts.DELETED_BY_URI:
             return true;
-        case LABEL_URI:
+        case consts.LABEL_URI:
             return isManaged;
-        case COMMENT_URI:
+        case consts.COMMENT_URI:
             return isCollection;
         default:
             return false;
@@ -129,13 +119,34 @@ export const shouldPropertyBeHidden = (key, domain) => {
 export const propertiesToShow = (properties = []) => {
     const domainKey = properties.find(property => property.key === '@type');
     const domainValue = domainKey && domainKey.values && domainKey.values[0] ? domainKey.values[0].id : undefined;
-    console.log("Properties to show: ", properties, domainValue);
     return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
 
-export const createIri = (id)  => `http://${window.location.hostname}/iri/${id}`;
+/**
+ * Creates a json-ld object from the given subject, predicate and values
+ */
+export const toJsonLd = (subject, predicate, values) => {
+    if (!subject || !predicate || !values) {
+        return null;
+    }
+
+    // if there are no values then send a special nil value as required by the backend
+    if (values.length === 0) {
+        return {
+            '@id': subject,
+            [predicate]: {'@id': consts.NIL_URI}
+        };
+    }
+
+    return {
+        '@id': subject,
+        [predicate]: values.map(({id, value}) => ({'@id': id, '@value': value}))
+    };
+};
+
+export const createIri = (id) => `http://${window.location.hostname}/iri/${id}`;
 
 export const url2iri = (iri) => {
     const url = new URL(iri);
-    return `http://${url.hostname}${url.pathname}`
+    return `http://${url.hostname}${url.pathname}`;
 };

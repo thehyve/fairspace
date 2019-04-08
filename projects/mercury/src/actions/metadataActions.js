@@ -9,13 +9,11 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const updateMetadata = (subject, predicate, values) => ({
+export const updateEntity = (subject, values) => ({
     type: actionTypes.UPDATE_METADATA,
-    payload: MetadataAPI.update(subject, predicate, values),
+    payload: MetadataAPI.updateEntity(subject, values),
     meta: {
-        subject,
-        predicate,
-        values
+        subject
     }
 });
 
@@ -73,7 +71,7 @@ const fetchEntitiesByType = createErrorHandlingPromiseAction(type => ({
 const fetchAllEntities = createErrorHandlingPromiseAction(dispatch => ({
     type: actionTypes.FETCH_ALL_METADATA_ENTITIES,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
-        .then(_ => MetadataAPI.getAllEntities())
+        .then(() => MetadataAPI.getAllEntities())
 }));
 
 export const fetchEntitiesIfNeeded = type => dispatchIfNeeded(
