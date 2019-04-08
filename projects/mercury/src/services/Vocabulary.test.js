@@ -258,3 +258,12 @@ describe('combination of vocabulary and metadata', () => {
         });
     });
 });
+
+describe('vocabulary contains', () => {
+    it('should return true if the given id is present in the vocabulary', () => expect(vocabulary.contains(vocabularyJsonLd[0]['@id'])).toBe(true));
+    it('should return false if the given id is not present in the vocabulary', () => expect(vocabulary.contains('http://not-present')).toBe(false));
+    it('should return false on empty vocabulary', () => expect(new Vocabulary().contains(vocabularyJsonLd[0]['@id'])).toBe(false));
+    it('should return false on invalid URI', () => expect(vocabulary.contains('invalid-uri')).toBe(false));
+    it('should return false on invalid parameter', () => expect(vocabulary.contains()).toBe(false));
+    it('should return false if URI is only referred to in vocabulary', () => expect(vocabulary.contains('http://fairspace.io/ontology#Collection')).toBe(false));
+});

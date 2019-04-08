@@ -9,6 +9,7 @@ import MetadataListPage from "./metadata/MetadataListPage";
 import FilesPage from "./file/FilesPage";
 import logout from "../services/logout";
 import SearchPage from './search/SearchPage';
+import VocabularyListPage from "./vocabulary/VocabularyListPage";
 
 const routes = () => (
     <>
@@ -17,6 +18,7 @@ const routes = () => (
         <Route path="/collections/:collection/:path(.*)?" component={FilesPage} />
         <Route path="/notebooks" exact component={Notebooks} />
         <Route path="/metadata" exact component={MetadataListPage} />
+        <Route path="/vocabulary" exact component={VocabularyListPage} />
         <Route path="/iri/**" component={MetadataEntityPage} />
         <Route path="/login" render={() => {window.location.href = '/login';}} />
         <Route path="/logout" render={logout} />

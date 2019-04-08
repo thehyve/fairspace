@@ -1,6 +1,7 @@
 import {combineReducers} from 'redux';
 import jsonLdBySubject from './jsonLdBySubjectReducers';
 import vocabulary from "./vocabularyReducers";
+import metaVocabulary from "./metaVocabularyReducers";
 import entitiesByType from "./entitiesByTypeReducers";
 import collections from "./collectionReducers";
 import filesByPath from "./filesByPathReducers";
@@ -15,6 +16,7 @@ export default combineReducers({
     users,
     allEntities,
     vocabulary,
+    metaVocabulary,
     collections,
     filesByPath,
     subjectByPath,

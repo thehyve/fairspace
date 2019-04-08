@@ -9,30 +9,9 @@ class MetadataAPI {
         credentials: 'same-origin'
     };
 
-    /**
-     *
-     * @param configParserFunc Function to retrieve the right urls from configuration.
-     *                         The configuration is not available when constructing the object, so
-     *                         we provide this function to be able to extract the right information
-     *
-     *                         Function input: config
-     *                         Function output: {statements: ..., entities: ...}
-     */
-    constructor(configParserFunc) {
-        this.configParserFunc = configParserFunc;
-    }
-
-    getStatementsUrl() {
-        return this.configParserFunc(Config.get()).statements;
-    }
-
-    getEntitiesUrl() {
-        return this.configParserFunc(Config.get()).statements;
-    }
-
     get(params) {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
-        return fetch(`${this.getStatementsUrl()}?labels&${query}`, MetadataAPI.getParams)
+        return fetch(`${Config.get().urls.metadata.statements}?labels&${query}`, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(jsonld.expand);
@@ -53,10 +32,10 @@ class MetadataAPI {
         }
 
         const request = (values.length === 0)
-            ? fetch(this.getStatementsUrl()
+            ? fetch(Config.get().urls.metadata.statements
                 + '?subject=' + encodeURIComponent(subject)
                 + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE', credentials: 'same-origin'})
-            : fetch(this.getStatementsUrl(), {
+            : fetch(Config.get().urls.metadata.statements, {
                 method: 'PATCH',
                 headers: new Headers({'Content-type': 'application/ld+json'}),
                 credentials: 'same-origin',
@@ -137,8 +116,4 @@ class MetadataAPI {
     }
 }
 
-export default {
-    metadata: new MetadataAPI(config => config.urls.metadata),
-    vocabulary: new MetadataAPI(config => config.urls.vocabulary),
-    metaVocabulary: new MetadataAPI(config => config.urls.metaVocabulary)
-};
+export default new MetadataAPI();
