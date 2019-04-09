@@ -1,9 +1,8 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import {VocabularyAPI, MetaVocabularyAPI} from "../services/LinkedDataAPI";
+import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
 import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
-import {getVocabulary} from "../reducers/cache/vocabularyReducers";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
@@ -24,13 +23,15 @@ export const createVocabularyEntity = (shape, id) => {
     const subject = createIri(id);
     const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
 
-    if (getVocabulary().contains(id)) {
-        throw Error(`Vocabulary entity already exists: ${subject}`);
-    }
-
     return {
         type: actionTypes.CREATE_VOCABULARY_ENTITY,
-        payload: VocabularyAPI.update(subject, constants.TYPE_URI, [{id: type}])
+        payload: VocabularyAPI.get({subject})
+            .then((meta) => {
+                if (meta.length) {
+                    throw Error(`Vocabulary entity already exists: ${subject}`);
+                }
+            })
+            .then(() => VocabularyAPI.update(subject, constants.TYPE_URI, [{id: type}]))
             .then(() => subject),
         meta: {
             subject,
