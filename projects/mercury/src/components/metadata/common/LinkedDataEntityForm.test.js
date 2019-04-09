@@ -3,16 +3,16 @@ import {mount, shallow} from "enzyme";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
-import {List, Fab} from '@material-ui/core';
+import {Fab, List} from '@material-ui/core';
 
-import ConnectedMetadata, {MetadataEntityContainer} from "./MetadataEntityContainer";
-import Vocabulary from "../../services/Vocabulary";
-import Config from "../../services/Config/Config";
+import LinkedDataEntityForm from "./LinkedDataEntityForm";
+import Vocabulary from "../../../services/Vocabulary";
+import Config from "../../../services/Config/Config";
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
-describe('MetadataEntityContainer', () => {
+describe('MetaEntityForm', () => {
     beforeAll(() => {
         window.fetch = jest.fn(() => Promise.resolve({ok: true, json: () => ({})}));
 
@@ -43,7 +43,7 @@ describe('MetadataEntityContainer', () => {
             }
         ];
         const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-        const wrapper = shallow(<MetadataEntityContainer
+        const wrapper = shallow(<LinkedDataEntityForm
             properties={metadata}
             subject={subject}
         />);
@@ -69,48 +69,13 @@ describe('MetadataEntityContainer', () => {
             iri: "http://fairspace.com/iri/collections/1"
         };
 
-        const wrapper = shallow(<MetadataEntityContainer
+        const wrapper = shallow(<LinkedDataEntityForm
             properties={metadata}
             editable
             subject={collection.iri}
         />);
 
         expect(wrapper.find(List).length).toEqual(1);
-    });
-
-    it('shows a message if no metadata was found', () => {
-        const store = mockStore({
-            metadataBySubject: {
-                "http://fairspace.com/iri/collections/1": {
-                    data: []
-                }
-            },
-            cache: {
-                vocabulary:
-                {
-                    data: new Vocabulary([])
-                }
-            }
-        });
-
-        const wrapper = mount(<ConnectedMetadata subject="http://fairspace.com/iri/collections/1" store={store} />);
-
-        expect(wrapper.text()).toContain("An error occurred");
-    });
-
-    it('shows error when no subject provided', () => {
-        const store = mockStore({
-            metadataBySubject: {},
-            cache: {
-                vocabulary:
-                {
-                    data: new Vocabulary([])
-                }
-            }
-        });
-        const wrapper = mount(<ConnectedMetadata subject={null} store={store} />);
-
-        expect(wrapper.text()).toContain("An error occurred");
     });
 
     it('tries to load the metadata and the vocabulary', () => {
@@ -129,12 +94,12 @@ describe('MetadataEntityContainer', () => {
 
         const fetchVocabulary = jest.fn();
         const fetchMetadata = jest.fn();
-        mount(<MetadataEntityContainer
+        mount(<LinkedDataEntityForm
             subject="http://example.com/john"
             properties={[]}
             store={store}
-            fetchMetadataVocabularyIfNeeded={fetchVocabulary}
-            fetchMetadataBySubjectIfNeeded={fetchMetadata}
+            fetchShapes={fetchVocabulary}
+            fetchLinkedData={fetchMetadata}
         />);
 
         expect(fetchMetadata.mock.calls.length).toEqual(1);
@@ -142,13 +107,13 @@ describe('MetadataEntityContainer', () => {
     });
 
     it('updates state properly', () => {
-        const wrapper = shallow(<MetadataEntityContainer subject="http://example.com/john" properties={[]} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
         wrapper.instance().updateState('key', 'value');
         expect(wrapper.state('propertiesWithUpdatedValues')).toEqual({key: 'value'});
     });
 
     it('handleChange as update and proper state update', () => {
-        const wrapper = shallow(<MetadataEntityContainer subject="http://example.com/john" properties={[]} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
         const property = {
             key: "propert-key",
             values: [{
@@ -170,7 +135,7 @@ describe('MetadataEntityContainer', () => {
 
 
     it('handleChange as add new and proper state update', () => {
-        const wrapper = shallow(<MetadataEntityContainer subject="http://example.com/john" properties={[]} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
         const property = {
             key: "propert-key",
             values: [],
@@ -189,7 +154,7 @@ describe('MetadataEntityContainer', () => {
     });
 
     it('gives the correct state of pending changes', () => {
-        const wrapper = shallow(<MetadataEntityContainer subject="http://example.com/john" properties={[]} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
         expect(wrapper.instance().anyPendingChanges()).toBe(false);
         const state = {propertiesWithUpdatedValues: {key: 'value'}};
         wrapper.setState(state);
@@ -199,7 +164,7 @@ describe('MetadataEntityContainer', () => {
 
     it('makes call to updateEntity and reset changes after submission', (done) => {
         const updateEntity = jest.fn(() => Promise.resolve());
-        const wrapper = mount(<MetadataEntityContainer subject="http://example.com/john" properties={[]} updateEntity={updateEntity} />);
+        const wrapper = mount(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} updateEntity={updateEntity} />);
         const state = {propertiesWithUpdatedValues: {key: 'value'}};
         wrapper.setState(state);
         wrapper.find(Fab).simulate('click');

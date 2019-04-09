@@ -4,7 +4,7 @@ import {
     generateUuid,
     getFirstPredicateId,
     getFirstPredicateValue,
-    getLabel,
+    getLabel, getTypeInfo,
     linkLabel,
     propertiesToShow,
     relativeLink,
@@ -286,4 +286,43 @@ describe('Metadata Utils', () => {
             expect(url2iri('scheme://example.com:1234/some/path/?query')).toEqual('http://example.com/some/path/');
         });
     });
+
+    describe('getTypeInfo', () => {
+        const generateMetadataWithType = (typeData) => [{
+            key: '@type',
+            values: [{...typeData}]
+        }];
+
+        it('retrieves information on the type of the entity', () => {
+            const metadata = generateMetadataWithType({
+                label: 'some-label',
+                comment: 'some-comment'
+            });
+
+            expect(getTypeInfo(metadata)).toEqual('some-label - some-comment');
+        });
+
+        it('ignores missing comment', () => {
+            const metadata = generateMetadataWithType({
+                label: 'some-label'
+            });
+
+            expect(getTypeInfo(metadata)).toEqual('some-label');
+        });
+
+        it('ignores missing label', () => {
+            const metadata = generateMetadataWithType({
+                comment: 'some-comment'
+            });
+
+            expect(getTypeInfo(metadata)).toEqual('some-comment');
+        });
+
+        it('returns undefined if type is not present', () => {
+            const metadata = []
+
+            expect(getTypeInfo(metadata)).toBeUndefined();
+        });
+
+    })
 });

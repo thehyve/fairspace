@@ -7,7 +7,7 @@ import Grid from "@material-ui/core/Grid";
 
 import Dropdown from "./Dropdown";
 import {createMetadataEntity, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
-import NewMetadataEntityDialog from "../NewMetadataEntityDialog";
+import NewLinkedDataEntityDialog from "../common/NewLinkedDataEntityDialog";
 import LoadingInlay from "../../common/LoadingInlay";
 import ErrorMessage from "../../common/ErrorMessage";
 import {ErrorDialog} from "../../common";
@@ -65,7 +65,7 @@ class EntityDropdownContainer extends React.Component {
                         <Icon>add</Icon>
                     </Button>
 
-                    <NewMetadataEntityDialog
+                    <NewLinkedDataEntityDialog
                         open={this.state.adding}
                         shape={this.props.shape}
                         onCreate={this.handleEntityCreation}

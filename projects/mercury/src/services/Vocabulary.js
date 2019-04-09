@@ -221,6 +221,24 @@ class Vocabulary {
     }
 
     /**
+     * Checks whether the vocabulary contains the given identifier
+     * @param id
+     * @returns {boolean}
+     */
+    contains(id) {
+        return !!this.get(id);
+    }
+
+    /**
+     * Returns the json-ld entry for the given identifier
+     * @param id
+     * @returns {array}
+     */
+    get(id) {
+        return this.vocabulary.find(el => el['@id'] === id);
+    }
+
+    /**
      * Generates a list entry for a single property, with the values specified
      * @param predicate
      * @param values

@@ -8,7 +8,7 @@ import {getSearchQueryFromString} from '../../utils/searchUtils';
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import {getParentPath} from '../../utils/fileUtils';
 import * as searchActions from '../../actions/searchActions';
-import * as metadataActions from '../../actions/metadataActions';
+import * as vocabularyActions from '../../actions/vocabularyActions';
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import {ErrorMessage} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
@@ -89,7 +89,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
     performSearch: searchActions.performSearch,
-    fetchVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded,
+    fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded,
     selectPath: collectionBrowserActions.selectPath,
     deselectAllPaths: collectionBrowserActions.deselectAllPaths
 };
