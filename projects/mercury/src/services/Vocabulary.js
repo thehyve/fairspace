@@ -13,7 +13,7 @@ class Vocabulary {
      * @param vocabulary    Expanded version of the vocabulary to use
      */
     constructor(vocabulary) {
-        this.vocabulary = vocabulary;
+        this.vocabulary = vocabulary || [];
     }
 
     /**

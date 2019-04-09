@@ -78,7 +78,6 @@ class NewMetadataEntityDialog extends React.Component {
 NewMetadataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired
 };
 
 export default NewMetadataEntityDialog;

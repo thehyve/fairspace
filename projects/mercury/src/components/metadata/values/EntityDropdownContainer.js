@@ -11,6 +11,7 @@ import NewMetadataEntityDialog from "../NewMetadataEntityDialog";
 import LoadingInlay from "../../common/LoadingInlay";
 import ErrorMessage from "../../common/ErrorMessage";
 import {ErrorDialog} from "../../common";
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 
 class EntityDropdownContainer extends React.Component {
     state = {
@@ -83,13 +84,14 @@ EntityDropdownContainer.propTypes = {
     onChange: PropTypes.func.isRequired
 };
 
-const mapStateToProps = ({cache: {entitiesByType, vocabulary}}, ownProps) => {
+const mapStateToProps = (state, ownProps) => {
+    const {cache: {entitiesByType}} = state;
     const dropdownOptions = entitiesByType[ownProps.property.className];
-    const pending = !dropdownOptions || dropdownOptions.pending || vocabulary.pending;
-    const error = !dropdownOptions || dropdownOptions.error || vocabulary.error;
+    const pending = !dropdownOptions || dropdownOptions.pending || isVocabularyPending(state);
+    const error = !dropdownOptions || dropdownOptions.error || hasVocabularyError(state);
 
     const entities = (!pending && !error) ? dropdownOptions.data : [];
-    const shape = (!pending && !error) ? vocabulary.data.determineShapeForType(ownProps.property.className) : {};
+    const shape = (!pending && !error) ? getVocabulary(state).determineShapeForType(ownProps.property.className) : {};
 
     return {
         pending,

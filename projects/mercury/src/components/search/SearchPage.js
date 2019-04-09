@@ -12,6 +12,7 @@ import * as metadataActions from '../../actions/metadataActions';
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import {ErrorMessage} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
+import {getVocabulary, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
 
 // Exporting here to be able to test the component outside of Redux
 export class SearchPage extends React.Component {
@@ -79,11 +80,11 @@ export class SearchPage extends React.Component {
     }
 }
 
-const mapStateToProps = ({search, cache: {vocabulary}}) => ({
-    loading: search.pending || !vocabulary || vocabulary.pending,
-    results: search.results,
-    error: search.error,
-    vocabulary: vocabulary && vocabulary.data
+const mapStateToProps = (state) => ({
+    loading: state.search.pending || isVocabularyPending(state),
+    results: state.search.results,
+    error: state.search.error,
+    vocabulary: getVocabulary(state)
 });
 
 const mapDispatchToProps = {

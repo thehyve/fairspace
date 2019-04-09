@@ -1,13 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Paper, List, Fab, Grid} from '@material-ui/core';
+import {Fab, Grid, List, Paper} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../common";
 import * as metadataActions from "../../actions/metadataActions";
 import MetaEntityHeader from './MetaEntityHeader';
-import {isDateTimeProperty, propertiesToShow, linkLabel, url2iri} from "../../utils/metadataUtils";
+import {isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../utils/metadataUtils";
 
 import MetadataProperty from "./MetadataProperty";
+import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
+import {hasVocabularyError, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
 import ErrorDialog from "../common/ErrorDialog";
 
 export class MetadataEntityContainer extends React.Component {
@@ -29,10 +32,11 @@ export class MetadataEntityContainer extends React.Component {
     }
 
     load() {
-        const {subject, fetchCombinedMetadataIfNeeded} = this.props;
+        const {subject, fetchMetadataVocabularyIfNeeded, fetchMetadataBySubjectIfNeeded} = this.props;
 
         if (subject) {
-            fetchCombinedMetadataIfNeeded(subject);
+            fetchMetadataVocabularyIfNeeded();
+            fetchMetadataBySubjectIfNeeded(subject);
         }
     }
 
@@ -136,26 +140,25 @@ export class MetadataEntityContainer extends React.Component {
     }
 }
 const mapStateToProps = (state, ownProps) => {
-    const {metadataBySubject, cache: {vocabulary}} = state;
     const subject = ownProps.subject || url2iri(window.location.href);
-    const metadata = metadataBySubject[subject] || {};
-    const hasNoMetadata = !metadata || !metadata.data || metadata.data.length === 0;
-    const hasOtherErrors = (metadata && metadata.error) || !vocabulary || vocabulary.error;
-    const typeProp = metadata && metadata.data && metadata.data.find(prop => prop.key === '@type');
+    const metadata = getCombinedMetadataForSubject(state, subject);
+    const hasNoMetadata = !metadata || metadata.length === 0;
+    const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
+    const typeProp = metadata && metadata.find(prop => prop.key === '@type');
     const typeLabel = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
     const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
     const typeInfo = (typeLabel && comment) ? `${typeLabel} - ${comment}` : (typeLabel || comment);
     const label = linkLabel(subject);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
     const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
-    const properties = hasNoMetadata ? [] : propertiesToShow(metadata.data)
+    const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
             ...p,
             editable: editable && !isDateTimeProperty(p)
         }));
 
     return {
-        loading: metadata.pending || (vocabulary && vocabulary.pending),
+        loading: isMetadataPending(state, subject) || isVocabularyPending(state),
         properties,
         subject,
         typeInfo,
@@ -167,11 +170,20 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = {
-    ...metadataActions
+    fetchMetadataVocabularyIfNeeded: metadataActions.fetchMetadataVocabularyIfNeeded,
+    fetchMetadataBySubjectIfNeeded: metadataActions.fetchMetadataBySubjectIfNeeded,
+    updateEntity: metadataActions.updateEntity
 };
 
+MetadataEntityContainer.propTypes = {
+    updateEntity: PropTypes.func.isRequired,
+    fetchMetadataVocabularyIfNeeded: PropTypes.func,
+    fetchMetadataBySubjectIfNeeded: PropTypes.func
+}
+
 MetadataEntityContainer.defaultProps = {
-    fetchCombinedMetadataIfNeeded: () => {}
+    fetchMetadataVocabularyIfNeeded: () => {},
+    fetchMetadataBySubjectIfNeeded: () => {}
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntityContainer);

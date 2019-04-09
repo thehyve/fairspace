@@ -2,7 +2,6 @@ import {expand} from 'jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
 import {toJsonLd} from "../utils/metadataUtils";
-import Vocabulary from "./Vocabulary";
 
 class MetadataAPI {
     static getParams = {
@@ -78,14 +77,12 @@ class MetadataAPI {
      * @returns {Promise<Vocabulary | never>}
      */
     getVocabulary() {
-        // TODO: store the user and system vocabulary separately to allow
-        //       easy vocabulary editing for the user vocabulary
+        // TODO: use the new combined endpoint to retrieve both vocabularies at once
         return Config.waitFor()
             .then(() => fetch(Config.get().urls.vocabulary.combined, MetadataAPI.getParams))
             .then(failOnHttpError("Failure when retrieving the combined vocabulary"))
             .then(response => response.json())
             .then(expand)
-            .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
     }
 
     /**
