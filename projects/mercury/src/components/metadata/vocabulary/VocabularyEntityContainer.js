@@ -4,11 +4,11 @@ import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyAction
 import {
     getVocabulary,
     hasVocabularyError,
-    isVocabularyPending
-} from "../../../selectors/vocabularySelectors";
+    isVocabularyPending,
+    hasMetaVocabularyError, isMetaVocabularyPending
+} from "../../../reducers/cache/vocabularyReducers";
 import {getTypeInfo, isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
 import {MetaEntity} from "../common/MetaEntity";
-import {hasMetaVocabularyError, isMetaVocabularyPending} from "../../../selectors/metaVocabularySelectors";
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);

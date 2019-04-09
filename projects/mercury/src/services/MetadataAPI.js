@@ -1,6 +1,7 @@
-import * as jsonld from 'jsonld/dist/jsonld';
+import {expand} from 'jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
+import {toJsonLd} from "../utils/metadataUtils";
 
 class MetadataAPI {
     static getParams = {
@@ -43,7 +44,7 @@ class MetadataAPI {
         return fetch(`${this.getStatementsUrl()}?labels&${query}`, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
-            .then(jsonld.expand);
+            .then(expand);
     }
 
     /**
@@ -68,10 +69,36 @@ class MetadataAPI {
                 method: 'PATCH',
                 headers: new Headers({'Content-type': 'application/ld+json'}),
                 credentials: 'same-origin',
-                body: JSON.stringify(this.toJsonLd(subject, predicate, values))
+                body: JSON.stringify(toJsonLd(subject, predicate, values))
             });
 
         return request.then(failOnHttpError("Failure when updating metadata"));
+    }
+
+    /**
+     * Update values for all given properties
+     * @param subject   Single URI representing the subject to update
+     * @param properties An object with each key is the iri of the predicate to update
+     * and the value is the array of values
+     * Each value is an object on its own with one of the following keys
+     *   id: referencing another resource
+     *   value: referencing a literal value
+     * If both keys are specified, the id is stored and the literal value is ignored
+     * @returns {*}
+     */
+    updateEntity(subject, properties) {
+        if (!subject || !properties) {
+            return Promise.reject(Error("No subject or properties given"));
+        }
+
+        const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p]));
+
+        return fetch(Config.get().urls.metadata.statements, {
+            method: 'PATCH',
+            headers: new Headers({'Content-type': 'application/ld+json'}),
+            credentials: 'same-origin',
+            body: JSON.stringify(jsonLd)
+        }).then(failOnHttpError("Failure when updating metadata"));
     }
 
     /**
@@ -92,7 +119,7 @@ class MetadataAPI {
         return fetch(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(jsonld.expand);
+            .then(expand);
     }
 
     /**
@@ -109,16 +136,7 @@ class MetadataAPI {
         return fetch(this.getEntitiesUrl(), MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(jsonld.expand);
-    }
-
-    toJsonLd(subject, predicate, values) {
-        return [
-            {
-                '@id': subject,
-                [predicate]: values.map(value => ({'@id': value.id, '@value': value.value}))
-            }
-        ];
+            .then(expand);
     }
 }
 

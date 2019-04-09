@@ -1,5 +1,5 @@
 import {connect} from "react-redux";
-import {getMetaVocabulary, isMetaVocabularyPending} from "../../../selectors/metaVocabularySelectors";
+import {getMetaVocabulary, isMetaVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import {fetchMetaVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 import NewEntityDialog from "../common/NewEntityDialog";
 

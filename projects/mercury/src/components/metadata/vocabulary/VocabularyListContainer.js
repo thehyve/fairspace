@@ -10,13 +10,11 @@ import MetaList from '../common/MetaList';
 import {
     getVocabularyEntities,
     hasVocabularyEntitiesError,
-    isVocabularyEntitiesPending
-} from "../../../selectors/vocabularySelectors";
-import {
+    isVocabularyEntitiesPending,
     getMetaVocabulary,
     hasMetaVocabularyError,
     isMetaVocabularyPending
-} from "../../../selectors/metaVocabularySelectors";
+} from "../../../reducers/cache/vocabularyReducers";
 import NewVocabularyEntityDialog from "./NewVocabularyEntityDialog";
 
 class VocabularyListContainer extends React.Component {

@@ -1,5 +1,5 @@
-import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "./metadataSelectors";
-import vocabularyJsonLd from '../services/test.vocabulary.json';
+import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "./jsonLdBySubjectReducers";
+import vocabularyJsonLd from '../../services/test.vocabulary.json';
 
 describe('retrieving metadata from state', () => {
     const subject = 'http://subject';

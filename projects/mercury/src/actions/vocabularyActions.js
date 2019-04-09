@@ -3,7 +3,7 @@ import MetadataAPI from "../services/MetadataAPI";
 import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
 import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
-import {getVocabulary} from "../selectors/vocabularySelectors";
+import {getVocabulary} from "../reducers/cache/vocabularyReducers";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,

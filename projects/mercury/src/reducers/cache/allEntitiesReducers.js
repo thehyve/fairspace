@@ -2,7 +2,7 @@ import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
 import * as actionTypes from "../../actions/actionTypes";
 
-const defaultState = {data: ['']};
+const defaultState = null;
 
 export const metadataCreateReducer = (state = defaultState, action) => {
     switch (action.type) {
@@ -19,6 +19,6 @@ export const metadataCreateReducer = (state = defaultState, action) => {
     }
 };
 
-const fetchAllMetaEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_ALL_METADATA_ENTITIES, null);
+const fetchAllMetaEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_ALL_METADATA_ENTITIES, defaultState);
 
 export default reduceReducers(fetchAllMetaEntitiesReducer, metadataCreateReducer);
