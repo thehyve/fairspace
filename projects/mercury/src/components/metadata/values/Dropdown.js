@@ -44,7 +44,7 @@ Dropdown.propTypes = {
 
 Dropdown.defaultProps = {
     entry: {},
-    onChange: PropTypes.func,
+    onChange: () => {},
     entities: []
 };
 
