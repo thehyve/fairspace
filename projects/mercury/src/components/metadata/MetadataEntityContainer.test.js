@@ -199,12 +199,13 @@ describe('MetadataEntityContainer', () => {
 
     it('makes call to updateEntity and reset changes after submission', (done) => {
         const updateEntity = jest.fn(() => Promise.resolve());
-        const wrapper = mount(<MetadataEntityContainer subject="http://example.com/john" properties={[]} updateEntity={updateEntity} />);
+        const vocabulary = new Vocabulary();
+        const wrapper = mount(<MetadataEntityContainer subject="http://example.com/john" properties={[]} updateEntity={updateEntity} vocabulary={vocabulary} />);
         const state = {propertiesWithUpdatedValues: {key: 'value'}};
         wrapper.setState(state);
         wrapper.find(Fab).simulate('click');
         expect(updateEntity.mock.calls.length).toEqual(1);
-        expect(updateEntity.mock.calls[0]).toEqual(['http://example.com/john', {...state.propertiesWithUpdatedValues}]);
+        expect(updateEntity.mock.calls[0]).toEqual(['http://example.com/john', {...state.propertiesWithUpdatedValues}, vocabulary]);
         setTimeout(() => {
             expect(wrapper.state('propertiesWithUpdatedValues')).toEqual({});
             done();

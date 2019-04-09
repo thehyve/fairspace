@@ -1,4 +1,5 @@
 import * as consts from "../constants";
+import Vocabulary from "../services/Vocabulary";
 
 
 /**
@@ -122,10 +123,25 @@ export const propertiesToShow = (properties = []) => {
     return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
 
+
+/**
+ * Returns the given values in the right container. By default, no container is used
+ * If the predicate requires an rdf:List, the values are put into a {'@list': ...} object
+ * @param values
+ * @returns {*}
+ */
+const rdfContainerize = (values, shape) => {
+    if (Vocabulary.isRdfList(shape)) {
+        return {'@list': values};
+    }
+
+    return values;
+};
+
 /**
  * Creates a json-ld object from the given subject, predicate and values
  */
-export const toJsonLd = (subject, predicate, values) => {
+export const toJsonLd = (subject, predicate, values, vocabulary = new Vocabulary()) => {
     if (!subject || !predicate || !values) {
         return null;
     }
@@ -140,7 +156,10 @@ export const toJsonLd = (subject, predicate, values) => {
 
     return {
         '@id': subject,
-        [predicate]: values.map(({id, value}) => ({'@id': id, '@value': value}))
+        [predicate]: rdfContainerize(
+            values.map(({id, value}) => ({'@id': id, '@value': value})),
+            vocabulary.determineShapeForProperty(predicate)
+        )
     };
 };
 

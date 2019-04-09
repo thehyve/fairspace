@@ -115,7 +115,7 @@ class Vocabulary {
                 }
 
                 let values;
-                if (getFirstPredicateId(propertyShape, constants.SHACL_CLASS) === constants.LIST_URI) {
+                if (Vocabulary.isRdfList(propertyShape)) {
                     // RDF lists in JSON LD are arrays in a container with key '@list'
                     // We want to use just the arrays. If there are multiple lists
                     // they are concatenated
@@ -225,6 +225,10 @@ class Vocabulary {
             allowMultiple: false,
             machineOnly: true
         };
+    }
+
+    static isRdfList(propertyShape) {
+        return getFirstPredicateId(propertyShape, constants.SHACL_CLASS) === constants.LIST_URI;
     }
 
     /**

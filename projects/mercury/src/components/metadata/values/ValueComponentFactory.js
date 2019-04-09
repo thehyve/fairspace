@@ -18,6 +18,12 @@ const getInputComponent = (property) => {
         return EnumerationDropdown;
     }
 
+    // If the class refers to a RDF List, we currently
+    // only support string values
+    if (property.className === constants.LIST_URI) {
+        return StringValue;
+    }
+
     // The datatype determines the type of input element
     // If no datatype is specified, the field will be treated
     // as referring to another class

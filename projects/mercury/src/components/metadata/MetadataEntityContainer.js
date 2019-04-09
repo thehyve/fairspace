@@ -10,7 +10,7 @@ import {isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../ut
 
 import MetadataProperty from "./MetadataProperty";
 import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
-import {hasVocabularyError, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
 import ErrorDialog from "../common/ErrorDialog";
 
 export class MetadataEntityContainer extends React.Component {
@@ -69,7 +69,7 @@ export class MetadataEntityContainer extends React.Component {
     handleSubmit = () => {
         const {subject, updateEntity} = this.props;
 
-        updateEntity(subject, this.state.propertiesWithUpdatedValues)
+        updateEntity(subject, this.state.propertiesWithUpdatedValues, this.props.vocabulary)
             .then(this.resetChanges)
             .catch(e => ErrorDialog.showError(e, "Error while updating metadata"));
     };
@@ -142,6 +142,7 @@ export class MetadataEntityContainer extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
     const metadata = getCombinedMetadataForSubject(state, subject);
+    const vocabulary = getVocabulary(state);
     const hasNoMetadata = !metadata || metadata.length === 0;
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
     const typeProp = metadata && metadata.find(prop => prop.key === '@type');
@@ -166,6 +167,7 @@ const mapStateToProps = (state, ownProps) => {
         error,
         showHeader: ownProps.showHeader || false,
         editable,
+        vocabulary
     };
 };
 
