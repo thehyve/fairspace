@@ -2,7 +2,7 @@ import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
 import * as actionTypes from "../../actions/actionTypes";
 
-const defaultState = {data: ['']};
+const defaultState = {invalidated: true, data: []};
 
 export const vocabularyCreateReducer = (state = defaultState, action) => {
     switch (action.type) {
@@ -19,6 +19,6 @@ export const vocabularyCreateReducer = (state = defaultState, action) => {
     }
 };
 
-const fetchAllVocabularyEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_ALL_VOCABULARY_ENTITIES, null);
+const fetchAllVocabularyEntitiesReducer = promiseReducerFactory(actionTypes.FETCH_ALL_VOCABULARY_ENTITIES, defaultState);
 
 export default reduceReducers(fetchAllVocabularyEntitiesReducer, vocabularyCreateReducer);

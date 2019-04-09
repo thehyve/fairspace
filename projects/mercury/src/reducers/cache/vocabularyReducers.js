@@ -3,23 +3,16 @@ import Vocabulary from "../../services/Vocabulary";
 import {promiseReducerFactory} from "../../utils/redux";
 import {FETCH_VOCABULARY} from "../../actions/actionTypes";
 
-export default promiseReducerFactory(FETCH_VOCABULARY, null);
+export default promiseReducerFactory(FETCH_VOCABULARY, {invalidated: true, data: []});
 
 /**
  * Returns an object representing the vocabulary
  * @param state
  * @returns {Vocabulary}
  */
-export const getVocabulary = ({cache: {vocabulary}}) => {
-    if (vocabulary && !vocabulary.pending && !vocabulary.error) {
-        return new Vocabulary(vocabulary.data);
-    }
-
-    return new Vocabulary();
-};
-
-export const isVocabularyPending = state => !state.cache || !state.cache.vocabulary || state.cache.vocabulary.pending;
-export const hasVocabularyError = state => !state.cache || !state.cache.vocabulary || state.cache.vocabulary.error;
+export const getVocabulary = ({cache: {vocabulary}}) => new Vocabulary(vocabulary ? vocabulary.data : []);
+export const isVocabularyPending = ({cache: {vocabulary}}) => !!vocabulary.pending;
+export const hasVocabularyError = ({cache: {vocabulary}}) => !!vocabulary.error;
 
 
 /**
@@ -27,16 +20,9 @@ export const hasVocabularyError = state => !state.cache || !state.cache.vocabula
  * @param state
  * @returns {Array}
  */
-export const getVocabularyEntities = ({cache: {vocabularyEntities}}) => {
-    if (vocabularyEntities && !vocabularyEntities.pending && !vocabularyEntities.error) {
-        return vocabularyEntities.data;
-    }
-
-    return [];
-};
-
-export const isVocabularyEntitiesPending = state => !state.cache || !state.cache.allVocabularyEntities || state.cache.allVocabularyEntities.pending;
-export const hasVocabularyEntitiesError = state => !state.cache || !state.cache.allVocabularyEntities || state.cache.allVocabularyEntities.error;
+export const getVocabularyEntities = ({cache: {allVocabularyEntities}}) => allVocabularyEntities.data || [];
+export const isVocabularyEntitiesPending = ({cache: {allVocabularyEntities}}) => !!allVocabularyEntities.pending;
+export const hasVocabularyEntitiesError = ({cache: {allVocabularyEntities}}) => !!allVocabularyEntities.error;
 
 
 /**
@@ -44,13 +30,6 @@ export const hasVocabularyEntitiesError = state => !state.cache || !state.cache.
  * @param state
  * @returns {Vocabulary}
  */
-export const getMetaVocabulary = ({cache: {metaVocabulary}}) => {
-    if (metaVocabulary && !metaVocabulary.pending && !metaVocabulary.error) {
-        return new Vocabulary(metaVocabulary.data);
-    }
-
-    return new Vocabulary();
-};
-
-export const isMetaVocabularyPending = state => !state.cache || !state.cache.metaVocabulary || state.cache.metaVocabulary.pending;
-export const hasMetaVocabularyError = state => !state.cache || !state.cache.metaVocabulary || state.cache.metaVocabulary.error;
+export const getMetaVocabulary = ({cache: {metaVocabulary}}) => new Vocabulary(metaVocabulary.data);
+export const isMetaVocabularyPending = ({cache: {metaVocabulary}}) => !!metaVocabulary.pending;
+export const hasMetaVocabularyError = ({cache: {metaVocabulary}}) => !!metaVocabulary.error;
