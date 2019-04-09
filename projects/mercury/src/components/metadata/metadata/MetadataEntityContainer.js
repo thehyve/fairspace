@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
+import {getTypeInfo, isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
 import {
     getCombinedMetadataForSubject,
     hasMetadataError,
@@ -13,15 +13,15 @@ import LinkedDataEntityForm from "../common/LinkedDataEntityForm";
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
     const metadata = getCombinedMetadataForSubject(state, subject);
+
     const hasNoMetadata = !metadata || metadata.length === 0;
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
-    const typeProp = metadata && metadata.find(prop => prop.key === '@type');
-    const typeLabel = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
-    const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
-    const typeInfo = (typeLabel && comment) ? `${typeLabel} - ${comment}` : (typeLabel || comment);
-    const label = linkLabel(subject);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
+
+    const typeInfo = getTypeInfo(metadata)
+    const label = linkLabel(subject);
     const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
+
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
             ...p,
