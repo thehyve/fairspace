@@ -21,7 +21,7 @@ function Dropdown({entities, property, onSave, onChange, ...otherProps}) {
     }).sort(compareBy('disabled'));
 
     // Prevent saving any labels used for UI
-    const handleSave = (selected) => {
+    const handleChange = (selected) => {
         onChange({id: selected.id, label: selected.label, value: selected.value});
     };
 
@@ -30,7 +30,7 @@ function Dropdown({entities, property, onSave, onChange, ...otherProps}) {
             style={{width: '100%'}}
             {...otherProps}
             options={options}
-            onChange={handleSave}
+            onChange={handleChange}
         />
     );
 }
@@ -38,8 +38,14 @@ function Dropdown({entities, property, onSave, onChange, ...otherProps}) {
 Dropdown.propTypes = {
     property: PropTypes.object.isRequired,
     entry: PropTypes.object,
-    onSave: PropTypes.func,
+    onChange: PropTypes.func,
     entities: PropTypes.array
+};
+
+Dropdown.defaultProps = {
+    entry: {},
+    onChange: () => {},
+    entities: []
 };
 
 export default (Dropdown);

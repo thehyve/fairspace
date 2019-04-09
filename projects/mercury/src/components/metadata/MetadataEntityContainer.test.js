@@ -114,31 +114,31 @@ describe('MetadataEntityContainer', () => {
     });
 
     it('tries to load the metadata and the vocabulary', () => {
-    const store = mockStore({
-        cache: {
-            jsonLdBySubject: {
-                "http://fairspace.com/iri/collections/1": {
-                    data: []
+        const store = mockStore({
+            cache: {
+                jsonLdBySubject: {
+                    "http://fairspace.com/iri/collections/1": {
+                        data: []
+                    }
+                },
+                vocabulary: {
+                    data: new Vocabulary([])
                 }
-            },
-            vocabulary: {
-                data: new Vocabulary([])
             }
-        }
-    });
+        });
 
-    const fetchVocabulary = jest.fn();
-    const fetchMetadata = jest.fn();
-    mount(<MetadataEntityContainer
-        subject="http://example.com/john"
-        properties={[]}
-        store={store}
-        fetchMetadataVocabularyIfNeeded={fetchVocabulary}
-        fetchMetadataBySubjectIfNeeded={fetchMetadata}
-    />);
+        const fetchVocabulary = jest.fn();
+        const fetchMetadata = jest.fn();
+        mount(<MetadataEntityContainer
+            subject="http://example.com/john"
+            properties={[]}
+            store={store}
+            fetchMetadataVocabularyIfNeeded={fetchVocabulary}
+            fetchMetadataBySubjectIfNeeded={fetchMetadata}
+        />);
 
-    expect(fetchMetadata.mock.calls.length).toEqual(1);
-    expect(fetchVocabulary.mock.calls.length).toEqual(1);
+        expect(fetchMetadata.mock.calls.length).toEqual(1);
+        expect(fetchVocabulary.mock.calls.length).toEqual(1);
     });
 
     it('updates state properly', () => {

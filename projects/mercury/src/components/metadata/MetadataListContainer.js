@@ -45,13 +45,13 @@ class MetadataListContainer extends React.Component {
     };
 
     handleEntityCreation = (shape, id) => {
-        this.setState({creatingMetadataEntity: true})
+        this.setState({creatingMetadataEntity: true});
 
         this.props.createMetadataEntity(shape, id)
             .then((res) => {
                 this.props.fetchAllEntitiesIfNeeded();
                 this.props.history.push(relativeLink(res.value));
-                this.setState({creatingMetadataEntity: false})
+                this.setState({creatingMetadataEntity: false});
             })
             .catch(e => {
                 ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);

@@ -23,7 +23,7 @@ class MetadataProperty extends React.Component {
 
         return (
             <div
-                key={subject + property.key}
+                key={subject + property.key + entry.id || entry.value}
                 onMouseEnter={() => this.setHoveredIndex(idx)}
                 onMouseLeave={() => this.setHoveredIndex(null)}
             >
