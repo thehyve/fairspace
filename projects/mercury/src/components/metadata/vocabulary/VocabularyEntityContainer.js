@@ -8,7 +8,7 @@ import {
     hasMetaVocabularyError, isMetaVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
 import {getTypeInfo, isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
-import {MetaEntity} from "../common/MetaEntity";
+import {MetaEntityFormElements} from "../common/MetaEntityFormElements";
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
@@ -46,4 +46,4 @@ const mapDispatchToProps = {
     fetchData: fetchMetadataBySubjectIfNeeded
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MetaEntity);
+export default connect(mapStateToProps, mapDispatchToProps)(MetaEntityFormElements);

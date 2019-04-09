@@ -1,8 +1,8 @@
 import React from 'react';
 import Paper from "@material-ui/core/Paper";
-import MetadataListContainer from "./MetadataListContainer";
-import SearchBar from "../common/SearchBar";
-import BreadCrumbs from "../common/BreadCrumbs";
+import MetadataBrowserContainer from "./MetadataBrowserContainer";
+import SearchBar from "../../common/SearchBar";
+import BreadCrumbs from "../../common/BreadCrumbs";
 
 const MetadataListPage = () => (
     <>
@@ -14,7 +14,8 @@ const MetadataListPage = () => (
                 disableUnderline
             />
         </Paper>
-        <MetadataListContainer />
+
+        <MetadataBrowserContainer />
     </>
 );
 

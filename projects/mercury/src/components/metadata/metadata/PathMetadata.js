@@ -1,8 +1,8 @@
 import {connect} from 'react-redux';
 import React from "react";
-import ErrorMessage from "../common/ErrorMessage";
+import ErrorMessage from "../../common/ErrorMessage";
 import MetadataEntityContainer from "./MetadataEntityContainer";
-import {statFile} from "../../actions/fileActions";
+import {statFile} from "../../../actions/fileActions";
 
 export class PathMetadata extends React.Component {
     componentDidMount() {

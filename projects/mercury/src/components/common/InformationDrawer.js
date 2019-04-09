@@ -13,8 +13,8 @@ import {connect} from 'react-redux';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "./CollectionDetails";
-import MetadataEntityContainer from "../metadata/MetadataEntityContainer";
-import PathMetadata from "../metadata/PathMetadata";
+import MetadataEntityContainer from "../metadata/metadata/MetadataEntityContainer";
+import PathMetadata from "../metadata/metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
 import ErrorDialog from './ErrorDialog';

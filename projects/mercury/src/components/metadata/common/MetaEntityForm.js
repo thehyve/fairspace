@@ -1,20 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 import {Fab, Grid, List, Paper} from '@material-ui/core';
 
-import {ErrorMessage, LoadingInlay} from "../common";
-import * as metadataActions from "../../actions/metadataActions";
-import * as vocabularyActions from "../../actions/vocabularyActions";
-import {isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../utils/metadataUtils";
-import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
-import {hasVocabularyError, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
-import ErrorDialog from "../common/ErrorDialog";
+import {ErrorMessage, LoadingInlay} from "../../common";
+import ErrorDialog from "../../common/ErrorDialog";
 
-import MetaEntityHeader from './common/MetaEntityHeader';
+import MetaEntityHeader from './MetaEntityHeader';
 import MetadataProperty from "./MetadataProperty";
 
-export class MetadataEntityContainer extends React.Component {
+export class MetaEntityForm extends React.Component {
     state = {
         propertiesWithUpdatedValues: {}
     };
@@ -33,11 +27,11 @@ export class MetadataEntityContainer extends React.Component {
     }
 
     load() {
-        const {subject, fetchMetadataVocabularyIfNeeded, fetchMetadataBySubjectIfNeeded} = this.props;
+        const {subject, fetchShapes, fetchData} = this.props;
 
         if (subject) {
-            fetchMetadataVocabularyIfNeeded();
-            fetchMetadataBySubjectIfNeeded(subject);
+            fetchShapes();
+            fetchData(subject);
         }
     }
 
@@ -140,51 +134,27 @@ export class MetadataEntityContainer extends React.Component {
         ) : entity;
     }
 }
-const mapStateToProps = (state, ownProps) => {
-    const subject = ownProps.subject || url2iri(window.location.href);
-    const metadata = getCombinedMetadataForSubject(state, subject);
-    const hasNoMetadata = !metadata || metadata.length === 0;
-    const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
-    const typeProp = metadata && metadata.find(prop => prop.key === '@type');
-    const typeLabel = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
-    const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
-    const typeInfo = (typeLabel && comment) ? `${typeLabel} - ${comment}` : (typeLabel || comment);
-    const label = linkLabel(subject);
-    const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
-    const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
-    const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
-        .map(p => ({
-            ...p,
-            editable: editable && !isDateTimeProperty(p)
-        }));
 
-    return {
-        loading: isMetadataPending(state, subject) || isVocabularyPending(state),
-        properties,
-        subject,
-        typeInfo,
-        label,
-        error,
-        showHeader: ownProps.showHeader || false,
-        editable,
-    };
-};
-
-const mapDispatchToProps = {
-    fetchMetadataVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded,
-    fetchMetadataBySubjectIfNeeded: metadataActions.fetchMetadataBySubjectIfNeeded,
-    updateEntity: metadataActions.updateEntity
-};
-
-MetadataEntityContainer.propTypes = {
+MetaEntityForm.propTypes = {
     updateEntity: PropTypes.func.isRequired,
-    fetchMetadataVocabularyIfNeeded: PropTypes.func,
-    fetchMetadataBySubjectIfNeeded: PropTypes.func
-}
+    fetchShapes: PropTypes.func,
+    fetchData: PropTypes.func,
+    error: PropTypes.string,
 
-MetadataEntityContainer.defaultProps = {
-    fetchMetadataVocabularyIfNeeded: () => {},
-    fetchMetadataBySubjectIfNeeded: () => {}
+    loading: PropTypes.bool,
+    showHeader: PropTypes.bool,
+    editable: PropTypes.bool,
+
+    label: PropTypes.string,
+    typeInfo: PropTypes.string,
+
+    subject: PropTypes.string.isRequired,
+    properties: PropTypes.array,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntityContainer);
+MetaEntityForm.defaultProps = {
+    fetchShapes: () => {},
+    fetchData: () => {}
+};
+
+export default MetaEntityForm;

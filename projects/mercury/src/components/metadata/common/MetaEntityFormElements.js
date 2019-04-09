@@ -5,9 +5,9 @@ import {List, Paper} from '@material-ui/core';
 import {ErrorMessage, LoadingInlay} from "../../common";
 
 import MetaEntityHeader from './MetaEntityHeader';
-import MetadataProperty from "../MetadataProperty";
+import MetadataProperty from "./MetadataProperty";
 
-export class MetaEntity extends React.Component {
+export class MetaEntityFormElements extends React.Component {
     componentDidMount() {
         this.load();
     }
@@ -62,20 +62,25 @@ export class MetaEntity extends React.Component {
     }
 }
 
-MetaEntity.propTypes = {
+MetaEntityFormElements.propTypes = {
     fetchShapes: PropTypes.func,
     fetchData: PropTypes.func,
-    subject: PropTypes.string,
 
     label: PropTypes.string,
     typeInfo: PropTypes.string,
 
+    subject: PropTypes.string,
     properties: PropTypes.array,
-    editable: PropTypes.bool,
 
     error: PropTypes.bool,
     loading: PropTypes.bool,
+    editable: PropTypes.bool,
     showHeader: PropTypes.bool
 };
 
-export default MetaEntity;
+MetaEntityFormElements.defaultProps = {
+    fetchShapes: () => {},
+    fetchData: () => {}
+}
+
+export default MetaEntityFormElements;

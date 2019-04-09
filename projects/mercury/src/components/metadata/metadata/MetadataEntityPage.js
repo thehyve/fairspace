@@ -1,6 +1,6 @@
 import React from 'react';
 
-import BreadCrumbs from "../common/BreadCrumbs";
+import BreadCrumbs from "../../common/BreadCrumbs";
 import MetadataEntityContainer from './MetadataEntityContainer';
 
 const metadataEntityPage = () => (

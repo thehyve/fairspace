@@ -5,8 +5,8 @@ import {
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 
-import ValueComponentFactory from "./values/ValueComponentFactory";
-import * as constants from '../../constants';
+import ValueComponentFactory from "../values/ValueComponentFactory";
+import * as constants from '../../../constants';
 
 class MetadataProperty extends React.Component {
     state = {
