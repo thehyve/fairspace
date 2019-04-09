@@ -223,11 +223,8 @@ materialReactSelect.propTypes = {
 
 materialReactSelect.defaultProps = {
     placeholder: 'Please select a value',
-    label: '',
-    required: false,
     value: null,
     classes: null,
-
 };
 
 export default withStyles(styles, {withTheme: true})(materialReactSelect);
