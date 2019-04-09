@@ -218,11 +218,13 @@ materialReactSelect.propTypes = {
     value: PropTypes.shape(selectType),
     placeholder: PropTypes.string,
     classes: PropTypes.shape(),
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+    label: PropTypes.string,
 };
 
 materialReactSelect.defaultProps = {
     placeholder: 'Please select a value',
+    label: '',
     value: null,
     classes: null,
 };
