@@ -7,6 +7,9 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 
+/**
+ * Protects the system vocabulary from modification except to addition of new properties to open class shapes
+ */
 public class SystemVocabularyProtectingValidator implements MetadataRequestValidator {
 
     private static final Property CLOSED = createProperty(SH.NS + "closed");
