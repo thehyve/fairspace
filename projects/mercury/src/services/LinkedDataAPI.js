@@ -3,7 +3,7 @@ import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
 import {toJsonLd} from "../utils/metadataUtils";
 
-class MetadataAPI {
+class LinkedDataAPI {
     static getParams = {
         method: 'GET',
         headers: new Headers({Accept: 'application/ld+json'}),
@@ -41,7 +41,7 @@ class MetadataAPI {
 
     get(params = {}) {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
-        return fetch(`${this.getStatementsUrl()}?labels&${query}`, MetadataAPI.getParams)
+        return fetch(`${this.getStatementsUrl()}?labels&${query}`, LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(expand);
@@ -116,7 +116,7 @@ class MetadataAPI {
             return Promise.reject(new Error("No entities URL provided"));
         }
 
-        return fetch(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), MetadataAPI.getParams)
+        return fetch(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(expand);
@@ -133,15 +133,13 @@ class MetadataAPI {
             return Promise.reject(new Error("No entities URL provided"));
         }
 
-        return fetch(this.getEntitiesUrl(), MetadataAPI.getParams)
+        return fetch(this.getEntitiesUrl(), LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(expand);
     }
 }
 
-export default {
-    metadata: new MetadataAPI(config => config.urls.metadata),
-    vocabulary: new MetadataAPI(config => config.urls.vocabulary),
-    metaVocabulary: new MetadataAPI(config => config.urls.metaVocabulary)
-};
+export const MetadataAPI = new LinkedDataAPI(config => config.urls.metadata);
+export const VocabularyAPI = new LinkedDataAPI(config => config.urls.vocabulary);
+export const MetaVocabularyAPI = new LinkedDataAPI(config => config.urls.metaVocabulary);

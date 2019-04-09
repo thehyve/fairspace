@@ -1,5 +1,5 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import MetadataAPI from "../services/MetadataAPI";
+import {VocabularyAPI, MetaVocabularyAPI} from "../services/LinkedDataAPI";
 import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
 import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
@@ -10,9 +10,9 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const updateMetadata = (subject, predicate, values) => ({
-    type: actionTypes.UPDATE_METADATA,
-    payload: MetadataAPI.metadata.update(subject, predicate, values),
+export const updateVocabulary = (subject, predicate, values) => ({
+    type: actionTypes.UPDATE_VOCABULARY,
+    payload: VocabularyAPI.update(subject, predicate, values),
     meta: {
         subject,
         predicate,
@@ -30,7 +30,7 @@ export const createVocabularyEntity = (shape, id) => {
 
     return {
         type: actionTypes.CREATE_VOCABULARY_ENTITY,
-        payload: MetadataAPI.vocabulary.update(subject, constants.TYPE_URI, [{id: type}])
+        payload: VocabularyAPI.update(subject, constants.TYPE_URI, [{id: type}])
             .then(() => subject),
         meta: {
             subject,
@@ -41,7 +41,7 @@ export const createVocabularyEntity = (shape, id) => {
 
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
     type: actionTypes.FETCH_VOCABULARY,
-    payload: MetadataAPI.vocabulary.get()
+    payload: VocabularyAPI.get()
 }));
 
 export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
@@ -51,7 +51,7 @@ export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
 
 const fetchMetaVocabulary = createErrorHandlingPromiseAction(() => ({
     type: actionTypes.FETCH_META_VOCABULARY,
-    payload: MetadataAPI.metaVocabulary.get()
+    payload: MetaVocabularyAPI.get()
 }));
 
 export const fetchMetaVocabularyIfNeeded = () => dispatchIfNeeded(
@@ -61,7 +61,7 @@ export const fetchMetaVocabularyIfNeeded = () => dispatchIfNeeded(
 
 const fetchVocabularyEntitiesByType = createErrorHandlingPromiseAction(type => ({
     type: actionTypes.FETCH_VOCABULARY_ENTITIES,
-    payload: MetadataAPI.vocabulary.getEntitiesByType(type),
+    payload: VocabularyAPI.getEntitiesByType(type),
     meta: {
         type
     }
@@ -70,7 +70,7 @@ const fetchVocabularyEntitiesByType = createErrorHandlingPromiseAction(type => (
 const fetchAllVocabularyEntities = createErrorHandlingPromiseAction(dispatch => ({
     type: actionTypes.FETCH_ALL_VOCABULARY_ENTITIES,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
-        .then(_ => MetadataAPI.vocabulary.getAllEntities())
+        .then(() => VocabularyAPI.getAllEntities())
 }));
 
 export const fetchVocabularyEntitiesIfNeeded = type => dispatchIfNeeded(

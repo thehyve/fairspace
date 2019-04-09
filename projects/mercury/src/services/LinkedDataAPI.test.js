@@ -1,4 +1,4 @@
-import MetadataAPI from "./MetadataAPI";
+import LinkedDataAPI from "./LinkedDataAPI";
 import Config from "./Config/Config";
 
 const mockResponse = (status, statusText, response) => new window.Response(response, {
@@ -24,13 +24,13 @@ beforeAll(() => {
 
 it('fetches metadata with provided parameters', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
-    MetadataAPI.metadata.get({subject: 'a', predicate: 'b', object: 'c'});
+    LinkedDataAPI.metadata.get({subject: 'a', predicate: 'b', object: 'c'});
     expect(window.fetch.mock.calls[0][0]).toEqual("/meta/?labels&subject=a&predicate=b&object=c");
 });
 
 it('stores metadata as jsonld', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
-    MetadataAPI.metadata.update('http://thehyve.nl', 'hasEmployees', [{value: 'John Snow'}, {value: 'Ygritte'}]);
+    LinkedDataAPI.metadata.update('http://thehyve.nl', 'hasEmployees', [{value: 'John Snow'}, {value: 'Ygritte'}]);
     expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
     const expected = {
         '@id': 'http://thehyve.nl',
@@ -44,7 +44,7 @@ it('stores metadata as jsonld', () => {
 
 it('stores metadata as jsonld (Full entity)', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
-    MetadataAPI.metadata.updateEntity('http://thehyve.nl', {
+    LinkedDataAPI.metadata.updateEntity('http://thehyve.nl', {
         hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}],
         hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}],
     });
@@ -71,7 +71,7 @@ it('stores metadata as jsonld (Full entity)', () => {
 it('retrieves metadata entities using a sparql query', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     const type = 'http://my-special-entity-type';
-    MetadataAPI.metadata.getEntitiesByType(type);
+    LinkedDataAPI.metadata.getEntitiesByType(type);
     expect(window.fetch.mock.calls[0][0]).toEqual("/entities/?type=http%3A%2F%2Fmy-special-entity-type");
     expect(window.fetch.mock.calls[0][1].method).toEqual('GET');
 });
