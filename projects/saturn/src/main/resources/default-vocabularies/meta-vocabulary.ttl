@@ -6,7 +6,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-fs:ClassShapeMeta a sh:NodeShape ;
+fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Meta shape of classes." ;
     sh:name "Class Shape Meta" ;
@@ -63,7 +63,7 @@ fs:ClassShapeMeta a sh:NodeShape ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
 
-fs:PropertyShapeMeta a sh:NodeShape ;
+fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Meta shape of FS defined properties." ;
     sh:name "Property Shape Meta" ;
@@ -135,7 +135,7 @@ fs:PropertyShapeMeta a sh:NodeShape ;
     sh:targetClass fs:PropertyShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
 
-fs:RelationShapeMeta a sh:NodeShape ;
+fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Meta shape of FS defined relations." ;
     sh:name "Relation Shape Meta" ;
@@ -187,7 +187,17 @@ fs:RelationShapeMeta a sh:NodeShape ;
         fs:machineOnly true ; 
         sh:name "Fixed shape" ;
         sh:description "If this is true, a user can not make changes to this shape definiton."
-    ] ;
+    ], 
+        fs:inverseRelationShape ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+
+fs:inverseRelationShape a fs:RelationShape ;
+    fs:inverseRelation fs:inverseRelationShape ;
+    sh:path fs:inverseRelation 
+    sh:class fs:RelationShape ;
+    sh:maxCount 1 ;
+    sh:name "Inverse relation" ;
+    sh:description "An inverse relation has at most a single relation shape instance as value." ;
+    sh:path fs:inverseRelation . 
