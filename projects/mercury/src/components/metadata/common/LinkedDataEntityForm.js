@@ -136,7 +136,7 @@ export class LinkedDataEntityForm extends React.Component {
 }
 
 LinkedDataEntityForm.propTypes = {
-    updateEntity: PropTypes.func.isRequired,
+    updateEntity: PropTypes.func,
     fetchShapes: PropTypes.func,
     fetchLinkedData: PropTypes.func,
     error: PropTypes.string,
@@ -154,7 +154,8 @@ LinkedDataEntityForm.propTypes = {
 
 LinkedDataEntityForm.defaultProps = {
     fetchShapes: () => {},
-    fetchLinkedData: () => {}
+    fetchLinkedData: () => {},
+    updateEntity: () => {}
 };
 
 export default LinkedDataEntityForm;
