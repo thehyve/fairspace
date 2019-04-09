@@ -8,7 +8,7 @@ import DateValue from "./DateValue";
 import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
 import ResourceValue from "./ResourceValue";
-import EntityDropdown from "./EntityDropdown";
+import EntityDropdownContainer from "./EntityDropdownContainer";
 import EnumerationDropdown from "./EnumerationDropdown";
 
 const getInputComponent = (property) => {
@@ -45,6 +45,6 @@ const getInputComponent = (property) => {
 
 export default {
     editComponent: property => getInputComponent(property) || ReferringValue,
-    addComponent: property => getInputComponent(property) || EntityDropdown,
+    addComponent: property => getInputComponent(property) || EntityDropdownContainer,
     readOnlyComponent: () => ReferringValue
 };

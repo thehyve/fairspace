@@ -4,6 +4,7 @@ import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
@@ -16,8 +17,10 @@ import java.util.List;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class ChangeableMetadataService extends ReadableMetadataService {
+    static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
     private static final Model EMPTY = createDefaultModel();
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
@@ -97,6 +100,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         var unchanged = modelToRemove.intersection(modelToAdd);
         modelToRemove.remove(unchanged);
         modelToAdd.remove(unchanged);
+        modelToAdd.removeAll(null, null, NIL);
 
         ensureValidParameters(modelToRemove, modelToAdd);
 

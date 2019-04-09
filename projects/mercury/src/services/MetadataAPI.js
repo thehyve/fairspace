@@ -1,7 +1,7 @@
-import * as jsonld from 'jsonld/dist/jsonld';
+import {expand} from 'jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
-import Vocabulary from "./Vocabulary";
+import {toJsonLd} from "../utils/metadataUtils";
 
 class MetadataAPI {
     static getParams = {
@@ -15,7 +15,7 @@ class MetadataAPI {
         return fetch(`${Config.get().urls.metadata.statements}?labels&${query}`, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
-            .then(jsonld.expand);
+            .then(expand);
     }
 
     /**
@@ -40,10 +40,36 @@ class MetadataAPI {
                 method: 'PATCH',
                 headers: new Headers({'Content-type': 'application/ld+json'}),
                 credentials: 'same-origin',
-                body: JSON.stringify(this.toJsonLd(subject, predicate, values))
+                body: JSON.stringify(toJsonLd(subject, predicate, values))
             });
 
         return request.then(failOnHttpError("Failure when updating metadata"));
+    }
+
+    /**
+     * Update values for all given properties
+     * @param subject   Single URI representing the subject to update
+     * @param properties An object with each key is the iri of the predicate to update
+     * and the value is the array of values
+     * Each value is an object on its own with one of the following keys
+     *   id: referencing another resource
+     *   value: referencing a literal value
+     * If both keys are specified, the id is stored and the literal value is ignored
+     * @returns {*}
+     */
+    updateEntity(subject, properties) {
+        if (!subject || !properties) {
+            return Promise.reject(Error("No subject or properties given"));
+        }
+
+        const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p]));
+
+        return fetch(Config.get().urls.metadata.statements, {
+            method: 'PATCH',
+            headers: new Headers({'Content-type': 'application/ld+json'}),
+            credentials: 'same-origin',
+            body: JSON.stringify(jsonLd)
+        }).then(failOnHttpError("Failure when updating metadata"));
     }
 
     /**
@@ -51,14 +77,12 @@ class MetadataAPI {
      * @returns {Promise<Vocabulary | never>}
      */
     getVocabulary() {
-        // TODO: store the user and system vocabulary separately to allow
-        //       easy vocabulary editing for the user vocabulary
+        // TODO: use the new combined endpoint to retrieve both vocabularies at once
         return Config.waitFor()
             .then(() => fetch(Config.get().urls.vocabulary, MetadataAPI.getParams))
             .then(failOnHttpError("Failure when retrieving the vocabulary"))
             .then(response => response.json())
-            .then(jsonld.expand)
-            .then(expandedVocabulary => new Vocabulary(expandedVocabulary));
+            .then(expand)
     }
 
     /**
@@ -75,7 +99,7 @@ class MetadataAPI {
         return fetch(Config.get().urls.metadata.entities + "?type=" + encodeURIComponent(type), MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(jsonld.expand);
+            .then(expand);
     }
 
     /**
@@ -88,16 +112,7 @@ class MetadataAPI {
         return fetch(Config.get().urls.metadata.entities, MetadataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(jsonld.expand);
-    }
-
-    toJsonLd(subject, predicate, values) {
-        return [
-            {
-                '@id': subject,
-                [predicate]: values.map(value => ({'@id': value.id, '@value': value.value}))
-            }
-        ];
+            .then(expand);
     }
 }
 
