@@ -42,7 +42,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = {
     fetchShapes: vocabularyActions.fetchMetadataVocabularyIfNeeded,
-    fetchData: metadataActions.fetchMetadataBySubjectIfNeeded,
+    fetchLinkedData: metadataActions.fetchMetadataBySubjectIfNeeded,
     updateEntity: metadataActions.updateEntity
 };
 

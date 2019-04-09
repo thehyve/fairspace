@@ -43,7 +43,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = {
     fetchShapes: fetchMetaVocabularyIfNeeded,
-    fetchData: fetchMetadataVocabularyIfNeeded
+    fetchLinkedData: fetchMetadataVocabularyIfNeeded
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataEntityForm);

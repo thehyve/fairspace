@@ -99,7 +99,7 @@ describe('MetaEntityForm', () => {
             properties={[]}
             store={store}
             fetchShapes={fetchVocabulary}
-            fetchData={fetchMetadata}
+            fetchLinkedData={fetchMetadata}
         />);
 
         expect(fetchMetadata.mock.calls.length).toEqual(1);

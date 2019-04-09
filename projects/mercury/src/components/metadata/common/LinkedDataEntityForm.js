@@ -27,11 +27,11 @@ export class LinkedDataEntityForm extends React.Component {
     }
 
     load() {
-        const {subject, fetchShapes, fetchData} = this.props;
+        const {subject, fetchShapes, fetchLinkedData} = this.props;
 
         if (subject) {
             fetchShapes();
-            fetchData(subject);
+            fetchLinkedData(subject);
         }
     }
 
@@ -138,7 +138,7 @@ export class LinkedDataEntityForm extends React.Component {
 LinkedDataEntityForm.propTypes = {
     updateEntity: PropTypes.func.isRequired,
     fetchShapes: PropTypes.func,
-    fetchData: PropTypes.func,
+    fetchLinkedData: PropTypes.func,
     error: PropTypes.string,
 
     loading: PropTypes.bool,
@@ -154,7 +154,7 @@ LinkedDataEntityForm.propTypes = {
 
 LinkedDataEntityForm.defaultProps = {
     fetchShapes: () => {},
-    fetchData: () => {}
+    fetchLinkedData: () => {}
 };
 
 export default LinkedDataEntityForm;
