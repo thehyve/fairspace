@@ -42,4 +42,8 @@ Dropdown.propTypes = {
     entities: PropTypes.array
 };
 
+Dropdown.defaultProps = {
+    entities: []
+};
+
 export default (Dropdown);
