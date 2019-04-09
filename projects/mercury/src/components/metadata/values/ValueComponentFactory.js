@@ -20,7 +20,7 @@ const getInputComponent = (property) => {
 
     // If the class refers to a RDF List, we currently
     // only support string values
-    if (property.className === constants.LIST_URI) {
+    if (property.isRdfList) {
         return StringValue;
     }
 

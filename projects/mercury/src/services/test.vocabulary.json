@@ -210,9 +210,9 @@
     "@type": [
       "http://fairspace.io/ontology#RelationShape"
     ],
-    "http://www.w3.org/ns/shacl#class": [
+    "http://www.w3.org/ns/shacl#node": [
       {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
+        "@id": "http://datashapes.org/dash#ListShape"
       }
     ],
     "http://www.w3.org/ns/shacl#description": [

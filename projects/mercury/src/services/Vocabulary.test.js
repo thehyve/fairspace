@@ -273,6 +273,22 @@ describe('combination of vocabulary and metadata', () => {
     });
 
     describe('support for rdf:List', () => {
+        it('combine returns isRdfList correctly', () => {
+            const metadata = [{
+                '@id': 'http://fairspace.com/iri/collections/1',
+                '@type': ['http://fairspace.io/ontology#Collection'],
+                'http://fairspace.io/ontology#list': [{
+                    '@list': [{"@value": "abc"}, {"@value": "def"}, {"@value": "ghi"}]
+                }]
+            }];
+
+            const result = vocabulary.combine(metadata);
+            expect(result.length).toBeGreaterThan(2);
+            expect(result[0].key).toEqual('http://fairspace.io/ontology#list');
+            expect(result[0].isRdfList).toEqual(true);
+            expect(result[1].isRdfList).toEqual(false);
+        });
+
         it('returns list values as arrays', () => {
             const metadata = [{
                 '@id': 'http://fairspace.com/iri/collections/1',

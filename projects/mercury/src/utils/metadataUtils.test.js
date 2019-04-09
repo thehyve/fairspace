@@ -287,7 +287,7 @@ describe('Metadata Utils', () => {
 
             const vocabularyMock = {
                 determineShapeForProperty: () => ({
-                    [constants.SHACL_CLASS]: [{'@id': constants.LIST_URI}]
+                    [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
                 })
             };
 

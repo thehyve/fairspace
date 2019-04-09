@@ -228,7 +228,7 @@ class Vocabulary {
     }
 
     static isRdfList(propertyShape) {
-        return getFirstPredicateId(propertyShape, constants.SHACL_CLASS) === constants.LIST_URI;
+        return getFirstPredicateId(propertyShape, constants.SHACL_NODE) === constants.DASH_LIST_SHAPE;
     }
 
     /**
@@ -247,6 +247,7 @@ class Vocabulary {
         const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
         const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
         const allowedValues = getFirstPredicateList(propertyShape, constants.SHACL_IN, undefined);
+        const isRdfList = Vocabulary.isRdfList(propertyShape);
 
         return {
             key: predicate,
@@ -257,7 +258,8 @@ class Vocabulary {
             allowMultiple,
             machineOnly,
             multiLine,
-            allowedValues
+            allowedValues,
+            isRdfList
         };
     }
 
