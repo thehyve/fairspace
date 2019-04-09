@@ -24,7 +24,6 @@ import org.topbraid.spin.constraints.ConstraintViolation;
 import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.services.metadata.validation.InversionUtils.getAffectedResources;

@@ -11,9 +11,11 @@ import org.topbraid.shacl.vocabulary.SH;
 import java.util.Set;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.util.Ref.ref;
 import static java.lang.String.format;
 
+/**
+ * Prohibits any modification of vocabulary resources used in metadata, except to a few whitelisted properties
+ */
 @AllArgsConstructor
 public class MetadataAndVocabularyConsistencyValidator implements MetadataRequestValidator {
     private static final Set<Property> WHITE_LISTED_PROPERTIES = Set.of(RDFS.label, RDFS.comment, SH.property);
@@ -22,15 +24,14 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        var result = ref(ValidationResult.VALID);
-        modelToRemove.union(modelToAdd)
-                .listStatements()
-                .forEachRemaining(stmt -> {
-                    if (!WHITE_LISTED_PROPERTIES.contains(stmt.getPredicate()) && isUsed(stmt.getSubject())) {
-                        result.value = result.value.merge(new ValidationResult(format("Resource %s has been used in metadata and cannot be altered", stmt.getSubject())));
-                    }
-                });
-        return result.value;
+        var result = ValidationResult.VALID;
+        for (var it = modelToRemove.union(modelToAdd).listStatements(); it.hasNext(); ) {
+            var stmt = it.next();
+            if (!WHITE_LISTED_PROPERTIES.contains(stmt.getPredicate()) && isUsed(stmt.getSubject())) {
+                result = result.merge(new ValidationResult(format("Resource %s has been used in metadata and cannot be altered", stmt.getSubject())));
+            }
+        }
+        return result;
     }
 
     private boolean isUsed(Resource resource) {
