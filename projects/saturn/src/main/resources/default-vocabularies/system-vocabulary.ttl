@@ -87,7 +87,8 @@ fs:blobIdShape a fs:PropertyShape ;
     sh:path fs:blobId ;
     fs:machineOnly true .
 
-fs:collectionTypeShape sh:path fs:collectionType ;
+fs:collectionTypeShape a fs:PropertyShape ;
+    sh:path fs:collectionType ;
     fs:machineOnly true .
 
 rdfs:labelShape a fs:PropertyShape ;
