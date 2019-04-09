@@ -176,14 +176,15 @@ const mapDispatchToProps = {
 };
 
 MetadataEntityContainer.propTypes = {
-    updateEntity: PropTypes.func.isRequired,
+    updateEntity: PropTypes.func,
     fetchMetadataVocabularyIfNeeded: PropTypes.func,
     fetchMetadataBySubjectIfNeeded: PropTypes.func
-}
+};
 
 MetadataEntityContainer.defaultProps = {
     fetchMetadataVocabularyIfNeeded: () => {},
-    fetchMetadataBySubjectIfNeeded: () => {}
+    fetchMetadataBySubjectIfNeeded: () => {},
+    updateEntity: () => {},
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntityContainer);
