@@ -22,7 +22,7 @@ fs:FileShape a fs:ClassShape ;
     sh:description "A single file." ;
     sh:name "File" ;
     sh:targetClass fs:File ; 
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
     fs:fixedShape true ;
     fs:systemProperties 
         fs:fileSizeShape,
@@ -82,7 +82,7 @@ fs:CollectionShape a fs:ClassShape ;
     sh:description "Collection of files with associated metadata and access rules." ;
     sh:name "Collection" ;
     sh:targetClass fs:Collection ; 
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:collectionType ) ;
     fs:fixedShape true ;
     fs:systemProperties 
         fs:filePathShape,
@@ -118,6 +118,14 @@ fs:UserShape a fs:ClassShape ;
         fs:userEmailShape .
 
 ## Property Shapes
+
+fs:blobIdShape a fs:PropertyShape ;
+    sh:path fs:blobId ;
+    fs:machineOnly true .
+
+fs:collectionTypeShape a fs:PropertyShape ;
+    sh:path fs:collectionType ;
+    fs:machineOnly true .
 
 rdfs:labelShape a fs:PropertyShape ;
     sh:name "Label" ;

@@ -1,10 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -14,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -124,6 +122,16 @@ public class ChangeableMetadataServiceTest {
         assertTrue(ds.getNamedModel(GRAPH).contains(newStmt3));
         assertFalse(ds.getNamedModel(GRAPH).contains(STMT1));
         assertFalse(ds.getNamedModel(GRAPH).contains(STMT2));
+    }
+
+    @Test
+    public void patchWithNil() {
+        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(S1, P1, S2).add(S1, P1, S3));
+
+
+        api.patch(createDefaultModel().add(S1, P1, NIL));
+
+        assertFalse(ds.getNamedModel(GRAPH).contains(S1, P1, (RDFNode) null));
     }
 
     @Test
