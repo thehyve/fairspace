@@ -1,14 +1,14 @@
 import {connect} from 'react-redux';
-import {fetchMetadataBySubjectIfNeeded} from "../../../actions/metadataActions";
-import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
+import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 import {
     getVocabulary,
+    hasMetaVocabularyError,
     hasVocabularyError,
-    isVocabularyPending,
-    hasMetaVocabularyError, isMetaVocabularyPending
+    isMetaVocabularyPending,
+    isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
 import {getTypeInfo, isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
-import {MetaEntityFormElements} from "../common/MetaEntityFormElements";
+import {MetaEntityForm} from "../common/MetaEntityForm";
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
@@ -42,8 +42,8 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = {
-    fetchShapes: fetchMetadataVocabularyIfNeeded,
-    fetchData: fetchMetadataBySubjectIfNeeded
+    fetchShapes: fetchMetaVocabularyIfNeeded,
+    fetchData: fetchMetadataVocabularyIfNeeded
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MetaEntityFormElements);
+export default connect(mapStateToProps, mapDispatchToProps)(MetaEntityForm);
