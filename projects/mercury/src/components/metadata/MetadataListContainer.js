@@ -54,7 +54,7 @@ class MetadataListContainer extends React.Component {
                 this.setState({creatingMetadataEntity: false});
             })
             .catch(e => {
-                ErrorDialog.showError(e, `Error creating a new metadata entity.`);
+                ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
                 this.setState({creatingMetadataEntity: false});
             });
     }

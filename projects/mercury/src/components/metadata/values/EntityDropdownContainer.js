@@ -38,7 +38,7 @@ class EntityDropdownContainer extends React.Component {
                 this.props.fetchEntitiesIfNeeded(this.props.property.className);
                 this.props.onChange({id: res.value});
             })
-            .catch(e => ErrorDialog.showError(e, `Error creating a new metadata entity.`));
+            .catch(e => ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`));
     }
 
     render() {
