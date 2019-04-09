@@ -40,13 +40,13 @@ export const createVocabularyEntity = (shape, id) => {
 };
 
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
-    type: actionTypes.FETCH_METADATA_VOCABULARY,
+    type: actionTypes.FETCH_VOCABULARY,
     payload: MetadataAPI.vocabulary.get()
 }));
 
 export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
     fetchVocabulary,
-    state => (state && state.cache ? state.cache.vocabulary : undefined)
+    state => (state && state.cache && state.cache.vocabulary)
 );
 
 const fetchMetaVocabulary = createErrorHandlingPromiseAction(() => ({
@@ -56,7 +56,7 @@ const fetchMetaVocabulary = createErrorHandlingPromiseAction(() => ({
 
 export const fetchMetaVocabularyIfNeeded = () => dispatchIfNeeded(
     fetchMetaVocabulary,
-    state => (state && state.cache ? state.cache.metaVocabulary : undefined)
+    state => (state && state.cache && state.cache.metaVocabulary)
 );
 
 const fetchVocabularyEntitiesByType = createErrorHandlingPromiseAction(type => ({

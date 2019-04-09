@@ -151,10 +151,10 @@ export const toJsonLd = (subject, predicate, values) => {
  */
 export const getTypeInfo = (metadata) => {
     const typeProp = metadata && metadata.find(prop => prop.key === '@type');
-    const typeLabel = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].label;
-    const comment = typeProp && typeProp.values && typeProp.values.length && typeProp.values[0].comment;
+    const typeValue = (typeProp && typeProp.values && typeProp.values.length && typeProp.values[0]) || {};
+    const {label, comment} = typeValue;
 
-    return (typeLabel && comment) ? `${typeLabel} - ${comment}` : (typeLabel || comment);
+    return (label && comment) ? `${label} - ${comment}` : (label || comment);
 }
 
 export const createIri = (id) => `http://${window.location.hostname}/iri/${id}`;

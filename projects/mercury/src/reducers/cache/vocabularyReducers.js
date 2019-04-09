@@ -1,9 +1,9 @@
 import Vocabulary from "../../services/Vocabulary";
 
 import {promiseReducerFactory} from "../../utils/redux";
-import {FETCH_METADATA_VOCABULARY} from "../../actions/actionTypes";
+import {FETCH_VOCABULARY} from "../../actions/actionTypes";
 
-export default promiseReducerFactory(FETCH_METADATA_VOCABULARY, null);
+export default promiseReducerFactory(FETCH_VOCABULARY, null);
 
 /**
  * Returns an object representing the vocabulary
