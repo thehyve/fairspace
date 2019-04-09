@@ -83,7 +83,8 @@ fs:UserShape a fs:ClassShape ;
 
 ## Property Shapes
 
-fs:blobIdShape sh:path fs:blobId ;
+fs:blobIdShape a fs:PropertyShape ;
+    sh:path fs:blobId ;
     fs:machineOnly true .
 
 fs:collectionTypeShape sh:path fs:collectionType ;
