@@ -1,7 +1,7 @@
 import React from 'react';
-import {mount, shallow} from "enzyme";
+import {shallow} from "enzyme";
 import {Link} from "react-router-dom";
-import MetadataLink from "./MetadataLink";
+import LinkedDataLink from "./LinkedDataLink";
 
 describe('MetadataLink', () => {
     // Please note that for tests, the window.location.origin is set to http://localhost
@@ -9,12 +9,12 @@ describe('MetadataLink', () => {
     const origin = 'http://localhost';
 
     it('should render internal link for uri with same hostname', () => {
-        const wrapper = shallow(<MetadataLink uri={`${origin}${pathAndParams}`} />);
+        const wrapper = shallow(<LinkedDataLink uri={`${origin}${pathAndParams}`} />);
         expect(wrapper.containsMatchingElement(<Link to={pathAndParams} />)).toBe(true);
     });
     it('should render external link for uri with other hostname', () => {
         const uri = `http://other-host${pathAndParams}`;
-        const wrapper = shallow(<MetadataLink uri={uri} />);
+        const wrapper = shallow(<LinkedDataLink uri={uri} />);
         expect(wrapper.containsMatchingElement(<a href={uri} />)).toBe(true);
     });
 
@@ -22,11 +22,11 @@ describe('MetadataLink', () => {
         let wrapper; let uri;
 
         uri = `https://localhost${pathAndParams}`;
-        wrapper = shallow(<MetadataLink uri={uri} />);
+        wrapper = shallow(<LinkedDataLink uri={uri} />);
         expect(wrapper.contains(<a href={uri} />)).toBe(true);
 
         uri = `http://localhost:8080${pathAndParams}`;
-        wrapper = shallow(<MetadataLink uri={uri} />);
+        wrapper = shallow(<LinkedDataLink uri={uri} />);
         expect(wrapper.contains(<a href={uri} />)).toBe(true);
     });
 })

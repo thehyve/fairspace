@@ -10,7 +10,7 @@ import {
 } from "../../../reducers/cache/vocabularyReducers";
 import {getLabel, relativeLink} from "../../../utils/metadataUtils";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import MetaBrowser from "../common/MetaBrowser";
+import LinkedDataBrowser from "../common/LinkedDataBrowser";
 
 const mapStateToProps = (state) => {
     const vocabularyEntities = getVocabularyEntities(state);
@@ -43,4 +43,4 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 
 // Please note that withRoute must be applied after connect
 // in order to have the history available in mapDispatchToProps
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MetaBrowser));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(LinkedDataBrowser));

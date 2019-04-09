@@ -16,7 +16,7 @@ import {getLabel} from "../../../utils/metadataUtils";
 import {compareBy} from "../../../utils/comparisionUtils";
 import LoadingInlay from '../../common/LoadingInlay';
 
-const ShapeChooserDialog = props => {
+const LinkedDataShapeChooserDialog = props => {
     const closeDialog = (e) => {
         if (e) e.stopPropagation();
         props.onClose();
@@ -66,10 +66,10 @@ const ShapeChooserDialog = props => {
     );
 };
 
-ShapeChooserDialog.propTypes = {
+LinkedDataShapeChooserDialog.propTypes = {
     onChooseShape: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     shapes: PropTypes.array
 };
 
-export default ShapeChooserDialog;
+export default LinkedDataShapeChooserDialog;

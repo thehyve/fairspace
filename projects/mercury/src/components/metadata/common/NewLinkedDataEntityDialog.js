@@ -4,7 +4,7 @@ import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} fr
 
 import {generateUuid, getLabel} from "../../../utils/metadataUtils";
 
-class NewEntityDialog extends React.Component {
+class NewLinkedDataEntityDialog extends React.Component {
     state = {
         id: generateUuid()
     };
@@ -75,9 +75,9 @@ class NewEntityDialog extends React.Component {
     }
 }
 
-NewEntityDialog.propTypes = {
+NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired
 }
-export default NewEntityDialog;
+export default NewLinkedDataEntityDialog;

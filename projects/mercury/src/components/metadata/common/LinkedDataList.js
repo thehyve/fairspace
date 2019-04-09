@@ -1,9 +1,9 @@
 import React from "react";
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
 
-import MetadataLink from "./MetadataLink";
+import LinkedDataLink from "./LinkedDataLink";
 
-const metaList = ({items = []}) => (
+const linkedDataList = ({items = []}) => (
     <Paper>
         <Table>
             <TableHead>
@@ -24,9 +24,9 @@ const metaList = ({items = []}) => (
                                 <a href={type}> {typeLabel} </a>
                             </TableCell>
                             <TableCell>
-                                <MetadataLink uri={id}>
+                                <LinkedDataLink uri={id}>
                                     {label}
-                                </MetadataLink>
+                                </LinkedDataLink>
                             </TableCell>
                         </TableRow>
                     ))
@@ -36,4 +36,4 @@ const metaList = ({items = []}) => (
     </Paper>
 );
 
-export default metaList;
+export default linkedDataList;

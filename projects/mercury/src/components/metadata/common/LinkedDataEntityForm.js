@@ -5,10 +5,10 @@ import {Fab, Grid, List, Paper} from '@material-ui/core';
 import {ErrorMessage, LoadingInlay} from "../../common";
 import ErrorDialog from "../../common/ErrorDialog";
 
-import MetaEntityHeader from './MetaEntityHeader';
-import MetadataProperty from "./MetadataProperty";
+import LinkedDataEntityHeader from './LinkedDataEntityHeader';
+import LinkedDataProperty from "./LinkedDataProperty";
 
-export class MetaEntityForm extends React.Component {
+export class LinkedDataEntityForm extends React.Component {
     state = {
         propertiesWithUpdatedValues: {}
     };
@@ -109,7 +109,7 @@ export class MetaEntityForm extends React.Component {
                 <List dense>
                     {
                         propertiesWithChanges.map((p) => (
-                            <MetadataProperty
+                            <LinkedDataProperty
                                 editable={editable && p.editable}
                                 subject={subject}
                                 key={subject + p.key}
@@ -126,7 +126,7 @@ export class MetaEntityForm extends React.Component {
 
         return showHeader ? (
             <>
-                <MetaEntityHeader label={label} typeInfo={typeInfo} />
+                <LinkedDataEntityHeader label={label} typeInfo={typeInfo} />
                 <Paper style={{paddingLeft: 20}}>
                     {entity}
                 </Paper>
@@ -135,7 +135,7 @@ export class MetaEntityForm extends React.Component {
     }
 }
 
-MetaEntityForm.propTypes = {
+LinkedDataEntityForm.propTypes = {
     updateEntity: PropTypes.func.isRequired,
     fetchShapes: PropTypes.func,
     fetchData: PropTypes.func,
@@ -152,9 +152,9 @@ MetaEntityForm.propTypes = {
     properties: PropTypes.array,
 };
 
-MetaEntityForm.defaultProps = {
+LinkedDataEntityForm.defaultProps = {
     fetchShapes: () => {},
     fetchData: () => {}
 };
 
-export default MetaEntityForm;
+export default LinkedDataEntityForm;

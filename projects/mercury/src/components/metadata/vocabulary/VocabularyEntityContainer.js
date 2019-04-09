@@ -8,7 +8,7 @@ import {
     isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
 import {getTypeInfo, isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
-import {MetaEntityForm} from "../common/MetaEntityForm";
+import {LinkedDataEntityForm} from "../common/LinkedDataEntityForm";
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
@@ -46,4 +46,4 @@ const mapDispatchToProps = {
     fetchData: fetchMetadataVocabularyIfNeeded
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MetaEntityForm);
+export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataEntityForm);

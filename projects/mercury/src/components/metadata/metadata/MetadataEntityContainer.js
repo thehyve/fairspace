@@ -8,7 +8,7 @@ import {
     isMetadataPending
 } from "../../../reducers/cache/jsonLdBySubjectReducers";
 import {hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
-import MetaEntityForm from "../common/MetaEntityForm";
+import LinkedDataEntityForm from "../common/LinkedDataEntityForm";
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
@@ -46,4 +46,4 @@ const mapDispatchToProps = {
     updateEntity: metadataActions.updateEntity
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(MetaEntityForm);
+export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataEntityForm);

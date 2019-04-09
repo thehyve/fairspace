@@ -5,7 +5,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import {Fab, List} from '@material-ui/core';
 
-import MetaEntityForm from "./MetaEntityForm";
+import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import Vocabulary from "../../../services/Vocabulary";
 import Config from "../../../services/Config/Config";
 
@@ -43,7 +43,7 @@ describe('MetaEntityForm', () => {
             }
         ];
         const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-        const wrapper = shallow(<MetaEntityForm
+        const wrapper = shallow(<LinkedDataEntityForm
             properties={metadata}
             subject={subject}
         />);
@@ -69,7 +69,7 @@ describe('MetaEntityForm', () => {
             iri: "http://fairspace.com/iri/collections/1"
         };
 
-        const wrapper = shallow(<MetaEntityForm
+        const wrapper = shallow(<LinkedDataEntityForm
             properties={metadata}
             editable
             subject={collection.iri}
@@ -94,7 +94,7 @@ describe('MetaEntityForm', () => {
 
         const fetchVocabulary = jest.fn();
         const fetchMetadata = jest.fn();
-        mount(<MetaEntityForm
+        mount(<LinkedDataEntityForm
             subject="http://example.com/john"
             properties={[]}
             store={store}
@@ -107,13 +107,13 @@ describe('MetaEntityForm', () => {
     });
 
     it('updates state properly', () => {
-        const wrapper = shallow(<MetaEntityForm subject="http://example.com/john" properties={[]} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
         wrapper.instance().updateState('key', 'value');
         expect(wrapper.state('propertiesWithUpdatedValues')).toEqual({key: 'value'});
     });
 
     it('handleChange as update and proper state update', () => {
-        const wrapper = shallow(<MetaEntityForm subject="http://example.com/john" properties={[]} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
         const property = {
             key: "propert-key",
             values: [{
@@ -135,7 +135,7 @@ describe('MetaEntityForm', () => {
 
 
     it('handleChange as add new and proper state update', () => {
-        const wrapper = shallow(<MetaEntityForm subject="http://example.com/john" properties={[]} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
         const property = {
             key: "propert-key",
             values: [],
@@ -154,7 +154,7 @@ describe('MetaEntityForm', () => {
     });
 
     it('gives the correct state of pending changes', () => {
-        const wrapper = shallow(<MetaEntityForm subject="http://example.com/john" properties={[]} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
         expect(wrapper.instance().anyPendingChanges()).toBe(false);
         const state = {propertiesWithUpdatedValues: {key: 'value'}};
         wrapper.setState(state);
@@ -164,7 +164,7 @@ describe('MetaEntityForm', () => {
 
     it('makes call to updateEntity and reset changes after submission', (done) => {
         const updateEntity = jest.fn(() => Promise.resolve());
-        const wrapper = mount(<MetaEntityForm subject="http://example.com/john" properties={[]} updateEntity={updateEntity} />);
+        const wrapper = mount(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} updateEntity={updateEntity} />);
         const state = {propertiesWithUpdatedValues: {key: 'value'}};
         wrapper.setState(state);
         wrapper.find(Fab).simulate('click');

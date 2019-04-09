@@ -2,12 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import {Button} from "@material-ui/core";
-import ShapeChooserDialog from "./ShapeChooserDialog";
+import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
 import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../../common";
-import MetaList from './MetaList';
-import NewEntityDialog from "./NewEntityDialog";
+import LinkedDataList from './LinkedDataList';
+import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
 
-class MetaBrowser extends React.Component {
+class LinkedDataBrowser extends React.Component {
     static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
 
     static CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
@@ -31,13 +31,13 @@ class MetaBrowser extends React.Component {
     startCreating = (e) => {
         e.stopPropagation();
 
-        this.setState({creationState: MetaBrowser.CREATION_STATE_CHOOSE_SHAPE});
+        this.setState({creationState: LinkedDataBrowser.CREATION_STATE_CHOOSE_SHAPE});
     };
 
     chooseShape = (shape) => {
         this.setState({
             shape,
-            creationState: MetaBrowser.CREATION_STATE_CREATE_ENTITY
+            creationState: LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY
         });
     };
 
@@ -88,27 +88,27 @@ class MetaBrowser extends React.Component {
                     Create
                 </Button>
 
-                <ShapeChooserDialog
-                    open={this.state.creationState === MetaBrowser.CREATION_STATE_CHOOSE_SHAPE}
+                <LinkedDataShapeChooserDialog
+                    open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CHOOSE_SHAPE}
                     shapes={this.props.shapes}
                     onChooseShape={this.chooseShape}
                     onClose={this.closeDialog}
                 />
-                <NewEntityDialog
-                    open={this.state.creationState === MetaBrowser.CREATION_STATE_CREATE_ENTITY}
+                <NewLinkedDataEntityDialog
+                    open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
                     shape={this.state.shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}
                 />
 
-                {entities && entities.length > 0 ? <MetaList items={entities} /> : null}
+                {entities && entities.length > 0 ? <LinkedDataList items={entities} /> : null}
                 <LoadingOverlay loading={this.state.creatingMetadataEntity} />
             </>
         );
     }
 }
 
-MetaBrowser.propTypes = {
+LinkedDataBrowser.propTypes = {
     fetch: PropTypes.func.isRequired,
     fetchShapes: PropTypes.func.isRequired,
     create: PropTypes.func.isRequired,
@@ -119,4 +119,4 @@ MetaBrowser.propTypes = {
     entities: PropTypes.array
 };
 
-export default MetaBrowser;
+export default LinkedDataBrowser;

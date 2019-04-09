@@ -8,7 +8,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import ValueComponentFactory from "../values/ValueComponentFactory";
 import * as constants from '../../../constants';
 
-class MetadataProperty extends React.Component {
+class LinkedDataProperty extends React.Component {
     state = {
         hoveredIndex: null
     };
@@ -86,7 +86,7 @@ class MetadataProperty extends React.Component {
 
         // The edit component should not actually allow editing the value if editable is set to false
         // or if the property contains settings that disallow editing existing values
-        const disableEditing = !editable || MetadataProperty.disallowEditingOfExistingValues(property);
+        const disableEditing = !editable || LinkedDataProperty.disallowEditingOfExistingValues(property);
         const ValueComponent = disableEditing
             ? ValueComponentFactory.readOnlyComponent()
             : ValueComponentFactory.editComponent(property);
@@ -120,8 +120,8 @@ class MetadataProperty extends React.Component {
     }
 }
 
-MetadataProperty.defaultProps = {
+LinkedDataProperty.defaultProps = {
     onChange: () => {}
 };
 
-export default MetadataProperty;
+export default LinkedDataProperty;
