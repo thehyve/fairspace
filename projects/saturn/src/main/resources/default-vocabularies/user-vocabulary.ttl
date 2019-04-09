@@ -6,19 +6,36 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/#> .
-@prefix osiris: <http://osiris.fairspace.io/ontology/#> .
-@prefix icdo3: <http://icdo3.fairspace.io/ontology/#> .
-@prefix fhir: <http://hl7.org/fhir/STU3/#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix osiris: <http://osiris.fairspace.io/ontology#> .
+@prefix icdo3: <http://icdo3.fairspace.io/ontology#> .
+@prefix fhir: <http://hl7.org/fhir/STU3/> .
 
 ########################
 ###   User Shapes    ###
 ########################
 
+## Augmented system class shapes
+fs:FileShape sh:property
+    fs:aboutPersonShape,
+    fs:aboutMaterialShape,
+    fs:associatedAnalysisShape .
+
+fs:DirectoryShape sh:property
+    fs:aboutPersonShape,
+    fs:aboutMaterialShape,
+    fs:associatedAnalysisShape .
+
+fs:CollectionShape sh:property
+    fs:aboutPersonShape,
+    fs:aboutMaterialShape,
+    fs:partOfProjectShape .
+
+
 ## User class Shapes
 
 foaf:PersonShape a fs:ClassShape ;
-    sh:closed true ;
+    sh:closed false ;
     sh:description "A person that is subject of research." ;
     sh:name "Person" ;
     sh:targetClass foaf:Person ; 
@@ -33,7 +50,7 @@ foaf:PersonShape a fs:ClassShape ;
         rdfs:commentShape .
 
 fs:PersonConsentShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "A research consent given by person." ;
     sh:name "Person Consent" ;
     sh:targetClass fs:PersonConsent ; 
@@ -46,7 +63,7 @@ fs:PersonConsentShape a fs:ClassShape ;
         rdfs:commentShape .
 
 fs:ResearchProjectShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "A research project." ;
     sh:name "Research Project" ;
     sh:targetClass fs:ResearchProject ; 
@@ -61,7 +78,7 @@ fs:ResearchProjectShape a fs:ClassShape ;
         rdfs:commentShape .
 
 osiris:TumorPathologyEventShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "Description for osiris:TumorPathologyEvent" ;
     sh:name "Tumor Pathology Event" ;
     sh:targetClass osiris:TumorPathologyEvent ; 
@@ -84,7 +101,7 @@ osiris:TumorPathologyEventShape a fs:ClassShape ;
         rdfs:commentShape .
 
 osiris:BiologicalSampleShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "Description for osiris:BiologicalSample" ;
     sh:name "Biological Sample" ;
     sh:targetClass osiris:BiologicalSample ; 
@@ -104,7 +121,7 @@ osiris:BiologicalSampleShape a fs:ClassShape ;
         rdfs:commentShape .
 
 fs:AnalysisShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "Description for fs:Analysis" ;
     sh:name "Analysis" ;
     sh:targetClass fs:Analysis ; 
@@ -124,7 +141,91 @@ fs:AnalysisShape a fs:ClassShape ;
         rdfs:labelShape,
         rdfs:commentShape .
 
+fs:WidgetMaster a fs:Class .
+fs:WidgetMasterShape a fs:ClassShape ;
+    sh:closed false ; 
+    sh:description "A widget is an element of a graphical user interface (GUI) that displays information or provides a specific way for a user to interact with the operating system or an application." ;
+    sh:name "Master of widgets" ;
+    sh:targetClass fs:WidgetMaster ; 
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:showInCatalog true ;
+    sh:property
+        fs:relatesToWidgetShape,
+        fs:dateWidgetShape,
+        fs:dateTimeWidgetShape,
+        fs:multiLineStringWidgetShape,
+        fs:integerLongWidgetShape,
+        fs:integerWidgetShape,
+        fs:booleanWidgetShape,
+        fs:booleanX4WidgetShape,
+        fs:fixedDropdownWidgetShape,
+        rdfs:labelShape,
+        rdfs:commentShape .
+
 ## User property shapes
+
+fs:dateWidget a rdf:Property .
+fs:dateWidgetShape a fs:PropertyShape ; 
+    sh:name "A single date" ;
+    sh:description "A single date." ;
+    sh:datatype xsd:date ;
+    sh:maxCount 1 ;
+    sh:path fs:dateWidget .
+
+fs:dateTimeWidget a rdf:Property .
+fs:dateTimeWidgetShape a fs:PropertyShape ; 
+    sh:name "Date and times" ;
+    sh:description "A bunch of date and times." ;
+    sh:datatype xsd:dateTime ;
+    sh:path fs:dateTimeWidget .
+
+fs:multiLineStringWidget a rdf:Property .
+fs:multiLineStringWidgetShape a fs:PropertyShape ; 
+    sh:name "Multi line string" ;
+    sh:description "Can do newlines, but max length of 500." ;
+    sh:datatype xsd:string ;
+    sh:maxLength 500 ;
+    sh:path fs:multiLineStringWidget .
+
+fs:integerLongWidget a rdf:Property .
+fs:integerLongWidgetShape a fs:PropertyShape ; 
+    sh:name "Integer" ;
+    sh:description "A single integer (long)." ;
+    sh:datatype xsd:long ;
+    sh:maxCount 1 ;
+    sh:path fs:integerLongWidget .
+
+fs:integerWidget a rdf:Property .
+fs:integerWidgetShape a fs:PropertyShape ; 
+    sh:name "Integer" ;
+    sh:description "A single integer." ;
+    sh:datatype xsd:integer ;
+    sh:maxCount 1 ;
+    sh:path fs:integerWidget .
+
+fs:booleanWidget a rdf:Property .
+fs:booleanWidgetShape a fs:PropertyShape ; 
+    sh:name "Boolean" ;
+    sh:description "On or off single." ;
+    sh:datatype xsd:boolean ;
+    sh:maxCount 1 ;
+    sh:path fs:booleanWidget .
+
+fs:booleanX4Widget a rdf:Property .
+fs:booleanX4WidgetShape a fs:PropertyShape ; 
+    sh:name "Boolean X4" ;
+    sh:description "On or off 4 times." ;
+    sh:datatype xsd:boolean ;
+    sh:maxCount 4 ;
+    sh:path fs:booleanX4Widget .
+
+fs:fixedDropdownWidget a rdf:Property .
+fs:fixedDropdownWidgetShape a fs:PropertyShape ; 
+    sh:name "Fixed set of values (pick 2)" ;
+    sh:description "A set of 2 values from a fixed list." ;
+    sh:in ( "E" "A" "D" "G" "B" "E" ) ; 
+    sh:maxCount 2 ;
+    sh:path fs:fixedDropdownWidget .
 
 fs:projectCodeShape a fs:PropertyShape ;
     sh:name "Project Code" ;
@@ -356,6 +457,13 @@ fs:NumberOfBreakPointsShape a fs:PropertyShape ;
     sh:path fs:NumberOfBreakPoints . 
 
 ## User relation shapes
+
+fs:relatesToWidget a rdf:Property .
+fs:relatesToWidgetShape a fs:RelationShape ; 
+    sh:name "Relates to widget master" ;
+    sh:description "Relates to other widget masters" ;
+    sh:class fs:WidgetMaster ; 
+    sh:path fs:relatesToWidget .
 
 fs:derivesFromShape a fs:RelationShape ; 
     sh:name "Derives from" ;

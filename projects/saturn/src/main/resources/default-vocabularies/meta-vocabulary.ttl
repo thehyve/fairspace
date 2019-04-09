@@ -16,7 +16,7 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ; 
-        sh:name "Class name"
+        sh:name "Class shape name"
     ], [
         # This means every value for predicate sh:property should have this type.
         sh:class sh:PropertyShape ;
@@ -25,14 +25,15 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:name "Properties" ; 
         sh:description "List of all properties and relations for this class." 
     ], [
-        sh:value true ;
+        sh:value false ;
         sh:path sh:closed ; 
-        sh:description "sh:closed should be true."
+        sh:description "sh:closed should be false."
     ], [
         sh:class fs:Class ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:targetClass ; 
+        sh:name "Target class" ;
         sh:description "IRI of the class this shape constrains."
     ], [
         sh:datatype xsd:string ;
@@ -42,10 +43,23 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:name "Class description"
     ], [
         sh:datatype xsd:boolean ;
+        sh:path fs:fixedShape ;
+        fs:machineOnly true ;
+        sh:name "Fixed shape" ;
+        sh:description "If this is true, a user can not make changes to this shape definiton, except for properties not included in fs:systemProperties."
+    ], [
+        sh:path fs:systemProperties ;
+        fs:machineOnly true ;
+        sh:name "System properties" ;
+        sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties."
+    ], [
+        sh:datatype xsd:boolean ;
         sh:maxCount 1 ;
         sh:path fs:showInCatalog ;
-        sh:name "Show in catalog"
+        sh:name "Show in catalog" ;
+        sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
+    fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
 
@@ -63,10 +77,14 @@ fs:PropertyShapeMeta a sh:NodeShape ;
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
+        sh:maxInclusive 1 ;
+        sh:lessThanOrEquals sh:maxCount ;
         sh:name "Minimum number of values"
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxCount ;
+        sh:greaterThanOrEquals sh:minCount ;
+        sh:minInclusive 1 ;
         sh:name "Maximum number of values"
     ], [
         sh:class rdf:List ;
@@ -92,10 +110,28 @@ fs:PropertyShapeMeta a sh:NodeShape ;
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:path
+        sh:path sh:path ;
+        sh:nodeKind sh:IRI ;
+        sh:name "Property identifier"
     ], [
-        sh:path fs:machineOnly
+        sh:datatype xsd:boolean ;
+        sh:path fs:machineOnly ;
+        sh:name "Machine edits only" ;
+        sh:description "Users should not be able to change the value of any value node of this shape."
+    ], [
+        sh:datatype xsd:boolean ;
+        sh:path fs:fixedShape ;
+        fs:machineOnly true ; 
+        sh:name "Fixed shape" ;
+        sh:description "If this is true, a user can not make changes to this shape definiton."
     ] ;
+    sh:or ( 
+        [ sh:path sh:in ; 
+          sh:minCount 1  ] 
+        [ sh:path sh:datatype ; 
+          sh:minCount 1  ]
+      ) ; 
+    fs:showInCatalog true ;
     sh:targetClass fs:PropertyShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
 
@@ -106,7 +142,15 @@ fs:RelationShapeMeta a sh:NodeShape ;
     sh:property [
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
+        sh:maxInclusive 1 ;
+        sh:lessThanOrEquals sh:maxCount ;
         sh:name "Minimum number of values"
+    ], [
+        sh:datatype xsd:integer ;
+        sh:path sh:maxCount ;
+        sh:minInclusive 1 ;
+        sh:greaterThanOrEquals sh:minCount ;
+        sh:name "Maximum number of values"
     ], [
         sh:class fs:Class ;
         sh:path sh:class ;
@@ -116,26 +160,34 @@ fs:RelationShapeMeta a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:description ;
-        sh:name "Property description"
+        sh:name "Relation description"
     ], [
         sh:path sh:message
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:path
+        sh:path sh:path ;
+        sh:nodeKind sh:IRI ;
+        sh:name "Relation identifier"
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ;
-        sh:name "Property name"
+        sh:name "Relation name"
     ], [
-        sh:datatype xsd:integer ;
-        sh:path sh:maxCount ;
-        sh:name "Maximum number of values"
+        sh:datatype xsd:boolean ;
+        sh:path fs:machineOnly ;
+        sh:name "Machine edits only" ;
+        sh:description "Users should not be able to change the value of any value node of this shape."
     ], [
-        sh:path fs:machineOnly
+        sh:datatype xsd:boolean ;
+        sh:path fs:fixedShape ;
+        fs:machineOnly true ; 
+        sh:name "Fixed shape" ;
+        sh:description "If this is true, a user can not make changes to this shape definiton."
     ] ;
+    fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .

@@ -7,21 +7,24 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.AccessInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.jena.vocabulary.RDFS;
+
+import static io.fairspace.saturn.vocabulary.FS.*;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-@RDFType("http://fairspace.io/ontology#Collection")
+@RDFType(COLLECTION_URI)
 public class Collection extends LifecycleAwarePersistentEntity implements AccessInfo {
-    @RDFProperty(value = "http://www.w3.org/2000/01/rdf-schema#label", required = true)
+    @RDFProperty(value = RDFS.uri + "label", required = true)
     private String name;
 
-    @RDFProperty(value = "http://www.w3.org/2000/01/rdf-schema#comment", required = true)
+    @RDFProperty(value = RDFS.uri + "comment", required = true)
     private String description;
 
-    @RDFProperty(value = "http://fairspace.io/ontology#filePath", required = true)
+    @RDFProperty(value = FILE_PATH_URI, required = true)
     private String location;
 
-    @RDFProperty(value = "http://fairspace.io/ontology#collectionType", required = true)
+    @RDFProperty(value = COLLECTION_TYPE_URI, required = true)
     private String type;
 
     private Access access;

@@ -4,30 +4,25 @@ import MaterialReactSelect from "../../common/MaterialReactSelect";
 import {getLabel} from "../../../utils/metadataUtils";
 import {compareBy} from "../../../utils/comparisionUtils";
 
-function Dropdown({
-    entities, property, onSave, ...otherProps
-}) {
+function Dropdown({entities, property, onSave, onChange, ...otherProps}) {
     // Transform the entities to ensure a label is present
     const options = entities.map((entity) => {
         const id = entity['@id'];
-        const label = getLabel(entity);
         const value = entity['@value'];
+        const label = getLabel(entity) || value;
+        const disabled = property.values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
 
-        const option = {
-            disabled: property.values.some(v => (v.id && v.id === id) || (v.value && v.value === value)),
-            label: label || value,
+        return {
+            disabled,
+            label,
             id,
             value
         };
-
-        return option;
-    });
-
-    options.sort(compareBy('disabled'));
+    }).sort(compareBy('disabled'));
 
     // Prevent saving any labels used for UI
     const handleSave = (selected) => {
-        onSave({id: selected.id, label: selected.label, value: selected.value});
+        onChange({id: selected.id, label: selected.label, value: selected.value});
     };
 
     return (

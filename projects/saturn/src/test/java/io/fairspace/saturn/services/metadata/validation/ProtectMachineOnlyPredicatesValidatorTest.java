@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.rdf.Vocabulary;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -18,13 +19,12 @@ import java.util.List;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProtectMachineOnlyPredicatesValidatorTest {
-    private static final Property MACHINE_ONLY_PROPERTY = createProperty("http://fairspace.io/ontology#filePath");
+    private static final Property MACHINE_ONLY_PROPERTY = FS.filePath;
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
@@ -37,7 +37,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     private ProtectMachineOnlyPredicatesValidator validator;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         validator = new ProtectMachineOnlyPredicatesValidator(vocabulary);
     }
 
@@ -48,7 +48,6 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
 
         // An empty model should pass
         Model testModel = createDefaultModel();
-        assertFalse(validator.containsMachineOnlyPredicates(testModel));
 
         // A machine-only property may be used as subject or object
         testModel.add(P1, RDF.type, RDF.Property);
@@ -58,7 +57,8 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         testModel.add(S1, P2, S2);
         testModel.add(S2, P2, S1);
 
-        assertFalse(validator.containsMachineOnlyPredicates(testModel));
+        var result = validator.validate(testModel, createDefaultModel());
+        assertTrue(result.isValid());
     }
 
     @Test
@@ -78,7 +78,9 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         testModel.add(S1, P2, S3);
         testModel.add(S3, P2, S2);
 
-        assertTrue(validator.containsMachineOnlyPredicates(testModel));
+        var result = validator.validate(testModel, createDefaultModel());
+        assertFalse(result.isValid());
+        assertEquals("The given model contains a machine-only predicate http://fairspace.io/ontology#filePath.", result.getMessage());
     }
 
     @Test
@@ -97,13 +99,13 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         testModel.add(S1, P2, S3);
         testModel.add(S3, P2, S2);
 
-        assertFalse(validator.containsMachineOnlyPredicates(testModel));
+        var result = validator.validate(testModel, createDefaultModel());
+        assertTrue(result.isValid());
     }
 
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyModel() {
-        assertFalse(validator.containsMachineOnlyPredicates(createDefaultModel()));
-        assertFalse(validator.containsMachineOnlyPredicates(null));
+        assertTrue(validator.validate(createDefaultModel(), createDefaultModel()).isValid());
     }
 
 }

@@ -6,6 +6,7 @@ import org.apache.jena.graph.Node;
 
 import java.time.Instant;
 
+import static io.fairspace.saturn.vocabulary.FS.*;
 import static lombok.AccessLevel.PACKAGE;
 
 /**
@@ -14,24 +15,21 @@ import static lombok.AccessLevel.PACKAGE;
 @Getter
 @Setter(PACKAGE)
 public abstract class LifecycleAwarePersistentEntity extends PersistentEntity {
-    public static final String DATE_CREATED_IRI = "http://fairspace.io/ontology#dateCreated";
-    public static final String CREATED_BY_IRI = "http://fairspace.io/ontology#createdBy";
-
-    @RDFProperty(value = DATE_CREATED_IRI, required = true)
+    @RDFProperty(value = DATE_CREATED_URI, required = true)
     private Instant dateCreated;
 
-    @RDFProperty(value = CREATED_BY_IRI, required = true)
+    @RDFProperty(value = CREATED_BY_URI, required = true)
     private Node createdBy;
 
-    @RDFProperty(value = "http://fairspace.io/ontology#dateModified", required = true)
+    @RDFProperty(value = DATE_MODIFIED_URI, required = true)
     private Instant dateModified;
 
-    @RDFProperty(value = "http://fairspace.io/ontology#modifiedBy", required = true)
+    @RDFProperty(value = MODIFIED_BY_URI, required = true)
     private Node modifiedBy;
 
-    @RDFProperty("http://fairspace.io/ontology#dateDeleted")
+    @RDFProperty(DATE_DELETED_URI)
     private Instant dateDeleted;
 
-    @RDFProperty("http://fairspace.io/ontology#deletedBy")
+    @RDFProperty(DELETED_BY_URI)
     private Node deletedBy;
 }
