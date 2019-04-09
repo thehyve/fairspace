@@ -72,7 +72,8 @@ public class App {
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)),
                 new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
-                new SystemVocabularyProtectingValidator()
+                new SystemVocabularyProtectingValidator(),
+                new MetadataAndVocabularyConsistencyValidator(rdf)
         );
         var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);

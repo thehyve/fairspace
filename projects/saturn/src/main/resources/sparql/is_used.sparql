@@ -1,0 +1,5 @@
+# 0 - iri
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+ASK { { %1$s ?p1 ?o1 } UNION { ?s2 %1$s ?o2 } UNION { ?s3 ?p3 %1$s } }
