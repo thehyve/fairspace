@@ -18,7 +18,7 @@ public class Vocabularies {
     public static final Node META_VOCABULARY_GRAPH_URI = createURI(FS.NS + "meta-vocabulary");
     public static final Node VOCABULARY_GRAPH_URI = generateIri("vocabulary");
 
-    private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "system-vocabulary-backup";
+    private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
 
     private final RDFConnection rdf;
 
