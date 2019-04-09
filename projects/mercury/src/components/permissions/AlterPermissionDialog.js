@@ -94,7 +94,7 @@ const getNoOptionMessage = (users) => {
         if (users.pending) {
             noOptionMessage = 'Loading ..';
         } else if (users.error) {
-            noOptionMessage = 'Error: Cannot fetch users.';
+            noOptionMessage = 'Error: Cannot fetchLinkedData users.';
         }
     }
     return noOptionMessage;

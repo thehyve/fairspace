@@ -27,7 +27,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetch: () => dispatch(metadataActions.fetchAllEntitiesIfNeeded()),
+    fetchLinkedData: () => dispatch(metadataActions.fetchAllEntitiesIfNeeded()),
     fetchShapes: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded),
     create: (shape, id) => dispatch(metadataActions.createMetadataEntity(shape, id))
         .then((response) => {

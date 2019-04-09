@@ -20,7 +20,7 @@ class LinkedDataBrowser extends React.Component {
     unMounted = false;
 
     componentDidMount() {
-        this.props.fetch();
+        this.props.fetchLinkedData();
         this.props.fetchShapes();
     }
 
@@ -109,7 +109,7 @@ class LinkedDataBrowser extends React.Component {
 }
 
 LinkedDataBrowser.propTypes = {
-    fetch: PropTypes.func.isRequired,
+    fetchLinkedData: PropTypes.func.isRequired,
     fetchShapes: PropTypes.func.isRequired,
     create: PropTypes.func.isRequired,
 

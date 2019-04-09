@@ -32,7 +32,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetch: () => dispatch(vocabularyActions.fetchAllVocabularyEntitiesIfNeeded()),
+    fetchLinkedData: () => dispatch(vocabularyActions.fetchAllVocabularyEntitiesIfNeeded()),
     fetchShapes: () => dispatch(vocabularyActions.fetchMetaVocabularyIfNeeded()),
     create: (shape, id) => dispatch(vocabularyActions.createVocabularyEntity(shape, id))
         .then((response) => {

@@ -27,7 +27,7 @@ describe('<SearchPage />', () => {
         expect(search.mock.calls.length).toEqual(1);
     });
 
-    it('should fetch vocabulary on component first mount', () => {
+    it('should fetchLinkedData vocabulary on component first mount', () => {
         const fetchVocabularyIfNeeded = jest.fn();
         shallow(<SearchPage fetchVocabularyIfNeeded={fetchVocabularyIfNeeded} location={{search: ''}} performSearch={() => {}} />);
         expect(fetchVocabularyIfNeeded.mock.calls.length).toEqual(1);

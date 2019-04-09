@@ -18,8 +18,8 @@ beforeAll(() => {
     return Config.init();
 });
 
-describe('fetch metadata', () => {
-    it('should fetch data if nothing is present', () => {
+describe('fetchLinkedData metadata', () => {
+    it('should fetchLinkedData data if nothing is present', () => {
         const store = mockStore({});
 
         window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify([{name: 'collection1'}]))));
@@ -35,7 +35,7 @@ describe('fetch metadata', () => {
             });
     });
 
-    it('should not fetch data if data present', () => {
+    it('should not fetchLinkedData data if data present', () => {
         const store = mockStore({
             cache: {
                 jsonLdBySubject: {
@@ -53,7 +53,7 @@ describe('fetch metadata', () => {
             });
     });
 
-    it('should fetch data if an the data was invalidated', () => {
+    it('should fetchLinkedData data if an the data was invalidated', () => {
         const store = mockStore({
             cache: {
                 jsonLdBySubject: {
@@ -78,7 +78,7 @@ describe('fetch metadata', () => {
             });
     });
 
-    it('should not fetch data if already fetching', () => {
+    it('should not fetchLinkedData data if already fetching', () => {
         const store = mockStore({
             cache: {
                 jsonLdBySubject: {
