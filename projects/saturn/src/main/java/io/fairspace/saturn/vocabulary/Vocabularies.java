@@ -17,6 +17,7 @@ public class Vocabularies {
     public static final Model SYSTEM_VOCABULARY = FileManager.get().loadModel("default-vocabularies/system-vocabulary.ttl");
     public static final Node META_VOCABULARY_GRAPH_URI = createURI(FS.NS + "meta-vocabulary");
     public static final Node VOCABULARY_GRAPH_URI = generateIri("vocabulary");
+
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "system-vocabulary-backup";
 
     private final RDFConnection rdf;
@@ -30,10 +31,9 @@ public class Vocabularies {
             if (!SYSTEM_VOCABULARY.isIsomorphicWith(oldSystemVocabulary)) {
                 var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
 
-                var userVocabulary = oldVocabulary.difference(oldSystemVocabulary);
-                if (userVocabulary.isEmpty()) {
-                    userVocabulary = FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", generateIri("").getURI(), null);
-                }
+                var userVocabulary = oldVocabulary.isEmpty()
+                        ? FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", generateIri("").getURI(), null)
+                        : oldVocabulary.difference(oldSystemVocabulary);
 
                 rdf.put(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));
                 rdf.put(SYSTEM_VOCABULARY_GRAPH_BACKUP, SYSTEM_VOCABULARY);
@@ -46,5 +46,4 @@ public class Vocabularies {
         rdf.querySelect(storedQuery("machine_only_properties", vocabularyGraphUri), processor);
         return processor.getValues();
     }
-
 }
