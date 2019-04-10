@@ -11,9 +11,6 @@ import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
  * Protects the system vocabulary from modification except to addition of new properties to open class shapes
  */
 public class SystemVocabularyProtectingValidator implements MetadataRequestValidator {
-
-    private static final Property CLOSED = createProperty(SH.NS + "closed");
-
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
         var result = ValidationResult.VALID;
@@ -28,15 +25,11 @@ public class SystemVocabularyProtectingValidator implements MetadataRequestValid
         for (var it = modelToAdd.listStatements(); it.hasNext(); ) {
             var statement = it.nextStatement();
             if (SYSTEM_VOCABULARY.contains(statement.getSubject(), null, (RDFNode) null)
-                    && (!statement.getPredicate().equals(SH.property) || isClosed(statement.getSubject()))) {
+                    && !statement.getPredicate().equals(SH.property)) {
                 result = result.merge(new ValidationResult("Cannot add a statement modifying a shape from the system vocabulary: " + statement));
             }
         }
 
         return result;
-    }
-
-    private static boolean isClosed(Resource subject) {
-        return SYSTEM_VOCABULARY.contains(subject, CLOSED, createTypedLiteral(true));
     }
 }
