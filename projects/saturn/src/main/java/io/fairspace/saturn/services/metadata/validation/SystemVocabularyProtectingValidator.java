@@ -21,7 +21,7 @@ public class SystemVocabularyProtectingValidator implements MetadataRequestValid
         for (var it = modelToRemove.listStatements(); it.hasNext(); ) {
             var statement = it.nextStatement();
             if (SYSTEM_VOCABULARY.contains(statement)) {
-                result = result.merge(reportStatement(statement));
+                result = result.merge(new ValidationResult("Cannot remove a statement from the system vocabulary: " + statement));
             }
         }
 
@@ -29,7 +29,7 @@ public class SystemVocabularyProtectingValidator implements MetadataRequestValid
             var statement = it.nextStatement();
             if (SYSTEM_VOCABULARY.contains(statement.getSubject(), null, (RDFNode) null)
                     && (!statement.getPredicate().equals(SH.property) || isClosed(statement.getSubject()))) {
-                result = result.merge(reportStatement(statement));
+                result = result.merge(new ValidationResult("Cannot add a statement modifying a shape from the system vocabulary: " + statement));
             }
         }
 
@@ -38,9 +38,5 @@ public class SystemVocabularyProtectingValidator implements MetadataRequestValid
 
     private static boolean isClosed(Resource subject) {
         return SYSTEM_VOCABULARY.contains(subject, CLOSED, createTypedLiteral(true));
-    }
-
-    private ValidationResult reportStatement(Statement statement) {
-        return new ValidationResult("Cannot modify the system vocabulary: " + statement);
     }
 }
