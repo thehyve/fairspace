@@ -8,11 +8,17 @@ class DateTimeValue extends React.Component {
         this.state = {value: props.entry.value || ''};
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.entry.value !== prevProps.entry.value) {
+            this.reset();
+        }
+    }
+
     handleChange = (e) => {
         this.setState({value: e.target.value});
     }
 
-    handleSave = () => {
+    handleBlur = () => {
         this.props.onChange({value: this.delocalize(this.state.value)});
     }
 
@@ -31,8 +37,8 @@ class DateTimeValue extends React.Component {
                 multiline={false}
                 value={this.localize(this.state.value)}
                 type="datetime-local"
-                onChange={this.handleChange.bind}
-                onBlur={this.handleSave.bind}
+                onChange={this.handleChange}
+                onBlur={this.handleBlur}
                 margin="normal"
                 style={{...style, marginTop: 0, width: '100%'}}
             />

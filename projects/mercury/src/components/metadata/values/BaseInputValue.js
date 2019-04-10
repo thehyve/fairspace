@@ -8,11 +8,17 @@ class BaseInputValue extends React.Component {
         this.state = {value: props.entry.value};
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.entry.value !== prevProps.entry.value) {
+            this.reset();
+        }
+    }
+
     handleChange = (e) => {
         this.setState({value: e.target.value});
     }
 
-    handleSave = () => {
+    handleBlur = () => {
         const {onChange, transformValue} = this.props;
         onChange({value: transformValue(this.state.value)});
         this.reset();
@@ -33,7 +39,7 @@ class BaseInputValue extends React.Component {
                 multiline={property.multiLine}
                 value={this.state.value}
                 onChange={this.handleChange}
-                onBlur={this.handleSave}
+                onBlur={this.handleBlur}
                 margin="normal"
                 style={{...style, marginTop: 0, width: '100%'}}
             />

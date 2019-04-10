@@ -8,11 +8,17 @@ class ResourceValue extends React.Component {
         this.state = {value: props.entry.id, oldValue: props.entry.id};
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.entry.value !== prevProps.entry.value) {
+            this.reset();
+        }
+    }
+
     handleChange = (e) => {
         this.setState({value: e.target.value});
     }
 
-    handleSave = () => {
+    handleBlur = () => {
         try {
             this.props.onChange({id: new URL(this.state.value).toString()});
         } catch (e) {
@@ -31,7 +37,7 @@ class ResourceValue extends React.Component {
                 multiline={property.multiLine}
                 value={this.state.value}
                 onChange={this.handleChange}
-                onBlur={this.handleSave}
+                onBlur={this.handleBlur}
                 margin="normal"
                 style={{...style, marginTop: 0, width: '100%'}}
                 type="url"
