@@ -125,7 +125,7 @@ export class LinkedDataEntityForm extends React.Component {
                                     onChange={(value, index) => this.handleChange(p, value, index)}
                                     onAdd={(value) => this.handleAdd(p, value)}
                                     onDelete={(index) => this.handleDelete(p, index)}
-                                    onValidityUpdate={(isValid) => this.handleValidityUpdate(p.key, isValid)}
+                                    onValidityUpdate={({isValid}) => this.handleValidityUpdate(p.key, isValid)}
                                 />
                             ))
                         }

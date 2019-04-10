@@ -99,7 +99,7 @@ class LinkedDataProperty extends React.Component {
     updateErrors = () => {
         const {property, onValidityUpdate} = this.props;
         const errors = Vocabulary.validatePropertyValues(property);
-        onValidityUpdate(!errors || errors.length === 0);
+        onValidityUpdate({isValid: !errors || errors.length === 0});
         this.setState({errors});
     }
 
