@@ -3,7 +3,7 @@ import {mount, shallow} from "enzyme";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
-import {Fab, List} from '@material-ui/core';
+import {Button, List, Grid} from '@material-ui/core';
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import Vocabulary from "../../../services/Vocabulary";
@@ -165,10 +165,10 @@ describe('MetaEntityForm', () => {
     it('makes call to updateEntity and reset changes after submission', (done) => {
         const updateEntity = jest.fn(() => Promise.resolve());
         const vocabulary = new Vocabulary();
-        const wrapper = mount(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} updateEntity={updateEntity} vocabulary={vocabulary} />);
+        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} updateEntity={updateEntity} vocabulary={vocabulary} />);
         const state = {propertiesWithUpdatedValues: {key: 'value'}};
         wrapper.setState(state);
-        wrapper.find(Fab).simulate('click');
+        wrapper.find(Button).simulate('click');
         expect(updateEntity.mock.calls.length).toEqual(1);
         expect(updateEntity.mock.calls[0]).toEqual(['http://example.com/john', {...state.propertiesWithUpdatedValues}, vocabulary]);
         setTimeout(() => {

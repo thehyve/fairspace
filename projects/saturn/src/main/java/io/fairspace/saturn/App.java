@@ -97,7 +97,9 @@ public class App {
         if (!auth.enabled) {
             log.warn("Authentication is disabled");
         }
-        var authenticator = auth.enabled ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm) : new DummyAuthenticator();
+        var authenticator = auth.enabled
+                ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
+                : new DummyAuthenticator(CONFIG.auth.developerRoles);
         fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
 
         fusekiServerBuilder
