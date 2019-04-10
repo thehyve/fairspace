@@ -1,10 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
-import * as PropTypes from "prop-types";
 
-import {generateUuid, getLabel} from "../../utils/metadataUtils";
+import {generateUuid, getLabel} from "../../../utils/metadataUtils";
 
-class NewMetadataEntityDialog extends React.Component {
+class NewLinkedDataEntityDialog extends React.Component {
     state = {
         id: generateUuid()
     };
@@ -52,7 +52,7 @@ class NewMetadataEntityDialog extends React.Component {
                         onClick={this.closeDialog}
                         color="secondary"
                     >
-                        Close
+                        Cancel
                     </Button>
                     <Button
                         onClick={this.createEntity}
@@ -75,9 +75,9 @@ class NewMetadataEntityDialog extends React.Component {
     }
 }
 
-NewMetadataEntityDialog.propTypes = {
+NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
-};
-
-export default NewMetadataEntityDialog;
+    onClose: PropTypes.func.isRequired
+}
+export default NewLinkedDataEntityDialog;

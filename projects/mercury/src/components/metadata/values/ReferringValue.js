@@ -2,7 +2,7 @@ import React from 'react';
 import {isDateTimeProperty} from "../../../utils/metadataUtils";
 import DateTime from "../../common/DateTime";
 import {RESOURCE_URI} from "../../../constants";
-import MetadataLink from "../MetadataLink";
+import LinkedDataLink from "../common/LinkedDataLink";
 
 function linkLabel(link) {
     return link
@@ -22,9 +22,9 @@ const ReferringValue = ({property, entry}) => {
 
     if (entry.id) {
         return (
-            <MetadataLink uri={entry.id}>
+            <LinkedDataLink uri={entry.id}>
                 {displayValue}
-            </MetadataLink>
+            </LinkedDataLink>
         );
     }
     return displayValue;

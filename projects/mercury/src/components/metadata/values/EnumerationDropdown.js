@@ -4,7 +4,7 @@ import Dropdown from "./Dropdown";
 function EnumerationDropdown(props) {
     return (
         <Dropdown
-            entities={props.property.allowedValues}
+            entities={props.property.allowedValues || []}
             {...props}
         />
     );

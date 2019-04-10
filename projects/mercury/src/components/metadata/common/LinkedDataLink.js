@@ -10,15 +10,15 @@ import * as PropTypes from "prop-types";
  * @param props
  * @constructor
  */
-const MetadataLink = (props) => (
+const LinkedDataLink = (props) => (
     props.uri.startsWith(`${window.location.origin}/`)
         ? <Link to={props.uri.replace(window.location.origin, '')}>{props.children}</Link>
         : <a href={props.uri}>{props.children}</a>
 );
 
-MetadataLink.propTypes = {
+LinkedDataLink.propTypes = {
     uri: PropTypes.string.isRequired,
     children: PropTypes.any
 };
 
-export default MetadataLink;
+export default LinkedDataLink;

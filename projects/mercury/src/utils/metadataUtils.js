@@ -163,6 +163,19 @@ export const toJsonLd = (subject, predicate, values, vocabulary = new Vocabulary
     };
 };
 
+/**
+ * Creates a textual description of the type for the given metadata item
+ * @param metadata
+ * @returns {string}
+ */
+export const getTypeInfo = (metadata) => {
+    const typeProp = metadata && metadata.find(prop => prop.key === '@type');
+    const typeValue = (typeProp && typeProp.values && typeProp.values.length && typeProp.values[0]) || {};
+    const {label, comment} = typeValue;
+
+    return (label && comment) ? `${label} - ${comment}` : (label || comment);
+}
+
 export const createIri = (id) => `http://${window.location.hostname}/iri/${id}`;
 
 export const url2iri = (iri) => {
