@@ -7,15 +7,36 @@ import ClearIcon from '@material-ui/icons/Clear';
 
 import ValueComponentFactory from "../values/ValueComponentFactory";
 import * as constants from '../../../constants';
+import Vocabulary from '../../../services/Vocabulary';
 
 class LinkedDataProperty extends React.Component {
-    state = {
-        hoveredIndex: null
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            hoveredIndex: null,
+            errors: []
+        };
+    }
+
+    shouldComponentUpdate(nextProps) {
+        return nextProps.property.values !== this.props.property.values;
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.property.values !== this.props.property.values) {
+            this.updateErrors();
+        }
+    }
 
     setHoveredIndex = (hoveredIndex) => {
         this.setState({hoveredIndex});
     };
+
+    // This is hard to do, because the values within the property are before the change
+    // handleChnage = (value, index) => {
+    //     const errors = Vocabulary.validatePropertyValues(this.props.property);
+    //     this.props.onChange(value, index, errors && errors.length > 0);
+    // }
 
     renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
         const {editable, property, onChange, onDelete, subject} = this.props;
@@ -75,8 +96,20 @@ class LinkedDataProperty extends React.Component {
         );
     };
 
+    updateErrors = () => {
+        const {property, onValidityUpdate} = this.props;
+        const errors = Vocabulary.validatePropertyValues(property);
+        onValidityUpdate(!errors || errors.length === 0);
+        this.setState({errors});
+    }
+
     render() {
         const {editable, property} = this.props;
+        const {errors} = this.state;
+
+        if (errors.length > 0) {
+            console.log({errors});
+        }
 
         // Do not show an add component if no multiples are allowed
         // and there is already a value
@@ -96,6 +129,7 @@ class LinkedDataProperty extends React.Component {
                 <Typography variant="body1" component="label" id={labelId}>
                     {property.label}
                 </Typography>
+                {errors && errors.length > 0 ? errors.map(e => `${e} `) : null}
                 <List dense>
                     {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
                     {canAdd ? this.renderAddComponent(labelId) : null}

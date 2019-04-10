@@ -10,7 +10,8 @@ import LinkedDataProperty from "./LinkedDataProperty";
 
 export class LinkedDataEntityForm extends React.Component {
     state = {
-        propertiesWithUpdatedValues: {}
+        propertiesWithUpdatedValues: {},
+        updatedPropertiesValidity: {}
     };
 
     componentDidMount() {
@@ -71,10 +72,21 @@ export class LinkedDataEntityForm extends React.Component {
 
     anyPendingChanges = () => Object.keys(this.state.propertiesWithUpdatedValues).length !== 0;
 
+    // find any propertyKey within updatedPropertiesValidity with a false value
+    anyInvalidChanges = () => !!Object.keys(this.state.updatedPropertiesValidity)
+        .find(p => !this.state.updatedPropertiesValidity[p]);
+
     shouldShowSubmitButton = () => this.props.editable && this.anyPendingChanges();
 
     resetChanges = () => {
         this.setState({propertiesWithUpdatedValues: {}});
+    }
+
+    handleValidityUpdate = (propertyKey, isValid) => {
+        this.setState(prevState => ({
+            updatedPropertiesValidity:
+                {...prevState.updatedPropertiesValidity, [propertyKey]: isValid}
+        }));
     }
 
     render() {
@@ -113,6 +125,7 @@ export class LinkedDataEntityForm extends React.Component {
                                     onChange={(value, index) => this.handleChange(p, value, index)}
                                     onAdd={(value) => this.handleAdd(p, value)}
                                     onDelete={(index) => this.handleDelete(p, index)}
+                                    onValidityUpdate={(isValid) => this.handleValidityUpdate(p.key, isValid)}
                                 />
                             ))
                         }
@@ -122,7 +135,7 @@ export class LinkedDataEntityForm extends React.Component {
                     <Button
                         onClick={this.handleSubmit}
                         color="primary"
-                        disabled={!this.shouldShowSubmitButton()}
+                        disabled={!this.shouldShowSubmitButton() || this.anyInvalidChanges()}
                         style={{visibility: submitButtonVisibility}}
                     >
                         Update

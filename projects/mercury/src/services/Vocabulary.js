@@ -253,22 +253,23 @@ class Vocabulary {
      * Generates a list entry for a single property, with the values specified
      * @param predicate
      * @param values
-     * @param propertyShape
+     * @param shape
      * @returns {{key: string, label: string, values: [], datatype: string, className: string, allowMultiple: boolean, machineOnly: boolean, multiLine: boolean}}
      * @private
      */
-    static generatePropertyEntry(predicate, values, propertyShape) {
-        const label = getFirstPredicateValue(propertyShape, constants.SHACL_NAME);
-        const datatype = getFirstPredicateId(propertyShape, constants.SHACL_DATATYPE);
-        const className = getFirstPredicateId(propertyShape, constants.SHACL_CLASS);
-        const allowMultiple = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT, 1000) > 1;
-        const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
-        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
-        const allowedValues = getFirstPredicateList(propertyShape, constants.SHACL_IN, undefined);
-        const isRdfList = Vocabulary.isRdfList(propertyShape);
+    static generatePropertyEntry(predicate, values, shape) {
+        const label = getFirstPredicateValue(shape, constants.SHACL_NAME);
+        const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
+        const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
+        const allowMultiple = getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT, 1000) > 1;
+        const machineOnly = getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false);
+        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const allowedValues = getFirstPredicateList(shape, constants.SHACL_IN);
+        const isRdfList = Vocabulary.isRdfList(shape);
 
         return {
             key: predicate,
+            shape,
             label,
             values,
             datatype,
@@ -277,7 +278,7 @@ class Vocabulary {
             machineOnly,
             multiLine,
             allowedValues,
-            isRdfList
+            isRdfList,
         };
     }
 
@@ -299,6 +300,36 @@ class Vocabulary {
         const entry = allMetadata.find(element => element['@id'] === id);
         return getLabel(entry);
     }
+
+    static validatePropertyValues(property) {
+        const {shape, datatype, values} = property;
+        const pureValues = values.map(v => v.value || v.id);
+        const maxLength = getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH);
+        const minCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
+        const errors = [];
+
+        if (maxLength > 0 && datatype === constants.STRING_URI) {
+            const maxLengthValidation = Vocabulary.maxLengthValidation(maxLength, pureValues);
+            if (maxLengthValidation) {
+                errors.push(maxLengthValidation);
+            }
+        }
+
+        if (minCount > 0) {
+            const minCountValidation = Vocabulary.minCountValidation(minCount, pureValues);
+            if (minCountValidation) {
+                errors.push(minCountValidation);
+            }
+        }
+
+        return errors;
+    }
+
+    static maxLengthValidation = (maxLength, values) => ((maxLength > 0 && values && values.length > 0 && values[0] && values[0].length > maxLength)
+        ? `You have passed the maximum length of ${maxLength}` : null);
+
+    static minCountValidation = (minCount, values) => ((!values || values.length < minCount)
+        ? `You need a minimum number of values of ${minCount}` : null);
 }
 
 export default Vocabulary;

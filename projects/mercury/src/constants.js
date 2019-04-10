@@ -35,6 +35,7 @@ export const SHACL_CLASS = SHACL_NS + 'class';
 export const SHACL_NODE = SHACL_NS + 'node';
 export const SHACL_DATATYPE = SHACL_NS + 'datatype';
 export const SHACL_MAX_COUNT = SHACL_NS + 'maxCount';
+export const SHACL_MIN_COUNT = SHACL_NS + 'minCount';
 export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
 export const SHACL_IN = SHACL_NS + 'in';
 
