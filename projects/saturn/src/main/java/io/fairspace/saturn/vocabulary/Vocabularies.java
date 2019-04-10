@@ -15,6 +15,7 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class Vocabularies {
     public static final Model SYSTEM_VOCABULARY = FileManager.get().loadModel("default-vocabularies/system-vocabulary.ttl");
+    public static final Model META_VOCABULARY = FileManager.get().loadModel("default-vocabularies/meta-vocabulary.ttl");
     public static final Node META_VOCABULARY_GRAPH_URI = createURI(FS.NS + "meta-vocabulary");
     public static final Node VOCABULARY_GRAPH_URI = generateIri("vocabulary");
 
@@ -26,6 +27,8 @@ public class Vocabularies {
         this.rdf = rdf;
 
         commit("Initializing the vocabularies", rdf, () -> {
+            rdf.put(META_VOCABULARY_GRAPH_URI.getURI(), META_VOCABULARY);
+
             var oldSystemVocabulary = rdf.fetch(SYSTEM_VOCABULARY_GRAPH_BACKUP);
 
             if (!SYSTEM_VOCABULARY.isIsomorphicWith(oldSystemVocabulary)) {
