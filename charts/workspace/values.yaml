@@ -87,7 +87,7 @@ workspace:
         image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.2
         pullPolicy: IfNotPresent
         resources:
-            request:
+            requests:
                 cpu: "50m"
                 memory: "512Mi"
             limits:
@@ -132,7 +132,7 @@ pluto:
       memory: 1024Mi
     requests:
       cpu: 50m
-      memory: 650Mi
+      memory: 300Mi
   probePath: /actuator/health
   livenessProbe:
     initialDelaySeconds: 20
@@ -318,8 +318,8 @@ jupyterhub:
     extraEnv:
       WORKSPACE_URL:
     cpu:
-      limit: 500m
-      guarantee: 100m
+      limit: 0.5
+      guarantee: 0.1
     memory:
       limit: 1G
   hub:
@@ -335,15 +335,19 @@ jupyterhub:
         c.KubeSpawner.cmd = ['/start']
         c.KubeSpawner.singleuser_privileged = True
         c.Authenticator.auto_login = True
+    # Requests values are set in Jupyterhub chart.
     resources:
       limits:
         cpu: 200m
         memory: 512Mi
   proxy:
     resources:
+      requests:
+        cpu: 10m
+        memory: 10Mi
       limits:
         cpu: 200m
-        memory: 1G
+        memory: 512Mi
     # The JupyterHub chart requires this value to be set here with the same
     # length as the actual values
     # Ensure to override this value with a 64-character hex string when installing
@@ -361,22 +365,28 @@ elasticsearch:
   client:
     resources:
       requests:
-        memory: "1600Mi"
+        memory: "800Mi"
+        cpu: 0.1
       limits:
         memory: "2048Mi"
+        cpu: 1
   data:
     exposeHttp: true
     resources:
       requests:
         memory: "1600Mi"
+        cpu: 0.1
       limits:
         memory: "2048Mi"
+        cpu: 1
   master:
     resources:
       requests:
-        memory: "1600Mi"
+        memory: "800Mi"
+        cpu: 0.1
       limits:
         memory: "4096Mi"
+        cpu: 1
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}
