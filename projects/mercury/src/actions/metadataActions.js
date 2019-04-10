@@ -1,17 +1,18 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import MetadataAPI from "../services/MetadataAPI";
+import {MetadataAPI} from "../services/LinkedDataAPI";
 import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
 import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
+import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
     meta: {subject}
 });
 
-export const updateEntity = (subject, values) => ({
+export const updateEntity = (subject, values, vocabulary) => ({
     type: actionTypes.UPDATE_METADATA,
-    payload: MetadataAPI.updateEntity(subject, values),
+    payload: MetadataAPI.updateEntity(subject, values, vocabulary),
     meta: {
         subject
     }
@@ -44,16 +45,6 @@ const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({
         subject
     }
 }));
-
-const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
-    type: actionTypes.FETCH_METADATA_VOCABULARY,
-    payload: MetadataAPI.getVocabulary()
-}));
-
-export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
-    fetchVocabulary,
-    state => (state && state.cache ? state.cache.vocabulary : undefined)
-);
 
 export const fetchMetadataBySubjectIfNeeded = subject => dispatchIfNeeded(
     () => fetchMetadataBySubject(subject),

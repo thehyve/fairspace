@@ -10,8 +10,13 @@
       "statements": "/api/metadata/",
       "entities": "/api/metadata/entities/"
     },
-    "vocabulary": "/api/vocabulary/",
-    "meta-vocabulary": "/api/meta-vocabulary/",
+    "vocabulary": {
+      "statements": "/api/vocabulary/",
+      "entities": "/api/vocabulary/entities/"
+    },
+    "metaVocabulary": {
+      "statements": "/api/meta-vocabulary/"
+    },
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"
   },

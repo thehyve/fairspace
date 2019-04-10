@@ -61,6 +61,17 @@ const Menu = ({location: {pathname}}) => (
                 </ListItemIcon>
                 <ListItemText primary="Metadata" />
             </ListItem>
+            <ListItem
+                component={NavLink}
+                to="/vocabulary"
+                button
+                selected={pathname.startsWith('/vocabulary')}
+            >
+                <ListItemIcon>
+                    <Icon>code</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Vocabulary" />
+            </ListItem>
         </List>
         <Divider />
         <List>

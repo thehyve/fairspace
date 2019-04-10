@@ -1,11 +1,7 @@
 import {compareBy, comparing} from "../utils/comparisionUtils";
 import * as constants from "../constants";
-import {
-    getFirstPredicateId,
-    getFirstPredicateList,
-    getFirstPredicateValue,
-    getLabel
-} from "../utils/metadataUtils";
+import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue, getLabel} from "../utils/metadataUtils";
+import {flattenShallow} from "../utils/arrayUtils";
 
 class Vocabulary {
     /**
@@ -118,11 +114,22 @@ class Vocabulary {
                     return;
                 }
 
-                const values = metadata[predicateUri].map(i => ({
-                    id: i['@id'],
-                    value: i['@value'],
-                    label: Vocabulary.lookupLabel(i['@id'], allMetadata)
-                }));
+                let values;
+                if (Vocabulary.isRdfList(propertyShape)) {
+                    // RDF lists in JSON LD are arrays in a container with key '@list'
+                    // We want to use just the arrays. If there are multiple lists
+                    // they are concatenated
+                    // Please note that entries are not sorted as rdf:lists are meant to be ordered
+                    values = flattenShallow(metadata[predicateUri].map(
+                        entry => (entry['@list'] ? entry['@list'] : [entry])
+                    )).map(entry => Vocabulary.generateValueEntry(entry, allMetadata));
+                } else {
+                    // Convert json-ld values into our internal format and
+                    // sort the values
+                    values = metadata[predicateUri]
+                        .map(entry => Vocabulary.generateValueEntry(entry, allMetadata))
+                        .sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
+                }
 
                 prefilledProperties.push(Vocabulary.generatePropertyEntry(predicateUri, values, propertyShape));
             });
@@ -220,6 +227,28 @@ class Vocabulary {
         };
     }
 
+    static isRdfList(propertyShape) {
+        return getFirstPredicateId(propertyShape, constants.SHACL_NODE) === constants.DASH_LIST_SHAPE;
+    }
+
+    /**
+     * Checks whether the vocabulary contains the given identifier
+     * @param id
+     * @returns {boolean}
+     */
+    contains(id) {
+        return !!this.get(id);
+    }
+
+    /**
+     * Returns the json-ld entry for the given identifier
+     * @param id
+     * @returns {array}
+     */
+    get(id) {
+        return this.vocabulary.find(el => el['@id'] === id);
+    }
+
     /**
      * Generates a list entry for a single property, with the values specified
      * @param predicate
@@ -236,18 +265,33 @@ class Vocabulary {
         const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
         const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
         const allowedValues = getFirstPredicateList(propertyShape, constants.SHACL_IN, undefined);
-        const sortedValues = values.sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
+        const isRdfList = Vocabulary.isRdfList(propertyShape);
 
         return {
             key: predicate,
             label,
-            values: sortedValues,
+            values,
             datatype,
             className,
             allowMultiple,
             machineOnly,
             multiLine,
-            allowedValues
+            allowedValues,
+            isRdfList
+        };
+    }
+
+    /**
+     * Generates an entry to describe a single value for a property
+     * @param entry
+     * @param allMetadata
+     * @returns {{id: *, label, value: *}}
+     */
+    static generateValueEntry(entry, allMetadata) {
+        return {
+            id: entry['@id'],
+            value: entry['@value'],
+            label: Vocabulary.lookupLabel(entry['@id'], allMetadata)
         };
     }
 
