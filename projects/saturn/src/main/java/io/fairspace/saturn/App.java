@@ -86,7 +86,7 @@ public class App {
                         new ChangeableMetadataApp("/api/metadata", metadataService),
                         new ChangeableMetadataApp("/api/vocabulary/", userVocabularyService)
                             .withAuthorizationVerifier("/api/vocabulary/*", vocabularyAuthorizationVerifier),
-                        new ReadableMetadataApp("/api/vocabulary/meta-vocabulary/", metaVocabularyService),
+                        new ReadableMetadataApp("/api/meta-vocabulary/", metaVocabularyService),
                         new CollectionsApp(collections),
                         new PermissionsApp(permissions),
                         new HealthApp()))
