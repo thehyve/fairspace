@@ -1,17 +1,50 @@
 import React from 'react';
 import TextField from "@material-ui/core/TextField";
 
-const ResourceValue = ({property, entry, style, onChange, ...otherProps}) => (
-    <TextField
-        {...otherProps}
-        multiline={property.multiLine}
-        value={entry.id}
-        onChange={e => onChange({id: e.target.value})}
-        margin="normal"
-        style={{...style, marginTop: 0, width: '100%'}}
-        type="url"
-    />
-);
+class ResourceValue extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {value: props.entry.id, oldValue: props.entry.id};
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.entry.value !== prevProps.entry.value) {
+            this.reset();
+        }
+    }
+
+    handleChange = (e) => {
+        this.setState({value: e.target.value});
+    }
+
+    handleBlur = () => {
+        try {
+            this.props.onChange({id: new URL(this.state.value).toString()});
+        } catch (e) {
+            this.setState(prevState => ({value: prevState.oldValue}));
+        }
+    }
+
+    render() {
+        const {
+            property, style, onSave, ...otherProps
+        } = this.props;
+
+        return (
+            <TextField
+                {...otherProps}
+                multiline={property.multiLine}
+                value={this.state.value}
+                onChange={this.handleChange}
+                onBlur={this.handleBlur}
+                margin="normal"
+                style={{...style, marginTop: 0, width: '100%'}}
+                type="url"
+            />
+        );
+    }
+}
 
 ResourceValue.defaultProps = {
     entry: {}
