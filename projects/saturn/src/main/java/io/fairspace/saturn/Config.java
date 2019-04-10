@@ -7,7 +7,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.query.text.es.ESSettings;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
 
 public class Config {
     public int port = 8080;
@@ -41,6 +45,8 @@ public class Config {
 
     public static class Auth {
         public boolean enabled = false;
+
+        public final Set<String> developerRoles = new HashSet<>(asList("datasteward"));
 
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
