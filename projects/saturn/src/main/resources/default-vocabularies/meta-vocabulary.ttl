@@ -139,7 +139,9 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Meta shape of FS defined relations." ;
     sh:name "Relation Shape Meta" ;
-    sh:property [
+    sh:property 
+        fs:inverseRelationShape, 
+    [
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
         sh:maxInclusive 1 ;
@@ -187,15 +189,14 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:machineOnly true ; 
         sh:name "Fixed shape" ;
         sh:description "If this is true, a user can not make changes to this shape definiton."
-    ], 
-        fs:inverseRelationShape ;
+    ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
-    sh:path fs:inverseRelation 
+    sh:path fs:inverseRelation ;
     sh:class fs:RelationShape ;
     sh:maxCount 1 ;
     sh:name "Inverse relation" ;
