@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Fab, Grid, List, Paper} from '@material-ui/core';
+import {Button, Grid, List, Paper} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../../common";
 import ErrorDialog from "../../common/ErrorDialog";
@@ -81,7 +81,7 @@ export class LinkedDataEntityForm extends React.Component {
         const {
             subject, label, typeInfo, properties, editable, error, loading, showHeader
         } = this.props;
-        const submitButtonVisibility = this.shouldShowSubmitButton() ? 'visible' : 'hidden';
+        const submitButtonVisibility = editable ? 'visible' : 'hidden';
 
         if (error) {
             return <ErrorMessage message={error.message} />;
@@ -97,30 +97,37 @@ export class LinkedDataEntityForm extends React.Component {
         }));
 
         const entity = (
-            <Grid>
-                <Fab
-                    variant="extended"
-                    onClick={this.handleSubmit}
-                    color="primary"
-                    style={{visibility: submitButtonVisibility}}
+            <Grid container>
+                <Grid
+                    item
+                    xs={12}
                 >
-                    Update
-                </Fab>
-                <List dense>
-                    {
-                        propertiesWithChanges.map((p) => (
-                            <LinkedDataProperty
-                                editable={editable && p.editable}
-                                subject={subject}
-                                key={subject + p.key}
-                                property={p}
-                                onChange={(value, index) => this.handleChange(p, value, index)}
-                                onAdd={(value) => this.handleAdd(p, value)}
-                                onDelete={(index) => this.handleDelete(p, index)}
-                            />
-                        ))
-                    }
-                </List>
+                    <List dense>
+                        {
+                            propertiesWithChanges.map((p) => (
+                                <LinkedDataProperty
+                                    editable={editable && p.editable}
+                                    subject={subject}
+                                    key={subject + p.key}
+                                    property={p}
+                                    onChange={(value, index) => this.handleChange(p, value, index)}
+                                    onAdd={(value) => this.handleAdd(p, value)}
+                                    onDelete={(index) => this.handleDelete(p, index)}
+                                />
+                            ))
+                        }
+                    </List>
+                </Grid>
+                <Grid item>
+                    <Button
+                        onClick={this.handleSubmit}
+                        color="primary"
+                        disabled={!this.shouldShowSubmitButton()}
+                        style={{visibility: submitButtonVisibility}}
+                    >
+                        Update
+                    </Button>
+                </Grid>
             </Grid>
         );
 
