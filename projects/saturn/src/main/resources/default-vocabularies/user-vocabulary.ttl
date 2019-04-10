@@ -681,27 +681,60 @@ fs:NumberOfBreakPoints a rdf:Property .
 fs:hasData a rdf:Property .
 fs:aboutPerson a rdf:Property .
 fs:aboutMaterial a rdf:Property .
-fs:derivesFrom a rdf:Property .
-fs:providesMaterial a rdf:Property .
-fs:isConsentOf a rdf:Property .
-fs:gaveConsent a rdf:Property .
-fs:hasCollection a rdf:Property .
-fs:partOfProject a rdf:Property .
-fs:providesMaterial a rdf:Property  .
-fs:isConsentOf a rdf:Property .
-fs:gaveConsent a rdf:Property .
-fs:hasCollection a rdf:Property .
-fs:partOfProject a rdf:Property .
-fs:isProjectConsent a rdf:Property .
-fs:hasPersonConsent a rdf:Property .
-fs:isAnalysedBy a rdf:Property .
-fs:analysisOfEvent a rdf:Property .
-fs:authorizes a rdf:Property .
-fs:isAuthorizedBy a rdf:Property .
-fs:hasEvent a rdf:Property .
-fs:eventSubject a rdf:Property .
-fs:associatedAnalysis a rdf:Property .
-fs:associatedFiles a rdf:Property .
-fs:isParentOf a rdf:Property .
-fs:isChildOf a rdf:Property .
-fs:isLinkedTo a rdf:Property .
+
+fs:derivesFrom a rdf:Property ;
+    owl:inverseOf fs:providesMaterial .
+
+fs:providesMaterial a rdf:Property ;
+    owl:inverseOf fs:derivesFrom .
+
+fs:isConsentOf a rdf:Property ;
+    owl:inverseOf fs:gaveConsent .
+
+fs:gaveConsent a rdf:Property ;
+    owl:inverseOf fs:isConsentOf .
+
+fs:hasCollection a rdf:Property ;
+    owl:inverseOf fs:partOfProject .
+
+fs:partOfProject a rdf:Property ;
+    owl:inverseOf fs:hasCollection .
+
+fs:isProjectConsent a rdf:Property ;
+    owl:inverseOf fs:hasPersonConsent .
+
+fs:hasPersonConsent a rdf:Property ;
+    owl:inverseOf fs:isProjectConsent .
+
+fs:isAnalysedBy a rdf:Property ;
+    owl:inverseOf fs:analysisOfEvent .
+
+fs:analysisOfEvent a rdf:Property ;
+    owl:inverseOf fs:isAnalysedBy .
+
+fs:authorizes a rdf:Property ;
+    owl:inverseOf fs:isAuthorizedBy .
+
+fs:isAuthorizedBy a rdf:Property ;
+    owl:inverseOf fs:authorizes .
+
+fs:hasEvent a rdf:Property ;
+    owl:inverseOf fs:eventSubject .
+
+fs:eventSubject a rdf:Property ;
+    owl:inverseOf fs:hasEvent .
+
+fs:associatedAnalysis a rdf:Property ;
+    owl:inverseOf fs:associatedFiles .
+
+fs:associatedFiles a rdf:Property ;
+    owl:inverseOf fs:associatedAnalysis .
+
+fs:isParentOf a rdf:Property ;
+    owl:inverseOf fs:isChildOf .
+
+fs:isChildOf a rdf:Property ;
+    owl:inverseOf fs:isParentOf .
+
+fs:isLinkedTo a rdf:Property ;
+    owl:inverseOf fs:isLinkedTo .

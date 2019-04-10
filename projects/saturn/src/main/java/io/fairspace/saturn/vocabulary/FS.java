@@ -68,4 +68,8 @@ public class FS {
 
     public static final String WRITE_RESTRICTED_URI = NS + "writeRestricted";
     public static final Property writeRestricted = createProperty(WRITE_RESTRICTED_URI);
+
+    public static final String INVERSE_RELATION_URI = NS + "inverseRelation";
+    public static final Property inverseRelation = createProperty(INVERSE_RELATION_URI);
 }
+
