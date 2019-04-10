@@ -11,7 +11,7 @@ import {
     shouldPropertyBeHidden,
     toJsonLd, url2iri,
 } from "./metadataUtils";
-import * as consts from "../constants";
+import * as constants from "../constants";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {
@@ -33,7 +33,7 @@ describe('Metadata Utils', () => {
 
     describe('getLabel', () => {
         it('should return the label if present', () => {
-            expect(getLabel({[consts.LABEL_URI]: [{'@value': 'My label'}]})).toEqual('My label');
+            expect(getLabel({[constants.LABEL_URI]: [{'@value': 'My label'}]})).toEqual('My label');
         });
 
         it('should return the shacl name if no label is present', () => {
@@ -43,22 +43,22 @@ describe('Metadata Utils', () => {
         it('should not fail if json-ld is not properly expanded', () => {
             expect(getLabel({
                 '@id': 'http://test.com/name',
-                [consts.LABEL_URI]: 'My label'
+                [constants.LABEL_URI]: 'My label'
             }, true)).toEqual('name');
 
             expect(getLabel({
                 '@id': 'http://test.com/name',
-                [consts.LABEL_URI]: {'@value': 'My label'}
+                [constants.LABEL_URI]: {'@value': 'My label'}
             }, true)).toEqual('name');
 
             expect(getLabel({
                 '@id': 'http://test.com/name',
-                [consts.LABEL_URI]: ['My label']
+                [constants.LABEL_URI]: ['My label']
             }, true)).toEqual('name');
 
             expect(getLabel({
                 '@id': 'http://test.com/name',
-                [consts.LABEL_URI]: []
+                [constants.LABEL_URI]: []
             }, true)).toEqual('name');
         });
 
@@ -127,55 +127,55 @@ describe('Metadata Utils', () => {
     describe('shouldPropertyBeHidden', () => {
         it('should never show @type', () => {
             expect(shouldPropertyBeHidden('@type', 'http://example.com')).toBe(true);
-            expect(shouldPropertyBeHidden('@type', consts.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden('@type', consts.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden('@type', consts.COLLECTION_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.TYPE_URI, 'http://example.com')).toBe(true);
-            expect(shouldPropertyBeHidden(consts.TYPE_URI, consts.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.TYPE_URI, consts.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.TYPE_URI, consts.COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden('@type', constants.FILE_URI)).toBe(true);
+            expect(shouldPropertyBeHidden('@type', constants.DIRECTORY_URI)).toBe(true);
+            expect(shouldPropertyBeHidden('@type', constants.COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.TYPE_URI, 'http://example.com')).toBe(true);
+            expect(shouldPropertyBeHidden(constants.TYPE_URI, constants.FILE_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.TYPE_URI, constants.DIRECTORY_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.TYPE_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should show comments for everything except to collections', () => {
-            expect(shouldPropertyBeHidden(consts.COMMENT_URI, 'http://example.com')).toBe(false);
-            expect(shouldPropertyBeHidden(consts.COMMENT_URI, consts.FILE_URI)).toBe(false);
-            expect(shouldPropertyBeHidden(consts.COMMENT_URI, consts.DIRECTORY_URI)).toBe(false);
-            expect(shouldPropertyBeHidden(consts.COMMENT_URI, consts.COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.COMMENT_URI, 'http://example.com')).toBe(false);
+            expect(shouldPropertyBeHidden(constants.COMMENT_URI, constants.FILE_URI)).toBe(false);
+            expect(shouldPropertyBeHidden(constants.COMMENT_URI, constants.DIRECTORY_URI)).toBe(false);
+            expect(shouldPropertyBeHidden(constants.COMMENT_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should not show labels for managed entities', () => {
-            expect(shouldPropertyBeHidden(consts.LABEL_URI, 'http://example.com')).toBe(false);
-            expect(shouldPropertyBeHidden(consts.LABEL_URI, consts.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.LABEL_URI, consts.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.LABEL_URI, consts.COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.LABEL_URI, 'http://example.com')).toBe(false);
+            expect(shouldPropertyBeHidden(constants.LABEL_URI, constants.FILE_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.LABEL_URI, constants.DIRECTORY_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.LABEL_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should never show fs:filePath', () => {
-            expect(shouldPropertyBeHidden(consts.FILE_PATH_URI, 'http://example.com')).toBe(true);
-            expect(shouldPropertyBeHidden(consts.FILE_PATH_URI, consts.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.FILE_PATH_URI, consts.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.FILE_PATH_URI, consts.COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, 'http://example.com')).toBe(true);
+            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.FILE_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.DIRECTORY_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should never show fs:dateDeleted', () => {
-            expect(shouldPropertyBeHidden(consts.DATE_DELETED_URI, 'http://example.com')).toBe(true);
-            expect(shouldPropertyBeHidden(consts.DATE_DELETED_URI, consts.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.DATE_DELETED_URI, consts.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.DATE_DELETED_URI, consts.COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.DATE_DELETED_URI, 'http://example.com')).toBe(true);
+            expect(shouldPropertyBeHidden(constants.DATE_DELETED_URI, constants.FILE_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.DATE_DELETED_URI, constants.DIRECTORY_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.DATE_DELETED_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should never show fs:deletedBy', () => {
-            expect(shouldPropertyBeHidden(consts.DELETED_BY_URI, 'http://example.com')).toBe(true);
-            expect(shouldPropertyBeHidden(consts.DELETED_BY_URI, consts.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.DELETED_BY_URI, consts.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(consts.DELETED_BY_URI, consts.COLLECTION_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.DELETED_BY_URI, 'http://example.com')).toBe(true);
+            expect(shouldPropertyBeHidden(constants.DELETED_BY_URI, constants.FILE_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.DELETED_BY_URI, constants.DIRECTORY_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.DELETED_BY_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should always show regular properties', () => {
             expect(shouldPropertyBeHidden('http://example.com/property', 'http://example.com')).toBe(false);
-            expect(shouldPropertyBeHidden('http://example.com/property', consts.FILE_URI)).toBe(false);
-            expect(shouldPropertyBeHidden('http://example.com/property', consts.DIRECTORY_URI)).toBe(false);
-            expect(shouldPropertyBeHidden('http://example.com/property', consts.COLLECTION_URI)).toBe(false);
+            expect(shouldPropertyBeHidden('http://example.com/property', constants.FILE_URI)).toBe(false);
+            expect(shouldPropertyBeHidden('http://example.com/property', constants.DIRECTORY_URI)).toBe(false);
+            expect(shouldPropertyBeHidden('http://example.com/property', constants.COLLECTION_URI)).toBe(false);
         });
     });
 
@@ -260,7 +260,7 @@ describe('Metadata Utils', () => {
 
             const expected = {
                 "@id": "some-subject",
-                [predicate]: {'@id': consts.NIL_URI}
+                [predicate]: {'@id': constants.NIL_URI}
             };
 
             expect(jsonLd).toEqual(expected);
@@ -278,6 +278,27 @@ describe('Metadata Utils', () => {
             const jsonLd = toJsonLd();
 
             expect(jsonLd).toEqual(null);
+        });
+
+        it('should generate a valid json-ld for rdf:List', () => {
+            const subject = "some-subject";
+            const predicate = "some-predicate";
+            const values = [{value: "some-value"}, {value: "some-other-value"}];
+
+            const vocabularyMock = {
+                determineShapeForProperty: () => ({
+                    [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
+                })
+            };
+
+            const jsonLd = toJsonLd(subject, predicate, values, vocabularyMock);
+
+            const expected = {
+                "@id": "some-subject",
+                "some-predicate": {"@list": [{"@value": "some-value"}, {"@value": "some-other-value"}]}
+            };
+
+            expect(jsonLd).toEqual(expected);
         });
     });
 

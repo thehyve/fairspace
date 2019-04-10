@@ -84,14 +84,15 @@ class LinkedDataAPI {
      *   id: referencing another resource
      *   value: referencing a literal value
      * If both keys are specified, the id is stored and the literal value is ignored
+     * @param vocabulary The {Vocabulary} object containing the shapes for this metadata entity
      * @returns {*}
      */
-    updateEntity(subject, properties) {
+    updateEntity(subject, properties, vocabulary) {
         if (!subject || !properties) {
             return Promise.reject(Error("No subject or properties given"));
         }
 
-        const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p]));
+        const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
 
         return fetch(Config.get().urls.metadata.statements, {
             method: 'PATCH',

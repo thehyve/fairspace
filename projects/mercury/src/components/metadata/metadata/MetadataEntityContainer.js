@@ -7,12 +7,13 @@ import {
     hasMetadataError,
     isMetadataPending
 } from "../../../reducers/cache/jsonLdBySubjectReducers";
-import {hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityForm from "../common/LinkedDataEntityForm";
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
     const metadata = getCombinedMetadataForSubject(state, subject);
+    const vocabulary = getVocabulary(state);
 
     const hasNoMetadata = !metadata || metadata.length === 0;
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
@@ -30,13 +31,16 @@ const mapStateToProps = (state, ownProps) => {
 
     return {
         loading: isMetadataPending(state, subject) || isVocabularyPending(state),
+        error,
+
         properties,
         subject,
+
         typeInfo,
         label,
-        error,
         showHeader: ownProps.showHeader || false,
         editable,
+        vocabulary
     };
 };
 

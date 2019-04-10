@@ -64,7 +64,7 @@ export class LinkedDataEntityForm extends React.Component {
     handleSubmit = () => {
         const {subject, updateEntity} = this.props;
 
-        updateEntity(subject, this.state.propertiesWithUpdatedValues)
+        updateEntity(subject, this.state.propertiesWithUpdatedValues, this.props.vocabulary)
             .then(this.resetChanges)
             .catch(e => ErrorDialog.showError(e, "Error while updating metadata"));
     };

@@ -10,9 +10,9 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const updateEntity = (subject, values) => ({
+export const updateEntity = (subject, values, vocabulary) => ({
     type: actionTypes.UPDATE_METADATA,
-    payload: MetadataAPI.updateEntity(subject, values),
+    payload: MetadataAPI.updateEntity(subject, values, vocabulary),
     meta: {
         subject
     }
