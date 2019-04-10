@@ -28,8 +28,7 @@ auth:
   # Enables JWT/JWKS authentication. Defaults to false.
   enabled: false
   # User roles (for local development only)
-  developerRoles:
-#    - datasteward
+  developerRoles: []
   # JWKS URL
   jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
   # JWK encryption algorithm. Defaults to "RS256"
