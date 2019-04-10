@@ -1,7 +1,7 @@
 import React from 'react';
 import {Paper, Typography} from "@material-ui/core";
 
-const metaEntityHeader = ({label, typeInfo}) => (
+const linkedDataEntityHeader = ({label, typeInfo}) => (
     <Paper style={{padding: 20}}>
         <Typography variant="h6">
             {label}
@@ -12,4 +12,4 @@ const metaEntityHeader = ({label, typeInfo}) => (
     </Paper>
 );
 
-export default metaEntityHeader;
+export default linkedDataEntityHeader;

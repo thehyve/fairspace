@@ -3,16 +3,45 @@ import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
 import {toJsonLd} from "../utils/metadataUtils";
 
-class MetadataAPI {
+class LinkedDataAPI {
     static getParams = {
         method: 'GET',
         headers: new Headers({Accept: 'application/ld+json'}),
         credentials: 'same-origin'
     };
 
-    get(params) {
+    /**
+     *
+     * @param configParserFunc Function to retrieve the right urls from configuration.
+     *                         The configuration is not available when constructing the object, so
+     *                         we provide this function to be able to extract the right information
+     *
+     *                         Function input: config
+     *                         Function output: {statements: ..., entities: ...}
+     */
+    constructor(configParserFunc) {
+        this.configParserFunc = configParserFunc;
+    }
+
+    /**
+     * Returns the URL to use for separate statements
+     * @returns {string}
+     */
+    getStatementsUrl() {
+        return this.configParserFunc(Config.get()).statements;
+    }
+
+    /**
+     * Returns the URL to use for retrieving a list of entities
+     * @returns {string}
+     */
+    getEntitiesUrl() {
+        return this.configParserFunc(Config.get()).entities;
+    }
+
+    get(params = {}) {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
-        return fetch(`${Config.get().urls.metadata.statements}?labels&${query}`, MetadataAPI.getParams)
+        return fetch(`${this.getStatementsUrl()}?labels&${query}`, LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(expand);
@@ -33,10 +62,10 @@ class MetadataAPI {
         }
 
         const request = (values.length === 0)
-            ? fetch(Config.get().urls.metadata.statements
+            ? fetch(this.getStatementsUrl()
                 + '?subject=' + encodeURIComponent(subject)
                 + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE', credentials: 'same-origin'})
-            : fetch(Config.get().urls.metadata.statements, {
+            : fetch(this.getStatementsUrl(), {
                 method: 'PATCH',
                 headers: new Headers({'Content-type': 'application/ld+json'}),
                 credentials: 'same-origin',
@@ -55,14 +84,15 @@ class MetadataAPI {
      *   id: referencing another resource
      *   value: referencing a literal value
      * If both keys are specified, the id is stored and the literal value is ignored
+     * @param vocabulary The {Vocabulary} object containing the shapes for this metadata entity
      * @returns {*}
      */
-    updateEntity(subject, properties) {
+    updateEntity(subject, properties, vocabulary) {
         if (!subject || !properties) {
             return Promise.reject(Error("No subject or properties given"));
         }
 
-        const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p]));
+        const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
 
         return fetch(Config.get().urls.metadata.statements, {
             method: 'PATCH',
@@ -70,19 +100,6 @@ class MetadataAPI {
             credentials: 'same-origin',
             body: JSON.stringify(jsonLd)
         }).then(failOnHttpError("Failure when updating metadata"));
-    }
-
-    /**
-     * Retrieves the vocabulary (user and system) and instantiates a Vocabulary object with it
-     * @returns {Promise<Vocabulary | never>}
-     */
-    getVocabulary() {
-        // TODO: use the new combined endpoint to retrieve both vocabularies at once
-        return Config.waitFor()
-            .then(() => fetch(Config.get().urls.vocabulary.combined, MetadataAPI.getParams))
-            .then(failOnHttpError("Failure when retrieving the combined vocabulary"))
-            .then(response => response.json())
-            .then(expand)
     }
 
     /**
@@ -96,7 +113,11 @@ class MetadataAPI {
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
     getEntitiesByType(type) {
-        return fetch(Config.get().urls.metadata.entities + "?type=" + encodeURIComponent(type), MetadataAPI.getParams)
+        if (!this.getEntitiesUrl()) {
+            return Promise.reject(new Error("No entities URL provided"));
+        }
+
+        return fetch(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(expand);
@@ -109,11 +130,17 @@ class MetadataAPI {
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
     getAllEntities() {
-        return fetch(Config.get().urls.metadata.entities, MetadataAPI.getParams)
+        if (!this.getEntitiesUrl()) {
+            return Promise.reject(new Error("No entities URL provided"));
+        }
+
+        return fetch(this.getEntitiesUrl(), LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(expand);
     }
 }
 
-export default new MetadataAPI();
+export const MetadataAPI = new LinkedDataAPI(config => config.urls.metadata);
+export const VocabularyAPI = new LinkedDataAPI(config => config.urls.vocabulary);
+export const MetaVocabularyAPI = new LinkedDataAPI(config => config.urls.metaVocabulary);

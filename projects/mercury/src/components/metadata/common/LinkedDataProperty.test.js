@@ -4,9 +4,9 @@ import ListItem from '@material-ui/core/ListItem';
 import ClearIcon from '@material-ui/icons/Clear';
 import {shallow} from "enzyme";
 
-import ValueComponentFactory from "./values/ValueComponentFactory";
-import {STRING_URI} from "../../constants";
-import MetadataProperty from "./MetadataProperty";
+import ValueComponentFactory from "../values/ValueComponentFactory";
+import {STRING_URI} from "../../../constants";
+import LinkedDataProperty from "./LinkedDataProperty";
 
 const defaultProperty = {
     key: 'description',
@@ -22,14 +22,14 @@ describe('MetadataProperty elements', () => {
             ...defaultProperty,
             allowMultiple: false
         };
-        const wrapper = shallow(<MetadataProperty editable property={property} />);
+        const wrapper = shallow(<LinkedDataProperty editable property={property} />);
         const listItems = wrapper.dive().find(List).find(ListItem);
 
         expect(listItems.length).toEqual(3);
     });
 
     it('shows an add element if multiple values are allowed, and it is editable', () => {
-        const wrapper = shallow(<MetadataProperty editable property={defaultProperty} />);
+        const wrapper = shallow(<LinkedDataProperty editable property={defaultProperty} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(4);
@@ -38,7 +38,7 @@ describe('MetadataProperty elements', () => {
     });
 
     it('shows no add element if multiple values are allowed, but it is uneditable', () => {
-        const wrapper = shallow(<MetadataProperty editable={false} property={defaultProperty} />);
+        const wrapper = shallow(<LinkedDataProperty editable={false} property={defaultProperty} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(3);
@@ -52,7 +52,7 @@ describe('MetadataProperty elements', () => {
             values: []
         };
 
-        const wrapper = shallow(<MetadataProperty editable property={property} />);
+        const wrapper = shallow(<LinkedDataProperty editable property={property} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
@@ -69,7 +69,7 @@ describe('MetadataProperty elements', () => {
             values: []
         };
 
-        const wrapper = shallow(<MetadataProperty editable={false} property={property} />);
+        const wrapper = shallow(<LinkedDataProperty editable={false} property={property} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(0);
@@ -82,7 +82,7 @@ describe('MetadataProperty elements', () => {
             allowMultiple: false
         };
 
-        const wrapper = shallow(<MetadataProperty editable property={property} />);
+        const wrapper = shallow(<LinkedDataProperty editable property={property} />);
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
@@ -100,7 +100,7 @@ describe('MetadataProperty elements', () => {
             allowMultiple: true
         };
 
-        const wrapper = shallow(<MetadataProperty editable={false} property={property} />);
+        const wrapper = shallow(<LinkedDataProperty editable={false} property={property} />);
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(2);
     });

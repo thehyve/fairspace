@@ -26,7 +26,6 @@ describe('retrieving vocabulary from state', () => {
 describe('isVocabularyPending', () => {
     it('returns true while loading metadata', () => expect(isVocabularyPending({cache: {vocabulary: {pending: true}}})).toBeTruthy());
     it('returns false on metadata error', () => expect(isVocabularyPending({cache: {vocabulary: {error: true}}})).toBeFalsy());
-    it('returns true when no metadata is stored at all', () => expect(isVocabularyPending({cache: {}})).toBeTruthy());
     it('returns false with missing data for subject', () => expect(isVocabularyPending({cache: {vocabulary: {}}})).toBeFalsy());
     it('returns false with empty metadata', () => expect(isVocabularyPending({cache: {vocabulary: {data: []}}})).toBeFalsy());
 });
@@ -34,7 +33,6 @@ describe('isVocabularyPending', () => {
 describe('hasVocabularyError', () => {
     it('returns false while loading metadata', () => expect(hasVocabularyError({cache: {vocabulary: {pending: true}}})).toBeFalsy());
     it('returns true on metadata error', () => expect(hasVocabularyError({cache: {vocabulary: {error: true}}})).toBeTruthy());
-    it('returns true when no metadata is stored at all', () => expect(hasVocabularyError({cache: {}})).toBeTruthy());
     it('returns false with missing data for subject', () => expect(hasVocabularyError({cache: {vocabulary: {}}})).toBeFalsy());
     it('returns false with empty metadata', () => expect(hasVocabularyError({cache: {vocabulary: {data: []}}})).toBeFalsy());
 });

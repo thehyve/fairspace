@@ -20,7 +20,8 @@ describe('retrieving metadata from state', () => {
                 }
             }
         };
-        expect(getCombinedMetadataForSubject(state, subject).length).toEqual(5);
+
+        expect(getCombinedMetadataForSubject(state, subject).length).toEqual(6);
     });
 
     it('does not fail on missing vocabulary', () => {

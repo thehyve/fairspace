@@ -12,11 +12,11 @@ import {
 } from "@material-ui/core";
 
 import * as PropTypes from "prop-types";
-import {getLabel} from "../../utils/metadataUtils";
-import {compareBy} from "../../utils/comparisionUtils";
-import LoadingInlay from '../common/LoadingInlay';
+import {getLabel} from "../../../utils/metadataUtils";
+import {compareBy} from "../../../utils/comparisionUtils";
+import LoadingInlay from '../../common/LoadingInlay';
 
-const MetadataShapeChooserDialog = props => {
+const LinkedDataShapeChooserDialog = props => {
     const closeDialog = (e) => {
         if (e) e.stopPropagation();
         props.onClose();
@@ -64,12 +64,12 @@ const MetadataShapeChooserDialog = props => {
             </DialogActions>
         </Dialog>
     );
-}
+};
 
-MetadataShapeChooserDialog.propTypes = {
+LinkedDataShapeChooserDialog.propTypes = {
     onChooseShape: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     shapes: PropTypes.array
 };
 
-export default MetadataShapeChooserDialog;
+export default LinkedDataShapeChooserDialog;
