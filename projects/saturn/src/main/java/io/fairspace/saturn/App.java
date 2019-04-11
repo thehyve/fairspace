@@ -76,7 +76,7 @@ public class App {
                 new SystemVocabularyProtectingValidator(),
                 new MetadataAndVocabularyConsistencyValidator(rdf)
         );
-        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator, recomputeInverseInferenceEventHandler);
+        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator, recomputeInverseInferenceEventHandler);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
