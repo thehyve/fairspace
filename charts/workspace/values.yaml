@@ -341,13 +341,14 @@ jupyterhub:
         cpu: 200m
         memory: 512Mi
   proxy:
-    resources:
-      requests:
-        cpu: 10m
-        memory: 10Mi
-      limits:
-        cpu: 200m
-        memory: 512Mi
+    chp:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 10Mi
+        limits:
+          cpu: 200m
+          memory: 512Mi
     # The JupyterHub chart requires this value to be set here with the same
     # length as the actual values
     # Ensure to override this value with a 64-character hex string when installing
