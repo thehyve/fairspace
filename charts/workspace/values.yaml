@@ -378,7 +378,7 @@ elasticsearch:
         memory: "1600Mi"
         cpu: 0.1
       limits:
-        memory: "2048Mi"
+        memory: "4096Mi"
         cpu: 1
   master:
     resources:
