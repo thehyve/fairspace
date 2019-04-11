@@ -91,25 +91,25 @@ public class ShaclValidatorTest {
     }
 
     @Test
-    public void canPerformTypChecks() {
+    public void canPerformTypeChecks() {
         ds.getDefaultModel()
-                .add(resource2, RDF.type, FOAF.Person);
+                .add(resource2, RDF.type, FS.User);
 
         var model = createDefaultModel()
                 .add(resource1, RDF.type, FS.File)
                 .add(resource1, FS.filePath, createStringLiteral("some/path"))
-                .add(resource1, createProperty(FS.NS + "aboutPerson"), resource2);
+                .add(resource1, FS.createdBy, resource2);
 
         var result1 = validator.validate(EMPTY, model);
 
         assertTrue(result1.isValid());
 
         ds.getDefaultModel()
-                .remove(resource2, RDF.type, FOAF.Person)
-                .add(resource2, RDF.type, FOAF.Document);
+                .remove(resource2, RDF.type, FS.User)
+                .add(resource2, RDF.type, FOAF.Person);
 
         var result2 = validator.validate(EMPTY, model);
         assertFalse(result2.isValid());
-        assertEquals("http://example.com/123 http://fairspace.io/ontology#aboutPerson: Value does not have class foaf:Person.", result2.getMessage());
+        assertEquals("http://example.com/123 http://fairspace.io/ontology#createdBy: Value does not have class fs:User.", result2.getMessage());
     }
 }

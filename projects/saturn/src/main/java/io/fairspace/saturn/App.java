@@ -69,19 +69,20 @@ public class App {
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, metadataValidator);
 
+        RecomputeInverseInferenceEventHandler recomputeInverseInferenceEventHandler = new RecomputeInverseInferenceEventHandler(rdf, VOCABULARY_GRAPH_URI);
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)),
                 new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
                 new SystemVocabularyProtectingValidator(),
                 new MetadataAndVocabularyConsistencyValidator(rdf)
         );
-        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator);
+        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator, recomputeInverseInferenceEventHandler);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
         var fusekiServerBuilder = FusekiServer.create()
-                .add("rdf", ds)
+                .add("api/rdf/", ds, false)
                 .addFilter("/api/*", new SaturnSparkFilter(
                         new ChangeableMetadataApp("/api/metadata", metadataService),
                         new ChangeableMetadataApp("/api/vocabulary/", userVocabularyService)

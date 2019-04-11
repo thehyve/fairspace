@@ -3,8 +3,6 @@ package io.fairspace.saturn.services.metadata;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +42,7 @@ public class ChangeableMetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new ChangeableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager,null);
+        api = new ChangeableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager);
     }
 
     @Test
