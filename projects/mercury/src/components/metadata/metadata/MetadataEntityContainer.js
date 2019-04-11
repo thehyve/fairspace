@@ -8,7 +8,7 @@ import {
     isMetadataPending
 } from "../../../reducers/cache/jsonLdBySubjectReducers";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
-import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
+import LinkedDataEntityFormWithButton from "../common/LinkedDataEntityFormWithButton";
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
@@ -19,7 +19,7 @@ const mapStateToProps = (state, ownProps) => {
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
-    const typeInfo = getTypeInfo(metadata)
+    const typeInfo = getTypeInfo(metadata);
     const label = linkLabel(subject);
     const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
 
@@ -44,10 +44,11 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-const mapDispatchToProps = {
-    fetchShapes: vocabularyActions.fetchMetadataVocabularyIfNeeded,
-    fetchLinkedData: metadataActions.fetchMetadataBySubjectIfNeeded,
-    updateEntity: metadataActions.updateEntity
-};
+const mapDispatchToProps = (dispatch) => ({
+    fetchShapes: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded()),
+    fetchLinkedData: (subject) => dispatch(metadataActions.fetchMetadataBySubjectIfNeeded(subject)),
+    onSubmit: (subject) => dispatch(metadataActions.submitMetadataChangesFromState(subject))
+        .then(() => dispatch(metadataActions.fetchMetadataBySubjectIfNeeded(subject)))
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataEntityFormContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataEntityFormWithButton);

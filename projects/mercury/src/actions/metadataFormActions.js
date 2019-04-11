@@ -25,4 +25,9 @@ export const deleteMetadataValue = (subject, property, index) => ({
 export const initializeMetadataForm = (subject) => ({
     type: actionTypes.INITIALIZE_METADATA_FORM,
     subject
-})
+});
+
+export const clearMetadataForm = (subject) => ({
+    type: actionTypes.CLEAR_METADATA_FORM,
+    subject
+});

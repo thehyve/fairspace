@@ -4,6 +4,8 @@ import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
 import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
 import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
+import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
+import {getVocabulary} from "../reducers/cache/vocabularyReducers";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
@@ -17,6 +19,12 @@ export const updateEntity = (subject, values, vocabulary) => ({
         subject
     }
 });
+
+export const submitMetadataChangesFromState = (subject) => (dispatch, getState) => {
+    const updates = getMetadataFormUpdates(getState(), subject);
+    const vocabulary = getVocabulary(getState());
+    return dispatch(updateEntity(subject, updates, vocabulary));
+};
 
 export const createMetadataEntity = (shape, id) => {
     const subject = createIri(id);

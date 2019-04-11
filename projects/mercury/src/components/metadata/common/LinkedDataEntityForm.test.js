@@ -115,21 +115,5 @@ describe('MetaEntityForm', () => {
         expect(fetchVocabulary.mock.calls.length).toEqual(1);
     });
 
-    it('gives the correct state of pending changes', () => {
-        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} />);
-        expect(wrapper.instance().anyPendingChanges()).toBe(false);
 
-        const wrapperWithChanges = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} updates={{a: 'b'}}/>);
-        expect(wrapperWithChanges.instance().anyPendingChanges()).toBe(true);
-    });
-
-
-    it('makes call to updateEntity and reset changes after submission', () => {
-        const updateEntity = jest.fn(() => Promise.resolve());
-        const vocabulary = new Vocabulary();
-        const wrapper = shallow(<LinkedDataEntityForm subject="http://example.com/john" properties={[]} updateEntity={updateEntity} updates={{a: 'b'}} vocabulary={vocabulary} />);
-        wrapper.find(Button).simulate('click');
-        expect(updateEntity.mock.calls.length).toEqual(1);
-        expect(updateEntity.mock.calls[0]).toEqual(['http://example.com/john', {a: 'b'}, vocabulary]);
-    });
 });

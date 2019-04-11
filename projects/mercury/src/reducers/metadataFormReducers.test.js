@@ -1,10 +1,10 @@
-import {metadataFormReducerPerSubject} from './metadataFormReducers';
+import {metadataFormChangesReducerPerSubject} from './metadataFormReducers';
 import * as actionTypes from "../actions/actionTypes";
 
 describe('Metadata form reducer', () => {
     it('should clear updates on initialization', () => {
         expect(
-            metadataFormReducerPerSubject(
+            metadataFormChangesReducerPerSubject(
                 {
                     updates: {a: 'b'}
                 }, {
@@ -19,7 +19,7 @@ describe('Metadata form reducer', () => {
     describe('adding values', () => {
         it('should add a value when no values are present yet', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     undefined, {
                         type: actionTypes.ADD_METADATA_VALUE,
                         property: {key: 'propertyA', values: ['previousValue']},
@@ -32,7 +32,7 @@ describe('Metadata form reducer', () => {
         });
         it('should add a value if some updates were already done to this field', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     {
                         updates: {propertyA: ['test']}
                     }, {
@@ -47,7 +47,7 @@ describe('Metadata form reducer', () => {
         });
         it('should not change values for other fields', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     {
                         updates: {propertyA: ['test']}
                     }, {
@@ -68,7 +68,7 @@ describe('Metadata form reducer', () => {
     describe('updating values', () => {
         it('should update a value when no changes are present yet', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     undefined, {
                         type: actionTypes.UPDATE_METADATA_VALUE,
                         property: {key: 'propertyA', values: ['previousValue']},
@@ -82,7 +82,7 @@ describe('Metadata form reducer', () => {
         });
         it('should update a value if some updates were already done to this field', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     {
                         updates: {propertyA: ['test', 'test2']}
                     }, {
@@ -98,7 +98,7 @@ describe('Metadata form reducer', () => {
         });
         it('should not change values for other fields', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     {
                         updates: {propertyA: ['test']}
                     }, {
@@ -117,7 +117,7 @@ describe('Metadata form reducer', () => {
         });
         it('should ignore changes where the index if out of bounds', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     {
                         updates: {propertyA: ['test', 'test2']}
                     }, {
@@ -139,7 +139,7 @@ describe('Metadata form reducer', () => {
     describe('deleting values', () => {
         it('should delete a value when no changes are present yet', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     undefined, {
                         type: actionTypes.DELETE_METADATA_VALUE,
                         property: {key: 'propertyA', values: ['previousValue', 'previousValue2']},
@@ -152,7 +152,7 @@ describe('Metadata form reducer', () => {
         });
         it('should delete a value if some updates were already done to this field', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     {
                         updates: {propertyA: ['test', 'test2', 'test3']}
                     }, {
@@ -167,7 +167,7 @@ describe('Metadata form reducer', () => {
         });
         it('should not change values for other fields', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     {
                         updates: {propertyA: ['test']}
                     }, {
@@ -185,7 +185,7 @@ describe('Metadata form reducer', () => {
         });
         it('should ignore changes where the index if out of bounds', () => {
             expect(
-                metadataFormReducerPerSubject(
+                metadataFormChangesReducerPerSubject(
                     {
                         updates: {propertyA: ['test', 'test2']}
                     }, {
