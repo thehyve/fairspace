@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
 import LinkedDataEntityForm from "./LinkedDataEntityFormContainer";
 import LinkedDataEntityButton from "./LinkedDataEntitySubmitButtonContainer";
-import {ErrorMessage, LoadingInlay} from "../../common";
 
 const LinkedDataEntityFormWithButton = props => {
     const {editable, onSubmit, subject, ...otherProps} = props;
