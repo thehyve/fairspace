@@ -15,7 +15,9 @@ const metadataEntityPage = (props) => (
         <BreadCrumbs homeUrl="/metadata" />
         <Paper>
             <LinkedDataEntityHeader label={props.label} typeInfo={props.typeInfo} />
-            <MetadataEntityContainer style={{paddingLeft: 20}} subject={props.subject} />
+            <div style={{paddingLeft: 20}}>
+                <MetadataEntityContainer subject={props.subject} />
+            </div>
         </Paper>
     </>
 );
