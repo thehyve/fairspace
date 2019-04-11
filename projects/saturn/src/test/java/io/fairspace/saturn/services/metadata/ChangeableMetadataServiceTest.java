@@ -43,7 +43,7 @@ public class ChangeableMetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new ChangeableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), lifeCycleManager,null);
+        api = new ChangeableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), lifeCycleManager);
     }
 
     @Test

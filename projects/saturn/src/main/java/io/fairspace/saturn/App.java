@@ -84,7 +84,8 @@ public class App {
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
 
-        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary));
+        RecomputeInverseInferenceEventHandler recomputeInverseInferenceEventHandler = new RecomputeInverseInferenceEventHandler(rdf, userVocabularyGraphNode);
+        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary), recomputeInverseInferenceEventHandler);
         var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
         var metaVocabularyService = new ReadableMetadataService(rdf, metaVocabularyGraphNode);
         var combinedVocabularyService = new MergingReadableMetadataService(systemVocabularyService, userVocabularyService);
