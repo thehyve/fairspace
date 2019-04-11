@@ -18,6 +18,10 @@ import static java.lang.String.format;
  */
 @AllArgsConstructor
 public class MetadataAndVocabularyConsistencyValidator implements MetadataRequestValidator {
+    /**
+     * The whitelist contains the properties of the system shapes that can be changed.
+     * Currently it's allowed to change shape's label or comment and add a new property shape to a class shape.
+     */
     private static final Set<Property> WHITE_LISTED_PROPERTIES = Set.of(RDFS.label, RDFS.comment, SH.property);
 
     private final RDFConnection rdf;
