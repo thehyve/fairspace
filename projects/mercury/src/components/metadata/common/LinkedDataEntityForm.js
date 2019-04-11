@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {List, Paper} from '@material-ui/core';
+import {List} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../../common";
-
-import LinkedDataEntityHeader from './LinkedDataEntityHeader';
 import LinkedDataProperty from "./LinkedDataProperty";
 
 export class LinkedDataEntityForm extends React.Component {
@@ -30,7 +28,7 @@ export class LinkedDataEntityForm extends React.Component {
 
     render() {
         const {
-            subject, label, typeInfo, properties, editable, error, loading, showHeader
+            subject, properties, editable, error, loading
         } = this.props;
 
         if (error) {
@@ -46,7 +44,7 @@ export class LinkedDataEntityForm extends React.Component {
             values: this.props.updates[p.key] || p.values
         }));
 
-        const entity = (
+        return (
             <List dense>
                 {
                     propertiesWithChanges.map((p) => (
@@ -63,15 +61,6 @@ export class LinkedDataEntityForm extends React.Component {
                 }
             </List>
         );
-
-        return showHeader ? (
-            <>
-                <LinkedDataEntityHeader label={label} typeInfo={typeInfo} />
-                <Paper style={{paddingLeft: 20}}>
-                    {entity}
-                </Paper>
-            </>
-        ) : entity;
     }
 }
 
@@ -87,11 +76,7 @@ LinkedDataEntityForm.propTypes = {
     error: PropTypes.string,
 
     loading: PropTypes.bool,
-    showHeader: PropTypes.bool,
     editable: PropTypes.bool,
-
-    label: PropTypes.string,
-    typeInfo: PropTypes.string,
 
     subject: PropTypes.string.isRequired,
     properties: PropTypes.array
