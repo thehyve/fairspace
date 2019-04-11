@@ -158,7 +158,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     private String getLabel(Node node) {
-        var stmts = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, node, RDFS.label.asNode(), null)).listStatements();
+        var stmts = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, node, RDFS.label, null)).listStatements();
         return stmts.hasNext() ? stmts.nextStatement().getString() : "";
     }
 }
