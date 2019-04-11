@@ -372,8 +372,15 @@ elasticsearch:
         memory: "800Mi"
         cpu: 0.1
       limits:
-        memory: "2048Mi"
+        memory: "1024Mi"
         cpu: 1
+    initResources:
+      limits:
+        cpu: "25m"
+        memory: "128Mi"
+      requests:
+        cpu: "25m"
+        memory: "128Mi"
   data:
     exposeHttp: true
     resources:
@@ -381,16 +388,30 @@ elasticsearch:
         memory: "1600Mi"
         cpu: 0.1
       limits:
-        memory: "4096Mi"
+        memory: "2048Mi"
         cpu: 1
+    initResources:
+      limits:
+        cpu: "25m"
+        memory: "128Mi"
+      requests:
+        cpu: "25m"
+        memory: "128Mi"
   master:
     resources:
       requests:
         memory: "800Mi"
         cpu: 0.1
       limits:
-        memory: "4096Mi"
+        memory: "1024Mi"
         cpu: 1
+    initResources:
+      limits:
+        cpu: "25m"
+        memory: "128Mi"
+      requests:
+        cpu: "25m"
+        memory: "128Mi"
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}
