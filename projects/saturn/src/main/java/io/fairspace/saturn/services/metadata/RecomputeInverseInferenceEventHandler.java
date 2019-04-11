@@ -6,13 +6,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.modify.request.QuadAcc;
-import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
 import org.apache.jena.vocabulary.OWL;
 import org.topbraid.shacl.vocabulary.SH;
-
-import java.util.Collections;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -25,11 +20,11 @@ public class RecomputeInverseInferenceEventHandler implements MetadataUpdateEven
     @Override
     public void onEvent() {
         // Delete all existing inverseOfTriples
-        rdf.update(storedQuery("delete_by_mask", graph, null, OWL.inverseOf.asNode(), null));
+        rdf.update(storedQuery("delete_by_mask", graph, null, OWL.inverseOf, null));
 
         // Retrieve information on sh:path and fs:inverseRelation
-        Model shPathModel = rdf.queryConstruct(storedQuery("select_by_mask", graph, null, SH.path.asNode(), null));
-        Model fsInverseRelationModel = rdf.queryConstruct(storedQuery("select_by_mask", graph, null, FS.inverseRelation.asNode(), null));
+        Model shPathModel = rdf.queryConstruct(storedQuery("select_by_mask", graph, null, SH.path, null));
+        Model fsInverseRelationModel = rdf.queryConstruct(storedQuery("select_by_mask", graph, null, FS.inverseRelation, null));
 
         // Load all inverseOfTriples for the given information
         rdf.load(graph.getURI(), generateInverseOfTriples(shPathModel, fsInverseRelationModel));

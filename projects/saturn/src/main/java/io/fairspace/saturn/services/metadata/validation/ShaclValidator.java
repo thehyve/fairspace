@@ -80,7 +80,7 @@ public class ShaclValidator implements MetadataRequestValidator {
     private Model affectedModelSubSet(Set<Resource> affectedResources) {
         var model = createDefaultModel();
         affectedResources.forEach(r ->
-                model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, r.asNode(), null, null))));
+                model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, r, null, null))));
 
         return model;
     }
@@ -88,7 +88,7 @@ public class ShaclValidator implements MetadataRequestValidator {
     private void addObjectTypes(Model model) {
         model.listObjects().toSet().forEach(obj -> {
             if (obj.isResource() && !((Resource)obj).hasProperty(RDF.type)) {
-                model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, obj.asNode(), RDF.type.asNode(), null)));
+                model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, obj, RDF.type, null)));
             }
         });
     }
