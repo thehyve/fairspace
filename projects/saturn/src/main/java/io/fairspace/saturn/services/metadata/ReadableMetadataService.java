@@ -38,11 +38,11 @@ class ReadableMetadataService {
      * Returns a model with all fairspace metadata entities for the given type
      *
      * The method returns the type and the label (if present) for all entities that match
-     * the given type if the type is marked as fairspaceEntity in the vocabulary.
+     * the given type if the type is marked as fs:showInCatalog in the vocabulary.
      *
-     * If the type is not marked as fairspaceEntity, the resulting model will be empty
+     * If the type is not marked as fs:showInCatalog, the resulting model will be empty
      *
-     * If the type is null, all entities for which the type is marked as fairspaceEntity in
+     * If the type is null, all entities for which the type is marked as fs:showInCatalog in
      * the vocabulary will be returned.
      *
      * @param type  URI for the type to filter the list of entities on
