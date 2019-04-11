@@ -93,7 +93,7 @@ public class App {
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
         var fusekiServerBuilder = FusekiServer.create()
-                .add("rdf", ds)
+                .add("api/rdf", ds, false)
                 .addFilter("/api/*", new SaturnSparkFilter(
                         new ChangeableMetadataApp("/api/metadata", metadataService),
                         new ChangeableMetadataApp("/api/vocabulary/user", userVocabularyService)

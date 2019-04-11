@@ -82,6 +82,9 @@ zuul:
     permissions:
       path: /api/permissions/**
       url: http://saturn/api/permissions/
+    rdf:
+      path: /api/rdf/**
+      url: http://saturn/api/rdf/
     ui:
       path: /**
       url: http://mercury/
