@@ -31,6 +31,11 @@ describe('MetadataEntityContainer', () => {
                     data: []
                 }
             },
+            metadataForm: {
+                "http://fairspace.com/iri/collections/1": {
+                    updates: {}
+                }
+            },
             cache: {
                 vocabulary:
                 {
@@ -47,6 +52,7 @@ describe('MetadataEntityContainer', () => {
     it('shows error when no subject provided', () => {
         const store = mockStore({
             metadataBySubject: {},
+            metadataForm: {},
             cache: {
                 vocabulary:
                 {

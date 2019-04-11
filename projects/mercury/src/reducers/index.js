@@ -6,6 +6,7 @@ import clipboard from "./clipboardReducers";
 import workspace from './workspaceReducers';
 import ui from "./uiReducers";
 import search from './searchReducers';
+import metadataForm from './metadataFormReducers';
 
 export default combineReducers({
     account,
@@ -14,5 +15,6 @@ export default combineReducers({
     workspace,
     clipboard,
     ui,
-    search
+    search,
+    metadataForm
 });

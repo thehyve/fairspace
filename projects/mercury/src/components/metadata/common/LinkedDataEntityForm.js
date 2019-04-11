@@ -9,73 +9,37 @@ import LinkedDataEntityHeader from './LinkedDataEntityHeader';
 import LinkedDataProperty from "./LinkedDataProperty";
 
 export class LinkedDataEntityForm extends React.Component {
-    state = {
-        propertiesWithUpdatedValues: {}
-    };
-
     componentDidMount() {
-        this.load();
+        this.initialize();
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.subject !== prevProps.subject) {
-            this.resetChanges();
-            this.load();
-        } else if (this.anyPendingChanges()) {
-            this.load();
+            this.initialize();
         }
     }
 
-    load() {
-        const {subject, fetchShapes, fetchLinkedData} = this.props;
+    initialize() {
+        const {subject, initializeForm, fetchShapes, fetchLinkedData} = this.props;
 
         if (subject) {
+            initializeForm(subject);
             fetchShapes();
             fetchLinkedData(subject);
         }
     }
 
-    updateState = (propertyKey, updatedValues) => {
-        this.setState(prevState => ({
-            propertiesWithUpdatedValues:
-                {...prevState.propertiesWithUpdatedValues, [propertyKey]: updatedValues}
-        }));
-    };
-
-    handleChange = (property, value, index) => {
-        const pendingValues = this.state.propertiesWithUpdatedValues[property.key];
-        const values = pendingValues || property.values;
-        const updatedValues = values.map((el, idx) => ((idx === index) ? value : el));
-        this.updateState(property.key, updatedValues);
-    };
-
-    handleAdd = (property, value) => {
-        const updatedValues = [...property.values, value];
-        this.updateState(property.key, updatedValues);
-    };
-
-    handleDelete = (property, index) => {
-        const pendingValues = this.state.propertiesWithUpdatedValues[property.key];
-        const values = pendingValues || property.values;
-        const updatedValues = values.filter((el, idx) => idx !== index);
-        this.updateState(property.key, updatedValues);
-    };
-
     handleSubmit = () => {
         const {subject, updateEntity} = this.props;
 
-        updateEntity(subject, this.state.propertiesWithUpdatedValues, this.props.vocabulary)
+        updateEntity(subject, this.props.updates, this.props.vocabulary)
             .then(this.resetChanges)
             .catch(e => ErrorDialog.showError(e, "Error while updating metadata"));
     };
 
-    anyPendingChanges = () => Object.keys(this.state.propertiesWithUpdatedValues).length !== 0;
+    anyPendingChanges = () => Object.keys(this.props.updates).length !== 0;
 
     shouldShowSubmitButton = () => this.props.editable && this.anyPendingChanges();
-
-    resetChanges = () => {
-        this.setState({propertiesWithUpdatedValues: {}});
-    }
 
     render() {
         const {
@@ -93,7 +57,7 @@ export class LinkedDataEntityForm extends React.Component {
 
         const propertiesWithChanges = properties.map(p => ({
             ...p,
-            values: this.state.propertiesWithUpdatedValues[p.key] || p.values
+            values: this.props.updates[p.key] || p.values
         }));
 
         const entity = (
@@ -110,9 +74,9 @@ export class LinkedDataEntityForm extends React.Component {
                                     subject={subject}
                                     key={subject + p.key}
                                     property={p}
-                                    onChange={(value, index) => this.handleChange(p, value, index)}
-                                    onAdd={(value) => this.handleAdd(p, value)}
-                                    onDelete={(index) => this.handleDelete(p, index)}
+                                    onChange={(value, index) => this.props.handleChange(p, value, index)}
+                                    onAdd={(value) => this.props.handleAdd(p, value)}
+                                    onDelete={(index) => this.props.handleDelete(p, index)}
                                 />
                             ))
                         }
@@ -143,6 +107,12 @@ export class LinkedDataEntityForm extends React.Component {
 }
 
 LinkedDataEntityForm.propTypes = {
+    initializeForm: PropTypes.func,
+    handleAdd: PropTypes.func,
+    handleChange: PropTypes.func,
+    handleDelete: PropTypes.func,
+    updates: PropTypes.object,
+
     updateEntity: PropTypes.func,
     fetchShapes: PropTypes.func,
     fetchLinkedData: PropTypes.func,
@@ -156,13 +126,20 @@ LinkedDataEntityForm.propTypes = {
     typeInfo: PropTypes.string,
 
     subject: PropTypes.string.isRequired,
-    properties: PropTypes.array,
+    properties: PropTypes.array
 };
 
 LinkedDataEntityForm.defaultProps = {
     fetchShapes: () => {},
     fetchLinkedData: () => {},
-    updateEntity: () => {}
+    initializeForm: () => {},
+
+    handleAdd: () => {},
+    handleChange: () => {},
+    handleDelete: () => {},
+    updateEntity: () => {},
+
+    updates: {}
 };
 
 export default LinkedDataEntityForm;
