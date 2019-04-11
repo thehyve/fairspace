@@ -38,7 +38,7 @@ class LinkedDataProperty extends React.Component {
     //     this.props.onChange(value, index, errors && errors.length > 0);
     // }
 
-    renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
+    renderEntry = (entry, idx, PropertyValueComponent, labelledBy, hasErrors) => {
         const {editable, property, onChange, onDelete, subject} = this.props;
         const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
 
@@ -55,6 +55,7 @@ class LinkedDataProperty extends React.Component {
                             entry={entry}
                             onChange={(value) => onChange(value, idx)}
                             aria-labelledby={labelledBy}
+                            error={hasErrors}
                         />
                     </ListItemText>
                     {
@@ -106,10 +107,7 @@ class LinkedDataProperty extends React.Component {
     render() {
         const {editable, property} = this.props;
         const {errors} = this.state;
-
-        if (errors.length > 0) {
-            console.log({errors});
-        }
+        const hasErrors = errors && errors.length > 0;
 
         // Do not show an add component if no multiples are allowed
         // and there is already a value
@@ -131,7 +129,7 @@ class LinkedDataProperty extends React.Component {
                 </Typography>
                 {errors && errors.length > 0 ? errors.map(e => `${e} `) : null}
                 <List dense>
-                    {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
+                    {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId, hasErrors))}
                     {canAdd ? this.renderAddComponent(labelId) : null}
                 </List>
             </ListItem>
