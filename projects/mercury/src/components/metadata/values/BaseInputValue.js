@@ -10,7 +10,7 @@ class BaseInputValue extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.entry.value !== prevProps.entry.value) {
-            this.reset();
+            this.updateState();
         }
     }
 
@@ -19,12 +19,17 @@ class BaseInputValue extends React.Component {
     }
 
     handleBlur = () => {
-        const {onChange, transformValue} = this.props;
-        onChange({value: transformValue(this.state.value)});
-        this.reset();
+        const {onChange, transformValue, entry: {value: oldValue}} = this.props;
+        const {value: newValue} = this.state;
+
+        // only if values don't match OR if the inputted value is empty AND already had value (removed existing)
+        if (newValue !== oldValue || (!newValue && oldValue)) {
+            onChange({value: transformValue(newValue)});
+            this.updateState();
+        }
     }
 
-    reset() {
+    updateState = () => {
         this.setState({value: this.props.entry.value});
     }
 
