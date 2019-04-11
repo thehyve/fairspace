@@ -12,7 +12,9 @@ describe('Metadata form reducer', () => {
                 }
             )
         ).toEqual({
-            updates: {}
+            updates: {},
+            error: false,
+            pending: false
         });
     });
 
@@ -27,7 +29,9 @@ describe('Metadata form reducer', () => {
                     }
                 )
             ).toEqual({
-                updates: {propertyA: ['previousValue', 'added']}
+                updates: {propertyA: ['previousValue', 'added']},
+                error: false,
+                pending: false
             });
         });
         it('should add a value if some updates were already done to this field', () => {
@@ -77,7 +81,9 @@ describe('Metadata form reducer', () => {
                     }
                 )
             ).toEqual({
-                updates: {propertyA: ['changed']}
+                updates: {propertyA: ['changed']},
+                error: false,
+                pending: false
             });
         });
         it('should update a value if some updates were already done to this field', () => {
@@ -147,7 +153,9 @@ describe('Metadata form reducer', () => {
                     }
                 )
             ).toEqual({
-                updates: {propertyA: ['previousValue']}
+                updates: {propertyA: ['previousValue']},
+                error: false,
+                pending: false
             });
         });
         it('should delete a value if some updates were already done to this field', () => {
