@@ -9,6 +9,7 @@ import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import Vocabulary from "../../../services/Vocabulary";
 import Config from "../../../services/Config/Config";
 import {STRING_URI} from "../../../constants";
+import ErrorMessage from "../../common/ErrorMessage";
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
@@ -86,6 +87,22 @@ describe('MetaEntityForm', () => {
 
         expect(wrapper.find(List).length).toEqual(1);
     });
+
+    it('shows an error message if no data is available', () => {
+        const collection = {
+            iri: "http://fairspace.com/iri/collections/1"
+        };
+
+        const wrapper = shallow(<LinkedDataEntityForm
+            properties={defaultMetadata}
+            editable
+            subject={collection.iri}
+            error="Testing error"
+        />);
+
+        const errorMessage = wrapper.find(ErrorMessage);
+        expect(errorMessage.length).toEqual(1);
+    })
 
     it('tries to initialize the metadata and the vocabulary', () => {
         const store = mockStore({
