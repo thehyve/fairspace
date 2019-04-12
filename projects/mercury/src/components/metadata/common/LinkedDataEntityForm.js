@@ -11,7 +11,7 @@ export const LinkedDataEntityForm = props => {
     } = props;
 
     if (error) {
-        return <ErrorMessage message={error.message} />;
+        return <ErrorMessage message={error} />;
     }
 
     if (loading) {
