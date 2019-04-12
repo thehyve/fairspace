@@ -174,7 +174,9 @@ saturn:
     image: eu.gcr.io/fairspace-207108/saturn
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
-
+  initContainer:
+    image: alpine:3.9
+    pullPolicy: IfNotPresent
   service:
     name: saturn
     type: ClusterIP
