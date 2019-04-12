@@ -33,7 +33,7 @@ export const createEntity = (subject, type, values, vocabulary) => ({
             }
         })
         .then(() => MetadataAPI.createEntity(subject, type, values, vocabulary))
-        .then(() => subject),
+        .then(() => ({subject, type, values})),
     meta: {
         subject,
         type

@@ -35,10 +35,10 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
         const subject = createIri(id);
         const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
         return dispatch(metadataActions.createMetadataEntityFromState(subject, type))
-            .then((response) => {
+            .then(({value}) => {
                 dispatch(metadataActions.fetchAllEntitiesIfNeeded());
-                ownProps.history.push(relativeLink(response.value));
-            })
+                ownProps.history.push(relativeLink(value.subject));
+            });
     }
 });
 

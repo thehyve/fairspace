@@ -6,12 +6,15 @@ import Icon from "@material-ui/core/Icon";
 import Grid from "@material-ui/core/Grid";
 
 import Dropdown from "./Dropdown";
-import {createMetadataEntityFromState, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
+import * as metadataActions from "../../../actions/metadataActions";
+import {fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
 import NewLinkedDataEntityDialog from "../common/NewLinkedDataEntityDialog";
 import LoadingInlay from "../../common/LoadingInlay";
 import ErrorMessage from "../../common/ErrorMessage";
 import {ErrorDialog} from "../../common";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {createIri, getFirstPredicateProperty} from "../../../utils/metadataUtils";
+import * as constants from "../../../constants";
 
 class EntityDropdownContainer extends React.Component {
     state = {
@@ -33,10 +36,13 @@ class EntityDropdownContainer extends React.Component {
 
     handleEntityCreation = (shape, id) => {
         this.props.onCreate(shape, id)
-            .then((res) => {
+            .then(({value}) => {
+                const label = getFirstPredicateProperty(value.values, constants.LABEL_URI, 'value')
+                                || getFirstPredicateProperty(value.values, constants.SHACL_NAME, 'value');
+
                 this.handleCloseDialog();
-                this.props.fetchEntitiesIfNeeded(this.props.property.className);
-                this.props.onChange({id: res.value});
+                this.props.fetchEntities(this.props.property.className);
+                this.props.onChange({id: value.subject, label});
             })
             .catch(e => ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`));
     }
@@ -68,6 +74,7 @@ class EntityDropdownContainer extends React.Component {
                     <NewLinkedDataEntityDialog
                         open={this.state.adding}
                         shape={this.props.shape}
+                        linkedData={this.props.vocabulary.emptyLinkedData(this.props.shape)}
                         onCreate={this.handleEntityCreation}
                         onClose={this.handleCloseDialog}
                     />
@@ -78,6 +85,7 @@ class EntityDropdownContainer extends React.Component {
 }
 
 EntityDropdownContainer.propTypes = {
+    vocabulary: PropTypes.object.isRequired,
     property: PropTypes.object.isRequired,
     fetchEntities: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -87,6 +95,7 @@ EntityDropdownContainer.propTypes = {
 const mapStateToProps = (state, ownProps) => {
     const {cache: {entitiesByType}} = state;
     const dropdownOptions = entitiesByType[ownProps.property.className];
+    const vocabulary = getVocabulary(state);
     const pending = !dropdownOptions || dropdownOptions.pending || isVocabularyPending(state);
     const error = !dropdownOptions || dropdownOptions.error || hasVocabularyError(state);
 
@@ -97,13 +106,18 @@ const mapStateToProps = (state, ownProps) => {
         pending,
         error,
         entities,
-        shape
+        shape,
+        vocabulary
     };
 };
 
-const mapDispatchToProps = {
-    fetchEntities: fetchEntitiesIfNeeded,
-    onCreate: createMetadataEntityFromState
-};
+const mapDispatchToProps = (dispatch, ownProps) => ({
+    fetchEntities: (type) => dispatch(fetchEntitiesIfNeeded(type)),
+    onCreate: (shape, id) => {
+        const subject = createIri(id);
+        const type = ownProps.property.className;
+        return dispatch(metadataActions.createMetadataEntityFromState(subject, type));
+    }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(EntityDropdownContainer);
