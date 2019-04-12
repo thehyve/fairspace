@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Resource;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -31,6 +32,9 @@ public class SparqlUtils {
         var params = new Object[args.length];
         for (int i = 0; i < args.length; i++) {
             var arg = args[i];
+            if (arg instanceof Resource) {
+                arg = ((Resource) arg).asNode();
+            }
             if (arg instanceof Node && ((Node)arg).isURI()) {
                 validateIRI(((Node) arg).getURI());
             }
