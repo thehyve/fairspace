@@ -1,48 +1,23 @@
 import React from 'react';
-import {PropTypes} from "prop-types";
-import {connect} from "react-redux";
 import Paper from "@material-ui/core/Paper";
 
 import BreadCrumbs from "../../common/BreadCrumbs";
 import MetadataEntityContainer from './MetadataEntityContainer';
-import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
-import {getTypeInfo, linkLabel, url2iri} from "../../../utils/metadataUtils";
-import {getCombinedMetadataForSubject, isMetadataPending} from "../../../reducers/cache/jsonLdBySubjectReducers";
-import {isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {url2iri} from "../../../utils/metadataUtils";
+import MetadataEntityHeaderContainer from "./MetadataEntityHeaderContainer";
 
-const metadataEntityPage = (props) => (
-    <>
-        <BreadCrumbs homeUrl="/metadata" />
-        <Paper>
-            <LinkedDataEntityHeader label={props.label} typeInfo={props.typeInfo} />
-            <div style={{paddingLeft: 20}}>
-                <MetadataEntityContainer subject={props.subject} />
-            </div>
-        </Paper>
-    </>
-);
-
-metadataEntityPage.propTypes = {
-    subject: PropTypes.string.isRequired,
-    label: PropTypes.string,
-    typeInfo: PropTypes.string
-};
-
-const mapStateToProps = (state) => {
+export default () => {
     const subject = url2iri(window.location.href);
-    const metadata = getCombinedMetadataForSubject(state, subject);
 
-    const typeInfo = getTypeInfo(metadata);
-    const label = linkLabel(subject);
-
-    return {
-        loading: isMetadataPending(state, subject) || isVocabularyPending(state),
-        error: isMetadataPending(state, subject) || isVocabularyPending(state),
-
-        subject,
-        typeInfo,
-        label
-    };
+    return (
+        <>
+            <BreadCrumbs homeUrl="/metadata" />
+            <Paper>
+                <MetadataEntityHeaderContainer subject={subject} />
+                <div style={{paddingLeft: 20}}>
+                    <MetadataEntityContainer subject={subject} />
+                </div>
+            </Paper>
+        </>
+    );
 };
-
-export default connect(mapStateToProps)(metadataEntityPage);
