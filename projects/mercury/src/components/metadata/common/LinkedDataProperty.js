@@ -121,7 +121,8 @@ class LinkedDataProperty extends React.Component {
 }
 
 LinkedDataProperty.defaultProps = {
-    onChange: () => {}
+    onChange: () => {},
+    editable: true
 };
 
 export default LinkedDataProperty;

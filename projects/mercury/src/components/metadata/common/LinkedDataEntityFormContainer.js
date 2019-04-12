@@ -55,6 +55,10 @@ class LinkedDataEntityFormContainer extends React.Component {
 }
 
 LinkedDataEntityFormContainer.propTypes = {
+    initializeForm: PropTypes.func,
+    fetchShapes: PropTypes.func,
+    fetchLinkedData: PropTypes.func,
+
     onAdd: PropTypes.func,
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
@@ -70,6 +74,9 @@ LinkedDataEntityFormContainer.propTypes = {
 };
 
 LinkedDataEntityFormContainer.defaultProps = {
+    fetchShapes: () => {},
+    fetchLinkedData: () => {},
+
     onAdd: () => {},
     onChange: () => {},
     onDelete: () => {},

@@ -1,8 +1,6 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {MetadataAPI} from "../services/LinkedDataAPI";
-import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
-import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
 import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
 import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
 import {getVocabulary} from "../reducers/cache/vocabularyReducers";
@@ -26,24 +24,27 @@ export const submitMetadataChangesFromState = (subject) => (dispatch, getState) 
     return dispatch(updateEntity(subject, updates, vocabulary));
 };
 
-export const createMetadataEntity = (shape, id) => {
-    const subject = createIri(id);
-    const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
-    return {
-        type: actionTypes.CREATE_METADATA_ENTITY,
-        payload: MetadataAPI.get({subject})
-            .then((meta) => {
-                if (meta.length) {
-                    throw Error(`Metadata entity already exists: ${subject}`);
-                }
-            })
-            .then(() => MetadataAPI.update(subject, constants.TYPE_URI, [{id: type}]))
-            .then(() => subject),
-        meta: {
-            subject,
-            type
-        }
-    };
+export const createEntity = (subject, type, values, vocabulary) => ({
+    type: actionTypes.CREATE_METADATA_ENTITY,
+    payload: MetadataAPI.get({subject})
+        .then((meta) => {
+            if (meta.length) {
+                throw Error(`Entity already exists: ${subject}`);
+            }
+        })
+        .then(() => MetadataAPI.createEntity(subject, type, values, vocabulary))
+        .then(() => subject),
+    meta: {
+        subject,
+        type
+    }
+});
+
+export const createMetadataEntityFromState = (subject, type) => (dispatch, getState) => {
+    const values = getMetadataFormUpdates(getState(), subject);
+    const vocabulary = getVocabulary(getState());
+
+    return dispatch(createEntity(subject, type, values, vocabulary));
 };
 
 const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({

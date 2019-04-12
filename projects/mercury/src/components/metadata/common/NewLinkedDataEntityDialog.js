@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 
-import {generateUuid, getLabel} from "../../../utils/metadataUtils";
+import {createIri, generateUuid, getLabel} from "../../../utils/metadataUtils";
+import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
@@ -22,8 +23,9 @@ class NewLinkedDataEntityDialog extends React.Component {
     handleInputChange = event => this.setState({id: event.target.value});
 
     render() {
-        const typeLabel = getLabel(this.props.shape);
-        const showDialog = this.props.open && this.props.shape !== undefined;
+        const {shape, open, linkedData} = this.props;
+        const typeLabel = getLabel(shape);
+        const showDialog = open && shape !== undefined;
 
         return (
             <Dialog
@@ -46,6 +48,12 @@ class NewLinkedDataEntityDialog extends React.Component {
                         error={!this.hasValidId()}
                         style={{width: 400}}
                     />
+
+                    <LinkedDataEntityFormContainer
+                        subject={createIri(this.state.id)}
+                        properties={linkedData}
+                    />
+
                 </DialogContent>
                 <DialogActions>
                     <Button

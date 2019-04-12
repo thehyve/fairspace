@@ -65,6 +65,40 @@ class Vocabulary {
     }
 
     /**
+     * Returns a linked data object for a new entity. The object can be used in form generation
+     *
+     * Please note that only the metadata for the first subject will be used
+     *
+     * @param shape The shape for the
+     * @param subject Subject to combine the metadata for. If not provided, the metadata is expected to contain
+     *                information on a single entity
+     * @returns [Any] A promise resolving in an array with metadata. Each element will look like this:
+     * {
+     *      key: "http://fairspace.io/ontology#description",
+     *      label: "Description",
+     *      values: [
+     *          { id: "http://fairspace.com/collections/1", label: "My collection" },
+     *          { value: "Literal value"}
+     *      ]
+     *  }
+     */
+    emptyLinkedData(shape) {
+        if (!shape) {
+            return [];
+        }
+
+        // Determine properties allowed for the given type
+        const propertyShapes = this.determinePropertyShapesForNodeShape(shape);
+        const emptyProperties = this.determineAdditionalEmptyProperties({}, propertyShapes);
+
+        // An entry with information on the type is returned as well for display purposes
+        const types = (shape[constants.SHACL_TARGET_CLASS] || []).map(node => node['@id']);
+        const typeProperty = this.generateTypeProperty(types);
+
+        return [...emptyProperties, typeProperty];
+    }
+
+    /**
      * Looks up an entity shape in the vocabulary for the given type
      * @param type
      */
@@ -190,8 +224,14 @@ class Vocabulary {
      * @param type
      */
     determinePropertyShapesForType(type) {
-        const shape = this.determineShapeForType(type);
+        return this.determinePropertyShapesForNodeShape(this.determineShapeForType(type));
+    }
 
+    /**
+     * Returns a list of property shapes that are in given node shape
+     * @param shape
+     */
+    determinePropertyShapesForNodeShape(shape) {
         if (!shape) {
             return [];
         }

@@ -27,6 +27,7 @@ const mapStateToProps = (state) => {
         loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
         error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
         shapes: metaVocabulary.getFairspaceClasses(),
+        vocabulary: metaVocabulary,
         entities
     });
 };

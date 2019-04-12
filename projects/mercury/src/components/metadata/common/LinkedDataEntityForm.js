@@ -23,7 +23,7 @@ export const LinkedDataEntityForm = props => {
             {
                 properties.map((p) => (
                     <LinkedDataProperty
-                        editable={editable && p.editable}
+                        editable={editable}
                         subject={subject}
                         key={subject + p.key}
                         property={p}

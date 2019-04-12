@@ -6,7 +6,7 @@ import Icon from "@material-ui/core/Icon";
 import Grid from "@material-ui/core/Grid";
 
 import Dropdown from "./Dropdown";
-import {createMetadataEntity, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
+import {createMetadataEntityFromState, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
 import NewLinkedDataEntityDialog from "../common/NewLinkedDataEntityDialog";
 import LoadingInlay from "../../common/LoadingInlay";
 import ErrorMessage from "../../common/ErrorMessage";
@@ -20,7 +20,7 @@ class EntityDropdownContainer extends React.Component {
 
     constructor(props) {
         super(props);
-        props.fetchEntitiesIfNeeded(props.property.className);
+        props.fetchEntities(props.property.className);
     }
 
     handleAdd = () => {
@@ -32,7 +32,7 @@ class EntityDropdownContainer extends React.Component {
     };
 
     handleEntityCreation = (shape, id) => {
-        this.props.createMetadataEntity(shape, id)
+        this.props.onCreate(shape, id)
             .then((res) => {
                 this.handleCloseDialog();
                 this.props.fetchEntitiesIfNeeded(this.props.property.className);
@@ -79,9 +79,9 @@ class EntityDropdownContainer extends React.Component {
 
 EntityDropdownContainer.propTypes = {
     property: PropTypes.object.isRequired,
-    fetchEntitiesIfNeeded: PropTypes.func.isRequired,
-    createMetadataEntity: PropTypes.func.isRequired,
-    onChange: PropTypes.func.isRequired
+    fetchEntities: PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onCreate: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state, ownProps) => {
@@ -102,8 +102,8 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = {
-    fetchEntitiesIfNeeded,
-    createMetadataEntity
+    fetchEntities: fetchEntitiesIfNeeded,
+    onCreate: createMetadataEntityFromState
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EntityDropdownContainer);

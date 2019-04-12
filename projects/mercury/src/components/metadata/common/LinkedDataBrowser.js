@@ -96,6 +96,7 @@ class LinkedDataBrowser extends React.Component {
                 />
                 <NewLinkedDataEntityDialog
                     open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
+                    linkedData={this.props.vocabulary.emptyLinkedData(this.state.shape)}
                     shape={this.state.shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}
