@@ -1,11 +1,17 @@
 import React from "react";
 import PropTypes from "prop-types";
+import {Button} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import LinkedDataEntityForm from "./LinkedDataEntityFormContainer";
-import LinkedDataEntityButton from "./LinkedDataEntitySubmitButton";
+import ErrorDialog from "../../common/ErrorDialog";
 
 const LinkedDataEntityFormWithButton = props => {
     const {editable, buttonDisabled, onSubmit, subject, ...otherProps} = props;
+
+    const handleButtonClick = () => {
+        props.onSubmit(props.subject)
+            .catch(err => ErrorDialog.showError(err, "Error while updating metadata"));
+    };
 
     return (
         <Grid container>
@@ -16,7 +22,13 @@ const LinkedDataEntityFormWithButton = props => {
                 editable
                     ? (
                         <Grid item>
-                            <LinkedDataEntityButton subject={subject} onClick={onSubmit} disabled={buttonDisabled} />
+                            <Button
+                                onClick={handleButtonClick}
+                                color="primary"
+                                disabled={buttonDisabled}
+                            >
+                                Update
+                            </Button>
                         </Grid>
                     )
                     : null
