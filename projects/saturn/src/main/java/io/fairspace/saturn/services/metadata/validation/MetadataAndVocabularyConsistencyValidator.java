@@ -59,10 +59,10 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
 
         var result = ref(ValidationResult.VALID);
 
-        var withMeta = newVocabulary.union(META_VOCABULARY);
+        var combinedVocabulary = newVocabulary.union(META_VOCABULARY);
 
         Consumer<QuerySolution> subjectValidator = row ->
-                result.value = result.value.merge(validateResource(row.getResource("s"), withMeta));
+                result.value = result.value.merge(validateResource(row.getResource("s"), combinedVocabulary));
 
         affectedClasses.forEach(c -> rdf.querySelect(storedQuery("subjects_by_type", c), subjectValidator));
         affectedProperties.forEach(p -> rdf.querySelect(storedQuery("subjects_with_property", p), subjectValidator));

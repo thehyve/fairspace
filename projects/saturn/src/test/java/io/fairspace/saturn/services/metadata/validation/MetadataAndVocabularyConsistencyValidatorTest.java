@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Before;
@@ -22,6 +23,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
 
 public class MetadataAndVocabularyConsistencyValidatorTest {
+    private static final String NS = "http://example.com/";
     private static final Model EMPTY = createDefaultModel();
 
     private Dataset ds = DatasetFactory.create();
@@ -35,15 +37,21 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidation() {
-        var classShapeResource = createResource(FS.NS + "TestClassShape");
-        var classResource = createResource(FS.NS + "TestClass");
-        var propertyShapeResource = createResource(FS.NS + "testPropertyShape");
-        var propertyResource = createProperty(FS.NS + "testProperty");
-        var subject = createResource(FS.NS + "testSubject");
+        var classShapeResource = createResource(NS + "TestClassShape");
+        var classResource = createResource(NS + "TestClass");
+        var propertyShapeResource = createResource(NS + "testPropertyShape");
+        var propertyResource = createProperty(NS + "testProperty");
+        var relationShapeResource = createResource(NS + "testRelationShape");
+        var relationResource = createProperty(NS + "testRelation");
+        var subject = createResource(NS + "testSubject");
+        var object = createResource(NS + "testObject");
+
 
         ds.getDefaultModel()
                 .add(subject, RDF.type, classResource)
-                .add(subject, propertyResource, createStringLiteral("123"));
+                .add(subject, propertyResource, createStringLiteral("123"))
+                .add(subject, relationResource, object)
+                .add(object, RDF.type, FOAF.Person);
 
 
         var createNewClassShape = createDefaultModel()
@@ -51,41 +59,52 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
                 .add(classShapeResource, SH.targetClass, classResource);
 
 
-        var result = validator.validate(EMPTY, createNewClassShape);
+        var result = apply(createNewClassShape);
         assertTrue(result.isValid());
-
-
-        ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()).add(createNewClassShape);
 
 
         var createNewPropertyShape = createDefaultModel()
                 .add(propertyShapeResource, RDF.type, FS.PropertyShape)
-                .add(propertyShapeResource, SH.path, propertyResource)
-                .add(propertyShapeResource, SH.datatype, XSD.xstring);
+                .add(propertyShapeResource, SH.datatype, XSD.xstring)
+                .add(propertyShapeResource, SH.path, propertyResource);
 
-        result = validator.validate(EMPTY, createNewPropertyShape);
+        result = apply(createNewPropertyShape);
         assertTrue(result.isValid());
-
-
-        ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()).add(createNewPropertyShape);
 
         var addPropertyShapeToClassShape = createDefaultModel()
                 .add(classShapeResource, SH.property, propertyShapeResource);
 
 
-        result = validator.validate(EMPTY, addPropertyShapeToClassShape);
+        result = apply(addPropertyShapeToClassShape);
         assertTrue(result.isValid());
-
-        ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()).add(addPropertyShapeToClassShape);
 
         var setMaxLength = createDefaultModel()
                 .add(propertyShapeResource, SH.maxLength, createTypedLiteral(2));
 
         result = validator.validate(EMPTY, setMaxLength);
         assertFalse(result.isValid());
-        assertEquals(Set.of("http://fairspace.io/ontology#testSubject http://fairspace.io/ontology#testProperty: Value has more than 2 characters."),
+        assertEquals(Set.of("http://example.com/testSubject http://example.com/testProperty: Value has more than 2 characters."),
+                result.getValidationMessages());
+
+
+
+        var addRelationShape = createDefaultModel()
+                .add(relationShapeResource, RDF.type, FS.RelationShape)
+                .add(relationShapeResource, SH.path, relationResource)
+                .add(relationShapeResource, SH.class_, FOAF.Document)
+                .add(classShapeResource, SH.property, relationShapeResource);
+
+        result = apply(addRelationShape);
+        assertFalse(result.isValid());
+        assertEquals(Set.of("http://example.com/testSubject http://example.com/testRelation: Value does not have class <http://xmlns.com/foaf/0.1/Document>."),
                 result.getValidationMessages());
     }
 
-
+    private ValidationResult apply(Model changes) {
+        var result = validator.validate(EMPTY, changes);
+        if (result.isValid()) {
+            ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()).add(changes);
+        }
+        return result;
+    }
 }
