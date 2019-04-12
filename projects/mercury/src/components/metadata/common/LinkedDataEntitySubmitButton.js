@@ -1,8 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {connect} from "react-redux";
 import {Button} from "@material-ui/core";
-import {hasMetadataFormUpdates} from "../../../reducers/metadataFormReducers";
 import ErrorDialog from "../../common/ErrorDialog";
 
 export const LinkedDataEntityButton = (props) => {
@@ -28,8 +26,4 @@ LinkedDataEntityButton.propTypes = {
     disabled: PropTypes.bool
 };
 
-const mapStateToProps = (state, ownProps) => ({
-    disabled: ownProps.disabled || !hasMetadataFormUpdates(state, ownProps.subject)
-});
-
-export default connect(mapStateToProps)(LinkedDataEntityButton);
+export default LinkedDataEntityButton;

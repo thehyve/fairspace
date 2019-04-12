@@ -2,10 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
 import LinkedDataEntityForm from "./LinkedDataEntityFormContainer";
-import LinkedDataEntityButton from "./LinkedDataEntitySubmitButtonContainer";
+import LinkedDataEntityButton from "./LinkedDataEntitySubmitButton";
 
 const LinkedDataEntityFormWithButton = props => {
-    const {editable, onSubmit, subject, ...otherProps} = props;
+    const {editable, buttonDisabled, onSubmit, subject, ...otherProps} = props;
 
     return (
         <Grid container>
@@ -16,7 +16,7 @@ const LinkedDataEntityFormWithButton = props => {
                 editable
                     ? (
                         <Grid item>
-                            <LinkedDataEntityButton subject={subject} onClick={onSubmit}/>
+                            <LinkedDataEntityButton subject={subject} onClick={onSubmit} disabled={buttonDisabled} />
                         </Grid>
                     )
                     : null
@@ -27,6 +27,7 @@ const LinkedDataEntityFormWithButton = props => {
 
 LinkedDataEntityFormWithButton.propTypes = {
     editable: PropTypes.bool,
+    buttonDisabled: PropTypes.bool,
     subject: PropTypes.string,
     onSubmit: PropTypes.func.isRequired
 };

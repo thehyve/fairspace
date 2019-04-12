@@ -9,6 +9,7 @@ import {
 } from "../../../reducers/cache/jsonLdBySubjectReducers";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityFormWithButton from "../common/LinkedDataEntityFormWithButton";
+import {hasMetadataFormUpdates} from "../../../reducers/metadataFormReducers";
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
@@ -20,6 +21,7 @@ const mapStateToProps = (state, ownProps) => {
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
     const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
+    const buttonDisabled = !hasMetadataFormUpdates(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
@@ -35,6 +37,7 @@ const mapStateToProps = (state, ownProps) => {
         subject,
 
         editable,
+        buttonDisabled,
         vocabulary
     };
 };
