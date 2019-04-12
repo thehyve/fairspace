@@ -1,4 +1,9 @@
+import React from "react";
 import {connect} from 'react-redux';
+
+import {Button} from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
@@ -8,8 +13,42 @@ import {
     isMetadataPending
 } from "../../../reducers/cache/jsonLdBySubjectReducers";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
-import LinkedDataEntityFormWithButton from "../common/LinkedDataEntityFormWithButton";
 import {hasMetadataFormUpdates} from "../../../reducers/metadataFormReducers";
+import ErrorDialog from "../../common/ErrorDialog";
+import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
+
+const MetadataEntityContainer = props => {
+    const {editable, buttonDisabled, onSubmit, subject, ...otherProps} = props;
+
+    const handleButtonClick = () => {
+        props.onSubmit(props.subject)
+            .catch(err => ErrorDialog.showError(err, "Error while updating metadata"));
+    };
+
+    return (
+        <Grid container>
+            <Grid item xs={12}>
+                <LinkedDataEntityFormContainer editable={editable} subject={subject} {...otherProps} />
+            </Grid>
+            {
+                editable
+                    ? (
+                        <Grid item>
+                            <Button
+                                onClick={handleButtonClick}
+                                color="primary"
+                                disabled={buttonDisabled}
+                            >
+                                Update
+                            </Button>
+                        </Grid>
+                    )
+                    : null
+            }
+        </Grid>
+    );
+};
+
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
@@ -49,4 +88,4 @@ const mapDispatchToProps = (dispatch) => ({
         .then(() => dispatch(metadataActions.fetchMetadataBySubjectIfNeeded(subject)))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataEntityFormWithButton);
+export default connect(mapStateToProps, mapDispatchToProps)(MetadataEntityContainer);
