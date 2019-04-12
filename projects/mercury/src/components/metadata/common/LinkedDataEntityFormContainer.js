@@ -39,9 +39,9 @@ class LinkedDataEntityFormContainer extends React.Component {
 
         return (
             <LinkedDataEntityForm
-                handleAdd={this.props.handleAdd}
-                handleChange={this.props.handleChange}
-                handleDelete={this.props.handleDelete}
+                onAdd={this.props.onAdd}
+                onChange={this.props.onChange}
+                onDelete={this.props.onDelete}
 
                 error={this.props.error}
                 loading={this.props.loading}
@@ -55,9 +55,9 @@ class LinkedDataEntityFormContainer extends React.Component {
 }
 
 LinkedDataEntityFormContainer.propTypes = {
-    handleAdd: PropTypes.func,
-    handleChange: PropTypes.func,
-    handleDelete: PropTypes.func,
+    onAdd: PropTypes.func,
+    onChange: PropTypes.func,
+    onDelete: PropTypes.func,
 
     error: PropTypes.string,
 
@@ -70,9 +70,9 @@ LinkedDataEntityFormContainer.propTypes = {
 };
 
 LinkedDataEntityFormContainer.defaultProps = {
-    handleAdd: () => {},
-    handleChange: () => {},
-    handleDelete: () => {},
+    onAdd: () => {},
+    onChange: () => {},
+    onDelete: () => {},
 
     properties: [],
     updates: {},
@@ -85,13 +85,13 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     initializeForm: (subject) => dispatch(initializeMetadataForm(subject)),
-    handleAdd: (property, value) => {
+    onAdd: (property, value) => {
         dispatch(addMetadataValue(ownProps.subject, property, value));
     },
-    handleChange: (property, value, index) => {
+    onChange: (property, value, index) => {
         dispatch(updateMetadataValue(ownProps.subject, property, value, index));
     },
-    handleDelete: (property, index) => {
+    onDelete: (property, index) => {
         dispatch(deleteMetadataValue(ownProps.subject, property, index));
     }
 });

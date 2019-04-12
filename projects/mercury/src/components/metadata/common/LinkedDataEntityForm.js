@@ -27,9 +27,9 @@ export const LinkedDataEntityForm = props => {
                         subject={subject}
                         key={subject + p.key}
                         property={p}
-                        onChange={(value, index) => props.handleChange(p, value, index)}
-                        onAdd={(value) => props.handleAdd(p, value)}
-                        onDelete={(index) => props.handleDelete(p, index)}
+                        onChange={(value, index) => props.onChange(p, value, index)}
+                        onAdd={(value) => props.onAdd(p, value)}
+                        onDelete={(index) => props.onDelete(p, index)}
                     />
                 ))
             }
@@ -38,9 +38,9 @@ export const LinkedDataEntityForm = props => {
 };
 
 LinkedDataEntityForm.propTypes = {
-    handleAdd: PropTypes.func,
-    handleChange: PropTypes.func,
-    handleDelete: PropTypes.func,
+    onAdd: PropTypes.func,
+    onChange: PropTypes.func,
+    onDelete: PropTypes.func,
 
     error: PropTypes.string,
 
@@ -52,9 +52,9 @@ LinkedDataEntityForm.propTypes = {
 };
 
 LinkedDataEntityForm.defaultProps = {
-    handleAdd: () => {},
-    handleChange: () => {},
-    handleDelete: () => {},
+    onAdd: () => {},
+    onChange: () => {},
+    onDelete: () => {},
 
     properties: []
 };
