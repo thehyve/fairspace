@@ -1,20 +1,13 @@
 import React from 'react';
-import {mount, shallow} from "enzyme";
-import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
-import promiseMiddleware from "redux-promise-middleware";
-import {Button, List, Grid} from '@material-ui/core';
+import {shallow} from "enzyme";
+import {List} from '@material-ui/core';
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
-import Vocabulary from "../../../services/Vocabulary";
 import Config from "../../../services/Config/Config";
 import {STRING_URI} from "../../../constants";
 import ErrorMessage from "../../common/ErrorMessage";
 
-const middlewares = [thunk, promiseMiddleware];
-const mockStore = configureStore(middlewares);
-
-describe('MetaEntityForm', () => {
+describe('LinkedDataEntityForm', () => {
     const defaultMetadata = [{
         key: "@type",
         label: "",
@@ -102,35 +95,5 @@ describe('MetaEntityForm', () => {
 
         const errorMessage = wrapper.find(ErrorMessage);
         expect(errorMessage.length).toEqual(1);
-    })
-
-    it('tries to initialize the metadata and the vocabulary', () => {
-        const store = mockStore({
-            cache: {
-                jsonLdBySubject: {
-                    "http://fairspace.com/iri/collections/1": {
-                        data: []
-                    }
-                },
-                vocabulary: {
-                    data: new Vocabulary([])
-                }
-            }
-        });
-
-        const fetchVocabulary = jest.fn();
-        const fetchMetadata = jest.fn();
-        mount(<LinkedDataEntityForm
-            subject="http://example.com/john"
-            properties={[]}
-            store={store}
-            fetchShapes={fetchVocabulary}
-            fetchLinkedData={fetchMetadata}
-        />);
-
-        expect(fetchMetadata.mock.calls.length).toEqual(1);
-        expect(fetchVocabulary.mock.calls.length).toEqual(1);
     });
-
-
 });
