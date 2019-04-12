@@ -22,7 +22,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 
 /**
- * Prohibits any modification of vocabulary resources used in metadata, except to a few whitelisted properties
+ * Checks if existing metadata remains valid after changes in the vocabulary
  */
 @AllArgsConstructor
 public class MetadataAndVocabularyConsistencyValidator implements MetadataRequestValidator {
