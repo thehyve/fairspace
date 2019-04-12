@@ -11,6 +11,7 @@ import java.util.Set;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.services.metadata.validation.InversionUtils.getAffectedResources;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.*;
+import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @AllArgsConstructor
@@ -30,7 +31,7 @@ public class ShaclValidator implements MetadataRequestValidator {
         addObjectTypes(modelToValidate, dataGraph, rdf);
 
         try {
-            var shapesModel = rdf.fetch(vocabularyGraph.getURI());
+            var shapesModel = rdf.fetch(vocabularyGraph.getURI()).union(META_VOCABULARY);
             var validationEngine = createEngine(modelToValidate, shapesModel);
 
             for (var resource : affectedResources) {

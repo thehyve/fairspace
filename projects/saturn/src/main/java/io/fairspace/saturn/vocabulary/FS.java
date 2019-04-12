@@ -78,6 +78,15 @@ public class FS {
     public static final String RELATION_SHAPE_META_SHAPE_URI = NS + "RelationShapeMetaShape";
     public static final Resource RelationShapeMetaShape = createResource(RELATION_SHAPE_META_SHAPE_URI);
 
+    public static final String CLASS_SHAPE_URI = NS + "ClassShape";
+    public static final Resource ClassShape = createResource(CLASS_SHAPE_URI);
+
+    public static final String PROPERTY_SHAPE_URI = NS + "PropertyShape";
+    public static final Resource PropertyShape = createResource(PROPERTY_SHAPE_URI);
+
+    public static final String RELATION_SHAPE_URI = NS + "RelationShape";
+    public static final Resource RelationShape = createResource(RELATION_SHAPE_URI);
+
     public static final String INVERSE_RELATION_URI = NS + "inverseRelation";
     public static final Property inverseRelation = createProperty(INVERSE_RELATION_URI);
 }

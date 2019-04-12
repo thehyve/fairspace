@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.jena.rdf.model.Model;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 import static com.google.common.collect.Sets.union;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.*;
+import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
@@ -29,7 +31,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     @SneakyThrows(InterruptedException.class)
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
         var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
-        var newVocabulary = oldVocabulary.remove(modelToRemove).add(modelToAdd);
+        var newVocabulary = oldVocabulary.difference(modelToRemove).union(modelToAdd);
         var actuallyAdded = newVocabulary.difference(oldVocabulary);
         var actuallyRemoved = oldVocabulary.difference(newVocabulary);
         var affectedSubjects = union(actuallyRemoved.listSubjects().toSet(), actuallyAdded.listSubjects().toSet());
@@ -43,13 +45,13 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
                                 .filter(Resource::isURIResource)
                                 .map(subj -> vocabulary.createResource(subj.getURI()))
                                 .forEach(vocabularyResource -> {
-                                    if (vocabularyResource.hasProperty(RDF.type, FS.ClassShapeMetaShape)) {
+                                    if (vocabularyResource.hasProperty(RDF.type, FS.ClassShape)) {
                                         var targetClass = vocabularyResource.getPropertyResourceValue(SH.targetClass);
                                         if (targetClass != null) {
                                             affectedClasses.add(targetClass);
                                         }
-                                    } else if (vocabularyResource.hasProperty(RDF.type, FS.PropertyShapeMetaShape)
-                                            || vocabularyResource.hasProperty(RDF.type, FS.RelationShapeMetaShape)) {
+                                    } else if (vocabularyResource.hasProperty(RDF.type, FS.PropertyShape)
+                                            || vocabularyResource.hasProperty(RDF.type, FS.RelationShape)) {
                                         var targetProperty = vocabularyResource.getPropertyResourceValue(SH.path);
                                         if (targetProperty != null) {
                                             affectedProperties.add(targetProperty);
@@ -59,26 +61,37 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
 
         var result = ValidationResult.VALID;
 
+        var withMeta = newVocabulary.union(META_VOCABULARY);
+
         for(var c: affectedClasses) {
-            var model = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, null, RDF.type, c));
-            result = result.merge(validateModel(model, newVocabulary));
+            var search = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, null, RDF.type, c));
+            result = result.merge(validateResources(search, withMeta));
         }
 
         for(var p: affectedProperties) {
-            var model = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, null, p, null));
-            result = result.merge(validateModel(model, newVocabulary));
+            var search = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, null, p, null));
+            result = result.merge(validateResources(search, withMeta));
         }
 
         return result;
     }
 
-    private ValidationResult validateModel(Model model, Model vocabulary) throws InterruptedException {
-        var subjects = model.listSubjects().toList();
-        addObjectTypes(model, defaultGraphIRI, rdf);
-        var validationEngine = createEngine(model, vocabulary);
-        for (var resource : subjects) {
-            validationEngine.validateNode(resource.asNode());
+    private ValidationResult validateResources(Model model, Model vocabulary) throws InterruptedException {
+        var result = ValidationResult.VALID;
+        for (var it = model.listSubjects(); it.hasNext(); ) {
+            var subject = it.next();
+            if (subject.isURIResource()) {
+                var subjectModel = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, subject, null, null));
+                addObjectTypes(model, defaultGraphIRI, rdf);
+                result = result.merge(validateResource(subject, subjectModel, vocabulary));
+            }
         }
+        return result;
+    }
+
+    private ValidationResult validateResource(Resource resource, Model model, Model vocabulary) throws InterruptedException {
+        var validationEngine = createEngine(model, vocabulary.union(Vocabularies.META_VOCABULARY));
+        validationEngine.validateNode(resource.asNode());
         return getValidationResult(validationEngine);
     }
 }
