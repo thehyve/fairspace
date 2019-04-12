@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid, List, Paper} from '@material-ui/core';
+import {Grid, List, Paper} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../../common";
 import ErrorDialog from "../../common/ErrorDialog";
@@ -79,7 +79,7 @@ export class LinkedDataEntityForm extends React.Component {
 
     render() {
         const {
-            subject, label, typeInfo, properties, editable, error, loading, showHeader
+            subject, label, typeInfo, properties, editable, error, loading, showHeader, children
         } = this.props;
         const submitButtonVisibility = editable ? 'visible' : 'hidden';
 
@@ -119,14 +119,7 @@ export class LinkedDataEntityForm extends React.Component {
                     </List>
                 </Grid>
                 <Grid item>
-                    <Button
-                        onClick={this.handleSubmit}
-                        color="primary"
-                        disabled={!this.shouldShowSubmitButton()}
-                        style={{visibility: submitButtonVisibility}}
-                    >
-                        Update
-                    </Button>
+                    {children(this.handleSubmit, !this.shouldShowSubmitButton(), submitButtonVisibility)}
                 </Grid>
             </Grid>
         );
