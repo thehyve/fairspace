@@ -141,3 +141,20 @@ export const dispatchIfNeeded = (actionCreator, statePropertyExtractor) => (disp
     }
     return Promise.resolve({value: stateProperty.data});
 };
+
+/**
+ * High order reducer that will apply the reducer for a key retrieved from the action
+ * @param predicate
+ * @param mapActionToKey
+ * @returns {function(*): Function}
+ * @see https://medium.com/@mange_vibration/reducer-composition-with-higher-order-reducers-35c3977ed08f
+ */
+export const createByKey = (predicate, mapActionToKey) => reducer => {
+    return (state = {}, action) => {
+        if (predicate(action)) {
+            const key = mapActionToKey(action);
+            return {...state, [key]: reducer(state[key], action)};
+        }
+        return state
+    };
+}
