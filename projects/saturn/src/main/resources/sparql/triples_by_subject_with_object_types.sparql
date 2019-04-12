@@ -1,0 +1,7 @@
+# 0 - type
+
+CONSTRUCT {%1$s ?p ?o . ?o a ?t}
+WHERE {
+    { %1$s ?p ?o; }
+    OPTIONAL {?o a ?t}
+}
