@@ -18,7 +18,6 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getValidationResult;
 import static io.fairspace.saturn.util.Ref.ref;
-import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 
 /**
@@ -59,7 +58,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
 
         var result = ref(ValidationResult.VALID);
 
-        var combinedVocabulary = newVocabulary.union(META_VOCABULARY);
+        var combinedVocabulary = newVocabulary;
 
         Consumer<QuerySolution> subjectValidator = row ->
                 result.value = result.value.merge(validateResource(row.getResource("s"), combinedVocabulary));
