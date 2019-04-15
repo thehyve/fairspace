@@ -31,10 +31,10 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(metadataActions.fetchAllEntitiesIfNeeded()),
     fetchShapes: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded),
-    create: (shape, id) => {
+    create: (formKey, shape, id) => {
         const subject = createIri(id);
         const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
-        return dispatch(metadataActions.createMetadataEntityFromState(subject, type))
+        return dispatch(metadataActions.createMetadataEntityFromState(formKey, subject, type))
             .then(({value}) => {
                 dispatch(metadataActions.fetchAllEntitiesIfNeeded());
                 ownProps.history.push(relativeLink(value.subject));

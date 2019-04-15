@@ -7,6 +7,7 @@ import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
+        formKey: generateUuid(),
         id: generateUuid()
     };
 
@@ -17,7 +18,7 @@ class NewLinkedDataEntityDialog extends React.Component {
 
     createEntity = (e) => {
         if (e) e.stopPropagation();
-        this.props.onCreate(this.props.shape, this.state.id);
+        this.props.onCreate(this.state.formKey, this.props.shape, this.state.id);
     };
 
     handleInputChange = event => this.setState({id: event.target.value});
@@ -50,6 +51,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                     />
 
                     <LinkedDataEntityFormContainer
+                        formKey={this.state.formKey}
                         subject={createIri(this.state.id)}
                         properties={linkedData}
                     />
@@ -87,5 +89,6 @@ NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired
-}
+};
+
 export default NewLinkedDataEntityDialog;

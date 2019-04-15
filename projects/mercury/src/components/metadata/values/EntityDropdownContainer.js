@@ -34,8 +34,8 @@ class EntityDropdownContainer extends React.Component {
         this.setState({adding: false});
     };
 
-    handleEntityCreation = (shape, id) => {
-        this.props.onCreate(shape, id)
+    handleEntityCreation = (formKey, shape, id) => {
+        this.props.onCreate(formKey, shape, id)
             .then(({value}) => {
                 const label = getFirstPredicateProperty(value.values, constants.LABEL_URI, 'value')
                                 || getFirstPredicateProperty(value.values, constants.SHACL_NAME, 'value');
@@ -113,10 +113,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchEntities: (type) => dispatch(fetchEntitiesIfNeeded(type)),
-    onCreate: (shape, id) => {
+    onCreate: (formKey, shape, id) => {
         const subject = createIri(id);
         const type = ownProps.property.className;
-        return dispatch(metadataActions.createMetadataEntityFromState(subject, type));
+        return dispatch(metadataActions.createMetadataEntityFromState(formKey, subject, type));
     }
 });
 

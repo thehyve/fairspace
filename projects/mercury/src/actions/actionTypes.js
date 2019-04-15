@@ -110,8 +110,7 @@ export const PERFORM_SEARCH_REJECTED                = 'PERFORM_SEARCH_REJECTED';
 
 // Metadata editing
 export const INITIALIZE_METADATA_FORM               = 'INITIALIZE_METADATA_FORM';
+export const SET_SUBJECT_FOR_METADATA_FORM          = 'SET_SUBJECT_FOR_METADATA_FORM';
 export const ADD_METADATA_VALUE                     = 'ADD_METADATA_VALUE';
 export const UPDATE_METADATA_VALUE                  = 'UPDATE_METADATA_VALUE';
 export const DELETE_METADATA_VALUE                  = 'DELETE_METADATA_VALUE';
-export const SUBMIT_METADATA_FORM                   = 'SUBMIT_METADATA_FORM';
-export const CLEAR_METADATA_FORM                    = 'CLEAR_METADATA_FORM';

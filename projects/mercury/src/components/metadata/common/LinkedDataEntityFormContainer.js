@@ -16,16 +16,16 @@ class LinkedDataEntityFormContainer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.subject !== prevProps.subject) {
+        if (this.props.formKey !== prevProps.formKey) {
             this.initialize();
         }
     }
 
     initialize() {
-        const {subject, initializeForm, fetchShapes, fetchLinkedData} = this.props;
+        const {formKey, subject, initializeForm, fetchShapes, fetchLinkedData} = this.props;
 
-        if (subject) {
-            initializeForm(subject);
+        if (formKey) {
+            initializeForm(formKey, subject);
             fetchShapes();
             fetchLinkedData(subject);
         }
@@ -47,7 +47,6 @@ class LinkedDataEntityFormContainer extends React.Component {
                 loading={this.props.loading}
                 editable={this.props.editable}
 
-                subject={this.props.subject}
                 properties={propertiesWithChanges}
             />
         );
@@ -68,7 +67,9 @@ LinkedDataEntityFormContainer.propTypes = {
     loading: PropTypes.bool,
     editable: PropTypes.bool,
 
-    subject: PropTypes.string.isRequired,
+    formKey: PropTypes.string.isRequired,
+    subject: PropTypes.string,
+
     properties: PropTypes.array,
     updates: PropTypes.object
 };
@@ -87,19 +88,19 @@ LinkedDataEntityFormContainer.defaultProps = {
 };
 
 const mapStateToProps = (state, ownProps) => ({
-    updates: getMetadataFormUpdates(state, ownProps.subject)
+    updates: getMetadataFormUpdates(state, ownProps.formKey),
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    initializeForm: (subject) => dispatch(initializeMetadataForm(subject)),
+    initializeForm: (formKey, subject) => dispatch(initializeMetadataForm(formKey, subject)),
     onAdd: (property, value) => {
-        dispatch(addMetadataValue(ownProps.subject, property, value));
+        dispatch(addMetadataValue(ownProps.formKey, property, value));
     },
     onChange: (property, value, index) => {
-        dispatch(updateMetadataValue(ownProps.subject, property, value, index));
+        dispatch(updateMetadataValue(ownProps.formKey, property, value, index));
     },
     onDelete: (property, index) => {
-        dispatch(deleteMetadataValue(ownProps.subject, property, index));
+        dispatch(deleteMetadataValue(ownProps.formKey, property, index));
     }
 });
 

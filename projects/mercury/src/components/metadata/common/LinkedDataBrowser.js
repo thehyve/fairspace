@@ -46,10 +46,10 @@ class LinkedDataBrowser extends React.Component {
         this.setState({creationState: false});
     };
 
-    handleEntityCreation = (shape, id) => {
+    handleEntityCreation = (formKey, shape, id) => {
         this.setState({creatingMetadataEntity: true});
 
-        this.props.create(shape, id)
+        this.props.create(formKey, shape, id)
             .then(() => {
                 if (!this.unMounted) {
                     this.setState({creatingMetadataEntity: false});

@@ -2,7 +2,7 @@ import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux
 import {MetadataAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
-import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
+import {getMetadataFormSubject, getMetadataFormUpdates} from "../reducers/metadataFormReducers";
 import {getVocabulary} from "../reducers/cache/vocabularyReducers";
 
 export const invalidateMetadata = subject => ({
@@ -10,18 +10,21 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const updateEntity = (subject, values, vocabulary) => ({
+export const updateEntity = (formKey, subject, values, vocabulary) => ({
     type: actionTypes.UPDATE_METADATA,
     payload: MetadataAPI.updateEntity(subject, values, vocabulary),
     meta: {
+        formKey,
         subject
     }
 });
 
 export const submitMetadataChangesFromState = (subject) => (dispatch, getState) => {
-    const updates = getMetadataFormUpdates(getState(), subject);
+    // For metadata changes, the subject iri is used as form key
+    const formKey = subject;
+    const updates = getMetadataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
-    return dispatch(updateEntity(subject, updates, vocabulary));
+    return dispatch(updateEntity(formKey, subject, updates, vocabulary));
 };
 
 export const createEntity = (subject, type, values, vocabulary) => ({
@@ -40,8 +43,8 @@ export const createEntity = (subject, type, values, vocabulary) => ({
     }
 });
 
-export const createMetadataEntityFromState = (subject, type) => (dispatch, getState) => {
-    const values = getMetadataFormUpdates(getState(), subject);
+export const createMetadataEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
+    const values = getMetadataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
 
     return dispatch(createEntity(subject, type, values, vocabulary));

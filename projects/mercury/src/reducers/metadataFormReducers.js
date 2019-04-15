@@ -6,7 +6,7 @@ import {createByKey} from "../utils/redux";
  * The updates map contains a map from propertyKey (predicate) to a list of values for that property
  * @type {{updates: {}}}
  */
-const initialState = {updates: {}, pending: false, error: false};
+const initialState = {subject: undefined, updates: {}, pending: false, error: false};
 
 /**
  * Returns the values that are present in the form for the given propertyKey
@@ -25,17 +25,18 @@ const generateStateWithNewValues = (state, propertyKey, updatedValues) => ({
 });
 
 /**
- * Reducers the state for the metadata form, for a single subject
+ * Reducers the state for the metadata form, for a single formKey
  *
  * @param state
  * @param action
  * @returns {*}
  */
-export const metadataFormChangesReducerPerSubject = (state = initialState, action) => {
+export const metadataFormChangesReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.INITIALIZE_METADATA_FORM:
-        case actionTypes.CLEAR_METADATA_FORM:
-            return initialState;
+            return {...initialState, subject: action.subject};
+        case actionTypes.SET_SUBJECT_FOR_METADATA_FORM:
+            return {...state, subject: action.subject};
         case actionTypes.ADD_METADATA_VALUE:
             return generateStateWithNewValues(
                 state,
@@ -66,7 +67,7 @@ export const metadataFormChangesReducerPerSubject = (state = initialState, actio
  * @param action
  * @returns {*}
  */
-export const metadataFormSubmissionReducerPerSubject = (state = initialState, action) => {
+export const metadataFormSubmissionReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.UPDATE_METADATA_PENDING:
         case actionTypes.UPDATE_VOCABULARY_PENDING:
@@ -94,20 +95,21 @@ export const metadataFormSubmissionReducerPerSubject = (state = initialState, ac
     }
 };
 
-// We need two different reducers, as the normal actions have the subject
-// in the action.subject property, whereas the promise actions have the subject
-// in action.meta.subject due to implementation details
+// We need two different reducers, as the normal actions have the formKey
+// in the action.formKey property, whereas the promise actions have the formKey
+// in action.meta.formKey due to implementation details
 export default reduceReducers(
     createByKey(
-        action => action && action.subject,
-        action => action.subject
-    )(metadataFormChangesReducerPerSubject),
+        action => action && action.formKey,
+        action => action.formKey
+    )(metadataFormChangesReducerPerForm),
     createByKey(
-        action => action && action.meta && action.meta.subject,
-        action => action.meta.subject
-    )(metadataFormSubmissionReducerPerSubject)
+        action => action && action.meta && action.meta.formKey,
+        action => action.meta.formKey
+    )(metadataFormSubmissionReducerPerForm)
 );
 
 
-export const getMetadataFormUpdates = (state, subject) => (state.metadataForm[subject] && state.metadataForm[subject].updates) || {};
-export const hasMetadataFormUpdates = (state, subject) => !!(state.metadataForm[subject] && state.metadataForm[subject].updates && Object.keys(state.metadataForm[subject].updates).length > 0);
+export const getMetadataFormSubject = (state, formKey) => (state.metadataForm[formKey] && state.metadataForm[formKey].subject);
+export const getMetadataFormUpdates = (state, formKey) => (state.metadataForm[formKey] && state.metadataForm[formKey].updates) || {};
+export const hasMetadataFormUpdates = (state, formKey) => !!(state.metadataForm[formKey] && state.metadataForm[formKey].updates && Object.keys(state.metadataForm[formKey].updates).length > 0);

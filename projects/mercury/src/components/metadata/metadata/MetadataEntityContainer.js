@@ -28,7 +28,7 @@ const MetadataEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataEntityFormContainer editable={editable} subject={subject} {...otherProps} />
+                <LinkedDataEntityFormContainer editable={editable} formKey={subject} subject={subject} {...otherProps} />
             </Grid>
             {
                 editable

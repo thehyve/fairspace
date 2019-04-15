@@ -18,12 +18,12 @@ class LinkedDataProperty extends React.Component {
     };
 
     renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
-        const {editable, property, onChange, onDelete, subject} = this.props;
+        const {editable, property, onChange, onDelete} = this.props;
         const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
 
         return (
             <div
-                key={subject + property.key + entry.id || entry.value}
+                key={property.key + entry.id || entry.value}
                 onMouseEnter={() => this.setHoveredIndex(idx)}
                 onMouseLeave={() => this.setHoveredIndex(null)}
             >
