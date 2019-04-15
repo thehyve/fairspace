@@ -1,23 +1,20 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.vocabulary.SH;
 
-import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static com.google.common.collect.Sets.union;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getValidationResult;
-import static io.fairspace.saturn.util.Ref.ref;
+import static io.fairspace.saturn.services.metadata.validation.ValidationResult.mergeValidationResults;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 
 /**
@@ -33,47 +30,37 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         var newVocabulary = oldVocabulary.difference(modelToRemove).union(modelToAdd);
         var actuallyAdded = newVocabulary.difference(oldVocabulary);
         var actuallyRemoved = oldVocabulary.difference(newVocabulary);
-        var affectedSubjects = union(actuallyRemoved.listSubjects().toSet(), actuallyAdded.listSubjects().toSet());
+        var modifiedShapes = union(actuallyRemoved.listSubjects().toSet(), actuallyAdded.listSubjects().toSet());
 
-        var affectedClasses = new HashSet<Resource>();
-        var affectedProperties = new HashSet<Resource>();
+        return validateModifiedShapes(modifiedShapes, newVocabulary);
+    }
 
-        affectedSubjects.stream()
-                .filter(Resource::isURIResource)
-                .map(subj -> newVocabulary.createResource(subj.getURI()))
-                .forEach(vocabularyResource -> {
-                    if (vocabularyResource.hasProperty(RDF.type, FS.ClassShape)) {
-                        var targetClass = vocabularyResource.getPropertyResourceValue(SH.targetClass);
-                        if (targetClass != null) {
-                            affectedClasses.add(targetClass);
-                        }
-                    } else if (vocabularyResource.hasProperty(RDF.type, FS.PropertyShape)
-                            || vocabularyResource.hasProperty(RDF.type, FS.RelationShape)) {
-                        var targetProperty = vocabularyResource.getPropertyResourceValue(SH.path);
-                        if (targetProperty != null) {
-                            affectedProperties.add(targetProperty);
-                        }
-                    }
-                });
+    private ValidationResult validateModifiedShapes(Set<Resource> shapes, Model vocabulary) {
+        return mergeValidationResults(onResult ->
+                shapes.forEach(shape -> {
+                    validateTargetClass(shape, vocabulary, onResult);
+                    validateProperty(shape, vocabulary, onResult);
+                }));
+    }
 
-        var result = ref(ValidationResult.VALID);
+    private void validateTargetClass(Resource shape, Model vocabulary, Consumer<ValidationResult> onResult) {
+        vocabulary.listObjectsOfProperty(shape, SH.targetClass)
+                .forEachRemaining(targetClass -> rdf.querySelect(storedQuery("subjects_by_type", targetClass),
+                        row -> validateResource(row.getResource("s"), vocabulary, onResult)));
+    }
 
-        var combinedVocabulary = newVocabulary;
 
-        Consumer<QuerySolution> subjectValidator = row ->
-                result.value = result.value.merge(validateResource(row.getResource("s"), combinedVocabulary));
-
-        affectedClasses.forEach(c -> rdf.querySelect(storedQuery("subjects_by_type", c), subjectValidator));
-        affectedProperties.forEach(p -> rdf.querySelect(storedQuery("subjects_with_property", p), subjectValidator));
-
-        return result.value;
+    private void validateProperty(Resource shape, Model vocabulary, Consumer<ValidationResult> onResult) {
+        vocabulary.listObjectsOfProperty(shape, SH.path)
+                .forEachRemaining(path -> rdf.querySelect(storedQuery("subjects_with_property", path),
+                        row -> validateResource(row.getResource("s"), vocabulary, onResult)));
     }
 
     @SneakyThrows
-    private ValidationResult validateResource(Resource resource, Model vocabulary) {
+    private void validateResource(Resource resource, Model vocabulary, Consumer<ValidationResult> onResult) {
         var dataModel = rdf.queryConstruct(storedQuery("triples_by_subject_with_object_types", resource));
         var validationEngine = createEngine(dataModel, vocabulary);
         validationEngine.validateNode(resource.asNode());
-        return getValidationResult(validationEngine);
+        onResult.accept(getValidationResult(validationEngine));
     }
 }
