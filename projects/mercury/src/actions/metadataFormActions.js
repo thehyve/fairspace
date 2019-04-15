@@ -27,9 +27,3 @@ export const initializeMetadataForm = (formKey, subject) => ({
     formKey,
     subject
 });
-
-export const setSubjectForMetadataForm = (formKey, subject) => ({
-    type: actionTypes.SET_SUBJECT_FOR_METADATA_FORM,
-    formKey,
-    subject
-});

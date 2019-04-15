@@ -33,24 +33,6 @@ describe('Metadata form reducer', () => {
         });
     });
 
-    describe('setting subject', () => {
-        it('should keep updates when setting subject', () => {
-            expect(
-                metadataFormChangesReducerPerForm(
-                    {
-                        updates: {a: 'b'}
-                    }, {
-                        type: actionTypes.SET_SUBJECT_FOR_METADATA_FORM,
-                        subject: 'test'
-                    }
-                )
-            ).toEqual({
-                updates: {a: 'b'},
-                subject: 'test'
-            });
-        });
-    });
-
     describe('adding values', () => {
         it('should add a value when no values are present yet', () => {
             expect(

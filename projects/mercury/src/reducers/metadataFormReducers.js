@@ -35,8 +35,6 @@ export const metadataFormChangesReducerPerForm = (state = initialState, action) 
     switch (action.type) {
         case actionTypes.INITIALIZE_METADATA_FORM:
             return {...initialState, subject: action.subject};
-        case actionTypes.SET_SUBJECT_FOR_METADATA_FORM:
-            return {...state, subject: action.subject};
         case actionTypes.ADD_METADATA_VALUE:
             return generateStateWithNewValues(
                 state,
