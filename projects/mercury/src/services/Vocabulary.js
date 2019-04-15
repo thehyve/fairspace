@@ -246,7 +246,7 @@ class Vocabulary {
      * @returns {array}
      */
     get(id) {
-        return this.vocabulary.find(el => el['@id'] === id);
+        return this.vocabulary.find(el => el['@id'] === id) || [];
     }
 
     /**

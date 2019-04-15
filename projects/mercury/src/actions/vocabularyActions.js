@@ -3,21 +3,27 @@ import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
 import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
+import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
+import {getMetaVocabulary} from "../reducers/cache/vocabularyReducers";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
     meta: {subject}
 });
 
-export const updateVocabulary = (subject, predicate, values) => ({
+export const updateVocabulary = (subject, values, metaVocabulary) => ({
     type: actionTypes.UPDATE_VOCABULARY,
-    payload: VocabularyAPI.update(subject, predicate, values),
+    payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
     meta: {
-        subject,
-        predicate,
-        values
+        subject
     }
 });
+
+export const submitVocabularyChangesFromState = (subject) => (dispatch, getState) => {
+    const updates = getMetadataFormUpdates(getState(), subject);
+    const metaVocabulary = getMetaVocabulary(getState());
+    return dispatch(updateVocabulary(subject, updates, metaVocabulary));
+};
 
 export const createVocabularyEntity = (shape, id) => {
     const subject = createIri(id);

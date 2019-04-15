@@ -1,9 +1,25 @@
-import Vocabulary from "../../services/Vocabulary";
-
+import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
-import {FETCH_VOCABULARY} from "../../actions/actionTypes";
+import Vocabulary from "../../services/Vocabulary";
+import * as actionTypes from "../../actions/actionTypes";
 
-export default promiseReducerFactory(FETCH_VOCABULARY, {invalidated: true, data: []});
+const defaultState = {invalidated: true, data: []};
+
+const fetchVocabularyReducer = promiseReducerFactory(actionTypes.FETCH_VOCABULARY, defaultState);
+
+const updateVocabularyReducer = (state = defaultState, action) => {
+    switch (action.type) {
+        case actionTypes.UPDATE_VOCABULARY_FULFILLED:
+            return {
+                ...state,
+                invalidated: true
+            };
+        default:
+            return state;
+    }
+};
+
+export default reduceReducers(fetchVocabularyReducer, updateVocabularyReducer, defaultState);
 
 /**
  * Returns an object representing the vocabulary
