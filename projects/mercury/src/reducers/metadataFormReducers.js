@@ -108,6 +108,5 @@ export default reduceReducers(
 );
 
 
-export const getMetadataFormSubject = (state, formKey) => (state.metadataForm[formKey] && state.metadataForm[formKey].subject);
 export const getMetadataFormUpdates = (state, formKey) => (state.metadataForm[formKey] && state.metadataForm[formKey].updates) || {};
 export const hasMetadataFormUpdates = (state, formKey) => !!(state.metadataForm[formKey] && state.metadataForm[formKey].updates && Object.keys(state.metadataForm[formKey].updates).length > 0);
