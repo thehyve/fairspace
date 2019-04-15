@@ -11,8 +11,9 @@ import * as PropTypes from "prop-types";
  * @constructor
  */
 const LinkedDataLink = ({uri, children}) => {
-    const currentUrl = new URL(window.location.origin);
-    const originMinusPort = currentUrl.origin.replace(':' + currentUrl.port, '');
+    const {origin, port} = new URL(window.location.origin);
+    const originMinusPort = port ? origin.replace(':' + port, '') : origin;
+
     return (
         uri.startsWith(`${originMinusPort}/`)
             ? <Link to={uri.replace(originMinusPort, '')}>{children}</Link>
