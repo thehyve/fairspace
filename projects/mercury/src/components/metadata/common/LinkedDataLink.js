@@ -11,13 +11,12 @@ import * as PropTypes from "prop-types";
  * @constructor
  */
 const LinkedDataLink = ({uri, children}) => {
-    const {origin, port} = new URL(window.location.origin);
-    const originMinusPort = port ? origin.replace(':' + port, '') : origin;
+    const {hostname, pathname, search, hash, protocol} = new URL(uri);
+    const uriIsSameOrigin = hostname === window.location.hostname && protocol === window.location.protocol;
 
-    return (
-        uri.startsWith(`${originMinusPort}/`)
-            ? <Link to={uri.replace(originMinusPort, '')}>{children}</Link>
-            : <a href={uri}>{children}</a>
+    return (uriIsSameOrigin
+        ? <Link to={{pathname, search, hash}}>{children}</Link>
+        : <a href={uri}>{children}</a>
     );
 };
 
