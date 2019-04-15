@@ -30,6 +30,8 @@ spec:
       - name: configure-keycloak-job
         image: "{{ $scripts.image }}"
         imagePullPolicy: {{ $scripts.pullPolicy }}
+        resources:
+{{ toYaml $scripts.resources | indent 10 }}
         env:
           - name: LOGIN_REALM
             value: {{ .Values.hyperspace.keycloak.loginRealm }}

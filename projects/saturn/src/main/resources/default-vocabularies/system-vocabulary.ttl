@@ -273,3 +273,4 @@ fs:Directory a fs:Class ;
 
 fs:dateCreated a rdf:Property .
 fs:createdBy a rdf:Property .
+fs:inverseRelation a rdf:Property .

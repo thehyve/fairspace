@@ -10,6 +10,7 @@ import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
+import org.apache.jena.vocabulary.OWL;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,11 +26,21 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
+    private final MetadataUpdateEventHandler afterUpdateEventHandler;
+
+    public ChangeableMetadataService(RDFConnection rdf, Node graph, MetadataEntityLifeCycleManager lifeCycleManager) {
+        this(rdf, graph, lifeCycleManager, null, null);
+    }
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
+        this(rdf, graph, lifeCycleManager, validator, null);
+    }
+
+    public ChangeableMetadataService(RDFConnection rdf, Node graph, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, MetadataUpdateEventHandler afterUpdateEventHandler) {
         super(rdf, graph);
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
+        this.afterUpdateEventHandler = afterUpdateEventHandler;
     }
 
     /**
@@ -111,6 +122,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         // Store the actual update
         rdf.load(graph.getURI(), modelToAdd);
+
+        // Reapply inference
+        if(afterUpdateEventHandler != null)
+            afterUpdateEventHandler.onEvent();
     }
 
     /**
