@@ -23,7 +23,7 @@ class BaseInputValue extends React.Component {
         const {value: newValue} = this.state;
 
         // only if values don't match OR if the inputted value is empty AND already had value (removed existing)
-        if (newValue !== oldValue || (!newValue && oldValue)) {
+        if (transformValue(newValue) !== oldValue || (!transformValue(newValue) && oldValue)) {
             onChange({value: transformValue(newValue)});
             this.updateState();
         }

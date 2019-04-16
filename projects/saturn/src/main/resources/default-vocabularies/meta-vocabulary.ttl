@@ -23,7 +23,8 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:path sh:property ;
         sh:name "Properties" ; 
-        sh:description "List of all properties and relations for this class." 
+        sh:description "List of all properties and relations for this class." ;
+        fs:showAsTable true
     ], [
         sh:value false ;
         sh:datatype xsd:boolean ;
@@ -76,7 +77,9 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ;
-        sh:name "Property name"
+        sh:name "Property name" ;
+        fs:showInTable true ;
+        sh:order 0
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
@@ -98,12 +101,16 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:description ;
-        sh:name "Property description"
+        sh:name "Property description" ;
+        fs:showInTable true ;
+        sh:order 1
     ], [
         sh:path sh:datatype ;
         # direct controlled vocabulary approach
         sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
-        sh:name "Datatype"
+        sh:name "Datatype" ;
+        fs:showInTable true ;
+        sh:order 2
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
@@ -113,7 +120,9 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:path sh:path ;
         sh:nodeKind sh:IRI ;
-        sh:name "Property identifier"
+        sh:name "Property identifier" ;
+        fs:showInTable true ;
+        sh:order 3
     ], [
         sh:datatype xsd:boolean ;
         sh:path fs:machineOnly ;
@@ -157,26 +166,34 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     ], [
         sh:class fs:Class ;
         sh:path sh:class ;
-        sh:name "Class target"
+        sh:name "Class target" ;
+        fs:showInTable true ;
+        sh:order 2
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:description ;
-        sh:name "Relation description"
+        sh:name "Relation description" ;
+        fs:showInTable true ;
+        sh:order 1
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:path ;
         sh:nodeKind sh:IRI ;
-        sh:name "Relation identifier"
+        sh:name "Relation identifier" ;
+        fs:showInTable true ;
+        sh:order 3
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ;
-        sh:name "Relation name"
+        sh:name "Relation name" ;
+        fs:showInTable true ;
+        sh:order 0
     ], [
         sh:datatype xsd:boolean ;
         sh:path fs:machineOnly ;

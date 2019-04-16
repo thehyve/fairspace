@@ -3,30 +3,48 @@ import {shallow} from "enzyme";
 import {Link} from "react-router-dom";
 import LinkedDataLink from "./LinkedDataLink";
 
+const setLocation = (location) => {
+    delete global.window.location;
+    global.window.location = location;
+};
+
 describe('MetadataLink', () => {
     // Please note that for tests, the window.location.origin is set to http://localhost
-    const pathAndParams = '/uri/test/abc?query#hash';
+    const pathname = '/uri/test/abc';
+    const search = '?query';
+    const hash = '#hash';
     const origin = 'http://localhost';
+    const pathAndParams = `${pathname}${search}${hash}`;
 
     it('should render internal link for uri with same hostname', () => {
-        const wrapper = shallow(<LinkedDataLink uri={`${origin}${pathAndParams}`} />);
-        expect(wrapper.containsMatchingElement(<Link to={pathAndParams} />)).toBe(true);
+        const wrapper = shallow(<LinkedDataLink uri={`${origin}${pathname}${search}${hash}`} />);
+        expect(wrapper.containsMatchingElement(<Link to={{pathname, search, hash}} />)).toBe(true);
     });
+
+    it('should render internal link for uri with same hostname (URI includes port)', () => {
+        const wrapper = shallow(<LinkedDataLink uri={`${origin}:8000${pathname}${search}${hash}`} />);
+        expect(wrapper.containsMatchingElement(<Link to={{pathname, search, hash}} />)).toBe(true);
+    });
+
+    it('should render internal link for uri with same hostname if server runs on different port', () => {
+        const oldLocation = global.window.location;
+        setLocation(new URL("http://localhost:8080/"));
+
+        const wrapper = shallow(<LinkedDataLink uri={`${origin}${pathname}${search}${hash}`} />);
+        expect(wrapper.containsMatchingElement(<Link to={{pathname, search, hash}} />)).toBe(true);
+
+        setLocation(oldLocation);
+    });
+
     it('should render external link for uri with other hostname', () => {
         const uri = `http://other-host${pathAndParams}`;
         const wrapper = shallow(<LinkedDataLink uri={uri} />);
         expect(wrapper.containsMatchingElement(<a href={uri} />)).toBe(true);
     });
 
-    it('should treat changes in scheme or port as foreign', () => {
-        let wrapper; let uri;
-
-        uri = `https://localhost${pathAndParams}`;
-        wrapper = shallow(<LinkedDataLink uri={uri} />);
-        expect(wrapper.contains(<a href={uri} />)).toBe(true);
-
-        uri = `http://localhost:8080${pathAndParams}`;
-        wrapper = shallow(<LinkedDataLink uri={uri} />);
+    it('should treat changes in scheme as foreign', () => {
+        const uri = `https://localhost${pathAndParams}`;
+        const wrapper = shallow(<LinkedDataLink uri={uri} />);
         expect(wrapper.contains(<a href={uri} />)).toBe(true);
     });
-})
+});
