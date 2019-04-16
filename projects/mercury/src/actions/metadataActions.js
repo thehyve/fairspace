@@ -2,7 +2,7 @@ import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux
 import {MetadataAPI} from "../services/LinkedDataAPI";
 import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
-import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
+import {createMetadataIri, getFirstPredicateId} from "../utils/metadataUtils";
 import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
 import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
 import {getVocabulary} from "../reducers/cache/vocabularyReducers";
@@ -27,7 +27,7 @@ export const submitMetadataChangesFromState = (subject) => (dispatch, getState) 
 };
 
 export const createMetadataEntity = (shape, id) => {
-    const subject = createIri(id);
+    const subject = createMetadataIri(id);
     const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
     return {
         type: actionTypes.CREATE_METADATA_ENTITY,

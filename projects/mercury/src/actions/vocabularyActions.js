@@ -2,7 +2,7 @@ import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux
 import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
-import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
+import {createVocabularyIri, getFirstPredicateId} from "../utils/metadataUtils";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
@@ -20,7 +20,7 @@ export const updateVocabulary = (subject, predicate, values) => ({
 });
 
 export const createVocabularyEntity = (shape, id) => {
-    const subject = createIri(id);
+    const subject = createVocabularyIri(id);
     const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
 
     return {

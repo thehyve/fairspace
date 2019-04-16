@@ -15,11 +15,16 @@ import * as constants from "../constants";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {
-        it('handles IRIs', () => {
+        it('handles local IRIs', () => {
             expect(linkLabel('http://localhost/iri/1234')).toEqual('1234');
+            expect(linkLabel('http://localhost/vocabulary/1234')).toEqual('1234');
         });
 
-        it('handles collections', () => {
+        it('handles local IRIs with query and hash', () => {
+            expect(linkLabel('http://localhost/iri/some-identifier/extra?query#hash')).toEqual('some-identifier/extra?query#hash');
+        });
+
+        it('handles local collections', () => {
             expect(linkLabel('http://localhost/collections/coll1')).toEqual('coll1');
         });
 
