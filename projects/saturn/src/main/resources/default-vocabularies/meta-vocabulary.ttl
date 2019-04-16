@@ -27,8 +27,11 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         fs:showAsTable true
     ], [
         sh:value false ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
         sh:path sh:closed ; 
-        sh:description "sh:closed should be false."
+        sh:description "sh:closed should be false." ;
+        sh:name "Closed"
     ], [
         sh:class fs:Class ;
         sh:maxCount 1 ;
@@ -62,7 +65,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
 
 fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -109,8 +112,6 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         fs:showInTable true ;
         sh:order 2
     ], [
-        sh:path sh:message
-    ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
         sh:name "Maximum length (for string only)"
@@ -142,7 +143,7 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
       ) ; 
     fs:showInCatalog true ;
     sh:targetClass fs:PropertyShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
 
 fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -177,8 +178,6 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:showInTable true ;
         sh:order 1
     ], [
-        sh:path sh:message
-    ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:path ;
@@ -209,7 +208,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;

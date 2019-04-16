@@ -237,7 +237,7 @@ class Vocabulary {
      * @returns {boolean}
      */
     contains(id) {
-        return !!this.get(id);
+        return this.vocabulary.some(el => el['@id'] === id);
     }
 
     /**
@@ -246,7 +246,7 @@ class Vocabulary {
      * @returns {array}
      */
     get(id) {
-        return this.vocabulary.find(el => el['@id'] === id);
+        return this.vocabulary.find(el => el['@id'] === id) || [];
     }
 
     /**
