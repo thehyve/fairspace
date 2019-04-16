@@ -33,7 +33,7 @@ public class VocabulariesTest {
 
     @Test
     public void validateVocabulary() throws InterruptedException {
-        validate(ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()), META_VOCABULARY);
+        validate(ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()), META_VOCABULARY.union(SHACL_FOR_SHACL));
     }
 
     @Test
