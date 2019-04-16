@@ -237,7 +237,7 @@ class Vocabulary {
      * @returns {boolean}
      */
     contains(id) {
-        return !!this.get(id);
+        return this.vocabulary.some(el => el['@id'] === id);
     }
 
     /**
