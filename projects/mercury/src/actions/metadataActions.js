@@ -10,44 +10,40 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const updateEntity = (formKey, subject, values, vocabulary) => ({
-    type: actionTypes.UPDATE_METADATA,
-    payload: MetadataAPI.updateEntity(subject, values, vocabulary),
-    meta: {
-        formKey,
-        subject
-    }
-});
-
 export const submitMetadataChangesFromState = (subject) => (dispatch, getState) => {
     // For metadata changes, the subject iri is used as form key
     const formKey = subject;
-    const updates = getMetadataFormUpdates(getState(), formKey);
+    const values = getMetadataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
-    return dispatch(updateEntity(formKey, subject, updates, vocabulary));
+    return dispatch({
+        type: actionTypes.UPDATE_METADATA,
+        payload: MetadataAPI.updateEntity(subject, values, vocabulary),
+        meta: {
+            formKey,
+            subject
+        }
+    });
 };
-
-export const createEntity = (subject, type, values, vocabulary) => ({
-    type: actionTypes.CREATE_METADATA_ENTITY,
-    payload: MetadataAPI.get({subject})
-        .then((meta) => {
-            if (meta.length) {
-                throw Error(`Entity already exists: ${subject}`);
-            }
-        })
-        .then(() => MetadataAPI.createEntity(subject, type, values, vocabulary))
-        .then(() => ({subject, type, values})),
-    meta: {
-        subject,
-        type
-    }
-});
 
 export const createMetadataEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
     const values = getMetadataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
 
-    return dispatch(createEntity(subject, type, values, vocabulary));
+    return dispatch({
+        type: actionTypes.CREATE_METADATA_ENTITY,
+        payload: MetadataAPI.get({subject})
+            .then((meta) => {
+                if (meta.length) {
+                    throw Error(`Entity already exists: ${subject}`);
+                }
+            })
+            .then(() => MetadataAPI.createEntity(subject, type, values, vocabulary))
+            .then(() => ({subject, type, values})),
+        meta: {
+            subject,
+            type
+        }
+    });
 };
 
 const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({

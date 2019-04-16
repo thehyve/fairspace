@@ -1,8 +1,6 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
-import {MetadataAPI, MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
-import * as constants from "../constants";
+import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
-import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
 import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
 import {getMetaVocabulary, getVocabulary} from "../reducers/cache/vocabularyReducers";
 
@@ -11,41 +9,37 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const updateVocabulary = (subject, values, metaVocabulary) => ({
-    type: actionTypes.UPDATE_VOCABULARY,
-    payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
-    meta: {
-        subject
-    }
-});
-
 export const submitVocabularyChangesFromState = (subject) => (dispatch, getState) => {
-    const updates = getMetadataFormUpdates(getState(), subject);
+    const values = getMetadataFormUpdates(getState(), subject);
     const metaVocabulary = getMetaVocabulary(getState());
-    return dispatch(updateVocabulary(subject, updates, metaVocabulary));
+    return dispatch({
+        type: actionTypes.UPDATE_VOCABULARY,
+        payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
+        meta: {
+            subject
+        }
+    });
 };
-
-export const createEntity = (subject, type, values, vocabulary) => ({
-    type: actionTypes.CREATE_METADATA_ENTITY,
-    payload: VocabularyAPI.get({subject})
-        .then((meta) => {
-            if (meta.length) {
-                throw Error(`Vocabulary entity already exists: ${subject}`);
-            }
-        })
-        .then(() => VocabularyAPI.createEntity(subject, type, values, vocabulary))
-        .then(() => ({subject, type, values})),
-    meta: {
-        subject,
-        type
-    }
-});
 
 export const createVocabularyEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
     const values = getMetadataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
 
-    return dispatch(createEntity(subject, type, values, vocabulary));
+    return dispatch({
+        type: actionTypes.CREATE_METADATA_ENTITY,
+        payload: VocabularyAPI.get({subject})
+            .then((meta) => {
+                if (meta.length) {
+                    throw Error(`Vocabulary entity already exists: ${subject}`);
+                }
+            })
+            .then(() => VocabularyAPI.createEntity(subject, type, values, vocabulary))
+            .then(() => ({subject, type, values})),
+        meta: {
+            subject,
+            type
+        }
+    });
 };
 
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
