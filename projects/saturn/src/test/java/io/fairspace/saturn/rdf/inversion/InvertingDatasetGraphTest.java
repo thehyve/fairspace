@@ -7,14 +7,13 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.util.FileManager;
 import org.apache.jena.vocabulary.OWL;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -38,7 +37,7 @@ public class InvertingDatasetGraphTest {
     public void before() {
         DatasetGraph dsg = createTxnMem();
         ds = DatasetFactory.wrap(new InvertingDatasetGraph(dsg, vocabularyGraph));
-        initializeVocabulary(new RDFConnectionLocal(ds), vocabularyGraph, "test-vocabulary.jsonld");
+        ds.replaceNamedModel(vocabularyGraph.getURI(),  FileManager.get().loadModel("test-vocabulary.jsonld"));
 
         ds.begin(ReadWrite.WRITE);
     }

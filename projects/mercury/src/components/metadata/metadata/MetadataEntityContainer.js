@@ -21,7 +21,7 @@ const MetadataEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, ...otherProps} = props;
 
     const handleButtonClick = () => {
-        props.onSubmit(props.subject)
+        onSubmit(props.subject)
             .catch(err => ErrorDialog.showError(err, "Error while updating metadata"));
     };
 

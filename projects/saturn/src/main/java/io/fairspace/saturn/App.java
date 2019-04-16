@@ -11,20 +11,18 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.*;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
-import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
-import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
+import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
@@ -34,26 +32,20 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
-import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
-import static io.fairspace.saturn.rdf.Vocabulary.recreateVocabulary;
-import static org.apache.jena.graph.NodeFactory.createURI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
-import static org.apache.jena.system.Txn.calculateRead;
 
 @Slf4j
 public class App {
     public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
-        var userVocabularyGraphNode = createURI(CONFIG.jena.baseIRI + "user-vocabulary");
-        var systemVocabularyGraphNode = createURI("http://fairspace.io/ontology/system-vocabulary");
-        var metaVocabularyGraphNode = createURI("http://fairspace.io/ontology/meta-vocabulary");
-
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, userVocabularyGraphNode);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, VOCABULARY_GRAPH_URI);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
-        var rdf = new RDFConnectionLocal(ds);
+        var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
 
         var eventBus = new EventBus();
 
@@ -68,27 +60,24 @@ public class App {
 
         var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
-        // Setup and initialize vocabularies
-        var userVocabulary = initializeVocabulary(rdf, userVocabularyGraphNode, "default-vocabularies/user-vocabulary.ttl");
-        var systemVocabulary = recreateVocabulary(rdf, systemVocabularyGraphNode, "default-vocabularies/system-vocabulary.ttl");
-        var metaVocabulary = recreateVocabulary(rdf, metaVocabularyGraphNode, "default-vocabularies/meta-vocabulary.ttl");
-
-        Supplier<Model> mergedVocabularySupplier = () -> calculateRead(rdf, () ->
-                rdf.fetch(systemVocabularyGraphNode.getURI())
-                        .add(rdf.fetch(userVocabularyGraphNode.getURI())));
+        var vocabularies = new Vocabularies(rdf);
 
         var metadataValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(systemVocabulary),
+                new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(VOCABULARY_GRAPH_URI)),
                 new PermissionCheckingValidator(rdf, permissions),
-                new ShaclValidator(rdf, defaultGraphIRI, mergedVocabularySupplier));
+                new ShaclValidator(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI));
 
-        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, lifeCycleManager, metadataValidator);
+        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, metadataValidator);
 
-        RecomputeInverseInferenceEventHandler recomputeInverseInferenceEventHandler = new RecomputeInverseInferenceEventHandler(rdf, userVocabularyGraphNode);
-        var userVocabularyService = new ChangeableMetadataService(rdf, userVocabularyGraphNode, lifeCycleManager, new ProtectMachineOnlyPredicatesValidator(metaVocabulary), recomputeInverseInferenceEventHandler);
-        var systemVocabularyService = new ReadableMetadataService(rdf, systemVocabularyGraphNode);
-        var metaVocabularyService = new ReadableMetadataService(rdf, metaVocabularyGraphNode);
-        var combinedVocabularyService = new MergingReadableMetadataService(systemVocabularyService, userVocabularyService);
+        RecomputeInverseInferenceEventHandler recomputeInverseInferenceEventHandler = new RecomputeInverseInferenceEventHandler(rdf, VOCABULARY_GRAPH_URI);
+        var vocabularyValidator = new ComposedValidator(
+                new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)),
+                new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
+                new SystemVocabularyProtectingValidator(),
+                new MetadataAndVocabularyConsistencyValidator(rdf)
+        );
+        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator, recomputeInverseInferenceEventHandler);
+        var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
@@ -96,11 +85,9 @@ public class App {
                 .add("api/rdf/", ds, false)
                 .addFilter("/api/*", new SaturnSparkFilter(
                         new ChangeableMetadataApp("/api/metadata", metadataService),
-                        new ChangeableMetadataApp("/api/vocabulary/user", userVocabularyService)
-                            .withAuthorizationVerifier("/api/vocabulary/user/*", vocabularyAuthorizationVerifier),
-                        new ReadableMetadataApp("/api/vocabulary/system", systemVocabularyService),
-                        new ReadableMetadataApp("/api/vocabulary/combined", combinedVocabularyService),
-                        new ReadableMetadataApp("/api/vocabulary/meta", metaVocabularyService),
+                        new ChangeableMetadataApp("/api/vocabulary/", userVocabularyService)
+                            .withAuthorizationVerifier("/api/vocabulary/*", vocabularyAuthorizationVerifier),
+                        new ReadableMetadataApp("/api/meta-vocabulary/", metaVocabularyService),
                         new CollectionsApp(collections),
                         new PermissionsApp(permissions),
                         new HealthApp()))

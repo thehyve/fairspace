@@ -165,7 +165,7 @@ class LinkedDataAPI {
      * @returns {Promise<Response>}
      */
     patchMetadata(jsonLd) {
-        return fetch(Config.get().urls.metadata.statements, {
+        return fetch(this.getStatementsUrl(), {
             method: 'PATCH',
             headers: new Headers({'Content-type': 'application/ld+json'}),
             credentials: 'same-origin',

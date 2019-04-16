@@ -47,7 +47,7 @@ public class ReadableMetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH));
+        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI));
     }
 
     @Test

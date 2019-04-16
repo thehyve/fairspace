@@ -1,9 +1,6 @@
 # 0 - graph
 # 1 - type
 
-PREFIX fs: <http://fairspace.io/ontology#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
 CONSTRUCT {?s ?p ?o}
 WHERE {
     GRAPH %1$s { ?s a %2$s; ?p ?o; }

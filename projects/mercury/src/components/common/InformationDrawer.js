@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     ExpansionPanel,
     ExpansionPanelDetails,
@@ -22,9 +23,9 @@ import {getPathInfoFromParams} from "../../utils/fileUtils";
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection, locationChanged) => {
-        const {fetchCombinedMetadataIfNeeded, invalidateMetadata} = this.props;
+        const {fetchMetadata, invalidateMetadata} = this.props;
         invalidateMetadata(collection.iri);
-        fetchCombinedMetadataIfNeeded(collection.iri);
+        fetchMetadata(collection.iri);
 
         // If the location of a collection has changed, the URI where it
         // can be found may also change. For that reason we need to redirect
@@ -130,6 +131,18 @@ function pathHierarchy(fullPath) {
     return paths.reverse();
 }
 
+InformationDrawer.propTypes = {
+    fetchMetadata: PropTypes.func,
+    invalidateMetadata: PropTypes.func,
+    updateCollection: PropTypes.func,
+    deleteCollection: PropTypes.func,
+    fetchCollectionsIfNeeded: PropTypes.func,
+    onCollectionLocationChange: PropTypes.func,
+
+    collection: PropTypes.object,
+    loading: PropTypes.bool
+}
+
 const mapStateToProps = ({cache: {collections, users},
     collectionBrowser: {selectedPaths, selectedCollectionLocation}}, ownProps) => {
     const {match: {params}} = ownProps;
@@ -145,8 +158,12 @@ const mapStateToProps = ({cache: {collections, users},
 };
 
 const mapDispatchToProps = {
-    ...metadataActions,
-    ...collectionActions
+    fetchMetadata: metadataActions.fetchMetadataBySubjectIfNeeded,
+    invalidateMetadata: metadataActions.invalidateMetadata,
+
+    updateCollection: collectionActions.updateCollection,
+    deleteCollection: collectionActions.deleteCollection,
+    fetchCollectionsIfNeeded: collectionActions.fetchCollectionsIfNeeded
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer)));

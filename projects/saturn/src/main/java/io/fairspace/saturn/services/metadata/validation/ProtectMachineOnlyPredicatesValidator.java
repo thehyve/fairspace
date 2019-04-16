@@ -1,27 +1,24 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.rdf.Vocabulary;
+import lombok.AllArgsConstructor;
 import org.apache.jena.rdf.model.Model;
 
-import static io.fairspace.saturn.util.Ref.ref;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * This validator checks whether the requested action will modify any machine-only
  * predicates. If so, the request will not validate
  */
+@AllArgsConstructor
 public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestValidator {
-    private Vocabulary vocabulary;
-
-    public ProtectMachineOnlyPredicatesValidator(Vocabulary vocabulary) {
-        this.vocabulary = vocabulary;
-    }
+    private final Supplier<List<String>> machineOnlyPredicatesSupplier;
 
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
         return validateModelAgainstMachineOnlyPredicates(modelToRemove.union(modelToAdd));
     }
-
 
     /**
      * Ensures that the given model does not contain any machine-only predicates.
@@ -31,15 +28,16 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
      * @param model
      */
     private ValidationResult validateModelAgainstMachineOnlyPredicates(Model model) {
-        var result = ref(ValidationResult.VALID);
-        var machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
+        var result = ValidationResult.VALID;
+        var machineOnlyPredicates = machineOnlyPredicatesSupplier.get();
 
-        model.listStatements().forEachRemaining(stmt -> {
+        for(var it = model.listStatements(); it.hasNext(); ){
+            var stmt = it.next();
             if (machineOnlyPredicates.contains(stmt.getPredicate().getURI())) {
-                result.value = result.value.merge(new ValidationResult("The given model contains a machine-only predicate " + stmt.getPredicate().getURI()));
+                result = result.merge(new ValidationResult("The given model contains a machine-only predicate " + stmt.getPredicate().getURI()));
             }
-        });
+        }
 
-        return result.value;
+        return result;
     }
 }

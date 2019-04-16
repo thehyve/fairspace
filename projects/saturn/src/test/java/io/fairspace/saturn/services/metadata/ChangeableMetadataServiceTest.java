@@ -3,8 +3,6 @@ package io.fairspace.saturn.services.metadata;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +21,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class ChangeableMetadataServiceTest {
     private static final String GRAPH = "http://localhost/iri/graph";
+    private static final String VOCABULARY = "http://localhost/iri/vocabulary";
 
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
@@ -43,7 +42,7 @@ public class ChangeableMetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new ChangeableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), lifeCycleManager);
+        api = new ChangeableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager);
     }
 
     @Test
