@@ -4,8 +4,8 @@ import Switch from "@material-ui/core/Switch";
 const SwitchValue = ({entry, property, style, onChange, ...otherProps}) => (
     <Switch
         {...otherProps}
-        checked={entry.value}
-        onChange={e => onChange({checked: e.target.checked})}
+        checked={!!entry.value}
+        onChange={e => onChange({value: e.target.checked})}
     />
 );
 
