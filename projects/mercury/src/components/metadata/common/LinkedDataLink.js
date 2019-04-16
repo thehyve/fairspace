@@ -10,11 +10,15 @@ import * as PropTypes from "prop-types";
  * @param props
  * @constructor
  */
-const LinkedDataLink = (props) => (
-    props.uri.startsWith(`${window.location.origin}/`)
-        ? <Link to={props.uri.replace(window.location.origin, '')}>{props.children}</Link>
-        : <a href={props.uri}>{props.children}</a>
-);
+const LinkedDataLink = ({uri, children}) => {
+    const {hostname, pathname, search, hash, protocol} = new URL(uri);
+    const uriIsSameOrigin = hostname === window.location.hostname && protocol === window.location.protocol;
+
+    return (uriIsSameOrigin
+        ? <Link to={{pathname, search, hash}}>{children}</Link>
+        : <a href={uri}>{children}</a>
+    );
+};
 
 LinkedDataLink.propTypes = {
     uri: PropTypes.string.isRequired,
