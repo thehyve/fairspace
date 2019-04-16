@@ -6,7 +6,8 @@ import lombok.SneakyThrows;
 import org.apache.jena.sparql.core.Transactional;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static org.apache.jena.system.Txn.*;
+import static org.apache.jena.system.Txn.calculateWrite;
+import static org.apache.jena.system.Txn.executeWrite;
 
 public class TransactionUtils {
     public static void commit(String message, Transactional transactional, ThrowingRunnable<?> action) {

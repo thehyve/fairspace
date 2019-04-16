@@ -28,16 +28,16 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     private final MetadataRequestValidator validator;
     private final MetadataUpdateEventHandler afterUpdateEventHandler;
 
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, MetadataEntityLifeCycleManager lifeCycleManager) {
-        this(rdf, graph, lifeCycleManager, null, null);
+    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager) {
+        this(rdf, graph, vocabulary, lifeCycleManager, null, null);
     }
 
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        this(rdf, graph, lifeCycleManager, validator, null);
+    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
+        this(rdf, graph, vocabulary, lifeCycleManager, validator, null);
     }
 
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, MetadataUpdateEventHandler afterUpdateEventHandler) {
-        super(rdf, graph);
+    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, MetadataUpdateEventHandler afterUpdateEventHandler) {
+        super(rdf, graph, vocabulary);
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
         this.afterUpdateEventHandler = afterUpdateEventHandler;

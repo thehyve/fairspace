@@ -11,11 +11,11 @@
       "entities": "/api/metadata/entities/"
     },
     "vocabulary": {
-      "statements": "/api/vocabulary/combined/",
-      "entities": "/api/vocabulary/combined/entities/"
+      "statements": "/api/vocabulary/",
+      "entities": "/api/vocabulary/entities/"
     },
     "metaVocabulary": {
-      "statements": "/api/vocabulary/meta/"
+      "statements": "/api/meta-vocabulary/"
     },
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"

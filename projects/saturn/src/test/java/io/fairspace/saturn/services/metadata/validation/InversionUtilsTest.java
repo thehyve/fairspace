@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -10,8 +11,6 @@ import org.junit.Test;
 
 import java.util.Set;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
-import static io.fairspace.saturn.rdf.Vocabulary.initializeVocabulary;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -28,7 +27,7 @@ public class InversionUtilsTest {
 
     @Before
     public void setUp() {
-        initializeVocabulary(rdf, generateIri("user-vocabulary"), "default-vocabularies/user-vocabulary.ttl");
+        new Vocabularies(rdf);
     }
 
     @Test

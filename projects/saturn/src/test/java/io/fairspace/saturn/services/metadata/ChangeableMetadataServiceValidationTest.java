@@ -38,6 +38,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     private static final ValidationResult INVALID_VALIDATION_RESULT = new ValidationResult("Test error");
     private static final String GRAPH = "http://localhost/iri/graph";
+    private static final String VOCABULARY = "http://localhost/iri/vocabulary";
 
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
@@ -54,7 +55,7 @@ public class ChangeableMetadataServiceValidationTest {
     public void setUp() {
         ds = createTxnMem();
         RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new ChangeableMetadataService(rdf, createURI(GRAPH), lifeCycleManager, validator);
+        api = new ChangeableMetadataService(rdf, createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager, validator);
     }
 
     @Test
