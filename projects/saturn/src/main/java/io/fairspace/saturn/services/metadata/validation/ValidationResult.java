@@ -3,10 +3,8 @@ package io.fairspace.saturn.services.metadata.validation;
 import lombok.Data;
 
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static com.google.common.collect.Sets.union;
-import static io.fairspace.saturn.util.Ref.ref;
 import static java.lang.String.join;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
@@ -46,18 +44,5 @@ public class ValidationResult {
 
     public String getMessage() {
         return join(" ", validationMessages);
-    }
-
-    /*
-    ValidationResult mergedValidationResult = mergeValidationResults(onValidationError -> {
-      ...
-      onValidationError.accept(new ValidationResult("Error"));
-      ...
-    });
-     */
-    public static ValidationResult mergeValidationResults(Consumer<Consumer<ValidationResult>> validationAction) {
-        var result = ref(VALID);
-        validationAction.accept(res -> result.value = result.value.merge(res));
-        return result.value;
     }
 }

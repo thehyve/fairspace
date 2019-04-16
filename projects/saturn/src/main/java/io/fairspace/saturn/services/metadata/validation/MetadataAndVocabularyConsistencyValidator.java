@@ -7,14 +7,13 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.topbraid.shacl.vocabulary.SH;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static com.google.common.collect.Sets.union;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getValidationResult;
-import static io.fairspace.saturn.services.metadata.validation.ValidationResult.mergeValidationResults;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 
 /**
@@ -38,33 +37,36 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     }
 
     private ValidationResult validateModifiedShapes(Set<Resource> shapes, Model vocabulary) {
-        return mergeValidationResults(onResult ->
-                shapes.forEach(shape -> {
-                    validateByTargetClass(shape, vocabulary, onResult);
-                    validateByPropertyPath(shape, vocabulary, onResult);
-                }));
+        var results = new HashSet<ValidationResult>();
+
+        shapes.forEach(shape -> {
+            validateByTargetClass(shape, vocabulary, results);
+            validateByPropertyPath(shape, vocabulary, results);
+        });
+
+        return results.stream().reduce(ValidationResult.VALID, ValidationResult::merge);
     }
 
-    private void validateByTargetClass(Resource shape, Model vocabulary, Consumer<ValidationResult> onResult) {
+    private void validateByTargetClass(Resource shape, Model vocabulary, Set<ValidationResult> results) {
         // determine the target class (if any) and validate all the entities belonging to it
         vocabulary.listObjectsOfProperty(shape, SH.targetClass)
                 .forEachRemaining(targetClass -> rdf.querySelect(storedQuery("subjects_by_type", targetClass),
-                        row -> validateResource(row.getResource("s"), vocabulary, onResult)));
+                        row -> validateResource(row.getResource("s"), vocabulary, results)));
     }
 
 
-    private void validateByPropertyPath(Resource shape, Model vocabulary, Consumer<ValidationResult> onResult) {
+    private void validateByPropertyPath(Resource shape, Model vocabulary, Set<ValidationResult> results) {
         // determine the underlying property path (if any) and validate all the entities having it
         vocabulary.listObjectsOfProperty(shape, SH.path)
                 .forEachRemaining(path -> rdf.querySelect(storedQuery("subjects_with_property", path),
-                        row -> validateResource(row.getResource("s"), vocabulary, onResult)));
+                        row -> validateResource(row.getResource("s"), vocabulary, results)));
     }
 
     @SneakyThrows
-    private void validateResource(Resource resource, Model vocabulary, Consumer<ValidationResult> onResult) {
+    private void validateResource(Resource resource, Model vocabulary, Set<ValidationResult> results) {
         var dataModel = rdf.queryConstruct(storedQuery("triples_by_subject_with_object_types", resource));
         var validationEngine = createEngine(dataModel, vocabulary);
         validationEngine.validateNode(resource.asNode());
-        onResult.accept(getValidationResult(validationEngine));
+        results.add(getValidationResult(validationEngine));
     }
 }
