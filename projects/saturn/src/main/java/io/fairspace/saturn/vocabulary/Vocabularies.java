@@ -8,6 +8,7 @@ import org.apache.jena.util.FileManager;
 
 import java.util.List;
 
+import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -35,7 +36,7 @@ public class Vocabularies {
                 var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
 
                 var userVocabulary = oldVocabulary.isEmpty()
-                        ? FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", generateVocabularyIri("").getURI(), null)
+                        ? FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", CONFIG.jena.vocabularyBaseIRI, null)
                         : oldVocabulary.difference(oldSystemVocabulary);
 
                 rdf.put(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));
