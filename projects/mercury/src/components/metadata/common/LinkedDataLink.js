@@ -11,8 +11,8 @@ import * as PropTypes from "prop-types";
  * @constructor
  */
 const LinkedDataLink = ({uri, children}) => {
-    const {hostname, pathname, search, hash, protocol} = new URL(uri);
-    const uriIsSameOrigin = hostname === window.location.hostname && protocol === window.location.protocol;
+    const {hostname, pathname, search, hash} = new URL(uri);
+    const uriIsSameOrigin = hostname === window.location.hostname;
 
     return (uriIsSameOrigin
         ? <Link to={{pathname, search, hash}}>{children}</Link>
