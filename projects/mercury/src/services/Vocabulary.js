@@ -52,14 +52,25 @@ class Vocabulary {
         }
 
         // Determine properties allowed for the given type
-        const propertyShapes = this.determinePropertyShapesForTypes(metadataItem['@type']);
+        const types = metadataItem['@type'];
+        const propertyShapes = this.determinePropertyShapesForTypes(types);
+        return this.generatePropertiesForMetadata(metadataItem, types, propertyShapes, expandedMetadata);
+    }
 
+    /**
+     *
+     * @param metadataItem
+     * @param propertyShapes
+     * @param expandedMetadata
+     * @returns {*[]}
+     */
+    generatePropertiesForMetadata(metadataItem, types, propertyShapes, expandedMetadata) {
         // Actually convert the metadata into a list of properties
         const properties = this.convertMetadataIntoPropertyList(metadataItem, propertyShapes, expandedMetadata);
         const emptyProperties = this.determineAdditionalEmptyProperties(metadataItem, propertyShapes);
 
         // An entry with information on the type is returned as well for display purposes
-        const typeProperty = this.generateTypeProperty(metadataItem['@type']);
+        const typeProperty = this.generateTypeProperty(types);
 
         return [...properties, ...emptyProperties, typeProperty];
     }
@@ -89,13 +100,10 @@ class Vocabulary {
 
         // Determine properties allowed for the given type
         const propertyShapes = this.determinePropertyShapesForNodeShape(shape);
-        const emptyProperties = this.determineAdditionalEmptyProperties({}, propertyShapes);
-
-        // An entry with information on the type is returned as well for display purposes
         const types = (shape[constants.SHACL_TARGET_CLASS] || []).map(node => node['@id']);
-        const typeProperty = this.generateTypeProperty(types);
 
-        return [...emptyProperties, typeProperty];
+        // Generate a list of empty properties
+        return this.generatePropertiesForMetadata({}, types, propertyShapes, []);
     }
 
     /**
