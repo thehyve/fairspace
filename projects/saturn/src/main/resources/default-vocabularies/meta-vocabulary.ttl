@@ -68,7 +68,11 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Meta shape of FS defined properties." ;
     sh:name "Property Shape Meta" ;
-    sh:property [
+    sh:property
+        sh:MinCountConstraintComponent-minCount,
+        sh:MaxCountConstraintComponent-maxCount,
+        sh:MaxLengthConstraintComponent-maxLength,
+    [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
@@ -77,18 +81,6 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:name "Property name" ;
         fs:showInTable true ;
         sh:order 0
-    ], [
-        sh:datatype xsd:integer ;
-        sh:path sh:minCount ;
-        sh:maxInclusive 1 ;
-        sh:lessThanOrEquals sh:maxCount ;
-        sh:name "Minimum number of values"
-    ], [
-        sh:datatype xsd:integer ;
-        sh:path sh:maxCount ;
-        sh:greaterThanOrEquals sh:minCount ;
-        sh:minInclusive 1 ;
-        sh:name "Maximum number of values"
     ], [
         sh:range rdf:List ;
         sh:path sh:in ;
@@ -110,10 +102,6 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:order 2
     ], [
         sh:path sh:message
-    ], [
-        sh:datatype xsd:integer ;
-        sh:path sh:maxLength ;
-        sh:name "Maximum length (for string only)"
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -148,21 +136,11 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Meta shape of FS defined relations." ;
     sh:name "Relation Shape Meta" ;
-    sh:property 
+    sh:property
+        sh:MinCountConstraintComponent-minCount,
+        sh:MaxCountConstraintComponent-maxCount,
         fs:inverseRelationShape, 
     [
-        sh:datatype xsd:integer ;
-        sh:path sh:minCount ;
-        sh:maxInclusive 1 ;
-        sh:lessThanOrEquals sh:maxCount ;
-        sh:name "Minimum number of values"
-    ], [
-        sh:datatype xsd:integer ;
-        sh:path sh:maxCount ;
-        sh:minInclusive 1 ;
-        sh:greaterThanOrEquals sh:minCount ;
-        sh:name "Maximum number of values"
-    ], [
         sh:class fs:Class ;
         sh:path sh:class ;
         sh:name "Class target" ;
