@@ -127,7 +127,7 @@ fs:blobIdShape a fs:PropertyShape ;
     fs:machineOnly true .
 
 fs:collectionTypeShape a fs:PropertyShape ;
-    sh:name "ColllectionType";
+    sh:name "Collection type";
     sh:description "Collection Type";
     sh:path fs:collectionType ;
     sh:datatype xsd:string ;
