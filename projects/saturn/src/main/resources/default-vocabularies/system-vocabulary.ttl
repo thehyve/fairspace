@@ -120,11 +120,17 @@ fs:UserShape a fs:ClassShape ;
 ## Property Shapes
 
 fs:blobIdShape a fs:PropertyShape ;
+    sh:name "BlobID";
+    sh:description "Blob ID in the blob store" ;
     sh:path fs:blobId ;
+    sh:datatype xsd:string ;
     fs:machineOnly true .
 
 fs:collectionTypeShape a fs:PropertyShape ;
+    sh:name "ColllectionType";
+    sh:description "Collection Type";
     sh:path fs:collectionType ;
+    sh:datatype xsd:string ;
     fs:machineOnly true .
 
 rdfs:labelShape a fs:PropertyShape ;
