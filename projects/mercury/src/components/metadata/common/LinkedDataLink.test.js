@@ -42,8 +42,14 @@ describe('MetadataLink', () => {
         expect(wrapper.containsMatchingElement(<a href={uri} />)).toBe(true);
     });
 
-    it('should treat changes in scheme as foreign', () => {
+    it('should ignore changes in scheme', () => {
         const uri = `https://localhost${pathAndParams}`;
+        const wrapper = shallow(<LinkedDataLink uri={uri} />);
+        expect(wrapper.contains(<Link to={{pathname, search, hash}} />)).toBe(true);
+    });
+
+    it('should not break on an invalid url', () => {
+        const uri = `some-invalid-url`;
         const wrapper = shallow(<LinkedDataLink uri={uri} />);
         expect(wrapper.contains(<a href={uri} />)).toBe(true);
     });

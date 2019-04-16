@@ -11,13 +11,18 @@ import * as PropTypes from "prop-types";
  * @constructor
  */
 const LinkedDataLink = ({uri, children}) => {
-    const {hostname, pathname, search, hash, protocol} = new URL(uri);
-    const uriIsSameOrigin = hostname === window.location.hostname && protocol === window.location.protocol;
+    try {
+        const {hostname, pathname, search, hash} = new URL(uri);
+        const uriIsSameOrigin = hostname === window.location.hostname;
 
-    return (uriIsSameOrigin
-        ? <Link to={{pathname, search, hash}}>{children}</Link>
-        : <a href={uri}>{children}</a>
-    );
+        return (uriIsSameOrigin
+            ? <Link to={{pathname, search, hash}}>{children}</Link>
+            : <a href={uri}>{children}</a>
+        );
+    } catch (e) {
+        console.warn("Invalid URL passed to LinkedDataLink component", uri);
+        return <a href={uri}>{children}</a>;
+    }
 };
 
 LinkedDataLink.propTypes = {
