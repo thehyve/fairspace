@@ -94,7 +94,7 @@ class LinkedDataAPI {
 
         const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
 
-        return fetch(Config.get().urls.metadata.statements, {
+        return fetch(this.getStatementsUrl(), {
             method: 'PATCH',
             headers: new Headers({'Content-type': 'application/ld+json'}),
             credentials: 'same-origin',
