@@ -303,9 +303,21 @@ describe('Metadata Utils', () => {
     });
 
     describe('url2iri', () => {
-        it('Handles URLS', () => {
-            expect(url2iri('scheme://example.com:1234/some/path/?query')).toEqual('http://example.com/some/path/');
+        it('returns http scheme regardless of the input scheme', () => {
+            expect(url2iri('scheme://example.com/some/path')).toEqual('http://example.com/some/path');
         });
+        it('removes the port number from the uri', () => {
+            expect(url2iri('http://example.com:1234/some/path')).toEqual('http://example.com/some/path');
+        });
+
+        it('handles urls with query and fragment ', () => {
+            expect(url2iri('scheme://example.com/some/path/?query#some-fragment')).toEqual('http://example.com/some/path/?query#some-fragment');
+        });
+
+        it('removes empty fragment or query strings', () => {
+            expect(url2iri('scheme://example.com/some/path/?#')).toEqual('http://example.com/some/path/');
+        });
+
     });
 
     describe('getTypeInfo', () => {

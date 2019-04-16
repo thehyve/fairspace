@@ -176,9 +176,30 @@ export const getTypeInfo = (metadata) => {
     return (label && comment) ? `${label} - ${comment}` : (label || comment);
 }
 
+/**
+ * Creates a new IRI within this workspace, based on the given identifier
+ *
+ * Please note that IRIs within the workspace always use http as scheme, regardless
+ * of whether the app runs on https. This ensures consistent IRI generation and
+ * add the ability to access the same IRI on different protocols.
+ *
+ * @param id
+ * @returns {string}
+ */
 export const createIri = (id) => `http://${window.location.hostname}/iri/${id}`;
 
+/**
+ * Generates a compatible workspace IRI from the given iri.
+ *
+ * This method will return the same iri as was given, but with http as scheme
+ * and without the port number.
+ * This ensures consistent IRI generation and
+ * add the ability to access the same IRI on different protocols.
+ *
+ * @param id
+ * @returns {string}
+ */
 export const url2iri = (iri) => {
     const url = new URL(iri);
-    return `http://${url.hostname}${url.pathname}`;
+    return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
 };
