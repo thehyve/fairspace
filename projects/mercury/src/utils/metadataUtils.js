@@ -200,6 +200,11 @@ export const createIri = (id) => `http://${window.location.hostname}/iri/${id}`;
  * @returns {string}
  */
 export const url2iri = (iri) => {
-    const url = new URL(iri);
-    return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
+    try {
+        const url = new URL(iri);
+        return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
+    } catch (e) {
+        console.warn("Invalid uri given to convert to iri", iri);
+        return iri;
+    }
 };

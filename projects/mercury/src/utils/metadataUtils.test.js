@@ -318,6 +318,10 @@ describe('Metadata Utils', () => {
             expect(url2iri('scheme://example.com/some/path/?#')).toEqual('http://example.com/some/path/');
         });
 
+        it('return the unmodified uri if it is invalid', () => {
+            expect(url2iri('some-invalid-uri')).toEqual('some-invalid-uri');
+        });
+
     });
 
     describe('getTypeInfo', () => {
