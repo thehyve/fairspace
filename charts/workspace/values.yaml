@@ -162,12 +162,8 @@ pluto:
   # Where to find the backends for this proxy
   backends:
     ui:
-    rdf:
-    metadata:
-    vocabulary:
+    saturn:
     storage:
-    collections:
-    permissions:
 
 #####################################################################
 # Specific settings for Saturn subchart
