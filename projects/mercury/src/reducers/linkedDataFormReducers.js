@@ -31,23 +31,23 @@ const generateStateWithNewValues = (state, propertyKey, updatedValues) => ({
  * @param action
  * @returns {*}
  */
-export const metadataFormChangesReducerPerForm = (state = initialState, action) => {
+export const linkedDataFormChangesReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.INITIALIZE_METADATA_FORM:
+        case actionTypes.INITIALIZE_LINKEDDATA_FORM:
             return {...initialState, subject: action.subject};
-        case actionTypes.ADD_METADATA_VALUE:
+        case actionTypes.ADD_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
                 action.property.key,
                 [...getValues(state, action), action.value]
             );
-        case actionTypes.UPDATE_METADATA_VALUE:
+        case actionTypes.UPDATE_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
                 action.property.key,
                 getValues(state, action).map((el, idx) => ((idx === action.index) ? action.value : el))
             );
-        case actionTypes.DELETE_METADATA_VALUE:
+        case actionTypes.DELETE_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
                 action.property.key,
@@ -65,7 +65,7 @@ export const metadataFormChangesReducerPerForm = (state = initialState, action) 
  * @param action
  * @returns {*}
  */
-export const metadataFormSubmissionReducerPerForm = (state = initialState, action) => {
+export const linkedDataFormSubmissionReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.UPDATE_METADATA_PENDING:
         case actionTypes.UPDATE_VOCABULARY_PENDING:
@@ -100,13 +100,13 @@ export default reduceReducers(
     createByKey(
         action => action && action.formKey,
         action => action.formKey
-    )(metadataFormChangesReducerPerForm),
+    )(linkedDataFormChangesReducerPerForm),
     createByKey(
         action => action && action.meta && action.meta.formKey,
         action => action.meta.formKey
-    )(metadataFormSubmissionReducerPerForm)
+    )(linkedDataFormSubmissionReducerPerForm)
 );
 
 
-export const getMetadataFormUpdates = (state, formKey) => (state.metadataForm[formKey] && state.metadataForm[formKey].updates) || {};
-export const hasMetadataFormUpdates = (state, formKey) => !!(state.metadataForm[formKey] && state.metadataForm[formKey].updates && Object.keys(state.metadataForm[formKey].updates).length > 0);
+export const getLinkedDataFormUpdates = (state, formKey) => (state.linkedDataForm[formKey] && state.linkedDataForm[formKey].updates) || {};
+export const hasLinkedDataFormUpdates = (state, formKey) => !!(state.linkedDataForm[formKey] && state.linkedDataForm[formKey].updates && Object.keys(state.linkedDataForm[formKey].updates).length > 0);

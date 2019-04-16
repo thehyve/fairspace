@@ -39,7 +39,7 @@ describe('LinkedDataEntityFormContainer', () => {
                 jsonLdBySubject: {},
                 vocabulary: {}
             },
-            metadataForm: {
+            linkedDataForm: {
                 "http://example.com/john": {
                     updates: {
                         'http://www.w3.org/2000/01/rdf-schema#comment': [
@@ -82,7 +82,7 @@ describe('LinkedDataEntityFormContainer', () => {
                     data: new Vocabulary([])
                 }
             },
-            metadataForm: {}
+            linkedDataForm: {}
         });
 
         const fetchVocabulary = jest.fn();

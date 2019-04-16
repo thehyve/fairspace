@@ -1,7 +1,7 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
-import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
+import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
 import {getMetaVocabulary, getVocabulary} from "../reducers/cache/vocabularyReducers";
 
 export const invalidateMetadata = subject => ({
@@ -10,7 +10,7 @@ export const invalidateMetadata = subject => ({
 });
 
 export const submitVocabularyChangesFromState = (subject) => (dispatch, getState) => {
-    const values = getMetadataFormUpdates(getState(), subject);
+    const values = getLinkedDataFormUpdates(getState(), subject);
     const metaVocabulary = getMetaVocabulary(getState());
     return dispatch({
         type: actionTypes.UPDATE_VOCABULARY,
@@ -22,7 +22,7 @@ export const submitVocabularyChangesFromState = (subject) => (dispatch, getState
 };
 
 export const createVocabularyEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
-    const values = getMetadataFormUpdates(getState(), formKey);
+    const values = getLinkedDataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
 
     return dispatch({

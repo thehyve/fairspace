@@ -2,8 +2,8 @@ import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux
 import {MetadataAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
-import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
 import {getVocabulary} from "../reducers/cache/vocabularyReducers";
+import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
@@ -13,7 +13,7 @@ export const invalidateMetadata = subject => ({
 export const submitMetadataChangesFromState = (subject) => (dispatch, getState) => {
     // For metadata changes, the subject iri is used as form key
     const formKey = subject;
-    const values = getMetadataFormUpdates(getState(), formKey);
+    const values = getLinkedDataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
     return dispatch({
         type: actionTypes.UPDATE_METADATA,
@@ -26,7 +26,7 @@ export const submitMetadataChangesFromState = (subject) => (dispatch, getState) 
 };
 
 export const createMetadataEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
-    const values = getMetadataFormUpdates(getState(), formKey);
+    const values = getLinkedDataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
 
     return dispatch({

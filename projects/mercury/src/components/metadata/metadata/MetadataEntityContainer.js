@@ -13,9 +13,9 @@ import {
     isMetadataPending
 } from "../../../reducers/cache/jsonLdBySubjectReducers";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
-import {hasMetadataFormUpdates} from "../../../reducers/metadataFormReducers";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
+import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 
 const MetadataEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, ...otherProps} = props;
@@ -60,7 +60,7 @@ const mapStateToProps = (state, ownProps) => {
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
     const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
-    const buttonDisabled = !hasMetadataFormUpdates(state, subject);
+    const buttonDisabled = !hasLinkedDataFormUpdates(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
