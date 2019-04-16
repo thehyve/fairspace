@@ -26,11 +26,10 @@ class NewLinkedDataEntityDialog extends React.Component {
     render() {
         const {shape, open, linkedData} = this.props;
         const typeLabel = getLabel(shape);
-        const showDialog = open && shape !== undefined;
 
         return (
             <Dialog
-                open={showDialog}
+                open={open}
                 onClose={this.closeDialog}
                 aria-labelledby="form-dialog-title"
             >
@@ -88,7 +87,8 @@ class NewLinkedDataEntityDialog extends React.Component {
 NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired
+    onClose: PropTypes.func.isRequired,
+    open: PropTypes.bool
 };
 
 export default NewLinkedDataEntityDialog;
