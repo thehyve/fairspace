@@ -1,4 +1,5 @@
 server.port: 5000
+
 app:
   domain: http://localhost:5000
   forceHttps: false
@@ -23,15 +24,17 @@ keycloak:
 
 zuul:
   routes:
+    # Please note that the order of the routes is relevant
+    # The elasticsearch route must be defined before
+    # saturn, which must be defined before ui, because of the
+    # paths they listen to
     storage:
       url: http://localhost:8080
-    metadata:
-      url: http://localhost:8080/api/metadata/
-    collections:
-      url: http://localhost:8080/api/collections/
-    ui:
-      url: http://localhost:3000
     elasticsearch:
       url: http://localhost:9200
+    saturn:
+      url: http://localhost:8080
+    ui:
+      url: http://localhost:3000
 
   include-debug-header: true
