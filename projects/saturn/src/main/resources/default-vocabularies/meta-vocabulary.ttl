@@ -17,7 +17,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ; 
-        sh:name "Class shape name"
+        sh:name "Class name"
     ], [
         # This means every value for predicate sh:property should have this type.
         sh:class sh:PropertyShape ;
