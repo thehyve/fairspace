@@ -209,7 +209,7 @@ fs:fixedShapeShape a fs:PropertyShape ;
     sh:path fs:fixedShape ;
     fs:machineOnly true ; 
     sh:name "Fixed shape" ;
-    sh:description "If this is true, a user can not make changes to this shape definiton." .
+    sh:description "If this is true, a user can not make changes to this shape definition." .
 
 fs:machineOnlyShape a fs:PropertyShape ; 
     sh:datatype xsd:boolean ;
