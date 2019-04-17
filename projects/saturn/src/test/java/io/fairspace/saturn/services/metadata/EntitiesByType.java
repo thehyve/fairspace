@@ -72,21 +72,20 @@ public class EntitiesByType {
     public void testListAllEntities() {
         given(ds).testConstruct(storedQuery("entities_by_type", GRAPH, VOCABULARY, null),
                 model -> {
-                    assertEquals(Set.of(ENTITY_1, ENTITY_3, ENTITY_4), model.listSubjects().toSet());
-                    assertTrue(model.contains(ENTITY_1, RDFS.label));
-                    assertEquals(CLASS_1, model.getRequiredProperty(ENTITY_1, RDF.type).getResource());
-                    assertEquals(CLASS_3, model.getRequiredProperty(ENTITY_3, RDF.type).getResource());
+                    assertEquals("All entities those shapes have fs:showInCatalog should be returned",
+                            Set.of(ENTITY_1, ENTITY_3, ENTITY_4),
+                            model.listSubjects().toSet());
+                    assertTrue("The result should include labels when possible", model.contains(ENTITY_1, RDFS.label));
+
+                    assertEquals("Entities should have proper types", CLASS_3, model.getRequiredProperty(ENTITY_3, RDF.type).getResource());
                 });
     }
 
     @Test
     public void testGetEntitiesByType() {
-        given(ds)
-                .testConstruct(storedQuery("entities_by_type", GRAPH, VOCABULARY, CLASS_1),
-                        model -> assertEquals(Set.of(ENTITY_1, ENTITY_3), model.listSubjects().toSet()))
-                .testConstruct(storedQuery("entities_by_type", GRAPH, VOCABULARY, CLASS_2),
-                        model -> assertEquals(Set.of(ENTITY_3), model.listSubjects().toSet()))
-                .testConstruct(storedQuery("entities_by_type", GRAPH, VOCABULARY, CLASS_3),
-                        model -> assertEquals(Set.of(ENTITY_3), model.listSubjects().toSet()));
+        given(ds).testConstruct(storedQuery("entities_by_type", GRAPH, VOCABULARY, CLASS_1),
+                model -> assertEquals("Inheritance works all the way down",
+                        Set.of(ENTITY_1, ENTITY_3),
+                        model.listSubjects().toSet()));
     }
 }
