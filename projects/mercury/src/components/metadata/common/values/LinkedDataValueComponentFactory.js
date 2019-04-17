@@ -22,6 +22,12 @@ export const getInputComponent = (property) => {
         return StringValue;
     }
 
+    // If this class refers to a generic IRI, let the user
+    // enter the iri in a textbox
+    if (property.isGenericIriResource) {
+        return ResourceValue;
+    }
+
     // The datatype determines the type of input element
     // If no datatype is specified, the field will be treated
     // as referring to another class
@@ -40,8 +46,6 @@ export const getInputComponent = (property) => {
             return TimeValue;
         case constants.BOOLEAN_URI:
             return SwitchValue;
-        case constants.RESOURCE_URI:
-            return ResourceValue;
         default:
             return undefined;
     }

@@ -275,10 +275,6 @@ class Vocabulary {
         };
     }
 
-    static isRdfList(propertyShape) {
-        return getFirstPredicateId(propertyShape, constants.SHACL_NODE) === constants.DASH_LIST_SHAPE;
-    }
-
     /**
      * Checks whether the vocabulary contains the given identifier
      * @param id
@@ -314,6 +310,7 @@ class Vocabulary {
         const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
         const allowedValues = getFirstPredicateList(propertyShape, constants.SHACL_IN, undefined);
         const isRdfList = Vocabulary.isRdfList(propertyShape);
+        const isGenericIriResource = Vocabulary.isGenericIriResource(propertyShape);
 
         return {
             key: predicate,
@@ -325,7 +322,8 @@ class Vocabulary {
             machineOnly,
             multiLine,
             allowedValues,
-            isRdfList
+            isRdfList,
+            isGenericIriResource
         };
     }
 
@@ -347,6 +345,15 @@ class Vocabulary {
         const entry = allMetadata.find(element => element['@id'] === id);
         return getLabel(entry);
     }
+
+    static isRdfList(propertyShape) {
+        return getFirstPredicateId(propertyShape, constants.SHACL_NODE) === constants.DASH_LIST_SHAPE;
+    }
+
+    static isGenericIriResource(propertyShape) {
+        return getFirstPredicateId(propertyShape, constants.SHACL_NODEKIND) === constants.SHACL_IRI;
+    }
+
 }
 
 export default Vocabulary;
