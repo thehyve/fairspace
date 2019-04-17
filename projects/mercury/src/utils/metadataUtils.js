@@ -1,7 +1,6 @@
 import * as consts from "../constants";
 import Vocabulary from "../services/Vocabulary";
 
-
 /**
  * Returns the value of the given property on the first entry of the predicate for the metadat
  * @param metadataEntry     An expanded metadata object with keys being the predicates
@@ -124,19 +123,37 @@ export const propertiesToShow = (properties = []) => {
     return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
 
-
 /**
  * Returns the given values in the right container. By default, no container is used
  * If the predicate requires an rdf:List, the values are put into a {'@list': ...} object
+ * Some values require a type value (such as date and datetime), so the type will be provided
  * @param values
  * @returns {*}
  */
-const rdfContainerize = (values, shape) => {
+const jsonLdWrapper = (values, shape) => {
     if (Vocabulary.isRdfList(shape)) {
-        return {'@list': values};
+        return {
+            '@list': values.map(({id, value}) => ({'@id': id, '@value': value}))
+        };
     }
 
-    return values;
+    const dataType = getFirstPredicateId(shape, consts.SHACL_DATATYPE);
+
+    if (dataType === consts.DATE_URI) {
+        return values.map(({value}) => ({
+            "@value": value,
+            "@type": consts.DATE_URI
+        }));
+    }
+
+    if (dataType === consts.DATETIME_URI) {
+        return values.map(({value}) => ({
+            "@value": value,
+            "@type": consts.DATETIME_URI
+        }));
+    }
+
+    return values.map(({id, value}) => ({'@id': id, '@value': value}));
 };
 
 /**
@@ -157,10 +174,7 @@ export const toJsonLd = (subject, predicate, values, vocabulary = new Vocabulary
 
     return {
         '@id': subject,
-        [predicate]: rdfContainerize(
-            values.map(({id, value}) => ({'@id': id, '@value': value})),
-            vocabulary.determineShapeForProperty(predicate)
-        )
+        [predicate]: jsonLdWrapper(values, vocabulary.determineShapeForProperty(predicate))
     };
 };
 

@@ -1,53 +1,43 @@
 import React from 'react';
-import TextField from "@material-ui/core/TextField";
+import {DateTimePicker} from "material-ui-pickers";
 
 class DateTimeValue extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {value: props.entry.value || ''};
+        this.state = {value: props.entry.value || undefined};
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.entry.value !== prevProps.entry.value) {
-            this.reset();
+            this.updateState();
         }
     }
 
     handleChange = (e) => {
-        this.setState({value: e.target.value});
+        this.props.onChange({value: e});
+        this.setState({value: e});
     }
 
-    handleBlur = () => {
-        this.props.onChange({value: this.delocalize(this.state.value)});
+    updateState = () => {
+        this.setState({value: this.props.entry.value});
     }
-
-    localize = (dt) => (dt && dt.endsWith('Z') ? dt.substring(0, dt.length - 1) : dt);
-
-    delocalize = (dt) => (dt ? `${dt}Z` : dt);
 
     render() {
-        const {
-            entry, property, style, onSave, ...otherProps
-        } = this.props;
+        const {entry, property, ...otherProps} = this.props;
 
         return (
-            <TextField
+            <DateTimePicker
                 {...otherProps}
-                multiline={false}
-                value={this.localize(this.state.value)}
-                type="datetime-local"
+                value={this.state.value}
                 onChange={this.handleChange}
-                onBlur={this.handleBlur}
-                margin="normal"
-                style={{...style, marginTop: 0, width: '100%'}}
             />
         );
     }
 }
 
 DateTimeValue.defaultProps = {
-    entry: {}
+    entry: {value: undefined},
 };
 
 export default DateTimeValue;
