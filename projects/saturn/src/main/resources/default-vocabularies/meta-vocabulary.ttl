@@ -34,7 +34,10 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:description "sh:closed should be false." ;
         sh:name "Closed"
     ], [
-        sh:class fs:Class ;
+        # This nodeKind restriction could be replaced by something like
+        # sh:class fs:Class. Currently that restriction will limit our
+        # options to add new shapes
+        sh:nodeKind sh:IRI ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:targetClass ; 

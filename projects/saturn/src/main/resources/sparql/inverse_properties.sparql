@@ -4,5 +4,5 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
 SELECT ?lhs ?rhs
 WHERE {
-    GRAPH ws:vocabulary { ?lhs a rdf:Property ; owl:inverseOf ?rhs . }
+    GRAPH %1$s { ?lhs a rdf:Property ; owl:inverseOf ?rhs . }
 }
