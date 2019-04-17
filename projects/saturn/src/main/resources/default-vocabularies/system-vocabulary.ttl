@@ -18,7 +18,7 @@
 ## Class Shapes
 
 fs:FileShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "A single file." ;
     sh:name "File" ;
     sh:targetClass fs:File ; 
@@ -50,7 +50,7 @@ fs:FileShape a fs:ClassShape ;
         rdfs:commentShape .
 
 fs:DirectoryShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "A directory containing multiple files." ;
     sh:name "Directory" ;
     sh:targetClass fs:Directory ; 
@@ -78,7 +78,7 @@ fs:DirectoryShape a fs:ClassShape ;
         rdfs:commentShape .
 
 fs:CollectionShape a fs:ClassShape ;
-    sh:closed true ; 
+    sh:closed false ; 
     sh:description "Collection of files with associated metadata and access rules." ;
     sh:name "Collection" ;
     sh:targetClass fs:Collection ; 
@@ -105,7 +105,7 @@ fs:CollectionShape a fs:ClassShape ;
         rdfs:labelShape,
         rdfs:commentShape .
 
-fs:UserShape a fs:ClassShape ;
+fs:UserShape a sh:NodeShape ;
     sh:closed true ; 
     sh:description "Description for fs:User" ;
     sh:name "User" ;

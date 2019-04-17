@@ -27,7 +27,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:description "List of all properties and relations for this class." ;
         fs:showAsTable true
     ], [
-        sh:value false ;
+        sh:hasValue false ;
         sh:datatype xsd:boolean ;
         sh:maxCount 1 ;
         sh:path sh:closed ;
