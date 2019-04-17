@@ -6,7 +6,7 @@ import {createByKey} from "../utils/redux";
  * The updates map contains a map from propertyKey (predicate) to a list of values for that property
  * @type {{updates: {}}}
  */
-const initialState = {updates: {}, pending: false, error: false};
+const initialState = {subject: undefined, updates: {}, pending: false, error: false};
 
 /**
  * Returns the values that are present in the form for the given propertyKey
@@ -25,30 +25,29 @@ const generateStateWithNewValues = (state, propertyKey, updatedValues) => ({
 });
 
 /**
- * Reducers the state for the metadata form, for a single subject
+ * Reducers the state for the metadata form, for a single formKey
  *
  * @param state
  * @param action
  * @returns {*}
  */
-export const metadataFormChangesReducerPerSubject = (state = initialState, action) => {
+export const linkedDataFormChangesReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.INITIALIZE_METADATA_FORM:
-        case actionTypes.CLEAR_METADATA_FORM:
-            return initialState;
-        case actionTypes.ADD_METADATA_VALUE:
+        case actionTypes.INITIALIZE_LINKEDDATA_FORM:
+            return {...initialState, subject: action.subject};
+        case actionTypes.ADD_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
                 action.property.key,
                 [...getValues(state, action), action.value]
             );
-        case actionTypes.UPDATE_METADATA_VALUE:
+        case actionTypes.UPDATE_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
                 action.property.key,
                 getValues(state, action).map((el, idx) => ((idx === action.index) ? action.value : el))
             );
-        case actionTypes.DELETE_METADATA_VALUE:
+        case actionTypes.DELETE_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
                 action.property.key,
@@ -66,7 +65,7 @@ export const metadataFormChangesReducerPerSubject = (state = initialState, actio
  * @param action
  * @returns {*}
  */
-export const metadataFormSubmissionReducerPerSubject = (state = initialState, action) => {
+export const linkedDataFormSubmissionReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.UPDATE_METADATA_PENDING:
         case actionTypes.UPDATE_VOCABULARY_PENDING:
@@ -94,20 +93,20 @@ export const metadataFormSubmissionReducerPerSubject = (state = initialState, ac
     }
 };
 
-// We need two different reducers, as the normal actions have the subject
-// in the action.subject property, whereas the promise actions have the subject
-// in action.meta.subject due to implementation details
+// We need two different reducers, as the normal actions have the formKey
+// in the action.formKey property, whereas the promise actions have the formKey
+// in action.meta.formKey due to implementation details
 export default reduceReducers(
     createByKey(
-        action => action && action.subject,
-        action => action.subject
-    )(metadataFormChangesReducerPerSubject),
+        action => action && action.formKey,
+        action => action.formKey
+    )(linkedDataFormChangesReducerPerForm),
     createByKey(
-        action => action && action.meta && action.meta.subject,
-        action => action.meta.subject
-    )(metadataFormSubmissionReducerPerSubject)
+        action => action && action.meta && action.meta.formKey,
+        action => action.meta.formKey
+    )(linkedDataFormSubmissionReducerPerForm)
 );
 
 
-export const getMetadataFormUpdates = (state, subject) => (state.metadataForm[subject] && state.metadataForm[subject].updates) || {};
-export const hasMetadataFormUpdates = (state, subject) => !!(state.metadataForm[subject] && state.metadataForm[subject].updates && Object.keys(state.metadataForm[subject].updates).length > 0);
+export const getLinkedDataFormUpdates = (state, formKey) => (state.linkedDataForm[formKey] && state.linkedDataForm[formKey].updates) || {};
+export const hasLinkedDataFormUpdates = (state, formKey) => !!(state.linkedDataForm[formKey] && state.linkedDataForm[formKey].updates && Object.keys(state.linkedDataForm[formKey].updates).length > 0);

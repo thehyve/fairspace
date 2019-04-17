@@ -8,8 +8,8 @@ import DateValue from "./DateValue";
 import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
 import ResourceValue from "./ResourceValue";
-import EntityDropdownContainer from "./EntityDropdownContainer";
 import EnumerationDropdown from "./EnumerationDropdown";
+import EntityDropdownWithAdditionContainer from "./EntityDropdownWithAdditionContainer";
 
 const getInputComponent = (property) => {
     // If the property has a restricted set of allowed values
@@ -51,6 +51,6 @@ const getInputComponent = (property) => {
 
 export default {
     editComponent: property => getInputComponent(property) || ReferringValue,
-    addComponent: property => getInputComponent(property) || EntityDropdownContainer,
+    addComponent: property => getInputComponent(property) || EntityDropdownWithAdditionContainer,
     readOnlyComponent: () => ReferringValue
 };

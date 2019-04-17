@@ -28,8 +28,11 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         fs:showAsTable true
     ], [
         sh:value false ;
-        sh:path sh:closed ; 
-        sh:description "sh:closed should be false."
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        sh:path sh:closed ;
+        sh:description "sh:closed should be false." ;
+        sh:name "Closed"
     ], [
         sh:class fs:Class ;
         sh:maxCount 1 ;
@@ -63,7 +66,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
 
 fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -82,16 +85,19 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
         sh:maxInclusive 1 ;
+        sh:maxCount 1 ;
         sh:lessThanOrEquals sh:maxCount ;
         sh:name "Minimum number of values"
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxCount ;
+        sh:maxCount 1 ;
         sh:greaterThanOrEquals sh:minCount ;
         sh:minInclusive 1 ;
         sh:name "Maximum number of values"
     ], [
         sh:path sh:in ;
+        sh:maxCount 1 ;
         sh:name "Controlled vocabulary" ;
         sh:node dash:ListShape ;
         sh:property [
@@ -112,12 +118,12 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
         sh:name "Datatype" ;
         fs:showInTable true ;
+        sh:maxCount 1 ;
         sh:order 2
-    ], [
-        sh:path sh:message
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
+        sh:maxCount 1 ;
         sh:name "Maximum length (for string only)"
     ], [
         sh:maxCount 1 ;
@@ -147,7 +153,7 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
       ) ; 
     fs:showInCatalog true ;
     sh:targetClass fs:PropertyShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
 
 fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -159,17 +165,21 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
         sh:maxInclusive 1 ;
+        sh:maxCount 1 ;
         sh:lessThanOrEquals sh:maxCount ;
         sh:name "Minimum number of values"
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxCount ;
         sh:minInclusive 1 ;
+        sh:maxCount 1 ;
         sh:greaterThanOrEquals sh:minCount ;
         sh:name "Maximum number of values"
     ], [
         sh:class fs:Class ;
         sh:path sh:class ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
         sh:name "Class target" ;
         fs:showInTable true ;
         sh:order 2
@@ -181,8 +191,6 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:name "Relation description" ;
         fs:showInTable true ;
         sh:order 1
-    ], [
-        sh:path sh:message
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -214,7 +222,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;

@@ -1,24 +1,26 @@
 import React from "react";
 import {connect} from 'react-redux';
-import {Button} from "@material-ui/core";
-import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded} from "../../../actions/vocabularyActions";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {
+    getMetaVocabulary,
     getVocabulary,
     hasMetaVocabularyError,
     hasVocabularyError,
     isMetaVocabularyPending,
     isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {getTypeInfo, isDateTimeProperty, linkLabel, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
+import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
 import ErrorDialog from "../../common/ErrorDialog";
-import Grid from "../metadata/MetadataEntityContainer";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
+import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 
 const VocabularyEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, ...otherProps} = props;
 
     const handleButtonClick = () => {
-        props.onSubmit(props.subject)
+        onSubmit(props.subject)
             .catch(err => ErrorDialog.showError(err, "Error while updating vocabulary"));
     };
 
@@ -49,16 +51,18 @@ const VocabularyEntityContainer = props => {
 
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
-    const metadata = getVocabulary(state).get(subject);
+    const loading = isVocabularyPending(state) || isMetaVocabularyPending(state);
+
+    const vocabulary = getVocabulary(state);
+    const metaVocabulary = getMetaVocabulary(state);
+    const metadata = loading ? [] : metaVocabulary.combine(vocabulary.vocabulary, subject);
 
     const hasNoMetadata = !metadata || metadata.length === 0;
     const hasOtherErrors = hasVocabularyError(state) || hasMetaVocabularyError(state);
-    const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
+    const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading vocabulary.' : '';
 
-    // Find information on the type
-    const typeInfo = getTypeInfo(metadata);
-    const label = linkLabel(subject);
     const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
+    const buttonDisabled = !hasLinkedDataFormUpdates(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
@@ -67,20 +71,24 @@ const mapStateToProps = (state, ownProps) => {
         }));
 
     return {
-        loading: isVocabularyPending(state, subject) || isMetaVocabularyPending(state),
+        loading,
+        error,
+
         properties,
         subject,
-        typeInfo,
-        label,
-        error,
-        showHeader: ownProps.showHeader || false,
+
         editable,
+        buttonDisabled,
+        vocabulary: metaVocabulary
     };
+
 };
 
-const mapDispatchToProps = {
-    fetchShapes: fetchMetaVocabularyIfNeeded,
-    fetchLinkedData: fetchMetadataVocabularyIfNeeded
-}
+const mapDispatchToProps = (dispatch) => ({
+    fetchShapes: () => dispatch(vocabularyActions.fetchMetaVocabularyIfNeeded()),
+    fetchLinkedData: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded()),
+    onSubmit: (subject) => dispatch(vocabularyActions.submitVocabularyChangesFromState(subject))
+        .then(() => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded()))
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(VocabularyEntityContainer);

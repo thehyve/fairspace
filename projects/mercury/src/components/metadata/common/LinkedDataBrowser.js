@@ -46,10 +46,10 @@ class LinkedDataBrowser extends React.Component {
         this.setState({creationState: false});
     };
 
-    handleEntityCreation = (shape, id) => {
+    handleEntityCreation = (formKey, shape, id) => {
         this.setState({creatingMetadataEntity: true});
 
-        this.props.create(shape, id)
+        this.props.create(formKey, shape, id)
             .then(() => {
                 if (!this.unMounted) {
                     this.setState({creatingMetadataEntity: false});
@@ -96,6 +96,7 @@ class LinkedDataBrowser extends React.Component {
                 />
                 <NewLinkedDataEntityDialog
                     open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
+                    linkedData={this.props.vocabulary.emptyLinkedData(this.state.shape)}
                     shape={this.state.shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}

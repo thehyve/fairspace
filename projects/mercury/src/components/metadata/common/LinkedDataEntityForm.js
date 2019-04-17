@@ -7,7 +7,7 @@ import LinkedDataProperty from "./LinkedDataProperty";
 
 export const LinkedDataEntityForm = props => {
     const {
-        subject, properties, editable, error, loading
+        properties, editable, error, loading
     } = props;
 
     if (error) {
@@ -23,9 +23,8 @@ export const LinkedDataEntityForm = props => {
             {
                 properties.map((p) => (
                     <LinkedDataProperty
-                        editable={editable && p.editable}
-                        subject={subject}
-                        key={subject + p.key}
+                        editable={editable}
+                        key={p.key}
                         property={p}
                         onChange={(value, index) => props.onChange(p, value, index)}
                         onAdd={(value) => props.onAdd(p, value)}
@@ -47,7 +46,6 @@ LinkedDataEntityForm.propTypes = {
     loading: PropTypes.bool,
     editable: PropTypes.bool,
 
-    subject: PropTypes.string.isRequired,
     properties: PropTypes.array
 };
 
