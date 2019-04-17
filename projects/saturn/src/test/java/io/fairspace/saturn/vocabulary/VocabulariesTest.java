@@ -63,13 +63,9 @@ public class VocabulariesTest {
         var violations = createConstraintViolations(report.getModel());
 
         // Show validation errors on failure
-        for(Resource resource : JenaUtil.getAllInstances(SH.ValidationResult.inModel(report.getModel()))) {
-            Resource focusNode = JenaUtil.getResourceProperty(resource, SH.focusNode);
-            Resource value = JenaUtil.getResourceProperty(resource, SH.value);
-            Resource path = JenaUtil.getResourceProperty(resource, SH.resultPath);
-            String message = JenaUtil.getStringProperty(resource, SH.resultMessage);
-
-            System.out.println(String.format("%s %s %s - %s", focusNode.getURI(), path.getURI(), value != null ? value.getURI() : '-',message));
+        if(!violations.isEmpty()) {
+            System.err.println("Validation errors");
+            report.getModel().listStatements().forEachRemaining(System.err::println);
         }
 
         assertTrue(violations.isEmpty());
