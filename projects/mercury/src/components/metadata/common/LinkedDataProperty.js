@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from "prop-types";
+
 import {
     List, ListItem, Typography, IconButton,
     ListItemSecondaryAction, ListItemText
 } from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
 
-import ValueComponentFactory from "../values/ValueComponentFactory";
+import ClearIcon from '@material-ui/icons/Clear';
 import * as constants from '../../../constants';
 
 class LinkedDataProperty extends React.Component {
@@ -59,7 +60,7 @@ class LinkedDataProperty extends React.Component {
 
     renderAddComponent = (labelledBy) => {
         const {property, onAdd} = this.props;
-        const ValueAddComponent = ValueComponentFactory.addComponent(property);
+        const ValueAddComponent = this.props.valueComponentFactory.addComponent(property);
 
         return (
             <ListItem key="add-component-key">
@@ -88,8 +89,8 @@ class LinkedDataProperty extends React.Component {
         // or if the property contains settings that disallow editing existing values
         const disableEditing = !editable || LinkedDataProperty.disallowEditingOfExistingValues(property);
         const ValueComponent = disableEditing
-            ? ValueComponentFactory.readOnlyComponent()
-            : ValueComponentFactory.editComponent(property);
+            ? this.props.valueComponentFactory.readOnlyComponent()
+            : this.props.valueComponentFactory.editComponent(property);
 
         return (
             <ListItem disableGutters style={{display: 'block'}}>
@@ -120,9 +121,20 @@ class LinkedDataProperty extends React.Component {
     }
 }
 
+LinkedDataProperty.propTypes = {
+    onChange: PropTypes.func,
+    editable: PropTypes.bool,
+    property: PropTypes.object,
+
+    valueComponentFactory: PropTypes.shape({
+        editComponent: PropTypes.func,
+        addComponent: PropTypes.func,
+        readOnlyComponent: PropTypes.func
+    }).isRequired
+}
 LinkedDataProperty.defaultProps = {
     onChange: () => {},
-    editable: true
+    editable: true,
 };
 
 export default LinkedDataProperty;

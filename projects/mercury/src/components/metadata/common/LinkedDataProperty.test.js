@@ -4,7 +4,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ClearIcon from '@material-ui/icons/Clear';
 import {shallow} from "enzyme";
 
-import ValueComponentFactory from "../values/ValueComponentFactory";
+import ValueComponentFactory from "./values/ValueComponentFactory";
 import {STRING_URI} from "../../../constants";
 import LinkedDataProperty from "./LinkedDataProperty";
 

@@ -100,6 +100,7 @@ class LinkedDataBrowser extends React.Component {
                     shape={this.state.shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}
+                    valueComponentFactory={this.props.valueComponentFactory}
                 />
 
                 {entities && entities.length > 0 ? <LinkedDataList items={entities} /> : null}
@@ -117,7 +118,10 @@ LinkedDataBrowser.propTypes = {
     loading: PropTypes.bool,
     error: PropTypes.bool,
     shapes: PropTypes.array,
-    entities: PropTypes.array
+    entities: PropTypes.array,
+
+    valueComponentFactory: PropTypes.object.isRequired,
+    vocabulary: PropTypes.object.isRequired
 };
 
 export default LinkedDataBrowser;

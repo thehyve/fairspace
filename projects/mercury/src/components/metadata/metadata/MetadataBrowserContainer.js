@@ -6,6 +6,7 @@ import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import * as constants from "../../../constants";
+import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 
 const mapStateToProps = (state) => {
     const {cache: {allEntities}} = state;
@@ -23,6 +24,7 @@ const mapStateToProps = (state) => {
         loading: pending,
         error: allEntities ? allEntities.error : false,
         shapes: vocabulary.getFairspaceClasses(),
+        valueComponentFactory: MetadataValueComponentFactory,
         vocabulary,
         entities,
     });

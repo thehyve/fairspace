@@ -1,6 +1,5 @@
-import ReferringValue from "./ReferringValue";
 import StringValue from "./StringValue";
-import * as constants from "../../../constants";
+import * as constants from "../../../../constants";
 import IntegerValue from "./IntegerValue";
 import DateTimeValue from "./DateTimeValue";
 import DecimalValue from "./DecimalValue";
@@ -9,9 +8,8 @@ import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
 import ResourceValue from "./ResourceValue";
 import EnumerationDropdown from "./EnumerationDropdown";
-import EntityDropdownWithAdditionContainer from "./EntityDropdownWithAdditionContainer";
 
-const getInputComponent = (property) => {
+export const getInputComponent = (property) => {
     // If the property has a restricted set of allowed values
     // show a dropdown with these values
     if (property.allowedValues) {
@@ -47,10 +45,4 @@ const getInputComponent = (property) => {
         default:
             return undefined;
     }
-};
-
-export default {
-    editComponent: property => getInputComponent(property) || ReferringValue,
-    addComponent: property => getInputComponent(property) || EntityDropdownWithAdditionContainer,
-    readOnlyComponent: () => ReferringValue
 };

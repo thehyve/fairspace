@@ -215,7 +215,7 @@ class Vocabulary {
      */
     determineShapeForType(typeUri) {
         return this.vocabulary
-            .find(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === typeUri);
+            .find(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === typeUri) || {};
     }
 
     /**

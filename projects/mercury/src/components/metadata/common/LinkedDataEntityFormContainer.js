@@ -8,6 +8,9 @@ import {
     initializeLinkedDataForm,
     updateLinkedDataValue
 } from "../../../actions/linkedDataFormActions";
+import {getInputComponent} from "./values/LinkedDataValueComponentFactory";
+import ReferringValue from "./values/ReferringValue";
+import MetadataDropdownWithAdditionContainer from "../metadata/MetadataDropdownWithAdditionContainer";
 
 class LinkedDataEntityFormContainer extends React.Component {
     componentDidMount() {
@@ -46,6 +49,7 @@ class LinkedDataEntityFormContainer extends React.Component {
                 editable={this.props.editable}
 
                 properties={propertiesWithChanges}
+                valueComponentFactory={this.props.valueComponentFactory}
             />
         );
     }
@@ -67,7 +71,9 @@ LinkedDataEntityFormContainer.propTypes = {
     formKey: PropTypes.string.isRequired,
 
     properties: PropTypes.array,
-    updates: PropTypes.object
+    updates: PropTypes.object,
+
+    valueComponentFactory: PropTypes.object
 };
 
 LinkedDataEntityFormContainer.defaultProps = {

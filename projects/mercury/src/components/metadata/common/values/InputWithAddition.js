@@ -1,20 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import Grid from "@material-ui/core/Grid";
-import * as metadataActions from "../../../actions/metadataActions";
-import NewLinkedDataEntityDialog from "../common/NewLinkedDataEntityDialog";
-import LoadingInlay from "../../common/LoadingInlay";
-import ErrorMessage from "../../common/ErrorMessage";
-import {ErrorDialog} from "../../common";
-import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
-import {createIri, getFirstPredicateProperty} from "../../../utils/metadataUtils";
-import * as constants from "../../../constants";
-import EntityDropdownContainer from "./EntityDropdownContainer";
+import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
+import LoadingInlay from "../../../common/LoadingInlay";
+import ErrorMessage from "../../../common/ErrorMessage";
+import {ErrorDialog} from "../../../common";
+import {getFirstPredicateProperty} from "../../../../utils/metadataUtils";
+import * as constants from "../../../../constants";
 
-class EntityDropdownWithAdditionContainer extends React.Component {
+class InputWithAddition extends React.Component {
     state = {
         adding: false,
     };
@@ -37,7 +33,7 @@ class EntityDropdownWithAdditionContainer extends React.Component {
                 this.props.fetchEntities(this.props.property.className);
                 this.props.onChange({id: value.subject, label});
             })
-            .catch(e => ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`));
+            .catch(e => ErrorDialog.showError(e, `Error creating a new entity.\n${e.message}`));
     }
 
     renderAddFunctionality() {
@@ -63,9 +59,10 @@ class EntityDropdownWithAdditionContainer extends React.Component {
                 <NewLinkedDataEntityDialog
                     open={this.state.adding}
                     shape={this.props.shape}
-                    linkedData={this.props.vocabulary.emptyLinkedData(this.props.shape)}
+                    linkedData={this.props.emptyData}
                     onCreate={this.handleEntityCreation}
                     onClose={this.handleCloseDialog}
+                    valueComponentFactory={this.props.valueComponentFactory}
                 />
             </>
         );
@@ -75,11 +72,7 @@ class EntityDropdownWithAdditionContainer extends React.Component {
         return (
             <Grid container justify="space-between">
                 <Grid item xs={11}>
-                    <EntityDropdownContainer
-                        property={this.props.property}
-                        entry={this.props.entry}
-                        onChange={this.props.onChange}
-                    />
+                    {this.props.children}
                 </Grid>
                 <Grid item xs={1}>
                     {this.renderAddFunctionality()}
@@ -89,39 +82,17 @@ class EntityDropdownWithAdditionContainer extends React.Component {
     }
 }
 
-EntityDropdownWithAdditionContainer.propTypes = {
-    vocabulary: PropTypes.object.isRequired,
+InputWithAddition.propTypes = {
+    shape: PropTypes.object.isRequired,
+    emptyData: PropTypes.array.isRequired,
     property: PropTypes.object.isRequired,
-    entry: PropTypes.object,
     onChange: PropTypes.func.isRequired,
     onCreate: PropTypes.func.isRequired,
+    fetchEntities: PropTypes.func.isRequired,
 
     error: PropTypes.bool,
-    pending: PropTypes.bool
+    pending: PropTypes.bool,
+    valueComponentFactory: PropTypes.object
 };
 
-const mapStateToProps = (state, ownProps) => {
-    const vocabulary = getVocabulary(state);
-    const pending = isVocabularyPending(state);
-    const error = hasVocabularyError(state);
-
-    const shape = (!pending && !error) ? getVocabulary(state).determineShapeForType(ownProps.property.className) : {};
-
-    return {
-        pending,
-        error,
-        shape,
-        vocabulary
-    };
-};
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetchEntities: metadataActions.fetchEntitiesIfNeeded,
-    onCreate: (formKey, shape, id) => {
-        const subject = createIri(id);
-        const type = ownProps.property.className;
-        return dispatch(metadataActions.createMetadataEntityFromState(formKey, subject, type));
-    }
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(EntityDropdownWithAdditionContainer);
+export default InputWithAddition;

@@ -16,6 +16,7 @@ import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../r
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
+import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 
 const MetadataEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -31,7 +32,13 @@ const MetadataEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataEntityFormContainer editable={editable} formKey={subject} subject={subject} {...otherProps} />
+                <LinkedDataEntityFormContainer
+                    editable={editable}
+                    formKey={subject}
+                    subject={subject}
+                    valueComponentFactory={MetadataValueComponentFactory}
+                    {...otherProps}
+                />
             </Grid>
             {
                 editable
