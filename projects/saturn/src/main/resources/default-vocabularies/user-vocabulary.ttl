@@ -499,7 +499,7 @@ fs:CollectionShape sh:property
     sh:name "Sample is child sample of" ;
     sh:description "The biological sample has been extracted from this parent sample" ;
     sh:class osiris:BiologicalSample ; 
-    <inverseRelation> <isParentOf> ;
+    <inverseRelation> <isParentOfShape> ;
     sh:path <isChildOf> .
 
 <isLinkedToShape> a fs:RelationShape ; 
