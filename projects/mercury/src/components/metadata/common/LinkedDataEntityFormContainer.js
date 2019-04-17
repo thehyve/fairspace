@@ -21,11 +21,12 @@ class LinkedDataEntityFormContainer extends React.Component {
     }
 
     initialize() {
-        const {formKey, initializeForm, fetchShapes} = this.props;
+        const {formKey, initializeForm, fetchShapes, fetchLinkedData} = this.props;
 
         if (formKey) {
             initializeForm(formKey);
             fetchShapes();
+            fetchLinkedData();
         }
     }
 
@@ -54,6 +55,7 @@ class LinkedDataEntityFormContainer extends React.Component {
 LinkedDataEntityFormContainer.propTypes = {
     initializeForm: PropTypes.func,
     fetchShapes: PropTypes.func,
+    fetchLinkedData: PropTypes.func,
 
     onAdd: PropTypes.func,
     onChange: PropTypes.func,
