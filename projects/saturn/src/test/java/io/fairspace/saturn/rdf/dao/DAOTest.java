@@ -55,7 +55,7 @@ public class DAOTest {
         assertNotNull(iri);
         assertTrue(iri.isURI());
         validateIRI(iri.getURI());
-        assertTrue(iri.getURI().startsWith(CONFIG.jena.baseIRI));
+        assertTrue(iri.getURI().startsWith(CONFIG.jena.metadataBaseIRI));
         dao.write(entity);
         assertEquals(iri, entity.getIri());
         assertNotEquals(iri, dao.write(new Entity()).getIri());

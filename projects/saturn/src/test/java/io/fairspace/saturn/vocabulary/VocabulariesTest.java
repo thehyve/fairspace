@@ -3,10 +3,12 @@ package io.fairspace.saturn.vocabulary;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.util.FileManager;
 import org.junit.Test;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.util.JenaUtil;
 
 import java.util.List;
 
@@ -59,6 +61,13 @@ public class VocabulariesTest {
         var engine = createEngine(dataModel, shapesModel);
         var report = engine.validateAll();
         var violations = createConstraintViolations(report.getModel());
+
+        // Show validation errors on failure
+        if(!violations.isEmpty()) {
+            System.err.println("Validation errors");
+            report.getModel().listStatements().forEachRemaining(System.err::println);
+        }
+
         assertTrue(violations.isEmpty());
     }
 }

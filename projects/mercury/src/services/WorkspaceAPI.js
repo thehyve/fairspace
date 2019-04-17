@@ -1,6 +1,6 @@
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
-import {createIri} from "../utils/metadataUtils";
+import {createMetadataIri} from "../utils/metadataUtils";
 
 class WorkspaceAPI {
     static getConfig = {
@@ -13,7 +13,7 @@ class WorkspaceAPI {
         return fetch(Config.get().urls.users, WorkspaceAPI.getConfig)
             .then(failOnHttpError('Error while loading users'))
             .then(response => response.json())
-            .then(users => users.map(user => ({...user, iri: createIri(user.id)})));
+            .then(users => users.map(user => ({...user, iri: createMetadataIri(user.id)})));
     }
 
     getWorkspace() {

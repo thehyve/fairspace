@@ -8,7 +8,8 @@ import org.apache.jena.util.FileManager;
 
 import java.util.List;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
+import static io.fairspace.saturn.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -17,7 +18,7 @@ public class Vocabularies {
     public static final Model SYSTEM_VOCABULARY = FileManager.get().loadModel("default-vocabularies/system-vocabulary.ttl");
     public static final Model META_VOCABULARY = FileManager.get().loadModel("default-vocabularies/meta-vocabulary.ttl");
     public static final Node META_VOCABULARY_GRAPH_URI = createURI(FS.NS + "meta-vocabulary");
-    public static final Node VOCABULARY_GRAPH_URI = generateIri("vocabulary");
+    public static final Node VOCABULARY_GRAPH_URI = generateVocabularyIri("");
 
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
 
@@ -35,7 +36,7 @@ public class Vocabularies {
                 var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
 
                 var userVocabulary = oldVocabulary.isEmpty()
-                        ? FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", generateIri("").getURI(), null)
+                        ? FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", CONFIG.jena.vocabularyBaseIRI, null)
                         : oldVocabulary.difference(oldSystemVocabulary);
 
                 rdf.put(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));

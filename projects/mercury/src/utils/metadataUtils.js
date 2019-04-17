@@ -29,15 +29,16 @@ export const getFirstPredicateList = (metadataEntry, predicate, defaultValue) =>
  * @returns {*}
  */
 export function linkLabel(uri, shortenExternalUris = false) {
-    const entityPrefix = `${window.location.origin}/iri/`;
-    if (uri.startsWith(entityPrefix)) {
-        const path = uri.substring(entityPrefix.length);
-        return path.substring(path.indexOf('/') + 1);
-    }
+    const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
+    const url = new URL(uri);
 
-    const collectionPrefix = `${window.location.origin}/collections/`;
-    if (uri.startsWith(collectionPrefix)) {
-        return uri.substring(collectionPrefix.length);
+    // Local uris are treated separately, as we know its
+    // structure
+    if (url.hostname === window.location.hostname) {
+        const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
+        if (foundInfix) {
+            return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
+        }
     }
 
     if (shortenExternalUris) {
@@ -174,10 +175,10 @@ export const getTypeInfo = (metadata) => {
     const {label, comment} = typeValue;
 
     return (label && comment) ? `${label} - ${comment}` : (label || comment);
-}
+};
 
 /**
- * Creates a new IRI within this workspace, based on the given identifier
+ * Creates a new IRI within this workspace, based on the given identifier and infix
  *
  * Please note that IRIs within the workspace always use http as scheme, regardless
  * of whether the app runs on https. This ensures consistent IRI generation and
@@ -186,7 +187,25 @@ export const getTypeInfo = (metadata) => {
  * @param id
  * @returns {string}
  */
-export const createIri = (id) => `http://${window.location.hostname}/iri/${id}`;
+export const createIri = (id, infix) => `http://${window.location.hostname}/${infix}/${id}`;
+
+/**
+ * Creates a new metadata IRI within this workspace
+ *
+ * @param id
+ * @returns {string}
+ * @see createIri
+ */
+export const createMetadataIri = (id) => createIri(id, 'iri');
+
+/**
+ * Creates a new vocabulary IRI within this workspace
+ *
+ * @param id
+ * @returns {string}
+ * @see createIri
+ */
+export const createVocabularyIri = (id) => createIri(id, 'vocabulary');
 
 /**
  * Generates a compatible workspace IRI from the given iri.

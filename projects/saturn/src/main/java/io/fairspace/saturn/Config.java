@@ -23,7 +23,8 @@ public class Config {
     public final Properties mail = new Properties();
 
     public static class Jena {
-        public String baseIRI = "http://localhost/iri/";
+        public String metadataBaseIRI = "http://localhost/iri/";
+        public String vocabularyBaseIRI = "http://localhost/vocabulary/";
 
         public File datasetPath = new File("data/db");
 

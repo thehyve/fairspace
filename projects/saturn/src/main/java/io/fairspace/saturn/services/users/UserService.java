@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 
 public class UserService {
@@ -66,12 +66,12 @@ public class UserService {
     }
 
     private User findUser(UserInfo userInfo) {
-        return usersById.get(generateIri(userInfo.getUserId()));
+        return usersById.get(generateMetadataIri(userInfo.getUserId()));
     }
 
     private User createUser(UserInfo userInfo) {
         var newUser = new User();
-        newUser.setIri(generateIri(userInfo.getUserId()));
+        newUser.setIri(generateMetadataIri(userInfo.getUserId()));
         newUser.setName(userInfo.getFullName());
         newUser.setEmail(userInfo.getEmail());
         return commit("Store a new user with id " + userInfo.getUserId(), dao, () -> {

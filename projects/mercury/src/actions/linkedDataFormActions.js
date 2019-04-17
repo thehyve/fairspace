@@ -22,8 +22,7 @@ export const deleteLinkedDataValue = (formKey, property, index) => ({
     index
 });
 
-export const initializeLinkedDataForm = (formKey, subject) => ({
+export const initializeLinkedDataForm = (formKey) => ({
     type: actionTypes.INITIALIZE_LINKEDDATA_FORM,
-    formKey,
-    subject
+    formKey
 });

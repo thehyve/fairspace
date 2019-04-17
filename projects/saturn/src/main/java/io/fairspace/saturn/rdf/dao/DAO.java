@@ -1,6 +1,7 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
+import io.fairspace.saturn.rdf.SparqlUtils;
 import lombok.experimental.Delegate;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.generateIri;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.lang.String.format;
 import static java.time.Instant.now;
@@ -111,7 +112,7 @@ public class DAO implements Transactional {
             }
 
             if (entity.getIri() == null) {
-                entity.setIri(generateIri());
+                entity.setIri(SparqlUtils.generateMetadataIri());
             }
 
             var update = new UpdateRequest();

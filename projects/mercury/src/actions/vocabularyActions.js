@@ -1,8 +1,8 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
-import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
 import {getMetaVocabulary, getVocabulary} from "../reducers/cache/vocabularyReducers";
+import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,

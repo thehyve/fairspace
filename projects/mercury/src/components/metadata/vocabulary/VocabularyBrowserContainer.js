@@ -8,7 +8,7 @@ import {
     isMetaVocabularyPending,
     isVocabularyEntitiesPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {createIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
+import {createVocabularyIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import * as constants from "../../../constants";
@@ -37,7 +37,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(vocabularyActions.fetchAllVocabularyEntitiesIfNeeded()),
     fetchShapes: () => dispatch(vocabularyActions.fetchMetaVocabularyIfNeeded()),
     create: (formKey, shape, id) => {
-        const subject = createIri(id);
+        const subject = createVocabularyIri(id);
         const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
         return dispatch(vocabularyActions.createVocabularyEntityFromState(formKey, subject, type))
             .then(({value}) => {
