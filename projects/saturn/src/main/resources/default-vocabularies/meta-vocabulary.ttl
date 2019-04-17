@@ -47,12 +47,6 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:path sh:description ;
         sh:name "Class description"
     ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:fixedShape ;
-        fs:machineOnly true ;
-        sh:name "Fixed shape" ;
-        sh:description "If this is true, a user can not make changes to this shape definiton, except for properties not included in fs:systemProperties."
-    ], [
         sh:path fs:systemProperties ;
         fs:machineOnly true ;
         sh:name "System properties" ;
@@ -66,7 +60,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape ) .
 
 fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -138,12 +132,6 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:path fs:machineOnly ;
         sh:name "Machine edits only" ;
         sh:description "Users should not be able to change the value of any value node of this shape."
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:fixedShape ;
-        fs:machineOnly true ; 
-        sh:name "Fixed shape" ;
-        sh:description "If this is true, a user can not make changes to this shape definiton."
     ] ;
     sh:or ( 
         [ sh:path sh:in ; 
@@ -153,7 +141,7 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
       ) ; 
     fs:showInCatalog true ;
     sh:targetClass fs:PropertyShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape ) .
 
 fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -213,16 +201,10 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:path fs:machineOnly ;
         sh:name "Machine edits only" ;
         sh:description "Users should not be able to change the value of any value node of this shape."
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:fixedShape ;
-        fs:machineOnly true ; 
-        sh:name "Fixed shape" ;
-        sh:description "If this is true, a user can not make changes to this shape definiton."
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape ) .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
@@ -232,3 +214,10 @@ fs:inverseRelationShape a fs:RelationShape ;
     sh:name "Inverse relation" ;
     sh:description "An inverse relation has at most a single relation shape instance as value. A shape with sh:path P1 and fs:inverseRelationShape S2 with sh:path P2 has equivalent meaning as P1 owl:inverseOf P2." ;
     sh:path fs:inverseRelation . 
+
+fs:fixedShapeShape 
+    sh:datatype xsd:boolean ;
+    sh:path fs:fixedShape ;
+    fs:machineOnly true ; 
+    sh:name "Fixed shape" ;
+    sh:description "If this is true, a user can not make changes to this shape definiton." .
