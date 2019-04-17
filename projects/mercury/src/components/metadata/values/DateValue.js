@@ -15,8 +15,8 @@ class DateValue extends React.Component {
         }
     }
 
-    handleChange = (e) => {
-        const value = format(e, 'yyyy-MM-dd', {awareOfUnicodeTokens: true});
+    handleChange = (date) => {
+        const value = format(date, 'yyyy-MM-dd', {awareOfUnicodeTokens: true});
         this.props.onChange({value});
     }
 
