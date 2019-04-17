@@ -27,13 +27,6 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:description "List of all properties and relations for this class." ;
         fs:showAsTable true
     ], [
-        sh:hasValue false ;
-        sh:datatype xsd:boolean ;
-        sh:maxCount 1 ;
-        sh:path sh:closed ;
-        sh:description "sh:closed should be false." ;
-        sh:name "Closed"
-    ], [
         sh:class fs:Class ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -53,6 +46,11 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:name "Show in catalog" ;
         sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
+    sh:not [
+        sh:hasValue true ;
+        sh:path sh:closed ;
+        sh:description "A fs:ClassShape shape cannot be defined as sh:closed."
+    ]
     fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape fs:systemProperties ) .
@@ -216,9 +214,8 @@ fs:machineOnlyShape a fs:PropertyShape ;
     sh:name "Machine edits only" ;
     sh:description "Users should not be able to change the value of any value node of this shape."
 
-
 fs:machineOnlyShape a fs:PropertyShape ;
-        sh:path fs:systemProperties ;
-        fs:machineOnly true ;
-        sh:name "System properties" ;
-        sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties."
+    sh:path fs:systemProperties ;
+    fs:machineOnly true ;
+    sh:name "System properties" ;
+    sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties."
