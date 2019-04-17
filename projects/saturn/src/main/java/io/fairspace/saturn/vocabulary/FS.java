@@ -89,5 +89,8 @@ public class FS {
 
     public static final String INVERSE_RELATION_URI = NS + "inverseRelation";
     public static final Property inverseRelation = createProperty(INVERSE_RELATION_URI);
+
+    public static final String SHOW_IN_CATALOG_URI = NS + "showInCatalog";
+    public static final Property showInCatalog = createProperty(SHOW_IN_CATALOG_URI);
 }
 

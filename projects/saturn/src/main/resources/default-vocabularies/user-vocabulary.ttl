@@ -46,7 +46,7 @@ fs:CollectionShape sh:property
     sh:closed false ; 
     sh:description "A research consent given by person." ;
     sh:name "Person Consent" ;
-    sh:targetClass <PersonConsent> ; 
+    sh:targetClass <PersonConsent> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:showInCatalog true ;
     sh:property
@@ -59,14 +59,14 @@ fs:CollectionShape sh:property
     sh:closed false ; 
     sh:description "A research project." ;
     sh:name "Research Project" ;
-    sh:targetClass <ResearchProject> ; 
+    sh:targetClass <ResearchProject> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:showInCatalog true ;
     sh:property
         <projectCodeShape>,
-        <investigationNatureShape>, 
+        <investigationNatureShape>,
         <projectManagerShape>,
-        <hasCollectionShape>, 
+        <hasCollectionShape>,
         <hasPersonConsentShape>,
         rdfs:labelShape,
         rdfs:commentShape .
@@ -109,7 +109,7 @@ fs:CollectionShape sh:property
     sh:closed false ; 
     sh:description "Description for <Analysis" ;
     sh:name "Analysis" ;
-    sh:targetClass <Analysis> ; 
+    sh:targetClass <Analysis> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:showInCatalog true ;
     sh:property
@@ -125,7 +125,7 @@ fs:CollectionShape sh:property
     sh:closed false ; 
     sh:description "A widget is an element of a graphical user interface (GUI) that displays information or provides a specific way for a user to interact with the operating system or an application." ;
     sh:name "Master of widgets" ;
-    sh:targetClass <WidgetMaster> ; 
+    sh:targetClass <WidgetMaster> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:showInCatalog true ;
     sh:property
@@ -183,7 +183,7 @@ fs:CollectionShape sh:property
     sh:path <integerWidget> .
 
 <booleanWidget> a rdf:Property .
-<booleanWidgetShape> a fs:PropertyShape ; 
+<booleanWidgetShape> a fs:PropertyShape ;
     sh:name "Boolean" ;
     sh:description "On or off single." ;
     sh:datatype xsd:boolean ;
@@ -191,7 +191,7 @@ fs:CollectionShape sh:property
     sh:path <booleanWidget> .
 
 <booleanX4Widget> a rdf:Property .
-<booleanX4WidgetShape> a fs:PropertyShape ; 
+<booleanX4WidgetShape> a fs:PropertyShape ;
     sh:name "Boolean X4" ;
     sh:description "On or off 4 times." ;
     sh:datatype xsd:boolean ;
@@ -199,7 +199,7 @@ fs:CollectionShape sh:property
     sh:path <booleanX4Widget> .
 
 <fixedDropdownWidget> a rdf:Property .
-<fixedDropdownWidgetShape> a fs:PropertyShape ; 
+<fixedDropdownWidgetShape> a fs:PropertyShape ;
     sh:name "Fixed set of values (pick 2)" ;
     sh:description "A set of 2 values from a fixed list." ;
     sh:in ( "E" "A" "D" "G" "B" "E" ) ; 
@@ -212,21 +212,21 @@ fs:CollectionShape sh:property
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
-    sh:path <projectCode> . 
+    sh:path <projectCode> .
      
 <investigationNatureShape> a fs:PropertyShape ;
     sh:name "Investigation Nature" ;
     sh:description "choose between: basic research, biomedical research, clinical trial, medical diagnosis" ;
     sh:datatype xsd:string ;
     sh:maxLength 128 ;
-    sh:path <investigationNature> . 
+    sh:path <investigationNature> .
      
 <projectManagerShape> a fs:PropertyShape ;
     sh:name "Project Manager" ;
     sh:description "Project manager" ;
     sh:datatype xsd:string ;
     sh:maxLength 128 ;
-    sh:path <projectManager> . 
+    sh:path <projectManager> .
      
 <AdministrativeGenderShape> a fs:PropertyShape ;
     sh:name "Gender" ;
@@ -241,7 +241,7 @@ fs:CollectionShape sh:property
     sh:description "The age at which this person has died" ;
     sh:datatype xsd:date ;
     sh:maxCount 1 ;
-    sh:path <ageOfDeath> . 
+    sh:path <ageOfDeath> .
      
 <patientIdentifierShape> a fs:PropertyShape ;
     sh:name "Patient Identifier" ;
@@ -249,7 +249,7 @@ fs:CollectionShape sh:property
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
-    sh:path <patientIdentifier> . 
+    sh:path <patientIdentifier> .
      
 <EventTypeShape> a fs:PropertyShape ;
     sh:name "Neoplasm Event" ;
@@ -278,21 +278,21 @@ fs:CollectionShape sh:property
     sh:description "The date of tumor diagnosis" ;
     sh:datatype xsd:date ;
     sh:maxCount 1 ;
-    sh:path <diagnosisDate> . 
+    sh:path <diagnosisDate> .
      
 <collectDateShape> a fs:PropertyShape ;
     sh:name "Collect Date" ;
     sh:description "The collect date of the biological sample" ;
     sh:datatype xsd:date ;
     sh:maxCount 1 ;
-    sh:path <collectDate> . 
+    sh:path <collectDate> .
 
 <tumorCellularityShape> a fs:PropertyShape ;
     sh:name "Tumor Cellularity" ;
     sh:description "The percentage of tumor cells in the biological sample (pathological measure)" ;
     sh:datatype xsd:integer ;
     sh:maxCount 1 ;
-    sh:path <tumorCellularity> . 
+    sh:path <tumorCellularity> .
      
 <analysisCodeShape> a fs:PropertyShape ;
     sh:name "Analysis code" ;
@@ -300,7 +300,7 @@ fs:CollectionShape sh:property
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
-    sh:path <analysisCode> . 
+    sh:path <analysisCode> .
      
 <analyticPipelineCodeShape> a fs:PropertyShape ;
     sh:name "Analytic pipeline code" ;
@@ -308,26 +308,26 @@ fs:CollectionShape sh:property
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
-    sh:path <analyticPipelineCode> . 
+    sh:path <analyticPipelineCode> .
      
 <numberOfBreakPointsShape> a fs:PropertyShape ;
     sh:name "Number of break points" ;
     sh:description "Calculated number of break points in genomic profile" ;
     sh:datatype xsd:integer ;
     sh:maxCount 1 ;
-    sh:path <numberOfBreakPoints> . 
+    sh:path <numberOfBreakPoints> .
 
 ## User relation shapes
 
 <relatesToWidget> a rdf:Property .
-<relatesToWidgetShape> a fs:RelationShape ; 
+<relatesToWidgetShape> a fs:RelationShape ;
     sh:name "Relates to widget master" ;
     sh:description "Relates to other widget masters" ;
-    sh:class <WidgetMaster> ; 
+    sh:class <WidgetMaster> ;
     fs:inverseRelation <relatesToWidgetShape> ;
     sh:path <relatesToWidget> .
 
-<derivesFromShape> a fs:RelationShape ; 
+<derivesFromShape> a fs:RelationShape ;
     sh:name "Derives from" ;
     sh:description "Person that provided this sample." ;
     sh:class foaf:Person ; 
@@ -335,14 +335,14 @@ fs:CollectionShape sh:property
     fs:inverseRelation <providesMaterialShape> ;
     sh:path <derivesFrom> .
 
-<providesMaterialShape> a fs:RelationShape ; 
+<providesMaterialShape> a fs:RelationShape ;
     sh:name "Provides material" ;
     sh:description "Samples provided by this person" ;
     sh:class osiris:BiologicalSample ; 
     fs:inverseRelation <derivesFromShape> ;
     sh:path <providesMaterial> .
 
-<isConsentOfShape> a fs:RelationShape ; 
+<isConsentOfShape> a fs:RelationShape ;
     sh:name "Is consent of" ;
     sh:description "" ;
     sh:class foaf:Person ; 
@@ -350,77 +350,77 @@ fs:CollectionShape sh:property
     fs:inverseRelation <gaveConsentShape> ;
     sh:path <isConsentOf> .
 
-<gaveConsentShape> a fs:RelationShape ; 
+<gaveConsentShape> a fs:RelationShape ;
     sh:name "Gave consent" ;
     sh:description "" ;
-    sh:class <PersonConsent> ; 
-    fs:inverseRelation <isConsentOfShape> ; 
+    sh:class <PersonConsent> ;
+    fs:inverseRelation <isConsentOfShape> ;
     sh:path <gaveConsent> .
 
-<hasCollectionShape> a fs:RelationShape ; 
+<hasCollectionShape> a fs:RelationShape ;
     sh:name "Has associated collections" ; 
     sh:description "Collections that are related to this project." ;
     sh:class fs:Collection ; 
-    fs:inverseRelation <partOfProjectShape> ; 
+    fs:inverseRelation <partOfProjectShape> ;
     sh:path <hasCollection> .
 
-<partOfProjectShape> a fs:RelationShape ; 
+<partOfProjectShape> a fs:RelationShape ;
     sh:name "Part of project" ;
     sh:description "" ;
-    sh:class <ResearchProject> ; 
+    sh:class <ResearchProject> ;
     sh:maxCount 1 ;
-    fs:inverseRelation <hasCollectionShape> ; 
+    fs:inverseRelation <hasCollectionShape> ;
     sh:path <partOfProject> .
 
-<aboutPersonShape> a fs:RelationShape ; 
+<aboutPersonShape> a fs:RelationShape ;
     sh:name "Is about person" ;
     sh:description "Persons that are featured in this collection." ;
     sh:class foaf:Person ;
-    fs:inverseRelation <hasDataShape> ; 
+    fs:inverseRelation <hasDataShape> ;
     sh:path <aboutPerson> .
 
-<hasDataShape> a fs:RelationShape ; 
+<hasDataShape> a fs:RelationShape ;
     sh:name "Has data in collection" ;
     sh:description "Collections that contain data for this person." ;
     sh:class fs:Collection ;
     fs:inverseRelation <aboutPersonShape> ;
     sh:path <hasData> .
 
-<aboutMaterialShape> a fs:RelationShape ; 
+<aboutMaterialShape> a fs:RelationShape ;
     sh:name "Is about biological sample." ;
     sh:description "Materials that are featured in this collection." ;
     sh:class osiris:BiologicalSample ; 
     sh:path <aboutMaterial> .
 
-<hasDataSShape> a fs:RelationShape ; 
+<hasDataSShape> a fs:RelationShape ;
     sh:name "Has data in collection" ;
     sh:description "Collections that contain data for this sample." ;
     sh:class fs:Collection ;
     fs:inverseRelation <aboutMaterialShape> ;
     sh:path <hasDataS> .
 
-<isProjectConsentShape> a fs:RelationShape ; 
+<isProjectConsentShape> a fs:RelationShape ;
     sh:name "Consent for specific project" ;
     sh:description "" ;
-    sh:class <ResearchProject> ; 
-    fs:inverseRelation <hasPersonConsentShape> ; 
+    sh:class <ResearchProject> ;
+    fs:inverseRelation <hasPersonConsentShape> ;
     sh:path <isProjectConsent> .
 
-<hasPersonConsentShape> a fs:RelationShape ; 
+<hasPersonConsentShape> a fs:RelationShape ;
     sh:name "Person consent" ;
     sh:description "" ;
-    sh:class <PersonConsent> ; 
-    fs:inverseRelation <isProjectConsentShape> ; 
+    sh:class <PersonConsent> ;
+    fs:inverseRelation <isProjectConsentShape> ;
     sh:path <hasPersonConsent> .
 
-<isAnalysedByShape> a fs:RelationShape ; 
+<isAnalysedByShape> a fs:RelationShape ;
     sh:name "Event is analysed by" ;
     sh:description "Analyses associated with this tumor pathology event" ;
-    sh:class <Analysis> ; 
+    sh:class <Analysis> ;
     fs:inverseRelation <analysisOfEventShape> ;
     sh:path <isAnalysedBy> .
 
-<analysisOfEventShape> a fs:RelationShape ; 
+<analysisOfEventShape> a fs:RelationShape ;
     sh:name "Analysis of tumor event" ;
     sh:description "Event associated with this analysis" ;
     sh:class osiris:TumorPathologyEvent ; 
@@ -428,29 +428,29 @@ fs:CollectionShape sh:property
     fs:inverseRelation <isAnalysedByShape> ;
     sh:path <analysisOfEvent> .
 
-<authorizesShape> a fs:RelationShape ; 
+<authorizesShape> a fs:RelationShape ;
     sh:name "Consent authorizes" ;
     sh:description "The samples that is authorized with this consent" ;
     sh:class osiris:BiologicalSample ; 
     fs:inverseRelation <isAuthorizedByShape> ;
     sh:path <authorizes> .
 
-<isAuthorizedByShape> a fs:RelationShape ; 
+<isAuthorizedByShape> a fs:RelationShape ;
     sh:name "Sample is authorized by" ;
     sh:description "The relevent consent" ;
-    sh:class <PersonConsent> ; 
+    sh:class <PersonConsent> ;
     sh:maxCount 1 ;
     fs:inverseRelation <authorizesShape> ;
     sh:path <isAuthorizedBy> .
 
-<hasEventShape> a fs:RelationShape ; 
+<hasEventShape> a fs:RelationShape ;
     sh:name "Event" ;
     sh:description "Tumor pathology events for this patient" ;
     sh:class osiris:TumorPathologyEvent ; 
     fs:inverseRelation <eventSubjectShape> ;
     sh:path <hasEvent> .
 
-<eventSubjectShape> a fs:RelationShape ; 
+<eventSubjectShape> a fs:RelationShape ;
     sh:name "Event subject" ;
     sh:description "The patient associated with this event" ;
     sh:class foaf:Person ; 
@@ -458,36 +458,36 @@ fs:CollectionShape sh:property
     fs:inverseRelation <hasEventShape> ;
     sh:path <eventSubject> .
 
-<associatedAnalysisShape> a fs:RelationShape ; 
+<associatedAnalysisShape> a fs:RelationShape ;
     sh:name "Analysed by" ;
     sh:description "The files associated to the analysis" ;
-    sh:class <Analysis> ; 
+    sh:class <Analysis> ;
     sh:maxCount 1 ;
     fs:inverseRelation <associatedFilesShape> ;
     sh:path <associatedAnalysis> .
 
-<associatedFilesShape> a fs:RelationShape ; 
+<associatedFilesShape> a fs:RelationShape ;
     sh:name "Analysis files" ;
     sh:description "The analysis linked to the files" ;
     sh:class fs:File ; 
     fs:inverseRelation <associatedAnalysisShape> ;
     sh:path <associatedFiles> .
 
-<isParentOfShape> a fs:RelationShape ; 
+<isParentOfShape> a fs:RelationShape ;
     sh:name "Sample has children" ;
     sh:description "The biological sample has child samples extracted (ex : tissue DNA extraction)" ;
     sh:class osiris:BiologicalSample ; 
-    fs:inverseRelation <isChildOfShape> ; 
+    fs:inverseRelation <isChildOfShape> ;
     sh:path <isParentOf> .
 
-<isChildOfShape> a fs:RelationShape ; 
+<isChildOfShape> a fs:RelationShape ;
     sh:name "Sample is child sample of" ;
     sh:description "The biological sample has been extracted from this parent sample" ;
     sh:class osiris:BiologicalSample ; 
     fs:inverseRelation <isParentOfShape> ;
     sh:path <isChildOf> .
 
-<isLinkedToShape> a fs:RelationShape ; 
+<isLinkedToShape> a fs:RelationShape ;
     sh:name "Event parentage" ;
     sh:description "The tumor events could be linked to others as a chain. For example, a primary tumor event could be linked to a local relapse and then a metastatic relapse." ;
     sh:class osiris:TumorPathologyEvent ; 
