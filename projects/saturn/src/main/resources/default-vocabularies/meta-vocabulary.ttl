@@ -218,7 +218,7 @@ fs:machineOnlyShape a fs:PropertyShape ;
     sh:name "Machine edits only" ;
     sh:description "Users should not be able to change the value of any value node of this shape." .
 
-fs:machineOnlyShape a fs:PropertyShape ;
+fs:systemPropertiesShape a fs:PropertyShape ;
     sh:path fs:systemProperties ;
     fs:machineOnly true ;
     sh:name "System properties" ;
