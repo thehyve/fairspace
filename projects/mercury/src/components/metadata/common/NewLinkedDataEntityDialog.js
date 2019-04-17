@@ -11,6 +11,22 @@ class NewLinkedDataEntityDialog extends React.Component {
         id: generateUuid()
     };
 
+    componentDidUpdate(prevProps) {
+        // Reset form key and new identifier when the
+        // dialog opens to prevent reusing the same
+        // identifier
+        if (!prevProps.open && this.props.open) {
+            this.resetDialog();
+        }
+    }
+
+    resetDialog() {
+        this.setState({
+            formKey: generateUuid(),
+            id: generateUuid()
+        });
+    }
+
     closeDialog = (e) => {
         if (e) e.stopPropagation();
         this.props.onClose();
