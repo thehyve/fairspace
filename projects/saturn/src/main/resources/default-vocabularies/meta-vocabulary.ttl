@@ -56,7 +56,8 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape fs:systemProperties ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message 
+                           fs:fixedShape fs:systemProperties sh:closed ) .
 
 fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
