@@ -617,7 +617,7 @@ fs:isChildOfShape a fs:RelationShape ;
     sh:name "Sample is child sample of" ;
     sh:description "The biological sample has been extracted from this parent sample" ;
     sh:class osiris:BiologicalSample ; 
-    fs:inverseRelation fs:isParentOf ;
+    fs:inverseRelation fs:isParentOfShape ;
     sh:path fs:isChildOf .
 
 fs:isLinkedToShape a fs:RelationShape ; 
