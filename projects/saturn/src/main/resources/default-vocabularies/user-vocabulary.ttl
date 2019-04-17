@@ -638,6 +638,8 @@ fs:ResearchProject a fs:Class .
 osiris:TumorPathologyEvent a fs:Class .
 osiris:BiologicalSample a fs:Class .
 fs:Analysis a fs:Class .
+fs:PersonConsentEx a fs:Class .
+fs:PersonConsentEx rdfs:subClassOf fs:PersonConsent .
 
 ########################
 ### User Properties  ###
