@@ -14,22 +14,9 @@ describe('Metadata form reducer', () => {
                 )
             ).toEqual({
                 updates: {},
-                subject: undefined,
                 error: false,
                 pending: false
             });
-        });
-        it('should set subject on initialization', () => {
-            expect(
-                linkedDataFormChangesReducerPerForm(
-                    {
-                        updates: {a: 'b'}
-                    }, {
-                        type: actionTypes.INITIALIZE_LINKEDDATA_FORM,
-                        subject: 'some-subject'
-                    }
-                ).subject
-            ).toEqual('some-subject');
         });
     });
 

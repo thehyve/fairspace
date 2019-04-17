@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {createIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
+import {createMetadataIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
@@ -32,7 +32,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(metadataActions.fetchAllEntitiesIfNeeded()),
     fetchShapes: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded),
     create: (formKey, shape, id) => {
-        const subject = createIri(id);
+        const subject = createMetadataIri(id);
         const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
         return dispatch(metadataActions.createMetadataEntityFromState(formKey, subject, type))
             .then(({value}) => {

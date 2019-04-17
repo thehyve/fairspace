@@ -21,12 +21,11 @@ class LinkedDataEntityFormContainer extends React.Component {
     }
 
     initialize() {
-        const {formKey, subject, initializeForm, fetchShapes, fetchLinkedData} = this.props;
+        const {formKey, initializeForm, fetchShapes} = this.props;
 
         if (formKey) {
-            initializeForm(formKey, subject);
+            initializeForm(formKey);
             fetchShapes();
-            fetchLinkedData(subject);
         }
     }
 
@@ -55,7 +54,6 @@ class LinkedDataEntityFormContainer extends React.Component {
 LinkedDataEntityFormContainer.propTypes = {
     initializeForm: PropTypes.func,
     fetchShapes: PropTypes.func,
-    fetchLinkedData: PropTypes.func,
 
     onAdd: PropTypes.func,
     onChange: PropTypes.func,
@@ -67,7 +65,6 @@ LinkedDataEntityFormContainer.propTypes = {
     editable: PropTypes.bool,
 
     formKey: PropTypes.string.isRequired,
-    subject: PropTypes.string,
 
     properties: PropTypes.array,
     updates: PropTypes.object
@@ -75,7 +72,6 @@ LinkedDataEntityFormContainer.propTypes = {
 
 LinkedDataEntityFormContainer.defaultProps = {
     fetchShapes: () => {},
-    fetchLinkedData: () => {},
 
     onAdd: () => {},
     onChange: () => {},
@@ -91,7 +87,7 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    initializeForm: (formKey, subject) => dispatch(initializeLinkedDataForm(formKey, subject)),
+    initializeForm: (formKey) => dispatch(initializeLinkedDataForm(formKey)),
     onAdd: (property, value) => {
         dispatch(addLinkedDataValue(ownProps.formKey, property, value));
     },

@@ -175,7 +175,7 @@ export const getTypeInfo = (metadata) => {
     const {label, comment} = typeValue;
 
     return (label && comment) ? `${label} - ${comment}` : (label || comment);
-}
+};
 
 /**
  * Creates a new IRI within this workspace, based on the given identifier and infix

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 
-import {createIri, generateUuid, getLabel} from "../../../utils/metadataUtils";
+import {generateUuid, getLabel} from "../../../utils/metadataUtils";
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 
 class NewLinkedDataEntityDialog extends React.Component {
@@ -51,7 +51,6 @@ class NewLinkedDataEntityDialog extends React.Component {
 
                     <LinkedDataEntityFormContainer
                         formKey={this.state.formKey}
-                        subject={createIri(this.state.id)}
                         properties={linkedData}
                     />
 

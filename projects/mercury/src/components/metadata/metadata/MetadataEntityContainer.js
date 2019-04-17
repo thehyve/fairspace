@@ -18,12 +18,15 @@ import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContain
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 
 const MetadataEntityContainer = props => {
-    const {editable, buttonDisabled, onSubmit, subject, ...otherProps} = props;
+    const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
             .catch(err => ErrorDialog.showError(err, "Error while updating metadata"));
     };
+
+    // Ensure the data is present
+    fetchLinkedData(subject);
 
     return (
         <Grid container>

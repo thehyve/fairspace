@@ -6,7 +6,7 @@ import {createByKey} from "../utils/redux";
  * The updates map contains a map from propertyKey (predicate) to a list of values for that property
  * @type {{updates: {}}}
  */
-const initialState = {subject: undefined, updates: {}, pending: false, error: false};
+const initialState = {updates: {}, pending: false, error: false};
 
 /**
  * Returns the values that are present in the form for the given propertyKey
@@ -34,7 +34,7 @@ const generateStateWithNewValues = (state, propertyKey, updatedValues) => ({
 export const linkedDataFormChangesReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.INITIALIZE_LINKEDDATA_FORM:
-            return {...initialState, subject: action.subject};
+            return initialState;
         case actionTypes.ADD_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
