@@ -15,7 +15,6 @@ import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/meta
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
-import MetadataValueComponentFactory from "../metadata/MetadataValueComponentFactory";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 
 const VocabularyEntityContainer = props => {
@@ -26,17 +25,14 @@ const VocabularyEntityContainer = props => {
             .catch(err => ErrorDialog.showError(err, "Error while updating vocabulary"));
     };
 
-    // Ensure the data is present
-    fetchLinkedData(subject);
-
     return (
         <Grid container>
             <Grid item xs={12}>
                 <LinkedDataEntityFormContainer
                     editable={editable}
                     formKey={subject}
-                    subject={subject}
                     valueComponentFactory={VocabularyValueComponentFactory}
+                    fetchLinkedData={() => fetchLinkedData(subject)}
                     {...otherProps}
                 />
             </Grid>

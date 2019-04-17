@@ -26,18 +26,16 @@ const MetadataEntityContainer = props => {
             .catch(err => ErrorDialog.showError(err, "Error while updating metadata"));
     };
 
-    // Ensure the data is present
-    fetchLinkedData(subject);
-
     return (
         <Grid container>
             <Grid item xs={12}>
                 <LinkedDataEntityFormContainer
                     editable={editable}
                     formKey={subject}
-                    subject={subject}
                     valueComponentFactory={MetadataValueComponentFactory}
+                    fetchLinkedData={() => fetchLinkedData(subject)}
                     {...otherProps}
+                />
                 />
             </Grid>
             {

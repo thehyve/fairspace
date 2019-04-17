@@ -4,13 +4,11 @@ import {connect} from "react-redux";
 import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
 import {getLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 import {
-    addLinkedDataValue, deleteLinkedDataValue,
+    addLinkedDataValue,
+    deleteLinkedDataValue,
     initializeLinkedDataForm,
     updateLinkedDataValue
 } from "../../../actions/linkedDataFormActions";
-import {getInputComponent} from "./values/LinkedDataValueComponentFactory";
-import ReferringValue from "./values/ReferringValue";
-import MetadataDropdownWithAdditionContainer from "../metadata/MetadataDropdownWithAdditionContainer";
 
 class LinkedDataEntityFormContainer extends React.Component {
     componentDidMount() {
@@ -24,11 +22,12 @@ class LinkedDataEntityFormContainer extends React.Component {
     }
 
     initialize() {
-        const {formKey, initializeForm, fetchShapes} = this.props;
+        const {formKey, initializeForm, fetchShapes, fetchLinkedData} = this.props;
 
         if (formKey) {
             initializeForm(formKey);
             fetchShapes();
+            fetchLinkedData();
         }
     }
 
@@ -58,6 +57,7 @@ class LinkedDataEntityFormContainer extends React.Component {
 LinkedDataEntityFormContainer.propTypes = {
     initializeForm: PropTypes.func,
     fetchShapes: PropTypes.func,
+    fetchLinkedData: PropTypes.func,
 
     onAdd: PropTypes.func,
     onChange: PropTypes.func,
@@ -73,7 +73,7 @@ LinkedDataEntityFormContainer.propTypes = {
     properties: PropTypes.array,
     updates: PropTypes.object,
 
-    valueComponentFactory: PropTypes.object
+    valueComponentFactory: PropTypes.object.isRequired
 };
 
 LinkedDataEntityFormContainer.defaultProps = {
