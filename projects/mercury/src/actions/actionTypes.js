@@ -109,9 +109,7 @@ export const PERFORM_SEARCH_FULFILLED               = 'PERFORM_SEARCH_FULFILLED'
 export const PERFORM_SEARCH_REJECTED                = 'PERFORM_SEARCH_REJECTED';
 
 // Metadata editing
-export const INITIALIZE_METADATA_FORM               = 'INITIALIZE_METADATA_FORM';
-export const ADD_METADATA_VALUE                     = 'ADD_METADATA_VALUE';
-export const UPDATE_METADATA_VALUE                  = 'UPDATE_METADATA_VALUE';
-export const DELETE_METADATA_VALUE                  = 'DELETE_METADATA_VALUE';
-export const SUBMIT_METADATA_FORM                   = 'SUBMIT_METADATA_FORM';
-export const CLEAR_METADATA_FORM                    = 'CLEAR_METADATA_FORM';
+export const INITIALIZE_LINKEDDATA_FORM             = 'INITIALIZE_LINKEDDATA_FORM';
+export const ADD_LINKEDDATA_VALUE                   = 'ADD_LINKEDDATA_VALUE';
+export const UPDATE_LINKEDDATA_VALUE                = 'UPDATE_LINKEDDATA_VALUE';
+export const DELETE_LINKEDDATA_VALUE                = 'DELETE_LINKEDDATA_VALUE';

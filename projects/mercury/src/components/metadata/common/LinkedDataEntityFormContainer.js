@@ -2,13 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
-import {getMetadataFormUpdates} from "../../../reducers/metadataFormReducers";
+import {getLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 import {
-    addMetadataValue,
-    deleteMetadataValue,
-    initializeMetadataForm,
-    updateMetadataValue
-} from "../../../actions/metadataFormActions";
+    addLinkedDataValue, deleteLinkedDataValue,
+    initializeLinkedDataForm,
+    updateLinkedDataValue
+} from "../../../actions/linkedDataFormActions";
 
 class LinkedDataEntityFormContainer extends React.Component {
     componentDidMount() {
@@ -16,16 +15,16 @@ class LinkedDataEntityFormContainer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.subject !== prevProps.subject) {
+        if (this.props.formKey !== prevProps.formKey) {
             this.initialize();
         }
     }
 
     initialize() {
-        const {subject, initializeForm, fetchShapes, fetchLinkedData} = this.props;
+        const {formKey, subject, initializeForm, fetchShapes, fetchLinkedData} = this.props;
 
-        if (subject) {
-            initializeForm(subject);
+        if (formKey) {
+            initializeForm(formKey, subject);
             fetchShapes();
             fetchLinkedData(subject);
         }
@@ -47,7 +46,6 @@ class LinkedDataEntityFormContainer extends React.Component {
                 loading={this.props.loading}
                 editable={this.props.editable}
 
-                subject={this.props.subject}
                 properties={propertiesWithChanges}
             />
         );
@@ -55,6 +53,10 @@ class LinkedDataEntityFormContainer extends React.Component {
 }
 
 LinkedDataEntityFormContainer.propTypes = {
+    initializeForm: PropTypes.func,
+    fetchShapes: PropTypes.func,
+    fetchLinkedData: PropTypes.func,
+
     onAdd: PropTypes.func,
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
@@ -64,12 +66,17 @@ LinkedDataEntityFormContainer.propTypes = {
     loading: PropTypes.bool,
     editable: PropTypes.bool,
 
-    subject: PropTypes.string.isRequired,
+    formKey: PropTypes.string.isRequired,
+    subject: PropTypes.string,
+
     properties: PropTypes.array,
     updates: PropTypes.object
 };
 
 LinkedDataEntityFormContainer.defaultProps = {
+    fetchShapes: () => {},
+    fetchLinkedData: () => {},
+
     onAdd: () => {},
     onChange: () => {},
     onDelete: () => {},
@@ -80,19 +87,19 @@ LinkedDataEntityFormContainer.defaultProps = {
 };
 
 const mapStateToProps = (state, ownProps) => ({
-    updates: getMetadataFormUpdates(state, ownProps.subject)
+    updates: getLinkedDataFormUpdates(state, ownProps.formKey),
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    initializeForm: (subject) => dispatch(initializeMetadataForm(subject)),
+    initializeForm: (formKey, subject) => dispatch(initializeLinkedDataForm(formKey, subject)),
     onAdd: (property, value) => {
-        dispatch(addMetadataValue(ownProps.subject, property, value));
+        dispatch(addLinkedDataValue(ownProps.formKey, property, value));
     },
     onChange: (property, value, index) => {
-        dispatch(updateMetadataValue(ownProps.subject, property, value, index));
+        dispatch(updateLinkedDataValue(ownProps.formKey, property, value, index));
     },
     onDelete: (property, index) => {
-        dispatch(deleteMetadataValue(ownProps.subject, property, index));
+        dispatch(deleteLinkedDataValue(ownProps.formKey, property, index));
     }
 });
 

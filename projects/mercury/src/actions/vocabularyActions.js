@@ -1,49 +1,45 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
-import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
-import {createIri, getFirstPredicateId} from "../utils/metadataUtils";
-import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
-import {getMetaVocabulary} from "../reducers/cache/vocabularyReducers";
+import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
+import {getMetaVocabulary, getVocabulary} from "../reducers/cache/vocabularyReducers";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
     meta: {subject}
 });
 
-export const updateVocabulary = (subject, values, metaVocabulary) => ({
-    type: actionTypes.UPDATE_VOCABULARY,
-    payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
-    meta: {
-        subject
-    }
-});
-
 export const submitVocabularyChangesFromState = (subject) => (dispatch, getState) => {
-    const updates = getMetadataFormUpdates(getState(), subject);
+    const values = getLinkedDataFormUpdates(getState(), subject);
     const metaVocabulary = getMetaVocabulary(getState());
-    return dispatch(updateVocabulary(subject, updates, metaVocabulary));
+    return dispatch({
+        type: actionTypes.UPDATE_VOCABULARY,
+        payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
+        meta: {
+            subject
+        }
+    });
 };
 
-export const createVocabularyEntity = (shape, id) => {
-    const subject = createIri(id);
-    const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
+export const createVocabularyEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
+    const values = getLinkedDataFormUpdates(getState(), formKey);
+    const vocabulary = getVocabulary(getState());
 
-    return {
-        type: actionTypes.CREATE_VOCABULARY_ENTITY,
+    return dispatch({
+        type: actionTypes.CREATE_METADATA_ENTITY,
         payload: VocabularyAPI.get({subject})
             .then((meta) => {
                 if (meta.length) {
                     throw Error(`Vocabulary entity already exists: ${subject}`);
                 }
             })
-            .then(() => VocabularyAPI.update(subject, constants.TYPE_URI, [{id: type}]))
-            .then(() => subject),
+            .then(() => VocabularyAPI.createEntity(subject, type, values, vocabulary))
+            .then(() => ({subject, type, values})),
         meta: {
             subject,
             type
         }
-    };
+    });
 };
 
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({

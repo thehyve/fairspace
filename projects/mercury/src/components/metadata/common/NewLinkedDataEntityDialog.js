@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 
-import {generateUuid, getLabel} from "../../../utils/metadataUtils";
+import {createIri, generateUuid, getLabel} from "../../../utils/metadataUtils";
+import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
+        formKey: generateUuid(),
         id: generateUuid()
     };
 
@@ -16,18 +18,18 @@ class NewLinkedDataEntityDialog extends React.Component {
 
     createEntity = (e) => {
         if (e) e.stopPropagation();
-        this.props.onCreate(this.props.shape, this.state.id);
+        this.props.onCreate(this.state.formKey, this.props.shape, this.state.id);
     };
 
     handleInputChange = event => this.setState({id: event.target.value});
 
     render() {
-        const typeLabel = getLabel(this.props.shape);
-        const showDialog = this.props.open && this.props.shape !== undefined;
+        const {shape, open, linkedData} = this.props;
+        const typeLabel = getLabel(shape);
 
         return (
             <Dialog
-                open={showDialog}
+                open={open}
                 onClose={this.closeDialog}
                 aria-labelledby="form-dialog-title"
             >
@@ -46,6 +48,13 @@ class NewLinkedDataEntityDialog extends React.Component {
                         error={!this.hasValidId()}
                         style={{width: 400}}
                     />
+
+                    <LinkedDataEntityFormContainer
+                        formKey={this.state.formKey}
+                        subject={createIri(this.state.id)}
+                        properties={linkedData}
+                    />
+
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -78,6 +87,8 @@ class NewLinkedDataEntityDialog extends React.Component {
 NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired
-}
+    onClose: PropTypes.func.isRequired,
+    open: PropTypes.bool
+};
+
 export default NewLinkedDataEntityDialog;
