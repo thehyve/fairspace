@@ -47,11 +47,6 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:path sh:description ;
         sh:name "Class description"
     ], [
-        sh:path fs:systemProperties ;
-        fs:machineOnly true ;
-        sh:name "System properties" ;
-        sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties."
-    ], [
         sh:datatype xsd:boolean ;
         sh:maxCount 1 ;
         sh:path fs:showInCatalog ;
@@ -60,7 +55,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape fs:systemProperties ) .
 
 fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -127,11 +122,6 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:name "Property identifier" ;
         fs:showInTable true ;
         sh:order 3
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:machineOnly ;
-        sh:name "Machine edits only" ;
-        sh:description "Users should not be able to change the value of any value node of this shape."
     ] ;
     sh:or ( 
         [ sh:path sh:in ; 
@@ -141,7 +131,8 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
       ) ; 
     fs:showInCatalog true ;
     sh:targetClass fs:PropertyShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties 
+                           sh:message fs:fixedShape fs:machineOnly ) .
 
 fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -196,15 +187,11 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:name "Relation name" ;
         fs:showInTable true ;
         sh:order 0
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:machineOnly ;
-        sh:name "Machine edits only" ;
-        sh:description "Users should not be able to change the value of any value node of this shape."
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message fs:fixedShape ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties 
+                           sh:message fs:fixedShape fs:machineOnly ) .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
@@ -215,9 +202,23 @@ fs:inverseRelationShape a fs:RelationShape ;
     sh:description "An inverse relation has at most a single relation shape instance as value. A shape with sh:path P1 and fs:inverseRelationShape S2 with sh:path P2 has equivalent meaning as P1 owl:inverseOf P2." ;
     sh:path fs:inverseRelation . 
 
-fs:fixedShapeShape 
+fs:fixedShapeShape a fs:PropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path fs:fixedShape ;
     fs:machineOnly true ; 
     sh:name "Fixed shape" ;
     sh:description "If this is true, a user can not make changes to this shape definiton." .
+
+fs:machineOnlyShape a fs:PropertyShape ; 
+    sh:datatype xsd:boolean ;
+    sh:path fs:machineOnly ;
+    fs:machineOnly true ;
+    sh:name "Machine edits only" ;
+    sh:description "Users should not be able to change the value of any value node of this shape."
+
+
+fs:machineOnlyShape a fs:PropertyShape ;
+        sh:path fs:systemProperties ;
+        fs:machineOnly true ;
+        sh:name "System properties" ;
+        sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties."
