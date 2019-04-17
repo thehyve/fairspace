@@ -36,7 +36,6 @@ const MetadataEntityContainer = props => {
                     fetchLinkedData={() => fetchLinkedData(subject)}
                     {...otherProps}
                 />
-                />
             </Grid>
             {
                 editable

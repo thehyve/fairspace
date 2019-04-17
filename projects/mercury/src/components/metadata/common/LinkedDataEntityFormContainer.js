@@ -78,6 +78,7 @@ LinkedDataEntityFormContainer.propTypes = {
 
 LinkedDataEntityFormContainer.defaultProps = {
     fetchShapes: () => {},
+    fetchLinkedData: () => {},
 
     onAdd: () => {},
     onChange: () => {},
