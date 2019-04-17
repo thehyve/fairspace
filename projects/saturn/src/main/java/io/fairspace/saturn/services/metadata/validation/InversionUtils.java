@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -43,7 +44,7 @@ public class InversionUtils {
      */
     public static Map<Property, Property> getInverseProperties(RDFConnection rdf) {
         var result = new HashMap<Property, Property>();
-        rdf.querySelect(storedQuery("inverse_properties"), row -> {
+        rdf.querySelect(storedQuery("inverse_properties", Vocabularies.VOCABULARY_GRAPH_URI),row -> {
             var lhs = createProperty(row.getResource("lhs").getURI());
             var rhs = createProperty(row.getResource("rhs").getURI());
             result.put(lhs, rhs);

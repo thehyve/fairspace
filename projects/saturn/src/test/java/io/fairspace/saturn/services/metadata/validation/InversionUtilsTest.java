@@ -21,7 +21,7 @@ public class InversionUtilsTest {
     private static final Resource R2 = createResource();
     private static final Resource R3 = createResource("http://example.com/resource2");
     private static final Property P1 = createProperty("http://example.com/property");
-    private static final Property P2 = createProperty("http://fairspace.io/ontology#derivesFrom"); // has an inverse
+    private static final Property P2 = createProperty("http://localhost/vocabulary/derivesFrom"); // has an inverse
 
     private RDFConnection rdf = new RDFConnectionLocal(DatasetFactory.create());
 

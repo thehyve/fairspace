@@ -18,7 +18,7 @@ import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContain
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 
 const MetadataEntityContainer = props => {
-    const {editable, buttonDisabled, onSubmit, subject, ...otherProps} = props;
+    const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
@@ -28,7 +28,12 @@ const MetadataEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataEntityFormContainer editable={editable} formKey={subject} subject={subject} {...otherProps} />
+                <LinkedDataEntityFormContainer
+                    editable={editable}
+                    formKey={subject}
+                    fetchLinkedData={() => fetchLinkedData(subject)}
+                    {...otherProps}
+                />
             </Grid>
             {
                 editable

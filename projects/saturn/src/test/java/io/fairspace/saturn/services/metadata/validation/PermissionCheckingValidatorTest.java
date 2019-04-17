@@ -31,7 +31,7 @@ public class PermissionCheckingValidatorTest {
 
     private static final Statement STATEMENT_WITH_INVERSE = createStatement(
             createResource("http://ex.com/subject"),
-            createProperty("http://fairspace.io/ontology#derivesFrom"), // has an inverse
+            createProperty("http://localhost/vocabulary/derivesFrom"), // has an inverse
             createResource("http://ex.com/object"));
 
     @Mock

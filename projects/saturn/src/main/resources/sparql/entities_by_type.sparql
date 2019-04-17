@@ -6,9 +6,12 @@ PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 
-CONSTRUCT {?s a %3$s; rdfs:label ?l}
+CONSTRUCT {?s a ?type; rdfs:label ?l}
 WHERE {
-    GRAPH %1$s { ?s a %3$s }
-    GRAPH %2$s { ?t sh:targetClass %3$s ; fs:showInCatalog true .}
+    GRAPH %1$s { ?s a ?type .  }
+    GRAPH %2$s {
+      ?type rdfs:subClassOf* %3$s .
+      ?shape sh:targetClass ?type ; fs:showInCatalog true .
+    }
     OPTIONAL { GRAPH %1$s {?s rdfs:label ?l} }
 }
