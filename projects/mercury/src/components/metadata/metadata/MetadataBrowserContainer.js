@@ -1,27 +1,29 @@
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {getLabel, relativeLink} from "../../../utils/metadataUtils";
+import {createIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
+import * as constants from "../../../constants";
 
 const mapStateToProps = (state) => {
     const {cache: {allEntities}} = state;
     const pending = isVocabularyPending(state) || !allEntities || allEntities.pending;
     const allEntitiesData = allEntities && allEntities.data ? allEntities.data : [];
-    const vocabularyData = getVocabulary(state);
+    const vocabulary = getVocabulary(state);
     const entities = allEntitiesData.map(e => ({
         id: e['@id'],
         label: getLabel(e),
         type: e['@type'],
-        typeLabel: getLabel(vocabularyData.determineShapeForType(e['@type'][0]), true)
+        typeLabel: getLabel(vocabulary.determineShapeForType(e['@type'][0]), true)
     }));
 
     return ({
         loading: pending,
         error: allEntities ? allEntities.error : false,
-        shapes: vocabularyData && vocabularyData.getFairspaceClasses(),
+        shapes: vocabulary.getFairspaceClasses(),
+        vocabulary,
         entities,
     });
 };
@@ -29,11 +31,15 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(metadataActions.fetchAllEntitiesIfNeeded()),
     fetchShapes: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded),
-    create: (shape, id) => dispatch(metadataActions.createMetadataEntity(shape, id))
-        .then((response) => {
-            dispatch(metadataActions.fetchAllEntitiesIfNeeded());
-            ownProps.history.push(relativeLink(response.value));
-        })
+    create: (formKey, shape, id) => {
+        const subject = createIri(id);
+        const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
+        return dispatch(metadataActions.createMetadataEntityFromState(formKey, subject, type))
+            .then(({value}) => {
+                dispatch(metadataActions.fetchAllEntitiesIfNeeded());
+                ownProps.history.push(relativeLink(value.subject));
+            });
+    }
 });
 
 // Please note that withRoute must be applied after connect

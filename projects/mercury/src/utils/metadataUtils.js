@@ -177,11 +177,53 @@ export const getTypeInfo = (metadata) => {
     return (label && comment) ? `${label} - ${comment}` : (label || comment);
 }
 
+/**
+ * Creates a new IRI within this workspace, based on the given identifier and infix
+ *
+ * Please note that IRIs within the workspace always use http as scheme, regardless
+ * of whether the app runs on https. This ensures consistent IRI generation and
+ * add the ability to access the same IRI on different protocols.
+ *
+ * @param id
+ * @returns {string}
+ */
 export const createIri = (id, infix) => `http://${window.location.hostname}/${infix}/${id}`;
+
+/**
+ * Creates a new metadata IRI within this workspace
+ *
+ * @param id
+ * @returns {string}
+ * @see createIri
+ */
 export const createMetadataIri = (id) => createIri(id, 'iri');
+
+/**
+ * Creates a new vocabulary IRI within this workspace
+ *
+ * @param id
+ * @returns {string}
+ * @see createIri
+ */
 export const createVocabularyIri = (id) => createIri(id, 'vocabulary');
 
+/**
+ * Generates a compatible workspace IRI from the given iri.
+ *
+ * This method will return the same iri as was given, but with http as scheme
+ * and without the port number.
+ * This ensures consistent IRI generation and
+ * add the ability to access the same IRI on different protocols.
+ *
+ * @param id
+ * @returns {string}
+ */
 export const url2iri = (iri) => {
-    const url = new URL(iri);
-    return `http://${url.hostname}${url.pathname}`;
+    try {
+        const url = new URL(iri);
+        return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
+    } catch (e) {
+        console.warn("Invalid uri given to convert to iri", iri);
+        return iri;
+    }
 };

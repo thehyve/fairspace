@@ -52,16 +52,58 @@ class Vocabulary {
         }
 
         // Determine properties allowed for the given type
-        const propertyShapes = this.determinePropertyShapesForTypes(metadataItem['@type']);
+        const types = metadataItem['@type'];
+        const propertyShapes = this.determinePropertyShapesForTypes(types);
+        return this.generatePropertiesForMetadata(metadataItem, types, propertyShapes, expandedMetadata);
+    }
 
+    /**
+     *
+     * @param metadataItem
+     * @param propertyShapes
+     * @param expandedMetadata
+     * @returns {*[]}
+     */
+    generatePropertiesForMetadata(metadataItem, types, propertyShapes, expandedMetadata) {
         // Actually convert the metadata into a list of properties
         const properties = this.convertMetadataIntoPropertyList(metadataItem, propertyShapes, expandedMetadata);
         const emptyProperties = this.determineAdditionalEmptyProperties(metadataItem, propertyShapes);
 
         // An entry with information on the type is returned as well for display purposes
-        const typeProperty = this.generateTypeProperty(metadataItem['@type']);
+        const typeProperty = this.generateTypeProperty(types);
 
         return [...properties, ...emptyProperties, typeProperty];
+    }
+
+    /**
+     * Returns a linked data object for a new entity. The object can be used in form generation
+     *
+     * Please note that only the metadata for the first subject will be used
+     *
+     * @param shape The shape for the
+     * @param subject Subject to combine the metadata for. If not provided, the metadata is expected to contain
+     *                information on a single entity
+     * @returns [Any] A promise resolving in an array with metadata. Each element will look like this:
+     * {
+     *      key: "http://fairspace.io/ontology#description",
+     *      label: "Description",
+     *      values: [
+     *          { id: "http://fairspace.com/collections/1", label: "My collection" },
+     *          { value: "Literal value"}
+     *      ]
+     *  }
+     */
+    emptyLinkedData(shape) {
+        if (!shape) {
+            return [];
+        }
+
+        // Determine properties allowed for the given type
+        const propertyShapes = this.determinePropertyShapesForNodeShape(shape);
+        const types = (shape[constants.SHACL_TARGET_CLASS] || []).map(node => node['@id']);
+
+        // Generate a list of empty properties
+        return this.generatePropertiesForMetadata({}, types, propertyShapes, []);
     }
 
     /**
@@ -190,8 +232,14 @@ class Vocabulary {
      * @param type
      */
     determinePropertyShapesForType(type) {
-        const shape = this.determineShapeForType(type);
+        return this.determinePropertyShapesForNodeShape(this.determineShapeForType(type));
+    }
 
+    /**
+     * Returns a list of property shapes that are in given node shape
+     * @param shape
+     */
+    determinePropertyShapesForNodeShape(shape) {
         if (!shape) {
             return [];
         }

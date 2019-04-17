@@ -76,6 +76,29 @@ class LinkedDataAPI {
     }
 
     /**
+     * Creates a new entity
+     * @param subject   Single URI representing the subject to update
+     * @param properties An object with each key is the iri of the predicate to update
+     * and the value is the array of values
+     * Each value is an object on its own with one of the following keys
+     *   id: referencing another resource
+     *   value: referencing a literal value
+     * If both keys are specified, the id is stored and the literal value is ignored
+     * @param vocabulary The {Vocabulary} object containing the shapes for this metadata entity
+     * @returns {*}
+     */
+    createEntity(subject, type, properties, vocabulary) {
+        if (!subject || !properties) {
+            return Promise.reject(Error("No subject or properties given"));
+        }
+
+        const initialValuesJsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
+
+        return this.patchMetadata([...initialValuesJsonLd, {'@id': subject, '@type': type}])
+            .then(failOnHttpError("Failure when creating entity"));
+    }
+
+    /**
      * Update values for all given properties
      * @param subject   Single URI representing the subject to update
      * @param properties An object with each key is the iri of the predicate to update
@@ -94,12 +117,8 @@ class LinkedDataAPI {
 
         const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
 
-        return fetch(this.getStatementsUrl(), {
-            method: 'PATCH',
-            headers: new Headers({'Content-type': 'application/ld+json'}),
-            credentials: 'same-origin',
-            body: JSON.stringify(jsonLd)
-        }).then(failOnHttpError("Failure when updating metadata"));
+        return this.patchMetadata(jsonLd)
+            .then(failOnHttpError("Failure when updating metadata"));
     }
 
     /**
@@ -138,6 +157,20 @@ class LinkedDataAPI {
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(expand);
+    }
+
+    /**
+     * Send a patch request to the backend with the given json-ld
+     * @param jsonLd
+     * @returns {Promise<Response>}
+     */
+    patchMetadata(jsonLd) {
+        return fetch(this.getStatementsUrl(), {
+            method: 'PATCH',
+            headers: new Headers({'Content-type': 'application/ld+json'}),
+            credentials: 'same-origin',
+            body: JSON.stringify(jsonLd)
+        });
     }
 }
 

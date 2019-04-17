@@ -1,49 +1,49 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {MetadataAPI} from "../services/LinkedDataAPI";
-import * as constants from "../constants";
 import * as actionTypes from "./actionTypes";
-import {createMetadataIri, getFirstPredicateId} from "../utils/metadataUtils";
 import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
-import {getMetadataFormUpdates} from "../reducers/metadataFormReducers";
 import {getVocabulary} from "../reducers/cache/vocabularyReducers";
+import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
     meta: {subject}
 });
 
-export const updateEntity = (subject, values, vocabulary) => ({
-    type: actionTypes.UPDATE_METADATA,
-    payload: MetadataAPI.updateEntity(subject, values, vocabulary),
-    meta: {
-        subject
-    }
-});
-
 export const submitMetadataChangesFromState = (subject) => (dispatch, getState) => {
-    const updates = getMetadataFormUpdates(getState(), subject);
+    // For metadata changes, the subject iri is used as form key
+    const formKey = subject;
+    const values = getLinkedDataFormUpdates(getState(), formKey);
     const vocabulary = getVocabulary(getState());
-    return dispatch(updateEntity(subject, updates, vocabulary));
+    return dispatch({
+        type: actionTypes.UPDATE_METADATA,
+        payload: MetadataAPI.updateEntity(subject, values, vocabulary),
+        meta: {
+            formKey,
+            subject
+        }
+    });
 };
 
-export const createMetadataEntity = (shape, id) => {
-    const subject = createMetadataIri(id);
-    const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
-    return {
+export const createMetadataEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
+    const values = getLinkedDataFormUpdates(getState(), formKey);
+    const vocabulary = getVocabulary(getState());
+
+    return dispatch({
         type: actionTypes.CREATE_METADATA_ENTITY,
         payload: MetadataAPI.get({subject})
             .then((meta) => {
                 if (meta.length) {
-                    throw Error(`Metadata entity already exists: ${subject}`);
+                    throw Error(`Entity already exists: ${subject}`);
                 }
             })
-            .then(() => MetadataAPI.update(subject, constants.TYPE_URI, [{id: type}]))
-            .then(() => subject),
+            .then(() => MetadataAPI.createEntity(subject, type, values, vocabulary))
+            .then(() => ({subject, type, values})),
         meta: {
             subject,
             type
         }
-    };
+    });
 };
 
 const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({

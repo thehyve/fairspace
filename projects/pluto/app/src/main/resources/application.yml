@@ -63,6 +63,10 @@ keycloak:
 
 zuul:
   routes:
+    # Please note that the order of the routes is relevant
+    # The elasticsearch route must be defined before
+    # saturn, which must be defined before ui, because of the
+    # paths they listen to
     storage:
       # The webdav URL is not only used in the request URI, but also in headers (e.g. Destination)
       # To avoid rewriting these headers, it is suggested that the path on the proxy is the same
@@ -70,30 +74,16 @@ zuul:
       path: /webdav/**
       url: http://saturn/
       strip-prefix: false
-    metadata:
-      path: /api/metadata/**
-      url: http://saturn/api/metadata/
-    vocabulary:
-      path: /api/vocabulary/**
-      url: http://saturn/api/vocabulary/
-    collections:
-      path: /api/collections/**
-      url: http://saturn/api/collections/
-    permissions:
-      path: /api/permissions/**
-      url: http://saturn/api/permissions/
-    rdf:
-      path: /api/rdf/**
-      url: http://saturn/api/rdf/
-    ui:
-      path: /**
-      url: http://mercury/
-    notebooks:
-      path: /api/notebooks/**
-      url: http://jupyterhub/
     elasticsearch:
       path: /api/search/*/_search
       url: http://elasticsearch/
+    saturn:
+      path: /api/**
+      url: http://saturn/
+      strip-prefix: false
+    ui:
+      path: /**
+      url: http://mercury/
   ignored-patterns:
   - /actuator/**
   - /account/**

@@ -4,7 +4,7 @@ import MaterialReactSelect from "../../common/MaterialReactSelect";
 import {getLabel} from "../../../utils/metadataUtils";
 import {compareBy} from "../../../utils/comparisionUtils";
 
-function Dropdown({entities, property, onSave, onChange, ...otherProps}) {
+function Dropdown({entities, property, onChange, ...otherProps}) {
     // Transform the entities to ensure a label is present
     const options = entities.map((entity) => {
         const id = entity['@id'];
