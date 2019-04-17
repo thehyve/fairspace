@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import lombok.SneakyThrows;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.MultiUnion;
@@ -55,8 +56,9 @@ public class ShaclUtil {
     }
 
     // Copied from org.topbraid.shacl.validation.ValidationUtil.validateModel
-    // TODO: Use ValidationUtil.createEngine to be added in SHACL 1.2.0
-    static ValidationEngine createEngine(Model dataModel, Model shapesModel) throws InterruptedException {
+    // TODO: Use ValidationUtil.createEngine to be added in SHACL 1.2.
+    @SneakyThrows(InterruptedException.class)
+    public static ValidationEngine createEngine(Model dataModel, Model shapesModel) {
         // Ensure that the SHACL, DASH and TOSH graphs are present in the shapes Model
         if (!shapesModel.contains(TOSH.hasShape, RDF.type, (RDFNode) null)) { // Heuristic
             Model unionModel = SHACLSystemModel.getSHACLModel();
