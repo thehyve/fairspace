@@ -9,8 +9,8 @@
 
 fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of classes." ;
-    sh:name "Class Shape Meta" ;
+    sh:description "Shape of classes." ;
+    sh:name "Class Shape" ;
     sh:property [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -64,8 +64,8 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
 
 fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of FS defined properties." ;
-    sh:name "Property Shape Meta" ;
+    sh:description "Shape of FS defined properties." ;
+    sh:name "Property Shape" ;
     sh:property [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -145,8 +145,8 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
 
 fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of FS defined relations." ;
-    sh:name "Relation Shape Meta" ;
+    sh:description "Shape of FS defined relations." ;
+    sh:name "Relation Shape" ;
     sh:property 
         fs:inverseRelationShape, 
     [
