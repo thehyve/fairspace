@@ -26,21 +26,11 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
-    private final MetadataUpdateEventHandler afterUpdateEventHandler;
-
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager) {
-        this(rdf, graph, vocabulary, lifeCycleManager, null, null);
-    }
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        this(rdf, graph, vocabulary, lifeCycleManager, validator, null);
-    }
-
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, MetadataUpdateEventHandler afterUpdateEventHandler) {
         super(rdf, graph, vocabulary);
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
-        this.afterUpdateEventHandler = afterUpdateEventHandler;
     }
 
     /**
@@ -125,10 +115,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         // Store the actual update
         rdf.load(graph.getURI(), modelToAdd);
-
-        // Reapply inference
-        if(afterUpdateEventHandler != null)
-            afterUpdateEventHandler.onEvent();
     }
 
     /**
@@ -137,11 +123,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * If no validator is specified, the method does nothing
      */
     private void ensureValidParameters(Model toRemove, Model toAdd) {
-        if(validator != null) {
-            var validationResult = validator.validate(toRemove, toAdd);
-            if(!validationResult.isValid()) {
-                throw new ValidationException(validationResult.getMessage());
-            }
+        var validationResult = validator.validate(toRemove, toAdd);
+        if(!validationResult.isValid()) {
+            throw new ValidationException(validationResult.getMessage());
         }
     }
 

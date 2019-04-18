@@ -66,7 +66,6 @@ public class App {
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, metadataValidator);
 
-        RecomputeInverseInferenceEventHandler recomputeInverseInferenceEventHandler = new RecomputeInverseInferenceEventHandler(rdf, VOCABULARY_GRAPH_URI);
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, META_VOCABULARY_GRAPH_URI)),
                 new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
@@ -74,7 +73,7 @@ public class App {
                 new MetadataAndVocabularyConsistencyValidator(rdf),
                 new InverseForUsedPropertiesValidator(rdf)
         );
-        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator, recomputeInverseInferenceEventHandler);
+        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
