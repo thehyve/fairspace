@@ -98,8 +98,11 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     void patch(Model model) {
         commit("Update metadata", rdf, () -> {
             var toDelete = createDefaultModel();
-            model.listStatements().forEachRemaining(stmt ->
-                    toDelete.add(get(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), null, false)));
+            model.listStatements().forEachRemaining(stmt -> {
+                if (stmt.getSubject().isURIResource()) {
+                    toDelete.add(get(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), null, false));
+                }
+            });
 
             update(toDelete, model);
         });
