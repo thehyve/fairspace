@@ -39,11 +39,12 @@ public class App {
     public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, VOCABULARY_GRAPH_URI);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
+        initVocabularies(rdf);
 
         var eventBus = new EventBus();
 
@@ -57,8 +58,6 @@ public class App {
         var fs = new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions);
 
         var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
-
-        initVocabularies(rdf);
 
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, VOCABULARY_GRAPH_URI)),

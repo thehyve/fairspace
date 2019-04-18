@@ -3,7 +3,6 @@ package io.fairspace.saturn.rdf;
 import io.fairspace.saturn.Config;
 import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.commits.CommitMessages;
-import io.fairspace.saturn.rdf.inversion.InvertingDatasetGraph;
 import io.fairspace.saturn.rdf.search.AutoEntityDefinition;
 import io.fairspace.saturn.rdf.search.ElasticSearchClientFactory;
 import io.fairspace.saturn.rdf.search.ElasticSearchIndexConfigurer;
@@ -12,7 +11,6 @@ import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
@@ -32,10 +30,9 @@ public class SaturnDatasetFactory {
      * We're playing Russian dolls here.
      * The original TDB2 dataset graph, which in fact consists of a number of wrappers itself (Jena uses wrappers everywhere),
      * is wrapped with a number of wrapper classes, each adding a new feature.
-     * Currently it adds transaction logging, ElasticSearch indexing (if enabled),
-     * inverse properties' inference, and applies default vocabulary if needed.
+     * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config, Node inferenceGraphNode) throws IOException {
+    public static Dataset connect(Config.Jena config) throws IOException {
         var restoreNeeded = !config.datasetPath.exists();
 
         // Create a TDB2 dataset graph
@@ -69,9 +66,6 @@ public class SaturnDatasetFactory {
                 }
             }
         }
-
-        // Add property inversion
-        dsg = new InvertingDatasetGraph(dsg, inferenceGraphNode);
 
         // Create a dataset
         return DatasetFactory.wrap(dsg);
