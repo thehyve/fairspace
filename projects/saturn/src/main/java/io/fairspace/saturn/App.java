@@ -71,7 +71,8 @@ public class App {
                 new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, META_VOCABULARY_GRAPH_URI)),
                 new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
                 new SystemVocabularyProtectingValidator(),
-                new MetadataAndVocabularyConsistencyValidator(rdf)
+                new MetadataAndVocabularyConsistencyValidator(rdf),
+                new InverseForUsedPropertiesValidator(rdf)
         );
         var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator, recomputeInverseInferenceEventHandler);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
