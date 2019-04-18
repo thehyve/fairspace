@@ -21,6 +21,7 @@ import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataEntityLifeCycleManagerTest {
@@ -119,5 +120,22 @@ public class MetadataEntityLifeCycleManagerTest {
 
         verify(permissionsService).createResource(NodeFactory.createURI(resource.getURI()));
         verify(permissionsService).createResource(NodeFactory.createURI(otherResource.getURI()));
+    }
+
+    @Test
+    public void testMissingPermissionsService() {
+        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, () -> user);
+
+        Model delta = ModelFactory.createDefaultModel();
+        delta.add(resource, property, otherResource);
+
+        lifeCycleManager.updateLifecycleMetadata(delta);
+
+        // Ensure correct storage of creation information
+        assertTrue(model.contains(resource, createdBy, userResource));
+        assertTrue(model.contains(otherResource, createdBy, userResource));
+
+        // Ensure any permissions are ignored
+        verifyZeroInteractions(permissionsService);
     }
 }
