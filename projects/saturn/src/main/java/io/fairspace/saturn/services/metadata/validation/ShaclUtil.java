@@ -59,9 +59,9 @@ public class ShaclUtil {
                 inverse = true;
             }
         }
-        var pathStr = (path != null) ? ((inverse ? "inverse of " : "") + path) : "?";
-        var value = shResult.getProperty(SH.value);
-        var valueStr = (value != null) ? value.getObject().toString() : "?";
+        var pathStr = (path != null) ? ((inverse ? "inverse of " : "") + path) : "";
+        var valueStmt = shResult.getProperty(SH.value);
+        var valueStr = (valueStmt != null) ? valueStmt.getObject().toString() : "";
         return new ValidationResult(format("%s %s %s - %s", root, pathStr, valueStr, message));
     }
 
