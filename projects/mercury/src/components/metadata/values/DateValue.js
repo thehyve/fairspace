@@ -6,7 +6,7 @@ class DateValue extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {value: props.entry.value || undefined};
+        this.state = {value: props.entry.value || null};
     }
 
     componentDidUpdate(prevProps) {
