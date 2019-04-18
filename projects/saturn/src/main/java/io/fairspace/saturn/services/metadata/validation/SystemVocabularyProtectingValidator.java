@@ -1,11 +1,10 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.topbraid.shacl.vocabulary.SH;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 
 /**
  * Protects the system vocabulary from modification except to addition of new properties to open class shapes
