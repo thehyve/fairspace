@@ -28,6 +28,15 @@ class MetadataEntityLifeCycleManager {
     private final Supplier<Node> userIriSupplier;
     private final PermissionsService permissionsService;
 
+    /**
+     * Instantiates a lifecycle manager without a reference for the permissions
+     * @param rdf
+     * @param graph
+     * @param userIriSupplier
+     */
+    public MetadataEntityLifeCycleManager(RDFConnection rdf, Node graph, Supplier<Node> userIriSupplier) {
+        this(rdf, graph, userIriSupplier, null);
+    }
 
     /**
      * Stores statements regarding the lifecycle of the entities in this model
@@ -57,7 +66,9 @@ class MetadataEntityLifeCycleManager {
         if (!newEntities.isEmpty()) {
             rdf.load(graph.getURI(), generateCreationInformation(newEntities));
 
-            newEntities.forEach(resource -> permissionsService.createResource(resource.asNode()));
+            if(permissionsService != null) {
+                newEntities.forEach(resource -> permissionsService.createResource(resource.asNode()));
+            }
         }
     }
 

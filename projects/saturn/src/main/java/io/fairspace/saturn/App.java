@@ -57,14 +57,14 @@ public class App {
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions);
 
-        var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
+        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
         var metadataValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, VOCABULARY_GRAPH_URI)),
                 new PermissionCheckingValidator(rdf, permissions),
                 new ShaclValidator(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI));
 
-        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, metadataValidator);
+        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, metadataLifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, META_VOCABULARY_GRAPH_URI)),
@@ -73,7 +73,9 @@ public class App {
                 new MetadataAndVocabularyConsistencyValidator(rdf),
                 new InverseForUsedPropertiesValidator(rdf)
         );
-        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, lifeCycleManager, vocabularyValidator);
+        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, VOCABULARY_GRAPH_URI, userIriSupplier);
+
+        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
