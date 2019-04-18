@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -20,6 +19,7 @@ import org.topbraid.shacl.vocabulary.SH;
 import java.util.Set;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
@@ -43,7 +43,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Before
     public void setUp() {
-        new Vocabularies(rdf);
+        initVocabularies(rdf);;
 
         ds.getDefaultModel()
                 .add(subject, RDF.type, classResource)

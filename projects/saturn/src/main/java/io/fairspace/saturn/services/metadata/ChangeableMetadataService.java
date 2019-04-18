@@ -10,12 +10,12 @@ import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
-import org.apache.jena.vocabulary.OWL;
 
 import java.util.Collection;
 import java.util.List;
 
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
+import static io.fairspace.saturn.vocabulary.Vocabularies.getInverse;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -113,6 +113,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         modelToAdd.remove(unchanged);
         modelToAdd.removeAll(null, null, NIL);
 
+        applyInference(modelToRemove);
+        applyInference(modelToAdd);
+
         ensureValidParameters(modelToRemove, modelToAdd);
 
         rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove.listStatements().toList()))));
@@ -147,5 +150,21 @@ public class ChangeableMetadataService extends ReadableMetadataService {
                 .stream()
                 .map(s -> new Quad(graph, s.asTriple()))
                 .collect(toList());
+    }
+
+    private void applyInference(Model model) {
+        var toAdd = createDefaultModel();
+
+        model.listStatements().forEachRemaining(stmt -> {
+            if (stmt.getObject().isResource()) {
+                var inverse = getInverse(rdf, vocabulary, stmt.getPredicate());
+
+                if (inverse != null) {
+                    toAdd.add(stmt.getObject().asResource(), inverse, stmt.getSubject());
+                }
+            }
+        });
+
+        model.add(toAdd);
     }
 }

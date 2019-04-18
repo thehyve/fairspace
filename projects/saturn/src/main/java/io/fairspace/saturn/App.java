@@ -17,7 +17,6 @@ import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
-import io.fairspace.saturn.vocabulary.Vocabularies;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
@@ -32,8 +31,7 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
-import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
@@ -60,10 +58,10 @@ public class App {
 
         var lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
-        var vocabularies = new Vocabularies(rdf);
+        initVocabularies(rdf);
 
         var metadataValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(VOCABULARY_GRAPH_URI)),
+                new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, VOCABULARY_GRAPH_URI)),
                 new PermissionCheckingValidator(rdf, permissions),
                 new ShaclValidator(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI));
 
@@ -71,7 +69,7 @@ public class App {
 
         RecomputeInverseInferenceEventHandler recomputeInverseInferenceEventHandler = new RecomputeInverseInferenceEventHandler(rdf, VOCABULARY_GRAPH_URI);
         var vocabularyValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(() -> vocabularies.getMachineOnlyPredicates(META_VOCABULARY_GRAPH_URI)),
+                new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, META_VOCABULARY_GRAPH_URI)),
                 new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
                 new SystemVocabularyProtectingValidator(),
                 new MetadataAndVocabularyConsistencyValidator(rdf)

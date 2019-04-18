@@ -2,7 +2,6 @@ package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
@@ -30,8 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
@@ -73,9 +71,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                     .orElse(null);
         }
 
-        var processor = new QuerySolutionProcessor<>(this::fileInfo);
-        rdf.querySelect(storedQuery("fs_stat", path), processor);
-        return processor.getSingle().orElse(null);
+        return selectSingle(rdf, storedQuery("fs_stat", path), this::fileInfo).orElse(null);
     }
 
     @Override
@@ -87,9 +83,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                     .collect(toList());
         }
 
-        var processor = new QuerySolutionProcessor<>(this::fileInfo);
-        rdf.querySelect(storedQuery("fs_ls", path + '/'), processor);
-        return processor.getValues()
+        return select(rdf, storedQuery("fs_ls", path + '/'), this::fileInfo)
                 .stream()
                 .filter(Objects::nonNull)
                 .collect(toList());
@@ -138,9 +132,9 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
-        var processor = new QuerySolutionProcessor<>(row -> row.getLiteral("blobId").getString());
-        rdf.querySelect(storedQuery("fs_get_blobid", path), processor);
-        var blobId = processor.getSingle().orElseThrow(() -> new FileNotFoundException(path));
+        var blobId = selectSingle(rdf, storedQuery("fs_get_blobid", path),
+                row -> row.getLiteral("blobId").getString())
+                .orElseThrow(() -> new FileNotFoundException(path));
         store.read(blobId, out);
     }
 

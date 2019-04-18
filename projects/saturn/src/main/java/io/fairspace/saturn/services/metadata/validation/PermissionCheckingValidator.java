@@ -6,8 +6,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 
-import static io.fairspace.saturn.services.metadata.validation.InversionUtils.getAffectedResources;
-
 @AllArgsConstructor
 public class PermissionCheckingValidator implements MetadataRequestValidator {
     private final RDFConnection rdf;
@@ -15,7 +13,9 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        return getAffectedResources(rdf, modelToRemove.union(modelToAdd))
+        return modelToRemove.union(modelToAdd)
+                .listSubjects()
+                .toSet()
                 .stream()
                 .filter(Resource::isURIResource)
                 .map(this::validateResource)

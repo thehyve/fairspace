@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.permissions;
 
-import io.fairspace.saturn.rdf.QuerySolutionProcessor;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
@@ -20,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.selectSingle;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
@@ -68,9 +68,9 @@ public class PermissionsServiceImpl implements PermissionsService {
     public Access getPermission(Node resource) {
         return calculateRead(rdf, () -> {
             var authority = getAuthority(resource);
-            var processor = new QuerySolutionProcessor<>(PermissionsServiceImpl::getAccess);
-            rdf.querySelect(storedQuery("permissions_get_for_user", authority, userService.getCurrentUser().getIri()), processor);
-            return processor.getSingle().orElseGet(() -> defaultAccess(authority));
+            return selectSingle(rdf, storedQuery("permissions_get_for_user", authority, userService.getCurrentUser().getIri()),
+                    PermissionsServiceImpl::getAccess)
+                    .orElseGet(() -> defaultAccess(authority));
         });
     }
 
@@ -132,9 +132,9 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @return an authoritative resource for the given resource: currently either the parent collection (for files and directories) or the resource itself
      */
     private Node getAuthority(Node resource) {
-        var processor = new QuerySolutionProcessor<>(row -> row.getResource("collection").asNode());
-        rdf.querySelect(storedQuery("get_parent_collection", resource), processor);
-        return processor.getSingle().orElse(resource);
+        return selectSingle(rdf, storedQuery("get_parent_collection", resource),
+                row -> row.getResource("collection").asNode())
+                .orElse(resource);
     }
 
     private void notifyUser(Node user, Node resource, Access access) {
