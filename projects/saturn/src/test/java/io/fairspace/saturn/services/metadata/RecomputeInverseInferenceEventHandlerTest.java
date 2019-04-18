@@ -15,11 +15,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.topbraid.shacl.vocabulary.SH;
 
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RecomputeInverseInferenceEventHandlerTest {
     RecomputeInverseInferenceEventHandler eventHandler;
