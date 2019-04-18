@@ -2,6 +2,9 @@ import React from 'react';
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
+import DateFnsUtils from "@date-io/date-fns";
+import {MuiPickersUtilsProvider} from "material-ui-pickers";
+
 import {fetchAuthorizations, fetchUser} from "../actions/accountActions";
 import {fetchUsers, fetchWorkspace} from "../actions/workspaceActions";
 import configureStore from "../store/configureStore";
@@ -47,15 +50,17 @@ class App extends React.Component {
     render() {
         if (this.state.configLoaded) {
             return (
-                <MuiThemeProvider theme={theme}>
-                    <Provider store={this.store}>
-                        <ErrorDialog>
-                            <Router>
-                                <Layout />
-                            </Router>
-                        </ErrorDialog>
-                    </Provider>
-                </MuiThemeProvider>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <MuiThemeProvider theme={theme}>
+                        <Provider store={this.store}>
+                            <ErrorDialog>
+                                <Router>
+                                    <Layout />
+                                </Router>
+                            </ErrorDialog>
+                        </Provider>
+                    </MuiThemeProvider>
+                </MuiPickersUtilsProvider>
             );
         }
         return <LoadingInlay />;
