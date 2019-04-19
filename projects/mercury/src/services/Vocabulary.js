@@ -117,7 +117,7 @@ class Vocabulary {
     /**
      * Returns a list of classes marked as fairspace entities
      */
-    getFairspaceClasses() {
+    getClassesInCatalog() {
         return this.vocabulary
             .filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI));
     }
@@ -130,8 +130,7 @@ class Vocabulary {
             return false;
         }
 
-        return this.vocabulary
-            .filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI))
+        return this.getClassesInCatalog()
             .some(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
     }
 

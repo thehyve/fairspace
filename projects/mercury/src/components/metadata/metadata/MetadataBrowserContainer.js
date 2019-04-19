@@ -23,7 +23,7 @@ const mapStateToProps = (state) => {
     return ({
         loading: pending,
         error: allEntities ? allEntities.error : false,
-        shapes: vocabulary.getFairspaceClasses(),
+        shapes: vocabulary.getClassesInCatalog(),
         valueComponentFactory: MetadataValueComponentFactory,
         vocabulary,
         entities,
