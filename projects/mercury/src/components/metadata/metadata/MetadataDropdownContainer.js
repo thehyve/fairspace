@@ -1,6 +1,18 @@
+import React from 'react';
 import {connect} from 'react-redux';
 import * as metadataActions from "../../../actions/metadataActions";
 import EntityDropdown from "../common/values/EntityDropdown";
+
+class MetadataDropdownContainer extends React.Component {
+    constructor(props) {
+        super(props);
+        props.fetchEntities(props.property.className);
+    }
+
+    render() {
+        return <EntityDropdown {...this.props} />;
+    }
+}
 
 const mapStateToProps = (state, ownProps) => {
     const {cache: {entitiesByType}} = state;
@@ -21,4 +33,4 @@ const mapDispatchToProps = ({
     fetchEntities: metadataActions.fetchEntitiesIfNeeded
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(EntityDropdown);
+export default connect(mapStateToProps, mapDispatchToProps)(MetadataDropdownContainer);
