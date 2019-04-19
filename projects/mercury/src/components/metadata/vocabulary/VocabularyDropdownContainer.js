@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from 'react-redux';
-import * as metadataActions from "../../../actions/metadataActions";
+import * as vocabularyActions from "../../../actions/vocabularyActions";
 import EntityDropdown from "../common/values/EntityDropdown";
 
 class VocabularyDropdownContainer extends React.Component {
@@ -15,8 +15,8 @@ class VocabularyDropdownContainer extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {cache: {entitiesByType}} = state;
-    const dropdownOptions = entitiesByType[ownProps.property.className];
+    const {cache: {vocabularyEntitiesByType}} = state;
+    const dropdownOptions = vocabularyEntitiesByType[ownProps.property.className];
     const pending = !dropdownOptions || dropdownOptions.pending;
     const error = (dropdownOptions && dropdownOptions.error) || '';
 
@@ -30,7 +30,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = ({
-    fetchEntities: metadataActions.fetchEntitiesIfNeeded
+    fetchEntities: vocabularyActions.fetchVocabularyEntitiesIfNeeded
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(VocabularyDropdownContainer);
