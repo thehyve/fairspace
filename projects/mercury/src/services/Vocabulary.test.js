@@ -1,5 +1,6 @@
 import Vocabulary from './Vocabulary';
 import vocabularyJsonLd from './test.vocabulary.json';
+import * as constants from "../constants";
 
 const vocabulary = new Vocabulary(vocabularyJsonLd);
 describe('Vocabulary', () => {
@@ -379,5 +380,33 @@ describe('Vocabulary', () => {
         it('should return false on invalid URI', () => expect(vocabulary.contains('invalid-uri')).toBe(false));
         it('should return false on invalid parameter', () => expect(vocabulary.contains()).toBe(false));
         it('should return false if URI is only referred to in vocabulary', () => expect(vocabulary.contains('http://fairspace.io/ontology#Collection')).toBe(false));
+    });
+
+    describe('isRdfList', () => {
+        const rdfListShape = {
+            [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
+        };
+
+        const nonRdfListShape = {
+            [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}]
+        };
+
+        it('should return true if the given shape is an rdf list', () => expect(Vocabulary.isRdfList(rdfListShape)).toBe(true));
+        it('should return false if the given shape is not an rdf list', () => expect(Vocabulary.isRdfList(nonRdfListShape)).toBe(false));
+        it('should return false on an empty shape', () => expect(Vocabulary.isRdfList({})).toBe(false));
+    });
+
+    describe('isGenericResourceIri', () => {
+        const genericResourceShape = {
+            [constants.SHACL_NODEKIND]: [{'@id': constants.SHACL_IRI}]
+        };
+
+        const nonGenericResourceShape = {
+            [constants.SHACL_NODEKIND]: [{'@id': constants.STRING_URI}]
+        };
+
+        it('should return true if the given shape represents a generic iri resource', () => expect(Vocabulary.isGenericIriResource(genericResourceShape)).toBe(true));
+        it('should return false if the given shape does not represent a generic iri resource', () => expect(Vocabulary.isGenericIriResource(nonGenericResourceShape)).toBe(false));
+        it('should return false on an empty shape', () => expect(Vocabulary.isGenericIriResource({})).toBe(false));
     });
 });

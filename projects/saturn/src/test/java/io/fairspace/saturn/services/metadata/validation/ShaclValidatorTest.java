@@ -15,6 +15,8 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
@@ -56,10 +58,10 @@ public class ShaclValidatorTest {
                 .add(resource1, RDFS.comment, createTypedLiteral(123)));
 
         assertFalse(result.isValid());
-        assertEquals(2, result.getValidationMessages().size());
-        assertTrue(result.getValidationMessages().contains("http://example.com/123 http://www.w3.org/2000/01/rdf-schema#label: Value does not have datatype xsd:string."));
-        assertTrue(result.getValidationMessages().contains("http://example.com/123 http://www.w3.org/2000/01/rdf-schema#comment: Value does not have datatype xsd:string."));
-    }
+        assertEquals(Set.of("http://example.com/123 http://www.w3.org/2000/01/rdf-schema#comment 123^^http://www.w3.org/2001/XMLSchema#int - Value does not have datatype xsd:string.",
+                "http://example.com/123 http://www.w3.org/2000/01/rdf-schema#label 123^^http://www.w3.org/2001/XMLSchema#int - Value does not have datatype xsd:string."),
+                result.getValidationMessages());
+     }
 
     @Test
     public void validateResourceWithUnknownProperty() {
@@ -68,7 +70,7 @@ public class ShaclValidatorTest {
                 .add(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123)));
 
         assertFalse(result.isValid());
-        assertEquals("http://example.com/123 http://example.com#unknown: Predicate <http://example.com#unknown> is not allowed (closed shape).", result.getMessage());
+        assertEquals("http://example.com/123 http://example.com#unknown 123^^http://www.w3.org/2001/XMLSchema#int - Predicate <http://example.com#unknown> is not allowed (closed shape).", result.getMessage());
     }
 
     @Test
@@ -77,7 +79,7 @@ public class ShaclValidatorTest {
                 .add(resource1, RDF.type, FS.File));
 
         assertFalse(result.isValid());
-        assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath: Less than 1 values.", result.getMessage());
+        assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath  - Less than 1 values.", result.getMessage());
     }
 
     @Test
@@ -86,7 +88,7 @@ public class ShaclValidatorTest {
                 .add(resource1, RDF.type, FS.File));
 
         assertFalse(result.isValid());
-        assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath: Less than 1 values.", result.getMessage());
+        assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath  - Less than 1 values.", result.getMessage());
     }
 
     @Test
@@ -109,6 +111,6 @@ public class ShaclValidatorTest {
 
         var result2 = validator.validate(EMPTY, model);
         assertFalse(result2.isValid());
-        assertEquals("http://example.com/123 http://fairspace.io/ontology#createdBy: Value does not have class fs:User.", result2.getMessage());
+        assertEquals("http://example.com/123 http://fairspace.io/ontology#createdBy http://example.com/234 - Value does not have class fs:User.", result2.getMessage());
     }
 }

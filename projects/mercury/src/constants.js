@@ -22,7 +22,6 @@ export const DASH_NS = 'http://datashapes.org/dash#';
 
 // URIs
 export const TYPE_URI = RDF_NS + 'type';
-export const LIST_URI = RDF_NS + 'List';
 export const LABEL_URI = RDFS_NS + 'label';
 export const COMMENT_URI = RDFS_NS + 'comment';
 
@@ -33,10 +32,12 @@ export const SHACL_TARGET_CLASS = SHACL_NS + 'targetClass';
 export const SHACL_PROPERTY = SHACL_NS + 'property';
 export const SHACL_CLASS = SHACL_NS + 'class';
 export const SHACL_NODE = SHACL_NS + 'node';
+export const SHACL_NODEKIND = SHACL_NS + 'nodeKind';
 export const SHACL_DATATYPE = SHACL_NS + 'datatype';
 export const SHACL_MAX_COUNT = SHACL_NS + 'maxCount';
 export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
 export const SHACL_IN = SHACL_NS + 'in';
+export const SHACL_IRI = SHACL_NS + 'IRI';
 
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
 
@@ -47,7 +48,6 @@ export const DATE_URI = XMLSCHEMA_NS + 'date';
 export const TIME_URI = XMLSCHEMA_NS + 'time';
 export const INTEGER_URI = XMLSCHEMA_NS + 'integer';
 export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
-export const RESOURCE_URI = RDFS_NS + 'Resource';
 
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
 export const SHOW_IN_CATALOG_URI = FAIRSPACE_NS + 'showInCatalog';

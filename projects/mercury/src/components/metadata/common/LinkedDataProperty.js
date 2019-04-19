@@ -1,13 +1,9 @@
 import React from 'react';
 import PropTypes from "prop-types";
 
-import {
-    List, ListItem, Typography, IconButton,
-    ListItemSecondaryAction, ListItemText
-} from '@material-ui/core';
+import {IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Typography} from '@material-ui/core';
 
 import ClearIcon from '@material-ui/icons/Clear';
-import * as constants from '../../../constants';
 
 class LinkedDataProperty extends React.Component {
     state = {
@@ -116,7 +112,7 @@ class LinkedDataProperty extends React.Component {
      */
     static disallowEditingOfExistingValues(property) {
         return property.machineOnly
-            || property.className === constants.RESOURCE_URI
+            || property.isGenericIriResource
             || property.allowedValues;
     }
 }
