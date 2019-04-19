@@ -124,11 +124,17 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:name "Property identifier" ;
         fs:showInTable true ;
         sh:order 3
+    ], [
+        sh:maxCount 1 ;
+        sh:path sh:nodeKind ;
+        sh:name "Property node kind" ;
     ] ;
     sh:or ( 
         [ sh:path sh:in ; 
           sh:minCount 1  ] 
-        [ sh:path sh:datatype ; 
+        [ sh:path sh:nodeKind ;
+          sh:minCount 1  ]
+        [ sh:path sh:datatype ;
           sh:minCount 1  ]
       ) ; 
     fs:showInCatalog true ;

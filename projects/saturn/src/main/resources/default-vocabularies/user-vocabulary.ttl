@@ -138,6 +138,7 @@ fs:CollectionShape sh:property
         <booleanWidgetShape>,
         <booleanX4WidgetShape>,
         <fixedDropdownWidgetShape>,
+        <resourceWidgetShape>,
         rdfs:labelShape,
         rdfs:commentShape .
 
@@ -205,6 +206,14 @@ fs:CollectionShape sh:property
     sh:in ( "E" "A" "D" "G" "B" "E" ) ; 
     sh:maxCount 2 ;
     sh:path <fixedDropdownWidget> .
+
+<resourceWidget> a rdf:Property .
+<resourceWidgetShape> a fs:PropertyShape ;
+    sh:name "Resource" ;
+    sh:description "Some URL" ;
+    sh:nodeKind sh:IRI ;
+    sh:maxCount 5 ;
+    sh:path <resourceWidget> .
 
 <projectCodeShape> a fs:PropertyShape ;
     sh:name "Project Code" ;
