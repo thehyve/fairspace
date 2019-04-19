@@ -38,7 +38,7 @@ Additional `:8080/api/metadata/entities/` and `:8080/api/vocabulary/entities/` e
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                      |
 |-------------|---------------------------------------------------|---------------------------|----------------------------------------------------------------------- |
-| GET         | type (optional, URL-encoded)                      | -                         | Returns JsonLD-encoded modetaining FairSpace entities and their labels |
+| GET         | type (optional, URL-encoded), catalog (boolean, optional)  | -                         | Returns JsonLD-encoded model containing entities and their labels, filtered on type and on `fs:showInCatalog` | 
 
 ### Vocabulary API
 

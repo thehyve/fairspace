@@ -32,7 +32,7 @@ const mapStateToProps = (state) => {
         loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
         error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
         editable: isDataSteward(getAuthorizations(state), Config.get()),
-        shapes: metaVocabulary.getFairspaceClasses(),
+        shapes: metaVocabulary.getClassesInCatalog(),
         vocabulary: metaVocabulary,
         valueComponentFactory: VocabularyValueComponentFactory,
         entities
