@@ -9,15 +9,15 @@
 
 fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of classes." ;
-    sh:name "Class Shape Meta" ;
+    sh:description "Shape of classes." ;
+    sh:name "Class Shape" ;
     sh:property [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ; 
-        sh:name "Class shape name"
+        sh:name "Class name"
     ], [
         # This means every value for predicate sh:property should have this type.
         sh:class sh:PropertyShape ;
@@ -26,13 +26,6 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:name "Properties" ; 
         sh:description "List of all properties and relations for this class." ;
         fs:showAsTable true
-    ], [
-        sh:value false ;
-        sh:datatype xsd:boolean ;
-        sh:maxCount 1 ;
-        sh:path sh:closed ;
-        sh:description "sh:closed should be false." ;
-        sh:name "Closed"
     ], [
         # This nodeKind restriction could be replaced by something like
         # sh:class fs:Class. Currently that restriction will limit our
@@ -51,30 +44,25 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:name "Class description"
     ], [
         sh:datatype xsd:boolean ;
-        sh:path fs:fixedShape ;
-        fs:machineOnly true ;
-        sh:name "Fixed shape" ;
-        sh:description "If this is true, a user can not make changes to this shape definiton, except for properties not included in fs:systemProperties."
-    ], [
-        sh:path fs:systemProperties ;
-        fs:machineOnly true ;
-        sh:name "System properties" ;
-        sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties."
-    ], [
-        sh:datatype xsd:boolean ;
         sh:maxCount 1 ;
         sh:path fs:showInCatalog ;
         sh:name "Show in catalog" ;
         sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
+    sh:not [
+        sh:hasValue true ;
+        sh:path sh:closed ;
+        sh:description "A fs:ClassShape shape cannot be defined as sh:closed."
+    ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message 
+                           fs:fixedShape fs:systemProperties sh:closed ) .
 
 fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of FS defined properties." ;
-    sh:name "Property Shape Meta" ;
+    sh:description "Shape of FS defined properties." ;
+    sh:name "Property Shape" ;
     sh:property [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -136,17 +124,6 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:name "Property identifier" ;
         fs:showInTable true ;
         sh:order 3
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:machineOnly ;
-        sh:name "Machine edits only" ;
-        sh:description "Users should not be able to change the value of any value node of this shape."
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:fixedShape ;
-        fs:machineOnly true ; 
-        sh:name "Fixed shape" ;
-        sh:description "If this is true, a user can not make changes to this shape definiton."
     ] ;
     sh:or ( 
         [ sh:path sh:in ; 
@@ -156,12 +133,13 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
       ) ; 
     fs:showInCatalog true ;
     sh:targetClass fs:PropertyShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties 
+                           sh:message fs:fixedShape fs:machineOnly ) .
 
 fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of FS defined relations." ;
-    sh:name "Relation Shape Meta" ;
+    sh:description "Shape of FS defined relations." ;
+    sh:name "Relation Shape" ;
     sh:property 
         fs:inverseRelationShape, 
     [
@@ -211,21 +189,11 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:name "Relation name" ;
         fs:showInTable true ;
         sh:order 0
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:machineOnly ;
-        sh:name "Machine edits only" ;
-        sh:description "Users should not be able to change the value of any value node of this shape."
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:path fs:fixedShape ;
-        fs:machineOnly true ; 
-        sh:name "Fixed shape" ;
-        sh:description "If this is true, a user can not make changes to this shape definiton."
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message ) .
+    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties 
+                           sh:message fs:fixedShape fs:machineOnly ) .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
@@ -235,3 +203,23 @@ fs:inverseRelationShape a fs:RelationShape ;
     sh:name "Inverse relation" ;
     sh:description "An inverse relation has at most a single relation shape instance as value. A shape with sh:path P1 and fs:inverseRelationShape S2 with sh:path P2 has equivalent meaning as P1 owl:inverseOf P2." ;
     sh:path fs:inverseRelation . 
+
+fs:fixedShapeShape a fs:PropertyShape ;
+    sh:datatype xsd:boolean ;
+    sh:path fs:fixedShape ;
+    fs:machineOnly true ; 
+    sh:name "Fixed shape" ;
+    sh:description "If this is true, a user can not make changes to this shape definition." .
+
+fs:machineOnlyShape a fs:PropertyShape ; 
+    sh:datatype xsd:boolean ;
+    sh:path fs:machineOnly ;
+    fs:machineOnly true ;
+    sh:name "Machine edits only" ;
+    sh:description "Users should not be able to change the value of any value node of this shape." .
+
+fs:systemPropertiesShape a fs:PropertyShape ;
+    sh:path fs:systemProperties ;
+    fs:machineOnly true ;
+    sh:name "System properties" ;
+    sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties." .

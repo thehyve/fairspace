@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.lang.String.format;
 import static java.time.Instant.now;

@@ -24,7 +24,7 @@ class LinkedDataProperty extends React.Component {
 
         return (
             <div
-                key={property.key + entry.id || entry.value}
+                key={idx}
                 onMouseEnter={() => this.setHoveredIndex(idx)}
                 onMouseLeave={() => this.setHoveredIndex(null)}
             >
