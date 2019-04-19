@@ -12,6 +12,13 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static java.lang.String.format;
 import static org.topbraid.spin.util.JenaUtil.getResourceProperty;
 
+/**
+ * Ensures that no changes are made to fs:inverseRelation in the vocabulary that
+ * would break the metadata validity.
+ *
+ * More specifically, it will disallow additions of fs:inverseRelation where the specific
+ * property has already been used in the metadata.
+ */
 @AllArgsConstructor
 public class InverseForUsedPropertiesValidator implements MetadataRequestValidator {
     private final RDFConnection rdf;
