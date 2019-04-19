@@ -105,6 +105,17 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
                 result.getValidationMessages());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidationOnInvalidTargetClass() {
+        Resource invalidResource = createResource(NS + "InvalidResource");
+
+        var invalidTargetClassModel = createDefaultModel()
+                .add(invalidResource, RDF.type, FS.ClassShape)
+                .add(invalidResource, SH.targetClass, "some-literal");
+
+        apply(invalidTargetClassModel);
+    }
+
     private ValidationResult apply(Model changes) {
         var result = validator.validate(EMPTY, changes);
         if (result.isValid()) {
