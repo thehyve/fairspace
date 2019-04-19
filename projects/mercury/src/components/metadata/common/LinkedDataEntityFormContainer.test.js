@@ -7,11 +7,17 @@ import Vocabulary from "../../../services/Vocabulary";
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
 import {STRING_URI} from "../../../constants";
+import StringValue from "./values/StringValue";
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
 
 describe('LinkedDataEntityFormContainer', () => {
+    const mockComponentFactory = {
+        addComponent: () => StringValue,
+        editComponent: () => StringValue
+    };
+
     it('combines the original metadata with the updates', () => {
         const properties = [{
             key: "http://www.w3.org/2000/01/rdf-schema#comment",
@@ -62,6 +68,7 @@ describe('LinkedDataEntityFormContainer', () => {
             properties={properties}
             fetchShapes={fetchVocabulary}
             fetchLinkedData={fetchMetadata}
+            valueComponentFactory={mockComponentFactory}
         />);
 
         const formProperties = wrapper.find(LinkedDataEntityForm).prop('properties');
@@ -93,6 +100,7 @@ describe('LinkedDataEntityFormContainer', () => {
             store={store}
             fetchShapes={fetchVocabulary}
             fetchLinkedData={fetchMetadata}
+            valueComponentFactory={mockComponentFactory}
         />);
 
         expect(fetchMetadata.mock.calls.length).toEqual(1);

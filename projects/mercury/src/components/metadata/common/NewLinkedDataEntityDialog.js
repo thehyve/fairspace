@@ -11,6 +11,22 @@ class NewLinkedDataEntityDialog extends React.Component {
         id: generateUuid()
     };
 
+    componentDidUpdate(prevProps) {
+        // Reset form key and new identifier when the
+        // dialog opens to prevent reusing the same
+        // identifier
+        if (!prevProps.open && this.props.open) {
+            this.resetDialog();
+        }
+    }
+
+    resetDialog() {
+        this.setState({
+            formKey: generateUuid(),
+            id: generateUuid()
+        });
+    }
+
     closeDialog = (e) => {
         if (e) e.stopPropagation();
         this.props.onClose();
@@ -52,6 +68,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                     <LinkedDataEntityFormContainer
                         formKey={this.state.formKey}
                         properties={linkedData}
+                        valueComponentFactory={this.props.valueComponentFactory}
                     />
 
                 </DialogContent>
@@ -87,7 +104,8 @@ NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    open: PropTypes.bool
+    open: PropTypes.bool,
+    valueComponentFactory: PropTypes.object
 };
 
 export default NewLinkedDataEntityDialog;

@@ -1,12 +1,9 @@
 import React from 'react';
-import {
-    List, ListItem, Typography, IconButton,
-    ListItemSecondaryAction, ListItemText
-} from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import PropTypes from "prop-types";
 
-import ValueComponentFactory from "../values/ValueComponentFactory";
-import * as constants from '../../../constants';
+import {IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Typography} from '@material-ui/core';
+
+import ClearIcon from '@material-ui/icons/Clear';
 
 class LinkedDataProperty extends React.Component {
     state = {
@@ -59,7 +56,7 @@ class LinkedDataProperty extends React.Component {
 
     renderAddComponent = (labelledBy) => {
         const {property, onAdd} = this.props;
-        const ValueAddComponent = ValueComponentFactory.addComponent(property);
+        const ValueAddComponent = this.props.valueComponentFactory.addComponent(property);
 
         return (
             <ListItem key="add-component-key">
@@ -88,8 +85,8 @@ class LinkedDataProperty extends React.Component {
         // or if the property contains settings that disallow editing existing values
         const disableEditing = !editable || LinkedDataProperty.disallowEditingOfExistingValues(property);
         const ValueComponent = disableEditing
-            ? ValueComponentFactory.readOnlyComponent()
-            : ValueComponentFactory.editComponent(property);
+            ? this.props.valueComponentFactory.readOnlyComponent()
+            : this.props.valueComponentFactory.editComponent(property);
 
         return (
             <ListItem disableGutters style={{display: 'block'}}>
@@ -115,14 +112,25 @@ class LinkedDataProperty extends React.Component {
      */
     static disallowEditingOfExistingValues(property) {
         return property.machineOnly
-            || property.className === constants.RESOURCE_URI
+            || property.isGenericIriResource
             || property.allowedValues;
     }
 }
 
+LinkedDataProperty.propTypes = {
+    onChange: PropTypes.func,
+    editable: PropTypes.bool,
+    property: PropTypes.object,
+
+    valueComponentFactory: PropTypes.shape({
+        editComponent: PropTypes.func,
+        addComponent: PropTypes.func,
+        readOnlyComponent: PropTypes.func
+    }).isRequired
+}
 LinkedDataProperty.defaultProps = {
     onChange: () => {},
-    editable: true
+    editable: true,
 };
 
 export default LinkedDataProperty;

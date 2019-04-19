@@ -4,7 +4,8 @@ import {connect} from "react-redux";
 import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
 import {getLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 import {
-    addLinkedDataValue, deleteLinkedDataValue,
+    addLinkedDataValue,
+    deleteLinkedDataValue,
     initializeLinkedDataForm,
     updateLinkedDataValue
 } from "../../../actions/linkedDataFormActions";
@@ -49,6 +50,7 @@ class LinkedDataEntityFormContainer extends React.Component {
                 editable={this.props.editable}
 
                 properties={propertiesWithChanges}
+                valueComponentFactory={this.props.valueComponentFactory}
             />
         );
     }
@@ -71,11 +73,14 @@ LinkedDataEntityFormContainer.propTypes = {
     formKey: PropTypes.string.isRequired,
 
     properties: PropTypes.array,
-    updates: PropTypes.object
+    updates: PropTypes.object,
+
+    valueComponentFactory: PropTypes.object.isRequired
 };
 
 LinkedDataEntityFormContainer.defaultProps = {
     fetchShapes: () => {},
+    fetchLinkedData: () => {},
 
     onAdd: () => {},
     onChange: () => {},

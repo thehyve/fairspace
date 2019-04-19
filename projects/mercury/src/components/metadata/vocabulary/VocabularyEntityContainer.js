@@ -15,6 +15,7 @@ import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/meta
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
+import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 
 const VocabularyEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -27,7 +28,13 @@ const VocabularyEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataEntityFormContainer editable={editable} subject={subject} fetchLinkedData={() => fetchLinkedData(subject)} {...otherProps} />
+                <LinkedDataEntityFormContainer
+                    editable={editable}
+                    formKey={subject}
+                    valueComponentFactory={VocabularyValueComponentFactory}
+                    fetchLinkedData={() => fetchLinkedData(subject)}
+                    {...otherProps}
+                />
             </Grid>
             {
                 editable
@@ -81,7 +88,6 @@ const mapStateToProps = (state, ownProps) => {
         buttonDisabled,
         vocabulary: metaVocabulary
     };
-
 };
 
 const mapDispatchToProps = (dispatch) => ({

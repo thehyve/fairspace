@@ -12,6 +12,7 @@ import {createVocabularyIri, getFirstPredicateId, getLabel, relativeLink} from "
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import * as constants from "../../../constants";
+import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 
 const mapStateToProps = (state) => {
     const vocabularyEntities = getVocabularyEntities(state);
@@ -29,6 +30,7 @@ const mapStateToProps = (state) => {
         error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
         shapes: metaVocabulary.getFairspaceClasses(),
         vocabulary: metaVocabulary,
+        valueComponentFactory: VocabularyValueComponentFactory,
         entities
     });
 };

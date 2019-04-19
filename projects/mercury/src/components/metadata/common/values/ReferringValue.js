@@ -1,8 +1,7 @@
 import React from 'react';
-import {isDateTimeProperty} from "../../../utils/metadataUtils";
-import DateTime from "../../common/DateTime";
-import {RESOURCE_URI} from "../../../constants";
-import LinkedDataLink from "../common/LinkedDataLink";
+import {isDateTimeProperty} from "../../../../utils/metadataUtils";
+import DateTime from "../../../common/DateTime";
+import LinkedDataLink from "../LinkedDataLink";
 
 function linkLabel(link) {
     return link
@@ -18,7 +17,7 @@ const ReferringValue = ({property, entry}) => {
         return extractedVal;
     }
 
-    const displayValue = (property.className === RESOURCE_URI) ? entry.id : extractDisplayValue(entry);
+    const displayValue = property.isGenericIriResource ? entry.id : extractDisplayValue(entry);
 
     if (entry.id) {
         return (

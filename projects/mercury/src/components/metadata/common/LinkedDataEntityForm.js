@@ -29,6 +29,7 @@ export const LinkedDataEntityForm = props => {
                         onChange={(value, index) => props.onChange(p, value, index)}
                         onAdd={(value) => props.onAdd(p, value)}
                         onDelete={(index) => props.onDelete(p, index)}
+                        valueComponentFactory={props.valueComponentFactory}
                     />
                 ))
             }
@@ -46,7 +47,9 @@ LinkedDataEntityForm.propTypes = {
     loading: PropTypes.bool,
     editable: PropTypes.bool,
 
-    properties: PropTypes.array
+    properties: PropTypes.array,
+
+    valueComponentFactory: PropTypes.object
 };
 
 LinkedDataEntityForm.defaultProps = {
