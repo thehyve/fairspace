@@ -5,12 +5,12 @@ class ResourceValue extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {value: props.entry.id || '', oldValue: props.entry.id || ''};
+        this.state = {value: props.entry.id || ''};
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.entry.id !== prevProps.entry.id) {
-            this.updateState();
+            this.resetState();
         }
     }
 
@@ -22,12 +22,12 @@ class ResourceValue extends React.Component {
         try {
             this.props.onChange({id: new URL(this.state.value).toString()});
         } catch (e) {
-            this.setState(prevState => ({value: prevState.oldValue}));
+            this.resetState();
         }
     };
 
-    updateState = () => {
-        this.setState({value: this.props.entry.id, oldValue: this.props.entry.id});
+    resetState = () => {
+        this.setState({value: this.props.entry.id || ''});
     }
 
     render() {
