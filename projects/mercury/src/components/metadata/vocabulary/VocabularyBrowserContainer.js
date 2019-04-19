@@ -28,7 +28,7 @@ const mapStateToProps = (state) => {
     return ({
         loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
         error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
-        shapes: metaVocabulary.getFairspaceClasses(),
+        shapes: metaVocabulary.getClassesInCatalog(),
         vocabulary: metaVocabulary,
         valueComponentFactory: VocabularyValueComponentFactory,
         entities
