@@ -17,5 +17,8 @@ import java.util.Map;
 public class FrontendConfig {
     // Map with urls for external applications
     private Map<String, String> urls = new HashMap<>();
+
+    // Map with role names user in the frontend
+    private Map<String, String> roles = new HashMap<>();
 }
 
