@@ -74,7 +74,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         result = validator.validate(EMPTY, setMaxLength);
         assertFalse(result.isValid());
-        assertEquals(Set.of("http://example.com/testSubject http://example.com/testProperty: Value has more than 2 characters."),
+        assertEquals(Set.of("http://example.com/testSubject http://example.com/testProperty 123 - Value has more than 2 characters."),
                 result.getValidationMessages());
     }
 
@@ -89,7 +89,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         var result = apply(addRelationShape);
         assertFalse(result.isValid());
-        assertEquals(Set.of("http://example.com/testSubject http://example.com/testRelation: Value does not have class <http://xmlns.com/foaf/0.1/Document>."),
+        assertEquals(Set.of("http://example.com/testSubject http://example.com/testRelation http://example.com/testObject - Value does not have class <http://xmlns.com/foaf/0.1/Document>."),
                 result.getValidationMessages());
     }
 
@@ -100,8 +100,8 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         var result = apply(markAsClosed);
         assertFalse(result.isValid());
-        assertEquals(Set.of("http://example.com/testSubject http://example.com/testRelation: Predicate <http://example.com/testRelation> is not allowed (closed shape).",
-                "http://example.com/testSubject http://www.w3.org/1999/02/22-rdf-syntax-ns#type: Predicate <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> is not allowed (closed shape)."),
+        assertEquals(Set.of("http://example.com/testSubject http://example.com/testRelation http://example.com/testObject - Predicate <http://example.com/testRelation> is not allowed (closed shape).",
+                "http://example.com/testSubject http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://example.com/TestClass - Predicate <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> is not allowed (closed shape)."),
                 result.getValidationMessages());
     }
 

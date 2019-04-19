@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vocabulary;
 
+import io.fairspace.saturn.services.metadata.validation.ValidationResult;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -15,10 +16,10 @@ import java.util.List;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
 import static io.fairspace.saturn.vocabulary.Vocabularies.*;
+import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getValidationResult;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
-import static org.topbraid.shacl.util.SHACL2SPINBridge.createConstraintViolations;
 
 public class VocabulariesTest {
     private static final Model SHACL_FOR_SHACL = FileManager.get().loadModel("default-vocabularies/shacl-shacl.ttl");
@@ -62,16 +63,8 @@ public class VocabulariesTest {
 
     private void validate(Model dataModel, Model shapesModel) throws InterruptedException {
         var engine = createEngine(dataModel, shapesModel);
-        var report = engine.validateAll();
-        var violations = createConstraintViolations(report.getModel());
-
-        // Show validation errors on failure
-        if(!violations.isEmpty()) {
-            System.err.println("Validation errors");
-            report.getModel().listStatements().forEachRemaining(System.err::println);
-        }
-
-        assertTrue(violations.isEmpty());
+        engine.validateAll();
+        assertEquals(ValidationResult.VALID, getValidationResult(engine));
     }
 
     @Test
