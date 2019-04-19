@@ -73,7 +73,7 @@ const fetchVocabularyEntitiesByType = createErrorHandlingPromiseAction(type => (
 const fetchAllVocabularyEntities = createErrorHandlingPromiseAction(dispatch => ({
     type: actionTypes.FETCH_ALL_VOCABULARY_ENTITIES,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
-        .then(() => VocabularyAPI.getAllEntities())
+        .then(() => VocabularyAPI.getAllCatalogEntities())
 }));
 
 export const fetchVocabularyEntitiesIfNeeded = type => dispatchIfNeeded(
