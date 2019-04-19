@@ -130,7 +130,7 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
         sh:name "Property node kind" ;
         sh:in ( sh:IRI )
     ] ;
-    sh:or ( 
+    sh:xone ( 
         [ sh:path sh:in ; 
           sh:minCount 1  ] 
         [ sh:path sh:nodeKind ;
