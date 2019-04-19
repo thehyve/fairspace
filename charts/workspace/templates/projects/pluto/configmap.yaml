@@ -23,6 +23,9 @@ data:
         files: {{ template "storage.url" . }}/webdav
         jupyter: {{ template "jupyterhub.url" . }}
         {{ if ( and .Values.services .Values.services.cbioportal  ) }}cbioportal: {{ .Values.services.cbioportal }}{{ end }}
+      roles:
+        dataSteward: "datasteward-{{ template "workspace.name" . }}"
+        coordinator: "coordinator-{{ template "workspace.name" . }}"
 
     workspace:
       name: {{ .Release.Name }}
