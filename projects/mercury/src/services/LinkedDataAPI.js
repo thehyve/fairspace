@@ -1,7 +1,7 @@
 import {expand} from 'jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
-import {toJsonLd} from "../utils/metadataUtils";
+import {toJsonLd} from "../utils/linkeddata/metadataUtils";
 
 class LinkedDataAPI {
     static getParams = {

@@ -1,6 +1,6 @@
 import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
-import Vocabulary from "../../services/Vocabulary";
+import Vocabulary from "../../utils/linkeddata/Vocabulary";
 import * as actionTypes from "../../actions/actionTypes";
 
 const defaultState = {invalidated: true, data: []};

@@ -7,7 +7,7 @@ import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/LoadingInlay";
 import ErrorMessage from "../../../common/ErrorMessage";
 import {ErrorDialog} from "../../../common";
-import {getFirstPredicateProperty} from "../../../../utils/metadataUtils";
+import {getFirstPredicateProperty} from "../../../../utils/linkeddata/metadataUtils";
 import * as constants from "../../../../constants";
 
 class InputWithAddition extends React.Component {

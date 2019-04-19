@@ -3,7 +3,7 @@ import Paper from "@material-ui/core/Paper";
 
 import BreadCrumbs from "../../common/BreadCrumbs";
 import MetadataEntityContainer from './MetadataEntityContainer';
-import {url2iri} from "../../../utils/metadataUtils";
+import {url2iri} from "../../../utils/linkeddata/metadataUtils";
 import MetadataEntityHeaderContainer from "./MetadataEntityHeaderContainer";
 
 export default () => {

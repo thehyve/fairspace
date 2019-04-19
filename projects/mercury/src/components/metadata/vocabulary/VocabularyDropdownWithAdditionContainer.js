@@ -8,7 +8,7 @@ import {
     hasMetaVocabularyError,
     isMetaVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {createVocabularyIri} from "../../../utils/metadataUtils";
+import {createVocabularyIri} from "../../../utils/linkeddata/metadataUtils";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {createVocabularyEntityFromState, fetchVocabularyEntitiesIfNeeded} from "../../../actions/vocabularyActions";
 

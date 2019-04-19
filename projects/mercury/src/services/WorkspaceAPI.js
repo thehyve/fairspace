@@ -1,6 +1,6 @@
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
-import {createMetadataIri} from "../utils/metadataUtils";
+import {createMetadataIri} from "../utils/linkeddata/metadataUtils";
 
 class WorkspaceAPI {
     static getConfig = {

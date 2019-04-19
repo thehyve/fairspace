@@ -8,7 +8,7 @@ import {
     isMetaVocabularyPending,
     isVocabularyEntitiesPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {createVocabularyIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
+import {createVocabularyIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import * as constants from "../../../constants";

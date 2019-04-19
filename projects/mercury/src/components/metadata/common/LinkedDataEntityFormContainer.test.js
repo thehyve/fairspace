@@ -3,7 +3,7 @@ import {mount} from "enzyme";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
-import Vocabulary from "../../../services/Vocabulary";
+import Vocabulary from "../../../utils/linkeddata/Vocabulary";
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
 import {STRING_URI} from "../../../constants";

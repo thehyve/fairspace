@@ -11,7 +11,7 @@ import {
     isMetaVocabularyPending,
     isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
+import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";

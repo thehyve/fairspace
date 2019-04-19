@@ -1,7 +1,7 @@
-import {compareBy, comparing} from "../utils/comparisionUtils";
-import * as constants from "../constants";
-import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue, getLabel} from "../utils/metadataUtils";
-import {flattenShallow} from "../utils/arrayUtils";
+import {compareBy, comparing} from "../comparisionUtils";
+import * as constants from "../../constants";
+import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue, getLabel} from "./metadataUtils";
+import {flattenShallow} from "../arrayUtils";
 
 class Vocabulary {
     /**

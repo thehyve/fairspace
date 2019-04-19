@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {createMetadataIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
+import {createMetadataIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";

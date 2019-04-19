@@ -5,7 +5,7 @@ import InputWithAddition from "../common/values/InputWithAddition";
 import MetadataDropdownContainer from "./MetadataDropdownContainer";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import {createMetadataEntityFromState, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
-import {createMetadataIri} from "../../../utils/metadataUtils";
+import {createMetadataIri} from "../../../utils/linkeddata/metadataUtils";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 
 const MetadataDropdownWithAdditionContainer = props => (

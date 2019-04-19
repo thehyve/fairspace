@@ -1,5 +1,5 @@
-import * as consts from "../constants";
-import Vocabulary from "../services/Vocabulary";
+import * as consts from "../../constants";
+import Vocabulary from "./Vocabulary";
 
 /**
  * Returns the value of the given property on the first entry of the predicate for the metadat

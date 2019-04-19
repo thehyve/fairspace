@@ -1,6 +1,6 @@
 import Vocabulary from './Vocabulary';
 import vocabularyJsonLd from './test.vocabulary.json';
-import * as constants from "../constants";
+import * as constants from "../../constants";
 
 const vocabulary = new Vocabulary(vocabularyJsonLd);
 describe('Vocabulary', () => {

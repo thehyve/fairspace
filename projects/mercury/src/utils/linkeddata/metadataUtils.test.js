@@ -11,7 +11,7 @@ import {
     shouldPropertyBeHidden,
     toJsonLd, url2iri,
 } from "./metadataUtils";
-import * as constants from "../constants";
+import * as constants from "../../constants";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {

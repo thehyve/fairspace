@@ -1,7 +1,7 @@
 import {connect} from "react-redux";
 import {PropTypes} from "prop-types";
 import {getCombinedMetadataForSubject, isMetadataPending} from "../../../reducers/cache/jsonLdBySubjectReducers";
-import {getTypeInfo, linkLabel} from "../../../utils/metadataUtils";
+import {getTypeInfo, linkLabel} from "../../../utils/linkeddata/metadataUtils";
 import {isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
 

@@ -6,7 +6,7 @@ import Grid from "@material-ui/core/Grid";
 
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/metadataUtils";
+import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import {
     getCombinedMetadataForSubject,
     hasMetadataError,

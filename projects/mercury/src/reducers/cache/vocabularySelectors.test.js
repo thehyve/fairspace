@@ -1,4 +1,4 @@
-import vocabularyJsonLd from '../../services/test.vocabulary.json';
+import vocabularyJsonLd from '../../utils/linkeddata/test.vocabulary.json';
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "./vocabularyReducers";
 
 describe('retrieving vocabulary from state', () => {
