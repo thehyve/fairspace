@@ -5,32 +5,24 @@ import Dropdown from "./Dropdown";
 import LoadingInlay from "../../../common/LoadingInlay";
 import ErrorMessage from "../../../common/ErrorMessage";
 
-class EntityDropdown extends React.Component {
-    constructor(props) {
-        super(props);
-        props.fetchEntities(props.property.className);
+const EntityDropdown = props => {
+    if (props.pending) {
+        return <LoadingInlay />;
     }
 
-    render() {
-        if (this.props.pending) {
-            return <LoadingInlay />;
-        }
-
-        if (this.props.error) {
-            return <ErrorMessage message={this.props.error} />;
-        }
-
-        return (
-            <Dropdown {...this.props} />
-        );
+    if (props.error) {
+        return <ErrorMessage message={props.error} />;
     }
+
+    return (
+        <Dropdown {...props} />
+    );
 }
 
 EntityDropdown.propTypes = {
     property: PropTypes.object.isRequired,
     entry: PropTypes.object,
     onChange: PropTypes.func,
-    fetchEntities: PropTypes.func.isRequired,
 
     entities: PropTypes.array,
     pending: PropTypes.bool,
