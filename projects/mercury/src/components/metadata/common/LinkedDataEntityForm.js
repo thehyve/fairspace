@@ -5,11 +5,9 @@ import {List} from '@material-ui/core';
 import {ErrorMessage, LoadingInlay} from "../../common";
 import LinkedDataProperty from "./LinkedDataProperty";
 
-export const LinkedDataEntityForm = props => {
-    const {
-        properties, editable, error, loading
-    } = props;
-
+export const LinkedDataEntityForm = ({
+    properties, editable, error, loading, onChange, onAdd, onDelete, valueComponentFactory
+}) => {
     if (error) {
         return <ErrorMessage message={error} />;
     }
@@ -26,10 +24,10 @@ export const LinkedDataEntityForm = props => {
                         editable={editable}
                         key={p.key}
                         property={p}
-                        onChange={(value, index) => props.onChange(p, value, index)}
-                        onAdd={(value) => props.onAdd(p, value)}
-                        onDelete={(index) => props.onDelete(p, index)}
-                        valueComponentFactory={props.valueComponentFactory}
+                        onChange={(value, index) => onChange(p, value, index)}
+                        onAdd={(value) => onAdd(p, value)}
+                        onDelete={(index) => onDelete(p, index)}
+                        valueComponentFactory={valueComponentFactory}
                     />
                 ))
             }

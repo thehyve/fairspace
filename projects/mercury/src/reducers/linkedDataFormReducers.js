@@ -1,12 +1,19 @@
 import reduceReducers from "reduce-reducers";
 import * as actionTypes from "../actions/actionTypes";
 import {createByKey} from "../utils/redux";
+import Vocabulary from '../services/Vocabulary';
 
 /**
  * The updates map contains a map from propertyKey (predicate) to a list of values for that property
- * @type {{updates: {}}}
+ * The validations map contains a map from propertyKey (predicate) to the list of errors of the property change
+ * @type {{updates: {}, validations: {}}}
  */
-const initialState = {updates: {}, pending: false, error: false};
+const initialState = {
+    updates: {},
+    validations: {},
+    pending: false,
+    error: false
+};
 
 /**
  * Returns the values that are present in the form for the given propertyKey
@@ -16,13 +23,22 @@ const initialState = {updates: {}, pending: false, error: false};
  */
 const getValues = (state, action) => state.updates[action.property.key] || action.property.values;
 
-const generateStateWithNewValues = (state, propertyKey, updatedValues) => ({
-    ...state,
-    updates: {
+const generateStateWithNewValues = (state, property, updatedValues) => {
+    const updates = {
         ...state.updates,
-        [propertyKey]: updatedValues
-    }
-});
+        [property.key]: updatedValues
+    };
+    const validations = {
+        ...state.validations,
+        [property.key]: Vocabulary.validatePropertyValues({...property, values: updatedValues})
+    };
+
+    return ({
+        ...state,
+        updates,
+        validations
+    });
+};
 
 /**
  * Reducers the state for the metadata form, for a single formKey
@@ -38,19 +54,19 @@ export const linkedDataFormChangesReducerPerForm = (state = initialState, action
         case actionTypes.ADD_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
-                action.property.key,
+                action.property,
                 [...getValues(state, action), action.value]
             );
         case actionTypes.UPDATE_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
-                action.property.key,
+                action.property,
                 getValues(state, action).map((el, idx) => ((idx === action.index) ? action.value : el))
             );
         case actionTypes.DELETE_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
-                action.property.key,
+                action.property,
                 getValues(state, action).filter((el, idx) => idx !== action.index)
             );
         default:
@@ -109,4 +125,9 @@ export default reduceReducers(
 
 
 export const getLinkedDataFormUpdates = (state, formKey) => (state.linkedDataForm[formKey] && state.linkedDataForm[formKey].updates) || {};
-export const hasLinkedDataFormUpdates = (state, formKey) => !!(state.linkedDataForm[formKey] && state.linkedDataForm[formKey].updates && Object.keys(state.linkedDataForm[formKey].updates).length > 0);
+
+export const hasLinkedDataFormUpdates = (state, formKey) => !!(Object.keys(getLinkedDataFormUpdates(state, formKey)).length > 0);
+
+export const getLinkedDataFormValidations = (state, formKey) => (state.linkedDataForm[formKey] && state.linkedDataForm[formKey].validations) || {};
+
+export const hasLinkedDataFormValidationErrors = (state, formKey) => !!Object.values(getLinkedDataFormValidations(state, formKey)).find(v => v.length > 0);

@@ -14,6 +14,7 @@ describe('Metadata form reducer', () => {
                 )
             ).toEqual({
                 updates: {},
+                validations: {},
                 error: false,
                 pending: false
             });
@@ -33,7 +34,8 @@ describe('Metadata form reducer', () => {
             ).toEqual({
                 updates: {propertyA: ['previousValue', 'added']},
                 error: false,
-                pending: false
+                pending: false,
+                validations: {propertyA: []}
             });
         });
         it('should add a value if some updates were already done to this field', () => {
@@ -48,7 +50,8 @@ describe('Metadata form reducer', () => {
                     }
                 )
             ).toEqual({
-                updates: {propertyA: ['test', 'added']}
+                updates: {propertyA: ['test', 'added']},
+                validations: {propertyA: []}
             });
         });
         it('should not change values for other fields', () => {
@@ -66,7 +69,8 @@ describe('Metadata form reducer', () => {
                 updates: {
                     propertyA: ['test'],
                     propertyB: ['previousValue', 'added']
-                }
+                },
+                validations: {propertyB: []}
             });
         });
     });
@@ -84,6 +88,7 @@ describe('Metadata form reducer', () => {
                 )
             ).toEqual({
                 updates: {propertyA: ['changed']},
+                validations: {propertyA: []},
                 error: false,
                 pending: false
             });
@@ -101,7 +106,8 @@ describe('Metadata form reducer', () => {
                     }
                 )
             ).toEqual({
-                updates: {propertyA: ['test', 'changed']}
+                updates: {propertyA: ['test', 'changed']},
+                validations: {propertyA: []}
             });
         });
         it('should not change values for other fields', () => {
@@ -120,7 +126,8 @@ describe('Metadata form reducer', () => {
                 updates: {
                     propertyA: ['test'],
                     propertyB: ['changed']
-                }
+                },
+                validations: {propertyB: []}
             });
         });
         it('should ignore changes where the index if out of bounds', () => {
@@ -139,7 +146,8 @@ describe('Metadata form reducer', () => {
                 updates: {
                     propertyA: ['test', 'test2'],
                     propertyB: ['previousValue']
-                }
+                },
+                validations: {propertyB: []}
             });
         });
     });
@@ -156,6 +164,7 @@ describe('Metadata form reducer', () => {
                 )
             ).toEqual({
                 updates: {propertyA: ['previousValue']},
+                validations: {propertyA: []},
                 error: false,
                 pending: false
             });
@@ -172,7 +181,8 @@ describe('Metadata form reducer', () => {
                     }
                 )
             ).toEqual({
-                updates: {propertyA: ['test', 'test3']}
+                updates: {propertyA: ['test', 'test3']},
+                validations: {propertyA: []}
             });
         });
         it('should not change values for other fields', () => {
@@ -190,7 +200,8 @@ describe('Metadata form reducer', () => {
                 updates: {
                     propertyA: ['test'],
                     propertyB: []
-                }
+                },
+                validations: {propertyB: []}
             });
         });
         it('should ignore changes where the index if out of bounds', () => {
@@ -208,7 +219,8 @@ describe('Metadata form reducer', () => {
                 updates: {
                     propertyA: ['test', 'test2'],
                     propertyB: ['previousValue']
-                }
+                },
+                validations: {propertyB: []}
             });
         });
     });
