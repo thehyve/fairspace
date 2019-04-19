@@ -16,8 +16,9 @@ import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
-import {isDataSteward} from "../../../reducers/account/authorizationsReducers";
+import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 import Config from "../../../services/Config/Config";
+import {isDataSteward} from "../../../utils/userUtils";
 
 const VocabularyEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -70,7 +71,7 @@ const mapStateToProps = (state, ownProps) => {
     const hasOtherErrors = hasVocabularyError(state) || hasMetaVocabularyError(state);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading vocabulary.' : '';
 
-    const editable = isDataSteward(state, Config.get());
+    const editable = isDataSteward(getAuthorizations(state), Config.get());
 
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject);
 

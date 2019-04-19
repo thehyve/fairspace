@@ -8,13 +8,14 @@ import {
     isMetaVocabularyPending,
     isVocabularyEntitiesPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {isDataSteward} from "../../../reducers/account/authorizationsReducers";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {createVocabularyIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
 import Config from "../../../services/Config/Config";
 import * as constants from "../../../constants";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
+import {isDataSteward} from "../../../utils/userUtils";
+import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 
 const mapStateToProps = (state) => {
     const vocabularyEntities = getVocabularyEntities(state);
@@ -30,7 +31,7 @@ const mapStateToProps = (state) => {
     return ({
         loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
         error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
-        editable: isDataSteward(state, Config.get()),
+        editable: isDataSteward(getAuthorizations(state), Config.get()),
         shapes: metaVocabulary.getFairspaceClasses(),
         vocabulary: metaVocabulary,
         valueComponentFactory: VocabularyValueComponentFactory,
