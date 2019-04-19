@@ -99,6 +99,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         commit("Update metadata", rdf, () -> {
             var toDelete = createDefaultModel();
             model.listStatements().forEachRemaining(stmt -> {
+                // Only explicitly delete triples for URI resources. As this model is also used
+                // for validation, we do not want to include blank nodes here. Triples for blank 
+                // nodes will be deleted automatically when it is not referred to anymore
                 if (stmt.getSubject().isURIResource()) {
                     toDelete.add(get(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), null, false));
                 }
