@@ -46,10 +46,18 @@ class ReadableMetadataService {
      * the vocabulary will be returned.
      *
      * @param type  URI for the type to filter the list of entities on
+     * @param filterOnCatalog If set to true, only entities marked as `fs:showInCatalog` will be returned
      * @return
      */
-    Model getByType(String type) {
-        return rdf.queryConstruct(storedQuery("entities_by_type", graph, vocabulary, asURI(type)));
+    Model getByType(String type, boolean filterOnCatalog) {
+        String queryName = filterOnCatalog ? "catalog_entities_by_type" : "entities_by_type";
+
+        return rdf.queryConstruct(storedQuery(
+                queryName,
+                graph,
+                vocabulary,
+                asURI(type)
+        ));
     }
 
     protected static Node asURI(String uri) {
