@@ -4,28 +4,33 @@ import io.fairspace.saturn.services.metadata.validation.ValidationResult;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.util.FileManager;
+import org.junit.Before;
 import org.junit.Test;
 import org.topbraid.shacl.vocabulary.SH;
 
 import java.util.List;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
+import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getValidationResult;
-import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.junit.Assert.*;
 
 public class VocabulariesTest {
     private static final Model SHACL_FOR_SHACL = FileManager.get().loadModel("default-vocabularies/shacl-shacl.ttl");
 
     private final Dataset ds = DatasetFactory.create();
-    private final Vocabularies vocabularies = new Vocabularies(new RDFConnectionLocal(ds));
+    private final RDFConnection rdf = new RDFConnectionLocal(ds);
+
+    @Before
+    public void setUp() {
+        initVocabularies(rdf);
+    }
 
     @Test
     public void validateMetaVocabulary() throws InterruptedException {
@@ -42,7 +47,7 @@ public class VocabulariesTest {
         var graph = createURI("http://example.com/graph");
         var model = ds.getNamedModel(graph.getURI());
 
-        assertTrue(vocabularies.getMachineOnlyPredicates(graph).isEmpty());
+        assertTrue(getMachineOnlyPredicates(rdf, graph).isEmpty());
 
         var shape1 = createResource("http://example.com/s1");
         var shape2 = createResource("http://example.com/s2");
@@ -53,12 +58,25 @@ public class VocabulariesTest {
         model.add(shape2, SH.path, property2);
         model.add(shape1, FS.machineOnly, createTypedLiteral(true));
 
-        assertEquals(List.of(property1.getURI()), vocabularies.getMachineOnlyPredicates(graph));
+        assertEquals(List.of(property1.getURI()), getMachineOnlyPredicates(rdf, graph));
     }
 
     private void validate(Model dataModel, Model shapesModel) throws InterruptedException {
         var engine = createEngine(dataModel, shapesModel);
         engine.validateAll();
         assertEquals(ValidationResult.VALID, getValidationResult(engine));
+    }
+
+    @Test
+    public void testGetInverseProperty() {
+        var provideMaterial = createProperty(generateVocabularyIri("providesMaterial").getURI());
+        var derivesFrom = createProperty(generateVocabularyIri("derivesFrom").getURI());
+        var unknown = createProperty(generateVocabularyIri("unknown").getURI());
+
+        assertEquals(provideMaterial, getInverse(rdf, VOCABULARY_GRAPH_URI, derivesFrom));
+        assertEquals(derivesFrom, getInverse(rdf, VOCABULARY_GRAPH_URI, provideMaterial));
+        assertNull(getInverse(rdf, VOCABULARY_GRAPH_URI, unknown));
+
+        assertEquals(FS.inverseRelation, getInverse(rdf, META_VOCABULARY_GRAPH_URI, FS.inverseRelation));
     }
 }

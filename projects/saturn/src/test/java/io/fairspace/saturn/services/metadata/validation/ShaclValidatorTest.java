@@ -15,6 +15,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import java.util.Set;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -32,7 +33,7 @@ public class ShaclValidatorTest {
 
     @Before
     public void setUp() {
-        new Vocabularies(rdf);
+        initVocabularies(rdf);
         validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, Vocabularies.VOCABULARY_GRAPH_URI);
     }
 

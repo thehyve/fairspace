@@ -4,16 +4,18 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static java.lang.String.format;
@@ -90,5 +92,19 @@ public class SparqlUtils {
 
     private static Calendar toCalendar(Instant value) {
         return GregorianCalendar.from(ZonedDateTime.ofInstant(value, ZoneId.systemDefault()));
+    }
+
+    public static <T> List<T> select(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+        var values = new ArrayList<T>();
+        rdf.querySelect(query, row -> values.add(valueExtractor.apply(row)));
+        return values;
+    }
+
+    public static <T> Optional<T> selectSingle(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+        var values = select(rdf, query, valueExtractor);
+        if (values.size() > 1) {
+            throw new IllegalStateException("Too many values: " + values.size());
+        }
+        return values.stream().findFirst();
     }
 }

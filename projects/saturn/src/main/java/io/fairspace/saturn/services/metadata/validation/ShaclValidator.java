@@ -9,7 +9,6 @@ import org.apache.jena.rdfconnection.RDFConnection;
 import java.util.Set;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.services.metadata.validation.InversionUtils.getAffectedResources;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.*;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
@@ -21,7 +20,7 @@ public class ShaclValidator implements MetadataRequestValidator {
 
     @Override
     public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        var affectedResources = getAffectedResources(rdf, modelToRemove.union(modelToAdd));
+        var affectedResources = modelToRemove.union(modelToAdd).listSubjects().toSet();
 
         var modelToValidate = affectedModelSubSet(affectedResources)
                 .remove(modelToRemove)

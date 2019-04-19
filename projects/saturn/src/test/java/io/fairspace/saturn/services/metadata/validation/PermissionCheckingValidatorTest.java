@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -13,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertEquals;
@@ -24,15 +24,11 @@ import static org.mockito.Mockito.*;
 public class PermissionCheckingValidatorTest {
     private static final Model EMPTY = createDefaultModel();
 
-    private static final Statement STATEMENT_WITHOUT_INVERSE = createStatement(
+    private static final Statement STATEMENT = createStatement(
             createResource("http://ex.com/subject"),
             createProperty("http://ex.com/predicate"), // does not have an inverse
             createResource("http://ex.com/object"));
 
-    private static final Statement STATEMENT_WITH_INVERSE = createStatement(
-            createResource("http://ex.com/subject"),
-            createProperty("http://localhost/vocabulary/derivesFrom"), // has an inverse
-            createResource("http://ex.com/object"));
 
     @Mock
     private PermissionsService permissions;
@@ -45,7 +41,7 @@ public class PermissionCheckingValidatorTest {
     @Before
     public void setUp() {
         var rdf = new RDFConnectionLocal(DatasetFactory.create());
-        new Vocabularies(rdf);
+        initVocabularies(rdf);
         validator = new PermissionCheckingValidator(rdf, permissions);
     }
 
@@ -58,7 +54,7 @@ public class PermissionCheckingValidatorTest {
 
     @Test
     public void noWritePermissionCausesAFailure() {
-        model.add(STATEMENT_WITH_INVERSE);
+        model.add(STATEMENT);
 
         when(permissions.getPermission(any())).thenReturn(Access.Read);
 
@@ -66,49 +62,15 @@ public class PermissionCheckingValidatorTest {
     }
 
     @Test
-    public void ifPredicateIsInvertibleItShouldCheckBothSubjectAndObject() {
-        model.add(STATEMENT_WITH_INVERSE);
+    public void itShouldCheckPermissionsForSubject() {
+        model.add(STATEMENT);
 
-        when(permissions.getPermission(any())).thenReturn(Access.Write);
-
-        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, model));
-
-        verify(permissions).getPermission(STATEMENT_WITH_INVERSE.getSubject().asNode());
-        verify(permissions).getPermission(STATEMENT_WITH_INVERSE.getObject().asNode());
-
-        verifyNoMoreInteractions(permissions);
-    }
-
-    @Test
-    public void ifPredicateIsNotInvertibleItShouldCheckSubjectOnly() {
-        model.add(STATEMENT_WITHOUT_INVERSE);
-
-        when(permissions.getPermission(eq(STATEMENT_WITHOUT_INVERSE.getSubject().asNode()))).thenReturn(Access.Write);
+        when(permissions.getPermission(eq(STATEMENT.getSubject().asNode()))).thenReturn(Access.Write);
 
         assertEquals(ValidationResult.VALID, validator.validate(EMPTY, model));
 
-        verify(permissions).getPermission(STATEMENT_WITH_INVERSE.getSubject().asNode());
+        verify(permissions).getPermission(STATEMENT.getSubject().asNode());
 
         verifyNoMoreInteractions(permissions);
-    }
-
-    @Test
-    public void invertiblePredicateWithoutWritePermissionForSubjectCausesAFailure() {
-        model.add(STATEMENT_WITH_INVERSE);
-
-        when(permissions.getPermission(eq(STATEMENT_WITH_INVERSE.getSubject().asNode()))).thenReturn(Access.Read);
-        when(permissions.getPermission(eq(STATEMENT_WITH_INVERSE.getObject().asNode()))).thenReturn(Access.Write);
-
-        assertFalse(validator.validate(EMPTY, model).isValid());
-    }
-
-    @Test
-    public void invertiblePredicateWithoutWritePermissionForObjectCausesAFailure() {
-        model.add(STATEMENT_WITH_INVERSE);
-
-        when(permissions.getPermission(eq(STATEMENT_WITH_INVERSE.getSubject().asNode()))).thenReturn(Access.Write);
-        when(permissions.getPermission(eq(STATEMENT_WITH_INVERSE.getObject().asNode()))).thenReturn(Access.Read);
-
-        assertFalse(validator.validate(EMPTY, model).isValid());
     }
 }

@@ -1,8 +1,0 @@
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX fs: <http://fairspace.io/ontology#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-
-SELECT ?lhs ?rhs
-WHERE {
-    GRAPH %1$s { ?lhs a rdf:Property ; owl:inverseOf ?rhs . }
-}

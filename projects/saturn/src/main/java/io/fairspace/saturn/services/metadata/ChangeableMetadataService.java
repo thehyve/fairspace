@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
+import static io.fairspace.saturn.vocabulary.Vocabularies.getInverse;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -25,21 +26,11 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
-    private final MetadataUpdateEventHandler afterUpdateEventHandler;
-
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager) {
-        this(rdf, graph, vocabulary, lifeCycleManager, null, null);
-    }
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        this(rdf, graph, vocabulary, lifeCycleManager, validator, null);
-    }
-
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, MetadataUpdateEventHandler afterUpdateEventHandler) {
         super(rdf, graph, vocabulary);
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
-        this.afterUpdateEventHandler = afterUpdateEventHandler;
     }
 
     /**
@@ -118,6 +109,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         modelToAdd.remove(unchanged);
         modelToAdd.removeAll(null, null, NIL);
 
+        applyInference(modelToRemove);
+        applyInference(modelToAdd);
+
         ensureValidParameters(modelToRemove, modelToAdd);
 
         rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove.listStatements().toList()))));
@@ -127,10 +121,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         // Store the actual update
         rdf.load(graph.getURI(), modelToAdd);
-
-        // Reapply inference
-        if(afterUpdateEventHandler != null)
-            afterUpdateEventHandler.onEvent();
     }
 
     /**
@@ -139,11 +129,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * If no validator is specified, the method does nothing
      */
     private void ensureValidParameters(Model toRemove, Model toAdd) {
-        if(validator != null) {
-            var validationResult = validator.validate(toRemove, toAdd);
-            if(!validationResult.isValid()) {
-                throw new ValidationException(validationResult.getMessage());
-            }
+        var validationResult = validator.validate(toRemove, toAdd);
+        if(!validationResult.isValid()) {
+            throw new ValidationException(validationResult.getMessage());
         }
     }
 
@@ -152,5 +140,21 @@ public class ChangeableMetadataService extends ReadableMetadataService {
                 .stream()
                 .map(s -> new Quad(graph, s.asTriple()))
                 .collect(toList());
+    }
+
+    private void applyInference(Model model) {
+        var toAdd = createDefaultModel();
+
+        model.listStatements().forEachRemaining(stmt -> {
+            if (stmt.getObject().isResource()) {
+                var inverse = getInverse(rdf, vocabulary, stmt.getPredicate());
+
+                if (inverse != null) {
+                    toAdd.add(stmt.getObject().asResource(), inverse, stmt.getSubject());
+                }
+            }
+        });
+
+        model.add(toAdd);
     }
 }
