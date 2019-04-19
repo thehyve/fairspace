@@ -27,9 +27,7 @@ class LinkedDataEntityFormContainer extends React.Component {
         if (formKey) {
             initializeForm(formKey);
             fetchShapes();
-            if (fetchLinkedData) {
-                fetchLinkedData();
-            }
+            fetchLinkedData();
         }
     }
 
