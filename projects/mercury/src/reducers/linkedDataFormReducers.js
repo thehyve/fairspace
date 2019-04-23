@@ -1,7 +1,7 @@
 import reduceReducers from "reduce-reducers";
+
 import * as actionTypes from "../actions/actionTypes";
 import {createByKey} from "../utils/redux";
-import Vocabulary from '../services/Vocabulary';
 
 /**
  * The updates map contains a map from propertyKey (predicate) to a list of values for that property
@@ -23,22 +23,13 @@ const initialState = {
  */
 const getValues = (state, action) => state.updates[action.property.key] || action.property.values;
 
-const generateStateWithNewValues = (state, property, updatedValues) => {
-    const updates = {
+const generateStateWithNewValues = (state, propertyKey, updatedValues) => ({
+    ...state,
+    updates: {
         ...state.updates,
-        [property.key]: updatedValues
-    };
-    const validations = {
-        ...state.validations,
-        [property.key]: Vocabulary.validatePropertyValues({...property, values: updatedValues})
-    };
-
-    return ({
-        ...state,
-        updates,
-        validations
-    });
-};
+        [propertyKey]: updatedValues
+    }
+});
 
 /**
  * Reducers the state for the metadata form, for a single formKey
@@ -54,21 +45,29 @@ export const linkedDataFormChangesReducerPerForm = (state = initialState, action
         case actionTypes.ADD_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
-                action.property,
+                action.property.key,
                 [...getValues(state, action), action.value]
             );
         case actionTypes.UPDATE_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
-                action.property,
+                action.property.key,
                 getValues(state, action).map((el, idx) => ((idx === action.index) ? action.value : el))
             );
         case actionTypes.DELETE_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
                 state,
-                action.property,
+                action.property.key,
                 getValues(state, action).filter((el, idx) => idx !== action.index)
             );
+        case actionTypes.VALIDATE_LINKEDDATA_PROPERTY:
+            return {
+                ...state,
+                validations: {
+                    ...state.validations,
+                    [action.property.key]: [...action.validations]
+                }
+            };
         default:
             return state;
     }

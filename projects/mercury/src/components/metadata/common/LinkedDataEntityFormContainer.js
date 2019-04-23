@@ -7,7 +7,8 @@ import {
     addLinkedDataValue,
     deleteLinkedDataValue,
     initializeLinkedDataForm,
-    updateLinkedDataValue
+    updateLinkedDataValue,
+    validateLinkedDataProperty
 } from "../../../actions/linkedDataFormActions";
 
 class LinkedDataEntityFormContainer extends React.Component {
@@ -99,12 +100,15 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     initializeForm: (formKey) => dispatch(initializeLinkedDataForm(formKey)),
     onAdd: (property, value) => {
         dispatch(addLinkedDataValue(ownProps.formKey, property, value));
+        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
     },
     onChange: (property, value, index) => {
         dispatch(updateLinkedDataValue(ownProps.formKey, property, value, index));
+        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
     },
     onDelete: (property, index) => {
         dispatch(deleteLinkedDataValue(ownProps.formKey, property, index));
+        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
     }
 });
 
