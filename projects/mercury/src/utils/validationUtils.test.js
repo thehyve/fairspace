@@ -53,20 +53,41 @@ describe('Validation Utils', () => {
     });
 
     describe('validateValuesAgainstShape', () => {
-        it('should return error message when length is over limit', () => {
+        it('should return all error messages (max length, min count)', () => {
             const shape = {
                 "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
-                "http://www.w3.org/ns/shacl#maxLength": [
+                [constants.SHACL_MAX_LENGTH]: [
                     {
                         "@value": 10
+                    }
+                ],
+                [constants.SHACL_MIN_COUNT]: [
+                    {
+                        "@value": 2
                     }
                 ]
             };
 
             const values = [{value: 'This is some text that is over 10 characters'}];
             const datatype = constants.STRING_URI;
-            expect(validateValuesAgainstShape({shape, datatype, values}).length).toBe(1);
+            expect(validateValuesAgainstShape({shape, datatype, values}).length).toBe(2);
             expect(validateValuesAgainstShape({shape, datatype, values})[0].length).toBeGreaterThan(0);
+            expect(validateValuesAgainstShape({shape, datatype, values})[1].length).toBeGreaterThan(0);
+        });
+
+        it('should return an error for max count', () => {
+            const shape = {
+                "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
+                [constants.SHACL_MAX_COUNT]: [
+                    {
+                        "@value": 2
+                    }
+                ]
+            };
+
+            const values = [{value: 0}, {value: 10}, {value: 100}];
+            expect(validateValuesAgainstShape({shape, values}).length).toBe(1);
+            expect(validateValuesAgainstShape({shape, values})[0].length).toBeGreaterThan(0);
         });
     });
 });
