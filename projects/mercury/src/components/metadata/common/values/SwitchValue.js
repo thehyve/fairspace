@@ -1,7 +1,7 @@
 import React from 'react';
 import Switch from "@material-ui/core/Switch";
 
-const SwitchValue = ({entry, property, style, onChange, ...otherProps}) => (
+const SwitchValue = ({entry, property, style, onChange, error, ...otherProps}) => (
     <Switch
         {...otherProps}
         checked={!!entry.value}
