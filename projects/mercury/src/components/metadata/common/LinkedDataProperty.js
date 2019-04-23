@@ -79,6 +79,7 @@ class LinkedDataProperty extends React.Component {
         // and there is already a value
         const editableAndNotMachineOnly = editable && !property.machineOnly;
         const canAdd = editableAndNotMachineOnly && (property.allowMultiple || !property.values || property.values.length === 0);
+        const maxValuesReached = (property.allowMultiple && property.maxValuesCount && (property.values.length >= property.maxValuesCount)) || false;
         const labelId = `label-${property.key}`;
 
         // The edit component should not actually allow editing the value if editable is set to false
@@ -95,7 +96,7 @@ class LinkedDataProperty extends React.Component {
                 </Typography>
                 <List dense>
                     {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
-                    {canAdd ? this.renderAddComponent(labelId) : null}
+                    {canAdd && !maxValuesReached ? this.renderAddComponent(labelId) : null}
                 </List>
             </ListItem>
         );

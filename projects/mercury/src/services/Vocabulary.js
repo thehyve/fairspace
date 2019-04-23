@@ -324,6 +324,7 @@ class Vocabulary {
         const isRdfList = Vocabulary.isRdfList(propertyShape);
         const isGenericIriResource = Vocabulary.isGenericIriResource(propertyShape);
         const allowAdditionOfEntities = this.isFairspaceClass(className);
+        const maxValuesCount = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT);
 
         return {
             key: predicate,
@@ -337,7 +338,8 @@ class Vocabulary {
             allowedValues,
             isRdfList,
             isGenericIriResource,
-            allowAdditionOfEntities
+            allowAdditionOfEntities,
+            maxValuesCount
         };
     }
 
