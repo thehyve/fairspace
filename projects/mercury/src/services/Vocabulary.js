@@ -118,9 +118,21 @@ class Vocabulary {
     /**
      * Returns a list of classes marked as fairspace entities
      */
-    getFairspaceClasses() {
+    getClassesInCatalog() {
         return this.vocabulary
             .filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI));
+    }
+
+    /**
+     * Determines whether the given class URI is a fairspace class
+     */
+    isFairspaceClass(className) {
+        if (!className) {
+            return false;
+        }
+
+        return this.getClassesInCatalog()
+            .some(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
     }
 
     /**
@@ -174,7 +186,7 @@ class Vocabulary {
                         .sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
                 }
 
-                prefilledProperties.push(Vocabulary.generatePropertyEntry(predicateUri, values, propertyShape));
+                prefilledProperties.push(this.generatePropertyEntry(predicateUri, values, propertyShape));
             });
 
         return prefilledProperties.sort(compareBy('label'));
@@ -192,7 +204,7 @@ class Vocabulary {
             .filter(shape => !Object.keys(metadata).includes(getFirstPredicateId(shape, constants.SHACL_PATH)))
             .map((shape) => {
                 const predicateUri = getFirstPredicateId(shape, constants.SHACL_PATH);
-                return Vocabulary.generatePropertyEntry(predicateUri, [], shape);
+                return this.generatePropertyEntry(predicateUri, [], shape);
             });
 
         return additionalProperties.sort(compareBy('label'));
@@ -302,7 +314,7 @@ class Vocabulary {
      * @returns {{key: string, label: string, values: [], datatype: string, className: string, allowMultiple: boolean, machineOnly: boolean, multiLine: boolean}}
      * @private
      */
-    static generatePropertyEntry(predicate, values, shape) {
+    generatePropertyEntry(predicate, values, shape) {
         const label = getFirstPredicateValue(shape, constants.SHACL_NAME);
         const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
         const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
@@ -312,6 +324,7 @@ class Vocabulary {
         const allowedValues = getFirstPredicateList(shape, constants.SHACL_IN, undefined);
         const isRdfList = Vocabulary.isRdfList(shape);
         const isGenericIriResource = Vocabulary.isGenericIriResource(shape);
+        const allowAdditionOfEntities = this.isFairspaceClass(className);
 
         return {
             key: predicate,
@@ -326,6 +339,7 @@ class Vocabulary {
             allowedValues,
             isRdfList,
             isGenericIriResource,
+            allowAdditionOfEntities
         };
     }
 
