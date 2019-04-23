@@ -1,6 +1,6 @@
 import * as actionTypes from "./actionTypes";
 import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
-import Vocabulary from '../services/Vocabulary';
+import {validateValuesAgainstShape} from '../utils/validationUtils';
 
 export const addLinkedDataValue = (formKey, property, value) => ({
     type: actionTypes.ADD_LINKEDDATA_VALUE,
@@ -32,7 +32,7 @@ export const initializeLinkedDataForm = (formKey) => ({
 export const validateLinkedDataProperty = (formKey, property) => (dispatch, getState) => {
     const formUpdates = getLinkedDataFormUpdates(getState(), formKey);
     const values = formUpdates[property.key];
-    const validations = Vocabulary.validatePropertyValues({...property, values});
+    const validations = validateValuesAgainstShape({...property, values});
 
     return dispatch({
         type: actionTypes.VALIDATE_LINKEDDATA_PROPERTY,

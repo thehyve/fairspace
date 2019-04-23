@@ -2,7 +2,6 @@ import {compareBy, comparing} from "../utils/comparisionUtils";
 import * as constants from "../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue, getLabel} from "../utils/metadataUtils";
 import {flattenShallow} from "../utils/arrayUtils";
-import {maxLengthValidation, minCountValidation, maxCountValidation} from '../utils/validationUtils';
 
 class Vocabulary {
     /**
@@ -368,38 +367,6 @@ class Vocabulary {
 
     static isGenericIriResource(propertyShape) {
         return getFirstPredicateId(propertyShape, constants.SHACL_NODEKIND) === constants.SHACL_IRI;
-    }
-
-    static validatePropertyValues(property) {
-        const {shape, datatype, values} = property;
-        const pureValues = values.map(v => v.value || v.id);
-        const maxLength = getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH);
-        const minCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
-        const maxCount = getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT);
-        const errors = [];
-
-        if (maxLength > 0 && datatype === constants.STRING_URI) {
-            const validation = maxLengthValidation(maxLength, pureValues);
-            if (validation) {
-                errors.push(validation);
-            }
-        }
-
-        if (minCount > 0) {
-            const validation = minCountValidation(minCount, pureValues);
-            if (validation) {
-                errors.push(validation);
-            }
-        }
-
-        if (maxCount > 0) {
-            const validation = maxCountValidation(maxCount, pureValues);
-            if (validation) {
-                errors.push(validation);
-            }
-        }
-
-        return errors;
     }
 }
 

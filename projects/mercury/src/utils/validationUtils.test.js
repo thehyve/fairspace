@@ -1,4 +1,10 @@
-import {maxLengthValidation, minCountValidation, maxCountValidation} from './validationUtils';
+import * as constants from "../constants";
+import {
+    maxLengthValidation,
+    minCountValidation,
+    maxCountValidation,
+    validateValuesAgainstShape
+} from './validationUtils';
 
 describe('Validation Utils', () => {
     describe('maxLengthValidation', () => {
@@ -43,6 +49,24 @@ describe('Validation Utils', () => {
         it('should not return error message when values count is lessmore than max', () => {
             const values = ['First', 'Second', '3rd', '4th', '5th'];
             expect(maxCountValidation(6, values)).toBeNull();
+        });
+    });
+
+    describe('validateValuesAgainstShape', () => {
+        it('should return error message when length is over limit', () => {
+            const shape = {
+                "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
+                "http://www.w3.org/ns/shacl#maxLength": [
+                    {
+                        "@value": 10
+                    }
+                ]
+            };
+
+            const values = [{value: 'This is some text that is over 10 characters'}];
+            const datatype = constants.STRING_URI;
+            expect(validateValuesAgainstShape({shape, datatype, values}).length).toBe(1);
+            expect(validateValuesAgainstShape({shape, datatype, values})[0].length).toBeGreaterThan(0);
         });
     });
 });
