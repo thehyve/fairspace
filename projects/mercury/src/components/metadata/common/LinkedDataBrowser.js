@@ -77,17 +77,22 @@ class LinkedDataBrowser extends React.Component {
 
         return (
             <>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    aria-label="Add"
-                    title="Create a new metadata entity"
-                    onClick={this.startCreating}
-                    style={{margin: '10px 0'}}
-                    disabled={!this.props.shapes}
-                >
-                    Create
-                </Button>
+                {this.props.editable
+                    ? (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            aria-label="Add"
+                            title="Create a new metadata entity"
+                            onClick={this.startCreating}
+                            style={{margin: '10px 0'}}
+                            disabled={!this.props.shapes}
+                        >
+                        Create
+                        </Button>
+                    )
+                    : null
+                }
 
                 <LinkedDataShapeChooserDialog
                     open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CHOOSE_SHAPE}
@@ -122,9 +127,14 @@ LinkedDataBrowser.propTypes = {
     error: PropTypes.bool,
     shapes: PropTypes.array,
     entities: PropTypes.array,
+    editable: PropTypes.bool,
 
     valueComponentFactory: PropTypes.object.isRequired,
     vocabulary: PropTypes.object.isRequired
+};
+
+LinkedDataBrowser.defaultProps = {
+    editable: true
 };
 
 export default LinkedDataBrowser;

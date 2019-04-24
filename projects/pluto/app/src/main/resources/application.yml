@@ -11,6 +11,7 @@ server:
 
 frontend:
   urls: {}
+  roles: {}
 
 spring:
   application:

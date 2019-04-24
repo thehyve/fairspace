@@ -17,6 +17,9 @@ import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContain
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {LinkedDataFormContext} from "../common/LinkedDataFormContext";
+import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
+import Config from "../../../services/Config/Config";
+import {isDataSteward} from "../../../utils/userUtils";
 
 const VocabularyEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -70,7 +73,8 @@ const mapStateToProps = (state, ownProps) => {
     const hasOtherErrors = hasVocabularyError(state) || hasMetaVocabularyError(state);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading vocabulary.' : '';
 
-    const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
+    const editable = isDataSteward(getAuthorizations(state), Config.get());
+
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)

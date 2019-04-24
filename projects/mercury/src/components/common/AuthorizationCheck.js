@@ -4,6 +4,11 @@ import {connect} from 'react-redux';
 import Typography from "@material-ui/core/Typography";
 import {withRouter} from "react-router-dom";
 import LoadingInlay from './LoadingInlay';
+import {
+    getAuthorizations,
+    hasAuthorizationsError,
+    isAuthorizationsPending
+} from "../../reducers/account/authorizationsReducers";
 
 /**
  * This component performs an authorization check for the current user
@@ -82,11 +87,10 @@ AuthorizationCheck.propTypes = {
     transformError: PropTypes.func
 };
 
-
-const mapStateToProps = ({account: {authorizations}}) => ({
-    pending: authorizations.pending,
-    error: authorizations.error,
-    authorizations: authorizations.data || []
+const mapStateToProps = state => ({
+    pending: isAuthorizationsPending(state),
+    error: hasAuthorizationsError(state),
+    authorizations: getAuthorizations(state)
 });
 
 export default withRouter(connect(mapStateToProps)(AuthorizationCheck));

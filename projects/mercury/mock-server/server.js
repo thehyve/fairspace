@@ -18,7 +18,7 @@ app.get('/api/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.htt
 
 // Account API
 app.get('/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
-app.get('/account/authorizations', (req, res) => res.send(['user-workspace1', 'ROLE_USER']));
+app.get('/account/authorizations', (req, res) => res.send(['user-workspace1', 'datasteward', 'ROLE_USER']));
 
 // Workspace API
 app.get('/api/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
