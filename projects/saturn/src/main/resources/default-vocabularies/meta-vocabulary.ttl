@@ -230,3 +230,9 @@ fs:systemPropertiesShape a fs:PropertyShape ;
     fs:machineOnly true ;
     sh:name "System properties" ;
     sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties." .
+
+# Definitions of our shape types, needed
+# for form building
+fs:ClassShape a sh:NodeShape .
+fs:PropertyShape rdfs:subClassOf sh:PropertyShape .
+fs:RelationShape rdfs:subClassOf sh:PropertyShape .
