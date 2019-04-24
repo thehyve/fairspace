@@ -9,7 +9,6 @@ import {
     isMetaVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
 import {createVocabularyIri} from "../../../utils/metadataUtils";
-import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {createVocabularyEntityFromState, fetchVocabularyEntitiesIfNeeded} from "../../../actions/vocabularyActions";
 
 const VocabularyDropdownWithAdditionContainer = props => (
@@ -22,7 +21,6 @@ const VocabularyDropdownWithAdditionContainer = props => (
         fetchEntities={props.fetchEntities}
         error={props.error}
         pending={props.pending}
-        valueComponentFactory={VocabularyValueComponentFactory}
     >
         <VocabularyDropdownContainer
             property={props.property}
