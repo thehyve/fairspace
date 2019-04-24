@@ -164,7 +164,10 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:greaterThanOrEquals sh:minCount ;
         sh:name "Maximum number of values"
     ], [
-        sh:class fs:Class ;
+        # This nodeKind restriction could be replaced by something like
+        # sh:class fs:Class. Currently that restriction will limit our
+        # options to add new shapes
+        sh:nodeKind sh:IRI ;
         sh:path sh:class ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
