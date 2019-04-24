@@ -234,7 +234,5 @@ fs:systemPropertiesShape a fs:PropertyShape ;
 # Definitions of our shape types, needed
 # for form building
 fs:ClassShape a sh:NodeShape .
-fs:PropertyShape a rdf:Class ;
-    rdfs:subClassOf sh:PropertyShape .
-fs:RelationShape a rdf:Class ;
-    rdfs:subClassOf sh:PropertyShape .
+fs:PropertyShape rdfs:subClassOf sh:PropertyShape .
+fs:RelationShape rdfs:subClassOf sh:PropertyShape .
