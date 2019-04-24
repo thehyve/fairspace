@@ -1,12 +1,13 @@
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {createMetadataIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/metadataUtils";
+import {createMetadataIri, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import * as constants from "../../../constants";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
+import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 
 const mapStateToProps = (state) => {
     const {cache: {allEntities}} = state;

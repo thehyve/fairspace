@@ -1,18 +1,21 @@
-import Vocabulary from './Vocabulary';
-import vocabularyJsonLd from './test.vocabulary.json';
-import * as constants from "../constants";
+import * as constants from "../../constants";
+import {emptyLinkedData, fromJsonLd, toJsonLd} from "./jsonLdConverter";
+import {vocabularyUtils} from "./vocabularyUtils";
+import vocabularyJsonLd from "./test.vocabulary";
 
-const vocabulary = new Vocabulary(vocabularyJsonLd);
-describe('Vocabulary', () => {
-    describe('combination of vocabulary and metadata', () => {
+describe('jsonLdConverter', () => {
+    describe('fromJsonLd', () => {
+        const vocabulary = vocabularyUtils(vocabularyJsonLd);
+        const subject = 'http://fairspace.com/iri/collections/1';
+
         describe('vocabulary information', () => {
             it('returns the type in a proper format', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection']
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.map(el => el.values)).toContainEqual([{
                     comment: "Collection of files with associated metadata and access rules.",
                     id: "http://fairspace.io/ontology#Collection",
@@ -22,7 +25,7 @@ describe('Vocabulary', () => {
 
             it('looks up labels in vocabulary properly', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://www.w3.org/2000/01/rdf-schema#comment': [
                         {
@@ -34,7 +37,7 @@ describe('Vocabulary', () => {
                     ]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
 
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
@@ -46,20 +49,20 @@ describe('Vocabulary', () => {
 
             it('returns nothing without type', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     'http://www.w3.org/2000/01/rdf-schema#label': {'@value': 'Collection 1'}
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result).toEqual([]);
             });
 
             it('returns an empty array when no properties are set', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result).toEqual([]);
             });
         });
@@ -67,12 +70,12 @@ describe('Vocabulary', () => {
         describe('property values', () => {
             it('returns values in vocabulary properly', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://www.w3.org/2000/01/rdf-schema#label': [{'@value': 'Collection 1'}]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
 
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
@@ -83,13 +86,13 @@ describe('Vocabulary', () => {
 
             it('return values if multiple types have been specified', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection', 'http://fairspace.io/ontology#Dataset'],
                     'http://www.w3.org/2000/01/rdf-schema#label': [{'@value': 'Collection 1'}],
                     'http://www.schema.org/creator': [{'@value': 'John Snow'}]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
 
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].key).toEqual("http://www.schema.org/creator");
@@ -104,7 +107,7 @@ describe('Vocabulary', () => {
 
             it('returns multiple values for one predicate in vocabulary properly', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://www.w3.org/2000/01/rdf-schema#comment': [
                         {
@@ -116,7 +119,7 @@ describe('Vocabulary', () => {
                     ]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
                 expect(result[0].values.length).toEqual(2);
@@ -126,7 +129,7 @@ describe('Vocabulary', () => {
 
             it('sorts values for a (set) predicate', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://www.w3.org/2000/01/rdf-schema#comment': [
                         {
@@ -138,7 +141,7 @@ describe('Vocabulary', () => {
                     ]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].values[0].value).toEqual('My first collection');
                 expect(result[0].values[1].value).toEqual('Some more info');
@@ -148,11 +151,11 @@ describe('Vocabulary', () => {
         describe('returned properties', () => {
             it('returns all properties specified in the vocabulary', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection']
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
 
                 expect(result.length).toEqual(6);
                 expect(result[0].key).toEqual("http://www.schema.org/creator");
@@ -165,7 +168,7 @@ describe('Vocabulary', () => {
 
             it('sorts properties in ascending order by label with existing values first', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://www.w3.org/2000/01/rdf-schema#label': [
                         {
@@ -179,7 +182,7 @@ describe('Vocabulary', () => {
                     ]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.length).toBeGreaterThan(4);
                 expect(result[0].key).toEqual("http://www.schema.org/creator");
                 expect(result[1].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
@@ -190,7 +193,7 @@ describe('Vocabulary', () => {
 
             it('only returns properties present in the vocabulary', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://fairspace.io/ontology#non-existing': [
                         {
@@ -199,13 +202,13 @@ describe('Vocabulary', () => {
                     ]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.map(property => property.key)).not.toContain('http://fairspace.io/ontology#non-existing');
             });
 
             it('does not return properties not allowed for a specific type', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://schema.org/Creator': [
                         {
@@ -214,7 +217,7 @@ describe('Vocabulary', () => {
                     ]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.map(property => property.key)).not.toContain('http://schema.org/Creator');
             });
         });
@@ -241,12 +244,12 @@ describe('Vocabulary', () => {
             ];
 
             it('returns nothing if multiple nodes are given but no subject', () => {
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.length).toEqual(0);
             });
 
             it('includes label of associated nodes if given', () => {
-                const result = vocabulary.combine(metadata, 'http://fairspace.com/iri/collections/1/dir');
+                const result = fromJsonLd(metadata, 'http://fairspace.com/iri/collections/1/dir', vocabulary);
 
                 expect(result[0].key).toEqual("http://fairspace.io/ontology#hasFile");
                 expect(result[0].values.length).toEqual(2);
@@ -257,33 +260,17 @@ describe('Vocabulary', () => {
             });
         });
 
-        describe('getLabelForPredicate', () => {
-            it('returns the label for a known predicate', () => {
-                expect(vocabulary.getLabelForPredicate('http://www.w3.org/2000/01/rdf-schema#label')).toEqual('Label');
-            });
-
-            it('returns the uri if no label is known for a predicate', () => {
-                const uri = 'http://fairspace.io/ontology#Unknown';
-                expect(vocabulary.getLabelForPredicate(uri)).toEqual(uri);
-            });
-
-            it('returns the uri if the predicate itself is unknown', () => {
-                const uri = 'http://fairspace.io/ontology#NonExisting';
-                expect(vocabulary.getLabelForPredicate(uri)).toEqual(uri);
-            });
-        });
-
         describe('support for rdf:List', () => {
-            it('combine returns isRdfList correctly', () => {
+            it('fromJsonLd returns isRdfList correctly', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://fairspace.io/ontology#list': [{
                         '@list': [{"@value": "abc"}, {"@value": "def"}, {"@value": "ghi"}]
                     }]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.length).toBeGreaterThan(2);
                 expect(result[0].key).toEqual('http://fairspace.io/ontology#list');
                 expect(result[0].isRdfList).toEqual(true);
@@ -292,14 +279,14 @@ describe('Vocabulary', () => {
 
             it('returns list values as arrays', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://fairspace.io/ontology#list': [{
                         '@list': [{"@value": "abc"}, {"@value": "def"}, {"@value": "ghi"}]
                     }]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].key).toEqual('http://fairspace.io/ontology#list');
                 expect(result[0].values.map(v => v.value)).toEqual(["abc", "def", "ghi"]);
@@ -307,7 +294,7 @@ describe('Vocabulary', () => {
 
             it('returns concatenates multiple lists', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://fairspace.io/ontology#list': [
                         {
@@ -319,7 +306,7 @@ describe('Vocabulary', () => {
                     ]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].key).toEqual('http://fairspace.io/ontology#list');
                 expect(result[0].values.map(v => v.value)).toEqual(["abc", "def", "ghi", "jkl"]);
@@ -327,7 +314,7 @@ describe('Vocabulary', () => {
 
             it('does not sort values for a rdf:list predicate', () => {
                 const metadata = [{
-                    '@id': 'http://fairspace.com/iri/collections/1',
+                    '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
                     'http://fairspace.io/ontology#list': [
                         {
@@ -339,17 +326,117 @@ describe('Vocabulary', () => {
                     ]
                 }];
 
-                const result = vocabulary.combine(metadata);
+                const result = fromJsonLd(metadata, subject, vocabulary);
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].values.map(v => v.value)).toEqual(["jkl", "abc", "ghi", "def"]);
             });
         });
     });
 
+    describe('toJsonLd', () => {
+        const vocabulary = vocabularyUtils([]);
+
+        it('should creates a valid json-ld (@value)', () => {
+            const subject = "some-subject";
+            const predicate = "some-predicate";
+            const values = [{value: "some-value"}];
+
+            const jsonLd = toJsonLd(subject, predicate, values, vocabulary);
+
+            const expected = {
+                "@id": "some-subject",
+                "some-predicate": [{"@value": "some-value"}]
+            };
+
+            expect(jsonLd).toEqual(expected);
+        });
+
+        it('should creates a valid json-ld (@id)', () => {
+            const subject = "some-subject";
+            const predicate = "some-predicate";
+            const values = [{id: "some-id"}];
+
+            const jsonLd = toJsonLd(subject, predicate, values, vocabulary);
+
+            const expected = {
+                "@id": "some-subject",
+                "some-predicate": [{"@id": "some-id"}]
+            };
+
+            expect(jsonLd).toEqual(expected);
+        });
+
+        it('null predicate', () => {
+            const subject = "some-subject";
+            const values = [{id: "some-id"}];
+            const jsonLd = toJsonLd(subject, null, values, vocabulary);
+
+            expect(jsonLd).toEqual(null);
+        });
+
+        it('null values', () => {
+            const subject = "some-subject";
+            const predicate = "some-predicate";
+            const jsonLd = toJsonLd(subject, predicate, null, vocabulary);
+
+            expect(jsonLd).toEqual(null);
+        });
+
+        it('empty values', () => {
+            const subject = "some-subject";
+            const predicate = "some-predicate";
+            const jsonLd = toJsonLd(subject, predicate, [], vocabulary);
+
+            const expected = {
+                "@id": "some-subject",
+                [predicate]: {'@id': constants.NIL_URI}
+            };
+
+            expect(jsonLd).toEqual(expected);
+        });
+
+        it('null subject', () => {
+            const predicate = "some-predicate";
+            const values = [{id: "some-id"}];
+            const jsonLd = toJsonLd(null, predicate, values, vocabulary);
+
+            expect(jsonLd).toEqual(null);
+        });
+
+        it('all null values', () => {
+            const jsonLd = toJsonLd();
+
+            expect(jsonLd).toEqual(null);
+        });
+
+        it('should generate a valid json-ld for rdf:List', () => {
+            const subject = "some-subject";
+            const predicate = "some-predicate";
+            const values = [{value: "some-value"}, {value: "some-other-value"}];
+
+            const vocabularyMock = {
+                determineShapeForProperty: () => ({
+                    [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
+                })
+            };
+
+            const jsonLd = toJsonLd(subject, predicate, values, vocabularyMock);
+
+            const expected = {
+                "@id": "some-subject",
+                "some-predicate": {"@list": [{"@value": "some-value"}, {"@value": "some-other-value"}]}
+            };
+
+            expect(jsonLd).toEqual(expected);
+        });
+    });
+
     describe('empty linked data object', () => {
+        const vocabulary = vocabularyUtils(vocabularyJsonLd);
+
         it('returns all properties without values', () => {
             const shape = vocabulary.determineShapeForType('http://fairspace.io/ontology#Collection');
-            const result = vocabulary.emptyLinkedData(shape);
+            const result = emptyLinkedData(vocabulary, shape);
 
             expect(result.length).toEqual(6);
 
@@ -362,51 +449,18 @@ describe('Vocabulary', () => {
 
         it('returns the type property with value', () => {
             const shape = vocabulary.determineShapeForType('http://fairspace.io/ontology#Collection');
-            const result = vocabulary.emptyLinkedData(shape);
+            const result = emptyLinkedData(vocabulary, shape);
 
             expect(result.length).toEqual(6);
             expect(result[5].values.map(el => el.id)).toEqual(['http://fairspace.io/ontology#Collection']);
         });
 
         it('returns nothing for an invalid shape', () => {
-            expect(vocabulary.emptyLinkedData()).toEqual([]);
+            expect(emptyLinkedData(vocabulary)).toEqual([]);
         });
-    });
 
-    describe('vocabulary contains', () => {
-        it('should return true if the given id is present in the vocabulary', () => expect(vocabulary.contains(vocabularyJsonLd[0]['@id'])).toBe(true));
-        it('should return false if the given id is not present in the vocabulary', () => expect(vocabulary.contains('http://not-present')).toBe(false));
-        it('should return false on empty vocabulary', () => expect(new Vocabulary().contains(vocabularyJsonLd[0]['@id'])).toBe(false));
-        it('should return false on invalid URI', () => expect(vocabulary.contains('invalid-uri')).toBe(false));
-        it('should return false on invalid parameter', () => expect(vocabulary.contains()).toBe(false));
-        it('should return false if URI is only referred to in vocabulary', () => expect(vocabulary.contains('http://fairspace.io/ontology#Collection')).toBe(false));
-    });
-
-    describe('isRdfList', () => {
-        const rdfListShape = {
-            [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
-        };
-
-        const nonRdfListShape = {
-            [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}]
-        };
-
-        it('should return true if the given shape is an rdf list', () => expect(Vocabulary.isRdfList(rdfListShape)).toBe(true));
-        it('should return false if the given shape is not an rdf list', () => expect(Vocabulary.isRdfList(nonRdfListShape)).toBe(false));
-        it('should return false on an empty shape', () => expect(Vocabulary.isRdfList({})).toBe(false));
-    });
-
-    describe('isGenericResourceIri', () => {
-        const genericResourceShape = {
-            [constants.SHACL_NODEKIND]: [{'@id': constants.SHACL_IRI}]
-        };
-
-        const nonGenericResourceShape = {
-            [constants.SHACL_NODEKIND]: [{'@id': constants.STRING_URI}]
-        };
-
-        it('should return true if the given shape represents a generic iri resource', () => expect(Vocabulary.isGenericIriResource(genericResourceShape)).toBe(true));
-        it('should return false if the given shape does not represent a generic iri resource', () => expect(Vocabulary.isGenericIriResource(nonGenericResourceShape)).toBe(false));
-        it('should return false on an empty shape', () => expect(Vocabulary.isGenericIriResource({})).toBe(false));
+        it('returns nothing for an invalid vocabulary', () => {
+            expect(emptyLinkedData(vocabulary)).toEqual([]);
+        });
     });
 });

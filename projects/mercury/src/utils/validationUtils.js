@@ -1,4 +1,4 @@
-import {getFirstPredicateValue} from "./metadataUtils";
+import {getFirstPredicateValue} from "./linkeddata/jsonLdUtils";
 import * as constants from "../constants";
 
 const conditionApplisToAnyValue = (values, condition) => values && values.some(condition);

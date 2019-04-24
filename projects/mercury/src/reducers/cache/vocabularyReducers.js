@@ -1,6 +1,6 @@
 import reduceReducers from "reduce-reducers";
 import {promiseReducerFactory} from "../../utils/redux";
-import Vocabulary from "../../services/Vocabulary";
+import {vocabularyUtils} from "../../utils/linkeddata/vocabularyUtils";
 import * as actionTypes from "../../actions/actionTypes";
 
 const defaultState = {invalidated: true, data: []};
@@ -26,7 +26,7 @@ export default reduceReducers(fetchVocabularyReducer, updateVocabularyReducer, d
  * @param state
  * @returns {Vocabulary}
  */
-export const getVocabulary = ({cache: {vocabulary}}) => new Vocabulary(vocabulary ? vocabulary.data : []);
+export const getVocabulary = ({cache: {vocabulary}}) => vocabularyUtils(vocabulary ? vocabulary.data : []);
 export const isVocabularyPending = ({cache: {vocabulary}}) => !!vocabulary.pending;
 export const hasVocabularyError = ({cache: {vocabulary}}) => !!vocabulary.error;
 
@@ -46,6 +46,6 @@ export const hasVocabularyEntitiesError = ({cache: {allVocabularyEntities}}) => 
  * @param state
  * @returns {Vocabulary}
  */
-export const getMetaVocabulary = ({cache: {metaVocabulary}}) => new Vocabulary(metaVocabulary.data);
+export const getMetaVocabulary = ({cache: {metaVocabulary}}) => vocabularyUtils(metaVocabulary.data);
 export const isMetaVocabularyPending = ({cache: {metaVocabulary}}) => !!metaVocabulary.pending;
 export const hasMetaVocabularyError = ({cache: {metaVocabulary}}) => !!metaVocabulary.error;

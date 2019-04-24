@@ -2,16 +2,15 @@ import nodeCrypto from "crypto";
 
 import {
     generateUuid,
-    getFirstPredicateId,
-    getFirstPredicateValue,
-    getLabel, getTypeInfo,
+    getLabel,
+    getTypeInfo,
     linkLabel,
     propertiesToShow,
     relativeLink,
     shouldPropertyBeHidden,
-    toJsonLd, url2iri,
+    url2iri,
 } from "./metadataUtils";
-import * as constants from "../constants";
+import * as constants from "../../constants";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {
@@ -75,35 +74,6 @@ describe('Metadata Utils', () => {
         });
         it('should return part of the url after the last slash if no pound sign present', () => {
             expect(getLabel({'@id': 'http://test.nl/name'}, true)).toEqual('name');
-        });
-    });
-
-    describe('getFirstPredicateValue', () => {
-        it('should return undefined if a property does not exist', () => {
-            expect(getFirstPredicateValue({name: 'John'}, 'age')).toEqual(undefined);
-        });
-
-        it('should return undefined if a property is empty', () => {
-            expect(getFirstPredicateValue({numbers: []}, 'numbers')).toEqual(undefined);
-        });
-
-        it('should support literal properties', () => {
-            expect(getFirstPredicateValue({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual(1);
-        });
-    });
-
-    describe('getFirstPredicateId', () => {
-        it('should return undefined if a property does not exist', () => {
-            expect(getFirstPredicateId({name: 'John'}, 'age')).toEqual(undefined);
-        });
-
-        it('should return undefined if a property is empty', () => {
-            expect(getFirstPredicateId({numbers: []}, 'numbers')).toEqual(undefined);
-        });
-
-        it('should support reference properties', () => {
-            expect(getFirstPredicateId({numbers: [{'@id': 'http://example.com/1'}, {'@id': 'http://example.com/2'}]}, 'numbers'))
-                .toEqual('http://example.com/1');
         });
     });
 
@@ -211,102 +181,6 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('toJsonLd', () => {
-        it('should creates a valid json-ld (@value)', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
-            const values = [{value: "some-value"}];
-
-            const jsonLd = toJsonLd(subject, predicate, values);
-
-            const expected = {
-                "@id": "some-subject",
-                "some-predicate": [{"@value": "some-value"}]
-            };
-
-            expect(jsonLd).toEqual(expected);
-        });
-
-        it('should creates a valid json-ld (@id)', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
-            const values = [{id: "some-id"}];
-
-            const jsonLd = toJsonLd(subject, predicate, values);
-
-            const expected = {
-                "@id": "some-subject",
-                "some-predicate": [{"@id": "some-id"}]
-            };
-
-            expect(jsonLd).toEqual(expected);
-        });
-
-        it('null predicate', () => {
-            const subject = "some-subject";
-            const values = [{id: "some-id"}];
-            const jsonLd = toJsonLd(subject, null, values);
-
-            expect(jsonLd).toEqual(null);
-        });
-
-        it('null values', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
-            const jsonLd = toJsonLd(subject, predicate, null);
-
-            expect(jsonLd).toEqual(null);
-        });
-
-        it('empty values', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
-            const jsonLd = toJsonLd(subject, predicate, []);
-
-            const expected = {
-                "@id": "some-subject",
-                [predicate]: {'@id': constants.NIL_URI}
-            };
-
-            expect(jsonLd).toEqual(expected);
-        });
-
-        it('null subject', () => {
-            const predicate = "some-predicate";
-            const values = [{id: "some-id"}];
-            const jsonLd = toJsonLd(null, predicate, values);
-
-            expect(jsonLd).toEqual(null);
-        });
-
-        it('all null values', () => {
-            const jsonLd = toJsonLd();
-
-            expect(jsonLd).toEqual(null);
-        });
-
-        it('should generate a valid json-ld for rdf:List', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
-            const values = [{value: "some-value"}, {value: "some-other-value"}];
-
-            const vocabularyMock = {
-                determineShapeForProperty: () => ({
-                    [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
-                })
-            };
-
-            const jsonLd = toJsonLd(subject, predicate, values, vocabularyMock);
-
-            const expected = {
-                "@id": "some-subject",
-                "some-predicate": {"@list": [{"@value": "some-value"}, {"@value": "some-other-value"}]}
-            };
-
-            expect(jsonLd).toEqual(expected);
-        });
-    });
-
     describe('url2iri', () => {
         it('returns http scheme regardless of the input scheme', () => {
             expect(url2iri('scheme://example.com/some/path')).toEqual('http://example.com/some/path');
@@ -326,7 +200,6 @@ describe('Metadata Utils', () => {
         it('return the unmodified uri if it is invalid', () => {
             expect(url2iri('some-invalid-uri')).toEqual('some-invalid-uri');
         });
-
     });
 
     describe('getTypeInfo', () => {
@@ -365,6 +238,5 @@ describe('Metadata Utils', () => {
 
             expect(getTypeInfo(metadata)).toBeUndefined();
         });
-
-    })
+    });
 });

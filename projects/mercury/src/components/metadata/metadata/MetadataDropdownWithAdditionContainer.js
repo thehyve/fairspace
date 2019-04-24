@@ -5,7 +5,8 @@ import InputWithAddition from "../common/values/InputWithAddition";
 import MetadataDropdownContainer from "./MetadataDropdownContainer";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import {createMetadataEntityFromState, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
-import {createMetadataIri} from "../../../utils/metadataUtils";
+import {createMetadataIri} from "../../../utils/linkeddata/metadataUtils";
+import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 
 const MetadataDropdownWithAdditionContainer = props => (
     <InputWithAddition
@@ -44,7 +45,7 @@ const mapStateToProps = (state, ownProps) => {
     const error = hasVocabularyError(state);
 
     const shape = (!pending && !error) ? vocabulary.determineShapeForType(ownProps.property.className) : {};
-    const emptyData = vocabulary.emptyLinkedData(shape);
+    const emptyData = emptyLinkedData(vocabulary, shape);
 
     return {pending, error, shape, emptyData};
 };

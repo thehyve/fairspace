@@ -1,5 +1,5 @@
 import React from 'react';
-import {isDateTimeProperty} from "../../../../utils/metadataUtils";
+import {isDateTimeProperty} from "../../../../utils/linkeddata/metadataUtils";
 import DateTime from "../../../common/DateTime";
 import LinkedDataLink from "../LinkedDataLink";
 

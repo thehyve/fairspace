@@ -1,7 +1,7 @@
 import {expand} from 'jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
-import {toJsonLd} from "../utils/metadataUtils";
+import {toJsonLd} from "../utils/linkeddata/jsonLdConverter";
 
 class LinkedDataAPI {
     static getParams = {
@@ -54,9 +54,10 @@ class LinkedDataAPI {
      * @param values    Array with objects representing the rdf-object for the triples.
      *                  Each object must have a 'value' key.
      *                  e.g.: [ {value: 'user 1'}, {value: 'another user'} ]
+     * @param vocabulary The {vocabularyUtils} object containing the shapes for this metadata entity
      * @returns {*}
      */
-    update(subject, predicate, values) {
+    update(subject, predicate, values, vocabulary) {
         if (!subject || !predicate || !values) {
             return Promise.reject(Error("No subject, predicate or values given"));
         }
@@ -69,7 +70,7 @@ class LinkedDataAPI {
                 method: 'PATCH',
                 headers: new Headers({'Content-type': 'application/ld+json'}),
                 credentials: 'same-origin',
-                body: JSON.stringify(toJsonLd(subject, predicate, values))
+                body: JSON.stringify(toJsonLd(subject, predicate, values, vocabulary))
             });
 
         return request.then(failOnHttpError("Failure when updating metadata"));
@@ -84,7 +85,7 @@ class LinkedDataAPI {
      *   id: referencing another resource
      *   value: referencing a literal value
      * If both keys are specified, the id is stored and the literal value is ignored
-     * @param vocabulary The {Vocabulary} object containing the shapes for this metadata entity
+     * @param vocabulary The {vocabularyUtils} object containing the shapes for this metadata entity
      * @returns {*}
      */
     createEntity(subject, type, properties, vocabulary) {
@@ -107,7 +108,7 @@ class LinkedDataAPI {
      *   id: referencing another resource
      *   value: referencing a literal value
      * If both keys are specified, the id is stored and the literal value is ignored
-     * @param vocabulary The {Vocabulary} object containing the shapes for this metadata entity
+     * @param vocabulary The {vocabularyUtils} object containing the shapes for this metadata entity
      * @returns {*}
      */
     updateEntity(subject, properties, vocabulary) {

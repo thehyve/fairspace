@@ -1,5 +1,6 @@
 import {MetadataAPI} from "./LinkedDataAPI";
 import Config from "./Config/Config";
+import {vocabularyUtils} from "../utils/linkeddata/vocabularyUtils";
 
 const mockResponse = (status, statusText, response) => new window.Response(response, {
     status,
@@ -30,7 +31,12 @@ it('fetches metadata with provided parameters', () => {
 
 it('stores metadata as jsonld', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
-    MetadataAPI.update('http://thehyve.nl', 'hasEmployees', [{value: 'John Snow'}, {value: 'Ygritte'}]);
+    MetadataAPI.update(
+        'http://thehyve.nl',
+        'hasEmployees',
+        [{value: 'John Snow'}, {value: 'Ygritte'}],
+        vocabularyUtils([])
+    );
     expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
     const expected = {
         '@id': 'http://thehyve.nl',
@@ -44,10 +50,14 @@ it('stores metadata as jsonld', () => {
 
 it('stores metadata as jsonld (Full entity)', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
-    MetadataAPI.updateEntity('http://thehyve.nl', {
-        hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}],
-        hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}],
-    });
+    MetadataAPI.updateEntity(
+        'http://thehyve.nl',
+        {
+            hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}],
+            hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}],
+        },
+        vocabularyUtils([])
+    );
     expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
     const expected = [
         {

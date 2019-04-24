@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 
 import * as PropTypes from "prop-types";
-import {getLabel} from "../../../utils/metadataUtils";
+import {getLabel} from "../../../utils/linkeddata/metadataUtils";
 import {compareBy} from "../../../utils/comparisionUtils";
 import LoadingInlay from '../../common/LoadingInlay';
 

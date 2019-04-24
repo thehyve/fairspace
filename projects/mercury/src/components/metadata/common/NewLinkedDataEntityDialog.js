@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 
-import {generateUuid, getLabel} from "../../../utils/metadataUtils";
+import {generateUuid, getLabel} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 
 class NewLinkedDataEntityDialog extends React.Component {
