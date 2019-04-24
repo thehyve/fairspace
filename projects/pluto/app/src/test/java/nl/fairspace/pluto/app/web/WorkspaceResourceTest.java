@@ -53,7 +53,7 @@ public class WorkspaceResourceTest {
 
     @Test
     public void frontendConfigurationReturnsAllUrlsSpecified() throws Exception {
-        Map config = restTemplate.getForObject("http://localhost:" + port + "/api/workspace/config", Map.class);
+        Map config = restTemplate.getForObject("http://localhost:" + port + "/api/v1/workspace/config", Map.class);
 
         assertTrue(config.containsKey("urls"));
         assertEquals("https://jupyterhub.someplace", ((Map) config.get("urls")).get("jupyter"));
@@ -62,7 +62,7 @@ public class WorkspaceResourceTest {
 
     @Test
     public void workspaceDetailsReturnsNameAndVersion() throws Exception {
-        Map details = restTemplate.getForObject("http://localhost:" + port + "/api/workspace/details", Map.class);
+        Map details = restTemplate.getForObject("http://localhost:" + port + "/api/v1/workspace/details", Map.class);
 
         assertEquals("Test Workspace", details.get("name"));
         assertEquals("1.2.3-TEST", details.get("version"));

@@ -21,6 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static nl.fairspace.pluto.app.config.Urls.AUTHORIZATIONS_PATH;
+import static nl.fairspace.pluto.app.config.Urls.EXCHANGE_TOKENS_PATH;
+import static nl.fairspace.pluto.app.config.Urls.USERINFO_PATH;
+import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_CONFIG_PATH;
+import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_DETAILS_PATH;
+import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_USERS_PATH;
+
 /**
  * REST controller for managing the current user's account.
  */
@@ -42,7 +49,7 @@ public class NoAuthResource {
      *
      * @return a map with authorizations for the current user.
      */
-    @GetMapping("/account/authorizations")
+    @GetMapping(AUTHORIZATIONS_PATH)
     public List<String> getAuthorizations() throws ParseException {
         return Collections.emptyList();
     }
@@ -52,7 +59,7 @@ public class NoAuthResource {
      *
      * @return the login if the user is authenticated
      */
-    @GetMapping("/account/user")
+    @GetMapping(USERINFO_PATH)
     public UserInfo getUser() {
         return new UserInfo("0", "mock-user", "Mock User", "Mock", "User");
     }
@@ -65,7 +72,7 @@ public class NoAuthResource {
      *
      * @return
      */
-    @PostMapping(value = "/account/tokens", consumes = "application/json")
+    @PostMapping(value = EXCHANGE_TOKENS_PATH, consumes = "application/json")
     public Map<String, String> exchangeTokens(@RequestBody ExchangeTokenParams tokenParams, HttpServletRequest request) {
         HttpSession session = request.getSession();
         return Collections.singletonMap("sessionId", base64Encode(session.getId()));
@@ -76,7 +83,7 @@ public class NoAuthResource {
      *
      * @return a map with configuration options relevant for the frontend
      */
-    @GetMapping(value = "/api/workspace/config", produces = "application/json")
+    @GetMapping(value = WORKSPACE_CONFIG_PATH, produces = "application/json")
     public FrontendConfig getConfiguration(HttpServletRequest incomingRequest) {
         return frontendConfig;
     }
@@ -89,7 +96,7 @@ public class NoAuthResource {
      * @return a list with information on all users in the system.
      * @see <https://www.keycloak.org/docs-api/3.4/rest-api/index.html#_users_resource>
      */
-    @GetMapping(value = "/api/workspace/users", produces = "application/json")
+    @GetMapping(value = WORKSPACE_USERS_PATH, produces = "application/json")
     public ResponseEntity<String> getUsers(HttpServletRequest incomingRequest) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +117,7 @@ public class NoAuthResource {
      *
      * @return a map with workspace details
      */
-    @GetMapping(value = "/api/workspace/details", produces = "application/json")
+    @GetMapping(value = WORKSPACE_DETAILS_PATH, produces = "application/json")
     public WorkspaceDetails getDetails() {
         return workspaceDetails;
     }

@@ -23,12 +23,14 @@ import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORIZATION_SESSION_
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.FIRSTNAME_CLAIM;
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.LASTNAME_CLAIM;
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.SUBJECT_CLAIM;
+import static nl.fairspace.pluto.app.config.Urls.AUTHORIZATIONS_PATH;
+import static nl.fairspace.pluto.app.config.Urls.EXCHANGE_TOKENS_PATH;
+import static nl.fairspace.pluto.app.config.Urls.USERINFO_PATH;
 
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
-@RequestMapping("/account")
 @Profile("!noAuth")
 @Slf4j
 public class AccountResource {
@@ -43,7 +45,7 @@ public class AccountResource {
      *
      * @return a map with authorizations for the current user.
      */
-    @GetMapping("/authorizations")
+    @GetMapping(AUTHORIZATIONS_PATH)
     public List<String> getAuthorizations() throws ParseException {
         log.trace("REST request to retrieve authorizations");
         if(token == null) {
@@ -59,7 +61,7 @@ public class AccountResource {
      *
      * @return the login if the user is authenticated
      */
-    @GetMapping("/user")
+    @GetMapping(USERINFO_PATH)
     public UserInfo getUser() {
         log.trace("REST request to check if the current user is authenticated");
         if(token == null) {
@@ -84,7 +86,7 @@ public class AccountResource {
      *
      * @return
      */
-    @PostMapping(value = "/tokens", consumes = "application/json")
+    @PostMapping(value = EXCHANGE_TOKENS_PATH, consumes = "application/json")
     public Map<String, String> exchangeTokens(@RequestBody ExchangeTokenParams tokenParams, HttpServletRequest request) {
         HttpSession session = request.getSession();
 

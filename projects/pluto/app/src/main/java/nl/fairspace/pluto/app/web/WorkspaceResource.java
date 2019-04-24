@@ -23,13 +23,16 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.nio.charset.Charset;
 
+import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_CONFIG_PATH;
+import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_DETAILS_PATH;
+import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_USERS_PATH;
+
 /**
  * REST controller for managing workspace contents
  */
 @RestController
 @Slf4j
 @Profile("!noAuth")
-@RequestMapping("/api/workspace")
 public class WorkspaceResource {
     @Autowired
     FrontendConfig frontendConfig;
@@ -45,7 +48,7 @@ public class WorkspaceResource {
      *
      * @return a map with configuration options relevant for the frontend
      */
-    @GetMapping(value = "/config", produces = "application/json")
+    @GetMapping(value = WORKSPACE_CONFIG_PATH, produces = "application/json")
     public FrontendConfig getConfiguration(HttpServletRequest incomingRequest) {
         return frontendConfig;
     }
@@ -58,7 +61,7 @@ public class WorkspaceResource {
      * @return a list with information on all users in the system.
      * @see <https://www.keycloak.org/docs-api/4.0/rest-api/index.html#_getusersinrole>
      */
-    @GetMapping(value = "/users", produces = "application/json")
+    @GetMapping(value = WORKSPACE_USERS_PATH, produces = "application/json")
     public ResponseEntity<String> getUsers(HttpServletRequest incomingRequest) {
         return keycloakUserList.getUsers(incomingRequest.getQueryString());
     }
@@ -68,7 +71,7 @@ public class WorkspaceResource {
      *
      * @return a map with workspace details
      */
-    @GetMapping(value = "/details", produces = "application/json")
+    @GetMapping(value = WORKSPACE_DETAILS_PATH, produces = "application/json")
     public WorkspaceDetails getDetails() {
         return workspaceDetails;
     }

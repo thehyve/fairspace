@@ -10,9 +10,11 @@ import static spark.Spark.*;
 
 @Slf4j
 public class CollectionsApp extends BaseApp {
+    private String pathPrefix;
     private final CollectionsService service;
 
-    public CollectionsApp(CollectionsService service) {
+    public CollectionsApp(String pathPrefix, CollectionsService service) {
+        this.pathPrefix = pathPrefix;
         this.service = service;
     }
 
@@ -20,7 +22,7 @@ public class CollectionsApp extends BaseApp {
     public void init() {
         super.init();
 
-        path("/api/collections", () -> {
+        path(pathPrefix + "/collections", () -> {
             get("/", (req, res) -> {
                 var iri = req.queryParams("iri");
 

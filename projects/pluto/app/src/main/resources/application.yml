@@ -1,4 +1,8 @@
 app:
+  apiVersion:
+    pluto: v1
+    saturn: v1
+    elasticSearch: v1
   oauth2:
     base-url: http://localhost:9080
     realm: keycloak
@@ -43,12 +47,12 @@ security:
     - /login
     - /logout
     - /authorize
-    - /account/tokens
+    - /api/${app.apiVersion.pluto}/account/tokens
     needsAuthentication:
-    - /account/name
+    - /api/${app.apiVersion.pluto}/account/name
     - /*
     needsAuthorization:
-    - /account/authorizations
+    - /api/${app.apiVersion.pluto}/account/authorizations
     - /api/*
 
 workspace:
@@ -68,18 +72,14 @@ zuul:
     # The elasticsearch route must be defined before
     # saturn, which must be defined before ui, because of the
     # paths they listen to
-    storage:
+    elasticsearch:
+      path: /api/${app.apiVersion.elasticSearch}/search/*/_search
+      url: http://elasticsearch/
+    saturn:
       # The webdav URL is not only used in the request URI, but also in headers (e.g. Destination)
       # To avoid rewriting these headers, it is suggested that the path on the proxy is the same
       # as the path on the upstream service for webdav calls.
-      path: /webdav/**
-      url: http://saturn/
-      strip-prefix: false
-    elasticsearch:
-      path: /api/search/*/_search
-      url: http://elasticsearch/
-    saturn:
-      path: /api/**
+      path: /api/${app.apiVersion.saturn}/**
       url: http://saturn/
       strip-prefix: false
     ui:
@@ -87,8 +87,8 @@ zuul:
       url: http://mercury/
   ignored-patterns:
   - /actuator/**
-  - /account/**
-  - /api/workspace/**
+  - /api/${app.apiVersion.pluto}/account/**
+  - /api/${app.apiVersion.pluto}/workspace/**
   - /login
   - /logout
   - /authorize

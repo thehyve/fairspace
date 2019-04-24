@@ -163,7 +163,6 @@ pluto:
   backends:
     ui:
     saturn:
-    storage:
 
 #####################################################################
 # Specific settings for Saturn subchart
@@ -194,7 +193,7 @@ saturn:
       cpu: 200m
       memory: 512Mi
 
-  probePath: /api/health/
+  probePath: /api/v1/health/
   livenessProbe:
     initialDelaySeconds: 20
     periodSeconds: 10

@@ -39,7 +39,7 @@ public class SaturnSecurityHandlerTest {
 
     @Test
     public void healthEndpointCanBeAccessedWithoutAuth() throws IOException, ServletException {
-        handler.handle("/api/health/", baseRequest, request, response);
+        handler.handle("/api/v1/health/", baseRequest, request, response);
 
         verifyIfRequestWasPassedToSuper(true);
     }
