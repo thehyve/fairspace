@@ -22,7 +22,7 @@ sent with the request. See also the `DummyAuthenticator` class for details.
 
 ### High-level metadata
 
-The high-level metadata API runs on :8080/api/metadata/.
+The high-level metadata API runs on :8080/api/v1/metadata/.
 Currently they support the following methods:
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                  |
@@ -33,7 +33,7 @@ Currently they support the following methods:
 | DELETE      | -                                                 | JsonLD-encoded statements | Deletes the statements provided                                    |
 | PATCH       | -                                                 | JsonLD-encoded statements | Replaces existing triples with the statements provided             |
 
-Additional `:8080/api/metadata/entities/` and `:8080/api/vocabulary/entities/` endpoints allow to retrieve labelled FairSpace entities, optionally filtered by type:
+Additional `:8080/api/v1/metadata/entities/` and `:8080/api/v1/vocabulary/entities/` endpoints allow to retrieve labelled FairSpace entities, optionally filtered by type:
 
 
 | HTTP Method | Query Parameters                                  | Request Body              | Effect & response                                                      |
@@ -46,16 +46,11 @@ The vocabulary consists of 3 different parts:
  - a meta vocabulary describing the structure of the user and system vocabularies
  - a system vocabulary describing the structure of fixed metadata classes (e.g File, Collection etc.)
  - a user vocabulary describing the structure of all other metadata classes. This vocabulary can be updated by data stewards
- 
-Please note:
-- The system vocabulary may contain properties being marked as `fs:machineOnly`. These are properties for which the user is
-  not allowed to add metadata. Metadata with such a property can only be added by our system itself (e.g. other APIs)
-- The user vocabulary may contain classes which are marked as `fs:showInCatalog`. These are classes
-  for which the UI should allow creating new entities
 
-The APIs run on :8080/api/vocabulary/{meta,system,user}/. The data for those vocabularies
-are stored in separate graphs internally. Also, the meta and system vocabularies are read only,
-where the user vocabulary  can be updated
+The system and user vocabulary are exposed as a single vocabulary. However, the system vocabulary triples can not be updated by the user.
+ 
+The APIs run on :8080/api/v1/vocabulary/ and :8080/api/v1/meta-vocabulary/. The data for those vocabularies
+are stored in separate graphs internally. 
 
 Currently they support the following methods:
 
@@ -96,7 +91,7 @@ Currently a collection has the following fields, all represented as strings:
  
  ### High-level permissions API
  
- The high-level permissions API runs on :8080/api/permissions/.
+ The high-level permissions API runs on :8080/api/v1/permissions/.
  
 | HTTP Method | Query Parameters                          | Request Body              | Effect & response                                                                                                                                        |
 |-------------|-------------------------------------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -105,13 +100,18 @@ Currently a collection has the following fields, all represented as strings:
 | PUT         | iri (URL-encoded)                         | {"user": <user IRI>, "access": <one of "None", "Read", "Write", "Manage">}    | Sets user's permissions for a specific resource                                                      |
 
 
- The API for marking entities as write-restricted runs on :8080/api/permissions/restricted/.
+ The API for marking entities as write-restricted runs on :8080/api/v1/permissions/restricted/.
 
 | HTTP Method | Query Parameters                          | Request Body                    | Effect & response                                                                 |
 |-------------|-------------------------------------------|---------------------------------|---------------------------------------------------------------------------------- |
 | GET         | iri (URL-encoded)                         | -                               | Answers whether an entity is marked as write-restricted: {"restricted": <true or false>} |
 | PUT         | iri (URL-encoded)                         | {"restricted": <true or false>} | Marks an entity as (not) write-restricted                                         |
 
+
+ ### File storage API
+ 
+ A file storage API is exposed via the WebDAV protocol. It runs on `:8080/webdav/v1/`. All visible collections in the system are exposed as top-level directories.
+ Creating a top-level directory via WebDAV will result in an error message.
 
 ## How to build
 

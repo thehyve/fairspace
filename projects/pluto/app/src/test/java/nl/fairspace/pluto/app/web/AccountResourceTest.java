@@ -72,7 +72,7 @@ public class AccountResourceTest {
         ExchangeTokenParams exchangeTokenParams = new ExchangeTokenParams(accessToken.serialize(), refreshToken.serialize());
         HttpEntity<ExchangeTokenParams> request = new HttpEntity<>(exchangeTokenParams, headers);
 
-        ResponseEntity<Map> tokenData = restTemplate.exchange("http://localhost:" + port + "/account/tokens", HttpMethod.POST, request, Map.class);
+        ResponseEntity<Map> tokenData = restTemplate.exchange("http://localhost:" + port + "/api/v1/account/tokens", HttpMethod.POST, request, Map.class);
         assertEquals(200, tokenData.getStatusCodeValue());
 
         // Ensure that the session id is returned both as a cookie and explicitly

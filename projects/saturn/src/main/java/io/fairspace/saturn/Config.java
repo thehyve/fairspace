@@ -14,6 +14,8 @@ import java.util.Set;
 public class Config {
     public int port = 8080;
 
+    public final String apiVersion = "v1";
+
     public final Jena jena = new Jena();
 
     public final Auth auth = new Auth();

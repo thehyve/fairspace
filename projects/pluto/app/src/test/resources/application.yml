@@ -1,4 +1,6 @@
 app:
+  apiVersion:
+    pluto: v1
   domain: http://fake-origin
 
 frontend:
@@ -21,7 +23,7 @@ security:
     permitAll:
     - /actuator/health
     - /login
-    - /account/tokens
+    - /api/v1/account/tokens
     needsAuthentication:
     - /noauthz
     needsAuthorization:

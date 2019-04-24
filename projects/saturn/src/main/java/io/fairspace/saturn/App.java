@@ -80,17 +80,18 @@ public class App {
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
+        var apiPathPrefix = "/api/" + CONFIG.apiVersion;
         var fusekiServerBuilder = FusekiServer.create()
-                .add("api/rdf/", ds, false)
-                .addFilter("/api/*", new SaturnSparkFilter(
-                        new ChangeableMetadataApp("/api/metadata", metadataService),
-                        new ChangeableMetadataApp("/api/vocabulary/", userVocabularyService)
-                            .withAuthorizationVerifier("/api/vocabulary/*", vocabularyAuthorizationVerifier),
-                        new ReadableMetadataApp("/api/meta-vocabulary/", metaVocabularyService),
-                        new CollectionsApp(collections),
-                        new PermissionsApp(permissions),
-                        new HealthApp()))
-                .addServlet("/webdav/*", new MiltonWebDAVServlet("/webdav/", fs))
+                .add("api/" + CONFIG.apiVersion + "/rdf/", ds, false)
+                .addFilter(apiPathPrefix + "/*", new SaturnSparkFilter(
+                        new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService),
+                        new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService)
+                            .withAuthorizationVerifier(apiPathPrefix + "/vocabulary/*", vocabularyAuthorizationVerifier),
+                        new ReadableMetadataApp(apiPathPrefix + "/meta-vocabulary/", metaVocabularyService),
+                        new CollectionsApp(apiPathPrefix, collections),
+                        new PermissionsApp(apiPathPrefix, permissions),
+                        new HealthApp(apiPathPrefix)))
+                .addServlet("/webdav/" + CONFIG.apiVersion + "/*", new MiltonWebDAVServlet("/webdav/" + CONFIG.apiVersion + "/", fs))
                 .port(CONFIG.port);
 
         var auth = CONFIG.auth;
