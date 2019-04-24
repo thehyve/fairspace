@@ -1,6 +1,6 @@
 # API Versioning
 
-* **Status**: proposed
+* **Status**: accepted
 
 * **Context**: 
 Our current APIs are only being used by our frontend and not in an production environment. In the near future
