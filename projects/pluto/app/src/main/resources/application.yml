@@ -75,10 +75,14 @@ zuul:
     elasticsearch:
       path: /api/${app.apiVersion.elasticSearch}/search/*/_search
       url: http://elasticsearch/
-    saturn:
+    storage:
       # The webdav URL is not only used in the request URI, but also in headers (e.g. Destination)
       # To avoid rewriting these headers, it is suggested that the path on the proxy is the same
       # as the path on the upstream service for webdav calls.
+      path: /webdav/${app.apiVersion.saturn}/**
+      url: http://saturn/
+      strip-prefix: false
+    saturn:
       path: /api/${app.apiVersion.saturn}/**
       url: http://saturn/
       strip-prefix: false
