@@ -2,12 +2,13 @@ import React from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
-import {getLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
+import {getLinkedDataFormUpdates, getLinkedDataFormValidations} from "../../../reducers/linkedDataFormReducers";
 import {
     addLinkedDataValue,
     deleteLinkedDataValue,
     initializeLinkedDataForm,
-    updateLinkedDataValue
+    updateLinkedDataValue,
+    validateLinkedDataProperty
 } from "../../../actions/linkedDataFormActions";
 
 class LinkedDataEntityFormContainer extends React.Component {
@@ -34,7 +35,8 @@ class LinkedDataEntityFormContainer extends React.Component {
     render() {
         const propertiesWithChanges = this.props.properties.map(p => ({
             ...p,
-            values: this.props.updates[p.key] || p.values
+            values: this.props.updates[p.key] || p.values,
+            errors: this.props.errors[p.key]
         }));
 
         return (
@@ -91,18 +93,22 @@ LinkedDataEntityFormContainer.defaultProps = {
 
 const mapStateToProps = (state, ownProps) => ({
     updates: getLinkedDataFormUpdates(state, ownProps.formKey),
+    errors: getLinkedDataFormValidations(state, ownProps.formKey),
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     initializeForm: (formKey) => dispatch(initializeLinkedDataForm(formKey)),
     onAdd: (property, value) => {
         dispatch(addLinkedDataValue(ownProps.formKey, property, value));
+        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
     },
     onChange: (property, value, index) => {
         dispatch(updateLinkedDataValue(ownProps.formKey, property, value, index));
+        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
     },
     onDelete: (property, index) => {
         dispatch(deleteLinkedDataValue(ownProps.formKey, property, index));
+        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
     }
 });
 

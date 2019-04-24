@@ -309,24 +309,25 @@ class Vocabulary {
      * Generates a list entry for a single property, with the values specified
      * @param predicate
      * @param values
-     * @param propertyShape
-     * @returns {{key: string, label: string, values: [], datatype: string, className: string, machineOnly: boolean, multiLine: boolean}}
+     * @param shape
+     * @returns {{key: string, label: string, values: [], datatype: string, className: string, allowMultiple: boolean, machineOnly: boolean, multiLine: boolean}}
      * @private
      */
-    generatePropertyEntry(predicate, values, propertyShape) {
-        const label = getFirstPredicateValue(propertyShape, constants.SHACL_NAME);
-        const datatype = getFirstPredicateId(propertyShape, constants.SHACL_DATATYPE);
-        const className = getFirstPredicateId(propertyShape, constants.SHACL_CLASS);
-        const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
-        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
-        const allowedValues = getFirstPredicateList(propertyShape, constants.SHACL_IN, undefined);
-        const isRdfList = Vocabulary.isRdfList(propertyShape);
-        const isGenericIriResource = Vocabulary.isGenericIriResource(propertyShape);
+    generatePropertyEntry(predicate, values, shape) {
+        const label = getFirstPredicateValue(shape, constants.SHACL_NAME);
+        const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
+        const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
+        const machineOnly = getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false);
+        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const allowedValues = getFirstPredicateList(shape, constants.SHACL_IN, undefined);
+        const isRdfList = Vocabulary.isRdfList(shape);
+        const isGenericIriResource = Vocabulary.isGenericIriResource(shape);
         const allowAdditionOfEntities = this.isFairspaceClass(className);
-        const maxValuesCount = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT);
+        const maxValuesCount = getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT);
 
         return {
             key: predicate,
+            shape,
             label,
             values,
             datatype,
@@ -367,7 +368,6 @@ class Vocabulary {
     static isGenericIriResource(propertyShape) {
         return getFirstPredicateId(propertyShape, constants.SHACL_NODEKIND) === constants.SHACL_IRI;
     }
-
 }
 
 export default Vocabulary;
