@@ -195,7 +195,7 @@ class Vocabulary {
      * Determines a list of properties for which no value is present in the metadata
      * @param metadata
      * @param propertyShapes
-     * @returns {{key, label, values, range, allowMultiple}[]}
+     * @returns {{key, label, values, range, maxValuesCount}[]}
      */
     determineAdditionalEmptyProperties(metadata, propertyShapes = []) {
         // Also add an entry for fields not yet entered
@@ -266,7 +266,7 @@ class Vocabulary {
     /**
      * Generates a property entry for the given type(s)
      * @param types  Array of uris of the type of an entity
-     * @returns {{allowMultiple: boolean, values: *, label: string, key: string, machineOnly: boolean}}
+     * @returns {{maxValuesCount: number, values: *, label: string, key: string, machineOnly: boolean}}
      */
     generateTypeProperty(types) {
         const typeValues = types.map(type => {
@@ -282,7 +282,7 @@ class Vocabulary {
             key: '@type',
             label: 'Type',
             values: typeValues,
-            allowMultiple: false,
+            maxValuesCount: 1,
             machineOnly: true
         };
     }
@@ -310,14 +310,13 @@ class Vocabulary {
      * @param predicate
      * @param values
      * @param propertyShape
-     * @returns {{key: string, label: string, values: [], datatype: string, className: string, allowMultiple: boolean, machineOnly: boolean, multiLine: boolean}}
+     * @returns {{key: string, label: string, values: [], datatype: string, className: string, machineOnly: boolean, multiLine: boolean}}
      * @private
      */
     generatePropertyEntry(predicate, values, propertyShape) {
         const label = getFirstPredicateValue(propertyShape, constants.SHACL_NAME);
         const datatype = getFirstPredicateId(propertyShape, constants.SHACL_DATATYPE);
         const className = getFirstPredicateId(propertyShape, constants.SHACL_CLASS);
-        const allowMultiple = getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT, 1000) > 1;
         const machineOnly = getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false);
         const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
         const allowedValues = getFirstPredicateList(propertyShape, constants.SHACL_IN, undefined);
@@ -332,7 +331,6 @@ class Vocabulary {
             values,
             datatype,
             className,
-            allowMultiple,
             machineOnly,
             multiLine,
             allowedValues,

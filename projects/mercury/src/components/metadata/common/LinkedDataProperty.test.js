@@ -15,7 +15,7 @@ const defaultProperty = {
     datatype: STRING_URI,
     label: 'Description',
     values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
-    allowMultiple: true
+    maxValuesCount: 4
 };
 
 describe('MetadataProperty elements', () => {
@@ -28,9 +28,9 @@ describe('MetadataProperty elements', () => {
     it('shows all provided values', () => {
         const property = {
             ...defaultProperty,
-            allowMultiple: false
+            maxValuesCount: 1
         };
-        const wrapper = shallow(<LinkedDataProperty editable property={property} valueComponentFactory={mockComponentFactory}/>);
+        const wrapper = shallow(<LinkedDataProperty editable property={property} valueComponentFactory={mockComponentFactory} />);
         const listItems = wrapper.dive().find(List).find(ListItem);
 
         expect(listItems.length).toEqual(3);
@@ -87,7 +87,7 @@ describe('MetadataProperty elements', () => {
         const property = {
             ...defaultProperty,
             values: [{value: 'More info'}],
-            allowMultiple: false
+            maxValuesCount: 1
         };
 
         const wrapper = shallow(<LinkedDataProperty editable property={property} valueComponentFactory={mockComponentFactory} />);
@@ -105,7 +105,7 @@ describe('MetadataProperty elements', () => {
         const property = {
             ...defaultProperty,
             values: [{value: 'More info'}, {value: 'another info'}],
-            allowMultiple: true
+            maxValuesCount: 2
         };
 
         const wrapper = shallow(<LinkedDataProperty editable={false} property={property} valueComponentFactory={mockComponentFactory} />);
