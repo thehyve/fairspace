@@ -7,6 +7,7 @@ import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../r
 import {createMetadataEntityFromState, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
 import {createMetadataIri} from "../../../utils/linkeddata/metadataUtils";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
+import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 
 const MetadataDropdownWithAdditionContainer = props => (
     <InputWithAddition
@@ -46,7 +47,7 @@ const mapStateToProps = (state, ownProps) => {
     const error = hasVocabularyError(state);
 
     const shape = (!pending && !error) ? vocabulary.determineShapeForType(ownProps.property.className) : {};
-    const emptyData = vocabulary.emptyLinkedData(shape);
+    const emptyData = emptyLinkedData(vocabulary, shape);
 
     return {pending, error, shape, emptyData};
 };

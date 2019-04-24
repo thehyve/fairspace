@@ -8,7 +8,7 @@ import {
     isMetaVocabularyPending,
     isVocabularyEntitiesPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {createVocabularyIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
+import {createVocabularyIri, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import Config from "../../../services/Config/Config";
 import * as constants from "../../../constants";
@@ -16,6 +16,7 @@ import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {isDataSteward} from "../../../utils/userUtils";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
+import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 
 const mapStateToProps = (state) => {
     const vocabularyEntities = getVocabularyEntities(state);

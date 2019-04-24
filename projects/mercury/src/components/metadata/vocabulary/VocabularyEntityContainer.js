@@ -19,6 +19,7 @@ import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 import Config from "../../../services/Config/Config";
 import {isDataSteward} from "../../../utils/userUtils";
+import {fromJsonLd} from "../../../utils/linkeddata/jsonLdConverter";
 
 const VocabularyEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -65,7 +66,7 @@ const mapStateToProps = (state, ownProps) => {
 
     const vocabulary = getVocabulary(state);
     const metaVocabulary = getMetaVocabulary(state);
-    const metadata = loading ? [] : metaVocabulary.combine(vocabulary.vocabulary, subject);
+    const metadata = loading ? [] : fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
 
     const hasNoMetadata = !metadata || metadata.length === 0;
     const hasOtherErrors = hasVocabularyError(state) || hasMetaVocabularyError(state);

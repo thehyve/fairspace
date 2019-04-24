@@ -11,6 +11,7 @@ import {
 import {createVocabularyIri} from "../../../utils/linkeddata/metadataUtils";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {createVocabularyEntityFromState, fetchVocabularyEntitiesIfNeeded} from "../../../actions/vocabularyActions";
+import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 
 const VocabularyDropdownWithAdditionContainer = props => (
     <InputWithAddition
@@ -50,7 +51,7 @@ const mapStateToProps = (state, ownProps) => {
     const error = hasMetaVocabularyError(state);
 
     const shape = (!pending && !error) ? metaVocabulary.determineShapeForType(ownProps.property.className) : {};
-    const emptyData = metaVocabulary.emptyLinkedData(shape);
+    const emptyData = emptyLinkedData(metaVocabulary, shape);
 
     return {pending, error, shape, emptyData};
 };

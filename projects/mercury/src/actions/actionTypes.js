@@ -73,7 +73,7 @@ export const CREATE_METADATA_ENTITY_PENDING         = 'CREATE_METADATA_ENTITY_PE
 export const CREATE_METADATA_ENTITY_FULFILLED       = 'CREATE_METADATA_ENTITY_FULFILLED';
 export const CREATE_METADATA_ENTITY_REJECTED        = 'CREATE_METADATA_ENTITY_REJECTED';
 
-// Vocabulary
+// vocabularyUtils
 export const FETCH_VOCABULARY                       = 'FETCH_VOCABULARY';
 export const FETCH_META_VOCABULARY                  = 'FETCH_META_VOCABULARY';
 export const UPDATE_VOCABULARY                      = 'UPDATE_VOCABULARY';

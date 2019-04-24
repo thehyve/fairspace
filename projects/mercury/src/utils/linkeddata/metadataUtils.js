@@ -1,23 +1,5 @@
 import * as consts from "../../constants";
-import Vocabulary from "./Vocabulary";
-
-/**
- * Returns the value of the given property on the first entry of the predicate for the metadat
- * @param metadataEntry     An expanded metadata object with keys being the predicates
- * @param predicate         The predicate to search for
- * @param property          The property to return for the found object. Mostly '@id' or '@value' are used
- * @param defaultValue      A default value to be returned if no value could be found for the metadata entry
- * @returns {*}
- */
-export const getFirstPredicateProperty = (metadataEntry, predicate, property, defaultValue) =>
-    // eslint-disable-next-line implicit-arrow-linebreak
-    (metadataEntry && metadataEntry[predicate] && metadataEntry[predicate][0] ? metadataEntry[predicate][0][property] : defaultValue);
-
-export const getFirstPredicateValue = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
-
-export const getFirstPredicateId = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
-
-export const getFirstPredicateList = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
+import {getFirstPredicateValue} from "./jsonLdUtils";
 
 /**
  *
@@ -49,6 +31,7 @@ export function linkLabel(uri, shortenExternalUris = false) {
     return uri;
 }
 
+
 /**
  * Returns the label for the given entity.
  *
@@ -67,6 +50,17 @@ export function getLabel(entity, shortenExternalUris = false) {
 }
 
 /**
+ * Looks up a label for the given entity in the provided metadata
+ * @param id
+ * @param allMetadata
+ * @returns {string}
+ */
+export const lookupLabel = (id, allMetadata) => {
+    const entry = allMetadata.find(element => element['@id'] === id);
+    return getLabel(entry);
+};
+
+/**
  * Returns a relative navigable link, excluding the base url
  * @param link
  * @returns {string}
@@ -77,7 +71,7 @@ export function relativeLink(link) {
 }
 
 export function isDateTimeProperty(property) {
-    return property.datatype === 'http://www.w3.org/TR/xmlschema11-2/#dateTime';
+    return property.datatype === consts.DATETIME_URI;
 }
 
 export function generateUuid() {
@@ -124,61 +118,6 @@ export const propertiesToShow = (properties = []) => {
 };
 
 /**
- * Returns the given values in the right container. By default, no container is used
- * If the predicate requires an rdf:List, the values are put into a {'@list': ...} object
- * Some values require a type value (such as date and datetime), so the type will be provided
- * @param values
- * @returns {*}
- */
-const jsonLdWrapper = (values, shape) => {
-    if (Vocabulary.isRdfList(shape)) {
-        return {
-            '@list': values.map(({id, value}) => ({'@id': id, '@value': value}))
-        };
-    }
-
-    const dataType = getFirstPredicateId(shape, consts.SHACL_DATATYPE);
-
-    if (dataType === consts.DATE_URI) {
-        return values.map(({value}) => ({
-            "@value": value,
-            "@type": consts.DATE_URI
-        }));
-    }
-
-    if (dataType === consts.DATETIME_URI) {
-        return values.map(({value}) => ({
-            "@value": value,
-            "@type": consts.DATETIME_URI
-        }));
-    }
-
-    return values.map(({id, value}) => ({'@id': id, '@value': value}));
-};
-
-/**
- * Creates a json-ld object from the given subject, predicate and values
- */
-export const toJsonLd = (subject, predicate, values, vocabulary = new Vocabulary()) => {
-    if (!subject || !predicate || !values) {
-        return null;
-    }
-
-    // if there are no values then send a special nil value as required by the backend
-    if (values.length === 0) {
-        return {
-            '@id': subject,
-            [predicate]: {'@id': consts.NIL_URI}
-        };
-    }
-
-    return {
-        '@id': subject,
-        [predicate]: jsonLdWrapper(values, vocabulary.determineShapeForProperty(predicate))
-    };
-};
-
-/**
  * Creates a textual description of the type for the given metadata item
  * @param metadata
  * @returns {string}
@@ -199,6 +138,7 @@ export const getTypeInfo = (metadata) => {
  * add the ability to access the same IRI on different protocols.
  *
  * @param id
+ * @param infix
  * @returns {string}
  */
 export const createIri = (id, infix) => `http://${window.location.hostname}/${infix}/${id}`;

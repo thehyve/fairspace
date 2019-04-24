@@ -10,7 +10,7 @@ describe('retrieving vocabulary from state', () => {
                 }
             }
         };
-        expect(getVocabulary(state).vocabulary).toEqual(vocabularyJsonLd);
+        expect(getVocabulary(state).getRaw()).toEqual(vocabularyJsonLd);
     });
 
     it('does not fail on missing vocabulary', () => {
@@ -19,7 +19,7 @@ describe('retrieving vocabulary from state', () => {
             }
         };
 
-        expect(getVocabulary(state).vocabulary).toEqual([]);
+        expect(getVocabulary(state).getRaw()).toEqual([]);
     });
 });
 
