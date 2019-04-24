@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import {IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Typography} from '@material-ui/core';
 
 import ClearIcon from '@material-ui/icons/Clear';
-import {LinkedDataFormContext} from "./LinkedDataFormContext";
+import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
 
 class LinkedDataProperty extends React.Component {
     state = {
@@ -120,7 +120,7 @@ class LinkedDataProperty extends React.Component {
     }
 }
 
-LinkedDataProperty.contextType = LinkedDataFormContext;
+LinkedDataProperty.contextType = LinkedDataValuesContext;
 
 // Please note that this way of setting the context type
 // structure is deprecates. However, it is needed to have

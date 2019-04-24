@@ -17,7 +17,7 @@ import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
-import {LinkedDataFormContext} from "../common/LinkedDataFormContext";
+import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 
 const MetadataEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -30,14 +30,14 @@ const MetadataEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataFormContext.Provider value={MetadataValueComponentFactory}>
+                <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
                     <LinkedDataEntityFormContainer
                         editable={editable}
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
                         {...otherProps}
                     />
-                </LinkedDataFormContext.Provider>
+                </LinkedDataValuesContext.Provider>
             </Grid>
             {
                 editable
