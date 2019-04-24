@@ -1,11 +1,11 @@
-import {linkedDataFormChangesReducerPerForm} from './linkedDataFormReducers';
+import {linkedDataFormChangesReducerPerForm as changesReducer} from './linkedDataFormReducers';
 import * as actionTypes from "../actions/actionTypes";
 
 describe('Metadata form reducer', () => {
     describe('initialization', () => {
         it('should clear updates on initialization', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {a: 'b'}
                     }, {
@@ -14,6 +14,7 @@ describe('Metadata form reducer', () => {
                 )
             ).toEqual({
                 updates: {},
+                validations: {},
                 error: false,
                 pending: false
             });
@@ -23,7 +24,7 @@ describe('Metadata form reducer', () => {
     describe('adding values', () => {
         it('should add a value when no values are present yet', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     undefined, {
                         type: actionTypes.ADD_LINKEDDATA_VALUE,
                         property: {key: 'propertyA', values: ['previousValue']},
@@ -32,13 +33,14 @@ describe('Metadata form reducer', () => {
                 )
             ).toEqual({
                 updates: {propertyA: ['previousValue', 'added']},
+                validations: {},
                 error: false,
                 pending: false
             });
         });
         it('should add a value if some updates were already done to this field', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {propertyA: ['test']}
                     }, {
@@ -53,7 +55,7 @@ describe('Metadata form reducer', () => {
         });
         it('should not change values for other fields', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {propertyA: ['test']}
                     }, {
@@ -74,7 +76,7 @@ describe('Metadata form reducer', () => {
     describe('updating values', () => {
         it('should update a value when no changes are present yet', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     undefined, {
                         type: actionTypes.UPDATE_LINKEDDATA_VALUE,
                         property: {key: 'propertyA', values: ['previousValue']},
@@ -84,13 +86,14 @@ describe('Metadata form reducer', () => {
                 )
             ).toEqual({
                 updates: {propertyA: ['changed']},
+                validations: {},
                 error: false,
                 pending: false
             });
         });
         it('should update a value if some updates were already done to this field', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {propertyA: ['test', 'test2']}
                     }, {
@@ -106,7 +109,7 @@ describe('Metadata form reducer', () => {
         });
         it('should not change values for other fields', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {propertyA: ['test']}
                     }, {
@@ -125,7 +128,7 @@ describe('Metadata form reducer', () => {
         });
         it('should ignore changes where the index if out of bounds', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {propertyA: ['test', 'test2']}
                     }, {
@@ -147,7 +150,7 @@ describe('Metadata form reducer', () => {
     describe('deleting values', () => {
         it('should delete a value when no changes are present yet', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     undefined, {
                         type: actionTypes.DELETE_LINKEDDATA_VALUE,
                         property: {key: 'propertyA', values: ['previousValue', 'previousValue2']},
@@ -156,13 +159,14 @@ describe('Metadata form reducer', () => {
                 )
             ).toEqual({
                 updates: {propertyA: ['previousValue']},
+                validations: {},
                 error: false,
                 pending: false
             });
         });
         it('should delete a value if some updates were already done to this field', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {propertyA: ['test', 'test2', 'test3']}
                     }, {
@@ -177,7 +181,7 @@ describe('Metadata form reducer', () => {
         });
         it('should not change values for other fields', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {propertyA: ['test']}
                     }, {
@@ -195,7 +199,7 @@ describe('Metadata form reducer', () => {
         });
         it('should ignore changes where the index if out of bounds', () => {
             expect(
-                linkedDataFormChangesReducerPerForm(
+                changesReducer(
                     {
                         updates: {propertyA: ['test', 'test2']}
                     }, {
@@ -208,6 +212,33 @@ describe('Metadata form reducer', () => {
                 updates: {
                     propertyA: ['test', 'test2'],
                     propertyB: ['previousValue']
+                }
+            });
+        });
+    });
+
+    describe('validating properties', () => {
+        it('should update property validations without touching other properties validations', () => {
+            const state = {
+                updates: {
+                    updates: {propertyA: ['test', 'test2'], propertyB: ['something', 'value']},
+                },
+                validations: {propertyA: []}
+            };
+
+            expect(
+                changesReducer(
+                    state, {
+                        type: actionTypes.VALIDATE_LINKEDDATA_PROPERTY,
+                        property: {key: 'propertyB', values: ['new value']},
+                        validations: ['some error']
+                    }
+                )
+            ).toEqual({
+                ...state,
+                validations: {
+                    ...state.validations,
+                    propertyB: ['some error']
                 }
             });
         });

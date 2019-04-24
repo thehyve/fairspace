@@ -1,8 +1,7 @@
 import React from "react";
 import {connect} from 'react-redux';
 
-import {Button} from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
+import {Button, Grid} from "@material-ui/core";
 
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
@@ -15,7 +14,7 @@ import {
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
-import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
+import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 
 const MetadataEntityContainer = props => {
@@ -67,7 +66,7 @@ const mapStateToProps = (state, ownProps) => {
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
     const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
-    const buttonDisabled = !hasLinkedDataFormUpdates(state, subject);
+    const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({

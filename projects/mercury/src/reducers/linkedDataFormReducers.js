@@ -1,12 +1,19 @@
 import reduceReducers from "reduce-reducers";
+
 import * as actionTypes from "../actions/actionTypes";
 import {createByKey} from "../utils/redux";
 
 /**
  * The updates map contains a map from propertyKey (predicate) to a list of values for that property
- * @type {{updates: {}}}
+ * The validations map contains a map from propertyKey (predicate) to the list of errors of the property change
+ * @type {{updates: {}, validations: {}}}
  */
-const initialState = {updates: {}, pending: false, error: false};
+const initialState = {
+    updates: {},
+    validations: {},
+    pending: false,
+    error: false
+};
 
 /**
  * Returns the values that are present in the form for the given propertyKey
@@ -53,6 +60,14 @@ export const linkedDataFormChangesReducerPerForm = (state = initialState, action
                 action.property.key,
                 getValues(state, action).filter((el, idx) => idx !== action.index)
             );
+        case actionTypes.VALIDATE_LINKEDDATA_PROPERTY:
+            return {
+                ...state,
+                validations: {
+                    ...state.validations,
+                    [action.property.key]: [...action.validations]
+                }
+            };
         default:
             return state;
     }
@@ -109,4 +124,9 @@ export default reduceReducers(
 
 
 export const getLinkedDataFormUpdates = (state, formKey) => (state.linkedDataForm[formKey] && state.linkedDataForm[formKey].updates) || {};
-export const hasLinkedDataFormUpdates = (state, formKey) => !!(state.linkedDataForm[formKey] && state.linkedDataForm[formKey].updates && Object.keys(state.linkedDataForm[formKey].updates).length > 0);
+
+export const hasLinkedDataFormUpdates = (state, formKey) => !!(Object.keys(getLinkedDataFormUpdates(state, formKey)).length > 0);
+
+export const getLinkedDataFormValidations = (state, formKey) => (state.linkedDataForm[formKey] && state.linkedDataForm[formKey].validations) || {};
+
+export const hasLinkedDataFormValidationErrors = (state, formKey) => !!Object.values(getLinkedDataFormValidations(state, formKey)).find(v => v.length > 0);

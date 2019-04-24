@@ -103,7 +103,7 @@ export const vocabularyUtils = (vocabulary = []) => {
      * @param predicate
      * @param values
      * @param propertyShape
-     * @returns {{key: string, label: string, datatype: string, className: string, allowMultiple: boolean, machineOnly: boolean, multiLine: boolean}}
+     * @returns {{key: string, label: string, datatype: string, className: string, maxValuesCount: number, machineOnly: boolean, multiLine: boolean}}
      * @private
      */
     const generatePropertyEntry = (predicate, propertyShape) => {
@@ -117,7 +117,7 @@ export const vocabularyUtils = (vocabulary = []) => {
             datatype,
             multiLine,
             className,
-            allowMultiple: getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT, 1000) > 1,
+            maxValuesCount: getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT),
             machineOnly: getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false),
             allowedValues: getFirstPredicateList(propertyShape, constants.SHACL_IN),
             isRdfList: isRdfList(propertyShape),

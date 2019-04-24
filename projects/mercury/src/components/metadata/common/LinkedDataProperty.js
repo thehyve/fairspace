@@ -1,8 +1,13 @@
 import React from 'react';
 import PropTypes from "prop-types";
-
-import {IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Typography} from '@material-ui/core';
-
+import {
+    IconButton,
+    List,
+    ListItem,
+    ListItemSecondaryAction,
+    ListItemText,
+    Typography
+} from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 
 class LinkedDataProperty extends React.Component {
@@ -14,7 +19,7 @@ class LinkedDataProperty extends React.Component {
         this.setState({hoveredIndex});
     };
 
-    renderEntry = (entry, idx, PropertyValueComponent, labelledBy) => {
+    renderEntry = (entry, idx, PropertyValueComponent, labelledBy, hasErrors) => {
         const {editable, property, onChange, onDelete} = this.props;
         const visibility = this.state.hoveredIndex === idx ? 'visible' : 'hidden';
 
@@ -31,6 +36,7 @@ class LinkedDataProperty extends React.Component {
                             entry={entry}
                             onChange={(value) => onChange(value, idx)}
                             aria-labelledby={labelledBy}
+                            error={hasErrors}
                         />
                     </ListItemText>
                     {
@@ -55,8 +61,8 @@ class LinkedDataProperty extends React.Component {
     };
 
     renderAddComponent = (labelledBy) => {
-        const {property, onAdd} = this.props;
-        const ValueAddComponent = this.props.valueComponentFactory.addComponent(property);
+        const {property, onAdd, valueComponentFactory} = this.props;
+        const ValueAddComponent = valueComponentFactory.addComponent(property);
 
         return (
             <ListItem key="add-component-key">
@@ -73,20 +79,19 @@ class LinkedDataProperty extends React.Component {
     };
 
     render() {
-        const {editable, property} = this.props;
+        const {editable, property, valueComponentFactory} = this.props;
+        const hasErrors = property.errors && property.errors.length > 0;
 
         // Do not show an add component if no multiples are allowed
         // and there is already a value
-        const editableAndNotMachineOnly = editable && !property.machineOnly;
-        const canAdd = editableAndNotMachineOnly && (property.allowMultiple || !property.values || property.values.length === 0);
+        const maxValuesReached = (property.maxValuesCount && (property.values.length >= property.maxValuesCount)) || false;
+        const canAdd = editable && !property.machineOnly && !maxValuesReached;
         const labelId = `label-${property.key}`;
 
         // The edit component should not actually allow editing the value if editable is set to false
         // or if the property contains settings that disallow editing existing values
         const disableEditing = !editable || LinkedDataProperty.disallowEditingOfExistingValues(property);
-        const ValueComponent = disableEditing
-            ? this.props.valueComponentFactory.readOnlyComponent()
-            : this.props.valueComponentFactory.editComponent(property);
+        const ValueComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
 
         return (
             <ListItem disableGutters style={{display: 'block'}}>
@@ -94,7 +99,10 @@ class LinkedDataProperty extends React.Component {
                     {property.label}
                 </Typography>
                 <List dense>
-                    {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId))}
+                    {property.values.map((entry, idx) => this.renderEntry(entry, idx, ValueComponent, labelId, hasErrors))}
+                    <Typography variant="body2" color="error">
+                        {hasErrors ? property.errors.map(e => `${e}. `) : null}
+                    </Typography>
                     {canAdd ? this.renderAddComponent(labelId) : null}
                 </List>
             </ListItem>
@@ -127,7 +135,8 @@ LinkedDataProperty.propTypes = {
         addComponent: PropTypes.func,
         readOnlyComponent: PropTypes.func
     }).isRequired
-}
+};
+
 LinkedDataProperty.defaultProps = {
     onChange: () => {},
     editable: true,

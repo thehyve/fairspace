@@ -24,7 +24,7 @@ const generateTypeProperty = (vocabulary, types) => {
         key: '@type',
         label: 'Type',
         values: typeValues,
-        allowMultiple: false,
+        maxValuesCount: 1,
         machineOnly: true
     };
 };
@@ -94,7 +94,7 @@ const convertMetadataIntoPropertyList = (metadata, propertyShapes = [], allMetad
  * @param metadata
  * @param propertyShapes
  * @param vocabulary
- * @returns {{key, label, values, range, allowMultiple}[]}
+ * @returns {{key, label, values, range, maxValuesCount}[]}
  */
 const determineAdditionalEmptyProperties = (metadata, propertyShapes = [], vocabulary) => {
     // Also add an entry for fields not yet entered
