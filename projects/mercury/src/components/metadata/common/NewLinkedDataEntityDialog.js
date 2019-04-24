@@ -68,7 +68,6 @@ class NewLinkedDataEntityDialog extends React.Component {
                     <LinkedDataEntityFormContainer
                         formKey={this.state.formKey}
                         properties={linkedData}
-                        valueComponentFactory={this.props.valueComponentFactory}
                     />
 
                 </DialogContent>
@@ -104,8 +103,7 @@ NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    open: PropTypes.bool,
-    valueComponentFactory: PropTypes.object
+    open: PropTypes.bool
 };
 
 export default NewLinkedDataEntityDialog;

@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import {IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Typography} from '@material-ui/core';
 
 import ClearIcon from '@material-ui/icons/Clear';
+import {LinkedDataFormContext} from "./LinkedDataFormContext";
 
 class LinkedDataProperty extends React.Component {
     state = {
@@ -56,7 +57,8 @@ class LinkedDataProperty extends React.Component {
 
     renderAddComponent = (labelledBy) => {
         const {property, onAdd} = this.props;
-        const ValueAddComponent = this.props.valueComponentFactory.addComponent(property);
+        const valueComponentFactory = this.context;
+        const ValueAddComponent = valueComponentFactory.addComponent(property);
 
         return (
             <ListItem key="add-component-key">
@@ -74,6 +76,9 @@ class LinkedDataProperty extends React.Component {
 
     render() {
         const {editable, property} = this.props;
+        const valueComponentFactory = this.context;
+
+        console.log("Factory: ", valueComponentFactory);
 
         // Do not show an add component if no multiples are allowed
         // and there is already a value
@@ -85,8 +90,8 @@ class LinkedDataProperty extends React.Component {
         // or if the property contains settings that disallow editing existing values
         const disableEditing = !editable || LinkedDataProperty.disallowEditingOfExistingValues(property);
         const ValueComponent = disableEditing
-            ? this.props.valueComponentFactory.readOnlyComponent()
-            : this.props.valueComponentFactory.editComponent(property);
+            ? valueComponentFactory.readOnlyComponent()
+            : valueComponentFactory.editComponent(property);
 
         return (
             <ListItem disableGutters style={{display: 'block'}}>
@@ -117,17 +122,25 @@ class LinkedDataProperty extends React.Component {
     }
 }
 
+LinkedDataProperty.contextType = LinkedDataFormContext;
+
+// Please note that this way of setting the context type
+// structure is deprecates. However, it is needed to have
+// the context work properly in unit tests, awaiting proper
+// support for the new context API in enzyme.
+// See https://stackoverflow.com/questions/55293154/how-to-pass-data-as-context-in-jest
+LinkedDataProperty.contextTypes = {
+    addComponent: PropTypes.func,
+    editComponent: PropTypes.func,
+    readOnlyComponent: PropTypes.func
+};
+
 LinkedDataProperty.propTypes = {
     onChange: PropTypes.func,
     editable: PropTypes.bool,
     property: PropTypes.object,
+};
 
-    valueComponentFactory: PropTypes.shape({
-        editComponent: PropTypes.func,
-        addComponent: PropTypes.func,
-        readOnlyComponent: PropTypes.func
-    }).isRequired
-}
 LinkedDataProperty.defaultProps = {
     onChange: () => {},
     editable: true,

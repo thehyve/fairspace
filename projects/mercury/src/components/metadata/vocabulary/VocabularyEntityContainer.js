@@ -16,6 +16,7 @@ import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
+import {LinkedDataFormContext} from "../common/LinkedDataFormContext";
 
 const VocabularyEntityContainer = props => {
     const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -28,13 +29,14 @@ const VocabularyEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataEntityFormContainer
-                    editable={editable}
-                    formKey={subject}
-                    valueComponentFactory={VocabularyValueComponentFactory}
-                    fetchLinkedData={() => fetchLinkedData(subject)}
-                    {...otherProps}
-                />
+                <LinkedDataFormContext.Provider value={VocabularyValueComponentFactory}>
+                    <LinkedDataEntityFormContainer
+                        editable={editable}
+                        formKey={subject}
+                        fetchLinkedData={() => fetchLinkedData(subject)}
+                        {...otherProps}
+                    />
+                </LinkedDataFormContext.Provider>
             </Grid>
             {
                 editable

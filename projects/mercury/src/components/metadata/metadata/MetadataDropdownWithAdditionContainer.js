@@ -6,7 +6,6 @@ import MetadataDropdownContainer from "./MetadataDropdownContainer";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import {createMetadataEntityFromState, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
 import {createMetadataIri} from "../../../utils/metadataUtils";
-import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 
 const MetadataDropdownWithAdditionContainer = props => (
     <InputWithAddition
@@ -18,7 +17,6 @@ const MetadataDropdownWithAdditionContainer = props => (
         fetchEntities={props.fetchEntities}
         error={props.error}
         pending={props.pending}
-        valueComponentFactory={MetadataValueComponentFactory}
     >
         <MetadataDropdownContainer
             property={props.property}

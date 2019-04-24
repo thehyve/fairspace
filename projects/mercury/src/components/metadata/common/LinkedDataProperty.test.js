@@ -18,26 +18,27 @@ const defaultProperty = {
     allowMultiple: true
 };
 
-describe('MetadataProperty elements', () => {
-    const mockComponentFactory = {
-        addComponent: () => StringValue,
-        editComponent: () => DateValue,
-        readOnlyComponent: () => ReferringValue
-    };
+const mockComponentFactory = {
+    addComponent: () => StringValue,
+    editComponent: () => DateValue,
+    readOnlyComponent: () => ReferringValue
+};
 
+describe('LinkedDataProperty elements', () => {
     it('shows all provided values', () => {
         const property = {
             ...defaultProperty,
             allowMultiple: false
         };
-        const wrapper = shallow(<LinkedDataProperty editable property={property} valueComponentFactory={mockComponentFactory}/>);
+
+        const wrapper = shallow(<LinkedDataProperty editable property={property} />, {context: mockComponentFactory});
         const listItems = wrapper.dive().find(List).find(ListItem);
 
         expect(listItems.length).toEqual(3);
     });
 
     it('shows an add element if multiple values are allowed, and it is editable', () => {
-        const wrapper = shallow(<LinkedDataProperty editable property={defaultProperty} valueComponentFactory={mockComponentFactory} />);
+        const wrapper = shallow(<LinkedDataProperty editable property={defaultProperty} />, {context: mockComponentFactory});
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(4);
@@ -46,7 +47,7 @@ describe('MetadataProperty elements', () => {
     });
 
     it('shows no add element if multiple values are allowed, but it is uneditable', () => {
-        const wrapper = shallow(<LinkedDataProperty editable={false} property={defaultProperty} valueComponentFactory={mockComponentFactory} />);
+        const wrapper = shallow(<LinkedDataProperty editable={false} property={defaultProperty} />, {context: mockComponentFactory});
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(3);
@@ -60,7 +61,7 @@ describe('MetadataProperty elements', () => {
             values: []
         };
 
-        const wrapper = shallow(<LinkedDataProperty editable property={property} valueComponentFactory={mockComponentFactory} />);
+        const wrapper = shallow(<LinkedDataProperty editable property={property} />, {context: mockComponentFactory});
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
@@ -77,7 +78,7 @@ describe('MetadataProperty elements', () => {
             values: []
         };
 
-        const wrapper = shallow(<LinkedDataProperty editable={false} property={property} valueComponentFactory={mockComponentFactory} />);
+        const wrapper = shallow(<LinkedDataProperty editable={false} property={property} />, {context: mockComponentFactory});
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(0);
@@ -90,7 +91,7 @@ describe('MetadataProperty elements', () => {
             allowMultiple: false
         };
 
-        const wrapper = shallow(<LinkedDataProperty editable property={property} valueComponentFactory={mockComponentFactory} />);
+        const wrapper = shallow(<LinkedDataProperty editable property={property} />, {context: mockComponentFactory});
 
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
@@ -108,7 +109,7 @@ describe('MetadataProperty elements', () => {
             allowMultiple: true
         };
 
-        const wrapper = shallow(<LinkedDataProperty editable={false} property={property} valueComponentFactory={mockComponentFactory} />);
+        const wrapper = shallow(<LinkedDataProperty editable={false} property={property} />, {context: mockComponentFactory});
         const listItems = wrapper.dive().find(List).find(ListItem);
         expect(listItems.length).toEqual(2);
     });
