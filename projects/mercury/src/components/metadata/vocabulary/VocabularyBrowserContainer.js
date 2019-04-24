@@ -10,9 +10,12 @@ import {
 } from "../../../reducers/cache/vocabularyReducers";
 import {createVocabularyIri, getFirstPredicateId, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import LinkedDataBrowser from "../common/LinkedDataBrowser";
+import Config from "../../../services/Config/Config";
 import * as constants from "../../../constants";
+import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
+import {isDataSteward} from "../../../utils/userUtils";
+import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 
 const mapStateToProps = (state) => {
     const vocabularyEntities = getVocabularyEntities(state);
@@ -28,7 +31,8 @@ const mapStateToProps = (state) => {
     return ({
         loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
         error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
-        shapes: metaVocabulary.getFairspaceClasses(),
+        editable: isDataSteward(getAuthorizations(state), Config.get()),
+        shapes: metaVocabulary.getClassesInCatalog(),
         vocabulary: metaVocabulary,
         valueComponentFactory: VocabularyValueComponentFactory,
         entities

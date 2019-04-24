@@ -29,16 +29,19 @@ public class EntitiesByType {
     private static final Resource CLASS_2 = createResource("http://example.com/class2");
     private static final Resource CLASS_3 = createResource("http://example.com/class3");
     private static final Resource CLASS_4 = createResource("http://example.com/class4");
+    private static final Resource CLASS_5 = createResource("http://example.com/class5");
 
     private static final Resource CLASS_SHAPE_1 = createResource("http://example.com/classShape1");
     private static final Resource CLASS_SHAPE_2 = createResource("http://example.com/classShape2");
     private static final Resource CLASS_SHAPE_3 = createResource("http://example.com/classShape3");
-    private static final Resource CLASS_SHAPE_4 = createResource("http://example.com/classShape3");
+    private static final Resource CLASS_SHAPE_4 = createResource("http://example.com/classShape4");
+    private static final Resource CLASS_SHAPE_5 = createResource("http://example.com/classShape5");
 
     private static final Resource ENTITY_1 = createResource("http://example.com/entity1");
     private static final Resource ENTITY_2 = createResource("http://example.com/entity2");
     private static final Resource ENTITY_3 = createResource("http://example.com/entity3");
     private static final Resource ENTITY_4 = createResource("http://example.com/entity4");
+    private static final Resource ENTITY_5 = createResource("http://example.com/entity5");
 
     private Dataset ds = DatasetFactory.create();
 
@@ -58,22 +61,45 @@ public class EntitiesByType {
                 .add(CLASS_SHAPE_3, SH.targetClass, CLASS_3)
                 .add(CLASS_SHAPE_3, FS.showInCatalog, createTypedLiteral(true))
                 .add(CLASS_SHAPE_4, SH.targetClass, CLASS_4)
-                .add(CLASS_SHAPE_4, FS.showInCatalog, createTypedLiteral(true));
+                .add(CLASS_SHAPE_4, FS.showInCatalog, createTypedLiteral(true))
+                .add(CLASS_SHAPE_5, SH.targetClass, CLASS_5);
 
         ds.getNamedModel(GRAPH.getURI())
                 .add(ENTITY_1, RDF.type, CLASS_1)
                 .add(ENTITY_2, RDF.type, CLASS_2)
                 .add(ENTITY_3, RDF.type, CLASS_3)
                 .add(ENTITY_1, RDFS.label, "label")
-                .add(ENTITY_4, RDF.type, CLASS_4);
+                .add(ENTITY_4, RDF.type, CLASS_4)
+                .add(ENTITY_5, RDF.type, CLASS_5);
+    }
+
+    @Test
+    public void testListAllCatalogEntities() {
+        given(ds).testConstruct(storedQuery("catalog_entities_by_type", GRAPH, VOCABULARY, null),
+                model -> {
+                    assertEquals("All entities whose shapes have fs:showInCatalog should be returned",
+                            Set.of(ENTITY_1, ENTITY_3, ENTITY_4),
+                            model.listSubjects().toSet());
+                    assertTrue("The result should include labels when possible", model.contains(ENTITY_1, RDFS.label));
+
+                    assertEquals("Entities should have proper types", CLASS_3, model.getRequiredProperty(ENTITY_3, RDF.type).getResource());
+                });
+    }
+
+    @Test
+    public void testGetCatalogEntitiesByType() {
+        given(ds).testConstruct(storedQuery("catalog_entities_by_type", GRAPH, VOCABULARY, CLASS_1),
+                model -> assertEquals("Inheritance works all the way down",
+                        Set.of(ENTITY_1, ENTITY_3),
+                        model.listSubjects().toSet()));
     }
 
     @Test
     public void testListAllEntities() {
         given(ds).testConstruct(storedQuery("entities_by_type", GRAPH, VOCABULARY, null),
                 model -> {
-                    assertEquals("All entities those shapes have fs:showInCatalog should be returned",
-                            Set.of(ENTITY_1, ENTITY_3, ENTITY_4),
+                    assertEquals("All entities should be returned",
+                            Set.of(ENTITY_1, ENTITY_2, ENTITY_3, ENTITY_4, ENTITY_5),
                             model.listSubjects().toSet());
                     assertTrue("The result should include labels when possible", model.contains(ENTITY_1, RDFS.label));
 
@@ -85,7 +111,7 @@ public class EntitiesByType {
     public void testGetEntitiesByType() {
         given(ds).testConstruct(storedQuery("entities_by_type", GRAPH, VOCABULARY, CLASS_1),
                 model -> assertEquals("Inheritance works all the way down",
-                        Set.of(ENTITY_1, ENTITY_3),
+                        Set.of(ENTITY_1, ENTITY_2, ENTITY_3),
                         model.listSubjects().toSet()));
     }
 }

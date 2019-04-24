@@ -50,8 +50,16 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validateByTargetClass(Resource shape, Model vocabulary, Set<ValidationResult> results) {
         // determine the target class (if any) and validate all the entities belonging to it
         vocabulary.listObjectsOfProperty(shape, SH.targetClass)
-                .forEachRemaining(targetClass -> rdf.querySelect(storedQuery("subjects_by_type", targetClass),
-                        row -> validateResource(row.getResource("s"), vocabulary, results)));
+                .forEachRemaining(targetClass -> {
+                    if(!targetClass.isURIResource()) {
+                        throw new IllegalArgumentException("sh:targetClass expects a URI resource as object. " + targetClass + " given");
+                    }
+
+                    rdf.querySelect(
+                        storedQuery("subjects_by_type", targetClass),
+                        row -> validateResource(row.getResource("s"), vocabulary, results)
+                    );
+                });
     }
 
 

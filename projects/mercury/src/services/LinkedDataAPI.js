@@ -148,12 +148,12 @@ class LinkedDataAPI {
      * @returns Promise<jsonld> A promise with an expanded version of the JSON-LD structure, describing the entities.
      *                          The entities will have an ID, type and optionally an rdfs:label
      */
-    getAllEntities() {
+    getAllCatalogEntities() {
         if (!this.getEntitiesUrl()) {
             return Promise.reject(new Error("No entities URL provided"));
         }
 
-        return fetch(this.getEntitiesUrl(), LinkedDataAPI.getParams)
+        return fetch(this.getEntitiesUrl() + "?catalog", LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
             .then(expand);

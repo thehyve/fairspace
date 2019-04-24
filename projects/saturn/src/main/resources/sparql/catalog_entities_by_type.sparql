@@ -11,7 +11,7 @@ WHERE {
     GRAPH %1$s { ?s a ?type .  }
     GRAPH %2$s {
       ?type rdfs:subClassOf* %3$s .
-      ?shape sh:targetClass ?type .
+      ?shape sh:targetClass ?type ; fs:showInCatalog true .
     }
     OPTIONAL {
         GRAPH %1$s {?s rdfs:label ?l}

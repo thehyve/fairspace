@@ -20,7 +20,6 @@
     "users": "/api/workspace/users",
     "workspace": "/api/workspace/details"
   },
-
   "elasticsearch": {
     "host": "/api/search",
     "log": "error"
@@ -28,6 +27,10 @@
   "externalConfigurationFiles": [
     "/api/workspace/config"
   ],
+  "roles": {
+    "dataSteward": "",
+    "coordinator": ""
+  },
   "enableExperimentalFeatures": false
 
 }

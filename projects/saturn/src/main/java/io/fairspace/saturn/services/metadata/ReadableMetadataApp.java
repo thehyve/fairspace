@@ -32,7 +32,7 @@ public class ReadableMetadataApp extends BaseApp {
             });
             get("/entities/", JSON_LD_HEADER_STRING, (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());
-                return toJsonLD(api.getByType(req.queryParams("type")));
+                return toJsonLD(api.getByType(req.queryParams("type"), req.queryParams().contains("catalog")));
             });
         });
     }

@@ -70,7 +70,7 @@ const fetchEntitiesByType = createErrorHandlingPromiseAction(type => ({
 const fetchAllEntities = createErrorHandlingPromiseAction(dispatch => ({
     type: actionTypes.FETCH_ALL_METADATA_ENTITIES,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
-        .then(() => MetadataAPI.getAllEntities())
+        .then(() => MetadataAPI.getAllCatalogEntities())
 }));
 
 export const fetchEntitiesIfNeeded = type => dispatchIfNeeded(
