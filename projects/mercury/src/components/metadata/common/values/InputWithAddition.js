@@ -62,7 +62,6 @@ class InputWithAddition extends React.Component {
                     linkedData={this.props.emptyData}
                     onCreate={this.handleEntityCreation}
                     onClose={this.handleCloseDialog}
-                    valueComponentFactory={this.props.valueComponentFactory}
                 />
             </>
         );
@@ -91,8 +90,7 @@ InputWithAddition.propTypes = {
     fetchEntities: PropTypes.func.isRequired,
 
     error: PropTypes.bool,
-    pending: PropTypes.bool,
-    valueComponentFactory: PropTypes.object
+    pending: PropTypes.bool
 };
 
 export default InputWithAddition;

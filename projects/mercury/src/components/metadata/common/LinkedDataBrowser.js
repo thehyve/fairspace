@@ -7,6 +7,7 @@ import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../../com
 import LinkedDataList from './LinkedDataList';
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
+import {LinkedDataValuesContext} from './LinkedDataValuesContext';
 
 class LinkedDataBrowser extends React.Component {
     static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
@@ -100,14 +101,16 @@ class LinkedDataBrowser extends React.Component {
                     onChooseShape={this.chooseShape}
                     onClose={this.closeDialog}
                 />
-                <NewLinkedDataEntityDialog
-                    open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
+
+                <LinkedDataValuesContext.Provider value={this.props.valueComponentFactory}>
+                    <NewLinkedDataEntityDialog
+                        open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
                     linkedData={emptyLinkedData(this.props.vocabulary, this.state.shape)}
-                    shape={this.state.shape}
-                    onCreate={this.handleEntityCreation}
-                    onClose={this.closeDialog}
-                    valueComponentFactory={this.props.valueComponentFactory}
-                />
+                        shape={this.state.shape}
+                        onCreate={this.handleEntityCreation}
+                        onClose={this.closeDialog}
+                    />
+                </LinkedDataValuesContext.Provider>
 
                 {entities && entities.length > 0 ? <LinkedDataList items={entities} /> : null}
                 <LoadingOverlay loading={this.state.creatingMetadataEntity} />

@@ -9,6 +9,7 @@ import {
     Typography
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
+import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
 
 class LinkedDataProperty extends React.Component {
     state = {
@@ -61,7 +62,8 @@ class LinkedDataProperty extends React.Component {
     };
 
     renderAddComponent = (labelledBy) => {
-        const {property, onAdd, valueComponentFactory} = this.props;
+        const {property, onAdd} = this.props;
+        const valueComponentFactory = this.context;
         const ValueAddComponent = valueComponentFactory.addComponent(property);
 
         return (
@@ -79,7 +81,8 @@ class LinkedDataProperty extends React.Component {
     };
 
     render() {
-        const {editable, property, valueComponentFactory} = this.props;
+        const {editable, property} = this.props;
+        const valueComponentFactory = this.context;
         const hasErrors = property.errors && property.errors.length > 0;
 
         // Do not show an add component if no multiples are allowed
@@ -125,17 +128,25 @@ class LinkedDataProperty extends React.Component {
     }
 }
 
+LinkedDataProperty.contextType = LinkedDataValuesContext;
+
+// Please note that this way of setting the context type
+// structure is deprecates. However, it is needed to have
+// the context work properly in unit tests, awaiting proper
+// support for the new context API in enzyme.
+// See https://stackoverflow.com/questions/55293154/how-to-pass-data-as-context-in-jest
+LinkedDataProperty.contextTypes = {
+    addComponent: PropTypes.func,
+    editComponent: PropTypes.func,
+    readOnlyComponent: PropTypes.func
+};
+
 LinkedDataProperty.propTypes = {
     onChange: PropTypes.func,
     editable: PropTypes.bool,
     property: PropTypes.object,
-
-    valueComponentFactory: PropTypes.shape({
-        editComponent: PropTypes.func,
-        addComponent: PropTypes.func,
-        readOnlyComponent: PropTypes.func
-    }).isRequired
 };
+
 
 LinkedDataProperty.defaultProps = {
     onChange: () => {},

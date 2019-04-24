@@ -1,6 +1,6 @@
 # Use microservices architecture
 
-* **Status**: accepted
+* **Status**: superseded (by [005_data_integrity](../005_data_integrity.md))
 
 * **Context**: While setting up our system, we identified a number of separate functionalities. These include storage, metadata, authentication and authorization. 
 We want our system to be properly scalable, and the distinct parts of the application will have different load and performance requirements. 
