@@ -78,8 +78,6 @@ class LinkedDataProperty extends React.Component {
         const {editable, property} = this.props;
         const valueComponentFactory = this.context;
 
-        console.log("Factory: ", valueComponentFactory);
-
         // Do not show an add component if no multiples are allowed
         // and there is already a value
         const editableAndNotMachineOnly = editable && !property.machineOnly;
