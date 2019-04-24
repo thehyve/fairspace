@@ -73,20 +73,18 @@ class LinkedDataProperty extends React.Component {
     };
 
     render() {
-        const {editable, property} = this.props;
+        const {editable, property, valueComponentFactory} = this.props;
 
         // Do not show an add component if no multiples are allowed
         // and there is already a value
-        const editableAndNotMachineOnly = editable && !property.machineOnly;
-        const canAdd = editableAndNotMachineOnly && (property.allowMultiple || !property.values || property.values.length === 0);
+        const maxValuesReached = (property.maxValuesCount && (property.values.length >= property.maxValuesCount)) || false;
+        const canAdd = editable && !property.machineOnly && !maxValuesReached;
         const labelId = `label-${property.key}`;
 
         // The edit component should not actually allow editing the value if editable is set to false
         // or if the property contains settings that disallow editing existing values
         const disableEditing = !editable || LinkedDataProperty.disallowEditingOfExistingValues(property);
-        const ValueComponent = disableEditing
-            ? this.props.valueComponentFactory.readOnlyComponent()
-            : this.props.valueComponentFactory.editComponent(property);
+        const ValueComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
 
         return (
             <ListItem disableGutters style={{display: 'block'}}>
@@ -127,7 +125,8 @@ LinkedDataProperty.propTypes = {
         addComponent: PropTypes.func,
         readOnlyComponent: PropTypes.func
     }).isRequired
-}
+};
+
 LinkedDataProperty.defaultProps = {
     onChange: () => {},
     editable: true,

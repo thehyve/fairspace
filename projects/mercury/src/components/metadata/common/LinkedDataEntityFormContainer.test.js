@@ -27,7 +27,7 @@ describe('LinkedDataEntityFormContainer', () => {
                 {value: "My second collection"}
             ],
             datatype: STRING_URI,
-            allowMultiple: false,
+            maxValuesCount: 1,
             machineOnly: false,
             multiLine: false
         }, {
@@ -35,7 +35,7 @@ describe('LinkedDataEntityFormContainer', () => {
             label: "Label",
             values: [],
             datatype: STRING_URI,
-            allowMultiple: false,
+            maxValuesCount: 1,
             machineOnly: false,
             multiLine: false
         }];
