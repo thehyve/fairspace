@@ -1,10 +1,10 @@
 import React from 'react';
-import {mount} from "enzyme";
+import {mount, shallow} from "enzyme";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import Vocabulary from "../../../services/Vocabulary";
-import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
+import {LinkedDataEntityFormContainer} from "./LinkedDataEntityFormContainer";
 import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
 import {STRING_URI} from "../../../constants";
 import StringValue from "./values/StringValue";
@@ -40,35 +40,24 @@ describe('LinkedDataEntityFormContainer', () => {
             multiLine: false
         }];
 
-        const store = mockStore({
-            cache: {
-                jsonLdBySubject: {},
-                vocabulary: {}
-            },
-            linkedDataForm: {
-                "http://example.com/john": {
-                    updates: {
-                        'http://www.w3.org/2000/01/rdf-schema#comment': [
-                            {value: 'My collection'}
-                        ],
-                        'http://www.w3.org/2000/01/rdf-schema#label': [
-                            {value: 'Some label'}
-                        ]
-                    }
-                }
-            }
-        });
+        const updates = {
+            'http://www.w3.org/2000/01/rdf-schema#comment': [
+                {value: 'My collection'}
+            ],
+            'http://www.w3.org/2000/01/rdf-schema#label': [
+                {value: 'Some label'}
+            ]
+        };
 
         const fetchVocabulary = jest.fn();
         const fetchMetadata = jest.fn();
-        const wrapper = mount(<LinkedDataEntityFormContainer
+        const wrapper = shallow(<LinkedDataEntityFormContainer
             formKey="http://example.com/john"
             subject="http://example.com/john"
-            store={store}
+            updates={updates}
             properties={properties}
             fetchShapes={fetchVocabulary}
             fetchLinkedData={fetchMetadata}
-            valueComponentFactory={mockComponentFactory}
         />);
 
         const formProperties = wrapper.find(LinkedDataEntityForm).prop('properties');

@@ -11,7 +11,7 @@ import {
     validateLinkedDataProperty
 } from "../../../actions/linkedDataFormActions";
 
-class LinkedDataEntityFormContainer extends React.Component {
+export class LinkedDataEntityFormContainer extends React.Component {
     componentDidMount() {
         this.initialize();
     }
@@ -50,7 +50,6 @@ class LinkedDataEntityFormContainer extends React.Component {
                 editable={this.props.editable}
 
                 properties={propertiesWithChanges}
-                valueComponentFactory={this.props.valueComponentFactory}
             />
         );
     }
@@ -74,11 +73,12 @@ LinkedDataEntityFormContainer.propTypes = {
 
     properties: PropTypes.array,
     updates: PropTypes.object,
+    errors: PropTypes.object
 
-    valueComponentFactory: PropTypes.object.isRequired
 };
 
 LinkedDataEntityFormContainer.defaultProps = {
+    initializeForm: () => {},
     fetchShapes: () => {},
     fetchLinkedData: () => {},
 
@@ -88,6 +88,7 @@ LinkedDataEntityFormContainer.defaultProps = {
 
     properties: [],
     updates: {},
+    errors: {},
     editable: true
 };
 
