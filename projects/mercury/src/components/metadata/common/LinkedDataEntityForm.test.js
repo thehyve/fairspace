@@ -17,7 +17,7 @@ describe('LinkedDataEntityForm', () => {
                 label: "Biological Sample"
             }
         ],
-        allowMultiple: false,
+        maxValuesCount: 1,
         machineOnly: false,
         multiLine: false
     }, {
@@ -25,7 +25,7 @@ describe('LinkedDataEntityForm', () => {
         label: "",
         values: [],
         datatype: STRING_URI,
-        allowMultiple: false,
+        maxValuesCount: 1,
         machineOnly: false,
         multiLine: false
     }];
@@ -54,7 +54,7 @@ describe('LinkedDataEntityForm', () => {
                     }
                 ],
                 range: "http://fairspace.io/ontology#User",
-                allowMultiple: false,
+                maxValuesCount: 0,
                 machineOnly: true,
                 multiLine: false
             }

@@ -15,7 +15,7 @@ const defaultProperty = {
     datatype: STRING_URI,
     label: 'Description',
     values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
-    allowMultiple: true
+    maxValuesCount: 4
 };
 
 const mockComponentFactory = {
@@ -28,7 +28,7 @@ describe('LinkedDataProperty elements', () => {
     it('shows all provided values', () => {
         const property = {
             ...defaultProperty,
-            allowMultiple: false
+            maxValuesCount: 1
         };
 
         const wrapper = shallow(<LinkedDataProperty editable property={property} />, {context: mockComponentFactory});
@@ -88,7 +88,7 @@ describe('LinkedDataProperty elements', () => {
         const property = {
             ...defaultProperty,
             values: [{value: 'More info'}],
-            allowMultiple: false
+            maxValuesCount: 1
         };
 
         const wrapper = shallow(<LinkedDataProperty editable property={property} />, {context: mockComponentFactory});
@@ -106,7 +106,7 @@ describe('LinkedDataProperty elements', () => {
         const property = {
             ...defaultProperty,
             values: [{value: 'More info'}, {value: 'another info'}],
-            allowMultiple: true
+            maxValuesCount: 2
         };
 
         const wrapper = shallow(<LinkedDataProperty editable={false} property={property} />, {context: mockComponentFactory});
