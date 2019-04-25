@@ -40,8 +40,8 @@ fs:CollectionShape sh:property
         <patientIdentifierShape>,
         <hasEventShape>,
         <gaveConsentShape>,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 <PersonConsentShape> a fs:ClassShape ;
     sh:closed false ; 
@@ -54,8 +54,8 @@ fs:CollectionShape sh:property
         <isProjectConsentShape>,
         <authorizesShape>,
         <isConsentOfShape>,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 <ResearchProjectShape> a fs:ClassShape ;
     sh:closed false ; 
@@ -70,8 +70,8 @@ fs:CollectionShape sh:property
         <projectManagerShape>,
         <hasCollectionShape>,
         <hasPersonConsentShape>,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 <TumorPathologyEventShape> a fs:ClassShape ;
     sh:closed false ; 
@@ -88,8 +88,8 @@ fs:CollectionShape sh:property
         <isAnalysedByShape>,
         <eventSubjectShape>,
         <isLinkedToShape>,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 <BiologicalSampleShape> a fs:ClassShape ;
     sh:closed false ; 
@@ -104,8 +104,8 @@ fs:CollectionShape sh:property
         <isAuthorizedByShape>,
         <isParentOfShape>,
         <isChildOfShape>,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 <AnalysisShape> a fs:ClassShape ;
     sh:closed false ; 
@@ -119,8 +119,8 @@ fs:CollectionShape sh:property
         <analyticPipelineCodeShape>,
         <numberOfBreakPointsShape>,
         <associatedFilesShape>,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 <WidgetMaster> a fs:Class .
 <WidgetMasterShape> a fs:ClassShape ;
@@ -141,8 +141,8 @@ fs:CollectionShape sh:property
         <booleanX4WidgetShape>,
         <fixedDropdownWidgetShape>,
         <resourceWidgetShape>,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 ## User property shapes
 
