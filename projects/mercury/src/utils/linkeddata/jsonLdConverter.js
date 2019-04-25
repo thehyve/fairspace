@@ -146,7 +146,7 @@ const jsonLdWrapper = (values, shape) => {
 
     const dataType = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
 
-    if (dataType === constants.DATE_URI || dataType === constants.DATETIME_URI) {
+    if (dataType) {
         return values.map(({value}) => ({
             "@value": value,
             "@type": dataType

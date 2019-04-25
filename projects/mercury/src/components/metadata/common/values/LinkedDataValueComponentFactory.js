@@ -1,8 +1,7 @@
 import StringValue from "./StringValue";
 import * as constants from "../../../../constants";
-import IntegerValue from "./IntegerValue";
+import NumberValue from "./NumberValue";
 import DateTimeValue from "./DateTimeValue";
-import DecimalValue from "./DecimalValue";
 import DateValue from "./DateValue";
 import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
@@ -35,9 +34,9 @@ export const getInputComponent = (property) => {
         case constants.STRING_URI:
             return StringValue;
         case constants.INTEGER_URI:
-            return IntegerValue;
         case constants.DECIMAL_URI:
-            return DecimalValue;
+        case constants.LONG_URI:
+            return NumberValue;
         case constants.DATETIME_URI:
             return DateTimeValue;
         case constants.DATE_URI:
