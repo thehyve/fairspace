@@ -102,26 +102,27 @@ export const vocabularyUtils = (vocabulary = []) => {
      * Generates a list entry for a single property
      * @param predicate
      * @param values
-     * @param propertyShape
+     * @param shape
      * @returns {{key: string, label: string, datatype: string, className: string, maxValuesCount: number, machineOnly: boolean, multiLine: boolean}}
      * @private
      */
-    const generatePropertyEntry = (predicate, propertyShape) => {
-        const datatype = getFirstPredicateId(propertyShape, constants.SHACL_DATATYPE);
-        const className = getFirstPredicateId(propertyShape, constants.SHACL_CLASS);
-        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(propertyShape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+    const generatePropertyEntry = (predicate, shape) => {
+        const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
+        const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
+        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH, 1000) > 255;
 
         return {
             key: predicate,
-            label: getFirstPredicateValue(propertyShape, constants.SHACL_NAME),
+            label: getFirstPredicateValue(shape, constants.SHACL_NAME),
+            shape,
             datatype,
             multiLine,
             className,
-            maxValuesCount: getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT),
-            machineOnly: getFirstPredicateValue(propertyShape, constants.MACHINE_ONLY_URI, false),
-            allowedValues: getFirstPredicateList(propertyShape, constants.SHACL_IN),
-            isRdfList: isRdfList(propertyShape),
-            isGenericIriResource: isGenericIriResource(propertyShape),
+            maxValuesCount: getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT),
+            machineOnly: getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false),
+            allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
+            isRdfList: isRdfList(shape),
+            isGenericIriResource: isGenericIriResource(shape),
             allowAdditionOfEntities: isFairspaceClass(className)
         };
     };
