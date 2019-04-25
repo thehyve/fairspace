@@ -171,7 +171,7 @@ fs:CollectionShape sh:property
 
 <integerLongWidget> a rdf:Property .
 <integerLongWidgetShape> a fs:PropertyShape ;
-    sh:name "Integer" ;
+    sh:name "Integer (long)" ;
     sh:description "A single integer (long)." ;
     sh:datatype xsd:long ;
     sh:maxCount 1 ;
