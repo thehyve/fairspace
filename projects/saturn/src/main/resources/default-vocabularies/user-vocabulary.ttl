@@ -39,6 +39,7 @@ fs:CollectionShape sh:property
         <ageOfDeathShape>,
         <patientIdentifierShape>,
         <hasEventShape>,
+        <gaveConsentShape>,
         rdfs:labelShape,
         rdfs:commentShape .
 
@@ -52,6 +53,7 @@ fs:CollectionShape sh:property
     sh:property
         <isProjectConsentShape>,
         <authorizesShape>,
+        <isConsentOfShape>,
         rdfs:labelShape,
         rdfs:commentShape .
 

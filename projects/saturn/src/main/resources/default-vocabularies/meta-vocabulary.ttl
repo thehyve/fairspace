@@ -7,6 +7,13 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dash: <http://datashapes.org/dash#> .
 
+<ignoredPropertiesCollection>
+   rdf:first rdf:type ;
+   rdf:rest ( owl:sameAs sh:ignoredProperties sh:message fs:machineOnly
+              fs:fixedShape fs:systemProperties sh:closed fs:createdByShape
+              fs:dateCreatedShape fs:modifiedByShape fs:dateModifiedShape 
+              fs:deletedByShape fs:dateDeletedShape ) . 
+
 fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Shape of classes." ;
@@ -49,15 +56,10 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:name "Show in catalog" ;
         sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
-    sh:not [
-        sh:hasValue true ;
-        sh:path sh:closed ;
-        sh:description "A fs:ClassShape shape cannot be defined as sh:closed."
-    ] ;
+    sh:not fs:ShapeIsAClosedShape ; 
     fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties sh:message 
-                           fs:fixedShape fs:systemProperties sh:closed ) .
+    sh:ignoredProperties <ignoredPropertiesCollection> .
 
 fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -140,8 +142,7 @@ fs:PropertyShapeMetaShape a sh:NodeShape ;
       ) ; 
     fs:showInCatalog true ;
     sh:targetClass fs:PropertyShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties 
-                           sh:message fs:fixedShape fs:machineOnly ) .
+    sh:ignoredProperties <ignoredPropertiesCollection> .
 
 fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -202,8 +203,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties 
-                           sh:message fs:fixedShape fs:machineOnly ) .
+    sh:ignoredProperties <ignoredPropertiesCollection> .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
@@ -233,6 +233,11 @@ fs:systemPropertiesShape a fs:PropertyShape ;
     fs:machineOnly true ;
     sh:name "System properties" ;
     sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties." .
+
+fs:ShapeIsAClosedShape a sh:PropertyShape ;
+  sh:hasValue true ;
+  sh:description "A fs:ClassShape shape cannot be defined as sh:closed true." ;
+  sh:path sh:closed .
 
 # Definitions of our shape types, needed
 # for form building
