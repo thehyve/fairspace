@@ -48,6 +48,7 @@ export const DATETIME_URI = XMLSCHEMA_NS + 'dateTime';
 export const DATE_URI = XMLSCHEMA_NS + 'date';
 export const TIME_URI = XMLSCHEMA_NS + 'time';
 export const INTEGER_URI = XMLSCHEMA_NS + 'integer';
+export const LONG_URI = XMLSCHEMA_NS + 'long';
 export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
 
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';

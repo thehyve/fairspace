@@ -1,14 +1,13 @@
 import React from 'react';
 import BaseInputValue from "./BaseInputValue";
 
-function IntegerValue(props) {
+function NumberValue(props) {
     return (
         <BaseInputValue
             {...props}
             type="number"
-            transformValue={v => parseInt(v, 10) || 0}
         />
     );
 }
 
-export default IntegerValue;
+export default NumberValue;
