@@ -33,8 +33,8 @@ fs:FileShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape ;
+        fs:labelShape,
+        fs:commentShape ;
     sh:property
         fs:fileSizeShape,
         fs:md5Shape,
@@ -45,8 +45,8 @@ fs:FileShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 fs:DirectoryShape a fs:ClassShape ;
     sh:description "A directory containing multiple files." ;
@@ -62,8 +62,8 @@ fs:DirectoryShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape ;
+        fs:labelShape,
+        fs:commentShape ;
     sh:property
         fs:filePathShape,
         fs:createdByShape,
@@ -72,8 +72,8 @@ fs:DirectoryShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 fs:CollectionShape a fs:ClassShape ;
     sh:description "Collection of files with associated metadata and access rules." ;
@@ -89,8 +89,8 @@ fs:CollectionShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape ;
+        fs:labelShape,
+        fs:commentShape ;
     sh:property
         fs:filePathShape,
         fs:createdByShape,
@@ -99,8 +99,8 @@ fs:CollectionShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape .
 
 fs:UserShape a sh:NodeShape ;
     sh:closed true ; 
@@ -110,8 +110,8 @@ fs:UserShape a sh:NodeShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
     sh:property
-        rdfs:labelShape,
-        rdfs:commentShape,
+        fs:labelShape,
+        fs:commentShape,
         fs:userEmailShape .
 
 ## Property Shapes
@@ -130,7 +130,7 @@ fs:collectionTypeShape a fs:PropertyShape ;
     sh:datatype xsd:string ;
     fs:machineOnly true .
 
-rdfs:labelShape a fs:PropertyShape ;
+fs:labelShape a fs:PropertyShape ;
     sh:name "Label" ;
     sh:description "Human readable label for this resource." ;
     sh:datatype xsd:string ;
@@ -139,7 +139,7 @@ rdfs:labelShape a fs:PropertyShape ;
     fs:fixedShape true ;
     sh:path rdfs:label . 
  
-rdfs:commentShape a fs:PropertyShape ;
+fs:commentShape a fs:PropertyShape ;
     sh:name "Description" ;
     sh:description "Human friendly description." ;
     sh:datatype xsd:string ;
