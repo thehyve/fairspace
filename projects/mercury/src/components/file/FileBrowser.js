@@ -10,6 +10,10 @@ import FileOperations from "./FileOperations";
 import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
+    componentWillUnmount = () => {
+        this.props.onDeselectAll();
+    }
+
     handlePathCheckboxClick = (path) => {
         const {selectedPaths, selectPath, deselectPath} = this.props;
         const isPathSelected = selectedPaths.some(el => el === path.filename);
