@@ -1,8 +1,7 @@
 import React from 'react';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ClearIcon from '@material-ui/icons/Clear';
 import {shallow} from "enzyme";
+import {List, ListItem} from '@material-ui/core';
+import ClearIcon from '@material-ui/icons/Clear';
 
 import {STRING_URI} from "../../../constants";
 import LinkedDataProperty from "./LinkedDataProperty";
@@ -32,7 +31,7 @@ describe('LinkedDataProperty elements', () => {
         };
 
         const wrapper = shallow(<LinkedDataProperty editable property={property} />, {context: mockComponentFactory});
-        const listItems = wrapper.dive().find(List).find(ListItem);
+        const listItems = wrapper.find(List).find(ListItem);
 
         expect(listItems.length).toEqual(3);
     });
@@ -40,18 +39,18 @@ describe('LinkedDataProperty elements', () => {
     it('shows an add element if multiple values are allowed, and it is editable', () => {
         const wrapper = shallow(<LinkedDataProperty editable property={defaultProperty} />, {context: mockComponentFactory});
 
-        const listItems = wrapper.dive().find(List).find(ListItem);
+        const listItems = wrapper.find(List).find(ListItem);
         expect(listItems.length).toEqual(4);
-        const deletIcons = wrapper.dive().find(List).find(ClearIcon);
+        const deletIcons = wrapper.find(List).find(ClearIcon);
         expect(deletIcons.length).toEqual(3);
     });
 
     it('shows no add element if multiple values are allowed, but it is uneditable', () => {
         const wrapper = shallow(<LinkedDataProperty editable={false} property={defaultProperty} />, {context: mockComponentFactory});
 
-        const listItems = wrapper.dive().find(List).find(ListItem);
+        const listItems = wrapper.find(List).find(ListItem);
         expect(listItems.length).toEqual(3);
-        const deletIcons = wrapper.dive().find(List).find(ClearIcon);
+        const deletIcons = wrapper.find(List).find(ClearIcon);
         expect(deletIcons.length).toEqual(0);
     });
 
@@ -63,7 +62,7 @@ describe('LinkedDataProperty elements', () => {
 
         const wrapper = shallow(<LinkedDataProperty editable property={property} />, {context: mockComponentFactory});
 
-        const listItems = wrapper.dive().find(List).find(ListItem);
+        const listItems = wrapper.find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
 
         // Assert contents of the single component
@@ -80,7 +79,7 @@ describe('LinkedDataProperty elements', () => {
 
         const wrapper = shallow(<LinkedDataProperty editable={false} property={property} />, {context: mockComponentFactory});
 
-        const listItems = wrapper.dive().find(List).find(ListItem);
+        const listItems = wrapper.find(List).find(ListItem);
         expect(listItems.length).toEqual(0);
     });
 
@@ -93,7 +92,7 @@ describe('LinkedDataProperty elements', () => {
 
         const wrapper = shallow(<LinkedDataProperty editable property={property} />, {context: mockComponentFactory});
 
-        const listItems = wrapper.dive().find(List).find(ListItem);
+        const listItems = wrapper.find(List).find(ListItem);
         expect(listItems.length).toEqual(1);
 
         // Assert contents of the single component
@@ -110,7 +109,7 @@ describe('LinkedDataProperty elements', () => {
         };
 
         const wrapper = shallow(<LinkedDataProperty editable={false} property={property} />, {context: mockComponentFactory});
-        const listItems = wrapper.dive().find(List).find(ListItem);
+        const listItems = wrapper.find(List).find(ListItem);
         expect(listItems.length).toEqual(2);
     });
 });
