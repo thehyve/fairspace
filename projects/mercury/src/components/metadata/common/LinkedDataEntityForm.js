@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {List} from '@material-ui/core';
+import {List, ListItem} from '@material-ui/core';
 
 import {ErrorMessage, LoadingInlay} from "../../common";
 import LinkedDataProperty from "./LinkedDataProperty";
 
 export const LinkedDataEntityForm = ({
-    properties, editable, error, loading, onChange, onAdd, onDelete, valueComponentFactory
+    properties, editable, error, loading, onChange, onAdd, onDelete
 }) => {
     if (error) {
         return <ErrorMessage message={error} />;
@@ -20,14 +20,19 @@ export const LinkedDataEntityForm = ({
         <List dense>
             {
                 properties.map((p) => (
-                    <LinkedDataProperty
-                        editable={editable}
+                    <ListItem
                         key={p.key}
-                        property={p}
-                        onChange={(value, index) => onChange(p, value, index)}
-                        onAdd={(value) => onAdd(p, value)}
-                        onDelete={(index) => onDelete(p, index)}
-                    />
+                        disableGutters
+                        style={{display: 'block'}}
+                    >
+                        <LinkedDataProperty
+                            editable={editable}
+                            property={p}
+                            onChange={(value, index) => onChange(p, value, index)}
+                            onAdd={(value) => onAdd(p, value)}
+                            onDelete={(index) => onDelete(p, index)}
+                        />
+                    </ListItem>
                 ))
             }
         </List>

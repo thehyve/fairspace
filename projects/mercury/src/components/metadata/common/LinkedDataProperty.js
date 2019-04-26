@@ -97,7 +97,7 @@ class LinkedDataProperty extends React.Component {
         const ValueComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
 
         return (
-            <ListItem disableGutters style={{display: 'block'}}>
+            <>
                 <Typography variant="body1" component="label" id={labelId}>
                     {property.label}
                 </Typography>
@@ -108,7 +108,7 @@ class LinkedDataProperty extends React.Component {
                     </Typography>
                     {canAdd ? this.renderAddComponent(labelId) : null}
                 </List>
-            </ListItem>
+            </>
         );
     }
 
