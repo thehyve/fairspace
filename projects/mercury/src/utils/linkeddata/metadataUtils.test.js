@@ -234,7 +234,7 @@ describe('Metadata Utils', () => {
         });
 
         it('returns undefined if type is not present', () => {
-            const metadata = []
+            const metadata = [];
 
             expect(getTypeInfo(metadata)).toBeUndefined();
         });

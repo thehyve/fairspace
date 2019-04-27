@@ -141,7 +141,7 @@ InformationDrawer.propTypes = {
 
     collection: PropTypes.object,
     loading: PropTypes.bool
-}
+};
 
 const mapStateToProps = ({cache: {collections, users},
     collectionBrowser: {selectedPaths, selectedCollectionLocation}}, ownProps) => {

@@ -94,6 +94,4 @@ describe('LinkedDataEntityFormContainer', () => {
         expect(fetchMetadata.mock.calls.length).toEqual(1);
         expect(fetchVocabulary.mock.calls.length).toEqual(1);
     });
-
-
 });

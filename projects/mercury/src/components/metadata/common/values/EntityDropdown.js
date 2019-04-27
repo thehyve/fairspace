@@ -17,7 +17,7 @@ const EntityDropdown = props => {
     return (
         <Dropdown {...props} />
     );
-}
+};
 
 EntityDropdown.propTypes = {
     property: PropTypes.object.isRequired,

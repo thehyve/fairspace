@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-has-content */
 import React from 'react';
 import {shallow} from "enzyme";
 import {Link} from "react-router-dom";

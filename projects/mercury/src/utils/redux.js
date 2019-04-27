@@ -155,6 +155,6 @@ export const createByKey = (predicate, mapActionToKey) => reducer => {
             const key = mapActionToKey(action);
             return {...state, [key]: reducer(state[key], action)};
         }
-        return state
+        return state;
     };
-}
+};

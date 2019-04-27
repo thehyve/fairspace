@@ -6,7 +6,7 @@ const styles = {
         padding: '20px',
         borderBottom: '1px solid #eee'
     }
-}
+};
 
 const linkedDataEntityHeader = ({label, typeInfo, classes}) => (
     <div className={classes.root}>

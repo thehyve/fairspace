@@ -20,13 +20,14 @@ export const renameFile = (path, currentFilename, newFilename) => {
         payload: FileAPI.move(from, to),
         meta: {
             path,
-            currentFilename, newFilename
+            currentFilename,
+            newFilename
         }
     };
 };
 
 export const deleteFile = (path) => (
-     {
+    {
         type: actionTypes.DELETE_FILE,
         payload: FileAPI.delete(path),
         meta: {
@@ -34,27 +35,23 @@ export const deleteFile = (path) => (
         }
     });
 
-export const uploadFiles = (path, files, nameMapping) => {
-    return {
-        type: actionTypes.UPLOAD_FILES,
-        payload: FileAPI.upload(path, files, nameMapping),
-        meta: {
-            path, files, nameMapping
-        }
-    };
-};
+export const uploadFiles = (path, files, nameMapping) => ({
+    type: actionTypes.UPLOAD_FILES,
+    payload: FileAPI.upload(path, files, nameMapping),
+    meta: {
+        path, files, nameMapping
+    }
+});
 
-export const createDirectory = (path) => {
-    return {
-        type: actionTypes.CREATE_DIRECTORY,
-        payload: FileAPI.createDirectory(path),
-        meta: {path}
-    };
-};
+export const createDirectory = (path) => ({
+    type: actionTypes.CREATE_DIRECTORY,
+    payload: FileAPI.createDirectory(path),
+    meta: {path}
+});
 
 const fetchFiles = createErrorHandlingPromiseAction((path) => ({
     type: actionTypes.FETCH_FILES,
-    payload:  FileAPI.list(path),
+    payload: FileAPI.list(path),
     meta: {
         path
     }
@@ -68,5 +65,5 @@ export const fetchFilesIfNeeded = (path) => dispatchIfNeeded(
 export const statFile = createErrorHandlingPromiseAction((path) => ({
     type: actionTypes.STAT_FILE,
     payload: FileAPI.stat(path),
-    meta: { path }
+    meta: {path}
 }));
