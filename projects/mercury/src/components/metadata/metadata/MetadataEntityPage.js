@@ -19,7 +19,7 @@ export default () => {
             >
                 <Paper style={{width: '80%', padding: 20}}>
                     <MetadataEntityHeaderContainer subject={subject} />
-                    <Divider />
+                    <Divider style={{marginTop: 16}} />
                     <MetadataEntityContainer subject={subject} />
                 </Paper>
             </Grid>

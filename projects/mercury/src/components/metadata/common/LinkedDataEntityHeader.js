@@ -1,5 +1,5 @@
 import React from 'react';
-import {Grid, Typography, Chip} from "@material-ui/core";
+import {Grid, Typography, Chip, Tooltip} from "@material-ui/core";
 
 const linkedDataEntityHeader = ({header, label, description}) => (
     <>
@@ -10,14 +10,9 @@ const linkedDataEntityHeader = ({header, label, description}) => (
                 </Typography>
             </Grid>
             <Grid item>
-                <Chip label={label || '........'} />
-            </Grid>
-        </Grid>
-        <Grid container justify="flex-end" style={{margin: '4px 0'}}>
-            <Grid item>
-                <Typography variant="subtitle1">
-                    {description}
-                </Typography>
+                <Tooltip title={description} aria-label={description}>
+                    <Chip label={label || '........'} />
+                </Tooltip>
             </Grid>
         </Grid>
     </>
