@@ -10,9 +10,17 @@ import FileOperations from "./FileOperations";
 import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
-    componentDidUpdate(prevProps) {
-        if (this.props.location !== prevProps.location) {
+    historyListener = null;
+
+    componentDidMount() {
+        this.historyListener = this.props.history.listen(() => {
             this.props.onDeselectAll();
+        });
+    }
+
+    componentWillUnmount() {
+        if (this.historyListener) {
+            this.historyListener();
         }
     }
 
