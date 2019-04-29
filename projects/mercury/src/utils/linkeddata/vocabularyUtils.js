@@ -110,6 +110,7 @@ export const vocabularyUtils = (vocabulary = []) => {
         const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
         const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
         const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const minValuesCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
 
         return {
             key: predicate,
@@ -118,6 +119,7 @@ export const vocabularyUtils = (vocabulary = []) => {
             datatype,
             multiLine,
             className,
+            minValuesCount,
             maxValuesCount: getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT),
             machineOnly: getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false),
             allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
