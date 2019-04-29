@@ -76,7 +76,7 @@ class FileBrowser extends React.Component {
     render() {
         const {
             loading, error, openedCollection, files = [], selectedPaths, openedPath,
-            fetchFilesIfNeeded, onSelectAll, onDeselectAll, history
+            fetchFilesIfNeeded, onSelectAll, onDeselectAll
         } = this.props;
         const collectionExists = openedCollection && openedCollection.iri;
 
