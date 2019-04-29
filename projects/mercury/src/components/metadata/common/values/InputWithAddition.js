@@ -27,7 +27,7 @@ class InputWithAddition extends React.Component {
         this.props.onCreate(formKey, shape, id)
             .then(({value}) => {
                 const label = getFirstPredicateProperty(value.values, constants.LABEL_URI, 'value')
-                                || getFirstPredicateProperty(value.values, constants.SHACL_NAME, 'value');
+                    || getFirstPredicateProperty(value.values, constants.SHACL_NAME, 'value');
 
                 this.handleCloseDialog();
                 this.props.fetchEntities(this.props.property.className);
@@ -69,7 +69,7 @@ class InputWithAddition extends React.Component {
 
     render() {
         return (
-            <Grid container justify="space-between">
+            <Grid container justify="space-between" spacing={8}>
                 <Grid item xs={11}>
                     {this.props.children}
                 </Grid>
