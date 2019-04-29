@@ -7,16 +7,16 @@ import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
 
 const mapStateToProps = (state, ownProps) => {
     const metadata = getCombinedMetadataForSubject(state, ownProps.subject);
-
-    const typeInfo = getTypeInfo(metadata);
-    const label = linkLabel(ownProps.subject);
+    const header = linkLabel(ownProps.subject);
+    const {label, description} = getTypeInfo(metadata);
 
     return {
         loading: isMetadataPending(state, ownProps.subject) || isVocabularyPending(state),
         error: isMetadataPending(state, ownProps.subject) || isVocabularyPending(state),
 
-        typeInfo,
-        label
+        header,
+        label,
+        description
     };
 };
 

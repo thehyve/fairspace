@@ -1,22 +1,26 @@
 import React from 'react';
-import {Typography, withStyles} from "@material-ui/core";
+import {Grid, Typography, Chip} from "@material-ui/core";
 
-const styles = {
-    root: {
-        padding: '20px',
-        borderBottom: '1px solid #eee'
-    }
-};
-
-const linkedDataEntityHeader = ({label, typeInfo, classes}) => (
-    <div className={classes.root}>
-        <Typography variant="h6">
-            {label}
-        </Typography>
-        <Typography variant="h6">
-            {typeInfo}
-        </Typography>
-    </div>
+const linkedDataEntityHeader = ({header, label, description}) => (
+    <>
+        <Grid container justify="space-between">
+            <Grid item>
+                <Typography variant="h5">
+                    {header}
+                </Typography>
+            </Grid>
+            <Grid item>
+                <Chip label={label || '........'} />
+            </Grid>
+        </Grid>
+        <Grid container justify="flex-end" style={{margin: '4px 0'}}>
+            <Grid item>
+                <Typography variant="subtitle1">
+                    {description}
+                </Typography>
+            </Grid>
+        </Grid>
+    </>
 );
 
-export default withStyles(styles)(linkedDataEntityHeader);
+export default linkedDataEntityHeader;
