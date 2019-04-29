@@ -100,7 +100,7 @@ class LinkedDataProperty extends React.Component {
                                     <div style={{width: '100%'}}>
                                         <ValueAddComponent
                                             property={property}
-                                            placeholder="Add new"
+                                            placeholder=""
                                             onChange={onAdd}
                                             aria-labelledby={labelId}
                                         />

@@ -49,7 +49,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                 onClose={this.closeDialog}
                 aria-labelledby="form-dialog-title"
             >
-                <DialogTitle id="form-dialog-title">Create new {typeLabel}</DialogTitle>
+                <DialogTitle id="form-dialog-title">{typeLabel}</DialogTitle>
 
                 <DialogContent>
                     <TextField
