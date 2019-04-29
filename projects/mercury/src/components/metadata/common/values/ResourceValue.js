@@ -21,6 +21,7 @@ class ResourceValue extends React.Component {
     handleBlur = () => {
         try {
             this.props.onChange({id: new URL(this.state.value).toString()});
+            this.resetState();
         } catch (e) {
             this.resetState();
         }
