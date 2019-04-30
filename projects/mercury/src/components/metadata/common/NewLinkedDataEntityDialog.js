@@ -48,6 +48,8 @@ class NewLinkedDataEntityDialog extends React.Component {
                 open={open}
                 onClose={this.closeDialog}
                 aria-labelledby="form-dialog-title"
+                fullWidth
+                maxWidth="sm"
             >
                 <DialogTitle id="form-dialog-title">{typeLabel}</DialogTitle>
 
@@ -62,7 +64,6 @@ class NewLinkedDataEntityDialog extends React.Component {
                         fullWidth
                         required
                         error={!this.hasValidId()}
-                        style={{width: 400}}
                     />
 
                     <LinkedDataEntityFormContainer
