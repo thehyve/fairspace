@@ -28,7 +28,7 @@ const LinkedDataShapeChooserDialog = props => {
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
-            <DialogTitle id="form-dialog-title">Choose metadata type</DialogTitle>
+            <DialogTitle id="form-dialog-title">Type</DialogTitle>
             <DialogContent>
                 <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
                     {

@@ -48,10 +48,12 @@ class NewLinkedDataEntityDialog extends React.Component {
                 open={open}
                 onClose={this.closeDialog}
                 aria-labelledby="form-dialog-title"
+                fullWidth
+                maxWidth="sm"
             >
-                <DialogTitle id="form-dialog-title">Create new {typeLabel}</DialogTitle>
+                <DialogTitle id="form-dialog-title">{typeLabel}</DialogTitle>
 
-                <DialogContent>
+                <DialogContent style={{overflowX: 'hidden'}}>
                     <TextField
                         autoFocus
                         id="name"
@@ -62,7 +64,6 @@ class NewLinkedDataEntityDialog extends React.Component {
                         fullWidth
                         required
                         error={!this.hasValidId()}
-                        style={{width: 400}}
                     />
 
                     <LinkedDataEntityFormContainer

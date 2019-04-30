@@ -214,7 +214,10 @@ describe('Metadata Utils', () => {
                 comment: 'some-comment'
             });
 
-            expect(getTypeInfo(metadata)).toEqual('some-label - some-comment');
+            expect(getTypeInfo(metadata)).toEqual({
+                label: 'some-label',
+                description: 'some-comment'
+            });
         });
 
         it('ignores missing comment', () => {
@@ -222,7 +225,10 @@ describe('Metadata Utils', () => {
                 label: 'some-label'
             });
 
-            expect(getTypeInfo(metadata)).toEqual('some-label');
+            expect(getTypeInfo(metadata)).toEqual({
+                label: 'some-label',
+                description: ''
+            });
         });
 
         it('ignores missing label', () => {
@@ -230,13 +236,16 @@ describe('Metadata Utils', () => {
                 comment: 'some-comment'
             });
 
-            expect(getTypeInfo(metadata)).toEqual('some-comment');
+            expect(getTypeInfo(metadata)).toEqual({
+                description: 'some-comment',
+                label: ''
+            });
         });
 
         it('returns undefined if type is not present', () => {
             const metadata = [];
 
-            expect(getTypeInfo(metadata)).toBeUndefined();
+            expect(getTypeInfo(metadata)).toEqual({description: '', label: ''});
         });
     });
 });

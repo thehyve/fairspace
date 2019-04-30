@@ -27,8 +27,14 @@ const MetadataEntityContainer = props => {
     };
 
     return (
-        <Grid container>
-            <Grid item xs={12}>
+        <Grid
+            style={{minHeight: '74vh'}}
+            container
+            direction="column"
+            justify="space-between"
+            alignItems="stretch"
+        >
+            <Grid item>
                 <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
                     <LinkedDataEntityFormContainer
                         editable={editable}
@@ -38,21 +44,15 @@ const MetadataEntityContainer = props => {
                     />
                 </LinkedDataValuesContext.Provider>
             </Grid>
-            {
-                editable
-                    ? (
-                        <Grid item>
-                            <Button
-                                onClick={handleButtonClick}
-                                color="primary"
-                                disabled={buttonDisabled}
-                            >
-                                Update
-                            </Button>
-                        </Grid>
-                    )
-                    : null
-            }
+            <Grid item>
+                <Button
+                    onClick={handleButtonClick}
+                    color="primary"
+                    disabled={buttonDisabled}
+                >
+                    Update
+                </Button>
+            </Grid>
         </Grid>
     );
 };

@@ -120,14 +120,13 @@ export const propertiesToShow = (properties = []) => {
 /**
  * Creates a textual description of the type for the given metadata item
  * @param metadata
- * @returns {string}
+ * @returns {{label: string, description: string}} object containing the type label and description
  */
 export const getTypeInfo = (metadata) => {
     const typeProp = metadata && metadata.find(prop => prop.key === '@type');
-    const typeValue = (typeProp && typeProp.values && typeProp.values.length && typeProp.values[0]) || {};
-    const {label, comment} = typeValue;
+    const {label = '', comment: description = ''} = (typeProp && typeProp.values && typeProp.values.length && typeProp.values[0]) || {};
 
-    return (label && comment) ? `${label} - ${comment}` : (label || comment);
+    return {label, description};
 };
 
 /**
