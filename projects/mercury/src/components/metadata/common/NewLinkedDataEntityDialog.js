@@ -53,7 +53,7 @@ class NewLinkedDataEntityDialog extends React.Component {
             >
                 <DialogTitle id="form-dialog-title">{typeLabel}</DialogTitle>
 
-                <DialogContent>
+                <DialogContent style={{overflowX: 'hidden'}}>
                     <TextField
                         autoFocus
                         id="name"
