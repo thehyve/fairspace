@@ -13,7 +13,7 @@ export const maxCountValidation = (maxCount, values) => ((values && values.lengt
     ? `The maximum number of values is ${maxCount}` : null);
 
 export const validateValuesAgainstShape = ({shape, datatype, values}) => {
-    const pureValues = values.map(v => v.value || v.id);
+    const pureValues = values.map(v => v.value || v.id || '');
     const maxLength = getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH);
     const minCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
     const maxCount = getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT);
