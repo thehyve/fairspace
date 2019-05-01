@@ -10,7 +10,18 @@ const linkedDataEntityHeader = ({header, label, description}) => (
                 </Typography>
             </Grid>
             <Grid item>
-                <Tooltip title={description} aria-label={description}>
+                <Tooltip
+                    title={(
+                        <Typography
+                            variant="caption"
+                            color="inherit"
+                            style={{whiteSpace: 'pre-line'}}
+                        >
+                            {description}
+                        </Typography>
+                    )}
+                    aria-label={description}
+                >
                     <Chip label={label || '........'} />
                 </Tooltip>
             </Grid>

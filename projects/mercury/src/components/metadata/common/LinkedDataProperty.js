@@ -7,7 +7,6 @@ import {
     FormLabel,
     FormGroup,
     FormHelperText,
-    Grid,
     Typography
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
@@ -23,9 +22,9 @@ import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
      * @param property
      * @returns {Boolean}
      */
-const disallowEditingOfExistingValues = (property) => property.machineOnly
-    || property.isGenericIriResource
-    || property.allowedValues;
+const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, allowedValues}) => machineOnly
+    || isGenericIriResource
+    || allowedValues;
 
 const LinkedDataProperty = ({property, editable, onAdd, onChange, onDelete}) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -46,6 +45,7 @@ const LinkedDataProperty = ({property, editable, onAdd, onChange, onDelete}) => 
     const disableEditing = !editable || disallowEditingOfExistingValues(property);
     const ValueComponent = disableEditing ? readOnlyComponent() : editComponent(property);
     const ValueAddComponent = addComponent(property);
+    const pathVisibility = hoveredAllProperty ? 'visible' : 'hidden';
 
     return (
         <FormControl
@@ -59,16 +59,12 @@ const LinkedDataProperty = ({property, editable, onAdd, onChange, onDelete}) => 
                 margin: 4,
             }}
         >
-            <Grid container justify="space-between">
-                <Grid item>
-                    <FormLabel component="legend">{label}</FormLabel>
-                </Grid>
-                <Grid item>
-                    <Typography color="primary" variant="caption" style={{visibility: hoveredAllProperty ? 'visible' : 'hidden'}}>
-                        {path}
-                    </Typography>
-                </Grid>
-            </Grid>
+            <FormLabel component="legend">
+                {label}
+            </FormLabel>
+            <Typography variant="caption" color="textSecondary" style={{visibility: pathVisibility, textAlign: 'right'}}>
+                {path}
+            </Typography>
             <FormGroup>
                 {values.map((entry, idx) => (
                     <div
@@ -96,7 +92,11 @@ const LinkedDataProperty = ({property, editable, onAdd, onChange, onDelete}) => 
                                                     aria-label="Delete"
                                                     title="Delete"
                                                     onClick={() => onDelete(idx)}
-                                                    style={{visibility: hoveredIndex === idx ? 'visible' : 'hidden'}}
+                                                    style={{
+                                                        visibility: hoveredIndex === idx ? 'visible' : 'hidden',
+                                                        padding: 6,
+                                                        marginLeft: 8
+                                                    }}
                                                 >
                                                     <ClearIcon />
                                                 </IconButton>
