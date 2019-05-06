@@ -1,7 +1,7 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
-import {getMetaVocabulary, getVocabulary} from "../reducers/cache/vocabularyReducers";
+import {getMetaVocabulary} from "../reducers/cache/vocabularyReducers";
 import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
 
 export const invalidateMetadata = subject => ({
@@ -23,7 +23,7 @@ export const submitVocabularyChangesFromState = (subject) => (dispatch, getState
 
 export const createVocabularyEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
     const values = getLinkedDataFormUpdates(getState(), formKey);
-    const vocabulary = getVocabulary(getState());
+    const metaVocabulary = getMetaVocabulary(getState());
 
     return dispatch({
         type: actionTypes.CREATE_VOCABULARY_ENTITY,
@@ -33,7 +33,7 @@ export const createVocabularyEntityFromState = (formKey, subject, type) => (disp
                     throw Error(`Vocabulary entity already exists: ${subject}`);
                 }
             })
-            .then(() => VocabularyAPI.createEntity(subject, type, values, vocabulary))
+            .then(() => VocabularyAPI.createEntity(subject, type, values, metaVocabulary))
             .then(() => ({subject, type, values})),
         meta: {
             subject,

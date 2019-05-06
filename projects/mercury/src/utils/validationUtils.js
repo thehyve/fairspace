@@ -1,5 +1,6 @@
 import {getFirstPredicateValue} from "./linkeddata/jsonLdUtils";
 import * as constants from "../constants";
+import {getMaxCount} from "./linkeddata/vocabularyUtils";
 
 const conditionApplisToAnyValue = (values, condition) => values && values.some(condition);
 
@@ -16,7 +17,7 @@ export const validateValuesAgainstShape = ({shape, datatype, values}) => {
     const pureValues = values.map(v => v.value || v.id || '');
     const maxLength = getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH);
     const minCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
-    const maxCount = getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT);
+    const maxCount = getMaxCount(shape);
     const errors = [];
 
     if (maxLength > 0 && datatype === constants.STRING_URI) {
