@@ -15,6 +15,18 @@ export const isRdfList = (propertyShape) => getFirstPredicateId(propertyShape, c
  */
 export const isGenericIriResource = (propertyShape) => getFirstPredicateId(propertyShape, constants.SHACL_NODEKIND) === constants.SHACL_IRI;
 
+/**
+ * Returns the maxCount value for the given shape
+ *
+ * RDF lists are treated as a special case. They have a maxCount of 1, because
+ * they (mostly) support only a single list. However, our UI and validation should
+ * treat it as if multiple values are allowed.
+ *
+ * @param shape
+ * @returns {number}
+ */
+export const getMaxCount = shape => (isRdfList(shape) ? 0 : getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT));
+
 export const vocabularyUtils = (vocabulary = []) => {
     /**
      * Returns a list of classes marked as fairspace entities
@@ -124,10 +136,10 @@ export const vocabularyUtils = (vocabulary = []) => {
             multiLine,
             className,
             minValuesCount,
-            maxValuesCount: getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT),
+            maxValuesCount: getMaxCount(shape),
             machineOnly: getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false),
-            allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
             isRdfList: isRdfList(shape),
+            allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
             isGenericIriResource: isGenericIriResource(shape),
             allowAdditionOfEntities: isFairspaceClass(className)
         };

@@ -1,4 +1,4 @@
-import {isGenericIriResource, isRdfList, vocabularyUtils} from './vocabularyUtils';
+import {getMaxCount, isGenericIriResource, isRdfList, vocabularyUtils} from './vocabularyUtils';
 import vocabularyJsonLd from './test.vocabulary.json';
 import * as constants from "../../constants";
 
@@ -41,6 +41,21 @@ describe('vocabularyUtils', () => {
         it('should return true if the given shape is an rdf list', () => expect(isRdfList(rdfListShape)).toBe(true));
         it('should return false if the given shape is not an rdf list', () => expect(isRdfList(nonRdfListShape)).toBe(false));
         it('should return false on an empty shape', () => expect(isRdfList({})).toBe(false));
+    });
+
+    describe('getMaxCount', () => {
+        const rdfListShape = {
+            [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}],
+            [constants.SHACL_MAX_COUNT]: [{'@value': 1}]
+        };
+
+        const nonRdfListShape = {
+            [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
+            [constants.SHACL_MAX_COUNT]: [{'@value': 10}]
+        };
+
+        it('should return the max count value for a non list property', () => expect(getMaxCount(nonRdfListShape)).toEqual(10));
+        it('should be falsy for an RDF list, regardless of its value', () => expect(getMaxCount(rdfListShape)).toBeFalsy());
     });
 
     describe('isGenericResourceIri', () => {
