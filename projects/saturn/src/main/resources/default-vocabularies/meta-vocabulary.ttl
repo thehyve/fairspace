@@ -10,9 +10,9 @@
 <ignoredPropertiesCollection>
    rdf:first rdf:type ;
    rdf:rest ( owl:sameAs sh:ignoredProperties sh:message fs:machineOnly
-              fs:fixedShape fs:systemProperties sh:closed fs:createdByShape
-              fs:dateCreatedShape fs:modifiedByShape fs:dateModifiedShape 
-              fs:deletedByShape fs:dateDeletedShape ) . 
+              fs:fixedShape fs:systemProperties sh:closed fs:createdBy
+              fs:dateCreated fs:modifiedBy fs:dateModified
+              fs:deletedBy fs:dateDeleted ) .
 
 fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
