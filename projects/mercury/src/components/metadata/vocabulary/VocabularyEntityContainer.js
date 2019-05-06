@@ -23,7 +23,7 @@ import {isDataSteward} from "../../../utils/userUtils";
 import {fromJsonLd} from "../../../utils/linkeddata/jsonLdConverter";
 
 const VocabularyEntityContainer = props => {
-    const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
+    const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
@@ -38,24 +38,24 @@ const VocabularyEntityContainer = props => {
                         editable={editable}
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
+                        error={error}
                         {...otherProps}
                     />
                 </LinkedDataValuesContext.Provider>
             </Grid>
             {
-                editable
-                    ? (
-                        <Grid item>
-                            <Button
-                                onClick={handleButtonClick}
-                                color="primary"
-                                disabled={buttonDisabled}
-                            >
-                                Update
-                            </Button>
-                        </Grid>
-                    )
-                    : null
+                editable && !error
+                && (
+                    <Grid item>
+                        <Button
+                            onClick={handleButtonClick}
+                            color="primary"
+                            disabled={buttonDisabled}
+                        >
+                            Update
+                        </Button>
+                    </Grid>
+                )
             }
         </Grid>
     );

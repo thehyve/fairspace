@@ -1,5 +1,5 @@
 import React from 'react';
-import {Paper, Divider} from "@material-ui/core";
+import {Paper} from "@material-ui/core";
 
 import BreadCrumbs from "../../common/BreadCrumbs";
 import MetadataEntityContainer from './MetadataEntityContainer';
@@ -14,7 +14,6 @@ export default () => {
             <BreadCrumbs homeUrl="/metadata" />
             <Paper style={{maxWidth: 800, padding: 20}}>
                 <MetadataEntityHeaderContainer subject={subject} />
-                <Divider style={{marginTop: 16}} />
                 <MetadataEntityContainer subject={subject} />
             </Paper>
         </>

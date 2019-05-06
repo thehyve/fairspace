@@ -26,7 +26,7 @@ export const createVocabularyEntityFromState = (formKey, subject, type) => (disp
     const vocabulary = getVocabulary(getState());
 
     return dispatch({
-        type: actionTypes.CREATE_METADATA_ENTITY,
+        type: actionTypes.CREATE_VOCABULARY_ENTITY,
         payload: VocabularyAPI.get({subject})
             .then((meta) => {
                 if (meta.length) {

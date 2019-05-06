@@ -19,7 +19,7 @@ import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 
 const MetadataEntityContainer = props => {
-    const {editable, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
+    const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
@@ -40,19 +40,22 @@ const MetadataEntityContainer = props => {
                         editable={editable}
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
+                        error={error}
                         {...otherProps}
                     />
                 </LinkedDataValuesContext.Provider>
             </Grid>
-            <Grid item>
-                <Button
-                    onClick={handleButtonClick}
-                    color="primary"
-                    disabled={buttonDisabled}
-                >
-                    Update
-                </Button>
-            </Grid>
+            {editable && !error && (
+                <Grid item>
+                    <Button
+                        onClick={handleButtonClick}
+                        color="primary"
+                        disabled={buttonDisabled}
+                    >
+                        Update
+                    </Button>
+                </Grid>
+            )}
         </Grid>
     );
 };
