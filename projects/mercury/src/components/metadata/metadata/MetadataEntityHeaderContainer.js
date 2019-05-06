@@ -1,14 +1,16 @@
 import {connect} from "react-redux";
 import {PropTypes} from "prop-types";
-import {getCombinedMetadataForSubject, isMetadataPending} from "../../../reducers/cache/jsonLdBySubjectReducers";
-import {getTypeInfo, linkLabel} from "../../../utils/linkeddata/metadataUtils";
-import {isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {getCombinedMetadataForSubject, isMetadataPending, hasMetadataError} from "../../../reducers/cache/jsonLdBySubjectReducers";
+import {getTypeInfo, linkLabel, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
 
 const mapStateToProps = (state, ownProps) => {
     const metadata = getCombinedMetadataForSubject(state, ownProps.subject);
     const hasNoMetadata = !metadata || metadata.length === 0;
-    if (hasNoMetadata) {
+    const subject = ownProps.subject || url2iri(window.location.href);
+    const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
+    if (hasNoMetadata || hasOtherErrors) {
         return {
             error: true
         };
