@@ -46,8 +46,10 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     create: (formKey, shape, id) => {
         const subject = createVocabularyIri(id);
         const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
+
         return dispatch(vocabularyActions.createVocabularyEntityFromState(formKey, subject, type))
             .then(({value}) => {
+                dispatch(vocabularyActions.fetchVocabularyEntitiesIfNeeded());
                 dispatch(vocabularyActions.fetchAllVocabularyEntitiesIfNeeded());
                 ownProps.history.push(relativeLink(value.subject));
             });

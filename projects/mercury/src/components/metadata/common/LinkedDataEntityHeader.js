@@ -1,7 +1,7 @@
 import React from 'react';
-import {Grid, Typography, Chip, Tooltip} from "@material-ui/core";
+import {Grid, Typography, Chip, Tooltip, Divider} from "@material-ui/core";
 
-const linkedDataEntityHeader = ({header, label, description}) => (
+const linkedDataEntityHeader = ({header, label, description, error}) => !error && (
     <>
         <Grid container justify="space-between">
             <Grid item>
@@ -26,6 +26,7 @@ const linkedDataEntityHeader = ({header, label, description}) => (
                 </Tooltip>
             </Grid>
         </Grid>
+        <Divider style={{marginTop: 16}} />
     </>
 );
 
