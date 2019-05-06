@@ -66,8 +66,14 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validateByPropertyPath(Resource shape, Model vocabulary, Set<ValidationResult> results) {
         // determine the underlying property path (if any) and validate all the entities having it
         vocabulary.listObjectsOfProperty(shape, SH.path)
-                .forEachRemaining(path -> rdf.querySelect(storedQuery("subjects_with_property", path),
-                        row -> validateResource(row.getResource("s"), vocabulary, results)));
+                .forEachRemaining(path -> {
+                    if(path.isURIResource()) {
+                        rdf.querySelect(
+                                storedQuery("subjects_with_property", path),
+                                row -> validateResource(row.getResource("s"), vocabulary, results)
+                        );
+                    }
+                });
     }
 
     @SneakyThrows
