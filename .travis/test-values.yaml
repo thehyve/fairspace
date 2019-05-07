@@ -40,7 +40,7 @@ jupyterhub:
         client_id: workspace-pluto
         client_secret: db67da94-fa31-47cd-8c42-0ed295790841
         openid_url: https://keycloak.hyperspace.test.fairspace.app/auth/realms/test/protocol/openid-connect/
-        session_url: https://workspace.test.fairspace.app/account/tokens
+        session_url: https://workspace.test.fairspace.app/api/v1/account/tokens
   singleuser:
     image:
       tag: 0.6.0-simple

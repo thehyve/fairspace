@@ -49,7 +49,7 @@ jupyterhub:
               client_id: workspace-test-pluto
               client_secret: baf559f1-1926-44c2-95c9-b635639918b0
               openid_url: https://cbioportal-fairspace.thehyve.net:8443/auth/realms/cbio/protocol/openid-connect/
-              session_url: https://workspace.cbiotest.fairway.app/account/tokens
+              session_url: https://workspace.cbiotest.fairway.app/api/v1/account/tokens
   singleuser:
     image:
       name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
