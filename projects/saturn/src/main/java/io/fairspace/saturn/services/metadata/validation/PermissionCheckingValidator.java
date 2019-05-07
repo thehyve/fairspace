@@ -4,11 +4,9 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 @AllArgsConstructor
 public class PermissionCheckingValidator implements MetadataRequestValidator {
-    private final RDFConnection rdf;
     private final PermissionsService permissions;
 
     @Override
