@@ -1,7 +1,7 @@
 const styles = {
     buttonsContainer: {
         "display": 'inline-block',
-        "& button": {
+        "& button & a": {
             padding: 10
         }
     },

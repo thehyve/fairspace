@@ -1,0 +1,5 @@
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
+SELECT ?inverse
+WHERE {GRAPH %1$s {?shape sh:path %2$s ; fs:inverseRelation ?inverseShape . ?inverseShape sh:path ?inverse }}

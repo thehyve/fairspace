@@ -1,37 +1,38 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.rdf.Vocabulary;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionCheckingValidatorTest {
+    private static final Model EMPTY = createDefaultModel();
+
     private static final Statement STATEMENT = createStatement(
             createResource("http://ex.com/subject"),
-            createProperty("http://ex.com/predicate"),
+            createProperty("http://ex.com/predicate"), // does not have an inverse
             createResource("http://ex.com/object"));
+
 
     @Mock
     private PermissionsService permissions;
 
-    @Mock
-    private Vocabulary vocabulary1;
-
-    @Mock
-    private Vocabulary vocabulary2;
 
     private PermissionCheckingValidator validator;
 
@@ -39,14 +40,16 @@ public class PermissionCheckingValidatorTest {
 
     @Before
     public void setUp() {
-        validator = new PermissionCheckingValidator(permissions, vocabulary1, vocabulary2);
+        var rdf = new RDFConnectionLocal(DatasetFactory.create());
+        initVocabularies(rdf);
+        validator = new PermissionCheckingValidator(rdf, permissions);
     }
 
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
-        assertEquals(ValidationResult.VALID, validator.validatePut(model));
+        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, EMPTY));
 
-        verifyZeroInteractions(permissions, vocabulary1, vocabulary2);
+        verifyZeroInteractions(permissions);
     }
 
     @Test
@@ -55,57 +58,19 @@ public class PermissionCheckingValidatorTest {
 
         when(permissions.getPermission(any())).thenReturn(Access.Read);
 
-        assertFalse(validator.validatePut(model).isValid());
+        assertFalse(validator.validate(EMPTY, model).isValid());
     }
 
     @Test
-    public void ifSubjectIsOkItShouldCheckPredicate() {
-        model.add(STATEMENT);
-
-        when(permissions.getPermission(any())).thenReturn(Access.Write);
-        when(vocabulary1.isInvertiblePredicate(any())).thenReturn(false);
-        when(vocabulary2.isInvertiblePredicate(any())).thenReturn(false);
-
-        assertEquals(ValidationResult.VALID, validator.validatePut(model));
-
-        verify(permissions).getPermission(STATEMENT.getSubject().asNode());
-        verify(vocabulary1).isInvertiblePredicate(STATEMENT.getPredicate().getURI());
-        verify(vocabulary2).isInvertiblePredicate(STATEMENT.getPredicate().getURI());
-        verifyNoMoreInteractions(permissions, vocabulary1, vocabulary2);
-    }
-
-    @Test
-    public void ifPredicateIsInvertibleItShouldCheckObject() {
-        model.add(STATEMENT);
-
-        when(permissions.getPermission(any())).thenReturn(Access.Write);
-        when(vocabulary1.isInvertiblePredicate(any())).thenReturn(false);
-        when(vocabulary2.isInvertiblePredicate(any())).thenReturn(true);
-
-        assertEquals(ValidationResult.VALID, validator.validatePut(model));
-
-        verify(permissions).getPermission(STATEMENT.getSubject().asNode());
-        verify(permissions).getPermission(STATEMENT.getObject().asNode());
-        verify(vocabulary1).isInvertiblePredicate(STATEMENT.getPredicate().getURI());
-        verify(vocabulary2).isInvertiblePredicate(STATEMENT.getPredicate().getURI());
-        verifyNoMoreInteractions(permissions, vocabulary1, vocabulary2);
-    }
-
-    @Test
-    public void invertiblePredicateWithoutWritePermissionForObjectCausesAFailure() {
+    public void itShouldCheckPermissionsForSubject() {
         model.add(STATEMENT);
 
         when(permissions.getPermission(eq(STATEMENT.getSubject().asNode()))).thenReturn(Access.Write);
-        when(permissions.getPermission(eq(STATEMENT.getObject().asNode()))).thenReturn(Access.Read);
-        when(vocabulary1.isInvertiblePredicate(any())).thenReturn(false);
-        when(vocabulary2.isInvertiblePredicate(any())).thenReturn(true);
 
-        assertFalse(validator.validatePut(model).isValid());
+        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, model));
 
         verify(permissions).getPermission(STATEMENT.getSubject().asNode());
-        verify(permissions).getPermission(STATEMENT.getObject().asNode());
-        verify(vocabulary1).isInvertiblePredicate(STATEMENT.getPredicate().getURI());
-        verify(vocabulary2).isInvertiblePredicate(STATEMENT.getPredicate().getURI());
-        verifyNoMoreInteractions(permissions, vocabulary1, vocabulary2);
+
+        verifyNoMoreInteractions(permissions);
     }
 }

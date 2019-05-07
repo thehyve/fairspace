@@ -1,4 +1,8 @@
 app:
+  apiVersion:
+    pluto: v1
+    saturn: v1
+    elasticSearch: v1
   oauth2:
     base-url: http://localhost:9080
     realm: keycloak
@@ -11,6 +15,7 @@ server:
 
 frontend:
   urls: {}
+  roles: {}
 
 spring:
   application:
@@ -42,12 +47,12 @@ security:
     - /login
     - /logout
     - /authorize
-    - /account/tokens
+    - /api/${app.apiVersion.pluto}/account/tokens
     needsAuthentication:
-    - /account/name
+    - /api/${app.apiVersion.pluto}/account/name
     - /*
     needsAuthorization:
-    - /account/authorizations
+    - /api/${app.apiVersion.pluto}/account/authorizations
     - /api/*
 
 workspace:
@@ -63,38 +68,31 @@ keycloak:
 
 zuul:
   routes:
+    # Please note that the order of the routes is relevant
+    # The elasticsearch route must be defined before
+    # saturn, which must be defined before ui, because of the
+    # paths they listen to
+    elasticsearch:
+      path: /api/${app.apiVersion.elasticSearch}/search/*/_search
+      url: http://elasticsearch/
     storage:
       # The webdav URL is not only used in the request URI, but also in headers (e.g. Destination)
       # To avoid rewriting these headers, it is suggested that the path on the proxy is the same
       # as the path on the upstream service for webdav calls.
-      path: /webdav/**
+      path: /webdav/${app.apiVersion.saturn}/**
       url: http://saturn/
       strip-prefix: false
-    metadata:
-      path: /api/metadata/**
-      url: http://saturn/api/metadata/
-    vocabulary:
-      path: /api/vocabulary/**
-      url: http://saturn/api/vocabulary/
-    collections:
-      path: /api/collections/**
-      url: http://saturn/api/collections/
-    permissions:
-      path: /api/permissions/**
-      url: http://saturn/api/permissions/
+    saturn:
+      path: /api/${app.apiVersion.saturn}/**
+      url: http://saturn/
+      strip-prefix: false
     ui:
       path: /**
       url: http://mercury/
-    notebooks:
-      path: /api/notebooks/**
-      url: http://jupyterhub/
-    elasticsearch:
-      path: /api/search/*/_search
-      url: http://elasticsearch/
   ignored-patterns:
   - /actuator/**
-  - /account/**
-  - /api/workspace/**
+  - /api/${app.apiVersion.pluto}/account/**
+  - /api/${app.apiVersion.pluto}/workspace/**
   - /login
   - /logout
   - /authorize

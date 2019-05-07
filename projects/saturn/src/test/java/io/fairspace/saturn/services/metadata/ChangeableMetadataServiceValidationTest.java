@@ -24,7 +24,8 @@ import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,6 +38,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     private static final ValidationResult INVALID_VALIDATION_RESULT = new ValidationResult("Test error");
     private static final String GRAPH = "http://localhost/iri/graph";
+    private static final String VOCABULARY = "http://localhost/iri/vocabulary";
 
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
@@ -53,12 +55,12 @@ public class ChangeableMetadataServiceValidationTest {
     public void setUp() {
         ds = createTxnMem();
         RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new ChangeableMetadataService(rdf, createURI(GRAPH), lifeCycleManager, validator);
+        api = new ChangeableMetadataService(rdf, createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager, validator);
     }
 
     @Test
     public void testPutShouldSucceedOnValidationSuccess() {
-        when(validator.validatePut(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validate(any(), any())).thenReturn(ValidationResult.VALID);
         api.put(createDefaultModel().add(LBL_STMT1));
 
         Model model = ds.getNamedModel(GRAPH);
@@ -67,14 +69,13 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test(expected = ValidationException.class)
     public void testPutShouldFailOnValidationError() {
-        when(validator.validatePut(any())).thenReturn(INVALID_VALIDATION_RESULT);
+        when(validator.validate(any(), any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.put(createDefaultModel());
     }
 
     @Test
     public void testPatchShouldSucceedOnValidationSuccess() {
-        when(validator.validatePut(any())).thenReturn(ValidationResult.VALID);
-        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validate(any(), any())).thenReturn(ValidationResult.VALID);
         api.patch(createDefaultModel().add(LBL_STMT1));
 
         Model model = ds.getNamedModel(GRAPH);
@@ -83,23 +84,26 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test(expected = ValidationException.class)
     public void patchShouldNotAcceptMachineOnlyTriples() {
-        when(validator.validatePut(any())).thenReturn(INVALID_VALIDATION_RESULT);
-        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validate(any(), any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.patch(createDefaultModel());
     }
 
-    @Test(expected = ValidationException.class)
-    public void patchShouldNotDeleteMachineOnlyTriples() {
-        when(validator.validatePut(any())).thenReturn(ValidationResult.VALID);
-        when(validator.validateDelete(any())).thenReturn(INVALID_VALIDATION_RESULT);
-        api.patch(createDefaultModel());
+    @Test
+    public void patchShouldNotValidateExistingTriples() {
+        when(validator.validate(any(), any())).thenReturn(ValidationResult.VALID);
+        when(validator.validate(any(), any())).thenReturn(ValidationResult.VALID);
+
+        ds.getNamedModel(GRAPH).add(STMT1);
+        api.patch(createDefaultModel().add(STMT1));
+
+        verify(validator).validate(argThat(Model::isEmpty), argThat(Model::isEmpty));
     }
 
     @Test
     public void testDeleteShouldSucceedOnValidationSuccess() {
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
 
-        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validate(any(), any())).thenReturn(ValidationResult.VALID);
         api.delete(S1.getURI(), null, null);
 
         Model model = ds.getNamedModel(GRAPH);
@@ -108,7 +112,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test(expected = ValidationException.class)
     public void deleteShouldFailOnMachineOnValidationFailure() {
-        when(validator.validateDelete(any())).thenReturn(new ValidationResult("Error"));
+        when(validator.validate(any(), any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.delete(S1.getURI(), P1.getURI(), S2.getURI());
     }
 
@@ -116,7 +120,7 @@ public class ChangeableMetadataServiceValidationTest {
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
 
-        when(validator.validateDelete(any())).thenReturn(ValidationResult.VALID);
+        when(validator.validate(any(), any())).thenReturn(ValidationResult.VALID);
         api.delete(createDefaultModel().add(LBL_STMT1));
 
         Model model = ds.getNamedModel(GRAPH);
@@ -125,7 +129,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test(expected = ValidationException.class)
     public void deleteModelShouldNotAcceptMachineOnlyTriples() {
-        when(validator.validateDelete(any())).thenReturn(INVALID_VALIDATION_RESULT);
+        when(validator.validate(any(), any())).thenReturn(INVALID_VALIDATION_RESULT);
         api.delete(createDefaultModel());
     }
 }

@@ -14,15 +14,15 @@ const app = express();
 // parse application/json
 app.use(bodyParser.json());
 
-app.get('/api/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
+app.get('/api/v1/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
 
 // Account API
-app.get('/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
-app.get('/account/authorizations', (req, res) => res.send(['user-workspace1', 'ROLE_USER']));
+app.get('/api/v1/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
+app.get('/api/v1/account/authorizations', (req, res) => res.send(['user-workspace1', 'datasteward', 'ROLE_USER']));
 
 // Workspace API
-app.get('/api/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
-app.get('/api/workspace/config', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-config.json`));
-app.get('/api/workspace/details', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-details.json`));
+app.get('/api/v1/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
+app.get('/api/v1/workspace/config', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-config.json`));
+app.get('/api/v1/workspace/details', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-details.json`));
 
 app.listen(port);

@@ -8,9 +8,9 @@ export function findById(itemList, itemId) {
         ? itemList.find(item => item.id === itemId) : undefined;
 }
 
-/**	
- * Flattens the given array with a depth of 1	
- * @param array	
- * @returns {*}	
- */	
+/**
+ * Flattens the given array with a depth of 1
+ * @param array
+ * @returns {*}
+ */
 export const flattenShallow = array => [].concat(...array);

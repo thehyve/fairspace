@@ -12,13 +12,14 @@ import static spark.Spark.*;
 
 @AllArgsConstructor
 public class PermissionsApp extends BaseApp {
+    private final String pathPrefix;
     private final PermissionsService permissionsService;
 
     @Override
     public void init() {
         super.init();
 
-        path("/api/permissions", () -> {
+        path(pathPrefix + "/permissions", () -> {
             get("/", APPLICATION_JSON.asString(), (req, res) -> {
                 res.type(APPLICATION_JSON.asString());
                 if (req.queryParams().contains("all")) {

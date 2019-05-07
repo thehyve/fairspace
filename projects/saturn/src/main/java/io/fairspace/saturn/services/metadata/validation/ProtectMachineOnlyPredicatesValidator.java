@@ -1,60 +1,43 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.rdf.Vocabulary;
+import lombok.AllArgsConstructor;
 import org.apache.jena.rdf.model.Model;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * This validator checks whether the requested action will modify any machine-only
  * predicates. If so, the request will not validate
  */
-public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestValidator{
-    private Vocabulary vocabulary;
+@AllArgsConstructor
+public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestValidator {
+    private final Supplier<List<String>> machineOnlyPredicatesSupplier;
 
-    public ProtectMachineOnlyPredicatesValidator(Vocabulary vocabulary) {
-        this.vocabulary = vocabulary;
-    }
 
     @Override
-    public ValidationResult validatePut(Model model) {
-        return validateModelAgainstMachineOnlyPredicates(model);
-    }
-
-    @Override
-    public ValidationResult validateDelete(Model model) {
-        return validateModelAgainstMachineOnlyPredicates(model);
+    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
+        return validateModelAgainstMachineOnlyPredicates(modelToRemove.union(modelToAdd));
     }
 
     /**
      * Ensures that the given model does not contain any machine-only predicates.
-     *
+     * <p>
      * If the model does contain a machine-only predicate, an IllegalArgumentException is thrown
+     *
      * @param model
      */
     private ValidationResult validateModelAgainstMachineOnlyPredicates(Model model) {
-        if (containsMachineOnlyPredicates(model)) {
-            return new ValidationResult("The given model contains one or more statements with machine-only predicates.");
+        var result = ValidationResult.VALID;
+        var machineOnlyPredicates = machineOnlyPredicatesSupplier.get();
+
+        for(var it = model.listStatements(); it.hasNext(); ){
+            var stmt = it.next();
+            if (machineOnlyPredicates.contains(stmt.getPredicate().getURI())) {
+                result = result.merge(new ValidationResult("The given model contains a machine-only predicate " + stmt.getPredicate().getURI()));
+            }
         }
 
-        return ValidationResult.VALID;
-    }
-
-    /**
-     * Verifies whether the given model contains any triples with a machine-only predicate
-     *
-     * Whether a predicate is machine-only, is specified in the vocabulary.
-     * @param model
-     * @return true iff the given model contains one or more triples with a machine-only predicate
-     */
-    boolean containsMachineOnlyPredicates(Model model) {
-        if(model == null || model.isEmpty())
-            return false;
-
-        List<String> machineOnlyPredicates = vocabulary.getMachineOnlyPredicates();
-
-        // See if any of the predicates is present in the given model
-        return machineOnlyPredicates.stream()
-                .anyMatch(predicateURI -> model.listResourcesWithProperty(model.createProperty(predicateURI)).hasNext());
+        return result;
     }
 }

@@ -6,10 +6,10 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/#> .
-@prefix osiris: <http://osiris.fairspace.io/ontology/#> .
-@prefix icdo3: <http://icdo3.fairspace.io/ontology/#> .
-@prefix fhir: <http://hl7.org/fhir/STU3/#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix osiris: <http://osiris.fairspace.io/ontology#> .
+@prefix icdo3: <http://icdo3.fairspace.io/ontology#> .
+@prefix fhir: <http://hl7.org/fhir/STU3/> .
 
 ########################
 ###   Fixed Shapes   ###
@@ -18,15 +18,12 @@
 ## Class Shapes
 
 fs:FileShape a fs:ClassShape ;
-    sh:closed true ; 
     sh:description "A single file." ;
     sh:name "File" ;
     sh:targetClass fs:File ; 
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-        fs:aboutPersonShape,
-        fs:aboutMaterialShape,
-        fs:associatedAnalysisShape,
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
+    fs:fixedShape true ;
+    fs:systemProperties 
         fs:fileSizeShape,
         fs:md5Shape,
         fs:filePathShape,
@@ -36,19 +33,28 @@ fs:FileShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape ;
+    sh:property
+        fs:fileSizeShape,
+        fs:md5Shape,
+        fs:filePathShape,
+        fs:createdByShape,
+        fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        fs:labelShape,
+        fs:commentShape .
 
 fs:DirectoryShape a fs:ClassShape ;
-    sh:closed true ; 
     sh:description "A directory containing multiple files." ;
     sh:name "Directory" ;
     sh:targetClass fs:Directory ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-        fs:aboutPersonShape,
-        fs:aboutMaterialShape,
-        fs:associatedAnalysisShape,
+    fs:fixedShape true ;
+    fs:systemProperties 
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -56,20 +62,26 @@ fs:DirectoryShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape ;
+    sh:property
+        fs:filePathShape,
+        fs:createdByShape,
+        fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        fs:labelShape,
+        fs:commentShape .
 
 fs:CollectionShape a fs:ClassShape ;
-    sh:closed true ; 
     sh:description "Collection of files with associated metadata and access rules." ;
     sh:name "Collection" ;
     sh:targetClass fs:Collection ; 
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-        fs:hasFileShape,
-        fs:aboutPersonShape,
-        fs:aboutMaterialShape,
-        fs:partOfProjectShape,
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:collectionType ) ;
+    fs:fixedShape true ;
+    fs:systemProperties 
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -77,34 +89,62 @@ fs:CollectionShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape ;
+    sh:property
+        fs:filePathShape,
+        fs:createdByShape,
+        fs:dateCreatedShape,
+        fs:modifiedByShape,
+        fs:dateModifiedShape,
+        fs:deletedByShape,
+        fs:dateDeletedShape,
+        fs:labelShape,
+        fs:commentShape .
 
-fs:UserShape a fs:ClassShape ;
+fs:UserShape a sh:NodeShape ;
     sh:closed true ; 
     sh:description "Description for fs:User" ;
     sh:name "User" ;
     sh:targetClass fs:User ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:fixedShape true ;
     sh:property
-        rdfs:labelShape,
-        rdfs:commentShape .
+        fs:labelShape,
+        fs:commentShape,
+        fs:userEmailShape .
 
 ## Property Shapes
 
-rdfs:labelShape a fs:PropertyShape ;
+fs:blobIdShape a fs:PropertyShape ;
+    sh:name "BlobID";
+    sh:description "Blob ID in the blob store" ;
+    sh:path fs:blobId ;
+    sh:datatype xsd:string ;
+    fs:machineOnly true .
+
+fs:collectionTypeShape a fs:PropertyShape ;
+    sh:name "Collection type";
+    sh:description "Collection Type";
+    sh:path fs:collectionType ;
+    sh:datatype xsd:string ;
+    fs:machineOnly true .
+
+fs:labelShape a fs:PropertyShape ;
     sh:name "Label" ;
     sh:description "Human readable label for this resource." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
+    fs:fixedShape true ;
     sh:path rdfs:label . 
  
-rdfs:commentShape a fs:PropertyShape ;
+fs:commentShape a fs:PropertyShape ;
     sh:name "Description" ;
     sh:description "Human friendly description." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
+    fs:fixedShape true ;
     sh:path rdfs:comment . 
      
 fs:dateCreatedShape a fs:PropertyShape ;
@@ -113,6 +153,7 @@ fs:dateCreatedShape a fs:PropertyShape ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:dateCreated .
 
 fs:dateModifiedShape a fs:PropertyShape ;
@@ -121,6 +162,7 @@ fs:dateModifiedShape a fs:PropertyShape ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:dateModified .
 
 fs:dateDeletedShape a fs:PropertyShape ;
@@ -129,14 +171,17 @@ fs:dateDeletedShape a fs:PropertyShape ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:dateDeleted . 
 
 fs:filePathShape a fs:PropertyShape ; 
     sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:name "File path" ;
+    sh:datatype xsd:string ;
     sh:description "File path" ;
-    fs:machineOnly true ; 
+    fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:filePath .
 
 fs:fileSizeShape a fs:PropertyShape ;
@@ -145,6 +190,7 @@ fs:fileSizeShape a fs:PropertyShape ;
     sh:datatype xsd:long ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:fileSize .
 
 fs:md5Shape a fs:PropertyShape ;
@@ -153,7 +199,17 @@ fs:md5Shape a fs:PropertyShape ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:md5 .
+
+fs:userEmailShape a fs:PropertyShape ;
+    sh:name "Email" ;
+    sh:description "Email address" ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:email .
 
 
 ## Relation Shapes
@@ -164,6 +220,7 @@ fs:createdByShape a fs:RelationShape ;
     sh:class fs:User ; 
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:createdBy .
 
 fs:modifiedByShape a fs:RelationShape ; 
@@ -172,6 +229,7 @@ fs:modifiedByShape a fs:RelationShape ;
     sh:class fs:User ; 
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:modifiedBy .
 
 fs:deletedByShape a fs:RelationShape ; 
@@ -180,19 +238,8 @@ fs:deletedByShape a fs:RelationShape ;
     sh:class fs:User ; 
     sh:maxCount 1 ;
     fs:machineOnly true ;
+    fs:fixedShape true ;
     sh:path fs:deletedBy .
-
-fs:hasCollectionShape a fs:RelationShape ; 
-    sh:name "Associated collections" ;
-    sh:description "" ;
-    sh:class fs:Collection ; 
-    sh:path fs:hasCollection .
-
-fs:hasFileShape a fs:RelationShape ; 
-    sh:name "Files in this collection" ;
-    sh:description "All files and directories that are in (sub)directories." ; 
-    sh:class fs:File ;
-    sh:path fs:hasFile .
 
 
 ########################
@@ -229,3 +276,4 @@ fs:Directory a fs:Class ;
 
 fs:dateCreated a rdf:Property .
 fs:createdBy a rdf:Property .
+fs:inverseRelation a rdf:Property .

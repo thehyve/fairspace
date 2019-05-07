@@ -218,16 +218,15 @@ materialReactSelect.propTypes = {
     value: PropTypes.shape(selectType),
     placeholder: PropTypes.string,
     classes: PropTypes.shape(),
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+    label: PropTypes.string,
 };
 
 materialReactSelect.defaultProps = {
-    placeholder: 'Please select a value',
+    placeholder: '',
     label: '',
-    required: false,
     value: null,
     classes: null,
-
 };
 
 export default withStyles(styles, {withTheme: true})(materialReactSelect);

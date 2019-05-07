@@ -1,19 +1,28 @@
 package io.fairspace.saturn.rdf;
 
+import com.pivovarit.function.ThrowingRunnable;
+import com.pivovarit.function.ThrowingSupplier;
+import lombok.SneakyThrows;
 import org.apache.jena.sparql.core.Transactional;
-
-import java.util.function.Supplier;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static org.apache.jena.system.Txn.calculateWrite;
 import static org.apache.jena.system.Txn.executeWrite;
 
 public class TransactionUtils {
-    public static void commit(String message, Transactional transactional, Runnable action) {
-        withCommitMessage(message, () -> executeWrite(transactional, action));
+    public static void commit(String message, Transactional transactional, ThrowingRunnable<?> action) {
+        withCommitMessage(message, () -> executeWrite(transactional, () -> sneaky(() -> {
+            action.run();
+            return null;
+        })));
     }
 
-    public static <T> T commit(String message, Transactional transactional, Supplier<T> action) {
-        return withCommitMessage(message, () -> calculateWrite(transactional, action));
+    public static <T> T commit(String message, Transactional transactional, ThrowingSupplier<T, ?> action) {
+        return withCommitMessage(message, () -> calculateWrite(transactional, () -> sneaky(action)));
+    }
+
+    @SneakyThrows(Exception.class)
+    private static <R> R sneaky(ThrowingSupplier<R, ?> action) {
+        return action.get();
     }
 }

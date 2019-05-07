@@ -49,7 +49,7 @@ public class RestoreTest {
 
     @Test
     public void restoreWorksAsExpected() throws IOException {
-        var ds1 = SaturnDatasetFactory.connect(config, vocabularyGraph);
+        var ds1 = SaturnDatasetFactory.connect(config);
 
         executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt1));
         executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt2));
@@ -60,7 +60,7 @@ public class RestoreTest {
         assertFalse(config.datasetPath.exists());
 
 
-        var ds2 = SaturnDatasetFactory.connect(config, vocabularyGraph);
+        var ds2 = SaturnDatasetFactory.connect(config);
 
         try {
             executeRead(ds2, () -> {

@@ -6,7 +6,7 @@ describe('InformationDrawer', () => {
     const resolveMock = jest.fn(() => Promise.resolve());
     const rejectMock = jest.fn(() => Promise.reject());
     const invalidateMetadata = jest.fn();
-    const fetchCombinedMetadataIfNeeded = jest.fn();
+    const fetchMetadata = jest.fn();
 
     let collection;
     let handleCollectionLocationChange;
@@ -27,7 +27,7 @@ describe('InformationDrawer', () => {
             collection={collection}
             updateCollection={resolveMock}
             invalidateMetadata={invalidateMetadata}
-            fetchCombinedMetadataIfNeeded={fetchCombinedMetadataIfNeeded}
+            fetchMetadata={fetchMetadata}
             onCollectionLocationChange={handleCollectionLocationChange}
             paths={[]}
         />);
@@ -45,7 +45,7 @@ describe('InformationDrawer', () => {
             collection={collection}
             updateCollection={resolveMock}
             invalidateMetadata={invalidateMetadata}
-            fetchCombinedMetadataIfNeeded={fetchCombinedMetadataIfNeeded}
+            fetchMetadata={fetchMetadata}
             onCollectionLocationChange={handleCollectionLocationChange}
             paths={[]}
         />);
@@ -63,7 +63,7 @@ describe('InformationDrawer', () => {
             collection={collection}
             updateCollection={rejectMock}
             invalidateMetadata={invalidateMetadata}
-            fetchCombinedMetadataIfNeeded={fetchCombinedMetadataIfNeeded}
+            fetchMetadata={fetchMetadata}
             onCollectionLocationChange={handleCollectionLocationChange}
             paths={[]}
         />);
@@ -80,7 +80,7 @@ describe('InformationDrawer', () => {
             collection={collection}
             updateCollection={resolveMock}
             invalidateMetadata={invalidateMetadata}
-            fetchCombinedMetadataIfNeeded={fetchCombinedMetadataIfNeeded}
+            fetchMetadata={fetchMetadata}
             paths={[]}
         />);
 

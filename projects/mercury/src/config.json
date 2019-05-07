@@ -1,31 +1,36 @@
 {
   "urls": {
     "logout": "/logout",
-    "userInfo": "/account/user",
-    "authorizations": "/account/authorizations",
-    "collections": "/api/collections/",
-    "permissions": "/api/permissions/",
-    "files": "/webdav",
+    "userInfo": "/api/v1/account/user",
+    "authorizations": "/api/v1/account/authorizations",
+    "collections": "/api/v1/collections/",
+    "permissions": "/api/v1/permissions/",
+    "files": "/webdav/v1",
     "metadata": {
-      "statements": "/api/metadata/",
-      "entities": "/api/metadata/entities/"
+      "statements": "/api/v1/metadata/",
+      "entities": "/api/v1/metadata/entities/"
     },
     "vocabulary": {
-      "user": "/api/vocabulary/user/",
-      "system": "/api/vocabulary/system/",
-      "meta": "/api/vocabulary/meta/"
+      "statements": "/api/v1/vocabulary/",
+      "entities": "/api/v1/vocabulary/entities/"
     },
-    "users": "/api/workspace/users",
-    "workspace": "/api/workspace/details"
+    "metaVocabulary": {
+      "statements": "/api/v1/meta-vocabulary/"
+    },
+    "users": "/api/v1/workspace/users",
+    "workspace": "/api/v1/workspace/details"
   },
-
   "elasticsearch": {
-    "host": "/api/search",
+    "host": "/api/v1/search",
     "log": "error"
   },
   "externalConfigurationFiles": [
-    "/api/workspace/config"
+    "/api/v1/workspace/config"
   ],
+  "roles": {
+    "dataSteward": "",
+    "coordinator": ""
+  },
   "enableExperimentalFeatures": false
 
 }

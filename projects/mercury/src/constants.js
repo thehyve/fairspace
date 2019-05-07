@@ -18,7 +18,7 @@ export const XMLSCHEMA_NS = 'http://www.w3.org/2001/XMLSchema#';
 export const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
 export const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
 export const FAIRSPACE_NS = 'http://fairspace.io/ontology#';
-
+export const DASH_NS = 'http://datashapes.org/dash#';
 
 // URIs
 export const TYPE_URI = RDF_NS + 'type';
@@ -31,9 +31,16 @@ export const SHACL_PATH = SHACL_NS + 'path';
 export const SHACL_TARGET_CLASS = SHACL_NS + 'targetClass';
 export const SHACL_PROPERTY = SHACL_NS + 'property';
 export const SHACL_CLASS = SHACL_NS + 'class';
+export const SHACL_NODE = SHACL_NS + 'node';
+export const SHACL_NODEKIND = SHACL_NS + 'nodeKind';
 export const SHACL_DATATYPE = SHACL_NS + 'datatype';
 export const SHACL_MAX_COUNT = SHACL_NS + 'maxCount';
+export const SHACL_MIN_COUNT = SHACL_NS + 'minCount';
 export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
+export const SHACL_IN = SHACL_NS + 'in';
+export const SHACL_IRI = SHACL_NS + 'IRI';
+
+export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
 
 export const STRING_URI = XMLSCHEMA_NS + 'string';
 export const BOOLEAN_URI = XMLSCHEMA_NS + 'boolean';
@@ -41,8 +48,8 @@ export const DATETIME_URI = XMLSCHEMA_NS + 'dateTime';
 export const DATE_URI = XMLSCHEMA_NS + 'date';
 export const TIME_URI = XMLSCHEMA_NS + 'time';
 export const INTEGER_URI = XMLSCHEMA_NS + 'integer';
+export const LONG_URI = XMLSCHEMA_NS + 'long';
 export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
-export const RESOURCE_URI = RDFS_NS + 'Resource';
 
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
 export const SHOW_IN_CATALOG_URI = FAIRSPACE_NS + 'showInCatalog';
@@ -52,3 +59,4 @@ export const DIRECTORY_URI = FAIRSPACE_NS + 'Directory';
 export const FILE_PATH_URI = FAIRSPACE_NS + 'filePath';
 export const DATE_DELETED_URI = FAIRSPACE_NS + 'dateDeleted';
 export const DELETED_BY_URI = FAIRSPACE_NS + 'deletedBy';
+export const NIL_URI = FAIRSPACE_NS + 'nil';

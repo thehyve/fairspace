@@ -1,7 +1,7 @@
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
-import {fetchJsonLdBySubjectIfNeeded} from "./metadataActions";
+import {fetchMetadataBySubjectIfNeeded} from "./metadataActions";
 import Config from "../services/Config/Config";
 import configFile from "../config";
 import {mockResponse} from "../utils/testUtils";
@@ -24,7 +24,7 @@ describe('fetch metadata', () => {
 
         window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify([{name: 'collection1'}]))));
 
-        return store.dispatch(fetchJsonLdBySubjectIfNeeded(subject))
+        return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(2);
@@ -46,7 +46,7 @@ describe('fetch metadata', () => {
             }
         });
 
-        return store.dispatch(fetchJsonLdBySubjectIfNeeded(subject))
+        return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(0);
@@ -67,7 +67,7 @@ describe('fetch metadata', () => {
 
         window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify([{name: 'collection1'}]))));
 
-        return store.dispatch(fetchJsonLdBySubjectIfNeeded(subject))
+        return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(2);
@@ -90,7 +90,7 @@ describe('fetch metadata', () => {
             }
         });
 
-        return store.dispatch(fetchJsonLdBySubjectIfNeeded(subject))
+        return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
             .then(() => {
                 const actions = store.getActions();
                 expect(actions.length).toEqual(0);

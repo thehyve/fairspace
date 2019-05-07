@@ -5,11 +5,19 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dash: <http://datashapes.org/dash#> .
 
-fs:ClassShapeMeta a sh:NodeShape ;
+<ignoredPropertiesCollection>
+   rdf:first rdf:type ;
+   rdf:rest ( owl:sameAs sh:ignoredProperties sh:message fs:machineOnly
+              fs:fixedShape fs:systemProperties sh:closed fs:createdBy
+              fs:dateCreated fs:modifiedBy fs:dateModified
+              fs:deletedBy fs:dateDeleted ) .
+
+fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of classes." ;
-    sh:name "Class Shape Meta" ;
+    sh:description "Shape of classes." ;
+    sh:name "Class Shape" ;
     sh:property [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -23,16 +31,17 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:minCount 1 ;
         sh:path sh:property ;
         sh:name "Properties" ; 
-        sh:description "List of all properties and relations for this class." 
+        sh:description "List of all properties and relations for this class." ;
+        fs:showAsTable true
     ], [
-        sh:value true ;
-        sh:path sh:closed ; 
-        sh:description "sh:closed should be true."
-    ], [
-        sh:class fs:Class ;
+        # This nodeKind restriction could be replaced by something like
+        # sh:class fs:Class. Currently that restriction will limit our
+        # options to add new shapes
+        sh:nodeKind sh:IRI ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:targetClass ; 
+        sh:name "Target class" ;
         sh:description "IRI of the class this shape constrains."
     ], [
         sh:datatype xsd:string ;
@@ -44,98 +53,194 @@ fs:ClassShapeMeta a sh:NodeShape ;
         sh:datatype xsd:boolean ;
         sh:maxCount 1 ;
         sh:path fs:showInCatalog ;
-        sh:name "Show in catalog"
+        sh:name "Show in catalog" ;
+        sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
+    sh:not fs:ShapeIsAClosedShape ; 
+    fs:showInCatalog true ;
     sh:targetClass fs:ClassShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties <ignoredPropertiesCollection> .
 
-fs:PropertyShapeMeta a sh:NodeShape ;
+fs:PropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of FS defined properties." ;
-    sh:name "Property Shape Meta" ;
+    sh:description "Shape of FS defined properties." ;
+    sh:name "Property Shape" ;
     sh:property [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ;
-        sh:name "Property name"
+        sh:name "Property name" ;
+        fs:showInTable true ;
+        sh:order 0
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
+        sh:maxInclusive 1 ;
+        sh:maxCount 1 ;
+        sh:lessThanOrEquals sh:maxCount ;
         sh:name "Minimum number of values"
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxCount ;
+        sh:maxCount 1 ;
+        sh:greaterThanOrEquals sh:minCount ;
+        sh:minInclusive 1 ;
         sh:name "Maximum number of values"
     ], [
-        sh:class rdf:List ;
         sh:path sh:in ;
-        sh:name "Controlled vocabulary"
+        sh:maxCount 1 ;
+        sh:name "Controlled vocabulary" ;
+        sh:node dash:ListShape ;
+        sh:property [
+            sh:path ( [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
+            sh:minLength 1 ;
+        ]
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:description ;
-        sh:name "Property description"
+        sh:name "Property description" ;
+        fs:showInTable true ;
+        sh:order 1
     ], [
         sh:path sh:datatype ;
         # direct controlled vocabulary approach
         sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
-        sh:name "Datatype"
-    ], [
-        sh:path sh:message
+        sh:name "Datatype" ;
+        fs:showInTable true ;
+        sh:maxCount 1 ;
+        sh:order 2
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
+        sh:maxCount 1 ;
         sh:name "Maximum length (for string only)"
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:path
+        sh:path sh:path ;
+        sh:nodeKind sh:IRI ;
+        sh:name "Property identifier" ;
+        fs:showInTable true ;
+        sh:order 3
     ], [
-        sh:path fs:machineOnly
+        sh:maxCount 1 ;
+        sh:path sh:nodeKind ;
+        sh:name "Property node kind" ;
+        sh:in ( sh:IRI )
     ] ;
+    sh:xone ( 
+        [ sh:path sh:in ; 
+          sh:minCount 1  ] 
+        [ sh:path sh:nodeKind ;
+          sh:minCount 1  ]
+        [ sh:path sh:datatype ;
+          sh:minCount 1  ]
+      ) ; 
+    fs:showInCatalog true ;
     sh:targetClass fs:PropertyShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties <ignoredPropertiesCollection> .
 
-fs:RelationShapeMeta a sh:NodeShape ;
+fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
-    sh:description "Meta shape of FS defined relations." ;
-    sh:name "Relation Shape Meta" ;
-    sh:property [
+    sh:description "Shape of FS defined relations." ;
+    sh:name "Relation Shape" ;
+    sh:property 
+        fs:inverseRelationShape, 
+    [
         sh:datatype xsd:integer ;
         sh:path sh:minCount ;
+        sh:maxInclusive 1 ;
+        sh:maxCount 1 ;
+        sh:lessThanOrEquals sh:maxCount ;
         sh:name "Minimum number of values"
     ], [
-        sh:class fs:Class ;
+        sh:datatype xsd:integer ;
+        sh:path sh:maxCount ;
+        sh:minInclusive 1 ;
+        sh:maxCount 1 ;
+        sh:greaterThanOrEquals sh:minCount ;
+        sh:name "Maximum number of values"
+    ], [
+        # This nodeKind restriction could be replaced by something like
+        # sh:class fs:Class. Currently that restriction will limit our
+        # options to add new shapes
+        sh:nodeKind sh:IRI ;
         sh:path sh:class ;
-        sh:name "Class target"
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:name "Class target" ;
+        fs:showInTable true ;
+        sh:order 2
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:description ;
-        sh:name "Property description"
-    ], [
-        sh:path sh:message
+        sh:name "Relation description" ;
+        fs:showInTable true ;
+        sh:order 1
     ], [
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:path
+        sh:path sh:path ;
+        sh:nodeKind sh:IRI ;
+        sh:name "Relation identifier" ;
+        fs:showInTable true ;
+        sh:order 3
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ;
-        sh:name "Property name"
-    ], [
-        sh:datatype xsd:integer ;
-        sh:path sh:maxCount ;
-        sh:name "Maximum number of values"
-    ], [
-        sh:path fs:machineOnly
+        sh:name "Relation name" ;
+        fs:showInTable true ;
+        sh:order 0
     ] ;
+    fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
-    sh:ignoredProperties ( rdf:type owl:sameAs sh:ignoredProperties ) .
+    sh:ignoredProperties <ignoredPropertiesCollection> .
+
+fs:inverseRelationShape a fs:RelationShape ;
+    fs:inverseRelation fs:inverseRelationShape ;
+    sh:path fs:inverseRelation ;
+    sh:class fs:RelationShape ;
+    sh:maxCount 1 ;
+    sh:name "Inverse relation" ;
+    sh:description "An inverse relation has at most a single relation shape instance as value. A shape with sh:path P1 and fs:inverseRelationShape S2 with sh:path P2 has equivalent meaning as P1 owl:inverseOf P2." ;
+    sh:path fs:inverseRelation . 
+
+fs:fixedShapeShape a fs:PropertyShape ;
+    sh:datatype xsd:boolean ;
+    sh:path fs:fixedShape ;
+    fs:machineOnly true ; 
+    sh:name "Fixed shape" ;
+    sh:description "If this is true, a user can not make changes to this shape definition." .
+
+fs:machineOnlyShape a fs:PropertyShape ; 
+    sh:datatype xsd:boolean ;
+    sh:path fs:machineOnly ;
+    fs:machineOnly true ;
+    sh:name "Machine edits only" ;
+    sh:description "Users should not be able to change the value of any value node of this shape." .
+
+fs:systemPropertiesShape a fs:PropertyShape ;
+    sh:path fs:systemProperties ;
+    fs:machineOnly true ;
+    sh:name "System properties" ;
+    sh:description "Users are only allowed to add or remove a value for sh:property of the focus node if it is not a value of fs:systemProperties." .
+
+fs:ShapeIsAClosedShape a sh:PropertyShape ;
+  sh:hasValue true ;
+  sh:description "A fs:ClassShape shape cannot be defined as sh:closed true." ;
+  sh:path sh:closed .
+
+# Definitions of our shape types, needed
+# for form building
+fs:ClassShape a sh:NodeShape .
+fs:PropertyShape rdfs:subClassOf sh:PropertyShape .
+fs:RelationShape rdfs:subClassOf sh:PropertyShape .

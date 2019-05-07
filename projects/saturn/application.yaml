@@ -2,7 +2,9 @@
 port: 8080
 jena:
   # Base IRI for all metadata entities
-  baseIRI: "http://localhost/iri/"
+  metadataBaseIRI: "http://localhost/iri/"
+  # Base IRI for all vocabulary entities
+  vocabularyBaseIRI: "http://localhost/vocabulary/"
   # Jena's TDB2 database path
   datasetPath: "data/db"
   # Path of the transaction log
@@ -27,6 +29,9 @@ jena:
 auth:
   # Enables JWT/JWKS authentication. Defaults to false.
   enabled: false
+  # User roles (for local development only)
+  developerRoles:
+    - datasteward
   # JWKS URL
   jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
   # JWK encryption algorithm. Defaults to "RS256"

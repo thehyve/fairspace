@@ -10,6 +10,20 @@ import FileOperations from "./FileOperations";
 import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
+    historyListener = null;
+
+    componentDidMount() {
+        this.historyListener = this.props.history.listen(() => {
+            this.props.onDeselectAll();
+        });
+    }
+
+    componentWillUnmount() {
+        if (this.historyListener) {
+            this.historyListener();
+        }
+    }
+
     handlePathCheckboxClick = (path) => {
         const {selectedPaths, selectPath, deselectPath} = this.props;
         const isPathSelected = selectedPaths.some(el => el === path.filename);
@@ -70,7 +84,7 @@ class FileBrowser extends React.Component {
     render() {
         const {
             loading, error, openedCollection, files = [], selectedPaths, openedPath,
-            fetchFilesIfNeeded, onSelectAll, onDeselectAll,
+            fetchFilesIfNeeded, onSelectAll, onDeselectAll
         } = this.props;
         const collectionExists = openedCollection && openedCollection.iri;
 

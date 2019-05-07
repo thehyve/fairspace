@@ -20,9 +20,12 @@ data:
 
     frontend:
       urls:
-        files: {{ template "storage.url" . }}/webdav
+        files: {{ template "storage.url" . }}/webdav/v1
         jupyter: {{ template "jupyterhub.url" . }}
         {{ if ( and .Values.services .Values.services.cbioportal  ) }}cbioportal: {{ .Values.services.cbioportal }}{{ end }}
+      roles:
+        dataSteward: "datasteward-{{ template "workspace.name" . }}"
+        coordinator: "coordinator-{{ template "workspace.name" . }}"
 
     workspace:
       name: {{ .Release.Name }}
@@ -40,17 +43,15 @@ data:
 
     zuul:
       routes:
-        ui:
-          url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
-        storage:
-          url: {{ .Values.pluto.backends.storage | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
-        collections:
-          url: {{ .Values.pluto.backends.collections | default (printf "http://%s-saturn.%s.svc.cluster.local/api/collections/" .Release.Name .Release.Namespace)}}
-        permissions:
-          url: {{ .Values.pluto.backends.permissions | default (printf "http://%s-saturn.%s.svc.cluster.local/api/permissions/" .Release.Name .Release.Namespace)}}
-        metadata:
-          url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/metadata/" .Release.Name .Release.Namespace)}}
-        vocabulary:
-          url: {{ .Values.pluto.backends.metadata | default (printf "http://%s-saturn.%s.svc.cluster.local/api/vocabulary/" .Release.Name .Release.Namespace)}}
+        # Please note that the order of the routes is relevant
+        # The elasticsearch route must be defined before
+        # saturn, which must be defined before ui, because of the
+        # paths they listen to
         elasticsearch:
           url: {{ template "workspace.elasticsearch.resturl" . }}
+        storage:
+          url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+        saturn:
+          url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+        ui:
+          url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}

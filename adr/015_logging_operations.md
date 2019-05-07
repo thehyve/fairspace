@@ -1,6 +1,6 @@
 # Functional logging of (file) operations
 
-* **Status**: proposed
+* **Status**: accepted
 
 * **Context**: Our system consists of several APIs that provide access to data or metadata or allows modifying it. We want to provide
   a way to log the actions performed on the system. This logging should allow for (certain) users to analyse who did what in the system 

@@ -16,11 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
-import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -47,7 +43,7 @@ public class ReadableMetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH));
+        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI));
     }
 
     @Test
@@ -113,59 +109,100 @@ public class ReadableMetadataServiceTest {
     }
 
     @Test
-    public void getByType() {
+    public void getByTypeInCatalog() {
+        setupModelForTypes();
+
+        Resource personConsentEx = createResource("http://fairspace.io/ontology#PersonConsentEx");
+        Resource researchProject = createResource("http://fairspace.io/ontology#ResearchProject");
+        Resource user = createResource("http://fairspace.io/ontology#User");
+
+        // Test whether entities of a single type can be retrieved, including the label
+        var m1 = api.getByType("http://fairspace.io/ontology#PersonConsent", true);
+        assertEquals(2, m1.size());
+        assertTrue(m1.contains(S1, RDF.type, personConsentEx));
+        assertTrue(m1.contains(LBL_STMT1));
+
+        // If no type is given, return all fairspace entities, including the label
+        var m2 = api.getByType(null, true);
+        assertEquals(3, m2.size());
+        assertTrue(m2.contains(S1, RDF.type, personConsentEx));
+        assertTrue(m2.contains(LBL_STMT1));
+        assertTrue(m2.contains(S2, RDF.type, researchProject));
+
+        // If the shape for a type is not known, do not return any entity for that type
+        var m3 = api.getByType("http://fairspace.io/ontology#Unknown", true);
+        assertTrue(m3.isEmpty());
+
+        // If the type is not a fairspace entity, do not return any entity for that type
+        var m4 = api.getByType(user.toString(), true);
+        assertTrue(m4.isEmpty());
+    }
+
+    @Test
+    public void getAllByType() {
+        setupModelForTypes();
+
+        Resource personConsentEx = createResource("http://fairspace.io/ontology#PersonConsentEx");
+        Resource researchProject = createResource("http://fairspace.io/ontology#ResearchProject");
+        Resource user = createResource("http://fairspace.io/ontology#User");
+
+        // Test whether entities of a single type can be retrieved, including the label
+        var m1 = api.getByType("http://fairspace.io/ontology#PersonConsent", false);
+        assertEquals(2, m1.size());
+        assertTrue(m1.contains(S1, RDF.type, personConsentEx));
+        assertTrue(m1.contains(LBL_STMT1));
+
+        // If no type is given, return all fairspace entities, including the label
+        var m2 = api.getByType(null, false);
+        assertEquals(4, m2.size());
+        assertTrue(m2.contains(S1, RDF.type, personConsentEx));
+        assertTrue(m2.contains(LBL_STMT1));
+        assertTrue(m2.contains(S2, RDF.type, researchProject));
+        assertTrue(m2.contains(createResource("http://example.com/user"), RDF.type, user));
+
+        // If the shape for a type is not known, do not return any entity for that type
+        var m3 = api.getByType("http://fairspace.io/ontology#Unknown", false);
+        assertTrue(m3.isEmpty());
+
+        // If the type is not a fairspace entity, do not return any entity for that type
+        var m4 = api.getByType(user.toString(), false);
+        assertEquals(1, m4.size());
+        assertTrue(m4.contains(createResource("http://example.com/user"), RDF.type, user));
+    }
+
+    private void setupModelForTypes() {
         Resource personConsent = createResource("http://fairspace.io/ontology#PersonConsent");
+        Resource personConsentEx = createResource("http://fairspace.io/ontology#PersonConsentEx");
         Resource researchProject = createResource("http://fairspace.io/ontology#ResearchProject");
         Property showInCatalog = createProperty("http://fairspace.io/ontology#showInCatalog");
         Property targetClass = createProperty("http://www.w3.org/ns/shacl#targetClass");
         Resource personConsentShape = createProperty("http://fairspace.io/ontology#PersonConsentShape");
+        Resource personConsentExShape = createProperty("http://fairspace.io/ontology#PersonConsentExShape");
         Resource researchShape = createProperty("http://fairspace.io/ontology#ResearchProjectShape");
+        Resource user = createProperty("http://fairspace.io/ontology#User");
+        Resource userShape = createProperty("http://fairspace.io/ontology#UserShape");
 
         // Setup the model
         executeWrite(ds, () -> {
             ds.getNamedModel(GRAPH)
-                    .add(S1, RDF.type, personConsent)
+                    .add(S1, RDF.type, personConsentEx)
                     .add(LBL_STMT1)
                     .add(S2, RDF.type, researchProject)
                     .add(createResource("http://example.com/unknown"), RDF.type, createResource("http://fairspace.io/ontology#Unknown"))
-                    .add(createResource("http://example.com/person"), RDF.type, FOAF.Person);
+                    .add(createResource("http://example.com/person"), RDF.type, FOAF.Person)
+                    .add(createResource("http://example.com/user"), RDF.type, user);
 
             // Mark personConsent and researchProject as fairspace entities
             ds.getNamedModel(userVocabularyURI)
                     .add(personConsentShape, targetClass, personConsent)
                     .add(personConsentShape, showInCatalog, createTypedLiteral(true))
+                    .add(personConsentExShape, targetClass, personConsentEx)
+                    .add(personConsentExShape, showInCatalog, createTypedLiteral(true))
                     .add(researchShape, targetClass, researchProject)
                     .add(researchShape, showInCatalog, createTypedLiteral(true))
-                    .add(personConsent, showInCatalog, createTypedLiteral(true))
-                    .add(FOAF.Person, showInCatalog, createTypedLiteral(false));
+                    .add(userShape, targetClass, user)
+                    .add(personConsentEx, RDFS.subClassOf, personConsent);
         });
-
-        System.out.println("--- Statements in " + GRAPH);
-        ds.getNamedModel(GRAPH).listStatements().forEachRemaining(System.out::println);
-        System.out.println("--- Statements in " + userVocabularyURI);
-        ds.getNamedModel(userVocabularyURI).listStatements().forEachRemaining(System.out::println);
-
-
-        // Test whether entities of a single type can be retrieved, including the label
-        var m1 = api.getByType("http://fairspace.io/ontology#PersonConsent");
-        assertEquals(2, m1.size());
-        assertTrue(m1.contains(S1, RDF.type, personConsent));
-        assertTrue(m1.contains(LBL_STMT1));
-
-        // If no type is given, return all fairspace entities, including the label
-        var m2 = api.getByType(null);
-        assertEquals(3, m2.size());
-        assertTrue(m2.contains(S1, RDF.type, personConsent));
-        assertTrue(m2.contains(LBL_STMT1));
-        assertTrue(m2.contains(S2, RDF.type, researchProject));
-
-        // If the type is not a fairspace entity, do not return any entity for that type
-        var m3 = api.getByType("http://fairspace.io/ontology#Unknown");
-        assertTrue(m3.isEmpty());
-
-        // If the type is not a fairspace entity, do not return any entity for that type
-        var m4 = api.getByType(FOAF.Person.toString());
-        assertTrue(m4.isEmpty());
     }
 
 }

@@ -15,12 +15,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.time.Instant;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity.CREATED_BY_IRI;
-import static io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity.DATE_CREATED_IRI;
+import static io.fairspace.saturn.vocabulary.FS.createdBy;
+import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataEntityLifeCycleManagerTest {
@@ -37,8 +38,6 @@ public class MetadataEntityLifeCycleManagerTest {
 
     private Resource resource = ResourceFactory.createResource("http://resource");
     private Property property = ResourceFactory.createProperty("http://property");
-    private Property createdBy = ResourceFactory.createProperty(CREATED_BY_IRI);
-    private Property dateCreated = ResourceFactory.createProperty(DATE_CREATED_IRI);
     private Resource otherResource = ResourceFactory.createResource("http://resource2");
 
     @Before
@@ -60,8 +59,8 @@ public class MetadataEntityLifeCycleManagerTest {
         assertTrue(model.contains(resource, createdBy, userResource));
         assertTrue(model.contains(otherResource, createdBy, userResource));
 
-        String dateCreated = model.getRequiredProperty(resource, this.dateCreated).getString();
-        ensureRecentInstant(Instant.parse(dateCreated));
+        String dateCreatedValue = model.getRequiredProperty(resource, dateCreated).getString();
+        ensureRecentInstant(Instant.parse(dateCreatedValue));
     }
 
     @Test
@@ -73,8 +72,8 @@ public class MetadataEntityLifeCycleManagerTest {
 
         assertTrue(model.contains(otherResource, createdBy, userResource));
 
-        String dateCreated = model.getRequiredProperty(otherResource, this.dateCreated).getString();
-        ensureRecentInstant(Instant.parse(dateCreated));
+        String dateCreatedValue = model.getRequiredProperty(otherResource, dateCreated).getString();
+        ensureRecentInstant(Instant.parse(dateCreatedValue));
     }
 
     @Test
@@ -101,6 +100,18 @@ public class MetadataEntityLifeCycleManagerTest {
     }
 
     @Test
+    public void testStorageOfBlankNodes() {
+        // Try to add the information about the resource
+        Model delta = ModelFactory.createDefaultModel();
+        delta.add(ResourceFactory.createResource(), property, "test");
+
+        lifeCycleManager.updateLifecycleMetadata(delta);
+
+        // Expect no information to be added for blank nodes
+        assertTrue(model.isEmpty());
+    }
+
+    @Test
     public void testStorageOfPermissions() {
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, otherResource);
@@ -109,5 +120,22 @@ public class MetadataEntityLifeCycleManagerTest {
 
         verify(permissionsService).createResource(NodeFactory.createURI(resource.getURI()));
         verify(permissionsService).createResource(NodeFactory.createURI(otherResource.getURI()));
+    }
+
+    @Test
+    public void testMissingPermissionsService() {
+        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, () -> user);
+
+        Model delta = ModelFactory.createDefaultModel();
+        delta.add(resource, property, otherResource);
+
+        lifeCycleManager.updateLifecycleMetadata(delta);
+
+        // Ensure correct storage of creation information
+        assertTrue(model.contains(resource, createdBy, userResource));
+        assertTrue(model.contains(otherResource, createdBy, userResource));
+
+        // Ensure any permissions are ignored
+        verifyZeroInteractions(permissionsService);
     }
 }
