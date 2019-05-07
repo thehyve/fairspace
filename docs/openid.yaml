@@ -1,6 +1,6 @@
 openapi: "3.0.0"
 info:
-  version: 1.0.0
+  version: 0.0.1
   title: Fairspace APIs
   description: Fairspace provides APIs for managing files and its associated metadata. Files can be managed using the WebDAV protocol at the path /webdav/v1. Each webdav resource has a special `iri` property indicating the iri that is used to describe its metadata.
   license:
