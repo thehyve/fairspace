@@ -42,8 +42,6 @@ jupyterhub:
         openid_url: https://keycloak.hyperspace.test.fairspace.app/auth/realms/test/protocol/openid-connect/
         session_url: https://workspace.test.fairspace.app/api/v1/account/tokens
   singleuser:
-    image:
-      tag: 0.6.4
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.test.fairspace.app
   hub:

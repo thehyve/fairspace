@@ -58,7 +58,6 @@ jupyterhub:
             account/tokens
   singleuser:
     image:
-      tag: 0.6.4-SNAPSHOT
       pullPolicy: Always
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.ci.fairway.app
