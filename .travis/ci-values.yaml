@@ -57,7 +57,6 @@ jupyterhub:
               session_url: https://workspace.ci.fairway.app/api/v1/account/tokens
   singleuser:
     image:
-      tag: 0.6.1-SNAPSHOT
       pullPolicy: Always
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.ci.fairway.app

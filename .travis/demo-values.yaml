@@ -58,8 +58,6 @@ jupyterhub:
         openid_url: https://keycloak.hyperspace.demo.fairway.app/auth/realms/demo/protocol/openid-connect/
         session_url: https://workspace.demo.fairway.app/api/v1/account/tokens
   singleuser:
-    image:
-      tag: 0.5.6-simple
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.demo.fairway.app
   hub:
