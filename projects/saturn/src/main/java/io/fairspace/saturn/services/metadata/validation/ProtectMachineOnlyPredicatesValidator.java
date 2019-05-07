@@ -16,8 +16,9 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
 
 
     @Override
-    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        return validateModelAgainstMachineOnlyPredicates(modelToRemove.union(modelToAdd));
+    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
+        validateModelAgainstMachineOnlyPredicates(modelToRemove, violationHandler);
+        validateModelAgainstMachineOnlyPredicates(modelToAdd, violationHandler);
     }
 
     /**
@@ -27,17 +28,14 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
      *
      * @param model
      */
-    private ValidationResult validateModelAgainstMachineOnlyPredicates(Model model) {
-        var result = ValidationResult.VALID;
+    private void validateModelAgainstMachineOnlyPredicates(Model model, ViolationHandler violationHandler) {
         var machineOnlyPredicates = machineOnlyPredicatesSupplier.get();
 
         for(var it = model.listStatements(); it.hasNext(); ){
             var stmt = it.next();
             if (machineOnlyPredicates.contains(stmt.getPredicate().getURI())) {
-                result = result.merge(new ValidationResult("The given model contains a machine-only predicate " + stmt.getPredicate().getURI()));
+                violationHandler.onViolation("The given model contains a machine-only predicate", stmt);
             }
         }
-
-        return result;
     }
 }

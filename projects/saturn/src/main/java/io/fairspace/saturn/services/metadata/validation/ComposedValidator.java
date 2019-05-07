@@ -10,7 +10,7 @@ import static java.util.Arrays.asList;
  * This validator checks whether the requested action will modify any machine-only
  * predicates. If so, the request will not validate
  */
-public class ComposedValidator implements MetadataRequestValidator{
+public class ComposedValidator implements MetadataRequestValidator {
     private List<MetadataRequestValidator> validators;
 
     public ComposedValidator(MetadataRequestValidator... validators) {
@@ -21,9 +21,7 @@ public class ComposedValidator implements MetadataRequestValidator{
      * Executes each validator and returns the composed result
      */
     @Override
-    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        return validators.stream()
-                .map(v -> v.validate(modelToRemove, modelToAdd))
-                .reduce(ValidationResult.VALID, ValidationResult::merge);
+    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
+        validators.forEach(v -> v.validate(modelToRemove, modelToAdd, violationHandler));
     }
 }

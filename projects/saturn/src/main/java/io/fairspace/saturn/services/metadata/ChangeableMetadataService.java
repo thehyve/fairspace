@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
+import io.fairspace.saturn.services.metadata.validation.Violation;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -12,6 +13,7 @@ import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -35,7 +37,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     /**
      * Adds all the statements in the given model to the database
-     *
+     * <p>
      * If the given model contains any statements for which the predicate is marked as machineOnly,
      * an IllegalArgumentException will be thrown
      *
@@ -47,10 +49,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     /**
      * Deletes the statements in the database, based on the combination of subject, predicate and object
-     *
+     * <p>
      * If any of the fields is null, that field is not included to filter statements to delete. For example, if only
      * subject is given and predicate and object are null, then all statements with the given subject will be deleted.
-     *
+     * <p>
      * If the set of triples matching the provided wildcard includes any protected triple (e.g. with a predicate marked
      * as fs:machineOnly) a ValidationException will be thrown.
      *
@@ -64,8 +66,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     /**
      * Deletes the statements in the given model from the database.
-     *
+     * <p>
      * If the model contains any statements for which the predicate is marked as 'machineOnly', an IllegalArgumentException will be thrown.
+     *
      * @param model
      */
     void delete(Model model) {
@@ -74,13 +77,13 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     /**
      * Overwrites metadata in the database with statements from the given model.
-     *
+     * <p>
      * For any subject/predicate combination in the model to add, the existing data in the database will be removed,
      * before adding the new data. This means that if the given model contains a triple
-     *   S rdfs:label "test"
+     * S rdfs:label "test"
      * then any statement in the database specifying the rdfs:label for S will be deleted. This effectively overwrites
      * values in the database.
-     *
+     * <p>
      * If the given model contains any statements for which the predicate is marked as machineOnly,
      * an IllegalArgumentException will be thrown
      *
@@ -112,7 +115,13 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         applyInference(modelToRemove);
         applyInference(modelToAdd);
 
-        ensureValidParameters(modelToRemove, modelToAdd);
+        var violations = new LinkedHashSet<Violation>();
+        validator.validate(modelToRemove, modelToAdd,
+                (message, subject, predicate, object) -> violations.add(new Violation(message, subject, predicate, object)));
+
+        if (!violations.isEmpty()) {
+            throw new ValidationException(violations);
+        }
 
         rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove.listStatements().toList()))));
 
@@ -121,18 +130,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         // Store the actual update
         rdf.load(graph.getURI(), modelToAdd);
-    }
-
-    /**
-     * Runs the given validationLogic the validator and throws an IllegalArgumentException if the validation fails
-     *
-     * If no validator is specified, the method does nothing
-     */
-    private void ensureValidParameters(Model toRemove, Model toAdd) {
-        var validationResult = validator.validate(toRemove, toAdd);
-        if(!validationResult.isValid()) {
-            throw new ValidationException(validationResult.getMessage());
-        }
     }
 
     private List<Quad> toQuads(Collection<Statement> statements) {

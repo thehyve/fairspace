@@ -17,10 +17,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProtectMachineOnlyPredicatesValidatorTest {
@@ -35,6 +33,9 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     private Supplier<List<String>> supplier;
 
     private ProtectMachineOnlyPredicatesValidator validator;
+
+    @Mock
+    private ViolationHandler violationHandler;
 
     @Before
     public void setUp() {
@@ -57,8 +58,8 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         testModel.add(S1, P2, S2);
         testModel.add(S2, P2, S1);
 
-        var result = validator.validate(testModel, createDefaultModel());
-        assertTrue(result.isValid());
+        validator.validate(testModel, createDefaultModel(), violationHandler);
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
@@ -78,9 +79,10 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         testModel.add(S1, P2, S3);
         testModel.add(S3, P2, S2);
 
-        var result = validator.validate(testModel, createDefaultModel());
-        assertFalse(result.isValid());
-        assertEquals("The given model contains a machine-only predicate http://fairspace.io/ontology#filePath.", result.getMessage());
+        validator.validate(testModel, createDefaultModel(), violationHandler);
+
+        verify(violationHandler).onViolation("The given model contains a machine-only predicate",
+                createStatement(S3, MACHINE_ONLY_PROPERTY, S1));
     }
 
     @Test
@@ -99,13 +101,15 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         testModel.add(S1, P2, S3);
         testModel.add(S3, P2, S2);
 
-        var result = validator.validate(testModel, createDefaultModel());
-        assertTrue(result.isValid());
+        validator.validate(testModel, createDefaultModel(), violationHandler);
+
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyModel() {
-        assertTrue(validator.validate(createDefaultModel(), createDefaultModel()).isValid());
+        validator.validate(createDefaultModel(), createDefaultModel(), violationHandler);
+        verifyZeroInteractions(violationHandler);
     }
 
 }
