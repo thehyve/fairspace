@@ -12,8 +12,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,6 +28,9 @@ public class PermissionCheckingValidatorTest {
     @Mock
     private PermissionsService permissions;
 
+    @Mock
+    private ViolationHandler violationHandler;
+
 
     private PermissionCheckingValidator validator;
 
@@ -42,9 +43,9 @@ public class PermissionCheckingValidatorTest {
 
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
-        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, EMPTY));
+        validator.validate(EMPTY, EMPTY, violationHandler);
 
-        verifyZeroInteractions(permissions);
+        verifyZeroInteractions(permissions, violationHandler);
     }
 
     @Test
@@ -52,8 +53,8 @@ public class PermissionCheckingValidatorTest {
         model.add(STATEMENT);
 
         when(permissions.getPermission(any())).thenReturn(Access.Read);
-
-        assertFalse(validator.validate(EMPTY, model).isValid());
+        validator.validate(EMPTY, model, violationHandler);
+        verify(violationHandler).onViolation("Cannot modify read-only resource http://ex.com/subject", STATEMENT.getSubject(), null, null);
     }
 
     @Test
@@ -62,8 +63,9 @@ public class PermissionCheckingValidatorTest {
 
         when(permissions.getPermission(eq(STATEMENT.getSubject().asNode()))).thenReturn(Access.Write);
 
-        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, model));
+        validator.validate(EMPTY, model, violationHandler);
 
+        verifyZeroInteractions(violationHandler);
         verify(permissions).getPermission(STATEMENT.getSubject().asNode());
 
         verifyNoMoreInteractions(permissions);

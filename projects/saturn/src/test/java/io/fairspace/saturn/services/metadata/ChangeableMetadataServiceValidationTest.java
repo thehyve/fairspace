@@ -131,7 +131,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test(expected = ValidationException.class)
     public void deleteModelShouldNotAcceptMachineOnlyTriples() {
-        produceValidationError();;
+        produceValidationError();
         api.delete(createDefaultModel());
     }
 }
