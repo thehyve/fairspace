@@ -1,6 +1,6 @@
 import {connect} from "react-redux";
 
-import {getTypeInfo, linkLabel, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {getTypeInfo, linkLabel} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
 import {
     getMetaVocabulary,
@@ -12,8 +12,7 @@ import {
 } from "../../../reducers/cache/vocabularyReducers";
 import {fromJsonLd} from "../../../utils/linkeddata/jsonLdConverter";
 
-const mapStateToProps = (state) => {
-    const subject = url2iri(window.location.href);
+const mapStateToProps = (state, {subject}) => {
     const vocabulary = getVocabulary(state);
     const metaVocabulary = getMetaVocabulary(state);
     const loading = isVocabularyPending(state) || isMetaVocabularyPending(state);
