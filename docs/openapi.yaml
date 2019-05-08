@@ -686,7 +686,7 @@ components:
           type: string
         info:
           oneOf:
-            - $ref: "#/components/schemas/ValidionInfo"
+            - $ref: "#/components/schemas/ValidationInfo"
       example: |
         {
           "status": 400,
@@ -700,7 +700,7 @@ components:
             }
           ]
         }
-    ValidionInfo:
+    ValidationInfo:
       required:
         - message
         - subject
