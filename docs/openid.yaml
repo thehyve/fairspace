@@ -684,6 +684,37 @@ components:
           format: int32
         message:
           type: string
+        info:
+          oneOf:
+            - $ref: "#/components/schemas/ValidionInfo"
+      example: |
+        {
+          "status": 400,
+          "message": "Validation Error",
+          "info": [
+            {
+              "message": "The given model contains a machine-only predicate",
+              "subject": "http://fairspace.io/ontology#CollectionShape",
+              "predicate": "http://fairspace.io/ontology#systemProperties",
+              "value": "http://fairspace.io/ontology#dateModifiedShape"
+            }
+          ]
+        }
+    ValidionInfo:
+      required:
+        - message
+        - subject
+      properties:
+        message:
+          type: string
+        subject:
+          type: string
+          format: iri
+        predicate:
+          type: string
+          format: iri
+        object:
+          type: string
     BasicCollection:
       properties:
         name:
