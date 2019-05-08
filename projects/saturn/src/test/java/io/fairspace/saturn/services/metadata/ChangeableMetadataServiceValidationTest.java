@@ -75,7 +75,7 @@ public class ChangeableMetadataServiceValidationTest {
     private void produceValidationError() {
         doAnswer(invocation -> {
             ViolationHandler handler = invocation.getArgument(2);
-            handler.onViolation("ERROR", null, null, null);
+            handler.onViolation("ERROR", createResource(), null, null);
 
             return null;
         }).when(validator).validate(any(), any(), any());
