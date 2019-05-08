@@ -105,3 +105,6 @@ zuul:
     - X-Frame-Options
     - X-Content-Type-Options
     - X-XSS-Protection
+  host:
+    socket-timeout-millis: 10000
+    connect-timeout-millis: 2000
