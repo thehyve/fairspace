@@ -15,6 +15,7 @@ import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vocabulary.Vocabularies.getInverse;
@@ -117,7 +118,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         var violations = new LinkedHashSet<Violation>();
         validator.validate(modelToRemove, modelToAdd,
-                (message, subject, predicate, object) -> violations.add(new Violation(message, subject, predicate, object)));
+                (message, subject, predicate, object) ->
+                        violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))));
 
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
