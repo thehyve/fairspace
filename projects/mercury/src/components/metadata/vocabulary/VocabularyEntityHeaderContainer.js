@@ -1,22 +1,30 @@
 import {connect} from "react-redux";
 
-import {getCombinedMetadataForSubject, isMetadataPending, hasMetadataError} from "../../../reducers/cache/jsonLdBySubjectReducers";
 import {getTypeInfo, linkLabel, url2iri} from "../../../utils/linkeddata/metadataUtils";
-import {hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
+import {
+    getMetaVocabulary,
+    getVocabulary,
+    hasMetaVocabularyError,
+    hasVocabularyError,
+    isMetaVocabularyPending,
+    isVocabularyPending
+} from "../../../reducers/cache/vocabularyReducers";
+import {fromJsonLd} from "../../../utils/linkeddata/jsonLdConverter";
 
 const mapStateToProps = (state) => {
     const subject = url2iri(window.location.href);
-    const metadata = getCombinedMetadataForSubject(state, subject);
+    const vocabulary = getVocabulary(state);
+    const metaVocabulary = getMetaVocabulary(state);
+    const loading = isVocabularyPending(state) || isMetaVocabularyPending(state);
+    const metadata = loading ? [] : fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
     const hasNoMetadata = !metadata || metadata.length === 0;
-    const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
+    const hasOtherErrors = hasVocabularyError(state) || hasMetaVocabularyError(state);
     if (hasNoMetadata || hasOtherErrors) {
         return {
             error: true
         };
     }
-
-    const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
     const header = linkLabel(subject);
     const {label, description} = getTypeInfo(metadata);
 
