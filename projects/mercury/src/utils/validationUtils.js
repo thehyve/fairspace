@@ -6,11 +6,11 @@ import {getMaxCount} from "./linkeddata/vocabularyUtils";
 export const removeWhitespaceValues = (values) => (values ? values.filter(v => typeof v !== 'string' || v.trim().length > 0) : []);
 
 export const maxLengthValidation = (maxLength, values) => (values && values.some(v => v.length > maxLength)
-    ? `The maximum length is ${maxLength}` : null);
+    ? `Please provide no more than ${maxLength} characters` : null);
 
 export const minCountValidation = (minCount, values) => {
     if (!values || values.length < minCount) {
-        return minCount === 1 ? 'Please provide a value' : `The minimum number of values is ${minCount}`;
+        return minCount === 1 ? 'Please provide a value' : `Please specify at least ${minCount} values`;
     }
     return null;
 };
@@ -18,7 +18,7 @@ export const minCountValidation = (minCount, values) => {
 export const pushNonEmpty = (arr, value) => (value ? [...arr, value] : arr);
 
 export const maxCountValidation = (maxCount, values) => ((values && values.length > maxCount)
-    ? `The maximum number of values is ${maxCount}` : null);
+    ? `Please provide no more than ${maxCount} values` : null);
 
 export const validateValuesAgainstShape = ({shape, datatype, values}) => {
     // ignore falsy values (null, NaN, undefined or '') with the exception of zero and false
