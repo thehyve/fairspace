@@ -684,14 +684,14 @@ components:
           format: int32
         message:
           type: string
-        info:
+        details:
           oneOf:
-            - $ref: "#/components/schemas/ValidationInfo"
+            - $ref: "#/components/schemas/ValidationResults"
       example: |
         {
           "status": 400,
           "message": "Validation Error",
-          "info": [
+          "details": [
             {
               "message": "The given model contains a machine-only predicate",
               "subject": "http://fairspace.io/ontology#CollectionShape",
@@ -700,7 +700,11 @@ components:
             }
           ]
         }
-    ValidationInfo:
+    ValidationResults:
+      type: array
+      items:
+        $ref: "#/components/schemas/ValidationResult"
+    ValidationResult:
       required:
         - message
         - subject
