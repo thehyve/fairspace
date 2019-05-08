@@ -23,7 +23,7 @@ class BaseInputValue extends React.Component {
         const {value: newValue} = this.state;
 
         // Only store the new values if either
-        // 1: the property allows only a single value (to enforce validation on empty strings)
+        // 1: the property allows only a single value (Not to add empty values to properties accepting multiple values)
         // 2: the new value is different from the old one
         // 3: the user has removed the existing value
         if (property.maxValuesCount === 1 || newValue !== oldValue || (!newValue && oldValue)) {
