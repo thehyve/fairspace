@@ -49,9 +49,9 @@ describe('MetadataLink', () => {
         expect(wrapper.contains(<Link to={{pathname, search, hash}} />)).toBe(true);
     });
 
-    it('should not break on an invalid url', () => {
+    it('should not break on an invalid url (return children only)', () => {
         const uri = `some-invalid-url`;
-        const wrapper = shallow(<LinkedDataLink uri={uri} />);
-        expect(wrapper.contains(<a href={uri} />)).toBe(true);
+        const wrapper = shallow(<LinkedDataLink uri={uri}>something</LinkedDataLink>);
+        expect(wrapper.contains('something')).toBe(true);
     });
 });
