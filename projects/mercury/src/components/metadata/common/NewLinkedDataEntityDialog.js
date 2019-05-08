@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 
 import {generateUuid, getLabel} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
+import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
@@ -40,7 +42,8 @@ class NewLinkedDataEntityDialog extends React.Component {
     handleInputChange = event => this.setState({id: event.target.value});
 
     render() {
-        const {shape, open, linkedData} = this.props;
+        const {shape, open, linkedData, storeState} = this.props;
+        const {id, formKey} = this.state;
         const typeLabel = getLabel(shape);
 
         return (
@@ -58,7 +61,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                         autoFocus
                         id="name"
                         label="Id"
-                        value={this.state.id}
+                        value={id}
                         name="id"
                         onChange={this.handleInputChange}
                         fullWidth
@@ -67,7 +70,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                     />
 
                     <LinkedDataEntityFormContainer
-                        formKey={this.state.formKey}
+                        formKey={formKey}
                         properties={linkedData}
                     />
 
@@ -82,7 +85,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                     <Button
                         onClick={this.createEntity}
                         color="primary"
-                        disabled={!this.canCreate()}
+                        disabled={!this.canCreate() || !hasLinkedDataFormUpdates(storeState, formKey) || hasLinkedDataFormValidationErrors(storeState, formKey)}
                     >
                         Create
                     </Button>
@@ -107,4 +110,8 @@ NewLinkedDataEntityDialog.propTypes = {
     open: PropTypes.bool
 };
 
-export default NewLinkedDataEntityDialog;
+const mapStateToProps = (state) => ({
+    storeState: state,
+});
+
+export default connect(mapStateToProps)(NewLinkedDataEntityDialog);

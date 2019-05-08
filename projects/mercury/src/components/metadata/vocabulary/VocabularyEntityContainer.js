@@ -2,7 +2,11 @@ import React from "react";
 import {connect} from 'react-redux';
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import * as vocabularyActions from "../../../actions/vocabularyActions";
+import {
+    fetchMetaVocabularyIfNeeded,
+    fetchMetadataVocabularyIfNeeded,
+    submitVocabularyChangesFromState
+} from "../../../actions/vocabularyActions";
 import {
     getMetaVocabulary,
     getVocabulary,
@@ -14,7 +18,7 @@ import {
 import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
-import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
+import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
@@ -76,7 +80,7 @@ const mapStateToProps = (state, ownProps) => {
 
     const editable = isDataSteward(getAuthorizations(state), Config.get());
 
-    const buttonDisabled = !hasLinkedDataFormUpdates(state, subject);
+    const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
@@ -98,10 +102,10 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-    fetchShapes: () => dispatch(vocabularyActions.fetchMetaVocabularyIfNeeded()),
-    fetchLinkedData: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded()),
-    onSubmit: (subject) => dispatch(vocabularyActions.submitVocabularyChangesFromState(subject))
-        .then(() => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded()))
+    fetchShapes: () => dispatch(fetchMetaVocabularyIfNeeded()),
+    fetchLinkedData: () => dispatch(fetchMetadataVocabularyIfNeeded()),
+    onSubmit: (subject) => dispatch(submitVocabularyChangesFromState(subject))
+        .then(() => dispatch(fetchMetadataVocabularyIfNeeded()))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(VocabularyEntityContainer);

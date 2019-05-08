@@ -3,7 +3,9 @@ import {
     maxLengthValidation,
     minCountValidation,
     maxCountValidation,
-    validateValuesAgainstShape
+    validateValuesAgainstShape,
+    removeWhitespaceValues,
+    pushNonEmpty
 } from './validationUtils';
 
 describe('Validation Utils', () => {
@@ -88,6 +90,61 @@ describe('Validation Utils', () => {
             const values = [{value: 0}, {value: 10}, {value: 100}];
             expect(validateValuesAgainstShape({shape, values}).length).toBe(1);
             expect(validateValuesAgainstShape({shape, values})[0].length).toBeGreaterThan(0);
+        });
+
+        it('should ignore falsy values but zero', () => {
+            const shape = {
+                "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
+                [constants.SHACL_MAX_LENGTH]: [
+                    {
+                        "@value": 1
+                    }
+                ],
+                [constants.SHACL_MIN_COUNT]: [
+                    {
+                        "@value": 1
+                    }
+                ]
+            };
+
+            const values = [{value: 0}, {}, {value: null}, {value: undefined}, {value: NaN}];
+            expect(validateValuesAgainstShape({shape, values}).length).toBe(0);
+        });
+
+        it('should ignore falsy values but false', () => {
+            const shape = {
+                "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
+                [constants.SHACL_MAX_LENGTH]: [
+                    {
+                        "@value": 1
+                    }
+                ],
+                [constants.SHACL_MIN_COUNT]: [
+                    {
+                        "@value": 1
+                    }
+                ]
+            };
+
+            const values = [{value: false}, {}, {value: null}, {value: undefined}, {value: NaN}];
+            expect(validateValuesAgainstShape({shape, values}).length).toBe(0);
+        });
+    });
+
+    describe('removeWhitespaceValues', () => {
+        it('should filter out values that contain only whitespace', () => {
+            const values = [' ', 'abc', '   '];
+            expect(removeWhitespaceValues(values)).toEqual(['abc']);
+        });
+    });
+
+    describe('pushNonEmpty', () => {
+        it('should add non empty strings', () => {
+            const values = ['1', '2'];
+            expect(pushNonEmpty(values, '3')).toEqual(['1', '2', '3']);
+            expect(pushNonEmpty(values, '')).toEqual([...values]);
+            expect(pushNonEmpty(values, null)).toEqual([...values]);
+            expect(pushNonEmpty(values, undefined)).toEqual([...values]);
         });
     });
 });
