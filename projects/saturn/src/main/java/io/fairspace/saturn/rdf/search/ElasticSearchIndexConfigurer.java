@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf.search;
 
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.text.TextIndexException;
@@ -91,12 +90,14 @@ public class ElasticSearchIndexConfigurer {
     }
 
     private String getMappings() throws IOException {
-        return new String(SaturnDatasetFactory.class.getResourceAsStream("/elasticsearch/mappings.json").readAllBytes(), UTF_8);
+        try(var is = getClass().getResourceAsStream("/elasticsearch/mappings.json")) {
+            return new String(is.readAllBytes(), UTF_8);
+        }
     }
 
     private Settings.Builder getSettings() throws IOException {
         return Settings.builder()
-                .loadFromStream("es-settings.json", SaturnDatasetFactory.class.getResourceAsStream("/elasticsearch/settings.json"), false);
+                .loadFromStream("es-settings.json", getClass().getResourceAsStream("/elasticsearch/settings.json"), false);
     }
 
 
