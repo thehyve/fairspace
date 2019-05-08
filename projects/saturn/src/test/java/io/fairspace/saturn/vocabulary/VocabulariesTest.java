@@ -1,6 +1,6 @@
 package io.fairspace.saturn.vocabulary;
 
-import io.fairspace.saturn.services.metadata.validation.ValidationResult;
+import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -9,23 +9,31 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.util.FileManager;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
 import java.util.List;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
+import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getViolations;
 import static io.fairspace.saturn.vocabulary.Vocabularies.*;
-import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getValidationResult;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
+@RunWith(MockitoJUnitRunner.class)
 public class VocabulariesTest {
     private static final Model SHACL_FOR_SHACL = FileManager.get().loadModel("default-vocabularies/shacl-shacl.ttl");
 
     private final Dataset ds = DatasetFactory.create();
     private final RDFConnection rdf = new RDFConnectionLocal(ds);
+
+    @Mock
+    private ViolationHandler violationHandler;
 
     @Before
     public void setUp() {
@@ -64,7 +72,8 @@ public class VocabulariesTest {
     private void validate(Model dataModel, Model shapesModel) throws InterruptedException {
         var engine = createEngine(dataModel, shapesModel);
         engine.validateAll();
-        assertEquals(ValidationResult.VALID, getValidationResult(engine));
+        getViolations(engine, violationHandler);
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
