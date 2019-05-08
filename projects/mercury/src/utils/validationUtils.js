@@ -16,14 +16,17 @@ export const minCountValidation = (minCount, values) => {
 };
 
 export const iriValidation = (values) => {
-    const message = 'Please provide a valid URI';
-    if (!values || values.length === 0) {
-        return message;
-    }
     try {
-        values.forEach(v => new URL(v));
+        if (values && values.length > 0) {
+            values.forEach(v => {
+                if (v) {
+                    // eslint-disable-next-line no-new
+                    new URL(v);
+                }
+            });
+        }
     } catch (e) {
-        return message;
+        return 'Please provide a valid URI';
     }
     return null;
 };
@@ -44,7 +47,7 @@ export const validateValuesAgainstShape = ({shape, datatype, values, isGenericIr
     const maxCount = getMaxCount(shape);
     let errors = [];
 
-    // If thre's an error for URI values, return this error by itself as it's enough and more specific than other errors
+    // this error is enough and more specific than other errors, return it by itself
     if (isGenericIriResource) {
         const validation = iriValidation(pureValues);
         if (validation) {

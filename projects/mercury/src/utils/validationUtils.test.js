@@ -150,18 +150,16 @@ describe('Validation Utils', () => {
     });
 
     describe('iriValidation', () => {
-        it('should return error on invalid URIs', () => {
+        it('should return some error on invalid URIs', () => {
             expect(iriValidation(['http'])).not.toBeNull();
             expect(iriValidation(['http:'])).not.toBeNull();
             expect(iriValidation(['http:/'])).not.toBeNull();
             expect(iriValidation(['http://'])).not.toBeNull();
             expect(iriValidation(['ht tp://google'])).not.toBeNull();
             expect(iriValidation(['http ://google'])).not.toBeNull();
-            expect(iriValidation([''])).not.toBeNull();
             expect(iriValidation([123])).not.toBeNull();
-            expect(iriValidation([])).not.toBeNull();
         });
-        it('should return non error on valid URIs', () => {
+        it('should return nothing on valid URIs', () => {
             // values from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples
             expect(iriValidation(['https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top'])).toBeNull();
             expect(iriValidation(['ldap://[2001:db8::7]/c=GB?objectClass?one'])).toBeNull();
