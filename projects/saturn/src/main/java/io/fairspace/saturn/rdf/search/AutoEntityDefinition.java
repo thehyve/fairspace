@@ -9,7 +9,7 @@ import org.apache.jena.vocabulary.RDFS;
  */
 public class AutoEntityDefinition extends EntityDefinition {
     public AutoEntityDefinition() {
-        super("iri", "label", null, RDFS.label.asNode());
+        super("iri", "label", "graph", RDFS.label.asNode());
     }
 
     @Override
