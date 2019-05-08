@@ -15,12 +15,25 @@ export const minCountValidation = (minCount, values) => {
     return null;
 };
 
+export const iriValidation = (values) => {
+    const message = 'Please provide a valid URI';
+    if (!values || values.length === 0) {
+        return message;
+    }
+    try {
+        values.forEach(v => new URL(v));
+    } catch (e) {
+        return message;
+    }
+    return null;
+};
+
 export const pushNonEmpty = (arr, value) => (value ? [...arr, value] : arr);
 
 export const maxCountValidation = (maxCount, values) => ((values && values.length > maxCount)
     ? `Please provide no more than ${maxCount} values` : null);
 
-export const validateValuesAgainstShape = ({shape, datatype, values}) => {
+export const validateValuesAgainstShape = ({shape, datatype, values, isGenericIriResource}) => {
     // ignore falsy values (null, NaN, undefined or '') with the exception of zero and false
     const pureValues = values
         .map(v => v.id || v.value)
@@ -30,6 +43,14 @@ export const validateValuesAgainstShape = ({shape, datatype, values}) => {
     const minCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
     const maxCount = getMaxCount(shape);
     let errors = [];
+
+    // If thre's an error for URI values, return this error by itself as it's enough and more specific than other errors
+    if (isGenericIriResource) {
+        const validation = iriValidation(pureValues);
+        if (validation) {
+            return [validation];
+        }
+    }
 
     if (maxLength > 0 && datatype === constants.STRING_URI) {
         const validation = maxLengthValidation(maxLength, pureValues);

@@ -19,12 +19,8 @@ class ResourceValue extends React.Component {
     };
 
     handleBlur = () => {
-        try {
-            this.props.onChange({id: new URL(this.state.value).toString()});
-            this.resetState();
-        } catch (e) {
-            this.resetState();
-        }
+        this.props.onChange({id: this.state.value});
+        this.resetState();
     };
 
     resetState = () => {
@@ -39,7 +35,6 @@ class ResourceValue extends React.Component {
         return (
             <TextField
                 {...otherProps}
-                multiline={property.multiLine}
                 value={this.state.value}
                 onChange={this.handleChange}
                 onBlur={this.handleBlur}
