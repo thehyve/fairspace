@@ -110,7 +110,7 @@ public class ChangeableMetadataServiceValidationTest {
         api.delete(S1.getURI(), null, null);
 
         Model model = ds.getNamedModel(GRAPH);
-        assertTrue(!model.contains(LBL_STMT1));
+        assertFalse(model.contains(LBL_STMT1));
     }
 
     @Test(expected = ValidationException.class)
