@@ -17,7 +17,7 @@ public class ValidationUtils {
     }
 
     public static void validateContentType(Request request, String contentType) {
-        if (!contentType.equals(getContentTypeWithoutCharset(request.contentType()))) {
+        if (request.contentType() == null || !contentType.equals(getContentTypeWithoutCharset(request.contentType()))) {
             throw new UnsupportedMediaTypeException(contentType);
         }
     }
