@@ -23,9 +23,9 @@ class BaseInputValue extends React.Component {
         const {value: newValue} = this.state;
 
         // only if one of these apply (This is mainly to avoid adding multiple empty strings):
-        // 1: values don't match
-        // 2: the inputted value is empty AND already had value (removed existing)
-        // 3: the property allows only single value (to enforce validation on empty strings)
+        // 1: the property allows only single value (to enforce validation on empty strings)
+        // 2: values don't match
+        // 3: the inputted value is empty AND already had value (removed existing)
         if (property.maxValuesCount === 1 || newValue !== oldValue || (!newValue && oldValue)) {
             onChange({value: newValue});
             this.updateState();

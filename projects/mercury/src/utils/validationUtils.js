@@ -15,6 +15,8 @@ export const minCountValidation = (minCount, values) => {
     return null;
 };
 
+export const pushNonEmpty = (arr, value) => (value ? [...arr, value] : arr);
+
 export const maxCountValidation = (maxCount, values) => ((values && values.length > maxCount)
     ? `The maximum number of values is ${maxCount}` : null);
 
@@ -27,27 +29,21 @@ export const validateValuesAgainstShape = ({shape, datatype, values}) => {
     const maxLength = getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH);
     const minCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
     const maxCount = getMaxCount(shape);
-    const errors = [];
+    let errors = [];
 
     if (maxLength > 0 && datatype === constants.STRING_URI) {
         const validation = maxLengthValidation(maxLength, pureValues);
-        if (validation) {
-            errors.push(validation);
-        }
+        errors = pushNonEmpty(errors, validation);
     }
 
     if (minCount > 0) {
         const validation = minCountValidation(minCount, removeWhitespaceValues(pureValues));
-        if (validation) {
-            errors.push(validation);
-        }
+        errors = pushNonEmpty(errors, validation);
     }
 
     if (maxCount > 0) {
         const validation = maxCountValidation(maxCount, removeWhitespaceValues(pureValues));
-        if (validation) {
-            errors.push(validation);
-        }
+        errors = pushNonEmpty(errors, validation);
     }
 
     return errors;
