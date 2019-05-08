@@ -13,6 +13,7 @@ plugins {
     id 'application'
     id 'jacoco'
     id  'com.github.spotbugs' version '1.6.10'
+    id "org.owasp.dependencycheck" version "5.0.0-M3.1"
 }
 
 group 'io.fairspace'
