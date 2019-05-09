@@ -395,6 +395,34 @@ describe('jsonLdConverter', () => {
             expect(jsonLd).toEqual(expected);
         });
 
+        it('all values are empty', () => {
+            const subject = "some-subject";
+            const predicate = "some-predicate";
+            const values = [{value: ''}, {value: undefined}, {value: null}];
+            const jsonLd = toJsonLd(subject, predicate, values, vocabulary);
+
+            const expected = {
+                "@id": "some-subject",
+                [predicate]: {'@id': constants.NIL_URI}
+            };
+
+            expect(jsonLd).toEqual(expected);
+        });
+
+        it('filters out invalid values', () => {
+            const subject = "some-subject";
+            const predicate = "some-predicate";
+            const values = [{value: ''}, {value: undefined}, {value: null}, {value: 'some-value'}, {value: 'some-other-value'}];
+            const jsonLd = toJsonLd(subject, predicate, values, vocabulary);
+
+            const expected = {
+                "@id": "some-subject",
+                "some-predicate": [{"@value": "some-value"}, {"@value": "some-other-value"}]
+            };
+
+            expect(jsonLd).toEqual(expected);
+        });
+
         it('null subject', () => {
             const predicate = "some-predicate";
             const values = [{id: "some-id"}];

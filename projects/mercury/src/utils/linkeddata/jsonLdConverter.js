@@ -1,7 +1,6 @@
-import {compareBy, comparing} from "../comparisionUtils";
+import {compareBy, comparing, flattenShallow, isTruthyOrZeroOrFalse} from "../genericUtils";
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
-import {flattenShallow} from "../arrayUtils";
 import {isRdfList} from "./vocabularyUtils";
 import {lookupLabel} from "./metadataUtils";
 
@@ -130,33 +129,6 @@ const generatePropertiesForMetadata = (vocabulary, metadataItem, types, property
 };
 
 /**
- * Returns the given values in the right container. By default, no container is used
- * If the predicate requires an rdf:List, the values are put into a {'@list': ...} object
- * Some values require a type value (such as date and datetime), so the type will be provided
- * @param values
- * @param shape
- * @returns {*}
- */
-const jsonLdWrapper = (values, shape) => {
-    if (isRdfList(shape)) {
-        return {
-            '@list': values.map(({id, value}) => ({'@id': id, '@value': value}))
-        };
-    }
-
-    const dataType = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
-
-    if (dataType) {
-        return values.map(({value}) => ({
-            "@value": value,
-            "@type": dataType
-        }));
-    }
-
-    return values.map(({id, value}) => ({'@id': id, '@value': value}));
-};
-
-/**
  * Combines the given metadata with the current vocabulary to make a list of
  * objects with the label and value as keys.
  *
@@ -203,6 +175,26 @@ export const fromJsonLd = (expandedMetadata, subject, vocabulary) => {
 };
 
 /**
+ * Returns the given values in the right container. By default, no container is used
+ * If the predicate requires an rdf:List, the values are put into a {'@list': ...} object
+ * Whevever the data type is available it will be sent for values that are not part of RDF List
+ * @param values
+ * @param shape
+ * @returns {*}
+ */
+const jsonLdWrapper = (values, shape) => {
+    if (isRdfList(shape)) {
+        return {
+            '@list': values.map(({id, value}) => ({'@id': id, '@value': value}))
+        };
+    }
+
+    const dataType = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
+
+    return values.map(({id, value}) => ({'@id': id, '@value': value, "@type": dataType}));
+};
+
+/**
  * Converts information for a subject and predicate into json-ld
  * @param subject       Subject URI
  * @param predicate     Predicate URI
@@ -215,8 +207,10 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
         return null;
     }
 
-    // if there are no values then send a special nil value as required by the backend
-    if (values.length === 0) {
+    const validValues = values.filter(({id, value}) => isTruthyOrZeroOrFalse(value) || !!id);
+
+    // Return special nil value if no values or if all values are empty or invalid (non-truthy except zero or false)
+    if (validValues.length === 0) {
         return {
             '@id': subject,
             [predicate]: {'@id': constants.NIL_URI}
@@ -225,7 +219,7 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
 
     return {
         '@id': subject,
-        [predicate]: jsonLdWrapper(values, vocabulary.determineShapeForProperty(predicate))
+        [predicate]: jsonLdWrapper(validValues, vocabulary.determineShapeForProperty(predicate))
     };
 };
 

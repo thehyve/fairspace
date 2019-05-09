@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 import {withStyles} from '@material-ui/core/styles';
 
-import {flattenShallow} from "../../utils/arrayUtils";
+import {flattenShallow} from "../../utils/genericUtils";
 import menuitems from "../../menuitems";
 
 const menuEntries = flattenShallow(menuitems.map(sublist => sublist.items));
