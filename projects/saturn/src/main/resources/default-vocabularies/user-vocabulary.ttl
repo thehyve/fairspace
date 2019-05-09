@@ -138,7 +138,7 @@ fs:CollectionShape sh:property
         <integerLongWidgetShape>,
         <integerWidgetShape>,
         <booleanWidgetShape>,
-        <booleanX4WidgetShape>,
+        <booleanX2WidgetShape>,
         <fixedDropdownWidgetShape>,
         <resourceWidgetShape>,
         fs:labelShape,
@@ -193,13 +193,13 @@ fs:CollectionShape sh:property
     sh:maxCount 1 ;
     sh:path <booleanWidget> .
 
-<booleanX4Widget> a rdf:Property .
-<booleanX4WidgetShape> a fs:PropertyShape ;
+<booleanX2Widget> a rdf:Property .
+<booleanX2WidgetShape> a fs:PropertyShape ;
     sh:name "Boolean X4" ;
-    sh:description "On or off 4 times." ;
+    sh:description "On or off (max 2) times. Can only store unique values though." ;
     sh:datatype xsd:boolean ;
-    sh:maxCount 4 ;
-    sh:path <booleanX4Widget> .
+    sh:maxCount 2 ;
+    sh:path <booleanX2Widget> .
 
 <fixedDropdownWidget> a rdf:Property .
 <fixedDropdownWidgetShape> a fs:PropertyShape ;
