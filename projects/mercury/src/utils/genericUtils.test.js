@@ -1,4 +1,4 @@
-import {findById, flattenShallow, compareBy, comparing, isTruthyOrZeroOrFalse} from "./genericUtils";
+import {findById, flattenShallow, compareBy, comparing} from "./genericUtils";
 
 describe('array Utils', () => {
     describe('findById', () => {
@@ -70,22 +70,6 @@ describe('comparison Utils', () => {
             expect(c({x: 2, y: 2, z: 3}, {x: 1, y: 20, z: 30})).toBe(1);
             expect(c({x: 1, y: 2, z: 3}, {x: 1, y: 2, z: 4})).toBe(-1);
             expect(c({x: 1, y: 3, z: 3}, {x: 1, y: 2, z: 30})).toBe(1);
-        });
-    });
-});
-
-
-describe('Other Utils', () => {
-    describe('isTruthyOrZeroOrFalse', () => {
-        it('Returns true for the given values', () => {
-            const values = ['something', 0, 9999, ' ', true, false, -999, {}, []];
-
-            values.forEach(v => expect(isTruthyOrZeroOrFalse(v)).toBe(true));
-        });
-        it('Returns false for the given values', () => {
-            const values = [undefined, null, '', NaN, "", ``];
-
-            values.forEach(v => expect(isTruthyOrZeroOrFalse(v)).toBe(false));
         });
     });
 });

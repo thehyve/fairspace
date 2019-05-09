@@ -33,9 +33,3 @@ export function compareBy(valueExtractor, ascending = true) {
 export function comparing(...comparators) {
     return comparators.reduce((c1, c2) => (x, y) => c1(x, y) || c2(x, y));
 }
-
-/**
- * Returns true if the given value is truthy or zero or false
- * @param {*}
- */
-export const isTruthyOrZeroOrFalse = (value) => Boolean(value) || value === 0 || value === false;
