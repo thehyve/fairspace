@@ -185,4 +185,4 @@ export const url2iri = (iri) => {
  * Returns true if the given value is truthy or zero or false
  * @param {*}
  */
-export const isValidValue = (value) => Boolean(value) || value === 0 || value === false;
+export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;

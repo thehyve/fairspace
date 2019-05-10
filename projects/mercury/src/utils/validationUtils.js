@@ -1,7 +1,7 @@
 import {getFirstPredicateValue} from "./linkeddata/jsonLdUtils";
 import * as constants from "../constants";
 import {getMaxCount} from "./linkeddata/vocabularyUtils";
-import {isValidValue} from "./linkeddata/metadataUtils";
+import {isNonEmptyValue} from "./linkeddata/metadataUtils";
 
 // remove the string values that only contain whitespace
 export const removeWhitespaceValues = (values) => (values ? values.filter(v => typeof v !== 'string' || v.trim().length > 0) : []);
@@ -24,7 +24,7 @@ export const maxCountValidation = (maxCount, values) => ((values && values.lengt
 export const validateValuesAgainstShape = ({shape, datatype, values}) => {
     const pureValues = values
         .map(v => v.id || v.value)
-        .filter(isValidValue);
+        .filter(isNonEmptyValue);
 
     const maxLength = getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH);
     const minCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);

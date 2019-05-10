@@ -9,7 +9,7 @@ import {
     relativeLink,
     shouldPropertyBeHidden,
     url2iri,
-    isValidValue
+    isNonEmptyValue
 } from "./metadataUtils";
 import * as constants from "../../constants";
 
@@ -250,16 +250,16 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('isValidValue', () => {
+    describe('isNonEmptyValue', () => {
         it('Returns true for the given values', () => {
             const values = ['something', 0, 9999, ' ', true, false, -999, {}, []];
 
-            values.forEach(v => expect(isValidValue(v)).toBe(true));
+            values.forEach(v => expect(isNonEmptyValue(v)).toBe(true));
         });
         it('Returns false for the given values', () => {
             const values = [undefined, null, '', NaN, "", ``];
 
-            values.forEach(v => expect(isValidValue(v)).toBe(false));
+            values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
         });
     });
 });

@@ -2,7 +2,7 @@ import {compareBy, comparing, flattenShallow} from "../genericUtils";
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 import {isRdfList} from "./vocabularyUtils";
-import {lookupLabel, isValidValue} from "./metadataUtils";
+import {lookupLabel, isNonEmptyValue} from "./metadataUtils";
 
 /**
  * Generates a property entry for the given type(s)
@@ -207,7 +207,7 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
         return null;
     }
 
-    const validValues = values.filter(({id, value}) => isValidValue(value) || !!id);
+    const validValues = values.filter(({id, value}) => isNonEmptyValue(value) || !!id);
 
     // Return special nil value if no values or if all values are empty or invalid (non-truthy except zero or false)
     if (validValues.length === 0) {

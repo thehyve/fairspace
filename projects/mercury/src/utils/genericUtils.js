@@ -1,5 +1,5 @@
 /**
- * Get collection from collection list by collection id
+ * Get the first item that has an id that matches the given {itemId}
  * @param itemList
  * @param itemId
  */
