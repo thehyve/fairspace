@@ -7,7 +7,9 @@ import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../../com
 import LinkedDataList from './LinkedDataList';
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
+import {groupErrors} from "../../../utils/linkeddata/metadataUtils";
 import {LinkedDataValuesContext} from './LinkedDataValuesContext';
+import ValidationErrorsDisplay from './ValidationErrorsDisplay';
 
 class LinkedDataBrowser extends React.Component {
     static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
@@ -58,7 +60,11 @@ class LinkedDataBrowser extends React.Component {
                 }
             })
             .catch(e => {
-                ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+                if (e.details) {
+                    ErrorDialog.renderError(ValidationErrorsDisplay, groupErrors(e.details, id), e.message);
+                } else {
+                    ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+                }
                 if (!this.unMounted) {
                     this.setState({creatingMetadataEntity: false});
                 }

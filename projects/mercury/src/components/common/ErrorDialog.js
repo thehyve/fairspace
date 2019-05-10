@@ -2,12 +2,14 @@ import React from 'react';
 import {
     Button, Dialog, DialogActions,
     DialogContent, DialogContentText,
-    DialogTitle, Slide, Icon, Grid, Typography
+    DialogTitle, Slide, Icon, Grid, Typography,
 } from '@material-ui/core';
 
 function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
+
+const DEFAULT_ERROR_TITLE = 'An error has occurred';
 
 class ErrorDialog extends React.Component {
     static instance;
@@ -15,8 +17,11 @@ class ErrorDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            error: false,
-            message: null
+            title: DEFAULT_ERROR_TITLE,
+            message: null,
+            onRetry: null,
+            errorAsComponent: null,
+            errorAsComponentProps: null
         };
         ErrorDialog.instance = this;
     }
@@ -26,7 +31,18 @@ class ErrorDialog extends React.Component {
             console.error(message, error);
         }
         if (ErrorDialog.instance) {
-            ErrorDialog.instance.setState({error: true, stackTrace: error, message, onRetry});
+            ErrorDialog.instance.setState({stackTrace: error, message, onRetry});
+        }
+    }
+
+    static renderError(component, props, title = DEFAULT_ERROR_TITLE) {
+        if (ErrorDialog.instance) {
+            ErrorDialog.instance.setState({
+                title,
+                message: null,
+                errorAsComponent: component,
+                errorAsComponentProps: props,
+            });
         }
     }
 
@@ -34,27 +50,40 @@ class ErrorDialog extends React.Component {
         ErrorDialog.showError(error, error.message);
     }
 
+    resetState = () => {
+        this.setState({
+            title: DEFAULT_ERROR_TITLE,
+            message: null,
+            onRetry: null,
+            errorAsComponent: null,
+            errorAsComponentProps: null,
+        });
+    }
+
     handleClose = () => {
-        this.setState({error: false, onRetry: null});
+        this.resetState();
     };
 
     handleRetry = () => {
         const retry = this.state.onRetry;
-        this.setState({error: false, onRetry: null});
+        this.resetState();
         retry();
     };
 
     render() {
-        const {error, message, onRetry} = this.state;
+        const {title, message, errorAsComponent: ErrorComponent, errorAsComponentProps, onRetry} = this.state;
+        const hasErrorComponent = !!ErrorComponent;
 
         const dialog = (
             <Dialog
-                open={error}
+                open={message || hasErrorComponent}
                 TransitionComponent={Transition}
                 onClose={this.handleClose}
                 aria-labelledby="alert-dialog-slide-title"
                 aria-describedby="alert-dialog-slide-description"
                 key="error-dialog"
+                // maxWidth={hasErrorComponent ? 'md' : 'sm'}
+                // fullWidth={hasErrorComponent}
             >
                 <DialogTitle id="alert-dialog-slide-title">
                     <Grid container alignItems="center" spacing={8}>
@@ -63,15 +92,17 @@ class ErrorDialog extends React.Component {
                         </Grid>
                         <Grid item>
                             <Typography variant="h6" gutterBottom>
-                                An error has occurred
+                                {title}
                             </Typography>
                         </Grid>
                     </Grid>
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-slide-description">
-                        {message}
-                    </DialogContentText>
+                    {hasErrorComponent ? <ErrorComponent {...errorAsComponentProps} /> : (
+                        <DialogContentText id="alert-dialog-slide-description">
+                            {message}
+                        </DialogContentText>
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button

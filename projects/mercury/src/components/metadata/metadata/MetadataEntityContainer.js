@@ -5,7 +5,7 @@ import {Button, Grid} from "@material-ui/core";
 
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {isDateTimeProperty, propertiesToShow, url2iri, groupErrors} from "../../../utils/linkeddata/metadataUtils";
 import {
     getCombinedMetadataForSubject,
     hasMetadataError,
@@ -17,13 +17,20 @@ import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContain
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const MetadataEntityContainer = props => {
     const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
-            .catch(err => ErrorDialog.showError(err, "Error while updating metadata"));
+            .catch(e => {
+                if (e.details) {
+                    ErrorDialog.renderError(ValidationErrorsDisplay, groupErrors(e.details, subject), e.message);
+                } else {
+                    ErrorDialog.showError(e, `Error while updating metadata.\n${e.message}`);
+                }
+            });
     };
 
     return (

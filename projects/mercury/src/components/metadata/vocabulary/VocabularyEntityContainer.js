@@ -15,7 +15,7 @@ import {
     isMetaVocabularyPending,
     isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {isDateTimeProperty, propertiesToShow, url2iri, groupErrors} from "../../../utils/linkeddata/metadataUtils";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
@@ -25,13 +25,20 @@ import {getAuthorizations} from "../../../reducers/account/authorizationsReducer
 import Config from "../../../services/Config/Config";
 import {isDataSteward} from "../../../utils/userUtils";
 import {fromJsonLd} from "../../../utils/linkeddata/jsonLdConverter";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const VocabularyEntityContainer = props => {
     const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
-            .catch(err => ErrorDialog.showError(err, "Error while updating vocabulary"));
+            .catch(e => {
+                if (e.details) {
+                    ErrorDialog.renderError(ValidationErrorsDisplay, groupErrors(e.details, subject), e.message);
+                } else {
+                    ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+                }
+            });
     };
 
     return (
