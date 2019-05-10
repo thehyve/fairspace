@@ -1,3 +1,20 @@
+/**
+ * Get the first item that has an id that matches the given {itemId}
+ * @param itemList
+ * @param itemId
+ */
+export function findById(itemList, itemId) {
+    return Array.isArray(itemList)
+        ? itemList.find(item => item.id === itemId) : undefined;
+}
+
+/**
+ * Flattens the given array with a depth of 1
+ * @param array
+ * @returns {*}
+ */
+export const flattenShallow = array => [].concat(...array);
+
 export function comparePrimitives(x, y) {
     if (x < y) {
         return -1;

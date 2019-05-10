@@ -1,4 +1,4 @@
-import {compareBy, comparing} from "./comparisionUtils";
+import {compareBy, comparing} from "./genericUtils";
 
 export const AccessRights = ['Read', 'Write', 'Manage'];
 

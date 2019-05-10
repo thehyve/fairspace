@@ -3,13 +3,12 @@ package io.fairspace.saturn.services.metadata.validation;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.topbraid.shacl.vocabulary.SH;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.util.Ref.ref;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
-import static java.lang.String.format;
 import static org.topbraid.spin.util.JenaUtil.getResourceProperty;
 
 /**
@@ -24,23 +23,19 @@ public class InverseForUsedPropertiesValidator implements MetadataRequestValidat
     private final RDFConnection rdf;
 
     @Override
-    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        var result = ref(ValidationResult.VALID);
-
+    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
         var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
         var newVocabulary = oldVocabulary.difference(modelToRemove).union(modelToAdd);
         var actuallyAdded = newVocabulary.difference(oldVocabulary);
 
-        actuallyAdded.listSubjectsWithProperty(FS.inverseRelation).forEachRemaining(shape -> {
+        actuallyAdded.listStatements(null, FS.inverseRelation, (RDFNode) null).forEachRemaining(stmt -> {
+            var shape = stmt.getSubject();
             var property = getResourceProperty(shape, SH.path);
             if (property != null) {
                 if (rdf.queryAsk(storedQuery("is_property_used", property))) {
-                    var error = new ValidationResult(format("Cannot set fs:inverseRelation for %s, property %s has been used already", shape, property));
-                    result.value = result.value.merge(error);
+                    violationHandler.onViolation("Cannot set fs:inverseRelation for a property that has been used already", stmt);
                 }
             }
         });
-
-        return result.value;
     }
 }

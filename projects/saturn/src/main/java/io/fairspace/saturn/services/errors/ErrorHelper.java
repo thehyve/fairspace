@@ -21,8 +21,12 @@ public class ErrorHelper {
         };
     }
 
-    @SneakyThrows(JsonProcessingException.class)
     public static String errorBody(int status, String message) {
-        return mapper.writeValueAsString(new ErrorDto(status, message));
+        return errorBody(status, message, null);
+    }
+
+    @SneakyThrows(JsonProcessingException.class)
+    public static String errorBody(int status, String message, Object info) {
+        return mapper.writeValueAsString(new ErrorDto(status, message, info));
     }
 }

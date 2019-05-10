@@ -14,16 +14,18 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
-
-import java.util.Set;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MetadataAndVocabularyConsistencyValidatorTest {
     private static final String NS = "http://example.com/";
     private static final Model EMPTY = createDefaultModel();
@@ -31,6 +33,8 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
     private Dataset ds = DatasetFactory.create();
     private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
     private MetadataAndVocabularyConsistencyValidator validator = new MetadataAndVocabularyConsistencyValidator(rdf);
+    @Mock
+    private ViolationHandler violationHandler;
 
     private static final Resource classShapeResource = createResource(NS + "TestClassShape");
     private static final Resource classResource = createResource(NS + "TestClass");
@@ -43,7 +47,8 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Before
     public void setUp() {
-        initVocabularies(rdf);;
+        initVocabularies(rdf);
+        ;
 
         ds.getDefaultModel()
                 .add(subject, RDF.type, classResource)
@@ -66,16 +71,16 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
                 .add(classShapeResource, SH.property, propertyShapeResource);
 
 
-        var result = apply(addPropertyShapeToClassShape);
-        assertTrue(result.isValid());
+        validator.validate(EMPTY, addPropertyShapeToClassShape, violationHandler);
+        verifyZeroInteractions(violationHandler);
+        ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()).add(addPropertyShapeToClassShape);
 
         var setMaxLength = createDefaultModel()
                 .add(propertyShapeResource, SH.maxLength, createTypedLiteral(2));
 
-        result = validator.validate(EMPTY, setMaxLength);
-        assertFalse(result.isValid());
-        assertEquals(Set.of("http://example.com/testSubject http://example.com/testProperty 123 - Value has more than 2 characters."),
-                result.getValidationMessages());
+        validator.validate(EMPTY, setMaxLength, violationHandler);
+        verify(violationHandler).onViolation("Value has more than 2 characters", subject, propertyResource, createStringLiteral("123"));
+        verifyNoMoreInteractions(violationHandler);
     }
 
 
@@ -87,10 +92,9 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
                 .add(relationShapeResource, SH.class_, FOAF.Document)
                 .add(classShapeResource, SH.property, relationShapeResource);
 
-        var result = apply(addRelationShape);
-        assertFalse(result.isValid());
-        assertEquals(Set.of("http://example.com/testSubject http://example.com/testRelation http://example.com/testObject - Value does not have class <http://xmlns.com/foaf/0.1/Document>."),
-                result.getValidationMessages());
+        validator.validate(EMPTY, addRelationShape, violationHandler);
+        verify(violationHandler, atLeast(1)).onViolation("Value does not have class <http://xmlns.com/foaf/0.1/Document>", subject, relationResource, object);
+        verifyNoMoreInteractions(violationHandler);
     }
 
     @Test
@@ -98,29 +102,20 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
         var markAsClosed = createDefaultModel()
                 .add(classShapeResource, createProperty(SH.NS + "closed"), createTypedLiteral(true));
 
-        var result = apply(markAsClosed);
-        assertFalse(result.isValid());
-        assertEquals(Set.of("http://example.com/testSubject http://example.com/testRelation http://example.com/testObject - Predicate <http://example.com/testRelation> is not allowed (closed shape).",
-                "http://example.com/testSubject http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://example.com/TestClass - Predicate <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> is not allowed (closed shape)."),
-                result.getValidationMessages());
+        validator.validate(EMPTY, markAsClosed, violationHandler);
+        verify(violationHandler).onViolation("Predicate <http://example.com/testRelation> is not allowed (closed shape)", subject, relationResource, object);
+        verify(violationHandler).onViolation("Predicate <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> is not allowed (closed shape)", subject, RDF.type, classResource);
+        verifyNoMoreInteractions(violationHandler);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidationOnInvalidTargetClass() {
-        Resource invalidResource = createResource(NS + "InvalidResource");
+        var invalidResource = createResource(NS + "InvalidResource");
 
         var invalidTargetClassModel = createDefaultModel()
                 .add(invalidResource, RDF.type, FS.ClassShape)
                 .add(invalidResource, SH.targetClass, "some-literal");
 
-        apply(invalidTargetClassModel);
-    }
-
-    private ValidationResult apply(Model changes) {
-        var result = validator.validate(EMPTY, changes);
-        if (result.isValid()) {
-            ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()).add(changes);
-        }
-        return result;
+        validator.validate(EMPTY, invalidTargetClassModel, violationHandler);
     }
 }

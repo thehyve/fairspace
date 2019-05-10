@@ -18,8 +18,7 @@ public class ShaclValidator implements MetadataRequestValidator {
     private final Node dataGraph;
     private final Node vocabularyGraph;
 
-    @Override
-    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
+    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
         var affectedResources = modelToRemove.union(modelToAdd).listSubjects().toSet();
 
         var modelToValidate = affectedModelSubSet(affectedResources)
@@ -36,7 +35,7 @@ public class ShaclValidator implements MetadataRequestValidator {
                 validationEngine.validateNode(resource.asNode());
             }
 
-            return getValidationResult(validationEngine);
+            getViolations(validationEngine, violationHandler);
         } catch (InterruptedException e) {
             throw new RuntimeException("SHACL validation was interrupted");
         }

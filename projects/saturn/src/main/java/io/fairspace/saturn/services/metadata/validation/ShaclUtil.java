@@ -5,10 +5,7 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -27,7 +24,8 @@ import java.net.URI;
 import java.util.UUID;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 
 public class ShaclUtil {
     static void addObjectTypes(Model model, Node dataGraph, RDFConnection rdf) {
@@ -39,32 +37,17 @@ public class ShaclUtil {
         model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, null, RDFS.subClassOf, null)));
     }
 
-    public static ValidationResult getValidationResult(ValidationEngine validationEngine) {
-        return JenaUtil.getAllInstances(SH.ValidationResult.inModel(validationEngine.getReport().getModel()))
-                .stream()
-                .map(ShaclUtil::toValidationResult)
-                .reduce(ValidationResult.VALID, ValidationResult::merge);
-    }
-
-    private static ValidationResult toValidationResult(Resource shResult) {
-        if(!shResult.hasProperty(SH.resultSeverity, SH.Violation)) {
-            return ValidationResult.VALID;
-        }
-        var message = JenaUtil.getStringProperty(shResult, SH.resultMessage);
-        var root = shResult.getPropertyResourceValue(SH.focusNode);
-        Resource path = null;
-        var inverse = false;
-        if(root != null) {
-            path = shResult.getPropertyResourceValue(SH.resultPath);
-            if(path == null) {
-                path = shResult.getPropertyResourceValue(SH.inversePath);
-                inverse = true;
-            }
-        }
-        var pathStr = (path != null) ? ((inverse ? "inverse of " : "") + path) : "";
-        var valueStmt = shResult.getProperty(SH.value);
-        var valueStr = (valueStmt != null) ? valueStmt.getObject().toString() : "";
-        return new ValidationResult(format("%s %s %s - %s", root, pathStr, valueStr, message));
+    public static void getViolations(ValidationEngine validationEngine, ViolationHandler violationHandler) {
+         JenaUtil.getAllInstances(SH.ValidationResult.inModel(validationEngine.getReport().getModel()))
+                .forEach(shResult -> {
+                    if (shResult.hasProperty(SH.resultSeverity, SH.Violation)) {
+                        var message = JenaUtil.getStringProperty(shResult, SH.resultMessage);
+                        var root = shResult.getPropertyResourceValue(SH.focusNode);
+                        var path = ofNullable(shResult.getPropertyResourceValue(SH.resultPath)).map(res -> createProperty(res.getURI())).orElse(null);
+                        var value = ofNullable(shResult.getProperty(SH.value)).map(Statement::getObject).orElse(null);
+                        violationHandler.onViolation(message, root, path, value);
+                    }
+                });
     }
 
     // Copied from org.topbraid.shacl.validation.ValidationUtil.validateModel

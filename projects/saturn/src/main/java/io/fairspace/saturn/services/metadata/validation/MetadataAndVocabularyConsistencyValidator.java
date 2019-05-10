@@ -7,13 +7,12 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.topbraid.shacl.vocabulary.SH;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.union;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
-import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getValidationResult;
+import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getViolations;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 
 /**
@@ -24,7 +23,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private final RDFConnection rdf;
 
     @Override
-    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
+    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
         // We first determine which shapes were modified and how the updated vocabulary will look like.
         var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
         var newVocabulary = oldVocabulary.difference(modelToRemove).union(modelToAdd);
@@ -33,21 +32,17 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         var modifiedShapes = union(actuallyRemoved.listSubjects().toSet(), actuallyAdded.listSubjects().toSet());
 
         // And then check, if the model is still valid with the updated vocabulary
-        return validateModifiedShapes(modifiedShapes, newVocabulary);
+        validateModifiedShapes(modifiedShapes, newVocabulary, violationHandler);
     }
 
-    private ValidationResult validateModifiedShapes(Set<Resource> shapes, Model vocabulary) {
-        var results = new HashSet<ValidationResult>();
-
+    private void validateModifiedShapes(Set<Resource> shapes, Model vocabulary,ViolationHandler violationHandler) {
         shapes.forEach(shape -> {
-            validateByTargetClass(shape, vocabulary, results);
-            validateByPropertyPath(shape, vocabulary, results);
+            validateByTargetClass(shape, vocabulary, violationHandler);
+            validateByPropertyPath(shape, vocabulary, violationHandler);
         });
-
-        return results.stream().reduce(ValidationResult.VALID, ValidationResult::merge);
     }
 
-    private void validateByTargetClass(Resource shape, Model vocabulary, Set<ValidationResult> results) {
+    private void validateByTargetClass(Resource shape, Model vocabulary, ViolationHandler violationHandler) {
         // determine the target class (if any) and validate all the entities belonging to it
         vocabulary.listObjectsOfProperty(shape, SH.targetClass)
                 .forEachRemaining(targetClass -> {
@@ -57,30 +52,30 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
 
                     rdf.querySelect(
                         storedQuery("subjects_by_type", targetClass),
-                        row -> validateResource(row.getResource("s"), vocabulary, results)
+                        row -> validateResource(row.getResource("s"), vocabulary, violationHandler)
                     );
                 });
     }
 
 
-    private void validateByPropertyPath(Resource shape, Model vocabulary, Set<ValidationResult> results) {
+    private void validateByPropertyPath(Resource shape, Model vocabulary, ViolationHandler violationHandler) {
         // determine the underlying property path (if any) and validate all the entities having it
         vocabulary.listObjectsOfProperty(shape, SH.path)
                 .forEachRemaining(path -> {
                     if(path.isURIResource()) {
                         rdf.querySelect(
                                 storedQuery("subjects_with_property", path),
-                                row -> validateResource(row.getResource("s"), vocabulary, results)
+                                row -> validateResource(row.getResource("s"), vocabulary, violationHandler)
                         );
                     }
                 });
     }
 
     @SneakyThrows
-    private void validateResource(Resource resource, Model vocabulary, Set<ValidationResult> results) {
+    private void validateResource(Resource resource, Model vocabulary, ViolationHandler violationHandler) {
         var dataModel = rdf.queryConstruct(storedQuery("triples_by_subject_with_object_types", resource));
         var validationEngine = createEngine(dataModel, vocabulary);
         validationEngine.validateNode(resource.asNode());
-        results.add(getValidationResult(validationEngine));
+        getViolations(validationEngine, violationHandler);
     }
 }
