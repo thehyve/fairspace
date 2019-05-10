@@ -36,6 +36,8 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
 public class App {
+    private static final String API_VERSION = "v1";
+
     public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
@@ -80,9 +82,9 @@ public class App {
 
         var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
 
-        var apiPathPrefix = "/api/" + CONFIG.apiVersion;
+        var apiPathPrefix = "/api/" + API_VERSION;
         var fusekiServerBuilder = FusekiServer.create()
-                .add("api/" + CONFIG.apiVersion + "/rdf/", ds, false)
+                .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", new SaturnSparkFilter(
                         new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService),
                         new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService)
@@ -91,7 +93,7 @@ public class App {
                         new CollectionsApp(apiPathPrefix, collections),
                         new PermissionsApp(apiPathPrefix, permissions),
                         new HealthApp(apiPathPrefix)))
-                .addServlet("/webdav/" + CONFIG.apiVersion + "/*", new MiltonWebDAVServlet("/webdav/" + CONFIG.apiVersion + "/", fs))
+                .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet("/webdav/" + API_VERSION + "/", fs))
                 .port(CONFIG.port);
 
         var auth = CONFIG.auth;
