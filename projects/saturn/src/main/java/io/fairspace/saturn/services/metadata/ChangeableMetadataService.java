@@ -26,6 +26,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 public class ChangeableMetadataService extends ReadableMetadataService {
     static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
     private static final Model EMPTY = createDefaultModel();
+    private static final int MAX_VIOLATIONS = 10;
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
@@ -118,8 +119,12 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         var violations = new LinkedHashSet<Violation>();
         validator.validate(modelToRemove, modelToAdd,
-                (message, subject, predicate, object) ->
-                        violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))));
+                (message, subject, predicate, object) -> {
+                    violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null)));
+                    if (violations.size() == MAX_VIOLATIONS) {
+                        throw new ValidationException(violations);
+                    }
+                });
 
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
