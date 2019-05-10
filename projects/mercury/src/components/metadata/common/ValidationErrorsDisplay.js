@@ -35,7 +35,7 @@ export default ({entityErrors, otherErrors}) => {
     return (
         <>
             {hasEntityErrors && (
-                hasOtherErrors ? (
+                hasOtherErrors ? ( // No expansion panel if only entity errors
                     <ExpansionPanel defaultExpanded>
                         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography>Current entity</Typography>
@@ -47,7 +47,7 @@ export default ({entityErrors, otherErrors}) => {
                 ) : entityErrorsTable)}
 
             {hasOtherErrors && (
-                <ExpansionPanel defaultExpanded={false}>
+                <ExpansionPanel defaultExpanded={!hasEntityErrors}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography>Other affected entities</Typography>
                     </ExpansionPanelSummary>
