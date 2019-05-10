@@ -47,10 +47,11 @@ export const validateValuesAgainstShape = ({shape, datatype, values, isGenericIr
     const maxCount = getMaxCount(shape);
     let errors = [];
 
-    // this error is enough and more specific than other errors, return it by itself
     if (isGenericIriResource) {
         const validation = iriValidation(pureValues);
         if (validation) {
+            // this error is enough and more specific than other errors, return it by itself
+            // So show invalid URI error, and no errors such as min count
             return [validation];
         }
     }
