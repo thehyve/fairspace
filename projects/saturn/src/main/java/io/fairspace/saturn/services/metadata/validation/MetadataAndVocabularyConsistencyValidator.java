@@ -3,10 +3,13 @@ package io.fairspace.saturn.services.metadata.validation;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.topbraid.shacl.vocabulary.SH;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.union;
@@ -20,6 +23,9 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
  */
 @AllArgsConstructor
 public class MetadataAndVocabularyConsistencyValidator implements MetadataRequestValidator {
+    static final int MAX_SUBJECTS = 10;
+    private static final TooManyViolationsException TOO_MANY_VIOLATIONS = new TooManyViolationsException();
+
     private final RDFConnection rdf;
 
     @Override
@@ -32,43 +38,55 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         var modifiedShapes = union(actuallyRemoved.listSubjects().toSet(), actuallyAdded.listSubjects().toSet());
 
         // And then check, if the model is still valid with the updated vocabulary
-        validateModifiedShapes(modifiedShapes, newVocabulary, violationHandler);
+        var terminatingViolationHandlerWrapper = new ViolationHandler() {
+            private Set<Resource> subjects = new HashSet<>();
+
+            @Override
+            public void onViolation(String message, Resource subject, Property predicate, RDFNode object) {
+                violationHandler.onViolation(message, subject, predicate, object);
+                subjects.add(subject);
+                if(subjects.size() == MAX_SUBJECTS) {
+                    throw TOO_MANY_VIOLATIONS;
+                }
+            }
+        };
+
+        try {
+            validateModifiedShapes(modifiedShapes, newVocabulary, terminatingViolationHandlerWrapper);
+        } catch (TooManyViolationsException ignore) {
+        }
     }
 
-    private void validateModifiedShapes(Set<Resource> shapes, Model vocabulary,ViolationHandler violationHandler) {
-        shapes.forEach(shape -> {
+    private void validateModifiedShapes(Set<Resource> shapes, Model vocabulary, ViolationHandler violationHandler) {
+        for (var shape: shapes) {
             validateByTargetClass(shape, vocabulary, violationHandler);
             validateByPropertyPath(shape, vocabulary, violationHandler);
-        });
+        }
     }
 
     private void validateByTargetClass(Resource shape, Model vocabulary, ViolationHandler violationHandler) {
         // determine the target class (if any) and validate all the entities belonging to it
-        vocabulary.listObjectsOfProperty(shape, SH.targetClass)
-                .forEachRemaining(targetClass -> {
-                    if(!targetClass.isURIResource()) {
-                        throw new IllegalArgumentException("sh:targetClass expects a URI resource as object. " + targetClass + " given");
-                    }
+        var targetClass = shape.inModel(vocabulary).getPropertyResourceValue(SH.targetClass);
 
-                    rdf.querySelect(
-                        storedQuery("subjects_by_type", targetClass),
-                        row -> validateResource(row.getResource("s"), vocabulary, violationHandler)
-                    );
-                });
+        if (targetClass != null && targetClass.isURIResource()) {
+            rdf.querySelect(
+                    storedQuery("subjects_by_type", targetClass),
+                    row -> validateResource(row.getResource("s"), vocabulary, violationHandler)
+            );
+        }
     }
 
 
     private void validateByPropertyPath(Resource shape, Model vocabulary, ViolationHandler violationHandler) {
         // determine the underlying property path (if any) and validate all the entities having it
-        vocabulary.listObjectsOfProperty(shape, SH.path)
-                .forEachRemaining(path -> {
-                    if(path.isURIResource()) {
-                        rdf.querySelect(
-                                storedQuery("subjects_with_property", path),
-                                row -> validateResource(row.getResource("s"), vocabulary, violationHandler)
-                        );
-                    }
-                });
+        var path = shape.inModel(vocabulary).getPropertyResourceValue(SH.path);
+
+        if (path != null && path.isURIResource()) {
+            rdf.querySelect(
+                    storedQuery("subjects_with_property", path),
+                    row -> validateResource(row.getResource("s"), vocabulary, violationHandler)
+            );
+        }
     }
 
     @SneakyThrows
@@ -78,4 +96,6 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         validationEngine.validateNode(resource.asNode());
         getViolations(validationEngine, violationHandler);
     }
+
+    private static class TooManyViolationsException extends RuntimeException {}
 }

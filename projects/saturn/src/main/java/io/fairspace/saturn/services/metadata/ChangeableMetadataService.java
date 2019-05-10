@@ -26,7 +26,6 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 public class ChangeableMetadataService extends ReadableMetadataService {
     static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
     private static final Model EMPTY = createDefaultModel();
-    private static final int MAX_VIOLATIONS = 10;
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
@@ -96,7 +95,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             var toDelete = createDefaultModel();
             model.listStatements().forEachRemaining(stmt -> {
                 // Only explicitly delete triples for URI resources. As this model is also used
-                // for validation, we do not want to include blank nodes here. Triples for blank 
+                // for validation, we do not want to include blank nodes here. Triples for blank
                 // nodes will be deleted automatically when it is not referred to anymore
                 if (stmt.getSubject().isURIResource()) {
                     toDelete.add(get(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), null, false));
@@ -119,12 +118,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         var violations = new LinkedHashSet<Violation>();
         validator.validate(modelToRemove, modelToAdd,
-                (message, subject, predicate, object) -> {
-                    violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null)));
-                    if (violations.size() == MAX_VIOLATIONS) {
-                        throw new ValidationException(violations);
-                    }
-                });
+                (message, subject, predicate, object) ->
+                        violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))));
 
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
