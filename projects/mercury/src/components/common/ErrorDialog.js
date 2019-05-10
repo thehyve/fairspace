@@ -35,7 +35,7 @@ class ErrorDialog extends React.Component {
         }
     }
 
-    static renderError(component, props, title = DEFAULT_ERROR_TITLE) {
+    static renderError(component, props, title) {
         if (ErrorDialog.instance) {
             ErrorDialog.instance.setState({
                 title,
@@ -73,17 +73,18 @@ class ErrorDialog extends React.Component {
     render() {
         const {title, message, errorAsComponent: ErrorComponent, errorAsComponentProps, onRetry} = this.state;
         const hasErrorComponent = !!ErrorComponent;
+        const showDialog = !!message || hasErrorComponent;
 
         const dialog = (
             <Dialog
-                open={message || hasErrorComponent}
+                open
                 TransitionComponent={Transition}
                 onClose={this.handleClose}
                 aria-labelledby="alert-dialog-slide-title"
                 aria-describedby="alert-dialog-slide-description"
                 key="error-dialog"
-                // maxWidth={hasErrorComponent ? 'md' : 'sm'}
-                // fullWidth={hasErrorComponent}
+                maxWidth={hasErrorComponent ? 'md' : 'sm'}
+                fullWidth={hasErrorComponent}
             >
                 <DialogTitle id="alert-dialog-slide-title">
                     <Grid container alignItems="center" spacing={8}>
@@ -92,7 +93,7 @@ class ErrorDialog extends React.Component {
                         </Grid>
                         <Grid item>
                             <Typography variant="h6" gutterBottom>
-                                {title}
+                                {title || DEFAULT_ERROR_TITLE}
                             </Typography>
                         </Grid>
                     </Grid>
@@ -125,7 +126,7 @@ class ErrorDialog extends React.Component {
             </Dialog>
         );
 
-        return [this.props.children, dialog];
+        return [this.props.children, showDialog ? dialog : null];
     }
 }
 

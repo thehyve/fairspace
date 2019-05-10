@@ -7,8 +7,8 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 export default ({entityErrors, otherErrors}) => {
-    const hasOtherErrors = otherErrors && otherErrors.length;
-    const hasEntityErrors = entityErrors && entityErrors.length;
+    const hasOtherErrors = otherErrors && otherErrors.length > 0;
+    const hasEntityErrors = entityErrors && entityErrors.length > 0;
     const entityErrorsTable = (
         <Table padding="checkbox">
             <TableHead>
@@ -34,7 +34,7 @@ export default ({entityErrors, otherErrors}) => {
 
     return (
         <>
-            {hasEntityErrors > 0 && (
+            {hasEntityErrors && (
                 hasOtherErrors ? (
                     <ExpansionPanel defaultExpanded>
                         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -46,7 +46,7 @@ export default ({entityErrors, otherErrors}) => {
                     </ExpansionPanel>
                 ) : entityErrorsTable)}
 
-            {hasOtherErrors > 0 && (
+            {hasOtherErrors && (
                 <ExpansionPanel defaultExpanded={false}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography>Other affected entities</Typography>
