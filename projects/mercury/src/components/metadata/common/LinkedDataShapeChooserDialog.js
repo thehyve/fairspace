@@ -13,7 +13,7 @@ import {
 
 import * as PropTypes from "prop-types";
 import {getLabel} from "../../../utils/linkeddata/metadataUtils";
-import {compareBy} from "../../../utils/comparisionUtils";
+import {compareBy} from "../../../utils/genericUtils";
 import LoadingInlay from '../../common/LoadingInlay';
 
 const LinkedDataShapeChooserDialog = props => {
