@@ -188,7 +188,9 @@ export const url2iri = (iri) => {
  * @returns {Object}
  */
 export const groupErrors = (errors, subject) => {
-    const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject.endsWith(subject));
+    const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject
+        || e.subject === createMetadataIri(subject)
+        || e.subject === createVocabularyIri(subject));
     return {entityErrors, otherErrors};
 };
 

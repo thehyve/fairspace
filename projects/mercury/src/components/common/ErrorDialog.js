@@ -10,6 +10,7 @@ function Transition(props) {
 }
 
 const DEFAULT_ERROR_TITLE = 'An error has occurred';
+const DEFAULT_MAX_WIDTH = 'sm';
 
 class ErrorDialog extends React.Component {
     static instance;
@@ -18,11 +19,10 @@ class ErrorDialog extends React.Component {
         super(props);
         this.state = {
             showDialog: false,
+            errorAsComponent: DialogContentText,
+            errorAsComponentProps: null,
             title: DEFAULT_ERROR_TITLE,
-            message: null,
-            onRetry: null,
-            errorAsComponent: null,
-            errorAsComponentProps: null
+            onRetry: null
         };
         ErrorDialog.instance = this;
     }
@@ -31,25 +31,19 @@ class ErrorDialog extends React.Component {
         if (printToConsole) {
             console.error(message, error);
         }
-        if (ErrorDialog.instance) {
-            ErrorDialog.instance.setState({
-                showDialog: true,
-                title: DEFAULT_ERROR_TITLE,
-                stackTrace: error,
-                message,
-                onRetry
-            });
-        }
+
+        ErrorDialog.renderError(DialogContentText, {children: message}, DEFAULT_ERROR_TITLE, DEFAULT_MAX_WIDTH, onRetry);
     }
 
-    static renderError(component, props, title = DEFAULT_ERROR_TITLE) {
+    static renderError(component, props, title = DEFAULT_ERROR_TITLE, maxWidth, onRetry) {
         if (ErrorDialog.instance) {
             ErrorDialog.instance.setState({
                 showDialog: true,
-                title,
-                message: null,
                 errorAsComponent: component,
                 errorAsComponentProps: props,
+                title,
+                maxWidth: maxWidth || 'md',
+                onRetry,
             });
         }
     }
@@ -76,8 +70,7 @@ class ErrorDialog extends React.Component {
     };
 
     render() {
-        const {showDialog, title, message, errorAsComponent: ErrorComponent, errorAsComponentProps, onRetry} = this.state;
-        const hasErrorComponent = !!ErrorComponent;
+        const {showDialog, title, errorAsComponent: ErrorComponent, errorAsComponentProps, onRetry, maxWidth} = this.state;
 
         const dialog = (
             <Dialog
@@ -87,8 +80,8 @@ class ErrorDialog extends React.Component {
                 aria-labelledby="alert-dialog-slide-title"
                 aria-describedby="alert-dialog-slide-description"
                 key="error-dialog"
-                maxWidth={hasErrorComponent ? 'md' : 'sm'}
-                fullWidth={hasErrorComponent}
+                maxWidth={maxWidth || 'sm'}
+                fullWidth={maxWidth === 'md'}
             >
                 <DialogTitle id="alert-dialog-slide-title">
                     <Grid container alignItems="center" spacing={8}>
@@ -103,11 +96,7 @@ class ErrorDialog extends React.Component {
                     </Grid>
                 </DialogTitle>
                 <DialogContent>
-                    {hasErrorComponent ? <ErrorComponent {...errorAsComponentProps} /> : (
-                        <DialogContentText id="alert-dialog-slide-description">
-                            {message}
-                        </DialogContentText>
-                    )}
+                    <ErrorComponent {...errorAsComponentProps} />
                 </DialogContent>
                 <DialogActions>
                     <Button
