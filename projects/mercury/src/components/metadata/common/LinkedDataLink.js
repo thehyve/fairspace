@@ -20,8 +20,8 @@ const LinkedDataLink = ({uri, children}) => {
             : <a href={uri}>{children}</a>
         );
     } catch (e) {
-        console.warn("Invalid URL passed to LinkedDataLink component", uri);
-        return <a href={uri}>{children}</a>;
+        console.warn(`The URI ${uri} passed to ${LinkedDataLink.name} is invalid`);
+        return children;
     }
 };
 

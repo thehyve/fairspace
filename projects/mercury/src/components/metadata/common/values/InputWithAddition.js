@@ -70,10 +70,10 @@ class InputWithAddition extends React.Component {
     render() {
         return (
             <Grid container justify="space-between" spacing={8}>
-                <Grid item xs={11}>
+                <Grid item xs={10}>
                     {this.props.children}
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={2}>
                     {this.renderAddFunctionality()}
                 </Grid>
             </Grid>

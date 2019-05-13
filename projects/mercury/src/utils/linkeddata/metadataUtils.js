@@ -183,7 +183,6 @@ export const url2iri = (iri) => {
     }
 };
 
-
 /**
  * Groups the validation errors of the same subject into a single array and the other array is the other errors
  * @returns {Object}
@@ -192,3 +191,9 @@ export const groupErrors = (errors, subject) => {
     const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject.endsWith(subject));
     return {entityErrors, otherErrors};
 };
+
+/**
+ * Returns true if the given value is truthy or zero or false
+ * @param {*}
+ */
+export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
