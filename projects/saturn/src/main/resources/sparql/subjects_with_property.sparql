@@ -1,3 +1,0 @@
-# 0 - property
-
-SELECT ?s WHERE { ?s %1$s ?o }
