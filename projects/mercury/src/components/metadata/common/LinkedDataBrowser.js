@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import {Button} from "@material-ui/core";
 import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
-import {ErrorDialog, ErrorMessage, LoadingInlay, LoadingOverlay} from "../../common";
+import {ErrorMessage, LoadingInlay, LoadingOverlay} from "../../common";
 import LinkedDataList from './LinkedDataList';
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
@@ -50,15 +50,11 @@ class LinkedDataBrowser extends React.Component {
 
     handleEntityCreation = (formKey, shape, id) => {
         this.setState({creatingMetadataEntity: true});
+        const {create, onError} = this.props;
 
-        this.props.create(formKey, shape, id)
-            .then(() => {
-                if (!this.unMounted) {
-                    this.setState({creatingMetadataEntity: false});
-                }
-            })
-            .catch(e => {
-                ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+        create(formKey, shape, id)
+            .catch(e => onError(e, id))
+            .finally(() => {
                 if (!this.unMounted) {
                     this.setState({creatingMetadataEntity: false});
                 }

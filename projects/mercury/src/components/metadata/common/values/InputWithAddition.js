@@ -6,7 +6,6 @@ import Grid from "@material-ui/core/Grid";
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/LoadingInlay";
 import ErrorMessage from "../../../common/ErrorMessage";
-import {ErrorDialog} from "../../../common";
 import {getFirstPredicateProperty} from "../../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../../constants";
 
@@ -24,16 +23,18 @@ class InputWithAddition extends React.Component {
     };
 
     handleEntityCreation = (formKey, shape, id) => {
-        this.props.onCreate(formKey, shape, id)
+        const {property, fetchEntities, onChange, onCreate, onError} = this.props;
+
+        onCreate(formKey, shape, id)
             .then(({value}) => {
                 const label = getFirstPredicateProperty(value.values, constants.LABEL_URI, 'value')
                     || getFirstPredicateProperty(value.values, constants.SHACL_NAME, 'value');
 
                 this.handleCloseDialog();
-                this.props.fetchEntities(this.props.property.className);
-                this.props.onChange({id: value.subject, label});
+                fetchEntities(property.className);
+                onChange({id: value.subject, label});
             })
-            .catch(e => ErrorDialog.showError(e, `Error creating a new entity.\n${e.message}`));
+            .catch(e => onError(e, id));
     }
 
     renderAddFunctionality() {
