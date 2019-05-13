@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
+import static io.fairspace.saturn.services.metadata.validation.MetadataAndVocabularyConsistencyValidator.MAX_SUBJECTS;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -48,7 +49,6 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
     @Before
     public void setUp() {
         initVocabularies(rdf);
-        ;
 
         ds.getDefaultModel()
                 .add(subject, RDF.type, classResource)
@@ -69,7 +69,6 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
     public void testPropertyValidation() {
         var addPropertyShapeToClassShape = createDefaultModel()
                 .add(classShapeResource, SH.property, propertyShapeResource);
-
 
         validator.validate(EMPTY, addPropertyShapeToClassShape, violationHandler);
         verifyZeroInteractions(violationHandler);
@@ -108,14 +107,24 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
         verifyNoMoreInteractions(violationHandler);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testValidationOnInvalidTargetClass() {
-        var invalidResource = createResource(NS + "InvalidResource");
+    @Test
+    public void testNoMoreThanMaxSubjectsViolations() {
+        for (int i = 0; i < 2 * MAX_SUBJECTS; i++) {
+            var subject =  createResource(NS + i);
+            ds.getDefaultModel()
+                    .add(subject, RDF.type, classResource)
+                    .add(subject, propertyResource, createStringLiteral("123"))
+                    .add(subject, relationResource, object)
+                    .add(object, RDF.type, FOAF.Person);
 
-        var invalidTargetClassModel = createDefaultModel()
-                .add(invalidResource, RDF.type, FS.ClassShape)
-                .add(invalidResource, SH.targetClass, "some-literal");
+        }
 
-        validator.validate(EMPTY, invalidTargetClassModel, violationHandler);
+        var setMaxLength = createDefaultModel()
+                .add(propertyShapeResource, SH.maxLength, createTypedLiteral(2));
+
+        validator.validate(EMPTY, setMaxLength, violationHandler);
+
+        verify(violationHandler, times(MAX_SUBJECTS)).onViolation(any(), any(), any(), any());
+        verifyNoMoreInteractions(violationHandler);
     }
 }
