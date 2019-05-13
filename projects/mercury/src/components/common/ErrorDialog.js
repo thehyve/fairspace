@@ -17,6 +17,7 @@ class ErrorDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            showDialog: false,
             title: DEFAULT_ERROR_TITLE,
             message: null,
             onRetry: null,
@@ -31,13 +32,20 @@ class ErrorDialog extends React.Component {
             console.error(message, error);
         }
         if (ErrorDialog.instance) {
-            ErrorDialog.instance.setState({stackTrace: error, message, onRetry});
+            ErrorDialog.instance.setState({
+                showDialog: true,
+                title: DEFAULT_ERROR_TITLE,
+                stackTrace: error,
+                message,
+                onRetry
+            });
         }
     }
 
-    static renderError(component, props, title) {
+    static renderError(component, props, title = DEFAULT_ERROR_TITLE) {
         if (ErrorDialog.instance) {
             ErrorDialog.instance.setState({
+                showDialog: true,
                 title,
                 message: null,
                 errorAsComponent: component,
@@ -52,11 +60,8 @@ class ErrorDialog extends React.Component {
 
     resetState = () => {
         this.setState({
-            title: DEFAULT_ERROR_TITLE,
-            message: null,
+            showDialog: false,
             onRetry: null,
-            errorAsComponent: null,
-            errorAsComponentProps: null,
         });
     }
 
@@ -71,13 +76,12 @@ class ErrorDialog extends React.Component {
     };
 
     render() {
-        const {title, message, errorAsComponent: ErrorComponent, errorAsComponentProps, onRetry} = this.state;
+        const {showDialog, title, message, errorAsComponent: ErrorComponent, errorAsComponentProps, onRetry} = this.state;
         const hasErrorComponent = !!ErrorComponent;
-        const showDialog = !!message || hasErrorComponent;
 
         const dialog = (
             <Dialog
-                open
+                open={showDialog}
                 TransitionComponent={Transition}
                 onClose={this.handleClose}
                 aria-labelledby="alert-dialog-slide-title"
@@ -126,7 +130,7 @@ class ErrorDialog extends React.Component {
             </Dialog>
         );
 
-        return [this.props.children, showDialog ? dialog : null];
+        return [this.props.children, dialog];
     }
 }
 
