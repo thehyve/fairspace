@@ -46,7 +46,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
             public void onViolation(String message, Resource subject, Property predicate, RDFNode object) {
                 violationHandler.onViolation(message, subject, predicate, object);
                 subjects.add(subject);
-                if(subjects.size() == MAX_SUBJECTS) {
+                if (subjects.size() == MAX_SUBJECTS) {
                     throw TOO_MANY_VIOLATIONS; // Stop validation
                 }
             }
@@ -59,7 +59,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     }
 
     private void validateModifiedShapes(Set<Resource> shapes, Model vocabulary, ViolationHandler violationHandler) {
-        for (var shape: shapes) {
+        for (var shape : shapes) {
             validateByTargetClass(shape, vocabulary, violationHandler);
             validateByPropertyPath(shape, vocabulary, violationHandler);
         }
@@ -77,17 +77,11 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         }
     }
 
-
     private void validateByPropertyPath(Resource shape, Model vocabulary, ViolationHandler violationHandler) {
-        // determine the underlying property path (if any) and validate all the entities having it
-        var path = shape.inModel(vocabulary).getPropertyResourceValue(SH.path);
-
-        if (path != null && path.isURIResource()) {
-            rdf.querySelect(
-                    storedQuery("subjects_with_property", path),
-                    row -> validateResource(row.getResource("s"), vocabulary, violationHandler)
-            );
-        }
+        // determine the affected classes for a a property shape
+        vocabulary.listSubjectsWithProperty(SH.property, shape)
+                .forEachRemaining(classShape ->
+                        validateByTargetClass(classShape, vocabulary, violationHandler));
     }
 
     @SneakyThrows
