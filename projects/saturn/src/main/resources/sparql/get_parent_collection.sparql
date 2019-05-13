@@ -8,4 +8,5 @@ WHERE {
   ?collection a fs:Collection; fs:filePath ?collectionPath .
   %1$s fs:filePath ?filePath .
   FILTER(STRSTARTS(?filePath, CONCAT(?collectionPath, "/")))
+  FILTER NOT EXISTS { ?collection fs:dateDeleted ?dateDeleted }
 }
