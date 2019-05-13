@@ -187,10 +187,8 @@ export const url2iri = (iri) => {
  * Groups the validation errors of the same subject into a single array and the other array is the other errors
  * @returns {Object}
  */
-export const groupErrors = (errors, subject) => {
-    const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject
-        || e.subject === createMetadataIri(subject)
-        || e.subject === createVocabularyIri(subject));
+export const partitionErrors = (errors, subject) => {
+    const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject);
     return {entityErrors, otherErrors};
 };
 

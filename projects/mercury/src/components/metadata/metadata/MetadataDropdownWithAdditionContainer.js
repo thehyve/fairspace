@@ -5,8 +5,10 @@ import InputWithAddition from "../common/values/InputWithAddition";
 import MetadataDropdownContainer from "./MetadataDropdownContainer";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import {createMetadataEntityFromState, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
-import {createMetadataIri} from "../../../utils/linkeddata/metadataUtils";
+import {createMetadataIri, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
+import {ErrorDialog} from "../../common";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const MetadataDropdownWithAdditionContainer = props => (
     <InputWithAddition
@@ -18,6 +20,7 @@ const MetadataDropdownWithAdditionContainer = props => (
         fetchEntities={props.fetchEntities}
         error={props.error}
         pending={props.pending}
+        onError={props.onError}
     >
         <MetadataDropdownContainer
             property={props.property}
@@ -47,7 +50,15 @@ const mapStateToProps = (state, ownProps) => {
     const shape = (!pending && !error) ? vocabulary.determineShapeForType(ownProps.property.className) : {};
     const emptyData = emptyLinkedData(vocabulary, shape);
 
-    return {pending, error, shape, emptyData};
+    const onError = (e, id) => {
+        if (e.details) {
+            ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createMetadataIri(id)), e.message);
+        } else {
+            ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+        }
+    };
+
+    return {pending, error, shape, emptyData, onError};
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

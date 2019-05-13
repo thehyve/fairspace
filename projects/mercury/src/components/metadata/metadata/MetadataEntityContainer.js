@@ -5,7 +5,7 @@ import {Button, Grid} from "@material-ui/core";
 
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {isDateTimeProperty, propertiesToShow, url2iri, groupErrors} from "../../../utils/linkeddata/metadataUtils";
+import {isDateTimeProperty, propertiesToShow, url2iri, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import {
     getCombinedMetadataForSubject,
     hasMetadataError,
@@ -26,7 +26,7 @@ const MetadataEntityContainer = props => {
         onSubmit(props.subject)
             .catch(e => {
                 if (e.details) {
-                    ErrorDialog.renderError(ValidationErrorsDisplay, groupErrors(e.details, subject), e.message);
+                    ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, subject), e.message);
                 } else {
                     ErrorDialog.showError(e, `Error while updating metadata.\n${e.message}`);
                 }
