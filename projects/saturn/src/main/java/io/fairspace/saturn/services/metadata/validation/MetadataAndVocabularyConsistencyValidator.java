@@ -24,6 +24,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 @AllArgsConstructor
 public class MetadataAndVocabularyConsistencyValidator implements MetadataRequestValidator {
     static final int MAX_SUBJECTS = 10;
+    // This static exception instance is used to stop further validation
     private static final TooManyViolationsException TOO_MANY_VIOLATIONS = new TooManyViolationsException();
 
     private final RDFConnection rdf;
@@ -46,7 +47,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
                 violationHandler.onViolation(message, subject, predicate, object);
                 subjects.add(subject);
                 if(subjects.size() == MAX_SUBJECTS) {
-                    throw TOO_MANY_VIOLATIONS;
+                    throw TOO_MANY_VIOLATIONS; // Stop validation
                 }
             }
         };
