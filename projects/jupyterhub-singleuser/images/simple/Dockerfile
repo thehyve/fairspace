@@ -26,6 +26,7 @@ ADD atomiclargefilemanager.py /opt/conda/lib/python3.6/site-packages/notebook/se
 RUN echo "" >> /etc/jupyter/jupyter_notebook_config.py
 RUN echo "from notebook.services.contents.atomiclargefilemanager import AtomicLargeFileManager" >> /etc/jupyter/jupyter_notebook_config.py
 RUN echo "c.NotebookApp.contents_manager_class = AtomicLargeFileManager" >> /etc/jupyter/jupyter_notebook_config.py
+RUN echo "c.FileCheckpoints.checkpoint_dir = '/home/jovyan/.notebookCheckpoints'" >> /etc/jupyter/jupyter_notebook_config.py
 
 USER $NB_USER
 RUN mkdir /home/jovyan/collections
