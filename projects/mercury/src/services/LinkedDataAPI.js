@@ -48,35 +48,6 @@ class LinkedDataAPI {
     }
 
     /**
-     * Update values in the metadata store
-     * @param subject   Single URI representing the subject to update
-     * @param predicate Single URI representing the predicate to update
-     * @param values    Array with objects representing the rdf-object for the triples.
-     *                  Each object must have a 'value' key.
-     *                  e.g.: [ {value: 'user 1'}, {value: 'another user'} ]
-     * @param vocabulary The {vocabularyUtils} object containing the shapes for this metadata entity
-     * @returns {*}
-     */
-    update(subject, predicate, values, vocabulary) {
-        if (!subject || !predicate || !values) {
-            return Promise.reject(Error("No subject, predicate or values given"));
-        }
-
-        const request = (values.length === 0)
-            ? fetch(this.getStatementsUrl()
-                + '?subject=' + encodeURIComponent(subject)
-                + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE', credentials: 'same-origin'})
-            : fetch(this.getStatementsUrl(), {
-                method: 'PATCH',
-                headers: new Headers({'Content-type': 'application/ld+json'}),
-                credentials: 'same-origin',
-                body: JSON.stringify(toJsonLd(subject, predicate, values, vocabulary))
-            });
-
-        return request.then(failOnHttpError("Failure when updating metadata"));
-    }
-
-    /**
      * Creates a new entity
      * @param subject   Single URI representing the subject to update
      * @param properties An object with each key is the iri of the predicate to update
@@ -95,7 +66,7 @@ class LinkedDataAPI {
 
         const initialValuesJsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
 
-        return this.patchMetadata([...initialValuesJsonLd, {'@id': subject, '@type': type}])
+        return this.patch([...initialValuesJsonLd, {'@id': subject, '@type': type}])
             .then(failOnHttpError("Failure when creating entity"));
     }
 
@@ -118,7 +89,7 @@ class LinkedDataAPI {
 
         const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
 
-        return this.patchMetadata(jsonLd)
+        return this.patch(jsonLd)
             .then(failOnHttpError("Failure when updating metadata"));
     }
 
@@ -165,7 +136,7 @@ class LinkedDataAPI {
      * @param jsonLd
      * @returns {Promise<Response>}
      */
-    patchMetadata(jsonLd) {
+    patch(jsonLd) {
         return fetch(this.getStatementsUrl(), {
             method: 'PATCH',
             headers: new Headers({'Content-type': 'application/ld+json'}),
