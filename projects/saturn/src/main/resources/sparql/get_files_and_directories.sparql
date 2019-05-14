@@ -1,0 +1,9 @@
+# 0 - subjects
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+SELECT ?subject
+  WHERE {
+    { ?subject a fs:Directory } UNION { ?subject a fs:File }
+  }
+  VALUES ?subject {%1$s}

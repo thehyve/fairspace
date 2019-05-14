@@ -1,8 +1,11 @@
 package io.fairspace.saturn.services.permissions;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Resource;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 
 public interface PermissionsService {
@@ -12,6 +15,13 @@ public interface PermissionsService {
      * @param resource
      */
     void createResource(Node resource);
+
+    /**
+     * Creates multiple new resource entities and grants current user Manage access to it.
+     * This method should be only called by other high-level APIs and must not be directly exposed as an API endpoint.
+     * @param resources
+     */
+    void createResources(Collection<Resource> resources);
 
     /**
      * Sets permission for a specific user and resource.
@@ -29,6 +39,14 @@ public interface PermissionsService {
      * depending on the type of the resource.
      */
     Access getPermission(Node resource);
+
+    /**
+     * Ensures the current user has access to the specified nodes
+     * @param nodes
+     * @param requestedAccess
+     * @throws io.fairspace.saturn.services.AccessDeniedException if the user does not have requested access to all nodes
+     */
+    void ensureAccess(Set<Node> nodes, Access requestedAccess);
 
     /**
      *
