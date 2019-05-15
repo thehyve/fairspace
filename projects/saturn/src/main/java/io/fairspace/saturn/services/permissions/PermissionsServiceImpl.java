@@ -43,6 +43,8 @@ import static org.apache.jena.system.Txn.calculateRead;
 @AllArgsConstructor
 @Slf4j
 public class PermissionsServiceImpl implements PermissionsService {
+    private static final int BATCH_SIZE = 100;
+
     private final RDFConnection rdf;
     private final UserService userService;
     private final MailService mailService;
@@ -97,9 +99,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Check access control in batches as the SPARQL queries do not
         // accept an arbitrary number of parameters
-        int batchSize = 100;
-
-        Iterables.partition(nodes, batchSize)
+        Iterables.partition(nodes, BATCH_SIZE)
                 .forEach(batch -> ensureAccessWithoutBatch(batch, requestedAccess));
     }
 
