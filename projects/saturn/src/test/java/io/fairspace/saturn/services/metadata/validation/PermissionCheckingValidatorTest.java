@@ -1,7 +1,9 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Before;
@@ -10,10 +12,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collections;
+import java.util.Set;
+
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionCheckingValidatorTest {
@@ -45,28 +54,29 @@ public class PermissionCheckingValidatorTest {
     public void noChecksShouldBePerformedOnAnEmptyModel() {
         validator.validate(EMPTY, EMPTY, violationHandler);
 
-        verifyZeroInteractions(permissions, violationHandler);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void noWritePermissionCausesAFailure() {
         model.add(STATEMENT);
+        Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        when(permissions.getPermission(any())).thenReturn(Access.Read);
+        doThrow(new AccessDeniedException()).when(permissions).ensureAccess(nodes, Access.Write);
         validator.validate(EMPTY, model, violationHandler);
-        verify(violationHandler).onViolation("Cannot modify read-only resource http://ex.com/subject", STATEMENT.getSubject(), null, null);
+        verify(violationHandler).onViolation("Cannot modify read-only resource", null, null, null);
     }
 
     @Test
     public void itShouldCheckPermissionsForSubject() {
         model.add(STATEMENT);
-
-        when(permissions.getPermission(eq(STATEMENT.getSubject().asNode()))).thenReturn(Access.Write);
+        Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
         validator.validate(EMPTY, model, violationHandler);
 
         verifyZeroInteractions(violationHandler);
-        verify(permissions).getPermission(STATEMENT.getSubject().asNode());
+        verify(permissions).ensureAccess(nodes, Access.Write);
 
         verifyNoMoreInteractions(permissions);
     }
