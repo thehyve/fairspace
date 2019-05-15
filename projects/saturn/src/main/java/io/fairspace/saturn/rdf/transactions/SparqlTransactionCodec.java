@@ -1,10 +1,14 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import org.apache.jena.atlas.io.IndentedLineBuffer;
 import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Prologue;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 import org.apache.jena.sparql.modify.request.UpdateDataInsert;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.util.NodeToLabelMap;
 import org.apache.jena.update.Update;
 import org.apache.jena.update.UpdateFactory;
 
@@ -21,11 +25,12 @@ public class SparqlTransactionCodec implements TransactionCodec {
     private static final String COMMIT_MESSAGE_PREFIX = "# Commit Message: ";
     private static final String COMMITTED = "# Committed";
     private static final String ABORTED = "# Aborted";
+    private static final Prologue PROLOGUE = new Prologue();
 
     @Override
     public TransactionListener write(OutputStream out) throws IOException {
         return new TransactionListener() {
-            OutputStreamWriter writer = new OutputStreamWriter(out, UTF_8);
+            private OutputStreamWriter writer = new OutputStreamWriter(out, UTF_8);
 
             @Override
             public void onBegin(String commitMessage, String userId, String userName, long timestamp) throws IOException {
@@ -53,7 +58,10 @@ public class SparqlTransactionCodec implements TransactionCodec {
             }
 
             private void save(Update update) throws IOException {
-                writer.append(update.toString().replace('\n', ' ')).append(";\n");
+                var buff = new IndentedLineBuffer() ;
+                var sc = new SerializationContext(PROLOGUE, new NodeToLabelMap("b", true));
+                update.output(buff, sc) ;
+                writer.append(buff.toString().replace('\n', ' ')).append(";\n");
             }
 
             private QuadDataAcc toQuads(Node graph, Node subject, Node predicate, Node object) {
