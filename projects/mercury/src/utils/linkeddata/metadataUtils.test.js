@@ -9,7 +9,8 @@ import {
     relativeLink,
     shouldPropertyBeHidden,
     url2iri,
-    isNonEmptyValue
+    isNonEmptyValue,
+    partitionErrors
 } from "./metadataUtils";
 import * as constants from "../../constants";
 
@@ -260,6 +261,42 @@ describe('Metadata Utils', () => {
             const values = [undefined, null, '', NaN, "", ``];
 
             values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
+        });
+    });
+
+    describe('partitionErrors', () => {
+        it('returns 2 arrays one for errors of the given subjects other is the rest of errors', () => {
+            const errorsSub1 = [
+                {
+                    message: "Error message...",
+                    subject: "subject1",
+                    predicate: "some-predicate-x"
+                },
+                {
+                    message: "Error message",
+                    subject: "subject1",
+                    predicate: "some-predicate-y"
+                }
+            ];
+            const errorsSub2 = [
+                {
+                    message: "Error message x",
+                    subject: "subject2",
+                    predicate: "some-predicate-a"
+                },
+                {
+                    message: "Error message y",
+                    subject: "subject2",
+                    predicate: "some-predicate-b"
+                }
+            ];
+            const allErrors = [...errorsSub1, ...errorsSub2];
+
+            expect(partitionErrors(allErrors, 'subject1'))
+                .toEqual({
+                    entityErrors: errorsSub1,
+                    otherErrors: errorsSub2
+                });
         });
     });
 });

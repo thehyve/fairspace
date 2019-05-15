@@ -8,7 +8,7 @@ import {
     isMetaVocabularyPending,
     isVocabularyEntitiesPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {createVocabularyIri, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
+import {createVocabularyIri, getLabel, relativeLink, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import Config from "../../../services/Config/Config";
 import * as constants from "../../../constants";
@@ -17,6 +17,8 @@ import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {isDataSteward} from "../../../utils/userUtils";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
+import {ErrorDialog} from "../../common";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const mapStateToProps = (state) => {
     const vocabularyEntities = getVocabularyEntities(state);
@@ -29,6 +31,14 @@ const mapStateToProps = (state) => {
         typeLabel: e['@type'] ? getLabel(metaVocabulary.determineShapeForType(e['@type'][0]), true) : ''
     }));
 
+    const onError = (e, id) => {
+        if (e.details) {
+            ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createVocabularyIri(id)), e.message);
+        } else {
+            ErrorDialog.showError(e, `Error creating a new vocabulary.\n${e.message}`);
+        }
+    };
+
     return ({
         loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
         error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
@@ -36,7 +46,8 @@ const mapStateToProps = (state) => {
         shapes: metaVocabulary.getClassesInCatalog(),
         vocabulary: metaVocabulary,
         valueComponentFactory: VocabularyValueComponentFactory,
-        entities
+        entities,
+        onError
     });
 };
 

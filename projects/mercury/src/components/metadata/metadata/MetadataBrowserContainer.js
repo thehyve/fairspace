@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {createMetadataIri, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
+import {createMetadataIri, getLabel, relativeLink, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
@@ -8,6 +8,8 @@ import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import * as constants from "../../../constants";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
+import {ErrorDialog} from "../../common";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const mapStateToProps = (state) => {
     const {cache: {allEntities}} = state;
@@ -21,14 +23,23 @@ const mapStateToProps = (state) => {
         typeLabel: getLabel(vocabulary.determineShapeForType(e['@type'][0]), true)
     }));
 
-    return ({
+    const onError = (e, id) => {
+        if (e.details) {
+            ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createMetadataIri(id)), e.message);
+        } else {
+            ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+        }
+    };
+
+    return {
         loading: pending,
         error: allEntities ? allEntities.error : false,
         shapes: vocabulary.getClassesInCatalog(),
         valueComponentFactory: MetadataValueComponentFactory,
         vocabulary,
         entities,
-    });
+        onError
+    };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

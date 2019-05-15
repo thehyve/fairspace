@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import * as consts from "../../constants";
 import {getFirstPredicateValue} from "./jsonLdUtils";
 
@@ -179,6 +181,15 @@ export const url2iri = (iri) => {
         console.warn("Invalid uri given to convert to iri", iri);
         return iri;
     }
+};
+
+/**
+ * Groups the validation errors of the same subject into a single array and the other array is the other errors
+ * @returns {Object}
+ */
+export const partitionErrors = (errors, subject) => {
+    const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject);
+    return {entityErrors, otherErrors};
 };
 
 /**
