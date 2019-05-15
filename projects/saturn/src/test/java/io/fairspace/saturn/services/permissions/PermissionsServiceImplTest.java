@@ -265,7 +265,7 @@ public class PermissionsServiceImplTest {
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Write);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test(expected = MetadataAccessDeniedException.class)
     public void testEnsureAccessToCollections() {
         setupAccessCheckForMultipleNodes();
 
@@ -277,7 +277,7 @@ public class PermissionsServiceImplTest {
         service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_2), Access.Read);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test(expected = MetadataAccessDeniedException.class)
     public void testEnsureAccessToFiles() {
         setupAccessCheckForMultipleNodes();
 
@@ -302,7 +302,7 @@ public class PermissionsServiceImplTest {
         service.ensureAccess(Set.of(RESOURCE2), Access.Write);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test(expected = MetadataAccessDeniedException.class)
     public void testEnsureAccessToRestrictedEntities() {
         setupAccessCheckForMultipleNodes();
 
@@ -314,6 +314,33 @@ public class PermissionsServiceImplTest {
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Write);
     }
 
+    @Test
+    public void testReturnedSubjectInEnsureAccessException() {
+        setupAccessCheckForMultipleNodes();
+
+        when(userService.getCurrentUser()).thenReturn(new User() {{
+            setIri(USER2);
+            setName("John");
+        }});
+
+        // The exception thrown by ensureAccess should return the failing entity
+        try {
+            service.ensureAccess(Set.of(RESOURCE2, RESOURCE), Access.Write);
+            fail();
+        } catch(MetadataAccessDeniedException e) {
+            assertEquals(RESOURCE, e.getSubject());
+        }
+
+        // The exception thrown by ensureAccess should return the failing entity
+        // also when it has been verified by authority
+        try {
+            service.ensureAccess(Set.of(FILE_1, COLLECTION_2, FILE_2), Access.Read);
+            fail();
+        } catch(MetadataAccessDeniedException e) {
+            assertEquals(FILE_1, e.getSubject());
+        }
+
+    }
 
     private void setupAccessCheckForMultipleNodes() {
         Resource c1 = createResource(COLLECTION_1.getURI());

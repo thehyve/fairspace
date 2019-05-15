@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.MetadataAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
@@ -15,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.Set;
 
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -63,9 +65,9 @@ public class PermissionCheckingValidatorTest {
         model.add(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        doThrow(new AccessDeniedException()).when(permissions).ensureAccess(nodes, Access.Write);
+        doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
         validator.validate(EMPTY, model, violationHandler);
-        verify(violationHandler).onViolation("Cannot modify read-only resource", null, null, null);
+        verify(violationHandler).onViolation("Cannot modify read-only resource", STATEMENT.getSubject(), null, null);
     }
 
     @Test

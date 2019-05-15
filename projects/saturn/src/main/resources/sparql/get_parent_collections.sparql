@@ -3,7 +3,7 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-SELECT ?collection
+SELECT ?collection ?subject
 WHERE {
   ?collection a fs:Collection; fs:filePath ?collectionPath .
   ?subject fs:filePath ?filePath .

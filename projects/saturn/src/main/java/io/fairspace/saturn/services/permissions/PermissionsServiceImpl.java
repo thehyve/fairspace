@@ -8,6 +8,7 @@ import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.selectSingle;
@@ -108,10 +110,24 @@ public class PermissionsServiceImpl implements PermissionsService {
      */
     private void ensureAccessWithoutBatch(List<Node> nodes, Access requestedAccess) {
         // Get authorities for the given nodes
-        Set<Node> authorities = getAuthorities(nodes);
+        Set<ResourceAuthority> resourceAuthorities = getAuthorities(nodes);
+        Set<Node> authorities = resourceAuthorities.stream().map(ResourceAuthority::getAuthority).collect(Collectors.toSet());
 
         // Ensure the user has access to all of the authorities
-        ensureHasAccess(authorities, requestedAccess);
+        try {
+            ensureHasAccess(authorities, requestedAccess);
+        } catch(MetadataAccessDeniedException e) {
+            // The exception contains a reference to the authority. However, consumers of this
+            // method will expect a reference to an entity. For that reason we choose the first
+            // node that references this authority
+            ResourceAuthority accessDeniedResourceAuthority = resourceAuthorities
+                    .stream()
+                    .filter(resourceAuthority -> resourceAuthority.getAuthority().equals(e.getSubject()))
+                    .findFirst()
+                    .orElseThrow(IllegalStateException::new);
+
+            throw new MetadataAccessDeniedException(e.getMessage(), accessDeniedResourceAuthority.getResource(), e);
+        }
     }
 
     @Override
@@ -180,17 +196,22 @@ public class PermissionsServiceImpl implements PermissionsService {
     private void ensureHasAccess(Collection<Node> authorities, Access requestedAccess) {
         Map<Node, Access> permissions = getPermissions(authorities);
 
-        Stream<Access> accessStream = authorities.stream().map(resource -> {
-            if (permissions.containsKey(resource)) {
-                return permissions.get(resource);
+        Stream<AuthorityAccess> accessStream = authorities.stream().map(authority -> {
+            if (permissions.containsKey(authority)) {
+                return new AuthorityAccess(authority, permissions.get(authority));
             } else {
-                return defaultAccess(resource);
+                return new AuthorityAccess(authority, defaultAccess(authority));
             }
         });
 
-        if ( accessStream.anyMatch(access -> access.compareTo(requestedAccess) < 0)) {
-            throw new AccessDeniedException(format("User %s has no %s access to some of the requested resources", userService.getCurrentUser().getIri(), requestedAccess.name().toLowerCase()));
-        }
+        // If there is an entity that a user does not have access to, use that in
+        // the exception to indicate the cause of the error
+        accessStream
+                .filter(authorityAccess -> authorityAccess.getAccess().compareTo(requestedAccess) < 0)
+                .findFirst()
+                .ifPresent(access -> {
+                    throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources", userService.getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), access.getAuthority());
+                });
     }
 
     /**
@@ -221,9 +242,9 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @return an authoritative resource for the given resource: currently either the parent collection (for files and directories) or the resource itself
      */
     private Node getAuthority(Node resource) {
-        List<Node> fileAuthorities = getFileAuthorities(List.of(resource));
+        Map<Node, Node> fileAuthorities = getFileAuthorities(List.of(resource));
 
-        return fileAuthorities.size() > 0 ? fileAuthorities.get(0) : resource;
+        return fileAuthorities.size() > 0 ? fileAuthorities.get(resource) : resource;
     }
 
     /**
@@ -234,26 +255,36 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @param fileNodes List of file/directory nodes
      * @return
      */
-    private List<Node> getFileAuthorities(List<Node> fileNodes) {
-        return SparqlUtils.select(rdf,
+    private Map<Node, Node> getFileAuthorities(List<Node> fileNodes) {
+        Map<Node, Node> authorities = new HashMap<>();
+
+        rdf.querySelect(
                 storedQuery("get_parent_collections", fileNodes),
-                querySolution -> querySolution.get("collection").asNode());
+                row -> authorities.put(row.get("subject").asNode(), row.get("collection").asNode()));
+
+        return authorities;
     }
 
     /**
      *
      * @param nodes
-     * @return The set of authorities relevant for the given nodes.
+     * @return A map from node to its authority
      *         Could be the original nodes for metadata entities, or the enclosing collection
      *         for files or directories
      */
-    private Set<Node> getAuthorities(List<Node> nodes) {
+    private Set<ResourceAuthority> getAuthorities(List<Node> nodes) {
         List<Node> fileNodes = getFileNodes(nodes);
-        List<Node> fileAuthorities = getFileAuthorities(fileNodes);
+        Map<Node, Node> fileAuthorities = getFileAuthorities(fileNodes);
 
-        HashSet<Node> authorities = new HashSet<>(nodes);
-        authorities.removeAll(fileNodes);
-        authorities.addAll(fileAuthorities);
+        Set<ResourceAuthority> authorities = new HashSet<>();
+        nodes.forEach(node -> {
+            // For non-file nodes, the authority is the node itself
+            if(!fileNodes.contains(node)) {
+                authorities.add(new ResourceAuthority(node, node));
+            } else {
+                authorities.add(new ResourceAuthority(node, fileAuthorities.get(node)));
+            }
+        });
 
         return authorities;
     }
@@ -282,4 +313,18 @@ public class PermissionsServiceImpl implements PermissionsService {
         var stmts = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, node, RDFS.label, null)).listStatements();
         return stmts.hasNext() ? stmts.nextStatement().getString() : "";
     }
+
+    @Data
+    private static class ResourceAuthority {
+        private final Node resource;
+        private final Node authority;
+    }
+
+    @Data
+    private static class AuthorityAccess {
+        private final Node authority;
+        private final Access access;
+    }
+
+
 }
