@@ -9,14 +9,14 @@ import static spark.Spark.before;
 public class PerformanceMeasurer {
     public static void applyPerformanceMeasuring() {
         before((request, response) ->{
-            request.attribute("startTime", System.nanoTime());
+            request.attribute("startTime", System.currentTimeMillis());
         });
         afterAfter((request, response) ->{
-            Object startTime = request.attribute("startTime");
+            Long startTime = request.attribute("startTime");
 
             if(startTime != null) {
-                long elapsedNanos = System.nanoTime() - ((long)startTime);
-                log.debug("Duration of {} request to {} (status {}): {} ms", request.requestMethod(), request.pathInfo(), response.status(), elapsedNanos / 1000000);
+                long elapsedMillis = System.currentTimeMillis() - startTime;
+                log.debug("Duration of {} request to {} (status {}): {} ms", request.requestMethod(), request.pathInfo(), response.status(), elapsedMillis);
                 request.attribute("startTime", null);
             }
         });
