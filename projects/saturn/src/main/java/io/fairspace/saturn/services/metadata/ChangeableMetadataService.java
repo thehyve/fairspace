@@ -33,6 +33,14 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
+
+    /**
+     * Keep a cache of the inverse properties during a transaction, in order to avoid
+     * too many lookups. As many properties do not have an inverse, this map stores
+     * an Optional. An empty optional indicates that we know there is no inverse for this
+     * property. A missing value indicates that we do not know whether there is an inverse
+     * for this prperty
+     */
     private final Map<String, Optional<Property>> inverseCache = new HashMap<>();
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
@@ -155,26 +163,21 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         model.listStatements().forEachRemaining(stmt -> {
             if (stmt.getObject().isResource()) {
-                var inverse = getInverseWithCache(stmt.getPredicate());
-
-                if (inverse != null) {
-                    toAdd.add(stmt.getObject().asResource(), inverse, stmt.getSubject());
-                }
+                getInverseWithCache(stmt.getPredicate())
+                        .ifPresent(inverse ->
+                                toAdd.add(stmt.getObject().asResource(), inverse, stmt.getSubject())
+                        );
             }
         });
 
         model.add(toAdd);
     }
 
-    private Property getInverseWithCache(Property property) {
-        if(inverseCache.containsKey(property.getURI())) {
-            return inverseCache.get(property.getURI()).orElse(null);
-        }
-
-        var inverse = getInverse(rdf, vocabulary, property);
-        inverseCache.put(property.getURI(), Optional.ofNullable(inverse));
-
-        return inverse;
+    private Optional<Property> getInverseWithCache(Property property) {
+        return inverseCache.computeIfAbsent(
+                property.getURI(),
+                s -> Optional.ofNullable(getInverse(rdf, vocabulary, property))
+        );
     }
 
 }
