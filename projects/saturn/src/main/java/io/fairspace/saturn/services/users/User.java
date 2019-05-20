@@ -14,7 +14,7 @@ import static io.fairspace.saturn.vocabulary.FS.USER_URI;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class User extends PersistentEntity {
-    @RDFProperty(value = RDFS.uri + "label", required = true)
+    @RDFProperty(value = RDFS.uri + "label")
     private String name;
 
     @RDFProperty(EMAIL_URI)
