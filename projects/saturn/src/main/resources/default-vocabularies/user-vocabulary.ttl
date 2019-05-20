@@ -229,9 +229,9 @@ fs:CollectionShape sh:property
     sh:name "Investigation Nature" ;
     sh:description "choose between: basic research, biomedical research, clinical trial, medical diagnosis" ;
     sh:in (
-      "basic research", 
-      "biomedical research", 
-      "clinical trial",
+      "basic research"
+      "biomedical research"
+      "clinical trial"
       "medical diagnosis"
       ) ;
     sh:path <investigationNature> .
@@ -247,9 +247,9 @@ fs:CollectionShape sh:property
     sh:name "Gender" ;
     sh:description "The gender of the patient" ;
     sh:in (
-      "Male",
-      "Female",
-      "Unknown",
+      "Male"
+      "Female"
+      "Unknown"
       "Other"
       ) ;
     sh:maxCount 1 ;
@@ -274,10 +274,10 @@ fs:CollectionShape sh:property
     sh:name "Neoplasm Event" ;
     sh:description "The type of tumor event." ;
     sh:in (
-      "primary tumor",
-      "local relapse",
+      "primary tumor"
+      "local relapse"
       "metastatic relapse"
-    )
+    ) ;
     sh:maxCount 1 ;
     sh:path osiris:EventType . 
      
