@@ -74,7 +74,7 @@ public class TextIndexESBulk extends TextIndexES {
             var start = currentTimeMillis();
             var response = client.bulk(bulk).get();
             var finish = currentTimeMillis();
-            LOGGER.debug("Indexing in ElasticSearch took " + (finish - start) + " ms.");
+            LOGGER.debug("Indexing in ElasticSearch took {} ms", finish - start);
             if (response.hasFailures()) {
                 LOGGER.error("The response contains errors:" + response);
             }
