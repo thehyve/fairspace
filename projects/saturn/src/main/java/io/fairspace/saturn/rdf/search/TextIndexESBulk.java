@@ -117,7 +117,7 @@ public class TextIndexESBulk extends TextIndexES {
      */
     @Override
     public void addEntity(Entity entity) {
-        LOGGER.debug("Adding/Updating the entity in ES");
+        LOGGER.trace("Adding/Updating the entity {} in ES", entity.getId());
 
         //The field that has a not null value in the current Entity instance.
         //Required, mainly for building a script for the update command.
@@ -188,8 +188,7 @@ public class TextIndexESBulk extends TextIndexES {
         }
 
         if(fieldToRemove != null && valueToRemove != null) {
-
-            LOGGER.debug("deleting content related to entity: " + entity.getId());
+            LOGGER.trace("deleting content related to entity {}", entity.getId());
             String deleteScript = DELETE_SCRIPT.replaceAll("<fieldToRemove>", fieldToRemove);
             Map<String,Object> params = new HashMap<>();
             params.put("valueToRemove", valueToRemove);
