@@ -147,7 +147,7 @@ fs:CollectionShape sh:property
 ## User property shapes
 
 <dateWidget> a rdf:Property .
-<dateWidgetShape> a fs:PropertyShape ;
+<dateWidgetShape> a fs:DatatypePropertyShape ;
     sh:name "A single date" ;
     sh:description "A single date." ;
     sh:datatype xsd:date ;
@@ -155,14 +155,14 @@ fs:CollectionShape sh:property
     sh:path <dateWidget> .
 
 <dateTimeWidget> a rdf:Property .
-<dateTimeWidgetShape> a fs:PropertyShape ;
+<dateTimeWidgetShape> a fs:DatatypePropertyShape ;
     sh:name "Date and times" ;
     sh:description "A bunch of date and times." ;
     sh:datatype xsd:dateTime ;
     sh:path <dateTimeWidget> .
 
 <multiLineStringWidget> a rdf:Property .
-<multiLineStringWidgetShape> a fs:PropertyShape ;
+<multiLineStringWidgetShape> a fs:DatatypePropertyShape ;
     sh:name "Multi line string" ;
     sh:description "Can do newlines, but max length of 500." ;
     sh:datatype xsd:string ;
@@ -170,7 +170,7 @@ fs:CollectionShape sh:property
     sh:path <multiLineStringWidget> .
 
 <integerLongWidget> a rdf:Property .
-<integerLongWidgetShape> a fs:PropertyShape ;
+<integerLongWidgetShape> a fs:DatatypePropertyShape ;
     sh:name "Integer (long)" ;
     sh:description "A single integer (long)." ;
     sh:datatype xsd:long ;
@@ -178,7 +178,7 @@ fs:CollectionShape sh:property
     sh:path <integerLongWidget> .
 
 <integerWidget> a rdf:Property .
-<integerWidgetShape> a fs:PropertyShape ;
+<integerWidgetShape> a fs:DatatypePropertyShape ;
     sh:name "Integer" ;
     sh:description "A single integer." ;
     sh:datatype xsd:integer ;
@@ -186,7 +186,7 @@ fs:CollectionShape sh:property
     sh:path <integerWidget> .
 
 <booleanWidget> a rdf:Property .
-<booleanWidgetShape> a fs:PropertyShape ;
+<booleanWidgetShape> a fs:DatatypePropertyShape ;
     sh:name "Boolean" ;
     sh:description "On or off single." ;
     sh:datatype xsd:boolean ;
@@ -194,7 +194,7 @@ fs:CollectionShape sh:property
     sh:path <booleanWidget> .
 
 <booleanX2Widget> a rdf:Property .
-<booleanX2WidgetShape> a fs:PropertyShape ;
+<booleanX2WidgetShape> a fs:DatatypePropertyShape ;
     sh:name "Boolean X4" ;
     sh:description "On or off (max 2) times. Can only store unique values though." ;
     sh:datatype xsd:boolean ;
@@ -202,7 +202,7 @@ fs:CollectionShape sh:property
     sh:path <booleanX2Widget> .
 
 <fixedDropdownWidget> a rdf:Property .
-<fixedDropdownWidgetShape> a fs:PropertyShape ;
+<fixedDropdownWidgetShape> a fs:ControlledVocabularyPropertyShape ;
     sh:name "Fixed set of values (pick 2)" ;
     sh:description "A set of 2 values from a fixed list." ;
     sh:in ( "E" "A" "D" "G" "B" "E" ) ; 
@@ -210,14 +210,14 @@ fs:CollectionShape sh:property
     sh:path <fixedDropdownWidget> .
 
 <resourceWidget> a rdf:Property .
-<resourceWidgetShape> a fs:PropertyShape ;
+<resourceWidgetShape> a fs:ExternalIRIPropertyShape ;
     sh:name "Resource" ;
     sh:description "Some URL" ;
     sh:nodeKind sh:IRI ;
     sh:maxCount 5 ;
     sh:path <resourceWidget> .
 
-<projectCodeShape> a fs:PropertyShape ;
+<projectCodeShape> a fs:DatatypePropertyShape ;
     sh:name "Project Code" ;
     sh:description "Specific project code." ;
     sh:datatype xsd:string ;
@@ -225,36 +225,44 @@ fs:CollectionShape sh:property
     sh:maxLength 128 ;
     sh:path <projectCode> .
      
-<investigationNatureShape> a fs:PropertyShape ;
+<investigationNatureShape> a fs:ControlledVocabularyPropertyShape ;
     sh:name "Investigation Nature" ;
     sh:description "choose between: basic research, biomedical research, clinical trial, medical diagnosis" ;
-    sh:datatype xsd:string ;
-    sh:maxLength 128 ;
+    sh:in (
+      "basic research", 
+      "biomedical research", 
+      "clinical trial",
+      "medical diagnosis"
+      ) ;
     sh:path <investigationNature> .
      
-<projectManagerShape> a fs:PropertyShape ;
+<projectManagerShape> a fs:DatatypePropertyShape ;
     sh:name "Project Manager" ;
     sh:description "Project manager" ;
     sh:datatype xsd:string ;
     sh:maxLength 128 ;
     sh:path <projectManager> .
      
-<AdministrativeGenderShape> a fs:PropertyShape ;
+<AdministrativeGenderShape> a fs:ControlledVocabularyPropertyShape ;
     sh:name "Gender" ;
     sh:description "The gender of the patient" ;
-    sh:datatype xsd:string ;
+    sh:in (
+      "Male",
+      "Female",
+      "Unknown",
+      "Other"
+      ) ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
     sh:path fhir:AdministrativeGender . 
      
-<ageOfDeathShape> a fs:PropertyShape ;
+<ageOfDeathShape> a fs:DatatypePropertyShape ;
     sh:name "Age of death" ;
     sh:description "The age at which this person has died" ;
     sh:datatype xsd:date ;
     sh:maxCount 1 ;
     sh:path <ageOfDeath> .
      
-<patientIdentifierShape> a fs:PropertyShape ;
+<patientIdentifierShape> a fs:DatatypePropertyShape ;
     sh:name "Patient Identifier" ;
     sh:description "The identifier of the patient" ;
     sh:datatype xsd:string ;
@@ -262,50 +270,53 @@ fs:CollectionShape sh:property
     sh:maxLength 128 ;
     sh:path <patientIdentifier> .
      
-<EventTypeShape> a fs:PropertyShape ;
+<EventTypeShape> a fs:ControlledVocabularyPropertyShape ;
     sh:name "Neoplasm Event" ;
-    sh:description "The type of tumor event (primary tumor, local relapse, metastatic relapse)" ;
-    sh:datatype xsd:string ;
+    sh:description "The type of tumor event." ;
+    sh:in (
+      "primary tumor",
+      "local relapse",
+      "metastatic relapse"
+    )
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
     sh:path osiris:EventType . 
      
-<EventStartDateShape> a fs:PropertyShape ;
+<EventStartDateShape> a fs:DatatypePropertyShape ;
     sh:name "Neoplasm Event Start Date" ;
     sh:description "The start date of the tumor event" ;
     sh:datatype xsd:date ;
     sh:maxCount 1 ;
     sh:path osiris:EventStartDate . 
      
-<EventEndDateShape> a fs:PropertyShape ;
+<EventEndDateShape> a fs:DatatypePropertyShape ;
     sh:name "Neoplasm Event End Date" ;
     sh:description "The end date of the tumor event" ;
     sh:datatype xsd:date ;
     sh:maxCount 1 ;
     sh:path osiris:EventEndDate . 
      
-<diagnosisDateShape> a fs:PropertyShape ;
+<diagnosisDateShape> a fs:DatatypePropertyShape ;
     sh:name "Neoplasm diagnosis date" ;
     sh:description "The date of tumor diagnosis" ;
     sh:datatype xsd:date ;
     sh:maxCount 1 ;
     sh:path <diagnosisDate> .
      
-<collectDateShape> a fs:PropertyShape ;
+<collectDateShape> a fs:DatatypePropertyShape ;
     sh:name "Collect Date" ;
     sh:description "The collect date of the biological sample" ;
     sh:datatype xsd:date ;
     sh:maxCount 1 ;
     sh:path <collectDate> .
 
-<tumorCellularityShape> a fs:PropertyShape ;
+<tumorCellularityShape> a fs:DatatypePropertyShape ;
     sh:name "Tumor Cellularity" ;
     sh:description "The percentage of tumor cells in the biological sample (pathological measure)" ;
     sh:datatype xsd:integer ;
     sh:maxCount 1 ;
     sh:path <tumorCellularity> .
      
-<analysisCodeShape> a fs:PropertyShape ;
+<analysisCodeShape> a fs:DatatypePropertyShape ;
     sh:name "Analysis code" ;
     sh:description "The analysis run identifier" ;
     sh:datatype xsd:string ;
@@ -313,7 +324,7 @@ fs:CollectionShape sh:property
     sh:maxLength 128 ;
     sh:path <analysisCode> .
      
-<analyticPipelineCodeShape> a fs:PropertyShape ;
+<analyticPipelineCodeShape> a fs:DatatypePropertyShape ;
     sh:name "Analytic pipeline code" ;
     sh:description "Identifier of the pipeline used into the analysis (unique in the center)" ;
     sh:datatype xsd:string ;
@@ -321,7 +332,7 @@ fs:CollectionShape sh:property
     sh:maxLength 128 ;
     sh:path <analyticPipelineCode> .
      
-<numberOfBreakPointsShape> a fs:PropertyShape ;
+<numberOfBreakPointsShape> a fs:DatatypePropertyShape ;
     sh:name "Number of break points" ;
     sh:description "Calculated number of break points in genomic profile" ;
     sh:datatype xsd:integer ;
