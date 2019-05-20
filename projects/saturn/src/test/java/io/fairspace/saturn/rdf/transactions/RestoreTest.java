@@ -2,7 +2,6 @@ package io.fairspace.saturn.rdf.transactions;
 
 import io.fairspace.saturn.Config;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
@@ -14,16 +13,13 @@ import java.io.IOException;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
-import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeRead;
 import static org.apache.jena.system.Txn.executeWrite;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RestoreTest {
-    private static final Node vocabularyGraph = createURI("http://example.com");
-
     private final Statement stmt1 = createStatement(createResource("http://example.com/subject1"),
             createProperty("http://example.com/property1"),
             createResource("http://example.com/object1"));
@@ -36,7 +32,7 @@ public class RestoreTest {
     @Before
     public void before() {
         config = new Config.Jena();
-        config.elasticSearch.required = false;
+        config.elasticSearch.enabled = false;
         config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
         config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
     }
@@ -67,6 +63,28 @@ public class RestoreTest {
                 assertTrue(ds2.getDefaultModel().contains(stmt1));
                 assertTrue(ds2.getDefaultModel().contains(stmt2));
             });
+        } finally {
+            ds2.close();
+        }
+    }
+
+    @Test
+    public void restoreListsWorksAsExpected() throws IOException {
+        var m = createDefaultModel();
+        m.add(createResource("http://example.com/1"), createProperty("http://example.com/items"), m.createList(createTypedLiteral(1), createTypedLiteral(2)));
+        m.add(createResource("http://example.com/2"), createProperty("http://example.com/children"), m.createList(createTypedLiteral("a"), createTypedLiteral("b")));
+
+        var ds1 = SaturnDatasetFactory.connect(config);
+        executeWrite(ds1, () -> ds1.getDefaultModel().add(m));
+
+        ds1.close();
+
+        deleteDirectory(config.datasetPath);
+
+        var ds2 = SaturnDatasetFactory.connect(config);
+
+        try {
+            executeRead(ds2, () -> assertEquals(m.listStatements().toSet(), ds2.getDefaultModel().listStatements().toSet()));
         } finally {
             ds2.close();
         }
