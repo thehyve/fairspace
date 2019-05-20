@@ -4,7 +4,11 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.Instant;
+import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
@@ -118,8 +123,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
         lifeCycleManager.updateLifecycleMetadata(delta);
 
-        verify(permissionsService).createResource(NodeFactory.createURI(resource.getURI()));
-        verify(permissionsService).createResource(NodeFactory.createURI(otherResource.getURI()));
+        verify(permissionsService).createResources(Set.of(resource, otherResource));
     }
 
     @Test

@@ -1,12 +1,13 @@
 # Find parent collection for a file or a directory
-# 0 - file or directory
+# 0 - list of files or directories
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-SELECT ?collection
+SELECT ?collection ?subject
 WHERE {
   ?collection a fs:Collection; fs:filePath ?collectionPath .
-  %1$s fs:filePath ?filePath .
+  ?subject fs:filePath ?filePath .
   FILTER(STRSTARTS(?filePath, CONCAT(?collectionPath, "/")))
   FILTER NOT EXISTS { ?collection fs:dateDeleted ?dateDeleted }
 }
+VALUES ?subject {%1$s}

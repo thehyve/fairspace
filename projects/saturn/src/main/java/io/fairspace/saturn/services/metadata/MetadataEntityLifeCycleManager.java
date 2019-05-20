@@ -67,7 +67,7 @@ class MetadataEntityLifeCycleManager {
             rdf.load(graph.getURI(), generateCreationInformation(newEntities));
 
             if(permissionsService != null) {
-                newEntities.forEach(resource -> permissionsService.createResource(resource.asNode()));
+                permissionsService.createResources(newEntities);
             }
         }
     }
