@@ -7,13 +7,24 @@ import styles from './SearchBar.styles';
 
 const SearchBar = ({classes, query = '', placeholder, onKeyDown = () => {}}) => {
     const [value, setValue] = useState(query);
+    const [keyDown, setKeyDown] = useState({key: null, shouldHandle: false});
+
 
     const handleChange = (event) => {
         setValue(event.target.value);
+
+        if (keyDown.shouldHandle) {
+            onKeyDown(keyDown.key, event.target.value);
+            setKeyDown({key: null, shouldHandle: false});
+        }
     };
 
-    const handleOnKeyDown = (event) => {
-        onKeyDown(event, value);
+    const handleOnKeyDown = ({key}) => {
+        if (key === 'Enter') {
+            onKeyDown(key, value);
+        } else {
+            setKeyDown({key, shouldHandle: true});
+        }
     };
 
     return (

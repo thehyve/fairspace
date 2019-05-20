@@ -24,9 +24,7 @@ const MetadataBrowserContainer = ({searchMetadata: search, ...otherProps}) => (
                 placeholder="Search"
                 disableUnderline
                 onKeyDown={(e, val) => {
-                    if (val) {
-                        search(val);
-                    }
+                    search(val);
                 }}
             />
         </Paper>

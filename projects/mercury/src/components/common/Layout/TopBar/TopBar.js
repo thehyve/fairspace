@@ -19,9 +19,9 @@ const styles = theme => ({
 const TopBar = ({classes, workspaceName, location, history}) => {
     const query = getSearchQueryFromString(location.search);
 
-    const onKeyDown = (event, value) => {
+    const onKeyDown = (key, value) => {
         // if Enter is pressed and search has value
-        if (event.keyCode === 13 && value) {
+        if (key === 'Enter' && value) {
             const searchUrl = buildSearchUrl(value);
             history.push(searchUrl);
         }
