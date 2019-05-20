@@ -10,6 +10,7 @@ servers:
   - url: https://workspace.ci.fairway.app/api/v1
 paths:
   /metadata/:
+    description: The metadata is stored as triples. Its structure should match the vocabulary definition in /vocabulary. Any updates that do not match the vocabulary definition will return a 400 status with a message indicating what went wrong.
     get:
       summary: Retrieve metadata
       operationId: getMetadata
@@ -325,6 +326,485 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /vocabulary/:
+    description: The vocabulary contains a description of the structure of the metadata. It contains the types of entities that can be created, along with the datatypes for the fields. It is stored in the [SHACL](https://www.w3.org/TR/shacl/) format.
+
+      The vocabulary structure should match the meta-vocabulary definition in /meta-vocabulary. Any updates that do not match that definition will return a 400 status with a message indicating what went wrong.
+    get:
+      summary: Retrieve vocabulary
+      operationId: getVocabulary
+      tags:
+        - vocabulary
+      parameters:
+        - name: subject
+          in: query
+          description: The subject to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: predicate
+          in: query
+          description: The predicate to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: object
+          in: query
+          description: The object to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: labels
+          in: query
+          description: If set, the response will include labels for the included objects
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A representation of the vocabulary that matches the given query.
+          content:
+            application/ld+json:
+              schema:
+                $ref: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
+              example: |
+                {
+                  "@context": {
+                    "dash": "http://datashapes.org/dash#",
+                    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+                    "schema": "http://schema.org/",
+                    "sh": "http://www.w3.org/ns/shacl#",
+                    "xsd": "http://www.w3.org/2001/XMLSchema#",
+                    "sh:datatype": { "@type": "@id" },
+                    "sh:path": { "@type": "@id" }
+                  },
+                  "@graph": [
+                    {
+                      "@id": "schema:AddressShape",
+                      "@type": "sh:NodeShape",
+                      "sh:closed": true,
+                      "sh:property": [
+                        {
+                          "sh:maxInclusive": 99999,
+                          "sh:minInclusive": 10000,
+                          "sh:or": {
+                            "@list": [
+                              {
+                                "sh:datatype": "xsd:string"
+                              },
+                              {
+                                "sh:datatype": "xsd:integer"
+                              }
+                            ]
+                          },
+                          "sh:path": "schema:postalCode"
+                        },
+                        {
+                          "sh:datatype": "xsd:string",
+                          "sh:path": "schema:streetAddress"
+                        }
+                      ]
+                    },
+                    {
+                      "@id": "schema:PersonShape",
+                      "@type": "sh:NodeShape",
+                      "sh:property": [
+                        {
+                          "sh:datatype": "xsd:string",
+                          "sh:name": "given name",
+                          "sh:path": "schema:givenName"
+                        },
+                        {
+                          "sh:lessThan": {
+                            "@id": "schema:deathDate"
+                          },
+                          "sh:maxCount": 1,
+                          "sh:path": "schema:birthDate"
+                        },
+                        {
+                          "sh:node": {
+                            "@id": "schema:AddressShape"
+                          },
+                          "sh:path": "schema:address"
+                        },
+                        {
+                          "sh:in": {
+                            "@list": [
+                              "female",
+                              "male"
+                            ]
+                          },
+                          "sh:path": "schema:gender"
+                        }
+                      ],
+                      "sh:targetClass": {
+                        "@id": "schema:Person"
+                      }
+                    }
+                  ]
+                }
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Adds a shacl definition to the vocabulary. Existing vocabulary is left untouched
+      operationId: putVocabulary
+      tags:
+        - vocabulary
+      requestBody:
+        content:
+          application/ld+json:
+            schema:
+              $ref: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
+            example: |
+              {
+                "@graph": [
+                  {
+                    "@id": "schema:PersonShape",
+                    "sh:name": "New name for personShape"
+                  }
+                ],
+                "@context": {
+                  "schema": "http://schema.org/",
+                  "sh": "http://www.w3.org/ns/shacl#",
+                }
+              }
+
+      responses:
+        '200':
+          description: Data was stored properly
+        '400':
+          description: Bad request. Either the syntax or the data was invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      summary: Adds a shacl definition to the vocabulary. Existing vocabulary entries are overwritten.
+      description: Any existing vocabulary definitions for a given subject/predicate combination will be overwritten with the provided values
+      operationId: patchVocabulary
+      tags:
+        - vocabulary
+      requestBody:
+        content:
+          application/ld+json:
+            schema:
+              $ref: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
+            example: |
+              {
+                "@graph": [
+                  {
+                    "@id": "schema:PersonShape",
+                    "sh:name": "New name for personShape"
+                  }
+                ],
+                "@context": {
+                  "schema": "http://schema.org/",
+                  "sh": "http://www.w3.org/ns/shacl#",
+                }
+              }
+
+      responses:
+        '200':
+          description: Data was stored properly
+        '400':
+          description: Bad request. Either the syntax or the data was invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete vocabulary entries
+      description: If a request body is given in JSON-LD format, the triples specified in the body will be deleted. Otherwise, all triples that match the parameters (subject, predicate, object) will be deleted.
+      operationId: deleteVocabulary
+      tags:
+        - vocabulary
+      parameters:
+        - name: subject
+          in: query
+          description: The subject to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: predicate
+          in: query
+          description: The predicate to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: object
+          in: query
+          description: The object to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+      requestBody:
+        content:
+          application/ld+json:
+            schema:
+              $ref: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
+            example: |
+              {
+                "@graph": [
+                  {
+                    "@id": "schema:PersonShape",
+                    "sh:name": "New name for personShape"
+                  }
+                ],
+                "@context": {
+                  "schema": "http://schema.org/",
+                  "sh": "http://www.w3.org/ns/shacl#",
+                }
+              }
+      responses:
+        '200':
+          description: Data was deleted
+        '400':
+          description: Bad request. Either the syntax was invalid, or the data would be invalidated by this deletion.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /vocabulary/entities/:
+    get:
+      summary: Retrieve vocabulary entities
+      operationId: getVocabularyEntities
+      tags:
+        - vocabulary
+      parameters:
+        - name: type
+          in: query
+          description: The type to filter on. If given, only entities of the specified type will be returned.
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: catalog
+          in: query
+          description: If set, the response will only return entities marked for which the type has `fs:showInCatalog` set to true in the meta-vocabulary. Can be used to retrieve all entities for which the type is marked as showInCatalog.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A representation of the vocabulary that matches the given query. The structure will include the id and the label for the entities, if present.
+          content:
+            application/ld+json:
+              schema:
+                $ref: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
+              example: |
+                {
+                  "@graph" : [ {
+                    "@id" : "ws:51cde887-b665-4585-af46-e8312d33c7d9",
+                    "@type" : "fs:ClassShape"
+                  }, {
+                    "@id" : "ws:a145dd0b-b1d5-41e4-a6db-cf8343399681",
+                    "@type" : "fs:RelationShape"
+                  } ],
+                  "@context" : {
+                    "label" : {
+                      "@id" : "http://www.w3.org/2000/01/rdf-schema#label"
+                    },
+                    "vocabulary" : "http://workspace.ci.fairway.app/vocabulary/",
+                    "sh" : "http://www.w3.org/ns/shacl#",
+                    "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
+                    "ws" : "http://workspace.ci.fairway.app/iri/",
+                    "fs" : "http://fairspace.io/ontology#"
+                  }
+                }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /meta-vocabulary/:
+    description: The meta-vocabulary contains a description of the structure of the vocabulary. It contains the types of entities that can be created, along with the datatypes for the fields. It is stored in the [SHACL](https://www.w3.org/TR/shacl/) format.
+
+      Please note that the meta-vocabulary is fixed and can only be changed in the code. This means that a client can
+      cache the response for the meta-vocabulary for a long time.
+
+    get:
+      summary: Retrieve meta-vocabulary
+      operationId: getMetaVocabulary
+      tags:
+        - vocabulary
+      parameters:
+        - name: subject
+          in: query
+          description: The subject to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: predicate
+          in: query
+          description: The predicate to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: object
+          in: query
+          description: The object to filter on
+          required: false
+          schema:
+            type: string
+            format: iri
+        - name: labels
+          in: query
+          description: If set, the response will include labels for the included objects
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A representation of the vocabulary that matches the given query.
+          content:
+            application/ld+json:
+              schema:
+                $ref: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
+              example: |
+                {
+                  "@context":{
+                    "fs":"http://fairspace.io/ontology#",
+                    "owl":"http://www.w3.org/2002/07/owl#",
+                    "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                    "sh":"http://www.w3.org/ns/shacl#",
+                    "xsd":"http://www.w3.org/2001/XMLSchema#",
+                    "sh:datatype": {"@type": "@id"},
+                    "sh:path": {"@type": "@id"}
+                  },
+                  "@graph":[
+                    {
+                      "@id":"fs:ClassShapeMetaShape",
+                      "@type":"sh:NodeShape",
+                      "fs:showInCatalog":true,
+                      "sh:closed":true,
+                      "sh:description":"Shape of classes.",
+                      "sh:ignoredProperties":{
+                        "@list":[
+                          {"@id":"rdf:type"},
+                          {"@id":"owl:sameAs"},
+                          {"@id":"sh:ignoredProperties"},
+                          {"@id":"sh:message"},
+                          {"@id":"fs:machineOnly"},
+                          {"@id":"fs:fixedShape"},
+                          {"@id":"fs:systemProperties"},
+                          {"@id":"sh:closed"},
+                          {"@id":"fs:createdBy"},
+                          {"@id":"fs:dateCreated"},
+                          {"@id":"fs:modifiedBy"},
+                          {"@id":"fs:dateModified"},
+                          {"@id":"fs:deletedBy"},
+                          {"@id":"fs:dateDeleted"}
+                        ]
+                      },
+                      "sh:name":"Class Shape",
+                      "sh:not":{
+                        "@id":"fs:ShapeIsAClosedShape"
+                      },
+                      "sh:property":[
+                        {
+                          "fs:showAsTable":true,
+                          "sh:class":{
+                            "@id":"sh:PropertyShape"
+                          },
+                          "sh:description":"List of all properties and relations for this class.",
+                          "sh:minCount":1,
+                          "sh:name":"Properties",
+                          "sh:path":"sh:property"
+                        },
+                        {
+                          "sh:datatype":"xsd:boolean",
+                          "sh:description":"This will allow user to create new instances of this class which show up in the metadata browser.",
+                          "sh:maxCount":1,
+                          "sh:name":"Show in catalog",
+                          "sh:path":"fs:showInCatalog"
+                        },
+                        {
+                          "sh:datatype":"xsd:string",
+                          "sh:maxCount":1,
+                          "sh:minCount":1,
+                          "sh:name":"Class description",
+                          "sh:path":"sh:description"
+                        },
+                        {
+                          "sh:description":"IRI of the class this shape constrains.",
+                          "sh:maxCount":1,
+                          "sh:minCount":1,
+                          "sh:name":"Target class",
+                          "sh:nodeKind":{
+                            "@id":"sh:IRI"
+                          },
+                          "sh:path":"sh:targetClass"
+                        },
+                        {
+                          "sh:datatype":"xsd:string",
+                          "sh:maxCount":1,
+                          "sh:maxLength":128,
+                          "sh:minCount":1,
+                          "sh:name":"Class name",
+                          "sh:path":"sh:name"
+                        }
+                      ],
+                      "sh:targetClass":{
+                        "@id":"fs:ClassShape"
+                      }
+                    }
+                  ]
+                }
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
 
   /collections/:
     get:
