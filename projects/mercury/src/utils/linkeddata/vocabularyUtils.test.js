@@ -20,6 +20,19 @@ describe('vocabularyUtils', () => {
         });
     });
 
+    describe('determineShapeForProperty', () => {
+        it('returns the correct shape given a url', () => {
+            expect(vocabulary.determineShapeForProperty('http://www.w3.org/2000/01/rdf-schema#comment')['@id']).toEqual('http://www.w3.org/2000/01/rdf-schema#commentShape');
+        });
+        it('returns the correct shape if there is also a blank node pointing to it', () => {
+            expect(vocabulary.determineShapeForProperty('http://fairspace.io/ontology#list')['@id']).toEqual('http://fairspace.io/ontology#listShape');
+        });
+
+        it('is undefined if there is only a blank node for a property', () => {
+            expect(vocabulary.determineShapeForProperty('http://fairspace.io/ontology#only-blank')).toBe(undefined);
+        });
+    });
+
     describe('vocabulary contains', () => {
         it('should return true if the given id is present in the vocabulary', () => expect(vocabulary.contains(vocabularyJsonLd[0]['@id'])).toBe(true));
         it('should return false if the given id is not present in the vocabulary', () => expect(vocabulary.contains('http://not-present')).toBe(false));
