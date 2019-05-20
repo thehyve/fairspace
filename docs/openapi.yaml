@@ -353,11 +353,11 @@ paths:
                 single:
                   value: |
                     {
-                      "iri": "http://localhost/iri/3a95581c-de86-4977-a853-0237b3ee728e",
+                      "iri": "http://workspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
                       "dateCreated": "2019-04-24T13:49:05.547Z",
-                      "createdBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                      "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                       "dateModified": "2019-04-24T13:49:05.547Z",
-                      "modifiedBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                      "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                       "dateDeleted": null,
                       "deletedBy": null,
                       "name": "Collection update",
@@ -373,11 +373,11 @@ paths:
                   value: |
                     [
                       {
-                        "iri": "http://localhost/iri/3a95581c-de86-4977-a853-0237b3ee728e",
+                        "iri": "http://workspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
                         "dateCreated": "2019-04-24T13:49:05.547Z",
-                        "createdBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                        "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                         "dateModified": "2019-04-24T13:49:05.547Z",
-                        "modifiedBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                        "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                         "dateDeleted": null,
                         "deletedBy": null,
                         "name": "Collection update",
@@ -390,11 +390,11 @@ paths:
                         "canRead": true
                       },
                       {
-                          "iri": "http://localhost/iri/f1487ce4-e4c4-4243-af34-18e33d0be7e5",
+                          "iri": "http://workspace.ci.fairway.app/iri/f1487ce4-e4c4-4243-af34-18e33d0be7e5",
                           "dateCreated": "2019-04-24T14:14:18.093Z",
-                          "createdBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                          "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                           "dateModified": "2019-04-24T14:14:18.093Z",
-                          "modifiedBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                          "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                           "dateDeleted": null,
                           "deletedBy": null,
                           "name": "test",
@@ -428,11 +428,11 @@ paths:
                 $ref: '#/components/schemas/ReturnedCollection'
               example: |
                 {
-                  "iri": "http://localhost/iri/3a95581c-de86-4977-a853-0237b3ee728e",
+                  "iri": "http://workspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
                   "dateCreated": "2019-04-24T13:49:05.547Z",
-                  "createdBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                  "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                   "dateModified": "2019-04-24T13:49:05.547Z",
-                  "modifiedBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                  "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                   "dateDeleted": null,
                   "deletedBy": null,
                   "name": "Collection update",
@@ -465,11 +465,11 @@ paths:
                 $ref: '#/components/schemas/ReturnedCollection'
               example: |
                 {
-                  "iri": "http://localhost/iri/3a95581c-de86-4977-a853-0237b3ee728e",
+                  "iri": "http://workspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
                   "dateCreated": "2019-04-24T13:49:05.547Z",
-                  "createdBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                  "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                   "dateModified": "2019-04-24T13:49:05.547Z",
-                  "modifiedBy": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                  "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                   "dateDeleted": null,
                   "deletedBy": null,
                   "name": "Collection update",
@@ -535,7 +535,7 @@ paths:
                 single:
                   value: |
                     {
-                        "user": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                        "user": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                         "access": "Manage",
                         "canWrite": true,
                         "canManage": true,
@@ -545,14 +545,14 @@ paths:
                   value: |
                     [
                       {
-                          "user": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                          "user": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                           "access": "Manage",
                           "canWrite": true,
                           "canManage": true,
                           "canRead": true
                       },
                       {
-                          "user": "http://localhost/iri/other-user",
+                          "user": "http://workspace.ci.fairway.app/iri/other-user",
                           "access": "Write",
                           "canWrite": true,
                           "canManage": false,
