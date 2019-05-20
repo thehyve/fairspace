@@ -24,6 +24,7 @@ import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.out.NodeFmtLib.str;
+import static org.apache.jena.riot.out.NodeFmtLib.strNodes;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 
 public class SparqlUtils {
@@ -34,15 +35,35 @@ public class SparqlUtils {
         var params = new Object[args.length];
         for (int i = 0; i < args.length; i++) {
             var arg = args[i];
-            if (arg instanceof Resource) {
-                arg = ((Resource) arg).asNode();
+            String param;
+
+            if(arg == null) {
+                param = "?" + i;
+            } else if(arg instanceof Collection) {
+                var nodes = ((Collection<Object>) arg).stream()
+                        .filter(Objects::nonNull)
+                        .map(SparqlUtils::toSerializableNode)
+                        .toArray(Node[]::new);
+
+                param = strNodes(nodes);
+            } else {
+                param = toString(toSerializableNode(arg));
             }
-            if (arg instanceof Node && ((Node)arg).isURI()) {
-                validateIRI(((Node) arg).getURI());
-            }
-            params[i] = arg != null ? toString(arg) : "?" + i;
+
+            params[i] = param;
         }
         return format(template, (Object[]) params);
+    }
+
+    private static Node toSerializableNode(Object value) {
+        if (value instanceof Resource) {
+            value = ((Resource) value).asNode();
+        }
+        if (value instanceof Node && ((Node)value).isURI()) {
+            validateIRI(((Node) value).getURI());
+        }
+
+        return toNode(value);
     }
 
     @SneakyThrows(IOException.class)
