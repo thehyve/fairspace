@@ -7,10 +7,9 @@ const defaultState = {invalidated: true, data: []};
 export const metadataCreateReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.CREATE_METADATA_ENTITY_FULFILLED: {
-            const metadata = {'@id': action.meta.subject, '@type': [action.meta.type]};
             return {
                 ...state,
-                data: [...state.data, metadata],
+                data: [],
                 invalidated: true,
             };
         }

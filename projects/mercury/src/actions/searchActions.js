@@ -1,12 +1,26 @@
-import searchAPI from "../services/SearchAPI";
 import * as actionTypes from "./actionTypes";
 import {createErrorHandlingPromiseAction} from "../utils/redux";
+import searchAPI from "../services/SearchAPI";
+import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
+import {getVocabulary} from "../reducers/cache/vocabularyReducers";
+import {getFirstPredicateId} from "../utils/linkeddata/jsonLdUtils";
+import * as constants from "../constants";
 
-export const performSearch = createErrorHandlingPromiseAction((query, searchType) => ({
+export const searchCollections = createErrorHandlingPromiseAction((query) => ({
     type: actionTypes.PERFORM_SEARCH,
-    payload: searchAPI().performSearch(query, searchType),
+    payload: searchAPI().searchCollections(query),
     meta: {
-        searchType,
         query
     }
 }));
+
+export const searchMetadata = (query) => (dispatch, getState) => dispatch({
+    type: actionTypes.FETCH_ALL_METADATA_ENTITIES,
+    payload: dispatch(fetchMetadataVocabularyIfNeeded())
+        .then(() => {
+            const vocabulary = getVocabulary(getState());
+            const iris = vocabulary.getClassesInCatalog()
+                .map(c => getFirstPredicateId(c, constants.SHACL_TARGET_CLASS));
+            return searchAPI().searchMetadata(iris, query);
+        })
+});

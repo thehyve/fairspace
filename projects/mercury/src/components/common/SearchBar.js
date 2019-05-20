@@ -1,55 +1,43 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {withRouter} from "react-router-dom";
 import {InputBase, withStyles} from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
 import styles from './SearchBar.styles';
-import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
 
-class SearchBar extends React.Component {
-    state = {
-        value: getSearchQueryFromString(this.props.location.search)
+const SearchBar = ({classes, query = '', placeholder, onKeyDown = () => {}}) => {
+    const [value, setValue] = useState(query);
+
+    const handleChange = (event) => {
+        setValue(event.target.value);
     };
 
-    handleChange = (event) => {
-        this.setState({value: event.target.value});
-    }
+    const handleOnKeyDown = (event) => {
+        onKeyDown(event, value);
+    };
 
-    handleKeyDown = (event) => {
-        // if Enter is pressed and search has value
-        if (event.keyCode === 13 && this.state.value) {
-            const searchUrl = buildSearchUrl(this.state.value);
-            this.props.history.push(searchUrl);
-        }
-    }
-
-    render() {
-        const {classes, placeholder} = this.props;
-
-        return (
-            <div className={classes.search}>
-                <div className={classes.searchIcon}>
-                    <SearchIcon />
-                </div>
-                <InputBase
-                    placeholder={placeholder}
-                    classes={{
-                        root: classes.inputRoot,
-                        input: classes.inputInput,
-                    }}
-                    value={this.state.value}
-                    onChange={this.handleChange}
-                    onKeyDown={this.handleKeyDown}
-                />
+    return (
+        <div className={classes.search}>
+            <div className={classes.searchIcon}>
+                <SearchIcon />
             </div>
-        );
-    }
-}
+            <InputBase
+                placeholder={placeholder}
+                classes={{
+                    root: classes.inputRoot,
+                    input: classes.inputInput,
+                }}
+                value={value}
+                onChange={handleChange}
+                onKeyDown={handleOnKeyDown}
+            />
+        </div>
+    );
+};
 
 SearchBar.propTypes = {
     classes: PropTypes.object.isRequired,
     placeholder: PropTypes.string
 };
 
-export default withRouter(withStyles(styles)(SearchBar));
+export default withStyles(styles)(SearchBar);
