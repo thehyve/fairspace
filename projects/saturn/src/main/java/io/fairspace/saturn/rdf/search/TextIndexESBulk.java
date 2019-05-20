@@ -6,6 +6,7 @@ import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.query.text.TextIndexException;
 import org.apache.jena.query.text.es.TextIndexES;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
@@ -70,16 +71,17 @@ public class TextIndexESBulk extends TextIndexES {
         var bulk = new BulkRequest();
         updates.forEach(bulk::add);
         updates.clear();
+        BulkResponse response;
         try {
             var start = currentTimeMillis();
-            var response = client.bulk(bulk).get();
+            response = client.bulk(bulk).get();
             var finish = currentTimeMillis();
             LOGGER.debug("Indexing in ElasticSearch took {} ms", finish - start);
-            if (response.hasFailures()) {
-                LOGGER.error("The response contains errors:" + response);
-            }
         } catch (Exception e) {
-            throw new TextIndexException("Unable to Index the Entity in ElasticSearch.", e);
+            throw new TextIndexException("Error indexing in ElasticSearch", e);
+        }
+        if (response.hasFailures()) {
+            throw new TextIndexException(response.buildFailureMessage());
         }
     }
 
