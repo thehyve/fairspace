@@ -9,22 +9,14 @@ const SearchBar = ({
     classes, query = '', placeholder, onSearchChange = () => {}
 }) => {
     const [value, setValue] = useState(query);
-    const [keyDown, setKeyDown] = useState({key: null, shouldHandle: false});
 
     const handleChange = (event) => {
         setValue(event.target.value);
-
-        if (keyDown.shouldHandle) {
-            onSearchChange(keyDown.key, event.target.value);
-            setKeyDown({key: null, shouldHandle: false});
-        }
     };
 
     const handleOnKeyDown = ({key}) => {
-        if (key === 'Enter') {
-            onSearchChange(key, value);
-        } else {
-            setKeyDown({key, shouldHandle: true});
+        if (key === 'Enter' && value) {
+            onSearchChange(value);
         }
     };
 

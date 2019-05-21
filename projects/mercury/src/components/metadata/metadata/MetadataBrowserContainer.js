@@ -25,7 +25,7 @@ const MetadataBrowserContainer = ({searchMetadata: search, ...otherProps}) => (
             <SearchBar
                 placeholder="Search"
                 disableUnderline
-                onSearchChange={(key, val) => {
+                onSearchChange={(val) => {
                     search(val);
                 }}
             />
