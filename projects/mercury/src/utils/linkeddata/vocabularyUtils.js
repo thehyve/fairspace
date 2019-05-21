@@ -64,8 +64,8 @@ export const vocabularyUtils = (vocabulary = []) => {
      * @param propertyUri
      */
     const determineShapeForProperty = (propertyUri) => vocabulary.find(
-        entry => getFirstPredicateValue(entry, constants.SHACL_NAME)
-            && getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri
+        entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri
+            && getFirstPredicateValue(entry, constants.SHACL_NAME)
     );
 
     /**
