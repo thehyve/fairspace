@@ -2,7 +2,7 @@ import elasticsearch from "elasticsearch";
 import _ from 'lodash';
 
 import Config from "./Config/Config";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from '../constants';
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from '../constants';
 import {getFirstIfSingleItemArray} from '../utils/genericUtils';
 
 const ES_INDEX = 'fairspace';
@@ -81,7 +81,7 @@ export class SearchAPI {
     /**
      * @returns {Promise}
      */
-    searchMetadata = (types, query = '*') => this.search({query, size: 9999, types});
+    searchMetadata = (types, query = '*') => this.search({query, size: SEARCH_MAX_SIZE, types});
 
     /**
      * Transforms the search result into a format that can be used internally. The format looks like this:
