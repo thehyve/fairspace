@@ -1,7 +1,7 @@
 import {expand} from 'jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
-import {toJsonLd} from "../utils/linkeddata/jsonLdConverter";
+import {normalizeTypes, toJsonLd} from "../utils/linkeddata/jsonLdConverter";
 
 class LinkedDataAPI {
     static getParams = {
@@ -44,7 +44,8 @@ class LinkedDataAPI {
         return fetch(`${this.getStatementsUrl()}?labels&${query}`, LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
-            .then(expand);
+            .then(expand)
+            .then(normalizeTypes);
     }
 
     /**
@@ -111,7 +112,8 @@ class LinkedDataAPI {
         return fetch(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(expand);
+            .then(expand)
+            .then(normalizeTypes);
     }
 
     /**
@@ -128,7 +130,8 @@ class LinkedDataAPI {
         return fetch(this.getEntitiesUrl() + "?catalog", LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(expand);
+            .then(expand)
+            .then(normalizeTypes);
     }
 
     /**

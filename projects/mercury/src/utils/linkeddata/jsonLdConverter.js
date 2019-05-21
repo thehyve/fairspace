@@ -253,3 +253,21 @@ export const emptyLinkedData = (vocabulary, shape) => {
     // Generate a list of empty properties
     return generatePropertiesForMetadata(vocabulary, {}, types, propertyShapes, []);
 };
+
+
+const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+
+/**
+ * Replaces all occurrences of rdf:type with @type
+ * @param expandedMetadata
+ * @returns {*}
+ */
+export const normalizeTypes = (expandedMetadata) =>
+    expandedMetadata.map(e => {
+        let typed = {
+            ...e,
+            '@type': e['@type'] || e[RDF_TYPE]
+        };
+        delete typed[RDF_TYPE];
+        return typed;
+    });
