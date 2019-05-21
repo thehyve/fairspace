@@ -2,6 +2,7 @@ import React from 'react';
 import Paper from "@material-ui/core/Paper";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
+
 import {createMetadataIri, getLabel, relativeLink, partitionErrors, linkLabel} from "../../../utils/linkeddata/metadataUtils";
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
@@ -24,7 +25,7 @@ const MetadataBrowserContainer = ({searchMetadata: search, ...otherProps}) => (
             <SearchBar
                 placeholder="Search"
                 disableUnderline
-                onKeyDown={(e, val) => {
+                onSearchChange={(key, val) => {
                     search(val);
                 }}
             />

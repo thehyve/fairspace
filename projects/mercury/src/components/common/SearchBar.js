@@ -5,23 +5,24 @@ import SearchIcon from '@material-ui/icons/Search';
 
 import styles from './SearchBar.styles';
 
-const SearchBar = ({classes, query = '', placeholder, onKeyDown = () => {}}) => {
+const SearchBar = ({
+    classes, query = '', placeholder, onSearchChange = () => {}
+}) => {
     const [value, setValue] = useState(query);
     const [keyDown, setKeyDown] = useState({key: null, shouldHandle: false});
-
 
     const handleChange = (event) => {
         setValue(event.target.value);
 
         if (keyDown.shouldHandle) {
-            onKeyDown(keyDown.key, event.target.value);
+            onSearchChange(keyDown.key, event.target.value);
             setKeyDown({key: null, shouldHandle: false});
         }
     };
 
     const handleOnKeyDown = ({key}) => {
         if (key === 'Enter') {
-            onKeyDown(key, value);
+            onSearchChange(key, value);
         } else {
             setKeyDown({key, shouldHandle: true});
         }

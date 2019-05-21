@@ -19,7 +19,7 @@ const styles = theme => ({
 const TopBar = ({classes, workspaceName, location, history}) => {
     const query = getSearchQueryFromString(location.search);
 
-    const onKeyDown = (key, value) => {
+    const handleSearch = (key, value) => {
         // if Enter is pressed and search has value
         if (key === 'Enter' && value) {
             const searchUrl = buildSearchUrl(value);
@@ -33,7 +33,7 @@ const TopBar = ({classes, workspaceName, location, history}) => {
                 <Typography variant="h6" color="inherit" noWrap className={classes.title}>
                     {workspaceName}
                 </Typography>
-                <SearchBar query={query} onKeyDown={onKeyDown} />
+                <SearchBar query={query} onSearchChange={handleSearch} />
                 <UserMenu onLogout={logout} />
             </Toolbar>
         </AppBar>
