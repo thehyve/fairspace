@@ -15,7 +15,7 @@ export const searchCollections = createErrorHandlingPromiseAction((query) => ({
 }));
 
 export const searchMetadata = (query) => (dispatch, getState) => dispatch({
-    type: actionTypes.FETCH_ALL_METADATA_ENTITIES,
+    type: actionTypes.PERFORM_SEARCH,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
         .then(() => {
             const vocabulary = getVocabulary(getState());

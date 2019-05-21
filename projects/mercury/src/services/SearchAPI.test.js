@@ -12,13 +12,13 @@ describe('Search API', () => {
         searchAPI = new SearchAPI(mockClient);
     });
 
-    it('forwards the query to ES', () => searchAPI.performSearch('my-query')
+    it('forwards the query to ES', () => searchAPI.searchCollections('my-query')
         .then(() => {
             expect(mockClient.search.mock.calls.length).toEqual(1);
             expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query).toEqual('my-query');
         }));
 
-    it('filters deleted entities from ES results', () => searchAPI.performSearch('my-query')
+    it('filters deleted entities from ES results', () => searchAPI.searchCollections('my-query')
         .then(() => {
             expect(mockClient.search.mock.calls.length).toEqual(1);
             expect(mockClient.search.mock.calls[0][0].body.query.bool.must_not.exists.field).toEqual(
@@ -26,7 +26,7 @@ describe('Search API', () => {
             );
         }));
 
-    it('filters ES results based on types', () => searchAPI.performSearch('my-query')
+    it('filters ES results based on types', () => searchAPI.searchCollections('my-query')
         .then(() => {
             expect(mockClient.search.mock.calls.length).toEqual(1);
             expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword']).toEqual(
@@ -62,7 +62,7 @@ describe('Search API', () => {
             };
 
             mockClient.search = jest.fn(() => Promise.resolve(esResult));
-            return searchAPI.performSearch()
+            return searchAPI.searchCollections()
                 .then(result => {
                     expect(result.total).toEqual(123);
                     expect(result.items.length).toEqual(1);
@@ -105,7 +105,7 @@ describe('Search API', () => {
                 });
 
                 expect(transformedHit.label).toEqual("text");
-                expect(transformedHit.numberList).toEqual([4]);
+                expect(transformedHit.numberList).toEqual(4);
             });
             it('adds id, score and highlight', () => {
                 const transformedHit = searchAPI.transformESHit({

@@ -1,4 +1,4 @@
-import {findById, flattenShallow, compareBy, comparing} from "./genericUtils";
+import {findById, flattenShallow, compareBy, comparing, getFirstIfSingleItemArray} from "./genericUtils";
 
 describe('array Utils', () => {
     describe('findById', () => {
@@ -46,6 +46,21 @@ describe('array Utils', () => {
 
         it('goes only one level deep', () => {
             expect(flattenShallow([[[1, 2, 3]], [[4, 5]]])).toEqual([[1, 2, 3], [4, 5]]);
+        });
+    });
+
+    describe('getFirstIfSingleItemArray', () => {
+        it('return null if empty or null', () => {
+            expect(getFirstIfSingleItemArray([])).toBeNull();
+            expect(getFirstIfSingleItemArray(null)).toBeNull();
+            expect(getFirstIfSingleItemArray(undefined)).toBeUndefined();
+        });
+        it('return single item if single item array', () => {
+            expect(getFirstIfSingleItemArray([5])).toBe(5);
+            expect(getFirstIfSingleItemArray(['item'])).toBe('item');
+        });
+        it('return array as it if it has more than one item', () => {
+            expect(getFirstIfSingleItemArray([1, null, 9, 'x'])).toEqual([1, null, 9, 'x']);
         });
     });
 });

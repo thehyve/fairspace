@@ -2,7 +2,8 @@ import * as actionTypes from "../actions/actionTypes";
 
 const initialState = {
     pending: false,
-    results: {items: [], total: 0},
+    items: [],
+    total: 0,
     error: null
 };
 
@@ -12,19 +13,22 @@ const searchReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pending: true,
-                results: {}
+                items: [],
+                total: 0
             };
         case actionTypes.PERFORM_SEARCH_FULFILLED:
             return {
                 ...state,
                 pending: false,
                 error: null,
-                results: {...action.payload}
+                ...action.payload
             };
         case actionTypes.PERFORM_SEARCH_REJECTED:
             return {
                 ...state,
                 pending: false,
+                items: [],
+                total: 0,
                 error: action.payload.message
             };
         default:
@@ -33,3 +37,9 @@ const searchReducer = (state = initialState, action) => {
 };
 
 export default searchReducer;
+
+export const getSearchResults = ({search}) => search;
+
+export const isSearchPending = (state) => getSearchResults(state).pending;
+
+export const hasSearchError = (state) => !!getSearchResults(state).error;

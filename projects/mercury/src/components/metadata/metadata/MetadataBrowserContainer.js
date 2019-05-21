@@ -6,7 +6,8 @@ import {createMetadataIri, getLabel, relativeLink, partitionErrors, linkLabel} f
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 import {searchMetadata} from "../../../actions/searchActions";
-import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {getVocabulary} from "../../../reducers/cache/vocabularyReducers";
+import {getSearchResults, isSearchPending, hasSearchError} from "../../../reducers/searchReducers";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import * as constants from "../../../constants";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
@@ -34,16 +35,15 @@ const MetadataBrowserContainer = ({searchMetadata: search, ...otherProps}) => (
 );
 
 const mapStateToProps = (state) => {
-    const {cache: {allEntities}} = state;
-    const pending = isVocabularyPending(state) || !allEntities || allEntities.pending;
-    const allEntitiesData = (allEntities && allEntities.data && allEntities.data.items) || [];
+    const pending = isSearchPending(state);
+    const {items} = getSearchResults(state);
+    const error = hasSearchError(state);
     const vocabulary = getVocabulary(state);
-
-    const entities = allEntitiesData.map(e => ({
-        id: e.id,
-        label: e.label || e.name || linkLabel(e.id, true),
-        type: e.type,
-        typeLabel: getLabel(vocabulary.determineShapeForType(e.type), true)
+    const entities = items.map(({id, type, label, name}) => ({
+        id,
+        label: label || name || linkLabel(id, true),
+        type,
+        typeLabel: getLabel(vocabulary.determineShapeForType(type), true)
     }));
 
     const onError = (e, id) => {
@@ -56,7 +56,7 @@ const mapStateToProps = (state) => {
 
     return {
         loading: pending,
-        error: allEntities ? allEntities.error : false,
+        error,
         shapes: vocabulary.getClassesInCatalog(),
         valueComponentFactory: MetadataValueComponentFactory,
         vocabulary,

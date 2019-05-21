@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import Config from "./Config/Config";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from '../constants';
+import {getFirstIfSingleItemArray} from '../utils/genericUtils';
 
 const ES_INDEX = 'fairspace';
 
@@ -117,25 +118,17 @@ export class SearchAPI {
      * Please note that this format is not capable of returning source fields called 'id', 'score' or 'highlight'
      */
     transformESHit = (hit) => {
-        const source = _.mapValues(hit._source, this.getFirstItemIfSizeIsOne);
-        return (hit ? {
+        if (!hit) {
+            return {};
+        }
+
+        const source = _.mapValues(hit._source, getFirstIfSingleItemArray);
+        return {
             ...source,
             id: hit._id,
             score: hit._score,
             highlight: hit.highlight
-        } : {});
-    };
-
-    getFirstItemIfSizeIsOne = (value) => {
-        if (Array.isArray(value)) {
-            if (value.length === 0) {
-                return null;
-            } if (value.length === 1) {
-                return value[0];
-            }
-        }
-
-        return value;
+        };
     };
 }
 
