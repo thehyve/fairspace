@@ -263,9 +263,9 @@ export const emptyLinkedData = (vocabulary, shape) => {
 export const normalizeTypes = (expandedMetadata) =>
     expandedMetadata.map(e => {
         if (!e['@type'] && e[RDF_TYPE]) {
-            const {[RDF_TYPE]: type, ...rest} = e;
+            const {[RDF_TYPE]: types, ...rest} = e;
             return {
-                '@type': type,
+                '@type': types.map(t => t['@id']),
                 ...rest
             };
         }
