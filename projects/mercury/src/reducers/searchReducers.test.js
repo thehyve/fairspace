@@ -19,7 +19,7 @@ describe('Search reducers', () => {
     it('should return proper pending value after firing pending action', () => {
         expect(
             collectionsSearchReducer(undefined, {
-                type: actionTypes.COLLECTION_SEARCH_PENDING,
+                type: actionTypes.COLLECTIONS_SEARCH_PENDING,
                 meta: {searchType: 'collections'},
             })
         ).toEqual({
@@ -33,7 +33,7 @@ describe('Search reducers', () => {
     it('should update results on search success', () => {
         const results = {items: ['item 1', 'item 2']};
         const action = {
-            type: actionTypes.COLLECTION_SEARCH_FULFILLED,
+            type: actionTypes.COLLECTIONS_SEARCH_FULFILLED,
             payload: results,
             meta: {searchType: 'collections'},
         };

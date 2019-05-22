@@ -62,7 +62,6 @@ export const metadataSearchReducer = (state = initialState, action) => {
     }
 };
 
-
 //* ********************
 //* * SELECTORS
 //* ********************
