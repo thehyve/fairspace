@@ -14,8 +14,9 @@ const SearchBar = ({
         setValue(event.target.value);
     };
 
-    const handleOnKeyDown = ({key}) => {
-        if (key === 'Enter' && value) {
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (value) {
             onSearchChange(value);
         }
     };
@@ -25,16 +26,19 @@ const SearchBar = ({
             <div className={classes.searchIcon}>
                 <SearchIcon />
             </div>
-            <InputBase
-                placeholder={placeholder}
-                classes={{
-                    root: classes.inputRoot,
-                    input: classes.inputInput,
-                }}
-                value={value}
-                onChange={handleChange}
-                onKeyDown={handleOnKeyDown}
-            />
+            <form
+                onSubmit={handleSearch}
+            >
+                <InputBase
+                    placeholder={placeholder}
+                    classes={{
+                        root: classes.inputRoot,
+                        input: classes.inputInput,
+                    }}
+                    value={value}
+                    onChange={handleChange}
+                />
+            </form>
         </div>
     );
 };
