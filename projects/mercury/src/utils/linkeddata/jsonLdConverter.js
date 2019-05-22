@@ -262,10 +262,12 @@ export const emptyLinkedData = (vocabulary, shape) => {
  */
 export const normalizeTypes = (expandedMetadata) =>
     expandedMetadata.map(e => {
-        let typed = {
-            ...e,
-            '@type': e['@type'] || e[RDF_TYPE]
-        };
-        delete typed[RDF_TYPE];
-        return typed;
+        if (!e['@type'] && e[RDF_TYPE]) {
+            const {[RDF_TYPE]: type, ...rest} = e;
+            return {
+                '@type': type,
+                ...rest
+            };
+        }
+        return e;
     });
