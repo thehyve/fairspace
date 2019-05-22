@@ -62,13 +62,13 @@ class LinkedDataBrowser extends React.Component {
     };
 
     render() {
-        const {loading, error, entities} = this.props;
+        const {loading, hasError, entities} = this.props;
 
         if (loading) {
             return <LoadingInlay />;
         }
 
-        if (error) {
+        if (hasError) {
             return <ErrorMessage message="An error occurred while loading metadata" />;
         }
 
@@ -121,7 +121,7 @@ LinkedDataBrowser.propTypes = {
     create: PropTypes.func.isRequired,
 
     loading: PropTypes.bool,
-    error: PropTypes.bool,
+    hasError: PropTypes.bool,
     shapes: PropTypes.array,
     entities: PropTypes.array,
     editable: PropTypes.bool,

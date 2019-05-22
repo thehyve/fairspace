@@ -1,4 +1,4 @@
-import * as actionTypes from "./actionTypes";
+import {COLLECTIONS_SEARCH, METADATA_SEARCH} from "./actionTypes";
 import {createErrorHandlingPromiseAction} from "../utils/redux";
 import searchAPI from "../services/SearchAPI";
 import {fetchMetadataVocabularyIfNeeded} from "./vocabularyActions";
@@ -7,7 +7,7 @@ import {getFirstPredicateId} from "../utils/linkeddata/jsonLdUtils";
 import * as constants from "../constants";
 
 export const searchCollections = createErrorHandlingPromiseAction((query) => ({
-    type: actionTypes.PERFORM_SEARCH,
+    type: COLLECTIONS_SEARCH,
     payload: searchAPI().searchCollections(query),
     meta: {
         query
@@ -15,7 +15,7 @@ export const searchCollections = createErrorHandlingPromiseAction((query) => ({
 }));
 
 export const searchMetadata = (query) => (dispatch, getState) => dispatch({
-    type: actionTypes.PERFORM_SEARCH,
+    type: METADATA_SEARCH,
     payload: dispatch(fetchMetadataVocabularyIfNeeded())
         .then(() => {
             const vocabulary = getVocabulary(getState());

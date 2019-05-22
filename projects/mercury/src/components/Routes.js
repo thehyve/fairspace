@@ -5,7 +5,7 @@ import Home from "./Home";
 import Collections from "./collections/CollectionsPage";
 import Notebooks from "./Notebooks";
 import MetadataEntityPage from "./metadata/metadata/MetadataEntityPage";
-import MetadataBrowserContainer from "./metadata/metadata/MetadataBrowserContainer";
+import MetadataListPage from "./metadata/metadata/MetadataListPage";
 import FilesPage from "./file/FilesPage";
 import logout from "../services/logout";
 import SearchPage from './search/SearchPage';
@@ -18,7 +18,7 @@ const routes = () => (
         <Route path="/collections" exact component={Collections} />
         <Route path="/collections/:collection/:path(.*)?" component={FilesPage} />
         <Route path="/notebooks" exact component={Notebooks} />
-        <Route path="/metadata" exact component={MetadataBrowserContainer} />
+        <Route path="/metadata" exact component={MetadataListPage} />
         <Route path="/iri/**" component={MetadataEntityPage} />
         <Route path="/vocabulary" exact component={VocabularyListPage} />
         <Route path="/vocabulary/**" exact component={VocabularyEntityPage} />

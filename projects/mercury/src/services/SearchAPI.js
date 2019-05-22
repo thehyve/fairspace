@@ -25,6 +25,9 @@ export class SearchAPI {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
+                must: [{
+                    query_string: {query}
+                }],
                 must_not: {
                     exists: {
                         field: "dateDeleted"
@@ -32,12 +35,6 @@ export class SearchAPI {
                 }
             }
         };
-
-        if (query) {
-            esQuery.bool.must = [
-                {query_string: {query}}
-            ];
-        }
 
         // Add types filter, if specified
         if (types && Array.isArray(types)) {

@@ -7,39 +7,66 @@ const initialState = {
     error: null
 };
 
-const searchReducer = (state = initialState, action) => {
+const genericSearchReducer = (state = initialState, action) => {
+    if (action.type.endsWith('PENDING')) {
+        return {
+            ...state,
+            pending: true,
+            items: [],
+            total: 0
+        };
+    }
+    if (action.type.endsWith('FULFILLED')) {
+        return {
+            ...state,
+            pending: false,
+            error: null,
+            ...action.payload
+        };
+    }
+    if (action.type.endsWith('REJECTED')) {
+        return {
+            ...state,
+            pending: false,
+            items: [],
+            total: 0,
+            error: action.payload.message
+        };
+    }
+    return state;
+};
+
+export const collectionsSearchReducer = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.PERFORM_SEARCH_PENDING:
-            return {
-                ...state,
-                pending: true,
-                items: [],
-                total: 0
-            };
-        case actionTypes.PERFORM_SEARCH_FULFILLED:
-            return {
-                ...state,
-                pending: false,
-                error: null,
-                ...action.payload
-            };
-        case actionTypes.PERFORM_SEARCH_REJECTED:
-            return {
-                ...state,
-                pending: false,
-                items: [],
-                total: 0,
-                error: action.payload.message
-            };
+        case actionTypes.COLLECTIONS_SEARCH_PENDING:
+            return genericSearchReducer(state, action);
+        case actionTypes.COLLECTIONS_SEARCH_FULFILLED:
+            return genericSearchReducer(state, action);
+        case actionTypes.COLLECTIONS_SEARCH_REJECTED:
+            return genericSearchReducer(state, action);
         default:
             return state;
     }
 };
 
-export default searchReducer;
+export const metadataSearchReducer = (state = initialState, action) => {
+    switch (action.type) {
+        case actionTypes.METADATA_SEARCH_PENDING:
+            return genericSearchReducer(state, action);
+        case actionTypes.METADATA_SEARCH_FULFILLED:
+            return genericSearchReducer(state, action);
+        case actionTypes.METADATA_SEARCH_REJECTED:
+            return genericSearchReducer(state, action);
+        default:
+            return state;
+    }
+};
 
-export const getSearchResults = ({search}) => search;
 
-export const isSearchPending = (state) => getSearchResults(state).pending;
+//* ********************
+//* * SELECTORS
+//* ********************
 
-export const hasSearchError = (state) => !!getSearchResults(state).error;
+export const getCollectionsSearchResults = ({collectionSearch}) => collectionSearch;
+
+export const getMetadataSearchResults = ({metadataSearch}) => metadataSearch;

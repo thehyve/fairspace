@@ -13,7 +13,7 @@ import * as collectionBrowserActions from "../../actions/collectionBrowserAction
 import {ErrorMessage} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
 import {getVocabulary, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
-import {getSearchResults, isSearchPending, hasSearchError} from "../../reducers/searchReducers";
+import {getCollectionsSearchResults} from "../../reducers/searchReducers";
 
 // Exporting here to be able to test the component outside of Redux
 export class SearchPage extends React.Component {
@@ -80,15 +80,14 @@ export class SearchPage extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const results = getSearchResults(state);
-    const error = hasSearchError(state);
-    const loading = isSearchPending(state) || isVocabularyPending(state);
+    const results = getCollectionsSearchResults(state);
+    const loading = results.pending || isVocabularyPending(state);
     const vocabulary = getVocabulary(state);
 
     return {
         loading,
         results,
-        error,
+        error: results.error,
         vocabulary
     };
 };
