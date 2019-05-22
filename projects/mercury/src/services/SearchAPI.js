@@ -21,7 +21,7 @@ export class SearchAPI {
      * @param types     List of class URIs to search for. If empty, it returns all types
      * @return Promise
      */
-    search = ({query, size = 50, types = []}) => {
+    search = ({query, size = 50, types}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
