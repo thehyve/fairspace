@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import Dropdown from "./Dropdown";
 import LoadingInlay from "../../../common/LoadingInlay";
-import ErrorMessage from "../../../common/ErrorMessage";
+import MessageDisplay from "../../../common/MessageDisplay";
 
 const EntityDropdown = props => {
     if (props.pending) {
@@ -11,7 +11,7 @@ const EntityDropdown = props => {
     }
 
     if (props.error) {
-        return <ErrorMessage message={props.error} />;
+        return <MessageDisplay message={props.error} />;
     }
 
     return (

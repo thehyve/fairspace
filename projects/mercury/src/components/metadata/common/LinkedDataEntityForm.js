@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {List, ListItem} from '@material-ui/core';
 
-import {ErrorMessage, LoadingInlay} from "../../common";
+import {MessageDisplay, LoadingInlay} from "../../common";
 import LinkedDataProperty from "./LinkedDataProperty";
 
 export const LinkedDataEntityForm = ({
     properties, editable, error, loading, onChange, onAdd, onDelete
 }) => {
     if (error) {
-        return <ErrorMessage message={error} />;
+        return <MessageDisplay message={error} />;
     }
 
     if (loading) {

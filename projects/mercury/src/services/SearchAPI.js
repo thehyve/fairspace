@@ -1,9 +1,7 @@
 import elasticsearch from "elasticsearch";
-import _ from 'lodash';
 
 import Config from "./Config/Config";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from '../constants';
-import {getFirstIfSingleItemArray} from '../utils/genericUtils';
 
 const ES_INDEX = 'fairspace';
 
@@ -119,9 +117,8 @@ export class SearchAPI {
             return {};
         }
 
-        const source = _.mapValues(hit._source, getFirstIfSingleItemArray);
         return {
-            ...source,
+            ...hit._source,
             id: hit._id,
             score: hit._score,
             highlight: hit.highlight

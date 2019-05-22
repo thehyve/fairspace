@@ -7,7 +7,7 @@ import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import MoreIcon from '@material-ui/icons/MoreVert';
 
 import {
-    ErrorMessage, ConfirmationDialog, LoadingInlay,
+    MessageDisplay, ConfirmationDialog, LoadingInlay,
     LoadingOverlay
 } from "../common";
 import AlterPermissionContainer from "./AlterPermissionContainer";
@@ -196,7 +196,7 @@ class PermissionsViewer extends React.Component {
         const {permissions, error, loading, altering} = this.props;
 
         if (error) {
-            return (<ErrorMessage message="An error occurred loading permissions" />);
+            return (<MessageDisplay message="An error occurred loading permissions" />);
         } if (loading) {
             return (<LoadingInlay />);
         } if (altering) {

@@ -10,7 +10,7 @@ import {getParentPath} from '../../utils/fileUtils';
 import {searchCollections} from '../../actions/searchActions';
 import * as vocabularyActions from '../../actions/vocabularyActions';
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
-import {ErrorMessage} from "../common";
+import {MessageDisplay} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
 import {getVocabulary, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
 import {getCollectionsSearchResults} from "../../reducers/searchReducers";
@@ -49,12 +49,12 @@ export class SearchPage extends React.Component {
     }
 
     getPathOfResult = ({type, filePath}) => {
-        switch (type) {
+        switch (type[0]) {
             case COLLECTION_URI:
             case DIRECTORY_URI:
-                return filePath;
+                return filePath[0];
             case FILE_URI:
-                return getParentPath(filePath);
+                return getParentPath(filePath[0]);
             default:
                 // TODO: handle metadata open. Out of scope for now
                 return '';
@@ -65,7 +65,7 @@ export class SearchPage extends React.Component {
         const {results, vocabulary, loading, error} = this.props;
 
         if (!loading && error) {
-            return <ErrorMessage message={error} />;
+            return <MessageDisplay message={error} />;
         }
 
         return (

@@ -19,22 +19,6 @@ export function findById(itemList, itemId) {
  */
 export const flattenShallow = array => [].concat(...array);
 
-/**
- * Getn an array and returns null if empty, single item if it's a single-item array otherwise return the array as it
- * @param {Array} value
- */
-export const getFirstIfSingleItemArray = (value) => {
-    if (Array.isArray(value)) {
-        if (value.length === 0) {
-            return null;
-        } if (value.length === 1) {
-            return value[0];
-        }
-    }
-
-    return value;
-};
-
 //* *********************************
 //* COMPARISION
 //* *********************************

@@ -3,7 +3,7 @@ export {default as BreadCrumbs} from "./BreadCrumbs";
 export {default as ConfirmationDialog} from './ConfirmationDialog';
 export {default as DateTime} from './DateTime';
 export {default as ErrorDialog} from "./ErrorDialog";
-export {default as ErrorMessage} from "./ErrorMessage";
+export {default as MessageDisplay} from "./MessageDisplay";
 export {default as CollectionEditor} from "./CollectionEditor";
 export {default as LoadingInlay} from './LoadingInlay';
 export {default as LoadingOverlay} from './LoadingOverlay';

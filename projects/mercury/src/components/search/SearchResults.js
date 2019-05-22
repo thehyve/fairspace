@@ -5,7 +5,7 @@ import {
     TableCell, TableHead, TableRow
 } from '@material-ui/core';
 
-import {LoadingInlay} from "../common";
+import {LoadingInlay, MessageDisplay} from "../common";
 import SearchResultHighlights from "./SearchResultHighlights";
 
 const searchResults = ({
@@ -23,7 +23,7 @@ const searchResults = ({
     }
 
     if (!results || results.total === 0) {
-        return 'No results found!';
+        return <MessageDisplay message="No results found!" isError={false} />;
     }
 
     return (
