@@ -105,7 +105,7 @@ describe('Search API', () => {
                 });
 
                 expect(transformedHit.label).toEqual("text");
-                expect(transformedHit.numberList).toEqual(4);
+                expect(transformedHit.numberList).toEqual([4]);
             });
             it('adds id, score and highlight', () => {
                 const transformedHit = searchAPI.transformESHit({
