@@ -1,7 +1,7 @@
 import elasticsearch from "elasticsearch";
 
 import Config from "./Config/Config";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from '../constants';
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE, SEARCH_DEFAULT_SIZE} from '../constants';
 
 const ES_INDEX = 'fairspace';
 
@@ -19,7 +19,7 @@ export class SearchAPI {
      * @param types     List of class URIs to search for. If empty, it returns all types
      * @return Promise
      */
-    search = ({query, size = 50, types}) => {
+    search = ({query, size = SEARCH_DEFAULT_SIZE, types}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
@@ -112,18 +112,12 @@ export class SearchAPI {
      *
      * Please note that this format is not capable of returning source fields called 'id', 'score' or 'highlight'
      */
-    transformESHit = (hit) => {
-        if (!hit) {
-            return {};
-        }
-
-        return {
-            ...hit._source,
-            id: hit._id,
-            score: hit._score,
-            highlight: hit.highlight
-        };
-    };
+    transformESHit = (hit) => (hit ? {
+        ...hit._source,
+        id: hit._id,
+        score: hit._score,
+        highlight: hit.highlight
+    } : {});
 }
 
 // Expose the API as a singleton.

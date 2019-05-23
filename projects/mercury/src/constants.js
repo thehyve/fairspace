@@ -12,6 +12,7 @@ export const MAIN_CONTENT_MAX_HEIGHT = '65vh';
 export const COLLECTION_SEARCH_TYPE = 'collections';
 export const FILES_SEARCH_TYPE = 'files';
 export const SEARCH_MAX_SIZE = 10000;
+export const SEARCH_DEFAULT_SIZE = 50;
 
 // Metadata schemas
 export const SHACL_NS = 'http://www.w3.org/ns/shacl#';
