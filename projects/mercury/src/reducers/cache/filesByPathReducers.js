@@ -58,7 +58,6 @@ const filesByPath = (state = defaultState, action) => {
                 creatingDirectory: true
             };
         case actionTypes.CREATE_DIRECTORY_FULFILLED:
-        case actionTypes.CREATE_DIRECTORY_REJECTED:
         case actionTypes.INVALIDATE_CREATE_DIRECTORY: {
             const newState = {
                 ...state,
@@ -66,7 +65,11 @@ const filesByPath = (state = defaultState, action) => {
             };
             return invalidateFiles(newState, getParentPath(action.meta.path));
         }
-
+        case actionTypes.CREATE_DIRECTORY_REJECTED:
+            return {
+                ...state,
+                creatingDirectory: false
+            };
 
         case actionTypes.DELETE_FILE_FULFILLED:
             return invalidateFiles(state, getParentPath(action.meta.path));

@@ -1,5 +1,13 @@
 [
   {
+    "@id": "_:blank2",
+    "http://www.w3.org/ns/shacl#path": [
+      {
+        "@id": "http://fairspace.io/ontology#list"
+      }
+    ]
+  },
+  {
     "@id": "http://fairspace.io/ontology#CollectionShape",
     "@type": [
       "http://fairspace.io/ontology#ClassShape"
@@ -230,6 +238,13 @@
         "@id": "http://fairspace.io/ontology#list"
       }
     ]
+  },
+  {
+    "@id": "_:blank1",
+    "http://www.w3.org/ns/shacl#path": [
+      {
+        "@id": "http://fairspace.io/ontology#only-blank"
+      }
+    ]
   }
-
 ]

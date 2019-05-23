@@ -50,6 +50,7 @@ public abstract class BaseApp implements SparkApplication {
         exception(DAOException.class, exceptionHandler(SC_BAD_REQUEST, "Bad request"));
         exception(UnsupportedMediaTypeException.class, exceptionHandler(SC_UNSUPPORTED_MEDIA_TYPE, null));
         exception(AccessDeniedException.class, exceptionHandler(SC_UNAUTHORIZED, null));
+        exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
 
     /**
