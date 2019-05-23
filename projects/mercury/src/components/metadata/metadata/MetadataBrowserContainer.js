@@ -49,10 +49,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
         const subject = createMetadataIri(id);
         const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
         return dispatch(createMetadataEntityFromState(formKey, subject, type))
-            .then(({value}) => {
-                dispatch(searchMetadata());
-                ownProps.history.push(relativeLink(value.subject));
-            });
+            .then(() => ownProps.history.push(relativeLink(subject)));
     }
 });
 
