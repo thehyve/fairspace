@@ -72,10 +72,6 @@ class LinkedDataBrowser extends React.Component {
             return <MessageDisplay message="An error occurred while loading metadata" />;
         }
 
-        if (entities && entities.length === 0) {
-            return <MessageDisplay message="No data found!" isError={false} />;
-        }
-
         return (
             <>
                 {editable
@@ -112,7 +108,10 @@ class LinkedDataBrowser extends React.Component {
                     />
                 </LinkedDataValuesContext.Provider>
 
-                {entities && entities.length > 0 ? <LinkedDataList items={entities} /> : null}
+                {entities && entities.length > 0
+                    ? <LinkedDataList items={entities} />
+                    : <MessageDisplay message="No data is found!" isError={false} />}
+
                 <LoadingOverlay loading={this.state.creatingMetadataEntity} />
             </>
         );
