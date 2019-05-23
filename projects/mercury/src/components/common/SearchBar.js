@@ -16,9 +16,7 @@ const SearchBar = ({
 
     const handleSearch = (e) => {
         e.preventDefault();
-        if (value) {
-            onSearchChange(value);
-        }
+        onSearchChange(value);
     };
 
     return (
