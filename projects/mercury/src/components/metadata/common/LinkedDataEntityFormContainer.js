@@ -33,11 +33,13 @@ export class LinkedDataEntityFormContainer extends React.Component {
     }
 
     render() {
-        const propertiesWithChanges = this.props.properties.map(p => ({
-            ...p,
-            values: this.props.updates[p.key] || p.values,
-            errors: this.props.errors[p.key]
-        }));
+        const propertiesWithChanges = this.props.properties
+            .filter(p => this.props.editable || p.values.length)
+            .map(p => ({
+                ...p,
+                values: this.props.updates[p.key] || p.values,
+                errors: this.props.errors[p.key]
+            }));
 
         return (
             <LinkedDataEntityForm
