@@ -17,11 +17,12 @@ import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 const mapStateToProps = (state) => {
     const {items, pending, error} = getMetadataSearchResults(state);
     const vocabulary = getVocabulary(state);
-    const entities = items.map(({id, type, label, name}) => ({
+    const entities = items.map(({id, type, label, name, highlights}) => ({
         id,
         label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
         type: type[0],
-        typeLabel: getLabel(vocabulary.determineShapeForType(type[0]), true)
+        typeLabel: getLabel(vocabulary.determineShapeForType(type[0]), true),
+        highlights
     }));
     const onError = (e, id) => {
         if (e.details) {
@@ -35,6 +36,7 @@ const mapStateToProps = (state) => {
         loading: pending,
         hasError: !!error,
         entities,
+        hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         shapes: vocabulary.getClassesInCatalog(),
         valueComponentFactory: MetadataValueComponentFactory,
         vocabulary,

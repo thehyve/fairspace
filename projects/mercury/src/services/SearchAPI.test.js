@@ -70,9 +70,8 @@ describe('Search API', () => {
                         label: "update.txt",
                         id: "http://fairspace.io/iri/0df9a97a-45aa-9a98-b428-2ba35bd61c2c",
                         score: 4.59,
-                        highlight: {
-                            label: ["<em>update</em>.txt"]
-                        }
+                        highlights: [['label', ["<em>update</em>.txt"]]]
+
                     });
                 });
         });
@@ -119,9 +118,7 @@ describe('Search API', () => {
 
                 expect(transformedHit.id).toEqual("special-id");
                 expect(transformedHit.score).toEqual(4.23);
-                expect(transformedHit.highlight).toEqual({
-                    label: ["some-html"]
-                });
+                expect(transformedHit.highlights).toEqual([['label', ["some-html"]]]);
             });
             it('overwrites id, score and highlight in source properties', () => {
                 const transformedHit = searchAPI.transformESHit({
@@ -140,17 +137,13 @@ describe('Search API', () => {
 
                 expect(transformedHit.id).toEqual("special-id");
                 expect(transformedHit.score).toEqual(4.23);
-                expect(transformedHit.highlight).toEqual({
-                    label: ["some-html"]
-                });
+                expect(transformedHit.highlights).toEqual([["label", ["some-html"]]]);
                 expect(transformedHit.label).toEqual("not-overwritten");
             });
             it('handles missing values gracefully', () => {
-                expect(searchAPI.transformESHit({})).toEqual({});
+                expect(searchAPI.transformESHit({})).toEqual({highlights: []});
                 expect(searchAPI.transformESHit()).toEqual({});
             });
         });
-    });
-    it('transforms the results from ES into ', () => {
     });
 });
