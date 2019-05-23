@@ -19,7 +19,7 @@ const mapStateToProps = (state) => {
     const vocabulary = getVocabulary(state);
     const entities = items.map(({id, type, label, name}) => ({
         id,
-        label: label[0] || name[0] || linkLabel(id, true),
+        label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
         type: type[0],
         typeLabel: getLabel(vocabulary.determineShapeForType(type[0]), true)
     }));
