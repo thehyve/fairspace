@@ -3,6 +3,7 @@ import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 import {isRdfList} from "./vocabularyUtils";
 import {lookupLabel, isNonEmptyValue} from "./metadataUtils";
+import {RDF_TYPE} from "../../constants";
 
 /**
  * Generates a property entry for the given type(s)
@@ -253,3 +254,20 @@ export const emptyLinkedData = (vocabulary, shape) => {
     // Generate a list of empty properties
     return generatePropertiesForMetadata(vocabulary, {}, types, propertyShapes, []);
 };
+
+/**
+ * Replaces all occurrences of rdf:type with @type
+ * @param expandedMetadata
+ * @returns {*}
+ */
+export const normalizeTypes = (expandedMetadata) =>
+    expandedMetadata.map(e => {
+        if (!e['@type'] && e[RDF_TYPE]) {
+            const {[RDF_TYPE]: types, ...rest} = e;
+            return {
+                '@type': types.map(t => t['@id']),
+                ...rest
+            };
+        }
+        return e;
+    });

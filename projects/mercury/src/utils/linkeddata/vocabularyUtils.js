@@ -54,10 +54,19 @@ export const vocabularyUtils = (vocabulary = []) => {
     const determineShapeForType = (typeUri) => vocabulary.find(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === typeUri) || {};
 
     /**
-     * Determines the SHACL shape to be applied to the given type
+     * Determines the SHACL shape to be applied to the given type.
+     *
+     * This method filters out any node that does not have a required SHACL name. This avoid an issue where
+     * there could be a blank node in the vocabulary referring the same sh:path, but only used to define a required field.
+     *
+     * See VRE-752 for more details
+     *
      * @param propertyUri
      */
-    const determineShapeForProperty = (propertyUri) => vocabulary.find(entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri);
+    const determineShapeForProperty = (propertyUri) => vocabulary.find(
+        entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri
+            && getFirstPredicateValue(entry, constants.SHACL_NAME)
+    );
 
     /**
      * Returns a human readable label for the given predicate or the uri if no label is specified
