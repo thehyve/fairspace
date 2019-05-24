@@ -43,7 +43,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetchLinkedData: () => dispatch(searchMetadata('*')),
+    fetchLinkedData: () => dispatch(searchMetadata('*', ownProps.classesInCatalog)),
     fetchShapes: () => dispatch(fetchMetadataVocabularyIfNeeded()),
     create: (formKey, shape, id) => {
         const subject = createMetadataIri(id);
