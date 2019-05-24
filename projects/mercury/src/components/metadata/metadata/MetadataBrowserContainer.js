@@ -3,9 +3,7 @@ import {withRouter} from 'react-router-dom';
 
 import {createMetadataIri, getLabel, relativeLink, partitionErrors, linkLabel} from "../../../utils/linkeddata/metadataUtils";
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
-import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 import {searchMetadata} from "../../../actions/searchActions";
-import {getVocabulary} from "../../../reducers/cache/vocabularyReducers";
 import {getMetadataSearchResults} from "../../../reducers/searchReducers";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import * as constants from "../../../constants";
@@ -14,9 +12,8 @@ import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, {vocabulary}) => {
     const {items, pending, error} = getMetadataSearchResults(state);
-    const vocabulary = getVocabulary(state);
     const entities = items.map(({id, type, label, name, highlights}) => ({
         id,
         label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
@@ -45,8 +42,8 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetchLinkedData: () => dispatch(searchMetadata('*')),
-    fetchShapes: () => dispatch(fetchMetadataVocabularyIfNeeded()),
+    fetchLinkedData: () => dispatch(searchMetadata('*', ownProps.targetClasses)),
+    fetchShapes: () => {},
     create: (formKey, shape, id) => {
         const subject = createMetadataIri(id);
         const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
