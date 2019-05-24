@@ -74,6 +74,9 @@ export class SearchAPI {
     searchCollections = (query) => this.search({query, types: COLLECTION_DIRECTORIES_FILES});
 
     /**
+     * @param query
+     * @param types
+     * @param size
      * @returns {Promise}
      */
     searchMetadata = (types, query) => this.search({query: query || '*', size: SEARCH_MAX_SIZE, types});
