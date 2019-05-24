@@ -1,9 +1,11 @@
 import elasticsearch from "elasticsearch";
+
 import Config from "./Config/Config";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from '../constants';
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE, SEARCH_DEFAULT_SIZE} from '../constants';
 
 const ES_INDEX = 'fairspace';
 
+const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 /* eslint-disable no-underscore-dangle */
 export class SearchAPI {
     constructor(client, index) {
@@ -17,7 +19,7 @@ export class SearchAPI {
      * @param types     List of class URIs to search for. If empty, it returns all types
      * @return Promise
      */
-    searchForTypes = (query, types) => {
+    search = ({query, size = SEARCH_DEFAULT_SIZE, types}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
@@ -47,7 +49,7 @@ export class SearchAPI {
         return this.client.search({
             index: this.index,
             body: {
-                size: 50,
+                size,
                 query: esQuery,
                 highlight: {
                     fields: {
@@ -66,12 +68,18 @@ export class SearchAPI {
     };
 
     /**
-     * Performs a search query
-     * @param type
      * @param query
      * @returns {Promise}
      */
-    performSearch = (query) => this.searchForTypes(query, [DIRECTORY_URI, FILE_URI, COLLECTION_URI]);
+    searchCollections = (query) => this.search({query, types: COLLECTION_DIRECTORIES_FILES});
+
+    /**
+     * @param query
+     * @param types
+     * @param size
+     * @returns {Promise}
+     */
+    searchMetadata = (types, query) => this.search({query: query || '*', size: SEARCH_MAX_SIZE, types});
 
     /**
      * Transforms the search result into a format that can be used internally. The format looks like this:
@@ -102,6 +110,8 @@ export class SearchAPI {
      *       "comment": "ajs",
      *       ...,
      *       "_highlight": {        // Information on the fragment to highlight to show where the result matched.
+     *                              // Only show highlights for which the key does not end in 'keyword'
+     *                              // as these are mostly duplicates of the fields themselves
      *         "key": value         // The key is the field name that is matched, the value is an HTML fragment to display
      *     }                        // See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-highlighting.html
      *
@@ -111,7 +121,8 @@ export class SearchAPI {
         ...hit._source,
         id: hit._id,
         score: hit._score,
-        highlight: hit.highlight
+        highlights: hit.highlight ? Object.entries(hit.highlight)
+            .filter(([key]) => !key.endsWith('.keyword')) : []
     } : {});
 }
 

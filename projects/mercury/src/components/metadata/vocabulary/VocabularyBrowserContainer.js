@@ -41,7 +41,7 @@ const mapStateToProps = (state) => {
 
     return ({
         loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
-        error: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
+        hasError: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
         editable: isDataSteward(getAuthorizations(state), Config.get()),
         shapes: metaVocabulary.getClassesInCatalog(),
         vocabulary: metaVocabulary,

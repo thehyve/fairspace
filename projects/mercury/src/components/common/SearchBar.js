@@ -1,55 +1,49 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {withRouter} from "react-router-dom";
 import {InputBase, withStyles} from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
 import styles from './SearchBar.styles';
-import {buildSearchUrl, getSearchQueryFromString} from '../../utils/searchUtils';
 
-class SearchBar extends React.Component {
-    state = {
-        value: getSearchQueryFromString(this.props.location.search)
+const SearchBar = ({
+    classes, query = '', placeholder, onSearchChange = () => {}
+}) => {
+    const [value, setValue] = useState(query);
+
+    const handleChange = (event) => {
+        setValue(event.target.value);
     };
 
-    handleChange = (event) => {
-        this.setState({value: event.target.value});
-    }
+    const handleSearch = (e) => {
+        e.preventDefault();
+        onSearchChange(value);
+    };
 
-    handleKeyDown = (event) => {
-        // if Enter is pressed and search has value
-        if (event.keyCode === 13 && this.state.value) {
-            const searchUrl = buildSearchUrl(this.state.value);
-            this.props.history.push(searchUrl);
-        }
-    }
-
-    render() {
-        const {classes, placeholder} = this.props;
-
-        return (
-            <div className={classes.search}>
-                <div className={classes.searchIcon}>
-                    <SearchIcon />
-                </div>
+    return (
+        <div className={classes.search}>
+            <div className={classes.searchIcon}>
+                <SearchIcon />
+            </div>
+            <form
+                onSubmit={handleSearch}
+            >
                 <InputBase
                     placeholder={placeholder}
                     classes={{
                         root: classes.inputRoot,
                         input: classes.inputInput,
                     }}
-                    value={this.state.value}
-                    onChange={this.handleChange}
-                    onKeyDown={this.handleKeyDown}
+                    value={value}
+                    onChange={handleChange}
                 />
-            </div>
-        );
-    }
-}
+            </form>
+        </div>
+    );
+};
 
 SearchBar.propTypes = {
     classes: PropTypes.object.isRequired,
     placeholder: PropTypes.string
 };
 
-export default withRouter(withStyles(styles)(SearchBar));
+export default withStyles(styles)(SearchBar);

@@ -1,35 +1,31 @@
+import {promiseReducerFactory} from "../utils/redux";
 import * as actionTypes from "../actions/actionTypes";
 
 const initialState = {
     pending: false,
-    results: {items: [], total: 0},
+    data: {
+        items: [],
+        total: 0
+    },
     error: null
 };
 
-const searchReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case actionTypes.PERFORM_SEARCH_PENDING:
-            return {
-                ...state,
-                pending: true,
-                results: {}
-            };
-        case actionTypes.PERFORM_SEARCH_FULFILLED:
-            return {
-                ...state,
-                pending: false,
-                error: null,
-                results: {...action.payload}
-            };
-        case actionTypes.PERFORM_SEARCH_REJECTED:
-            return {
-                ...state,
-                pending: false,
-                error: action.payload.message
-            };
-        default:
-            return state;
-    }
+export const metadataSearchReducer = promiseReducerFactory(actionTypes.METADATA_SEARCH, initialState);
+
+export const collectionsSearchReducer = promiseReducerFactory(actionTypes.COLLECTIONS_SEARCH, initialState);
+
+//* ********************
+//* * SELECTORS
+//* ********************
+
+export const getCollectionsSearchResults = ({collectionSearch}) => {
+    const {data, ...rest} = collectionSearch;
+    const {items, total} = data || {...initialState.data};
+    return {items, total, ...rest};
 };
 
-export default searchReducer;
+export const getMetadataSearchResults = ({metadataSearch}) => {
+    const {data, ...rest} = metadataSearch;
+    const {items, total} = data || {...initialState.data};
+    return {items, total, ...rest};
+};

@@ -5,7 +5,7 @@ import {List} from '@material-ui/core';
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import Config from "../../../services/Config/Config";
 import {STRING_URI} from "../../../constants";
-import ErrorMessage from "../../common/ErrorMessage";
+import MessageDisplay from "../../common/MessageDisplay";
 
 describe('LinkedDataEntityForm', () => {
     const defaultMetadata = [{
@@ -93,7 +93,7 @@ describe('LinkedDataEntityForm', () => {
             error="Testing error"
         />);
 
-        const errorMessage = wrapper.find(ErrorMessage);
+        const errorMessage = wrapper.find(MessageDisplay);
         expect(errorMessage.length).toEqual(1);
     });
 });

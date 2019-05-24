@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import React from "react";
-import ErrorMessage from "../../common/ErrorMessage";
+import MessageDisplay from "../../common/MessageDisplay";
 import MetadataEntityContainer from "./MetadataEntityContainer";
 import {statFile} from "../../../actions/fileActions";
 
@@ -25,7 +25,7 @@ export class PathMetadata extends React.Component {
         } = this.props;
 
         if (error) {
-            return (<ErrorMessage message="An error occurred while determining metadata subject" />);
+            return (<MessageDisplay message="An error occurred while determining metadata subject" />);
         } if (loading) {
             return (<div>Loading...</div>);
         } if (!subject) {

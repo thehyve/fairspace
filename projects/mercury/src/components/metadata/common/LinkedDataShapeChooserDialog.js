@@ -32,7 +32,7 @@ const LinkedDataShapeChooserDialog = props => {
             <DialogContent>
                 <Paper style={{maxHeight: 400, overflow: 'auto', width: 400}}>
                     {
-                        props.shapes.length
+                        props.shapes && props.shapes.length
                             ? (
                                 <List>
                                     {

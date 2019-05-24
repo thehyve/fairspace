@@ -8,7 +8,7 @@ const styles = {
         minWidth: 700,
     },
     cell: {
-        minWidth: 110
+        minWidth: 80
     }
 };
 

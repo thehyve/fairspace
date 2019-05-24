@@ -1,5 +1,5 @@
 import {SearchAPI} from "./SearchAPI";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
 
 let mockClient;
 let searchAPI;
@@ -12,13 +12,13 @@ describe('Search API', () => {
         searchAPI = new SearchAPI(mockClient);
     });
 
-    it('forwards the query to ES', () => searchAPI.performSearch('my-query')
+    it('forwards the collections search query to ES', () => searchAPI.searchCollections('my-query')
         .then(() => {
             expect(mockClient.search.mock.calls.length).toEqual(1);
             expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query).toEqual('my-query');
         }));
 
-    it('filters deleted entities from ES results', () => searchAPI.performSearch('my-query')
+    it('filters deleted entities from ES results', () => searchAPI.searchCollections('my-query')
         .then(() => {
             expect(mockClient.search.mock.calls.length).toEqual(1);
             expect(mockClient.search.mock.calls[0][0].body.query.bool.must_not.exists.field).toEqual(
@@ -26,7 +26,7 @@ describe('Search API', () => {
             );
         }));
 
-    it('filters ES results based on types', () => searchAPI.performSearch('my-query')
+    it('filters ES results based on types', () => searchAPI.searchCollections('my-query')
         .then(() => {
             expect(mockClient.search.mock.calls.length).toEqual(1);
             expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword']).toEqual(
@@ -62,7 +62,7 @@ describe('Search API', () => {
             };
 
             mockClient.search = jest.fn(() => Promise.resolve(esResult));
-            return searchAPI.performSearch()
+            return searchAPI.searchCollections()
                 .then(result => {
                     expect(result.total).toEqual(123);
                     expect(result.items.length).toEqual(1);
@@ -70,9 +70,8 @@ describe('Search API', () => {
                         label: "update.txt",
                         id: "http://fairspace.io/iri/0df9a97a-45aa-9a98-b428-2ba35bd61c2c",
                         score: 4.59,
-                        highlight: {
-                            label: ["<em>update</em>.txt"]
-                        }
+                        highlights: [['label', ["<em>update</em>.txt"]]]
+
                     });
                 });
         });
@@ -119,9 +118,7 @@ describe('Search API', () => {
 
                 expect(transformedHit.id).toEqual("special-id");
                 expect(transformedHit.score).toEqual(4.23);
-                expect(transformedHit.highlight).toEqual({
-                    label: ["some-html"]
-                });
+                expect(transformedHit.highlights).toEqual([['label', ["some-html"]]]);
             });
             it('overwrites id, score and highlight in source properties', () => {
                 const transformedHit = searchAPI.transformESHit({
@@ -140,17 +137,88 @@ describe('Search API', () => {
 
                 expect(transformedHit.id).toEqual("special-id");
                 expect(transformedHit.score).toEqual(4.23);
-                expect(transformedHit.highlight).toEqual({
-                    label: ["some-html"]
-                });
+                expect(transformedHit.highlights).toEqual([["label", ["some-html"]]]);
                 expect(transformedHit.label).toEqual("not-overwritten");
             });
             it('handles missing values gracefully', () => {
-                expect(searchAPI.transformESHit({})).toEqual({});
+                expect(searchAPI.transformESHit({})).toEqual({highlights: []});
                 expect(searchAPI.transformESHit()).toEqual({});
+            });
+
+            it('Handles highlights properly', () => {
+                const transformedHit = searchAPI.transformESHit({
+                    _index: "fairspace",
+                    _type: "iri",
+                    _id: "http://localhost/iri/PERSON",
+                    _score: 1.2039728,
+                    _source: {
+                        label: [
+                            "Mo"
+                        ],
+                        type: [
+                            "http://xmlns.com/foaf/0.1/Person"
+                        ],
+                        dateCreated: [
+                            "2019-05-24T08:43:35.309Z"
+                        ],
+                        createdBy: [
+                            "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3"
+                        ],
+                        comment: [
+                            "Mohammad"
+                        ]
+                    },
+                    highlight: {
+                        "type.keyword": [
+                            "<em>http://xmlns.com/foaf/0.1/Person</em>"
+                        ],
+                        "label": [
+                            "<em>Mo</em>"
+                        ]
+                    }
+                });
+                expect(transformedHit.highlights).toEqual([["label", ["<em>Mo</em>"]]]);
             });
         });
     });
-    it('transforms the results from ES into ', () => {
+
+    it('forwards the metadata search query to ES', () => {
+        const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
+        searchAPI.searchMetadata(types, 'my-query')
+            .then(() => {
+                expect(mockClient.search.mock.calls.length)
+                    .toEqual(1);
+
+                expect(mockClient.search.mock.calls[0][0].body.size)
+                    .toEqual(SEARCH_MAX_SIZE);
+
+                expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
+                    .toEqual('my-query');
+
+                expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
+                    .toEqual(
+                        expect.arrayContaining(types)
+                    );
+            });
+    });
+
+    it('searchs all metadata when no query is given', () => {
+        const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
+        searchAPI.searchMetadata(types)
+            .then(() => {
+                expect(mockClient.search.mock.calls.length)
+                    .toEqual(1);
+
+                expect(mockClient.search.mock.calls[0][0].body.size)
+                    .toEqual(SEARCH_MAX_SIZE);
+
+                expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
+                    .toEqual('*');
+
+                expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
+                    .toEqual(
+                        expect.arrayContaining(types)
+                    );
+            });
     });
 });
