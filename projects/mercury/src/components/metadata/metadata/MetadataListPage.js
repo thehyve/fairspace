@@ -11,7 +11,7 @@ import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../constants";
 import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 
-const MetadataListPage = ({fetchVocabulary, classesInCatalog, searchMetadata: search}) => {
+const MetadataListPage = ({fetchVocabulary, vocabulary, targetClasses, searchMetadata: search}) => {
     fetchVocabulary();
 
     return (
@@ -22,21 +22,28 @@ const MetadataListPage = ({fetchVocabulary, classesInCatalog, searchMetadata: se
                     placeholder="Search"
                     disableUnderline
                     onSearchChange={(query) => {
-                        search(query, classesInCatalog);
+                        search(query, targetClasses);
                     }}
                 />
             </Paper>
-            <MetadataBrowserContainer classesInCatalog={classesInCatalog} />
+            {targetClasses && targetClasses.length > 0 && (
+                <MetadataBrowserContainer
+                    vocabulary={vocabulary}
+                    targetClasses={targetClasses}
+                    fetchVocabulary={fetchVocabulary}
+                />
+            )
+            }
         </>
     );
 };
 
 const mapStateToProps = (state) => {
     const vocabulary = getVocabulary(state);
-    const classesInCatalog = vocabulary.getClassesInCatalog()
+    const targetClasses = vocabulary.getClassesInCatalog()
         .map(c => getFirstPredicateId(c, constants.SHACL_TARGET_CLASS));
 
-    return {classesInCatalog};
+    return {targetClasses, vocabulary};
 };
 
 const mapDispatchToProps = {
