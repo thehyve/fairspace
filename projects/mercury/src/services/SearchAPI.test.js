@@ -144,6 +144,41 @@ describe('Search API', () => {
                 expect(searchAPI.transformESHit({})).toEqual({highlights: []});
                 expect(searchAPI.transformESHit()).toEqual({});
             });
+
+            it('Handles highlights properly', () => {
+                const transformedHit = searchAPI.transformESHit({
+                    _index: "fairspace",
+                    _type: "iri",
+                    _id: "http://localhost/iri/PERSON",
+                    _score: 1.2039728,
+                    _source: {
+                        label: [
+                            "Mo"
+                        ],
+                        type: [
+                            "http://xmlns.com/foaf/0.1/Person"
+                        ],
+                        dateCreated: [
+                            "2019-05-24T08:43:35.309Z"
+                        ],
+                        createdBy: [
+                            "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3"
+                        ],
+                        comment: [
+                            "Mohammad"
+                        ]
+                    },
+                    highlight: {
+                        "type.keyword": [
+                            "<em>http://xmlns.com/foaf/0.1/Person</em>"
+                        ],
+                        "label": [
+                            "<em>Mo</em>"
+                        ]
+                    }
+                });
+                expect(transformedHit.highlights).toEqual([["label", ["<em>Mo</em>"]]]);
+            });
         });
     });
 
@@ -151,7 +186,6 @@ describe('Search API', () => {
         const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
         searchAPI.searchMetadata(types, 'my-query')
             .then(() => {
-
                 expect(mockClient.search.mock.calls.length)
                     .toEqual(1);
 
