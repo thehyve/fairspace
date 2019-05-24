@@ -8,8 +8,10 @@ describe('Search reducers', () => {
     it('should return the initial state when no action is given', () => {
         const initialState = {
             pending: false,
-            items: [],
-            total: 0,
+            data: {
+                items: [],
+                total: 0,
+            },
             error: null
         };
         expect(collectionsSearchReducer(undefined, {}))
@@ -24,9 +26,8 @@ describe('Search reducers', () => {
             })
         ).toEqual({
             pending: true,
-            items: [],
-            total: 0,
-            error: null,
+            data: undefined,
+            error: false,
         });
     });
 
@@ -37,6 +38,6 @@ describe('Search reducers', () => {
             payload: results,
             meta: {searchType: 'collections'},
         };
-        expect(collectionsSearchReducer(undefined, action).items).toContain('item 1');
+        expect(collectionsSearchReducer(undefined, action).data.items).toContain('item 1');
     });
 });
