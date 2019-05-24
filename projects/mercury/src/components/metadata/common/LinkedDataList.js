@@ -11,8 +11,9 @@ import {
 
 import LinkedDataLink from "./LinkedDataLink";
 import styles from './LinkedDataList.styles';
+import SearchResultHighlights from "../../search/SearchResultHighlights";
 
-const linkedDataList = ({items = [], classes}) => (
+const linkedDataList = ({items = [], hasHighlights, classes}) => (
     <Paper className={classes.root}>
         <Table className={classes.table}>
             <TableHead>
@@ -20,11 +21,12 @@ const linkedDataList = ({items = [], classes}) => (
                     <TableCell>Label</TableCell>
                     <TableCell>Type</TableCell>
                     <TableCell>URI</TableCell>
+                    {hasHighlights && <TableCell>Match</TableCell>}
                 </TableRow>
             </TableHead>
             <TableBody>
                 {
-                    items.map(({id, label, type, typeLabel}) => (
+                    items.map(({id, label, type, typeLabel, highlights}) => (
                         <TableRow key={id}>
                             <TableCell className={classes.cell}>
                                 {label}
@@ -37,6 +39,11 @@ const linkedDataList = ({items = [], classes}) => (
                                     {label}
                                 </LinkedDataLink>
                             </TableCell>
+                            {hasHighlights && (
+                                <TableCell>
+                                    <SearchResultHighlights highlights={highlights} />
+                                </TableCell>
+                            )}
                         </TableRow>
                     ))
                 }

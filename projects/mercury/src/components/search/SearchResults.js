@@ -55,7 +55,7 @@ const searchResults = ({
                                     {item.comment}
                                 </TableCell>
                                 <TableCell>
-                                    <SearchResultHighlights highlights={item.highlight} />
+                                    <SearchResultHighlights highlights={item.highlights} />
                                 </TableCell>
                             </TableRow>
                         ))}

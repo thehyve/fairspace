@@ -70,9 +70,8 @@ describe('Search API', () => {
                         label: "update.txt",
                         id: "http://fairspace.io/iri/0df9a97a-45aa-9a98-b428-2ba35bd61c2c",
                         score: 4.59,
-                        highlight: {
-                            label: ["<em>update</em>.txt"]
-                        }
+                        highlights: [['label', ["<em>update</em>.txt"]]]
+
                     });
                 });
         });
@@ -119,9 +118,7 @@ describe('Search API', () => {
 
                 expect(transformedHit.id).toEqual("special-id");
                 expect(transformedHit.score).toEqual(4.23);
-                expect(transformedHit.highlight).toEqual({
-                    label: ["some-html"]
-                });
+                expect(transformedHit.highlights).toEqual([['label', ["some-html"]]]);
             });
             it('overwrites id, score and highlight in source properties', () => {
                 const transformedHit = searchAPI.transformESHit({
@@ -140,14 +137,47 @@ describe('Search API', () => {
 
                 expect(transformedHit.id).toEqual("special-id");
                 expect(transformedHit.score).toEqual(4.23);
-                expect(transformedHit.highlight).toEqual({
-                    label: ["some-html"]
-                });
+                expect(transformedHit.highlights).toEqual([["label", ["some-html"]]]);
                 expect(transformedHit.label).toEqual("not-overwritten");
             });
             it('handles missing values gracefully', () => {
-                expect(searchAPI.transformESHit({})).toEqual({});
+                expect(searchAPI.transformESHit({})).toEqual({highlights: []});
                 expect(searchAPI.transformESHit()).toEqual({});
+            });
+
+            it('Handles highlights properly', () => {
+                const transformedHit = searchAPI.transformESHit({
+                    _index: "fairspace",
+                    _type: "iri",
+                    _id: "http://localhost/iri/PERSON",
+                    _score: 1.2039728,
+                    _source: {
+                        label: [
+                            "Mo"
+                        ],
+                        type: [
+                            "http://xmlns.com/foaf/0.1/Person"
+                        ],
+                        dateCreated: [
+                            "2019-05-24T08:43:35.309Z"
+                        ],
+                        createdBy: [
+                            "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3"
+                        ],
+                        comment: [
+                            "Mohammad"
+                        ]
+                    },
+                    highlight: {
+                        "type.keyword": [
+                            "<em>http://xmlns.com/foaf/0.1/Person</em>"
+                        ],
+                        "label": [
+                            "<em>Mo</em>"
+                        ]
+                    }
+                });
+                expect(transformedHit.highlights).toEqual([["label", ["<em>Mo</em>"]]]);
             });
         });
     });
@@ -156,7 +186,6 @@ describe('Search API', () => {
         const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
         searchAPI.searchMetadata(types, 'my-query')
             .then(() => {
-
                 expect(mockClient.search.mock.calls.length)
                     .toEqual(1);
 
