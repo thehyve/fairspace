@@ -2,6 +2,7 @@ import {createClient} from "webdav";
 import axios from 'axios';
 import Config from "./Config/Config";
 import {addCounterToFilename, generateUniqueFileName, getFileName, getParentPath, joinPaths} from '../utils/fileUtils';
+import {compareBy, comparing} from "../utils/genericUtils";
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
@@ -37,7 +38,8 @@ class FileAPI {
      */
     list(path) {
         return this.client().getDirectoryContents(path, includeDetails)
-            .then(result => result.data);
+            .then(result => result.data)
+            .then(files => files.sort(comparing(compareBy('type'), compareBy('filename'))));
     }
 
     /**

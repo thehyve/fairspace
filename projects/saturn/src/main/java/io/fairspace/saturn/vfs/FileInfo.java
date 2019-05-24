@@ -7,7 +7,7 @@ import java.time.Instant;
 
 @Value
 @Builder
-public class FileInfo {
+public class FileInfo implements Comparable<FileInfo> {
     String iri;
     String path;
     boolean isDirectory;
@@ -15,4 +15,9 @@ public class FileInfo {
     Instant created;
     Instant modified;
     boolean readOnly;
+
+    @Override
+    public int compareTo(FileInfo o) {
+        return isDirectory == o.isDirectory ? path.compareTo(o.path) : isDirectory ? 1 : -1;
+    }
 }
