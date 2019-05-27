@@ -27,7 +27,7 @@ import static java.util.Collections.singletonList;
 
 @Slf4j
 public abstract class VfsBackedMiltonResource implements
-        Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource, Comparable<Resource> {
+        Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource {
     private static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
     private static final PropertyMetaData IRI_PROPERTY_META = new PropertyMetaData(PropertyAccessibility.READ_ONLY, String.class);
 
@@ -112,11 +112,6 @@ public abstract class VfsBackedMiltonResource implements
     @Override
     public String checkRedirect(Request request) throws NotAuthorizedException, BadRequestException {
         return null;
-    }
-
-    @Override
-    public int compareTo(Resource resource) {
-        return getName().compareTo(resource.getName());
     }
 
     private static void checkTarget(CollectionResource c) throws BadRequestException, NotAuthorizedException {

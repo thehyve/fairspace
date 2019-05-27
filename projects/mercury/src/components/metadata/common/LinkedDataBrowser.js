@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-
 import {Button} from "@material-ui/core";
+
 import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
-import {ErrorMessage, LoadingInlay, LoadingOverlay} from "../../common";
+import {MessageDisplay, LoadingInlay, LoadingOverlay} from "../../common";
 import LinkedDataList from './LinkedDataList';
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
@@ -62,19 +62,21 @@ class LinkedDataBrowser extends React.Component {
     };
 
     render() {
-        const {loading, error, entities} = this.props;
+        const {
+            loading, hasError, entities, hasHighlights, editable, shapes, vocabulary, valueComponentFactory
+        } = this.props;
 
         if (loading) {
             return <LoadingInlay />;
         }
 
-        if (error) {
-            return <ErrorMessage message="An error occurred while loading metadata" />;
+        if (hasError) {
+            return <MessageDisplay message="An error occurred while loading metadata" />;
         }
 
         return (
             <>
-                {this.props.editable
+                {editable
                     ? (
                         <Button
                             variant="contained"
@@ -83,7 +85,7 @@ class LinkedDataBrowser extends React.Component {
                             title="Create a new metadata entity"
                             onClick={this.startCreating}
                             style={{margin: '10px 0'}}
-                            disabled={!this.props.shapes}
+                            disabled={!shapes}
                         >
                             Create
                         </Button>
@@ -93,22 +95,25 @@ class LinkedDataBrowser extends React.Component {
 
                 <LinkedDataShapeChooserDialog
                     open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CHOOSE_SHAPE}
-                    shapes={this.props.shapes}
+                    shapes={shapes}
                     onChooseShape={this.chooseShape}
                     onClose={this.closeDialog}
                 />
 
-                <LinkedDataValuesContext.Provider value={this.props.valueComponentFactory}>
+                <LinkedDataValuesContext.Provider value={valueComponentFactory}>
                     <NewLinkedDataEntityDialog
                         open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
-                        linkedData={emptyLinkedData(this.props.vocabulary, this.state.shape)}
+                        linkedData={emptyLinkedData(vocabulary, this.state.shape)}
                         shape={this.state.shape}
                         onCreate={this.handleEntityCreation}
                         onClose={this.closeDialog}
                     />
                 </LinkedDataValuesContext.Provider>
 
-                {entities && entities.length > 0 ? <LinkedDataList items={entities} /> : null}
+                {entities && entities.length > 0
+                    ? <LinkedDataList items={entities} hasHighlights={hasHighlights} />
+                    : <MessageDisplay message="No data is found!" isError={false} />}
+
                 <LoadingOverlay loading={this.state.creatingMetadataEntity} />
             </>
         );
@@ -121,7 +126,7 @@ LinkedDataBrowser.propTypes = {
     create: PropTypes.func.isRequired,
 
     loading: PropTypes.bool,
-    error: PropTypes.bool,
+    hasError: PropTypes.bool,
     shapes: PropTypes.array,
     entities: PropTypes.array,
     editable: PropTypes.bool,

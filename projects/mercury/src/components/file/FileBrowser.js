@@ -2,7 +2,7 @@ import React from 'react';
 import {withRouter} from "react-router-dom";
 
 import {
-    ErrorDialog, ErrorMessage,
+    ErrorDialog, MessageDisplay,
     LoadingInlay
 } from "../common";
 import FileList from "./FileList";
@@ -89,7 +89,7 @@ class FileBrowser extends React.Component {
         const collectionExists = openedCollection && openedCollection.iri;
 
         if (error) {
-            return (<ErrorMessage message="An error occurred while loading files" />);
+            return (<MessageDisplay message="An error occurred while loading files" />);
         }
 
         if (loading) {

@@ -1,0 +1,62 @@
+@prefix fs: <http://fairspace.io/ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <http://www.schema.org/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+
+
+fs:Collection a sh:NodeShape, fs:ClassShape ;
+    sh:description "Collection of files with associated metadata and access rules." ;
+    sh:name "Collection" ;
+    sh:targetClass fs:Collection ; 
+    sh:property
+        fs:labelShape,
+        fs:commentShape .
+
+fs:labelShape a fs:DatatypePropertyShape ;
+    sh:name "Label" ;
+    sh:description "Human readable label for this resource." ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:maxLength 128 ;
+    fs:fixedShape true ;
+    sh:path rdfs:label . 
+ 
+fs:commentShape a fs:DatatypePropertyShape ;
+    sh:name "Description" ;
+    sh:description "Human friendly description." ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:path rdfs:comment . 
+
+<PersonShape> a fs:ClassShape ;
+    sh:closed false ;
+    sh:description "A person that is subject of research." ;
+    sh:name "Person" ;
+    sh:targetClass foaf:Person ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:showInCatalog true ;
+    sh:property
+        <patientIdentifierShape>,
+        fs:labelShape,
+        fs:commentShape .
+
+<patientIdentifierShape> a fs:DatatypePropertyShape ;
+    sh:name "Patient Identifier" ;
+    sh:description "The identifier of the patient" ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ; 
+    sh:maxLength 128 ;
+    sh:path <patientIdentifier> .
+
+<aboutPersonShape> a fs:RelationShape ;
+    sh:name "Is about person" ;
+    sh:description "Persons that are featured in this collection." ;
+    sh:class foaf:Person ;
+    fs:inverseRelation <hasDataShape> ;
+    sh:path <aboutPerson> .

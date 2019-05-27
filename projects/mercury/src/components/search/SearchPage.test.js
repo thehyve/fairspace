@@ -3,7 +3,7 @@ import {shallow} from 'enzyme';
 
 import {SearchPage} from './SearchPage';
 import SearchResults from './SearchResults';
-import {ErrorMessage} from "../common";
+import {MessageDisplay} from "../common";
 
 describe('<SearchPage />', () => {
     let wrapper;
@@ -16,9 +16,9 @@ describe('<SearchPage />', () => {
         expect(wrapper.find(SearchResults)).toHaveLength(1);
     });
 
-    it('should render <ErrorMessage /> on error', () => {
+    it('should render <MessageDisplay /> on error', () => {
         wrapper.setProps({error: 'An error'});
-        expect(wrapper.find(ErrorMessage)).toHaveLength(1);
+        expect(wrapper.find(MessageDisplay)).toHaveLength(1);
     });
 
     it('should perform search on component first mount', () => {

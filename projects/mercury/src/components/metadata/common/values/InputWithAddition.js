@@ -5,7 +5,7 @@ import Icon from "@material-ui/core/Icon";
 import Grid from "@material-ui/core/Grid";
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/LoadingInlay";
-import ErrorMessage from "../../../common/ErrorMessage";
+import MessageDisplay from "../../../common/MessageDisplay";
 import {getFirstPredicateProperty} from "../../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../../constants";
 
@@ -43,7 +43,7 @@ class InputWithAddition extends React.Component {
         }
 
         if (this.props.error) {
-            return <ErrorMessage />;
+            return <MessageDisplay />;
         }
 
         return (

@@ -5,7 +5,7 @@ import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 
 import {
-    ErrorDialog, ErrorMessage,
+    ErrorDialog, MessageDisplay,
     CollectionEditor,
     LoadingInlay, LoadingOverlay
 } from "../common";
@@ -86,7 +86,7 @@ class CollectionBrowser extends React.Component {
         const {loading, error} = this.props;
 
         if (error) {
-            return <ErrorMessage message="An error occurred while loading collections" />;
+            return <MessageDisplay message="An error occurred while loading collections" />;
         }
 
         return (
