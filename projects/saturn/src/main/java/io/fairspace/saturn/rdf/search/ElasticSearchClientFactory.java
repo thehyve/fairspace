@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class ElasticSearchClientFactory {
@@ -19,14 +20,20 @@ public class ElasticSearchClientFactory {
      * Builds a client for connecting to ES with the given configuration
      *
      * @param esSettings
+     * @param advancedSettings
      * @return
      * @throws UnknownHostException
      * @see org.apache.jena.query.text.es.TextIndexES
      */
-    public static Client build(ESSettings esSettings) throws UnknownHostException {
+    public static Client build(ESSettings esSettings, Map<String, String> advancedSettings) throws UnknownHostException {
         log.debug("Initializing the Elastic Search Java Client with settings: " + esSettings);
-        Settings settings = Settings.builder()
-                .put("cluster.name", esSettings.getClusterName()).build();
+        var settingsBuilder = Settings.builder();
+        if (advancedSettings != null) {
+            advancedSettings.forEach(settingsBuilder::put);
+        }
+        settingsBuilder.put("cluster.name", esSettings.getClusterName())     ;
+        var settings = settingsBuilder.build();
+
         List<TransportAddress> addresses = new ArrayList<>();
         for (String host : esSettings.getHostToPortMapping().keySet()) {
             TransportAddress addr = new TransportAddress(InetAddress.getByName(host), esSettings.getHostToPortMapping().get(host));

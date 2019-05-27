@@ -47,7 +47,7 @@ public class SaturnDatasetFactory {
         if (config.elasticSearch.enabled) {
             try {
                 // Setup ES client and index
-                Client client = ElasticSearchClientFactory.build(config.elasticSearch.settings);
+                Client client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
                 ElasticSearchIndexConfigurer esConfigurer = new ElasticSearchIndexConfigurer(client);
                 esConfigurer.configure(config.elasticSearch.settings);
 
