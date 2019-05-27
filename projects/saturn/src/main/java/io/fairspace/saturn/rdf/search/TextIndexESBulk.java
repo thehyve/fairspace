@@ -4,7 +4,9 @@ import org.apache.jena.query.text.Entity;
 import org.apache.jena.query.text.TextIndex;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.query.text.es.TextIndexES;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
@@ -16,14 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static java.lang.System.currentTimeMillis;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Bulk Elastic Search Implementation of {@link TextIndex}
- *
  */
-public class TextIndexESBulk extends TextIndexES {
+public class TextIndexESBulk extends TextIndexES implements ActionListener<BulkResponse> {
     private static final String DASH = "-";
 
     private static final String UNDERSCORE = "_";
@@ -43,7 +43,7 @@ public class TextIndexESBulk extends TextIndexES {
             "&& (ctx._source.<fieldToRemove>.indexOf(params.valueToRemove) >= 0)) " +
             "{ctx._source.<fieldToRemove>.remove(ctx._source.<fieldToRemove>.indexOf(params.valueToRemove))}";
 
-    private static final Logger LOGGER      = LoggerFactory.getLogger(TextIndexESBulk.class) ;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextIndexESBulk.class);
 
     private final Client client;
     private final String indexName;
@@ -52,6 +52,7 @@ public class TextIndexESBulk extends TextIndexES {
 
     /**
      * Constructor used mainly for performing Integration tests
+     *
      * @param config an instance of {@link TextIndexConfig}
      * @param client an instance of {@link TransportClient}. The client should already have been initialized with an index
      */
@@ -66,20 +67,12 @@ public class TextIndexESBulk extends TextIndexES {
         if (updates.isEmpty()) {
             return;
         }
+
         var bulk = new BulkRequest();
         updates.forEach(bulk::add);
         updates.clear();
-        try {
-            var start = currentTimeMillis();
-            var response = client.bulk(bulk).get();
-            var finish = currentTimeMillis();
-            LOGGER.debug("Indexing in ElasticSearch took {} ms", finish - start);
-            if (response.hasFailures()) {
-                LOGGER.error(response.buildFailureMessage());
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error indexing in ElasticSearch", e);
-        }
+
+        client.bulk(bulk, this);
     }
 
     @Override
@@ -95,6 +88,7 @@ public class TextIndexESBulk extends TextIndexES {
     /**
      * Update an Entity. Since we are doing Upserts in add entity anyway, we simply call {@link #addEntity(Entity)}
      * method that takes care of updating the Entity as well.
+     *
      * @param entity the entity to update.
      */
     @Override
@@ -110,6 +104,7 @@ public class TextIndexESBulk extends TextIndexES {
      * The entity will be added as a new document in ES, if it does not already exists.
      * If the Entity exists, then the entity will simply be updated.
      * The entity will never be replaced.
+     *
      * @param entity the entity to add
      */
     @Override
@@ -124,9 +119,9 @@ public class TextIndexESBulk extends TextIndexES {
             XContentBuilder builder = jsonBuilder()
                     .startObject();
 
-            for(String field: getDocDef().fields()) {
-                if(entity.get(field) != null) {
-                    if(entity.getLanguage() != null && !entity.getLanguage().isEmpty()) {
+            for (String field : getDocDef().fields()) {
+                if (entity.get(field) != null) {
+                    if (entity.getLanguage() != null && !entity.getLanguage().isEmpty()) {
                         //We make sure that the field name contains all underscore and no dash (for eg. when the lang value is en-GB)
                         //The reason to do this is because the script fails with exception in case we have "-" in field name.
                         fieldToAdd = normalizeFieldName(field, entity.getLanguage());
@@ -158,7 +153,7 @@ public class TextIndexESBulk extends TextIndexES {
 
             updates.add(upReq);
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOGGER.error("Unable to Index the Entity in ElasticSearch.", e);
         }
     }
@@ -166,6 +161,7 @@ public class TextIndexESBulk extends TextIndexES {
     /**
      * Delete the value of the entity from the existing document, if any.
      * The document itself will never get deleted. Only the value will get deleted.
+     *
      * @param entity entity whose value needs to be deleted
      */
     @Override
@@ -173,25 +169,25 @@ public class TextIndexESBulk extends TextIndexES {
 
         String fieldToRemove = null;
         String valueToRemove = null;
-        for(String field : getDocDef().fields()) {
-            if(entity.get(field) != null) {
+        for (String field : getDocDef().fields()) {
+            if (entity.get(field) != null) {
                 fieldToRemove = field;
-                if(entity.getLanguage()!= null && !entity.getLanguage().isEmpty()) {
+                if (entity.getLanguage() != null && !entity.getLanguage().isEmpty()) {
                     fieldToRemove = normalizeFieldName(fieldToRemove, entity.getLanguage());
                 }
-                valueToRemove = (String)entity.get(field);
+                valueToRemove = (String) entity.get(field);
                 break;
             }
         }
 
-        if(fieldToRemove != null && valueToRemove != null) {
+        if (fieldToRemove != null && valueToRemove != null) {
             LOGGER.trace("deleting content related to entity {}", entity.getId());
             String deleteScript = DELETE_SCRIPT.replaceAll("<fieldToRemove>", fieldToRemove);
-            Map<String,Object> params = new HashMap<>();
+            Map<String, Object> params = new HashMap<>();
             params.put("valueToRemove", valueToRemove);
 
             UpdateRequest updateRequest = new UpdateRequest(indexName, getDocDef().getEntityField(), entity.getId())
-                    .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG,deleteScript,params));
+                    .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, deleteScript, params));
 
             updates.add(updateRequest);
         }
@@ -200,7 +196,21 @@ public class TextIndexESBulk extends TextIndexES {
     private String normalizeFieldName(String fieldName, String lang) {
         //We know that the lang field is not null already
         StringBuilder sb = new StringBuilder(fieldName);
-        return sb.append(UNDERSCORE).append(lang.replaceAll(DASH,UNDERSCORE)).toString();
+        return sb.append(UNDERSCORE).append(lang.replaceAll(DASH, UNDERSCORE)).toString();
     }
 
+    @Override
+    public void onResponse(BulkResponse responses) {
+        LOGGER.debug("Indexing of {} updates in ElasticSearch took {} ms",
+                responses.getItems().length, responses.getIngestTook().millis() + responses.getTook().millis());
+
+        if (responses.hasFailures()) {
+            LOGGER.error(responses.buildFailureMessage());
+        }
+    }
+
+    @Override
+    public void onFailure(Exception e) {
+        LOGGER.error("Error indexing in ElasticSearch", e);
+    }
 }
