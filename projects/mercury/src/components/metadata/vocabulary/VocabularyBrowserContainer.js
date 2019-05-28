@@ -17,15 +17,21 @@ import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {isDataSteward} from "../../../utils/userUtils";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
-import {ErrorDialog} from "../../common";
+import {ErrorDialog, MessageDisplay} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import VocabularyList from "./VocabularyList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS} from "../../../constants";
 
-const VocabularyBrowserContainer = (props) => (
+const VocabularyBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
     <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
-        <LinkedDataBrowser {...props} ListComponent={VocabularyList} />
+        <LinkedDataBrowser {...otherProps}>
+            {
+                entities && entities.length > 0
+                    ? <VocabularyList items={entities} hasHighlights={hasHighlights} />
+                    : <MessageDisplay message="No data is found!" isError={false} />
+            }
+        </LinkedDataBrowser>
     </LinkedDataValuesContext.Provider>
 );
 

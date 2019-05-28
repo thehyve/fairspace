@@ -9,15 +9,21 @@ import {getMetadataSearchResults} from "../../../reducers/searchReducers";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
-import {ErrorDialog} from "../../common";
+import {ErrorDialog, MessageDisplay} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import MetadataList from "./MetadataList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS} from "../../../constants";
 
-const MetadataBrowserContainer = (props) => (
+const MetadataBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
     <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
-        <LinkedDataBrowser {...props} ListComponent={MetadataList} />
+        <LinkedDataBrowser {...otherProps}>
+            {
+                entities && entities.length > 0
+                    ? <MetadataList items={entities} hasHighlights={hasHighlights} />
+                    : <MessageDisplay message="No data is found!" isError={false} />
+            }
+        </LinkedDataBrowser>
     </LinkedDataValuesContext.Provider>
 );
 

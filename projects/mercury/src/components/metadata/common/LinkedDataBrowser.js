@@ -60,9 +60,7 @@ class LinkedDataBrowser extends React.Component {
     };
 
     render() {
-        const {
-            loading, error, entities, hasHighlights, editable, ListComponent, shapes, vocabulary
-        } = this.props;
+        const {children, loading, error, editable, shapes, vocabulary} = this.props;
 
         if (loading) {
             return <LoadingInlay />;
@@ -106,9 +104,7 @@ class LinkedDataBrowser extends React.Component {
                     onClose={this.closeDialog}
                 />
 
-                {entities && entities.length > 0
-                    ? <ListComponent items={entities} hasHighlights={hasHighlights} />
-                    : <MessageDisplay message="No data is found!" isError={false} />}
+                {children}
 
                 <LoadingOverlay loading={this.state.creatingMetadataEntity} />
             </>
@@ -123,9 +119,7 @@ LinkedDataBrowser.propTypes = {
 
     loading: PropTypes.bool,
     shapes: PropTypes.array,
-    entities: PropTypes.array,
     editable: PropTypes.bool,
-    ListComponent: PropTypes.func.isRequired,
 
     vocabulary: PropTypes.object.isRequired
 };
