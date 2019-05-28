@@ -64,8 +64,8 @@ export class SearchPage extends React.Component {
     render() {
         const {results, vocabulary, loading, error} = this.props;
 
-        if (!loading && error) {
-            return <MessageDisplay message={error} />;
+        if (!loading && error && error.message) {
+            return <MessageDisplay message={error.message} />;
         }
 
         return (
