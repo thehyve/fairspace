@@ -10,7 +10,6 @@ import * as constants from "../../../constants";
 import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 
 const MetadataListPage = ({fetchVocabulary, vocabulary, classesInCatalog, search}) => {
-
     fetchVocabulary();
 
     const toTargetClasses = shapes => shapes.map(c => getFirstPredicateId(c, constants.SHACL_TARGET_CLASS));
