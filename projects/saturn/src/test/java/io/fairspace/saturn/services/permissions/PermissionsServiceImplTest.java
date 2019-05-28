@@ -167,8 +167,9 @@ public class PermissionsServiceImplTest {
         var collection = createResource("http://example.com/collection");
         var file = createResource("http://example.com/file");
         ds.getDefaultModel()
-                .add(collection, RDF.type, createResource("http://fairspace.io/ontology#Collection"))
+                .add(collection, RDF.type, FS.Collection)
                 .add(collection, FS.filePath, createPlainLiteral("collectionPath"))
+                .add(file, RDF.type, FS.File)
                 .add(file, FS.filePath, createPlainLiteral("collectionPath/filePath"));
 
 
