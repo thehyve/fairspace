@@ -48,10 +48,10 @@ class LinkedDataBrowser extends React.Component {
 
     handleEntityCreation = (formKey, shape, id) => {
         this.setState({creatingMetadataEntity: true});
-        const {create, onError} = this.props;
+        const {create, onEntityCreationError} = this.props;
 
         create(formKey, shape, id)
-            .catch(e => onError(e, id))
+            .catch(e => onEntityCreationError(e, id))
             .finally(() => {
                 if (!this.unMounted) {
                     this.setState({creatingMetadataEntity: false});
@@ -61,15 +61,15 @@ class LinkedDataBrowser extends React.Component {
 
     render() {
         const {
-            loading, hasError, entities, hasHighlights, editable, ListComponent, shapes, vocabulary
+            loading, error, entities, hasHighlights, editable, ListComponent, shapes, vocabulary
         } = this.props;
 
         if (loading) {
             return <LoadingInlay />;
         }
 
-        if (hasError) {
-            return <MessageDisplay message="An error occurred while loading metadata" />;
+        if (error) {
+            return <MessageDisplay message={error.message || 'An error occurred while loading metadata'} />;
         }
 
         return (
@@ -122,7 +122,6 @@ LinkedDataBrowser.propTypes = {
     create: PropTypes.func.isRequired,
 
     loading: PropTypes.bool,
-    hasError: PropTypes.bool,
     shapes: PropTypes.array,
     entities: PropTypes.array,
     editable: PropTypes.bool,

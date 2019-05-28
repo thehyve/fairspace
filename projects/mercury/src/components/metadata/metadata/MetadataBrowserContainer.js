@@ -30,7 +30,7 @@ const mapStateToProps = (state, {vocabulary}) => {
         shape: vocabulary.determineShapeForType(type[0]),
         highlights
     }));
-    const onError = (e, id) => {
+    const onEntityCreationError = (e, id) => {
         if (e.details) {
             ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createMetadataIri(id)), e.message);
         } else {
@@ -40,12 +40,12 @@ const mapStateToProps = (state, {vocabulary}) => {
 
     return {
         loading: pending,
-        hasError: !!error,
+        error,
         entities,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         shapes: vocabulary.getClassesInCatalog(),
         vocabulary,
-        onError
+        onEntityCreationError
     };
 };
 
