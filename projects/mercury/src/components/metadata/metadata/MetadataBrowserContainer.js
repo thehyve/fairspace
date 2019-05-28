@@ -21,7 +21,7 @@ const MetadataBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
             {
                 entities && entities.length > 0
                     ? <MetadataList items={entities} hasHighlights={hasHighlights} />
-                    : <MessageDisplay message="The vocabulary is empty" isError={false} />
+                    : <MessageDisplay message="The metadata layer is empty" isError={false} />
             }
         </LinkedDataCreator>
     </LinkedDataValuesContext.Provider>
