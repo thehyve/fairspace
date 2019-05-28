@@ -5,8 +5,11 @@ PREFIX fs: <http://fairspace.io/ontology#>
 
 SELECT ?collection ?subject
 WHERE {
-  ?collection a fs:Collection; fs:filePath ?collectionPath .
+  { ?subject a fs:Directory } UNION { ?subject a fs:File }
   ?subject fs:filePath ?filePath .
+  ?collection a fs:Collection; fs:filePath ?collectionPath .
+
+
   FILTER(STRSTARTS(?filePath, CONCAT(?collectionPath, "/")))
   FILTER NOT EXISTS { ?collection fs:dateDeleted ?dateDeleted }
 }

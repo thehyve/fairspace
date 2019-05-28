@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -70,10 +69,15 @@ public class CollectionsService {
     }
 
     public List<Collection> list() {
-        return dao.list(Collection.class)
-                .stream()
-                .map(this::addPermissionsToObject)
-                .filter(Objects::nonNull)
+        var collections = dao.list(Collection.class);
+
+        var iris = collections.stream().map(Collection::getIri).collect(toList());
+        var userPermissions = permissions.getPermissions(iris);
+
+        return collections.stream()
+                .filter(c -> {
+                    c.setAccess(userPermissions.get(c.getIri()));
+                    return c.canRead(); })
                 .sorted(comparing(Collection::getName))
                 .collect(toList());
     }

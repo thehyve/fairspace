@@ -56,6 +56,13 @@ public interface PermissionsService {
     Map<Node, Access> getPermissions(Node resource);
 
     /**
+     * @param nodes
+     * @return Current user's permissions for the given nodes. If no permission was set explicitly, returns the default value
+     * depending on the type of the resource.
+     */
+    Map<Node, Access> getPermissions(Collection<Node> nodes);
+
+    /**
      *
      * @param resource
      * @return true if the resource is write-restricted

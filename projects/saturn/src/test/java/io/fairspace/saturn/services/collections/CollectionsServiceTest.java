@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -227,6 +228,10 @@ public class CollectionsServiceTest {
         c1 = collections.create(c1);
 
         when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.None);
+        when(permissions.getPermissions(any(java.util.Collection.class)))
+                .thenAnswer(invocation -> invocation.<java.util.Collection<Node>>getArgument(0)
+                        .stream()
+                        .collect(Collectors.toMap(node -> node, node -> Access.None)));
 
         assertNull(collections.get(c1.getIri().getURI()));
         assertNull(collections.getByLocation(c1.getLocation()));
