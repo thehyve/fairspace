@@ -1,40 +1,29 @@
 import React from 'react';
-import Paper from "@material-ui/core/Paper";
 import {connect} from 'react-redux';
 
+import LinkedDataListPage from "../common/LinkedDataListPage";
 import MetadataBrowserContainer from "./MetadataBrowserContainer";
-import SearchBar from "../../common/SearchBar";
-import BreadCrumbs from "../../common/BreadCrumbs";
 import {searchMetadata} from "../../../actions/searchActions";
 import {getVocabulary} from "../../../reducers/cache/vocabularyReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../constants";
 import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 
-const MetadataListPage = ({fetchVocabulary, vocabulary, targetClasses, searchMetadata: search}) => {
+const MetadataListPage = ({fetchVocabulary, vocabulary, search, targetClasses}) => {
     fetchVocabulary();
 
     return (
-        <>
-            <BreadCrumbs />
-            <Paper>
-                <SearchBar
-                    placeholder="Search"
-                    disableUnderline
-                    onSearchChange={(query) => {
-                        search(query, targetClasses);
-                    }}
-                />
-            </Paper>
-            {targetClasses && targetClasses.length > 0 && (
-                <MetadataBrowserContainer
-                    vocabulary={vocabulary}
-                    targetClasses={targetClasses}
-                    fetchVocabulary={fetchVocabulary}
-                />
-            )
-            }
-        </>
+        <LinkedDataListPage
+            onSearchChange={(query) => search(query, targetClasses)}
+            listRenderer={() => (
+                targetClasses && targetClasses.length > 0 && (
+                    <MetadataBrowserContainer
+                        targetClasses={targetClasses}
+                        vocabulary={vocabulary}
+                    />
+                )
+            )}
+        />
     );
 };
 
@@ -42,12 +31,11 @@ const mapStateToProps = (state) => {
     const vocabulary = getVocabulary(state);
     const targetClasses = vocabulary.getClassesInCatalog()
         .map(c => getFirstPredicateId(c, constants.SHACL_TARGET_CLASS));
-
-    return {targetClasses, vocabulary};
+    return {vocabulary, targetClasses};
 };
 
 const mapDispatchToProps = {
-    searchMetadata,
+    search: searchMetadata,
     fetchVocabulary: fetchMetadataVocabularyIfNeeded
 };
 
