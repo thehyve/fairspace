@@ -9,9 +9,10 @@ import {
     withStyles
 } from "@material-ui/core";
 
-import LinkedDataLink from "./LinkedDataLink";
-import styles from './LinkedDataList.styles';
+import LinkedDataLink from "../common/LinkedDataLink";
+import styles from '../common/LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
+import {METADATA_EDITOR_PATH, VOCABULARY_EDITOR_PATH} from "../../../constants";
 
 const linkedDataList = ({items = [], hasHighlights, classes}) => (
     <Paper className={classes.root}>
@@ -32,10 +33,12 @@ const linkedDataList = ({items = [], hasHighlights, classes}) => (
                                 {label}
                             </TableCell>
                             <TableCell className={classes.cell}>
-                                <a href={type}> {typeLabel} </a>
+                                <LinkedDataLink editorPath={VOCABULARY_EDITOR_PATH} uri={type}>
+                                    {typeLabel}
+                                </LinkedDataLink>
                             </TableCell>
                             <TableCell className={classes.cell}>
-                                <LinkedDataLink uri={id}>
+                                <LinkedDataLink editorPath={METADATA_EDITOR_PATH} uri={id}>
                                     {label}
                                 </LinkedDataLink>
                             </TableCell>

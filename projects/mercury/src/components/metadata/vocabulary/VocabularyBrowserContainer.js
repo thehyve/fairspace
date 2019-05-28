@@ -19,6 +19,7 @@ import {getAuthorizations} from "../../../reducers/account/authorizationsReducer
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
+import VocabularyList from "./VocabularyList";
 
 const mapStateToProps = (state) => {
     const vocabularyEntities = getVocabularyEntities(state);
@@ -45,9 +46,11 @@ const mapStateToProps = (state) => {
         editable: isDataSteward(getAuthorizations(state), Config.get()),
         shapes: metaVocabulary.getClassesInCatalog(),
         vocabulary: metaVocabulary,
-        valueComponentFactory: VocabularyValueComponentFactory,
         entities,
-        onError
+        onError,
+
+        valueComponentFactory: VocabularyValueComponentFactory,
+        ListComponent: VocabularyList
     });
 };
 

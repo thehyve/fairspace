@@ -11,6 +11,7 @@ import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
+import MetadataList from "./MetadataList";
 
 const mapStateToProps = (state, {vocabulary}) => {
     const {items, pending, error} = getMetadataSearchResults(state);
@@ -35,9 +36,11 @@ const mapStateToProps = (state, {vocabulary}) => {
         entities,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         shapes: vocabulary.getClassesInCatalog(),
-        valueComponentFactory: MetadataValueComponentFactory,
         vocabulary,
-        onError
+        onError,
+
+        valueComponentFactory: MetadataValueComponentFactory,
+        ListComponent: MetadataList
     };
 };
 

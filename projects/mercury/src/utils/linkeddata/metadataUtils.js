@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import * as consts from "../../constants";
 import {getFirstPredicateValue} from "./jsonLdUtils";
+import queryString from "query-string";
 
 /**
  *
@@ -197,3 +198,5 @@ export const partitionErrors = (errors, subject) => {
  * @param {*}
  */
 export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
+
+export const getIriQueryParameter = (searchString) => queryString.parse(searchString).q || '';

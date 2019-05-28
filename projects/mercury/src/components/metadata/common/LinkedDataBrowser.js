@@ -3,8 +3,7 @@ import PropTypes from "prop-types";
 import {Button} from "@material-ui/core";
 
 import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
-import {MessageDisplay, LoadingInlay, LoadingOverlay} from "../../common";
-import LinkedDataList from './LinkedDataList';
+import {LoadingInlay, LoadingOverlay, MessageDisplay} from "../../common";
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 import {LinkedDataValuesContext} from './LinkedDataValuesContext';
@@ -63,7 +62,7 @@ class LinkedDataBrowser extends React.Component {
 
     render() {
         const {
-            loading, hasError, entities, hasHighlights, editable, shapes, vocabulary, valueComponentFactory
+            loading, hasError, entities, hasHighlights, editable, ListComponent, shapes, vocabulary, valueComponentFactory
         } = this.props;
 
         if (loading) {
@@ -111,7 +110,7 @@ class LinkedDataBrowser extends React.Component {
                 </LinkedDataValuesContext.Provider>
 
                 {entities && entities.length > 0
-                    ? <LinkedDataList items={entities} hasHighlights={hasHighlights} />
+                    ? <ListComponent items={entities} hasHighlights={hasHighlights} />
                     : <MessageDisplay message="No data is found!" isError={false} />}
 
                 <LoadingOverlay loading={this.state.creatingMetadataEntity} />
@@ -130,6 +129,7 @@ LinkedDataBrowser.propTypes = {
     shapes: PropTypes.array,
     entities: PropTypes.array,
     editable: PropTypes.bool,
+    ListComponent: PropTypes.func.isRequired,
 
     valueComponentFactory: PropTypes.object.isRequired,
     vocabulary: PropTypes.object.isRequired
