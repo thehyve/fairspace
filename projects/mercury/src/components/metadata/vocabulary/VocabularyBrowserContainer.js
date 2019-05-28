@@ -29,7 +29,7 @@ const VocabularyBrowserContainer = ({entities, hasHighlights, ...otherProps}) =>
             {
                 entities && entities.length > 0
                     ? <VocabularyList items={entities} hasHighlights={hasHighlights} />
-                    : <MessageDisplay message="No data is found!" isError={false} />
+                    : <MessageDisplay message="The metadata is empty" isError={false} />
             }
         </LinkedDataCreator>
     </LinkedDataValuesContext.Provider>
