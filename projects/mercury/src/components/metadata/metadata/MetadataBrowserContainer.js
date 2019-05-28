@@ -6,7 +6,7 @@ import {createMetadataIri, linkLabel, partitionErrors, relativeLink} from "../..
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {searchMetadata} from "../../../actions/searchActions";
 import {getMetadataSearchResults} from "../../../reducers/searchReducers";
-import LinkedDataBrowser from "../common/LinkedDataBrowser";
+import LinkedDataCreator from "../common/LinkedDataCreator";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog, MessageDisplay} from "../../common";
@@ -17,13 +17,13 @@ import {SHACL_TARGET_CLASS} from "../../../constants";
 
 const MetadataBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
     <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
-        <LinkedDataBrowser {...otherProps}>
+        <LinkedDataCreator {...otherProps}>
             {
                 entities && entities.length > 0
                     ? <MetadataList items={entities} hasHighlights={hasHighlights} />
                     : <MessageDisplay message="No data is found!" isError={false} />
             }
-        </LinkedDataBrowser>
+        </LinkedDataCreator>
     </LinkedDataValuesContext.Provider>
 );
 

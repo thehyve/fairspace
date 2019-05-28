@@ -12,7 +12,7 @@ import {
 import {createVocabularyIri, getLabel, partitionErrors, relativeLink} from "../../../utils/linkeddata/metadataUtils";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
 import Config from "../../../services/Config/Config";
-import LinkedDataBrowser from "../common/LinkedDataBrowser";
+import LinkedDataCreator from "../common/LinkedDataCreator";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {isDataSteward} from "../../../utils/userUtils";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
@@ -25,13 +25,13 @@ import {SHACL_TARGET_CLASS} from "../../../constants";
 
 const VocabularyBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
     <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
-        <LinkedDataBrowser {...otherProps}>
+        <LinkedDataCreator {...otherProps}>
             {
                 entities && entities.length > 0
                     ? <VocabularyList items={entities} hasHighlights={hasHighlights} />
                     : <MessageDisplay message="No data is found!" isError={false} />
             }
-        </LinkedDataBrowser>
+        </LinkedDataCreator>
     </LinkedDataValuesContext.Provider>
 );
 
