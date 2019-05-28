@@ -26,10 +26,9 @@ const LinkedDataListPage = ({
         const targetClass = getFirstPredicateId(type, constants.SHACL_TARGET_CLASS);
         const label = getLabel(type);
         return {targetClass, label};
-    })
+    });
 
-    const labelMap = {};
-    allTypes.forEach(({targetClass, label}) => labelMap[targetClass] = label);
+    const getTypeLabel = (type) => allTypes.find(({targetClass}) => targetClass === type).label;
 
     const renderTypeClass = ({targetClass, label}) => (
         <MenuItem key={targetClass} value={targetClass}>
@@ -65,7 +64,7 @@ const LinkedDataListPage = ({
                         onChange={e => onTypesChange(e.target.value)}
                         input={<Input id="select-multiple-checkbox" />}
                         renderValue={selected => (selected.length === 0 ? '[All types]'
-                            : selected.map(targetClass => labelMap[targetClass]).join(', '))}
+                            : selected.map(getTypeLabel).join(', '))}
                     >
                         {allTypes.map(renderTypeClass)}
                     </Select>
