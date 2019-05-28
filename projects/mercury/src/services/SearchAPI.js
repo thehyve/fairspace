@@ -79,7 +79,7 @@ export class SearchAPI {
      * @param size
      * @returns {Promise}
      */
-    searchMetadata = (types, query) => this.search({query: query || '*', size: SEARCH_MAX_SIZE, types});
+    searchLinkedData = (types, query) => this.search({query: query || '*', size: SEARCH_MAX_SIZE, types});
 
     /**
      * Transforms the search result into a format that can be used internally. The format looks like this:

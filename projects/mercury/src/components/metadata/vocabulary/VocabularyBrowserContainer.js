@@ -1,15 +1,9 @@
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {
-    getMetaVocabulary,
-    getVocabularyEntities,
-    hasMetaVocabularyError,
-    hasVocabularyEntitiesError,
-    isMetaVocabularyPending,
-    isVocabularyEntitiesPending
-} from "../../../reducers/cache/vocabularyReducers";
-import {createVocabularyIri, getLabel, relativeLink, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
-import * as vocabularyActions from "../../../actions/vocabularyActions";
+
+import {createVocabularyIri, getLabel, relativeLink, partitionErrors, linkLabel} from "../../../utils/linkeddata/metadataUtils";
+import {createVocabularyEntityFromState} from "../../../actions/vocabularyActions";
+import {searchVocabulary} from "../../../actions/searchActions";
 import Config from "../../../services/Config/Config";
 import * as constants from "../../../constants";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
@@ -19,19 +13,19 @@ import {getAuthorizations} from "../../../reducers/account/authorizationsReducer
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
+import {getVocabularySearchResults} from "../../../reducers/searchReducers";
 
-const mapStateToProps = (state) => {
-    const vocabularyEntities = getVocabularyEntities(state);
-    const metaVocabulary = getMetaVocabulary(state);
-
-    const entities = vocabularyEntities.map(e => ({
-        id: e['@id'],
-        label: getLabel(e),
-        type: e['@type'],
-        typeLabel: e['@type'] ? getLabel(metaVocabulary.determineShapeForType(e['@type'][0]), true) : ''
+const mapStateToProps = (state, {vocabulary}) => {
+    const {items, pending, error} = getVocabularySearchResults(state);
+    const entities = items.map(({id, type, label, name, highlights}) => ({
+        id,
+        label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
+        type: type[0],
+        typeLabel: getLabel(vocabulary.determineShapeForType(type[0]), true),
+        highlights
     }));
 
-    const onError = (e, id) => {
+    const onEntityCreationError = (e, id) => {
         if (e.details) {
             ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createVocabularyIri(id)), e.message);
         } else {
@@ -40,30 +34,27 @@ const mapStateToProps = (state) => {
     };
 
     return ({
-        loading: isVocabularyEntitiesPending(state) || isMetaVocabularyPending(state),
-        hasError: hasVocabularyEntitiesError(state) || hasMetaVocabularyError(state),
         editable: isDataSteward(getAuthorizations(state), Config.get()),
-        shapes: metaVocabulary.getClassesInCatalog(),
-        vocabulary: metaVocabulary,
-        valueComponentFactory: VocabularyValueComponentFactory,
+        shapes: vocabulary.getClassesInCatalog(),
+        loading: pending,
+        error,
         entities,
-        onError
+        hasHighlights: entities.some(({highlights}) => highlights.length > 0),
+        valueComponentFactory: VocabularyValueComponentFactory,
+        vocabulary,
+        onEntityCreationError
     });
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetchLinkedData: () => dispatch(vocabularyActions.fetchAllVocabularyEntitiesIfNeeded()),
-    fetchShapes: () => dispatch(vocabularyActions.fetchMetaVocabularyIfNeeded()),
+    fetchLinkedData: () => dispatch(searchVocabulary('*', ownProps.targetClasses)),
+    fetchShapes: () => {},
     create: (formKey, shape, id) => {
         const subject = createVocabularyIri(id);
         const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
 
-        return dispatch(vocabularyActions.createVocabularyEntityFromState(formKey, subject, type))
-            .then(({value}) => {
-                dispatch(vocabularyActions.fetchVocabularyEntitiesIfNeeded());
-                dispatch(vocabularyActions.fetchAllVocabularyEntitiesIfNeeded());
-                ownProps.history.push(relativeLink(value.subject));
-            });
+        return dispatch(createVocabularyEntityFromState(formKey, subject, type))
+            .then(({value}) => ownProps.history.push(relativeLink(value.subject)));
     }
 });
 

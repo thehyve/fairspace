@@ -184,7 +184,7 @@ describe('Search API', () => {
 
     it('forwards the metadata search query to ES', () => {
         const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
-        searchAPI.searchMetadata(types, 'my-query')
+        searchAPI.searchLinkedData(types, 'my-query')
             .then(() => {
                 expect(mockClient.search.mock.calls.length)
                     .toEqual(1);
@@ -204,7 +204,7 @@ describe('Search API', () => {
 
     it('searchs all metadata when no query is given', () => {
         const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
-        searchAPI.searchMetadata(types)
+        searchAPI.searchLinkedData(types)
             .then(() => {
                 expect(mockClient.search.mock.calls.length)
                     .toEqual(1);

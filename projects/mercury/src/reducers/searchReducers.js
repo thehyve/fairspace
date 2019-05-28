@@ -14,18 +14,20 @@ export const metadataSearchReducer = promiseReducerFactory(actionTypes.METADATA_
 
 export const collectionsSearchReducer = promiseReducerFactory(actionTypes.COLLECTIONS_SEARCH, initialState);
 
+export const vocabularySearchReducer = promiseReducerFactory(actionTypes.VOCABULARY_SEARCH, initialState);
+
 //* ********************
 //* * SELECTORS
 //* ********************
 
-export const getCollectionsSearchResults = ({collectionSearch}) => {
-    const {data, ...rest} = collectionSearch;
+export const destrctureSearchState = (state) => {
+    const {data, ...rest} = state;
     const {items, total} = data || {...initialState.data};
     return {items, total, ...rest};
 };
 
-export const getMetadataSearchResults = ({metadataSearch}) => {
-    const {data, ...rest} = metadataSearch;
-    const {items, total} = data || {...initialState.data};
-    return {items, total, ...rest};
-};
+export const getCollectionsSearchResults = ({collectionSearch}) => destrctureSearchState(collectionSearch);
+
+export const getMetadataSearchResults = ({metadataSearch}) => destrctureSearchState(metadataSearch);
+
+export const getVocabularySearchResults = ({vocabularySearch}) => destrctureSearchState(vocabularySearch);
