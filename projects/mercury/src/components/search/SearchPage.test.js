@@ -16,8 +16,12 @@ describe('<SearchPage />', () => {
         expect(wrapper.find(SearchResults)).toHaveLength(1);
     });
 
-    it('should render <MessageDisplay /> on error', () => {
-        wrapper.setProps({error: 'An error'});
+    it('should render error component on error', () => {
+        wrapper.setProps({
+            error: {
+                message: 'An error'
+            }
+        });
         expect(wrapper.find(MessageDisplay)).toHaveLength(1);
     });
 
