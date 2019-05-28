@@ -10,7 +10,7 @@ export const searchCollections = createErrorHandlingPromiseAction((query) => ({
     }
 }));
 
-export const searchMetadata = (query, types) => ({
+export const searchMetadata = createErrorHandlingPromiseAction((query, types) => ({
     type: METADATA_SEARCH,
     payload: searchAPI().searchMetadata(types, query)
-});
+}));
