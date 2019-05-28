@@ -158,6 +158,20 @@ public class PermissionsServiceImpl implements PermissionsService {
             return result;
     }
 
+    /**
+     * Ensure that the current user has the requested access level for all nodes
+     * @param nodes
+     * @param requestedAccess
+     */
+    private void ensureAccessWithoutBatch(Collection<Node> nodes, Access requestedAccess) {
+        var authorities = getAuthorities(nodes);
+        getPermissionsForAuthorities(authorities.keys()).forEach((authority, access) -> {
+            if (access.compareTo(requestedAccess) < 0) {
+                throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
+                        userService.getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), authorities.get(authority).iterator().next());
+            }
+        });
+    }
 
     /**
      * Retrieves the permissions of the current user for the given authorities
@@ -165,26 +179,11 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @return
      */
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
-        return calculateRead(rdf, () -> {
-            var result = new HashMap<Node, Access>();
-            rdf.querySelect(storedQuery("permissions_get_for_user", authorities, userService.getCurrentUser().getIri()),
-                    row -> result.put(row.getResource("subject").asNode(), getAccess(row)));
-            authorities.forEach(authority -> result.computeIfAbsent(authority, this::defaultAccess));
-            return result;
-        });
-    }
-
-    /**
-     * Ensure that the current user has the requested access level for all nodes
-     * @param nodes
-     * @param requestedAccess
-     */
-    private void ensureAccessWithoutBatch(Collection<Node> nodes, Access requestedAccess) {
-        getPermissionsWithoutBatch(nodes).forEach((node, access) -> {
-            if (access.compareTo(requestedAccess) < 0) {
-                throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources", userService.getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), node);
-            }
-        });
+        var result = new HashMap<Node, Access>();
+        rdf.querySelect(storedQuery("permissions_get_for_user", authorities, userService.getCurrentUser().getIri()),
+                row -> result.put(row.getResource("subject").asNode(), getAccess(row)));
+        authorities.forEach(authority -> result.computeIfAbsent(authority, this::defaultAccess));
+        return result;
     }
 
     private boolean isCollection(Node resource) {
@@ -225,7 +224,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     /**
      *
      * @param nodes
-     * @return A multimap from authority to the related nodes
+     * @return A multimap from authority to the related nodes (one authority can control multiple resources)
      *         The authority could be the original nodes for metadata entities, or the enclosing collection
      *         for files or directories
      */
