@@ -45,9 +45,11 @@ public class SaturnDatasetFactory {
 
         // ElasticSearch
         if (config.elasticSearch.enabled) {
+            var unwrapped = dsg;
+            Client client = null;
             try {
                 // Setup ES client and index
-                Client client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
+                client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
                 ElasticSearchIndexConfigurer esConfigurer = new ElasticSearchIndexConfigurer(client);
                 esConfigurer.configure(config.elasticSearch.settings);
 
@@ -55,10 +57,15 @@ public class SaturnDatasetFactory {
                 var textIndex =  new TextIndexESBulk(new TextIndexConfig(new AutoEntityDefinition()), client, config.elasticSearch.settings.getIndexName());
                 var textDocProducer = new SingleTripleTextDocProducer(textIndex, !config.elasticSearch.required);
                 dsg = TextDatasetFactory.create(dsg, textIndex, true, textDocProducer);
+
             } catch (Exception e) {
                 log.error("Error connecting to ElasticSearch", e);
                 if (config.elasticSearch.required) {
                     throw e; // Terminates Saturn
+                }
+                dsg = unwrapped;
+                if (client != null) {
+                    client.close();
                 }
             }
         }
