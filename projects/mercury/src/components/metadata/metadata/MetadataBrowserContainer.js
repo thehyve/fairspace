@@ -1,17 +1,25 @@
+import React from "react";
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
 
-import {createMetadataIri, getLabel, relativeLink, partitionErrors, linkLabel} from "../../../utils/linkeddata/metadataUtils";
+import {withRouter} from 'react-router-dom';
+import {createMetadataIri, linkLabel, partitionErrors, relativeLink} from "../../../utils/linkeddata/metadataUtils";
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {searchMetadata} from "../../../actions/searchActions";
 import {getMetadataSearchResults} from "../../../reducers/searchReducers";
 import LinkedDataBrowser from "../common/LinkedDataBrowser";
-import * as constants from "../../../constants";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import MetadataList from "./MetadataList";
+import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
+import {SHACL_TARGET_CLASS} from "../../../constants";
+
+const MetadataBrowserContainer = (props) => (
+    <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
+        <LinkedDataBrowser {...props} ListComponent={MetadataList} />
+    </LinkedDataValuesContext.Provider>
+);
 
 const mapStateToProps = (state, {vocabulary}) => {
     const {items, pending, error} = getMetadataSearchResults(state);
@@ -19,7 +27,7 @@ const mapStateToProps = (state, {vocabulary}) => {
         id,
         label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
         type: type[0],
-        typeLabel: getLabel(vocabulary.determineShapeForType(type[0]), true),
+        shape: vocabulary.determineShapeForType(type[0]),
         highlights
     }));
     const onError = (e, id) => {
@@ -37,10 +45,7 @@ const mapStateToProps = (state, {vocabulary}) => {
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         shapes: vocabulary.getClassesInCatalog(),
         vocabulary,
-        onError,
-
-        valueComponentFactory: MetadataValueComponentFactory,
-        ListComponent: MetadataList
+        onError
     };
 };
 
@@ -49,10 +54,10 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchShapes: () => {},
     create: (formKey, shape, id) => {
         const subject = createMetadataIri(id);
-        const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
+        const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
         return dispatch(createMetadataEntityFromState(formKey, subject, type))
             .then(() => ownProps.history.push(relativeLink(subject)));
     }
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(LinkedDataBrowser));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MetadataBrowserContainer));

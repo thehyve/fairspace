@@ -6,7 +6,6 @@ import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
 import {LoadingInlay, LoadingOverlay, MessageDisplay} from "../../common";
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
-import {LinkedDataValuesContext} from './LinkedDataValuesContext';
 
 class LinkedDataBrowser extends React.Component {
     static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
@@ -62,7 +61,7 @@ class LinkedDataBrowser extends React.Component {
 
     render() {
         const {
-            loading, hasError, entities, hasHighlights, editable, ListComponent, shapes, vocabulary, valueComponentFactory
+            loading, hasError, entities, hasHighlights, editable, ListComponent, shapes, vocabulary
         } = this.props;
 
         if (loading) {
@@ -99,15 +98,13 @@ class LinkedDataBrowser extends React.Component {
                     onClose={this.closeDialog}
                 />
 
-                <LinkedDataValuesContext.Provider value={valueComponentFactory}>
-                    <NewLinkedDataEntityDialog
-                        open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
-                        linkedData={emptyLinkedData(vocabulary, this.state.shape)}
-                        shape={this.state.shape}
-                        onCreate={this.handleEntityCreation}
-                        onClose={this.closeDialog}
-                    />
-                </LinkedDataValuesContext.Provider>
+                <NewLinkedDataEntityDialog
+                    open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
+                    linkedData={emptyLinkedData(vocabulary, this.state.shape)}
+                    shape={this.state.shape}
+                    onCreate={this.handleEntityCreation}
+                    onClose={this.closeDialog}
+                />
 
                 {entities && entities.length > 0
                     ? <ListComponent items={entities} hasHighlights={hasHighlights} />
@@ -131,7 +128,6 @@ LinkedDataBrowser.propTypes = {
     editable: PropTypes.bool,
     ListComponent: PropTypes.func.isRequired,
 
-    valueComponentFactory: PropTypes.object.isRequired,
     vocabulary: PropTypes.object.isRequired
 };
 
