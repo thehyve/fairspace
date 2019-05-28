@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.permissions;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
@@ -38,7 +37,7 @@ import static org.apache.jena.system.Txn.executeRead;
 @Slf4j
 public class PermissionsServiceImpl implements PermissionsService {
     private static final int BATCH_SIZE = 100;
-    private static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
+    public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
     private final RDFConnection rdf;
     private final UserService userService;
@@ -134,7 +133,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         if (getPermission(resource).compareTo(access) < 0) {
-            throw new AccessDeniedException(format("User %s has no %s access to resource %s", userService.getCurrentUser().getIri(), access.name().toLowerCase(), resource));
+            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userService.getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -165,7 +164,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      */
     private void ensureAccessWithoutBatch(Collection<Node> nodes, Access requestedAccess) {
         var authorities = getAuthorities(nodes);
-        getPermissionsForAuthorities(authorities.keys()).forEach((authority, access) -> {
+        getPermissionsForAuthorities(authorities.keySet()).forEach((authority, access) -> {
             if (access.compareTo(requestedAccess) < 0) {
                 throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
                         userService.getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), authorities.get(authority).iterator().next());
@@ -182,17 +181,11 @@ public class PermissionsServiceImpl implements PermissionsService {
         var result = new HashMap<Node, Access>();
         rdf.querySelect(storedQuery("permissions_get_for_user", authorities, userService.getCurrentUser().getIri()),
                 row -> result.put(row.getResource("subject").asNode(), getAccess(row)));
-        authorities.forEach(authority -> result.computeIfAbsent(authority, this::defaultAccess));
         return result;
     }
 
     private boolean isCollection(Node resource) {
         return rdf.queryAsk(storedQuery("is_collection", resource));
-    }
-
-
-    private Access defaultAccess(Node resource) {
-        return isCollection(resource) ? Access.None : isWriteRestricted(resource) ? Access.Read : Access.Write;
     }
 
     /**

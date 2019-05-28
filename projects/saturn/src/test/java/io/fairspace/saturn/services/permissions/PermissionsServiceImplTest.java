@@ -29,8 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -241,7 +240,9 @@ public class PermissionsServiceImplTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testSettingPermissionsWithoutManageAccess() {
-        service.setPermission(createURI("http://example.com/not-my-resource"), USER1, Access.Write);
+        var resource = createResource("http://example.com/not-my-resource");
+        ds.getDefaultModel().add(resource, RDFS.label, createTypedLiteral("blah"));
+        service.setPermission(resource.asNode(), USER1, Access.Write);
     }
 
     @Test
@@ -357,6 +358,7 @@ public class PermissionsServiceImplTest {
         ds.getDefaultModel()
                 .add(c1, RDF.type, FS.Collection)
                 .add(c1, FS.filePath, createPlainLiteral("collection1Path"))
+                .add(c1, RDF.type, FS.Collection)
                 .add(f1, RDF.type, FS.File)
                 .add(f1, FS.filePath, createPlainLiteral("collection1Path/filePath"))
                 .add(c2, RDF.type, FS.Collection)
