@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 
 import LinkedDataListPage from "../common/LinkedDataListPage";
@@ -8,11 +8,8 @@ import {getVocabulary} from "../../../reducers/cache/vocabularyReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../constants";
 import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
-import {getLabel} from "../../../utils/linkeddata/metadataUtils";
 
 const MetadataListPage = ({fetchVocabulary, vocabulary, classesInCatalog, search}) => {
-    const [selectedTypes, setSelectedTypes] = useState([]);
-    const [query, setQuery] = useState('');
 
     fetchVocabulary();
 
@@ -30,20 +27,8 @@ const MetadataListPage = ({fetchVocabulary, vocabulary, classesInCatalog, search
 
     return (
         <LinkedDataListPage
-            types={classesInCatalog.map(type => {
-                const targetClass = getFirstPredicateId(type, constants.SHACL_TARGET_CLASS);
-                const label = getLabel(type);
-                return {type: targetClass, label};
-            })}
-            selectedTypes={selectedTypes}
-            onSearchChange={q => {
-                setQuery(q);
-                performSearch(q, selectedTypes);
-            }}
-            onTypesChange={(types) => {
-                setSelectedTypes(types);
-                performSearch(query, types);
-            }}
+            classesInCatalog={classesInCatalog}
+            performSearch={performSearch}
             listRenderer={() => (
                 targetClasses && targetClasses.length > 0 && (
                     <MetadataBrowserContainer

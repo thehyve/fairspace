@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     withStyles, Paper, Select, MenuItem, FormControl,
     Checkbox, ListItemText, Input
@@ -6,6 +6,9 @@ import {
 
 import SearchBar from "../../common/SearchBar";
 import BreadCrumbs from "../../common/BreadCrumbs";
+import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
+import * as constants from "../../../constants";
+import {getLabel} from "../../../utils/linkeddata/metadataUtils";
 
 const styles = theme => ({
     typeSelect: {
@@ -14,14 +17,36 @@ const styles = theme => ({
 });
 
 const LinkedDataListPage = ({
-    classes, listRenderer, types, onSearchChange, onTypesChange, selectedTypes
+    classes, listRenderer, classesInCatalog, performSearch
 }) => {
-    const renderTypeClass = ({type, label}) => (
-        <MenuItem key={type} value={type}>
-            <Checkbox checked={selectedTypes.includes(type)} />
-            <ListItemText primary={label} secondary={type} />
+    const [selectedTypes, setSelectedTypes] = useState([]);
+    const [query, setQuery] = useState('');
+
+    const allTypes = classesInCatalog.map(type => {
+        const targetClass = getFirstPredicateId(type, constants.SHACL_TARGET_CLASS);
+        const label = getLabel(type);
+        return {targetClass, label};
+    })
+
+    const labelMap = {};
+    allTypes.forEach(({targetClass, label}) => labelMap[targetClass] = label);
+
+    const renderTypeClass = ({targetClass, label}) => (
+        <MenuItem key={targetClass} value={targetClass}>
+            <Checkbox checked={selectedTypes.includes(targetClass)} />
+            <ListItemText primary={label} secondary={targetClass} />
         </MenuItem>
     );
+
+    const onSearchChange = q => {
+        setQuery(q);
+        performSearch(q, selectedTypes);
+    };
+
+    const onTypesChange = types => {
+        setSelectedTypes(types);
+        performSearch(query, types);
+    };
 
     return (
         <>
@@ -40,10 +65,9 @@ const LinkedDataListPage = ({
                         onChange={e => onTypesChange(e.target.value)}
                         input={<Input id="select-multiple-checkbox" />}
                         renderValue={selected => (selected.length === 0 ? '[All types]'
-                            : types.filter(({type}) => selected.includes(type)).map(({label}) => label)
-                                .join(', '))}
+                            : selected.map(targetClass => labelMap[targetClass]).join(', '))}
                     >
-                        {types.map(renderTypeClass)}
+                        {allTypes.map(renderTypeClass)}
                     </Select>
                 </FormControl>
             </Paper>
