@@ -6,18 +6,24 @@ import {createMetadataIri, linkLabel, partitionErrors, relativeLink} from "../..
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {searchMetadata} from "../../../actions/searchActions";
 import {getMetadataSearchResults} from "../../../reducers/searchReducers";
-import LinkedDataBrowser from "../common/LinkedDataBrowser";
+import LinkedDataCreator from "../common/LinkedDataCreator";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
-import {ErrorDialog} from "../../common";
+import {ErrorDialog, MessageDisplay} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import MetadataList from "./MetadataList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS} from "../../../constants";
 
-const MetadataBrowserContainer = (props) => (
+const MetadataBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
     <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
-        <LinkedDataBrowser {...props} ListComponent={MetadataList} />
+        <LinkedDataCreator {...otherProps}>
+            {
+                entities && entities.length > 0
+                    ? <MetadataList items={entities} hasHighlights={hasHighlights} />
+                    : <MessageDisplay message="The metadata layer is empty" isError={false} />
+            }
+        </LinkedDataCreator>
     </LinkedDataValuesContext.Provider>
 );
 

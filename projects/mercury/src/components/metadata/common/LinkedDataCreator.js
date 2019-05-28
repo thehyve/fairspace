@@ -7,7 +7,7 @@ import {LoadingInlay, LoadingOverlay, MessageDisplay} from "../../common";
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 
-class LinkedDataBrowser extends React.Component {
+class LinkedDataCreator extends React.Component {
     static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
 
     static CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
@@ -31,13 +31,13 @@ class LinkedDataBrowser extends React.Component {
     startCreating = (e) => {
         e.stopPropagation();
 
-        this.setState({creationState: LinkedDataBrowser.CREATION_STATE_CHOOSE_SHAPE});
+        this.setState({creationState: LinkedDataCreator.CREATION_STATE_CHOOSE_SHAPE});
     };
 
     chooseShape = (shape) => {
         this.setState({
             shape,
-            creationState: LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY
+            creationState: LinkedDataCreator.CREATION_STATE_CREATE_ENTITY
         });
     };
 
@@ -60,9 +60,7 @@ class LinkedDataBrowser extends React.Component {
     };
 
     render() {
-        const {
-            loading, error, entities, hasHighlights, editable, ListComponent, shapes, vocabulary
-        } = this.props;
+        const {children, loading, error, editable, shapes, vocabulary} = this.props;
 
         if (loading) {
             return <LoadingInlay />;
@@ -92,23 +90,21 @@ class LinkedDataBrowser extends React.Component {
                 }
 
                 <LinkedDataShapeChooserDialog
-                    open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CHOOSE_SHAPE}
+                    open={this.state.creationState === LinkedDataCreator.CREATION_STATE_CHOOSE_SHAPE}
                     shapes={shapes}
                     onChooseShape={this.chooseShape}
                     onClose={this.closeDialog}
                 />
 
                 <NewLinkedDataEntityDialog
-                    open={this.state.creationState === LinkedDataBrowser.CREATION_STATE_CREATE_ENTITY}
+                    open={this.state.creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY}
                     linkedData={emptyLinkedData(vocabulary, this.state.shape)}
                     shape={this.state.shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}
                 />
 
-                {entities && entities.length > 0
-                    ? <ListComponent items={entities} hasHighlights={hasHighlights} />
-                    : <MessageDisplay message="No data is found!" isError={false} />}
+                {children}
 
                 <LoadingOverlay loading={this.state.creatingMetadataEntity} />
             </>
@@ -116,22 +112,20 @@ class LinkedDataBrowser extends React.Component {
     }
 }
 
-LinkedDataBrowser.propTypes = {
+LinkedDataCreator.propTypes = {
     fetchLinkedData: PropTypes.func.isRequired,
     fetchShapes: PropTypes.func.isRequired,
     create: PropTypes.func.isRequired,
 
     loading: PropTypes.bool,
     shapes: PropTypes.array,
-    entities: PropTypes.array,
     editable: PropTypes.bool,
-    ListComponent: PropTypes.func.isRequired,
 
     vocabulary: PropTypes.object.isRequired
 };
 
-LinkedDataBrowser.defaultProps = {
+LinkedDataCreator.defaultProps = {
     editable: true
 };
 
-export default LinkedDataBrowser;
+export default LinkedDataCreator;
