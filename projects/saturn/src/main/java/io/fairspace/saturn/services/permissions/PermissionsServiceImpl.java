@@ -27,6 +27,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -201,13 +202,29 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @return
      */
     private Map<Node, Node> getFileAuthorities(Collection<Node> fileNodes) {
-        Map<Node, Node> authorities = new HashMap<>();
+        var fileToCollectionPath = new HashMap<Node, String>(fileNodes.size());
+        var collectionPaths = new HashSet<String>();
 
-        rdf.querySelect(
-                storedQuery("get_parent_collections", fileNodes),
-                row -> authorities.put(row.get("subject").asNode(), row.get("collection").asNode()));
+        rdf.querySelect(storedQuery("get_file_paths", fileNodes), row -> {
+            var path = collectionPath(row.getLiteral("filePath").getString());
+            fileToCollectionPath.put(row.get("subject").asNode(), path);
+            collectionPaths.add(path);
+        });
 
-        return authorities;
+        var collectionsByPath = new HashMap<String, Node>();
+
+        rdf.querySelect(storedQuery("get_collections_by_paths", collectionPaths), row ->
+                collectionsByPath.put(row.getLiteral("path").getString(), row.getResource("collection").asNode()));
+
+        return fileToCollectionPath
+                .entrySet()
+                .stream()
+                .collect(toMap(e -> e.getKey(), e -> collectionsByPath.get(e.getValue())));
+    }
+
+    private static String collectionPath(String filePath) {
+        var pos = filePath.indexOf('/');
+        return pos < 0 ? filePath : filePath.substring(0, pos);
     }
 
     /**
