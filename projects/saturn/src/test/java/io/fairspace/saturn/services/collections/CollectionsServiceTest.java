@@ -36,7 +36,6 @@ public class CollectionsServiceTest {
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener, permissions);
-        doCallRealMethod().when(permissions).getPermission(any());
     }
 
     @Test
@@ -228,6 +227,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
         c1 = collections.create(c1);
 
+        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.None);
         when(permissions.getPermissions(any(java.util.Collection.class)))
                 .thenAnswer(invocation -> invocation.<java.util.Collection<Node>>getArgument(0)
                         .stream()
