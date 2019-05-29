@@ -93,7 +93,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         for (var r : getChildren()) {
             w.open("tr");
             w.open("td");;
-            w.begin("a").writeAtt("href", "/webdav/" + ((VfsBackedMiltonResource)r).info.getPath()).open().writeText(r.getName()).close();
+            w.begin("a").writeAtt("href", "./" + ((VfsBackedMiltonResource)r).info.getPath()).open().writeText(r.getName()).close();
             w.close("td");
             w.begin("td").open().writeText(r.getModifiedDate() + "").close();
             w.close("tr");
