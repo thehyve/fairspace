@@ -138,7 +138,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * Retrieves the permissions of the current user for the given authorities
+     * Retrieves the permissions of the current user for the given resources
      * @param nodes
      * @return
      */
