@@ -10,7 +10,8 @@ function linkLabel(link) {
             : link.substring(link.lastIndexOf('/') + 1));
 }
 
-const ReferringValue = ({property, entry}) => {
+const ReferringValue = ({property, entry, editorPath}) => {
+
     function extractDisplayValue(value) {
         let extractedVal = value.label || value.value || linkLabel(value.id) || '';
         extractedVal = isDateTimeProperty(property) ? <DateTime value={extractedVal} absolute /> : extractedVal;
@@ -21,7 +22,7 @@ const ReferringValue = ({property, entry}) => {
 
     if (entry.id) {
         return (
-            <LinkedDataLink uri={entry.id}>
+            <LinkedDataLink editorPath={editorPath} uri={entry.id}>
                 {displayValue}
             </LinkedDataLink>
         );

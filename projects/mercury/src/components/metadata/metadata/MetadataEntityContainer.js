@@ -5,7 +5,7 @@ import {Button, Grid} from "@material-ui/core";
 
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {isDateTimeProperty, propertiesToShow, url2iri, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
+import {isDateTimeProperty, partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import {
     getCombinedMetadataForSubject,
     hasMetadataError,

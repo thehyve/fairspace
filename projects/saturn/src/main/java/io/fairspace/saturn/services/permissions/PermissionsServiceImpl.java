@@ -37,7 +37,7 @@ import static org.apache.jena.system.Txn.executeRead;
 @Slf4j
 public class PermissionsServiceImpl implements PermissionsService {
     private static final int BATCH_SIZE = 100;
-    public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
+    private static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
     private final RDFConnection rdf;
     private final UserService userService;
@@ -78,11 +78,6 @@ public class PermissionsServiceImpl implements PermissionsService {
         });
 
         notifyUser(user, resource, access);
-    }
-
-    @Override
-    public Access getPermission(Node resource) {
-      return getPermissions(List.of(resource)).get(resource);
     }
 
     @Override
@@ -138,10 +133,11 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * Retrieves the permissions of the current user for the given authorities
+     * Retrieves the permissions of the current user for the given resources
      * @param nodes
      * @return
      */
+    @Override
     public Map<Node, Access> getPermissions(Collection<Node> nodes) {
         var result = new HashMap<Node, Access>();
         executeRead(rdf, () -> partition(nodes, BATCH_SIZE)

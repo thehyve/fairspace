@@ -3,10 +3,8 @@ import React from 'react';
 import LinkedDataPage from '../common/LinkedDataPage';
 import MetadataEntityContainer from './MetadataEntityContainer';
 import MetadataEntityHeaderContainer from "./MetadataEntityHeaderContainer";
-import {url2iri} from "../../../utils/linkeddata/metadataUtils";
 
-export default () => {
-    const subject = url2iri(window.location.href);
+export default ({subject}) => {
     return (
         <LinkedDataPage homeUrl="/metadata">
             <MetadataEntityHeaderContainer subject={subject} />

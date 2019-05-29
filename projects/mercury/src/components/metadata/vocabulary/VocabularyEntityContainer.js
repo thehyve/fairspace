@@ -3,8 +3,8 @@ import {connect} from 'react-redux';
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import {
-    fetchMetaVocabularyIfNeeded,
     fetchMetadataVocabularyIfNeeded,
+    fetchMetaVocabularyIfNeeded,
     submitVocabularyChangesFromState
 } from "../../../actions/vocabularyActions";
 import {
@@ -15,7 +15,7 @@ import {
     isMetaVocabularyPending,
     isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {isDateTimeProperty, propertiesToShow, url2iri, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
+import {isDateTimeProperty, partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
