@@ -4,6 +4,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Resource;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +39,9 @@ public interface PermissionsService {
      * @return Current user's permission for the resource. If no permission was set explicitly, returns the default value
      * depending on the type of the resource.
      */
-    Access getPermission(Node resource);
+    default Access getPermission(Node resource) {
+        return getPermissions(List.of(resource)).get(resource);
+    }
 
     /**
      * Ensures the current user has access to the specified nodes
@@ -54,6 +57,13 @@ public interface PermissionsService {
      * @return A map containing all non-default permissions from all users for a specific resource
      */
     Map<Node, Access> getPermissions(Node resource);
+
+    /**
+     * @param nodes
+     * @return Current user's permissions for the given nodes. If no permission was set explicitly, returns the default value
+     * depending on the type of the resource.
+     */
+    Map<Node, Access> getPermissions(Collection<Node> nodes);
 
     /**
      *
