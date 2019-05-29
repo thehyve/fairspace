@@ -12,7 +12,7 @@ import {
 import LinkedDataLink from "../common/LinkedDataLink";
 import styles from '../common/LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
-import {METADATA_EDITOR_PATH, VOCABULARY_EDITOR_PATH} from "../../../constants";
+import {METADATA_PATH, VOCABULARY_PATH} from "../../../constants";
 import {getLabel} from "../../../utils/linkeddata/metadataUtils";
 
 const linkedDataList = ({items = [], hasHighlights, classes}) => (
@@ -34,12 +34,12 @@ const linkedDataList = ({items = [], hasHighlights, classes}) => (
                                 {label}
                             </TableCell>
                             <TableCell className={classes.cell}>
-                                <LinkedDataLink editorPath={VOCABULARY_EDITOR_PATH} uri={shape['@id']}>
+                                <LinkedDataLink editorPath={VOCABULARY_PATH} uri={shape['@id']}>
                                     {getLabel(shape, true)}
                                 </LinkedDataLink>
                             </TableCell>
                             <TableCell className={classes.cell}>
-                                <LinkedDataLink editorPath={METADATA_EDITOR_PATH} uri={id}>
+                                <LinkedDataLink editorPath={METADATA_PATH} uri={id}>
                                     {label}
                                 </LinkedDataLink>
                             </TableCell>

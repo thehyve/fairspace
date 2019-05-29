@@ -12,7 +12,7 @@ import {
 import LinkedDataLink from "../common/LinkedDataLink";
 import styles from '../common/LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
-import {SHACL_TARGET_CLASS, VOCABULARY_EDITOR_PATH} from "../../../constants";
+import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 import {getLabel} from "../../../utils/linkeddata/metadataUtils";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 
@@ -38,7 +38,7 @@ const linkedDataList = ({items = [], hasHighlights, classes}) => (
                                 <a href={getFirstPredicateId(shape, SHACL_TARGET_CLASS)}> {getLabel(shape, true)} </a>
                             </TableCell>
                             <TableCell className={classes.cell}>
-                                <LinkedDataLink editorPath={VOCABULARY_EDITOR_PATH} uri={id}>
+                                <LinkedDataLink editorPath={VOCABULARY_PATH} uri={id}>
                                     {label}
                                 </LinkedDataLink>
                             </TableCell>

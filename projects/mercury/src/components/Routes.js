@@ -24,10 +24,9 @@ const routes = () => (
         <Route
             path="/metadata"
             exact
-            render={() => {
+            render={({location}) => {
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
-                // eslint-disable-next-line no-restricted-globals
                 const iriParam = queryString.parse(location.search).iri;
                 return iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <MetadataListPage />;
             }}
@@ -42,10 +41,9 @@ const routes = () => (
         <Route
             path="/vocabulary"
             exact
-            render={() => {
+            render={({location}) => {
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
-                // eslint-disable-next-line no-restricted-globals
                 const iriParam = queryString.parse(location.search).iri;
                 return iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <VocabularyListPage />;
             }}
