@@ -1,20 +1,22 @@
 package io.fairspace.saturn.vfs;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
-@Value
+@Getter
 @Builder
 public class FileInfo implements Comparable<FileInfo> {
-    String iri;
-    String path;
-    boolean isDirectory;
-    long size;
-    Instant created;
-    Instant modified;
-    boolean readOnly;
+    private String iri;
+    private String path;
+    private boolean isDirectory;
+    private long size;
+    private Instant created;
+    private Instant modified;
+    @Setter
+    private boolean readOnly;
 
     @Override
     public int compareTo(FileInfo o) {

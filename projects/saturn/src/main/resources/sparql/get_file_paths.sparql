@@ -1,0 +1,11 @@
+# Get file paths
+# 0 - list of files or directories
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+SELECT ?subject ?filePath
+WHERE {
+  { ?subject a fs:Directory } UNION { ?subject a fs:File }
+  ?subject fs:filePath ?filePath
+}
+VALUES ?subject {%1$s}
