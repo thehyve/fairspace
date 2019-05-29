@@ -93,7 +93,7 @@ public class CollectionsServiceTest {
     public void changingLocationEmitsAnEvent() {
         var created1 = collections.create(newCollection());
 
-        when(permissions.getPermission(eq(created1.getIri()))).thenReturn(Access.Manage);
+        mockPermissions(Access.Manage);
 
         var patch = new Collection();
         patch.setIri(created1.getIri());
@@ -106,7 +106,7 @@ public class CollectionsServiceTest {
     public void updatesWorkAsExpected() {
         var c = collections.create(newCollection());
 
-        when(permissions.getPermission(eq(c.getIri()))).thenReturn(Access.Manage);
+        mockPermissions(Access.Manage);
 
         var patch = new Collection();
         patch.setIri(c.getIri());
@@ -127,7 +127,7 @@ public class CollectionsServiceTest {
     public void deletedCollectionIsNoLongerVisible() {
         var c = collections.create(newCollection());
 
-        when(permissions.getPermission(eq(c.getIri()))).thenReturn(Access.Manage);
+        mockPermissions(Access.Manage);
 
         collections.delete(c.getIri().getURI());
         assertNull(collections.get(c.getIri().getURI()));
@@ -139,7 +139,7 @@ public class CollectionsServiceTest {
     @Test
     public void deletionEmitsAnEvent() {
         var c = collections.create(newCollection());
-        when(permissions.getPermission(eq(c.getIri()))).thenReturn(Access.Manage);
+        mockPermissions(Access.Manage);
         collections.delete(c.getIri().getURI());
         verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
     }
@@ -210,7 +210,7 @@ public class CollectionsServiceTest {
             var patch = new Collection();
             patch.setIri(c1.getIri());
             patch.setLocation(c2.getLocation());
-            when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Manage);
+            mockPermissions(Access.Manage);
             collections.update(patch);
         } finally {
             verify(eventListener, times(2)).accept(any(CollectionCreatedEvent.class));
@@ -227,11 +227,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
         c1 = collections.create(c1);
 
-        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.None);
-        when(permissions.getPermissions(any(java.util.Collection.class)))
-                .thenAnswer(invocation -> invocation.<java.util.Collection<Node>>getArgument(0)
-                        .stream()
-                        .collect(toMap(node -> node, node -> Access.None)));
+        mockPermissions(Access.None);
 
         assertNull(collections.get(c1.getIri().getURI()));
         assertNull(collections.getByLocation(c1.getLocation()));
@@ -247,7 +243,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
         c1 = collections.create(c1);
 
-        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Write);
+        mockPermissions(Access.Write);
 
         c1.setDescription("new description");
         collections.update(c1);
@@ -263,7 +259,7 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
         c1 = collections.create(c1);
 
-        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Read);
+        mockPermissions(Access.Read);
 
         c1.setDescription("new description");
         collections.update(c1);
@@ -278,8 +274,16 @@ public class CollectionsServiceTest {
         c1.setType("LOCAL");
         c1 = collections.create(c1);
 
-        when(permissions.getPermission(eq(c1.getIri()))).thenReturn(Access.Write);
+        mockPermissions(Access.Write);
 
         collections.delete(c1.getIri().getURI());
+    }
+
+    private void mockPermissions(Access access) {
+        when(permissions.getPermissions(any(java.util.Collection.class)))
+                .thenAnswer(invocation -> invocation.<java.util.Collection<Node>>getArgument(0)
+                        .stream()
+                        .collect(toMap(node -> node, node -> access)));
+        doCallRealMethod().when(permissions).getPermission(any());
     }
 }
