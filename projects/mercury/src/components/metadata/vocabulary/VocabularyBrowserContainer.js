@@ -2,7 +2,7 @@ import React from "react";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
-import {createVocabularyIri, getLabel, relativeLink, partitionErrors, linkLabel} from "../../../utils/linkeddata/metadataUtils";
+import {createVocabularyIri, relativeLink, partitionErrors, linkLabel} from "../../../utils/linkeddata/metadataUtils";
 import {createVocabularyEntityFromState} from "../../../actions/vocabularyActions";
 import {searchVocabulary} from "../../../actions/searchActions";
 import Config from "../../../services/Config/Config";
@@ -30,13 +30,13 @@ const VocabularyBrowserContainer = ({entities, hasHighlights, ...otherProps}) =>
     </LinkedDataValuesContext.Provider>
 );
 
-const mapStateToProps = (state, {vocabulary}) => {
+const mapStateToProps = (state, {metaVocabulary}) => {
     const {items, pending, error} = getVocabularySearchResults(state);
     const entities = items.map(({id, type, label, name, highlights}) => ({
         id,
         label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
         type: type[0],
-        typeLabel: getLabel(vocabulary.determineShapeForType(type[0]), true),
+        shape: type[0] ? metaVocabulary.determineShapeForType(type[0]) : {},
         highlights
     }));
 
@@ -50,13 +50,12 @@ const mapStateToProps = (state, {vocabulary}) => {
 
     return {
         editable: isDataSteward(getAuthorizations(state), Config.get()),
-        shapes: vocabulary.getClassesInCatalog(),
+        shapes: metaVocabulary.getClassesInCatalog(),
         loading: pending,
         error,
         entities,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
-        valueComponentFactory: VocabularyValueComponentFactory,
-        vocabulary,
+        vocabulary: metaVocabulary,
         onEntityCreationError
     };
 };

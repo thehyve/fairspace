@@ -4,12 +4,15 @@ import {connect} from 'react-redux';
 import VocabularyBrowserContainer from "./VocabularyBrowserContainer";
 import LinkedDataListPage from "../common/LinkedDataListPage";
 import {searchVocabulary} from "../../../actions/searchActions";
-import {getMetaVocabulary} from "../../../reducers/cache/vocabularyReducers";
+import {getMetaVocabulary, isMetaVocabularyPending, hasMetaVocabularyError} from "../../../reducers/cache/vocabularyReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../constants";
 import {fetchMetaVocabularyIfNeeded} from "../../../actions/vocabularyActions";
+import {LoadingInlay, MessageDisplay} from "../../common";
 
-const VocabularyListPage = ({fetchVocabulary, vocabulary, classesInCatalog, search}) => {
+const VocabularyListPage = (
+    {fetchVocabulary, loading, error, metaVocabulary, classesInCatalog, search}
+) => {
     fetchVocabulary();
 
     const toTargetClasses = shapes => shapes.map(c => getFirstPredicateId(c, constants.SHACL_TARGET_CLASS));
@@ -24,6 +27,14 @@ const VocabularyListPage = ({fetchVocabulary, vocabulary, classesInCatalog, sear
 
     const targetClasses = toTargetClasses(classesInCatalog);
 
+    if (loading) {
+        return <LoadingInlay />;
+    }
+
+    if (error) {
+        return <MessageDisplay message={error.message || 'Sorry unable to load the vocabulary.'} />;
+    }
+
     return (
         <LinkedDataListPage
             classesInCatalog={classesInCatalog}
@@ -32,7 +43,7 @@ const VocabularyListPage = ({fetchVocabulary, vocabulary, classesInCatalog, sear
                 targetClasses && targetClasses.length > 0 && (
                     <VocabularyBrowserContainer
                         targetClasses={targetClasses}
-                        vocabulary={vocabulary}
+                        metaVocabulary={metaVocabulary}
                     />
                 )
             )}
@@ -41,9 +52,17 @@ const VocabularyListPage = ({fetchVocabulary, vocabulary, classesInCatalog, sear
 };
 
 const mapStateToProps = (state) => {
-    const vocabulary = getMetaVocabulary(state);
-    const classesInCatalog = vocabulary.getClassesInCatalog();
-    return {vocabulary, classesInCatalog};
+    const metaVocabulary = getMetaVocabulary(state);
+    const loading = isMetaVocabularyPending(state);
+    const error = hasMetaVocabularyError(state);
+    const classesInCatalog = metaVocabulary.getClassesInCatalog();
+
+    return {
+        loading,
+        error,
+        metaVocabulary,
+        classesInCatalog
+    };
 };
 
 const mapDispatchToProps = {
