@@ -7,6 +7,9 @@ export const PATH_SEPARATOR = '/';
 export const MAIN_CONTENT_WIDTH = '55%';
 export const SIDE_PANEL_WIDTH = '45%';
 export const MAIN_CONTENT_MAX_HEIGHT = '65vh';
+export const METADATA_PATH = '/metadata';
+export const VOCABULARY_PATH = '/vocabulary';
+
 
 // Search
 export const COLLECTION_SEARCH_TYPE = 'collections';

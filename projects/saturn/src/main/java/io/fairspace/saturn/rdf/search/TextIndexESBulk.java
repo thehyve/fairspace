@@ -15,8 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
-import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
@@ -49,6 +50,9 @@ public class TextIndexESBulk extends TextIndexES {
     private final String indexName;
     private final List<UpdateRequest> updates = new ArrayList<>();
 
+    // Needed to avoid reordering or interference of bulk updates
+    private final ExecutorService singleThreadExecutor = newSingleThreadExecutor();
+
 
     /**
      * Constructor used mainly for performing Integration tests
@@ -69,11 +73,16 @@ public class TextIndexESBulk extends TextIndexES {
         var bulk = new BulkRequest();
         updates.forEach(bulk::add);
         updates.clear();
+
+        singleThreadExecutor.submit(() -> processBulkRequest(bulk));
+    }
+
+    private void processBulkRequest(BulkRequest bulk) {
         try {
-            var start = currentTimeMillis();
             var response = client.bulk(bulk).get();
-            var finish = currentTimeMillis();
-            LOGGER.debug("Indexing in ElasticSearch took {} ms", finish - start);
+            LOGGER.debug("Indexing {} updates in ElasticSearch took {} ms",
+                    response.getItems().length,
+                    response.getIngestTook().millis() + response.getTook().millis());
             if (response.hasFailures()) {
                 LOGGER.error(response.buildFailureMessage());
             }
@@ -90,6 +99,7 @@ public class TextIndexESBulk extends TextIndexES {
     @Override
     public void close() {
         updates.clear();
+        singleThreadExecutor.shutdown();
     }
 
     /**

@@ -7,9 +7,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.query.text.es.ESSettings;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class Config {
     public int port = 8080;
@@ -39,6 +37,7 @@ public class Config {
                     .clusterName("fairspace")
                     .hostAndPort("127.0.0.1", 9300)
                     .build();
+            public Map<String, String> advancedSettings = new HashMap<>(Map.of("transport.netty.worker_count", "1"));
         }
     }
 
