@@ -39,7 +39,6 @@ const mapStateToProps = (state, {metaVocabulary}) => {
         shape: type[0] ? metaVocabulary.determineShapeForType(type[0]) : {},
         highlights
     }));
-
     const onEntityCreationError = (e, id) => {
         if (e.details) {
             ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createVocabularyIri(id)), e.message);
