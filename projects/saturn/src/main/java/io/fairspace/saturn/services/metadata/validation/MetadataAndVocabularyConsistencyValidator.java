@@ -34,56 +34,67 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
 
         actuallyAdded.listStatements().forEachRemaining(stmt -> {
             var subject = stmt.getSubject().inModel(newVocabulary);
+            var predicate = stmt.getPredicate();
 
             if (subject.getPropertyResourceValue(SH.targetClass) != null) {
                 var targetClass = subject.getPropertyResourceValue(SH.targetClass);
 
-                if (stmt.getPredicate().equals(SH.property) && stmt.getObject().isResource()) {
+                if (predicate.equals(SH.property) && stmt.getObject().isResource()) {
                     var propertyShape = stmt.getObject().asResource().inModel(newVocabulary);
                     if (propertyShape.hasProperty(SH.path)) {
                         var property = newVocabulary.createProperty(propertyShape.getPropertyResourceValue(SH.path).getURI());
                         validateProperty(propertyShape, property, List.of(targetClass), violationHandler);
                     }
+                } else if (predicate.equals(SH.targetClass)) {
+                    subject.listProperties(SH.property)
+                            .forEachRemaining(s -> {
+                                        var propertyShape = s.getResource();
+                                        var property = newVocabulary.createProperty(propertyShape.getPropertyResourceValue(SH.path).getURI());
+                                        validateProperty(propertyShape, property, List.of(targetClass), violationHandler);
+                                    }
+                            );
                 }
             } else if (subject.getPropertyResourceValue(SH.path) != null) {
-                    var property = newVocabulary.createProperty(subject.getPropertyResourceValue(SH.path).getURI());
+                var property = newVocabulary.createProperty(subject.getPropertyResourceValue(SH.path).getURI());
 
-                    if (stmt.getPredicate().equals(SH.datatype)) {
-                        validateDataType(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
-                    } else if (stmt.getPredicate().equals(SH.class_)) {
-                        validateClass(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
-                    } else if (stmt.getPredicate().equals(SH.minCount)) {
-                        var newMinCount = getIntegerProperty(subject, SH.minCount);
-                        var oldMinCount = getIntegerProperty(subject.inModel(oldVocabulary), SH.minCount);
-                        if (newMinCount != null && (oldMinCount == null || oldMinCount < newMinCount)) {
-                            validateMinCount(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
-                        }
-                    } else if (stmt.getPredicate().equals(SH.maxCount)) {
-                        var newMaxCount = getIntegerProperty(subject, SH.maxCount);
-                        var oldMaxCount = getIntegerProperty(subject.inModel(oldVocabulary), SH.maxCount);
-                        if (newMaxCount != null && (oldMaxCount == null || oldMaxCount > newMaxCount)) {
-                            validateMaxCount(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
-                        }
-                    } else if (stmt.getPredicate().equals(SH.maxLength)) {
-                        var newMaxLength = getIntegerProperty(subject, SH.maxLength);
-                        var oldMaxLength = getIntegerProperty(subject.inModel(oldVocabulary), SH.maxLength);
-                        if (newMaxLength != null && (oldMaxLength == null || oldMaxLength > newMaxLength)) {
-                            validateMaxLength(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
-                        }
-                    } else if (stmt.getPredicate().equals(SH.minLength)) {
-                        var newMinLength = getIntegerProperty(subject, SH.minLength);
-                        var oldMinLength = getIntegerProperty(subject.inModel(oldVocabulary), SH.minLength);
-                        if (newMinLength != null && (oldMinLength == null || oldMinLength < newMinLength)) {
-                           validateMinLength(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
-                        }
-                    } else if (stmt.getPredicate().equals(SH.in)) {
-                        var newIn = getListProperty(subject, SH.in);
-                        var oldIn = getListProperty(subject.inModel(oldVocabulary), SH.in);
-                        if (newIn != null && (oldIn == null || !newIn.asJavaList().containsAll(oldIn.asJavaList()))) {
-                            validateIn(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
-                        }
+                if (predicate.equals(SH.datatype)) {
+                    validateDataType(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
+                } else if (stmt.getPredicate().equals(SH.class_)) {
+                    validateClass(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
+                } else if (predicate.equals(SH.minCount)) {
+                    var newMinCount = getIntegerProperty(subject, SH.minCount);
+                    var oldMinCount = getIntegerProperty(subject.inModel(oldVocabulary), SH.minCount);
+                    if (newMinCount != null && (oldMinCount == null || oldMinCount < newMinCount)) {
+                        validateMinCount(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
                     }
+                } else if (predicate.equals(SH.maxCount)) {
+                    var newMaxCount = getIntegerProperty(subject, SH.maxCount);
+                    var oldMaxCount = getIntegerProperty(subject.inModel(oldVocabulary), SH.maxCount);
+                    if (newMaxCount != null && (oldMaxCount == null || oldMaxCount > newMaxCount)) {
+                        validateMaxCount(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
+                    }
+                } else if (predicate.equals(SH.maxLength)) {
+                    var newMaxLength = getIntegerProperty(subject, SH.maxLength);
+                    var oldMaxLength = getIntegerProperty(subject.inModel(oldVocabulary), SH.maxLength);
+                    if (newMaxLength != null && (oldMaxLength == null || oldMaxLength > newMaxLength)) {
+                        validateMaxLength(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
+                    }
+                } else if (predicate.equals(SH.minLength)) {
+                    var newMinLength = getIntegerProperty(subject, SH.minLength);
+                    var oldMinLength = getIntegerProperty(subject.inModel(oldVocabulary), SH.minLength);
+                    if (newMinLength != null && (oldMinLength == null || oldMinLength < newMinLength)) {
+                        validateMinLength(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
+                    }
+                } else if (predicate.equals(SH.in)) {
+                    var newIn = getListProperty(subject, SH.in);
+                    var oldIn = getListProperty(subject.inModel(oldVocabulary), SH.in);
+                    if (newIn != null && (oldIn == null || !newIn.asJavaList().containsAll(oldIn.asJavaList()))) {
+                        validateIn(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
+                    }
+                } else if (predicate.equals(SH.path)) {
+                    validateProperty(subject, property, getClassesWithProperty(subject, newVocabulary), violationHandler);
                 }
+            }
         });
     }
 
