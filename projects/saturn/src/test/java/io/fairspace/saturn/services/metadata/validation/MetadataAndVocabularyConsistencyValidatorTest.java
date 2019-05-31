@@ -50,8 +50,6 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Before
     public void setUp() {
-//        doCallRealMethod().when(violationHandler).onViolation(any(), any());
-
         initVocabularies(rdf);
 
         model.removeAll();
@@ -95,7 +93,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         validator.validate(EMPTY, constraints, violationHandler);
 
-        verify(violationHandler).onViolation(any(), any(), any(), any());
+        verify(violationHandler).onViolation("Value needs to have class http://example.com/Class1", ENTITY1, PROPERTY, ENTITY3);
     }
 
     @Test
