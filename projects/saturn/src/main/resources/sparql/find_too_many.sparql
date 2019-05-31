@@ -1,4 +1,4 @@
-SELECT (count(?object) as ?num)
+SELECT ?subject (count(?object) as ?num)
 WHERE {
  ?subject a ?subjectClas;
  %1$s ?object .
