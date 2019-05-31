@@ -48,12 +48,7 @@ public class SparqlUtils {
                         .map(SparqlUtils::toString)
                         .collect(joining(" "));
             } else if(arg instanceof RDFList) {
-
-                param = ((RDFList) arg).asJavaList()
-                        .stream()
-                        .map(SparqlUtils::toSerializableNode)
-                        .map(SparqlUtils::toString)
-                        .collect(joining(", ", "(", ")"));
+                param = toString((RDFList) arg);
             } else {
                 param = toString(toSerializableNode(arg));
             }
@@ -138,5 +133,13 @@ public class SparqlUtils {
             throw new IllegalStateException("Too many values: " + values.size());
         }
         return values.stream().findFirst();
+    }
+
+    public static String toString(RDFList values) {
+        return values.asJavaList()
+                .stream()
+                .map(SparqlUtils::toSerializableNode)
+                .map(SparqlUtils::toString)
+                .collect(joining(", ", "(", ")"));
     }
 }

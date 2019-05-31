@@ -1,7 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.rdf.SparqlUtils;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -13,8 +13,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
-import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getViolations;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static java.lang.String.format;
 import static org.topbraid.spin.util.JenaUtil.getIntegerProperty;
@@ -119,7 +117,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         var dataType = propertyShape.getPropertyResourceValue(SH.datatype);
         if (dataType != null) {
             rdf.querySelect(storedQuery("find_wrong_data_type", property, subjectClasses, dataType), row ->
-                    violationHandler.onViolation("Invalid object type", row.getResource("subject"), property, row.get("object")));
+                    violationHandler.onViolation("Value does not have datatype " + dataType, row.getResource("subject"), property, row.get("object")));
         }
     }
 
@@ -127,7 +125,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         var theClass = propertyShape.getPropertyResourceValue(SH.class_);
         if (theClass != null) {
             rdf.querySelect(storedQuery("find_wrong_class", property, subjectClasses, theClass), row ->
-                    violationHandler.onViolation("Invalid object class", row.getResource("subject"), property, row.get("object")));
+                    violationHandler.onViolation("Value needs to have class " + theClass, row.getResource("subject"), property, row.get("object")));
         }
     }
 
@@ -152,7 +150,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         var minCount = getIntegerProperty(propertyShape, SH.minCount);
         if (minCount != null) {
             rdf.querySelect(storedQuery("find_too_few", property, subjectClasses, minCount), row ->
-                    violationHandler.onViolation("Too few values", row.getResource("subject"), property, null));
+                    violationHandler.onViolation(format("Less than %d values", minCount), row.getResource("subject"), property, null));
         }
     }
 
@@ -160,7 +158,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         var maxCount = getIntegerProperty(propertyShape, SH.maxCount);
         if (maxCount != null) {
             rdf.querySelect(storedQuery("find_too_many", property, subjectClasses, maxCount), row ->
-                    violationHandler.onViolation("Too many values", row.getResource("subject"), property, null));
+                    violationHandler.onViolation(format("More than %d values", maxCount), row.getResource("subject"), property, null));
         }
     }
 
@@ -169,15 +167,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
 
         if (values != null) {
             rdf.querySelect(storedQuery("find_not_in", property, subjectClasses, values), row ->
-                    violationHandler.onViolation("Invalid value", row.getResource("subject"), property, row.get("object")));
+                    violationHandler.onViolation("Value is not in " + SparqlUtils.toString(values), row.getResource("subject"), property, row.get("object")));
         }
-    }
-
-    @SneakyThrows
-    private void validateResource(Resource resource, Model vocabulary, ViolationHandler violationHandler) {
-        var dataModel = rdf.queryConstruct(storedQuery("triples_by_subject_with_object_types", resource));
-        var validationEngine = createEngine(dataModel, vocabulary);
-        validationEngine.validateNode(resource.asNode());
-        getViolations(validationEngine, violationHandler);
     }
 }
