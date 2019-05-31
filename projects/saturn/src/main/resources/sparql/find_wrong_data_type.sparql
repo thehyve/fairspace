@@ -1,0 +1,9 @@
+SELECT *
+WHERE {
+ ?subject a ?subjectClass ;
+ %1$s ?object .
+
+ FILTER ( datatype(?object) !=  %3$s)
+ VALUES ?subjectClass {%2$s}
+}
+LIMIT 1

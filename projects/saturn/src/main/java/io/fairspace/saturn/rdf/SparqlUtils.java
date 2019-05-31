@@ -3,9 +3,11 @@ package io.fairspace.saturn.rdf;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
+import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -20,11 +22,11 @@ import java.util.function.Function;
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
+import static java.util.stream.Collectors.joining;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.out.NodeFmtLib.str;
-import static org.apache.jena.riot.out.NodeFmtLib.strNodes;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 
 public class SparqlUtils {
@@ -40,12 +42,18 @@ public class SparqlUtils {
             if(arg == null) {
                 param = "?" + i;
             } else if(arg instanceof Collection) {
-                var nodes = ((Collection<Object>) arg).stream()
+                param = ((Collection<?>) arg).stream()
                         .filter(Objects::nonNull)
                         .map(SparqlUtils::toSerializableNode)
-                        .toArray(Node[]::new);
+                        .map(SparqlUtils::toString)
+                        .collect(joining(" "));
+            } else if(arg instanceof RDFList) {
 
-                param = strNodes(nodes);
+                param = ((RDFList) arg).asJavaList()
+                        .stream()
+                        .map(SparqlUtils::toSerializableNode)
+                        .map(SparqlUtils::toString)
+                        .collect(joining(", ", "(", ")"));
             } else {
                 param = toString(toSerializableNode(arg));
             }
@@ -104,6 +112,9 @@ public class SparqlUtils {
     private static Node toNode(Object value) {
         if (value instanceof Node) {
             return (Node) value;
+        }
+        if (value instanceof FrontsNode) {
+            return ((FrontsNode) value).asNode();
         }
         if (value instanceof String) {
             return createLiteral((String) value);
