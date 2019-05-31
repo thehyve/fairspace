@@ -67,14 +67,14 @@ const LinkedDataListPage = ({classes, listRenderer, classesInCatalog, performSea
         performSearch({...getSearchState(), page: 0, size: s});
     };
 
-    const footerRender = ({total, hasHighlights}) => (
+    const footerRender = ({count, colSpan}) => (
         <TableFooter>
             <TableRow>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     rowsPerPage={size}
-                    colSpan={hasHighlights ? 4 : 3}
-                    count={total}
+                    colSpan={colSpan}
+                    count={count}
                     page={page}
                     onChangePage={onPageChange}
                     onChangeRowsPerPage={onSizeChange}

@@ -52,7 +52,7 @@ const linkedDataList = ({items = [], total, hasHighlights, classes, footerRender
                     ))
                 }
             </TableBody>
-            {footerRender({total, hasHighlights})}
+            {footerRender({count: total, colSpan: hasHighlights ? 4 : 3})}
         </Table>
     </Paper>
 );
