@@ -1,12 +1,13 @@
+/* eslint-disable no-underscore-dangle */
 import elasticsearch from "elasticsearch";
 
 import Config from "./Config/Config";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE, SEARCH_DEFAULT_SIZE} from '../constants';
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_DEFAULT_SIZE} from '../constants';
 
 const ES_INDEX = 'fairspace';
 
 const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
-/* eslint-disable no-underscore-dangle */
+
 export class SearchAPI {
     constructor(client, index) {
         this.client = client;
@@ -19,7 +20,7 @@ export class SearchAPI {
      * @param types     List of class URIs to search for. If empty, it returns all types
      * @return Promise
      */
-    search = ({query, size = SEARCH_DEFAULT_SIZE, types}) => {
+    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
@@ -50,6 +51,7 @@ export class SearchAPI {
             index: this.index,
             body: {
                 size,
+                from,
                 query: esQuery,
                 highlight: {
                     fields: {
@@ -74,12 +76,14 @@ export class SearchAPI {
     searchCollections = (query) => this.search({query, types: COLLECTION_DIRECTORIES_FILES});
 
     /**
-     * @param query
-     * @param types
-     * @param size
      * @returns {Promise}
      */
-    searchLinkedData = (types, query) => this.search({query: query || '*', size: SEARCH_MAX_SIZE, types});
+    searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0}) => this.search({
+        query: query || '*',
+        size,
+        types,
+        from: page * size
+    });
 
     /**
      * Transforms the search result into a format that can be used internally. The format looks like this:
