@@ -1,22 +1,18 @@
-import React, {useState} from "react";
+import React from "react";
 import {
     Paper, Table, TableBody, TableCell,
     TableHead, TableRow, withStyles, Typography,
-    Tooltip, Grid,
+    Tooltip
 } from "@material-ui/core";
 
 import styles from '../common/LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
 
 const LinkedDataList = ({items = [], hasHighlights, onVocabularyOpen, classes}) => {
-    const [hoveredItem, setHoveredItem] = useState(null);
-
-    const renderItem = ({id, name, description, typeLabel, typeUrl, highlights}) => (
+    const renderRow = ({id, name, description, typeLabel, typeUrl, highlights}) => (
         <TableRow
             key={id}
             hover
-            onMouseEnter={() => setHoveredItem(id)}
-            onMouseLeave={() => setHoveredItem(null)}
             onDoubleClick={() => onVocabularyOpen(id)}
         >
             <TableCell style={{
@@ -27,16 +23,6 @@ const LinkedDataList = ({items = [], hasHighlights, onVocabularyOpen, classes}) 
             >
                 <Typography variant="body1">
                     {name}
-                    {/* <Grid container alignItems="center" spacing={8}>
-                                        <Grid item>
-                                            {name}
-                                        </Grid>
-                                        <Grid item>
-                                            <Tooltip title={id}>
-                                                <Info color="disabled" fontSize="small" />
-                                            </Tooltip>
-                                        </Grid>
-                                    </Grid> */}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                     {description}
@@ -53,7 +39,6 @@ const LinkedDataList = ({items = [], hasHighlights, onVocabularyOpen, classes}) 
         </TableRow>
     );
 
-
     return (
         <Paper className={classes.root}>
             <Table className={classes.table}>
@@ -67,13 +52,21 @@ const LinkedDataList = ({items = [], hasHighlights, onVocabularyOpen, classes}) 
                 <TableBody>
                     {
                         items.map((item) => (
-                            hoveredItem === item.id
-                                ? (
-                                    <Tooltip key={item.id} title={item.id}>
-                                        {renderItem(item)}
-                                    </Tooltip>
-                                )
-                                : renderItem(item)
+                            <Tooltip
+                                key={item.id}
+                                enterDelay={350}
+                                title={(
+                                    <Typography
+                                        variant="caption"
+                                        color="inherit"
+                                        style={{whiteSpace: 'pre-line'}}
+                                    >
+                                        {item.id}
+                                    </Typography>
+                                )}
+                            >
+                                {renderRow(item)}
+                            </Tooltip>
                         ))
                     }
                 </TableBody>
