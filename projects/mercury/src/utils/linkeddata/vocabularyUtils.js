@@ -1,6 +1,5 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
-import {SHACL_PROPERTY} from "../../constants";
 
 /**
  * Checks whether the given shape describes an RDF list
@@ -59,7 +58,7 @@ export const getSystemProperties = shape => (shape && shape[constants.SYSTEM_PRO
 export const extendPropertiesWithVocabularyEditingInfo = ({properties, editable = true, isFixed = false, systemProperties = []}) => properties
     .map(p => {
         // For fixed shapes, return the list of system properties for the SHACL_PROPERTY definition
-        if (isFixed && p.key === SHACL_PROPERTY) {
+        if (isFixed && p.key === constants.SHACL_PROPERTY) {
             return {...p, editable, systemProperties};
         }
 

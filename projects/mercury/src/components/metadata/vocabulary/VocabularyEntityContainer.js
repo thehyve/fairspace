@@ -31,7 +31,6 @@ import {
     getSystemProperties,
     isFixedShape
 } from "../../../utils/linkeddata/vocabularyUtils";
-import {SHACL_PROPERTY} from "../../../constants";
 
 const VocabularyEntityContainer = props => {
     const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
