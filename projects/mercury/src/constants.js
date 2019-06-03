@@ -15,7 +15,7 @@ export const VOCABULARY_PATH = '/vocabulary';
 export const COLLECTION_SEARCH_TYPE = 'collections';
 export const FILES_SEARCH_TYPE = 'files';
 export const SEARCH_MAX_SIZE = 10000;
-export const SEARCH_DEFAULT_SIZE = 50;
+export const SEARCH_DEFAULT_SIZE = 10;
 
 // Metadata schemas
 export const SHACL_NS = 'http://www.w3.org/ns/shacl#';

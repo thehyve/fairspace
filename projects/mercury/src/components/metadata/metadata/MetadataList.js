@@ -10,7 +10,7 @@ import SearchResultHighlights from "../../search/SearchResultHighlights";
 import {METADATA_PATH, VOCABULARY_PATH} from "../../../constants";
 import {getLabel} from "../../../utils/linkeddata/metadataUtils";
 
-const MetadataList = ({items = [], hasHighlights, classes}) => (
+const MetadataList = ({items = [], total, hasHighlights, classes, footerRender}) => (
     <Paper className={classes.root}>
         <Table className={classes.table}>
             <TableHead>
@@ -47,6 +47,7 @@ const MetadataList = ({items = [], hasHighlights, classes}) => (
                     ))
                 }
             </TableBody>
+            {footerRender({count: total, colSpan: hasHighlights ? 4 : 3})}
         </Table>
     </Paper>
 );

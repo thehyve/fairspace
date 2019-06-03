@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import LinkedDataListPage from "../common/LinkedDataListPage";
 import MetadataBrowserContainer from "./MetadataBrowserContainer";
 import {searchMetadata} from "../../../actions/searchActions";
-import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {getVocabulary, isVocabularyPending, hasVocabularyError} from "../../../reducers/cache/vocabularyReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../constants";
 import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
@@ -17,12 +17,13 @@ const MetadataListPage = (
 
     const toTargetClasses = shapes => shapes.map(c => getFirstPredicateId(c, constants.SHACL_TARGET_CLASS));
 
-    const performSearch = (queryString, types) => {
+    const performSearch = ({query, types, page, size}) => {
         const shapes = types.length === 0 ? classesInCatalog : classesInCatalog.filter(c => {
             const targetClass = getFirstPredicateId(c, constants.SHACL_TARGET_CLASS);
             return types.includes(targetClass);
         });
-        search(queryString, toTargetClasses(shapes));
+        const targetClasses = toTargetClasses(shapes);
+        search({query, types: targetClasses, size, page});
     };
 
     const targetClasses = toTargetClasses(classesInCatalog);
@@ -39,11 +40,12 @@ const MetadataListPage = (
         <LinkedDataListPage
             classesInCatalog={classesInCatalog}
             performSearch={performSearch}
-            listRenderer={() => (
+            listRenderer={(footerRender) => (
                 targetClasses && targetClasses.length > 0 && (
                     <MetadataBrowserContainer
                         targetClasses={targetClasses}
                         vocabulary={vocabulary}
+                        footerRender={footerRender}
                     />
                 )
             )}
@@ -54,10 +56,12 @@ const MetadataListPage = (
 const mapStateToProps = (state) => {
     const vocabulary = getVocabulary(state);
     const loading = isVocabularyPending(state);
+    const error = hasVocabularyError(state);
     const classesInCatalog = vocabulary.getClassesInCatalog();
 
     return {
         loading,
+        error,
         vocabulary,
         classesInCatalog
     };

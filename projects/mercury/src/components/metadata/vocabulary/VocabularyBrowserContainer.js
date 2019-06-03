@@ -18,7 +18,9 @@ import VocabularyList from "./VocabularyList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 
-const VocabularyBrowserContainer = ({entities, hasHighlights, history, ...otherProps}) => {
+const VocabularyBrowserContainer = (
+    {entities, hasHighlights, footerRender, total, history, ...otherProps}
+) => {
     const handleVocabularyOpen = (id) => {
         history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
     };
@@ -31,11 +33,13 @@ const VocabularyBrowserContainer = ({entities, hasHighlights, history, ...otherP
                         ? (
                             <VocabularyList
                                 items={entities}
+                                total={total}
                                 hasHighlights={hasHighlights}
+                                footerRender={footerRender}
                                 onVocabularyOpen={handleVocabularyOpen}
                             />
                         )
-                        : <MessageDisplay message="The metadata is empty" isError={false} />
+                        : <MessageDisplay message="The vocabulary is empty" isError={false} />
                 }
             </LinkedDataCreator>
         </LinkedDataValuesContext.Provider>
@@ -43,7 +47,7 @@ const VocabularyBrowserContainer = ({entities, hasHighlights, history, ...otherP
 };
 
 const mapStateToProps = (state, {metaVocabulary}) => {
-    const {items, pending, error} = getVocabularySearchResults(state);
+    const {items, pending, error, total} = getVocabularySearchResults(state);
     const entities = items.map((
         {id, name, description, type, highlights}
     ) => {
@@ -74,6 +78,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
         loading: pending,
         error,
         entities,
+        total,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         vocabulary: metaVocabulary,
         onEntityCreationError
@@ -81,7 +86,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetchLinkedData: () => dispatch(searchVocabulary('*', ownProps.targetClasses)),
+    fetchLinkedData: () => dispatch(searchVocabulary({query: '*', types: ownProps.targetClasses})),
     fetchShapes: () => {},
     create: (formKey, shape, id) => {
         const subject = createVocabularyIri(id);

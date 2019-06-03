@@ -8,7 +8,7 @@ import {
 import styles from '../common/LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
 
-const VocabularyList = ({items = [], hasHighlights, onVocabularyOpen, classes}) => {
+const VocabularyList = ({items = [], total, hasHighlights, onVocabularyOpen, classes, footerRender}) => {
     const renderRow = ({id, name, description, typeLabel, typeUrl, highlights}) => (
         <Tooltip
             key={id}
@@ -66,6 +66,7 @@ const VocabularyList = ({items = [], hasHighlights, onVocabularyOpen, classes}) 
                 <TableBody>
                     {items.map(renderRow)}
                 </TableBody>
+                {footerRender({count: total, colSpan: hasHighlights ? 4 : 3})}
             </Table>
         </Paper>
     );
