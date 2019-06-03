@@ -101,11 +101,15 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
         var constraints = createDefaultModel()
                 .add(PROPERTY_SHAPE, SH.minCount, createTypedLiteral(2));
 
+        validator.validate(EMPTY, constraints, violationHandler);
+
+        verify(violationHandler).onViolation(any(), any(), any(), any());
+
         model.add(ENTITY1, PROPERTY, createTypedLiteral(1));
 
         validator.validate(EMPTY, constraints, violationHandler);
 
-        verify(violationHandler).onViolation(any(), any(), any(), any());
+        verify(violationHandler, times(2)).onViolation(any(), any(), any(), any());
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(2));
 

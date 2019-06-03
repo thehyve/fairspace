@@ -5,8 +5,8 @@
 
 SELECT ?subject (count(?object) as ?num)
 WHERE {
- ?subject a ?subjectClas;
- %1$s ?object .
+ ?subject a ?subjectClass .
+ OPTIONAL {?subject %1$s ?object }
 
  VALUES ?subjectClass {%2$s}
 }
