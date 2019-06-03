@@ -2,7 +2,7 @@ import React from "react";
 import {
     Paper, Table, TableBody, TableCell,
     TableHead, TableRow, withStyles, Typography,
-    Tooltip
+    Tooltip, ListItemText
 } from "@material-ui/core";
 
 import styles from '../common/LinkedDataList.styles';
@@ -30,16 +30,11 @@ const VocabularyList = ({items = [], total, hasHighlights, onVocabularyOpen, cla
             >
                 <TableCell style={{
                     width: hasHighlights ? '40%' : '65%',
-                    paddingTop: hasHighlights ? 'inherit' : 10,
-                    paddingBottom: hasHighlights ? 'inherit' : 10,
+                    paddingTop: 10,
+                    paddingBottom: 10,
                 }}
                 >
-                    <Typography variant="body1">
-                        {name}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                        {description}
-                    </Typography>
+                    <ListItemText primary={name} secondary={description} />
                 </TableCell>
                 <TableCell style={{minWidth: 140}}>
                     <a href={typeUrl}> {typeLabel} </a>
