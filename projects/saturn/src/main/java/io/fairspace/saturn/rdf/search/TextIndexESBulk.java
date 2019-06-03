@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
+import static com.google.common.collect.Iterables.partition;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -45,6 +46,7 @@ public class TextIndexESBulk extends TextIndexES {
             "{ctx._source.<fieldToRemove>.remove(ctx._source.<fieldToRemove>.indexOf(params.valueToRemove))}";
 
     private static final Logger LOGGER      = LoggerFactory.getLogger(TextIndexESBulk.class) ;
+    private static final int BULK_SIZE = 1000;
 
     private final Client client;
     private final String indexName;
@@ -70,11 +72,14 @@ public class TextIndexESBulk extends TextIndexES {
         if (updates.isEmpty()) {
             return;
         }
-        var bulk = new BulkRequest();
-        updates.forEach(bulk::add);
-        updates.clear();
 
-        singleThreadExecutor.submit(() -> processBulkRequest(bulk));
+        partition(updates, BULK_SIZE).forEach(bulk -> {
+            var bulkRequest = new BulkRequest();
+            bulk.forEach(bulkRequest::add);
+            singleThreadExecutor.submit(() -> processBulkRequest(bulkRequest));
+        });
+
+        updates.clear();
     }
 
     private void processBulkRequest(BulkRequest bulk) {
