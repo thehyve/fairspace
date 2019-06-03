@@ -1,58 +1,85 @@
-import React from "react";
+import React, {useState} from "react";
 import {
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    withStyles
+    Paper, Table, TableBody, TableCell,
+    TableHead, TableRow, withStyles, Typography,
+    Tooltip, Grid,
 } from "@material-ui/core";
 
-import LinkedDataLink from "../common/LinkedDataLink";
 import styles from '../common/LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
-import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
-import {getLabel} from "../../../utils/linkeddata/metadataUtils";
-import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 
-const linkedDataList = ({items = [], hasHighlights, classes}) => (
-    <Paper className={classes.root}>
-        <Table className={classes.table}>
-            <TableHead>
-                <TableRow>
-                    <TableCell>Label</TableCell>
-                    <TableCell>Shape type</TableCell>
-                    <TableCell>URI</TableCell>
-                    {hasHighlights && <TableCell>Match</TableCell>}
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {
-                    items.map(({id, label, shape, highlights}) => (
-                        <TableRow key={id}>
-                            <TableCell className={classes.cell}>
-                                {label}
-                            </TableCell>
-                            <TableCell className={classes.cell}>
-                                <a href={getFirstPredicateId(shape, SHACL_TARGET_CLASS)}> {getLabel(shape, true)} </a>
-                            </TableCell>
-                            <TableCell className={classes.cell}>
-                                <LinkedDataLink editorPath={VOCABULARY_PATH} uri={id}>
-                                    {label}
-                                </LinkedDataLink>
-                            </TableCell>
-                            {hasHighlights && (
-                                <TableCell>
-                                    <SearchResultHighlights highlights={highlights} />
-                                </TableCell>
-                            )}
-                        </TableRow>
-                    ))
-                }
-            </TableBody>
-        </Table>
-    </Paper>
-);
+const LinkedDataList = ({items = [], hasHighlights, onVocabularyOpen, classes}) => {
+    const [hoveredItem, setHoveredItem] = useState(null);
 
-export default withStyles(styles)(linkedDataList);
+    const renderItem = ({id, name, description, typeLabel, typeUrl, highlights}) => (
+        <TableRow
+            key={id}
+            hover
+            onMouseEnter={() => setHoveredItem(id)}
+            onMouseLeave={() => setHoveredItem(null)}
+            onDoubleClick={() => onVocabularyOpen(id)}
+        >
+            <TableCell style={{
+                width: hasHighlights ? '40%' : '65%',
+                paddingTop: hasHighlights ? 'inherit' : 10,
+                paddingBottom: hasHighlights ? 'inherit' : 10,
+            }}
+            >
+                <Typography variant="body1">
+                    {name}
+                    {/* <Grid container alignItems="center" spacing={8}>
+                                        <Grid item>
+                                            {name}
+                                        </Grid>
+                                        <Grid item>
+                                            <Tooltip title={id}>
+                                                <Info color="disabled" fontSize="small" />
+                                            </Tooltip>
+                                        </Grid>
+                                    </Grid> */}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                    {description}
+                </Typography>
+            </TableCell>
+            <TableCell style={{minWidth: 140}}>
+                <a href={typeUrl}> {typeLabel} </a>
+            </TableCell>
+            {hasHighlights && (
+                <TableCell style={{minWidth: 200}}>
+                    <SearchResultHighlights highlights={highlights} />
+                </TableCell>
+            )}
+        </TableRow>
+    );
+
+
+    return (
+        <Paper className={classes.root}>
+            <Table className={classes.table}>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Entity</TableCell>
+                        <TableCell>Type</TableCell>
+                        {hasHighlights && <TableCell>Match</TableCell>}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {
+                        items.map((item) => (
+                            hoveredItem === item.id
+                                ? (
+                                    <Tooltip key={item.id} title={item.id}>
+                                        {renderItem(item)}
+                                    </Tooltip>
+                                )
+                                : renderItem(item)
+                        ))
+                    }
+                </TableBody>
+            </Table>
+        </Paper>
+    );
+};
+
+export default withStyles(styles)(LinkedDataList);
