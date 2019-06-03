@@ -8,7 +8,7 @@ import {
 import styles from '../common/LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
 
-const LinkedDataList = ({items = [], hasHighlights, onVocabularyOpen, classes}) => {
+const VocabularyList = ({items = [], hasHighlights, onVocabularyOpen, classes}) => {
     const renderRow = ({id, name, description, typeLabel, typeUrl, highlights}) => (
         <TableRow
             key={id}
@@ -75,4 +75,4 @@ const LinkedDataList = ({items = [], hasHighlights, onVocabularyOpen, classes}) 
     );
 };
 
-export default withStyles(styles)(LinkedDataList);
+export default withStyles(styles)(VocabularyList);
