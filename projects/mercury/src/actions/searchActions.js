@@ -10,12 +10,12 @@ export const searchCollections = createErrorHandlingPromiseAction((query) => ({
     }
 }));
 
-export const searchMetadata = createErrorHandlingPromiseAction((query, types) => ({
+export const searchMetadata = createErrorHandlingPromiseAction(({query, types, size, page}) => ({
     type: METADATA_SEARCH,
-    payload: searchAPI().searchLinkedData(types, query)
+    payload: searchAPI().searchLinkedData({types, query, size, page})
 }));
 
-export const searchVocabulary = createErrorHandlingPromiseAction((query, types) => ({
+export const searchVocabulary = createErrorHandlingPromiseAction(({query, types, size, page}) => ({
     type: VOCABULARY_SEARCH,
-    payload: searchAPI().searchLinkedData(types, query)
+    payload: searchAPI().searchLinkedData({query, types, size, page})
 }));

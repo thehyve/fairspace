@@ -18,20 +18,27 @@ import VocabularyList from "./VocabularyList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS} from "../../../constants";
 
-const VocabularyBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
+const VocabularyBrowserContainer = ({entities, total, hasHighlights, footerRender, ...otherProps}) => (
     <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
         <LinkedDataCreator {...otherProps}>
             {
                 entities && entities.length > 0
-                    ? <VocabularyList items={entities} hasHighlights={hasHighlights} />
-                    : <MessageDisplay message="The metadata is empty" isError={false} />
+                    ? (
+                        <VocabularyList
+                            items={entities}
+                            total={total}
+                            hasHighlights={hasHighlights}
+                            footerRender={footerRender}
+                        />
+                    )
+                    : <MessageDisplay message="The vocabulary is empty" isError={false} />
             }
         </LinkedDataCreator>
     </LinkedDataValuesContext.Provider>
 );
 
 const mapStateToProps = (state, {metaVocabulary}) => {
-    const {items, pending, error} = getVocabularySearchResults(state);
+    const {items, pending, error, total} = getVocabularySearchResults(state);
     const entities = items.map(({id, type, label, name, highlights}) => ({
         id,
         label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
@@ -53,6 +60,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
         loading: pending,
         error,
         entities,
+        total,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         vocabulary: metaVocabulary,
         onEntityCreationError
@@ -60,7 +68,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetchLinkedData: () => dispatch(searchVocabulary('*', ownProps.targetClasses)),
+    fetchLinkedData: () => dispatch(searchVocabulary({query: '*', types: ownProps.targetClasses})),
     fetchShapes: () => {},
     create: (formKey, shape, id) => {
         const subject = createVocabularyIri(id);
