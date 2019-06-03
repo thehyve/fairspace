@@ -5,7 +5,7 @@ import {Button, Grid} from "@material-ui/core";
 
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {isDateTimeProperty, partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import {
     getCombinedMetadataForSubject,
     hasMetadataError,
@@ -44,7 +44,6 @@ const MetadataEntityContainer = props => {
             <Grid item>
                 <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
                     <LinkedDataEntityFormContainer
-                        editable={editable}
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
                         error={error}
@@ -83,7 +82,7 @@ const mapStateToProps = (state, ownProps) => {
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
             ...p,
-            editable: editable && !isDateTimeProperty(p)
+            editable
         }));
 
     return {

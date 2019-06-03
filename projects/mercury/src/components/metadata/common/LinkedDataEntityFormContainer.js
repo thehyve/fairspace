@@ -34,7 +34,7 @@ export class LinkedDataEntityFormContainer extends React.Component {
 
     render() {
         const propertiesWithChanges = this.props.properties
-            .filter(p => this.props.editable || p.values.length)
+            .filter(p => p.editable || p.values.length)
             .map(p => ({
                 ...p,
                 values: this.props.updates[p.key] || p.values,
@@ -49,7 +49,6 @@ export class LinkedDataEntityFormContainer extends React.Component {
 
                 error={this.props.error}
                 loading={this.props.loading}
-                editable={this.props.editable}
 
                 properties={propertiesWithChanges}
             />
@@ -69,7 +68,6 @@ LinkedDataEntityFormContainer.propTypes = {
     error: PropTypes.string,
 
     loading: PropTypes.bool,
-    editable: PropTypes.bool,
 
     formKey: PropTypes.string.isRequired,
 
@@ -90,8 +88,7 @@ LinkedDataEntityFormContainer.defaultProps = {
 
     properties: [],
     updates: {},
-    errors: {},
-    editable: true
+    errors: {}
 };
 
 const mapStateToProps = (state, ownProps) => ({

@@ -47,6 +47,9 @@ const LinkedDataProperty = ({property, editable, onAdd, onChange, onDelete}) => 
     const ValueAddComponent = addComponent(property);
     const pathVisibility = hoveredAllProperty ? 'visible' : 'hidden';
 
+    const isSystemProperty = entry => property.systemProperties && property.systemProperties.includes(entry.id);
+    const canDelete = entry => editable && !isSystemProperty(entry);
+
     return (
         <FormControl
             onMouseEnter={() => setHoveredAllProperty(true)}
@@ -85,7 +88,7 @@ const LinkedDataProperty = ({property, editable, onAdd, onChange, onDelete}) => 
                                         error={hasErrors}
                                     />
                                     {
-                                        editable
+                                        canDelete(entry)
                                             ? (
                                                 <IconButton
                                                     size="small"

@@ -28,7 +28,8 @@ describe('LinkedDataEntityFormContainer', () => {
             datatype: STRING_URI,
             maxValuesCount: 1,
             machineOnly: false,
-            multiLine: false
+            multiLine: false,
+            editable: true
         }, {
             key: 'http://www.w3.org/2000/01/rdf-schema#label',
             label: "Label",
@@ -36,7 +37,8 @@ describe('LinkedDataEntityFormContainer', () => {
             datatype: STRING_URI,
             maxValuesCount: 1,
             machineOnly: false,
-            multiLine: false
+            multiLine: false,
+            editable: true
         }];
 
         const updates = {

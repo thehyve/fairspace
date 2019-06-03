@@ -6,7 +6,7 @@ import {MessageDisplay, LoadingInlay} from "../../common";
 import LinkedDataProperty from "./LinkedDataProperty";
 
 export const LinkedDataEntityForm = ({
-    properties, editable, error, loading, onChange, onAdd, onDelete
+    properties, error, loading, onChange, onAdd, onDelete
 }) => {
     if (error) {
         return <MessageDisplay message={error} />;
@@ -26,7 +26,7 @@ export const LinkedDataEntityForm = ({
                         style={{display: 'block'}}
                     >
                         <LinkedDataProperty
-                            editable={editable}
+                            editable={p.editable}
                             property={p}
                             onChange={(value, index) => onChange(p, value, index)}
                             onAdd={(value) => onAdd(p, value)}
@@ -47,8 +47,6 @@ LinkedDataEntityForm.propTypes = {
     error: PropTypes.string,
 
     loading: PropTypes.bool,
-    editable: PropTypes.bool,
-
     properties: PropTypes.array,
 };
 
