@@ -21,12 +21,17 @@ const ReferringValue = ({property, entry, editorPath}) => {
     const displayValue = property.isGenericIriResource ? entry.id : extractDisplayValue(entry);
 
     if (entry.id) {
-        return (
-            <LinkedDataLink editorPath={editorPath} uri={entry.id}>
-                {displayValue}
-            </LinkedDataLink>
-        );
+        // External links should be represented by a direct link to the URI itself
+        // Other iri entities should be opened in the metadata/vocabulary editor
+        return property.isExternalLink
+            ? <a href={entry.id}>{displayValue}</a>
+            : (
+                <LinkedDataLink editorPath={editorPath} uri={entry.id}>
+                    {displayValue}
+                </LinkedDataLink>
+            );
     }
+
     return displayValue;
 };
 
