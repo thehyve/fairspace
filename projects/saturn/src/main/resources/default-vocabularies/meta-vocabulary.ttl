@@ -77,6 +77,12 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         sh:path sh:nodeKind ;
         sh:name "Property node kind" ;
         sh:in ( sh:IRI )
+    ], [
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        sh:path fs:externalLink ;
+        sh:name "Show as external link" ;
+        sh:description "If this flag is set to true, a link to a IRI for this property will not be loaded in the metadata editor"
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ExternalIRIPropertyShape ;
