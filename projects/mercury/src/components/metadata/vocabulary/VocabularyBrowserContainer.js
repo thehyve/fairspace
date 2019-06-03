@@ -2,7 +2,7 @@ import React from "react";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
-import {createVocabularyIri, relativeLink, partitionErrors, linkLabel} from "../../../utils/linkeddata/metadataUtils";
+import {createVocabularyIri, relativeLink, partitionErrors, getLabel} from "../../../utils/linkeddata/metadataUtils";
 import {createVocabularyEntityFromState} from "../../../actions/vocabularyActions";
 import {searchVocabulary} from "../../../actions/searchActions";
 import Config from "../../../services/Config/Config";
@@ -16,36 +16,54 @@ import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import {getVocabularySearchResults} from "../../../reducers/searchReducers";
 import VocabularyList from "./VocabularyList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
-import {SHACL_TARGET_CLASS} from "../../../constants";
+import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 
-const VocabularyBrowserContainer = ({entities, total, hasHighlights, footerRender, ...otherProps}) => (
-    <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
-        <LinkedDataCreator {...otherProps}>
-            {
-                entities && entities.length > 0
-                    ? (
-                        <VocabularyList
-                            items={entities}
-                            total={total}
-                            hasHighlights={hasHighlights}
-                            footerRender={footerRender}
-                        />
-                    )
-                    : <MessageDisplay message="The vocabulary is empty" isError={false} />
-            }
-        </LinkedDataCreator>
-    </LinkedDataValuesContext.Provider>
-);
+const VocabularyBrowserContainer = (
+    {entities, hasHighlights, footerRender, total, history, ...otherProps}
+) => {
+    const handleVocabularyOpen = (id) => {
+        history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
+    };
+
+    return (
+        <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
+            <LinkedDataCreator {...otherProps}>
+                {
+                    entities && entities.length > 0
+                        ? (
+                            <VocabularyList
+                                items={entities}
+                                total={total}
+                                hasHighlights={hasHighlights}
+                                footerRender={footerRender}
+                                onVocabularyOpen={handleVocabularyOpen}
+                            />
+                        )
+                        : <MessageDisplay message="The vocabulary is empty" isError={false} />
+                }
+            </LinkedDataCreator>
+        </LinkedDataValuesContext.Provider>
+    );
+};
 
 const mapStateToProps = (state, {metaVocabulary}) => {
     const {items, pending, error, total} = getVocabularySearchResults(state);
-    const entities = items.map(({id, type, label, name, highlights}) => ({
-        id,
-        label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
-        type: type[0],
-        shape: type[0] ? metaVocabulary.determineShapeForType(type[0]) : {},
-        highlights
-    }));
+    const entities = items.map((
+        {id, name, description, type, highlights}
+    ) => {
+        const shape = type[0] ? metaVocabulary.determineShapeForType(type[0]) : {};
+        const typeLabel = getLabel(shape, true);
+        const typeUrl = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
+
+        return {
+            id,
+            name,
+            typeLabel,
+            typeUrl,
+            description,
+            highlights
+        };
+    });
     const onEntityCreationError = (e, id) => {
         if (e.details) {
             ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createVocabularyIri(id)), e.message);

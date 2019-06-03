@@ -1,12 +1,7 @@
 import React from "react";
 import {
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    withStyles
+    Paper, Table, TableBody, TableCell,
+    TableHead, TableRow, withStyles
 } from "@material-ui/core";
 
 import LinkedDataLink from "../common/LinkedDataLink";
@@ -15,7 +10,7 @@ import SearchResultHighlights from "../../search/SearchResultHighlights";
 import {METADATA_PATH, VOCABULARY_PATH} from "../../../constants";
 import {getLabel} from "../../../utils/linkeddata/metadataUtils";
 
-const linkedDataList = ({items = [], total, hasHighlights, classes, footerRender}) => (
+const MetadataList = ({items = [], total, hasHighlights, classes, footerRender}) => (
     <Paper className={classes.root}>
         <Table className={classes.table}>
             <TableHead>
@@ -57,4 +52,4 @@ const linkedDataList = ({items = [], total, hasHighlights, classes, footerRender
     </Paper>
 );
 
-export default withStyles(styles)(linkedDataList);
+export default withStyles(styles)(MetadataList);
