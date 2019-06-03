@@ -19,7 +19,7 @@ import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 
 const VocabularyBrowserContainer = ({entities, hasHighlights, history, ...otherProps}) => {
-    const handleVocabularOpen = (id) => {
+    const handleVocabularyOpen = (id) => {
         history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
     };
 
@@ -32,7 +32,7 @@ const VocabularyBrowserContainer = ({entities, hasHighlights, history, ...otherP
                             <VocabularyList
                                 items={entities}
                                 hasHighlights={hasHighlights}
-                                onVocabularyOpen={handleVocabularOpen}
+                                onVocabularyOpen={handleVocabularyOpen}
                             />
                         )
                         : <MessageDisplay message="The metadata is empty" isError={false} />

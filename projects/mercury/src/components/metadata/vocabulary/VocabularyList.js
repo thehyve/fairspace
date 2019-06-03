@@ -10,33 +10,47 @@ import SearchResultHighlights from "../../search/SearchResultHighlights";
 
 const VocabularyList = ({items = [], hasHighlights, onVocabularyOpen, classes}) => {
     const renderRow = ({id, name, description, typeLabel, typeUrl, highlights}) => (
-        <TableRow
+        <Tooltip
             key={id}
-            hover
-            onDoubleClick={() => onVocabularyOpen(id)}
-        >
-            <TableCell style={{
-                width: hasHighlights ? '40%' : '65%',
-                paddingTop: hasHighlights ? 'inherit' : 10,
-                paddingBottom: hasHighlights ? 'inherit' : 10,
-            }}
-            >
-                <Typography variant="body1">
-                    {name}
+            enterDelay={350}
+            title={(
+                <Typography
+                    variant="caption"
+                    color="inherit"
+                    style={{whiteSpace: 'pre-line'}}
+                >
+                    {id}
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
-                    {description}
-                </Typography>
-            </TableCell>
-            <TableCell style={{minWidth: 140}}>
-                <a href={typeUrl}> {typeLabel} </a>
-            </TableCell>
-            {hasHighlights && (
-                <TableCell style={{minWidth: 200}}>
-                    <SearchResultHighlights highlights={highlights} />
-                </TableCell>
             )}
-        </TableRow>
+        >
+            <TableRow
+                key={id}
+                hover
+                onDoubleClick={() => onVocabularyOpen(id)}
+            >
+                <TableCell style={{
+                    width: hasHighlights ? '40%' : '65%',
+                    paddingTop: hasHighlights ? 'inherit' : 10,
+                    paddingBottom: hasHighlights ? 'inherit' : 10,
+                }}
+                >
+                    <Typography variant="body1">
+                        {name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                        {description}
+                    </Typography>
+                </TableCell>
+                <TableCell style={{minWidth: 140}}>
+                    <a href={typeUrl}> {typeLabel} </a>
+                </TableCell>
+                {hasHighlights && (
+                    <TableCell style={{minWidth: 200}}>
+                        <SearchResultHighlights highlights={highlights} />
+                    </TableCell>
+                )}
+            </TableRow>
+        </Tooltip>
     );
 
     return (
@@ -50,25 +64,7 @@ const VocabularyList = ({items = [], hasHighlights, onVocabularyOpen, classes}) 
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {
-                        items.map((item) => (
-                            <Tooltip
-                                key={item.id}
-                                enterDelay={350}
-                                title={(
-                                    <Typography
-                                        variant="caption"
-                                        color="inherit"
-                                        style={{whiteSpace: 'pre-line'}}
-                                    >
-                                        {item.id}
-                                    </Typography>
-                                )}
-                            >
-                                {renderRow(item)}
-                            </Tooltip>
-                        ))
-                    }
+                    {items.map(renderRow)}
                 </TableBody>
             </Table>
         </Paper>
