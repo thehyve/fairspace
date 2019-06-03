@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import {ListItem} from '@material-ui/core';
-import List from "@material-ui/core/List";
+import {List, ListItem, ListItemText} from '@material-ui/core';
+import _ from 'lodash';
 
 /* eslint-disable no-underscore-dangle */
 /**
@@ -11,14 +11,18 @@ import List from "@material-ui/core/List";
  * @constructor
  */
 const SearchResultHighlights = ({highlights}) => highlights && (
-    <List>{
-        highlights
-            .map(([key, value]) => (
-                <ListItem key={key}>
-                    <u>{key}</u>: <span dangerouslySetInnerHTML={{__html: value}} />
-                </ListItem>
-            ))
-    }
+    <List dense>
+        {
+            highlights
+                .map(([key, value]) => (
+                    <ListItem key={key} dense disableGutters>
+                        <ListItemText
+                            primary={_.upperFirst(key)}
+                            secondary={<span dangerouslySetInnerHTML={{__html: value}} />}
+                        />
+                    </ListItem>
+                ))
+        }
     </List>
 );
 

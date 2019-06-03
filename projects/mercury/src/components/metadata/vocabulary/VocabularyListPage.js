@@ -17,12 +17,13 @@ const VocabularyListPage = (
 
     const toTargetClasses = shapes => shapes.map(c => getFirstPredicateId(c, constants.SHACL_TARGET_CLASS));
 
-    const performSearch = (queryString, types) => {
+    const performSearch = ({query, types, page, size}) => {
         const shapes = types.length === 0 ? classesInCatalog : classesInCatalog.filter(c => {
             const targetClass = getFirstPredicateId(c, constants.SHACL_TARGET_CLASS);
             return types.includes(targetClass);
         });
-        search(queryString, toTargetClasses(shapes));
+        const targetClasses = toTargetClasses(shapes);
+        search({query, types: targetClasses, size, page});
     };
 
     const targetClasses = toTargetClasses(classesInCatalog);
@@ -39,11 +40,12 @@ const VocabularyListPage = (
         <LinkedDataListPage
             classesInCatalog={classesInCatalog}
             performSearch={performSearch}
-            listRenderer={() => (
+            listRenderer={(footerRender) => (
                 targetClasses && targetClasses.length > 0 && (
                     <VocabularyBrowserContainer
                         targetClasses={targetClasses}
                         metaVocabulary={metaVocabulary}
+                        footerRender={footerRender}
                     />
                 )
             )}

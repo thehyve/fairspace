@@ -15,12 +15,19 @@ import MetadataList from "./MetadataList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS} from "../../../constants";
 
-const MetadataBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
+const MetadataBrowserContainer = ({entities, hasHighlights, footerRender, total, ...otherProps}) => (
     <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
         <LinkedDataCreator {...otherProps}>
             {
                 entities && entities.length > 0
-                    ? <MetadataList items={entities} hasHighlights={hasHighlights} />
+                    ? (
+                        <MetadataList
+                            items={entities}
+                            total={total}
+                            hasHighlights={hasHighlights}
+                            footerRender={footerRender}
+                        />
+                    )
                     : <MessageDisplay message="The metadata layer is empty" isError={false} />
             }
         </LinkedDataCreator>
@@ -28,8 +35,10 @@ const MetadataBrowserContainer = ({entities, hasHighlights, ...otherProps}) => (
 );
 
 const mapStateToProps = (state, {vocabulary}) => {
-    const {items, pending, error} = getMetadataSearchResults(state);
-    const entities = items.map(({id, type, label, name, highlights}) => ({
+    const {items, pending, error, total} = getMetadataSearchResults(state);
+    const entities = items.map(({
+        id, type, label, name, highlights
+    }) => ({
         id,
         label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
         type: type[0],
@@ -48,6 +57,7 @@ const mapStateToProps = (state, {vocabulary}) => {
         loading: pending,
         error,
         entities,
+        total,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         shapes: vocabulary.getClassesInCatalog(),
         vocabulary,
@@ -56,7 +66,7 @@ const mapStateToProps = (state, {vocabulary}) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetchLinkedData: () => dispatch(searchMetadata('*', ownProps.targetClasses)),
+    fetchLinkedData: () => dispatch(searchMetadata({query: '*', types: ownProps.targetClasses})),
     fetchShapes: () => {},
     create: (formKey, shape, id) => {
         const subject = createMetadataIri(id);
