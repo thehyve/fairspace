@@ -1,3 +1,8 @@
+# Find a subject violating sh:in constaraint
+# 0 - property
+# 1 - subject's class
+# 2 - an RDF list containg possible values
+
 SELECT *
 WHERE {
  ?subject a ?subjectClas;

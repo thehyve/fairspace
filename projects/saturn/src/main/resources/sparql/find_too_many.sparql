@@ -1,3 +1,8 @@
+# Find a subject violating sh:maxCount constaraint
+# 0 - property
+# 1 - a list of allowed subject's classes
+# 2 - maxCount
+
 SELECT ?subject (count(?object) as ?num)
 WHERE {
  ?subject a ?subjectClas;
