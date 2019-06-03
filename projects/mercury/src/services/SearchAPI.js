@@ -2,7 +2,10 @@
 import elasticsearch from "elasticsearch";
 
 import Config from "./Config/Config";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_DEFAULT_SIZE} from '../constants';
+import {
+    COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_DEFAULT_SIZE,
+    SEARCH_MAX_SIZE
+} from '../constants';
 
 const ES_INDEX = 'fairspace';
 
@@ -73,7 +76,7 @@ export class SearchAPI {
      * @param query
      * @returns {Promise}
      */
-    searchCollections = (query) => this.search({query, types: COLLECTION_DIRECTORIES_FILES});
+    searchCollections = (query) => this.search({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE});
 
     /**
      * @returns {Promise}
