@@ -74,7 +74,7 @@ const mapStateToProps = (state, ownProps) => {
 
     const hasNoMetadata = !metadata || metadata.length === 0;
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
-    const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
+    const error = hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
     const isEditable = ("isEditable" in ownProps) ? ownProps.isEditable : true;
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
