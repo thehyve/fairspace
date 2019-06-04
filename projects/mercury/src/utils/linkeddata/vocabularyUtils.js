@@ -28,13 +28,19 @@ export const isGenericIriResource = (propertyShape) => getFirstPredicateId(prope
 export const getMaxCount = shape => (isRdfList(shape) ? 0 : getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT));
 
 /**
+ * Checks whether the given shape represents an external link (specified by fs:externalLink)
+ * @param propertyShape
+ * @returns {boolean}
+ */
+const isExternalLink = (propertyShape) => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
+
+/**
  * Checks whether the given list of properties represents a fixed shape, as defined by FS:fixedShape
  */
 export const isFixedShape = shape => getFirstPredicateValue(shape, constants.FIXED_SHAPE_URI, false);
 
 /**
- * Returns a list of system properties defined for the given shape
- */
+ * Returns a list of system properties defined for the given shape */
 export const getSystemProperties = shape => (shape && shape[constants.SYSTEM_PROPERTIES_URI] && shape[constants.SYSTEM_PROPERTIES_URI].map(entry => entry['@id'])) || [];
 
 /**
@@ -197,6 +203,7 @@ export const vocabularyUtils = (vocabulary = []) => {
             isRdfList: isRdfList(shape),
             allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
             isGenericIriResource: isGenericIriResource(shape),
+            isExternalLink: isExternalLink(shape),
             allowAdditionOfEntities: isFairspaceClass(className)
         };
     };

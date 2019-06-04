@@ -66,6 +66,7 @@ export const FILE_PATH_URI = FAIRSPACE_NS + 'filePath';
 export const DATE_DELETED_URI = FAIRSPACE_NS + 'dateDeleted';
 export const DELETED_BY_URI = FAIRSPACE_NS + 'deletedBy';
 export const FIXED_SHAPE_URI = FAIRSPACE_NS + 'fixedShape';
+export const EXTERNAL_LINK_URI = FAIRSPACE_NS + 'externalLink';
 export const SYSTEM_PROPERTIES_URI = FAIRSPACE_NS + 'systemProperties';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';
