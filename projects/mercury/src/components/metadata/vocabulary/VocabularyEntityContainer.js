@@ -87,7 +87,7 @@ const mapStateToProps = (state, ownProps) => {
 
     const hasNoMetadata = !metadata || metadata.length === 0;
     const hasOtherErrors = hasVocabularyError(state) || hasMetaVocabularyError(state);
-    const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading vocabulary.' : '';
+    const error = hasOtherErrors ? 'An error occurred while loading vocabulary.' : '';
 
     const isEditable = isDataSteward(getAuthorizations(state), Config.get());
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
