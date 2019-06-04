@@ -252,7 +252,8 @@ export const emptyLinkedData = (vocabulary, shape) => {
     const types = (shape[constants.SHACL_TARGET_CLASS] || []).map(node => node['@id']);
 
     // Generate a list of empty properties
-    return generatePropertiesForMetadata(vocabulary, {}, types, propertyShapes, []);
+    return generatePropertiesForMetadata(vocabulary, {}, types, propertyShapes, [])
+        .map(p => ({...p, isEditable: true}));
 };
 
 /**

@@ -74,7 +74,6 @@ describe('LinkedDataEntityForm', () => {
 
         const wrapper = shallow(<LinkedDataEntityForm
             properties={defaultMetadata}
-            editable
             subject={collection.iri}
         />);
 
@@ -88,7 +87,6 @@ describe('LinkedDataEntityForm', () => {
 
         const wrapper = shallow(<LinkedDataEntityForm
             properties={defaultMetadata}
-            editable
             subject={collection.iri}
             error="Testing error"
         />);

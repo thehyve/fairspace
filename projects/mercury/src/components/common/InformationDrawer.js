@@ -87,7 +87,7 @@ export class InformationDrawer extends React.Component {
                 <Paper style={{padding: 20, marginTop: 10}}>
                     <MetadataEntityContainer
                         subject={collection.iri}
-                        editable={isMetaDataEditable}
+                        isEditable={isMetaDataEditable}
                     />
                 </Paper>
                 {
@@ -109,7 +109,7 @@ export class InformationDrawer extends React.Component {
                             <ExpansionPanelDetails>
                                 <PathMetadata
                                     path={path}
-                                    editable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
+                                    isEditable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
                                     style={{width: '100%'}}
                                 />
                             </ExpansionPanelDetails>

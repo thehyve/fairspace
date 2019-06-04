@@ -15,7 +15,7 @@ import {
     isMetaVocabularyPending,
     isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {isDateTimeProperty, partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
@@ -26,9 +26,14 @@ import Config from "../../../services/Config/Config";
 import {isDataSteward} from "../../../utils/userUtils";
 import {fromJsonLd} from "../../../utils/linkeddata/jsonLdConverter";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
+import {
+    extendPropertiesWithVocabularyEditingInfo,
+    getSystemProperties,
+    isFixedShape
+} from "../../../utils/linkeddata/vocabularyUtils";
 
 const VocabularyEntityContainer = props => {
-    const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
+    const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
@@ -46,7 +51,6 @@ const VocabularyEntityContainer = props => {
             <Grid item xs={12}>
                 <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
                     <LinkedDataEntityFormContainer
-                        editable={editable}
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
                         error={error}
@@ -55,7 +59,7 @@ const VocabularyEntityContainer = props => {
                 </LinkedDataValuesContext.Provider>
             </Grid>
             {
-                editable && !error
+                isEditable && !error
                 && (
                     <Grid item>
                         <Button
@@ -85,15 +89,18 @@ const mapStateToProps = (state, ownProps) => {
     const hasOtherErrors = hasVocabularyError(state) || hasMetaVocabularyError(state);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading vocabulary.' : '';
 
-    const editable = isDataSteward(getAuthorizations(state), Config.get());
-
+    const isEditable = isDataSteward(getAuthorizations(state), Config.get());
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
 
-    const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
-        .map(p => ({
-            ...p,
-            editable: editable && !isDateTimeProperty(p)
-        }));
+    // Use the SHACL shape of the subject to determine whether it is fixed
+    const shape = vocabulary.get(subject);
+
+    const properties = hasNoMetadata ? [] : extendPropertiesWithVocabularyEditingInfo({
+        properties: propertiesToShow(metadata),
+        isFixed: isFixedShape(shape),
+        systemProperties: getSystemProperties(shape),
+        isEditable
+    });
 
     return {
         loading,
@@ -102,7 +109,7 @@ const mapStateToProps = (state, ownProps) => {
         properties,
         subject,
 
-        editable,
+        isEditable,
         buttonDisabled,
         vocabulary: metaVocabulary
     };

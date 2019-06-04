@@ -12,7 +12,8 @@ const defaultProperty = {
     datatype: STRING_URI,
     label: 'Description',
     values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
-    maxValuesCount: 4
+    maxValuesCount: 4,
+    isEditable: true
 };
 
 describe('LinkedDataProperty elements', () => {
@@ -22,14 +23,14 @@ describe('LinkedDataProperty elements', () => {
             maxValuesCount: 1
         };
 
-        const wrapper = mount(<LinkedDataProperty editable property={property} />);
+        const wrapper = mount(<LinkedDataProperty property={property} />);
         const listItems = wrapper.find(FormGroup).find(FormControlLabel);
 
         expect(listItems.length).toEqual(3);
     });
 
     it('shows an add element if multiple values are allowed, and it is editable', () => {
-        const wrapper = mount(<LinkedDataProperty editable property={defaultProperty} />);
+        const wrapper = mount(<LinkedDataProperty property={defaultProperty} />);
 
         const listItems = wrapper.find(FormGroup).find(FormControlLabel);
         expect(listItems.length).toEqual(4);
@@ -38,7 +39,7 @@ describe('LinkedDataProperty elements', () => {
     });
 
     it('shows no add element if multiple values are allowed, but it is uneditable', () => {
-        const wrapper = mount(<LinkedDataProperty editable={false} property={defaultProperty} />);
+        const wrapper = mount(<LinkedDataProperty property={{...defaultProperty, isEditable: false}} />);
 
         const listItems = wrapper.find(FormGroup).find(FormControlLabel);
         expect(listItems.length).toEqual(3);
@@ -52,7 +53,7 @@ describe('LinkedDataProperty elements', () => {
             values: []
         };
 
-        const wrapper = mount(<LinkedDataProperty editable property={property} />);
+        const wrapper = mount(<LinkedDataProperty property={property} />);
 
         const listItems = wrapper.find(FormGroup).find(FormControlLabel);
         expect(listItems.length).toEqual(1);
@@ -65,10 +66,11 @@ describe('LinkedDataProperty elements', () => {
     it('shows no add element if there is no value yet, but it is uneditable', () => {
         const property = {
             ...defaultProperty,
+            isEditable: false,
             values: []
         };
 
-        const wrapper = mount(<LinkedDataProperty editable={false} property={property} />);
+        const wrapper = mount(<LinkedDataProperty property={property} />);
 
         const listItems = wrapper.find(FormGroup).find(FormControlLabel);
         expect(listItems.length).toEqual(0);
@@ -81,7 +83,7 @@ describe('LinkedDataProperty elements', () => {
             maxValuesCount: 1
         };
 
-        const wrapper = mount(<LinkedDataProperty editable property={property} />);
+        const wrapper = mount(<LinkedDataProperty property={property} />);
 
         const listItems = wrapper.find(FormGroup).find(FormControlLabel);
         expect(listItems.length).toEqual(1);
@@ -98,7 +100,7 @@ describe('LinkedDataProperty elements', () => {
             maxValuesCount: 2
         };
 
-        const wrapper = mount(<LinkedDataProperty editable={false} property={property} />);
+        const wrapper = mount(<LinkedDataProperty property={property} />);
         const listItems = wrapper.find(FormGroup).find(FormControlLabel);
         expect(listItems.length).toEqual(2);
     });

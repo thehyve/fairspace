@@ -73,7 +73,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
     };
 
     return {
-        editable: isDataSteward(getAuthorizations(state), Config.get()),
+        isEditable: isDataSteward(getAuthorizations(state), Config.get()),
         shapes: metaVocabulary.getClassesInCatalog(),
         loading: pending,
         error,

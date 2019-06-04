@@ -5,7 +5,7 @@ import {Button, Grid} from "@material-ui/core";
 
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {isDateTimeProperty, partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import {
     getCombinedMetadataForSubject,
     hasMetadataError,
@@ -20,7 +20,7 @@ import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const MetadataEntityContainer = props => {
-    const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
+    const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
@@ -44,7 +44,6 @@ const MetadataEntityContainer = props => {
             <Grid item>
                 <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
                     <LinkedDataEntityFormContainer
-                        editable={editable}
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
                         error={error}
@@ -52,7 +51,7 @@ const MetadataEntityContainer = props => {
                     />
                 </LinkedDataValuesContext.Provider>
             </Grid>
-            {editable && !error && (
+            {isEditable && !error && (
                 <Grid item>
                     <Button
                         onClick={handleButtonClick}
@@ -77,13 +76,13 @@ const mapStateToProps = (state, ownProps) => {
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
-    const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
+    const isEditable = ("isEditable" in ownProps) ? ownProps.isEditable : true;
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
             ...p,
-            editable: editable && !isDateTimeProperty(p)
+            isEditable
         }));
 
     return {
@@ -93,7 +92,7 @@ const mapStateToProps = (state, ownProps) => {
         properties,
         subject,
 
-        editable,
+        isEditable,
         buttonDisabled,
         vocabulary
     };

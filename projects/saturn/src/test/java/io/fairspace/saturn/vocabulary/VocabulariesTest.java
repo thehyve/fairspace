@@ -4,6 +4,9 @@ import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.util.FileManager;
@@ -32,12 +35,18 @@ public class VocabulariesTest {
     private final Dataset ds = DatasetFactory.create();
     private final RDFConnection rdf = new RDFConnectionLocal(ds);
 
-    @Mock
     private ViolationHandler violationHandler;
+    private boolean isValid = true;
 
     @Before
     public void setUp() {
         initVocabularies(rdf);
+        isValid = true;
+
+        violationHandler = (message, subject, predicate, object) -> {
+            isValid = false;
+            System.err.println(String.format("%s - { %s %s %s }", message, subject, predicate, object));
+        };
     }
 
     @Test
@@ -73,7 +82,7 @@ public class VocabulariesTest {
         var engine = createEngine(dataModel, shapesModel);
         engine.validateAll();
         getViolations(engine, violationHandler);
-        verifyZeroInteractions(violationHandler);
+        assertTrue(isValid);
     }
 
     @Test

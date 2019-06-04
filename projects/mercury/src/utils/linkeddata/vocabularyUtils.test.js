@@ -1,4 +1,11 @@
-import {getMaxCount, isGenericIriResource, isRdfList, vocabularyUtils} from './vocabularyUtils';
+import {
+    extendPropertiesWithVocabularyEditingInfo,
+    getMaxCount,
+    getSystemProperties,
+    isGenericIriResource,
+    isRdfList,
+    vocabularyUtils
+} from './vocabularyUtils';
 import vocabularyJsonLd from './test.vocabulary.json';
 import * as constants from "../../constants";
 
@@ -83,5 +90,50 @@ describe('vocabularyUtils', () => {
         it('should return true if the given shape represents a generic iri resource', () => expect(isGenericIriResource(genericResourceShape)).toBe(true));
         it('should return false if the given shape does not represent a generic iri resource', () => expect(isGenericIriResource(nonGenericResourceShape)).toBe(false));
         it('should return false on an empty shape', () => expect(isGenericIriResource({})).toBe(false));
+    });
+
+    describe('getSystemProperties', () => {
+        const emptyShape = {};
+        const emptyList = {
+            [constants.SYSTEM_PROPERTIES_URI]: []
+        };
+        const systemPropertiesList = {
+            [constants.SYSTEM_PROPERTIES_URI]: [{'@id': 'http://a'}, {'@id': 'http://b'}]
+        };
+
+        it('should return an empty list if no system properties are present', () => expect(getSystemProperties(emptyShape)).toEqual([]));
+        it('should return an empty list if the system properties list is empty', () => expect(getSystemProperties(emptyList)).toEqual([]));
+        it('should return a list with iris if no system properties are present', () => expect(getSystemProperties(systemPropertiesList)).toEqual(['http://a', 'http://b']));
+    });
+
+    describe('extendPropertiesWithVocabularyEditingInfo', () => {
+        const properties = [
+            {id: 'a'},
+            {id: 'b', key: 'http://uri'},
+            {id: 'property', key: constants.SHACL_PROPERTY, values: [{id: 'http://custom'}, {id: 'http://fixed'}]}
+        ];
+        const systemProperties = ['http://a', 'http://b', 'http://fixed'];
+
+        it('should set editable for all properties', () => {
+            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties});
+            expect(extendedProperties[0].isEditable).toBe(true);
+            expect(extendedProperties[1].isEditable).toBe(true);
+            expect(extendedProperties[2].isEditable).toBe(true);
+        });
+        it('should include isFixed to determine editability', () => {
+            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true});
+            expect(extendedProperties[0].isEditable).toBe(false);
+            expect(extendedProperties[1].isEditable).toBe(false);
+            expect(extendedProperties[2].isEditable).toBe(true);
+        });
+        it('should include given systemProperties for SHACL_PROPERTY', () => {
+            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
+            expect(extendedProperties[2].systemProperties).toEqual(systemProperties);
+        });
+
+        it('should set deletable flag for values for SHACL_PROPERTY', () => {
+            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
+            expect(extendedProperties[2].values).toEqual([{id: 'http://custom', isDeletable: true}, {id: 'http://fixed', isDeletable: false}]);
+        });
     });
 });
