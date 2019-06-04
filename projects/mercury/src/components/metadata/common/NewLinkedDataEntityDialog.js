@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@material-ui/core";
 
-import {generateUuid, getLabel} from "../../../utils/linkeddata/metadataUtils";
+import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import * as consts from "../../../constants";
-import Typography from "@material-ui/core/Typography";
+import {LinkedDataIdentifierField} from "./LinkedDataIdentifierField";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
         formKey: generateUuid(),
-        id: generateUuid()
+        id: this.props.requireIdentifier ? generateUuid() : ''
     };
 
     componentDidUpdate(prevProps) {
@@ -28,7 +28,7 @@ class NewLinkedDataEntityDialog extends React.Component {
     resetDialog() {
         this.setState({
             formKey: generateUuid(),
-            id: generateUuid()
+            id: this.props.requireIdentifier ? generateUuid() : ''
         });
     }
 
@@ -45,8 +45,8 @@ class NewLinkedDataEntityDialog extends React.Component {
     handleInputChange = event => this.setState({id: event.target.value});
 
     render() {
-        const {shape, open, linkedData, storeState} = this.props;
-        const {id, formKey} = this.state;
+        const {shape, open, storeState} = this.props;
+        const {formKey} = this.state;
         const typeLabel = getLabel(shape);
         const typeDescription = getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION);
 
@@ -64,23 +64,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                 </DialogTitle>
 
                 <DialogContent style={{overflowX: 'hidden'}}>
-                    <TextField
-                        autoFocus
-                        id="name"
-                        label="Id"
-                        value={id}
-                        name="id"
-                        onChange={this.handleInputChange}
-                        fullWidth
-                        required
-                        error={!this.hasValidId()}
-                    />
-
-                    <LinkedDataEntityFormContainer
-                        formKey={formKey}
-                        properties={linkedData}
-                    />
-
+                    {this.renderDialogContent()}
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -101,8 +85,42 @@ class NewLinkedDataEntityDialog extends React.Component {
         );
     }
 
+    renderDialogContent() {
+        // If the identifier field is not required, it will be inferred from other
+        // properties by default. This makes the field quite unimportant, so it will
+        // be rendered at the bottom. See VRE-830 for details
+        return this.props.requireIdentifier
+            ? (
+                <>
+                    <LinkedDataIdentifierField
+                        value={this.state.id}
+                        onChange={this.handleInputChange}
+                        required
+                    />
+
+                    <LinkedDataEntityFormContainer
+                        formKey={this.state.formKey}
+                        properties={this.props.linkedData}
+                    />
+                </>
+            )
+            : (
+                <>
+                    <LinkedDataEntityFormContainer
+                        formKey={this.state.formKey}
+                        properties={this.props.linkedData}
+                    />
+
+                    <LinkedDataIdentifierField
+                        value={this.state.id}
+                        onChange={this.handleInputChange}
+                    />
+                </>
+            );
+    }
+
     hasValidId() {
-        return new URL(`http://example.com/${this.state.id}`).toString() === `http://example.com/${this.state.id}`;
+        return !this.props.requireIdentifier || isValidLinkedDataIdentifier(this.state.id);
     }
 
     canCreate() {
@@ -114,7 +132,12 @@ NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    open: PropTypes.bool
+    open: PropTypes.bool,
+    requireIdentifier: PropTypes.bool
+};
+
+NewLinkedDataEntityDialog.defaultProps = {
+    requireIdentifier: true
 };
 
 const mapStateToProps = (state) => ({
