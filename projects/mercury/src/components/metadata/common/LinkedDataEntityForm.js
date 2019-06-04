@@ -26,7 +26,6 @@ export const LinkedDataEntityForm = ({
                         style={{display: 'block'}}
                     >
                         <LinkedDataProperty
-                            editable={p.editable}
                             property={p}
                             onChange={(value, index) => onChange(p, value, index)}
                             onAdd={(value) => onAdd(p, value)}
