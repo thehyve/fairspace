@@ -47,7 +47,7 @@ export function linkLabel(uri, shortenExternalUris = false) {
  */
 export function getLabel(entity, shortenExternalUris = false) {
     return getFirstPredicateValue(entity, consts.LABEL_URI)
-        || getFirstPredicateValue(entity, 'http://www.w3.org/ns/shacl#name')
+        || getFirstPredicateValue(entity, consts.SHACL_NAME)
         || (entity && entity['@id'] && linkLabel(entity['@id'], shortenExternalUris));
 }
 
