@@ -37,12 +37,12 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
     // Do not show an add component if no multiples are allowed
     // and there is already a value
     const maxValuesReached = (maxValuesCount && (values.length >= maxValuesCount)) || false;
-    const canAdd = property.editable && !machineOnly && !maxValuesReached;
+    const canAdd = property.isEditable && !machineOnly && !maxValuesReached;
     const labelId = `label-${key}`;
 
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
-    const disableEditing = !property.editable || disallowEditingOfExistingValues(property);
+    const disableEditing = !property.isEditable || disallowEditingOfExistingValues(property);
     const ValueComponent = disableEditing ? readOnlyComponent() : editComponent(property);
     const ValueAddComponent = addComponent(property);
     const pathVisibility = hoveredAllProperty ? 'visible' : 'hidden';
@@ -87,7 +87,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                                         error={hasErrors}
                                     />
                                     {
-                                        isDeletable(entry) && property.editable
+                                        isDeletable(entry) && property.isEditable
                                             ? (
                                                 <IconButton
                                                     size="small"

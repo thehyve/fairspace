@@ -253,7 +253,7 @@ export const emptyLinkedData = (vocabulary, shape) => {
 
     // Generate a list of empty properties
     return generatePropertiesForMetadata(vocabulary, {}, types, propertyShapes, [])
-        .map(p => ({...p, editable: true}));
+        .map(p => ({...p, isEditable: true}));
 };
 
 /**

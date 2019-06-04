@@ -116,20 +116,18 @@ describe('vocabularyUtils', () => {
 
         it('should set editable for all properties', () => {
             const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties});
-            expect(extendedProperties[0].editable).toBe(true);
-            expect(extendedProperties[1].editable).toBe(true);
-            expect(extendedProperties[2].editable).toBe(true);
+            expect(extendedProperties[0].isEditable).toBe(true);
+            expect(extendedProperties[1].isEditable).toBe(true);
+            expect(extendedProperties[2].isEditable).toBe(true);
         });
         it('should include isFixed to determine editability', () => {
             const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true});
-            expect(extendedProperties[0].editable).toBe(false);
-            expect(extendedProperties[1].editable).toBe(false);
-            expect(extendedProperties[2].editable).toBe(true);
+            expect(extendedProperties[0].isEditable).toBe(false);
+            expect(extendedProperties[1].isEditable).toBe(false);
+            expect(extendedProperties[2].isEditable).toBe(true);
         });
         it('should include given systemProperties for SHACL_PROPERTY', () => {
             const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
-            expect(extendedProperties[0].editable).toBe(false);
-            expect(extendedProperties[1].editable).toBe(false);
             expect(extendedProperties[2].systemProperties).toEqual(systemProperties);
         });
 

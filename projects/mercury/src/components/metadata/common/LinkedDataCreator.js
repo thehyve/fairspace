@@ -60,7 +60,7 @@ class LinkedDataCreator extends React.Component {
     };
 
     render() {
-        const {children, loading, error, editable, shapes, vocabulary} = this.props;
+        const {children, loading, error, isEditable, shapes, vocabulary} = this.props;
 
         if (loading) {
             return <LoadingInlay />;
@@ -72,7 +72,7 @@ class LinkedDataCreator extends React.Component {
 
         return (
             <>
-                {editable
+                {isEditable
                     ? (
                         <Button
                             variant="contained"
@@ -119,13 +119,13 @@ LinkedDataCreator.propTypes = {
 
     loading: PropTypes.bool,
     shapes: PropTypes.array,
-    editable: PropTypes.bool,
+    isEditable: PropTypes.bool,
 
     vocabulary: PropTypes.object.isRequired
 };
 
 LinkedDataCreator.defaultProps = {
-    editable: true
+    isEditable: true
 };
 
 export default LinkedDataCreator;

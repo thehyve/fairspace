@@ -34,7 +34,7 @@ export class LinkedDataEntityFormContainer extends React.Component {
 
     render() {
         const propertiesWithChanges = this.props.properties
-            .filter(p => p.editable || p.values.length)
+            .filter(p => p.isEditable || p.values.length)
             .map(p => ({
                 ...p,
                 values: this.props.updates[p.key] || p.values,

@@ -20,7 +20,7 @@ import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const MetadataEntityContainer = props => {
-    const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
+    const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
@@ -51,7 +51,7 @@ const MetadataEntityContainer = props => {
                     />
                 </LinkedDataValuesContext.Provider>
             </Grid>
-            {editable && !error && (
+            {isEditable && !error && (
                 <Grid item>
                     <Button
                         onClick={handleButtonClick}
@@ -76,13 +76,13 @@ const mapStateToProps = (state, ownProps) => {
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
     const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
-    const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
+    const isEditable = ("isEditable" in ownProps) ? ownProps.isEditable : true;
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
             ...p,
-            editable
+            isEditable
         }));
 
     return {
@@ -92,7 +92,7 @@ const mapStateToProps = (state, ownProps) => {
         properties,
         subject,
 
-        editable,
+        isEditable,
         buttonDisabled,
         vocabulary
     };
