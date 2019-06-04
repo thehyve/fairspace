@@ -56,6 +56,12 @@ export class SearchAPI {
                 size,
                 from,
                 query: esQuery,
+                sort: [
+                    {
+                        dateCreated: {order: "desc"}
+                    },
+                    "_score"
+                ],
                 highlight: {
                     fields: {
                         "*": {}
