@@ -18,13 +18,13 @@ import VocabularyList from "./VocabularyList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 
+const openVocabulary= (history, id) => {
+    history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
+};
+
 const VocabularyBrowserContainer = (
     {entities, hasHighlights, footerRender, total, history, ...otherProps}
 ) => {
-    const handleVocabularyOpen = (id) => {
-        history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
-    };
-
     return (
         <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
             <LinkedDataCreator {...otherProps}>
@@ -36,7 +36,7 @@ const VocabularyBrowserContainer = (
                                 total={total}
                                 hasHighlights={hasHighlights}
                                 footerRender={footerRender}
-                                onVocabularyOpen={handleVocabularyOpen}
+                                onVocabularyOpen={id => openVocabulary(history, id)}
                             />
                         )
                         : <MessageDisplay message="The vocabulary is empty" isError={false} />
@@ -93,7 +93,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
         const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
 
         return dispatch(createVocabularyEntityFromState(formKey, subject, type))
-            .then(({value}) => ownProps.history.push(relativeLink(value.subject)));
+            .then(({value}) => openVocabulary(ownProps.history, value.subject));
     }
 });
 
