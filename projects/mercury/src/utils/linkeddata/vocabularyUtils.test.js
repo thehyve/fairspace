@@ -110,25 +110,32 @@ describe('vocabularyUtils', () => {
         const properties = [
             {id: 'a'},
             {id: 'b', key: 'http://uri'},
-            {id: 'property', key: constants.SHACL_PROPERTY}
+            {id: 'property', key: constants.SHACL_PROPERTY, values: [{id: 'http://custom'}, {id: 'http://fixed'}]}
         ];
+        const systemProperties = ['http://a', 'http://b', 'http://fixed'];
 
-        it('should set editable for all properties', () => expect(extendPropertiesWithVocabularyEditingInfo({properties})).toEqual([
-            {id: 'a', editable: true},
-            {id: 'b', key: 'http://uri', editable: true},
-            {id: 'property', key: constants.SHACL_PROPERTY, editable: true}
-        ]));
-        it('should include isFixed to determine editability', () => expect(extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true})).toEqual([
-            {id: 'a', editable: false},
-            {id: 'b', key: 'http://uri', editable: false},
-            {id: 'property', key: constants.SHACL_PROPERTY, editable: true, systemProperties: []}
-        ]));
-        it('should include given systemProperties for SHACL_PROPERTY', () => expect(extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties: ['http://a', 'http://b']})).toEqual([
-            {id: 'a', editable: false},
-            {id: 'b', key: 'http://uri', editable: false},
-            {id: 'property', key: constants.SHACL_PROPERTY, editable: true, systemProperties: ['http://a', 'http://b']}
-        ]));
+        it('should set editable for all properties', () => {
+            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties});
+            expect(extendedProperties[0].editable).toBe(true);
+            expect(extendedProperties[1].editable).toBe(true);
+            expect(extendedProperties[2].editable).toBe(true);
+        });
+        it('should include isFixed to determine editability', () => {
+            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true});
+            expect(extendedProperties[0].editable).toBe(false);
+            expect(extendedProperties[1].editable).toBe(false);
+            expect(extendedProperties[2].editable).toBe(true);
+        });
+        it('should include given systemProperties for SHACL_PROPERTY', () => {
+            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
+            expect(extendedProperties[0].editable).toBe(false);
+            expect(extendedProperties[1].editable).toBe(false);
+            expect(extendedProperties[2].systemProperties).toEqual(systemProperties);
+        });
+
+        it('should set deletable flag for values for SHACL_PROPERTY', () => {
+            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
+            expect(extendedProperties[2].values).toEqual([{id: 'http://custom', isDeletable: true}, {id: 'http://fixed', isDeletable: false}]);
+        });
     });
-
-
 });

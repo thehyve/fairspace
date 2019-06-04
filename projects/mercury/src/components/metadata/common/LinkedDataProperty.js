@@ -47,8 +47,7 @@ const LinkedDataProperty = ({property, editable, onAdd, onChange, onDelete}) => 
     const ValueAddComponent = addComponent(property);
     const pathVisibility = hoveredAllProperty ? 'visible' : 'hidden';
 
-    const isSystemProperty = entry => property.systemProperties && property.systemProperties.includes(entry.id);
-    const canDelete = entry => editable && !isSystemProperty(entry);
+    const isDeletable = entry => !('isDeletable' in entry) || entry.isDeletable;
 
     return (
         <FormControl
@@ -88,7 +87,7 @@ const LinkedDataProperty = ({property, editable, onAdd, onChange, onDelete}) => 
                                         error={hasErrors}
                                     />
                                     {
-                                        canDelete(entry)
+                                        isDeletable(entry) && editable
                                             ? (
                                                 <IconButton
                                                     size="small"
