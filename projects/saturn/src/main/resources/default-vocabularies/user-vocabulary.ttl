@@ -141,7 +141,6 @@ fs:CollectionShape sh:property
         <booleanX2WidgetShape>,
         <fixedDropdownWidgetShape>,
         <resourceWidgetShape>,
-        <websiteWidgetShape>,
         fs:labelShape,
         fs:commentShape .
 
@@ -217,15 +216,6 @@ fs:CollectionShape sh:property
     sh:nodeKind sh:IRI ;
     sh:maxCount 5 ;
     sh:path <resourceWidget> .
-
-<websiteWidget> a rdf:Property .
-<websiteWidgetShape> a fs:ExternalIRIPropertyShape ;
-    sh:name "Website" ;
-    sh:description "A URL for another website" ;
-    sh:nodeKind sh:IRI ;
-    fs:externalURI true ;
-    sh:maxCount 5 ;
-    sh:path <websiteWidget> .
 
 <projectCodeShape> a fs:DatatypePropertyShape ;
     sh:name "Project Code" ;
