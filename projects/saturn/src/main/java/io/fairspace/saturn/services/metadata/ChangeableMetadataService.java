@@ -7,23 +7,15 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vocabulary.Vocabularies.getInverse;
-import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
@@ -142,7 +134,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             throw new ValidationException(violations);
         }
 
-        rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove.listStatements().toList()))));
+        rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove))));
 
         // Store information on the lifecycle of the entities
         lifeCycleManager.updateLifecycleMetadata(modelToAdd);
@@ -151,11 +143,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         rdf.load(graph.getURI(), modelToAdd);
     }
 
-    private List<Quad> toQuads(Collection<Statement> statements) {
-        return statements
-                .stream()
-                .map(s -> new Quad(graph, s.asTriple()))
-                .collect(toList());
+    private List<Quad> toQuads(Model model) {
+        return model.listStatements()
+                .mapWith(s -> new Quad(graph, s.asTriple()))
+                .toList();
     }
 
     private void applyInference(Model model) {
