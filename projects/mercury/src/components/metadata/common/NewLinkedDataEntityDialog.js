@@ -6,6 +6,9 @@ import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} fr
 import {generateUuid, getLabel} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
+import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
+import * as consts from "../../../constants";
+import Typography from "@material-ui/core/Typography";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
@@ -45,6 +48,7 @@ class NewLinkedDataEntityDialog extends React.Component {
         const {shape, open, linkedData, storeState} = this.props;
         const {id, formKey} = this.state;
         const typeLabel = getLabel(shape);
+        const typeDescription = getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION);
 
         return (
             <Dialog
@@ -54,7 +58,10 @@ class NewLinkedDataEntityDialog extends React.Component {
                 fullWidth
                 maxWidth="sm"
             >
-                <DialogTitle id="form-dialog-title">{typeLabel}</DialogTitle>
+                <DialogTitle id="form-dialog-title">
+                    New entity: {typeLabel}
+                    <Typography variant="body2">{typeDescription}</Typography>
+                </DialogTitle>
 
                 <DialogContent style={{overflowX: 'hidden'}}>
                     <TextField
