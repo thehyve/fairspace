@@ -27,6 +27,13 @@ export const isGenericIriResource = (propertyShape) => getFirstPredicateId(prope
  */
 export const getMaxCount = shape => (isRdfList(shape) ? 0 : getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT));
 
+/**
+ * Checks whether the given shape represents an external link (specified by fs:externalLink)
+ * @param propertyShape
+ * @returns {boolean}
+ */
+const isExternalLink = (propertyShape) => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
+
 export const vocabularyUtils = (vocabulary = []) => {
     /**
      * Returns a list of classes marked as fairspace entities
@@ -150,6 +157,7 @@ export const vocabularyUtils = (vocabulary = []) => {
             isRdfList: isRdfList(shape),
             allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
             isGenericIriResource: isGenericIriResource(shape),
+            isExternalLink: isExternalLink(shape),
             allowAdditionOfEntities: isFairspaceClass(className)
         };
     };
