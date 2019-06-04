@@ -25,6 +25,7 @@ const VocabularyDropdownWithAdditionContainer = props => (
         error={props.error}
         pending={props.pending}
         onError={props.onError}
+        requireIdentifier={false}
     >
         <VocabularyDropdownContainer
             property={props.property}
@@ -69,7 +70,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchEntities: fetchVocabularyEntitiesIfNeeded,
     onCreate: (formKey, shape, id) => {
-        const subject = createVocabularyIri(id);
+        const subject = id && createVocabularyIri(id);
         const type = ownProps.property.className;
         return dispatch(createVocabularyEntityFromState(formKey, subject, type));
     }

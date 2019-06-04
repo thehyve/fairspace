@@ -2,7 +2,7 @@ import React from "react";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
-import {createVocabularyIri, relativeLink, partitionErrors, getLabel} from "../../../utils/linkeddata/metadataUtils";
+import {createVocabularyIri, getLabel, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import {createVocabularyEntityFromState} from "../../../actions/vocabularyActions";
 import {searchVocabulary} from "../../../actions/searchActions";
 import Config from "../../../services/Config/Config";
@@ -27,7 +27,7 @@ const VocabularyBrowserContainer = (
 ) => {
     return (
         <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
-            <LinkedDataCreator {...otherProps}>
+            <LinkedDataCreator requireIdentifier={false} {...otherProps}>
                 {
                     entities && entities.length > 0
                         ? (
@@ -89,7 +89,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(searchVocabulary({query: '*', types: ownProps.targetClasses})),
     fetchShapes: () => {},
     create: (formKey, shape, id) => {
-        const subject = createVocabularyIri(id);
+        const subject = id && createVocabularyIri(id);
         const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
 
         return dispatch(createVocabularyEntityFromState(formKey, subject, type))

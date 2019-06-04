@@ -17,7 +17,7 @@ import {SHACL_TARGET_CLASS} from "../../../constants";
 
 const MetadataBrowserContainer = ({entities, hasHighlights, footerRender, total, ...otherProps}) => (
     <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
-        <LinkedDataCreator {...otherProps}>
+        <LinkedDataCreator requireIdentifier {...otherProps}>
             {
                 entities && entities.length > 0
                     ? (

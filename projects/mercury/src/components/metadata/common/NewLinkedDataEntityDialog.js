@@ -119,12 +119,8 @@ class NewLinkedDataEntityDialog extends React.Component {
             );
     }
 
-    hasValidId() {
-        return !this.props.requireIdentifier || isValidLinkedDataIdentifier(this.state.id);
-    }
-
     canCreate() {
-        return this.state.id && this.hasValidId();
+        return !this.props.requireIdentifier || (this.state.id && isValidLinkedDataIdentifier(this.state.id));
     }
 }
 
