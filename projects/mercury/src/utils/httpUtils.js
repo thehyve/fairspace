@@ -13,7 +13,12 @@ function failOnHttpError(providedMessage) {
             switch (response.status) {
                 case 401:
                     window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
-                    break;
+
+                    // eslint-disable-next-line no-throw-literal
+                    throw {
+                        message: 'Your session has expired. Please log in again',
+                        redirecting: true
+                    };
                 default:
                     return response.json()
                         .then(body => {
