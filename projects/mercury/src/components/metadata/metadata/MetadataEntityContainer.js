@@ -73,8 +73,10 @@ const mapStateToProps = (state, ownProps) => {
     const vocabulary = getVocabulary(state);
 
     const hasNoMetadata = !metadata || metadata.length === 0;
+    const failedLoading = hasNoMetadata && !loading;
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
-    const error = hasOtherErrors ? 'An error occurred while loading metadata.' : '';
+    const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
+    const error = failedLoading ? 'No metadata found for this subject' : hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
     const isEditable = ("isEditable" in ownProps) ? ownProps.isEditable : true;
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
@@ -86,7 +88,7 @@ const mapStateToProps = (state, ownProps) => {
         }));
 
     return {
-        loading: isMetadataPending(state, subject) || isVocabularyPending(state),
+        loading,
         error,
 
         properties,
