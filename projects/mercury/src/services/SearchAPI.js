@@ -23,27 +23,42 @@ export class SearchAPI {
      * @param types     List of class URIs to search for. If empty, it returns all types
      * @return Promise
      */
-    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types}) => {
+    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, subClassOf}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
                 must: [{
-                    query_string: {query}
+                    query_string: {query: query || '*'}
                 }],
                 must_not: {
                     exists: {
                         field: "dateDeleted"
                     }
-                }
+                },
+                filter: []
             }
         };
 
         // Add types filter, if specified
         if (types && Array.isArray(types)) {
             esQuery.bool.filter = [
+                ...esQuery.bool.filter,
                 {
+                    ...esQuery.bool.filter.terms,
                     terms: {
                         "type.keyword": types
+                    }
+                }
+            ];
+        }
+
+        if (subClassOf && Array.isArray(subClassOf)) {
+            esQuery.bool.filter = [
+                ...esQuery.bool.filter,
+                {
+                    ...esQuery.bool.filter.terms,
+                    terms: {
+                        "subClassOf.keyword": subClassOf
                     }
                 }
             ];
@@ -88,11 +103,16 @@ export class SearchAPI {
      * @returns {Promise}
      */
     searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0}) => this.search({
-        query: query || '*',
+        query,
         size,
         types,
         from: page * size
     });
+
+    /**
+     * @returns {Promise}
+     */
+    searchLinkedDataOfSubclass = ({subClassOf, ...rest}) => this.search({subClassOf, ...rest});
 
     /**
      * Transforms the search result into a format that can be used internally. The format looks like this:

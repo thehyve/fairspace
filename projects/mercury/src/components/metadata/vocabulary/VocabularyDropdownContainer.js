@@ -1,36 +1,32 @@
-import React from "react";
-import {connect} from 'react-redux';
-import * as vocabularyActions from "../../../actions/vocabularyActions";
-import EntityDropdown from "../common/values/EntityDropdown";
+import React, {useState, useEffect} from "react";
 
-class VocabularyDropdownContainer extends React.Component {
-    constructor(props) {
-        super(props);
-        props.fetchEntities(props.property.className);
+import LinkedDataDropdown from "../common/LinkedDataDropdown";
+import searchAPI from "../../../services/SearchAPI";
+import {LoadingInlay, MessageDisplay} from "../../common";
+
+const VocabularyDropdownContainer = (props) => {
+    const [types, setTypes] = useState(null);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        setTypes(null);
+        searchAPI()
+            .searchLinkedDataOfSubclass({subClassOf: [props.property.className], size: 100})
+            .then(({items}) => {
+                setTypes(items.map(({id}) => id));
+            })
+            .catch(setError);
+    }, [props.property.className]);
+
+    if (error) {
+        return <MessageDisplay noIcon message={error.message} />;
     }
 
-    render() {
-        return <EntityDropdown {...this.props} />;
+    if (!types) {
+        return <LoadingInlay />;
     }
-}
 
-const mapStateToProps = (state, ownProps) => {
-    const {cache: {vocabularyEntitiesByType}} = state;
-    const dropdownOptions = vocabularyEntitiesByType[ownProps.property.className];
-    const pending = !dropdownOptions || dropdownOptions.pending;
-    const error = (dropdownOptions && dropdownOptions.error) || '';
-
-    const entities = (!pending && !error) ? dropdownOptions.data : [];
-
-    return {
-        pending,
-        error,
-        entities,
-    };
+    return types && <LinkedDataDropdown {...props} types={types} />;
 };
 
-const mapDispatchToProps = ({
-    fetchEntities: vocabularyActions.fetchVocabularyEntitiesIfNeeded
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(VocabularyDropdownContainer);
+export default VocabularyDropdownContainer;
