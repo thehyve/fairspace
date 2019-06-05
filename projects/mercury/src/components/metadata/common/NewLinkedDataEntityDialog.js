@@ -86,6 +86,13 @@ class NewLinkedDataEntityDialog extends React.Component {
     }
 
     renderDialogContent() {
+        const form = (
+            <LinkedDataEntityFormContainer
+                formKey={this.state.formKey}
+                properties={this.props.linkedData}
+            />
+        );
+
         // If the identifier field is not required, it will be inferred from other
         // properties by default. This makes the field quite unimportant, so it will
         // be rendered at the bottom. See VRE-830 for details
@@ -96,21 +103,13 @@ class NewLinkedDataEntityDialog extends React.Component {
                         value={this.state.id}
                         onChange={this.handleInputChange}
                         required
+                        autoFocus
                     />
-
-                    <LinkedDataEntityFormContainer
-                        formKey={this.state.formKey}
-                        properties={this.props.linkedData}
-                    />
+                    {form}
                 </>
-            )
-            : (
+            ) : (
                 <>
-                    <LinkedDataEntityFormContainer
-                        formKey={this.state.formKey}
-                        properties={this.props.linkedData}
-                    />
-
+                    {form}
                     <LinkedDataIdentifierField
                         value={this.state.id}
                         onChange={this.handleInputChange}
