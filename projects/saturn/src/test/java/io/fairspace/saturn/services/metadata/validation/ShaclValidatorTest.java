@@ -6,6 +6,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.Quad;
@@ -20,8 +21,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.mockito.Mockito.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ShaclValidatorTest {
@@ -32,6 +38,7 @@ public class ShaclValidatorTest {
     private Dataset ds = DatasetFactory.create();
     private RDFConnection rdf = new RDFConnectionLocal(ds);
     private ShaclValidator validator;
+
     @Mock
     private ViolationHandler violationHandler;
 
@@ -140,5 +147,43 @@ public class ShaclValidatorTest {
                 resource1,
                 FS.createdBy,
                 resource2);
+    }
+
+
+    @Test
+    public void blankNodesAreProperlyValidated() {
+        // If the update contains a blank node, it should be validated solely with the
+        // information from the update, as there can not be any triple in the database
+        // already that references this blank node
+        Resource blankNode = createResource();
+        Model model = createDefaultModel()
+                .add(blankNode, RDF.type, FS.User)
+                .add(blankNode, FS.md5, "test");
+
+        validator.validate(EMPTY, model, violationHandler);
+
+        verify(violationHandler).onViolation("Predicate <http://fairspace.io/ontology#md5> is not allowed (closed shape)",
+                blankNode,
+                FS.md5,
+                ResourceFactory.createStringLiteral("test"));
+    }
+
+    @Test
+    public void blankNodesAreNotFetchedFromTheDatabase() {
+        // If the update contains a blank node, it should be validated solely with the
+        // information from the update, as there can not be any triple in the database
+        // already that references this blank node
+        ds.getDefaultModel()
+                .add(resource2, RDF.type, FS.User)
+                .add(ResourceFactory.createResource(), RDF.type, FS.Collection);
+
+        Resource blankNode = createResource();
+        var model = createDefaultModel()
+                .add(blankNode, RDF.type, FS.User)
+                .add(blankNode, RDFS.label, createTypedLiteral("My label"));
+
+        validator.validate(EMPTY, model, violationHandler);
+
+        verifyZeroInteractions(violationHandler);
     }
 }

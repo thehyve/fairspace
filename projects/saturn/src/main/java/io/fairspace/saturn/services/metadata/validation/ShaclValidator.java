@@ -9,7 +9,9 @@ import org.apache.jena.rdfconnection.RDFConnection;
 import java.util.Set;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.*;
+import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.addObjectTypes;
+import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
+import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getViolations;
 import static java.lang.Thread.currentThread;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
@@ -20,7 +22,10 @@ public class ShaclValidator implements MetadataRequestValidator {
     private final Node vocabularyGraph;
 
     public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
-        var affectedResources = modelToRemove.listSubjects().andThen(modelToAdd.listSubjects()).toSet();
+        var affectedResources = modelToRemove.listSubjects()
+                .andThen(modelToAdd.listSubjects())
+                .filterKeep(Resource::isURIResource)
+                .toSet();
 
         var modelToValidate = affectedModelSubSet(affectedResources)
                 .remove(modelToRemove)
