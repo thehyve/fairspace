@@ -10,6 +10,7 @@ const VocabularyDropdownContainer = (props) => {
 
     useEffect(() => {
         setTypes(null);
+        setError(null);
         searchAPI()
             .searchLinkedDataOfSubclass({subClassOf: [props.property.className], size: 100})
             .then(({items}) => {
@@ -19,7 +20,7 @@ const VocabularyDropdownContainer = (props) => {
     }, [props.property.className]);
 
     if (error) {
-        return <MessageDisplay noIcon message={error.message} />;
+        return <MessageDisplay withIcon={false} message={error.message} />;
     }
 
     if (!types) {

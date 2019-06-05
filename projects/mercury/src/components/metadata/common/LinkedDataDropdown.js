@@ -11,6 +11,7 @@ const LinkedDataDropdown = ({types, property, ...otherProps}) => {
 
     useEffect(() => {
         setFetchedItems(null);
+        setError(null);
         searchAPI()
             .searchLinkedData({types: types || [property.className], size: 100})
             .then(({items}) => {
@@ -20,7 +21,7 @@ const LinkedDataDropdown = ({types, property, ...otherProps}) => {
     }, [property.className, types]);
 
     if (error) {
-        return <MessageDisplay noIcon message={error.message} />;
+        return <MessageDisplay withIcon={false} message={error.message} />;
     }
 
     if (!fetchedItems) {

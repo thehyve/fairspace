@@ -2,9 +2,9 @@ import React from 'react';
 import Icon from "@material-ui/core/Icon";
 import Typography from "@material-ui/core/Typography";
 
-const MessageDisplay = ({message, isError = true, noIcon = false}) => (
+const MessageDisplay = ({message, isError = true, withIcon = true}) => (
     <div style={{textAlign: 'center', padding: 10}}>
-        {!noIcon && (
+        {withIcon && (
             <Icon style={{fontSize: '4em', marginBottom: 10}}>
                 {isError ? 'error_outline' : 'priority_high'}
             </Icon>
