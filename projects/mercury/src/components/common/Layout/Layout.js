@@ -9,8 +9,18 @@ import Footer from './Footer/Footer';
 import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../Routes";
+import {isUserPending} from "../../../reducers/account/userReducers";
+import {isUsersPending} from "../../../reducers/cache/usersReducers";
+import {isAuthorizationsPending} from "../../../reducers/account/authorizationsReducers";
+import {isWorkspacePending} from "../../../reducers/workspaceReducers";
+import {isRedirectingForLogin} from "../../../reducers/uiReducers";
+import {LoadingInlay} from "../index";
 
-const Layout = ({classes, menuExpanded, workspaceName, version}) => {
+const Layout = ({classes, menuExpanded, workspaceName, version, pending}) => {
+    if (pending) {
+        return <LoadingInlay />;
+    }
+
     // If an error is to be shown, it should be underneath the
     // AppBar. This method take care of it
     const transformError = errorContent => (
@@ -41,6 +51,7 @@ const mapStateToProps = state => {
     const {name, version} = {...state.workspace.data};
 
     return {
+        pending: isUserPending(state) || isUsersPending(state) || isAuthorizationsPending(state) || isWorkspacePending(state) || isRedirectingForLogin(state),
         menuExpanded: state.ui.menuExpanded,
         workspaceName: name,
         version
