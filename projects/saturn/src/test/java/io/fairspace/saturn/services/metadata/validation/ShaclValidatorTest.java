@@ -19,12 +19,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
+
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -46,8 +50,12 @@ public class ShaclValidatorTest {
     public void setUp() {
         initVocabularies(rdf);
         validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, Vocabularies.VOCABULARY_GRAPH_URI);
-    }
 
+        doAnswer(invocation -> {
+            System.err.println(Arrays.toString(invocation.getArguments()));
+            return null;
+        }).when(violationHandler).onViolation(any(),any(), any(), any());
+    }
 
     @Test
     public void validateNoChanges() {
@@ -149,7 +157,6 @@ public class ShaclValidatorTest {
                 resource2);
     }
 
-
     @Test
     public void blankNodesAreProperlyValidated() {
         // If the update contains a blank node, it should be validated solely with the
@@ -186,4 +193,56 @@ public class ShaclValidatorTest {
 
         verifyZeroInteractions(violationHandler);
     }
+
+    @Test
+    public void validationForSomethingReferringToABlankNode() {
+        Resource blankNode = createResource();
+        ds.getDefaultModel()
+                .add(blankNode, RDF.type, FS.User)
+                .add(resource1, RDF.type, FS.Collection)
+                .add(resource1, RDFS.label, "collection")
+                .add(resource1, RDFS.comment, "bla")
+                .add(resource1, FS.filePath, "/")
+                .add(resource1, FS.collectionType, "a")
+                .add(resource1, FS.createdBy, blankNode);
+
+        //Resource newBlankNode = createResource();
+        var toAdd = createDefaultModel()
+                .add(resource1, RDFS.label, "new");
+
+        var toRemove = createDefaultModel()
+                .add(resource1, RDFS.label, "collection");
+
+        validator.validate(toRemove, toAdd, violationHandler);
+
+        verifyZeroInteractions(violationHandler);
+    }
+
+    @Test
+    public void validationForSomethingReferringToABlankNode2() {
+        Resource blankNode = createResource();
+        ds.getDefaultModel()
+                .add(blankNode, RDF.type, FS.User)
+                .add(resource1, RDF.type, FS.Collection)
+                .add(resource1, RDFS.label, "collection")
+                .add(resource1, RDFS.comment, "bla")
+                .add(resource1, FS.filePath, "/")
+                .add(resource1, FS.collectionType, "a")
+                .add(resource1, FS.createdBy, blankNode);
+
+        Resource newBlankNode = createResource();
+        var toAdd = createDefaultModel()
+                .add(resource1, FS.createdBy, newBlankNode);
+
+        var toRemove = createDefaultModel()
+                .add(resource1, FS.createdBy, blankNode);
+
+        validator.validate(toRemove, toAdd, violationHandler);
+
+        verify(violationHandler).onViolation("Value does not have class fs:User",
+                resource1,
+                FS.createdBy,
+                newBlankNode);
+    }
+
 }

@@ -24,7 +24,6 @@ public class ShaclValidator implements MetadataRequestValidator {
     public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
         var affectedResources = modelToRemove.listSubjects()
                 .andThen(modelToAdd.listSubjects())
-                .filterKeep(Resource::isURIResource)
                 .toSet();
 
         var modelToValidate = affectedModelSubSet(affectedResources)
@@ -36,7 +35,7 @@ public class ShaclValidator implements MetadataRequestValidator {
         var shapesModel = rdf.fetch(vocabularyGraph.getURI());
         var validationEngine = createEngine(modelToValidate, shapesModel);
 
-        modelToValidate.listSubjects().forEachRemaining(resource -> {
+        affectedResources.forEach(resource -> {
             try {
                 validationEngine.validateNode(resource.asNode());
             } catch (InterruptedException e) {
@@ -54,9 +53,11 @@ public class ShaclValidator implements MetadataRequestValidator {
      */
     private Model affectedModelSubSet(Set<Resource> affectedResources) {
         var model = createDefaultModel();
-        affectedResources.forEach(r ->
-                model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, r, null, null))));
-
+        affectedResources.forEach(r -> {
+            if(r.isURIResource()) {
+                model.add(rdf.queryConstruct(storedQuery("select_by_mask_with_object_types", dataGraph, r, null, null)));
+            }
+        });
         return model;
     }
 }

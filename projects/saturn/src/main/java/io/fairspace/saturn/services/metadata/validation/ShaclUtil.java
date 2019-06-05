@@ -30,7 +30,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 public class ShaclUtil {
     static void addObjectTypes(Model model, Node dataGraph, RDFConnection rdf) {
         model.listObjects().forEachRemaining(obj -> {
-            if (obj.isResource() && !((Resource)obj).hasProperty(RDF.type)) {
+            if (obj.isURIResource() && !((Resource)obj).hasProperty(RDF.type)) {
                 model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, obj, RDF.type, null)));
             }
         });
