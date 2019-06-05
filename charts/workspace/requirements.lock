@@ -1,9 +1,9 @@
 dependencies:
 - name: jupyterhub
   repository: https://jupyterhub.github.io/helm-chart/
-  version: 0.7.0
+  version: 0.8.2
 - name: elasticsearch
   repository: https://kubernetes-charts.storage.googleapis.com
   version: 1.21.2
-digest: sha256:fc60e83ff0d1dcde19d878d306c6e6dc1d713cc275b13d7bfca406d7fe06b02a
-generated: 2019-03-18T15:41:10.92819+01:00
+digest: sha256:b4ac1b24a6fdf3500f90f92fdda057af9835dc19e4eca92da8851a3ff9c3a2d2
+generated: "2019-06-05T12:48:33.245785267+02:00"

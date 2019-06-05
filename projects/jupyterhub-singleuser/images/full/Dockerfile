@@ -1,4 +1,4 @@
-FROM eu.gcr.io/fairspace-207108/jupyterhub-singleuser-base:0.3.2
+FROM jupyter/scipy-notebook:d4cbf2f80a2a
 
 USER root
 
