@@ -73,9 +73,9 @@ const mapStateToProps = (state, ownProps) => {
     const vocabulary = getVocabulary(state);
 
     const hasNoMetadata = !metadata || metadata.length === 0;
+    const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
     const failedLoading = hasNoMetadata && !loading;
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
-    const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
     const error = failedLoading ? 'No metadata found for this subject' : hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
     const isEditable = ("isEditable" in ownProps) ? ownProps.isEditable : true;
