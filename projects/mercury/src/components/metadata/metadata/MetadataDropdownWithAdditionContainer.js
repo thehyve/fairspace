@@ -21,6 +21,7 @@ const MetadataDropdownWithAdditionContainer = props => (
         error={props.error}
         pending={props.pending}
         onError={props.onError}
+        requireIdentifier
     >
         <MetadataDropdownContainer
             property={props.property}

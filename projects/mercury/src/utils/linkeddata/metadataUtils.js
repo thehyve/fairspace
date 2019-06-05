@@ -82,6 +82,10 @@ export function generateUuid() {
         c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
 }
 
+export function isValidLinkedDataIdentifier(id, prefix = 'http://example.com/') {
+    return new URL(`${prefix}${id}`).toString() === `${prefix}${id}`;
+}
+
 /**
  * Returns whether a property should be shown to the user
  * @param {string} key property key

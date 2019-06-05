@@ -60,7 +60,8 @@ class LinkedDataCreator extends React.Component {
     };
 
     render() {
-        const {children, loading, error, isEditable, shapes, vocabulary} = this.props;
+        const {children, loading, error, isEditable, shapes, vocabulary, requireIdentifier} = this.props;
+        const {creationState, shape, creatingMetadataEntity} = this.state;
 
         if (loading) {
             return <LoadingInlay />;
@@ -90,23 +91,24 @@ class LinkedDataCreator extends React.Component {
                 }
 
                 <LinkedDataShapeChooserDialog
-                    open={this.state.creationState === LinkedDataCreator.CREATION_STATE_CHOOSE_SHAPE}
+                    open={creationState === LinkedDataCreator.CREATION_STATE_CHOOSE_SHAPE}
                     shapes={shapes}
                     onChooseShape={this.chooseShape}
                     onClose={this.closeDialog}
                 />
 
                 <NewLinkedDataEntityDialog
-                    open={this.state.creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY}
-                    linkedData={emptyLinkedData(vocabulary, this.state.shape)}
-                    shape={this.state.shape}
+                    open={creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY}
+                    linkedData={emptyLinkedData(vocabulary, shape)}
+                    shape={shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}
+                    requireIdentifier={requireIdentifier}
                 />
 
                 {children}
 
-                <LoadingOverlay loading={this.state.creatingMetadataEntity} />
+                <LoadingOverlay loading={creatingMetadataEntity} />
             </>
         );
     }
@@ -120,12 +122,14 @@ LinkedDataCreator.propTypes = {
     loading: PropTypes.bool,
     shapes: PropTypes.array,
     isEditable: PropTypes.bool,
+    requireIdentifier: PropTypes.bool,
 
     vocabulary: PropTypes.object.isRequired
 };
 
 LinkedDataCreator.defaultProps = {
-    isEditable: true
+    isEditable: true,
+    requireIdentifier: true
 };
 
 export default LinkedDataCreator;

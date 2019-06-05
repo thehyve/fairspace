@@ -2,7 +2,7 @@ import React from "react";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
-import {createVocabularyIri, relativeLink, partitionErrors, getLabel} from "../../../utils/linkeddata/metadataUtils";
+import {createVocabularyIri, getLabel, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import {createVocabularyEntityFromState} from "../../../actions/vocabularyActions";
 import {searchVocabulary} from "../../../actions/searchActions";
 import Config from "../../../services/Config/Config";
@@ -18,16 +18,16 @@ import VocabularyList from "./VocabularyList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 
+const openVocabulary= (history, id) => {
+    history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
+};
+
 const VocabularyBrowserContainer = (
     {entities, hasHighlights, footerRender, total, history, ...otherProps}
 ) => {
-    const handleVocabularyOpen = (id) => {
-        history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
-    };
-
     return (
         <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
-            <LinkedDataCreator {...otherProps}>
+            <LinkedDataCreator requireIdentifier={false} {...otherProps}>
                 {
                     entities && entities.length > 0
                         ? (
@@ -36,7 +36,7 @@ const VocabularyBrowserContainer = (
                                 total={total}
                                 hasHighlights={hasHighlights}
                                 footerRender={footerRender}
-                                onVocabularyOpen={handleVocabularyOpen}
+                                onVocabularyOpen={id => openVocabulary(history, id)}
                             />
                         )
                         : <MessageDisplay message="The vocabulary is empty" isError={false} />
@@ -89,11 +89,11 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(searchVocabulary({query: '*', types: ownProps.targetClasses})),
     fetchShapes: () => {},
     create: (formKey, shape, id) => {
-        const subject = createVocabularyIri(id);
+        const subject = id && createVocabularyIri(id);
         const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
 
         return dispatch(createVocabularyEntityFromState(formKey, subject, type))
-            .then(({value}) => ownProps.history.push(relativeLink(value.subject)));
+            .then(({value}) => openVocabulary(ownProps.history, value.subject));
     }
 });
 
