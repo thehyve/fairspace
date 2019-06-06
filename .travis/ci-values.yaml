@@ -57,11 +57,15 @@ jupyterhub:
               session_url: https://workspace.ci.fairway.app/api/v1/account/tokens
   singleuser:
     image:
+      name: eu.gcr.io/fairspace-207108/jupyterhub-singleuser
+      tag: 0.6.5-SNAPSHOT-NEW
       pullPolicy: Always
     extraEnv:
       WORKSPACE_URL: https://storage.workspace.ci.fairway.app
   hub:
     image:
+      name: eu.gcr.io/fairspace-207108/jupyterhub-hub
+      tag: 0.6.5-SNAPSHOT-NEW
       pullPolicy: Always
     extraEnv:
       JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
