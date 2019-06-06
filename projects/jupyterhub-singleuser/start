@@ -19,10 +19,13 @@ http {
 
 sudo nginx -c ~/.nginx.conf
 
-mkdir /home/jovyan/collections
-chmod 600 ~/.davfs2/secrets
-chmod a-s ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
-echo '/home/jovyan/collections dummyuser dummypassword' > ~/.davfs2/secrets
+mkdir ~/collections
+mkdir ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
+chmod 700 a-s ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
+echo "
+ask_auth        0
+use_locks       1
+" > ~/.davfs2/davfs2.conf
 mount /home/jovyan/collections
 
 jupyter-labhub

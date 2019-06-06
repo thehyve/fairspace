@@ -4,7 +4,7 @@ USER root
 
 RUN echo 'deb http://archive.ubuntu.com/ubuntu/ bionic-proposed restricted main multiverse universe' >> /etc/apt/sources.list.d/proposed-repositories.list
 RUN apt-get update
-RUN apt-get install -y nginx davfs2
+RUN apt-get install -y vim net-tools nginx davfs2
 
 EXPOSE 80
 
