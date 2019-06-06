@@ -463,7 +463,7 @@ describe('jsonLdConverter', () => {
         const vocabulary = vocabularyUtils(vocabularyJsonLd);
 
         it('returns all properties without values', () => {
-            const shape = vocabulary.determineShapeForType('http://fairspace.io/ontology#Collection');
+            const shape = vocabulary.determineShapeForTypes(['http://fairspace.io/ontology#Collection']);
             const result = emptyLinkedData(vocabulary, shape);
 
             expect(result.length).toEqual(6);
@@ -476,7 +476,7 @@ describe('jsonLdConverter', () => {
         });
 
         it('returns the type property with value', () => {
-            const shape = vocabulary.determineShapeForType('http://fairspace.io/ontology#Collection');
+            const shape = vocabulary.determineShapeForTypes(['http://fairspace.io/ontology#Collection']);
             const result = emptyLinkedData(vocabulary, shape);
 
             expect(result.length).toEqual(6);

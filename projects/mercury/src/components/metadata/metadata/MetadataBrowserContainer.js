@@ -38,13 +38,16 @@ const mapStateToProps = (state, {vocabulary}) => {
     const {items, pending, error, total} = getMetadataSearchResults(state);
     const entities = items.map(({
         id, type, label, name, highlights
-    }) => ({
-        id,
-        label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
-        type: type[0],
-        shape: vocabulary.determineShapeForType(type[0]),
-        highlights
-    }));
+    }) => {
+        const shape = vocabulary.determineShapeForTypes(type);
+        return {
+            id,
+            label: (label && label[0]) || (name && name[0]) || linkLabel(id, true),
+            type: getFirstPredicateId(shape, SHACL_TARGET_CLASS),
+            shape,
+            highlights
+        };
+    });
     const onEntityCreationError = (e, id) => {
         if (e.details) {
             ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createMetadataIri(id)), e.message);
