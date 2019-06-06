@@ -6,7 +6,7 @@
     "dev": "concurrently \"yarn server:mock\" \"yarn start\" \"yarn test\" \"yarn server\" \"yarn elasticsearch\"",
     "server:mock": "node mock-server/server.js",
     "server": "wait-on http://localhost:9200/ && cd ../saturn/ && ./gradlew run",
-    "elasticsearch": "docker run -p 9200:9200 -p 9300:9300 -e \"discovery.type=single-node\" docker.elastic.co/elasticsearch/elasticsearch:6.6.2",
+    "elasticsearch": "docker run -p 9200:9200 -p 9300:9300 -e \"discovery.type=single-node\" -v $PWD/../saturn/elasticsearch:/usr/share/elasticsearch/data docker.elastic.co/elasticsearch/elasticsearch:6.6.2",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
