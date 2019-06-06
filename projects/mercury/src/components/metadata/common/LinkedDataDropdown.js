@@ -9,17 +9,25 @@ import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
 const LinkedDataDropdown = ({types, property, ...otherProps}) => {
     const [fetchedItems, setFetchedItems] = useState(null);
     const [error, setError] = useState(null);
+    const [queries, setQueries] = useState([]);
+    const [query, setQuery] = useState(null);
 
     useEffect(() => {
         setFetchedItems(null);
         setError(null);
         searchAPI()
-            .searchLinkedData({types: types || [property.className], size: SEARCH_DROPDOWN_DEFAULT_SIZE})
+            .searchLinkedData({types: types || [property.className], query, size: SEARCH_DROPDOWN_DEFAULT_SIZE})
             .then(({items}) => {
                 setFetchedItems(items);
             })
             .catch(setError);
-    }, [property.className, types]);
+    }, [property.className, types, query]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setQuery(queries[queries.length - 1]);
+        }, 600);
+    }, [queries]);
 
     if (error) {
         return <MessageDisplay withIcon={false} message={error.message} />;
@@ -41,8 +49,12 @@ const LinkedDataDropdown = ({types, property, ...otherProps}) => {
             };
         });
 
+    const onTextInputChange = (e) => {
+        setQueries([...queries, e.target.value]);
+    };
+
     return (
-        <Dropdown {...otherProps} options={options} />
+        <Dropdown {...otherProps} onTextInputChange={onTextInputChange} options={options} />
     );
 };
 
