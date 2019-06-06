@@ -201,3 +201,8 @@ export const partitionErrors = (errors, subject) => {
  * @param {*}
  */
 export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
+
+/**
+ * Returns true if the given value or id is part of the property values
+ */
+export const propertyHasValue = ({values}, {value, id}) => !!(values && (value || id) && values.some(v => (v.id && v.id === id) || (v.value && v.value === value)));

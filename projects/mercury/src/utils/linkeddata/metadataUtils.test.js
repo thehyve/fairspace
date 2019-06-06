@@ -10,7 +10,8 @@ import {
     shouldPropertyBeHidden,
     url2iri,
     isNonEmptyValue,
-    partitionErrors
+    partitionErrors,
+    propertyHasValue
 } from "./metadataUtils";
 import * as constants from "../../constants";
 
@@ -297,6 +298,33 @@ describe('Metadata Utils', () => {
                     entityErrors: errorsSub1,
                     otherErrors: errorsSub2
                 });
+        });
+    });
+
+    describe('propertyHasValue', () => {
+        const property = {
+            values: [
+                {value: 'first value'},
+                {id: '1234'},
+                {value: 'other value'},
+                {id: 'some-id-555', value: 'wit hgiven value'}
+            ]
+        };
+
+        it('should returns true for the given values', () => {
+            expect(propertyHasValue(property, {value: 'first value'})).toBe(true);
+            expect(propertyHasValue(property, {id: '1234'})).toBe(true);
+            expect(propertyHasValue(property, {value: 'other value'})).toBe(true);
+            expect(propertyHasValue(property, {id: 'some-id-555', value: 'with given value'})).toBe(true);
+        });
+
+        it('should returns false for the given values', () => {
+            expect(propertyHasValue(property, {value: ''})).toBe(false);
+            expect(propertyHasValue(property, {id: '12345'})).toBe(false);
+            expect(propertyHasValue(property, {id: 'other value'})).toBe(false);
+            expect(propertyHasValue(property, {id: 'some-id-555x', value: 'with given valuex'})).toBe(false);
+            expect(propertyHasValue({}, {id: 'some-id-555', value: 'with given value'})).toBe(false);
+            expect(propertyHasValue({}, {id: undefined, value: null})).toBe(false);
         });
     });
 });

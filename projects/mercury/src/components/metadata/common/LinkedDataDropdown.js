@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import searchAPI from "../../../services/SearchAPI";
-import {linkLabel} from "../../../utils/linkeddata/metadataUtils";
+import {linkLabel, propertyHasValue} from "../../../utils/linkeddata/metadataUtils";
 import {LoadingInlay, MessageDisplay} from "../../common";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
@@ -31,7 +31,7 @@ const LinkedDataDropdown = ({types, property, ...otherProps}) => {
 
     const options = fetchedItems
         .map(({id, label, name, value}) => {
-            const disabled = property.values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
+            const disabled = propertyHasValue(property, {id, value});
             const l = (label && label[0]) || (name && name[0]) || linkLabel(id, true);
 
             return {

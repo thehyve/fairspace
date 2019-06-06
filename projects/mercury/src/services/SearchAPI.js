@@ -102,7 +102,7 @@ export class SearchAPI {
     /**
      * @returns {Promise}
      */
-    searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0}) => this.search({
+    searchLinkedData = ({types, query, size, page}) => this.search({
         query,
         size,
         types,
