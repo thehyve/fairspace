@@ -25,7 +25,7 @@ chmod 700 ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
 chmod a-s ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
 echo "
 ask_auth        0
-use_locks       1
+use_locks       0
 " > ~/.davfs2/davfs2.conf
 mount /home/jovyan/collections
 
