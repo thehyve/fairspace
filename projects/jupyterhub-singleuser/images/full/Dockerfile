@@ -2,20 +2,9 @@ FROM jupyter/scipy-notebook:d4cbf2f80a2a
 
 USER root
 
-# wdfs
 RUN echo 'deb http://archive.ubuntu.com/ubuntu/ bionic-proposed restricted main multiverse universe' >> /etc/apt/sources.list.d/proposed-repositories.list
 RUN apt-get update
-RUN apt-get install -y apt-utils
-RUN apt-get install -y -t bionic-proposed libneon27 libneon27-dev
-RUN apt-get install -y git autoconf automake checkinstall libfuse-dev python-fuse pkg-config vim net-tools nginx
-
-RUN wget http://noedler.de/projekte/wdfs/wdfs-1.4.2.tar.gz
-RUN tar xfz wdfs-1.4.2.tar.gz
-WORKDIR wdfs-1.4.2
-RUN ./configure && make && make install
-WORKDIR ..
-RUN rm -rf wdfs-1.4.2
-RUN rm -rf wdfs-1.4.2.tar.gz
+RUN apt-get install -y nginx davfs2
 
 EXPOSE 80
 
@@ -30,11 +19,7 @@ RUN echo "from notebook.services.contents.atomiclargefilemanager import AtomicLa
 RUN echo "c.NotebookApp.contents_manager_class = AtomicLargeFileManager" >> /etc/jupyter/jupyter_notebook_config.py
 RUN echo "c.FileCheckpoints.checkpoint_dir = '/home/jovyan/.notebookCheckpoints'" >> /etc/jupyter/jupyter_notebook_config.py
 
-RUN apt-get install -y davfs2
 RUN chmod u+s /sbin/mount.davfs
-RUN mkdir -p /home/jovyan/coll
-RUN echo 'http://localhost/webdav/v1/ /home/jovyan/coll davfs user,noauto,file_mode=600,dir_mode=700 0 1' >> /etc/fstab
+RUN echo 'http://localhost/webdav/v1/ /home/jovyan/collections davfs user,noauto,file_mode=600,dir_mode=700 0 1' >> /etc/fstab
 RUN usermod -a -G davfs2 jovyan
 
-USER $NB_USER
-RUN mkdir /home/jovyan/collections

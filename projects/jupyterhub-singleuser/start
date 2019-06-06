@@ -1,7 +1,5 @@
 #! /bin/bash
 
-mkdir -p ~/collections
-
 echo "
 events { worker_connections 1024; }
 
@@ -20,9 +18,11 @@ http {
 " > ~/.nginx.conf
 
 sudo nginx -c ~/.nginx.conf
-mkdir /home/jovyan/coll
+
+mkdir /home/jovyan/collections
 chmod 600 ~/.davfs2/secrets
-chmod a-s ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-coll+jovyan
-echo '/home/jovyan/coll dummyuser dummypassword' > ~/.davfs2/secrets
-mount /home/jovyan/coll
-wdfs http://localhost/webdav/v1/ ~/collections/ & jupyter-labhub
+chmod a-s ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
+echo '/home/jovyan/collections dummyuser dummypassword' > ~/.davfs2/secrets
+mount /home/jovyan/collections
+
+jupyter-labhub
