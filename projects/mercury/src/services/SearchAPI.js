@@ -102,7 +102,7 @@ export class SearchAPI {
     /**
      * @returns {Promise}
      */
-    searchLinkedData = ({types, query, size, page}) => this.search({
+    searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0}) => this.search({
         query,
         size,
         types,
@@ -112,7 +112,12 @@ export class SearchAPI {
     /**
      * @returns {Promise}
      */
-    searchLinkedDataOfSubclass = ({subClassOf, ...rest}) => this.search({subClassOf, ...rest});
+    searchLinkedDataOfSubclass = ({subClassOf, query, size = SEARCH_DEFAULT_SIZE, page = 0}) => this.search({
+        subClassOf,
+        query,
+        size,
+        from: page * size
+    });
 
     /**
      * Transforms the search result into a format that can be used internally. The format looks like this:
