@@ -19,7 +19,8 @@ const mapStateToProps = (state, {subject}) => {
 
     const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
     const header = linkLabel(subject);
-    const types = metadata && (metadata.find(prop => prop.key === '@type') || {}).values || [];
+    const metadataProperty = metadata && metadata.find(prop => prop.key === '@type');
+    const types = (metadataProperty || {}).values || [];
     const shape = getVocabulary(state).determineShapeForTypes(types.map(t => t.id));
     const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
     const {label, description} = types.find(t => t.id === type);
