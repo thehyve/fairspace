@@ -23,6 +23,6 @@ sudo nginx -c ~/.nginx.conf
 mkdir /home/jovyan/coll
 chmod 600 ~/.davfs2/secrets
 chmod a-s ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-coll+jovyan
-echo /home/jovyan/coll dummyuser dummypassword > ~/.davfs2/secrets
+echo '/home/jovyan/coll dummyuser dummypassword' > ~/.davfs2/secrets
 mount /home/jovyan/coll
 wdfs http://localhost/webdav/v1/ ~/collections/ & jupyter-labhub
