@@ -4,6 +4,7 @@ import searchAPI from "../../../services/SearchAPI";
 import {linkLabel} from "../../../utils/linkeddata/metadataUtils";
 import {LoadingInlay, MessageDisplay} from "../../common";
 import Dropdown from './values/Dropdown';
+import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
 
 const LinkedDataDropdown = ({types, property, ...otherProps}) => {
     const [fetchedItems, setFetchedItems] = useState(null);
@@ -13,7 +14,7 @@ const LinkedDataDropdown = ({types, property, ...otherProps}) => {
         setFetchedItems(null);
         setError(null);
         searchAPI()
-            .searchLinkedData({types: types || [property.className], size: 100})
+            .searchLinkedData({types: types || [property.className], size: SEARCH_DROPDOWN_DEFAULT_SIZE})
             .then(({items}) => {
                 setFetchedItems(items);
             })
