@@ -30,5 +30,11 @@ RUN echo "from notebook.services.contents.atomiclargefilemanager import AtomicLa
 RUN echo "c.NotebookApp.contents_manager_class = AtomicLargeFileManager" >> /etc/jupyter/jupyter_notebook_config.py
 RUN echo "c.FileCheckpoints.checkpoint_dir = '/home/jovyan/.notebookCheckpoints'" >> /etc/jupyter/jupyter_notebook_config.py
 
+RUN apt-get install -y davfs2
+RUN chmod u+s /sbin/mount.davfs
+RUN mkdir -p /home/jovyan/coll
+RUN echo 'http://localhost/webdav/v1/ /home/jovyan/coll davfs user,noauto,file_mode=600,dir_mode=700 0 1' >> /etc/fstab
+RUN usermod -a -G davfs2 jovyan
+
 USER $NB_USER
 RUN mkdir /home/jovyan/collections

@@ -20,4 +20,5 @@ http {
 " > ~/.nginx.conf
 
 sudo nginx -c ~/.nginx.conf
+mount /home/jovyan/coll
 wdfs http://localhost/webdav/v1/ ~/collections/ & jupyter-labhub
