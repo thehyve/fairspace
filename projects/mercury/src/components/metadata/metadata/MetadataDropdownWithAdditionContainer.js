@@ -48,7 +48,7 @@ const mapStateToProps = (state, ownProps) => {
     const pending = isVocabularyPending(state);
     const error = hasVocabularyError(state);
 
-    const shape = (!pending && !error) ? vocabulary.determineShapeForType(ownProps.property.className) : {};
+    const shape = (!pending && !error) ? vocabulary.determineShapeForTypes([ownProps.property.className]) : {};
     const emptyData = emptyLinkedData(vocabulary, shape);
 
     const onError = (e, id) => {

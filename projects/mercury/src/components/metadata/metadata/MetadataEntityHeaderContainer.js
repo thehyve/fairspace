@@ -2,7 +2,7 @@ import {connect} from "react-redux";
 
 import {getCombinedMetadataForSubject, isMetadataPending, hasMetadataError} from "../../../reducers/cache/jsonLdBySubjectReducers";
 import {getTypeInfo, linkLabel} from "../../../utils/linkeddata/metadataUtils";
-import {hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
 
 const mapStateToProps = (state, {subject}) => {
@@ -17,7 +17,7 @@ const mapStateToProps = (state, {subject}) => {
 
     const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
     const header = linkLabel(subject);
-    const {label, description} = getTypeInfo(metadata);
+    const {label, description} = getTypeInfo(metadata, getVocabulary(state));
 
     return {
         loading,
