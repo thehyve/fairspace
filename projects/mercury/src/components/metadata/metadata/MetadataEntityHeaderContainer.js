@@ -1,11 +1,9 @@
 import {connect} from "react-redux";
 
 import {getCombinedMetadataForSubject, isMetadataPending, hasMetadataError} from "../../../reducers/cache/jsonLdBySubjectReducers";
-import {linkLabel} from "../../../utils/linkeddata/metadataUtils";
+import {getTypeInfo, linkLabel} from "../../../utils/linkeddata/metadataUtils";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
-import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
-import {SHACL_TARGET_CLASS} from "../../../constants";
 
 const mapStateToProps = (state, {subject}) => {
     const metadata = getCombinedMetadataForSubject(state, subject);
@@ -19,11 +17,7 @@ const mapStateToProps = (state, {subject}) => {
 
     const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
     const header = linkLabel(subject);
-    const metadataProperty = metadata && metadata.find(prop => prop.key === '@type');
-    const types = (metadataProperty || {}).values || [];
-    const shape = getVocabulary(state).determineShapeForTypes(types.map(t => t.id));
-    const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
-    const {label, description} = types.find(t => t.id === type);
+    const {label, description} = getTypeInfo(metadata, getVocabulary(state));
 
     return {
         loading,
