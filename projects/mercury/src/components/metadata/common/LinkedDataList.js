@@ -14,7 +14,7 @@ import {
 import styles from './LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
 
-const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, linkRender, footerRender}) => {
+const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, typeRender, footerRender}) => {
     const renderRow = (entry) => {
         const {id, primaryText, secondaryText, highlights} = entry;
 
@@ -46,7 +46,7 @@ const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, link
                         <ListItemText primary={primaryText} secondary={secondaryText} />
                     </TableCell>
                     <TableCell style={{minWidth: 140}}>
-                        {linkRender(entry)}
+                        {typeRender(entry)}
                     </TableCell>
                     {hasHighlights && (
                         <TableCell style={{minWidth: 200}}>

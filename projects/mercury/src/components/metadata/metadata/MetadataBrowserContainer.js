@@ -37,7 +37,7 @@ const MetadataBrowserContainer = ({entities, hasHighlights, footerRender, total,
                             total={total}
                             hasHighlights={hasHighlights}
                             footerRender={footerRender}
-                            linkRender={entry => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>}
+                            typeRender={entry => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>}
                             onOpen={id => openMetadataEntry(history, id)}
                         />
                     )

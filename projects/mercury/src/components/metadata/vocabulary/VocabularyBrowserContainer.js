@@ -36,7 +36,7 @@ const VocabularyBrowserContainer = (
                                 total={total}
                                 hasHighlights={hasHighlights}
                                 footerRender={footerRender}
-                                linkRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
+                                typeRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
                                 onOpen={id => openVocabulary(history, id)}
                             />
                         )
