@@ -201,3 +201,10 @@ export const partitionErrors = (errors, subject) => {
  * @param value
  */
 export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
+
+/**
+ * Returns true if the given property have one or more non-empty values
+ * @param property
+ * @returns {boolean}
+ */
+export const hasValue = property => !!(property.values && Array.isArray(property.values) && property.values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);

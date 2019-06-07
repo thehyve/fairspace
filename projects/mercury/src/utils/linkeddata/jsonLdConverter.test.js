@@ -41,10 +41,7 @@ describe('jsonLdConverter', () => {
 
                 expect(result.length).toBeGreaterThan(1);
                 expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
-                expect(result[0].label).toEqual('Description');
-                expect(result[1].label).toEqual('Creator');
-                expect(result[2].label).toEqual('Files in this collection');
-                expect(result[3].label).toEqual('Label');
+                expect(result.map(entry => entry.label).sort()).toEqual(['Creator', 'Description', 'Files in this collection', 'Label', 'List', 'Type']);
             });
 
             it('returns nothing without type', () => {
@@ -95,14 +92,14 @@ describe('jsonLdConverter', () => {
                 const result = fromJsonLd(metadata, subject, vocabulary);
 
                 expect(result.length).toBeGreaterThan(1);
-                expect(result[0].key).toEqual("http://www.schema.org/creator");
-                expect(result[0].label).toEqual("Creator");
+                expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
+                expect(result[0].label).toEqual("Label");
                 expect(result[0].values.length).toEqual(1);
-                expect(result[0].values[0].value).toEqual('John Snow');
-                expect(result[1].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
-                expect(result[1].label).toEqual("Label");
+                expect(result[0].values[0].value).toEqual('Collection 1');
+                expect(result[1].key).toEqual("http://www.schema.org/creator");
+                expect(result[1].label).toEqual("Creator");
                 expect(result[1].values.length).toEqual(1);
-                expect(result[1].values[0].value).toEqual('Collection 1');
+                expect(result[1].values[0].value).toEqual('John Snow');
             });
 
             it('returns multiple values for one predicate in vocabulary properly', () => {
@@ -158,37 +155,14 @@ describe('jsonLdConverter', () => {
                 const result = fromJsonLd(metadata, subject, vocabulary);
 
                 expect(result.length).toEqual(6);
-                expect(result[0].key).toEqual("http://www.schema.org/creator");
-                expect(result[1].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
-                expect(result[2].key).toEqual("http://fairspace.io/ontology#hasFile");
-                expect(result[3].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
-                expect(result[4].key).toEqual("http://fairspace.io/ontology#list");
-                expect(result[5].key).toEqual("@type");
-            });
-
-            it('sorts properties in ascending order by label with existing values first', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://www.w3.org/2000/01/rdf-schema#label': [
-                        {
-                            '@value': 'My first collection'
-                        }
-                    ],
-                    'http://www.schema.org/creator': [
-                        {
-                            '@value': 'Someone'
-                        }
-                    ]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.length).toBeGreaterThan(4);
-                expect(result[0].key).toEqual("http://www.schema.org/creator");
-                expect(result[1].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
-                expect(result[2].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
-                expect(result[3].key).toEqual("http://fairspace.io/ontology#hasFile");
-                expect(result[4].key).toEqual("http://fairspace.io/ontology#list");
+                expect(result.map(entry => entry.key).sort()).toEqual([
+                    "@type",
+                    "http://fairspace.io/ontology#hasFile",
+                    "http://fairspace.io/ontology#list",
+                    "http://www.schema.org/creator",
+                    "http://www.w3.org/2000/01/rdf-schema#comment",
+                    "http://www.w3.org/2000/01/rdf-schema#label"
+                ]);
             });
 
             it('only returns properties present in the vocabulary', () => {

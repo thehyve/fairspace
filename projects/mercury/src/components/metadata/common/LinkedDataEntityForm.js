@@ -4,6 +4,8 @@ import {List, ListItem} from '@material-ui/core';
 
 import {MessageDisplay, LoadingInlay} from "../../common";
 import LinkedDataProperty from "./LinkedDataProperty";
+import {compareBy, comparing} from "../../../utils/genericUtils";
+import {hasValue} from "../../../utils/linkeddata/metadataUtils";
 
 export const LinkedDataEntityForm = ({
     properties, error, loading, onChange, onAdd, onDelete
@@ -19,20 +21,26 @@ export const LinkedDataEntityForm = ({
     return (
         <List dense>
             {
-                properties.map((p) => (
-                    <ListItem
-                        key={p.key}
-                        disableGutters
-                        style={{display: 'block'}}
-                    >
-                        <LinkedDataProperty
-                            property={p}
-                            onChange={(value, index) => onChange(p, value, index)}
-                            onAdd={(value) => onAdd(p, value)}
-                            onDelete={(index) => onDelete(p, index)}
-                        />
-                    </ListItem>
-                ))
+                properties
+                    .sort(comparing(
+                        compareBy(p => (p.order === undefined ? Number.MAX_SAFE_INTEGER : p.order)),
+                        compareBy(hasValue, false),
+                        compareBy('label')
+                    ))
+                    .map(p => (
+                        <ListItem
+                            key={p.key}
+                            disableGutters
+                            style={{display: 'block'}}
+                        >
+                            <LinkedDataProperty
+                                property={p}
+                                onChange={(value, index) => onChange(p, value, index)}
+                                onAdd={(value) => onAdd(p, value)}
+                                onDelete={(index) => onDelete(p, index)}
+                            />
+                        </ListItem>
+                    ))
             }
         </List>
     );
