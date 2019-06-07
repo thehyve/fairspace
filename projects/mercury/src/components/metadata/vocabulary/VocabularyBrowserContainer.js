@@ -14,9 +14,9 @@ import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog, MessageDisplay} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import {getVocabularySearchResults} from "../../../reducers/searchReducers";
-import VocabularyList from "./VocabularyList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
+import LinkedDataList from "../common/LinkedDataList";
 
 const openVocabulary= (history, id) => {
     history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
@@ -31,12 +31,13 @@ const VocabularyBrowserContainer = (
                 {
                     entities && entities.length > 0
                         ? (
-                            <VocabularyList
+                            <LinkedDataList
                                 items={entities}
                                 total={total}
                                 hasHighlights={hasHighlights}
                                 footerRender={footerRender}
-                                onVocabularyOpen={id => openVocabulary(history, id)}
+                                typeRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
+                                onOpen={id => openVocabulary(history, id)}
                             />
                         )
                         : <MessageDisplay message="The vocabulary is empty" isError={false} />
@@ -57,10 +58,10 @@ const mapStateToProps = (state, {metaVocabulary}) => {
 
         return {
             id,
-            name,
+            primaryText: name,
+            secondaryText: description,
             typeLabel,
             typeUrl,
-            description,
             highlights
         };
     });
