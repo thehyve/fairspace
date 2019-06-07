@@ -2,7 +2,13 @@ import React from "react";
 import {connect} from 'react-redux';
 
 import {withRouter} from 'react-router-dom';
-import {createMetadataIri, getLabel, partitionErrors, relativeLink} from "../../../utils/linkeddata/metadataUtils";
+import {
+    createMetadataIri,
+    getLabel,
+    linkLabel,
+    partitionErrors,
+    relativeLink
+} from "../../../utils/linkeddata/metadataUtils";
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {searchMetadata} from "../../../actions/searchActions";
 import {getMetadataSearchResults} from "../../../reducers/searchReducers";
@@ -46,14 +52,14 @@ const mapStateToProps = (state, {vocabulary}) => {
     const entities = items.map((
         {id, label, comment, type, highlights}
     ) => {
-        const shape = type[0] ? vocabulary.determineShapeForType(type[0]) : {};
+        const shape = vocabulary.determineShapeForTypes(type);
         const typeLabel = getLabel(shape, true);
         const shapeUrl = shape['@id'];
 
         return {
             id,
-            primaryText: label,
-            secondaryText: comment,
+            primaryText: (label && label[0]) || linkLabel(id, true),
+            secondaryText: (comment && comment[0]),
             typeLabel,
             shapeUrl,
             highlights

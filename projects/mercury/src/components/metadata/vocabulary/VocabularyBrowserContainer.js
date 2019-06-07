@@ -52,7 +52,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
     const entities = items.map((
         {id, name, description, type, highlights}
     ) => {
-        const shape = type[0] ? metaVocabulary.determineShapeForType(type[0]) : {};
+        const shape = metaVocabulary.determineShapeForTypes(type) || {};
         const typeLabel = getLabel(shape, true);
         const typeUrl = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
 

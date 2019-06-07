@@ -12,7 +12,7 @@ import {RDF_TYPE} from "../../constants";
  */
 const generateTypeProperty = (vocabulary, types) => {
     const typeValues = types.map(type => {
-        const shape = vocabulary.determineShapeForType(type);
+        const shape = vocabulary.determineShapeForTypes([type]);
         return {
             id: type,
             label: getFirstPredicateValue(shape, constants.SHACL_NAME, type),

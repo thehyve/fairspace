@@ -25,7 +25,7 @@ const mapStateToProps = (state, {subject}) => {
         };
     }
     const header = linkLabel(subject);
-    const {label, description} = getTypeInfo(metadata);
+    const {label, description} = getTypeInfo(metadata, metaVocabulary);
 
     return {
         loading,

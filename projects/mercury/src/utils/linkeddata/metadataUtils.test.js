@@ -13,6 +13,7 @@ import {
     partitionErrors
 } from "./metadataUtils";
 import * as constants from "../../constants";
+import {SHACL_TARGET_CLASS} from "../../constants";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {
@@ -207,16 +208,21 @@ describe('Metadata Utils', () => {
     describe('getTypeInfo', () => {
         const generateMetadataWithType = (typeData) => [{
             key: '@type',
-            values: [{...typeData}]
+            values: [typeData]
         }];
+
+        const vocabulary = {
+            determineShapeForTypes: (typeIris) => ({[SHACL_TARGET_CLASS]: [{'@id': typeIris[0]}]})
+        };
 
         it('retrieves information on the type of the entity', () => {
             const metadata = generateMetadataWithType({
+                id: 'http://example.com/123',
                 label: 'some-label',
                 comment: 'some-comment'
             });
 
-            expect(getTypeInfo(metadata)).toEqual({
+            expect(getTypeInfo(metadata, vocabulary)).toEqual({
                 label: 'some-label',
                 description: 'some-comment'
             });
@@ -224,10 +230,11 @@ describe('Metadata Utils', () => {
 
         it('ignores missing comment', () => {
             const metadata = generateMetadataWithType({
+                id: 'http://example.com/123',
                 label: 'some-label'
             });
 
-            expect(getTypeInfo(metadata)).toEqual({
+            expect(getTypeInfo(metadata, vocabulary)).toEqual({
                 label: 'some-label',
                 description: ''
             });
@@ -235,10 +242,11 @@ describe('Metadata Utils', () => {
 
         it('ignores missing label', () => {
             const metadata = generateMetadataWithType({
+                id: 'http://example.com/123',
                 comment: 'some-comment'
             });
 
-            expect(getTypeInfo(metadata)).toEqual({
+            expect(getTypeInfo(metadata, vocabulary)).toEqual({
                 description: 'some-comment',
                 label: ''
             });
@@ -247,7 +255,7 @@ describe('Metadata Utils', () => {
         it('returns undefined if type is not present', () => {
             const metadata = [];
 
-            expect(getTypeInfo(metadata)).toEqual({description: '', label: ''});
+            expect(getTypeInfo(metadata, vocabulary)).toEqual({description: '', label: ''});
         });
     });
 

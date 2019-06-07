@@ -101,10 +101,10 @@ export const vocabularyUtils = (vocabulary = []) => {
     const get = (id) => vocabulary.find(el => el['@id'] === id) || [];
 
     /**
-     * Determines the SHACL shape to be applied to the given type
-     * @param typeUri
+     * Determines the SHACL shape to be applied to the given types
+     * @param typeUris
      */
-    const determineShapeForType = (typeUri) => vocabulary.find(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === typeUri) || {};
+    const determineShapeForTypes = (typeUris) => vocabulary.find(entry => typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
 
     /**
      * Determines the SHACL shape to be applied to the given type.
@@ -145,20 +145,10 @@ export const vocabularyUtils = (vocabulary = []) => {
     };
 
     /**
-     * Returns a list of property shapes that are in the shape of the given type
-     * @param type
-     */
-    const determinePropertyShapesForType = (type) => determinePropertyShapesForNodeShape(determineShapeForType(type));
-
-    /**
      * Returns a list of property shapes that are in the shape of the given types
      * @param types
      */
-    const determinePropertyShapesForTypes = (types) => Array.from(new Set(
-        types
-            .map(type => determinePropertyShapesForType(type))
-            .reduce((fullList, typeList) => fullList.concat(typeList), [])
-    ));
+    const determinePropertyShapesForTypes = (types) => determinePropertyShapesForNodeShape(determineShapeForTypes(types));
 
     /**
      * Determines whether the given class URI is a fairspace class
@@ -217,7 +207,7 @@ export const vocabularyUtils = (vocabulary = []) => {
         contains,
         get,
         determineShapeForProperty,
-        determineShapeForType,
+        determineShapeForTypes,
         determinePropertyShapesForTypes,
         determinePropertyShapesForNodeShape,
         generatePropertyEntry,
