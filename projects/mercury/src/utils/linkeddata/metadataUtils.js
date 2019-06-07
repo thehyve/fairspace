@@ -131,10 +131,7 @@ export const propertiesToShow = (properties = []) => {
  */
 export const getTypeInfo = (metadata, vocabulary) => {
     const typeProp = metadata && metadata.find(prop => prop.key === '@type');
-    const types = typeProp && typeProp.values;
-    if (!types) {
-        return {label: '', description: ''};
-    }
+    const types = (typeProp && typeProp.values) || [];
     const shape = vocabulary.determineShapeForTypes(types.map(t => t.id));
     const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
     const {label = '', comment: description = ''} = types.find(t => t.id === type) || {};
