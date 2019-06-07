@@ -27,6 +27,9 @@ echo "
 ask_auth        0
 use_locks       0
 " > ~/.davfs2/davfs2.conf
-mount /home/jovyan/collections
+touch ~/.davfs2/secrets
+chmod 600 ~/.davfs2/secrets
+
+mount ~/collections
 
 jupyter-labhub
