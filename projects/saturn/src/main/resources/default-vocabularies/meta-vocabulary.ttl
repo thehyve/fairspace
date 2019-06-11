@@ -173,6 +173,43 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
+sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
+    sh:targetClass sh:PrefixDeclaration ; 
+    sh:closed true ;
+    sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
+    sh:name "Namespace" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:showInCatalog true ;
+    sh:property [
+      sh:path rdfs:label ;
+      sh:maxLength 128;
+      sh:maxCount 1 ; 
+      sh:datatype xsd:string ;
+      sh:name "Label"
+    ] ;
+    sh:property [
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:path sh:description ;
+      sh:name "Namespace description"
+    ] ;
+    sh:property [
+      sh:name "Prefix" ;
+      sh:maxLength 24 ;
+      sh:minCount 1 ; 
+      sh:maxCount 1 ; 
+      sh:datatype xsd:string ;
+      sh:path sh:prefix 
+    ] ;
+    sh:property [
+      sh:name "Namespace IRI" ;
+      sh:minCount 1 ; 
+      sh:maxCount 1 ; 
+      sh:nodeKind sh:IRI ;
+      fs:externalLink true ; 
+      sh:path sh:namespace 
+    ] .
+
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
     sh:path fs:inverseRelation ;
