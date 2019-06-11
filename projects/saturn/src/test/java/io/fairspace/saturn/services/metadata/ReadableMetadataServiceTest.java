@@ -1,8 +1,10 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
@@ -13,7 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.topbraid.shacl.vocabulary.SH;
 
+import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -75,37 +79,80 @@ public class ReadableMetadataServiceTest {
     }
 
     @Test
-    public void getWithLabels() {
+    public void getWithImportantPropertiesReturnsFullModel() {
         assertEquals(0, api.get(null, null, null, true).size());
 
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2).add(LBL_STMT1).add(LBL_STMT2));
+        executeWrite(ds, () -> {
+            ds.getNamedModel(GRAPH)
+                    .add(STMT1).add(STMT2)
+                    .add(LBL_STMT1).add(LBL_STMT2);
+            setupImportantProperties();
+        });
 
+        // Fetching the whole model should work with object properties as well
         Model m1 = api.get(null, null, null, true);
         assertEquals(4, m1.size());
         assertTrue(m1.contains(STMT1));
         assertTrue(m1.contains(STMT2));
         assertTrue(m1.contains(LBL_STMT1));
         assertTrue(m1.contains(LBL_STMT2));
+    }
 
+    @Test
+    public void getWithImportantPropertiesWorksWithoutImportantProperties() {
+        executeWrite(ds, () -> {
+            ds.getNamedModel(GRAPH)
+                    .add(STMT1).add(STMT2)
+                    .add(LBL_STMT1).add(LBL_STMT2);
+        });
+
+        // Fetching the whole model should work with object properties as well
+        Model m1 = api.get(null, null, null, true);
+        assertEquals(4, m1.size());
+        assertTrue(m1.contains(STMT1));
+        assertTrue(m1.contains(STMT2));
+        assertTrue(m1.contains(LBL_STMT1));
+        assertTrue(m1.contains(LBL_STMT2));
+    }
+
+    @Test
+    public void getWithImportantPropertiesIncludesImportantProperties() {
+        Statement createdBy = createStatement(S3, FS.createdBy, createStringLiteral("unit test"));
+        Statement dateCreated = createStatement(S3, FS.dateCreated, createStringLiteral("yesterday"));
+        Statement md5 = createStatement(S3, FS.md5, createStringLiteral("some-hash"));
+
+        executeWrite(ds, () -> {
+            setupImportantProperties();
+            ds.getNamedModel(GRAPH)
+                    .add(STMT1).add(STMT2)
+                    .add(LBL_STMT1).add(LBL_STMT2)
+                    .add(createdBy).add(dateCreated).add(md5);
+        });
+
+        // The important properties of any related object should be returned as well
+        // In this case we expect the important properties of S2 to be returned
         Model m2 = api.get(S1.getURI(), null, null, true);
         assertEquals(3, m2.size());
         assertTrue(m2.contains(STMT1));
         assertTrue(m2.contains(LBL_STMT1));
         assertTrue(m2.contains(LBL_STMT2));
 
+        // The important properties of any related object should be returned as well
+        // In this case we expect the important properties of S2 and S3 to be returned
+        // Only createdBy is marked as fs:importantProperty = true in the vocabulary
         Model m3 = api.get(null, P1.getURI(), null, true);
-        assertEquals(3, m3.size());
+        assertEquals(4, m3.size());
         assertTrue(m3.contains(STMT1));
         assertTrue(m3.contains(STMT2));
-        assertTrue(m2.contains(LBL_STMT2));
+        assertTrue(m3.contains(LBL_STMT2));
+        assertTrue(m3.contains(createdBy));
 
+        // The important property of any related object should be returned as well
+        // In this case we expect the important properties of S2 to be returned
         Model m4 = api.get(null, null, S2.getURI(), true);
         assertEquals(2, m4.size());
         assertTrue(m4.contains(STMT1));
         assertTrue(m4.contains(LBL_STMT2));
-
-        Model m5 = api.get(S3.getURI(), null, null, true);
-        assertTrue(m5.isEmpty());
     }
 
     @Test
@@ -205,4 +252,16 @@ public class ReadableMetadataServiceTest {
         });
     }
 
+    private void setupImportantProperties() {
+        Resource labelShape = createResource("http://labelShape");
+        Resource createdByShape = createResource("http://createdByShape");
+        Resource md5Shape = createResource("http://md5Shape");
+
+        ds.getNamedModel(userVocabularyURI).add(labelShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE));
+        ds.getNamedModel(userVocabularyURI).add(labelShape, SH.path, RDFS.label);
+        ds.getNamedModel(userVocabularyURI).add(createdByShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE));
+        ds.getNamedModel(userVocabularyURI).add(createdByShape, SH.path, FS.createdBy);
+        ds.getNamedModel(userVocabularyURI).add(md5Shape, FS.importantProperty, createTypedLiteral(Boolean.FALSE));
+        ds.getNamedModel(userVocabularyURI).add(md5Shape, SH.path, FS.md5);
+    }
 }

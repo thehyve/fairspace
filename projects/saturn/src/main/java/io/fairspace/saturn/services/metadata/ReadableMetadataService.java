@@ -25,13 +25,13 @@ class ReadableMetadataService {
      * @param subject       Subject URI for which you want to return statements
      * @param predicate     Predicate URI for which you want to return statements
      * @param object        Object URI for which you want to return statements. Literal values are not allowed
-     * @param withLabels    If set to true, the returned model will also include statements specifying the rdfs:label
- *                          property for the objects of the statements.
+     * @param withObjectProperties    If set to true, the returned model will also include statements specifying values for
+     *                                certain properties marked as fs:importantProperty in the vocabulary
      * @return
      */
-    Model get(String subject, String predicate, String object, boolean withLabels) {
-        var query = withLabels ? "select_by_mask_with_labels" : "select_by_mask";
-        return rdf.queryConstruct(storedQuery(query, graph, asURI(subject), asURI(predicate), asURI(object)));
+    Model get(String subject, String predicate, String object, boolean withObjectProperties) {
+        var query = withObjectProperties ? "select_by_mask_with_important_properties" : "select_by_mask";
+        return rdf.queryConstruct(storedQuery(query, graph, asURI(subject), asURI(predicate), asURI(object), vocabulary));
     }
 
     /**

@@ -92,5 +92,8 @@ public class FS {
 
     public static final String SHOW_IN_CATALOG_URI = NS + "showInCatalog";
     public static final Property showInCatalog = createProperty(SHOW_IN_CATALOG_URI);
+
+    public static final String IMPORTANT_PROPERTY_URI = NS + "importantProperty";
+    public static final Property importantProperty = createProperty(IMPORTANT_PROPERTY_URI);
 }
 
