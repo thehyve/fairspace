@@ -219,23 +219,4 @@ describe('Search API', () => {
                     .toEqual(types);
             });
     });
-
-    it('forwards the metadata search for subclasses to ES', () => {
-        const subClassOf = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
-
-        searchAPI.searchLinkedDataOfSubclass({subClassOf})
-            .then(() => {
-                expect(mockClient.search.mock.calls.length)
-                    .toEqual(1);
-
-                expect(mockClient.search.mock.calls[0][0].body.size)
-                    .toEqual(SEARCH_DEFAULT_SIZE);
-
-                expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
-                    .toEqual('*');
-
-                expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['subClassOf.keyword'])
-                    .toEqual(subClassOf);
-            });
-    });
 });

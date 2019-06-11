@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 
 import searchAPI from "../../../services/SearchAPI";
 import {linkLabel, propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
@@ -10,15 +10,27 @@ const LinkedDataDropdown = ({types, property, ...otherProps}) => {
     const [fetchedItems, setFetchedItems] = useState(null);
     const [error, setError] = useState(null);
 
+    const mountedRef = useRef(false);
+    useEffect(() => {
+        mountedRef.current = true;
+        return () => {mountedRef.current = false;};
+    }, []);
+
     useEffect(() => {
         setFetchedItems(null);
         setError(null);
         searchAPI()
             .searchLinkedData({types: types || [property.className], size: SEARCH_DROPDOWN_DEFAULT_SIZE})
             .then(({items}) => {
-                setFetchedItems(items);
+                if (mountedRef.current) {
+                    setFetchedItems(items);
+                }
             })
-            .catch(setError);
+            .catch(e => {
+                if (mountedRef.current) {
+                    setError(e);
+                }
+            });
     }, [property.className, types]);
 
     if (error) {

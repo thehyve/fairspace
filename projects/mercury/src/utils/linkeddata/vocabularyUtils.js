@@ -203,6 +203,22 @@ export const vocabularyUtils = (vocabulary = []) => {
      */
     const getRaw = () => vocabulary;
 
+    const getChildSubclasses = type => vocabulary.filter(e => getFirstPredicateId(e, constants.SUBCLASS_URI) === type).map(e => e['@id']);
+
+    const getClassHierarchy = type => {
+        let queue = [type];
+        let found = [];
+
+        while (queue.length > 0) {
+            const head = queue.shift();
+            const subClasses = getChildSubclasses(head);
+            queue = queue.concat(subClasses);
+            found = found.concat(subClasses);
+        }
+
+        return found;
+    };
+
     return Object.freeze({
         contains,
         get,
@@ -213,6 +229,8 @@ export const vocabularyUtils = (vocabulary = []) => {
         generatePropertyEntry,
         getRaw,
         getLabelForPredicate,
-        getClassesInCatalog
+        getClassesInCatalog,
+        getChildSubclasses,
+        getClassHierarchy
     });
 };
