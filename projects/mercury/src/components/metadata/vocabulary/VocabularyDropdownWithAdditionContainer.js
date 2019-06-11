@@ -50,7 +50,7 @@ const mapStateToProps = (state, ownProps) => {
     const pending = isMetaVocabularyPending(state);
     const error = hasMetaVocabularyError(state);
 
-    const shape = (!pending && !error) ? metaVocabulary.determineShapeForType(ownProps.property.className) : {};
+    const shape = (!pending && !error) ? metaVocabulary.determineShapeForTypes([ownProps.property.className]) : {};
     const emptyData = emptyLinkedData(metaVocabulary, shape);
 
     const onError = (e, id) => {

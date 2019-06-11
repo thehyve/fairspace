@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import * as consts from "../../constants";
-import {getFirstPredicateValue} from "./jsonLdUtils";
+import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 
 /**
  *
@@ -72,10 +72,6 @@ export function relativeLink(link) {
     return withoutSchema.substring(withoutSchema.indexOf('/'));
 }
 
-export function isDateTimeProperty(property) {
-    return property.datatype === consts.DATETIME_URI;
-}
-
 export function generateUuid() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g,
         // eslint-disable-next-line
@@ -126,11 +122,15 @@ export const propertiesToShow = (properties = []) => {
 /**
  * Creates a textual description of the type for the given metadata item
  * @param metadata
+ * @param vocabulary
  * @returns {{label: string, description: string}} object containing the type label and description
  */
-export const getTypeInfo = (metadata) => {
+export const getTypeInfo = (metadata, vocabulary) => {
     const typeProp = metadata && metadata.find(prop => prop.key === '@type');
-    const {label = '', comment: description = ''} = (typeProp && typeProp.values && typeProp.values.length && typeProp.values[0]) || {};
+    const types = (typeProp && typeProp.values) || [];
+    const shape = vocabulary.determineShapeForTypes(types.map(t => t.id));
+    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
+    const {label = '', comment: description = ''} = types.find(t => t.id === type) || {};
 
     return {label, description};
 };
@@ -174,7 +174,7 @@ export const createVocabularyIri = (id) => createIri(id, 'vocabulary');
  * This ensures consistent IRI generation and
  * add the ability to access the same IRI on different protocols.
  *
- * @param id
+ * @param iri
  * @returns {string}
  */
 export const url2iri = (iri) => {
@@ -198,7 +198,7 @@ export const partitionErrors = (errors, subject) => {
 
 /**
  * Returns true if the given value is truthy or zero or false
- * @param {*}
+ * @param value
  */
 export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
 
