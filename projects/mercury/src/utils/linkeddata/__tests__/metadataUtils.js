@@ -10,7 +10,7 @@ import {
     shouldPropertyBeHidden,
     url2iri,
     isNonEmptyValue,
-    partitionErrors
+    partitionErrors, hasValue
 } from "../metadataUtils";
 import * as constants from "../../../constants";
 import {SHACL_TARGET_CLASS} from "../../../constants";
@@ -307,4 +307,12 @@ describe('Metadata Utils', () => {
                 });
         });
     });
+
+    describe('hasValue', () => {
+        it('should return false if no value is present', () => expect(hasValue({})).toBe(false));
+        it('should return false if values list is empty', () => expect(hasValue({values: []})).toBe(false));
+        it('should return false if only an empty string is is present', () => expect(hasValue({values: [{value: ""}]})).toBe(false));
+        it('should return true if an id is present', () => expect(hasValue({values: [{id: "http://a"}]})).toBe(true));
+        it('should return true if a non-empty value is present', () => expect(hasValue({values: [{value: "label"}]})).toBe(true));
+    })
 });

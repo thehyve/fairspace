@@ -174,7 +174,6 @@ export const vocabularyUtils = (vocabulary = []) => {
         const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
         const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
         const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH, 1000) > 255;
-        const minValuesCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
         const description = getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION);
         const path = getFirstPredicateId(shape, constants.SHACL_PATH);
 
@@ -187,7 +186,8 @@ export const vocabularyUtils = (vocabulary = []) => {
             datatype,
             multiLine,
             className,
-            minValuesCount,
+            order: getFirstPredicateValue(shape, constants.SHACL_ORDER),
+            minValuesCount: getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT),
             maxValuesCount: getMaxCount(shape),
             machineOnly: getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false),
             isRdfList: isRdfList(shape),
