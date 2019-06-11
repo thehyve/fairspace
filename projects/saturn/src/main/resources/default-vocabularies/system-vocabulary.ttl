@@ -134,6 +134,7 @@ fs:labelShape a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
     fs:fixedShape true ;
+    fs:importantProperty true ;
     sh:path rdfs:label . 
  
 fs:commentShape a fs:DatatypePropertyShape ;

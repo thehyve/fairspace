@@ -70,6 +70,7 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape, 
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
     [
         sh:maxCount 1 ;
@@ -97,6 +98,7 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape, 
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
     [
         sh:path sh:datatype ;
@@ -126,6 +128,7 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape,
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
     [
         sh:path sh:in ;
@@ -247,6 +250,11 @@ fs:PathShape a sh:PropertyShape ;
   fs:showInTable true ;
   sh:order 3 .
 
+fs:ImportantPropertyShape a sh:PropertyShape ;
+  sh:datatype xsd:boolean ;
+  sh:maxCount 1 ;
+  sh:path fs:importantProperty ;
+  sh:name "Show this property as a column in a table " .
 
 # Definitions of our shape types, needed
 # for form building
