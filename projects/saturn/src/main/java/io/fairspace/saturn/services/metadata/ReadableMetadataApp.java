@@ -28,7 +28,7 @@ public class ReadableMetadataApp extends BaseApp {
                         req.queryParams("subject"),
                         req.queryParams("predicate"),
                         req.queryParams("object"),
-                        req.queryParams().contains("labels")));
+                        req.queryParams().contains("includeObjectProperties")));
             });
             get("/entities/", JSON_LD_HEADER_STRING, (req, res) -> {
                 res.type(JSONLD.getLang().getHeaderString());

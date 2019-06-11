@@ -26,7 +26,7 @@ beforeAll(() => {
 it('fetches metadata with provided parameters', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c'});
-    expect(window.fetch.mock.calls[0][0]).toEqual("/meta/?labels&subject=a&predicate=b&object=c");
+    expect(window.fetch.mock.calls[0][0]).toEqual("/meta/?includeObjectProperties&subject=a&predicate=b&object=c");
 });
 
 it('stores metadata as jsonld', () => {

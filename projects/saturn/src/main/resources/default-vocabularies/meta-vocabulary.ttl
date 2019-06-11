@@ -74,6 +74,7 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape, 
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
     [
         sh:maxCount 1 ;
@@ -101,13 +102,14 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape, 
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
     [
         sh:path sh:datatype ;
         # direct controlled vocabulary approach
         sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
         sh:name "Datatype" ;
-        fs:showInTable true ;
+        fs:importantProperty true ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:order 2
@@ -130,6 +132,7 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape,
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
     [
         sh:path sh:in ;
@@ -166,7 +169,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:name "Class target" ;
-        fs:showInTable true ;
+        fs:importantProperty true ;
         sh:order 2
     ] ;
     fs:showInCatalog true ;
@@ -214,7 +217,7 @@ fs:PropertyNameShape a sh:PropertyShape ;
   sh:minCount 1 ;
   sh:path sh:name ;
   sh:name "Property name" ;
-  fs:showInTable true ;
+  fs:importantProperty true ;
   sh:order 0 .
 
 fs:MinCountShape a sh:PropertyShape ; 
@@ -239,7 +242,7 @@ fs:DescriptionShape a sh:PropertyShape ;
   sh:minCount 1 ;
   sh:path sh:description ;
   sh:name "Property description" ;
-  fs:showInTable true ;
+  fs:importantProperty true ;
   sh:order 1 .
 
 fs:PathShape a sh:PropertyShape ; 
@@ -248,9 +251,14 @@ fs:PathShape a sh:PropertyShape ;
   sh:path sh:path ;
   sh:nodeKind sh:IRI ;
   sh:name "Property identifier" ;
-  fs:showInTable true ;
+  fs:importantProperty true ;
   sh:order 3 .
 
+fs:ImportantPropertyShape a sh:PropertyShape ;
+  sh:datatype xsd:boolean ;
+  sh:maxCount 1 ;
+  sh:path fs:importantProperty ;
+  sh:name "Show this property as a column in a table " .
 
 # Definitions of our shape types, needed
 # for form building
