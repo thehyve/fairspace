@@ -205,4 +205,10 @@ export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value
 /**
  * Returns true if the given value or id is part of the property values
  */
-export const propertyHasValue = ({values}, {value, id}) => !!(values && (value || id) && values.some(v => (v.id && v.id === id) || (v.value && v.value === value)));
+export const propertyContainsValueOrId = (property, value, id) => {
+    if (!Array.isArray(property.values) || property.values.length === 0 || (!value && !id)) {
+        return false;
+    }
+
+    return property.values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
+};

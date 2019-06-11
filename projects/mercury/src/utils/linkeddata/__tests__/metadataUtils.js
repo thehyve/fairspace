@@ -11,7 +11,7 @@ import {
     url2iri,
     isNonEmptyValue,
     partitionErrors,
-    propertyHasValue
+    propertyContainsValueOrId
 } from "../metadataUtils";
 import * as constants from "../../../constants";
 
@@ -308,30 +308,34 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('propertyHasValue', () => {
+    describe('propertyContainsValueOrId', () => {
         const property = {
             values: [
                 {value: 'first value'},
+                {value: '321'},
                 {id: '1234'},
                 {value: 'other value'},
-                {id: 'some-id-555', value: 'wit hgiven value'}
+                {id: 'some-id-555', value: 'with given value'}
             ]
         };
 
         it('should returns true for the given values', () => {
-            expect(propertyHasValue(property, {value: 'first value'})).toBe(true);
-            expect(propertyHasValue(property, {id: '1234'})).toBe(true);
-            expect(propertyHasValue(property, {value: 'other value'})).toBe(true);
-            expect(propertyHasValue(property, {id: 'some-id-555', value: 'with given value'})).toBe(true);
+            expect(propertyContainsValueOrId(property, 'first value')).toBe(true);
+            expect(propertyContainsValueOrId(property, '321', 99)).toBe(true);
+            expect(propertyContainsValueOrId(property, '321')).toBe(true);
+            expect(propertyContainsValueOrId(property, null, '1234')).toBe(true);
+            expect(propertyContainsValueOrId(property, 'other value')).toBe(true);
+            expect(propertyContainsValueOrId(property, 'with given value', 'some-id-555')).toBe(true);
         });
 
         it('should returns false for the given values', () => {
-            expect(propertyHasValue(property, {value: ''})).toBe(false);
-            expect(propertyHasValue(property, {id: '12345'})).toBe(false);
-            expect(propertyHasValue(property, {id: 'other value'})).toBe(false);
-            expect(propertyHasValue(property, {id: 'some-id-555x', value: 'with given valuex'})).toBe(false);
-            expect(propertyHasValue({}, {id: 'some-id-555', value: 'with given value'})).toBe(false);
-            expect(propertyHasValue({}, {id: undefined, value: null})).toBe(false);
+            expect(propertyContainsValueOrId(property, null, '')).toBe(false);
+            expect(propertyContainsValueOrId(property, 321)).toBe(false);
+            expect(propertyContainsValueOrId(property, undefined, '12345')).toBe(false);
+            expect(propertyContainsValueOrId(property, undefined, 'other value')).toBe(false);
+            expect(propertyContainsValueOrId(property, 'some value value', 'other-id')).toBe(false);
+            expect(propertyContainsValueOrId({}, 'with given value', 'some-id-555')).toBe(false);
+            expect(propertyContainsValueOrId({}, undefined, null)).toBe(false);
         });
     });
 });
