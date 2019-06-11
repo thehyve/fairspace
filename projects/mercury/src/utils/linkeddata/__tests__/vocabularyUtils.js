@@ -3,7 +3,7 @@ import {
     getMaxCount,
     getSystemProperties,
     isGenericIriResource,
-    isRdfList,
+    isRdfList, isRelationShape,
     vocabularyUtils
 } from '../vocabularyUtils';
 import vocabularyJsonLd from '../test.vocabulary.json';
@@ -134,6 +134,18 @@ describe('vocabularyUtils', () => {
         it('should set deletable flag for values for SHACL_PROPERTY', () => {
             const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
             expect(extendedProperties[2].values).toEqual([{id: 'http://custom', isDeletable: true}, {id: 'http://fixed', isDeletable: false}]);
+        });
+    });
+
+    describe('isRelationShape', () => {
+        it('should return true for relation shapes', () => {
+            expect(isRelationShape({'@type': [constants.RELATION_SHAPE_URI]})).toBe(true);
+            expect(isRelationShape({'@type': ['http://someShape', constants.RELATION_SHAPE_URI]})).toBe(true);
+        });
+        it('should return false for other types of shapes', () => {
+            expect(isRelationShape({'@type': ['http://other-type']})).toBe(false);
+            expect(isRelationShape({'@type': []})).toBe(false);
+            expect(isRelationShape({})).toBe(false);
         });
     });
 });

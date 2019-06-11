@@ -28,6 +28,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:order 1
     ], [
         # This means every value for predicate sh:property should have this type.
+        a fs:RelationShape ;
         sh:class sh:PropertyShape ;
         sh:minCount 1 ;
         sh:path sh:property ;

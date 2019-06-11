@@ -16,6 +16,13 @@ export const isRdfList = (propertyShape) => getFirstPredicateId(propertyShape, c
 export const isGenericIriResource = (propertyShape) => getFirstPredicateId(propertyShape, constants.SHACL_NODEKIND) === constants.SHACL_IRI;
 
 /**
+ * Checks whether the given shape describe a relation
+ * @param propertyShape
+ * @returns {boolean}
+ */
+export const isRelationShape = shape => Array.isArray(shape['@type']) && shape['@type'].includes(constants.RELATION_SHAPE_URI);
+
+/**
  * Returns the maxCount value for the given shape
  *
  * RDF lists are treated as a special case. They have a maxCount of 1, because
@@ -193,6 +200,7 @@ export const vocabularyUtils = (vocabulary = []) => {
             isRdfList: isRdfList(shape),
             allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
             isGenericIriResource: isGenericIriResource(shape),
+            isRelationShape: isRelationShape(shape),
             isExternalLink: isExternalLink(shape),
             allowAdditionOfEntities: isFairspaceClass(className)
         };
