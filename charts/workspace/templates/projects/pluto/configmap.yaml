@@ -42,6 +42,7 @@ data:
         base-url: {{ .Values.tracing.baseUrl }}
 
     zuul:
+      retryable: false
       host:
         connect-timeout-millis: {{ .Values.pluto.connectTimeoutMillis }}
         socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}

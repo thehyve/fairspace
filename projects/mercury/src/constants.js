@@ -47,6 +47,7 @@ export const SHACL_MIN_COUNT = SHACL_NS + 'minCount';
 export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
 export const SHACL_IN = SHACL_NS + 'in';
 export const SHACL_IRI = SHACL_NS + 'IRI';
+export const SHACL_ORDER = SHACL_NS + 'order';
 
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
 

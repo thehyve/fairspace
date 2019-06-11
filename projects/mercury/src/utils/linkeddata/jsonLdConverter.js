@@ -86,7 +86,7 @@ const convertMetadataIntoPropertyList = (metadata, propertyShapes = [], allMetad
             prefilledProperties.push({...vocabulary.generatePropertyEntry(predicateUri, propertyShape), values});
         });
 
-    return prefilledProperties.sort(compareBy('label'));
+    return prefilledProperties;
 };
 
 /**
@@ -105,7 +105,7 @@ const determineAdditionalEmptyProperties = (metadata, propertyShapes = [], vocab
             return {...vocabulary.generatePropertyEntry(predicateUri, shape), values: []};
         });
 
-    return additionalProperties.sort(compareBy('label'));
+    return additionalProperties;
 };
 
 

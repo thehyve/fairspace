@@ -212,3 +212,10 @@ export const propertyContainsValueOrId = (property, value, id) => {
 
     return property.values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
 };
+
+/**
+ * Returns true if the given property have one or more non-empty values
+ * @param property
+ * @returns {boolean}
+ */
+export const hasValue = property => !!(property.values && Array.isArray(property.values) && property.values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
