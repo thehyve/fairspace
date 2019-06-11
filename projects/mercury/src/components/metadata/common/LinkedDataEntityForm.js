@@ -23,7 +23,7 @@ export const LinkedDataEntityForm = ({
             {
                 properties
                     .sort(comparing(
-                        compareBy(p => (p.order === undefined ? Number.MAX_SAFE_INTEGER : p.order)),
+                        compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
                         compareBy(hasValue, false),
                         compareBy('label')
                     ))
