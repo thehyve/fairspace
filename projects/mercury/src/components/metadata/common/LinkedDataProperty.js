@@ -1,17 +1,9 @@
-import React, {useState, useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
-import {
-    IconButton,
-    FormControl,
-    FormControlLabel,
-    FormLabel,
-    FormGroup,
-    FormHelperText,
-    Typography
-} from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import {FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Typography} from '@material-ui/core';
 
 import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
+import LinkedDataPropertyValuesList from "./LinkedDataPropertyValuesList";
 
 /**
      * Checks whether the configuration of this property disallowed editing of existing values
@@ -27,7 +19,6 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || allowedValues;
 
 const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
-    const [hoveredIndex, setHoveredIndex] = useState(null);
     const [hoveredAllProperty, setHoveredAllProperty] = useState(false);
     const {readOnlyComponent, editComponent, addComponent} = useContext(LinkedDataValuesContext);
 
@@ -46,8 +37,6 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
     const ValueComponent = disableEditing ? readOnlyComponent() : editComponent(property);
     const ValueAddComponent = addComponent(property);
     const pathVisibility = hoveredAllProperty ? 'visible' : 'hidden';
-
-    const isDeletable = entry => !('isDeletable' in entry) || entry.isDeletable;
 
     return (
         <FormControl
@@ -68,47 +57,13 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                 {path}
             </Typography>
             <FormGroup>
-                {values.map((entry, idx) => (
-                    <div
-                        onMouseEnter={() => setHoveredIndex(idx)}
-                        onMouseLeave={() => setHoveredIndex(null)}
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={idx}
-                    >
-                        <FormControlLabel
-                            style={{width: '100%', margin: 0}}
-                            control={(
-                                <>
-                                    <ValueComponent
-                                        property={property}
-                                        entry={entry}
-                                        onChange={(value) => onChange(value, idx)}
-                                        aria-labelledby={labelId}
-                                        error={hasErrors}
-                                    />
-                                    {
-                                        isDeletable(entry) && property.isEditable
-                                            ? (
-                                                <IconButton
-                                                    size="small"
-                                                    aria-label="Delete"
-                                                    title="Delete"
-                                                    onClick={() => onDelete(idx)}
-                                                    style={{
-                                                        visibility: hoveredIndex === idx ? 'visible' : 'hidden',
-                                                        padding: 6,
-                                                        marginLeft: 8
-                                                    }}
-                                                >
-                                                    <ClearIcon />
-                                                </IconButton>
-                                            ) : null
-                                    }
-                                </>
-                            )}
-                        />
-                    </div>
-                ))}
+                <LinkedDataPropertyValuesList
+                    property={property}
+                    onChange={onChange}
+                    onDelete={onDelete}
+                    labelId={labelId}
+                    valueComponent={ValueComponent}
+                />
 
                 {canAdd ? (
                     <FormControlLabel
