@@ -4,6 +4,17 @@ import * as consts from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 
 /**
+ * Returns the local part of the given uri
+ * @param uri
+ * @returns {string}
+ */
+export const getLocalPart = uri => (
+    uri.includes('#')
+        ? uri.substring(uri.lastIndexOf('#') + 1)
+        : uri.substring(uri.lastIndexOf('/') + 1)
+);
+
+/**
  *
  * @param uri the URI to generate a label for
  * @param shortenExternalUris if true will generate a short label even if a URI doesn't belong to the current workspace
@@ -24,15 +35,8 @@ export function linkLabel(uri, shortenExternalUris = false) {
         }
     }
 
-    if (shortenExternalUris) {
-        return uri.includes('#')
-            ? uri.substring(uri.lastIndexOf('#') + 1)
-            : uri.substring(uri.lastIndexOf('/') + 1);
-    }
-
-    return uri;
+    return shortenExternalUris ? getLocalPart(uri) : uri;
 }
-
 
 /**
  * Returns the label for the given entity.

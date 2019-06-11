@@ -105,16 +105,8 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:DescriptionShape,
         fs:ImportantPropertyShape,
         fs:PathShape,
+        fs:DatatypeShape,
     [
-        sh:path sh:datatype ;
-        # direct controlled vocabulary approach
-        sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
-        sh:name "Datatype" ;
-        fs:importantProperty true ;
-        sh:maxCount 1 ;
-        sh:minCount 1 ;
-        sh:order 2
-    ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
         sh:maxCount 1 ;
@@ -261,6 +253,16 @@ fs:ImportantPropertyShape a sh:PropertyShape ;
   sh:path fs:importantProperty ;
   sh:name "Show this property as a column in a table " .
 
+fs:DatatypeShape a sh:PropertyShape ;
+    sh:path sh:datatype ;
+    # direct controlled vocabulary approach
+    sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
+    sh:name "Datatype" ;
+    fs:importantProperty true ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:order 2 .
+
 # Definitions of our shape types, needed
 # for form building
 fs:ClassShape a sh:NodeShape .
@@ -268,3 +270,13 @@ fs:DatatypePropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:ControlledVocabularyPropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:ExternalIRIPropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:RelationShape rdfs:subClassOf sh:PropertyShape .
+
+# Definition for property shape, used to render a table with properties
+sh:PropertyShape
+    sh:targetClass sh:PropertyShape ;
+    sh:property
+        fs:PropertyNameShape,
+        fs:DescriptionShape,
+        fs:DatatypeShape,
+        fs:PathShape .
+

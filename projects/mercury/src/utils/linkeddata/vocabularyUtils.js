@@ -158,6 +158,13 @@ export const vocabularyUtils = (vocabulary = []) => {
     const determinePropertyShapesForTypes = (types) => determinePropertyShapesForNodeShape(determineShapeForTypes(types));
 
     /**
+     * Returns a list of property shapes for the given type, where the properties are marked as fs:importantProperty
+     * @param type
+     */
+    const determineImportantPropertyShapes = type => determinePropertyShapesForTypes([type])
+        .filter(shape => getFirstPredicateValue(shape, constants.IMPORTANT_PROPERTY_URI, false));
+
+    /**
      * Determines whether the given class URI is a fairspace class
      */
     const isFairspaceClass = (className) => {
@@ -183,6 +190,8 @@ export const vocabularyUtils = (vocabulary = []) => {
         const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH, 1000) > 255;
         const description = getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION);
         const path = getFirstPredicateId(shape, constants.SHACL_PATH);
+        const shapeIsRelationShape = isRelationShape(shape);
+        const importantPropertyShapes = shapeIsRelationShape && className ? determineImportantPropertyShapes(className) : [];
 
         return {
             key: predicate,
@@ -200,9 +209,10 @@ export const vocabularyUtils = (vocabulary = []) => {
             isRdfList: isRdfList(shape),
             allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
             isGenericIriResource: isGenericIriResource(shape),
-            isRelationShape: isRelationShape(shape),
             isExternalLink: isExternalLink(shape),
-            allowAdditionOfEntities: isFairspaceClass(className)
+            allowAdditionOfEntities: isFairspaceClass(className),
+            isRelationShape: shapeIsRelationShape,
+            importantPropertyShapes
         };
     };
 

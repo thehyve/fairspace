@@ -4,6 +4,7 @@ import {FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Typ
 
 import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
 import LinkedDataPropertyValuesList from "./LinkedDataPropertyValuesList";
+import LinkedDataPropertyValuesTable from "./LinkedDataPropertyValuesTable";
 
 /**
      * Checks whether the configuration of this property disallowed editing of existing values
@@ -57,13 +58,22 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                 {path}
             </Typography>
             <FormGroup>
-                <LinkedDataPropertyValuesList
-                    property={property}
-                    onChange={onChange}
-                    onDelete={onDelete}
-                    labelId={labelId}
-                    valueComponent={ValueComponent}
-                />
+                {
+                    property.isRelationShape ? (
+                        <LinkedDataPropertyValuesTable
+                            property={property}
+                            onDelete={onDelete}
+                        />
+                    ) : (
+                        <LinkedDataPropertyValuesList
+                            property={property}
+                            onChange={onChange}
+                            onDelete={onDelete}
+                            labelId={labelId}
+                            valueComponent={ValueComponent}
+                        />
+                    )
+                }
 
                 {canAdd ? (
                     <FormControlLabel
