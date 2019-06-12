@@ -25,13 +25,7 @@ axios.interceptors.request.use((config) => {
       <d:getlastmodified />
    </d:prop>
    <d:prop>
-      <d:getcontenttype />
-   </d:prop>   
-   <d:prop>
       <d:getcontentlength />
-   </d:prop>
-   <d:prop>
-      <d:getetag />
    </d:prop>
 </propfind>`;
     }
