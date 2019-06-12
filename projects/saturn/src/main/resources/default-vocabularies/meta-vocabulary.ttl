@@ -143,7 +143,7 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         sh:property [
             sh:path ( [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
             sh:minLength 1 ;
-        ]
+        ] ;
         sh:order 3 
     ] ;
     fs:showInCatalog true ;
