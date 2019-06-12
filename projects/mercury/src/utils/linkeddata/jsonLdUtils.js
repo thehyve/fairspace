@@ -39,4 +39,4 @@ export const normalizeJsonLdResource = jsonLd => (
                     [getLocalPart(key)]: Array.isArray(jsonLd[key]) ? jsonLd[key].map(v => v['@value'] || v['@id'] || v) : jsonLd[key]
                 })
             )
-        ) : undefined);
+        ) : {});

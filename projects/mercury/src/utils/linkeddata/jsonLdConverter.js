@@ -80,7 +80,7 @@ const convertMetadataIntoPropertyList = (metadata, propertyShapes = [], allMetad
                 // sort the values
                 values = metadata[predicateUri]
                     .map(entry => generateValueEntry(entry, allMetadata))
-                    .sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
+                    .sort(comparing(compareBy(e => e.otherEntry && e.otherEntry.label), compareBy('id'), compareBy('value')));
             }
 
             prefilledProperties.push({...vocabulary.generatePropertyEntry(predicateUri, propertyShape), values});
