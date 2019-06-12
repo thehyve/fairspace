@@ -314,6 +314,11 @@ sh:PropertyShape
     sh:property
         fs:PropertyNameShape,
         fs:DescriptionShape,
-        fs:DatatypeShape,
-        fs:PathShape .
+        fs:PathShape,
+        [
+            sh:path sh:datatype ;
+            sh:name "Datatype" ;
+            fs:importantProperty true ;
+            sh:order 2
+        ] .
 
