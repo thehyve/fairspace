@@ -24,6 +24,7 @@ mkdir -p ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
 chmod 700 ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
 chmod a-s ~/.davfs2/cache/localhost-webdav-v1+home-jovyan-collections+jovyan
 echo "
+delay_upload    0
 ask_auth        0
 use_locks       0
 " > ~/.davfs2/davfs2.conf
