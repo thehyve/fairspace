@@ -13,7 +13,7 @@ const styles = {
             borderBottomWidth: 0
         }
     }
-}
+};
 
 export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onAdd, onDelete, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);

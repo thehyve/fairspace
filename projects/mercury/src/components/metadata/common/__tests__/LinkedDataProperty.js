@@ -6,7 +6,6 @@ import LinkedDataProperty from "../LinkedDataProperty";
 import LinkedDataRelationTable from "../LinkedDataRelationTable";
 import LinkedDataInputFieldsTable from "../LinkedDataInputFieldsTable";
 import {LinkedDataValuesContext} from "../LinkedDataValuesContext";
-import ReferringValue from "../values/ReferringValue";
 import NumberValue from "../values/NumberValue";
 import StringValue from "../values/StringValue";
 import SwitchValue from "../values/SwitchValue";
@@ -76,7 +75,7 @@ describe('LinkedDataProperty elements', () => {
             const table = wrapper.find(LinkedDataInputFieldsTable);
             expect(table.length).toEqual(1);
             return table;
-        }
+        };
 
         it('should use the factory in the context to determine the Add component', () => {
             expect(
@@ -135,5 +134,5 @@ describe('LinkedDataProperty elements', () => {
                 }).prop("editComponent")
             ).toEqual(SwitchValue);
         });
-    })
+    });
 });
