@@ -1,9 +1,8 @@
 import {compareBy, comparing, flattenShallow} from "../genericUtils";
 import * as constants from "../../constants";
-import {RDF_TYPE} from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue, normalizeJsonLdResource} from "./jsonLdUtils";
 import {isRdfList} from "./vocabularyUtils";
-import {isNonEmptyValue} from "./metadataUtils";
+import {isNonEmptyValue, simplifyUriPredicates} from "./metadataUtils";
 
 /**
  * Generates a property entry for the given type(s)
@@ -38,7 +37,7 @@ const generateTypeProperty = (vocabulary, types) => {
 const generateValueEntry = (entry, allMetadata) => ({
     id: entry['@id'],
     value: entry['@value'],
-    otherEntry: entry['@id'] ? normalizeJsonLdResource(allMetadata.find(element => element['@id'] === entry['@id'])) : {}
+    otherEntry: entry['@id'] ? simplifyUriPredicates(normalizeJsonLdResource(allMetadata.find(element => element['@id'] === entry['@id']))) : {}
 });
 
 /**
@@ -262,8 +261,8 @@ export const emptyLinkedData = (vocabulary, shape) => {
  * @returns {*}
  */
 export const normalizeTypes = (expandedMetadata) => expandedMetadata.map(e => {
-    if (!e['@type'] && e[RDF_TYPE]) {
-        const {[RDF_TYPE]: types, ...rest} = e;
+    if (!e['@type'] && e[constants.RDF_TYPE]) {
+        const {[constants.RDF_TYPE]: types, ...rest} = e;
         return {
             '@type': types.map(t => t['@id']),
             ...rest

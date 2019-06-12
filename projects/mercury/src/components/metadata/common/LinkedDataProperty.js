@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
-import {FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Typography} from '@material-ui/core';
+import {FormControl, FormGroup, FormHelperText, FormLabel, Typography} from '@material-ui/core';
 
 import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
 import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";

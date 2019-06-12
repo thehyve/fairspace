@@ -31,19 +31,6 @@ describe('json-ld Utils', () => {
     });
 
     describe('normalizeJsonLdResource', () => {
-        it('should convert keys into its localpart', () => {
-            expect(Object.keys(normalizeJsonLdResource({
-                'http://namespace#test': [{'@value': 'a'}],
-                'http://other-namespace/something#label': [{'@value': 'b'}],
-                'simple-key': [{'@value': 'c'}]
-            }))).toEqual(expect.arrayContaining(['test', 'label', 'simple-key']));
-        });
-        it('should not change @id and @type keys', () => {
-            expect(Object.keys(normalizeJsonLdResource({
-                '@id': [{'@value': 'a'}],
-                '@type': [{'@value': 'b'}]
-            }))).toEqual(expect.arrayContaining(['@id', '@type']));
-        });
         it('should convert objects with @value or @id into a literal', () => {
             expect(Object.values(normalizeJsonLdResource({
                 a: [{'@value': 'a'}],

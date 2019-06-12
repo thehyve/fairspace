@@ -15,7 +15,7 @@ const styles = {
     }
 }
 
-const LinkedDataValuesTable = ({classes, property, columnDefinitions, onAdd, onDelete, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
+export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onAdd, onDelete, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
     const isDeletable = entry => !('isDeletable' in entry) || entry.isDeletable;
@@ -65,7 +65,7 @@ const LinkedDataValuesTable = ({classes, property, columnDefinitions, onAdd, onD
                 ))}
             </TableBody>
 
-            {canAdd ? (
+            {canAdd && AddComponent ? (
                 <TableFooter>
                     <TableRow>
                         <TableCell colSpan={columnDefinitions.length}>
@@ -76,7 +76,7 @@ const LinkedDataValuesTable = ({classes, property, columnDefinitions, onAdd, onD
                                 aria-labelledby={labelId}
                             />
                         </TableCell>
-                        <TableCell className={classes.buttonColumn} />
+                        {property.isEditable ? <TableCell className={classes.buttonColumn} /> : undefined}
                     </TableRow>
                 </TableFooter>
             ) : undefined
@@ -87,7 +87,6 @@ const LinkedDataValuesTable = ({classes, property, columnDefinitions, onAdd, onD
 
 LinkedDataValuesTable.propTypes = {
     onAdd: PropTypes.func,
-    onChange: PropTypes.func,
     onDelete: PropTypes.func,
     showHeader: PropTypes.bool,
     canAdd: PropTypes.bool,
@@ -100,12 +99,16 @@ LinkedDataValuesTable.propTypes = {
         })
     ),
     property: PropTypes.object,
+
+    classes: PropTypes.object
 };
 
 LinkedDataValuesTable.defaultProps = {
     onDelete: () => {},
     showHeader: true,
-    canAdd: true
+    canAdd: true,
+    columnDefinitions: [],
+    classes: {}
 };
 
 export default withStyles(styles)(LinkedDataValuesTable);

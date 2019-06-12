@@ -1,11 +1,15 @@
 import React from 'react';
-import {mount} from "enzyme";
-import {FormGroup, FormControlLabel} from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import {mount, shallow} from "enzyme";
 
 import {STRING_URI} from "../../../../constants";
 import LinkedDataProperty from "../LinkedDataProperty";
+import LinkedDataRelationTable from "../LinkedDataRelationTable";
+import LinkedDataInputFieldsTable from "../LinkedDataInputFieldsTable";
+import {LinkedDataValuesContext} from "../LinkedDataValuesContext";
+import ReferringValue from "../values/ReferringValue";
+import NumberValue from "../values/NumberValue";
 import StringValue from "../values/StringValue";
+import SwitchValue from "../values/SwitchValue";
 
 const defaultProperty = {
     key: 'description',
@@ -13,95 +17,123 @@ const defaultProperty = {
     label: 'Description',
     values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
     maxValuesCount: 4,
-    isEditable: true
+    isEditable: true,
+    isRelationShape: true
 };
 
 describe('LinkedDataProperty elements', () => {
-    it('shows all provided values', () => {
+    it('shows a table with all values', () => {
+        const wrapper = shallow(<LinkedDataProperty property={defaultProperty} />);
+        const table = wrapper.find(LinkedDataRelationTable);
+        expect(table.length).toEqual(1);
+        expect(table.prop("property")).toEqual(defaultProperty);
+    });
+
+    it('shows a table for relations for relationShapes', () => {
         const property = {
             ...defaultProperty,
-            maxValuesCount: 1
+            isRelationShape: false
         };
 
-        const wrapper = mount(<LinkedDataProperty property={property} />);
-        const listItems = wrapper.find(FormGroup).find(FormControlLabel);
-
-        expect(listItems.length).toEqual(3);
+        const wrapper = shallow(<LinkedDataProperty property={property} />);
+        const table = wrapper.find(LinkedDataInputFieldsTable);
+        expect(table.length).toEqual(1);
+        expect(table.prop("property")).toEqual(property);
     });
 
-    it('shows an add element if multiple values are allowed, and it is editable', () => {
-        const wrapper = mount(<LinkedDataProperty property={defaultProperty} />);
+    describe('canAdd', () => {
+        const verifyCanAdd = (property, expectedCanAdd) => {
+            const wrapper = shallow(<LinkedDataProperty property={property} />);
+            const table = wrapper.find(LinkedDataRelationTable);
+            expect(table.length).toEqual(1);
+            expect(table.prop("canAdd")).toBe(expectedCanAdd);
+        };
 
-        const listItems = wrapper.find(FormGroup).find(FormControlLabel);
-        expect(listItems.length).toEqual(4);
-        const deletIcons = wrapper.find(FormGroup).find(ClearIcon);
-        expect(deletIcons.length).toEqual(3);
-    });
-
-    it('shows no add element if multiple values are allowed, but it is uneditable', () => {
-        const wrapper = mount(<LinkedDataProperty property={{...defaultProperty, isEditable: false}} />);
-
-        const listItems = wrapper.find(FormGroup).find(FormControlLabel);
-        expect(listItems.length).toEqual(3);
-        const deletIcons = wrapper.find(FormGroup).find(ClearIcon);
-        expect(deletIcons.length).toEqual(0);
-    });
-
-    it('shows an add element if there is no value yet, and it is editable', () => {
-        const property = {
+        it('should allow adding new entities', () => verifyCanAdd(defaultProperty, true));
+        it('should not allow adding new entities if property is not editable', () => verifyCanAdd({
             ...defaultProperty,
-            values: []
-        };
-
-        const wrapper = mount(<LinkedDataProperty property={property} />);
-
-        const listItems = wrapper.find(FormGroup).find(FormControlLabel);
-        expect(listItems.length).toEqual(1);
-
-        // Assert contents of the single component
-        const inputComponent = listItems.at(0).find(StringValue);
-        expect(inputComponent.prop('entry')).toEqual({value: ""});
-    });
-
-    it('shows no add element if there is no value yet, but it is uneditable', () => {
-        const property = {
+            isEditable: false
+        }, false));
+        it('should not allow adding new entities if property is machineOnly', () => verifyCanAdd({
             ...defaultProperty,
-            isEditable: false,
-            values: []
-        };
-
-        const wrapper = mount(<LinkedDataProperty property={property} />);
-
-        const listItems = wrapper.find(FormGroup).find(FormControlLabel);
-        expect(listItems.length).toEqual(0);
-    });
-
-    it('does not show an add element if one value has been provided already, and it is editable', () => {
-        const property = {
+            machineOnly: true
+        }, false));
+        it('should not allow adding new entities if the max number of values is reached', () => verifyCanAdd({
             ...defaultProperty,
-            values: [{value: 'More info'}],
-            maxValuesCount: 1
-        };
-
-        const wrapper = mount(<LinkedDataProperty property={property} />);
-
-        const listItems = wrapper.find(FormGroup).find(FormControlLabel);
-        expect(listItems.length).toEqual(1);
-
-        // Assert contents of the single component
-        const inputComponent = listItems.at(0).find(StringValue);
-        expect(inputComponent.prop('entry').value).toEqual('More info');
+            maxValuesCount: 3
+        }, false));
     });
 
-    it('does not show an add element if multiples values are provided, but it is not editable', () => {
-        const property = {
-            ...defaultProperty,
-            values: [{value: 'More info'}, {value: 'another info'}],
-            maxValuesCount: 2
+    describe('inputComponents', () => {
+        const valueComponentFactory = {
+            addComponent: () => NumberValue,
+            editComponent: () => StringValue,
+            readOnlyComponent: () => SwitchValue
         };
 
-        const wrapper = mount(<LinkedDataProperty property={property} />);
-        const listItems = wrapper.find(FormGroup).find(FormControlLabel);
-        expect(listItems.length).toEqual(2);
-    });
+        const renderTable = property => {
+            const wrapper = mount(<LinkedDataValuesContext.Provider value={valueComponentFactory}><LinkedDataProperty property={property} /></LinkedDataValuesContext.Provider>);
+            const table = wrapper.find(LinkedDataInputFieldsTable);
+            expect(table.length).toEqual(1);
+            return table;
+        }
+
+        it('should use the factory in the context to determine the Add component', () => {
+            expect(
+                renderTable({
+                    ...defaultProperty,
+                    isRelationShape: false
+                }).prop("addComponent")
+            ).toEqual(NumberValue);
+        });
+
+        it('should use the factory in the context to determine the edit component', () => {
+            expect(
+                renderTable({
+                    ...defaultProperty,
+                    isRelationShape: false
+                }).prop("editComponent")
+            ).toEqual(StringValue);
+        });
+
+        it('should render a read-only component for non editable shapes', () => {
+            expect(
+                renderTable({
+                    ...defaultProperty,
+                    isRelationShape: false,
+                    isEditable: false
+                }).prop("editComponent")
+            ).toEqual(SwitchValue);
+        });
+
+        it('should render a read-only component for machine only shapes', () => {
+            expect(
+                renderTable({
+                    ...defaultProperty,
+                    isRelationShape: false,
+                    machineOnly: true
+                }).prop("editComponent")
+            ).toEqual(SwitchValue);
+        });
+
+        it('should render a read-only component for generic IRI resources', () => {
+            expect(
+                renderTable({
+                    ...defaultProperty,
+                    isRelationShape: false,
+                    isGenericIriResource: true
+                }).prop("editComponent")
+            ).toEqual(SwitchValue);
+        });
+
+        it('should render a read-only component for controlled vocabulary shapes', () => {
+            expect(
+                renderTable({
+                    ...defaultProperty,
+                    isRelationShape: false,
+                    allowedValues: ['a']
+                }).prop("editComponent")
+            ).toEqual(SwitchValue);
+        });
+    })
 });

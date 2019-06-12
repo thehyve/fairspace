@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, {mapValues} from 'lodash';
 
 import * as consts from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
@@ -212,3 +212,32 @@ export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value
  * @returns {boolean}
  */
 export const hasValue = property => !!(property.values && Array.isArray(property.values) && property.values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
+
+/**
+ * Simplify the keys of the given object by converting the URIs into its local paths
+ * The output of this method is comparable to the results provided by elasticsearch
+ *
+ * @example {'http://namespace#label': [{'@value': 'abc'}]} -> {label: [{'@value': 'abc'}]}
+ * @param jsonLd
+ * @returns {{}}
+ */
+export const simplifyUriPredicates = jsonLd => (
+    jsonLd
+        ? Object.assign(
+            {},
+            ...Object.keys(jsonLd).map(key => ({[getLocalPart(key)]: jsonLd[key]}))
+        ) : {});
+
+/**
+ * Normalize an internal metadata resource by converting the values or iris into a single object
+ *
+ * The output of this method is comparable to the results provided by elasticsearch
+ *
+ * @example {'http://namespace#label': [{value: 'abc'}]} -> {http://namespace#label: ['abc']}
+ * @param jsonLd
+ * @returns {{}}
+ */
+export const normalizeMetadataResource = jsonLd => mapValues(
+    jsonLd,
+    values => (Array.isArray(values) ? values.map(v => v.value || v.id || v) : values)
+);

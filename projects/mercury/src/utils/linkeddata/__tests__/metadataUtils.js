@@ -4,16 +4,19 @@ import {
     generateUuid,
     getLabel,
     getTypeInfo,
+    hasValue,
+    isNonEmptyValue,
     linkLabel,
+    normalizeMetadataResource,
+    partitionErrors,
     propertiesToShow,
     relativeLink,
     shouldPropertyBeHidden,
-    url2iri,
-    isNonEmptyValue,
-    partitionErrors, hasValue
+    simplifyUriPredicates,
+    url2iri
 } from "../metadataUtils";
 import * as constants from "../../../constants";
-import {SHACL_TARGET_CLASS} from "../../../constants";
+import {normalizeJsonLdResource} from "../jsonLdUtils";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {
@@ -212,7 +215,7 @@ describe('Metadata Utils', () => {
         }];
 
         const vocabulary = {
-            determineShapeForTypes: (typeIris) => ({[SHACL_TARGET_CLASS]: [{'@id': typeIris[0]}]})
+            determineShapeForTypes: (typeIris) => ({[constants.SHACL_TARGET_CLASS]: [{'@id': typeIris[0]}]})
         };
 
         it('retrieves information on the type of the entity', () => {
@@ -314,5 +317,42 @@ describe('Metadata Utils', () => {
         it('should return false if only an empty string is is present', () => expect(hasValue({values: [{value: ""}]})).toBe(false));
         it('should return true if an id is present', () => expect(hasValue({values: [{id: "http://a"}]})).toBe(true));
         it('should return true if a non-empty value is present', () => expect(hasValue({values: [{value: "label"}]})).toBe(true));
-    })
+    });
+
+    describe('simplifyUriPredicates', () => {
+        it('should convert keys into its localpart', () => {
+            expect(Object.keys(simplifyUriPredicates({
+                'http://namespace#test': [{'@value': 'a'}],
+                'http://other-namespace/something#label': [{'@value': 'b'}],
+                'simple-key': [{'@value': 'c'}]
+            }))).toEqual(expect.arrayContaining(['test', 'label', 'simple-key']));
+        });
+        it('should not change @id and @type keys', () => {
+            expect(Object.keys(normalizeJsonLdResource({
+                '@id': [{'@value': 'a'}],
+                '@type': [{'@value': 'b'}]
+            }))).toEqual(expect.arrayContaining(['@id', '@type']));
+        });
+    });
+
+    describe('normalizeMetadataResource', () => {
+        it('should convert objects with @value or @id into a literal', () => {
+            expect(Object.values(normalizeMetadataResource({
+                a: [{value: 'a'}],
+                b: [{id: 'b'}],
+                c: [{value: 'c'}, {id: 'd'}]
+            }))).toEqual([
+                ['a'],
+                ['b'],
+                ['c', 'd']
+            ]);
+        });
+        it('should be able to handle regular values', () => {
+            const jsonLd = {
+                '@id': 'http://url',
+                '@type': ['http://type1', 'http://type2']
+            };
+            expect(normalizeMetadataResource(jsonLd)).toEqual(jsonLd);
+        });
+    });
 });

@@ -1,4 +1,4 @@
-import {getLocalPart} from "./metadataUtils";
+import {mapValues} from 'lodash';
 
 /**
  * Returns the value of the given property on the first entry of the predicate for the metadat
@@ -18,25 +18,16 @@ export const getFirstPredicateId = (metadataEntry, predicate, defaultValue) => g
 
 export const getFirstPredicateList = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
 
-
 /**
- * Normalize a JSON-LD resource by
- * - converting the predicate IRIs into its local paths
- * - converting the values or iris into a single object
+ * Normalize a JSON-LD resource by converting the values or iris into a single object
  *
  * The output of this method is comparable to the results provided by elasticsearch
  *
- * @example {'http://namespace#label': [{'@value': 'abc'}]} -> {label: ['abc']}
+ * @example {'http://namespace#label': [{'@value': 'abc'}]} -> {http://namespace#label: ['abc']}
  * @param jsonLd
  * @returns {{}}
  */
-export const normalizeJsonLdResource = jsonLd => (
-    jsonLd
-        ? Object.assign(
-            {},
-            ...Object.keys(jsonLd).map(
-                key => ({
-                    [getLocalPart(key)]: Array.isArray(jsonLd[key]) ? jsonLd[key].map(v => v['@value'] || v['@id'] || v) : jsonLd[key]
-                })
-            )
-        ) : {});
+export const normalizeJsonLdResource = jsonLd => mapValues(
+    jsonLd,
+    values => (Array.isArray(values) ? values.map(v => v['@value'] || v['@id'] || v) : values)
+);
