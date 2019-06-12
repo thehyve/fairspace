@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import {FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Typography} from '@material-ui/core';
 
 import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
-import LinkedDataPropertyValuesList from "./LinkedDataPropertyValuesList";
-import LinkedDataPropertyValuesTable from "./LinkedDataPropertyValuesTable";
+import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
+import LinkedDataRelationTable from "./LinkedDataRelationTable";
 
 /**
      * Checks whether the configuration of this property disallowed editing of existing values
@@ -35,8 +35,8 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
     const disableEditing = !property.isEditable || disallowEditingOfExistingValues(property);
-    const ValueComponent = disableEditing ? readOnlyComponent() : editComponent(property);
-    const ValueAddComponent = addComponent(property);
+    const editInputComponent = disableEditing ? readOnlyComponent() : editComponent(property);
+    const addInputComponent = addComponent(property);
     const pathVisibility = hoveredAllProperty ? 'visible' : 'hidden';
 
     return (
@@ -60,38 +60,26 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
             <FormGroup>
                 {
                     property.isRelationShape ? (
-                        <LinkedDataPropertyValuesTable
+                        <LinkedDataRelationTable
                             property={property}
+                            canAdd={canAdd}
+                            onAdd={onAdd}
                             onDelete={onDelete}
+                            addComponent={addInputComponent}
                         />
                     ) : (
-                        <LinkedDataPropertyValuesList
+                        <LinkedDataInputFieldsTable
                             property={property}
+                            canAdd={canAdd}
+                            onAdd={onAdd}
                             onChange={onChange}
                             onDelete={onDelete}
                             labelId={labelId}
-                            valueComponent={ValueComponent}
+                            editComponent={editInputComponent}
+                            addComponent={addInputComponent}
                         />
                     )
                 }
-
-                {canAdd ? (
-                    <FormControlLabel
-                        style={{width: '100%', margin: 0}}
-                        control={(
-                            <div style={{width: '100%'}}>
-                                <ValueAddComponent
-                                    property={property}
-                                    placeholder=""
-                                    onChange={onAdd}
-                                    aria-labelledby={labelId}
-                                />
-                            </div>
-
-                        )}
-                    />
-                ) : null}
-
             </FormGroup>
             <FormHelperText color="primary">
                 {hasErrors ? errors.map(e => `${e}. `) : null}
