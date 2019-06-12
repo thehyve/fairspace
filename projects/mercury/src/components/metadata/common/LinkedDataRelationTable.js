@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import {SHACL_NAME, SHACL_PATH} from "../../../constants";
+import {SHACL_NAME, SHACL_ORDER, SHACL_PATH} from "../../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import {getLocalPart} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataValuesTable from "./LinkedDataValuesTable";
+import {compareBy} from "../../../utils/genericUtils";
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 
@@ -14,8 +15,12 @@ const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponen
 
     if (property.importantPropertyShapes && property.importantPropertyShapes.length > 0) {
         columnDefinitions = property.importantPropertyShapes
+            .sort(compareBy(shape => {
+                const order = getFirstPredicateValue(shape, SHACL_ORDER);
+                return typeof order === 'number' ? order : Number.MAX_SAFE_INTEGER;
+            }))
             .map(shape => {
-                const propertyPath = getLocalPart(getFirstPredicateId(shape, SHACL_PATH));
+                const propertyPath = getLocalPart(getFirstPredicateId(shape, SHACL_PATH) || '');
                 return {
                     id: shape['@id'],
                     label: getFirstPredicateValue(shape, SHACL_NAME),
