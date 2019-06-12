@@ -78,8 +78,14 @@ export function generateUuid() {
         c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
 }
 
-export function isValidLinkedDataIdentifier(id, prefix = 'http://example.com/') {
-    return new URL(`${prefix}${id}`).toString() === `${prefix}${id}`;
+export function isValidLinkedDataIdentifier(uri) {
+    try {
+        // eslint-disable-next-line no-new
+        new URL(uri);
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 /**

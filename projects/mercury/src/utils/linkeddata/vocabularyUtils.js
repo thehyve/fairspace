@@ -1,6 +1,5 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
-import {SHACL_PREFIX} from "../../constants";
 
 /**
  * Checks whether the given shape describes an RDF list

@@ -8,12 +8,13 @@ import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import * as consts from "../../../constants";
-import {LinkedDataIdentifierField} from "./LinkedDataIdentifierField";
+import LinkedDataIdentifierFieldContainer from "./LinkedDataIdentifierFieldContainer";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
         formKey: generateUuid(),
-        id: this.props.requireIdentifier ? generateUuid() : ''
+        localPart: this.props.requireIdentifier ? generateUuid() : '',
+        namespace: undefined
     };
 
     componentDidUpdate(prevProps) {
@@ -28,7 +29,8 @@ class NewLinkedDataEntityDialog extends React.Component {
     resetDialog() {
         this.setState({
             formKey: generateUuid(),
-            id: this.props.requireIdentifier ? generateUuid() : ''
+            localPart: this.props.requireIdentifier ? generateUuid() : '',
+            namespace: undefined
         });
     }
 
@@ -39,10 +41,14 @@ class NewLinkedDataEntityDialog extends React.Component {
 
     createEntity = (e) => {
         if (e) e.stopPropagation();
-        this.props.onCreate(this.state.formKey, this.props.shape, this.state.id);
+        this.props.onCreate(this.state.formKey, this.props.shape, this.getIdentifier());
     };
 
-    handleInputChange = event => this.setState({id: event.target.value});
+    getIdentifier = () => (this.state.namespace ? this.state.namespace.value + this.state.localPart : this.state.localPart);
+
+    handleLocalPartChange = localPart => this.setState({localPart});
+
+    handleNamespaceChange = namespace => this.setState({namespace});
 
     render() {
         const {shape, open, storeState} = this.props;
@@ -93,33 +99,36 @@ class NewLinkedDataEntityDialog extends React.Component {
             />
         );
 
+        const idField = (
+            <LinkedDataIdentifierFieldContainer
+                namespace={this.state.namespace}
+                localPart={this.state.localPart}
+                onLocalPartChange={this.handleLocalPartChange}
+                onNamespaceChange={this.handleNamespaceChange}
+                required
+                autoFocus
+            />
+        );
+
         // If the identifier field is not required, it will be inferred from other
         // properties by default. This makes the field quite unimportant, so it will
         // be rendered at the bottom. See VRE-830 for details
         return this.props.requireIdentifier
             ? (
                 <>
-                    <LinkedDataIdentifierField
-                        value={this.state.id}
-                        onChange={this.handleInputChange}
-                        required
-                        autoFocus
-                    />
+                    {idField}
                     {form}
                 </>
             ) : (
                 <>
                     {form}
-                    <LinkedDataIdentifierField
-                        value={this.state.id}
-                        onChange={this.handleInputChange}
-                    />
+                    {idField}
                 </>
             );
     }
 
     canCreate() {
-        return !this.props.requireIdentifier || (this.state.id && isValidLinkedDataIdentifier(this.state.id));
+        return !this.props.requireIdentifier || (this.getIdentifier() && isValidLinkedDataIdentifier(this.getIdentifier()));
     }
 }
 

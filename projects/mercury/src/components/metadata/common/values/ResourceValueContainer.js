@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from "react-redux";
 import Grid from "@material-ui/core/Grid";
@@ -42,7 +42,7 @@ export class ResourceValue extends React.Component {
                     <MaterialReactSelect
                         options={namespaceOptions}
                         value={this.state.selectedNamespace}
-                        onChange={v => console.log("Set selected", v) || setSelectedNamespace(v)}
+                        onChange={v => setSelectedNamespace(v)}
                     />
                 </Grid>
                 <Grid item xs={8} style={{paddingTop: 8, paddingBottom: 0}}>
