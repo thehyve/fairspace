@@ -1,5 +1,6 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
+import {SHACL_PREFIX} from "../../constants";
 
 /**
  * Checks whether the given shape describes an RDF list
@@ -85,6 +86,18 @@ export const vocabularyUtils = (vocabulary = []) => {
      * Returns a list of classes marked as fairspace entities
      */
     const getClassesInCatalog = () => vocabulary.filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI));
+
+    /**
+     * Returns a list of classes marked as fairspace entities
+     */
+    const getNamespaces = () => vocabulary
+        .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
+        .map(namespace => ({
+            id: namespace['@id'],
+            label: getFirstPredicateValue(namespace, constants.LABEL_URI),
+            prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
+            namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE)
+        }));
 
     /**
      * Checks whether the vocabulary contains the given identifier
@@ -213,6 +226,7 @@ export const vocabularyUtils = (vocabulary = []) => {
         generatePropertyEntry,
         getRaw,
         getLabelForPredicate,
-        getClassesInCatalog
+        getClassesInCatalog,
+        getNamespaces
     });
 };

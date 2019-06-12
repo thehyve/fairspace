@@ -1,8 +1,8 @@
 import React from 'react';
+import Switch from "@material-ui/core/Switch";
 import DateTime from "../../../common/DateTime";
 import LinkedDataLink from "../LinkedDataLink";
 import {BOOLEAN_URI, DATETIME_URI} from "../../../../constants";
-import Switch from "@material-ui/core/Switch";
 
 function linkLabel(link) {
     return link
