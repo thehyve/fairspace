@@ -1,61 +1,66 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React from 'react';
 
-import searchAPI from "../../../services/SearchAPI";
+import api from "../../../services/SearchAPI";
 import {linkLabel, propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
 import {LoadingInlay, MessageDisplay} from "../../common";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
 
-const LinkedDataDropdown = ({types, property, ...otherProps}) => {
-    const [fetchedItems, setFetchedItems] = useState(null);
-    const [error, setError] = useState(null);
+class LinkedDataDropdown extends React.Component {
+    state = {
+        fetchedItems: null,
+        error: null
+    }
 
-    const mountedRef = useRef(false);
-    useEffect(() => {
-        mountedRef.current = true;
-        return () => {mountedRef.current = false;};
-    }, []);
+    mounted = true;
 
-    useEffect(() => {
-        setFetchedItems(null);
-        setError(null);
-        searchAPI()
+    componentDidMount() {
+        const {property, searchAPI, types} = this.props;
+
+        (searchAPI || api())
             .searchLinkedData({types: types || [property.className], size: SEARCH_DROPDOWN_DEFAULT_SIZE})
             .then(({items}) => {
-                if (mountedRef.current) {
-                    setFetchedItems(items);
+                if (this.mounted) {
+                    this.setState({fetchedItems: items});
                 }
             })
             .catch(e => {
-                if (mountedRef.current) {
-                    setError(e);
+                if (this.mounted) {
+                    this.setState({error: e, fetchedItems: []});
                 }
             });
-    }, [property.className, types]);
-
-    if (error) {
-        return <MessageDisplay withIcon={false} message={error.message} />;
     }
 
-    if (!fetchedItems) {
-        return <LoadingInlay />;
+    componentWillUnmount() {
+        this.mounted = false;
     }
 
-    const options = fetchedItems
-        .map(({id, label, name, value}) => {
-            const disabled = propertyContainsValueOrId(property, value, id);
-            const l = (label && label[0]) || (name && name[0]) || linkLabel(id, true);
+    render() {
+        const {property, ...otherProps} = this.props;
+        const {fetchedItems, error} = this.state;
 
-            return {
-                disabled,
-                label: l,
-                id,
-            };
-        });
+        if (error) {
+            return <MessageDisplay withIcon={false} message={error.message} />;
+        }
 
-    return (
-        <Dropdown {...otherProps} options={options} />
-    );
-};
+        if (!fetchedItems) {
+            return <LoadingInlay />;
+        }
+
+        const options = fetchedItems
+            .map(({id, label, name, value}) => {
+                const disabled = propertyContainsValueOrId(property, value, id);
+                const l = (label && label[0]) || (name && name[0]) || linkLabel(id, true);
+
+                return {
+                    disabled,
+                    label: l,
+                    id,
+                };
+            });
+
+        return <Dropdown {...otherProps} options={options} />;
+    }
+}
 
 export default LinkedDataDropdown;
