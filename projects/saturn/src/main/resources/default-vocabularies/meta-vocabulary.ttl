@@ -279,7 +279,7 @@ fs:MaxCountShape a sh:PropertyShape ;
   sh:maxCount 1 ;
   sh:greaterThanOrEquals sh:minCount ;
   sh:minInclusive 1 ;
-  sh:name "Maximum number of values" 
+  sh:name "Maximum number of values" ; 
   sh:order 10 . 
 
 fs:ImportantPropertyShape a sh:PropertyShape ;
