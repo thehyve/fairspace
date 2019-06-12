@@ -112,7 +112,7 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:importantProperty true ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:order 2
+        sh:order 3
     ], [
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
@@ -143,7 +143,8 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         sh:property [
             sh:path ( [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
             sh:minLength 1 ;
-        ]
+        ] ;
+        sh:order 3 
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ControlledVocabularyPropertyShape ;
@@ -170,7 +171,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:name "Class target" ;
         fs:importantProperty true ;
-        sh:order 2
+        sh:order 3
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
@@ -181,21 +182,9 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
     sh:closed true ;
     sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
     sh:name "Namespace" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:fixedShape ) ;
     fs:showInCatalog true ;
-    sh:property [
-      sh:path rdfs:label ;
-      sh:maxLength 128;
-      sh:maxCount 1 ; 
-      sh:datatype xsd:string ;
-      sh:name "Label"
-    ] ;
-    sh:property [
-      sh:datatype xsd:string ;
-      sh:maxCount 1 ;
-      sh:path sh:description ;
-      sh:name "Namespace description"
-    ] ;
+    sh:property fs:PropertyNameShape ;
     sh:property [
       sh:name "Prefix" ;
       sh:maxLength 24 ;
@@ -247,6 +236,15 @@ fs:ShapeIsAClosedShape a sh:PropertyShape ;
   sh:description "A fs:ClassShape shape cannot be defined as sh:closed true." ;
   sh:path sh:closed .
 
+fs:PathShape a sh:PropertyShape ; 
+  sh:maxCount 1 ;
+  sh:minCount 1 ;
+  sh:path sh:path ;
+  sh:nodeKind sh:IRI ;
+  sh:name "Property identifier" ;
+  fs:importantProperty true ;
+  sh:order 0 .
+
 fs:PropertyNameShape a sh:PropertyShape ;
   sh:datatype xsd:string ;
   sh:maxCount 1 ;
@@ -255,23 +253,7 @@ fs:PropertyNameShape a sh:PropertyShape ;
   sh:path sh:name ;
   sh:name "Property name" ;
   fs:importantProperty true ;
-  sh:order 0 .
-
-fs:MinCountShape a sh:PropertyShape ; 
-  sh:datatype xsd:integer ;
-  sh:path sh:minCount ;
-  sh:maxInclusive 1 ;
-  sh:maxCount 1 ;
-  sh:lessThanOrEquals sh:maxCount ;
-  sh:name "Minimum number of values" .
-
-fs:MaxCountShape a sh:PropertyShape ; 
-  sh:datatype xsd:integer ;
-  sh:path sh:maxCount ;
-  sh:maxCount 1 ;
-  sh:greaterThanOrEquals sh:minCount ;
-  sh:minInclusive 1 ;
-  sh:name "Maximum number of values" . 
+  sh:order 1 .
 
 fs:DescriptionShape a sh:PropertyShape ; 
   sh:datatype xsd:string ;
@@ -280,16 +262,25 @@ fs:DescriptionShape a sh:PropertyShape ;
   sh:path sh:description ;
   sh:name "Property description" ;
   fs:importantProperty true ;
-  sh:order 1 .
+  sh:order 2 .
 
-fs:PathShape a sh:PropertyShape ; 
+fs:MinCountShape a sh:PropertyShape ; 
+  sh:datatype xsd:integer ;
+  sh:path sh:minCount ;
+  sh:maxInclusive 1 ;
   sh:maxCount 1 ;
-  sh:minCount 1 ;
-  sh:path sh:path ;
-  sh:nodeKind sh:IRI ;
-  sh:name "Property identifier" ;
-  fs:importantProperty true ;
-  sh:order 3 .
+  sh:lessThanOrEquals sh:maxCount ;
+  sh:name "Minimum number of values" ;
+  sh:order 9 .
+
+fs:MaxCountShape a sh:PropertyShape ; 
+  sh:datatype xsd:integer ;
+  sh:path sh:maxCount ;
+  sh:maxCount 1 ;
+  sh:greaterThanOrEquals sh:minCount ;
+  sh:minInclusive 1 ;
+  sh:name "Maximum number of values" ; 
+  sh:order 10 . 
 
 fs:ImportantPropertyShape a sh:PropertyShape ;
   sh:datatype xsd:boolean ;

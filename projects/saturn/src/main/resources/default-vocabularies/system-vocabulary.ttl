@@ -12,34 +12,40 @@
 ### Fixed Namespaces ###
 ########################
 
-<FOAF-Namespace> a sh:PrefixDeclaration ;
-   rdfs:label "Friend of a friend (FOAF)" ;
+fs:FOAF-Namespace a sh:PrefixDeclaration ;
+   sh:name "Friend of a friend (FOAF)" ;
    sh:prefix "foaf" ;
+   fs:fixedShape true ;
    sh:namespace <http://xmlns.com/foaf/0.1/> .
 
-<RDF-Namespace> a sh:PrefixDeclaration ;
-   rdfs:label "RDF" ;
+fs:RDF-Namespace a sh:PrefixDeclaration ;
+   sh:name "RDF" ;
    sh:prefix "rdf" ;
+   fs:fixedShape true ;
    sh:namespace <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-<RDFS-Namespace> a sh:PrefixDeclaration ;
-   rdfs:label "RDF Schema (RDFS)" ;
+fs:RDFS-Namespace a sh:PrefixDeclaration ;
+   sh:name "RDF Schema (RDFS)" ;
    sh:prefix "rdfs" ;
+   fs:fixedShape true ;
    sh:namespace <http://www.w3.org/2000/01/rdf-schema#> .
 
-<XSD-Namespace> a sh:PrefixDeclaration ;
-   rdfs:label "XSD" ; 
+fs:XSD-Namespace a sh:PrefixDeclaration ;
+   sh:name "XSD" ; 
    sh:prefix "xsd" ;
+   fs:fixedShape true ;
    sh:namespace <http://www.w3.org/2001/XMLSchema#> .
 
-<Schema-Namespace> a sh:PrefixDeclaration ;
-   rdfs:label "schema.org" ; 
+fs:Schema-Namespace a sh:PrefixDeclaration ;
+   sh:name "schema.org" ; 
    sh:prefix "schema" ;
+   fs:fixedShape true ;
    sh:namespace <http://schema.org/> .
 
-<Fairspace-Namespace> a sh:PrefixDeclaration ;
-   rdfs:label "Fairspace (global)" ; 
+fs:Fairspace-Namespace a sh:PrefixDeclaration ;
+   sh:name "Fairspace (global)" ; 
    sh:prefix "fs" ;
+   fs:fixedShape true ;
    sh:namespace <http://fairspace.io/ontology#> .
 
 ########################
