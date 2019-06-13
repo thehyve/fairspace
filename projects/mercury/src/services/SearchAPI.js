@@ -34,17 +34,14 @@ export class SearchAPI {
                     exists: {
                         field: "dateDeleted"
                     }
-                },
-                filter: []
+                }
             }
         };
 
         // Add types filter, if specified
         if (types && Array.isArray(types)) {
             esQuery.bool.filter = [
-                ...esQuery.bool.filter,
                 {
-                    ...esQuery.bool.filter.terms,
                     terms: {
                         "type.keyword": types
                     }
