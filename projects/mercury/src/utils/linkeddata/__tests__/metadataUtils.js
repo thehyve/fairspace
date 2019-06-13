@@ -336,7 +336,7 @@ describe('Metadata Utils', () => {
     });
 
     describe('normalizeMetadataResource', () => {
-        it('should convert objects with @value or @id into a literal', () => {
+        it('should convert objects with value or id into a literal', () => {
             expect(Object.values(normalizeMetadataResource({
                 a: [{value: 'a'}],
                 b: [{id: 'b'}],
@@ -353,6 +353,30 @@ describe('Metadata Utils', () => {
                 '@type': ['http://type1', 'http://type2']
             };
             expect(normalizeMetadataResource(jsonLd)).toEqual(jsonLd);
+        });
+
+        it('should return value if both value and id are given', () => {
+            expect(Object.values(normalizeMetadataResource({
+                a: [{value: 'a', id: 'b'}]
+            }))).toEqual([
+                ['a']
+            ]);
+        });
+
+        it('should return complete object if no value and id are given', () => {
+            expect(Object.values(normalizeMetadataResource({
+                a: [{url: 'http://google.com'}]
+            }))).toEqual([
+                [{url: 'http://google.com'}]
+            ]);
+        });
+
+        it('should handle zero or false as actual values but not empty strings', () => {
+            expect(Object.values(normalizeMetadataResource({
+                a: [{value: 0, id: 'a'}, {value: false, id: 'b'}, {value: '', id: 'b'}],
+            }))).toEqual([
+                [0, false, 'b']
+            ]);
         });
     });
 });

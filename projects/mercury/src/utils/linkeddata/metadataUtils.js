@@ -239,5 +239,13 @@ export const simplifyUriPredicates = jsonLd => (
  */
 export const normalizeMetadataResource = jsonLd => mapValues(
     jsonLd,
-    values => (Array.isArray(values) ? values.map(v => v.value || v.id || v) : values)
+    values => (
+        Array.isArray(values)
+            ? values.map(v => {
+                if (isNonEmptyValue(v.value)) return v.value;
+                if (isNonEmptyValue(v.id)) return v.id;
+                return v;
+            })
+            : values
+    )
 );

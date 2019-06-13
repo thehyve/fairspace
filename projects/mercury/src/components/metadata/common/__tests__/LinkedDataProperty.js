@@ -21,14 +21,14 @@ const defaultProperty = {
 };
 
 describe('LinkedDataProperty elements', () => {
-    it('shows a table with all values', () => {
+    it('shows a table with relations for relationShapes', () => {
         const wrapper = shallow(<LinkedDataProperty property={defaultProperty} />);
         const table = wrapper.find(LinkedDataRelationTable);
         expect(table.length).toEqual(1);
         expect(table.prop("property")).toEqual(defaultProperty);
     });
 
-    it('shows a table for relations for relationShapes', () => {
+    it('shows a table for input fields for non-relationShapes', () => {
         const property = {
             ...defaultProperty,
             isRelationShape: false
