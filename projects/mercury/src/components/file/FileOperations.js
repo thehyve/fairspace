@@ -33,8 +33,7 @@ export class FileOperations extends React.Component {
 
     handlePaste(e) {
         e.stopPropagation();
-        this.props.paste(this.props.openedPath)
-            .then(() => this.refreshFiles())
+        this.fileOperation(this.props.paste(this.props.openedPath))
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while pasting your contents");
             });
@@ -47,8 +46,7 @@ export class FileOperations extends React.Component {
                 name: generateUniqueFileName(file.name, this.props.existingFiles)
             }));
 
-            return this.props.uploadFiles(this.props.openedPath, updatedFiles)
-                .then(() => this.refreshFiles())
+            return this.fileOperation(this.props.uploadFiles(this.props.openedPath, updatedFiles))
                 .catch((err) => {
                     ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
                 });
@@ -57,8 +55,7 @@ export class FileOperations extends React.Component {
     }
 
     handleCreateDirectory(name) {
-        return this.props.createDirectory(joinPaths(this.props.openedPath, name))
-            .then(() => this.refreshFiles())
+        return this.fileOperation(this.props.createDirectory(joinPaths(this.props.openedPath, name)))
             .catch((err) => {
                 if (err.response.status === 405) {
                     const message = "A directory or file with this name already exists. Please choose another name";
@@ -68,6 +65,20 @@ export class FileOperations extends React.Component {
                 ErrorDialog.showError(err, "An error occurred while creating directory", () => this.handleCreateDirectory(name));
                 return true;
             });
+    }
+
+    fileOperation(actionPromise) {
+        this.props.beginUpdate();
+        return actionPromise
+            .then(result => {
+                this.refreshFiles();
+                this.props.endUpdate();
+                return result;
+            })
+            .catch(e => {
+                this.props.endUpdate();
+                return Promise.reject(e);
+            })
     }
 
     addBadgeIfNotEmpty(badgeContent, children) {

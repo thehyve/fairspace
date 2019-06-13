@@ -11,6 +11,7 @@ import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
     historyListener = null;
+    state = {busy: false};
 
     componentDidMount() {
         this.historyListener = this.props.history.listen(() => {
@@ -81,6 +82,15 @@ class FileBrowser extends React.Component {
         this.props.history.push(`/collections${path}`);
     }
 
+    beginUpdate = () => {
+        this.setState({busy: true})
+    }
+
+    endUpdate = () => {
+        this.setState({busy: false})
+    }
+
+
     render() {
         const {
             loading, error, openedCollection, files = [], selectedPaths, openedPath,
@@ -92,7 +102,7 @@ class FileBrowser extends React.Component {
             return (<MessageDisplay message="An error occurred while loading files" />);
         }
 
-        if (loading) {
+        if (loading || this.state.busy) {
             return <LoadingInlay />;
         }
 
@@ -133,6 +143,8 @@ class FileBrowser extends React.Component {
                         existingFiles={files ? files.map(file => file.basename) : []}
                         fetchFilesIfNeeded={fetchFilesIfNeeded}
                         getDownloadLink={FileAPI.getDownloadLink}
+                        beginUpdate={this.beginUpdate}
+                        endUpdate={this.endUpdate}
                     />
                 </div>
             </>
