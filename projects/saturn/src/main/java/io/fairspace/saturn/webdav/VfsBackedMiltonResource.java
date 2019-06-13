@@ -68,6 +68,7 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public void moveTo(CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+        ensureIsWriteable();
         checkTarget(rDest);
         try {
             fs.move(info.getPath(), normalizePath(rDest + "/" + name));
