@@ -71,6 +71,7 @@ LinkedDataDropdown.defaultProps = {
 LinkedDataDropdown.propTypes = {
     fetchItems: PropTypes.func,
     property: PropTypes.object.isRequired,
+    types: PropTypes.arrayOf(PropTypes.string)
 };
 
 export default LinkedDataDropdown;
