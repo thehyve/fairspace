@@ -1,6 +1,7 @@
 import React from 'react';
+import {PropTypes} from 'prop-types';
 
-import api from "../../../services/SearchAPI";
+import searchAPI from "../../../services/SearchAPI";
 import {linkLabel, propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
 import {LoadingInlay, MessageDisplay} from "../../common";
 import Dropdown from './values/Dropdown';
@@ -15,10 +16,10 @@ class LinkedDataDropdown extends React.Component {
     mounted = true;
 
     componentDidMount() {
-        const {property, searchAPI, types} = this.props;
+        const {property, fetchItems, types} = this.props;
+        const typesToFetch = Array.isArray(types) && types.length > 0 ? types : [property.className];
 
-        (searchAPI || api())
-            .searchLinkedData({types: types || [property.className], size: SEARCH_DROPDOWN_DEFAULT_SIZE})
+        fetchItems({types: typesToFetch, size: SEARCH_DROPDOWN_DEFAULT_SIZE})
             .then(({items}) => {
                 if (this.mounted) {
                     this.setState({fetchedItems: items});
@@ -62,5 +63,14 @@ class LinkedDataDropdown extends React.Component {
         return <Dropdown {...otherProps} options={options} />;
     }
 }
+
+LinkedDataDropdown.defaultProps = {
+    fetchItems: (types, size) => searchAPI().searchLinkedData(types, size)
+};
+
+LinkedDataDropdown.propTypes = {
+    fetchItems: PropTypes.func,
+    property: PropTypes.object.isRequired,
+};
 
 export default LinkedDataDropdown;

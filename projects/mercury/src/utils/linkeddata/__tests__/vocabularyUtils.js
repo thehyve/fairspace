@@ -142,17 +142,19 @@ describe('vocabularyUtils', () => {
         const subClasses = ["http://fairspace.io/ontology#ControlledVocabularyPropertyShape", "http://fairspace.io/ontology#DatatypePropertyShape"];
         const subcSubClasess = ["http://fairspace.io/ontology#SpecialDatatypePropertyShape", "http://fairspace.io/ontology#AVerySpecialDatatypePropertyShape"];
 
-        describe(vocabulary.getChildSubclasses.name, () => {
+        describe('getChildSubclasses', () => {
             it('should extracts the direct subclasses of the type and avoids deep or indirect subclasses', () => {
                 const childClasses = vocabulary.getChildSubclasses(type);
+
                 expect(childClasses).toEqual(expect.arrayContaining(subClasses));
                 expect(childClasses).not.toEqual(expect.arrayContaining(subcSubClasess));
             });
         });
 
-        describe(vocabulary.getClassHierarchy.name, () => {
+        describe('getDescendants', () => {
             it('should extracts the full class hierarchy for the given type', () => {
-                const classHierarchy = vocabulary.getClassHierarchy(type);
+                const classHierarchy = vocabulary.getDescendants(type);
+
                 expect(classHierarchy).toEqual(expect.arrayContaining([...subClasses, ...subcSubClasess]));
                 expect(classHierarchy).not.toEqual(expect.arrayContaining(["http://fairspace.io/ontology#File"]));
             });

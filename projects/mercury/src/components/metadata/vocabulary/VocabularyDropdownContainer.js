@@ -3,14 +3,7 @@ import {connect} from 'react-redux';
 
 import LinkedDataDropdown from "../common/LinkedDataDropdown";
 import {LoadingInlay, MessageDisplay} from "../../common";
-import {
-    getMetaVocabulary,
-    getVocabulary,
-    hasMetaVocabularyError,
-    hasVocabularyError,
-    isMetaVocabularyPending,
-    isVocabularyPending
-} from "../../../reducers/cache/vocabularyReducers";
+import {getMetaVocabulary, hasMetaVocabularyError, isMetaVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 
 const VocabularyDropdownContainer = ({types, loading, error, ...otherProps}) => {
     if (error) {
@@ -25,10 +18,9 @@ const VocabularyDropdownContainer = ({types, loading, error, ...otherProps}) => 
 };
 
 const mapStateToProps = (state, {property}) => {
-    const vocabulary = getVocabulary(state);
     const metaVocabulary = getMetaVocabulary(state);
-    const loading = isVocabularyPending(state) || isMetaVocabularyPending(state);
-    const loadingError = hasVocabularyError(state) || hasMetaVocabularyError(state);
+    const loading = isMetaVocabularyPending(state);
+    const loadingError = hasMetaVocabularyError(state);
 
     if (loadingError) {
         return {
@@ -36,7 +28,7 @@ const mapStateToProps = (state, {property}) => {
         };
     }
 
-    const types = [...vocabulary.getClassHierarchy(property.className), ...metaVocabulary.getClassHierarchy(property.className)];
+    const types = metaVocabulary.getDescendants(property.className);
 
     return {
         loading,

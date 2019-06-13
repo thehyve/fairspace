@@ -1,63 +1,63 @@
 import React from 'react';
-import {shallow} from "enzyme";
+import {shallow} from 'enzyme';
 
 import LinkedDataDropdown from '../LinkedDataDropdown';
-import {SearchAPI} from "../../../../services/SearchAPI";
-import {MessageDisplay} from "../../../common";
+import {MessageDisplay} from '../../../common';
 import Dropdown from '../values/Dropdown';
 
-let mockClient;
-let searchAPI;
-
 describe('LinkedDataDropdown', () => {
-    beforeEach(() => {
-        mockClient = {
-            search: jest.fn(() => Promise.resolve())
-        };
-        searchAPI = new SearchAPI(mockClient);
-    });
-
     const property = {
-        className: "http://workspace.ci.fairway.app/vocabulary/PersonConsent"
+        className: 'http://workspace.ci.fairway.app/vocabulary/PersonConsent'
     };
 
-    it('fires a call to search with an array for types containing classname of the property', () => {
-        shallow(<LinkedDataDropdown property={property} searchAPI={searchAPI} />);
-        expect(mockClient.search.mock.calls.length).toEqual(1);
-        expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
+    it('calls fetchItems with the given types', () => {
+        const mockFetchItems = jest.fn(() => Promise.resolve());
+
+        shallow(<LinkedDataDropdown property={property} fetchItems={mockFetchItems} />);
+
+        expect(mockFetchItems.mock.calls.length).toEqual(1);
+        expect(mockFetchItems.mock.calls[0][0].types)
             .toEqual(['http://workspace.ci.fairway.app/vocabulary/PersonConsent']);
     });
 
-    it('shows an error message in case of an error', () => {
-        const wrapper = shallow(<LinkedDataDropdown property={property} searchAPI={searchAPI} />);
-        wrapper.setState({error: {message: 'some error'}});
-        const error = wrapper.find(MessageDisplay);
-        expect(error.length).toEqual(1);
+    it('shows an error message in case of an error', async () => {
+        const mockFailedFetchItems = () => Promise.reject(new Error());
+
+        const wrapper = shallow(<LinkedDataDropdown property={property} fetchItems={mockFailedFetchItems} />);
+
+        try {
+            await mockFailedFetchItems();
+        } catch (e) {
+            const error = wrapper.find(MessageDisplay);
+            expect(error.length).toEqual(1);
+        }
     });
 
-    it('should render the dropdown with proper options', () => {
-        const wrapper = shallow(<LinkedDataDropdown property={property} searchAPI={searchAPI} />);
-        wrapper.setState({
-            fetchedItems: [
+    it('should render the dropdown with proper options', async () => {
+        const id = 'http://localhost/vocabulary/multiLineStringWidgetShape';
+        const name = 'Multi line string';
+
+        const mockFetchItems = jest.fn(() => Promise.resolve({
+            items: [
                 {
-                    type: [
-                        "http://fairspace.io/ontology#DatatypePropertyShape"
-                    ],
-                    name: [
-                        "Multi line string"
-                    ],
-                    id: "http://localhost/vocabulary/multiLineStringWidgetShape"
+                    type: ['http://fairspace.io/ontology#DatatypePropertyShape'],
+                    name: [name],
+                    id
                 }
             ]
-        });
+        }));
+
+        const wrapper = shallow(<LinkedDataDropdown property={property} fetchItems={mockFetchItems} />);
+
+        await mockFetchItems();
 
         const dropdown = wrapper.find(Dropdown);
         expect(dropdown.length).toEqual(1);
         expect(dropdown.props().options).toEqual([
             {
                 disabled: false,
-                id: "http://localhost/vocabulary/multiLineStringWidgetShape",
-                label: "Multi line string",
+                id,
+                label: name,
             },
         ]);
     });

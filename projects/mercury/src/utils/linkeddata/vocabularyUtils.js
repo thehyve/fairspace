@@ -205,7 +205,11 @@ export const vocabularyUtils = (vocabulary = []) => {
 
     const getChildSubclasses = type => vocabulary.filter(e => getFirstPredicateId(e, constants.SUBCLASS_URI) === type).map(e => e['@id']);
 
-    const getClassHierarchy = type => {
+    /**
+     * Returns an array of the types that are subclasses of the provided type including indirect subclasses
+     * @param {string} type
+     */
+    const getDescendants = type => {
         let queue = [type];
         let found = [];
 
@@ -231,6 +235,6 @@ export const vocabularyUtils = (vocabulary = []) => {
         getLabelForPredicate,
         getClassesInCatalog,
         getChildSubclasses,
-        getClassHierarchy
+        getDescendants
     });
 };
