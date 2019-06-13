@@ -399,84 +399,30 @@ public class WebDAVIT {
 
     @Test
     public void testCopyingWithWritePermission() throws ServletException, IOException {
-        var newCollection = new Collection();
-        newCollection.setName("Collection 2");
-        newCollection.setLocation("coll2");
-        newCollection.setType("LOCAL");
-        collections.create(newCollection);
-        var newCollectionIRI = newCollection.getIri();
-
-        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
-        permissions.setPermission(newCollectionIRI, anotherUser, Access.Write);
-
-        req.setMethod("PUT");
-        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
-        milton.service(req, res);
-
-        currentUser = anotherUser;
-
-        req.setMethod("COPY");
-        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
-        req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
-        milton.service(req, res);
-
-        assertEquals(201, res.getStatus());
+        testCopyOrMove(false, Access.Read, Access.Write, true);
     }
 
     @Test
     public void testCopyingToAReadOnlyCollection() throws ServletException, IOException {
-        var newCollection = new Collection();
-        newCollection.setName("Collection 2");
-        newCollection.setLocation("coll2");
-        newCollection.setType("LOCAL");
-        collections.create(newCollection);
-        var newCollectionIRI = newCollection.getIri();
-
-        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
-        permissions.setPermission(newCollectionIRI, anotherUser, Access.Read);
-
-        req.setMethod("PUT");
-        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
-        milton.service(req, res);
-
-        currentUser = anotherUser;
-
-        req.setMethod("COPY");
-        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
-        req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
-        milton.service(req, res);
-
-        assertEquals(403, res.getStatus());
+        testCopyOrMove(false, Access.Write, Access.Read, false);
     }
 
     @Test
-    public void testMovingWithWritePermission() throws ServletException, IOException {
-        var newCollection = new Collection();
-        newCollection.setName("Collection 2");
-        newCollection.setLocation("coll2");
-        newCollection.setType("LOCAL");
-        collections.create(newCollection);
-        var newCollectionIRI = newCollection.getIri();
+    public void testMovingWithWritePermissions() throws ServletException, IOException {
+        testCopyOrMove(true, Access.Write, Access.Write, true);
+    }
 
-        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
-        permissions.setPermission(newCollectionIRI, anotherUser, Access.Write);
-
-        req.setMethod("PUT");
-        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
-        milton.service(req, res);
-
-        currentUser = anotherUser;
-
-        req.setMethod("MOVE");
-        req.setRequestURL("http://localhost/webdav/coll1/file.ext");
-        req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
-        milton.service(req, res);
-
-        assertEquals(201, res.getStatus());
+    @Test
+    public void testMovingFromAReadOnlyCollection() throws ServletException, IOException {
+        testCopyOrMove(true, Access.Read, Access.Write, false);
     }
 
     @Test
     public void testMovingToAReadOnlyCollection() throws ServletException, IOException {
+        testCopyOrMove(true, Access.Write, Access.Read, false);
+    }
+
+    private void testCopyOrMove(boolean move, Access sourceAccess, Access destAccess, boolean expectSuccess) throws ServletException, IOException {
         var newCollection = new Collection();
         newCollection.setName("Collection 2");
         newCollection.setLocation("coll2");
@@ -484,8 +430,8 @@ public class WebDAVIT {
         collections.create(newCollection);
         var newCollectionIRI = newCollection.getIri();
 
-        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
-        permissions.setPermission(newCollectionIRI, anotherUser, Access.Read);
+        permissions.setPermission(collectionIRI, anotherUser,sourceAccess);
+        permissions.setPermission(newCollectionIRI, anotherUser,destAccess);
 
         req.setMethod("PUT");
         req.setRequestURL("http://localhost/webdav/coll1/file.ext");
@@ -493,11 +439,11 @@ public class WebDAVIT {
 
         currentUser = anotherUser;
 
-        req.setMethod("MOVE");
+        req.setMethod(move ? "MOVE" : "COPY");
         req.setRequestURL("http://localhost/webdav/coll1/file.ext");
         req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
         milton.service(req, res);
 
-        assertEquals(403, res.getStatus());
+        assertEquals(expectSuccess ? 201 : 403, res.getStatus());
     }
 }
