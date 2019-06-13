@@ -399,30 +399,30 @@ public class WebDAVIT {
 
     @Test
     public void testCopyingWithWritePermission() throws ServletException, IOException {
-        testCopyOrMove(false, Access.Read, Access.Write, false);
+        testCopyOrMove(false, Access.Read, Access.Write, true);
     }
 
     @Test
     public void testCopyingToAReadOnlyCollection() throws ServletException, IOException {
-        testCopyOrMove(false, Access.Write, Access.Read, true);
+        testCopyOrMove(false, Access.Write, Access.Read, false);
     }
 
     @Test
     public void testMovingWithWritePermissions() throws ServletException, IOException {
-        testCopyOrMove(true, Access.Write, Access.Write, false);
+        testCopyOrMove(true, Access.Write, Access.Write, true);
     }
 
     @Test
     public void testMovingFromAReadOnlyCollection() throws ServletException, IOException {
-        testCopyOrMove(true, Access.Read, Access.Write, true);
+        testCopyOrMove(true, Access.Read, Access.Write, false);
     }
 
     @Test
     public void testMovingToAReadOnlyCollection() throws ServletException, IOException {
-        testCopyOrMove(true, Access.Write, Access.Read, true);
+        testCopyOrMove(true, Access.Write, Access.Read, false);
     }
 
-    private void testCopyOrMove(boolean move, Access sourceAccesa, Access destAccess, boolean shouldFail) throws ServletException, IOException {
+    private void testCopyOrMove(boolean move, Access sourceAccess, Access destAccess, boolean expectSuccess) throws ServletException, IOException {
         var newCollection = new Collection();
         newCollection.setName("Collection 2");
         newCollection.setLocation("coll2");
@@ -430,7 +430,7 @@ public class WebDAVIT {
         collections.create(newCollection);
         var newCollectionIRI = newCollection.getIri();
 
-        permissions.setPermission(collectionIRI, anotherUser,sourceAccesa);
+        permissions.setPermission(collectionIRI, anotherUser,sourceAccess);
         permissions.setPermission(newCollectionIRI, anotherUser,destAccess);
 
         req.setMethod("PUT");
@@ -444,6 +444,6 @@ public class WebDAVIT {
         req.addHeader("Destination", "http://localhost/webdav/coll2/file.ext");
         milton.service(req, res);
 
-        assertEquals(shouldFail ? 403 : 201, res.getStatus());
+        assertEquals(expectSuccess ? 201 : 403, res.getStatus());
     }
 }
