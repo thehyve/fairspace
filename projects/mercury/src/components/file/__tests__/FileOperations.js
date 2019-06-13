@@ -51,6 +51,7 @@ describe('handleCreateDirectory', () => {
                 createDirectory={createDirectory}
                 classes={{}}
                 getDownloadLink={() => {}}
+                onFileOperation={op => op}
             />
         ).instance();
 
