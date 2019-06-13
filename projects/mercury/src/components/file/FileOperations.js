@@ -17,10 +17,6 @@ import styles from './FileOperations.styles';
 import {CUT} from '../../constants';
 
 export class FileOperations extends React.Component {
-    refreshFiles() {
-        this.props.fetchFilesIfNeeded(this.props.openedPath);
-    }
-
     handleCut(e) {
         e.stopPropagation();
         this.props.cut(this.props.selectedPaths);
@@ -33,7 +29,7 @@ export class FileOperations extends React.Component {
 
     handlePaste(e) {
         e.stopPropagation();
-        this.fileOperation(this.props.paste(this.props.openedPath))
+        this.props.onFileOperation(this.props.paste(this.props.openedPath))
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while pasting your contents");
             });
@@ -46,7 +42,7 @@ export class FileOperations extends React.Component {
                 name: generateUniqueFileName(file.name, this.props.existingFiles)
             }));
 
-            return this.fileOperation(this.props.uploadFiles(this.props.openedPath, updatedFiles))
+            return this.props.onFileOperation(this.props.uploadFiles(this.props.openedPath, updatedFiles))
                 .catch((err) => {
                     ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
                 });
@@ -55,7 +51,7 @@ export class FileOperations extends React.Component {
     }
 
     handleCreateDirectory(name) {
-        return this.fileOperation(this.props.createDirectory(joinPaths(this.props.openedPath, name)))
+        return this.props.onFileOperation(this.props.createDirectory(joinPaths(this.props.openedPath, name)))
             .catch((err) => {
                 if (err.response.status === 405) {
                     const message = "A directory or file with this name already exists. Please choose another name";
@@ -65,20 +61,6 @@ export class FileOperations extends React.Component {
                 ErrorDialog.showError(err, "An error occurred while creating directory", () => this.handleCreateDirectory(name));
                 return true;
             });
-    }
-
-    fileOperation(actionPromise) {
-        this.props.beginUpdate();
-        return actionPromise
-            .then(result => {
-                this.refreshFiles();
-                this.props.endUpdate();
-                return result;
-            })
-            .catch(e => {
-                this.props.endUpdate();
-                return Promise.reject(e);
-            })
     }
 
     addBadgeIfNotEmpty(badgeContent, children) {
@@ -191,7 +173,6 @@ export class FileOperations extends React.Component {
                         </CreateDirectoryButton>
                         <UploadButton
                             onUpload={files => this.handleUpload(files)}
-                            onDidUpload={() => this.refreshFiles()}
                         >
                             <IconButton
                                 title="Upload"

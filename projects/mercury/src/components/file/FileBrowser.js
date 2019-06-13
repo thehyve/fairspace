@@ -11,6 +11,7 @@ import FileAPI from "../../services/FileAPI";
 
 class FileBrowser extends React.Component {
     historyListener = null;
+
     state = {busy: false};
 
     componentDidMount() {
@@ -82,19 +83,24 @@ class FileBrowser extends React.Component {
         this.props.history.push(`/collections${path}`);
     }
 
-    beginUpdate = () => {
-        this.setState({busy: true})
+    onFileOperation = (operationPromise) => {
+        this.setState({busy: true});
+        return operationPromise
+            .then(r => {
+                this.props.fetchFilesIfNeeded(this.props.openedPath);
+                this.setState({busy: false});
+                return r;
+            })
+            .catch(e => {
+                this.setState({busy: false});
+                return Promise.reject(e);
+            });
     }
-
-    endUpdate = () => {
-        this.setState({busy: false})
-    }
-
 
     render() {
         const {
             loading, error, openedCollection, files = [], selectedPaths, openedPath,
-            fetchFilesIfNeeded, onSelectAll, onDeselectAll
+            onSelectAll, onDeselectAll
         } = this.props;
         const collectionExists = openedCollection && openedCollection.iri;
 
@@ -141,10 +147,8 @@ class FileBrowser extends React.Component {
                         onDelete={this.handlePathDelete}
                         disabled={!openedCollection.canWrite}
                         existingFiles={files ? files.map(file => file.basename) : []}
-                        fetchFilesIfNeeded={fetchFilesIfNeeded}
                         getDownloadLink={FileAPI.getDownloadLink}
-                        beginUpdate={this.beginUpdate}
-                        endUpdate={this.endUpdate}
+                        onFoleOperation={this.onFileOperation}
                     />
                 </div>
             </>
