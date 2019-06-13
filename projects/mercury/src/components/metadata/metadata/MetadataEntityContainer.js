@@ -84,7 +84,7 @@ const mapStateToProps = (state, ownProps) => {
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
             ...p,
-            isEditable
+            isEditable: isEditable && !p.machineOnly
         }));
 
     return {
