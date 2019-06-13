@@ -12,9 +12,11 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
+import org.apache.jena.sparql.core.DatasetGraph;
 import org.elasticsearch.client.Client;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
@@ -36,6 +38,10 @@ public class SaturnDatasetFactory {
 
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
+        if (config.elasticSearch.enabled) {
+            dsg = enableElasticSearch(dsg, config, restoreNeeded);
+        }
+
         if (restoreNeeded) {
             restore(dsg, txnLog);
         }
@@ -43,34 +49,30 @@ public class SaturnDatasetFactory {
         // Add transaction log
         dsg = new TxnLogDatasetGraph(dsg, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
 
-        // ElasticSearch
-        if (config.elasticSearch.enabled) {
-            var unwrapped = dsg;
-            Client client = null;
-            try {
-                // Setup ES client and index
-                client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
-                ElasticSearchIndexConfigurer esConfigurer = new ElasticSearchIndexConfigurer(client);
-                esConfigurer.configure(config.elasticSearch.settings);
-
-                // Create a dataset that updates ES with every triple update
-                var textIndex =  new TextIndexESBulk(new TextIndexConfig(new AutoEntityDefinition()), client, config.elasticSearch.settings.getIndexName());
-                var textDocProducer = new SingleTripleTextDocProducer(textIndex, !config.elasticSearch.required);
-                dsg = TextDatasetFactory.create(dsg, textIndex, true, textDocProducer);
-
-            } catch (Exception e) {
-                log.error("Error connecting to ElasticSearch", e);
-                if (config.elasticSearch.required) {
-                    throw e; // Terminates Saturn
-                }
-                dsg = unwrapped;
-                if (client != null) {
-                    client.close();
-                }
-            }
-        }
-
         // Create a dataset
         return DatasetFactory.wrap(dsg);
+    }
+
+    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, Config.Jena config, boolean recreateIndex) throws UnknownHostException {
+        Client client = null;
+        try {
+            // Setup ES client and index
+            client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
+            ElasticSearchIndexConfigurer.configure(client, config.elasticSearch.settings, recreateIndex);
+
+            // Create a dataset graph that updates ES with every triple update
+            var textIndex = new TextIndexESBulk(new TextIndexConfig(new AutoEntityDefinition()), client, config.elasticSearch.settings.getIndexName());
+            var textDocProducer = new SingleTripleTextDocProducer(textIndex, !config.elasticSearch.required);
+            return TextDatasetFactory.create(dsg, textIndex, true, textDocProducer);
+        } catch (Exception e) {
+            log.error("Error connecting to ElasticSearch", e);
+            if (config.elasticSearch.required) {
+                throw e; // Terminates Saturn
+            }
+            if (client != null) {
+                client.close();
+            }
+            return dsg;
+        }
     }
 }

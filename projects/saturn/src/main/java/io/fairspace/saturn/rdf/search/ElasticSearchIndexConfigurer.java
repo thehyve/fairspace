@@ -22,23 +22,22 @@ public class ElasticSearchIndexConfigurer {
     private static final String NUM_OF_REPLICAS_PARAM = "number_of_replicas";
     private static final String IRI_TYPE = "iri";
 
-    Client client;
-
-    public ElasticSearchIndexConfigurer(Client client) {
-        this.client = client;
-    }
-
     /**
      * Configures the specified index with a specific analyzer for filePaths
      */
-    public void configure(ESSettings esSettings) {
+    public static void configure(Client client, ESSettings esSettings, boolean recreateIndex) {
         String indexName = esSettings.getIndexName();
         IndicesAdminClient indicesAdminClient = client.admin().indices();
 
         try {
             IndicesExistsResponse exists = indicesAdminClient.exists(new IndicesExistsRequest(indexName)).get();
 
-            if (!exists.isExists()) {
+            if (recreateIndex && exists.isExists()) {
+                log.info("Deleting an existing index.");
+                indicesAdminClient.prepareDelete(indexName).get();
+            }
+
+            if (!exists.isExists() || recreateIndex) {
                 log.info("Index with name {} does not exist yet. Creating one.", indexName);
 
                 client.admin().indices()
@@ -89,16 +88,14 @@ public class ElasticSearchIndexConfigurer {
         }
     }
 
-    private String getMappings() throws IOException {
-        try(var is = getClass().getResourceAsStream("/elasticsearch/mappings.json")) {
+    private static String getMappings() throws IOException {
+        try(var is = ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/mappings.json")) {
             return new String(is.readAllBytes(), UTF_8);
         }
     }
 
-    private Settings.Builder getSettings() throws IOException {
+    private static Settings.Builder getSettings() throws IOException {
         return Settings.builder()
-                .loadFromStream("es-settings.json", getClass().getResourceAsStream("/elasticsearch/settings.json"), false);
+                .loadFromStream("es-settings.json", ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/settings.json"), false);
     }
-
-
 }
