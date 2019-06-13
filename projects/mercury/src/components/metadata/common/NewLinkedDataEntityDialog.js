@@ -8,7 +8,7 @@ import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import * as consts from "../../../constants";
-import LinkedDataIdentifierFieldContainer from "./LinkedDataIdentifierFieldContainer";
+import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
@@ -100,13 +100,12 @@ class NewLinkedDataEntityDialog extends React.Component {
         );
 
         const idField = (
-            <LinkedDataIdentifierFieldContainer
+            <LinkedDataIdentifierField
                 namespace={this.state.namespace}
                 localPart={this.state.localPart}
                 onLocalPartChange={this.handleLocalPartChange}
                 onNamespaceChange={this.handleNamespaceChange}
-                required
-                autoFocus
+                required={this.props.requireIdentifier}
             />
         );
 

@@ -93,7 +93,7 @@ export const vocabularyUtils = (vocabulary = []) => {
         .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
         .map(namespace => ({
             id: namespace['@id'],
-            label: getFirstPredicateValue(namespace, constants.LABEL_URI),
+            label: getFirstPredicateValue(namespace, constants.SHACL_NAME),
             prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
             namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE)
         }));

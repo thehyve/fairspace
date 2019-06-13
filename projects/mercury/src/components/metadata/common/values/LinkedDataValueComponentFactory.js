@@ -5,7 +5,7 @@ import DateTimeValue from "./DateTimeValue";
 import DateValue from "./DateValue";
 import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
-import ResourceValueContainer from "./ResourceValueContainer";
+import ResourceValue from "./ResourceValue";
 import EnumerationDropdown from "./EnumerationDropdown";
 
 export const getInputComponent = (property) => {
@@ -24,7 +24,7 @@ export const getInputComponent = (property) => {
     // If this class refers to a generic IRI, let the user
     // enter the iri in a textbox
     if (property.isGenericIriResource) {
-        return ResourceValueContainer;
+        return ResourceValue;
     }
 
     // The datatype determines the type of input element
