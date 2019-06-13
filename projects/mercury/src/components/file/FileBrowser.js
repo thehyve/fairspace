@@ -55,12 +55,7 @@ class FileBrowser extends React.Component {
     }
 
     handlePathDelete = (path) => {
-        const {
-            deleteFile, fetchFilesIfNeeded, openedPath
-        } = this.props;
-
-        return deleteFile(path.filename)
-            .then(() => fetchFilesIfNeeded(openedPath))
+        return this.onFileOperation(this.props.deleteFile(path.filename))
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
             });
@@ -68,11 +63,10 @@ class FileBrowser extends React.Component {
 
     handlePathRename = (path, newName) => {
         const {
-            renameFile, fetchFilesIfNeeded, openedPath
+            renameFile, openedPath
         } = this.props;
 
-        return renameFile(openedPath, path.basename, newName)
-            .then(() => fetchFilesIfNeeded(openedPath))
+        return this.onFileOperation(renameFile(openedPath, path.basename, newName))
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
                 return false;
@@ -148,7 +142,7 @@ class FileBrowser extends React.Component {
                         disabled={!openedCollection.canWrite}
                         existingFiles={files ? files.map(file => file.basename) : []}
                         getDownloadLink={FileAPI.getDownloadLink}
-                        onFoleOperation={this.onFileOperation}
+                        onFileOperation={this.onFileOperation}
                     />
                 </div>
             </>
