@@ -39,6 +39,8 @@ public class SaturnDatasetFactory {
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
         if (config.elasticSearch.enabled) {
+            // When a restore is needed, we instruct ES to delete the index first
+            // This way, the index will be in sync with our current database
             dsg = enableElasticSearch(dsg, config, restoreNeeded);
         }
 
