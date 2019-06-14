@@ -12,8 +12,7 @@ import Config from "../services/Config/Config";
 import theme from './App.theme';
 import Layout from "./common/Layout/Layout";
 import {LoadingInlay, ErrorDialog} from './common';
-import {UserContext} from '../UserContext';
-import AccountAPI from '../services/AccountAPI';
+import {UserProvider} from '../UserContext';
 
 class App extends React.Component {
     cancellable = {
@@ -25,10 +24,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            configLoaded: false,
-            currentUserLoading: false,
-            currentUserError: null,
-            currentUser: {}
+            configLoaded: false
         };
     }
 
@@ -37,17 +33,6 @@ class App extends React.Component {
 
         Config.init()
             .then(() => {
-                this.setState({currentUserLoading: true});
-                AccountAPI.getUser()
-                    .then(currentUser => this.setState({
-                        currentUser,
-                        currentUserError: false
-                    }))
-                    .catch(e => this.setState({currentUserError: e}))
-                    .finally(() => {
-                        this.setState({currentUserLoading: false});
-                    });
-
                 this.store.dispatch(fetchUsers());
                 this.store.dispatch(fetchAuthorizations());
                 this.store.dispatch(fetchWorkspace());
@@ -64,10 +49,8 @@ class App extends React.Component {
 
     render() {
         if (this.state.configLoaded) {
-            const {currentUser, currentUserLoading, currentUserError} = this.state;
-
             return (
-                <UserContext.Provider value={{currentUser, currentUserLoading, currentUserError}}>
+                <UserProvider>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <MuiThemeProvider theme={theme}>
                             <Provider store={this.store}>
@@ -79,7 +62,7 @@ class App extends React.Component {
                             </Provider>
                         </MuiThemeProvider>
                     </MuiPickersUtilsProvider>
-                </UserContext.Provider>
+                </UserProvider>
             );
         }
         return <LoadingInlay />;

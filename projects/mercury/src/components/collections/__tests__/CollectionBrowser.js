@@ -6,9 +6,12 @@ import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
+
 import CollectionBrowser from "../CollectionBrowser";
 import Config from "../../../services/Config/Config";
 import * as actionTypes from "../../../actions/actionTypes";
+import UserContext from '../../../UserContext';
+import {LoadingInlay} from "../../common";
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
@@ -89,19 +92,13 @@ it('dispatch an action on collection save', () => {
 
 describe('loading state', () => {
     it('is loading as long as the user is pending', () => {
-        store = mockStore({
-            ...defaultState,
-            account: {
-                user: {
-                    ...defaultState.account.user,
-                    pending: true
-                }
-            },
-        });
+        const wrapper = shallow(
+            <UserContext.Provider value={{currentUserLoading: true}}>
+                <CollectionBrowser />
+            </UserContext.Provider>
+        );
 
-        const node = shallow(<CollectionBrowser store={store} />);
-
-        expect(node.prop('loading')).toEqual(true);
+        expect(wrapper.find(LoadingInlay).length).toBe(1);
     });
 
     it('is loading as long as the collections are pending', () => {

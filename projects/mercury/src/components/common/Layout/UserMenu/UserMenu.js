@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
 
-import {UserContext} from '../../../../UserContext';
+import UserContext from '../../../../UserContext';
 
 const styles = {
     row: {
@@ -19,9 +19,9 @@ const styles = {
     }
 };
 
-const UserMenu = ({classes, onLogout}) => {
+const UserMenu = ({classes}) => {
     const [anchorEl, setAnchorEl] = useState(null);
-    const {currentUser} = useContext(UserContext);
+    const {currentUser, onLogout} = useContext(UserContext);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);

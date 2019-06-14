@@ -13,7 +13,7 @@ import {
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import getDisplayName from "../../utils/userUtils";
 import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
-import {UserContext} from '../../UserContext';
+import UserContext from '../../UserContext';
 
 const PermissionsViewer = ({
     users, iri, fetchPermissionsIfNeeded, permissions,

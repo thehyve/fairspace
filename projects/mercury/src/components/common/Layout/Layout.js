@@ -14,7 +14,7 @@ import {isAuthorizationsPending} from "../../../reducers/account/authorizationsR
 import {isWorkspacePending} from "../../../reducers/workspaceReducers";
 import {isRedirectingForLogin} from "../../../reducers/uiReducers";
 import {LoadingInlay} from "../index";
-import {UserContext} from '../../../UserContext';
+import UserContext from '../../../UserContext';
 
 const Layout = ({classes, menuExpanded, workspaceName, version, pending}) => {
     const {currentUserLoading} = useContext(UserContext);
