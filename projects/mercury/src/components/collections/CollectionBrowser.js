@@ -106,7 +106,6 @@ class CollectionBrowser extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    user: state.account.user.data,
     loading: state.cache.collections.pending || state.account.user.pending || state.cache.users.pending,
     error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
     collections: state.cache.collections.data,

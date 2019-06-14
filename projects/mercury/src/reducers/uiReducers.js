@@ -41,7 +41,6 @@ const ui = (state = defaultState, action) => {
                 }
             };
 
-        case actionTypes.FETCH_USER + "_REJECTED":
         case actionTypes.FETCH_USERS + "_REJECTED":
         case actionTypes.FETCH_AUTHORIZATIONS + "_REJECTED":
         case actionTypes.FETCH_WORKSPACE + "_REJECTED":
