@@ -96,6 +96,7 @@ class NewLinkedDataEntityDialog extends React.Component {
             <LinkedDataEntityFormContainer
                 formKey={this.state.formKey}
                 properties={this.props.linkedData}
+                key="form"
             />
         );
 
@@ -106,28 +107,18 @@ class NewLinkedDataEntityDialog extends React.Component {
                 onLocalPartChange={this.handleLocalPartChange}
                 onNamespaceChange={this.handleNamespaceChange}
                 required={this.props.requireIdentifier}
+                key="identifier"
             />
         );
 
         // If the identifier field is not required, it will be inferred from other
         // properties by default. This makes the field quite unimportant, so it will
         // be rendered at the bottom. See VRE-830 for details
-        return this.props.requireIdentifier
-            ? (
-                <>
-                    {idField}
-                    {form}
-                </>
-            ) : (
-                <>
-                    {form}
-                    {idField}
-                </>
-            );
+        return this.props.requireIdentifier ? [idField, form] : [form, idField];
     }
 
     canCreate() {
-        return !this.props.requireIdentifier || (this.getIdentifier() && isValidLinkedDataIdentifier(this.getIdentifier()));
+        return !this.props.requireIdentifier || isValidLinkedDataIdentifier(this.getIdentifier());
     }
 }
 
