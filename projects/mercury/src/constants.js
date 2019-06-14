@@ -16,6 +16,7 @@ export const COLLECTION_SEARCH_TYPE = 'collections';
 export const FILES_SEARCH_TYPE = 'files';
 export const SEARCH_MAX_SIZE = 10000;
 export const SEARCH_DEFAULT_SIZE = 10;
+export const SEARCH_DROPDOWN_DEFAULT_SIZE = 100;
 
 // Metadata schemas
 export const SHACL_NS = 'http://www.w3.org/ns/shacl#';
@@ -30,6 +31,7 @@ export const RDF_TYPE = RDF_NS + 'type';
 export const TYPE_URI = RDF_NS + 'type';
 export const LABEL_URI = RDFS_NS + 'label';
 export const COMMENT_URI = RDFS_NS + 'comment';
+export const SUBCLASS_URI = RDFS_NS + 'subClassOf';
 
 export const SHACL_NAME = SHACL_NS + 'name';
 export const SHACL_DESCRIPTION = SHACL_NS + 'description';

@@ -2,14 +2,15 @@ import nodeCrypto from "crypto";
 
 import {
     generateUuid,
-    getLabel, getLocalPart,
+    getLabel,
+    getLocalPart,
     getTypeInfo,
     hasValue,
-    isNonEmptyValue,
-    linkLabel,
+    isNonEmptyValue, linkLabel,
     normalizeMetadataResource,
     partitionErrors,
     propertiesToShow,
+    propertyContainsValueOrId,
     relativeLink,
     shouldPropertyBeHidden,
     simplifyUriPredicates,
@@ -308,6 +309,37 @@ describe('Metadata Utils', () => {
                     entityErrors: errorsSub1,
                     otherErrors: errorsSub2
                 });
+        });
+    });
+
+    describe('propertyContainsValueOrId', () => {
+        const property = {
+            values: [
+                {value: 'first value'},
+                {value: '321'},
+                {id: '1234'},
+                {value: 'other value'},
+                {id: 'some-id-555', value: 'with given value'}
+            ]
+        };
+
+        it('should returns true for the given values', () => {
+            expect(propertyContainsValueOrId(property, 'first value')).toBe(true);
+            expect(propertyContainsValueOrId(property, '321', 99)).toBe(true);
+            expect(propertyContainsValueOrId(property, '321')).toBe(true);
+            expect(propertyContainsValueOrId(property, null, '1234')).toBe(true);
+            expect(propertyContainsValueOrId(property, 'other value')).toBe(true);
+            expect(propertyContainsValueOrId(property, 'with given value', 'some-id-555')).toBe(true);
+        });
+
+        it('should returns false for the given values', () => {
+            expect(propertyContainsValueOrId(property, null, '')).toBe(false);
+            expect(propertyContainsValueOrId(property, 321)).toBe(false);
+            expect(propertyContainsValueOrId(property, undefined, '12345')).toBe(false);
+            expect(propertyContainsValueOrId(property, undefined, 'other value')).toBe(false);
+            expect(propertyContainsValueOrId(property, 'some value value', 'other-id')).toBe(false);
+            expect(propertyContainsValueOrId({}, 'with given value', 'some-id-555')).toBe(false);
+            expect(propertyContainsValueOrId({}, undefined, null)).toBe(false);
         });
     });
 
