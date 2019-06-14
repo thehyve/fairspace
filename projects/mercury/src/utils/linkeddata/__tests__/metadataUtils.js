@@ -2,7 +2,7 @@ import nodeCrypto from "crypto";
 
 import {
     generateUuid,
-    getLabel,
+    getLabel, getLocalPart,
     getTypeInfo,
     hasValue,
     isNonEmptyValue,
@@ -377,6 +377,23 @@ describe('Metadata Utils', () => {
             }))).toEqual([
                 [0, false, 'b']
             ]);
+        });
+    });
+
+    describe('getLocalPart', () => {
+        it('should return the last part of the url with hash', () => {
+            expect(getLocalPart('http://iri/test#local')).toEqual('local');
+            expect(getLocalPart('http://iri/test#local/something-else')).toEqual('local/something-else');
+        });
+
+        it('should return the part after the last slash if no hash is present', () => {
+            expect(getLocalPart('http://iri/test')).toEqual('test');
+            expect(getLocalPart('http://iri/test/subpath')).toEqual('subpath');
+        });
+
+        it('should return the domain if no path or hash is present', () => {
+            expect(getLocalPart('http://iri')).toEqual('iri');
+            expect(getLocalPart('http://some.very.long.domain')).toEqual('some.very.long.domain');
         });
     });
 });
