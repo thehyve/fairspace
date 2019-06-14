@@ -5,16 +5,16 @@ import {FileOperations} from "../FileOperations";
 describe('FileOperations', () => {
     it('Resolves naming conflicts on upload', () => {
         const uploadFiles = jest.fn(() => Promise.resolve());
-        const onFileOperation = jest.fn((op) => op);
+        const fetchFilesIfNeeded = jest.fn();
 
         const wrapper = shallow(<FileOperations
             classes={{}}
             selectedPaths={[]}
             uploadFiles={uploadFiles}
+            fetchFilesIfNeeded={fetchFilesIfNeeded}
             openedPath="opened/Path"
             existingFiles={['file1.txt', 'file2.txt', 'file2 (1).txt', 'file2 (2).txt']}
             getDownloadLink={() => {}}
-            onFileOperation={onFileOperation}
         />);
 
         const files = [{name: 'file1.txt'}, {name: 'file2.txt'}, {name: 'file3.txt'}];
@@ -36,8 +36,8 @@ describe('FileOperations', () => {
                         value: {name: "file3.txt"}
                     }]
                 );
-                expect(onFileOperation.mock.calls.length).toEqual(1);
-                expect(onFileOperation.mock.calls[0][0]).toEqual(uploadFiles());
+                expect(fetchFilesIfNeeded.mock.calls.length).toEqual(1);
+                expect(fetchFilesIfNeeded.mock.calls[0][0]).toEqual('opened/Path');
             });
     });
 });
@@ -51,7 +51,6 @@ describe('handleCreateDirectory', () => {
                 createDirectory={createDirectory}
                 classes={{}}
                 getDownloadLink={() => {}}
-                onFileOperation={op => op}
             />
         ).instance();
 
