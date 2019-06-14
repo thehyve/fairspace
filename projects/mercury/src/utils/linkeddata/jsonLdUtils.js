@@ -1,4 +1,5 @@
 import {mapValues} from 'lodash';
+import {isNonEmptyValue} from "./metadataUtils";
 
 /**
  * Returns the value of the given property on the first entry of the predicate for the metadat
@@ -29,5 +30,12 @@ export const getFirstPredicateList = (metadataEntry, predicate, defaultValue) =>
  */
 export const normalizeJsonLdResource = jsonLd => mapValues(
     jsonLd,
-    values => (Array.isArray(values) ? values.map(v => v['@value'] || v['@id'] || v) : values)
+    values => (
+        Array.isArray(values)
+            ? values.map(v => {
+                if (isNonEmptyValue(v['@value'])) return v['@value'];
+                return v['@id'] || v;
+            })
+            : values
+    )
 );

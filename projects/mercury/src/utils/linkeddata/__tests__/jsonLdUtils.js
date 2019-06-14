@@ -1,4 +1,5 @@
 import {getFirstPredicateId, getFirstPredicateValue, normalizeJsonLdResource} from "../jsonLdUtils";
+import {normalizeMetadataResource} from "../metadataUtils";
 
 describe('json-ld Utils', () => {
     describe('getFirstPredicateValue', () => {
@@ -48,6 +49,30 @@ describe('json-ld Utils', () => {
                 '@type': ['http://type1', 'http://type2']
             };
             expect(normalizeJsonLdResource(jsonLd)).toEqual(jsonLd);
+        });
+
+        it('should return value if both value and id are given', () => {
+            expect(Object.values(normalizeJsonLdResource({
+                a: [{'@value': 'a', '@id': 'b'}]
+            }))).toEqual([
+                ['a']
+            ]);
+        });
+
+        it('should return complete object if no value and id are given', () => {
+            expect(Object.values(normalizeJsonLdResource({
+                a: [{url: 'http://google.com'}]
+            }))).toEqual([
+                [{url: 'http://google.com'}]
+            ]);
+        });
+
+        it('should handle zero or false as actual values but not empty strings', () => {
+            expect(Object.values(normalizeJsonLdResource({
+                a: [{'@value': 0, '@id': 'a'}, {'@value': false, '@id': 'b'}, {'@value': '', '@id': 'b'}],
+            }))).toEqual([
+                [0, false, 'b']
+            ]);
         });
     });
 });

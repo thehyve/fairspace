@@ -257,8 +257,7 @@ export const normalizeMetadataResource = jsonLd => mapValues(
         Array.isArray(values)
             ? values.map(v => {
                 if (isNonEmptyValue(v.value)) return v.value;
-                if (isNonEmptyValue(v.id)) return v.id;
-                return v;
+                return v.id || v;
             })
             : values
     )
