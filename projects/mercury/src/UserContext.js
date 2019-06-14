@@ -16,6 +16,7 @@ export const UserProvider = ({children}) => {
             .then(user => {
                 setCurrentUser(user);
                 setCurrentUserLoading(false);
+                setCurrentUserError(false);
             })
             .catch(setCurrentUserError)
             .finally(() => {
