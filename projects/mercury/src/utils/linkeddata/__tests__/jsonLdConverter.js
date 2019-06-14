@@ -232,9 +232,9 @@ describe('jsonLdConverter', () => {
                 expect(result[0].key).toEqual("http://fairspace.io/ontology#hasFile");
                 expect(result[0].values.length).toEqual(2);
                 expect(result[0].values[0].id).toEqual('http://fairspace.com/iri/files/2');
-                expect(result[0].values[0].label).toEqual("File 2");
+                expect(result[0].values[0].otherEntry.label).toEqual(["File 2"]);
                 expect(result[0].values[1].id).toEqual('http://fairspace.com/iri/files/3');
-                expect(result[0].values[1].label).toEqual(undefined);
+                expect(result[0].values[1].otherEntry).toEqual({});
             });
         });
 

@@ -1,9 +1,8 @@
 import {compareBy, comparing, flattenShallow} from "../genericUtils";
 import * as constants from "../../constants";
-import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import {getFirstPredicateId, getFirstPredicateValue, normalizeJsonLdResource} from "./jsonLdUtils";
 import {isRdfList} from "./vocabularyUtils";
-import {lookupLabel, isNonEmptyValue} from "./metadataUtils";
-import {RDF_TYPE} from "../../constants";
+import {isNonEmptyValue, simplifyUriPredicates} from "./metadataUtils";
 
 /**
  * Generates a property entry for the given type(s)
@@ -38,7 +37,7 @@ const generateTypeProperty = (vocabulary, types) => {
 const generateValueEntry = (entry, allMetadata) => ({
     id: entry['@id'],
     value: entry['@value'],
-    label: lookupLabel(entry['@id'], allMetadata)
+    otherEntry: entry['@id'] ? simplifyUriPredicates(normalizeJsonLdResource(allMetadata.find(element => element['@id'] === entry['@id']))) : {}
 });
 
 /**
@@ -80,7 +79,7 @@ const convertMetadataIntoPropertyList = (metadata, propertyShapes = [], allMetad
                 // sort the values
                 values = metadata[predicateUri]
                     .map(entry => generateValueEntry(entry, allMetadata))
-                    .sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
+                    .sort(comparing(compareBy(e => e.otherEntry && e.otherEntry.label), compareBy('id'), compareBy('value')));
             }
 
             prefilledProperties.push({...vocabulary.generatePropertyEntry(predicateUri, propertyShape), values});
@@ -261,14 +260,13 @@ export const emptyLinkedData = (vocabulary, shape) => {
  * @param expandedMetadata
  * @returns {*}
  */
-export const normalizeTypes = (expandedMetadata) =>
-    expandedMetadata.map(e => {
-        if (!e['@type'] && e[RDF_TYPE]) {
-            const {[RDF_TYPE]: types, ...rest} = e;
-            return {
-                '@type': types.map(t => t['@id']),
-                ...rest
-            };
-        }
-        return e;
-    });
+export const normalizeTypes = (expandedMetadata) => expandedMetadata.map(e => {
+    if (!e['@type'] && e[constants.RDF_TYPE]) {
+        const {[constants.RDF_TYPE]: types, ...rest} = e;
+        return {
+            '@type': types.map(t => t['@id']),
+            ...rest
+        };
+    }
+    return e;
+});

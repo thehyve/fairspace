@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
+import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import {getLinkedDataFormUpdates, getLinkedDataFormValidations} from "../../../reducers/linkedDataFormReducers";
 import {
     addLinkedDataValue,

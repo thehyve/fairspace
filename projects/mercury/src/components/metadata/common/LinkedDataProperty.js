@@ -1,17 +1,10 @@
-import React, {useState, useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
-import {
-    IconButton,
-    FormControl,
-    FormControlLabel,
-    FormLabel,
-    FormGroup,
-    FormHelperText,
-    Typography
-} from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import {FormControl, FormGroup, FormHelperText, FormLabel, Typography} from '@material-ui/core';
 
 import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
+import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
+import LinkedDataRelationTable from "./LinkedDataRelationTable";
 
 /**
      * Checks whether the configuration of this property disallowed editing of existing values
@@ -27,7 +20,6 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || allowedValues;
 
 const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
-    const [hoveredIndex, setHoveredIndex] = useState(null);
     const [hoveredAllProperty, setHoveredAllProperty] = useState(false);
     const {readOnlyComponent, editComponent, addComponent} = useContext(LinkedDataValuesContext);
 
@@ -43,11 +35,9 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
     const disableEditing = !property.isEditable || disallowEditingOfExistingValues(property);
-    const ValueComponent = disableEditing ? readOnlyComponent() : editComponent(property);
-    const ValueAddComponent = addComponent(property);
+    const editInputComponent = disableEditing ? readOnlyComponent() : editComponent(property);
+    const addInputComponent = addComponent(property);
     const pathVisibility = hoveredAllProperty ? 'visible' : 'hidden';
-
-    const isDeletable = entry => !('isDeletable' in entry) || entry.isDeletable;
 
     return (
         <FormControl
@@ -68,65 +58,28 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                 {path}
             </Typography>
             <FormGroup>
-                {values.map((entry, idx) => (
-                    <div
-                        onMouseEnter={() => setHoveredIndex(idx)}
-                        onMouseLeave={() => setHoveredIndex(null)}
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={idx}
-                    >
-                        <FormControlLabel
-                            style={{width: '100%', margin: 0}}
-                            control={(
-                                <>
-                                    <ValueComponent
-                                        property={property}
-                                        entry={entry}
-                                        onChange={(value) => onChange(value, idx)}
-                                        aria-labelledby={labelId}
-                                        error={hasErrors}
-                                    />
-                                    {
-                                        isDeletable(entry) && property.isEditable
-                                            ? (
-                                                <IconButton
-                                                    size="small"
-                                                    aria-label="Delete"
-                                                    title="Delete"
-                                                    onClick={() => onDelete(idx)}
-                                                    style={{
-                                                        visibility: hoveredIndex === idx ? 'visible' : 'hidden',
-                                                        padding: 6,
-                                                        marginLeft: 8
-                                                    }}
-                                                >
-                                                    <ClearIcon />
-                                                </IconButton>
-                                            ) : null
-                                    }
-                                </>
-                            )}
+                {
+                    property.isRelationShape ? (
+                        <LinkedDataRelationTable
+                            property={property}
+                            canAdd={canAdd}
+                            onAdd={onAdd}
+                            onDelete={onDelete}
+                            addComponent={addInputComponent}
                         />
-                    </div>
-                ))}
-
-                {canAdd ? (
-                    <FormControlLabel
-                        style={{width: '100%', margin: 0}}
-                        control={(
-                            <div style={{width: '100%'}}>
-                                <ValueAddComponent
-                                    property={property}
-                                    placeholder=""
-                                    onChange={onAdd}
-                                    aria-labelledby={labelId}
-                                />
-                            </div>
-
-                        )}
-                    />
-                ) : null}
-
+                    ) : (
+                        <LinkedDataInputFieldsTable
+                            property={property}
+                            canAdd={canAdd}
+                            onAdd={onAdd}
+                            onChange={onChange}
+                            onDelete={onDelete}
+                            labelId={labelId}
+                            editComponent={editInputComponent}
+                            addComponent={addInputComponent}
+                        />
+                    )
+                }
             </FormGroup>
             <FormHelperText color="primary">
                 {hasErrors ? errors.map(e => `${e}. `) : null}

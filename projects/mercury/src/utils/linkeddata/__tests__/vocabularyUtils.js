@@ -3,7 +3,7 @@ import {
     getMaxCount,
     getSystemProperties,
     isGenericIriResource,
-    isRdfList,
+    isRdfList, isRelationShape,
     vocabularyUtils,
 } from '../vocabularyUtils';
 import vocabularyJsonLd from '../test.vocabulary.json';
@@ -137,6 +137,18 @@ describe('vocabularyUtils', () => {
         });
     });
 
+    describe('isRelationShape', () => {
+        it('should return true for relation shapes', () => {
+            expect(isRelationShape({'@type': [constants.RELATION_SHAPE_URI]})).toBe(true);
+            expect(isRelationShape({'@type': ['http://someShape', constants.RELATION_SHAPE_URI]})).toBe(true);
+        });
+        it('should return false for other types of shapes', () => {
+            expect(isRelationShape({'@type': ['http://other-type']})).toBe(false);
+            expect(isRelationShape({'@type': []})).toBe(false);
+            expect(isRelationShape({})).toBe(false);
+        });
+    });
+    
     describe('Class hierarchy (subclasses and descendants)', () => {
         const type = 'http://www.w3.org/ns/shacl#PropertyShape';
         const subClasses = ["http://fairspace.io/ontology#ControlledVocabularyPropertyShape", "http://fairspace.io/ontology#DatatypePropertyShape"];
