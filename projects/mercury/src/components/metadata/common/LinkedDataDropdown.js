@@ -49,14 +49,16 @@ class LinkedDataDropdown extends React.Component {
         }
 
         const options = fetchedItems
-            .map(({id, label, name, value}) => {
-                const disabled = propertyContainsValueOrId(property, value, id);
-                const l = (label && label[0]) || (name && name[0]) || linkLabel(id, true);
+            .map(metadataItem => {
+                const {id, label, name} = metadataItem;
+                const disabled = propertyContainsValueOrId(property, undefined, id);
+                const displayLabel = (label && label[0]) || (name && name[0]) || linkLabel(id, true);
 
                 return {
                     disabled,
-                    label: l,
+                    label: displayLabel,
                     id,
+                    otherEntry: metadataItem
                 };
             });
 
