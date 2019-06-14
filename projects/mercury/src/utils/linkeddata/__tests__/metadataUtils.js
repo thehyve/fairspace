@@ -1,19 +1,12 @@
 import nodeCrypto from "crypto";
 
 import {
-    generateUuid,
-    getLabel,
-    getTypeInfo,
-    linkLabel,
-    propertiesToShow,
-    relativeLink,
-    shouldPropertyBeHidden,
-    url2iri,
-    isNonEmptyValue,
-    partitionErrors, hasValue
+    generateUuid, getLabel, getTypeInfo,
+    linkLabel, propertiesToShow, relativeLink,
+    shouldPropertyBeHidden, url2iri, isNonEmptyValue,
+    partitionErrors, propertyContainsValueOrId, hasValue
 } from "../metadataUtils";
 import * as constants from "../../../constants";
-import {SHACL_TARGET_CLASS} from "../../../constants";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {
@@ -212,7 +205,7 @@ describe('Metadata Utils', () => {
         }];
 
         const vocabulary = {
-            determineShapeForTypes: (typeIris) => ({[SHACL_TARGET_CLASS]: [{'@id': typeIris[0]}]})
+            determineShapeForTypes: (typeIris) => ({[constants.SHACL_TARGET_CLASS]: [{'@id': typeIris[0]}]})
         };
 
         it('retrieves information on the type of the entity', () => {
@@ -308,11 +301,42 @@ describe('Metadata Utils', () => {
         });
     });
 
+    describe('propertyContainsValueOrId', () => {
+        const property = {
+            values: [
+                {value: 'first value'},
+                {value: '321'},
+                {id: '1234'},
+                {value: 'other value'},
+                {id: 'some-id-555', value: 'with given value'}
+            ]
+        };
+
+        it('should returns true for the given values', () => {
+            expect(propertyContainsValueOrId(property, 'first value')).toBe(true);
+            expect(propertyContainsValueOrId(property, '321', 99)).toBe(true);
+            expect(propertyContainsValueOrId(property, '321')).toBe(true);
+            expect(propertyContainsValueOrId(property, null, '1234')).toBe(true);
+            expect(propertyContainsValueOrId(property, 'other value')).toBe(true);
+            expect(propertyContainsValueOrId(property, 'with given value', 'some-id-555')).toBe(true);
+        });
+
+        it('should returns false for the given values', () => {
+            expect(propertyContainsValueOrId(property, null, '')).toBe(false);
+            expect(propertyContainsValueOrId(property, 321)).toBe(false);
+            expect(propertyContainsValueOrId(property, undefined, '12345')).toBe(false);
+            expect(propertyContainsValueOrId(property, undefined, 'other value')).toBe(false);
+            expect(propertyContainsValueOrId(property, 'some value value', 'other-id')).toBe(false);
+            expect(propertyContainsValueOrId({}, 'with given value', 'some-id-555')).toBe(false);
+            expect(propertyContainsValueOrId({}, undefined, null)).toBe(false);
+        });
+    });
+
     describe('hasValue', () => {
         it('should return false if no value is present', () => expect(hasValue({})).toBe(false));
         it('should return false if values list is empty', () => expect(hasValue({values: []})).toBe(false));
         it('should return false if only an empty string is is present', () => expect(hasValue({values: [{value: ""}]})).toBe(false));
         it('should return true if an id is present', () => expect(hasValue({values: [{id: "http://a"}]})).toBe(true));
         it('should return true if a non-empty value is present', () => expect(hasValue({values: [{value: "label"}]})).toBe(true));
-    })
+    });
 });

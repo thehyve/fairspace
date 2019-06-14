@@ -28,7 +28,7 @@ export class SearchAPI {
         const esQuery = {
             bool: {
                 must: [{
-                    query_string: {query}
+                    query_string: {query: query || '*'}
                 }],
                 must_not: {
                     exists: {
@@ -88,7 +88,7 @@ export class SearchAPI {
      * @returns {Promise}
      */
     searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0}) => this.search({
-        query: query || '*',
+        query,
         size,
         types,
         from: page * size

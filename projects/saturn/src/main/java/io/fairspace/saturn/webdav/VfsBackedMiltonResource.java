@@ -8,6 +8,7 @@ import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.http.webdav.WebDavProtocol;
 import io.milton.property.PropertySource;
 import io.milton.property.PropertySource.PropertyAccessibility;
 import io.milton.property.PropertySource.PropertyMetaData;
@@ -23,13 +24,14 @@ import java.util.List;
 
 import static io.fairspace.saturn.vfs.PathUtils.name;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
-import static java.util.Collections.singletonList;
 
 @Slf4j
 public abstract class VfsBackedMiltonResource implements
         Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource {
     private static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
     private static final PropertyMetaData IRI_PROPERTY_META = new PropertyMetaData(PropertyAccessibility.READ_ONLY, String.class);
+    private static final QName ISREADONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
+    private static final PropertyMetaData ISREADONLY_PROPERTY_META = new PropertyMetaData(PropertyAccessibility.READ_ONLY, Boolean.class);
 
     protected final VirtualFileSystem fs;
     protected final FileInfo info;
@@ -66,6 +68,7 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public void moveTo(CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+        ensureIsWriteable();
         checkTarget(rDest);
         try {
             fs.move(info.getPath(), normalizePath(rDest + "/" + name));
@@ -127,6 +130,9 @@ public abstract class VfsBackedMiltonResource implements
         if (name.equals(IRI_PROPERTY)) {
             return info.getIri();
         }
+        if (name.equals(ISREADONLY_PROPERTY)) {
+            return info.isReadOnly();
+        }
         return null;
     }
 
@@ -140,12 +146,15 @@ public abstract class VfsBackedMiltonResource implements
         if (name.equals(IRI_PROPERTY)) {
             return IRI_PROPERTY_META;
         }
+        if (name.equals(ISREADONLY_PROPERTY)) {
+            return ISREADONLY_PROPERTY_META;
+        }
         return null;
     }
 
     @Override
     public List<QName> getAllPropertyNames() {
-        return singletonList(IRI_PROPERTY);
+        return List.of(IRI_PROPERTY, ISREADONLY_PROPERTY);
     }
 
     void onException(Exception e) throws NotAuthorizedException, BadRequestException, ConflictException {

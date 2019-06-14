@@ -215,6 +215,26 @@ export const vocabularyUtils = (vocabulary = []) => {
      */
     const getRaw = () => vocabulary;
 
+    const getChildSubclasses = type => vocabulary.filter(e => getFirstPredicateId(e, constants.SUBCLASS_URI) === type).map(e => e['@id']);
+
+    /**
+     * Returns an array of the types that are subclasses of the provided type including indirect subclasses
+     * @param {string} type
+     */
+    const getDescendants = type => {
+        let queue = [type];
+        let found = [];
+
+        while (queue.length > 0) {
+            const head = queue.shift();
+            const subClasses = getChildSubclasses(head);
+            queue = queue.concat(subClasses);
+            found = found.concat(subClasses);
+        }
+
+        return found;
+    };
+
     return Object.freeze({
         contains,
         get,
@@ -226,6 +246,8 @@ export const vocabularyUtils = (vocabulary = []) => {
         getRaw,
         getLabelForPredicate,
         getClassesInCatalog,
-        getNamespaces
+        getNamespaces,
+        getChildSubclasses,
+        getDescendants
     });
 };

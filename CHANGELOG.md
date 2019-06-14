@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Improved validation on metadata entities
 - Show a spinner while loading metadata
 - Improved read-only view for metadata and vocabulary entities
+- Use ElasticSearch to populate dropdowns
 
 ### Fixed
 - Fixed issues with validation of blank nodes

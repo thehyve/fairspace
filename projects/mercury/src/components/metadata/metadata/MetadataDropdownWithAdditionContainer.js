@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import InputWithAddition from "../common/values/InputWithAddition";
-import MetadataDropdownContainer from "./MetadataDropdownContainer";
+import LinkedDataDropdown from "../common/LinkedDataDropdown";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import {createMetadataEntityFromState, fetchEntitiesIfNeeded} from "../../../actions/metadataActions";
 import {createMetadataIri, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
@@ -23,9 +23,8 @@ const MetadataDropdownWithAdditionContainer = props => (
         onError={props.onError}
         requireIdentifier
     >
-        <MetadataDropdownContainer
+        <LinkedDataDropdown
             property={props.property}
-            entry={props.entry}
             onChange={props.onChange}
         />
     </InputWithAddition>
@@ -35,7 +34,6 @@ MetadataDropdownWithAdditionContainer.propTypes = {
     shape: PropTypes.object.isRequired,
     emptyData: PropTypes.array.isRequired,
     property: PropTypes.object.isRequired,
-    entry: PropTypes.object,
     onChange: PropTypes.func.isRequired,
     onCreate: PropTypes.func.isRequired,
 
