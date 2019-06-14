@@ -10,6 +10,7 @@ import {
     updateLinkedDataValue,
     validateLinkedDataProperty
 } from "../../../actions/linkedDataFormActions";
+import {propertiesToShow} from "../../../utils/linkeddata/metadataUtils";
 
 export class LinkedDataEntityFormContainer extends React.Component {
     componentDidMount() {
@@ -33,7 +34,7 @@ export class LinkedDataEntityFormContainer extends React.Component {
     }
 
     render() {
-        const propertiesWithChanges = this.props.properties
+        const propertiesWithChanges = propertiesToShow(this.props.properties)
             .filter(p => p.isEditable || p.values.length)
             .map(p => ({
                 ...p,

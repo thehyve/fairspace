@@ -66,11 +66,12 @@ export const extendPropertiesWithVocabularyEditingInfo = ({properties, isEditabl
         // For fixed shapes, return the list of system properties for the SHACL_PROPERTY definition
         if (isFixed && p.key === constants.SHACL_PROPERTY) {
             const isSystemProperty = entry => systemProperties && systemProperties.includes(entry.id);
-            const canDelete = entry => isEditable && !isSystemProperty(entry);
+            const isPropertyEditable = isEditable && !p.machineOnly;
+            const canDelete = entry => isPropertyEditable && !isSystemProperty(entry);
 
             // Add a flag to each value whether it can be deleted
             const values = p.values && p.values.map(v => ({...v, isDeletable: canDelete(v)}));
-            return {...p, values, isEditable, systemProperties};
+            return {...p, values, isEditable: isPropertyEditable, systemProperties};
         }
 
         // In all other cases, if the shape is fixed, the property must not be editable
