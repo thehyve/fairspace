@@ -87,6 +87,18 @@ export const vocabularyUtils = (vocabulary = []) => {
     const getClassesInCatalog = () => vocabulary.filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI));
 
     /**
+     * Returns a list of classes marked as fairspace entities
+     */
+    const getNamespaces = () => vocabulary
+        .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
+        .map(namespace => ({
+            id: namespace['@id'],
+            label: getFirstPredicateValue(namespace, constants.SHACL_NAME),
+            prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
+            namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE)
+        }));
+
+    /**
      * Checks whether the vocabulary contains the given identifier
      * @param id
      * @returns {boolean}
@@ -234,6 +246,7 @@ export const vocabularyUtils = (vocabulary = []) => {
         getRaw,
         getLabelForPredicate,
         getClassesInCatalog,
+        getNamespaces,
         getChildSubclasses,
         getDescendants
     });

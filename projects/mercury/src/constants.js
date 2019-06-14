@@ -48,6 +48,9 @@ export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
 export const SHACL_IN = SHACL_NS + 'in';
 export const SHACL_IRI = SHACL_NS + 'IRI';
 export const SHACL_ORDER = SHACL_NS + 'order';
+export const SHACL_PREFIX = SHACL_NS + 'prefix';
+export const SHACL_NAMESPACE = SHACL_NS + 'namespace';
+export const SHACL_PREFIX_DECLARATION = SHACL_NS + 'PrefixDeclaration';
 
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
 

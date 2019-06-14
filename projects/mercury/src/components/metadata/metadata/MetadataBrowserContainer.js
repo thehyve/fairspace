@@ -2,13 +2,7 @@ import React from "react";
 import {connect} from 'react-redux';
 
 import {withRouter} from 'react-router-dom';
-import {
-    createMetadataIri,
-    getLabel,
-    linkLabel,
-    partitionErrors,
-    relativeLink
-} from "../../../utils/linkeddata/metadataUtils";
+import {createMetadataIri, getLabel, linkLabel, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {searchMetadata} from "../../../actions/searchActions";
 import {getMetadataSearchResults} from "../../../reducers/searchReducers";
@@ -89,11 +83,10 @@ const mapStateToProps = (state, {vocabulary}) => {
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(searchMetadata({query: '*', types: ownProps.targetClasses})),
     fetchShapes: () => {},
-    create: (formKey, shape, id) => {
-        const subject = createMetadataIri(id);
+    create: (formKey, shape, subject) => {
         const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
         return dispatch(createMetadataEntityFromState(formKey, subject, type))
-            .then(() => ownProps.history.push(relativeLink(subject)));
+            .then(() => openMetadataEntry(ownProps.history, subject));
     }
 });
 

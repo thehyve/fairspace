@@ -18,7 +18,7 @@ import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 import LinkedDataList from "../common/LinkedDataList";
 
-const openVocabulary= (history, id) => {
+const openVocabulary = (history, id) => {
     history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
 };
 
@@ -89,8 +89,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(searchVocabulary({query: '*', types: ownProps.targetClasses})),
     fetchShapes: () => {},
-    create: (formKey, shape, id) => {
-        const subject = id && createVocabularyIri(id);
+    create: (formKey, shape, subject) => {
         const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
 
         return dispatch(createVocabularyEntityFromState(formKey, subject, type))
