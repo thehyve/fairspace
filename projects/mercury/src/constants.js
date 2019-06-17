@@ -64,7 +64,6 @@ export const LONG_URI = XMLSCHEMA_NS + 'long';
 export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
 
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
-export const SHOW_IN_CATALOG_URI = FAIRSPACE_NS + 'showInCatalog';
 export const COLLECTION_URI = FAIRSPACE_NS + 'Collection';
 export const FILE_URI = FAIRSPACE_NS + 'File';
 export const DIRECTORY_URI = FAIRSPACE_NS + 'Directory';

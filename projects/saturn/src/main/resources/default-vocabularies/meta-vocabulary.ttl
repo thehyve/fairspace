@@ -54,15 +54,8 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:path sh:description ;
         sh:name "Class description" ;
         sh:order 2
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:maxCount 1 ;
-        sh:path fs:showInCatalog ;
-        sh:name "Show in catalog" ;
-        sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
-    sh:not fs:ShapeIsAClosedShape ; 
-    fs:showInCatalog true ;
+    sh:not fs:ShapeIsAClosedShape ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -90,7 +83,6 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         sh:name "Show as external link" ;
         sh:description "If this flag is set to true, a link to a IRI for this property will not be loaded in the metadata editor"
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:ExternalIRIPropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -113,7 +105,6 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:name "Maximum length (for string only)"
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:DatatypePropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -140,7 +131,6 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         ] ;
         sh:order 3 
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:ControlledVocabularyPropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -167,7 +157,6 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:importantProperty true ;
         sh:order 3
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -177,7 +166,6 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
     sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
     sh:name "Namespace" ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:fixedShape ) ;
-    fs:showInCatalog true ;
     sh:property fs:PropertyNameShape ;
     sh:property [
       sh:name "Prefix" ;

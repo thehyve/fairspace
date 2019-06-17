@@ -3,7 +3,7 @@ package io.fairspace.saturn.services.metadata.validation;
 import lombok.AllArgsConstructor;
 import org.apache.jena.rdf.model.Model;
 
-import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  */
 @AllArgsConstructor
 public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestValidator {
-    private final Supplier<List<String>> machineOnlyPredicatesSupplier;
+    private final Supplier<Set<String>> machineOnlyPredicatesSupplier;
 
 
     @Override
