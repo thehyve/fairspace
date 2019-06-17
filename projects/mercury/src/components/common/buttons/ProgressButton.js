@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-class ProgressButton extends React.Component {
-    render() {
-        const {active, children} = this.props;
-
-        return active ? <CircularProgress/> : children;
-    }
-}
+const ProgressButton = ({active, children}) => (active ? (
+    <CircularProgress
+        style={{
+            alignSelf: 'center',
+            margin: 10,
+        }}
+        size={28}
+    />
+) : children);
 
 ProgressButton.propTypes = {
     active: PropTypes.bool

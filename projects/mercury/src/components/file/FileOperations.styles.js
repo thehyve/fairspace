@@ -1,6 +1,7 @@
 const styles = {
     buttonsContainer: {
-        "display": 'inline-block',
+        "display": 'inline-flex',
+        "min-width": 144,
         "& button & a": {
             padding: 10
         }
