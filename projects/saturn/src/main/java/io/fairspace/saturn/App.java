@@ -86,8 +86,8 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", new SaturnSparkFilter(
-                        new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService),
-                        new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService)
+                        new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService, CONFIG.jena.metadataBaseIRI),
+                        new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService, CONFIG.jena.vocabularyBaseIRI)
                             .withAuthorizationVerifier(apiPathPrefix + "/vocabulary/*", vocabularyAuthorizationVerifier),
                         new ReadableMetadataApp(apiPathPrefix + "/meta-vocabulary/", metaVocabularyService),
                         new CollectionsApp(apiPathPrefix, collections),

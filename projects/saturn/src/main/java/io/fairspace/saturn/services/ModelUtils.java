@@ -20,10 +20,10 @@ public class ModelUtils {
         return writer.toString();
     }
 
-    public static Model fromJsonLD(String json) throws PayloadParsingException {
+    public static Model fromJsonLD(String json, String baseURI) throws PayloadParsingException {
         try {
             var model = createDefaultModel();
-            RDFDataMgr.read(model, new StringReader(json), null, JSONLD.getLang());
+            RDFDataMgr.read(model, new StringReader(json), baseURI, JSONLD.getLang());
             return model;
         } catch (Exception e) {
             throw new PayloadParsingException(e);
