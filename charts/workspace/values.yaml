@@ -355,7 +355,15 @@ jupyterhub:
     # length as the actual values
     # Ensure to override this value with a 64-character hex string when installing
     secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
-
+  scheduling:
+    userScheduler:
+      enabled: false
+      pdb:
+        enabled: false
+    podPriority:
+      enabled: false
+    userPlaceholder:
+      enabled: false
 
 #####################################################################
 # Specific settings for ElasticSearch
