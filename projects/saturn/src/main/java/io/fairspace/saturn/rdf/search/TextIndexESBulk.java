@@ -68,7 +68,7 @@ public class TextIndexESBulk extends TextIndexES {
     }
 
     @Override
-    public void commit() {
+    public void prepareCommit() {
         if (updates.isEmpty()) {
             return;
         }

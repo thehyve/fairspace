@@ -1,9 +1,12 @@
 package io.fairspace.saturn.rdf.search;
 
-import org.apache.jena.query.text.Entity;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.text.DatasetGraphText;
 import org.apache.jena.query.text.EntityDefinition;
 import org.apache.jena.query.text.TextIndex;
 import org.apache.jena.query.text.TextIndexConfig;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -14,12 +17,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.currentThread;
+import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -31,8 +35,7 @@ public class TextIndexESBulkTest {
    @Mock
     private Client client;
 
-   @Mock
-   private EntityDefinition entityDefinition;
+   private EntityDefinition entityDefinition = new AutoEntityDefinition();
 
    @Mock
    private ActionFuture<BulkResponse> actionFuture;
@@ -43,10 +46,11 @@ public class TextIndexESBulkTest {
 
    private volatile Thread workerThread;
 
+   private DatasetGraph dsg;
+
    @Before
     public void before() throws ExecutionException, InterruptedException {
        when(config.getEntDef()).thenReturn(entityDefinition);
-       when(entityDefinition.fields()).thenReturn(List.of("field1"));
        when(client.bulk(any())).thenAnswer(invocation -> actionFuture);
        when(actionFuture.get()).thenAnswer(invocation -> {
            workerThread = currentThread();
@@ -56,7 +60,7 @@ public class TextIndexESBulkTest {
 
        latch = new CountDownLatch(1);
        index = new TextIndexESBulk(config, client, "index");
-
+       dsg = new DatasetGraphText(DatasetGraphFactory.createTxnMem(), index, new SingleTripleTextDocProducer(index, false));
    }
 
     @Test
@@ -98,13 +102,12 @@ public class TextIndexESBulkTest {
     }
 
     private void update() {
-        var entity1 = new Entity("http://example.com/123", "graph");
-        entity1.put("field1", "1");
-        index.addEntity(entity1);
+       dsg.begin(ReadWrite.WRITE);
+        dsg.add(defaultGraphIRI, createURI("http://example.com/s"), createURI("http://example.com/p"), createURI("http://example.com/o"));
     }
 
     private void commitAndWait() throws InterruptedException {
-        index.commit();
+        dsg.commit();
         assertTrue(latch.await(10, TimeUnit.SECONDS));
     }
 }
