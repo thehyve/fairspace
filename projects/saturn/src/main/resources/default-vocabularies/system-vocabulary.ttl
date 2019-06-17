@@ -146,7 +146,8 @@ fs:UserShape a sh:NodeShape ;
     sh:closed true ; 
     sh:description "Description for fs:User" ;
     sh:name "User" ;
-    sh:targetClass fs:User ; 
+    sh:targetClass fs:User ;
+    fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
     sh:property
