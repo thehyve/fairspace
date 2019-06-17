@@ -1,5 +1,7 @@
 import React from 'react';
 import {shallow} from "enzyme";
+import {IconButton} from "@material-ui/core";
+
 import {FileOperations} from "../FileOperations";
 
 describe('FileOperations', () => {
@@ -41,19 +43,39 @@ describe('FileOperations', () => {
             });
     });
 
-    it('should disable all buttons after on file operation', () => {
-
+    it('should disables all buttons on file operation', () => {
         const wrapper = shallow(<FileOperations
             classes={{}}
-            selectedPaths={[]}
-            openedPath="opened/Path"
+            paste={() => Promise.resolve()}
+            fetchFilesIfNeeded={() => {}}
             getDownloadLink={() => {}}
         />);
 
-        return wrapper.instance().handlePaste({})
-            .then(() => {
+        wrapper.instance().handlePaste({stopPropagation: () => {}});
+
+        wrapper.find(IconButton)
+            .forEach(b => {
+                expect(b.props().disabled).toBe(true);
             });
     });
+
+    // TODO: couldn't get this to work!
+    // it('should enables all buttons after successful file operation', async () => {
+    //     const wrapper = shallow(<FileOperations
+    //         classes={{}}
+    //         paste={() => Promise.resolve()}
+    //         fetchFilesIfNeeded={() => {}}
+    //         getDownloadLink={() => {}}
+    //     />);
+
+    //     wrapper.instance().handlePaste({stopPropagation: () => {}})
+    //         .then(() => {
+    //             wrapper.find(IconButton)
+    //                 .forEach(b => {
+    //                     expect(b.props().disabled).toBe(false);
+    //                 });
+    //         });
+    // });
 });
 
 describe('handleCreateDirectory', () => {

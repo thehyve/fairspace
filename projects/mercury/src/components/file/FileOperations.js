@@ -41,7 +41,7 @@ export class FileOperations extends React.Component {
 
     handlePaste(e) {
         e.stopPropagation();
-        this.fileOperation(Operations.PASTE, this.props.paste(this.props.openedPath))
+        return this.fileOperation(Operations.PASTE, this.props.paste(this.props.openedPath))
             .catch((err) => {
                 ErrorDialog.showError(err, "An error occurred while pasting your contents");
             });
@@ -75,7 +75,7 @@ export class FileOperations extends React.Component {
             });
     }
 
-    handlePathDelete = (path) => this.fileOperation("DELETE", this.props.deleteFile(path.filename))
+    handlePathDelete = (path) => this.fileOperation(Operations.DELETE, this.props.deleteFile(path.filename))
         .catch((err) => {
             ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
         })
@@ -149,7 +149,7 @@ export class FileOperations extends React.Component {
                             <IconButton
                                 title={`Rename ${selectedItem.basename}`}
                                 aria-label={`Rename ${selectedItem.basename}`}
-                                disabled={disabledForMoreThanOneSelection}
+                                disabled={disabledForMoreThanOneSelection || busy}
                             >
                                 <Icon>border_color</Icon>
                             </IconButton>
