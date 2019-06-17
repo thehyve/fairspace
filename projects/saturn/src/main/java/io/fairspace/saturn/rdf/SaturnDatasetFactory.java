@@ -3,7 +3,11 @@ package io.fairspace.saturn.rdf;
 import io.fairspace.saturn.Config;
 import io.fairspace.saturn.auth.SecurityUtil;
 import io.fairspace.saturn.commits.CommitMessages;
-import io.fairspace.saturn.rdf.search.*;
+import io.fairspace.saturn.rdf.search.AutoEntityDefinition;
+import io.fairspace.saturn.rdf.search.ElasticSearchClientFactory;
+import io.fairspace.saturn.rdf.search.ElasticSearchIndexConfigurer;
+import io.fairspace.saturn.rdf.search.SingleTripleTextDocProducer;
+import io.fairspace.saturn.rdf.search.TextIndexESBulk;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
@@ -15,6 +19,7 @@ import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.elasticsearch.client.Client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
@@ -31,7 +36,7 @@ public class SaturnDatasetFactory {
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
     public static Dataset connect(Config.Jena config) throws IOException {
-        var restoreNeeded = !config.datasetPath.exists();
+        var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
         var dsg = connectDatasetGraph(config.datasetPath.getAbsolutePath());
@@ -53,6 +58,10 @@ public class SaturnDatasetFactory {
 
         // Create a dataset
         return DatasetFactory.wrap(dsg);
+    }
+
+    protected static boolean isRestoreNeeded(File datasetPath) {
+        return !datasetPath.exists() || datasetPath.list().length == 0;
     }
 
     private static DatasetGraph enableElasticSearch(DatasetGraph dsg, Config.Jena config, boolean recreateIndex) throws UnknownHostException {
