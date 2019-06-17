@@ -1,15 +1,52 @@
 @prefix fs: <http://fairspace.io/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix osiris: <http://osiris.fairspace.io/ontology#> .
-@prefix icdo3: <http://icdo3.fairspace.io/ontology#> .
-@prefix fhir: <http://hl7.org/fhir/STU3/> .
+
+########################
+### Fixed Namespaces ###
+########################
+
+fs:FOAF-Namespace a sh:PrefixDeclaration ;
+   sh:name "Friend of a friend (FOAF)" ;
+   sh:prefix "foaf" ;
+   fs:fixedShape true ;
+   sh:namespace <http://xmlns.com/foaf/0.1/> .
+
+fs:RDF-Namespace a sh:PrefixDeclaration ;
+   sh:name "RDF" ;
+   sh:prefix "rdf" ;
+   fs:fixedShape true ;
+   sh:namespace <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+fs:RDFS-Namespace a sh:PrefixDeclaration ;
+   sh:name "RDF Schema (RDFS)" ;
+   sh:prefix "rdfs" ;
+   fs:fixedShape true ;
+   sh:namespace <http://www.w3.org/2000/01/rdf-schema#> .
+
+fs:XSD-Namespace a sh:PrefixDeclaration ;
+   sh:name "XSD" ; 
+   sh:prefix "xsd" ;
+   fs:fixedShape true ;
+   sh:namespace <http://www.w3.org/2001/XMLSchema#> .
+
+fs:Schema-Namespace a sh:PrefixDeclaration ;
+   sh:name "schema.org" ; 
+   sh:prefix "schema" ;
+   fs:fixedShape true ;
+   sh:namespace <http://schema.org/> .
+
+fs:Fairspace-Namespace a sh:PrefixDeclaration ;
+   sh:name "Fairspace (global)" ; 
+   sh:prefix "fs" ;
+   fs:fixedShape true ;
+   sh:namespace <http://fairspace.io/ontology#> .
 
 ########################
 ###   Fixed Shapes   ###
@@ -116,30 +153,31 @@ fs:UserShape a sh:NodeShape ;
 
 ## Property Shapes
 
-fs:blobIdShape a fs:PropertyShape ;
+fs:blobIdShape a fs:DatatypePropertyShape ;
     sh:name "BlobID";
     sh:description "Blob ID in the blob store" ;
     sh:path fs:blobId ;
     sh:datatype xsd:string ;
     fs:machineOnly true .
 
-fs:collectionTypeShape a fs:PropertyShape ;
+fs:collectionTypeShape a fs:DatatypePropertyShape ;
     sh:name "Collection type";
     sh:description "Collection Type";
     sh:path fs:collectionType ;
     sh:datatype xsd:string ;
     fs:machineOnly true .
 
-fs:labelShape a fs:PropertyShape ;
+fs:labelShape a fs:DatatypePropertyShape ;
     sh:name "Label" ;
     sh:description "Human readable label for this resource." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
     fs:fixedShape true ;
+    fs:importantProperty true ;
     sh:path rdfs:label . 
  
-fs:commentShape a fs:PropertyShape ;
+fs:commentShape a fs:DatatypePropertyShape ;
     sh:name "Description" ;
     sh:description "Human friendly description." ;
     sh:datatype xsd:string ;
@@ -147,7 +185,7 @@ fs:commentShape a fs:PropertyShape ;
     fs:fixedShape true ;
     sh:path rdfs:comment . 
      
-fs:dateCreatedShape a fs:PropertyShape ;
+fs:dateCreatedShape a fs:DatatypePropertyShape ;
     sh:name "Date created" ;
     sh:description "Time at point of creation" ;
     sh:datatype xsd:dateTime ;
@@ -156,7 +194,7 @@ fs:dateCreatedShape a fs:PropertyShape ;
     fs:fixedShape true ;
     sh:path fs:dateCreated .
 
-fs:dateModifiedShape a fs:PropertyShape ;
+fs:dateModifiedShape a fs:DatatypePropertyShape ;
     sh:name "Modified time" ;
     sh:description "Time at point last modification" ;
     sh:datatype xsd:dateTime ;
@@ -165,7 +203,7 @@ fs:dateModifiedShape a fs:PropertyShape ;
     fs:fixedShape true ;
     sh:path fs:dateModified .
 
-fs:dateDeletedShape a fs:PropertyShape ;
+fs:dateDeletedShape a fs:DatatypePropertyShape ;
     sh:name "Deleted at" ;
     sh:description "Time at point deletion." ;
     sh:datatype xsd:dateTime ;
@@ -174,7 +212,7 @@ fs:dateDeletedShape a fs:PropertyShape ;
     fs:fixedShape true ;
     sh:path fs:dateDeleted . 
 
-fs:filePathShape a fs:PropertyShape ; 
+fs:filePathShape a fs:DatatypePropertyShape ; 
     sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:name "File path" ;
@@ -184,7 +222,7 @@ fs:filePathShape a fs:PropertyShape ;
     fs:fixedShape true ;
     sh:path fs:filePath .
 
-fs:fileSizeShape a fs:PropertyShape ;
+fs:fileSizeShape a fs:DatatypePropertyShape ;
     sh:name "File size" ; 
     sh:description "File size in bytes" ; 
     sh:datatype xsd:long ;
@@ -193,7 +231,7 @@ fs:fileSizeShape a fs:PropertyShape ;
     fs:fixedShape true ;
     sh:path fs:fileSize .
 
-fs:md5Shape a fs:PropertyShape ;
+fs:md5Shape a fs:DatatypePropertyShape ;
     sh:name "MD5 checksum" ; 
     sh:description "Hash uniquely identifying the content of this file" ; 
     sh:datatype xsd:string ;
@@ -202,7 +240,7 @@ fs:md5Shape a fs:PropertyShape ;
     fs:fixedShape true ;
     sh:path fs:md5 .
 
-fs:userEmailShape a fs:PropertyShape ;
+fs:userEmailShape a fs:DatatypePropertyShape ;
     sh:name "Email" ;
     sh:description "Email address" ;
     sh:datatype xsd:string ;
@@ -247,8 +285,15 @@ fs:deletedByShape a fs:RelationShape ;
 ########################
 
 fs:ClassShape a sh:NodeShape .
-fs:PropertyShape a rdf:Class ;
+fs:DatatypePropertyShape a rdf:Class ;
     rdfs:subClassOf sh:PropertyShape .
+
+fs:ExternalIRIPropertyShape a rdf:Class ;
+    rdfs:subClassOf sh:PropertyShape .
+
+fs:ControlledVocabularyPropertyShape a rdf:Class ; 
+    rdfs:subClassOf sh:PropertyShape .
+
 fs:RelationShape a rdf:Class ;
     rdfs:subClassOf sh:PropertyShape .
 fs:Class a rdf:Class .

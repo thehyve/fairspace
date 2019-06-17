@@ -6,4 +6,5 @@ import lombok.Value;
 public class ErrorDto {
     private int status;
     private String message;
+    private Object details;
 }

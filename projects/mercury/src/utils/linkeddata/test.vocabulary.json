@@ -1,5 +1,13 @@
 [
   {
+    "@id": "_:blank2",
+    "http://www.w3.org/ns/shacl#path": [
+      {
+        "@id": "http://fairspace.io/ontology#list"
+      }
+    ]
+  },
+  {
     "@id": "http://fairspace.io/ontology#CollectionShape",
     "@type": [
       "http://fairspace.io/ontology#ClassShape"
@@ -230,6 +238,68 @@
         "@id": "http://fairspace.io/ontology#list"
       }
     ]
+  },
+  {
+    "@id": "_:blank1",
+    "http://www.w3.org/ns/shacl#path": [
+      {
+        "@id": "http://fairspace.io/ontology#only-blank"
+      }
+    ]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#ControlledVocabularyPropertyShape",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#PropertyShape"
+      }
+    ]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#DatatypePropertyShape",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#PropertyShape"
+      }
+    ]
+  },
+  {
+    "@type": [
+      "http://fairspace.io/ontology#Class"
+    ],
+    "@id": "http://fairspace.io/ontology#Directory",
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://fairspace.io/ontology#File"
+      }
+    ]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#SpecialDatatypePropertyShape",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://fairspace.io/ontology#DatatypePropertyShape"
+      }
+    ]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#AVerySpecialDatatypePropertyShape",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://fairspace.io/ontology#DatatypePropertyShape"
+      }
+    ]
   }
-
 ]

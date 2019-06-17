@@ -1,50 +1,93 @@
+import React from "react";
 import {connect} from 'react-redux';
+
 import {withRouter} from 'react-router-dom';
-import {createMetadataIri, getLabel, relativeLink} from "../../../utils/linkeddata/metadataUtils";
-import * as metadataActions from "../../../actions/metadataActions";
-import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {getVocabulary, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
-import LinkedDataBrowser from "../common/LinkedDataBrowser";
-import * as constants from "../../../constants";
+import {createMetadataIri, getLabel, linkLabel, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
+import {createMetadataEntityFromState} from "../../../actions/metadataActions";
+import {searchMetadata} from "../../../actions/searchActions";
+import {getMetadataSearchResults} from "../../../reducers/searchReducers";
+import LinkedDataCreator from "../common/LinkedDataCreator";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
+import {ErrorDialog, MessageDisplay} from "../../common";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
+import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
+import {METADATA_PATH, SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
+import LinkedDataLink from "../common/LinkedDataLink";
+import LinkedDataList from "../common/LinkedDataList";
 
-const mapStateToProps = (state) => {
-    const {cache: {allEntities}} = state;
-    const pending = isVocabularyPending(state) || !allEntities || allEntities.pending;
-    const allEntitiesData = allEntities && allEntities.data ? allEntities.data : [];
-    const vocabulary = getVocabulary(state);
-    const entities = allEntitiesData.map(e => ({
-        id: e['@id'],
-        label: getLabel(e),
-        type: e['@type'],
-        typeLabel: getLabel(vocabulary.determineShapeForType(e['@type'][0]), true)
-    }));
+const openMetadataEntry = (history, id) => {
+    history.push(`${METADATA_PATH}?iri=` + encodeURIComponent(id));
+};
 
-    return ({
-        loading: pending,
-        error: allEntities ? allEntities.error : false,
-        shapes: vocabulary.getClassesInCatalog(),
-        valueComponentFactory: MetadataValueComponentFactory,
-        vocabulary,
-        entities,
+const MetadataBrowserContainer = ({entities, hasHighlights, footerRender, total, history, ...otherProps}) => (
+    <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
+        <LinkedDataCreator requireIdentifier {...otherProps}>
+            {
+                entities && entities.length > 0
+                    ? (
+                        <LinkedDataList
+                            items={entities}
+                            total={total}
+                            hasHighlights={hasHighlights}
+                            footerRender={footerRender}
+                            typeRender={entry => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>}
+                            onOpen={id => openMetadataEntry(history, id)}
+                        />
+                    )
+                    : <MessageDisplay message="The metadata layer is empty" isError={false} />
+            }
+        </LinkedDataCreator>
+    </LinkedDataValuesContext.Provider>
+);
+
+const mapStateToProps = (state, {vocabulary}) => {
+    const {items, pending, error, total} = getMetadataSearchResults(state);
+    const entities = items.map((
+        {id, label, comment, type, highlights}
+    ) => {
+        const shape = vocabulary.determineShapeForTypes(type);
+        const typeLabel = getLabel(shape, true);
+        const shapeUrl = shape['@id'];
+
+        return {
+            id,
+            primaryText: (label && label[0]) || linkLabel(id, true),
+            secondaryText: (comment && comment[0]),
+            typeLabel,
+            shapeUrl,
+            highlights
+        };
     });
+
+    const onEntityCreationError = (e, id) => {
+        if (e.details) {
+            ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createMetadataIri(id)), e.message);
+        } else {
+            ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+        }
+    };
+
+    return {
+        loading: pending,
+        error,
+        entities,
+        total,
+        hasHighlights: entities.some(({highlights}) => highlights.length > 0),
+        shapes: vocabulary.getClassesInCatalog(),
+        vocabulary,
+        onEntityCreationError
+    };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    fetchLinkedData: () => dispatch(metadataActions.fetchAllEntitiesIfNeeded()),
-    fetchShapes: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded),
-    create: (formKey, shape, id) => {
-        const subject = createMetadataIri(id);
-        const type = getFirstPredicateId(shape, constants.SHACL_TARGET_CLASS);
-        return dispatch(metadataActions.createMetadataEntityFromState(formKey, subject, type))
-            .then(({value}) => {
-                dispatch(metadataActions.fetchAllEntitiesIfNeeded());
-                ownProps.history.push(relativeLink(value.subject));
-            });
+    fetchLinkedData: () => dispatch(searchMetadata({query: '*', types: ownProps.targetClasses})),
+    fetchShapes: () => {},
+    create: (formKey, shape, subject) => {
+        const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
+        return dispatch(createMetadataEntityFromState(formKey, subject, type))
+            .then(() => openMetadataEntry(ownProps.history, subject));
     }
 });
 
-// Please note that withRoute must be applied after connect
-// in order to have the history available in mapDispatchToProps
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(LinkedDataBrowser));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MetadataBrowserContainer));

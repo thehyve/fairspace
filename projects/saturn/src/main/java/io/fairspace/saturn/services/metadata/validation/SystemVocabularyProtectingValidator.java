@@ -11,13 +11,11 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
  */
 public class SystemVocabularyProtectingValidator implements MetadataRequestValidator {
     @Override
-    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        var result = ValidationResult.VALID;
-
+    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
         for (var it = modelToRemove.listStatements(); it.hasNext(); ) {
             var statement = it.nextStatement();
             if (SYSTEM_VOCABULARY.contains(statement)) {
-                result = result.merge(new ValidationResult("Cannot remove a statement from the system vocabulary: " + statement));
+                violationHandler.onViolation("Cannot remove a statement from the system vocabulary", statement);
             }
         }
 
@@ -25,10 +23,8 @@ public class SystemVocabularyProtectingValidator implements MetadataRequestValid
             var statement = it.nextStatement();
             if (SYSTEM_VOCABULARY.contains(statement.getSubject(), null, (RDFNode) null)
                     && !statement.getPredicate().equals(SH.property)) {
-                result = result.merge(new ValidationResult("Cannot add a statement modifying a shape from the system vocabulary: " + statement));
+                violationHandler.onViolation("Cannot add a statement modifying a shape from the system vocabulary", statement);
             }
         }
-
-        return result;
     }
 }

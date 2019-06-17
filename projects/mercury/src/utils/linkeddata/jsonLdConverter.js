@@ -1,9 +1,8 @@
-import {compareBy, comparing} from "../comparisionUtils";
+import {compareBy, comparing, flattenShallow} from "../genericUtils";
 import * as constants from "../../constants";
-import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
-import {flattenShallow} from "../arrayUtils";
+import {getFirstPredicateId, getFirstPredicateValue, normalizeJsonLdResource} from "./jsonLdUtils";
 import {isRdfList} from "./vocabularyUtils";
-import {lookupLabel} from "./metadataUtils";
+import {isNonEmptyValue, simplifyUriPredicates} from "./metadataUtils";
 
 /**
  * Generates a property entry for the given type(s)
@@ -12,7 +11,7 @@ import {lookupLabel} from "./metadataUtils";
  */
 const generateTypeProperty = (vocabulary, types) => {
     const typeValues = types.map(type => {
-        const shape = vocabulary.determineShapeForType(type);
+        const shape = vocabulary.determineShapeForTypes([type]);
         return {
             id: type,
             label: getFirstPredicateValue(shape, constants.SHACL_NAME, type),
@@ -38,7 +37,7 @@ const generateTypeProperty = (vocabulary, types) => {
 const generateValueEntry = (entry, allMetadata) => ({
     id: entry['@id'],
     value: entry['@value'],
-    label: lookupLabel(entry['@id'], allMetadata)
+    otherEntry: entry['@id'] ? simplifyUriPredicates(normalizeJsonLdResource(allMetadata.find(element => element['@id'] === entry['@id']))) : {}
 });
 
 /**
@@ -80,13 +79,13 @@ const convertMetadataIntoPropertyList = (metadata, propertyShapes = [], allMetad
                 // sort the values
                 values = metadata[predicateUri]
                     .map(entry => generateValueEntry(entry, allMetadata))
-                    .sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
+                    .sort(comparing(compareBy(e => e.otherEntry && e.otherEntry.label), compareBy('id'), compareBy('value')));
             }
 
             prefilledProperties.push({...vocabulary.generatePropertyEntry(predicateUri, propertyShape), values});
         });
 
-    return prefilledProperties.sort(compareBy('label'));
+    return prefilledProperties;
 };
 
 /**
@@ -105,7 +104,7 @@ const determineAdditionalEmptyProperties = (metadata, propertyShapes = [], vocab
             return {...vocabulary.generatePropertyEntry(predicateUri, shape), values: []};
         });
 
-    return additionalProperties.sort(compareBy('label'));
+    return additionalProperties;
 };
 
 
@@ -127,33 +126,6 @@ const generatePropertiesForMetadata = (vocabulary, metadataItem, types, property
     const typeProperty = generateTypeProperty(vocabulary, types);
 
     return [...properties, ...emptyProperties, typeProperty];
-};
-
-/**
- * Returns the given values in the right container. By default, no container is used
- * If the predicate requires an rdf:List, the values are put into a {'@list': ...} object
- * Some values require a type value (such as date and datetime), so the type will be provided
- * @param values
- * @param shape
- * @returns {*}
- */
-const jsonLdWrapper = (values, shape) => {
-    if (isRdfList(shape)) {
-        return {
-            '@list': values.map(({id, value}) => ({'@id': id, '@value': value}))
-        };
-    }
-
-    const dataType = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
-
-    if (dataType) {
-        return values.map(({value}) => ({
-            "@value": value,
-            "@type": dataType
-        }));
-    }
-
-    return values.map(({id, value}) => ({'@id': id, '@value': value}));
 };
 
 /**
@@ -203,6 +175,26 @@ export const fromJsonLd = (expandedMetadata, subject, vocabulary) => {
 };
 
 /**
+ * Returns the given values in the right container. By default, no container is used
+ * If the predicate requires an rdf:List, the values are put into a {'@list': ...} object
+ * Whevever the data type is available it will be sent for values that are not part of RDF List
+ * @param values
+ * @param shape
+ * @returns {*}
+ */
+const jsonLdWrapper = (values, shape) => {
+    if (isRdfList(shape)) {
+        return {
+            '@list': values.map(({id, value}) => ({'@id': id, '@value': value}))
+        };
+    }
+
+    const dataType = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
+
+    return values.map(({id, value}) => ({'@id': id, '@value': value, "@type": dataType}));
+};
+
+/**
  * Converts information for a subject and predicate into json-ld
  * @param subject       Subject URI
  * @param predicate     Predicate URI
@@ -215,8 +207,10 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
         return null;
     }
 
-    // if there are no values then send a special nil value as required by the backend
-    if (values.length === 0) {
+    const validValues = values.filter(({id, value}) => isNonEmptyValue(value) || !!id);
+
+    // Return special nil value if no values or if all values are empty or invalid (non-truthy except zero or false)
+    if (validValues.length === 0) {
         return {
             '@id': subject,
             [predicate]: {'@id': constants.NIL_URI}
@@ -225,7 +219,7 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
 
     return {
         '@id': subject,
-        [predicate]: jsonLdWrapper(values, vocabulary.determineShapeForProperty(predicate))
+        [predicate]: jsonLdWrapper(validValues, vocabulary.determineShapeForProperty(predicate))
     };
 };
 
@@ -257,5 +251,22 @@ export const emptyLinkedData = (vocabulary, shape) => {
     const types = (shape[constants.SHACL_TARGET_CLASS] || []).map(node => node['@id']);
 
     // Generate a list of empty properties
-    return generatePropertiesForMetadata(vocabulary, {}, types, propertyShapes, []);
+    return generatePropertiesForMetadata(vocabulary, {}, types, propertyShapes, [])
+        .map(p => ({...p, isEditable: true}));
 };
+
+/**
+ * Replaces all occurrences of rdf:type with @type
+ * @param expandedMetadata
+ * @returns {*}
+ */
+export const normalizeTypes = (expandedMetadata) => expandedMetadata.map(e => {
+    if (!e['@type'] && e[constants.RDF_TYPE]) {
+        const {[constants.RDF_TYPE]: types, ...rest} = e;
+        return {
+            '@type': types.map(t => t['@id']),
+            ...rest
+        };
+    }
+    return e;
+});

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf.search;
 
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.text.TextIndexException;
@@ -23,23 +22,22 @@ public class ElasticSearchIndexConfigurer {
     private static final String NUM_OF_REPLICAS_PARAM = "number_of_replicas";
     private static final String IRI_TYPE = "iri";
 
-    Client client;
-
-    public ElasticSearchIndexConfigurer(Client client) {
-        this.client = client;
-    }
-
     /**
      * Configures the specified index with a specific analyzer for filePaths
      */
-    public void configure(ESSettings esSettings) {
+    public static void configure(Client client, ESSettings esSettings, boolean recreateIndex) {
         String indexName = esSettings.getIndexName();
         IndicesAdminClient indicesAdminClient = client.admin().indices();
 
         try {
             IndicesExistsResponse exists = indicesAdminClient.exists(new IndicesExistsRequest(indexName)).get();
 
-            if (!exists.isExists()) {
+            if (recreateIndex && exists.isExists()) {
+                log.info("Deleting an existing index.");
+                indicesAdminClient.prepareDelete(indexName).get();
+            }
+
+            if (!exists.isExists() || recreateIndex) {
                 log.info("Index with name {} does not exist yet. Creating one.", indexName);
 
                 client.admin().indices()
@@ -90,14 +88,14 @@ public class ElasticSearchIndexConfigurer {
         }
     }
 
-    private String getMappings() throws IOException {
-        return new String(SaturnDatasetFactory.class.getResourceAsStream("/elasticsearch/mappings.json").readAllBytes(), UTF_8);
+    private static String getMappings() throws IOException {
+        try(var is = ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/mappings.json")) {
+            return new String(is.readAllBytes(), UTF_8);
+        }
     }
 
-    private Settings.Builder getSettings() throws IOException {
+    private static Settings.Builder getSettings() throws IOException {
         return Settings.builder()
-                .loadFromStream("es-settings.json", SaturnDatasetFactory.class.getResourceAsStream("/elasticsearch/settings.json"), false);
+                .loadFromStream("es-settings.json", ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/settings.json"), false);
     }
-
-
 }

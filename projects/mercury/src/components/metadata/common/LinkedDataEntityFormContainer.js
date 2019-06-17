@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import {LinkedDataEntityForm} from "./LinkedDataEntityForm";
+import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import {getLinkedDataFormUpdates, getLinkedDataFormValidations} from "../../../reducers/linkedDataFormReducers";
 import {
     addLinkedDataValue,
@@ -10,6 +10,7 @@ import {
     updateLinkedDataValue,
     validateLinkedDataProperty
 } from "../../../actions/linkedDataFormActions";
+import {propertiesToShow} from "../../../utils/linkeddata/metadataUtils";
 
 export class LinkedDataEntityFormContainer extends React.Component {
     componentDidMount() {
@@ -33,11 +34,13 @@ export class LinkedDataEntityFormContainer extends React.Component {
     }
 
     render() {
-        const propertiesWithChanges = this.props.properties.map(p => ({
-            ...p,
-            values: this.props.updates[p.key] || p.values,
-            errors: this.props.errors[p.key]
-        }));
+        const propertiesWithChanges = propertiesToShow(this.props.properties)
+            .filter(p => p.isEditable || p.values.length)
+            .map(p => ({
+                ...p,
+                values: this.props.updates[p.key] || p.values,
+                errors: this.props.errors[p.key]
+            }));
 
         return (
             <LinkedDataEntityForm
@@ -47,7 +50,6 @@ export class LinkedDataEntityFormContainer extends React.Component {
 
                 error={this.props.error}
                 loading={this.props.loading}
-                editable={this.props.editable}
 
                 properties={propertiesWithChanges}
             />
@@ -67,7 +69,6 @@ LinkedDataEntityFormContainer.propTypes = {
     error: PropTypes.string,
 
     loading: PropTypes.bool,
-    editable: PropTypes.bool,
 
     formKey: PropTypes.string.isRequired,
 
@@ -88,8 +89,7 @@ LinkedDataEntityFormContainer.defaultProps = {
 
     properties: [],
     updates: {},
-    errors: {},
-    editable: true
+    errors: {}
 };
 
 const mapStateToProps = (state, ownProps) => ({

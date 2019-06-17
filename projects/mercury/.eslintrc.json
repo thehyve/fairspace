@@ -3,11 +3,16 @@
     "browser": true,
     "jest": true
   },
+  "plugins": [
+    "react-hooks"
+  ],
   "extends": [
     "airbnb"
   ],
   "parser": "babel-eslint",
   "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "linebreak-style": 0,
     "indent": [
       "error",

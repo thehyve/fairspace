@@ -2,7 +2,11 @@ import React from "react";
 import {connect} from 'react-redux';
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import * as vocabularyActions from "../../../actions/vocabularyActions";
+import {
+    fetchMetadataVocabularyIfNeeded,
+    fetchMetaVocabularyIfNeeded,
+    submitVocabularyChangesFromState
+} from "../../../actions/vocabularyActions";
 import {
     getMetaVocabulary,
     getVocabulary,
@@ -11,23 +15,35 @@ import {
     isMetaVocabularyPending,
     isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
-import {hasLinkedDataFormUpdates} from "../../../reducers/linkedDataFormReducers";
+import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 import Config from "../../../services/Config/Config";
 import {isDataSteward} from "../../../utils/userUtils";
 import {fromJsonLd} from "../../../utils/linkeddata/jsonLdConverter";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
+import {
+    extendPropertiesWithVocabularyEditingInfo,
+    getSystemProperties,
+    isFixedShape
+} from "../../../utils/linkeddata/vocabularyUtils";
 
 const VocabularyEntityContainer = props => {
-    const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
+    const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
-            .catch(err => ErrorDialog.showError(err, "Error while updating vocabulary"));
+            .catch(e => {
+                if (e.details) {
+                    ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, subject), e.message);
+                } else {
+                    ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
+                }
+            });
     };
 
     return (
@@ -35,7 +51,6 @@ const VocabularyEntityContainer = props => {
             <Grid item xs={12}>
                 <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
                     <LinkedDataEntityFormContainer
-                        editable={editable}
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
                         error={error}
@@ -44,7 +59,7 @@ const VocabularyEntityContainer = props => {
                 </LinkedDataValuesContext.Provider>
             </Grid>
             {
-                editable && !error
+                isEditable && !error
                 && (
                     <Grid item>
                         <Button
@@ -71,18 +86,22 @@ const mapStateToProps = (state, ownProps) => {
     const metadata = loading ? [] : fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
 
     const hasNoMetadata = !metadata || metadata.length === 0;
+    const failedLoading = hasNoMetadata && !loading;
     const hasOtherErrors = hasVocabularyError(state) || hasMetaVocabularyError(state);
-    const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading vocabulary.' : '';
+    const error = failedLoading || hasOtherErrors ? 'An error occurred while loading vocabulary.' : '';
 
-    const editable = isDataSteward(getAuthorizations(state), Config.get());
+    const isEditable = isDataSteward(getAuthorizations(state), Config.get());
+    const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
 
-    const buttonDisabled = !hasLinkedDataFormUpdates(state, subject);
+    // Use the SHACL shape of the subject to determine whether it is fixed
+    const shape = vocabulary.get(subject);
 
-    const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
-        .map(p => ({
-            ...p,
-            editable: editable && !isDateTimeProperty(p)
-        }));
+    const properties = hasNoMetadata ? [] : extendPropertiesWithVocabularyEditingInfo({
+        properties: propertiesToShow(metadata),
+        isFixed: isFixedShape(shape),
+        systemProperties: getSystemProperties(shape),
+        isEditable
+    });
 
     return {
         loading,
@@ -91,17 +110,17 @@ const mapStateToProps = (state, ownProps) => {
         properties,
         subject,
 
-        editable,
+        isEditable,
         buttonDisabled,
         vocabulary: metaVocabulary
     };
 };
 
 const mapDispatchToProps = (dispatch) => ({
-    fetchShapes: () => dispatch(vocabularyActions.fetchMetaVocabularyIfNeeded()),
-    fetchLinkedData: () => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded()),
-    onSubmit: (subject) => dispatch(vocabularyActions.submitVocabularyChangesFromState(subject))
-        .then(() => dispatch(vocabularyActions.fetchMetadataVocabularyIfNeeded()))
+    fetchShapes: () => dispatch(fetchMetaVocabularyIfNeeded()),
+    fetchLinkedData: () => dispatch(fetchMetadataVocabularyIfNeeded()),
+    onSubmit: (subject) => dispatch(submitVocabularyChangesFromState(subject))
+        .then(() => dispatch(fetchMetadataVocabularyIfNeeded()))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(VocabularyEntityContainer);

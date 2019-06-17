@@ -1,7 +1,7 @@
 import React from 'react';
-import {ListItem} from '@material-ui/core';
-import * as PropTypes from "prop-types";
-import List from "@material-ui/core/List";
+import PropTypes from "prop-types";
+import {List, ListItem, ListItemText} from '@material-ui/core';
+import _ from 'lodash';
 
 /* eslint-disable no-underscore-dangle */
 /**
@@ -10,29 +10,25 @@ import List from "@material-ui/core/List";
  * @returns {*}
  * @constructor
  */
-const SearchResultHighlights = ({highlights}) => {
-    if (!highlights) {
-        return '';
-    }
-
-    // Only show highlights for which the key does not end in 'keyword'
-    // as these are mostly duplicates of the fields themselves
-    return (
-        <List>{
-            Object.keys(highlights)
-                .filter(key => !key.endsWith('.keyword'))
-                .map(key => (
-                    <ListItem key={key}>
-                        <u>{key}</u>: <span dangerouslySetInnerHTML={{__html: highlights[key]}} />
+const SearchResultHighlights = ({highlights}) => highlights && (
+    <List dense>
+        {
+            highlights
+                .map(([key, value]) => (
+                    <ListItem key={key} dense disableGutters>
+                        <ListItemText
+                            primary={_.upperFirst(key)}
+                            secondary={<span dangerouslySetInnerHTML={{__html: value}} />}
+                        />
                     </ListItem>
                 ))
         }
-        </List>
-    );
-};
+    </List>
+);
+
 
 SearchResultHighlights.propTypes = {
-    highlights: PropTypes.object
+    highlights: PropTypes.array
 };
 
 export default SearchResultHighlights;

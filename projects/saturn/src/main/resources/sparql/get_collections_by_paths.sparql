@@ -1,0 +1,14 @@
+# Get collections by their paths
+# 0 - list of paths
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+SELECT ?collection ?path
+WHERE {
+  ?collection a fs:Collection;
+     fs:filePath ?path .
+
+  FILTER NOT EXISTS { ?collection fs:dateDeleted ?dateDeleted }
+}
+
+VALUES ?path {%1$s}

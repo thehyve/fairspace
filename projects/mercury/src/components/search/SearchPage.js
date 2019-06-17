@@ -7,12 +7,13 @@ import SearchResults from './SearchResults';
 import {getSearchQueryFromString} from '../../utils/searchUtils';
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import {getParentPath} from '../../utils/fileUtils';
-import * as searchActions from '../../actions/searchActions';
+import {searchCollections} from '../../actions/searchActions';
 import * as vocabularyActions from '../../actions/vocabularyActions';
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
-import {ErrorMessage} from "../common";
+import {MessageDisplay} from "../common";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../../constants";
 import {getVocabulary, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
+import {getCollectionsSearchResults} from "../../reducers/searchReducers";
 
 // Exporting here to be able to test the component outside of Redux
 export class SearchPage extends React.Component {
@@ -44,18 +45,16 @@ export class SearchPage extends React.Component {
 
         history.push(navigationPath);
         deselectAllPaths();
-        selectPath('/' + result.filePath[0]);
+        selectPath('/' + result.filePath);
     }
 
-    getPathOfResult = (result) => {
-        const type = result.type[0];
-
-        switch (type) {
+    getPathOfResult = ({type, filePath}) => {
+        switch (type[0]) {
             case COLLECTION_URI:
             case DIRECTORY_URI:
-                return result.filePath[0];
+                return filePath[0];
             case FILE_URI:
-                return getParentPath(result.filePath[0]);
+                return getParentPath(filePath[0]);
             default:
                 // TODO: handle metadata open. Out of scope for now
                 return '';
@@ -65,8 +64,8 @@ export class SearchPage extends React.Component {
     render() {
         const {results, vocabulary, loading, error} = this.props;
 
-        if (!loading && error) {
-            return <ErrorMessage message={error} />;
+        if (!loading && error && error.message) {
+            return <MessageDisplay message={error.message} />;
         }
 
         return (
@@ -80,15 +79,21 @@ export class SearchPage extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    loading: state.search.pending || isVocabularyPending(state),
-    results: state.search.results,
-    error: state.search.error,
-    vocabulary: getVocabulary(state)
-});
+const mapStateToProps = (state) => {
+    const results = getCollectionsSearchResults(state);
+    const loading = results.pending || isVocabularyPending(state);
+    const vocabulary = getVocabulary(state);
+
+    return {
+        loading,
+        results,
+        error: results.error,
+        vocabulary
+    };
+};
 
 const mapDispatchToProps = {
-    performSearch: searchActions.performSearch,
+    performSearch: searchCollections,
     fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded,
     selectPath: collectionBrowserActions.selectPath,
     deselectAllPaths: collectionBrowserActions.deselectAllPaths

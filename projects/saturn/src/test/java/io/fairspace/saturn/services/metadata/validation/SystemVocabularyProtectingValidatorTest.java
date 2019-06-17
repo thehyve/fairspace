@@ -3,54 +3,66 @@ package io.fairspace.saturn.services.metadata.validation;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
+
+@RunWith(MockitoJUnitRunner.class)
 public class SystemVocabularyProtectingValidatorTest {
     private final SystemVocabularyProtectingValidator validator = new SystemVocabularyProtectingValidator();
+    @Mock
+    private ViolationHandler violationHandler;
 
     @Test
     public void itShouldNotBePossibleToDeleteStatementsFromTheSystemVocabulary() {
-        var result = validator.validate(
-                createDefaultModel()
-                        .add(createResource(FS.NS + "FileShape"), RDF.type, createResource(FS.NS + "ClassShape")),
-                createDefaultModel());
+        var stmt = createStatement(createResource(FS.NS + "FileShape"), RDF.type, createResource(FS.NS + "ClassShape"));
+        validator.validate(
+                createDefaultModel().add(stmt),
+                createDefaultModel(),
+                violationHandler);
 
-        assertFalse(result.isValid());
-        assertEquals("Cannot remove a statement from the system vocabulary: [http://fairspace.io/ontology#FileShape, http://www.w3.org/1999/02/22-rdf-syntax-ns#type, http://fairspace.io/ontology#ClassShape].",
-                result.getMessage());
+
+        verify(violationHandler).onViolation("Cannot remove a statement from the system vocabulary", stmt);
     }
 
     @Test
     public void itShouldBePossibleToAddNewShapes() {
-        var result = validator.validate(
+        var stmt = createStatement(createResource("http://example.com/NewShape"), SH.property, createResource(FS.NS + "ClassShape"));
+        validator.validate(
                 createDefaultModel(),
-                createDefaultModel().add(createResource("http://example.com/NewShape"), SH.property, createResource(FS.NS + "ClassShape")));
+                createDefaultModel().add(stmt),
+                violationHandler);
 
-        assertTrue(result.isValid());
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void itShouldBePossibleToAddNewPropertiesToSystemShapes() {
-        var result = validator.validate(
+        var stmt = createStatement(createResource(FS.NS + "FileShape"), SH.property, createProperty("http://example.com/property"));
+        validator.validate(
                 createDefaultModel(),
-                createDefaultModel().add(createResource(FS.NS + "FileShape"), SH.property, createProperty("http://example.com/property")));
+                createDefaultModel().add(stmt),
+                violationHandler);
 
-        assertTrue(result.isValid());
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void itShouldNotBePossibleToAddArbitraryStatementsToTheSystemVocabulary() {
-        var result = validator.validate(
+        var stmt = createStatement(createResource(FS.NS + "FileShape"), createProperty(FS.NS + "custom"), createStringLiteral("blah"));
+        validator.validate(
                 createDefaultModel(),
-                createDefaultModel().add(createResource(FS.NS + "FileShape"), createProperty(FS.NS + "custom"), createStringLiteral("blah")));
+                createDefaultModel().add(stmt),
+                violationHandler);
 
-        assertFalse(result.isValid());
-        assertEquals("Cannot add a statement modifying a shape from the system vocabulary: [http://fairspace.io/ontology#FileShape, http://fairspace.io/ontology#custom, \"blah\"].",
-                result.getMessage());
+        verify(violationHandler).onViolation("Cannot add a statement modifying a shape from the system vocabulary", stmt);
     }
 
 }

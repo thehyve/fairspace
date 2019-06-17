@@ -1,30 +1,31 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.MetadataAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
+import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 @AllArgsConstructor
 public class PermissionCheckingValidator implements MetadataRequestValidator {
-    private final RDFConnection rdf;
     private final PermissionsService permissions;
 
     @Override
-    public ValidationResult validate(Model modelToRemove, Model modelToAdd) {
-        return modelToRemove.union(modelToAdd)
-                .listSubjects()
-                .toSet()
-                .stream()
-                .filter(Resource::isURIResource)
-                .map(this::validateResource)
-                .reduce(ValidationResult.VALID, ValidationResult::merge);
-    }
-
-    private ValidationResult validateResource(Resource resource) {
-        return permissions.getPermission(resource.asNode()).canWrite()
-                ? ValidationResult.VALID
-                : new ValidationResult("Cannot modify read-only resource " + resource);
+    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
+        try {
+            permissions.ensureAccess(modelToRemove
+                            .listSubjects()
+                            .andThen(modelToAdd.listSubjects())
+                            .filterKeep(Resource::isURIResource)
+                            .mapWith(FrontsNode::asNode)
+                            .toSet(),
+                    Access.Write
+            );
+        } catch (MetadataAccessDeniedException e) {
+            violationHandler.onViolation("Cannot modify read-only resource", ResourceFactory.createResource(e.getSubject().getURI()), null, null);
+        }
     }
 }

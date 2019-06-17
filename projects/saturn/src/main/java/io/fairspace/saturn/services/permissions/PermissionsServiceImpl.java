@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.permissions;
 
-import io.fairspace.saturn.services.AccessDeniedException;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
@@ -9,28 +10,36 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.selectSingle;
+import static com.google.common.collect.Iterables.partition;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.apache.jena.system.Txn.calculateRead;
+import static org.apache.jena.system.Txn.executeRead;
 
 @AllArgsConstructor
 @Slf4j
 public class PermissionsServiceImpl implements PermissionsService {
+    private static final int BATCH_SIZE = 100;
+    private static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
+
     private final RDFConnection rdf;
     private final UserService userService;
     private final MailService mailService;
@@ -41,11 +50,19 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
+    public void createResources(Collection<Resource> resources) {
+        Model resourcePermissions = createDefaultModel();
+        Resource user = ResourceFactory.createResource(userService.getCurrentUser().getIri().getURI());
+        resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
+        rdf.load(PERMISSIONS_GRAPH, resourcePermissions);
+    }
+
+    @Override
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = userService.getCurrentUser().getIri();
 
         commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
-            ensureHasAccess(resource, Access.Manage);
+            ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
             if (!isCollection(resource)) {
                 validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
@@ -65,20 +82,18 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public Access getPermission(Node resource) {
-        return calculateRead(rdf, () -> {
-            var authority = getAuthority(resource);
-            return selectSingle(rdf, storedQuery("permissions_get_for_user", authority, userService.getCurrentUser().getIri()),
-                    PermissionsServiceImpl::getAccess)
-                    .orElseGet(() -> defaultAccess(authority));
-        });
+    public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
+        // Check access control in batches as the SPARQL queries do not
+        // accept an arbitrary number of parameters
+        partition(nodes, BATCH_SIZE)
+                .forEach(batch -> ensureAccessWithoutBatch(batch, requestedAccess));
     }
 
     @Override
     public Map<Node, Access> getPermissions(Node resource) {
         return calculateRead(rdf, () -> {
             var authority = getAuthority(resource);
-            ensureHasAccess(authority, Access.Read);
+            ensureAccess(authority, Access.Read);
 
             var result = new HashMap<Node, Access>();
             rdf.querySelect(storedQuery("permissions_get_all", authority), row ->
@@ -95,7 +110,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     @Override
     public void setWriteRestricted(Node resource, boolean restricted) {
         commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), rdf, () -> {
-            ensureHasAccess(resource, Access.Manage);
+            ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {
                 rdf.update(storedQuery("permissions_set_restricted", resource, restricted));
@@ -112,19 +127,62 @@ public class PermissionsServiceImpl implements PermissionsService {
         return createURI(FS.NS + access.name().toLowerCase());
     }
 
-    private void ensureHasAccess(Node resource, Access access) {
+    private void ensureAccess(Node resource, Access access) {
         if (getPermission(resource).compareTo(access) < 0) {
-            throw new AccessDeniedException(format("User %s has no %s access to resource %s", userService.getCurrentUser().getIri(), access.name().toLowerCase(), resource));
+            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userService.getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
         }
+    }
+
+    /**
+     * Retrieves the permissions of the current user for the given resources
+     * @param nodes
+     * @return
+     */
+    @Override
+    public Map<Node, Access> getPermissions(Collection<Node> nodes) {
+        var result = new HashMap<Node, Access>();
+        executeRead(rdf, () -> partition(nodes, BATCH_SIZE)
+                .forEach(batch -> result.putAll(getPermissionsWithoutBatch(batch))));
+        return result;
+    }
+
+    private Map<Node, Access> getPermissionsWithoutBatch(Collection<Node> nodes) {
+            var authorities = getAuthorities(nodes);
+            var permissionsForAuthorities = getPermissionsForAuthorities(authorities.keys());
+            var result = new HashMap<Node, Access>();
+            authorities.forEach((authority, node) -> result.put(node, permissionsForAuthorities.get(authority)));
+            return result;
+    }
+
+    /**
+     * Ensure that the current user has the requested access level for all nodes
+     * @param nodes
+     * @param requestedAccess
+     */
+    private void ensureAccessWithoutBatch(Collection<Node> nodes, Access requestedAccess) {
+        var authorities = getAuthorities(nodes);
+        getPermissionsForAuthorities(authorities.keySet()).forEach((authority, access) -> {
+            if (access.compareTo(requestedAccess) < 0) {
+                throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
+                        userService.getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), authorities.get(authority).iterator().next());
+            }
+        });
+    }
+
+    /**
+     * Retrieves the permissions of the current user for the given authorities
+     * @param authorities
+     * @return
+     */
+    private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
+        var result = new HashMap<Node, Access>();
+        rdf.querySelect(storedQuery("permissions_get_for_user", authorities, userService.getCurrentUser().getIri()),
+                row -> result.put(row.getResource("subject").asNode(), getAccess(row)));
+        return result;
     }
 
     private boolean isCollection(Node resource) {
         return rdf.queryAsk(storedQuery("is_collection", resource));
-    }
-
-
-    private Access defaultAccess(Node resource) {
-        return isCollection(resource) ? Access.None : isWriteRestricted(resource) ? Access.Read : Access.Write;
     }
 
     /**
@@ -132,9 +190,62 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @return an authoritative resource for the given resource: currently either the parent collection (for files and directories) or the resource itself
      */
     private Node getAuthority(Node resource) {
-        return selectSingle(rdf, storedQuery("get_parent_collection", resource),
-                row -> row.getResource("collection").asNode())
-                .orElse(resource);
+        return getFileAuthorities(List.of(resource)).getOrDefault(resource, resource);
+    }
+
+    /**
+     * Return a list of enclosing collections for the given nodes
+     *
+     * If any node is given that does not belong to a collection, it will not
+     * be included in the resulting set of authorities.
+     * @param fileNodes List of file/directory nodes
+     * @return
+     */
+    private Map<Node, Node> getFileAuthorities(Collection<Node> fileNodes) {
+        var fileToCollectionPath = new HashMap<Node, String>(fileNodes.size());
+        var collectionPaths = new HashSet<String>();
+
+        rdf.querySelect(storedQuery("get_file_paths", fileNodes), row -> {
+            var path = collectionPath(row.getLiteral("filePath").getString());
+            fileToCollectionPath.put(row.get("subject").asNode(), path);
+            collectionPaths.add(path);
+        });
+
+        var collectionsByPath = new HashMap<String, Node>();
+
+        rdf.querySelect(storedQuery("get_collections_by_paths", collectionPaths), row ->
+                collectionsByPath.put(row.getLiteral("path").getString(), row.getResource("collection").asNode()));
+
+        return fileToCollectionPath
+                .entrySet()
+                .stream()
+                .collect(toMap(e -> e.getKey(), e -> collectionsByPath.get(e.getValue())));
+    }
+
+    private static String collectionPath(String filePath) {
+        var pos = filePath.indexOf('/');
+        return pos < 0 ? filePath : filePath.substring(0, pos);
+    }
+
+    /**
+     *
+     * @param nodes
+     * @return A multimap from authority to the related nodes (one authority can control multiple resources)
+     *         The authority could be the original nodes for metadata entities, or the enclosing collection
+     *         for files or directories
+     */
+    private Multimap<Node, Node> getAuthorities(Collection<Node> nodes) {
+        var result = HashMultimap.<Node, Node>create();
+
+        var fileAuthorities = getFileAuthorities(nodes);
+        fileAuthorities.forEach((file, authority) -> result.put(authority, file));
+        nodes.forEach(node -> {
+            if (!result.containsValue(node)) {
+                result.put(node, node);
+            }
+        });
+
+        return result;
     }
 
     private void notifyUser(Node user, Node resource, Access access) {

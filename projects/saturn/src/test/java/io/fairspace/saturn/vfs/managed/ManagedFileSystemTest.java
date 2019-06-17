@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static java.util.Arrays.asList;
@@ -55,7 +56,15 @@ public class ManagedFileSystemTest {
         var rdf = connect(ds);
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
-        when(permissions.getPermission(any())).thenReturn(Access.Manage);
+
+        when(permissions.getPermission(any(Node.class))).thenReturn(Access.Manage);
+
+        when(permissions.getPermissions(any(java.util.Collection.class)))
+                .thenAnswer(invocation ->
+                        invocation.<java.util.Collection<Node>>getArgument(0)
+                                .stream()
+                                .collect(Collectors.toMap(node -> node, node -> Access.Manage)));
+
         fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus, permissions);
 
         var collection1 = new Collection();

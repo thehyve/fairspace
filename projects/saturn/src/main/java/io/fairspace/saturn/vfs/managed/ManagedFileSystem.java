@@ -6,7 +6,6 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
-import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
@@ -15,6 +14,7 @@ import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -36,6 +36,7 @@ import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
+import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -71,7 +72,16 @@ public class ManagedFileSystem implements VirtualFileSystem {
                     .orElse(null);
         }
 
-        return selectSingle(rdf, storedQuery("fs_stat", path), this::fileInfo).orElse(null);
+        return selectSingle(rdf, storedQuery("fs_stat", path), this::fileInfo)
+                .map(fileInfo -> {
+                    var access = permissions.getPermission(createURI(fileInfo.getIri()));
+                    if (!access.canRead()) {
+                        return null;
+                    }
+                    fileInfo.setReadOnly(!access.canWrite());
+                    return fileInfo;
+                })
+                .orElse(null);
     }
 
     @Override
@@ -83,8 +93,22 @@ public class ManagedFileSystem implements VirtualFileSystem {
                     .collect(toList());
         }
 
-        return select(rdf, storedQuery("fs_ls", path + '/'), this::fileInfo)
-                .stream()
+        var files = select(rdf, storedQuery("fs_ls", path + '/'), this::fileInfo);
+        var nodes = files.stream()
+                .map(FileInfo::getIri)
+                .map(NodeFactory::createURI)
+                .collect(toList());
+        var filePermissions = permissions.getPermissions(nodes);
+
+        return files.stream()
+                .map(fileInfo -> {
+                    var access = filePermissions.get(createURI(fileInfo.getIri()));
+                    if (!access.canRead()) {
+                        return null;
+                    }
+                    fileInfo.setReadOnly(!access.canWrite());
+                    return fileInfo;
+                })
                 .filter(Objects::nonNull)
                 .collect(toList());
     }
@@ -179,19 +203,13 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     private FileInfo fileInfo(QuerySolution row) {
-        var iri = row.getResource("iri");
-        var access = permissions.getPermission(iri.asNode());
-        if (access == Access.None) {
-            return null;
-        }
         return FileInfo.builder()
-                .iri(iri.getURI())
+                .iri(row.getResource("iri").getURI())
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
                 .isDirectory(!row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
                 .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
-                .readOnly(!access.canWrite())
                 .build();
     }
 

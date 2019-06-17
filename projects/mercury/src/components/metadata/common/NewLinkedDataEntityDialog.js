@@ -1,14 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
+import {connect} from 'react-redux';
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@material-ui/core";
 
-import {generateUuid, getLabel} from "../../../utils/linkeddata/metadataUtils";
+import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
+import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
+import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
+import * as consts from "../../../constants";
+import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
 
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
         formKey: generateUuid(),
-        id: generateUuid()
+        localPart: this.props.requireIdentifier ? generateUuid() : '',
+        namespace: undefined
     };
 
     componentDidUpdate(prevProps) {
@@ -23,7 +29,8 @@ class NewLinkedDataEntityDialog extends React.Component {
     resetDialog() {
         this.setState({
             formKey: generateUuid(),
-            id: generateUuid()
+            localPart: this.props.requireIdentifier ? generateUuid() : '',
+            namespace: undefined
         });
     }
 
@@ -34,14 +41,20 @@ class NewLinkedDataEntityDialog extends React.Component {
 
     createEntity = (e) => {
         if (e) e.stopPropagation();
-        this.props.onCreate(this.state.formKey, this.props.shape, this.state.id);
+        this.props.onCreate(this.state.formKey, this.props.shape, this.getIdentifier());
     };
 
-    handleInputChange = event => this.setState({id: event.target.value});
+    getIdentifier = () => (this.state.namespace ? this.state.namespace.value + this.state.localPart : this.state.localPart);
+
+    handleLocalPartChange = localPart => this.setState({localPart});
+
+    handleNamespaceChange = namespace => this.setState({namespace});
 
     render() {
-        const {shape, open, linkedData} = this.props;
+        const {shape, open, storeState} = this.props;
+        const {formKey} = this.state;
         const typeLabel = getLabel(shape);
+        const typeDescription = getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION);
 
         return (
             <Dialog
@@ -51,26 +64,13 @@ class NewLinkedDataEntityDialog extends React.Component {
                 fullWidth
                 maxWidth="sm"
             >
-                <DialogTitle id="form-dialog-title">{typeLabel}</DialogTitle>
+                <DialogTitle id="form-dialog-title">
+                    New entity: {typeLabel}
+                    <Typography variant="body2">{typeDescription}</Typography>
+                </DialogTitle>
 
                 <DialogContent style={{overflowX: 'hidden'}}>
-                    <TextField
-                        autoFocus
-                        id="name"
-                        label="Id"
-                        value={this.state.id}
-                        name="id"
-                        onChange={this.handleInputChange}
-                        fullWidth
-                        required
-                        error={!this.hasValidId()}
-                    />
-
-                    <LinkedDataEntityFormContainer
-                        formKey={this.state.formKey}
-                        properties={linkedData}
-                    />
-
+                    {this.renderDialogContent()}
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -82,7 +82,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                     <Button
                         onClick={this.createEntity}
                         color="primary"
-                        disabled={!this.canCreate()}
+                        disabled={!this.canCreate() || !hasLinkedDataFormUpdates(storeState, formKey) || hasLinkedDataFormValidationErrors(storeState, formKey)}
                     >
                         Create
                     </Button>
@@ -91,12 +91,34 @@ class NewLinkedDataEntityDialog extends React.Component {
         );
     }
 
-    hasValidId() {
-        return new URL(`http://example.com/${this.state.id}`).toString() === `http://example.com/${this.state.id}`;
+    renderDialogContent() {
+        const form = (
+            <LinkedDataEntityFormContainer
+                formKey={this.state.formKey}
+                properties={this.props.linkedData}
+                key="form"
+            />
+        );
+
+        const idField = (
+            <LinkedDataIdentifierField
+                namespace={this.state.namespace}
+                localPart={this.state.localPart}
+                onLocalPartChange={this.handleLocalPartChange}
+                onNamespaceChange={this.handleNamespaceChange}
+                required={this.props.requireIdentifier}
+                key="identifier"
+            />
+        );
+
+        // If the identifier field is not required, it will be inferred from other
+        // properties by default. This makes the field quite unimportant, so it will
+        // be rendered at the bottom. See VRE-830 for details
+        return this.props.requireIdentifier ? [idField, form] : [form, idField];
     }
 
     canCreate() {
-        return this.state.id && this.hasValidId();
+        return !this.props.requireIdentifier || isValidLinkedDataIdentifier(this.getIdentifier());
     }
 }
 
@@ -104,7 +126,16 @@ NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    open: PropTypes.bool
+    open: PropTypes.bool,
+    requireIdentifier: PropTypes.bool
 };
 
-export default NewLinkedDataEntityDialog;
+NewLinkedDataEntityDialog.defaultProps = {
+    requireIdentifier: true
+};
+
+const mapStateToProps = (state) => ({
+    storeState: state,
+});
+
+export default connect(mapStateToProps)(NewLinkedDataEntityDialog);

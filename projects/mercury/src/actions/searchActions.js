@@ -1,12 +1,21 @@
-import searchAPI from "../services/SearchAPI";
-import * as actionTypes from "./actionTypes";
+import {COLLECTIONS_SEARCH, METADATA_SEARCH, VOCABULARY_SEARCH} from "./actionTypes";
 import {createErrorHandlingPromiseAction} from "../utils/redux";
+import searchAPI from "../services/SearchAPI";
 
-export const performSearch = createErrorHandlingPromiseAction((query, searchType) => ({
-    type: actionTypes.PERFORM_SEARCH,
-    payload: searchAPI().performSearch(query, searchType),
+export const searchCollections = createErrorHandlingPromiseAction((query) => ({
+    type: COLLECTIONS_SEARCH,
+    payload: searchAPI().searchCollections(query),
     meta: {
-        searchType,
         query
     }
+}));
+
+export const searchMetadata = createErrorHandlingPromiseAction(({query, types, size, page}) => ({
+    type: METADATA_SEARCH,
+    payload: searchAPI().searchLinkedData({types, query, size, page})
+}));
+
+export const searchVocabulary = createErrorHandlingPromiseAction(({query, types, size, page}) => ({
+    type: VOCABULARY_SEARCH,
+    payload: searchAPI().searchLinkedData({query, types, size, page})
 }));

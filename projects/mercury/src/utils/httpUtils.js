@@ -13,11 +13,26 @@ function failOnHttpError(providedMessage) {
             switch (response.status) {
                 case 401:
                     window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
-                    break;
+
+                    // eslint-disable-next-line no-throw-literal
+                    throw {
+                        message: 'Your session has expired. Please log in again',
+                        redirecting: true
+                    };
                 default:
-                    // If a message was provided by the backend, provide it to the calling party
                     return response.json()
-                        .then(body => { throw Error(body && body.message ? body.message : defaultMessage); });
+                        .then(body => {
+                            if (response.status === 400 && body.details) {
+                                // eslint-disable-next-line no-throw-literal
+                                throw {
+                                    details: body.details,
+                                    message: body.message
+                                };
+                            }
+
+                            // If a message was provided by the backend, provide it to the calling party
+                            throw Error(body && body.message ? body.message : defaultMessage);
+                        });
             }
         }
         return response;

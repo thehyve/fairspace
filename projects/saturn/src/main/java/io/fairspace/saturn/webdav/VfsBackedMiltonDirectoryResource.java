@@ -68,8 +68,8 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     public List<? extends Resource> getChildren() throws NotAuthorizedException, BadRequestException {
         try {
             return fs.list(info.getPath()).stream()
-                    .map(f -> f.isDirectory() ? new VfsBackedMiltonDirectoryResource(fs, f) : new VfsBackedMiltonFileResource(fs, f))
                     .sorted()
+                    .map(f -> f.isDirectory() ? new VfsBackedMiltonDirectoryResource(fs, f) : new VfsBackedMiltonFileResource(fs, f))
                     .collect(toList());
         } catch (IOException e) {
             try {
@@ -93,7 +93,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         for (var r : getChildren()) {
             w.open("tr");
             w.open("td");;
-            w.begin("a").writeAtt("href", "/webdav/" + ((VfsBackedMiltonResource)r).info.getPath()).open().writeText(r.getName()).close();
+            w.begin("a").writeAtt("href", link(r)).open().writeText(r.getName()).close();
             w.close("td");
             w.begin("td").open().writeText(r.getModifiedDate() + "").close();
             w.close("tr");
@@ -102,6 +102,10 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         w.close("body");
         w.close("html");
         w.flush();
+    }
+
+    private static String link(Resource r) {
+        return r.getName() + (r instanceof FolderResource ? "/" : "");
     }
 
     @Override

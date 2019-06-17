@@ -5,7 +5,7 @@ import {Button, Grid} from "@material-ui/core";
 
 import * as metadataActions from "../../../actions/metadataActions";
 import * as vocabularyActions from "../../../actions/vocabularyActions";
-import {isDateTimeProperty, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
+import {partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkeddata/metadataUtils";
 import {
     getCombinedMetadataForSubject,
     hasMetadataError,
@@ -17,13 +17,20 @@ import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContain
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const MetadataEntityContainer = props => {
-    const {editable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
+    const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
 
     const handleButtonClick = () => {
         onSubmit(props.subject)
-            .catch(err => ErrorDialog.showError(err, "Error while updating metadata"));
+            .catch(e => {
+                if (e.details) {
+                    ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, subject), e.message);
+                } else {
+                    ErrorDialog.showError(e, `Error while updating metadata.\n${e.message}`);
+                }
+            });
     };
 
     return (
@@ -37,7 +44,6 @@ const MetadataEntityContainer = props => {
             <Grid item>
                 <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
                     <LinkedDataEntityFormContainer
-                        editable={editable}
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
                         error={error}
@@ -45,7 +51,7 @@ const MetadataEntityContainer = props => {
                     />
                 </LinkedDataValuesContext.Provider>
             </Grid>
-            {editable && !error && (
+            {isEditable && !error && (
                 <Grid item>
                     <Button
                         onClick={handleButtonClick}
@@ -67,26 +73,28 @@ const mapStateToProps = (state, ownProps) => {
     const vocabulary = getVocabulary(state);
 
     const hasNoMetadata = !metadata || metadata.length === 0;
+    const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
+    const failedLoading = hasNoMetadata && !loading;
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
-    const error = hasNoMetadata || hasOtherErrors ? 'An error occurred while loading metadata.' : '';
+    const error = failedLoading ? 'No metadata found for this subject' : hasOtherErrors ? 'An error occurred while loading metadata.' : '';
 
-    const editable = Object.prototype.hasOwnProperty.call(ownProps, "editable") ? ownProps.editable : true;
+    const isEditable = ("isEditable" in ownProps) ? ownProps.isEditable : true;
     const buttonDisabled = !hasLinkedDataFormUpdates(state, subject) || hasLinkedDataFormValidationErrors(state, subject);
 
     const properties = hasNoMetadata ? [] : propertiesToShow(metadata)
         .map(p => ({
             ...p,
-            editable: editable && !isDateTimeProperty(p)
+            isEditable: isEditable && !p.machineOnly
         }));
 
     return {
-        loading: isMetadataPending(state, subject) || isVocabularyPending(state),
+        loading,
         error,
 
         properties,
         subject,
 
-        editable,
+        isEditable,
         buttonDisabled,
         vocabulary
     };

@@ -1,5 +1,18 @@
+import _, {mapValues} from 'lodash';
+
 import * as consts from "../../constants";
-import {getFirstPredicateValue} from "./jsonLdUtils";
+import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+
+/**
+ * Returns the local part of the given uri
+ * @param uri
+ * @returns {string}
+ */
+export const getLocalPart = uri => (
+    uri.includes('#')
+        ? uri.substring(uri.lastIndexOf('#') + 1)
+        : uri.substring(uri.lastIndexOf('/') + 1)
+);
 
 /**
  *
@@ -22,15 +35,8 @@ export function linkLabel(uri, shortenExternalUris = false) {
         }
     }
 
-    if (shortenExternalUris) {
-        return uri.includes('#')
-            ? uri.substring(uri.lastIndexOf('#') + 1)
-            : uri.substring(uri.lastIndexOf('/') + 1);
-    }
-
-    return uri;
+    return shortenExternalUris ? getLocalPart(uri) : uri;
 }
-
 
 /**
  * Returns the label for the given entity.
@@ -45,7 +51,7 @@ export function linkLabel(uri, shortenExternalUris = false) {
  */
 export function getLabel(entity, shortenExternalUris = false) {
     return getFirstPredicateValue(entity, consts.LABEL_URI)
-        || getFirstPredicateValue(entity, 'http://www.w3.org/ns/shacl#name')
+        || getFirstPredicateValue(entity, consts.SHACL_NAME)
         || (entity && entity['@id'] && linkLabel(entity['@id'], shortenExternalUris));
 }
 
@@ -70,14 +76,20 @@ export function relativeLink(link) {
     return withoutSchema.substring(withoutSchema.indexOf('/'));
 }
 
-export function isDateTimeProperty(property) {
-    return property.datatype === consts.DATETIME_URI;
-}
-
 export function generateUuid() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g,
         // eslint-disable-next-line
         c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
+}
+
+export function isValidLinkedDataIdentifier(uri) {
+    try {
+        // eslint-disable-next-line no-new
+        new URL(uri);
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 /**
@@ -120,11 +132,15 @@ export const propertiesToShow = (properties = []) => {
 /**
  * Creates a textual description of the type for the given metadata item
  * @param metadata
+ * @param vocabulary
  * @returns {{label: string, description: string}} object containing the type label and description
  */
-export const getTypeInfo = (metadata) => {
+export const getTypeInfo = (metadata, vocabulary) => {
     const typeProp = metadata && metadata.find(prop => prop.key === '@type');
-    const {label = '', comment: description = ''} = (typeProp && typeProp.values && typeProp.values.length && typeProp.values[0]) || {};
+    const types = (typeProp && typeProp.values) || [];
+    const shape = vocabulary.determineShapeForTypes(types.map(t => t.id));
+    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
+    const {label = '', comment: description = ''} = types.find(t => t.id === type) || {};
 
     return {label, description};
 };
@@ -168,7 +184,7 @@ export const createVocabularyIri = (id) => createIri(id, 'vocabulary');
  * This ensures consistent IRI generation and
  * add the ability to access the same IRI on different protocols.
  *
- * @param id
+ * @param iri
  * @returns {string}
  */
 export const url2iri = (iri) => {
@@ -180,3 +196,75 @@ export const url2iri = (iri) => {
         return iri;
     }
 };
+
+/**
+ * Groups the validation errors of the same subject into a single array and the other array is the other errors
+ * @returns {Object}
+ */
+export const partitionErrors = (errors, subject) => {
+    const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject);
+    return {entityErrors, otherErrors};
+};
+
+/**
+ * Returns true if the given value is truthy or zero or false
+ * @param value
+ */
+export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
+
+/**
+ * Returns true if the either given value or id (or both) are part of the property values.
+ * @param {object} property
+ * @param {string} value
+ * @param {string} id
+ */
+export const propertyContainsValueOrId = (property, value, id) => {
+    if (!Array.isArray(property.values) || property.values.length === 0 || (!value && !id)) {
+        return false;
+    }
+
+    return property.values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
+};
+
+/**
+ * Returns true if the given property have one or more non-empty values
+ * @param property
+ * @returns {boolean}
+ */
+export const hasValue = property => !!(property.values && Array.isArray(property.values) && property.values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
+
+/**
+ * Simplify the keys of the given object by converting the URIs into its local paths
+ * The output of this method is comparable to the results provided by elasticsearch
+ *
+ * @example {'http://namespace#label': [{'@value': 'abc'}]} -> {label: [{'@value': 'abc'}]}
+ * @param jsonLd
+ * @returns {{}}
+ */
+export const simplifyUriPredicates = jsonLd => (
+    jsonLd
+        ? Object.assign(
+            {},
+            ...Object.keys(jsonLd).map(key => ({[getLocalPart(key)]: jsonLd[key]}))
+        ) : {});
+
+/**
+ * Normalize an internal metadata resource by converting the values or iris into a single object
+ *
+ * The output of this method is comparable to the results provided by elasticsearch
+ *
+ * @example {'http://namespace#label': [{value: 'abc'}]} -> {http://namespace#label: ['abc']}
+ * @param jsonLd
+ * @returns {{}}
+ */
+export const normalizeMetadataResource = jsonLd => mapValues(
+    jsonLd,
+    values => (
+        Array.isArray(values)
+            ? values.map(v => {
+                if (isNonEmptyValue(v.value)) return v.value;
+                return v.id || v;
+            })
+            : values
+    )
+);

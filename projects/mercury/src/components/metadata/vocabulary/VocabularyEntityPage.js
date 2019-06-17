@@ -1,13 +1,14 @@
 import React from 'react';
 
-import BreadCrumbs from "../../common/BreadCrumbs";
+import LinkedDataPage from '../common/LinkedDataPage';
+import VocabularyEntityHeaderContainer from './VocabularyEntityHeaderContainer';
 import VocabularyEntityContainer from './VocabularyEntityContainer';
 
-const vocabularyEntityPage = () => (
-    <>
-        <BreadCrumbs homeUrl="/vocabulary" />
-        <VocabularyEntityContainer showHeader />
-    </>
-);
-
-export default vocabularyEntityPage;
+export default ({subject}) => {
+    return (
+        <LinkedDataPage homeUrl="/vocabulary">
+            <VocabularyEntityHeaderContainer subject={subject} />
+            <VocabularyEntityContainer subject={subject} />
+        </LinkedDataPage>
+    );
+};

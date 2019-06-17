@@ -1,24 +1,30 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.MetadataAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
+import java.util.Collections;
+import java.util.Set;
+
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionCheckingValidatorTest {
@@ -33,6 +39,9 @@ public class PermissionCheckingValidatorTest {
     @Mock
     private PermissionsService permissions;
 
+    @Mock
+    private ViolationHandler violationHandler;
+
 
     private PermissionCheckingValidator validator;
 
@@ -40,36 +49,36 @@ public class PermissionCheckingValidatorTest {
 
     @Before
     public void setUp() {
-        var rdf = new RDFConnectionLocal(DatasetFactory.create());
-        initVocabularies(rdf);
-        validator = new PermissionCheckingValidator(rdf, permissions);
+        validator = new PermissionCheckingValidator(permissions);
     }
 
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
-        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, EMPTY));
+        validator.validate(EMPTY, EMPTY, violationHandler);
 
-        verifyZeroInteractions(permissions);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void noWritePermissionCausesAFailure() {
         model.add(STATEMENT);
+        Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        when(permissions.getPermission(any())).thenReturn(Access.Read);
-
-        assertFalse(validator.validate(EMPTY, model).isValid());
+        doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
+        validator.validate(EMPTY, model, violationHandler);
+        verify(violationHandler).onViolation("Cannot modify read-only resource", STATEMENT.getSubject(), null, null);
     }
 
     @Test
     public void itShouldCheckPermissionsForSubject() {
         model.add(STATEMENT);
+        Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        when(permissions.getPermission(eq(STATEMENT.getSubject().asNode()))).thenReturn(Access.Write);
+        validator.validate(EMPTY, model, violationHandler);
 
-        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, model));
-
-        verify(permissions).getPermission(STATEMENT.getSubject().asNode());
+        verifyZeroInteractions(violationHandler);
+        verify(permissions).ensureAccess(nodes, Access.Write);
 
         verifyNoMoreInteractions(permissions);
     }

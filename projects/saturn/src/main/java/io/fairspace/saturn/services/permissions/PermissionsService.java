@@ -1,8 +1,12 @@
 package io.fairspace.saturn.services.permissions;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Resource;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public interface PermissionsService {
@@ -12,6 +16,13 @@ public interface PermissionsService {
      * @param resource
      */
     void createResource(Node resource);
+
+    /**
+     * Creates multiple new resource entities and grants current user Manage access to it.
+     * This method should be only called by other high-level APIs and must not be directly exposed as an API endpoint.
+     * @param resources
+     */
+    void createResources(Collection<Resource> resources);
 
     /**
      * Sets permission for a specific user and resource.
@@ -28,7 +39,17 @@ public interface PermissionsService {
      * @return Current user's permission for the resource. If no permission was set explicitly, returns the default value
      * depending on the type of the resource.
      */
-    Access getPermission(Node resource);
+    default Access getPermission(Node resource) {
+        return getPermissions(List.of(resource)).get(resource);
+    }
+
+    /**
+     * Ensures the current user has access to the specified nodes
+     * @param nodes
+     * @param requestedAccess
+     * @throws io.fairspace.saturn.services.AccessDeniedException if the user does not have requested access to all nodes
+     */
+    void ensureAccess(Set<Node> nodes, Access requestedAccess);
 
     /**
      *
@@ -36,6 +57,13 @@ public interface PermissionsService {
      * @return A map containing all non-default permissions from all users for a specific resource
      */
     Map<Node, Access> getPermissions(Node resource);
+
+    /**
+     * @param nodes
+     * @return Current user's permissions for the given nodes. If no permission was set explicitly, returns the default value
+     * depending on the type of the resource.
+     */
+    Map<Node, Access> getPermissions(Collection<Node> nodes);
 
     /**
      *

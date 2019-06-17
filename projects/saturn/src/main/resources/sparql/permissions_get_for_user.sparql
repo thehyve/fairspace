@@ -4,11 +4,18 @@
 
 PREFIX fs: <http://fairspace.io/ontology#>
 
-SELECT * WHERE
+SELECT ?subject (IF(exists{ GRAPH ws:permissions {?subject fs:manage %2$s}},
+                   fs:manage,
+                 IF(exists{ GRAPH ws:permissions {?subject fs:write %2$s}},
+                   fs:write,
+                 IF(exists{ GRAPH ws:permissions {?subject fs:read %2$s}},
+                   fs:read,
+                 IF(exists{ GRAPH ws:permissions {?subject fs:writeRestricted true}},
+                   fs:read,
+                 IF(exists{?subject a fs:Collection},
+                   fs:none,
+                   fs:write))))) as ?access)
+WHERE
 {
-{SELECT (fs:read as ?access) WHERE { GRAPH ws:permissions { %1$s fs:read %2$s }}}
-UNION
-{SELECT (fs:write as ?access) WHERE { GRAPH ws:permissions { %1$s fs:write %2$s }}}
-UNION
-{SELECT (fs:manage as ?access) WHERE { GRAPH ws:permissions { %1$s fs:manage %2$s }}}
+  VALUES ?subject {%1$s}
 }

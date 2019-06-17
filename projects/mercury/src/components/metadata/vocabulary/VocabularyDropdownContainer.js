@@ -1,36 +1,39 @@
 import React from "react";
 import {connect} from 'react-redux';
-import * as vocabularyActions from "../../../actions/vocabularyActions";
-import EntityDropdown from "../common/values/EntityDropdown";
 
-class VocabularyDropdownContainer extends React.Component {
-    constructor(props) {
-        super(props);
-        props.fetchEntities(props.property.className);
+import LinkedDataDropdown from "../common/LinkedDataDropdown";
+import {LoadingInlay, MessageDisplay} from "../../common";
+import {getMetaVocabulary, hasMetaVocabularyError, isMetaVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+
+const VocabularyDropdownContainer = ({types, loading, error, ...otherProps}) => {
+    if (error) {
+        return <MessageDisplay withIcon={false} message={error.message} />;
     }
 
-    render() {
-        return <EntityDropdown {...this.props} />;
+    if (loading) {
+        return <LoadingInlay />;
     }
-}
 
-const mapStateToProps = (state, ownProps) => {
-    const {cache: {vocabularyEntitiesByType}} = state;
-    const dropdownOptions = vocabularyEntitiesByType[ownProps.property.className];
-    const pending = !dropdownOptions || dropdownOptions.pending;
-    const error = (dropdownOptions && dropdownOptions.error) || '';
+    return types && <LinkedDataDropdown types={types} {...otherProps} />;
+};
 
-    const entities = (!pending && !error) ? dropdownOptions.data : [];
+const mapStateToProps = (state, {property}) => {
+    const metaVocabulary = getMetaVocabulary(state);
+    const loading = isMetaVocabularyPending(state);
+    const loadingError = hasMetaVocabularyError(state);
+
+    if (loadingError) {
+        return {
+            error: {message: 'Unable to fetch options'}
+        };
+    }
+
+    const types = metaVocabulary.getDescendants(property.className);
 
     return {
-        pending,
-        error,
-        entities,
+        loading,
+        types
     };
 };
 
-const mapDispatchToProps = ({
-    fetchEntities: vocabularyActions.fetchVocabularyEntitiesIfNeeded
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(VocabularyDropdownContainer);
+export default connect(mapStateToProps)(VocabularyDropdownContainer);

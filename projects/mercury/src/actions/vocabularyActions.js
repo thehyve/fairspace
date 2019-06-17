@@ -3,6 +3,8 @@ import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {getMetaVocabulary} from "../reducers/cache/vocabularyReducers";
 import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
+import {SHACL_PATH, SHACL_TARGET_CLASS} from "../constants";
+import {getFirstPredicateProperty} from "../utils/linkeddata/jsonLdUtils";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
@@ -21,9 +23,16 @@ export const submitVocabularyChangesFromState = (subject) => (dispatch, getState
     });
 };
 
-export const createVocabularyEntityFromState = (formKey, subject, type) => (dispatch, getState) => {
+export const createVocabularyEntityFromState = (formKey, providedSubject, type) => (dispatch, getState) => {
     const values = getLinkedDataFormUpdates(getState(), formKey);
     const metaVocabulary = getMetaVocabulary(getState());
+
+    // Infer subject from sh:targetClass or sh:path if no explicit subject is given
+    const subject = providedSubject || getFirstPredicateProperty(values, SHACL_PATH, 'id') || getFirstPredicateProperty(values, SHACL_TARGET_CLASS, 'id');
+
+    if (!subject) {
+        return Promise.reject(new Error("Invalid metadata identifier given"));
+    }
 
     return dispatch({
         type: actionTypes.CREATE_VOCABULARY_ENTITY,

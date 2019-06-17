@@ -1,14 +1,13 @@
 import {connect} from "react-redux";
-import {PropTypes} from "prop-types";
+
 import {getCombinedMetadataForSubject, isMetadataPending, hasMetadataError} from "../../../reducers/cache/jsonLdBySubjectReducers";
-import {getTypeInfo, linkLabel, url2iri} from "../../../utils/linkeddata/metadataUtils";
-import {hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {getTypeInfo, linkLabel} from "../../../utils/linkeddata/metadataUtils";
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
 
-const mapStateToProps = (state, ownProps) => {
-    const metadata = getCombinedMetadataForSubject(state, ownProps.subject);
+const mapStateToProps = (state, {subject}) => {
+    const metadata = getCombinedMetadataForSubject(state, subject);
     const hasNoMetadata = !metadata || metadata.length === 0;
-    const subject = ownProps.subject || url2iri(window.location.href);
     const hasOtherErrors = hasMetadataError(state, subject) || hasVocabularyError(state);
     if (hasNoMetadata || hasOtherErrors) {
         return {
@@ -16,9 +15,9 @@ const mapStateToProps = (state, ownProps) => {
         };
     }
 
-    const loading = isMetadataPending(state, ownProps.subject) || isVocabularyPending(state);
-    const header = linkLabel(ownProps.subject);
-    const {label, description} = getTypeInfo(metadata);
+    const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
+    const header = linkLabel(subject);
+    const {label, description} = getTypeInfo(metadata, getVocabulary(state));
 
     return {
         loading,
@@ -28,10 +27,4 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-const MetadataEntityHeaderContainer = connect(mapStateToProps)(LinkedDataEntityHeader);
-
-MetadataEntityHeaderContainer.propTypes = {
-    subject: PropTypes.string.isRequired
-};
-
-export default MetadataEntityHeaderContainer;
+export default connect(mapStateToProps)(LinkedDataEntityHeader);

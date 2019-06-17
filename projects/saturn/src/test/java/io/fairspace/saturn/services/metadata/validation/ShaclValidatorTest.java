@@ -6,6 +6,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.Quad;
@@ -14,14 +15,25 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.Arrays;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
-import java.util.Set;
-
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ShaclValidatorTest {
     private static final Model EMPTY = createDefaultModel();
     private static final Resource resource1 = createResource("http://example.com/123");
@@ -31,65 +43,92 @@ public class ShaclValidatorTest {
     private RDFConnection rdf = new RDFConnectionLocal(ds);
     private ShaclValidator validator;
 
+    @Mock
+    private ViolationHandler violationHandler;
+
     @Before
     public void setUp() {
         initVocabularies(rdf);
         validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, Vocabularies.VOCABULARY_GRAPH_URI);
-    }
 
+        doAnswer(invocation -> {
+            System.err.println(Arrays.toString(invocation.getArguments()));
+            return null;
+        }).when(violationHandler).onViolation(any(),any(), any(), any());
+    }
 
     @Test
     public void validateNoChanges() {
-        assertEquals(ValidationResult.VALID, validator.validate(EMPTY, EMPTY));
+        validator.validate(EMPTY, EMPTY, violationHandler);
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void validateResourceWithNoType() {
-        var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDFS.label, createTypedLiteral(123)));
+        validator.validate(EMPTY, createDefaultModel()
+                        .add(resource1, RDFS.label, createTypedLiteral(123)),
+                violationHandler);
 
-        assertTrue(result.isValid());
+        verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void validateResourceWithInvalidProperties() {
-        var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDF.type, FS.User)
-                .add(resource1, RDFS.label, createTypedLiteral(123))
-                .add(resource1, RDFS.comment, createTypedLiteral(123)));
+        validator.validate(EMPTY, createDefaultModel()
+                        .add(resource1, RDF.type, FS.User)
+                        .add(resource1, RDFS.label, createTypedLiteral(123))
+                        .add(resource1, RDFS.comment, createTypedLiteral(123)),
+                violationHandler);
 
-        assertFalse(result.isValid());
-        assertEquals(Set.of("http://example.com/123 http://www.w3.org/2000/01/rdf-schema#comment 123^^http://www.w3.org/2001/XMLSchema#int - Value does not have datatype xsd:string.",
-                "http://example.com/123 http://www.w3.org/2000/01/rdf-schema#label 123^^http://www.w3.org/2001/XMLSchema#int - Value does not have datatype xsd:string."),
-                result.getValidationMessages());
-     }
+        verify(violationHandler).onViolation("Value does not have datatype xsd:string",
+                resource1,
+                RDFS.comment,
+                createTypedLiteral(123));
+
+        verify(violationHandler).onViolation("Value does not have datatype xsd:string",
+                resource1,
+                RDFS.label,
+                createTypedLiteral(123));
+
+        verifyNoMoreInteractions(violationHandler);
+    }
 
     @Test
     public void validateResourceWithUnknownProperty() {
-        var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDF.type, FS.User)
-                .add(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123)));
+        validator.validate(EMPTY, createDefaultModel()
+                        .add(resource1, RDF.type, FS.User)
+                        .add(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123)),
+                violationHandler);
 
-        assertFalse(result.isValid());
-        assertEquals("http://example.com/123 http://example.com#unknown 123^^http://www.w3.org/2001/XMLSchema#int - Predicate <http://example.com#unknown> is not allowed (closed shape).", result.getMessage());
+        verify(violationHandler).onViolation("Predicate <http://example.com#unknown> is not allowed (closed shape)",
+                resource1,
+                createProperty("http://example.com#unknown"),
+                createTypedLiteral(123));
     }
 
     @Test
     public void validateResourceMissingRequiredProperty() {
-        var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDF.type, FS.File));
+        validator.validate(EMPTY, createDefaultModel()
+                        .add(resource1, RDF.type, FS.File),
+                violationHandler);
 
-        assertFalse(result.isValid());
-        assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath  - Less than 1 values.", result.getMessage());
+        verify(violationHandler).onViolation("Less than 1 values",
+                resource1,
+                FS.filePath,
+                null);
     }
 
     @Test
     public void validateResourceWithWrongObjectsType() {
-        var result = validator.validate(EMPTY, createDefaultModel()
-                .add(resource1, RDF.type, FS.File));
+        validator.validate(EMPTY, createDefaultModel()
+                        .add(resource1, RDF.type, FS.File)
+                        .add(resource1, FS.filePath, createTypedLiteral(123)),
+                violationHandler);
 
-        assertFalse(result.isValid());
-        assertEquals("http://example.com/123 http://fairspace.io/ontology#filePath  - Less than 1 values.", result.getMessage());
+        verify(violationHandler).onViolation("Value does not have datatype xsd:string",
+                resource1,
+                FS.filePath,
+                createTypedLiteral(123));
     }
 
     @Test
@@ -102,16 +141,108 @@ public class ShaclValidatorTest {
                 .add(resource1, FS.filePath, createStringLiteral("some/path"))
                 .add(resource1, FS.createdBy, resource2);
 
-        var result1 = validator.validate(EMPTY, model);
+        validator.validate(EMPTY, model, violationHandler);
 
-        assertTrue(result1.isValid());
+        verifyZeroInteractions(violationHandler);
 
         ds.getDefaultModel()
                 .remove(resource2, RDF.type, FS.User)
                 .add(resource2, RDF.type, FOAF.Person);
 
-        var result2 = validator.validate(EMPTY, model);
-        assertFalse(result2.isValid());
-        assertEquals("http://example.com/123 http://fairspace.io/ontology#createdBy http://example.com/234 - Value does not have class fs:User.", result2.getMessage());
+        validator.validate(EMPTY, model, violationHandler);
+
+        verify(violationHandler).onViolation("Value does not have class fs:User",
+                resource1,
+                FS.createdBy,
+                resource2);
     }
+
+    @Test
+    public void blankNodesAreProperlyValidated() {
+        // If the update contains a blank node, it should be validated solely with the
+        // information from the update, as there can not be any triple in the database
+        // already that references this blank node
+        Resource blankNode = createResource();
+        Model model = createDefaultModel()
+                .add(blankNode, RDF.type, FS.User)
+                .add(blankNode, FS.md5, "test");
+
+        validator.validate(EMPTY, model, violationHandler);
+
+        verify(violationHandler).onViolation("Predicate <http://fairspace.io/ontology#md5> is not allowed (closed shape)",
+                blankNode,
+                FS.md5,
+                ResourceFactory.createStringLiteral("test"));
+    }
+
+    @Test
+    public void blankNodesAreNotFetchedFromTheDatabase() {
+        // If the update contains a blank node, it should be validated solely with the
+        // information from the update, as there can not be any triple in the database
+        // already that references this blank node
+        ds.getDefaultModel()
+                .add(resource2, RDF.type, FS.User)
+                .add(ResourceFactory.createResource(), RDF.type, FS.Collection);
+
+        Resource blankNode = createResource();
+        var model = createDefaultModel()
+                .add(blankNode, RDF.type, FS.User)
+                .add(blankNode, RDFS.label, createTypedLiteral("My label"));
+
+        validator.validate(EMPTY, model, violationHandler);
+
+        verifyZeroInteractions(violationHandler);
+    }
+
+    @Test
+    public void validationForSomethingReferringToABlankNode() {
+        Resource blankNode = createResource();
+        ds.getDefaultModel()
+                .add(blankNode, RDF.type, FS.User)
+                .add(resource1, RDF.type, FS.Collection)
+                .add(resource1, RDFS.label, "collection")
+                .add(resource1, RDFS.comment, "bla")
+                .add(resource1, FS.filePath, "/")
+                .add(resource1, FS.collectionType, "a")
+                .add(resource1, FS.createdBy, blankNode);
+
+        //Resource newBlankNode = createResource();
+        var toAdd = createDefaultModel()
+                .add(resource1, RDFS.label, "new");
+
+        var toRemove = createDefaultModel()
+                .add(resource1, RDFS.label, "collection");
+
+        validator.validate(toRemove, toAdd, violationHandler);
+
+        verifyZeroInteractions(violationHandler);
+    }
+
+    @Test
+    public void validationForSomethingReferringToABlankNode2() {
+        Resource blankNode = createResource();
+        ds.getDefaultModel()
+                .add(blankNode, RDF.type, FS.User)
+                .add(resource1, RDF.type, FS.Collection)
+                .add(resource1, RDFS.label, "collection")
+                .add(resource1, RDFS.comment, "bla")
+                .add(resource1, FS.filePath, "/")
+                .add(resource1, FS.collectionType, "a")
+                .add(resource1, FS.createdBy, blankNode);
+
+        Resource newBlankNode = createResource();
+        var toAdd = createDefaultModel()
+                .add(resource1, FS.createdBy, newBlankNode);
+
+        var toRemove = createDefaultModel()
+                .add(resource1, FS.createdBy, blankNode);
+
+        validator.validate(toRemove, toAdd, violationHandler);
+
+        verify(violationHandler).onViolation("Value does not have class fs:User",
+                resource1,
+                FS.createdBy,
+                newBlankNode);
+    }
+
 }

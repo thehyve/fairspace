@@ -1,58 +1,38 @@
 import React from 'react';
-import TextField from "@material-ui/core/TextField";
+import PropTypes from 'prop-types';
+import IriValueContainer from "./IriValueContainer";
 
 class ResourceValue extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {value: props.entry.id || ''};
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.entry.id !== prevProps.entry.id) {
-            this.resetState();
-        }
-    }
-
-    handleChange = (e) => {
-        this.setState({value: e.target.value});
+    state = {
+        namespace: undefined
     };
 
-    handleBlur = () => {
-        try {
-            this.props.onChange({id: new URL(this.state.value).toString()});
-            this.resetState();
-        } catch (e) {
-            this.resetState();
-        }
-    };
+    handleLocalPartChange = (value) => this.props.onChange({id: this.state.namespace.value + value});
 
-    resetState = () => {
-        this.setState({value: this.props.entry.id || ''});
-    }
+    handleNamespaceChange = namespace => this.setState({namespace});
 
     render() {
-        const {
-            property, style, onSave, ...otherProps
-        } = this.props;
+        const {entry, onChange, ...otherProps} = this.props;
 
         return (
-            <TextField
+            <IriValueContainer
+                namespace={this.state.namespace}
+                localPart={entry.id || ''}
+                onLocalPartChange={this.handleLocalPartChange}
+                onNamespaceChange={this.handleNamespaceChange}
                 {...otherProps}
-                multiline={property.multiLine}
-                value={this.state.value}
-                onChange={this.handleChange}
-                onBlur={this.handleBlur}
-                margin="normal"
-                style={{...style, marginTop: 0, width: '100%'}}
-                type="url"
             />
         );
     }
 }
 
+ResourceValue.propTypes = {
+    entry: PropTypes.object,
+    onChange: PropTypes.func
+};
+
 ResourceValue.defaultProps = {
-    entry: {}
+    entry: {},
 };
 
 export default ResourceValue;

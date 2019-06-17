@@ -16,6 +16,13 @@ export const isRdfList = (propertyShape) => getFirstPredicateId(propertyShape, c
 export const isGenericIriResource = (propertyShape) => getFirstPredicateId(propertyShape, constants.SHACL_NODEKIND) === constants.SHACL_IRI;
 
 /**
+ * Checks whether the given shape describe a relation
+ * @param propertyShape
+ * @returns {boolean}
+ */
+export const isRelationShape = shape => Array.isArray(shape['@type']) && shape['@type'].includes(constants.RELATION_SHAPE_URI);
+
+/**
  * Returns the maxCount value for the given shape
  *
  * RDF lists are treated as a special case. They have a maxCount of 1, because
@@ -27,11 +34,77 @@ export const isGenericIriResource = (propertyShape) => getFirstPredicateId(prope
  */
 export const getMaxCount = shape => (isRdfList(shape) ? 0 : getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT));
 
+/**
+ * Checks whether the given shape represents an external link (specified by fs:externalLink)
+ * @param propertyShape
+ * @returns {boolean}
+ */
+const isExternalLink = (propertyShape) => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
+
+/**
+ * Checks whether the given list of properties represents a fixed shape, as defined by FS:fixedShape
+ */
+export const isFixedShape = shape => getFirstPredicateValue(shape, constants.FIXED_SHAPE_URI, false);
+
+/**
+ * Returns a list of system properties defined for the given shape */
+export const getSystemProperties = shape => (shape && shape[constants.SYSTEM_PROPERTIES_URI] && shape[constants.SYSTEM_PROPERTIES_URI].map(entry => entry['@id'])) || [];
+
+/**
+ * Extends the list of properties with information for vocabulary editing
+ *
+ * The logic that is applied is based on the functionality of the fs:fixedShape flag. This flag
+ * indicates that a user is not allowed to change anything from a shape, except for adding
+ * new properties. The user is also allowed to delete properties that have been added before
+ * (i.e. not systemProperties)
+ *
+ * The following keys are added to the properties:
+ * - editable           is set based on the given editable flag combined with the isFixed flag
+ * - systemProperties   is set for the field SHACL_PROPERTY
+ *
+ * @param properties
+ * @param editable
+ * @param isFixed
+ * @param systemProperties
+ * @returns {*}
+ */
+export const extendPropertiesWithVocabularyEditingInfo = ({properties, isEditable = true, isFixed = false, systemProperties = []}) => properties
+    .map(p => {
+        // For fixed shapes, return the list of system properties for the SHACL_PROPERTY definition
+        if (isFixed && p.key === constants.SHACL_PROPERTY) {
+            const isSystemProperty = entry => systemProperties && systemProperties.includes(entry.id);
+            const isPropertyEditable = isEditable && !p.machineOnly;
+            const canDelete = entry => isPropertyEditable && !isSystemProperty(entry);
+
+            // Add a flag to each value whether it can be deleted
+            const values = p.values && p.values.map(v => ({...v, isDeletable: canDelete(v)}));
+            return {...p, values, isEditable: isPropertyEditable, systemProperties};
+        }
+
+        // In all other cases, if the shape is fixed, the property must not be editable
+        return {
+            ...p,
+            isEditable: !isFixed && isEditable
+        };
+    });
+
 export const vocabularyUtils = (vocabulary = []) => {
     /**
      * Returns a list of classes marked as fairspace entities
      */
     const getClassesInCatalog = () => vocabulary.filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI));
+
+    /**
+     * Returns a list of classes marked as fairspace entities
+     */
+    const getNamespaces = () => vocabulary
+        .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
+        .map(namespace => ({
+            id: namespace['@id'],
+            label: getFirstPredicateValue(namespace, constants.SHACL_NAME),
+            prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
+            namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE)
+        }));
 
     /**
      * Checks whether the vocabulary contains the given identifier
@@ -48,16 +121,25 @@ export const vocabularyUtils = (vocabulary = []) => {
     const get = (id) => vocabulary.find(el => el['@id'] === id) || [];
 
     /**
-     * Determines the SHACL shape to be applied to the given type
-     * @param typeUri
+     * Determines the SHACL shape to be applied to the given types
+     * @param typeUris
      */
-    const determineShapeForType = (typeUri) => vocabulary.find(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === typeUri) || {};
+    const determineShapeForTypes = (typeUris) => vocabulary.find(entry => typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
 
     /**
-     * Determines the SHACL shape to be applied to the given type
+     * Determines the SHACL shape to be applied to the given type.
+     *
+     * This method filters out any node that does not have a required SHACL name. This avoid an issue where
+     * there could be a blank node in the vocabulary referring the same sh:path, but only used to define a required field.
+     *
+     * See VRE-752 for more details
+     *
      * @param propertyUri
      */
-    const determineShapeForProperty = (propertyUri) => vocabulary.find(entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri);
+    const determineShapeForProperty = (propertyUri) => vocabulary.find(
+        entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri
+            && getFirstPredicateValue(entry, constants.SHACL_NAME)
+    );
 
     /**
      * Returns a human readable label for the given predicate or the uri if no label is specified
@@ -83,20 +165,17 @@ export const vocabularyUtils = (vocabulary = []) => {
     };
 
     /**
-     * Returns a list of property shapes that are in the shape of the given type
-     * @param type
-     */
-    const determinePropertyShapesForType = (type) => determinePropertyShapesForNodeShape(determineShapeForType(type));
-
-    /**
      * Returns a list of property shapes that are in the shape of the given types
      * @param types
      */
-    const determinePropertyShapesForTypes = (types) => Array.from(new Set(
-        types
-            .map(type => determinePropertyShapesForType(type))
-            .reduce((fullList, typeList) => fullList.concat(typeList), [])
-    ));
+    const determinePropertyShapesForTypes = (types) => determinePropertyShapesForNodeShape(determineShapeForTypes(types));
+
+    /**
+     * Returns a list of property shapes for the given type, where the properties are marked as fs:importantProperty
+     * @param type
+     */
+    const determineImportantPropertyShapes = type => determinePropertyShapesForTypes([type])
+        .filter(shape => getFirstPredicateValue(shape, constants.IMPORTANT_PROPERTY_URI, false));
 
     /**
      * Determines whether the given class URI is a fairspace class
@@ -122,9 +201,10 @@ export const vocabularyUtils = (vocabulary = []) => {
         const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
         const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
         const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH, 1000) > 255;
-        const minValuesCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);
         const description = getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION);
         const path = getFirstPredicateId(shape, constants.SHACL_PATH);
+        const shapeIsRelationShape = isRelationShape(shape);
+        const importantPropertyShapes = shapeIsRelationShape && className ? determineImportantPropertyShapes(className) : [];
 
         return {
             key: predicate,
@@ -135,13 +215,17 @@ export const vocabularyUtils = (vocabulary = []) => {
             datatype,
             multiLine,
             className,
-            minValuesCount,
+            order: getFirstPredicateValue(shape, constants.SHACL_ORDER),
+            minValuesCount: getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT),
             maxValuesCount: getMaxCount(shape),
             machineOnly: getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false),
             isRdfList: isRdfList(shape),
             allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
             isGenericIriResource: isGenericIriResource(shape),
-            allowAdditionOfEntities: isFairspaceClass(className)
+            isExternalLink: isExternalLink(shape),
+            allowAdditionOfEntities: isFairspaceClass(className),
+            isRelationShape: shapeIsRelationShape,
+            importantPropertyShapes
         };
     };
 
@@ -150,16 +234,39 @@ export const vocabularyUtils = (vocabulary = []) => {
      */
     const getRaw = () => vocabulary;
 
+    const getChildSubclasses = type => vocabulary.filter(e => getFirstPredicateId(e, constants.SUBCLASS_URI) === type).map(e => e['@id']);
+
+    /**
+     * Returns an array of the types that are subclasses of the provided type including indirect subclasses
+     * @param {string} type
+     */
+    const getDescendants = type => {
+        let queue = [type];
+        let found = [];
+
+        while (queue.length > 0) {
+            const head = queue.shift();
+            const subClasses = getChildSubclasses(head);
+            queue = queue.concat(subClasses);
+            found = found.concat(subClasses);
+        }
+
+        return found;
+    };
+
     return Object.freeze({
         contains,
         get,
         determineShapeForProperty,
-        determineShapeForType,
+        determineShapeForTypes,
         determinePropertyShapesForTypes,
         determinePropertyShapesForNodeShape,
         generatePropertyEntry,
         getRaw,
         getLabelForPredicate,
-        getClassesInCatalog
+        getClassesInCatalog,
+        getNamespaces,
+        getChildSubclasses,
+        getDescendants
     });
 };

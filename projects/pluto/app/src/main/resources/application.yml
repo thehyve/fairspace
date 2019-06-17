@@ -67,6 +67,7 @@ keycloak:
   usersUriPattern: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/groups/%s/members?%s
 
 zuul:
+  retryable: false
   routes:
     # Please note that the order of the routes is relevant
     # The elasticsearch route must be defined before
@@ -105,3 +106,6 @@ zuul:
     - X-Frame-Options
     - X-Content-Type-Options
     - X-XSS-Protection
+  host:
+    socket-timeout-millis: 10000
+    connect-timeout-millis: 2000

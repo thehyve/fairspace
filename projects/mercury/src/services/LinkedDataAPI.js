@@ -1,7 +1,7 @@
 import {expand} from 'jsonld';
 import Config from "./Config/Config";
 import failOnHttpError from "../utils/httpUtils";
-import {toJsonLd} from "../utils/linkeddata/jsonLdConverter";
+import {normalizeTypes, toJsonLd} from "../utils/linkeddata/jsonLdConverter";
 
 class LinkedDataAPI {
     static getParams = {
@@ -41,39 +41,11 @@ class LinkedDataAPI {
 
     get(params = {}) {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
-        return fetch(`${this.getStatementsUrl()}?labels&${query}`, LinkedDataAPI.getParams)
+        return fetch(`${this.getStatementsUrl()}?includeObjectProperties&${query}`, LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
-            .then(expand);
-    }
-
-    /**
-     * Update values in the metadata store
-     * @param subject   Single URI representing the subject to update
-     * @param predicate Single URI representing the predicate to update
-     * @param values    Array with objects representing the rdf-object for the triples.
-     *                  Each object must have a 'value' key.
-     *                  e.g.: [ {value: 'user 1'}, {value: 'another user'} ]
-     * @param vocabulary The {vocabularyUtils} object containing the shapes for this metadata entity
-     * @returns {*}
-     */
-    update(subject, predicate, values, vocabulary) {
-        if (!subject || !predicate || !values) {
-            return Promise.reject(Error("No subject, predicate or values given"));
-        }
-
-        const request = (values.length === 0)
-            ? fetch(this.getStatementsUrl()
-                + '?subject=' + encodeURIComponent(subject)
-                + '&predicate=' + encodeURIComponent(predicate), {method: 'DELETE', credentials: 'same-origin'})
-            : fetch(this.getStatementsUrl(), {
-                method: 'PATCH',
-                headers: new Headers({'Content-type': 'application/ld+json'}),
-                credentials: 'same-origin',
-                body: JSON.stringify(toJsonLd(subject, predicate, values, vocabulary))
-            });
-
-        return request.then(failOnHttpError("Failure when updating metadata"));
+            .then(expand)
+            .then(normalizeTypes);
     }
 
     /**
@@ -95,7 +67,7 @@ class LinkedDataAPI {
 
         const initialValuesJsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
 
-        return this.patchMetadata([...initialValuesJsonLd, {'@id': subject, '@type': type}])
+        return this.patch([...initialValuesJsonLd, {'@id': subject, '@type': type}])
             .then(failOnHttpError("Failure when creating entity"));
     }
 
@@ -118,7 +90,7 @@ class LinkedDataAPI {
 
         const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
 
-        return this.patchMetadata(jsonLd)
+        return this.patch(jsonLd)
             .then(failOnHttpError("Failure when updating metadata"));
     }
 
@@ -140,7 +112,8 @@ class LinkedDataAPI {
         return fetch(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(expand);
+            .then(expand)
+            .then(normalizeTypes);
     }
 
     /**
@@ -157,7 +130,8 @@ class LinkedDataAPI {
         return fetch(this.getEntitiesUrl() + "?catalog", LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving entities"))
             .then(response => response.json())
-            .then(expand);
+            .then(expand)
+            .then(normalizeTypes);
     }
 
     /**
@@ -165,7 +139,7 @@ class LinkedDataAPI {
      * @param jsonLd
      * @returns {Promise<Response>}
      */
-    patchMetadata(jsonLd) {
+    patch(jsonLd) {
         return fetch(this.getStatementsUrl(), {
             method: 'PATCH',
             headers: new Headers({'Content-type': 'application/ld+json'}),

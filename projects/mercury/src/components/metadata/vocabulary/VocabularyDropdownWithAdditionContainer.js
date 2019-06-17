@@ -2,15 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import InputWithAddition from "../common/values/InputWithAddition";
-import VocabularyDropdownContainer from "./VocabularyDropdownContainer";
+import LinkedDataDropdown from "../common/LinkedDataDropdown";
 import {
     getMetaVocabulary,
     hasMetaVocabularyError,
     isMetaVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
-import {createVocabularyIri} from "../../../utils/linkeddata/metadataUtils";
+import {createVocabularyIri, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import {createVocabularyEntityFromState, fetchVocabularyEntitiesIfNeeded} from "../../../actions/vocabularyActions";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
+import {ErrorDialog} from "../../common";
+import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 
 const VocabularyDropdownWithAdditionContainer = props => (
     <InputWithAddition
@@ -22,10 +24,11 @@ const VocabularyDropdownWithAdditionContainer = props => (
         fetchEntities={props.fetchEntities}
         error={props.error}
         pending={props.pending}
+        onError={props.onError}
+        requireIdentifier={false}
     >
-        <VocabularyDropdownContainer
+        <LinkedDataDropdown
             property={props.property}
-            entry={props.entry}
             onChange={props.onChange}
         />
     </InputWithAddition>
@@ -35,7 +38,6 @@ VocabularyDropdownWithAdditionContainer.propTypes = {
     shape: PropTypes.object.isRequired,
     emptyData: PropTypes.array.isRequired,
     property: PropTypes.object.isRequired,
-    entry: PropTypes.object,
     onChange: PropTypes.func.isRequired,
     onCreate: PropTypes.func.isRequired,
 
@@ -48,17 +50,24 @@ const mapStateToProps = (state, ownProps) => {
     const pending = isMetaVocabularyPending(state);
     const error = hasMetaVocabularyError(state);
 
-    const shape = (!pending && !error) ? metaVocabulary.determineShapeForType(ownProps.property.className) : {};
+    const shape = (!pending && !error) ? metaVocabulary.determineShapeForTypes([ownProps.property.className]) : {};
     const emptyData = emptyLinkedData(metaVocabulary, shape);
 
-    return {pending, error, shape, emptyData};
+    const onError = (e, id) => {
+        if (e.details) {
+            ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createVocabularyIri(id)), e.message);
+        } else {
+            ErrorDialog.showError(e, `Error creating a new vocabulary.\n${e.message}`);
+        }
+    };
+
+    return {pending, error, shape, emptyData, onError};
 };
 
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchEntities: fetchVocabularyEntitiesIfNeeded,
-    onCreate: (formKey, shape, id) => {
-        const subject = createVocabularyIri(id);
+    onCreate: (formKey, shape, subject) => {
         const type = ownProps.property.className;
         return dispatch(createVocabularyEntityFromState(formKey, subject, type));
     }

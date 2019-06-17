@@ -19,12 +19,15 @@ class BaseInputValue extends React.Component {
     }
 
     handleBlur = () => {
-        const {onChange, transformValue, entry: {value: oldValue}} = this.props;
+        const {onChange, entry: {value: oldValue}, property} = this.props;
         const {value: newValue} = this.state;
 
-        // only if values don't match OR if the inputted value is empty AND already had value (removed existing)
-        if (transformValue(newValue) !== oldValue || (!transformValue(newValue) && oldValue)) {
-            onChange({value: transformValue(newValue)});
+        // Only store the new values if either
+        // 1: the property allows only a single value (Not to add empty values to properties accepting multiple values)
+        // 2: the new value is different from the old one
+        // 3: the user has removed the existing value
+        if (property.maxValuesCount === 1 || newValue !== oldValue || (!newValue && oldValue)) {
+            onChange({value: newValue});
             this.updateState();
         }
     }
@@ -34,7 +37,7 @@ class BaseInputValue extends React.Component {
     }
 
     render() {
-        const {entry, property, style, transformValue, ...otherProps} = this.props;
+        const {entry, property, style, ...otherProps} = this.props;
 
         return (
             <TextField
@@ -51,8 +54,7 @@ class BaseInputValue extends React.Component {
 }
 
 BaseInputValue.defaultProps = {
-    entry: {value: ''},
-    transformValue: v => v
+    entry: {value: ''}
 };
 
 export default BaseInputValue;

@@ -103,10 +103,20 @@ export const MOUSE_ENTER_MENU                       = 'MOUSE_ENTER_MENU';
 export const MOUSE_LEAVE_MENU                       = 'MOUSE_LEAVE_MENU';
 
 // Search
-export const PERFORM_SEARCH                         = 'PERFORM_SEARCH';
-export const PERFORM_SEARCH_PENDING                 = 'PERFORM_SEARCH_PENDING';
-export const PERFORM_SEARCH_FULFILLED               = 'PERFORM_SEARCH_FULFILLED';
-export const PERFORM_SEARCH_REJECTED                = 'PERFORM_SEARCH_REJECTED';
+export const COLLECTIONS_SEARCH                     = 'COLLECTIONS_SEARCH';
+export const COLLECTIONS_SEARCH_PENDING             = 'COLLECTIONS_SEARCH_PENDING';
+export const COLLECTIONS_SEARCH_FULFILLED           = 'COLLECTIONS_SEARCH_FULFILLED';
+export const COLLECTIONS_SEARCH_REJECTED            = 'COLLECTIONS_SEARCH_REJECTED';
+// +
+export const METADATA_SEARCH                        = 'METADATA_SEARCH';
+export const METADATA_SEARCH_PENDING                = 'METADATA_SEARCH_PENDING';
+export const METADATA_SEARCH_FULFILLED              = 'METADATA_SEARCH_FULFILLED';
+export const METADATA_SEARCH_REJECTED               = 'METADATA_SEARCH_REJECTED';
+// +
+export const VOCABULARY_SEARCH                      = 'VOCABULARY_SEARCH';
+export const VOCABULARY_SEARCH_PENDING              = 'VOCABULARY_SEARCH_PENDING';
+export const VOCABULARY_SEARCH_FULFILLED            = 'VOCABULARY_SEARCH_FULFILLED';
+export const VOCABULARY_SEARCH_REJECTED             = 'VOCABULARY_SEARCH_REJECTED';
 
 // Metadata editing
 export const INITIALIZE_LINKEDDATA_FORM             = 'INITIALIZE_LINKEDDATA_FORM';

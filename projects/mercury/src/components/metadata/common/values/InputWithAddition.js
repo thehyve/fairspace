@@ -5,10 +5,8 @@ import Icon from "@material-ui/core/Icon";
 import Grid from "@material-ui/core/Grid";
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/LoadingInlay";
-import ErrorMessage from "../../../common/ErrorMessage";
-import {ErrorDialog} from "../../../common";
-import {getFirstPredicateProperty} from "../../../../utils/linkeddata/jsonLdUtils";
-import * as constants from "../../../../constants";
+import MessageDisplay from "../../../common/MessageDisplay";
+import {normalizeMetadataResource, simplifyUriPredicates} from "../../../../utils/linkeddata/metadataUtils";
 
 class InputWithAddition extends React.Component {
     state = {
@@ -24,16 +22,16 @@ class InputWithAddition extends React.Component {
     };
 
     handleEntityCreation = (formKey, shape, id) => {
-        this.props.onCreate(formKey, shape, id)
-            .then(({value}) => {
-                const label = getFirstPredicateProperty(value.values, constants.LABEL_URI, 'value')
-                    || getFirstPredicateProperty(value.values, constants.SHACL_NAME, 'value');
+        const {property, fetchEntities, onChange, onCreate, onError} = this.props;
 
+        onCreate(formKey, shape, id)
+            .then(({value}) => {
+                const otherEntry = simplifyUriPredicates(normalizeMetadataResource(value.values));
                 this.handleCloseDialog();
-                this.props.fetchEntities(this.props.property.className);
-                this.props.onChange({id: value.subject, label});
+                fetchEntities(property.className);
+                onChange({id: value.subject, otherEntry});
             })
-            .catch(e => ErrorDialog.showError(e, `Error creating a new entity.\n${e.message}`));
+            .catch(e => onError(e, id));
     }
 
     renderAddFunctionality() {
@@ -42,7 +40,7 @@ class InputWithAddition extends React.Component {
         }
 
         if (this.props.error) {
-            return <ErrorMessage />;
+            return <MessageDisplay />;
         }
 
         return (
@@ -62,6 +60,7 @@ class InputWithAddition extends React.Component {
                     linkedData={this.props.emptyData}
                     onCreate={this.handleEntityCreation}
                     onClose={this.handleCloseDialog}
+                    requireIdentifier={this.props.requireIdentifier}
                 />
             </>
         );
@@ -70,10 +69,10 @@ class InputWithAddition extends React.Component {
     render() {
         return (
             <Grid container justify="space-between" spacing={8}>
-                <Grid item xs={11}>
+                <Grid item xs={10}>
                     {this.props.children}
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={2}>
                     {this.renderAddFunctionality()}
                 </Grid>
             </Grid>
@@ -88,9 +87,14 @@ InputWithAddition.propTypes = {
     onChange: PropTypes.func.isRequired,
     onCreate: PropTypes.func.isRequired,
     fetchEntities: PropTypes.func.isRequired,
+    requireIdentifier: PropTypes.bool,
 
     error: PropTypes.bool,
     pending: PropTypes.bool
+};
+
+InputWithAddition.defaultProps = {
+    requireIdentifier: true
 };
 
 export default InputWithAddition;

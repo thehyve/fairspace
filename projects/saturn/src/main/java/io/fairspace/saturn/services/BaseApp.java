@@ -8,6 +8,7 @@ import io.fairspace.saturn.auth.AuthorizationVerifier;
 import io.fairspace.saturn.rdf.dao.DAOException;
 import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import lombok.extern.slf4j.Slf4j;
+import spark.*;
 import spark.servlet.SparkApplication;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
@@ -17,6 +18,7 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
+import static spark.globalstate.ServletFlag.isRunningFromServlet;
 
 @Slf4j
 public abstract class BaseApp implements SparkApplication {
@@ -48,6 +50,7 @@ public abstract class BaseApp implements SparkApplication {
         exception(DAOException.class, exceptionHandler(SC_BAD_REQUEST, "Bad request"));
         exception(UnsupportedMediaTypeException.class, exceptionHandler(SC_UNSUPPORTED_MEDIA_TYPE, null));
         exception(AccessDeniedException.class, exceptionHandler(SC_UNAUTHORIZED, null));
+        exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
 
     /**
@@ -59,5 +62,22 @@ public abstract class BaseApp implements SparkApplication {
         this.pathSpec = pathSpec;
         authorizationVerifier = verifier;
         return this;
+    }
+
+    // A temporary workaround for https://github.com/perwendel/spark/issues/1062
+    // Shadows spark.Spark.exception
+    public static <T extends Exception> void exception(Class<T> exceptionClass, ExceptionHandler<? super T> handler) {
+        if (isRunningFromServlet()) {
+            var wrapper = new ExceptionHandlerImpl<>(exceptionClass) {
+                @Override
+                public void handle(T exception, Request request, Response response) {
+                    handler.handle(exception, request, response);
+                }
+            };
+
+            ExceptionMapper.getServletInstance().map(exceptionClass, wrapper);
+        } else {
+            Spark.exception(exceptionClass, handler);
+        }
     }
 }

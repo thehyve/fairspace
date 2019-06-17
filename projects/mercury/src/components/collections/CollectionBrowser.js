@@ -5,14 +5,14 @@ import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 
 import {
-    ErrorDialog, ErrorMessage,
+    ErrorDialog, MessageDisplay,
     CollectionEditor,
     LoadingInlay, LoadingOverlay
 } from "../common";
 import CollectionList from "./CollectionList";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as collectionActions from "../../actions/collectionActions";
-import {findById} from "../../utils/arrayUtils";
+import {findById} from "../../utils/genericUtils";
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import Config from "../../services/Config/Config";
 
@@ -86,7 +86,7 @@ class CollectionBrowser extends React.Component {
         const {loading, error} = this.props;
 
         if (error) {
-            return <ErrorMessage message="An error occurred while loading collections" />;
+            return <MessageDisplay message="An error occurred while loading collections" />;
         }
 
         return (

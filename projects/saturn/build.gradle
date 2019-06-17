@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        jena_version = '3.10.0'
-        milton_version = '2.7.4.4'
+        jena_version = '3.11.0'
+        milton_version = '2.7.4.8'
         mockitoVersion = '2.23.0'
         jacksonVersion = '2.9.8'
     }
@@ -13,6 +13,7 @@ plugins {
     id 'application'
     id 'jacoco'
     id  'com.github.spotbugs' version '1.6.10'
+    id "org.owasp.dependencycheck" version "5.0.0-M3.1"
 }
 
 group 'io.fairspace'
@@ -40,13 +41,15 @@ dependencies {
     implementation "org.apache.jena:jena-text:${jena_version}"
     implementation "org.apache.jena:jena-text-es:${jena_version}"
     implementation "io.milton:milton-server-ce:${milton_version}"
-    implementation 'com.nimbusds:nimbus-jose-jwt:5.7'
+    implementation 'com.nimbusds:nimbus-jose-jwt:7.1'
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-    implementation "com.sparkjava:spark-core:2.7.2"
+    implementation "com.sparkjava:spark-core:2.9.0"
     implementation 'com.pivovarit:throwing-function:1.5.0'
     implementation 'com.google.guava:guava:27.1-jre'
     implementation 'org.topbraid:shacl:1.0.1'
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.11.1'
+
 
 
     testImplementation "junit:junit:4.12"

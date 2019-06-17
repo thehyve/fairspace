@@ -164,6 +164,10 @@ pluto:
     ui:
     saturn:
 
+  # Zuul timeouts when connecting to upstream services
+  socketTimeoutMillis: 15000
+  connectTimeoutMillis: 2000
+
 #####################################################################
 # Specific settings for Saturn subchart
 #####################################################################
