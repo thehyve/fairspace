@@ -40,6 +40,20 @@ describe('FileOperations', () => {
                 expect(fetchFilesIfNeeded.mock.calls[0][0]).toEqual('opened/Path');
             });
     });
+
+    it('should disable all buttons after on file operation', () => {
+
+        const wrapper = shallow(<FileOperations
+            classes={{}}
+            selectedPaths={[]}
+            openedPath="opened/Path"
+            getDownloadLink={() => {}}
+        />);
+
+        return wrapper.instance().handlePaste({})
+            .then(() => {
+            });
+    });
 });
 
 describe('handleCreateDirectory', () => {

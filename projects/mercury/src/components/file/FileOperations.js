@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from "react-router-dom";
-import {Badge, Icon, IconButton, Grid} from "@material-ui/core";
+import {Badge, Icon, IconButton} from "@material-ui/core";
 import {ContentCopy, ContentCut, ContentPaste, Download} from "mdi-material-ui";
 import {withStyles} from '@material-ui/core/styles';
 import classNames from 'classnames';
@@ -172,7 +172,6 @@ export class FileOperations extends React.Component {
                         </DeleteButton>
                     </ProgressButton>
                 </div>
-
                 <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}>
                     <IconButton
                         aria-label="Copy"
@@ -201,7 +200,7 @@ export class FileOperations extends React.Component {
                         </IconButton>
                     </ProgressButton>
                 </div>
-                <div className={classes.buttonsContainer} style={{float: 'right'}}>
+                <div className={classes.buttonsContainer} style={{float: 'right', minWidth: 'unset'}}>
                     <ProgressButton active={op === Operations.MKDIR}>
                         <CreateDirectoryButton
                             onCreate={name => this.handleCreateDirectory(name)}
