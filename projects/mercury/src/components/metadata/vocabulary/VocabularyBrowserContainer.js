@@ -69,7 +69,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
         if (e.details) {
             ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createVocabularyIri(id)), e.message);
         } else {
-            ErrorDialog.showError(e, `Error creating a new vocabulary.\n${e.message}`);
+            ErrorDialog.showError(e, `Error creating a new vocabulary entry.\n${e.message}`);
         }
     };
 
