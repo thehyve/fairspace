@@ -8,7 +8,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.util.FileManager;
 
-import java.util.List;
+import java.util.Set;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
@@ -42,8 +42,8 @@ public class Vocabularies {
         });
     }
 
-    public static List<String> getMachineOnlyPredicates(RDFConnection rdf, Node vocabularyGraphUri) {
-        return select(rdf, storedQuery("machine_only_properties", vocabularyGraphUri),
+    public static Set<String> getMachineOnlyPredicates(RDFConnection rdf, Node vocabularyGraphUri) {
+        return selectDistinct(rdf, storedQuery("machine_only_properties", vocabularyGraphUri),
                 row -> row.getResource("property").getURI());
     }
 

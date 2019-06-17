@@ -1,0 +1,9 @@
+# 0 - vocabulary graph
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
+SELECT ?class
+WHERE {
+    GRAPH vocabulary: { ?shape sh:targetClass ?class ; fs:machineOnly true . }
+}

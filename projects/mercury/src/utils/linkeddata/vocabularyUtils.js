@@ -92,7 +92,7 @@ export const vocabularyUtils = (vocabulary = []) => {
     /**
      * Returns a list of classes marked as fairspace entities
      */
-    const getClassesInCatalog = () => vocabulary.filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI));
+    const getClassesInCatalog = () => vocabulary.filter(entry => !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI));
 
     /**
      * Returns a list of classes marked as fairspace entities

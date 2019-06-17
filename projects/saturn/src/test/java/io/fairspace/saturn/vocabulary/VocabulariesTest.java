@@ -4,20 +4,16 @@ import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.util.FileManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
-import java.util.List;
+import java.util.Set;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
@@ -26,7 +22,6 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabulariesTest {
@@ -75,7 +70,7 @@ public class VocabulariesTest {
         model.add(shape2, SH.path, property2);
         model.add(shape1, FS.machineOnly, createTypedLiteral(true));
 
-        assertEquals(List.of(property1.getURI()), getMachineOnlyPredicates(rdf, graph));
+        assertEquals(Set.of(property1.getURI()), getMachineOnlyPredicates(rdf, graph));
     }
 
     private void validate(Model dataModel, Model shapesModel) throws InterruptedException {

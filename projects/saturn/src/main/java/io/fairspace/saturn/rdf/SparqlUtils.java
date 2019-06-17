@@ -127,8 +127,14 @@ public class SparqlUtils {
         return values;
     }
 
+    public static <T> Set<T> selectDistinct(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+        var values = new HashSet<T>();
+        rdf.querySelect(query, row -> values.add(valueExtractor.apply(row)));
+        return values;
+    }
+
     public static <T> Optional<T> selectSingle(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
-        var values = select(rdf, query, valueExtractor);
+        var values = selectDistinct(rdf, query, valueExtractor);
         if (values.size() > 1) {
             throw new IllegalStateException("Too many values: " + values.size());
         }
