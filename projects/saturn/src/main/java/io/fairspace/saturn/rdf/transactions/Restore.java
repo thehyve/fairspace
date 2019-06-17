@@ -8,7 +8,7 @@ import static org.apache.jena.system.Txn.executeWrite;
 
 @Slf4j
 public class Restore {
-    public static void restore(DatasetGraph dsg, LocalTransactionLog txnLog) {
+    public static void restore(DatasetGraph dsg, TransactionLog txnLog) {
         var logSize = txnLog.size();
 
         if (logSize == 0) {

@@ -9,6 +9,46 @@
 @prefix schema: <http://www.schema.org/> .
 
 ########################
+### Fixed Namespaces ###
+########################
+
+fs:FOAF-Namespace a sh:PrefixDeclaration ;
+   sh:name "Friend of a friend (FOAF)" ;
+   sh:prefix "foaf" ;
+   fs:fixedShape true ;
+   sh:namespace <http://xmlns.com/foaf/0.1/> .
+
+fs:RDF-Namespace a sh:PrefixDeclaration ;
+   sh:name "RDF" ;
+   sh:prefix "rdf" ;
+   fs:fixedShape true ;
+   sh:namespace <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+fs:RDFS-Namespace a sh:PrefixDeclaration ;
+   sh:name "RDF Schema (RDFS)" ;
+   sh:prefix "rdfs" ;
+   fs:fixedShape true ;
+   sh:namespace <http://www.w3.org/2000/01/rdf-schema#> .
+
+fs:XSD-Namespace a sh:PrefixDeclaration ;
+   sh:name "XSD" ; 
+   sh:prefix "xsd" ;
+   fs:fixedShape true ;
+   sh:namespace <http://www.w3.org/2001/XMLSchema#> .
+
+fs:Schema-Namespace a sh:PrefixDeclaration ;
+   sh:name "schema.org" ; 
+   sh:prefix "schema" ;
+   fs:fixedShape true ;
+   sh:namespace <http://schema.org/> .
+
+fs:Fairspace-Namespace a sh:PrefixDeclaration ;
+   sh:name "Fairspace (global)" ; 
+   sh:prefix "fs" ;
+   fs:fixedShape true ;
+   sh:namespace <http://fairspace.io/ontology#> .
+
+########################
 ###   Fixed Shapes   ###
 ########################
 
@@ -134,6 +174,7 @@ fs:labelShape a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
     fs:fixedShape true ;
+    fs:importantProperty true ;
     sh:path rdfs:label . 
  
 fs:commentShape a fs:DatatypePropertyShape ;

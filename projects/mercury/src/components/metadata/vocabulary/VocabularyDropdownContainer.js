@@ -1,34 +1,39 @@
-import React, {useState, useEffect} from "react";
+import React from "react";
+import {connect} from 'react-redux';
 
 import LinkedDataDropdown from "../common/LinkedDataDropdown";
-import searchAPI from "../../../services/SearchAPI";
 import {LoadingInlay, MessageDisplay} from "../../common";
-import {SEARCH_MAX_SIZE} from "../../../constants";
+import {getMetaVocabulary, hasMetaVocabularyError, isMetaVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 
-const VocabularyDropdownContainer = (props) => {
-    const [types, setTypes] = useState(null);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        setTypes(null);
-        setError(null);
-        searchAPI()
-            .searchLinkedDataOfSubclass({subClassOf: [props.property.className], size: SEARCH_MAX_SIZE})
-            .then(({items}) => {
-                setTypes(items.map(({id}) => id));
-            })
-            .catch(setError);
-    }, [props.property.className]);
-
+const VocabularyDropdownContainer = ({types, loading, error, ...otherProps}) => {
     if (error) {
         return <MessageDisplay withIcon={false} message={error.message} />;
     }
 
-    if (!types) {
+    if (loading) {
         return <LoadingInlay />;
     }
 
-    return types && <LinkedDataDropdown {...props} types={types} />;
+    return types && <LinkedDataDropdown types={types} {...otherProps} />;
 };
 
-export default VocabularyDropdownContainer;
+const mapStateToProps = (state, {property}) => {
+    const metaVocabulary = getMetaVocabulary(state);
+    const loading = isMetaVocabularyPending(state);
+    const loadingError = hasMetaVocabularyError(state);
+
+    if (loadingError) {
+        return {
+            error: {message: 'Unable to fetch options'}
+        };
+    }
+
+    const types = metaVocabulary.getDescendants(property.className);
+
+    return {
+        loading,
+        types
+    };
+};
+
+export default connect(mapStateToProps)(VocabularyDropdownContainer);

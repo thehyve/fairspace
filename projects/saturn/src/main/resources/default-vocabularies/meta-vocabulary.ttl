@@ -23,16 +23,19 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:maxLength 128 ;
         sh:minCount 1 ;
-        sh:path sh:name ; 
-        sh:name "Class name"
+        sh:path sh:name ;
+        sh:name "Class name" ;
+        sh:order 1
     ], [
         # This means every value for predicate sh:property should have this type.
+        a fs:RelationShape ;
         sh:class sh:PropertyShape ;
         sh:minCount 1 ;
         sh:path sh:property ;
         sh:name "Properties" ; 
         sh:description "List of all properties and relations for this class." ;
-        fs:showAsTable true
+        fs:showAsTable true ;
+        sh:order 3
     ], [
         # This nodeKind restriction could be replaced by something like
         # sh:class fs:Class. Currently that restriction will limit our
@@ -42,13 +45,15 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:path sh:targetClass ; 
         sh:name "Target class" ;
-        sh:description "IRI of the class this shape constrains."
+        sh:description "IRI of the class this shape constrains." ;
+        sh:order 0
     ], [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:path sh:description ;
-        sh:name "Class description"
+        sh:name "Class description" ;
+        sh:order 2
     ], [
         sh:datatype xsd:boolean ;
         sh:maxCount 1 ;
@@ -70,6 +75,7 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape, 
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
     [
         sh:maxCount 1 ;
@@ -97,17 +103,11 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape, 
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
+        fs:DatatypeShape,
     [
-        sh:path sh:datatype ;
-        # direct controlled vocabulary approach
-        sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
-        sh:name "Datatype" ;
-        fs:showInTable true ;
-        sh:maxCount 1 ;
-        sh:minCount 1 ;
-        sh:order 2
-    ], [
+
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
         sh:maxCount 1 ;
@@ -126,6 +126,7 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         fs:MinCountShape,
         fs:MaxCountShape,
         fs:DescriptionShape,
+        fs:ImportantPropertyShape,
         fs:PathShape,
     [
         sh:path sh:in ;
@@ -136,7 +137,8 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         sh:property [
             sh:path ( [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
             sh:minLength 1 ;
-        ]
+        ] ;
+        sh:order 3 
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:ControlledVocabularyPropertyShape ;
@@ -162,12 +164,37 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:name "Class target" ;
-        fs:showInTable true ;
-        sh:order 2
+        fs:importantProperty true ;
+        sh:order 3
     ] ;
     fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
+
+sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
+    sh:targetClass sh:PrefixDeclaration ; 
+    sh:closed true ;
+    sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
+    sh:name "Namespace" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:fixedShape ) ;
+    fs:showInCatalog true ;
+    sh:property fs:PropertyNameShape ;
+    sh:property [
+      sh:name "Prefix" ;
+      sh:maxLength 24 ;
+      sh:minCount 1 ; 
+      sh:maxCount 1 ; 
+      sh:datatype xsd:string ;
+      sh:path sh:prefix 
+    ] ;
+    sh:property [
+      sh:name "Namespace IRI" ;
+      sh:minCount 1 ; 
+      sh:maxCount 1 ; 
+      sh:nodeKind sh:IRI ;
+      fs:externalLink true ; 
+      sh:path sh:namespace 
+    ] .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
@@ -203,6 +230,15 @@ fs:ShapeIsAClosedShape a sh:PropertyShape ;
   sh:description "A fs:ClassShape shape cannot be defined as sh:closed true." ;
   sh:path sh:closed .
 
+fs:PathShape a sh:PropertyShape ; 
+  sh:maxCount 1 ;
+  sh:minCount 1 ;
+  sh:path sh:path ;
+  sh:nodeKind sh:IRI ;
+  sh:name "Property identifier" ;
+  fs:importantProperty true ;
+  sh:order 0 .
+
 fs:PropertyNameShape a sh:PropertyShape ;
   sh:datatype xsd:string ;
   sh:maxCount 1 ;
@@ -210,24 +246,8 @@ fs:PropertyNameShape a sh:PropertyShape ;
   sh:minCount 1 ;
   sh:path sh:name ;
   sh:name "Property name" ;
-  fs:showInTable true ;
-  sh:order 0 .
-
-fs:MinCountShape a sh:PropertyShape ; 
-  sh:datatype xsd:integer ;
-  sh:path sh:minCount ;
-  sh:maxInclusive 1 ;
-  sh:maxCount 1 ;
-  sh:lessThanOrEquals sh:maxCount ;
-  sh:name "Minimum number of values" .
-
-fs:MaxCountShape a sh:PropertyShape ; 
-  sh:datatype xsd:integer ;
-  sh:path sh:maxCount ;
-  sh:maxCount 1 ;
-  sh:greaterThanOrEquals sh:minCount ;
-  sh:minInclusive 1 ;
-  sh:name "Maximum number of values" . 
+  fs:importantProperty true ;
+  sh:order 1 .
 
 fs:DescriptionShape a sh:PropertyShape ; 
   sh:datatype xsd:string ;
@@ -235,18 +255,42 @@ fs:DescriptionShape a sh:PropertyShape ;
   sh:minCount 1 ;
   sh:path sh:description ;
   sh:name "Property description" ;
-  fs:showInTable true ;
-  sh:order 1 .
+  fs:importantProperty true ;
+  sh:order 2 .
 
-fs:PathShape a sh:PropertyShape ; 
+fs:MinCountShape a sh:PropertyShape ; 
+  sh:datatype xsd:integer ;
+  sh:path sh:minCount ;
+  sh:maxInclusive 1 ;
   sh:maxCount 1 ;
-  sh:minCount 1 ;
-  sh:path sh:path ;
-  sh:nodeKind sh:IRI ;
-  sh:name "Property identifier" ;
-  fs:showInTable true ;
-  sh:order 3 .
+  sh:lessThanOrEquals sh:maxCount ;
+  sh:name "Minimum number of values" ;
+  sh:order 9 .
 
+fs:MaxCountShape a sh:PropertyShape ; 
+  sh:datatype xsd:integer ;
+  sh:path sh:maxCount ;
+  sh:maxCount 1 ;
+  sh:greaterThanOrEquals sh:minCount ;
+  sh:minInclusive 1 ;
+  sh:name "Maximum number of values" ; 
+  sh:order 10 . 
+
+fs:ImportantPropertyShape a sh:PropertyShape ;
+  sh:datatype xsd:boolean ;
+  sh:maxCount 1 ;
+  sh:path fs:importantProperty ;
+  sh:name "Show this property as a column in a table " .
+
+fs:DatatypeShape a sh:PropertyShape ;
+    sh:path sh:datatype ;
+    # direct controlled vocabulary approach
+    sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
+    sh:name "Datatype" ;
+    fs:importantProperty true ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:order 3 .
 
 # Definitions of our shape types, needed
 # for form building
@@ -255,3 +299,18 @@ fs:DatatypePropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:ControlledVocabularyPropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:ExternalIRIPropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:RelationShape rdfs:subClassOf sh:PropertyShape .
+
+# Definition for property shape, used to render a table with properties
+sh:PropertyShape
+    sh:targetClass sh:PropertyShape ;
+    sh:property
+        fs:PropertyNameShape,
+        fs:DescriptionShape,
+        fs:PathShape,
+        [
+            sh:path sh:datatype ;
+            sh:name "Datatype" ;
+            fs:importantProperty true ;
+            sh:order 2
+        ] .
+

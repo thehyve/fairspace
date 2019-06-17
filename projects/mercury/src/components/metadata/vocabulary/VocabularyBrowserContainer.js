@@ -14,11 +14,11 @@ import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog, MessageDisplay} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import {getVocabularySearchResults} from "../../../reducers/searchReducers";
-import VocabularyList from "./VocabularyList";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
+import LinkedDataList from "../common/LinkedDataList";
 
-const openVocabulary= (history, id) => {
+const openVocabulary = (history, id) => {
     history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
 };
 
@@ -31,12 +31,13 @@ const VocabularyBrowserContainer = (
                 {
                     entities && entities.length > 0
                         ? (
-                            <VocabularyList
+                            <LinkedDataList
                                 items={entities}
                                 total={total}
                                 hasHighlights={hasHighlights}
                                 footerRender={footerRender}
-                                onVocabularyOpen={id => openVocabulary(history, id)}
+                                typeRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
+                                onOpen={id => openVocabulary(history, id)}
                             />
                         )
                         : <MessageDisplay message="The vocabulary is empty" isError={false} />
@@ -51,16 +52,16 @@ const mapStateToProps = (state, {metaVocabulary}) => {
     const entities = items.map((
         {id, name, description, type, highlights}
     ) => {
-        const shape = type[0] ? metaVocabulary.determineShapeForType(type[0]) : {};
+        const shape = metaVocabulary.determineShapeForTypes(type) || {};
         const typeLabel = getLabel(shape, true);
         const typeUrl = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
 
         return {
             id,
-            name,
+            primaryText: name,
+            secondaryText: description,
             typeLabel,
             typeUrl,
-            description,
             highlights
         };
     });
@@ -88,8 +89,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchLinkedData: () => dispatch(searchVocabulary({query: '*', types: ownProps.targetClasses})),
     fetchShapes: () => {},
-    create: (formKey, shape, id) => {
-        const subject = id && createVocabularyIri(id);
+    create: (formKey, shape, subject) => {
         const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
 
         return dispatch(createVocabularyEntityFromState(formKey, subject, type))

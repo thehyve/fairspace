@@ -23,7 +23,7 @@ export class SearchAPI {
      * @param types     List of class URIs to search for. If empty, it returns all types
      * @return Promise
      */
-    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, subClassOf}) => {
+    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
@@ -34,31 +34,16 @@ export class SearchAPI {
                     exists: {
                         field: "dateDeleted"
                     }
-                },
-                filter: []
+                }
             }
         };
 
         // Add types filter, if specified
         if (types && Array.isArray(types)) {
             esQuery.bool.filter = [
-                ...esQuery.bool.filter,
                 {
-                    ...esQuery.bool.filter.terms,
                     terms: {
                         "type.keyword": types
-                    }
-                }
-            ];
-        }
-
-        if (subClassOf && Array.isArray(subClassOf)) {
-            esQuery.bool.filter = [
-                ...esQuery.bool.filter,
-                {
-                    ...esQuery.bool.filter.terms,
-                    terms: {
-                        "subClassOf.keyword": subClassOf
                     }
                 }
             ];
@@ -106,16 +91,6 @@ export class SearchAPI {
         query,
         size,
         types,
-        from: page * size
-    });
-
-    /**
-     * @returns {Promise}
-     */
-    searchLinkedDataOfSubclass = ({subClassOf, query, size = SEARCH_DEFAULT_SIZE, page = 0}) => this.search({
-        subClassOf,
-        query,
-        size,
         from: page * size
     });
 

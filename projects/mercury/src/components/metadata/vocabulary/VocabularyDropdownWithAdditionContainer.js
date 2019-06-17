@@ -50,7 +50,7 @@ const mapStateToProps = (state, ownProps) => {
     const pending = isMetaVocabularyPending(state);
     const error = hasMetaVocabularyError(state);
 
-    const shape = (!pending && !error) ? metaVocabulary.determineShapeForType(ownProps.property.className) : {};
+    const shape = (!pending && !error) ? metaVocabulary.determineShapeForTypes([ownProps.property.className]) : {};
     const emptyData = emptyLinkedData(metaVocabulary, shape);
 
     const onError = (e, id) => {
@@ -67,8 +67,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchEntities: fetchVocabularyEntitiesIfNeeded,
-    onCreate: (formKey, shape, id) => {
-        const subject = id && createVocabularyIri(id);
+    onCreate: (formKey, shape, subject) => {
         const type = ownProps.property.className;
         return dispatch(createVocabularyEntityFromState(formKey, subject, type));
     }

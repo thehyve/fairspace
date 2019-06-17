@@ -31,6 +31,7 @@ export const RDF_TYPE = RDF_NS + 'type';
 export const TYPE_URI = RDF_NS + 'type';
 export const LABEL_URI = RDFS_NS + 'label';
 export const COMMENT_URI = RDFS_NS + 'comment';
+export const SUBCLASS_URI = RDFS_NS + 'subClassOf';
 
 export const SHACL_NAME = SHACL_NS + 'name';
 export const SHACL_DESCRIPTION = SHACL_NS + 'description';
@@ -46,6 +47,10 @@ export const SHACL_MIN_COUNT = SHACL_NS + 'minCount';
 export const SHACL_MAX_LENGTH = SHACL_NS + 'maxLength';
 export const SHACL_IN = SHACL_NS + 'in';
 export const SHACL_IRI = SHACL_NS + 'IRI';
+export const SHACL_ORDER = SHACL_NS + 'order';
+export const SHACL_PREFIX = SHACL_NS + 'prefix';
+export const SHACL_NAMESPACE = SHACL_NS + 'namespace';
+export const SHACL_PREFIX_DECLARATION = SHACL_NS + 'PrefixDeclaration';
 
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
 
@@ -69,5 +74,7 @@ export const DELETED_BY_URI = FAIRSPACE_NS + 'deletedBy';
 export const FIXED_SHAPE_URI = FAIRSPACE_NS + 'fixedShape';
 export const EXTERNAL_LINK_URI = FAIRSPACE_NS + 'externalLink';
 export const SYSTEM_PROPERTIES_URI = FAIRSPACE_NS + 'systemProperties';
+export const RELATION_SHAPE_URI = FAIRSPACE_NS + 'RelationShape';
+export const IMPORTANT_PROPERTY_URI = FAIRSPACE_NS + 'importantProperty';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';
