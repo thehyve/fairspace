@@ -1,36 +1,39 @@
-import React from 'react';
+import React from "react";
 import {connect} from 'react-redux';
-import * as metadataActions from "../../../actions/metadataActions";
-import EntityDropdown from "../common/values/EntityDropdown";
 
-class MetadataDropdownContainer extends React.Component {
-    constructor(props) {
-        super(props);
-        props.fetchEntities(props.property.className);
+import LinkedDataDropdown from "../common/LinkedDataDropdown";
+import {LoadingInlay, MessageDisplay} from "../../common";
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+
+const MetadataDropdownContainer = ({types, loading, error, ...otherProps}) => {
+    if (error) {
+        return <MessageDisplay withIcon={false} message={error.message} />;
     }
 
-    render() {
-        return <EntityDropdown {...this.props} />;
+    if (loading) {
+        return <LoadingInlay />;
     }
-}
 
-const mapStateToProps = (state, ownProps) => {
-    const {cache: {entitiesByType}} = state;
-    const dropdownOptions = entitiesByType[ownProps.property.className];
-    const pending = !dropdownOptions || dropdownOptions.pending;
-    const error = (dropdownOptions && dropdownOptions.error) || '';
+    return types && <LinkedDataDropdown types={types} {...otherProps} />;
+};
 
-    const entities = (!pending && !error) ? dropdownOptions.data : [];
+const mapStateToProps = (state, {property}) => {
+    const vocabulary = getVocabulary(state);
+    const loading = isVocabularyPending(state);
+    const loadingError = hasVocabularyError(state);
+
+    if (loadingError) {
+        return {
+            error: {message: 'Unable to fetch options'}
+        };
+    }
+
+    const types = vocabulary.getDescendants(property.className);
 
     return {
-        pending,
-        error,
-        entities,
+        loading,
+        types
     };
 };
 
-const mapDispatchToProps = ({
-    fetchEntities: metadataActions.fetchEntitiesIfNeeded
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(MetadataDropdownContainer);
+export default connect(mapStateToProps)(MetadataDropdownContainer);

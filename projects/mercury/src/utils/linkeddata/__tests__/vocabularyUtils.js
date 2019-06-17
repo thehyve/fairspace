@@ -3,8 +3,8 @@ import {
     getMaxCount,
     getSystemProperties,
     isGenericIriResource,
-    isRdfList,
-    vocabularyUtils
+    isRdfList, isRelationShape,
+    vocabularyUtils,
 } from '../vocabularyUtils';
 import vocabularyJsonLd from '../test.vocabulary.json';
 import * as constants from "../../../constants";
@@ -134,6 +134,42 @@ describe('vocabularyUtils', () => {
         it('should set deletable flag for values for SHACL_PROPERTY', () => {
             const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
             expect(extendedProperties[2].values).toEqual([{id: 'http://custom', isDeletable: true}, {id: 'http://fixed', isDeletable: false}]);
+        });
+    });
+
+    describe('isRelationShape', () => {
+        it('should return true for relation shapes', () => {
+            expect(isRelationShape({'@type': [constants.RELATION_SHAPE_URI]})).toBe(true);
+            expect(isRelationShape({'@type': ['http://someShape', constants.RELATION_SHAPE_URI]})).toBe(true);
+        });
+        it('should return false for other types of shapes', () => {
+            expect(isRelationShape({'@type': ['http://other-type']})).toBe(false);
+            expect(isRelationShape({'@type': []})).toBe(false);
+            expect(isRelationShape({})).toBe(false);
+        });
+    });
+    
+    describe('Class hierarchy (subclasses and descendants)', () => {
+        const type = 'http://www.w3.org/ns/shacl#PropertyShape';
+        const subClasses = ["http://fairspace.io/ontology#ControlledVocabularyPropertyShape", "http://fairspace.io/ontology#DatatypePropertyShape"];
+        const subcSubClasess = ["http://fairspace.io/ontology#SpecialDatatypePropertyShape", "http://fairspace.io/ontology#AVerySpecialDatatypePropertyShape"];
+
+        describe('getChildSubclasses', () => {
+            it('should extracts the direct subclasses of the type and avoids deep or indirect subclasses', () => {
+                const childClasses = vocabulary.getChildSubclasses(type);
+
+                expect(childClasses).toEqual(expect.arrayContaining(subClasses));
+                expect(childClasses).not.toEqual(expect.arrayContaining(subcSubClasess));
+            });
+        });
+
+        describe('getDescendants', () => {
+            it('should extracts the full class hierarchy for the given type', () => {
+                const classHierarchy = vocabulary.getDescendants(type);
+
+                expect(classHierarchy).toEqual(expect.arrayContaining([...subClasses, ...subcSubClasess]));
+                expect(classHierarchy).not.toEqual(expect.arrayContaining(["http://fairspace.io/ontology#File"]));
+            });
         });
     });
 });

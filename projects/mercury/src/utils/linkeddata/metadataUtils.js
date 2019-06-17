@@ -1,7 +1,18 @@
-import _ from 'lodash';
+import _, {mapValues} from 'lodash';
 
 import * as consts from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+
+/**
+ * Returns the local part of the given uri
+ * @param uri
+ * @returns {string}
+ */
+export const getLocalPart = uri => (
+    uri.includes('#')
+        ? uri.substring(uri.lastIndexOf('#') + 1)
+        : uri.substring(uri.lastIndexOf('/') + 1)
+);
 
 /**
  *
@@ -24,15 +35,8 @@ export function linkLabel(uri, shortenExternalUris = false) {
         }
     }
 
-    if (shortenExternalUris) {
-        return uri.includes('#')
-            ? uri.substring(uri.lastIndexOf('#') + 1)
-            : uri.substring(uri.lastIndexOf('/') + 1);
-    }
-
-    return uri;
+    return shortenExternalUris ? getLocalPart(uri) : uri;
 }
-
 
 /**
  * Returns the label for the given entity.
@@ -78,8 +82,14 @@ export function generateUuid() {
         c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
 }
 
-export function isValidLinkedDataIdentifier(id, prefix = 'http://example.com/') {
-    return new URL(`${prefix}${id}`).toString() === `${prefix}${id}`;
+export function isValidLinkedDataIdentifier(uri) {
+    try {
+        // eslint-disable-next-line no-new
+        new URL(uri);
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 /**
@@ -203,8 +213,58 @@ export const partitionErrors = (errors, subject) => {
 export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
 
 /**
+ * Returns true if the either given value or id (or both) are part of the property values.
+ * @param {object} property
+ * @param {string} value
+ * @param {string} id
+ */
+export const propertyContainsValueOrId = (property, value, id) => {
+    if (!Array.isArray(property.values) || property.values.length === 0 || (!value && !id)) {
+        return false;
+    }
+
+    return property.values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
+};
+
+/**
  * Returns true if the given property have one or more non-empty values
  * @param property
  * @returns {boolean}
  */
 export const hasValue = property => !!(property.values && Array.isArray(property.values) && property.values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
+
+/**
+ * Simplify the keys of the given object by converting the URIs into its local paths
+ * The output of this method is comparable to the results provided by elasticsearch
+ *
+ * @example {'http://namespace#label': [{'@value': 'abc'}]} -> {label: [{'@value': 'abc'}]}
+ * @param jsonLd
+ * @returns {{}}
+ */
+export const simplifyUriPredicates = jsonLd => (
+    jsonLd
+        ? Object.assign(
+            {},
+            ...Object.keys(jsonLd).map(key => ({[getLocalPart(key)]: jsonLd[key]}))
+        ) : {});
+
+/**
+ * Normalize an internal metadata resource by converting the values or iris into a single object
+ *
+ * The output of this method is comparable to the results provided by elasticsearch
+ *
+ * @example {'http://namespace#label': [{value: 'abc'}]} -> {http://namespace#label: ['abc']}
+ * @param jsonLd
+ * @returns {{}}
+ */
+export const normalizeMetadataResource = jsonLd => mapValues(
+    jsonLd,
+    values => (
+        Array.isArray(values)
+            ? values.map(v => {
+                if (isNonEmptyValue(v.value)) return v.value;
+                return v.id || v;
+            })
+            : values
+    )
+);

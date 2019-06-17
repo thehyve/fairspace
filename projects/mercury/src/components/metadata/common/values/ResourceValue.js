@@ -1,22 +1,38 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import IriValueContainer from "./IriValueContainer";
 
-import BaseInputValue from "./BaseInputValue";
+class ResourceValue extends React.Component {
+    state = {
+        namespace: undefined
+    };
 
-function ResourceValue(props) {
-    const entry = {...props.entry, value: props.entry.id || ''};
-    const onChange = ({value}) => props.onChange({id: value});
-    return (
-        <BaseInputValue
-            {...props}
-            entry={entry}
-            onChange={onChange}
-            type="url"
-        />
-    );
+    handleLocalPartChange = (value) => this.props.onChange({id: this.state.namespace.value + value});
+
+    handleNamespaceChange = namespace => this.setState({namespace});
+
+    render() {
+        const {entry, onChange, ...otherProps} = this.props;
+
+        return (
+            <IriValueContainer
+                namespace={this.state.namespace}
+                localPart={entry.id || ''}
+                onLocalPartChange={this.handleLocalPartChange}
+                onNamespaceChange={this.handleNamespaceChange}
+                {...otherProps}
+            />
+        );
+    }
 }
 
+ResourceValue.propTypes = {
+    entry: PropTypes.object,
+    onChange: PropTypes.func
+};
+
 ResourceValue.defaultProps = {
-    entry: {}
+    entry: {},
 };
 
 export default ResourceValue;

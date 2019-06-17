@@ -1,5 +1,5 @@
 import {SearchAPI} from "../SearchAPI";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../../constants";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_DEFAULT_SIZE} from "../../constants";
 
 let mockClient;
 let searchAPI;
@@ -184,41 +184,39 @@ describe('Search API', () => {
 
     it('forwards the metadata search query to ES', () => {
         const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
-        searchAPI.searchLinkedData(types, 'my-query')
+
+        searchAPI.searchLinkedData({types, query: 'my-query'})
             .then(() => {
                 expect(mockClient.search.mock.calls.length)
                     .toEqual(1);
 
                 expect(mockClient.search.mock.calls[0][0].body.size)
-                    .toEqual(SEARCH_MAX_SIZE);
+                    .toEqual(SEARCH_DEFAULT_SIZE);
 
                 expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
                     .toEqual('my-query');
 
                 expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
-                    .toEqual(
-                        expect.arrayContaining(types)
-                    );
+                    .toEqual(types);
             });
     });
 
     it('searchs all metadata when no query is given', () => {
         const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
-        searchAPI.searchLinkedData(types)
+
+        searchAPI.searchLinkedData({types})
             .then(() => {
                 expect(mockClient.search.mock.calls.length)
                     .toEqual(1);
 
                 expect(mockClient.search.mock.calls[0][0].body.size)
-                    .toEqual(SEARCH_MAX_SIZE);
+                    .toEqual(SEARCH_DEFAULT_SIZE);
 
                 expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
                     .toEqual('*');
 
                 expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
-                    .toEqual(
-                        expect.arrayContaining(types)
-                    );
+                    .toEqual(types);
             });
     });
 });

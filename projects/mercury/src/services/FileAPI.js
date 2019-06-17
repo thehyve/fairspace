@@ -13,7 +13,21 @@ const includeDetails = {...defaultOptions, details: true};
 axios.interceptors.request.use((config) => {
     if (config.method === 'propfind') {
         config.headers['content-type'] = 'application/xml';
-        config.data = '<?xml version="1.0" encoding="utf-8" ?><propfind xmlns:D="DAV:"><allprop/></propfind>';
+        config.data = `
+<propfind xmlns:d="DAV:" xmlns:fs="http://fairspace.io/ontology#">
+   <d:prop>
+      <fs:iri />
+   </d:prop>
+   <d:prop>
+      <d:resourcetype />
+   </d:prop>
+   <d:prop>
+      <d:getlastmodified />
+   </d:prop>
+   <d:prop>
+      <d:getcontentlength />
+   </d:prop>
+</propfind>`;
     }
     return config;
 }, (error) => Promise.reject(error));

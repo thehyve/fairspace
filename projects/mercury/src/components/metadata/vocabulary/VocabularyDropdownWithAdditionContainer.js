@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import InputWithAddition from "../common/values/InputWithAddition";
-import VocabularyDropdownContainer from "./VocabularyDropdownContainer";
+import LinkedDataDropdown from "../common/LinkedDataDropdown";
 import {
     getMetaVocabulary,
     hasMetaVocabularyError,
@@ -27,9 +27,8 @@ const VocabularyDropdownWithAdditionContainer = props => (
         onError={props.onError}
         requireIdentifier={false}
     >
-        <VocabularyDropdownContainer
+        <LinkedDataDropdown
             property={props.property}
-            entry={props.entry}
             onChange={props.onChange}
         />
     </InputWithAddition>
@@ -39,7 +38,6 @@ VocabularyDropdownWithAdditionContainer.propTypes = {
     shape: PropTypes.object.isRequired,
     emptyData: PropTypes.array.isRequired,
     property: PropTypes.object.isRequired,
-    entry: PropTypes.object,
     onChange: PropTypes.func.isRequired,
     onCreate: PropTypes.func.isRequired,
 
@@ -69,8 +67,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchEntities: fetchVocabularyEntitiesIfNeeded,
-    onCreate: (formKey, shape, id) => {
-        const subject = id && createVocabularyIri(id);
+    onCreate: (formKey, shape, subject) => {
         const type = ownProps.property.className;
         return dispatch(createVocabularyEntityFromState(formKey, subject, type));
     }
