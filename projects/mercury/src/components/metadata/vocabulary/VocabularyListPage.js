@@ -4,16 +4,23 @@ import {connect} from 'react-redux';
 import VocabularyBrowserContainer from "./VocabularyBrowserContainer";
 import LinkedDataListPage from "../common/LinkedDataListPage";
 import {searchVocabulary} from "../../../actions/searchActions";
-import {getMetaVocabulary, isMetaVocabularyPending, hasMetaVocabularyError} from "../../../reducers/cache/vocabularyReducers";
+import {
+    getMetaVocabulary,
+    isMetaVocabularyPending,
+    hasMetaVocabularyError,
+    isVocabularyPending, hasVocabularyError
+} from "../../../reducers/cache/vocabularyReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../constants";
-import {fetchMetaVocabularyIfNeeded} from "../../../actions/vocabularyActions";
+import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 import {LoadingInlay, MessageDisplay} from "../../common";
 
 const VocabularyListPage = (
-    {fetchVocabulary, loading, error, metaVocabulary, classesInCatalog, search}
+    {fetchVocabulary, fetchMetaVocabulary, loading, error, metaVocabulary, classesInCatalog, search}
 ) => {
+    // We need both the vocabulary (for namespaces) and metavocabulary (for shapes) here
     fetchVocabulary();
+    fetchMetaVocabulary();
 
     const toTargetClasses = shapes => shapes.map(c => getFirstPredicateId(c, constants.SHACL_TARGET_CLASS));
 
@@ -55,8 +62,8 @@ const VocabularyListPage = (
 
 const mapStateToProps = (state) => {
     const metaVocabulary = getMetaVocabulary(state);
-    const loading = isMetaVocabularyPending(state);
-    const error = hasMetaVocabularyError(state);
+    const loading = isMetaVocabularyPending(state) || isVocabularyPending(state);
+    const error = hasMetaVocabularyError(state) || hasVocabularyError(state);
     const classesInCatalog = metaVocabulary.getClassesInCatalog();
 
     return {
@@ -69,7 +76,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     search: searchVocabulary,
-    fetchVocabulary: fetchMetaVocabularyIfNeeded
+    fetchVocabulary: fetchMetadataVocabularyIfNeeded,
+    fetchMetaVocabulary: fetchMetaVocabularyIfNeeded
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(VocabularyListPage);
