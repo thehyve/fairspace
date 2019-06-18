@@ -43,7 +43,7 @@ describe('FileOperations', () => {
             });
     });
 
-    it('should disables all buttons on file operation', () => {
+    it('should disable all buttons on file operation', () => {
         const wrapper = shallow(<FileOperations
             classes={{}}
             paste={() => Promise.resolve()}
@@ -59,23 +59,23 @@ describe('FileOperations', () => {
             });
     });
 
-    // TODO: couldn't get this to work!
-    // it('should enables all buttons after successful file operation', async () => {
-    //     const wrapper = shallow(<FileOperations
-    //         classes={{}}
-    //         paste={() => Promise.resolve()}
-    //         fetchFilesIfNeeded={() => {}}
-    //         getDownloadLink={() => {}}
-    //     />);
+    it('should enable all buttons after successful file operation', () => {
+        const wrapper = shallow(<FileOperations
+            classes={{}}
+            paste={() => Promise.resolve()}
+            fetchFilesIfNeeded={() => {}}
+            getDownloadLink={() => {}}
+        />);
 
-    //     wrapper.instance().handlePaste({stopPropagation: () => {}})
-    //         .then(() => {
-    //             wrapper.find(IconButton)
-    //                 .forEach(b => {
-    //                     expect(b.props().disabled).toBe(false);
-    //                 });
-    //         });
-    // });
+        return wrapper.instance().handlePaste({stopPropagation: () => {}})
+            .then(() => {
+                wrapper.find(IconButton)
+                    .not('[download]')
+                    .forEach(b => {
+                        expect(b.props().disabled).toBe(false);
+                    });
+            });
+    });
 });
 
 describe('handleCreateDirectory', () => {
