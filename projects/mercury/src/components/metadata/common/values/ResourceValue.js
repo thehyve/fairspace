@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import IriValueContainer from "./IriValueContainer";
+import IriValueContainer, {noNamespace} from "./IriValueContainer";
 
 class ResourceValue extends React.Component {
     state = {
-        namespace: undefined
+        namespace: noNamespace
     };
 
     handleLocalPartChange = (value) => this.props.onChange({id: this.state.namespace.value + value});
