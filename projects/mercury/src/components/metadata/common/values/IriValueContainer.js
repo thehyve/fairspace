@@ -6,7 +6,7 @@ import MaterialReactSelect from "../../../common/MaterialReactSelect";
 import BaseInputValue from "./BaseInputValue";
 import {getVocabulary} from "../../../../reducers/cache/vocabularyReducers";
 
-const noNamespace = {
+export const noNamespace = {
     id: '',
     label: '(no namespace)',
     value: ''
