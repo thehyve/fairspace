@@ -21,7 +21,7 @@ const openMetadataEntry = (history, id) => {
 };
 
 const MetadataBrowserContainer = ({entities, hasHighlights, footerRender, total, history, ...otherProps}) => (
-    <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
+    <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
         <LinkedDataCreator requireIdentifier {...otherProps}>
             {
                 entities && entities.length > 0

@@ -15,7 +15,7 @@ const styles = {
     }
 };
 
-export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onAdd, onDelete, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
+export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
     const isDeletable = entry => !('isDeletable' in entry) || entry.isDeletable;
@@ -33,10 +33,11 @@ export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onA
                     </TableHead>
                 ) : undefined}
             <TableBody>
-                {property.values.map((entry, idx) => (
+                {property.values.map((entry, idx) => rowDecorator(entry, (
                     <TableRow
                         onMouseEnter={() => setHoveredIndex(idx)}
                         onMouseLeave={() => setHoveredIndex(null)}
+                        onDoubleClick={() => onOpen(entry)}
                         // eslint-disable-next-line react/no-array-index-key
                         key={idx}
                     >
@@ -62,7 +63,7 @@ export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onA
                                 </TableCell>
                             ) : undefined}
                     </TableRow>
-                ))}
+                )))}
             </TableBody>
 
             {canAdd && AddComponent ? (
@@ -86,8 +87,10 @@ export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onA
 };
 
 LinkedDataValuesTable.propTypes = {
+    onOpen: PropTypes.func,
     onAdd: PropTypes.func,
     onDelete: PropTypes.func,
+    rowDecorator: PropTypes.func,
     showHeader: PropTypes.bool,
     canAdd: PropTypes.bool,
 
@@ -104,7 +107,9 @@ LinkedDataValuesTable.propTypes = {
 };
 
 LinkedDataValuesTable.defaultProps = {
+    onOpen: () => {},
     onDelete: () => {},
+    rowDecorator: (entry, children) => children,
     showHeader: true,
     canAdd: true,
     columnDefinitions: [],

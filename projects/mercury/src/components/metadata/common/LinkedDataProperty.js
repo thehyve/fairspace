@@ -21,7 +21,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
 
 const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
     const [hoveredAllProperty, setHoveredAllProperty] = useState(false);
-    const {readOnlyComponent, editComponent, addComponent} = useContext(LinkedDataValuesContext);
+    const {editorPath, componentFactory: {readOnlyComponent, editComponent, addComponent}} = useContext(LinkedDataValuesContext);
 
     const {key, values, errors, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
     const hasErrors = errors && errors.length > 0;
@@ -66,6 +66,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                             onAdd={onAdd}
                             onDelete={onDelete}
                             addComponent={addInputComponent}
+                            editorPath={editorPath}
                         />
                     ) : (
                         <LinkedDataInputFieldsTable

@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import {SHACL_NAME, SHACL_ORDER, SHACL_PATH} from "../../../constants";
+import {withRouter} from "react-router-dom";
+import {SHACL_NAME, SHACL_ORDER, SHACL_PATH, TOOLTIP_ENTER_DELAY} from "../../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import {getLocalPart} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataValuesTable from "./LinkedDataValuesTable";
 import {compareBy} from "../../../utils/genericUtils";
+import IriTooltip from "../../common/IriTooltip";
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 
-const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponent}) => {
+export const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponent, editorPath, history}) => {
     // Determine the columns to show. If no important property shapes are defined, only
     // the URI will be shown
     let columnDefinitions;
@@ -24,15 +26,19 @@ const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponen
                 return {
                     id: shape['@id'],
                     label: getFirstPredicateValue(shape, SHACL_NAME),
-                    getValue: entry => (entry && entry.otherEntry && entry.otherEntry[propertyPath] ? entry.otherEntry[propertyPath].join(', ') : '')
+                    getValue: entry => (entry && entry.otherEntry && Array.isArray(entry.otherEntry[propertyPath]) ? entry.otherEntry[propertyPath].join(', ') : '')
                 };
             });
     } else {
         columnDefinitions = [IDENTIFIER_COLUMN];
     }
 
+    const rowDecorator = (entry, children) => <IriTooltip key={entry.id} enterDelay={TOOLTIP_ENTER_DELAY} title={entry.id}>{children}</IriTooltip>
+    const onOpen = entry => history.push(`${editorPath}?iri=` + encodeURIComponent(entry.id));
+
     return (
         <LinkedDataValuesTable
+            onOpen={onOpen}
             onAdd={onAdd}
             onDelete={onDelete}
             columnDefinitions={columnDefinitions}
@@ -40,6 +46,7 @@ const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponen
             showHeader={property.values && property.values.length > 0}
             canAdd={canAdd}
             addComponent={addComponent}
+            rowDecorator={rowDecorator}
         />
     );
 };
@@ -48,7 +55,8 @@ LinkedDataRelationTable.propTypes = {
     onAdd: PropTypes.func,
     onDelete: PropTypes.func,
     property: PropTypes.object,
-    canAdd: PropTypes.bool
+    canAdd: PropTypes.bool,
+    editorPath: PropTypes.string
 };
 
 LinkedDataRelationTable.defaultProps = {
@@ -57,4 +65,4 @@ LinkedDataRelationTable.defaultProps = {
     canAdd: true
 };
 
-export default LinkedDataRelationTable;
+export default withRouter(LinkedDataRelationTable);

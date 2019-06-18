@@ -18,6 +18,7 @@ import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../..
 import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
+import {METADATA_PATH} from "../../../constants";
 
 const MetadataEntityContainer = props => {
     const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -42,7 +43,7 @@ const MetadataEntityContainer = props => {
             alignItems="stretch"
         >
             <Grid item>
-                <LinkedDataValuesContext.Provider value={MetadataValueComponentFactory}>
+                <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
                     <LinkedDataEntityFormContainer
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
