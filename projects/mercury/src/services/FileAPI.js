@@ -177,15 +177,13 @@ class FileAPI {
      */
     uniqueDestinationPaths(filePaths, destinationDir) {
         return this.list(destinationDir)
-            .then(files => {
-                const usedNames = files.map(f => f.basename);
-                return filePaths.map((sourceFile) => {
-                    const destinationFilename = generateUniqueFileName(getFileName(sourceFile), usedNames);
-                    usedNames.push(destinationFilename);
-                    const destinationFile = joinPaths(destinationDir, destinationFilename);
-                    return [sourceFile, destinationFile];
-                });
-            });
+            .then(files => files.map(f => f.basename))
+            .then(usedNames => filePaths.map(sourceFile => {
+                const destinationFilename = generateUniqueFileName(getFileName(sourceFile), usedNames);
+                usedNames.push(destinationFilename);
+                const destinationFile = joinPaths(destinationDir, destinationFilename);
+                return [sourceFile, destinationFile];
+            }));
     }
 }
 
