@@ -12,13 +12,12 @@ function linkLabel(link) {
 }
 
 const ReferringValue = ({property, entry, editorPath}) => {
-
     function extractDisplayValue(value) {
         switch (property.datatype) {
             case DATETIME_URI:
                 return <DateTime value={value.value} absolute />;
             case BOOLEAN_URI:
-                return <Switch checked={value.value} readOnly/>;
+                return <Switch checked={value.value} readOnly />;
             default:
                 return value.label || value.value || linkLabel(value.id) || '';
         }

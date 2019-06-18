@@ -473,16 +473,16 @@ describe('jsonLdConverter', () => {
     describe('normalizeTypes', () => {
         it('replaces rdf:type with @type', () => {
             const result = normalizeTypes([
-                { '@id': 'http://example.com/1',  'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': [{'@id': 'http://example.com/Type'}]},
-                { '@id': 'http://example.com/2',  '@type': ['http://example.com/Type']},
-                { '@id': 'http://example.com/2',  'http://example.com/property': [123]}
+                {'@id': 'http://example.com/1', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': [{'@id': 'http://example.com/Type'}]},
+                {'@id': 'http://example.com/2', '@type': ['http://example.com/Type']},
+                {'@id': 'http://example.com/2', 'http://example.com/property': [123]}
             ]);
 
             expect(result).toEqual([
-                { '@id': 'http://example.com/1',  '@type': ['http://example.com/Type']},
-                { '@id': 'http://example.com/2',  '@type': ['http://example.com/Type']},
-                { '@id': 'http://example.com/2',  'http://example.com/property': [123]}
+                {'@id': 'http://example.com/1', '@type': ['http://example.com/Type']},
+                {'@id': 'http://example.com/2', '@type': ['http://example.com/Type']},
+                {'@id': 'http://example.com/2', 'http://example.com/property': [123]}
             ]);
-        })
-    })
+        });
+    });
 });

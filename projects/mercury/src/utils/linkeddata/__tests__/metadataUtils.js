@@ -6,7 +6,7 @@ import {
     getLocalPart,
     getTypeInfo,
     hasValue,
-    isNonEmptyValue, linkLabel,
+    linkLabel,
     normalizeMetadataResource,
     partitionErrors,
     propertiesToShow,
@@ -39,6 +39,12 @@ describe('Metadata Utils', () => {
             expect(linkLabel('http://example.com/path', true)).toEqual('path');
             expect(linkLabel('http://example.com/path#hash', false)).toEqual('http://example.com/path#hash');
             expect(linkLabel('http://example.com/path#hash', true)).toEqual('hash');
+        });
+
+        it('fails gracefully when an invalid URI is given', () => {
+            expect(linkLabel('_path', true)).toEqual('_path');
+            expect(linkLabel('_path', false)).toEqual('_path');
+            expect(linkLabel('_path')).toEqual('_path');
         });
     });
 
