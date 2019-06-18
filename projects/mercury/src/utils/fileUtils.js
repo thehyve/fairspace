@@ -38,21 +38,6 @@ export const joinPaths = (...paths) => paths
     .map(p => (p && p !== PATH_SEPARATOR ? p : ''))
     .join(PATH_SEPARATOR);
 
-export const addCounterToFilename = (fileName) => {
-    const {baseName, extension} = getBaseNameAndExtension(fileName);
-
-    // Verify if the filename already contains a counter
-    // If so, update the counter in the filename
-    const matchesCounter = baseName.match(/ \((\d+)\)$/);
-    if (matchesCounter) {
-        const newBaseName = baseName.substring(0, baseName.length - matchesCounter[0].length);
-        const counter = parseInt(matchesCounter[1], 10) + 1;
-        return `${newBaseName} (${counter})${extension}`;
-    }
-
-    return `${baseName} (${2})${extension}`;
-};
-
 export function getParentPath(path) {
     const pos = path.lastIndexOf('/', path.length - 2);
     return (pos > 1) ? path.substring(0, pos) : '';
