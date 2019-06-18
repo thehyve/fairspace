@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from "react-router-dom";
-import {Badge, Icon, IconButton} from "@material-ui/core";
+import {Badge, Icon, IconButton, Grid} from "@material-ui/core";
 import {ContentCopy, ContentCut, ContentPaste, Download} from "mdi-material-ui";
 import {withStyles} from '@material-ui/core/styles';
 import classNames from 'classnames';
@@ -125,110 +125,115 @@ export class FileOperations extends React.Component {
         const busy = !!op;
 
         return (
-            <>
-                <div
-                    className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}
-                    style={{marginRight: 8}}
-                >
-                    <IconButton
-                        title={`Download ${selectedItem.basename}`}
-                        aria-label={`Download ${selectedItem.basename}`}
-                        disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file' || busy}
-                        component="a"
-                        href={getDownloadLink(selectedItem.filename)}
-                        download
+            <Grid container justify="space-between">
+                <Grid item>
+                    <div
+                        className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}
+                        style={{marginRight: 8}}
                     >
-                        <Download />
-                    </IconButton>
-                    <ProgressButton active={op === Operations.RENAME}>
-                        <RenameButton
-                            currentName={selectedItem.basename}
-                            onRename={newName => this.handlePathRename(selectedItem, newName)}
-                            disabled={disabledForMoreThanOneSelection || busy}
-                        >
-                            <IconButton
-                                title={`Rename ${selectedItem.basename}`}
-                                aria-label={`Rename ${selectedItem.basename}`}
-                                disabled={disabledForMoreThanOneSelection || busy}
-                            >
-                                <Icon>border_color</Icon>
-                            </IconButton>
-                        </RenameButton>
-                    </ProgressButton>
-                    <ProgressButton active={op === Operations.DELETE}>
-                        <DeleteButton
-                            file={selectedItem.basename}
-                            onClick={() => this.handlePathDelete(selectedItem)}
-                            disabled={disabledForMoreThanOneSelection || busy}
-                        >
-                            <IconButton
-                                title={`Delete ${selectedItem.basename}`}
-                                aria-label={`Delete ${selectedItem.basename}`}
-                                disabled={disabledForMoreThanOneSelection || busy}
-                            >
-                                <Icon>delete</Icon>
-                            </IconButton>
-
-                        </DeleteButton>
-                    </ProgressButton>
-                </div>
-                <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}>
-                    <IconButton
-                        aria-label="Copy"
-                        title="Copy"
-                        onClick={e => this.handleCopy(e)}
-                        disabled={allOperationsDisabled || noSelectedPath || busy}
-                    >
-                        <ContentCopy />
-                    </IconButton>
-                    <IconButton
-                        aria-label="Cut"
-                        title="Cut"
-                        onClick={e => this.handleCut(e)}
-                        disabled={allOperationsDisabled || noSelectedPath || busy}
-                    >
-                        <ContentCut />
-                    </IconButton>
-                    <ProgressButton active={op === Operations.PASTE}>
                         <IconButton
-                            aria-label="Paste"
-                            title="Paste"
-                            onClick={e => this.handlePaste(e)}
-                            disabled={isPasteDisabled || busy}
+                            title={`Download ${selectedItem.basename}`}
+                            aria-label={`Download ${selectedItem.basename}`}
+                            disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file' || busy}
+                            component="a"
+                            href={getDownloadLink(selectedItem.filename)}
+                            download
                         >
-                            {this.addBadgeIfNotEmpty(clipboardItemsCount, <ContentPaste />)}
+                            <Download />
                         </IconButton>
-                    </ProgressButton>
-                </div>
-                <div className={classes.buttonsContainer} style={{float: 'right', minWidth: 'unset'}}>
-                    <ProgressButton active={op === Operations.MKDIR}>
-                        <CreateDirectoryButton
-                            onCreate={name => this.handleCreateDirectory(name)}
-                        >
-                            <IconButton
-                                aria-label="Create directory"
-                                title="Create directory"
-                                disabled={allOperationsDisabled || busy}
+                        <ProgressButton active={op === Operations.RENAME}>
+                            <RenameButton
+                                currentName={selectedItem.basename}
+                                onRename={newName => this.handlePathRename(selectedItem, newName)}
+                                disabled={disabledForMoreThanOneSelection || busy}
                             >
-                                <Icon>create_new_folder</Icon>
-                            </IconButton>
-                        </CreateDirectoryButton>
-                    </ProgressButton>
-                    <ProgressButton active={op === Operations.UPLOAD}>
-                        <UploadButton
-                            onUpload={files => this.handleUpload(files)}
-                        >
-                            <IconButton
-                                title="Upload"
-                                aria-label="Upload"
-                                disabled={allOperationsDisabled || busy}
+                                <IconButton
+                                    title={`Rename ${selectedItem.basename}`}
+                                    aria-label={`Rename ${selectedItem.basename}`}
+                                    disabled={disabledForMoreThanOneSelection || busy}
+                                >
+                                    <Icon>border_color</Icon>
+                                </IconButton>
+                            </RenameButton>
+                        </ProgressButton>
+                        <ProgressButton active={op === Operations.DELETE}>
+                            <DeleteButton
+                                file={selectedItem.basename}
+                                onClick={() => this.handlePathDelete(selectedItem)}
+                                disabled={disabledForMoreThanOneSelection || busy}
                             >
-                                <Icon>cloud_upload</Icon>
+                                <IconButton
+                                    title={`Delete ${selectedItem.basename}`}
+                                    aria-label={`Delete ${selectedItem.basename}`}
+                                    disabled={disabledForMoreThanOneSelection || busy}
+                                >
+                                    <Icon>delete</Icon>
+                                </IconButton>
+
+                            </DeleteButton>
+                        </ProgressButton>
+                    </div>
+                    <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}>
+                        <IconButton
+                            aria-label="Copy"
+                            title="Copy"
+                            onClick={e => this.handleCopy(e)}
+                            disabled={allOperationsDisabled || noSelectedPath || busy}
+                        >
+                            <ContentCopy />
+                        </IconButton>
+                        <IconButton
+                            aria-label="Cut"
+                            title="Cut"
+                            onClick={e => this.handleCut(e)}
+                            disabled={allOperationsDisabled || noSelectedPath || busy}
+                        >
+                            <ContentCut />
+                        </IconButton>
+                        <ProgressButton active={op === Operations.PASTE}>
+                            <IconButton
+                                aria-label="Paste"
+                                title="Paste"
+                                onClick={e => this.handlePaste(e)}
+                                disabled={isPasteDisabled || busy}
+                            >
+                                {this.addBadgeIfNotEmpty(clipboardItemsCount, <ContentPaste />)}
                             </IconButton>
-                        </UploadButton>
-                    </ProgressButton>
-                </div>
-            </>
+                        </ProgressButton>
+                    </div>
+                </Grid>
+
+                <Grid item>
+                    <div className={classes.buttonsContainer}>
+                        <ProgressButton active={op === Operations.MKDIR}>
+                            <CreateDirectoryButton
+                                onCreate={name => this.handleCreateDirectory(name)}
+                            >
+                                <IconButton
+                                    aria-label="Create directory"
+                                    title="Create directory"
+                                    disabled={allOperationsDisabled || busy}
+                                >
+                                    <Icon>create_new_folder</Icon>
+                                </IconButton>
+                            </CreateDirectoryButton>
+                        </ProgressButton>
+                        <ProgressButton active={op === Operations.UPLOAD}>
+                            <UploadButton
+                                onUpload={files => this.handleUpload(files)}
+                            >
+                                <IconButton
+                                    title="Upload"
+                                    aria-label="Upload"
+                                    disabled={allOperationsDisabled || busy}
+                                >
+                                    <Icon>cloud_upload</Icon>
+                                </IconButton>
+                            </UploadButton>
+                        </ProgressButton>
+                    </div>
+                </Grid>
+            </Grid>
         );
     }
 }
