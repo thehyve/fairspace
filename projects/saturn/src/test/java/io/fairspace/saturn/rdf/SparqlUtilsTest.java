@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf;
 
-import org.apache.jena.iri.IRIException;
 import org.junit.Test;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
@@ -41,7 +40,7 @@ public class SparqlUtilsTest {
     }
 
 
-    @Test(expected = IRIException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidIrisAreProhibited() {
         storedQuery("test_formatting", createURI("http://example.com>/path/subpath#hash"));
     }
