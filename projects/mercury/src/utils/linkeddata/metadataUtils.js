@@ -24,17 +24,20 @@ export const getLocalPart = uri => (
  * @returns {*}
  */
 export function linkLabel(uri, shortenExternalUris = false) {
-    const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
-    const url = new URL(uri);
+    try {
+        const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
+        const url = new URL(uri);
 
-    // Local uris are treated separately, as we know its
-    // structure
-    if (url.hostname === window.location.hostname) {
-        const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
-        if (foundInfix) {
-            return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
+        // Local uris are treated separately, as we know its
+        // structure
+        if (url.hostname === window.location.hostname) {
+            const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
+            if (foundInfix) {
+                return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
+            }
         }
-    }
+        // eslint-disable-next-line no-empty
+    } catch (e) {}
 
     return shortenExternalUris ? getLocalPart(uri) : uri;
 }
