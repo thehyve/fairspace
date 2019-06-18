@@ -26,7 +26,7 @@ const VocabularyBrowserContainer = (
     {entities, hasHighlights, footerRender, total, history, ...otherProps}
 ) => {
     return (
-        <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
+        <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
             <LinkedDataCreator requireIdentifier={false} {...otherProps}>
                 {
                     entities && entities.length > 0

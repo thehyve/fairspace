@@ -31,6 +31,7 @@ import {
     getSystemProperties,
     isFixedShape
 } from "../../../utils/linkeddata/vocabularyUtils";
+import {VOCABULARY_PATH} from "../../../constants";
 
 const VocabularyEntityContainer = props => {
     const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -49,7 +50,7 @@ const VocabularyEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataValuesContext.Provider value={VocabularyValueComponentFactory}>
+                <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
                     <LinkedDataEntityFormContainer
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
