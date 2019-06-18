@@ -2,7 +2,7 @@ import React from 'react';
 import {withRouter} from "react-router-dom";
 
 import {
-    ErrorDialog, MessageDisplay,
+    MessageDisplay,
     LoadingInlay
 } from "../common";
 import FileList from "./FileList";
@@ -52,30 +52,6 @@ class FileBrowser extends React.Component {
         }
     }
 
-    handlePathDelete = (path) => {
-        const {
-            deleteFile, fetchFilesIfNeeded, openedPath
-        } = this.props;
-
-        return deleteFile(path.filename)
-            .then(() => fetchFilesIfNeeded(openedPath))
-            .catch((err) => {
-                ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
-            });
-    }
-
-    handlePathRename = (path, newName) => {
-        const {
-            renameFile, fetchFilesIfNeeded, openedPath
-        } = this.props;
-
-        return renameFile(openedPath, path.basename, newName)
-            .then(() => fetchFilesIfNeeded(openedPath))
-            .catch((err) => {
-                ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
-                return false;
-            });
-    }
 
     openDir(path) {
         this.props.history.push(`/collections${path}`);
@@ -83,8 +59,8 @@ class FileBrowser extends React.Component {
 
     render() {
         const {
-            loading, error, openedCollection, files = [], selectedPaths, openedPath,
-            fetchFilesIfNeeded, onSelectAll, onDeselectAll
+            loading, error, openedCollection, files = [], selectedPaths, openedPath, fetchFilesIfNeeded,
+            onSelectAll, onDeselectAll
         } = this.props;
         const collectionExists = openedCollection && openedCollection.iri;
 
@@ -127,12 +103,10 @@ class FileBrowser extends React.Component {
                     <FileOperations
                         openedCollection={openedCollection}
                         openedPath={openedPath}
-                        onRename={this.handlePathRename}
-                        onDelete={this.handlePathDelete}
                         disabled={!openedCollection.canWrite}
                         existingFiles={files ? files.map(file => file.basename) : []}
-                        fetchFilesIfNeeded={fetchFilesIfNeeded}
                         getDownloadLink={FileAPI.getDownloadLink}
+                        fetchFilesIfNeeded={fetchFilesIfNeeded}
                     />
                 </div>
             </>
