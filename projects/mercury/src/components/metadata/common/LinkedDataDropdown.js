@@ -15,6 +15,8 @@ class LinkedDataDropdown extends React.Component {
 
     mounted = true;
 
+    fetchRequest = null;
+
     componentDidMount() {
         this.updateResults();
     }
@@ -37,11 +39,20 @@ class LinkedDataDropdown extends React.Component {
     }
 
     onTextInputChange = (e) => {
-        this.updateResults(e.target.value);
+        if (this.fetchRequest) {
+            clearTimeout(this.fetchRequest);
+        }
+        const {value} = e.target;
+        this.fetchRequest = setTimeout(() => {
+            this.updateResults(value);
+        }, 300);
     };
 
     componentWillUnmount() {
         this.mounted = false;
+        if (this.fetchRequest) {
+            clearTimeout(this.fetchRequest);
+        }
     }
 
     render() {
