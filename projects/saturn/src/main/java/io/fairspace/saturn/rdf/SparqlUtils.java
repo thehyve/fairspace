@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
@@ -27,7 +28,6 @@ import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.out.NodeFmtLib.str;
-import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 
 public class SparqlUtils {
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
