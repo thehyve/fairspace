@@ -11,8 +11,8 @@ export const getBaseNameAndExtension = (fileName) => {
     }
 
     const dotPosition = fileName.lastIndexOf('.');
-    const baseName = (dotPosition >= 0) ? fileName.substring(0, dotPosition) : fileName;
-    const extension = (dotPosition >= 0) ? fileName.substring(dotPosition) : '';
+    const baseName = (dotPosition > 0) ? fileName.substring(0, dotPosition) : fileName;
+    const extension = (dotPosition > 0) ? fileName.substring(dotPosition) : '';
 
     return {baseName, extension};
 };

@@ -5,7 +5,7 @@ import {
 } from '../fileUtils';
 
 describe('getBaseNameAndExtension', () => {
-    it('should return the exptected file base name and extension', () => {
+    it('should return the expected file base name and extension', () => {
         expect(getBaseNameAndExtension()).toEqual({baseName: '', extension: ''});
         expect(getBaseNameAndExtension(undefined)).toEqual({baseName: '', extension: ''});
         expect(getBaseNameAndExtension(null)).toEqual({baseName: '', extension: ''});
@@ -15,6 +15,7 @@ describe('getBaseNameAndExtension', () => {
         expect(getBaseNameAndExtension('name')).toEqual({baseName: 'name', extension: ''});
         expect(getBaseNameAndExtension('name. xxx.')).toEqual({baseName: 'name. xxx', extension: '.'});
         expect(getBaseNameAndExtension('name. xxx.ext')).toEqual({baseName: 'name. xxx', extension: '.ext'});
+        expect(getBaseNameAndExtension('.hidden')).toEqual({baseName: '.hidden', extension: ''});
     });
 });
 
