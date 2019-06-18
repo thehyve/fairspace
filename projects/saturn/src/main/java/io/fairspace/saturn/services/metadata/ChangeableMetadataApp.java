@@ -17,10 +17,12 @@ import static spark.Spark.*;
 @Slf4j
 public class ChangeableMetadataApp extends ReadableMetadataApp {
     protected final ChangeableMetadataService api;
+    private final String baseURI;
 
-    public ChangeableMetadataApp(String basePath, ChangeableMetadataService api) {
+    public ChangeableMetadataApp(String basePath, ChangeableMetadataService api, String baseURI) {
         super(basePath, api);
         this.api = api;
+        this.baseURI = baseURI;
     }
 
     @Override
@@ -30,17 +32,17 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
         path(basePath, () -> {
             put("/", (req, res) -> {
                 validateContentType(req, JSON_LD_HEADER_STRING);
-                api.put(fromJsonLD(req.body()));
+                api.put(fromJsonLD(req.body(), baseURI));
                 return "";
             });
             patch("/", (req, res) -> {
                 validateContentType(req, JSON_LD_HEADER_STRING);
-                api.patch(fromJsonLD(req.body()));
+                api.patch(fromJsonLD(req.body(), baseURI));
                 return "";
             });
             delete("/", (req, res) -> {
                 if (JSON_LD_HEADER_STRING.equals(req.contentType())) {
-                    api.delete(fromJsonLD(req.body()));
+                    api.delete(fromJsonLD(req.body(), baseURI));
                 } else {
                     api.delete(req.queryParams("subject"), req.queryParams("predicate"), req.queryParams("object"));
                 }
