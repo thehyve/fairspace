@@ -29,6 +29,6 @@ it('ignores cut-and-paste into same folder', () => {
 
 it('generates unique names', () => {
     FileAPI.list = jest.fn(() => Promise.resolve([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]));
-    return FileAPI.uniqueDestinationPaths(['/coll/src/file.ext'], '/coll/dst')
-        .then(result => expect(result).toEqual([['/coll/src/file.ext', '/coll/dst/file (3).ext']]));
+    return FileAPI.uniqueDestinationPaths(['/coll/src/file.ext', '/coll/src/new.ext'], '/coll/dst')
+        .then(result => expect(result).toEqual([['/coll/src/file.ext', '/coll/dst/file (3).ext'], ['/coll/src/new.ext', '/coll/dst/new.ext']]));
 });
