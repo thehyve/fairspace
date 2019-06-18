@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
 import {withStyles} from '@material-ui/core/styles';
@@ -15,8 +15,13 @@ import {isAuthorizationsPending} from "../../../reducers/account/authorizationsR
 import {isWorkspacePending} from "../../../reducers/workspaceReducers";
 import {isRedirectingForLogin} from "../../../reducers/uiReducers";
 import {LoadingInlay} from "../index";
+import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
 
-const Layout = ({classes, menuExpanded, workspaceName, version, pending}) => {
+const Layout = ({classes, workspaceName, version, pending}) => {
+    const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
+    const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
+    const [timeoutId, setTimeoutId] = useState();
+
     if (pending) {
         return <LoadingInlay />;
     }
@@ -30,14 +35,42 @@ const Layout = ({classes, menuExpanded, workspaceName, version, pending}) => {
         </main>
     );
 
+
+    const menuOpen = menuExpanded || menuOpenDueToHover;
+    const toggleMenuExpansion = () => {
+        const newExpansionState = !menuExpanded;
+        window.localStorage.setItem(LOCAL_STORAGE_MENU_KEY, newExpansionState);
+        setMenuExpanded(newExpansionState);
+    };
+
+    // The left menu should only open after a short delay.
+    // The timeout id for this is stored in state, as this component
+    // could be rerendered when the user clicks a menu item. Storing it
+    // in state makes sure that the timeout can still be cancelled when
+    // the user leaves the menu
+    const handleMouseEnter = () => {
+        setTimeoutId(setTimeout(() => {
+            setMenuOpenDueToHover(true);
+            setTimeoutId();
+        }, LEFT_MENU_EXPANSION_DELAY));
+    };
+
+    const handleMouseLeave = () => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+            setTimeoutId();
+        }
+        setMenuOpenDueToHover(false);
+    };
+
     // The app itself consists of a topbar, a drawer and the actual page
     // The topbar is shown even if the user has no proper authorization
     return (
         <>
             <TopBar workspaceName={workspaceName} />
             <AuthorizationCheck transformError={transformError}>
-                <MenuDrawer />
-                <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
+                <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter}/>
+                <main style={{marginLeft: menuOpen ? 175 : 0}} className={classes.main}>
                     <Routes />
                 </main>
             </AuthorizationCheck>
