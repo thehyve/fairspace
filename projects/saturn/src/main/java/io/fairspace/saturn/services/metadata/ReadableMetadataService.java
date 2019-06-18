@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -14,7 +13,6 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 public
 class ReadableMetadataService {
     protected final RDFConnection rdf;
-    @Getter
     protected final Node graph;
     protected final Node vocabulary;
 
