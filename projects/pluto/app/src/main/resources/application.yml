@@ -13,10 +13,6 @@ server:
       enabled: false
   max-http-header-size: 65535
 
-frontend:
-  urls: {}
-  roles: {}
-
 spring:
   application:
     name: Pluto
