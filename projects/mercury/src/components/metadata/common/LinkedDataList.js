@@ -1,15 +1,5 @@
 import React from "react";
-import {
-    ListItemText,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Typography,
-    withStyles
-} from "@material-ui/core";
+import {ListItemText, Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from "@material-ui/core";
 import styles from './LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
 import {TOOLTIP_ENTER_DELAY} from "../../../constants";
