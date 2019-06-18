@@ -5,6 +5,7 @@ import {getFirstPredicateId, getFirstPredicateValue} from "../../../utils/linked
 import {getLocalPart} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataValuesTable from "./LinkedDataValuesTable";
 import {compareBy} from "../../../utils/genericUtils";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 
@@ -31,6 +32,8 @@ const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponen
         columnDefinitions = [IDENTIFIER_COLUMN];
     }
 
+    const rowDecorator = (entry, children) => <Tooltip key={entry.id} title={entry.id}>{children}</Tooltip>
+
     return (
         <LinkedDataValuesTable
             onAdd={onAdd}
@@ -40,6 +43,7 @@ const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponen
             showHeader={property.values && property.values.length > 0}
             canAdd={canAdd}
             addComponent={addComponent}
+            rowDecorator={rowDecorator}
         />
     );
 };
