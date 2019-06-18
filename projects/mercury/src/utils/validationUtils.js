@@ -1,7 +1,7 @@
 import {getFirstPredicateValue} from "./linkeddata/jsonLdUtils";
 import * as constants from "../constants";
 import {getMaxCount} from "./linkeddata/vocabularyUtils";
-import {isNonEmptyValue} from "./linkeddata/metadataUtils";
+import {isNonEmptyValue} from './genericUtils';
 
 // remove the string values that only contain whitespace
 export const removeWhitespaceValues = (values) => (values ? values.filter(v => typeof v !== 'string' || v.trim().length > 0) : []);

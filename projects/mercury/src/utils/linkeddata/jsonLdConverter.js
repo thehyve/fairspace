@@ -1,8 +1,8 @@
-import {compareBy, comparing, flattenShallow} from "../genericUtils";
+import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../genericUtils";
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue, normalizeJsonLdResource} from "./jsonLdUtils";
 import {isRdfList} from "./vocabularyUtils";
-import {isNonEmptyValue, simplifyUriPredicates} from "./metadataUtils";
+import {simplifyUriPredicates} from "./metadataUtils";
 
 /**
  * Generates a property entry for the given type(s)

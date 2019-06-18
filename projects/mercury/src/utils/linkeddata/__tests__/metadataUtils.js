@@ -263,19 +263,6 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('isNonEmptyValue', () => {
-        it('Returns true for the given values', () => {
-            const values = ['something', 0, 9999, ' ', true, false, -999, {}, []];
-
-            values.forEach(v => expect(isNonEmptyValue(v)).toBe(true));
-        });
-        it('Returns false for the given values', () => {
-            const values = [undefined, null, '', NaN, "", ``];
-
-            values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
-        });
-    });
-
     describe('partitionErrors', () => {
         it('returns 2 arrays one for errors of the given subjects other is the rest of errors', () => {
             const errorsSub1 = [

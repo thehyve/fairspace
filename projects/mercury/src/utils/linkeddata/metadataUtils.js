@@ -2,6 +2,7 @@ import _, {mapValues} from 'lodash';
 
 import * as consts from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import {isNonEmptyValue} from '../genericUtils';
 
 /**
  * Returns the local part of the given uri
@@ -205,12 +206,6 @@ export const partitionErrors = (errors, subject) => {
     const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject);
     return {entityErrors, otherErrors};
 };
-
-/**
- * Returns true if the given value is truthy or zero or false
- * @param value
- */
-export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
 
 /**
  * Returns true if the either given value or id (or both) are part of the property values.
