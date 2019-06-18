@@ -291,6 +291,7 @@ fs:RelationShape rdfs:subClassOf sh:PropertyShape .
 # Definition for property shape, used to render a table with properties
 sh:PropertyShape
     sh:targetClass sh:PropertyShape ;
+    fs:machineOnly true ;
     sh:property
         fs:PropertyNameShape,
         fs:DescriptionShape,
