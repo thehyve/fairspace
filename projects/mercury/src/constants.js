@@ -4,6 +4,7 @@ export const COPY = 'COPY';
 export const PATH_SEPARATOR = '/';
 
 // UI
+export const LEFT_MENU_EXPANSION_DELAY = 500;
 export const MAIN_CONTENT_WIDTH = '55%';
 export const SIDE_PANEL_WIDTH = '45%';
 export const MAIN_CONTENT_MAX_HEIGHT = '65vh';
