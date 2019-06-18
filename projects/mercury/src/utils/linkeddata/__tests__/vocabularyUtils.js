@@ -148,7 +148,24 @@ describe('vocabularyUtils', () => {
             expect(isRelationShape({})).toBe(false);
         });
     });
-    
+
+    describe('getClassesInCatalog', () => {
+        const shapesIdsInCatalog = vocabulary.getClassesInCatalog().map(c => c['@id']);
+
+        it('should return classes without machineOnly predicate', () => {
+            expect(shapesIdsInCatalog).toEqual(expect.arrayContaining(['http://fairspace.io/ontology#UserShape']));
+        });
+
+        it('should not return properties', () => {
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.w3.org/2000/01/rdf-schema#commentShape']));
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.schema.org/creatorShape']));
+        });
+
+        it('should not return classes with machineOnly predicate', () => {
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://fairspace.io/ontology#CollectionShape']));
+        });
+    });
+
     describe('Class hierarchy (subclasses and descendants)', () => {
         const type = 'http://www.w3.org/ns/shacl#PropertyShape';
         const subClasses = ["http://fairspace.io/ontology#ControlledVocabularyPropertyShape", "http://fairspace.io/ontology#DatatypePropertyShape"];
