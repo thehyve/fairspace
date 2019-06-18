@@ -25,7 +25,7 @@ const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponen
                 return {
                     id: shape['@id'],
                     label: getFirstPredicateValue(shape, SHACL_NAME),
-                    getValue: entry => (entry && entry.otherEntry && entry.otherEntry[propertyPath] ? entry.otherEntry[propertyPath].join(', ') : '')
+                    getValue: entry => (entry && entry.otherEntry && Array.isArray(entry.otherEntry[propertyPath]) ? entry.otherEntry[propertyPath].join(', ') : '')
                 };
             });
     } else {
