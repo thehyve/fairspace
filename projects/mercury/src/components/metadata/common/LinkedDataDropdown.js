@@ -10,16 +10,22 @@ import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
 class LinkedDataDropdown extends React.Component {
     state = {
         fetchedItems: null,
-        error: null
+        error: null,
     }
 
     mounted = true;
 
+    fetchRequest = null;
+
     componentDidMount() {
+        this.updateResults();
+    }
+
+    updateResults = (query) => {
         const {property, fetchItems, types} = this.props;
         const typesToFetch = Array.isArray(types) && types.length > 0 ? types : [property.className];
 
-        fetchItems({types: typesToFetch, size: SEARCH_DROPDOWN_DEFAULT_SIZE})
+        fetchItems({types: typesToFetch, size: SEARCH_DROPDOWN_DEFAULT_SIZE, query})
             .then(({items}) => {
                 if (this.mounted) {
                     this.setState({fetchedItems: items});
@@ -32,8 +38,21 @@ class LinkedDataDropdown extends React.Component {
             });
     }
 
+    onTextInputChange = (e) => {
+        if (this.fetchRequest) {
+            clearTimeout(this.fetchRequest);
+        }
+        const {value} = e.target;
+        this.fetchRequest = setTimeout(() => {
+            this.updateResults(value);
+        }, 300);
+    };
+
     componentWillUnmount() {
         this.mounted = false;
+        if (this.fetchRequest) {
+            clearTimeout(this.fetchRequest);
+        }
     }
 
     render() {
@@ -62,7 +81,13 @@ class LinkedDataDropdown extends React.Component {
                 };
             });
 
-        return <Dropdown {...otherProps} options={options} />;
+        return (
+            <Dropdown
+                {...otherProps}
+                onTextInputChange={this.onTextInputChange}
+                options={options}
+            />
+        );
     }
 }
 
