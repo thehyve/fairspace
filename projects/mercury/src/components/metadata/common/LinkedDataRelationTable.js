@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import {SHACL_NAME, SHACL_ORDER, SHACL_PATH} from "../../../constants";
+import {withRouter} from "react-router-dom";
+import {SHACL_NAME, SHACL_ORDER, SHACL_PATH, TOOLTIP_ENTER_DELAY} from "../../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import {getLocalPart} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataValuesTable from "./LinkedDataValuesTable";
 import {compareBy} from "../../../utils/genericUtils";
-import Tooltip from "@material-ui/core/Tooltip";
-import {withRouter} from "react-router-dom";
+import IriTooltip from "../../common/IriTooltip";
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 
@@ -33,7 +33,7 @@ export const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addC
         columnDefinitions = [IDENTIFIER_COLUMN];
     }
 
-    const rowDecorator = (entry, children) => <Tooltip key={entry.id} title={entry.id}>{children}</Tooltip>
+    const rowDecorator = (entry, children) => <IriTooltip key={entry.id} enterDelay={TOOLTIP_ENTER_DELAY} title={entry.id}>{children}</IriTooltip>
     const onOpen = entry => history.push(`${editorPath}?iri=` + encodeURIComponent(entry.id));
 
     return (
