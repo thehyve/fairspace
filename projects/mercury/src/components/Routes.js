@@ -1,5 +1,6 @@
 import React from 'react';
 import {Redirect, Route} from "react-router-dom";
+import queryString from "query-string";
 
 import Home from "./Home";
 import Collections from "./collections/CollectionsPage";
@@ -12,7 +13,6 @@ import SearchPage from './search/SearchPage';
 import VocabularyListPage from "./metadata/vocabulary/VocabularyListPage";
 import VocabularyEntityPage from "./metadata/vocabulary/VocabularyEntityPage";
 import {createMetadataIri, createVocabularyIri} from "../utils/linkeddata/metadataUtils";
-import queryString from "query-string";
 
 const routes = () => (
     <>
