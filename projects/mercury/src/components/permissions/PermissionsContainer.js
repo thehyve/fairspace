@@ -1,6 +1,26 @@
+import React from 'react';
 import {connect} from 'react-redux';
 import PermissionsViewer from "./PermissionsViewer";
 import {alterPermission as alterPermissionActions, fetchPermissionsIfNeeded} from "../../actions/permissionsActions";
+
+import AlterPermissionContainer from "./AlterPermissionContainer";
+
+const PermissionsContainer = (props) => (
+    <PermissionsViewer
+        {...props}
+        renderPermissionsDialog={
+            ({handleShareWithDialogClose, selectedPermission, currentUser, iri}) => (
+                <AlterPermissionContainer
+                    open
+                    onClose={handleShareWithDialogClose}
+                    user={selectedPermission && selectedPermission.user}
+                    access={selectedPermission && selectedPermission.access}
+                    iri={iri}
+                    currentUser={currentUser}
+                />
+            )}
+    />
+);
 
 const mapStateToProps = (state, ownProps) => {
     const {
@@ -24,4 +44,4 @@ const mapDispatchToProps = {
     fetchPermissionsIfNeeded
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PermissionsViewer);
+export default connect(mapStateToProps, mapDispatchToProps)(PermissionsContainer);

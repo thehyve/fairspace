@@ -1,8 +1,9 @@
 import React from 'react';
-import {shallow} from "enzyme";
+import {shallow, mount} from "enzyme";
 
-import {IconButton} from "@material-ui/core";
+import {IconButton, Button} from "@material-ui/core";
 import PermissionsViewer from "../PermissionsViewer";
+import UserContext from '../../../UserContext';
 
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
@@ -48,16 +49,19 @@ describe('PermissionsViewer', () => {
     describe('Use Case 1: Current user is creator and can manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = shallow(<PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                canManage
-                permissions={mockCollaborators}
-                users={mockUsers}
-                currentUser={mockcurrentUserCreatorCanManage}
-                alterPermission={mockAlterPermissionFn}
-                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-            />);
+            wrapper = mount(
+                <UserContext.Provider value={{currentUser: mockcurrentUserCreatorCanManage}}>
+                    <PermissionsViewer
+                        creator={mockCreator}
+                        iri={500}
+                        canManage
+                        permissions={mockCollaborators}
+                        users={mockUsers}
+                        alterPermission={mockAlterPermissionFn}
+                        fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                    />
+                </UserContext.Provider>
+            );
         });
         it('should render all collaborators', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
@@ -86,25 +90,27 @@ describe('PermissionsViewer', () => {
             expect(wrapper.find(IconButton).length).toEqual(4);
         });
 
-
         it('should render add button', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
+            expect(wrapper.find(Button).length).toEqual(1);
         });
     });
 
     describe('Use Case 2: Current user is NOT creator and can NOT manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = shallow(<PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                canManage={false}
-                permissions={mockCollaborators}
-                users={mockUsers}
-                currentUser={mockcurrentUserNotCreatorCannotManage}
-                alterPermission={mockAlterPermissionFn}
-                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-            />);
+            wrapper = mount(
+                <UserContext.Provider value={{currentUser: mockcurrentUserNotCreatorCannotManage}}>
+                    <PermissionsViewer
+                        creator={mockCreator}
+                        iri={500}
+                        canManage={false}
+                        permissions={mockCollaborators}
+                        users={mockUsers}
+                        alterPermission={mockAlterPermissionFn}
+                        fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                    />
+                </UserContext.Provider>
+            );
         });
 
         it('should render all collaborators', () => {
@@ -140,16 +146,19 @@ describe('PermissionsViewer', () => {
     describe('Use Case 3: Current user is NOT creator and can manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = shallow(<PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                canManage
-                permissions={mockCollaborators}
-                users={mockUsers}
-                currentUser={mockcurrentUserNotCreatorCanManage}
-                alterPermission={mockAlterPermissionFn}
-                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-            />);
+            wrapper = mount(
+                <UserContext.Provider value={{currentUser: mockcurrentUserNotCreatorCanManage}}>
+                    <PermissionsViewer
+                        creator={mockCreator}
+                        iri={500}
+                        canManage
+                        permissions={mockCollaborators}
+                        users={mockUsers}
+                        alterPermission={mockAlterPermissionFn}
+                        fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                    />
+                </UserContext.Provider>
+            );
         });
 
         it('should render all collaborators', () => {
@@ -178,7 +187,7 @@ describe('PermissionsViewer', () => {
             expect(wrapper.find(IconButton).some('[disabled]')).toBeTruthy();
         });
         it('should render add button', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
+            expect(wrapper.find(Button).length).toEqual(1);
         });
     });
 });
