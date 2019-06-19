@@ -27,8 +27,25 @@ it('ignores cut-and-paste into same folder', () => {
         .then(() => expect(FileAPI.webDavClient.moveFile.mock.calls.length).toEqual(0));
 });
 
-it('generates unique names', () => {
-    FileAPI.list = jest.fn(() => Promise.resolve([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]));
-    return FileAPI.uniqueDestinationPaths(['/coll/src/file.ext', '/coll/src/new.ext'], '/coll/dst')
-        .then(result => expect(result).toEqual([['/coll/src/file.ext', '/coll/dst/file (3).ext'], ['/coll/src/new.ext', '/coll/dst/new.ext']]));
-});
+
+describe('uniqueDestinationPaths', () => {
+    it('generates unique names', () => {
+        FileAPI.list = jest.fn(() => Promise.resolve([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]));
+        return FileAPI.uniqueDestinationPaths(['/src/file.ext', '/src/file (2).ext'], '/dst')
+            .then(result => expect(result).toEqual([
+                ['/src/file.ext', '/dst/file (3).ext'],
+                ['/src/file (2).ext', '/dst/file (2) (1).ext']]));
+    });
+
+    it('leaves already unique names untouched', () => {
+        FileAPI.list = jest.fn(() => Promise.resolve([{basename: 'file.ext'}]));
+        return FileAPI.uniqueDestinationPaths(['/src/new.ext'], '/dst')
+            .then(result => expect(result).toEqual([['/src/new.ext', '/dst/new.ext']]));
+    });
+
+    it('handles multiple files with smae name', () => {
+        FileAPI.list = jest.fn(() => Promise.resolve([{basename: 'file.ext'}]));
+        return FileAPI.uniqueDestinationPaths(['/src1/file.ext', '/src2/file.ext'], '/dst')
+            .then(result => expect(result).toEqual([['/src1/file.ext', '/dst/file (1).ext'], ['/src2/file.ext', '/dst/file (2).ext']]));
+    });
+})
