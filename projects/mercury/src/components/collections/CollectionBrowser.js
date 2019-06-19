@@ -87,14 +87,15 @@ class CollectionBrowser extends React.Component {
 
     render() {
         const {loading, error} = this.props;
+        const {loading: usersLoading, error: usersError} = this.context;
 
-        if (error) {
+        if (error || usersError) {
             return <MessageDisplay message="An error occurred while loading collections" />;
         }
 
         return (
             <>
-                {loading ? <LoadingInlay /> : this.renderCollectionList()}
+                {loading || usersLoading ? <LoadingInlay /> : this.renderCollectionList()}
                 <Button
                     variant="text"
                     aria-label="Add"

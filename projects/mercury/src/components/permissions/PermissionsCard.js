@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
 import {ExpandMore, LockOpen} from "@material-ui/icons";
-import {Avatar, Card, CardContent, CardHeader, Collapse, Grid, IconButton, withStyles} from "@material-ui/core";
+import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles} from "@material-ui/core";
 import classnames from "classnames";
 import PermissionsContainer from "./PermissionsContainer";
 import PermissionContext from "./PermissionContext";
@@ -21,9 +21,17 @@ const styles = theme => ({
         marginTop: 10
     },
     avatar: {
-        width: 30,
-        height: 30,
-        display: 'inline-block'
+        width: 20,
+        height: 20,
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        margin: '0 4px'
+    },
+    additionalCollaborators: {
+        display: 'inline-block',
+        lineHeight: '20px',
+        verticalAlign: 'middle',
+        margin: '0 4px'
     }
 });
 
@@ -36,29 +44,24 @@ export const PermissionsCard = ({classes, iri, canManage, maxCollaboratorIcons})
     const permissionIcons = permissions
         .slice(0, maxCollaboratorIcons)
         .map(permission => (
-            <Grid key={permission.user} item>
-                <Avatar title={permission.userName} src="/images/avatar.png" className={classes.avatar} />
-            </Grid>
+            <Avatar key={permission.user} title={permission.userName} src="/images/avatar.png" className={classes.avatar} />
         ));
 
-    const cardHeaderAction = (
-        <Grid container direction="row" alignItems="center" spacing={8}>
+    const cardHeaderAction = (<>
             {permissionIcons}
-            {permissions.length > maxCollaboratorIcons ? <Grid item>and {permissions.length - maxCollaboratorIcons} more</Grid> : ''}
-            <Grid item>
-                <IconButton
-                    className={classnames(classes.expand, {
-                        [classes.expandOpen]: expanded,
-                    })}
-                    onClick={toggleExpand}
-                    aria-expanded={expanded}
-                    aria-label="Show more"
-                    title="Collaborators"
-                >
-                    <ExpandMore />
-                </IconButton>
-            </Grid>
-        </Grid>
+            {permissions.length > maxCollaboratorIcons ? <div className={classes.additionalCollaborators}>+ {permissions.length - maxCollaboratorIcons}</div> : ''}
+            <IconButton
+                className={classnames(classes.expand, {
+                    [classes.expandOpen]: expanded,
+                })}
+                onClick={toggleExpand}
+                aria-expanded={expanded}
+                aria-label="Show more"
+                title="Collaborators"
+            >
+                <ExpandMore />
+            </IconButton>
+        </>
     );
 
     return (

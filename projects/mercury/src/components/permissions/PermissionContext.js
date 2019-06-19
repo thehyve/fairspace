@@ -24,6 +24,11 @@ export const PermissionProvider = ({iri, children}) => {
             });
     };
 
+    const alterPermission = (userIri, resourceIri, access) => PermissionAPI
+        .alterPermission(userIri, resourceIri, access)
+        .then(refresh)
+        .catch(e => {console.error("Error altering permission", e);});
+
     // Refresh the permissions whenever the iri changes
     useEffect(refresh, [iri]);
 
@@ -33,7 +38,7 @@ export const PermissionProvider = ({iri, children}) => {
                 permissions,
                 error,
                 loading,
-                refresh
+                alterPermission
             }}
         >
             {children}
