@@ -1,13 +1,10 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
-import {Card, CardContent, CardHeader, Collapse, IconButton, withStyles} from "@material-ui/core";
+import {ExpandMore, LockOpen} from "@material-ui/icons";
+import {Avatar, Card, CardContent, CardHeader, Collapse, Grid, IconButton, withStyles} from "@material-ui/core";
 import classnames from "classnames";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import LockOpenIcon from '@material-ui/icons/LockOpen';
-import Avatar from "@material-ui/core/Avatar";
 import PermissionsContainer from "./PermissionsContainer";
 import PermissionContext from "./PermissionContext";
-import Grid from "@material-ui/core/Grid";
 
 const styles = theme => ({
     expand: {
@@ -30,15 +27,24 @@ const styles = theme => ({
     }
 });
 
-export const PermissionsCard = ({classes, iri, canManage}) => {
+export const PermissionsCard = ({classes, iri, canManage, maxCollaboratorIcons}) => {
     const {permissions} = useContext(PermissionContext);
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => setExpanded(!expanded);
 
+    const permissionIcons = permissions
+        .slice(0, maxCollaboratorIcons)
+        .map(permission => (
+            <Grid key={permission.user} item>
+                <Avatar title={permission.userName} src="/images/avatar.png" className={classes.avatar} />
+            </Grid>
+        ));
+
     const cardHeaderAction = (
-        <Grid container direction="row" alignItems="center">
-            {permissions.map(permission => (<Grid key={permission.user} item><Avatar title={permission.userName} src="/images/avatar.png" className={classes.avatar} /></Grid>))}
+        <Grid container direction="row" alignItems="center" spacing={8}>
+            {permissionIcons}
+            {permissions.length > maxCollaboratorIcons ? <Grid item>and {permissions.length - maxCollaboratorIcons} more</Grid> : ''}
             <Grid item>
                 <IconButton
                     className={classnames(classes.expand, {
@@ -49,7 +55,7 @@ export const PermissionsCard = ({classes, iri, canManage}) => {
                     aria-label="Show more"
                     title="Collaborators"
                 >
-                    <ExpandMoreIcon />
+                    <ExpandMore />
                 </IconButton>
             </Grid>
         </Grid>
@@ -62,7 +68,7 @@ export const PermissionsCard = ({classes, iri, canManage}) => {
                 titleTypographyProps={{variant: 'h6'}}
                 title="Collaborators"
                 avatar={(
-                    <LockOpenIcon />
+                    <LockOpen />
                 )}
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
@@ -80,10 +86,12 @@ export const PermissionsCard = ({classes, iri, canManage}) => {
 PermissionsCard.propTypes = {
     classes: PropTypes.object,
     iri: PropTypes.string.isRequired,
-    canManage: PropTypes.bool
+    canManage: PropTypes.bool,
+    maxCollaboratorIcons: PropTypes.number
 };
 
 PermissionsCard.defaultProps = {
+    maxCollaboratorIcons: 5,
     classes: {},
     canManage: false
 };
