@@ -1,93 +1,120 @@
 package io.fairspace.saturn.services.users;
 
-import io.fairspace.saturn.auth.UserInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.saturn.rdf.dao.DAO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
+import org.eclipse.jetty.client.HttpClient;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
+import java.util.concurrent.TimeUnit;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static io.fairspace.saturn.auth.SecurityUtil.authorizationHeader;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
+import static java.util.stream.Collectors.toList;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
 
+/**
+ * Loads users from the database on start and then regularly synchronizes the cache and the database with Keycloak.
+ * Loading from the database is needed to prevent unnecessary writes.
+ *
+ */
+@Slf4j
 public class UserService {
-    private final Supplier<UserInfo> currentUserInfoSupplier;
+    private static final long REFRESH_INTERVAL = TimeUnit.MINUTES.toMillis(1);
+    private static final ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private final String usersEndpoint;
     private final DAO dao;
-    private final Map<Node, User> usersById = new ConcurrentHashMap<>();
+    private final Map<Node, User> usersByIri = new ConcurrentHashMap<>();
+    private final HttpClient httpClient = new HttpClient();
+    private final Timer worker = new Timer();
+    private final boolean authorizationRequired;
+    private volatile String authorization;
 
-    public UserService(Supplier<UserInfo> currentUserInfoSupplier, DAO dao) {
-        this.currentUserInfoSupplier = currentUserInfoSupplier;
+    public UserService(String usersEndpoint, DAO dao, boolean authorizationRequired) {
+        this.usersEndpoint = usersEndpoint;
         this.dao = dao;
+        this.authorizationRequired = authorizationRequired;
 
         loadUsers();
-    }
 
-    private void loadUsers() {
-        dao.list(User.class).forEach(user -> usersById.put(user.getIri(), user));
-    }
-
-    /**
-     * Returns a URI for the provided userInfo.
-     * First tries to find an exiting fs:User entity which externalId  equals to userInfo.getUserId()
-     * If no existing entry is found, creates a new one and stores userInfo in it.
-     * Also updates an existing one if one of the userInfo's fields changed.
-
-     * @param userInfo
-     * @return
-     */
-    public Node getUserIRI(UserInfo userInfo) {
-        return getOrCreateUser(userInfo).getIri();
-    }
-
-    public User getCurrentUser() {
-        return getOrCreateUser(currentUserInfoSupplier.get());
+        worker.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                refreshCache();
+            }
+        }, 0, REFRESH_INTERVAL);
     }
 
     public User getUser(Node iri) {
-        return usersById.values()
-                .stream()
-                .filter(user -> user.getIri().equals(iri))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private User getOrCreateUser(UserInfo userInfo) {
-        var user = findUser(userInfo);
-        if (user != null) {
-            if (!Objects.equals(user.getName(), userInfo.getFullName()) || !Objects.equals(user.getEmail(), userInfo.getEmail())) {
-                updateUser(user, userInfo);
-            }
-            return user;
-        } else {
-            return createUser(userInfo);
+        authorization = authorizationHeader();
+        if (!usersByIri.containsKey(iri)) {
+            refreshCache();
         }
+
+        return usersByIri.get(iri);
     }
 
-    private User findUser(UserInfo userInfo) {
-        return usersById.get(generateMetadataIri(userInfo.getUserId()));
+
+    private void refreshCache() {
+        if (authorizationRequired && authorization == null) {
+            return;
+        }
+        var users = fetchUsers();
+        var updated = users
+                .stream()
+                .filter(user -> !user.equals(usersByIri.replace(user.getIri(), user)))
+                .collect(toList());
+        if (!updated.isEmpty()) {
+            commit("Update user information", dao, () -> updated.forEach(dao::write));
+        }
+
     }
 
-    private User createUser(UserInfo userInfo) {
-        var newUser = new User();
-        newUser.setIri(generateMetadataIri(userInfo.getUserId()));
-        newUser.setName(userInfo.getFullName());
-        newUser.setEmail(userInfo.getEmail());
-        return commit("Store a new user with id " + userInfo.getUserId(), dao, () -> {
-            var createdInMeantime = findUser(userInfo);
-            if(createdInMeantime != null) {
-                return createdInMeantime;
+    private void loadUsers() {
+        dao.list(User.class).forEach(user -> usersByIri.put(user.getIri(), user));
+    }
+
+    private List<User> fetchUsers() {
+        try {
+            if (!httpClient.isStarted()) {
+                httpClient.start();
             }
-            dao.write(newUser);
-            usersById.put(newUser.getIri(), newUser);
-            return newUser;
-        });
+            var request = httpClient.newRequest(usersEndpoint);
+            if(authorization != null) {
+                request.header(AUTHORIZATION, authorization);
+            }
+            var response = request.send();
+            if (response.getStatus() == SC_OK) {
+                List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {});
+                return keycloakUsers
+                        .stream()
+                        .map(keycloakUser -> {
+                            var user = new User();
+                            user.setIri(generateMetadataIri(keycloakUser.getId()));
+                            user.setName(keycloakUser.getFullName());
+                            user.setEmail(keycloakUser.getEmail());
+                            return user;
+                        })
+                        .collect(toList());
+            } else {
+                log.error("Error retrieving users from {}: {} {}", usersEndpoint, response.getStatus(), response.getReason());
+            }
+        } catch (Exception e) {
+            log.error("Error retrieving users from {}", usersEndpoint, e);
+        }
+        return List.of();
     }
 
-    private void updateUser(User user, UserInfo userInfo) {
-        user.setName(userInfo.getFullName());
-        user.setEmail(userInfo.getEmail());
-        commit("Update user with id " + userInfo.getUserId(), dao, () -> dao.write(user));
+    public Node getUserIri(String userId) {
+        return generateMetadataIri(userId);
     }
 }

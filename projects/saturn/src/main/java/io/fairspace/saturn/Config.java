@@ -20,6 +20,8 @@ public class Config {
 
     public final Properties mail = new Properties();
 
+    public String usersEndpoint = "http://localhost:8080/api/v1/workspace/users";
+
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
         public String vocabularyBaseIRI = "http://localhost/vocabulary/";

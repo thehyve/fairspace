@@ -50,11 +50,11 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(SecurityUtil::userInfo, new DAO(rdf, null));
-        Supplier<Node> userIriSupplier = () -> userService.getUserIRI(userInfo());
+        var userService = new UserService(CONFIG.usersEndpoint, new DAO(rdf, null), CONFIG.auth.enabled);
+        Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getUserId());
         var mailService = new MailService(CONFIG.mail);
 
-        var permissions = new PermissionsServiceImpl(rdf, userService, mailService);
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, userService, mailService);
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions);
@@ -104,7 +104,7 @@ public class App {
         var authenticator = auth.enabled
                 ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
                 : new DummyAuthenticator(CONFIG.auth.developerRoles);
-        fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator, userService::getUserIRI));
+        fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
 
         fusekiServerBuilder
                 .build()

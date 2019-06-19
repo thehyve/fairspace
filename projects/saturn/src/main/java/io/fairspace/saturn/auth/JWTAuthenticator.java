@@ -13,10 +13,10 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 class JWTAuthenticator {
-    private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String USERNAME_CLAIM = "preferred_username";
     private static final String FULLNAME_CLAIM = "name";
@@ -36,7 +36,7 @@ class JWTAuthenticator {
             return storedUserInfo;
         }
 
-        var authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
+        var authorizationHeader = request.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             return null;

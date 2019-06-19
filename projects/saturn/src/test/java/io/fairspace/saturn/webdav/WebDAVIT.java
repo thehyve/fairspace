@@ -10,7 +10,6 @@ import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
-import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
@@ -31,7 +30,6 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WebDAVIT {
@@ -64,9 +62,8 @@ public class WebDAVIT {
     public void before() {
         var rdf = connect(createTxnMem());
         var eventBus = new EventBus();
-        when(userService.getCurrentUser()).thenAnswer(invocation -> new User() {{ setIri(currentUser); }});
 
-        permissions = new PermissionsServiceImpl(rdf, userService, mailService);
+        permissions = new PermissionsServiceImpl(rdf, () -> currentUser, userService, mailService);
         collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
         var collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
         fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus, permissions);

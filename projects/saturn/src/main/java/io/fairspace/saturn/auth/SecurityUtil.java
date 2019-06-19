@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.Context.currentRequest;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 public class SecurityUtil {
     static final String USER_INFO_REQUEST_ATTRIBUTE = UserInfo.class.getName();
@@ -41,4 +42,12 @@ public class SecurityUtil {
                 .map(request -> (UserInfo) request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE))
                 .orElse(null);
     }
+
+    public static String authorizationHeader() {
+        return currentRequest()
+                .map(context -> context.getHeader(AUTHORIZATION))
+                .orElse(null);
+    }
+
+
 }
