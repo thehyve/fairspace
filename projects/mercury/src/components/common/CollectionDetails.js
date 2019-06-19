@@ -1,18 +1,26 @@
 import React from 'react';
 import {
-    Card, CardHeader, CardContent,
-    IconButton, CardActions, Collapse,
-    Typography, Icon, withStyles,
-    Menu, MenuItem
+    Card,
+    CardContent,
+    CardHeader,
+    Collapse,
+    Icon,
+    IconButton,
+    Menu,
+    MenuItem,
+    Typography,
+    withStyles
 } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 import classnames from 'classnames';
 
 import LoadingInlay from './LoadingInlay';
 import CollectionEditor from "./CollectionEditor";
 import ConfirmationDialog from './ConfirmationDialog';
 import PermissionsContainer from "../permissions/PermissionsContainer";
+import Avatar from "@material-ui/core/Avatar";
 
 export const ICONS = {
     LOCAL_STORAGE: 'folder_open',
@@ -34,6 +42,13 @@ const styles = theme => ({
     expandOpen: {
         transform: 'rotate(180deg)',
     },
+    permissionsCard: {
+        marginTop: 10
+    },
+    avatar: {
+        width: 30,
+        height: 30
+    }
 });
 
 class CollectionDetails extends React.Component {
@@ -130,19 +145,29 @@ class CollectionDetails extends React.Component {
                             {collection.description}
                         </Typography>
                     </CardContent>
-                    <CardActions style={{padding: '0 8px'}} disableActionSpacing>
-                        <IconButton
-                            className={classnames(classes.expand, {
-                                [classes.expandOpen]: expanded,
-                            })}
-                            onClick={this.handleExpandClick}
-                            aria-expanded={expanded}
-                            aria-label="Show more"
-                            title="Collaborators"
-                        >
-                            <ExpandMoreIcon />
-                        </IconButton>
-                    </CardActions>
+                </Card>
+
+                <Card classes={{root: classes.permissionsCard}}>
+                    <CardHeader
+                        action={(
+                            <IconButton
+                                className={classnames(classes.expand, {
+                                    [classes.expandOpen]: expanded,
+                                })}
+                                onClick={this.handleExpandClick}
+                                aria-expanded={expanded}
+                                aria-label="Show more"
+                                title="Collaborators"
+                            >
+                                <ExpandMoreIcon />
+                            </IconButton>
+                        )}
+                        titleTypographyProps={{variant: 'h6'}}
+                        title={<Avatar alt="User" src="/images/avatar.png" className={classes.avatar} />}
+                        avatar={(
+                            <LockOpenIcon />
+                        )}
+                    />
                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                         <CardContent>
                             <PermissionsContainer
