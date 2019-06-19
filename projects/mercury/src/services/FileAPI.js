@@ -173,7 +173,7 @@ class FileAPI {
      * Generates unique (non-existing) file paths in the destinationdir adding indices to the file names when necessary
      * @param filePaths
      * @param destinationDir
-     * @returns {*}
+     * @returns {Promise<Array<Array<string>>>} A list of source/destination combinations. The first entry in an array is the source path, the second entry is the associated unique destination path
      */
     uniqueDestinationPaths(filePaths, destinationDir) {
         return this.list(destinationDir)
