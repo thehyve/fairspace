@@ -1,11 +1,11 @@
 import {
-    addCounterToFilename, getFileName, getDirectoryFromFullpath,
+    getFileName, getDirectoryFromFullpath,
     getParentPath, generateUniqueFileName, getBaseNameAndExtension,
     getPathInfoFromParams
 } from '../fileUtils';
 
 describe('getBaseNameAndExtension', () => {
-    it('should return the exptected file base name and extension', () => {
+    it('should return the expected file base name and extension', () => {
         expect(getBaseNameAndExtension()).toEqual({baseName: '', extension: ''});
         expect(getBaseNameAndExtension(undefined)).toEqual({baseName: '', extension: ''});
         expect(getBaseNameAndExtension(null)).toEqual({baseName: '', extension: ''});
@@ -15,6 +15,7 @@ describe('getBaseNameAndExtension', () => {
         expect(getBaseNameAndExtension('name')).toEqual({baseName: 'name', extension: ''});
         expect(getBaseNameAndExtension('name. xxx.')).toEqual({baseName: 'name. xxx', extension: '.'});
         expect(getBaseNameAndExtension('name. xxx.ext')).toEqual({baseName: 'name. xxx', extension: '.ext'});
+        expect(getBaseNameAndExtension('.hidden')).toEqual({baseName: '.hidden', extension: ''});
     });
 });
 
@@ -86,23 +87,6 @@ describe('getDirectoryFromFullpath', () => {
         expect(getDirectoryFromFullpath('my-collection/sub-directory')).toEqual('/sub-directory');
         expect(getDirectoryFromFullpath('my-collection/sub-directory/nested/others.txt')).toEqual('/sub-directory/nested/others.txt');
         expect(getDirectoryFromFullpath('my-collection')).toEqual('/');
-    });
-});
-
-describe('addCounterToFilename', () => {
-    it('Adds a counter if there is no one', () => {
-        expect(addCounterToFilename('/some/path/file.ext')).toEqual('/some/path/file (2).ext');
-        expect(addCounterToFilename('/some/path/file')).toEqual('/some/path/file (2)');
-    });
-
-    it('Increments a counter if there is one already', () => {
-        expect(addCounterToFilename('/some/path/file (123).ext')).toEqual('/some/path/file (124).ext');
-        expect(addCounterToFilename('/some/path/file (123)')).toEqual('/some/path/file (124)');
-    });
-
-    it('Increments the correct counter if there is one already', () => {
-        expect(addCounterToFilename('/some/path/file (123) (123).ext')).toEqual('/some/path/file (123) (124).ext');
-        expect(addCounterToFilename('/some/path/file (123) (123)')).toEqual('/some/path/file (123) (124)');
     });
 });
 
