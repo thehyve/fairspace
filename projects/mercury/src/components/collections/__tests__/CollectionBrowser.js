@@ -7,11 +7,11 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 
-import CollectionBrowser from "../CollectionBrowser";
+import CollectionBrowserWithStore, {CollectionBrowser} from "../CollectionBrowser";
 import Config from "../../../services/Config/Config";
 import * as actionTypes from "../../../actions/actionTypes";
 import UserContext from '../../../UserContext';
-import {LoadingInlay} from "../../common";
+import {LoadingInlay, MessageDisplay} from "../../common";
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
@@ -49,7 +49,7 @@ beforeEach(() => {
     collectionBrowser = (
         <MemoryRouter>
             <Provider store={store}>
-                <CollectionBrowser />
+                <CollectionBrowserWithStore />
             </Provider>
         </MemoryRouter>
     );
@@ -92,7 +92,7 @@ it('dispatch an action on collection save', () => {
 
 describe('loading state', () => {
     it('is loading as long as the user is pending', () => {
-        const wrapper = shallow(
+        const wrapper = mount(
             <UserContext.Provider value={{currentUserLoading: true}}>
                 <CollectionBrowser />
             </UserContext.Provider>
@@ -113,7 +113,7 @@ describe('loading state', () => {
             },
         });
 
-        const node = shallow(<CollectionBrowser store={store} />);
+        const node = shallow(<CollectionBrowserWithStore store={store} />);
 
         expect(node.prop('loading')).toEqual(true);
     });
@@ -130,7 +130,7 @@ describe('loading state', () => {
             },
         });
 
-        const node = shallow(<CollectionBrowser store={store} />);
+        const node = shallow(<CollectionBrowserWithStore store={store} />);
 
         expect(node.prop('loading')).toEqual(true);
     });
@@ -138,19 +138,13 @@ describe('loading state', () => {
 
 describe('error state', () => {
     it('is in error state when user fetching failed', () => {
-        store = mockStore({
-            ...defaultState,
-            account: {
-                user: {
-                    ...defaultState.account.user,
-                    error: new Error('Test')
-                }
-            },
-        });
+        const wrapper = mount(
+            <UserContext.Provider value={{currentUserError: new Error()}}>
+                <CollectionBrowser />
+            </UserContext.Provider>
+        );
 
-        const node = shallow(<CollectionBrowser store={store} />);
-
-        expect(node.prop('error')).toEqual(new Error('Test'));
+        expect(wrapper.find(MessageDisplay).length).toBe(1);
     });
 
     it('is in error state when the collections fetching failed', () => {
@@ -168,7 +162,7 @@ describe('error state', () => {
             },
         });
 
-        const node = shallow(<CollectionBrowser store={store} />);
+        const node = shallow(<CollectionBrowserWithStore store={store} />);
 
         expect(node.prop('error')).toEqual(new Error('Test'));
     });
@@ -188,7 +182,7 @@ describe('error state', () => {
             },
         });
 
-        const node = shallow(<CollectionBrowser store={store} />);
+        const node = shallow(<CollectionBrowserWithStore store={store} />);
 
         expect(node.prop('error')).toEqual(new Error('Test'));
     });

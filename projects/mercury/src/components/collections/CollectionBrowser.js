@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React from 'react';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 import Button from "@material-ui/core/Button";
@@ -17,47 +17,49 @@ import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import Config from "../../services/Config/Config";
 import UserContext from '../../UserContext';
 
-const CollectionBrowser = ({
-    fetchCollectionsIfNeeded, users, collections, addingCollection, addCollection,
-    deletingCollection, history, selectedCollectionLocation, selectCollection,
-    error, loading
-}) => {
-    const [addingNewCollection, setAddingNewCollection] = useState(false);
-    const {currentUserLoading, currentUserError} = useContext(UserContext);
+export class CollectionBrowser extends React.Component {
+    static contextType = UserContext;
 
-    useEffect(() => {
-        fetchCollectionsIfNeeded();
-    }, [fetchCollectionsIfNeeded]);
-
-    const handleAddCollectionClick = () => {
-        setAddingNewCollection(true);
+    state = {
+        addingNewCollection: false
     };
 
-    const handleCollectionClick = (collection) => {
+    componentDidMount() {
+        this.props.fetchCollectionsIfNeeded();
+    }
+
+    handleAddCollectionClick = () => {
+        this.setState({addingNewCollection: true});
+    }
+
+    handleCollectionClick = (collection) => {
+        const {selectedCollectionLocation, selectCollection} = this.props;
         if (selectedCollectionLocation !== collection.location) {
             selectCollection(collection.location);
         }
-    };
+    }
 
-    const handleCollectionDoubleClick = (collection) => {
-        history.push(getCollectionAbsolutePath(collection.location));
-    };
+    handleCollectionDoubleClick = (collection) => {
+        this.props.history.push(getCollectionAbsolutePath(collection.location));
+    }
 
-    const handleAddCollection = (name, description, location, type) => {
-        addCollection(name, description, type, location)
-            .then(fetchCollectionsIfNeeded)
-            .then(() => setAddingNewCollection(false))
+    handleAddCollection = (name, description, location, type) => {
+        this.props.addCollection(name, description, type, location)
+            .then(this.props.fetchCollectionsIfNeeded)
+            .then(() => this.setState({addingNewCollection: false}))
             .catch(err => {
                 const message = err && err.message ? err.message : "An error occurred while creating a collection";
                 ErrorDialog.showError(err, message);
             });
-    };
+    }
 
-    const handleCancelAddCollection = () => {
-        setAddingNewCollection(false);
-    };
+    handleCancelAddCollection = () => {
+        this.setState({addingNewCollection: false});
+    }
 
-    const renderCollectionList = () => {
+    renderCollectionList() {
+        const {users, collections, addingCollection, deletingCollection} = this.props;
+
         collections.forEach(col => {
             col.creatorObj = findById(users, col.createdBy);
         });
@@ -65,41 +67,50 @@ const CollectionBrowser = ({
         return (
             <>
                 <CollectionList
-                    collections={collections}
-                    selectedCollectionLocation={selectedCollectionLocation}
-                    onCollectionClick={handleCollectionClick}
-                    onCollectionDoubleClick={handleCollectionDoubleClick}
+                    collections={this.props.collections}
+                    selectedCollectionLocation={this.props.selectedCollectionLocation}
+                    onCollectionClick={this.handleCollectionClick}
+                    onCollectionDoubleClick={this.handleCollectionDoubleClick}
                 />
-                {addingNewCollection ? (
+                {this.state.addingNewCollection ? (
                     <CollectionEditor
                         title="Add collection"
-                        onSave={handleAddCollection}
-                        onClose={handleCancelAddCollection}
+                        onSave={this.handleAddCollection}
+                        onClose={this.handleCancelAddCollection}
                         editType={Config.get().enableExperimentalFeatures}
                     />
                 ) : null}
                 <LoadingOverlay loading={addingCollection || deletingCollection} />
             </>
         );
-    };
-
-    if (error || currentUserError) {
-        return <MessageDisplay message="An error occurred while loading collections" />;
     }
 
-    return (
-        <>
-            {(loading || currentUserLoading) ? <LoadingInlay /> : renderCollectionList()}
-            <Button
-                variant="text"
-                aria-label="Add"
-                title="Create a new collection"
-                onClick={handleAddCollectionClick}
-            >
-                <Icon>add</Icon>
-            </Button>
-        </>
-    );
+    render() {
+        const {loading, error} = this.props;
+        const {currentUserError, currentUserLoading} = this.context;
+
+        if (error || currentUserError) {
+            return <MessageDisplay message="An error occurred while loading collections" />;
+        }
+
+        return (
+            <>
+                {(loading || currentUserLoading) ? <LoadingInlay /> : this.renderCollectionList()}
+                <Button
+                    variant="text"
+                    aria-label="Add"
+                    title="Create a new collection"
+                    onClick={this.handleAddCollectionClick}
+                >
+                    <Icon>add</Icon>
+                </Button>
+            </>
+        );
+    }
+}
+
+CollectionBrowser.defaultProps = {
+    fetchCollectionsIfNeeded: () => {}
 };
 
 const mapStateToProps = (state) => ({
