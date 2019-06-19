@@ -18,15 +18,6 @@ data:
     keycloak:
       workspace-login-group: {{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}
 
-    frontend:
-      urls:
-        files: {{ template "storage.url" . }}/webdav/v1
-        jupyter: {{ template "jupyterhub.url" . }}
-        {{ if ( and .Values.services .Values.services.cbioportal  ) }}cbioportal: {{ .Values.services.cbioportal }}{{ end }}
-      roles:
-        dataSteward: "datasteward-{{ template "workspace.name" . }}"
-        coordinator: "coordinator-{{ template "workspace.name" . }}"
-
     workspace:
       name: {{ .Release.Name }}
       version: {{ .Values.pluto.workspace.version }}
