@@ -22,11 +22,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
 
-/**
- * Loads users from the database on start and then regularly synchronizes the cache and the database with Keycloak.
- * Loading from the database is needed to prevent unnecessary writes.
- *
- */
 @Slf4j
 public class UserService {
     private static final long REFRESH_INTERVAL = TimeUnit.MINUTES.toMillis(1);
@@ -35,7 +30,6 @@ public class UserService {
     private final DAO dao;
     private final Map<Node, User> usersByIri = new ConcurrentHashMap<>();
     private final HttpClient httpClient = new HttpClient();
-    private final Timer worker = new Timer();
     private final boolean authorizationRequired;
     private volatile String authorization;
 
@@ -44,9 +38,7 @@ public class UserService {
         this.dao = dao;
         this.authorizationRequired = authorizationRequired;
 
-        loadUsers();
-
-        worker.schedule(new TimerTask() {
+        new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 refreshCache();
@@ -63,7 +55,6 @@ public class UserService {
         return usersByIri.get(iri);
     }
 
-
     private void refreshCache() {
         if (authorizationRequired && authorization == null) {
             return;
@@ -76,11 +67,6 @@ public class UserService {
         if (!updated.isEmpty()) {
             commit("Update user information", dao, () -> updated.forEach(dao::write));
         }
-
-    }
-
-    private void loadUsers() {
-        dao.list(User.class).forEach(user -> usersByIri.put(user.getIri(), user));
     }
 
     private List<User> fetchUsers() {
