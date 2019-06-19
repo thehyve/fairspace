@@ -20,7 +20,7 @@ app.get('/config/config.json', (req, res) => res.sendFile(`${mockDataDir}/worksp
 
 // Account API
 app.get('/api/v1/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
-app.get('/api/v1/account/authorizations', (req, res) => res.send(['user-workspace1', 'datasteward', 'ROLE_USER']));
+app.get('/api/v1/account/authorizations', (req, res) => res.send(['user-workspace', 'datasteward', 'ROLE_USER']));
 
 // Workspace API
 app.get('/api/v1/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));

@@ -28,6 +28,7 @@
     "/config/config.json"
   ],
   "roles": {
+    "user": "",
     "dataSteward": "",
     "coordinator": ""
   },
