@@ -154,8 +154,8 @@ export class AlterPermissionDialog extends React.Component {
 
         let options = [];
 
-        if (users.data && collaborators.data) {
-            options = transformUserToOptions(users, collaborators.data, currentUser);
+        if (users.data && collaborators) {
+            options = transformUserToOptions(users, collaborators, currentUser);
             if (user) { // only render the label if user is passed into this component
                 return (
                     <div>

@@ -21,22 +21,6 @@ class PermissionsViewer extends React.Component {
         selectedPermission: null
     };
 
-    componentDidMount() {
-        const {iri, fetchPermissionsIfNeeded} = this.props;
-
-        if (iri) {
-            fetchPermissionsIfNeeded(iri);
-        }
-    }
-
-    componentDidUpdate() {
-        const {iri, fetchPermissionsIfNeeded} = this.props;
-
-        if (iri) {
-            fetchPermissionsIfNeeded(iri);
-        }
-    }
-
     handleAlterPermission = ({user, access}) => {
         this.setState({
             showPermissionDialog: true,
@@ -160,12 +144,13 @@ class PermissionsViewer extends React.Component {
     };
 
     renderPermissionDialog = () => {
-        const {iri, currentUser} = this.props;
+        const {iri, currentUser, alterPermission} = this.props;
         const {selectedPermission, showPermissionDialog} = this.state;
 
         return (
             <AlterPermissionContainer
                 open={showPermissionDialog}
+                alterPermission={alterPermission}
                 onClose={this.handleShareWithDialogClose}
                 user={selectedPermission && selectedPermission.user}
                 access={selectedPermission && selectedPermission.access}

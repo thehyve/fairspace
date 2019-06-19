@@ -1,26 +1,12 @@
 import React from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    Collapse,
-    Icon,
-    IconButton,
-    Menu,
-    MenuItem,
-    Typography,
-    withStyles
-} from '@material-ui/core';
+import {Card, CardContent, CardHeader, Icon, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
-import classnames from 'classnames';
 
 import LoadingInlay from './LoadingInlay';
 import CollectionEditor from "./CollectionEditor";
 import ConfirmationDialog from './ConfirmationDialog';
-import PermissionsContainer from "../permissions/PermissionsContainer";
-import Avatar from "@material-ui/core/Avatar";
+import {PermissionProvider} from "../permissions/PermissionContext";
+import PermissionsCard from "../permissions/PermissionsCard";
 
 export const ICONS = {
     LOCAL_STORAGE: 'folder_open',
@@ -31,36 +17,11 @@ export const ICONS = {
 
 const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
-const styles = theme => ({
-    expand: {
-        transform: 'rotate(0deg)',
-        marginLeft: 'auto',
-        transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest,
-        }),
-    },
-    expandOpen: {
-        transform: 'rotate(180deg)',
-    },
-    permissionsCard: {
-        marginTop: 10
-    },
-    avatar: {
-        width: 30,
-        height: 30
-    }
-});
-
 class CollectionDetails extends React.Component {
     state = {
         editing: false,
         anchorEl: null,
-        expanded: false,
         deleting: false
-    };
-
-    handleExpandClick = () => {
-        this.setState(state => ({expanded: !state.expanded}));
     };
 
     handleEdit = () => {
@@ -95,8 +56,8 @@ class CollectionDetails extends React.Component {
     }
 
     render() {
-        const {classes, loading, collection} = this.props;
-        const {anchorEl, expanded, editing, deleting} = this.state;
+        const {loading, collection} = this.props;
+        const {anchorEl, editing, deleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (loading) {
@@ -147,36 +108,10 @@ class CollectionDetails extends React.Component {
                     </CardContent>
                 </Card>
 
-                <Card classes={{root: classes.permissionsCard}}>
-                    <CardHeader
-                        action={(
-                            <IconButton
-                                className={classnames(classes.expand, {
-                                    [classes.expandOpen]: expanded,
-                                })}
-                                onClick={this.handleExpandClick}
-                                aria-expanded={expanded}
-                                aria-label="Show more"
-                                title="Collaborators"
-                            >
-                                <ExpandMoreIcon />
-                            </IconButton>
-                        )}
-                        titleTypographyProps={{variant: 'h6'}}
-                        title={<Avatar alt="User" src="/images/avatar.png" className={classes.avatar} />}
-                        avatar={(
-                            <LockOpenIcon />
-                        )}
-                    />
-                    <Collapse in={expanded} timeout="auto" unmountOnExit>
-                        <CardContent>
-                            <PermissionsContainer
-                                iri={collection.iri}
-                                canManage={collection.canManage}
-                            />
-                        </CardContent>
-                    </Collapse>
-                </Card>
+                <PermissionProvider iri={collection.iri}>
+                    <PermissionsCard iri={collection.iri} canManage={collection.canManage} />
+                </PermissionProvider>
+
                 {editing ? (
                     <CollectionEditor
                         name={collection.name}
@@ -202,4 +137,4 @@ class CollectionDetails extends React.Component {
     }
 }
 
-export default withStyles(styles)(CollectionDetails);
+export default CollectionDetails;
