@@ -49,10 +49,12 @@ export class FileOperations extends React.Component {
 
     handleUpload(files) {
         if (files && files.length > 0) {
-            const updatedFiles = files.map(file => ({
-                value: file,
-                name: generateUniqueFileName(file.name, this.props.existingFiles)
-            }));
+            const usedNames = [...this.props.existingFiles];
+            const updatedFiles = files.map(file => {
+                const name = generateUniqueFileName(file.name, usedNames);
+                usedNames.push(name);
+                return {value: file, name};
+            });
 
             return this.fileOperation(Operations.UPLOAD, this.props.uploadFiles(this.props.openedPath, updatedFiles))
                 .catch((err) => {

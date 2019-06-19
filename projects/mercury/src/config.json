@@ -25,12 +25,11 @@
     "log": "error"
   },
   "externalConfigurationFiles": [
-    "/api/v1/workspace/config"
+    "/config/config.json"
   ],
   "roles": {
     "dataSteward": "",
     "coordinator": ""
   },
   "enableExperimentalFeatures": false
-
 }

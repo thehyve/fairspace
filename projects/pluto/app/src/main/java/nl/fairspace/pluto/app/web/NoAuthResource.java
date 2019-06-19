@@ -1,7 +1,6 @@
 package nl.fairspace.pluto.app.web;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.app.config.dto.FrontendConfig;
 import nl.fairspace.pluto.app.config.dto.WorkspaceDetails;
 import nl.fairspace.pluto.app.model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import java.util.Map;
 import static nl.fairspace.pluto.app.config.Urls.AUTHORIZATIONS_PATH;
 import static nl.fairspace.pluto.app.config.Urls.EXCHANGE_TOKENS_PATH;
 import static nl.fairspace.pluto.app.config.Urls.USERINFO_PATH;
-import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_CONFIG_PATH;
 import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_DETAILS_PATH;
 import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_USERS_PATH;
 
@@ -35,8 +33,6 @@ import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_USERS_PATH;
 @Profile("noAuth")
 @Slf4j
 public class NoAuthResource {
-    @Autowired
-    FrontendConfig frontendConfig;
 
     @Autowired
     WorkspaceDetails workspaceDetails;
@@ -76,16 +72,6 @@ public class NoAuthResource {
     public Map<String, String> exchangeTokens(@RequestBody ExchangeTokenParams tokenParams, HttpServletRequest request) {
         HttpSession session = request.getSession();
         return Collections.singletonMap("sessionId", base64Encode(session.getId()));
-    }
-
-    /**
-     * GET  /config: returns a map with configuration options relevant for the frontend
-     *
-     * @return a map with configuration options relevant for the frontend
-     */
-    @GetMapping(value = WORKSPACE_CONFIG_PATH, produces = "application/json")
-    public FrontendConfig getConfiguration(HttpServletRequest incomingRequest) {
-        return frontendConfig;
     }
 
     /**
