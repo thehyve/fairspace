@@ -49,11 +49,12 @@ security:
     - /authorize
     - /api/${app.apiVersion.pluto}/account/tokens
     needsAuthentication:
-    - /api/${app.apiVersion.pluto}/account/name
-    - /*
+    - /
+    - /static/*
+    - "*.js"
+    - /api/${app.apiVersion.pluto}/account/user
     needsAuthorization:
-    - /api/${app.apiVersion.pluto}/account/authorizations
-    - /api/*
+    - /*
 
 workspace:
   name: Workspace
