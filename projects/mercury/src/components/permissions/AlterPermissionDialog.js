@@ -76,7 +76,7 @@ const getUserLabelByUser = (user, options) => {
  * @returns {Array}
  */
 const transformUserToOptions = (users, collaborators, currentUser) => {
-    const tmp = users.data.map(r => ({
+    const tmp = users.map(r => ({
         label: getDisplayName(r),
         value: r.iri
     }));
@@ -88,16 +88,18 @@ const transformUserToOptions = (users, collaborators, currentUser) => {
  * @param users
  * @returns {string}
  */
-const getNoOptionMessage = (users) => {
-    let noOptionMessage = 'No options';
-    if (users) {
-        if (users.pending) {
-            noOptionMessage = 'Loading ..';
-        } else if (users.error) {
-            noOptionMessage = 'Error: Cannot fetch users.';
-        }
+const getNoOptionMessage = () => {
+    const {loading, error} = this.props;
+
+    if (loading) {
+        return 'Loading ..';
     }
-    return noOptionMessage;
+
+    if (error) {
+        return 'Error: Cannot fetch users.';
+    }
+
+    return 'No options';
 };
 
 export class AlterPermissionDialog extends React.Component {
@@ -154,7 +156,7 @@ export class AlterPermissionDialog extends React.Component {
 
         let options = [];
 
-        if (users.data && collaborators) {
+        if (users && collaborators) {
             options = transformUserToOptions(users, collaborators, currentUser);
             if (user) { // only render the label if user is passed into this component
                 return (
@@ -177,18 +179,18 @@ export class AlterPermissionDialog extends React.Component {
                 onChange={this.handleSelectedUserChange}
                 placeholder="Please select a user"
                 value={selectedUser}
-                noOptionsMessage={() => (getNoOptionMessage(users))}
+                noOptionsMessage={() => (getNoOptionMessage())}
                 label={selectedUserLabel}
             />
         );
     };
 
     render() {
-        const {classes, user} = this.props;
+        const {classes, user, open, loading, error} = this.props;
         const {selectedUser, accessRight} = this.state;
 
         return (
-            <Dialog open={this.props.open} onEnter={this.handleOnEnter} onClose={this.handleClose}>
+            <Dialog open={open} onEnter={this.handleOnEnter} onClose={this.handleClose}>
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={user ? classes.rootEdit : classes.root}>
@@ -224,7 +226,7 @@ export class AlterPermissionDialog extends React.Component {
                     <Button
                         onClick={this.handleSubmit}
                         color="primary"
-                        disabled={!selectedUser}
+                        disabled={!selectedUser || loading || error}
                     >
                         Submit
                     </Button>

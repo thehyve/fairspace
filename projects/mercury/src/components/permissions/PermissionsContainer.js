@@ -11,27 +11,25 @@ import PermissionAPI from "../../services/PermissionAPI";
 const mapStateToProps = (state, ownProps) => {
     const {
         account: {user},
-        cache: {users}
     } = state;
 
     return {
-        loading: user.pending || users.pending || ownProps.loading,
-        error: user.error || users.error || ownProps.error,
-        currentUser: user.data,
-        users: users.data
+        loading: user.pending || ownProps.loading,
+        error: user.error || ownProps.error,
+        currentUser: user.data
     };
 };
 
 const ConnectedPermissionsViewer = connect(mapStateToProps)(PermissionsViewer);
 
 export default (props) => {
-    const {permissions, loading, error, updatePermissions} = useContext(PermissionContext);
+    const {permissions, loading, error, refresh} = useContext(PermissionContext);
     const [altering, setAltering] = useState(false);
 
     const alterPermission = (userIri, iri, access) => {
         setAltering(true);
         PermissionAPI.alterPermission(userIri, iri, access)
-            .then(updatePermissions)
+            .then(refresh)
             .catch(e => {console.error("Error altering permission", e);})
             .finally(() => setAltering(false));
     };

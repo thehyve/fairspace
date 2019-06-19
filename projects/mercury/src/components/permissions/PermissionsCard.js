@@ -38,7 +38,7 @@ export const PermissionsCard = ({classes, iri, canManage}) => {
 
     const cardHeaderAction = (
         <Grid container direction="row" alignItems="center">
-            {permissions.map(permission => (<Grid item><Avatar key={permission.user} title={permission.user} src="/images/avatar.png" className={classes.avatar} /></Grid>))}
+            {permissions.map(permission => (<Grid key={permission.user} item><Avatar title={permission.userName} src="/images/avatar.png" className={classes.avatar} /></Grid>))}
             <Grid item>
                 <IconButton
                     className={classnames(classes.expand, {

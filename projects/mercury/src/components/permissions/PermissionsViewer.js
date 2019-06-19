@@ -73,16 +73,14 @@ class PermissionsViewer extends React.Component {
     };
 
     renderCollaboratorList(permissions) {
-        const {users, canManage, currentUser} = this.props;
+        const {canManage, currentUser} = this.props;
         const {anchorEl, selectedPermission} = this.state;
 
         const selectedPermissionKey = selectedPermission
             ? selectedPermission.access + selectedPermission.user
             : null;
 
-        const permissionsWithUserNames = permissions.map(permission => ({...permission, userName: getDisplayName(users.find(user => permission.user === user.iri))}));
-
-        return sortPermissions(permissionsWithUserNames)
+        return sortPermissions(permissions)
             .map((permission) => {
                 const key = permission.access + permission.user;
                 return (

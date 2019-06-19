@@ -8,7 +8,6 @@ import allVocabularyEntities from "./allVocabularyEntitiesReducers";
 import metaVocabulary from "./metaVocabularyReducers";
 import collections from "./collectionReducers";
 import filesByPath from "./filesByPathReducers";
-import users from "./usersReducers";
 import subjectByPath from "./subjectByPathReducers";
 
 export default combineReducers({
@@ -21,7 +20,6 @@ export default combineReducers({
     allVocabularyEntities,
 
     metaVocabulary,
-    users,
     collections,
     filesByPath,
     subjectByPath
