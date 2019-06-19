@@ -24,7 +24,6 @@ export const LinkedDataEntityForm = ({
                 properties
                     .sort(comparing(
                         compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
-                        compareBy(hasValue, false),
                         compareBy('label')
                     ))
                     .map(p => (

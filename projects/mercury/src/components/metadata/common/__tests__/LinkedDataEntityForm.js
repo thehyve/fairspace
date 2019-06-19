@@ -158,67 +158,7 @@ describe('LinkedDataEntityForm', () => {
             expect(renderedProperties.at(1).prop('property').key).toEqual("http://fairspace.io/ontology#AAA");
         });
 
-        it('should sort by values if no order is specified', () => {
-            const metadata = [
-                {
-                    key: "http://fairspace.io/ontology#AAA",
-                    label: "AAA",
-                },
-                {
-                    key: "http://fairspace.io/ontology#BBB",
-                    label: "BBB",
-                    values: [
-                        {
-                            id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
-                            label: "John"
-                        }
-                    ]
-                }
-            ];
-            const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-            const wrapper = shallow(<LinkedDataEntityForm
-                properties={metadata}
-                subject={subject}
-            />);
-
-            const renderedProperties = wrapper.find(LinkedDataProperty);
-            expect(renderedProperties.at(0).prop('property').key).toEqual("http://fairspace.io/ontology#BBB");
-            expect(renderedProperties.at(1).prop('property').key).toEqual("http://fairspace.io/ontology#AAA");
-        });
-
-        it('should treat empty values as non existent', () => {
-            const metadata = [
-                {
-                    key: "http://fairspace.io/ontology#AAA",
-                    label: "AAA",
-                    values: [
-                        {value: ""}
-                    ]
-                },
-                {
-                    key: "http://fairspace.io/ontology#BBB",
-                    label: "BBB",
-                    values: [
-                        {
-                            id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
-                            label: "John"
-                        }
-                    ]
-                }
-            ];
-            const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-            const wrapper = shallow(<LinkedDataEntityForm
-                properties={metadata}
-                subject={subject}
-            />);
-
-            const renderedProperties = wrapper.find(LinkedDataProperty);
-            expect(renderedProperties.at(0).prop('property').key).toEqual("http://fairspace.io/ontology#BBB");
-            expect(renderedProperties.at(1).prop('property').key).toEqual("http://fairspace.io/ontology#AAA");
-        });
-
-
-        it('should sort by label if no order is specified and both fields are empty', () => {
+        it('should sort by label if no order is specified', () => {
             const metadata = [
                 {
                     key: "http://fairspace.io/ontology#AAA",
@@ -226,7 +166,7 @@ describe('LinkedDataEntityForm', () => {
                 },
                 {
                     key: "http://fairspace.io/ontology#BBB",
-                    label: "First",
+                    label: "First"
                 }
 
             ];
