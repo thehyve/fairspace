@@ -145,7 +145,7 @@ public class CollectionsService {
     private void validateFields(Collection collection) {
         validate(isLocationValid(collection.getLocation()), "Invalid location");
         validate(isNotEmpty(collection.getName()), "Field name must be set");
-        validate(collection.getName().length() <= 128, "Filed name must contain no more than 128 characters");
+        validate(collection.getName().length() <= 128, "Field name must contain no more than 128 characters");
         validate(collection.getType() != null, "Field type must be set");
     }
 
