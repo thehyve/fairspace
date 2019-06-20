@@ -260,7 +260,7 @@ fs:username a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
     fs:fixedShape true ;
-    sh:path fs:username .
+    sh:path rdfs:label .
 
 ## Relation Shapes
 
