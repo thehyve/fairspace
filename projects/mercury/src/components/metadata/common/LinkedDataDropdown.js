@@ -92,7 +92,7 @@ class LinkedDataDropdown extends React.Component {
 }
 
 LinkedDataDropdown.defaultProps = {
-    fetchItems: ({types, size}) => searchAPI().searchLinkedData({types, size})
+    fetchItems: ({types, size, query}) => searchAPI().searchLinkedData({types, size, query})
 };
 
 LinkedDataDropdown.propTypes = {
