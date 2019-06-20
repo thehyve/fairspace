@@ -8,8 +8,6 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.util.FileManager;
 
-import java.util.Set;
-
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -40,11 +38,6 @@ public class Vocabularies {
                 rdf.put(SYSTEM_VOCABULARY_GRAPH_BACKUP, SYSTEM_VOCABULARY);
             }
         });
-    }
-
-    public static Set<String> getMachineOnlyPredicates(RDFConnection rdf, Node vocabularyGraphUri) {
-        return selectDistinct(rdf, storedQuery("machine_only_properties", vocabularyGraphUri),
-                row -> row.getResource("property").getURI());
     }
 
     public static Property getInverse(RDFConnection rdf, Node vocabularyGraphUri, Property property) {

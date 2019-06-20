@@ -62,15 +62,15 @@ public class App {
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
         var metadataValidator = new ComposedValidator(
-                new MachineOnlyClassesValidator(rdf),
-                new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, VOCABULARY_GRAPH_URI)),
+                new MachineOnlyClassesValidator(SYSTEM_VOCABULARY),
+                new ProtectMachineOnlyPredicatesValidator(SYSTEM_VOCABULARY),
                 new PermissionCheckingValidator(permissions),
                 new ShaclValidator(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, metadataLifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, META_VOCABULARY_GRAPH_URI)),
+                new ProtectMachineOnlyPredicatesValidator(META_VOCABULARY),
                 new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
                 new SystemVocabularyProtectingValidator(),
                 new MetadataAndVocabularyConsistencyValidator(rdf),
