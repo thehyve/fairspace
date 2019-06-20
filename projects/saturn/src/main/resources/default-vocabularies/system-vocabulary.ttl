@@ -144,16 +144,15 @@ fs:CollectionShape a fs:ClassShape ;
 
 fs:UserShape a sh:NodeShape ;
     sh:closed true ; 
-    sh:description "Description for fs:User" ;
+    sh:description "A current or previous user of this workspace." ;
     sh:name "User" ;
     sh:targetClass fs:User ;
     fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
     sh:property
-        fs:labelShape,
-        fs:commentShape,
-        fs:userEmailShape .
+        fs:username,
+        fs:email .
 
 ## Property Shapes
 
@@ -244,7 +243,7 @@ fs:md5Shape a fs:DatatypePropertyShape ;
     fs:fixedShape true ;
     sh:path fs:md5 .
 
-fs:userEmailShape a fs:DatatypePropertyShape ;
+fs:email a fs:DatatypePropertyShape ;
     sh:name "Email" ;
     sh:description "Email address" ;
     sh:datatype xsd:string ;
@@ -253,6 +252,15 @@ fs:userEmailShape a fs:DatatypePropertyShape ;
     fs:fixedShape true ;
     sh:path fs:email .
 
+fs:username a fs:DatatypePropertyShape ;
+    sh:name "Username" ;
+    sh:description "This users name, as provided by identity provider." ;
+    sh:datatype xsd:string ;
+    sh:maxLength 128 ;
+    sh:maxCount 1 ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:username .
 
 ## Relation Shapes
 
