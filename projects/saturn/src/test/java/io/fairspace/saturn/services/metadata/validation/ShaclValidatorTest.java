@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -20,12 +21,17 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ShaclValidatorTest {
@@ -43,7 +49,7 @@ public class ShaclValidatorTest {
     @Before
     public void setUp() {
         initVocabularies(rdf);
-        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI);
+        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, Vocabularies.VOCABULARY_GRAPH_URI);
 
         doAnswer(invocation -> {
             System.err.println(Arrays.toString(invocation.getArguments()));
@@ -69,7 +75,7 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceWithInvalidProperties() {
         validator.validate(EMPTY, createDefaultModel()
-                        .add(resource1, RDF.type, createResource(VOCABULARY_GRAPH_URI + "ResearchProject"))
+                        .add(resource1, RDF.type, FS.User)
                         .add(resource1, RDFS.label, createTypedLiteral(123))
                         .add(resource1, RDFS.comment, createTypedLiteral(123)),
                 violationHandler);
