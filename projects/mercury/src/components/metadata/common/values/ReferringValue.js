@@ -11,7 +11,7 @@ function linkLabel(link) {
             : link.substring(link.lastIndexOf('/') + 1));
 }
 
-const ReferringValue = ({property, entry, editorPath}) => {
+const ReferringValue = ({property, entry = {}, editorPath}) => {
     function extractDisplayValue(value) {
         switch (property.datatype) {
             case DATETIME_URI:

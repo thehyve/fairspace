@@ -5,7 +5,7 @@ import {STRING_URI} from "../../../../constants";
 import LinkedDataProperty from "../LinkedDataProperty";
 import LinkedDataRelationTable from "../LinkedDataRelationTable";
 import LinkedDataInputFieldsTable from "../LinkedDataInputFieldsTable";
-import {LinkedDataValuesContext} from "../LinkedDataValuesContext";
+import {LinkedDataValuesComponentsProvider} from "../../LinkedDataValuesComponentsContext";
 import NumberValue from "../values/NumberValue";
 import StringValue from "../values/StringValue";
 import SwitchValue from "../values/SwitchValue";
@@ -64,14 +64,8 @@ describe('LinkedDataProperty elements', () => {
     });
 
     describe('inputComponents', () => {
-        const valueComponentFactory = {
-            addComponent: () => NumberValue,
-            editComponent: () => StringValue,
-            readOnlyComponent: () => SwitchValue
-        };
-
         const renderTable = property => {
-            const wrapper = mount(<LinkedDataValuesContext.Provider value={{editorPath: '/metadata', componentFactory: valueComponentFactory}}><LinkedDataProperty property={property} /></LinkedDataValuesContext.Provider>);
+            const wrapper = mount(<LinkedDataValuesComponentsProvider editorPath="/metadata"><LinkedDataProperty property={property} /></LinkedDataValuesComponentsProvider>);
             const table = wrapper.find(LinkedDataInputFieldsTable);
             expect(table.length).toEqual(1);
             return table;

@@ -19,8 +19,6 @@ import {partitionErrors, propertiesToShow, url2iri} from "../../../utils/linkedd
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
-import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
-import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 import Config from "../../../services/Config/Config";
 import {isDataSteward} from "../../../utils/userUtils";
@@ -32,6 +30,7 @@ import {
     isFixedShape
 } from "../../../utils/linkeddata/vocabularyUtils";
 import {VOCABULARY_PATH} from "../../../constants";
+import {LinkedDataValuesComponentsProvider} from '../LinkedDataValuesComponentsContext';
 
 const VocabularyEntityContainer = props => {
     const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -50,14 +49,14 @@ const VocabularyEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
+                <LinkedDataValuesComponentsProvider editorPath={VOCABULARY_PATH}>
                     <LinkedDataEntityFormContainer
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
                         error={error}
                         {...otherProps}
                     />
-                </LinkedDataValuesContext.Provider>
+                </LinkedDataValuesComponentsProvider>
             </Grid>
             {
                 isEditable && !error

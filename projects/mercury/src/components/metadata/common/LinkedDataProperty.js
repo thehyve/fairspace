@@ -2,11 +2,11 @@ import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import {FormControl, FormGroup, FormHelperText, FormLabel} from '@material-ui/core';
 
-import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
 import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
 import LinkedDataRelationTable from "./LinkedDataRelationTable";
 import {TOOLTIP_ENTER_DELAY} from "../../../constants";
 import GenericTooltip from "../../common/GenericTooltip";
+import LinkedDataValuesComponentsContext from '../LinkedDataValuesComponentsContext';
 
 /**
      * Checks whether the configuration of this property disallowed editing of existing values
@@ -22,7 +22,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || allowedValues;
 
 const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
-    const {editorPath, componentFactory: {readOnlyComponent, editComponent, addComponent}} = useContext(LinkedDataValuesContext);
+    const {editorPath, readOnlyComponent, editComponent, addComponent} = useContext(LinkedDataValuesComponentsContext);
 
     const {key, values, errors, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
     const hasErrors = errors && errors.length > 0;

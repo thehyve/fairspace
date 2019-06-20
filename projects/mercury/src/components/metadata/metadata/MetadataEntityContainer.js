@@ -15,10 +15,11 @@ import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../r
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
-import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
-import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import {METADATA_PATH} from "../../../constants";
+import {LinkedDataValuesComponentsProvider} from '../LinkedDataValuesComponentsContext';
+import MetadataDropdownWithAdditionContainer from "./MetadataDropdownWithAdditionContainer";
+import MetadataDropdownContainer from "./MetadataDropdownContainer";
 
 const MetadataEntityContainer = props => {
     const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -43,14 +44,18 @@ const MetadataEntityContainer = props => {
             alignItems="stretch"
         >
             <Grid item>
-                <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
+                <LinkedDataValuesComponentsProvider
+                    editorPath={METADATA_PATH}
+                    dropdownComponent={MetadataDropdownContainer}
+                    dropdownWithAdditionComponent={MetadataDropdownWithAdditionContainer}
+                >
                     <LinkedDataEntityFormContainer
                         formKey={subject}
                         fetchLinkedData={() => fetchLinkedData(subject)}
                         error={error}
                         {...otherProps}
                     />
-                </LinkedDataValuesContext.Provider>
+                </LinkedDataValuesComponentsProvider>
             </Grid>
             {isEditable && !error && (
                 <Grid item>
