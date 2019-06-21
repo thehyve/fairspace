@@ -16,7 +16,7 @@ data:
         {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
       },
       "roles": {
-        "user": "datasteward-{{ template "workspace.name" . }}",
+        "user": "user-{{ template "workspace.name" . }}",
         "dataSteward": "datasteward-{{ template "workspace.name" . }}",
         "coordinator": "coordinator-{{ template "workspace.name" . }}"
       },
