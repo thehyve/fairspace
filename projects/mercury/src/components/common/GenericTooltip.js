@@ -5,6 +5,7 @@ import {withStyles} from "@material-ui/core";
 const styles = theme => ({
     tooltip: {
         ...theme.typography.caption,
+        maxWidth: 'none',
         color: 'white'
     }
 });
