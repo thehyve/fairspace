@@ -2,7 +2,10 @@ package io.fairspace.saturn.services.users;
 
 import lombok.Data;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.joining;
 
 @Data
 class KeycloakUser {
@@ -12,16 +15,8 @@ class KeycloakUser {
     private String email;
 
     String getFullName() {
-        var sb = new StringBuilder();
-        if (isNotEmpty(firstName)) {
-            sb.append(firstName);
-            if (isNotEmpty(lastName)) {
-                sb.append(' ');
-            }
-        }
-        if (isNotEmpty(lastName)) {
-            sb.append(lastName);
-        }
-        return sb.toString();
+        return Stream.of(firstName, lastName)
+                .filter(Objects::nonNull)
+                .collect(joining(" "));
     }
 }

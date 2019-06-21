@@ -50,7 +50,7 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(CONFIG.usersEndpoint, new DAO(rdf, null), CONFIG.auth.enabled);
+        var userService = new UserService(CONFIG.users.endpoint, CONFIG.users.synchronizationInterval, new DAO(rdf, null), CONFIG.auth.enabled);
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getUserId());
         var mailService = new MailService(CONFIG.mail);
 

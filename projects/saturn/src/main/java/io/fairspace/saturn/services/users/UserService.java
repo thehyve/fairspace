@@ -24,7 +24,6 @@ import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
 
 @Slf4j
 public class UserService {
-    private static final long REFRESH_INTERVAL = TimeUnit.MINUTES.toMillis(1);
     private static final ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     private final String usersEndpoint;
     private final DAO dao;
@@ -33,7 +32,7 @@ public class UserService {
     private final boolean authorizationRequired;
     private volatile String authorization;
 
-    public UserService(String usersEndpoint, DAO dao, boolean authorizationRequired) {
+    public UserService(String usersEndpoint, int refreshInterval, DAO dao, boolean authorizationRequired) {
         this.usersEndpoint = usersEndpoint;
         this.dao = dao;
         this.authorizationRequired = authorizationRequired;
@@ -43,7 +42,7 @@ public class UserService {
             public void run() {
                 refreshCache();
             }
-        }, 0, REFRESH_INTERVAL);
+        }, 0, TimeUnit.SECONDS.toMillis(refreshInterval));
     }
 
     public User getUser(Node iri) {

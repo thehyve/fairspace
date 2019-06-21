@@ -28,7 +28,9 @@ jena:
       indexName: "fairspace"
     advancedSettings:
       transport.netty.worker_count: 1
-usersEndpoint: "http://localhost:3000/api/v1/workspace/users"
+users:
+  endpoint: "http://localhost:3000/api/v1/workspace/users"
+  synchronizationInterval: 60
 auth:
   # Enables JWT/JWKS authentication. Defaults to false.
   enabled: false
