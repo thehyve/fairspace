@@ -15,6 +15,8 @@ import * as collectionActions from "../../actions/collectionActions";
 import {findById} from "../../utils/genericUtils";
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import Config from "../../services/Config/Config";
+import {getLocalPart} from "../../utils/linkeddata/metadataUtils";
+import UsersContext from "../permissions/UsersContext";
 
 class CollectionBrowser extends React.Component {
     state = {
@@ -55,10 +57,11 @@ class CollectionBrowser extends React.Component {
     }
 
     renderCollectionList() {
-        const {users, collections, addingCollection, deletingCollection} = this.props;
+        const {collections, addingCollection, deletingCollection} = this.props;
+        const {users} = this.context;
 
         collections.forEach(col => {
-            col.creatorObj = findById(users, col.createdBy);
+            col.creatorObj = findById(users, getLocalPart(col.createdBy));
         });
 
         return (
@@ -84,14 +87,15 @@ class CollectionBrowser extends React.Component {
 
     render() {
         const {loading, error} = this.props;
+        const {loading: usersLoading, error: usersError} = this.context;
 
-        if (error) {
+        if (error || usersError) {
             return <MessageDisplay message="An error occurred while loading collections" />;
         }
 
         return (
             <>
-                {loading ? <LoadingInlay /> : this.renderCollectionList()}
+                {loading || usersLoading ? <LoadingInlay /> : this.renderCollectionList()}
                 <Button
                     variant="text"
                     aria-label="Add"
@@ -105,12 +109,13 @@ class CollectionBrowser extends React.Component {
     }
 }
 
+CollectionBrowser.contextType = UsersContext;
+
 const mapStateToProps = (state) => ({
     user: state.account.user.data,
-    loading: state.cache.collections.pending || state.account.user.pending || state.cache.users.pending,
-    error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
+    loading: state.cache.collections.pending || state.account.user.pending,
+    error: state.cache.collections.error || state.account.user.error,
     collections: state.cache.collections.data,
-    users: state.cache.users.data,
     selectedCollectionLocation: state.collectionBrowser.selectedCollectionLocation,
     addingCollection: state.collectionBrowser.addingCollection,
     deletingCollection: state.collectionBrowser.deletingCollection

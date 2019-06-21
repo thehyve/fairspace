@@ -2,7 +2,6 @@
 
 // Account
 export const FETCH_USER                             = 'FETCH_USER';
-export const FETCH_USERS                            = 'FETCH_USERS';
 export const FETCH_AUTHORIZATIONS                   = 'FETCH_AUTHORIZATIONS';
 
 // Clipboard
@@ -86,13 +85,6 @@ export const CREATE_VOCABULARY_ENTITY_FULFILLED     = 'CREATE_VOCABULARY_ENTITY_
 export const CREATE_VOCABULARY_ENTITY_REJECTED      = 'CREATE_VOCABULARY_ENTITY_REJECTED';
 export const FETCH_VOCABULARY_ENTITIES              = 'FETCH_VOCABULARY_ENTITIES';
 export const FETCH_ALL_VOCABULARY_ENTITIES          = 'FETCH_ALL_VOCABULARY_ENTITIES';
-
-// Permissions
-export const FETCH_PERMISSIONS                      = 'FETCH_PERMISSIONS';
-export const ALTER_PERMISSION                       = 'ALTER_PERMISSION';
-export const ALTER_PERMISSION_PENDING               = 'ALTER_PERMISSION_PENDING';
-export const ALTER_PERMISSION_FULFILLED             = 'ALTER_PERMISSION_FULFILLED';
-export const ALTER_PERMISSION_REJECTED              = 'ALTER_PERMISSION_REJECTED';
 
 // Workspace
 export const FETCH_WORKSPACE                        = 'FETCH_WORKSPACE';

@@ -21,22 +21,6 @@ class PermissionsViewer extends React.Component {
         selectedPermission: null
     };
 
-    componentDidMount() {
-        const {iri, fetchPermissionsIfNeeded} = this.props;
-
-        if (iri) {
-            fetchPermissionsIfNeeded(iri);
-        }
-    }
-
-    componentDidUpdate() {
-        const {iri, fetchPermissionsIfNeeded} = this.props;
-
-        if (iri) {
-            fetchPermissionsIfNeeded(iri);
-        }
-    }
-
     handleAlterPermission = ({user, access}) => {
         this.setState({
             showPermissionDialog: true,
@@ -89,16 +73,14 @@ class PermissionsViewer extends React.Component {
     };
 
     renderCollaboratorList(permissions) {
-        const {users, canManage, currentUser} = this.props;
+        const {canManage, currentUser} = this.props;
         const {anchorEl, selectedPermission} = this.state;
 
         const selectedPermissionKey = selectedPermission
             ? selectedPermission.access + selectedPermission.user
             : null;
 
-        const permissionsWithUserNames = permissions.map(permission => ({...permission, userName: getDisplayName(users.find(user => permission.user === user.iri))}));
-
-        return sortPermissions(permissionsWithUserNames)
+        return sortPermissions(permissions)
             .map((permission) => {
                 const key = permission.access + permission.user;
                 return (
@@ -160,12 +142,13 @@ class PermissionsViewer extends React.Component {
     };
 
     renderPermissionDialog = () => {
-        const {iri, currentUser} = this.props;
+        const {iri, currentUser, alterPermission} = this.props;
         const {selectedPermission, showPermissionDialog} = this.state;
 
         return (
             <AlterPermissionContainer
                 open={showPermissionDialog}
+                alterPermission={alterPermission}
                 onClose={this.handleShareWithDialogClose}
                 user={selectedPermission && selectedPermission.user}
                 access={selectedPermission && selectedPermission.access}

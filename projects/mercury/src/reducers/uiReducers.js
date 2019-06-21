@@ -6,26 +6,7 @@ const defaultState = {
 
 const ui = (state = defaultState, action) => {
     switch (action.type) {
-        case actionTypes.ALTER_PERMISSION_PENDING:
-            return {
-                ...state,
-                pending: {
-                    ...state.pending,
-                    alterPermission: true
-                }
-            };
-        case actionTypes.ALTER_PERMISSION_FULFILLED:
-        case actionTypes.ALTER_PERMISSION_REJECTED:
-            return {
-                ...state,
-                pending: {
-                    ...state.pending,
-                    alterPermission: false
-                }
-            };
-
         case actionTypes.FETCH_USER + "_REJECTED":
-        case actionTypes.FETCH_USERS + "_REJECTED":
         case actionTypes.FETCH_AUTHORIZATIONS + "_REJECTED":
         case actionTypes.FETCH_WORKSPACE + "_REJECTED":
             // If a call has failed with a 401 status, the user
