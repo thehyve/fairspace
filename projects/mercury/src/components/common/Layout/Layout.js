@@ -9,6 +9,7 @@ import Footer from './Footer/Footer';
 import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../Routes";
+import Config from "../../../services/Config/Config";
 import {isUserPending} from "../../../reducers/account/userReducers";
 import {isAuthorizationsPending} from "../../../reducers/account/authorizationsReducers";
 import {isWorkspacePending} from "../../../reducers/workspaceReducers";
@@ -67,7 +68,7 @@ const Layout = ({classes, workspaceName, version, pending}) => {
     return (
         <>
             <TopBar workspaceName={workspaceName} />
-            <AuthorizationCheck transformError={transformError}>
+            <AuthorizationCheck authorization={Config.get().roles.user} transformError={transformError}>
                 <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter}/>
                 <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                     <Routes />
