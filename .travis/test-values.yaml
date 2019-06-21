@@ -49,12 +49,3 @@ jupyterhub:
       JUPYTERHUB_CRYPT_KEY: 8232144c8cba2105c71ee2f0e28158f2cc4417bfd103764017422393619208fe
   proxy:
     secretToken: "a09ebe4bd113e5bded426a1335e3f61f53850a395705563b20115bf717a11c93"
-  scheduling:
-    userScheduler:
-      enabled: false
-      pdb:
-        enabled: false
-    podPriority:
-      enabled: false
-    userPlaceholder:
-      enabled: false

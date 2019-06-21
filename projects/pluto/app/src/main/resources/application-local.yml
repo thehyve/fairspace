@@ -1,7 +1,5 @@
 server.port: 5000
 
-logging.level.io.fairspace.oidc_auth: DEBUG
-
 app:
   domain: http://localhost:5000
   forceHttps: false
