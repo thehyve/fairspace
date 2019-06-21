@@ -4,6 +4,7 @@
     "cbioportal": "https://cbioportal-server.com"
   },
   "roles": {
+    "user": "user-workspace",
     "dataSteward": "datasteward"
   },
   "elasticsearch": {

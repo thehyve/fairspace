@@ -9,6 +9,7 @@ import Footer from './Footer/Footer';
 import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../Routes";
+import Config from "../../../services/Config/Config";
 import {isAuthorizationsPending} from "../../../reducers/account/authorizationsReducers";
 import {isWorkspacePending} from "../../../reducers/workspaceReducers";
 import {isRedirectingForLogin} from "../../../reducers/uiReducers";
@@ -17,10 +18,10 @@ import UserContext from '../../../UserContext';
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
 
 const Layout = ({classes, workspaceName, version, pending}) => {
-    const {currentUserLoading} = useContext(UserContext);
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
+    const {currentUserLoading} = useContext(UserContext);
 
     if (pending || currentUserLoading) {
         return <LoadingInlay />;
@@ -68,7 +69,7 @@ const Layout = ({classes, workspaceName, version, pending}) => {
     return (
         <>
             <TopBar workspaceName={workspaceName} />
-            <AuthorizationCheck transformError={transformError}>
+            <AuthorizationCheck authorization={Config.get().roles.user} transformError={transformError}>
                 <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />
                 <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                     <Routes />
