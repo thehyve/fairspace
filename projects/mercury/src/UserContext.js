@@ -7,41 +7,21 @@ import WorkspaceAPI from "./services/WorkspaceAPI";
 const UserContext = React.createContext({});
 
 export const UserProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState({
-        loading: false,
-        error: null,
-        user: {}
-    });
+    const [currentUser, setCurrentUser] = useState({});
+    const [currentUserLoading, setCurrentUserLoading] = useState(false);
+    const [currentUserError, setCurrentUserError] = useState(null);
 
-    const [users, setUsers] = useState({
-        loading: false,
-        error: null,
-        users: {}
-    });
+    const [users, setUsers] = useState([]);
+    const [usersError, setError] = useState(false);
+    const [usersLoading, setLoading] = useState(false);
 
     const refreshUsers = () => {
-        setUsers({
-            ...users,
-            loading: true
-        });
-
+        setLoading(true);
         WorkspaceAPI.getUsers()
-            .then(u => {
-                setUsers({
-                    loading: false,
-                    error: null,
-                    users: u
-                });
-            })
-            .catch(e => setUsers({
-                ...users,
-                error: e
-            }))
+            .then(setUsers)
+            .catch(setError)
             .finally(() => {
-                setUsers({
-                    ...users,
-                    loading: false
-                });
+                setLoading(false);
             });
     };
 
@@ -49,41 +29,29 @@ export const UserProvider = ({children}) => {
     useEffect(refreshUsers, []);
 
     useEffect(() => {
-        setCurrentUser({
-            ...currentUser,
-            loading: true
-        });
+        setCurrentUserLoading(true);
 
         AccountAPI.getUser()
             .then(user => {
-                setCurrentUser({
-                    loading: false,
-                    error: null,
-                    user
-                });
+                setCurrentUser(user);
+                setCurrentUserError(null);
             })
-            .catch(e => setCurrentUser({
-                ...currentUser,
-                error: e
-            }))
+            .catch(setCurrentUserError)
             .finally(() => {
-                setCurrentUser({
-                    ...currentUser,
-                    loading: false
-                });
+                setCurrentUserLoading(false);
             });
-    }, [currentUser]);
+    }, []);
 
     return (
         <UserContext.Provider
             value={{
-                currentUser: currentUser.user,
-                currentUserLoading: currentUser.loading,
-                currentUserError: currentUser.error,
+                currentUser,
+                currentUserLoading,
+                currentUserError,
                 onLogout,
-                users: users.users,
-                usersError: users.error,
-                usersLoading: users.loading,
+                users,
+                usersError,
+                usersLoading,
                 refreshUsers
             }}
         >
