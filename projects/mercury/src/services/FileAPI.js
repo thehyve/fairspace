@@ -1,7 +1,7 @@
 import {createClient} from "webdav";
 import axios from 'axios';
 import Config from "./Config/Config";
-import {addCounterToFilename, generateUniqueFileName, getFileName, getParentPath, joinPaths} from '../utils/fileUtils';
+import {generateUniqueFileName, getFileName, joinPaths} from '../utils/fileUtils';
 import {compareBy, comparing} from "../utils/genericUtils";
 
 // Ensure that the client passes along the credentials
@@ -69,7 +69,6 @@ class FileAPI {
      * Uploads the given files into the provided path
      * @param path
      * @param files
-     * @param nameMapping
      * @returns Promise<any>
      */
     upload(path, files) {
@@ -155,10 +154,8 @@ class FileAPI {
      * @returns {*}
      */
     movePaths(filePaths, destinationDir) {
-        return Promise.all(filePaths.map((sourceFile) => {
-            const destinationFile = joinPaths(destinationDir, generateUniqueFileName(getFileName(sourceFile)));
-            return this.move(sourceFile, destinationFile);
-        }));
+        return this.uniqueDestinationPaths(filePaths, destinationDir)
+            .then(mapping => Promise.all(mapping.map(([src, dst]) => this.move(src, dst))));
     }
 
     /**
@@ -168,17 +165,25 @@ class FileAPI {
      * @returns {*}
      */
     copyPaths(filePaths, destinationDir) {
-        return Promise.all(filePaths.map((sourceFile) => {
-            let destinationFilename = generateUniqueFileName(getFileName(sourceFile));
-            // Copying files to the current directory involves renaming
-            if (destinationDir === getParentPath(sourceFile)) {
-                destinationFilename = addCounterToFilename(destinationFilename);
-            }
+        return this.uniqueDestinationPaths(filePaths, destinationDir)
+            .then(mapping => Promise.all(mapping.map(([src, dst]) => this.copy(src, dst))));
+    }
 
-            const destinationFile = joinPaths(destinationDir, destinationFilename);
-
-            return this.copy(sourceFile, destinationFile);
-        }));
+    /**
+     * Generates unique (non-existing) file paths in the destinationdir adding indices to the file names when necessary
+     * @param filePaths
+     * @param destinationDir
+     * @returns {Promise<Array<Array<string>>>} A list of source/destination combinations. The first entry in an array is the source path, the second entry is the associated unique destination path
+     */
+    uniqueDestinationPaths(filePaths, destinationDir) {
+        return this.list(destinationDir)
+            .then(files => files.map(f => f.basename))
+            .then(usedNames => filePaths.map(sourceFile => {
+                const destinationFilename = generateUniqueFileName(getFileName(sourceFile), usedNames);
+                usedNames.push(destinationFilename);
+                const destinationFile = joinPaths(destinationDir, destinationFilename);
+                return [sourceFile, destinationFile];
+            }));
     }
 }
 

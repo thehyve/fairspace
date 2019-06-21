@@ -11,7 +11,8 @@ WHERE {
     GRAPH %1$s { ?s a ?type .  }
     GRAPH %2$s {
       ?type rdfs:subClassOf* %3$s .
-      ?shape sh:targetClass ?type ; fs:showInCatalog true .
+      ?shape sh:targetClass ?type .
+      FILTER(NOT EXISTS { ?shape fs:machineOnly true })
     }
     OPTIONAL {
         GRAPH %1$s {?s rdfs:label ?l}

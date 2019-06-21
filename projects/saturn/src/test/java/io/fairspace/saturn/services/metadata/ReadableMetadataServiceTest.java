@@ -18,11 +18,7 @@ import org.topbraid.shacl.vocabulary.SH;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
-import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -223,7 +219,6 @@ public class ReadableMetadataServiceTest {
         Resource personConsent = createResource("http://fairspace.io/ontology#PersonConsent");
         Resource personConsentEx = createResource("http://fairspace.io/ontology#PersonConsentEx");
         Resource researchProject = createResource("http://fairspace.io/ontology#ResearchProject");
-        Property showInCatalog = createProperty("http://fairspace.io/ontology#showInCatalog");
         Property targetClass = createProperty("http://www.w3.org/ns/shacl#targetClass");
         Resource personConsentShape = createProperty("http://fairspace.io/ontology#PersonConsentShape");
         Resource personConsentExShape = createProperty("http://fairspace.io/ontology#PersonConsentExShape");
@@ -244,12 +239,10 @@ public class ReadableMetadataServiceTest {
             // Mark personConsent and researchProject as fairspace entities
             ds.getNamedModel(userVocabularyURI)
                     .add(personConsentShape, targetClass, personConsent)
-                    .add(personConsentShape, showInCatalog, createTypedLiteral(true))
                     .add(personConsentExShape, targetClass, personConsentEx)
-                    .add(personConsentExShape, showInCatalog, createTypedLiteral(true))
                     .add(researchShape, targetClass, researchProject)
-                    .add(researchShape, showInCatalog, createTypedLiteral(true))
                     .add(userShape, targetClass, user)
+                    .addLiteral(userShape, FS.machineOnly, true)
                     .add(personConsentEx, RDFS.subClassOf, personConsent);
         });
     }

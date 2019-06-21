@@ -10,6 +10,7 @@ import {
     MessageDisplay, ConfirmationDialog, LoadingInlay,
     LoadingOverlay
 } from "../common";
+import AlterPermissionContainer from "./AlterPermissionContainer";
 import getDisplayName from "../../utils/userUtils";
 import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
 import UserContext from '../../UserContext';
@@ -22,22 +23,6 @@ class PermissionsViewer extends React.Component {
         showConfirmDeleteDialog: false,
         selectedPermission: null
     };
-
-    componentDidMount() {
-        const {iri, fetchPermissionsIfNeeded} = this.props;
-
-        if (iri) {
-            fetchPermissionsIfNeeded(iri);
-        }
-    }
-
-    componentDidUpdate() {
-        const {iri, fetchPermissionsIfNeeded} = this.props;
-
-        if (iri) {
-            fetchPermissionsIfNeeded(iri);
-        }
-    }
 
     handleAlterPermission = ({user, access}) => {
         this.setState({
@@ -91,7 +76,7 @@ class PermissionsViewer extends React.Component {
     };
 
     renderCollaboratorList(permissions) {
-        const {users, canManage} = this.props;
+        const {canManage} = this.props;
         const {anchorEl, selectedPermission} = this.state;
         const {currentUser} = this.context;
 
@@ -99,9 +84,7 @@ class PermissionsViewer extends React.Component {
             ? selectedPermission.access + selectedPermission.user
             : null;
 
-        const permissionsWithUserNames = permissions.map(permission => ({...permission, userName: getDisplayName(users.find(user => permission.user === user.iri))}));
-
-        return sortPermissions(permissionsWithUserNames)
+        return sortPermissions(permissions)
             .map((permission) => {
                 const key = permission.access + permission.user;
                 return (
@@ -162,6 +145,23 @@ class PermissionsViewer extends React.Component {
         );
     };
 
+    renderPermissionDialog = () => {
+        const {iri, currentUser, alterPermission} = this.props;
+        const {selectedPermission, showPermissionDialog} = this.state;
+
+        return (
+            <AlterPermissionContainer
+                open={showPermissionDialog}
+                alterPermission={alterPermission}
+                onClose={this.handleShareWithDialogClose}
+                user={selectedPermission && selectedPermission.user}
+                access={selectedPermission && selectedPermission.access}
+                iri={iri}
+                currentUser={currentUser}
+            />
+        );
+    };
+
     renderConfirmationDialog = () => {
         const {selectedPermission, showConfirmDeleteDialog} = this.state;
         const fullName = selectedPermission && getDisplayName(selectedPermission.user);
@@ -180,9 +180,7 @@ class PermissionsViewer extends React.Component {
     };
 
     render() {
-        const {permissions, error, loading, altering, renderPermissionsDialog, iri} = this.props;
-        const {selectedPermission, showPermissionDialog} = this.state;
-        const {currentUser} = this.context;
+        const {permissions, error, loading, altering} = this.props;
 
         if (error) {
             return (<MessageDisplay message="An error occurred loading permissions" />);
@@ -196,12 +194,7 @@ class PermissionsViewer extends React.Component {
 
         return (
             <>
-                {showPermissionDialog && renderPermissionsDialog({
-                    handleShareWithDialogClose: this.handleShareWithDialogClose,
-                    selectedPermission,
-                    currentUser,
-                    iri
-                })}
+                {this.renderPermissionDialog()}
                 {this.renderConfirmationDialog()}
                 {this.renderUserList(permissions)}
             </>

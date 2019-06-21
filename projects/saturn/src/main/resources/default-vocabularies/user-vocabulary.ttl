@@ -33,7 +33,7 @@ fs:CollectionShape sh:property
     sh:name "Person" ;
     sh:targetClass foaf:Person ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <AdministrativeGenderShape>,
         <ageOfDeathShape>,
@@ -49,7 +49,7 @@ fs:CollectionShape sh:property
     sh:name "Person Consent" ;
     sh:targetClass <PersonConsent> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <isProjectConsentShape>,
         <authorizesShape>,
@@ -63,7 +63,7 @@ fs:CollectionShape sh:property
     sh:name "Research Project" ;
     sh:targetClass <ResearchProject> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <projectCodeShape>,
         <investigationNatureShape>,
@@ -79,7 +79,7 @@ fs:CollectionShape sh:property
     sh:name "Tumor Pathology Event" ;
     sh:targetClass osiris:TumorPathologyEvent ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <EventTypeShape>,
         <EventStartDateShape>,
@@ -97,7 +97,7 @@ fs:CollectionShape sh:property
     sh:name "Biological Sample" ;
     sh:targetClass osiris:BiologicalSample ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <collectDateShape>,
         <tumorCellularityShape>,
@@ -113,7 +113,7 @@ fs:CollectionShape sh:property
     sh:name "Analysis" ;
     sh:targetClass <Analysis> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <analysisCodeShape>,
         <analyticPipelineCodeShape>,
@@ -129,7 +129,6 @@ fs:CollectionShape sh:property
     sh:name "Master of widgets" ;
     sh:targetClass <WidgetMaster> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
     sh:property
         <relatesToWidgetShape>,
         <dateWidgetShape>,

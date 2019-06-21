@@ -11,6 +11,18 @@ const ES_INDEX = 'fairspace';
 
 const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
+const SORT_SCORE = ["_score"];
+
+export const SORT_DATE_CREATED = [
+    "_score",
+    {
+        dateCreated: {order: "desc"}
+    },
+];
+
+export const SORT_ALPHABETICALLY = [
+    "_score", "label.keyword", "name.keyword"
+]
 export class SearchAPI {
     constructor(client, index) {
         this.client = client;
@@ -23,7 +35,7 @@ export class SearchAPI {
      * @param types     List of class URIs to search for. If empty, it returns all types
      * @return Promise
      */
-    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types}) => {
+    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, sort = SORT_SCORE}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
@@ -55,13 +67,8 @@ export class SearchAPI {
             body: {
                 size,
                 from,
+                sort,
                 query: esQuery,
-                sort: [
-                    {
-                        dateCreated: {order: "desc"}
-                    },
-                    "_score"
-                ],
                 highlight: {
                     fields: {
                         "*": {}
@@ -82,16 +89,17 @@ export class SearchAPI {
      * @param query
      * @returns {Promise}
      */
-    searchCollections = (query) => this.search({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE});
+    searchCollections = (query) => this.search({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED});
 
     /**
      * @returns {Promise}
      */
-    searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0}) => this.search({
+    searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0, sort}) => this.search({
         query,
         size,
         types,
-        from: page * size
+        from: page * size,
+        sort
     });
 
     /**

@@ -1,7 +1,19 @@
-import _ from 'lodash';
+import _, {mapValues} from 'lodash';
 
 import * as consts from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import {isNonEmptyValue} from '../genericUtils';
+
+/**
+ * Returns the local part of the given uri
+ * @param uri
+ * @returns {string}
+ */
+export const getLocalPart = uri => (
+    uri.includes('#')
+        ? uri.substring(uri.lastIndexOf('#') + 1)
+        : uri.substring(uri.lastIndexOf('/') + 1)
+);
 
 /**
  *
@@ -12,27 +24,23 @@ import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
  * @returns {*}
  */
 export function linkLabel(uri, shortenExternalUris = false) {
-    const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
-    const url = new URL(uri);
+    try {
+        const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
+        const url = new URL(uri);
 
-    // Local uris are treated separately, as we know its
-    // structure
-    if (url.hostname === window.location.hostname) {
-        const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
-        if (foundInfix) {
-            return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
+        // Local uris are treated separately, as we know its
+        // structure
+        if (url.hostname === window.location.hostname) {
+            const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
+            if (foundInfix) {
+                return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
+            }
         }
-    }
+        // eslint-disable-next-line no-empty
+    } catch (e) {}
 
-    if (shortenExternalUris) {
-        return uri.includes('#')
-            ? uri.substring(uri.lastIndexOf('#') + 1)
-            : uri.substring(uri.lastIndexOf('/') + 1);
-    }
-
-    return uri;
+    return shortenExternalUris ? getLocalPart(uri) : uri;
 }
-
 
 /**
  * Returns the label for the given entity.
@@ -78,8 +86,14 @@ export function generateUuid() {
         c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
 }
 
-export function isValidLinkedDataIdentifier(id, prefix = 'http://example.com/') {
-    return new URL(`${prefix}${id}`).toString() === `${prefix}${id}`;
+export function isValidLinkedDataIdentifier(uri) {
+    try {
+        // eslint-disable-next-line no-new
+        new URL(uri);
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 /**
@@ -197,12 +211,6 @@ export const partitionErrors = (errors, subject) => {
 };
 
 /**
- * Returns true if the given value is truthy or zero or false
- * @param value
- */
-export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
-
-/**
  * Returns true if the either given value or id (or both) are part of the property values.
  * @param {object} property
  * @param {string} value
@@ -222,3 +230,39 @@ export const propertyContainsValueOrId = (property, value, id) => {
  * @returns {boolean}
  */
 export const hasValue = property => !!(property.values && Array.isArray(property.values) && property.values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
+
+/**
+ * Simplify the keys of the given object by converting the URIs into its local paths
+ * The output of this method is comparable to the results provided by elasticsearch
+ *
+ * @example {'http://namespace#label': [{'@value': 'abc'}]} -> {label: [{'@value': 'abc'}]}
+ * @param jsonLd
+ * @returns {{}}
+ */
+export const simplifyUriPredicates = jsonLd => (
+    jsonLd
+        ? Object.assign(
+            {},
+            ...Object.keys(jsonLd).map(key => ({[getLocalPart(key)]: jsonLd[key]}))
+        ) : {});
+
+/**
+ * Normalize an internal metadata resource by converting the values or iris into a single object
+ *
+ * The output of this method is comparable to the results provided by elasticsearch
+ *
+ * @example {'http://namespace#label': [{value: 'abc'}]} -> {http://namespace#label: ['abc']}
+ * @param jsonLd
+ * @returns {{}}
+ */
+export const normalizeMetadataResource = jsonLd => mapValues(
+    jsonLd,
+    values => (
+        Array.isArray(values)
+            ? values.map(v => {
+                if (isNonEmptyValue(v.value)) return v.value;
+                return v.id || v;
+            })
+            : values
+    )
+);

@@ -44,6 +44,11 @@
         "@id": "http://fairspace.io/ontology#listShape"
       }
     ],
+    "http://fairspace.io/ontology#machineOnly": [
+      {
+        "@value": true
+      }
+    ],
     "http://www.w3.org/ns/shacl#targetClass": [
       {
         "@id": "http://fairspace.io/ontology#Collection"

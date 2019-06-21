@@ -28,6 +28,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:order 1
     ], [
         # This means every value for predicate sh:property should have this type.
+        a fs:RelationShape ;
         sh:class sh:PropertyShape ;
         sh:minCount 1 ;
         sh:path sh:property ;
@@ -53,15 +54,8 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:path sh:description ;
         sh:name "Class description" ;
         sh:order 2
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:maxCount 1 ;
-        sh:path fs:showInCatalog ;
-        sh:name "Show in catalog" ;
-        sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
-    sh:not fs:ShapeIsAClosedShape ; 
-    fs:showInCatalog true ;
+    sh:not fs:ShapeIsAClosedShape ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -89,7 +83,6 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         sh:name "Show as external link" ;
         sh:description "If this flag is set to true, a link to a IRI for this property will not be loaded in the metadata editor"
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:ExternalIRIPropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -104,22 +97,14 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:DescriptionShape,
         fs:ImportantPropertyShape,
         fs:PathShape,
+        fs:DatatypeShape,
     [
-        sh:path sh:datatype ;
-        # direct controlled vocabulary approach
-        sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
-        sh:name "Datatype" ;
-        fs:importantProperty true ;
-        sh:maxCount 1 ;
-        sh:minCount 1 ;
-        sh:order 3
-    ], [
+
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
         sh:maxCount 1 ;
         sh:name "Maximum length (for string only)"
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:DatatypePropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -146,7 +131,6 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         ] ;
         sh:order 3 
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:ControlledVocabularyPropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -173,7 +157,6 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:importantProperty true ;
         sh:order 3
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -183,7 +166,6 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
     sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
     sh:name "Namespace" ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:fixedShape ) ;
-    fs:showInCatalog true ;
     sh:property fs:PropertyNameShape ;
     sh:property [
       sh:name "Prefix" ;
@@ -288,6 +270,16 @@ fs:ImportantPropertyShape a sh:PropertyShape ;
   sh:path fs:importantProperty ;
   sh:name "Show this property as a column in a table " .
 
+fs:DatatypeShape a sh:PropertyShape ;
+    sh:path sh:datatype ;
+    # direct controlled vocabulary approach
+    sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
+    sh:name "Datatype" ;
+    fs:importantProperty true ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:order 3 .
+
 # Definitions of our shape types, needed
 # for form building
 fs:ClassShape a sh:NodeShape .
@@ -295,3 +287,19 @@ fs:DatatypePropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:ControlledVocabularyPropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:ExternalIRIPropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:RelationShape rdfs:subClassOf sh:PropertyShape .
+
+# Definition for property shape, used to render a table with properties
+sh:PropertyShape
+    sh:targetClass sh:PropertyShape ;
+    fs:machineOnly true ;
+    sh:property
+        fs:PropertyNameShape,
+        fs:DescriptionShape,
+        fs:PathShape,
+        [
+            sh:path sh:datatype ;
+            sh:name "Datatype" ;
+            fs:importantProperty true ;
+            sh:order 2
+        ] .
+

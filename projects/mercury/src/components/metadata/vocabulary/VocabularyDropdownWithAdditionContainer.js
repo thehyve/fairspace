@@ -57,7 +57,7 @@ const mapStateToProps = (state, ownProps) => {
         if (e.details) {
             ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createVocabularyIri(id)), e.message);
         } else {
-            ErrorDialog.showError(e, `Error creating a new vocabulary.\n${e.message}`);
+            ErrorDialog.showError(e, `Error creating a new vocabulary entry.\n${e.message}`);
         }
     };
 
@@ -67,8 +67,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchEntities: fetchVocabularyEntitiesIfNeeded,
-    onCreate: (formKey, shape, id) => {
-        const subject = id && createVocabularyIri(id);
+    onCreate: (formKey, shape, subject) => {
         const type = ownProps.property.className;
         return dispatch(createVocabularyEntityFromState(formKey, subject, type));
     }

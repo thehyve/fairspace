@@ -206,6 +206,7 @@ const materialReactSelect = (props) => {
                 InputLabelProps: {
                     shrink: true,
                 },
+                onChange: props.onTextInputChange
             }}
         />
     );

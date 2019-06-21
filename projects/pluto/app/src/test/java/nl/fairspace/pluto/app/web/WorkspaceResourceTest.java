@@ -52,15 +52,6 @@ public class WorkspaceResourceTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void frontendConfigurationReturnsAllUrlsSpecified() throws Exception {
-        Map config = restTemplate.getForObject("http://localhost:" + port + "/api/v1/workspace/config", Map.class);
-
-        assertTrue(config.containsKey("urls"));
-        assertEquals("https://jupyterhub.someplace", ((Map) config.get("urls")).get("jupyter"));
-        assertEquals("https://external-url", ((Map) config.get("urls")).get("cbioportal"));
-    }
-
-    @Test
     public void workspaceDetailsReturnsNameAndVersion() throws Exception {
         Map details = restTemplate.getForObject("http://localhost:" + port + "/api/v1/workspace/details", Map.class);
 

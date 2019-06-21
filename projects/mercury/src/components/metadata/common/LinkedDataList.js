@@ -1,36 +1,19 @@
 import React from "react";
-import {
-    ListItemText,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Tooltip,
-    Typography,
-    withStyles
-} from "@material-ui/core";
+import {ListItemText, Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from "@material-ui/core";
 import styles from './LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
+import {TOOLTIP_ENTER_DELAY} from "../../../constants";
+import IriTooltip from "../../common/IriTooltip";
 
 const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, typeRender, footerRender}) => {
     const renderRow = (entry) => {
         const {id, primaryText, secondaryText, highlights} = entry;
 
         return (
-            <Tooltip
+            <IriTooltip
                 key={id}
-                enterDelay={350}
-                title={(
-                    <Typography
-                        variant="caption"
-                        color="inherit"
-                        style={{whiteSpace: 'pre-line'}}
-                    >
-                        {id}
-                    </Typography>
-                )}
+                enterDelay={TOOLTIP_ENTER_DELAY}
+                title={id}
             >
                 <TableRow
                     key={id}
@@ -54,7 +37,7 @@ const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, type
                         </TableCell>
                     )}
                 </TableRow>
-            </Tooltip>
+            </IriTooltip>
         );
     };
 

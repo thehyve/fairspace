@@ -62,14 +62,15 @@ public class App {
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
         var metadataValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, VOCABULARY_GRAPH_URI)),
+                new MachineOnlyClassesValidator(SYSTEM_VOCABULARY),
+                new ProtectMachineOnlyPredicatesValidator(SYSTEM_VOCABULARY),
                 new PermissionCheckingValidator(permissions),
                 new ShaclValidator(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI));
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, metadataLifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(() -> getMachineOnlyPredicates(rdf, META_VOCABULARY_GRAPH_URI)),
+                new ProtectMachineOnlyPredicatesValidator(META_VOCABULARY),
                 new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
                 new SystemVocabularyProtectingValidator(),
                 new MetadataAndVocabularyConsistencyValidator(rdf),
@@ -86,8 +87,8 @@ public class App {
         var fusekiServerBuilder = FusekiServer.create()
                 .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", new SaturnSparkFilter(
-                        new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService),
-                        new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService)
+                        new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService, CONFIG.jena.metadataBaseIRI),
+                        new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService, CONFIG.jena.vocabularyBaseIRI)
                             .withAuthorizationVerifier(apiPathPrefix + "/vocabulary/*", vocabularyAuthorizationVerifier),
                         new ReadableMetadataApp(apiPathPrefix + "/meta-vocabulary/", metaVocabularyService),
                         new CollectionsApp(apiPathPrefix, collections),

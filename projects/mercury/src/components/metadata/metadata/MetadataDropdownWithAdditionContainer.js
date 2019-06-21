@@ -62,8 +62,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchEntities: fetchEntitiesIfNeeded,
-    onCreate: (formKey, shape, id) => {
-        const subject = createMetadataIri(id);
+    onCreate: (formKey, shape, subject) => {
         const type = ownProps.property.className;
         return dispatch(createMetadataEntityFromState(formKey, subject, type));
     }

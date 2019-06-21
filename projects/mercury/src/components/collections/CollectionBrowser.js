@@ -5,8 +5,7 @@ import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 
 import {
-    ErrorDialog, MessageDisplay,
-    CollectionEditor,
+    ErrorDialog, MessageDisplay, CollectionEditor,
     LoadingInlay, LoadingOverlay
 } from "../common";
 import CollectionList from "./CollectionList";
@@ -16,6 +15,7 @@ import {findById} from "../../utils/genericUtils";
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import Config from "../../services/Config/Config";
 import UserContext from '../../UserContext';
+import {getLocalPart} from "../../utils/linkeddata/metadataUtils";
 
 export class CollectionBrowser extends React.Component {
     static contextType = UserContext;
@@ -58,10 +58,11 @@ export class CollectionBrowser extends React.Component {
     }
 
     renderCollectionList() {
-        const {users, collections, addingCollection, deletingCollection} = this.props;
+        const {collections, addingCollection, deletingCollection} = this.props;
+        const {users} = this.context;
 
         collections.forEach(col => {
-            col.creatorObj = findById(users, col.createdBy);
+            col.creatorObj = findById(users, getLocalPart(col.createdBy));
         });
 
         return (
@@ -87,15 +88,15 @@ export class CollectionBrowser extends React.Component {
 
     render() {
         const {loading, error} = this.props;
-        const {currentUserError, currentUserLoading} = this.context;
+        const {currentUserError, currentUserLoading, usersLoading, usersError} = this.context;
 
-        if (error || currentUserError) {
+        if (error || usersError || currentUserError) {
             return <MessageDisplay message="An error occurred while loading collections" />;
         }
 
         return (
             <>
-                {(loading || currentUserLoading) ? <LoadingInlay /> : this.renderCollectionList()}
+                {loading || usersLoading || currentUserLoading ? <LoadingInlay /> : this.renderCollectionList()}
                 <Button
                     variant="text"
                     aria-label="Add"
@@ -114,10 +115,9 @@ CollectionBrowser.defaultProps = {
 };
 
 const mapStateToProps = (state) => ({
-    loading: state.cache.collections.pending || state.cache.users.pending,
-    error: state.cache.collections.error || state.cache.users.error,
+    loading: state.cache.collections.pending,
+    error: state.cache.collections.error,
     collections: state.cache.collections.data,
-    users: state.cache.users.data,
     selectedCollectionLocation: state.collectionBrowser.selectedCollectionLocation,
     addingCollection: state.collectionBrowser.addingCollection,
     deletingCollection: state.collectionBrowser.deletingCollection

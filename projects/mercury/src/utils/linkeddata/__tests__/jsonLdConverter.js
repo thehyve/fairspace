@@ -232,9 +232,9 @@ describe('jsonLdConverter', () => {
                 expect(result[0].key).toEqual("http://fairspace.io/ontology#hasFile");
                 expect(result[0].values.length).toEqual(2);
                 expect(result[0].values[0].id).toEqual('http://fairspace.com/iri/files/2');
-                expect(result[0].values[0].label).toEqual("File 2");
+                expect(result[0].values[0].otherEntry.label).toEqual(["File 2"]);
                 expect(result[0].values[1].id).toEqual('http://fairspace.com/iri/files/3');
-                expect(result[0].values[1].label).toEqual(undefined);
+                expect(result[0].values[1].otherEntry).toEqual({});
             });
         });
 
@@ -473,16 +473,16 @@ describe('jsonLdConverter', () => {
     describe('normalizeTypes', () => {
         it('replaces rdf:type with @type', () => {
             const result = normalizeTypes([
-                { '@id': 'http://example.com/1',  'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': [{'@id': 'http://example.com/Type'}]},
-                { '@id': 'http://example.com/2',  '@type': ['http://example.com/Type']},
-                { '@id': 'http://example.com/2',  'http://example.com/property': [123]}
+                {'@id': 'http://example.com/1', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': [{'@id': 'http://example.com/Type'}]},
+                {'@id': 'http://example.com/2', '@type': ['http://example.com/Type']},
+                {'@id': 'http://example.com/2', 'http://example.com/property': [123]}
             ]);
 
             expect(result).toEqual([
-                { '@id': 'http://example.com/1',  '@type': ['http://example.com/Type']},
-                { '@id': 'http://example.com/2',  '@type': ['http://example.com/Type']},
-                { '@id': 'http://example.com/2',  'http://example.com/property': [123]}
+                {'@id': 'http://example.com/1', '@type': ['http://example.com/Type']},
+                {'@id': 'http://example.com/2', '@type': ['http://example.com/Type']},
+                {'@id': 'http://example.com/2', 'http://example.com/property': [123]}
             ]);
-        })
-    })
+        });
+    });
 });

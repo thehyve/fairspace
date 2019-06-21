@@ -38,15 +38,15 @@ class ReadableMetadataService {
      * Returns a model with all fairspace metadata entities for the given type
      *
      * The method returns the type and the label (if present) for all entities that match
-     * the given type if the type is marked as fs:showInCatalog in the vocabulary.
+     * the given type if the type is not marked as fs:machineOnly in the vocabulary.
      *
-     * If the type is not marked as fs:showInCatalog, the resulting model will be empty
+     * If the type is marked as fs:machineOnly, the resulting model will be empty
      *
-     * If the type is null, all entities for which the type is marked as fs:showInCatalog in
+     * If the type is null, all entities for which the type is not marked as fs:machineOnly in
      * the vocabulary will be returned.
      *
      * @param type  URI for the type to filter the list of entities on
-     * @param filterOnCatalog If set to true, only entities marked as `fs:showInCatalog` will be returned
+     * @param filterOnCatalog If set to true, only entities not marked as `fs:machineOnly` will be returned
      * @return
      */
     Model getByType(String type, boolean filterOnCatalog) {

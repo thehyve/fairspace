@@ -58,6 +58,11 @@ describe('LinkedDataDropdown', () => {
                 disabled: false,
                 id,
                 label: name,
+                otherEntry: {
+                    type: ['http://fairspace.io/ontology#DatatypePropertyShape'],
+                    name: [name],
+                    id
+                }
             },
         ]);
     });

@@ -12,28 +12,24 @@ const mockStore = configureStore(middlewares);
 describe('AlterPermissionDialog', () => {
     let shallow;
     const mockAlterPermissionFn = jest.fn();
-    const mockfetchUsersFn = jest.fn();
-    const mockUsers = {
-        data: [
-            {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey', iri: 'http://localhost/iri/user1-id'},
-            {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson', iri: 'http://localhost/iri/user2-id'},
-            {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars', iri: 'http://localhost/iri/user3-id'},
-            {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain', iri: 'http://localhost/iri/user4-id'},
-            {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande', iri: 'http://localhost/iri/user5-id'},
-        ]
-    };
-    const mockCollaborators = {
-        data: [
-            {
-                user: 'http://localhost/iri/user2-id',
-                access: 'Write'
-            },
-            {
-                user: 'http://localhost/iri/user4-id',
-                access: 'Manage'
-            }
-        ]
-    };
+    const mockUsers = [
+        {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey', iri: 'http://localhost/iri/user1-id'},
+        {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson', iri: 'http://localhost/iri/user2-id'},
+        {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars', iri: 'http://localhost/iri/user3-id'},
+        {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain', iri: 'http://localhost/iri/user4-id'},
+        {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande', iri: 'http://localhost/iri/user5-id'},
+    ];
+    const mockCollaborators = [
+        {
+            user: 'http://localhost/iri/user2-id',
+            access: 'Write'
+        },
+        {
+            user: 'http://localhost/iri/user4-id',
+            access: 'Manage'
+        }
+    ];
+
     const mockCurrentLoggedUser = {
         id: 'user1-id',
         iri: 'http://localhost/iri/user1-id'
@@ -86,8 +82,6 @@ describe('AlterPermissionDialog', () => {
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
-
-            fetchUsers={mockfetchUsersFn}
             alterPermission={mockAlterPermissionFn}
             users={mockUsers}
         />);
@@ -128,7 +122,6 @@ describe('AlterPermissionDialog', () => {
                     collectionId={mockCollectionId}
                     collaborators={mockCollaborators}
                     currentUser={mockCurrentLoggedUser}
-                    fetchUsers={mockfetchUsersFn}
                     alterPermission={mockAlterPermissionFn}
                     users={mockUsers}
                 />

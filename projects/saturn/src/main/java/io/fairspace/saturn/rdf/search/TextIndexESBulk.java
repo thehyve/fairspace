@@ -34,16 +34,16 @@ public class TextIndexESBulk extends TextIndexES {
      * ES Script for adding/updating the document in the index.
      * The main reason to use scripts is because we want to modify the values of the fields that contains an array of values
      */
-    private static final String ADD_UPDATE_SCRIPT = "if((ctx._source == null) || (ctx._source.<fieldName> == null) || (ctx._source.<fieldName>.empty == true)) " +
-            "{ctx._source.<fieldName>=[params.fieldValue] } else {ctx._source.<fieldName>.add(params.fieldValue)}";
+    private static final String ADD_UPDATE_SCRIPT = "if((ctx._source == null) || (ctx._source[params.fieldName] == null) || (ctx._source[params.fieldName].empty == true)) " +
+            "{ctx._source[params.fieldName]=[params.fieldValue] } else {ctx._source[params.fieldName].add(params.fieldValue)}";
 
     /**
      * ES Script for deleting a specific value in the field for the given document in the index.
      * The main reason to use scripts is because we want to delete specific value of the field that contains an array of values
      */
-    private static final String DELETE_SCRIPT = "if((ctx._source != null) && (ctx._source.<fieldToRemove> != null) && (ctx._source.<fieldToRemove>.empty != true) " +
-            "&& (ctx._source.<fieldToRemove>.indexOf(params.valueToRemove) >= 0)) " +
-            "{ctx._source.<fieldToRemove>.remove(ctx._source.<fieldToRemove>.indexOf(params.valueToRemove))}";
+    private static final String DELETE_SCRIPT = "if((ctx._source != null) && (ctx._source[params.fieldToRemove] != null) && (ctx._source[params.fieldToRemove].empty != true) " +
+            "&& (ctx._source[params.fieldToRemove].indexOf(params.valueToRemove) >= 0)) " +
+            "{ctx._source[params.fieldToRemove].remove(ctx._source[params.fieldToRemove].indexOf(params.valueToRemove))}";
 
     private static final Logger LOGGER      = LoggerFactory.getLogger(TextIndexESBulk.class) ;
     private static final int BULK_SIZE = 1000;
@@ -68,7 +68,7 @@ public class TextIndexESBulk extends TextIndexES {
     }
 
     @Override
-    public void commit() {
+    public void prepareCommit() {
         if (updates.isEmpty()) {
             return;
         }
@@ -163,12 +163,12 @@ public class TextIndexESBulk extends TextIndexES {
             IndexRequest indexRequest = new IndexRequest(indexName, getDocDef().getEntityField(), entity.getId())
                     .source(builder);
 
-            String addUpdateScript = ADD_UPDATE_SCRIPT.replaceAll("<fieldName>", fieldToAdd);
             Map<String, Object> params = new HashMap<>();
+            params.put("fieldName", fieldToAdd);
             params.put("fieldValue", fieldValueToAdd);
 
             UpdateRequest upReq = new UpdateRequest(indexName, getDocDef().getEntityField(), entity.getId())
-                    .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, addUpdateScript, params))
+                    .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, ADD_UPDATE_SCRIPT, params))
                     .upsert(indexRequest);
 
             updates.add(upReq);
@@ -201,12 +201,12 @@ public class TextIndexESBulk extends TextIndexES {
 
         if(fieldToRemove != null && valueToRemove != null) {
             LOGGER.trace("deleting content related to entity {}", entity.getId());
-            String deleteScript = DELETE_SCRIPT.replaceAll("<fieldToRemove>", fieldToRemove);
             Map<String,Object> params = new HashMap<>();
+            params.put("fieldToRemove", fieldToRemove);
             params.put("valueToRemove", valueToRemove);
 
             UpdateRequest updateRequest = new UpdateRequest(indexName, getDocDef().getEntityField(), entity.getId())
-                    .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG,deleteScript,params));
+                    .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, DELETE_SCRIPT, params));
 
             updates.add(updateRequest);
         }

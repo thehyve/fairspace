@@ -3,7 +3,7 @@ import {
     getMaxCount,
     getSystemProperties,
     isGenericIriResource,
-    isRdfList,
+    isRdfList, isRelationShape,
     vocabularyUtils,
 } from '../vocabularyUtils';
 import vocabularyJsonLd from '../test.vocabulary.json';
@@ -134,6 +134,35 @@ describe('vocabularyUtils', () => {
         it('should set deletable flag for values for SHACL_PROPERTY', () => {
             const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
             expect(extendedProperties[2].values).toEqual([{id: 'http://custom', isDeletable: true}, {id: 'http://fixed', isDeletable: false}]);
+        });
+    });
+
+    describe('isRelationShape', () => {
+        it('should return true for relation shapes', () => {
+            expect(isRelationShape({'@type': [constants.RELATION_SHAPE_URI]})).toBe(true);
+            expect(isRelationShape({'@type': ['http://someShape', constants.RELATION_SHAPE_URI]})).toBe(true);
+        });
+        it('should return false for other types of shapes', () => {
+            expect(isRelationShape({'@type': ['http://other-type']})).toBe(false);
+            expect(isRelationShape({'@type': []})).toBe(false);
+            expect(isRelationShape({})).toBe(false);
+        });
+    });
+
+    describe('getClassesInCatalog', () => {
+        const shapesIdsInCatalog = vocabulary.getClassesInCatalog().map(c => c['@id']);
+
+        it('should return classes without machineOnly predicate', () => {
+            expect(shapesIdsInCatalog).toEqual(expect.arrayContaining(['http://fairspace.io/ontology#UserShape']));
+        });
+
+        it('should not return properties', () => {
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.w3.org/2000/01/rdf-schema#commentShape']));
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.schema.org/creatorShape']));
+        });
+
+        it('should not return classes with machineOnly predicate', () => {
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://fairspace.io/ontology#CollectionShape']));
         });
     });
 

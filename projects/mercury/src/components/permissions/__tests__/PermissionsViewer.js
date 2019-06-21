@@ -1,5 +1,5 @@
 import React from 'react';
-import {shallow, mount} from "enzyme";
+import {mount} from "enzyme";
 
 import {IconButton, Button} from "@material-ui/core";
 import PermissionsViewer from "../PermissionsViewer";
@@ -11,37 +11,34 @@ describe('PermissionsViewer', () => {
             user: 'http://localhost/iri/user2-id',
             access: 'Write',
             firstName: 'Michael',
-            lastName: 'Jackson'
+            lastName: 'Jackson',
+            userName: 'Michael Jackson'
         },
         {
             user: 'http://localhost/iri/user3-id',
             access: 'Read',
             firstName: 'Bruno',
-            lastName: 'Mars'
+            lastName: 'Mars',
+            userName: 'Bruno Mars'
         },
         {
             user: 'http://localhost/iri/user1-id',
             access: 'Manage',
             firstName: 'Mariah',
-            lastName: 'Carey'
+            lastName: 'Carey',
+            userName: 'Mariah Carey'
         },
         {
             user: 'http://localhost/iri/user4-id',
             access: 'Manage',
             firstName: 'Kurt',
-            lastName: 'Cobain'
+            lastName: 'Cobain',
+            userName: 'Kurt Cobain'
         }
     ];
     const mockcurrentUserCreatorCanManage = {id: 'user4-id'};
     const mockcurrentUserNotCreatorCanManage = {id: 'user1-id'};
     const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
-    const mockUsers = [
-        {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey', iri: 'http://localhost/iri/user1-id'},
-        {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson', iri: 'http://localhost/iri/user2-id'},
-        {id: 'user3-id', firstName: 'Bruno', lastName: 'Mars', iri: 'http://localhost/iri/user3-id'},
-        {id: 'user4-id', firstName: 'Kurt', lastName: 'Cobain', iri: 'http://localhost/iri/user4-id'},
-        {id: 'user5-id', firstName: 'Ariana', lastName: 'Grande', iri: 'http://localhost/iri/user5-id'},
-    ];
     const mockCreator = 'user4-id';
     const mockFetchPermissionsFn = jest.fn();
     const mockAlterPermissionFn = jest.fn();
@@ -56,7 +53,6 @@ describe('PermissionsViewer', () => {
                         iri={500}
                         canManage
                         permissions={mockCollaborators}
-                        users={mockUsers}
                         alterPermission={mockAlterPermissionFn}
                         fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                     />
@@ -105,7 +101,6 @@ describe('PermissionsViewer', () => {
                         iri={500}
                         canManage={false}
                         permissions={mockCollaborators}
-                        users={mockUsers}
                         alterPermission={mockAlterPermissionFn}
                         fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                     />
@@ -153,7 +148,6 @@ describe('PermissionsViewer', () => {
                         iri={500}
                         canManage
                         permissions={mockCollaborators}
-                        users={mockUsers}
                         alterPermission={mockAlterPermissionFn}
                         fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                     />

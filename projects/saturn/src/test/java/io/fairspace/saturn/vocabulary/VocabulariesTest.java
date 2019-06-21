@@ -4,29 +4,20 @@ import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.util.FileManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.topbraid.shacl.vocabulary.SH;
-
-import java.util.List;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getViolations;
 import static io.fairspace.saturn.vocabulary.Vocabularies.*;
-import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabulariesTest {
@@ -57,25 +48,6 @@ public class VocabulariesTest {
     @Test
     public void validateVocabulary() throws InterruptedException {
         validate(ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()), META_VOCABULARY.union(SHACL_FOR_SHACL));
-    }
-
-    @Test
-    public void testGetMachineOnlyPredicates() {
-        var graph = createURI("http://example.com/graph");
-        var model = ds.getNamedModel(graph.getURI());
-
-        assertTrue(getMachineOnlyPredicates(rdf, graph).isEmpty());
-
-        var shape1 = createResource("http://example.com/s1");
-        var shape2 = createResource("http://example.com/s2");
-
-        var property1 = createResource("http://example.com/p1");
-        var property2 = createResource("http://example.com/p2");
-        model.add(shape1, SH.path, property1);
-        model.add(shape2, SH.path, property2);
-        model.add(shape1, FS.machineOnly, createTypedLiteral(true));
-
-        assertEquals(List.of(property1.getURI()), getMachineOnlyPredicates(rdf, graph));
     }
 
     private void validate(Model dataModel, Model shapesModel) throws InterruptedException {

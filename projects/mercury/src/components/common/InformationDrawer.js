@@ -143,7 +143,7 @@ InformationDrawer.propTypes = {
     loading: PropTypes.bool
 };
 
-const mapStateToProps = ({cache: {collections, users},
+const mapStateToProps = ({cache: {collections},
     collectionBrowser: {selectedPaths, selectedCollectionLocation}}, ownProps) => {
     const {match: {params}} = ownProps;
     const {collectionLocation, openedPath} = getPathInfoFromParams(params);
@@ -153,7 +153,7 @@ const mapStateToProps = ({cache: {collections, users},
     return {
         collection,
         paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
-        loading: users.pending
+        loading: collections.pending
     };
 };
 

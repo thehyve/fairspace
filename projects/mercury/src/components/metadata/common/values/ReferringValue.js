@@ -1,8 +1,8 @@
 import React from 'react';
+import Switch from "@material-ui/core/Switch";
 import DateTime from "../../../common/DateTime";
 import LinkedDataLink from "../LinkedDataLink";
 import {BOOLEAN_URI, DATETIME_URI} from "../../../../constants";
-import Switch from "@material-ui/core/Switch";
 
 function linkLabel(link) {
     return link
@@ -12,13 +12,12 @@ function linkLabel(link) {
 }
 
 const ReferringValue = ({property, entry, editorPath}) => {
-
     function extractDisplayValue(value) {
         switch (property.datatype) {
             case DATETIME_URI:
                 return <DateTime value={value.value} absolute />;
             case BOOLEAN_URI:
-                return <Switch checked={value.value} readOnly/>;
+                return <Switch checked={value.value} readOnly />;
             default:
                 return value.label || value.value || linkLabel(value.id) || '';
         }

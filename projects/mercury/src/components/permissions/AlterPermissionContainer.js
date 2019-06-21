@@ -1,12 +1,22 @@
-import {connect} from 'react-redux';
+import React, {useContext} from "react";
 import AlterPermissionDialog from "./AlterPermissionDialog";
-import {alterPermission} from "../../actions/permissionsActions";
+import PermissionContext from "./PermissionContext";
+import UserContext from "../../UserContext";
 
-const mapStateToProps = ({cache}, {iri}) => ({
-    users: cache.users,
-    collaborators: cache.permissionsByIri[iri]
-});
+const AlterPermissionContainer = props => {
+    const {permissions, loading: loadingPermissions, error: errorPermissions} = useContext(PermissionContext);
+    const {users, loadingUsers, errorUsers} = useContext(UserContext);
 
-const mapDispatchToProps = {alterPermission};
+    return (
+        <AlterPermissionDialog
+            {...props}
+            collaborators={permissions}
+            users={users}
+            loading={loadingPermissions || loadingUsers}
+            error={errorPermissions || errorUsers}
+        />
+    );
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(AlterPermissionDialog);
+
+export default AlterPermissionContainer;

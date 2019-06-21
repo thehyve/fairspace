@@ -6,8 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/LoadingInlay";
 import MessageDisplay from "../../../common/MessageDisplay";
-import {getFirstPredicateProperty} from "../../../../utils/linkeddata/jsonLdUtils";
-import * as constants from "../../../../constants";
+import {normalizeMetadataResource, simplifyUriPredicates} from "../../../../utils/linkeddata/metadataUtils";
 
 class InputWithAddition extends React.Component {
     state = {
@@ -27,12 +26,10 @@ class InputWithAddition extends React.Component {
 
         onCreate(formKey, shape, id)
             .then(({value}) => {
-                const label = getFirstPredicateProperty(value.values, constants.LABEL_URI, 'value')
-                    || getFirstPredicateProperty(value.values, constants.SHACL_NAME, 'value');
-
+                const otherEntry = simplifyUriPredicates(normalizeMetadataResource(value.values));
                 this.handleCloseDialog();
                 fetchEntities(property.className);
-                onChange({id: value.subject, label});
+                onChange({id: value.subject, otherEntry});
             })
             .catch(e => onError(e, id));
     }

@@ -6,7 +6,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
 
 import {fetchAuthorizations} from "../actions/accountActions";
-import {fetchUsers, fetchWorkspace} from "../actions/workspaceActions";
+import {fetchWorkspace} from "../actions/workspaceActions";
 import configureStore from "../store/configureStore";
 import Config from "../services/Config/Config";
 import theme from './App.theme';
@@ -33,7 +33,6 @@ class App extends React.Component {
 
         Config.init()
             .then(() => {
-                this.store.dispatch(fetchUsers());
                 this.store.dispatch(fetchAuthorizations());
                 this.store.dispatch(fetchWorkspace());
 
