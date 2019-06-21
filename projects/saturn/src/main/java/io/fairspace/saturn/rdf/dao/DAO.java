@@ -10,6 +10,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Transactional;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.modify.request.QuadAcc;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataInsert;
@@ -36,7 +37,6 @@ import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.graph.NodeFactory.createVariable;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.apache.jena.system.Txn.calculateWrite;
@@ -129,7 +129,7 @@ public class DAO implements Transactional {
                 setProperty(update, entity.getIri(), propertyNode, value);
             });
 
-            rdf.update(update.toString());
+            rdf.update(update);
 
             return entity;
         });
@@ -275,7 +275,7 @@ public class DAO implements Transactional {
                 defaultGraphIRI,
                 entityNode,
                 propertyNode,
-                createVariable("o"))))));
+                Var.alloc("o"))))));
 
         if (value instanceof Iterable) {
             ((Iterable<?>) value).forEach(item -> addProperty(update, entityNode, propertyNode, item));
