@@ -1,7 +1,7 @@
 import React from 'react';
 import {PropTypes} from 'prop-types';
 
-import searchAPI from "../../../services/SearchAPI";
+import searchAPI, {SORT_ALPHABETICALLY} from "../../../services/SearchAPI";
 import {linkLabel, propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
 import {LoadingInlay, MessageDisplay} from "../../common";
 import Dropdown from './values/Dropdown';
@@ -92,7 +92,7 @@ class LinkedDataDropdown extends React.Component {
 }
 
 LinkedDataDropdown.defaultProps = {
-    fetchItems: (types, size) => searchAPI().searchLinkedData(types, size)
+    fetchItems: ({types, size}) => searchAPI().searchLinkedData({types, size, sort: SORT_ALPHABETICALLY})
 };
 
 LinkedDataDropdown.propTypes = {
