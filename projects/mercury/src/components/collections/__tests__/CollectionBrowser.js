@@ -145,7 +145,7 @@ describe('error state', () => {
             },
         });
 
-        const node = shallow(<CollectionBrowser store={store} />);
+        const node = shallow(<CollectionBrowserWithStore store={store} />);
 
         expect(node.prop('error')).toEqual(new Error('Test'));
     });
