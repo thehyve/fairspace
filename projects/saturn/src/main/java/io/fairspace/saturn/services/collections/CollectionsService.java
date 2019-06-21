@@ -17,6 +17,7 @@ import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
 @RequiredArgsConstructor
@@ -28,9 +29,7 @@ public class CollectionsService {
 
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");
-        validate(isLocationValid(collection.getLocation()), "Invalid location");
-        validate(collection.getName() != null && !collection.getName().isEmpty(), "Field name must be set");
-        validate(collection.getType() != null, "Field type must be set");
+        validateFields(collection);
 
         if (collection.getDescription() == null) {
             collection.setDescription("");
@@ -107,43 +106,47 @@ public class CollectionsService {
         validateIRI(patch.getIri().getURI());
 
         return commit("Update collection " + patch.getName(), dao, () -> {
-            var existing = get(patch.getIri().getURI());
-            if (existing == null) {
+            var collection = get(patch.getIri().getURI());
+            if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());
                 throw new CollectionNotFoundException(patch.getIri().getURI());
             }
-            if (!existing.getAccess().canWrite()) {
+            if (!collection.getAccess().canWrite()) {
                 log.info("No enough permissions to modify a collection {}", patch.getIri());
                 throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
             }
 
-            validate(patch.getType() == null || patch.getType().equals(existing.getType()),
+            validate(patch.getType() == null || patch.getType().equals(collection.getType()),
                     "Cannot change collection's type");
 
-            if (patch.getLocation() != null && !patch.getLocation().equals(existing.getLocation())) {
+            var oldLocation = collection.getLocation();
+            if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
                 ensureLocationIsNotUsed(patch.getLocation());
-                validate(isLocationValid(patch.getLocation()), "Invalid location");
+                collection.setLocation(patch.getLocation());
             }
 
             if (patch.getName() != null) {
-                existing.setName(patch.getName());
+                collection.setName(patch.getName());
             }
 
             if (patch.getDescription() != null) {
-                existing.setDescription(patch.getDescription());
+                collection.setDescription(patch.getDescription());
             }
 
-            var oldLocation = existing.getLocation();
-            if (patch.getLocation() != null) {
-                existing.setLocation(patch.getLocation());
+            validateFields(collection);
+            collection = dao.write(collection);
+            if (!collection.getLocation().equals(oldLocation)) {
+                eventListener.accept(new CollectionMovedEvent(collection, oldLocation));
             }
-
-            var updated = dao.write(existing);
-            if (!updated.getLocation().equals(oldLocation)) {
-                eventListener.accept(new CollectionMovedEvent(updated, oldLocation));
-            }
-            return updated;
+            return collection;
         });
+    }
+
+    private void validateFields(Collection collection) {
+        validate(isLocationValid(collection.getLocation()), "Invalid location");
+        validate(isNotEmpty(collection.getName()), "Field name must be set");
+        validate(collection.getName().length() <= 128, "Field name must contain no more than 128 characters");
+        validate(collection.getType() != null, "Field type must be set");
     }
 
     private Collection addPermissionsToObject(Collection c) {
