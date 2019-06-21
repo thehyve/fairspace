@@ -1,29 +1,32 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import lombok.AllArgsConstructor;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.shacl.vocabulary.SH;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.selectDistinct;
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import java.util.List;
 
-@AllArgsConstructor
 public class MachineOnlyClassesValidator implements MetadataRequestValidator {
-    private final RDFConnection rdf;
+    private final List<Resource> machineOnlyClasses;
+
+    public MachineOnlyClassesValidator(Model vocabulary) {
+        this.machineOnlyClasses = vocabulary
+        .listSubjectsWithProperty(SH.targetClass)
+        .filterKeep(shape -> shape.hasLiteral(FS.machineOnly, true))
+        .mapWith(shape -> shape.getPropertyResourceValue(SH.targetClass))
+        .toList() ;
+    }
 
     @Override
     public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
-        var machineOnlyClasses = selectDistinct(rdf, storedQuery("machine_only_classes"), row -> row.getResource("class"));
-
-        modelToAdd.listStatements(null, RDF.type, (RDFNode) null)
-                .filterKeep(statement -> machineOnlyClasses.contains(statement.getObject()))
-                .forEachRemaining(statement -> violationHandler.onViolation("Trying to create a machine-only entity", statement));
-
-        modelToRemove.listStatements(null, RDF.type, (RDFNode) null)
-                .filterKeep(statement -> machineOnlyClasses.contains(statement.getObject()))
-                .forEachRemaining(statement -> violationHandler.onViolation("Trying to change type of a machine-only entity", statement));
+        machineOnlyClasses.forEach(moc -> {
+            modelToAdd.listStatements(null, RDF.type, moc)
+                    .forEachRemaining(statement -> violationHandler.onViolation("Trying to create a machine-only entity", statement));
+            modelToRemove.listStatements(null, RDF.type, moc)
+                    .forEachRemaining(statement -> violationHandler.onViolation("Trying to change type of a machine-only entity", statement));
+        });
     }
 
 }

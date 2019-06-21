@@ -71,7 +71,7 @@ const Layout = ({classes, workspaceName, version, pending}) => {
             <TopBar workspaceName={workspaceName} />
             <AuthorizationCheck authorization={Config.get().roles.user} transformError={transformError}>
                 <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter}/>
-                <main style={{marginLeft: menuOpen ? 175 : 0}} className={classes.main}>
+                <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                     <Routes />
                 </main>
             </AuthorizationCheck>

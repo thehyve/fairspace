@@ -1,12 +1,9 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.vocabulary.Vocabularies;
-import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -20,29 +17,21 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MachineOnlyClassesValidatorTest {
-
     private static final Resource machineOnlyClass = createResource("http://example.com/MachineOnly");
     private static final Resource regularClass = createResource("http://example.com/Regular");
     private static final Resource machineOnlyClassShape = createResource("http://example.com/MachineOnlyShape");
     private static final Resource regularClassShape = createResource("http://example.com/RegularShape");
     private static final Resource machineOnlyInstance = createResource("http://example.com/123");
     private static final Resource regularInstance = createResource("http://example.com/345");
+    private static final Model vocabulary = createDefaultModel()
+            .add(regularClassShape, SH.targetClass, regularClass)
+            .add(machineOnlyClassShape, SH.targetClass, machineOnlyClass)
+            .addLiteral(machineOnlyClassShape, FS.machineOnly, true);
 
-    private MachineOnlyClassesValidator validator;
+    private MachineOnlyClassesValidator validator = new MachineOnlyClassesValidator(vocabulary);
 
     @Mock
     private ViolationHandler violationHandler;
-
-    @Before
-    public void before() {
-        var ds = DatasetFactory.create();
-        ds.getNamedModel(Vocabularies.VOCABULARY_GRAPH_URI.getURI())
-                .add(regularClassShape, SH.targetClass, regularClass)
-                .add(machineOnlyClassShape, SH.targetClass, machineOnlyClass)
-                .addLiteral(machineOnlyClassShape, FS.machineOnly, true);
-
-        validator = new MachineOnlyClassesValidator(new RDFConnectionLocal(ds));
-    }
 
     @Test
     public void machineOnlyClassesCannotBeInstantiated() {
