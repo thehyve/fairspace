@@ -2,6 +2,7 @@ import React, {useContext, useState} from "react";
 import {connect} from 'react-redux';
 import PermissionsViewer from "./PermissionsViewer";
 import PermissionContext from "./PermissionContext";
+import PermissionAPI from "../../services/PermissionAPI";
 
 // This component has the context-approach and the redux approach mixed
 // together. In the near future, the user-information and users-information
@@ -22,14 +23,17 @@ const mapStateToProps = (state, ownProps) => {
 const ConnectedPermissionsViewer = connect(mapStateToProps)(PermissionsViewer);
 
 export default (props) => {
-    const {permissions, loading, error, alterPermission} = useContext(PermissionContext);
+    const {permissions, loading, error, refresh} = useContext(PermissionContext);
     const [altering, setAltering] = useState(false);
 
-    const alterPermissionWithSpinner = (userIri, iri, access) => {
+    const alterPermission = (userIri, resourceIri, access) => {
         setAltering(true);
-        return alterPermission(userIri, iri, access)
+        return PermissionAPI
+            .alterPermission(userIri, resourceIri, access)
+            .then(refresh)
+            .catch(e => {console.error("Error altering permission", e);})
             .finally(() => setAltering(false));
-    };
+    }
 
     return (
         <ConnectedPermissionsViewer
@@ -37,7 +41,7 @@ export default (props) => {
             error={error}
             altering={altering}
             permissions={permissions}
-            alterPermission={alterPermissionWithSpinner}
+            alterPermission={alterPermission}
             {...props}
         />
     );
