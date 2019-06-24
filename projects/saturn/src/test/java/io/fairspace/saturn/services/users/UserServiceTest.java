@@ -67,7 +67,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void retrievesUsers() {
+    public void usersAreRetrieved() {
         var iri = userService.getUserIri(keycloakUser.getId());
 
         var user =  userService.getUser(iri);
