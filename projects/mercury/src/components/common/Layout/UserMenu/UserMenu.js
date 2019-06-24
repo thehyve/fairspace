@@ -6,6 +6,7 @@ import {
 import {withStyles} from '@material-ui/core/styles';
 
 import UserContext from '../../../../UserContext';
+import MessageDisplay from '../../MessageDisplay';
 
 const styles = {
     row: {
@@ -21,7 +22,7 @@ const styles = {
 
 const UserMenu = ({classes}) => {
     const [anchorEl, setAnchorEl] = useState(null);
-    const {currentUser, onLogout} = useContext(UserContext);
+    const {currentUser, currentUserLoading, currentUserError, onLogout} = useContext(UserContext);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -35,6 +36,14 @@ const UserMenu = ({classes}) => {
         handleClose();
         onLogout();
     };
+
+    if (currentUserLoading) {
+        return '...';
+    }
+
+    if (currentUserError) {
+        return <MessageDisplay message=" " small noMessage />;
+    }
 
     return currentUser && (
         <>
