@@ -1,9 +1,8 @@
 import React from 'react';
-import {mount} from "enzyme";
+import {shallow} from "enzyme";
 
 import {IconButton, Button} from "@material-ui/core";
 import PermissionsViewer from "../PermissionsViewer";
-import UserContext from '../../../UserContext';
 
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
@@ -46,17 +45,16 @@ describe('PermissionsViewer', () => {
     describe('Use Case 1: Current user is creator and can manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = mount(
-                <UserContext.Provider value={{currentUser: mockcurrentUserCreatorCanManage}}>
-                    <PermissionsViewer
-                        creator={mockCreator}
-                        iri={500}
-                        canManage
-                        permissions={mockCollaborators}
-                        alterPermission={mockAlterPermissionFn}
-                        fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-                    />
-                </UserContext.Provider>
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    currentUser={mockcurrentUserCreatorCanManage}
+                    canManage
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
             );
         });
         it('should render all collaborators', () => {
@@ -94,17 +92,16 @@ describe('PermissionsViewer', () => {
     describe('Use Case 2: Current user is NOT creator and can NOT manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = mount(
-                <UserContext.Provider value={{currentUser: mockcurrentUserNotCreatorCannotManage}}>
-                    <PermissionsViewer
-                        creator={mockCreator}
-                        iri={500}
-                        canManage={false}
-                        permissions={mockCollaborators}
-                        alterPermission={mockAlterPermissionFn}
-                        fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-                    />
-                </UserContext.Provider>
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    canManage={false}
+                    currentUser={mockcurrentUserNotCreatorCannotManage}
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
             );
         });
 
@@ -141,17 +138,16 @@ describe('PermissionsViewer', () => {
     describe('Use Case 3: Current user is NOT creator and can manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = mount(
-                <UserContext.Provider value={{currentUser: mockcurrentUserNotCreatorCanManage}}>
-                    <PermissionsViewer
-                        creator={mockCreator}
-                        iri={500}
-                        canManage
-                        permissions={mockCollaborators}
-                        alterPermission={mockAlterPermissionFn}
-                        fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-                    />
-                </UserContext.Provider>
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    canManage
+                    currentUser={mockcurrentUserNotCreatorCanManage}
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
             );
         });
 

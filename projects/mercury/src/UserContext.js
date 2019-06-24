@@ -12,8 +12,8 @@ export const UserProvider = ({children}) => {
     const [currentUserError, setCurrentUserError] = useState(null);
 
     const [users, setUsers] = useState([]);
-    const [usersError, setError] = useState(false);
     const [usersLoading, setLoading] = useState(false);
+    const [usersError, setError] = useState(false);
 
     const refreshUsers = () => {
         setLoading(true);
