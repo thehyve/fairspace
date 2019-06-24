@@ -52,6 +52,10 @@ security:
     - /
     - /static/*
     - /config/*
+    - /metadata/*
+    - /collections/*
+    - /vocabulary/*
+    - /notebooks/*
     - "*.js"
     - /api/${app.apiVersion.pluto}/account/*
     - /api/${app.apiVersion.pluto}/workspace/*
