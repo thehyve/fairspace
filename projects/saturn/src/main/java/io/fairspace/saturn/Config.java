@@ -20,6 +20,8 @@ public class Config {
 
     public final Properties mail = new Properties();
 
+    public final Users users = new Users();
+
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
         public String vocabularyBaseIRI = "http://localhost/vocabulary/";
@@ -55,6 +57,12 @@ public class Config {
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
+    }
+
+    public static class Users {
+        public String endpoint  = "http://localhost:8080/api/v1/workspace/users";
+
+        public int synchronizationInterval = 60;
     }
 
     @Override

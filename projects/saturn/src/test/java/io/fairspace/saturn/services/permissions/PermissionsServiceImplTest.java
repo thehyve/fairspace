@@ -61,21 +61,20 @@ public class PermissionsServiceImplTest {
     @Mock
     private MailService mailService;
 
+    private Node currentUser = USER1;
+
     @Before
     public void setUp() {
-        when(userService.getCurrentUser()).thenReturn(new User() {{
-            setIri(USER1);
-            setName("John");
-        }});
         when(userService.getUser(any())).thenAnswer(invocation -> new User() {{
             setIri(invocation.getArgument(0));
+            setName("John");
             setEmail("user@example.com");
         }});
         when(mailService.newMessage()).thenReturn(message);
 
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), userService, mailService);
+        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> currentUser, userService, mailService);
         service.createResource(RESOURCE);
     }
 
@@ -257,10 +256,7 @@ public class PermissionsServiceImplTest {
     public void testEnsureAccessToVisibleCollections() {
         setupAccessCheckForMultipleNodes();
 
-        when(userService.getCurrentUser()).thenReturn(new User() {{
-            setIri(USER2);
-            setName("John");
-        }});
+        currentUser = USER2;
 
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Read);
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Write);
@@ -270,10 +266,7 @@ public class PermissionsServiceImplTest {
     public void testEnsureAccessToCollections() {
         setupAccessCheckForMultipleNodes();
 
-        when(userService.getCurrentUser()).thenReturn(new User() {{
-            setIri(USER2);
-            setName("John");
-        }});
+        currentUser = USER2;
 
         service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_2), Access.Read);
     }
@@ -282,10 +275,7 @@ public class PermissionsServiceImplTest {
     public void testEnsureAccessToFiles() {
         setupAccessCheckForMultipleNodes();
 
-        when(userService.getCurrentUser()).thenReturn(new User() {{
-            setIri(USER2);
-            setName("John");
-        }});
+        currentUser = USER2;
 
         service.ensureAccess(Set.of(FILE_1, COLLECTION_2, FILE_2), Access.Read);
     }
@@ -294,10 +284,7 @@ public class PermissionsServiceImplTest {
     public void testEnsureAccessToNonRestrictedEntities() {
         setupAccessCheckForMultipleNodes();
 
-        when(userService.getCurrentUser()).thenReturn(new User() {{
-            setIri(USER2);
-            setName("John");
-        }});
+        currentUser = USER2;
 
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
         service.ensureAccess(Set.of(RESOURCE2), Access.Write);
@@ -307,10 +294,7 @@ public class PermissionsServiceImplTest {
     public void testEnsureAccessToRestrictedEntities() {
         setupAccessCheckForMultipleNodes();
 
-        when(userService.getCurrentUser()).thenReturn(new User() {{
-            setIri(USER2);
-            setName("John");
-        }});
+        currentUser = USER2;
 
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Write);
     }
@@ -319,10 +303,7 @@ public class PermissionsServiceImplTest {
     public void testReturnedSubjectInEnsureAccessException() {
         setupAccessCheckForMultipleNodes();
 
-        when(userService.getCurrentUser()).thenReturn(new User() {{
-            setIri(USER2);
-            setName("John");
-        }});
+        currentUser = USER2;
 
         // The exception thrown by ensureAccess should return the failing entity
         try {

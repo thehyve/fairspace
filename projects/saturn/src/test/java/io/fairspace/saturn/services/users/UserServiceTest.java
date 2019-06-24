@@ -1,93 +1,107 @@
 package io.fairspace.saturn.services.users;
 
-import io.fairspace.saturn.auth.UserInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.HttpServer;
 import io.fairspace.saturn.rdf.dao.DAO;
-import org.apache.jena.graph.Node;
-import org.junit.BeforeClass;
+import io.fairspace.saturn.vocabulary.FS;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdfconnection.Isolation;
+import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Set;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import static java.util.Collections.singletonList;
-import static junit.framework.TestCase.assertEquals;
-import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
-    private static final Node IRI = createURI("http://localhost/iri/123");
-    private static final UserInfo userInfo = new UserInfo("123", "user1", "name1", "user1@host.com", Set.of("role1", "role2"));
-    private static User user;
 
-    @Mock
-    private DAO dao;
-    private UserService service;
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    private static final int refreshInterval = 1;
+
+    private HttpServer mockServer;
+
+    private UserService userService;
+
+    private Dataset ds = DatasetFactory.createTxnMem();
+
+    private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
+
+    private final KeycloakUser keycloakUser = new KeycloakUser() {{
+        setId("123");
+        setFirstName("John");
+        setLastName("Smith");
+        setEmail("john@example.com");
+    }};
+    private final KeycloakUser alteredKeycloakUser = new KeycloakUser() {{
+        setId(keycloakUser.getId());
+        setFirstName(keycloakUser.getFirstName());
+        setLastName(keycloakUser.getLastName());
+        setEmail("smith@example.com");
+    }};
+
+    private volatile List<KeycloakUser> keycloakUsers = List.of(keycloakUser);
 
 
-    @BeforeClass
-    public static void before() {
-        user = new User();
-        user.setIri(IRI);
-        user.setName(userInfo.getFullName());
-        user.setEmail(userInfo.getEmail());
+    @Before
+    public void before() throws IOException {
+        mockServer = HttpServer.create(new InetSocketAddress(0), 0);
+        mockServer.createContext("/users", exchange -> {
+            var response = mapper.writeValueAsBytes(keycloakUsers);
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
+        mockServer.start();
 
+        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/users", refreshInterval, new DAO(rdf, null), false);
     }
 
     @Test
-    public void shouldCreateAnIRIForANewUserAndThenStoreAndReuseIt() {
-        service = new UserService(() -> userInfo, dao);
+    public void usersAreRetrieved() {
+        var iri = userService.getUserIri(keycloakUser.getId());
 
-        when(dao.write(any(User.class)))
-                .thenAnswer(invocation -> withIri(invocation.getArgument(0)));
+        var user =  userService.getUser(iri);
 
-        var iri = service.getUserIRI(userInfo);
-
-        verify(dao, times(1)).write(argThat(e ->
-                e.getIri().equals(IRI)
-                && e instanceof User
-                && ((User)e).getName().equals(userInfo.getFullName())
-                && e.getIri().getURI().endsWith(userInfo.getUserId())
-                && ((User)e).getEmail().equals(userInfo.getEmail())));
-
-        assertEquals(iri, service.getUserIRI(userInfo));
-    }
-
-
-
-    @Test
-    public void shouldLoadPreviouslyCreatedUsersOnStart() {
-        when(dao.list(eq(User.class))).thenReturn(singletonList(user));
-        service = new UserService(() -> userInfo, dao);
-
-        var iri = service.getUserIRI(userInfo);
-        assertEquals(IRI, iri);
-        verify(dao, times(0)).write(any());
+        assertEquals(keycloakUser.getFullName(), user.getName());
+        assertEquals(keycloakUser.getEmail(), user.getEmail());
     }
 
 
     @Test
-    public void shouldUpdateMetadataWhenNeeded() {
-        when(dao.list(eq(User.class))).thenReturn(singletonList(user));
-        service = new UserService(() -> userInfo, dao);
+    public void usersGetPersisted() throws InterruptedException {
+        var iri = userService.getUserIri(keycloakUser.getId());
 
-        var updatedUserInfo = new UserInfo("123", "user2", "name2", "user2@host.com", Set.of("role1", "role2", "role3"));
-        service.getUserIRI(updatedUserInfo);
+        userService.getUser(iri);
 
-        var updatedUser = new User();
-        updatedUser.setIri(IRI);
-        updatedUser.setName(updatedUserInfo.getFullName());
-        updatedUser.setEmail(updatedUserInfo.getEmail());
+        Thread.sleep(TimeUnit.SECONDS.toMillis(2 * refreshInterval)); // Saving might take some time
 
-        verify(dao, times(1)).write(eq(updatedUser));
+        assertTrue(ds.getDefaultModel().containsResource(createResource(iri.getURI())));
     }
 
-    private static User withIri(User user) {
-        user.setIri(IRI);
-        return user;
+    @Test
+    public void userInformationGetRefreshed() throws InterruptedException {
+        var iri = userService.getUserIri(keycloakUser.getId());
+
+        userService.getUser(iri);
+
+        keycloakUsers = List.of(alteredKeycloakUser);
+
+        Thread.sleep(TimeUnit.SECONDS.toMillis(2 * refreshInterval)); // Refreshing might take some time
+
+        var user =  userService.getUser(iri);
+
+        assertEquals(alteredKeycloakUser.getEmail(), user.getEmail());
+
+        assertTrue(ds.getDefaultModel().contains(createResource(iri.getURI()), FS.email, alteredKeycloakUser.getEmail()));
     }
 }
