@@ -189,11 +189,17 @@ const materialReactSelect = (props) => {
             ...base,
             color: theme.palette.text.primary,
         }),
+        menuPortal: base => ({
+            ...base,
+            zIndex: 9999
+        }),
+
     };
 
     return (
         <Select
             classes={classes}
+            menuPortalTarget={document.body}
             styles={selectStyles}
             options={props.options}
             components={components}
