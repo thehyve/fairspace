@@ -28,8 +28,6 @@ public class UserServiceTest {
 
     private static final int refreshInterval = 1;
 
-    private volatile List<KeycloakUser> keycloakUsers = List.of();
-
     private HttpServer mockServer;
 
     private UserService userService;
@@ -37,6 +35,21 @@ public class UserServiceTest {
     private Dataset ds = DatasetFactory.createTxnMem();
 
     private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
+
+    private final KeycloakUser keycloakUser = new KeycloakUser() {{
+        setId("123");
+        setFirstName("John");
+        setLastName("Smith");
+        setEmail("john@example.com");
+    }};
+    private final KeycloakUser alteredKeycloakUser = new KeycloakUser() {{
+        setId(keycloakUser.getId());
+        setFirstName(keycloakUser.getFirstName());
+        setLastName(keycloakUser.getLastName());
+        setEmail("smith@example.com");
+    }};
+
+    private volatile List<KeycloakUser> keycloakUsers = List.of(keycloakUser);
 
 
     @Before
@@ -55,14 +68,6 @@ public class UserServiceTest {
 
     @Test
     public void retrievesUsers() {
-        var keycloakUser = new KeycloakUser();
-        keycloakUser.setId("123");
-        keycloakUser.setFirstName("John");
-        keycloakUser.setLastName("Smith");
-        keycloakUser.setEmail("john@example.com");
-
-        keycloakUsers = List.of(keycloakUser);
-
         var iri = userService.getUserIri(keycloakUser.getId());
 
         var user =  userService.getUser(iri);
@@ -74,14 +79,6 @@ public class UserServiceTest {
 
     @Test
     public void usersGetPersisted() throws InterruptedException {
-        var keycloakUser = new KeycloakUser();
-        keycloakUser.setId("123");
-        keycloakUser.setFirstName("John");
-        keycloakUser.setLastName("Smith");
-        keycloakUser.setEmail("john@example.com");
-
-        keycloakUsers = List.of(keycloakUser);
-
         var iri = userService.getUserIri(keycloakUser.getId());
 
         userService.getUser(iri);
@@ -93,32 +90,18 @@ public class UserServiceTest {
 
     @Test
     public void userInformationGetRefreshed() throws InterruptedException {
-        var keycloakUser1 = new KeycloakUser();
-        keycloakUser1.setId("123");
-        keycloakUser1.setFirstName("John");
-        keycloakUser1.setLastName("Smith");
-        keycloakUser1.setEmail("john@example.com");
-
-        keycloakUsers = List.of(keycloakUser1);
-
-        var iri = userService.getUserIri(keycloakUser1.getId());
+        var iri = userService.getUserIri(keycloakUser.getId());
 
         userService.getUser(iri);
 
-        var keycloakUser2 = new KeycloakUser();
-        keycloakUser2.setId(keycloakUser1.getId());
-        keycloakUser2.setFirstName(keycloakUser1.getFirstName());
-        keycloakUser2.setLastName(keycloakUser1.getLastName());
-        keycloakUser2.setEmail("smith@example.com");
-
-        keycloakUsers = List.of(keycloakUser2);
+        keycloakUsers = List.of(alteredKeycloakUser);
 
         Thread.sleep(TimeUnit.SECONDS.toMillis(2 * refreshInterval)); // Refreshing might take some time
 
         var user =  userService.getUser(iri);
 
-        assertEquals(keycloakUser2.getEmail(), user.getEmail());
+        assertEquals(alteredKeycloakUser.getEmail(), user.getEmail());
 
-        assertTrue(ds.getDefaultModel().contains(createResource(iri.getURI()), FS.email, keycloakUser2.getEmail()));
+        assertTrue(ds.getDefaultModel().contains(createResource(iri.getURI()), FS.email, alteredKeycloakUser.getEmail()));
     }
 }
