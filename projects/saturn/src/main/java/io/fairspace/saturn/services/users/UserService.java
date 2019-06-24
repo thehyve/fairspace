@@ -9,8 +9,6 @@ import org.eclipse.jetty.client.HttpClient;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +16,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static io.fairspace.saturn.auth.SecurityUtil.authorizationHeader;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.stream.Collectors.toList;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
@@ -37,12 +36,7 @@ public class UserService {
         this.dao = dao;
         this.authorizationRequired = authorizationRequired;
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                refreshCache();
-            }
-        }, 0, TimeUnit.SECONDS.toMillis(refreshInterval));
+        newSingleThreadScheduledExecutor().scheduleWithFixedDelay(this::refreshCache, 0, refreshInterval, TimeUnit.SECONDS);
     }
 
     public User getUser(Node iri) {
@@ -61,7 +55,7 @@ public class UserService {
         var users = fetchUsers();
         var updated = users
                 .stream()
-                .filter(user -> !user.equals(usersByIri.replace(user.getIri(), user)))
+                .filter(user -> !user.equals(usersByIri.put(user.getIri(), user)))
                 .collect(toList());
         if (!updated.isEmpty()) {
             commit("Update user information", dao, () -> updated.forEach(dao::write));
@@ -84,7 +78,7 @@ public class UserService {
                         .stream()
                         .map(keycloakUser -> {
                             var user = new User();
-                            user.setIri(generateMetadataIri(keycloakUser.getId()));
+                            user.setIri(getUserIri(keycloakUser.getId()));
                             user.setName(keycloakUser.getFullName());
                             user.setEmail(keycloakUser.getEmail());
                             return user;

@@ -97,6 +97,7 @@ public class App {
                 .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet("/webdav/" + API_VERSION + "/", fs))
                 .port(CONFIG.port);
 
+
         var auth = CONFIG.auth;
         if (!auth.enabled) {
             log.warn("Authentication is disabled");
