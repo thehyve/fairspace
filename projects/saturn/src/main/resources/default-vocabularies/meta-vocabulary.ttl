@@ -299,6 +299,7 @@ sh:PropertyShape
         [
             sh:path sh:datatype ;
             sh:name "Datatype" ;
+            sh:nodeKind sh:IRI ;
             fs:importantProperty true ;
             sh:order 2
         ] .

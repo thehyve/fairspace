@@ -1,7 +1,7 @@
 import React from 'react';
 import {shallow} from "enzyme";
 
-import {IconButton} from "@material-ui/core";
+import {IconButton, Button} from "@material-ui/core";
 import PermissionsViewer from "../PermissionsViewer";
 
 describe('PermissionsViewer', () => {
@@ -45,15 +45,17 @@ describe('PermissionsViewer', () => {
     describe('Use Case 1: Current user is creator and can manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = shallow(<PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                canManage
-                permissions={mockCollaborators}
-                currentUser={mockcurrentUserCreatorCanManage}
-                alterPermission={mockAlterPermissionFn}
-                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-            />);
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    currentUser={mockcurrentUserCreatorCanManage}
+                    canManage
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
+            );
         });
         it('should render all collaborators', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
@@ -82,24 +84,25 @@ describe('PermissionsViewer', () => {
             expect(wrapper.find(IconButton).length).toEqual(4);
         });
 
-
         it('should render add button', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
+            expect(wrapper.find(Button).length).toEqual(1);
         });
     });
 
     describe('Use Case 2: Current user is NOT creator and can NOT manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = shallow(<PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                canManage={false}
-                permissions={mockCollaborators}
-                currentUser={mockcurrentUserNotCreatorCannotManage}
-                alterPermission={mockAlterPermissionFn}
-                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-            />);
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    canManage={false}
+                    currentUser={mockcurrentUserNotCreatorCannotManage}
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
+            );
         });
 
         it('should render all collaborators', () => {
@@ -135,15 +138,17 @@ describe('PermissionsViewer', () => {
     describe('Use Case 3: Current user is NOT creator and can manage collection', () => {
         let wrapper;
         beforeAll(() => {
-            wrapper = shallow(<PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                canManage
-                permissions={mockCollaborators}
-                currentUser={mockcurrentUserNotCreatorCanManage}
-                alterPermission={mockAlterPermissionFn}
-                fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-            />);
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    canManage
+                    currentUser={mockcurrentUserNotCreatorCanManage}
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
+            );
         });
 
         it('should render all collaborators', () => {
@@ -172,7 +177,7 @@ describe('PermissionsViewer', () => {
             expect(wrapper.find(IconButton).some('[disabled]')).toBeTruthy();
         });
         it('should render add button', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(1);
+            expect(wrapper.find(Button).length).toEqual(1);
         });
     });
 });

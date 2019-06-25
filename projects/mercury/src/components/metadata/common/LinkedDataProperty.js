@@ -7,6 +7,7 @@ import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
 import LinkedDataRelationTable from "./LinkedDataRelationTable";
 import {TOOLTIP_ENTER_DELAY} from "../../../constants";
 import GenericTooltip from "../../common/GenericTooltip";
+import Iri from "../../common/Iri";
 
 /**
      * Checks whether the configuration of this property disallowed editing of existing values
@@ -39,7 +40,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
     const editInputComponent = disableEditing ? readOnlyComponent() : editComponent(property);
     const addInputComponent = addComponent(property);
 
-    const labelTooltip = <><div>{path}</div><div style={{marginTop: 4}}>{description}</div></>;
+    const labelTooltip = <><Iri iri={path} /><div style={{marginTop: 4}}>{description}</div></>;
 
     return (
         <FormControl

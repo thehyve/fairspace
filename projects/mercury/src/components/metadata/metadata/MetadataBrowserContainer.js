@@ -2,7 +2,7 @@ import React from "react";
 import {connect} from 'react-redux';
 
 import {withRouter} from 'react-router-dom';
-import {createMetadataIri, getLabel, linkLabel, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
+import {createMetadataIri, getLabel, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
 import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {searchMetadata} from "../../../actions/searchActions";
 import {getMetadataSearchResults} from "../../../reducers/searchReducers";
@@ -16,6 +16,7 @@ import {METADATA_PATH, SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../const
 import LinkedDataLink from "../common/LinkedDataLink";
 import LinkedDataList from "../common/LinkedDataList";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
+import Iri from "../../common/Iri";
 
 const openMetadataEntry = (history, id) => {
     history.push(`${METADATA_PATH}?iri=` + encodeURIComponent(id));
@@ -53,7 +54,7 @@ const mapStateToProps = (state, {vocabulary}) => {
 
         return {
             id,
-            primaryText: (label && label[0]) || linkLabel(id, true),
+            primaryText: (label && label[0]) || <Iri iri={id} />,
             secondaryText: (comment && comment[0]),
             typeLabel,
             shapeUrl,
