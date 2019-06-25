@@ -3,7 +3,6 @@ import {withRouter} from "react-router-dom";
 import {AppBar, Toolbar, Typography, withStyles} from "@material-ui/core";
 
 import UserMenu from "../UserMenu/UserMenu";
-import logout from "../../../../services/logout";
 import SearchBar from '../../SearchBar';
 import {buildSearchUrl, getSearchQueryFromString} from '../../../../utils/searchUtils';
 
@@ -31,7 +30,7 @@ const TopBar = ({classes, workspaceName, location, history}) => {
                     {workspaceName}
                 </Typography>
                 <SearchBar query={searchQuery} onSearchChange={handleSearch} />
-                <UserMenu onLogout={logout} />
+                <UserMenu />
             </Toolbar>
         </AppBar>
     );

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
 import {withStyles} from '@material-ui/core/styles';
@@ -10,19 +10,20 @@ import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../Routes";
 import Config from "../../../services/Config/Config";
-import {isUserPending} from "../../../reducers/account/userReducers";
 import {isAuthorizationsPending} from "../../../reducers/account/authorizationsReducers";
 import {isWorkspacePending} from "../../../reducers/workspaceReducers";
 import {isRedirectingForLogin} from "../../../reducers/uiReducers";
 import {LoadingInlay} from "../index";
+import UserContext from '../../../UserContext';
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
 
 const Layout = ({classes, workspaceName, version, pending}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
+    const {currentUserLoading} = useContext(UserContext);
 
-    if (pending) {
+    if (pending || currentUserLoading) {
         return <LoadingInlay />;
     }
 
@@ -69,7 +70,7 @@ const Layout = ({classes, workspaceName, version, pending}) => {
         <>
             <TopBar workspaceName={workspaceName} />
             <AuthorizationCheck authorization={Config.get().roles.user} transformError={transformError}>
-                <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter}/>
+                <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />
                 <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                     <Routes />
                 </main>
@@ -84,7 +85,7 @@ const mapStateToProps = state => {
     const {name, version} = {...state.workspace.data};
 
     return {
-        pending: isUserPending(state) || isAuthorizationsPending(state) || isWorkspacePending(state) || isRedirectingForLogin(state),
+        pending: isAuthorizationsPending(state) || isWorkspacePending(state) || isRedirectingForLogin(state),
         menuExpanded: state.ui.menuExpanded,
         workspaceName: name,
         version

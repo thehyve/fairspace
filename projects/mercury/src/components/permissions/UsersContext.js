@@ -25,8 +25,8 @@ export const UsersProvider = ({children}) => {
         <UsersContext.Provider
             value={{
                 users,
-                error,
-                loading,
+                usersError: error,
+                usersLoading: loading,
                 refresh
             }}
         >
