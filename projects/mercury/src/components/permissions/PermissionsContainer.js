@@ -4,10 +4,12 @@ import PermissionsViewer from "./PermissionsViewer";
 import PermissionContext from "./PermissionContext";
 import PermissionAPI from "../../services/PermissionAPI";
 import UserContext from '../../UserContext';
+import UsersContext from './UsersContext';
 
 export default (props) => {
     const {permissions, loading: permissionsLoading, error: permissionsError, refresh} = useContext(PermissionContext);
-    const {currentUser, currentUserLoading, currentUserError, usersLoading, usersError} = useContext(UserContext);
+    const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
+    const {usersLoading, usersError} = useContext(UsersContext);
     const [altering, setAltering] = useState(false);
 
     const alterPermission = (userIri, resourceIri, access) => {

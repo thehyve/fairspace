@@ -13,6 +13,7 @@ import theme from './App.theme';
 import Layout from "./common/Layout/Layout";
 import {LoadingInlay, ErrorDialog} from './common';
 import {UserProvider} from '../UserContext';
+import {UsersProvider} from "./permissions/UsersContext";
 
 class App extends React.Component {
     cancellable = {
@@ -50,17 +51,19 @@ class App extends React.Component {
         if (this.state.configLoaded) {
             return (
                 <UserProvider>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <MuiThemeProvider theme={theme}>
-                            <Provider store={this.store}>
-                                <ErrorDialog>
-                                    <Router>
-                                        <Layout />
-                                    </Router>
-                                </ErrorDialog>
-                            </Provider>
-                        </MuiThemeProvider>
-                    </MuiPickersUtilsProvider>
+                    <UsersProvider>
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <MuiThemeProvider theme={theme}>
+                                <Provider store={this.store}>
+                                    <ErrorDialog>
+                                        <Router>
+                                            <Layout />
+                                        </Router>
+                                    </ErrorDialog>
+                                </Provider>
+                            </MuiThemeProvider>
+                        </MuiPickersUtilsProvider>
+                    </UsersProvider>
                 </UserProvider>
             );
         }

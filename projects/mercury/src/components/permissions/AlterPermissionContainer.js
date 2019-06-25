@@ -1,11 +1,11 @@
 import React, {useContext} from "react";
 import AlterPermissionDialog from "./AlterPermissionDialog";
 import PermissionContext from "./PermissionContext";
-import UserContext from "../../UserContext";
+import UsersContext from "./UsersContext";
 
 const AlterPermissionContainer = props => {
     const {permissions, loading: loadingPermissions, error: errorPermissions} = useContext(PermissionContext);
-    const {users, loadingUsers, errorUsers} = useContext(UserContext);
+    const {users, loadingUsers, errorUsers} = useContext(UsersContext);
 
     return (
         <AlterPermissionDialog

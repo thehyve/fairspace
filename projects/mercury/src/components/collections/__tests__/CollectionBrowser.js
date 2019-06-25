@@ -7,10 +7,10 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 
-import CollectionBrowserWithStore, {CollectionBrowser} from "../CollectionBrowser";
+import CollectionBrowser from "../CollectionBrowser";
+import CollectionBrowserContainer from "../CollectionBrowserContainer";
 import Config from "../../../services/Config/Config";
 import * as actionTypes from "../../../actions/actionTypes";
-import UserContext from '../../../UserContext';
 import {LoadingInlay, MessageDisplay} from "../../common";
 
 const middlewares = [thunk, promiseMiddleware];
@@ -49,7 +49,7 @@ beforeEach(() => {
     collectionBrowser = (
         <MemoryRouter>
             <Provider store={store}>
-                <CollectionBrowserWithStore />
+                <CollectionBrowserContainer />
             </Provider>
         </MemoryRouter>
     );
@@ -92,11 +92,7 @@ it('dispatch an action on collection save', () => {
 
 describe('loading state', () => {
     it('is loading as long as the user is pending', () => {
-        const wrapper = mount(
-            <UserContext.Provider value={{currentUserLoading: true}}>
-                <CollectionBrowser />
-            </UserContext.Provider>
-        );
+        const wrapper = shallow(<CollectionBrowser currentUserLoading />);
 
         expect(wrapper.find(LoadingInlay).length).toBe(1);
     });
@@ -113,7 +109,7 @@ describe('loading state', () => {
             },
         });
 
-        const node = shallow(<CollectionBrowserWithStore store={store} />);
+        const node = shallow(<CollectionBrowserContainer store={store} />);
 
         expect(node.prop('loading')).toEqual(true);
     });
@@ -121,11 +117,7 @@ describe('loading state', () => {
 
 describe('error state', () => {
     it('is in error state when user fetching failed', () => {
-        const wrapper = mount(
-            <UserContext.Provider value={{currentUserError: new Error()}}>
-                <CollectionBrowser />
-            </UserContext.Provider>
-        );
+        const wrapper = shallow(<CollectionBrowser currentUserError={new Error()} />);
 
         expect(wrapper.find(MessageDisplay).length).toBe(1);
     });
@@ -145,7 +137,7 @@ describe('error state', () => {
             },
         });
 
-        const node = shallow(<CollectionBrowserWithStore store={store} />);
+        const node = shallow(<CollectionBrowserContainer store={store} />);
 
         expect(node.prop('error')).toEqual(new Error('Test'));
     });

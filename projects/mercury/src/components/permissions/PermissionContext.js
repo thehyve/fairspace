@@ -1,12 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import PermissionAPI from "../../services/PermissionAPI";
 import getDisplayName from "../../utils/userUtils";
-import UserContext from "../../UserContext";
+import UsersContext from "./UsersContext";
 
 const PermissionContext = React.createContext({});
 
 export const PermissionProvider = ({iri, children}) => {
-    const {users} = useContext(UserContext);
+    const {users} = useContext(UsersContext);
     const [permissions, setPermissions] = useState([]);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
