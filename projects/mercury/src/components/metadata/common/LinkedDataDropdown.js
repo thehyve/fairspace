@@ -84,6 +84,7 @@ class LinkedDataDropdown extends React.Component {
         return (
             <Dropdown
                 {...otherProps}
+                filterOption={() => true}
                 onTextInputChange={this.onTextInputChange}
                 options={options}
             />

@@ -207,6 +207,7 @@ const materialReactSelect = (props) => {
             onChange={props.onChange}
             noOptionsMessage={props.noOptionsMessage}
             placeholder={props.placeholder}
+            filterOption={props.filterOption}
             textFieldProps={{
                 label: props.label,
                 InputLabelProps: {
