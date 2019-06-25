@@ -17,6 +17,7 @@ import {getVocabularySearchResults} from "../../../reducers/searchReducers";
 import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 import LinkedDataList from "../common/LinkedDataList";
+import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 
 const openVocabulary = (history, id) => {
     history.push(`${VOCABULARY_PATH}?iri=` + encodeURIComponent(id));
@@ -73,6 +74,8 @@ const mapStateToProps = (state, {metaVocabulary}) => {
         }
     };
 
+    const generateInitialContent = (shape) => emptyLinkedData(metaVocabulary, shape);
+
     return {
         isEditable: isDataSteward(getAuthorizations(state), Config.get()),
         shapes: metaVocabulary.getClassesInCatalog(),
@@ -81,7 +84,7 @@ const mapStateToProps = (state, {metaVocabulary}) => {
         entities,
         total,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
-        vocabulary: metaVocabulary,
+        generateInitialContent,
         onEntityCreationError
     };
 };

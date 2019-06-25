@@ -50,14 +50,14 @@ describe('LinkedDataEntityFormContainer', () => {
             ]
         };
 
-        const fetchVocabulary = jest.fn();
+        const fetchShapes = jest.fn();
         const fetchMetadata = jest.fn();
         const wrapper = shallow(<LinkedDataEntityFormContainer
             formKey="http://example.com/john"
             subject="http://example.com/john"
             updates={updates}
             properties={properties}
-            fetchShapes={fetchVocabulary}
+            fetchShapes={fetchShapes}
             fetchLinkedData={fetchMetadata}
         />);
 
@@ -82,18 +82,18 @@ describe('LinkedDataEntityFormContainer', () => {
             linkedDataForm: {}
         });
 
-        const fetchVocabulary = jest.fn();
+        const fetchShapes = jest.fn();
         const fetchMetadata = jest.fn();
         mount(<LinkedDataEntityFormContainer
             subject="http://example.com/john"
             formKey="http://example.com/john"
             store={store}
-            fetchShapes={fetchVocabulary}
+            fetchShapes={fetchShapes}
             fetchLinkedData={fetchMetadata}
             valueComponentFactory={mockComponentFactory}
         />);
 
         expect(fetchMetadata.mock.calls.length).toEqual(1);
-        expect(fetchVocabulary.mock.calls.length).toEqual(1);
+        expect(fetchShapes.mock.calls.length).toEqual(1);
     });
 });
