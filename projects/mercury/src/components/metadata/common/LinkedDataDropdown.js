@@ -2,10 +2,11 @@ import React from 'react';
 import {PropTypes} from 'prop-types';
 
 import searchAPI, {SORT_ALPHABETICALLY} from "../../../services/SearchAPI";
-import {linkLabel, propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
+import {propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
 import {LoadingInlay, MessageDisplay} from "../../common";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
+import Iri from "../../common/Iri";
 
 class LinkedDataDropdown extends React.Component {
     state = {
@@ -71,7 +72,7 @@ class LinkedDataDropdown extends React.Component {
             .map(metadataItem => {
                 const {id, label, name} = metadataItem;
                 const disabled = propertyContainsValueOrId(property, undefined, id);
-                const displayLabel = (label && label[0]) || (name && name[0]) || linkLabel(id, true);
+                const displayLabel = (label && label[0]) || (name && name[0]) || <Iri iri={id} />;
 
                 return {
                     disabled,
