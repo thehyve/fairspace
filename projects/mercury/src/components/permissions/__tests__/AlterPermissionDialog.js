@@ -12,7 +12,6 @@ const mockStore = configureStore(middlewares);
 describe('AlterPermissionDialog', () => {
     let shallow;
     const mockAlterPermissionFn = jest.fn();
-    const mockfetchUsersFn = jest.fn();
     const mockUsers = [
         {id: 'user1-id', firstName: 'Mariah', lastName: 'Carey', iri: 'http://localhost/iri/user1-id'},
         {id: 'user2-id', firstName: 'Michael', lastName: 'Jackson', iri: 'http://localhost/iri/user2-id'},
@@ -83,8 +82,6 @@ describe('AlterPermissionDialog', () => {
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
-
-            fetchUsers={mockfetchUsersFn}
             alterPermission={mockAlterPermissionFn}
             users={mockUsers}
         />);
@@ -125,7 +122,6 @@ describe('AlterPermissionDialog', () => {
                     collectionId={mockCollectionId}
                     collaborators={mockCollaborators}
                     currentUser={mockCurrentLoggedUser}
-                    fetchUsers={mockfetchUsersFn}
                     alterPermission={mockAlterPermissionFn}
                     users={mockUsers}
                 />

@@ -1,7 +1,6 @@
 /* eslint-disable no-multi-spaces */
 
 // Account
-export const FETCH_USER                             = 'FETCH_USER';
 export const FETCH_AUTHORIZATIONS                   = 'FETCH_AUTHORIZATIONS';
 
 // Clipboard

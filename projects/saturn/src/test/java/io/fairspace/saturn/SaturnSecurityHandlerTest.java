@@ -12,7 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.mockito.Mockito.*;
@@ -27,14 +26,12 @@ public class SaturnSecurityHandlerTest {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
-    @Mock
-    private Consumer<UserInfo> userCallback;
 
     private SaturnSecurityHandler handler;
 
     @Before
     public void before() {
-        handler = new SaturnSecurityHandler(authenticator, userCallback);
+        handler = new SaturnSecurityHandler(authenticator);
     }
 
     @Test
@@ -65,7 +62,6 @@ public class SaturnSecurityHandlerTest {
 
     private void verifyAuthenticated(boolean success) {
         verifyIfRequestWasPassedToSuper(success);
-        verify(userCallback, times(success ? 1 : 0)).accept(any());
     }
 
     private void verifyIfRequestWasPassedToSuper(boolean success) {
