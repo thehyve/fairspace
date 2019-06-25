@@ -47,7 +47,8 @@ export const PermissionsCard = ({classes, iri, canManage, maxCollaboratorIcons})
             <Avatar key={permission.user} title={permission.userName} src="/images/avatar.png" className={classes.avatar} />
         ));
 
-    const cardHeaderAction = (<>
+    const cardHeaderAction = (
+        <>
             {permissionIcons}
             {permissions.length > maxCollaboratorIcons ? <div className={classes.additionalCollaborators}>+ {permissions.length - maxCollaboratorIcons}</div> : ''}
             <IconButton
