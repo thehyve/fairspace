@@ -212,12 +212,7 @@ export const getNamespacedIri = (iri, namespaces) => {
 
     const namespace = namespaces.find(n => iri.startsWith(n.namespace));
 
-    if (namespace) {
-        const local = iri.replace(namespace.namespace, '');
-        return `${namespace.prefix}:${local}`;
-    }
-
-    return iri;
+    return namespace ? iri.replace(namespace.namespace, namespace.prefix + ':') : iri;
 };
 
 /**

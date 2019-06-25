@@ -451,5 +451,8 @@ describe('Metadata Utils', () => {
             expect(getNamespacedIri(undefined, namespaces)).toBe(undefined);
             expect(getNamespacedIri('http://prefix/blabla')).toEqual('http://prefix/blabla');
         });
-    })
+        it('should shorten a uri with any of the prefixes if multiple namespaces apply', () => {
+            expect(getNamespacedIri('http://multiple/123', namespaces)).toEqual(expect.stringContaining(":123"));
+        });
+    });
 });
