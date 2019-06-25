@@ -125,7 +125,7 @@ describe('LinkedDataProperty elements', () => {
             ).toEqual(SwitchValue);
         });
 
-        it('should render a read-only component for controlled vocabulary shapes', () => {
+        it('should render a read-only component for controlled shapes', () => {
             expect(
                 renderTable({
                     ...defaultProperty,

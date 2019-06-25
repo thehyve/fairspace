@@ -5,7 +5,6 @@ import {Button} from "@material-ui/core";
 import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
 import {LoadingInlay, LoadingOverlay, MessageDisplay} from "../../common";
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
-import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 
 class LinkedDataCreator extends React.Component {
     static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
@@ -60,7 +59,7 @@ class LinkedDataCreator extends React.Component {
     };
 
     render() {
-        const {children, loading, error, isEditable, shapes, vocabulary, requireIdentifier} = this.props;
+        const {children, loading, error, isEditable, shapes, generateInitialContent, requireIdentifier} = this.props;
         const {creationState, shape, creatingMetadataEntity} = this.state;
 
         if (loading) {
@@ -99,7 +98,7 @@ class LinkedDataCreator extends React.Component {
 
                 <NewLinkedDataEntityDialog
                     open={creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY}
-                    linkedData={emptyLinkedData(vocabulary, shape)}
+                    linkedData={generateInitialContent(shape)}
                     shape={shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}
@@ -124,7 +123,7 @@ LinkedDataCreator.propTypes = {
     isEditable: PropTypes.bool,
     requireIdentifier: PropTypes.bool,
 
-    vocabulary: PropTypes.object.isRequired
+    generateInitialContent: PropTypes.func
 };
 
 LinkedDataCreator.defaultProps = {

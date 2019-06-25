@@ -11,7 +11,7 @@ import {
     hasMetadataError,
     isMetadataPending
 } from "../../../reducers/cache/jsonLdBySubjectReducers";
-import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
+import {hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
@@ -71,7 +71,6 @@ const MetadataEntityContainer = props => {
 const mapStateToProps = (state, ownProps) => {
     const subject = ownProps.subject || url2iri(window.location.href);
     const metadata = getCombinedMetadataForSubject(state, subject);
-    const vocabulary = getVocabulary(state);
 
     const hasNoMetadata = !metadata || metadata.length === 0;
     const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
@@ -96,8 +95,7 @@ const mapStateToProps = (state, ownProps) => {
         subject,
 
         isEditable,
-        buttonDisabled,
-        vocabulary
+        buttonDisabled
     };
 };
 

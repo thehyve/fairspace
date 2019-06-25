@@ -15,6 +15,7 @@ import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {METADATA_PATH, SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 import LinkedDataLink from "../common/LinkedDataLink";
 import LinkedDataList from "../common/LinkedDataList";
+import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 import Iri from "../../common/Iri";
 
 const openMetadataEntry = (history, id) => {
@@ -69,6 +70,8 @@ const mapStateToProps = (state, {vocabulary}) => {
         }
     };
 
+    const generateInitialContent = (shape) => emptyLinkedData(vocabulary, shape);
+
     return {
         loading: pending,
         error,
@@ -76,7 +79,7 @@ const mapStateToProps = (state, {vocabulary}) => {
         total,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         shapes: vocabulary.getClassesInCatalog(),
-        vocabulary,
+        generateInitialContent,
         onEntityCreationError
     };
 };
