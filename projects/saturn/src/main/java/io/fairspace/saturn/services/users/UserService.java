@@ -6,6 +6,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class UserService {
     private final String usersEndpoint;
     private final DAO dao;
     private final Map<Node, User> usersByIri = new ConcurrentHashMap<>();
-    private final HttpClient httpClient = new HttpClient();
+    private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
     private final boolean authorizationRequired;
     private volatile String authorization;
 
