@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -89,31 +90,17 @@ function Control(props) {
     );
 }
 
-function blockEvent(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    if ((event.target.tagName !== 'A') || !('href' in event.target)) {
-        return;
-    }
-    if (event.target.target) {
-        window.open(event.target.href, event.target.target);
-    } else {
-        window.location.href = event.target.href;
-    }
-}
-
 function Option(props) {
     return (
         <MenuItem
             buttonRef={props.innerRef}
             selected={props.isFocused}
             component="div"
+            disabled={props.isDisabled}
             style={{
                 fontWeight: props.isSelected ? 500 : 400,
             }}
             {...props.innerProps}
-            disabled={!!props.data.disabled}
-            onClick={props.data.disabled ? blockEvent : props.innerProps.onClick}
         >
             {props.children}
         </MenuItem>
@@ -196,37 +183,48 @@ const materialReactSelect = (props) => {
 
     };
 
+    const SelectComponent = props.async ? AsyncSelect : Select;
+
     return (
-        <Select
+        <SelectComponent
             classes={classes}
             menuPortalTarget={document.body}
             styles={selectStyles}
-            options={props.options}
             components={components}
-            value={props.value}
-            onChange={props.onChange}
-            noOptionsMessage={props.noOptionsMessage}
-            placeholder={props.placeholder}
+
             textFieldProps={{
                 label: props.label,
                 InputLabelProps: {
                     shrink: true,
-                },
-                onChange: props.onTextInputChange
+                }
             }}
+
+            options={props.options}
+            value={props.value}
+            onChange={props.onChange}
+            noOptionsMessage={props.noOptionsMessage}
+            placeholder={props.placeholder}
+
+            loadOptions={props.loadOptions}
+            isOptionDisabled={props.isOptionDisabled}
+            defaultOptions={!props.options}
         />
     );
 };
 
-const selectType = {disabled: PropTypes.bool, lavel: PropTypes.string, value: PropTypes.string};
+const selectType = {disabled: PropTypes.bool, label: PropTypes.string, value: PropTypes.string};
 
 materialReactSelect.propTypes = {
-    options: PropTypes.arrayOf(PropTypes.shape(selectType)).isRequired,
+    options: PropTypes.arrayOf(PropTypes.shape(selectType)),
     value: PropTypes.shape(selectType),
     placeholder: PropTypes.string,
     classes: PropTypes.shape(),
     onChange: PropTypes.func.isRequired,
     label: PropTypes.string,
+
+    async: PropTypes.bool,
+    loadOptions: PropTypes.func,
+    isOptionDisabled: PropTypes.func
 };
 
 materialReactSelect.defaultProps = {
@@ -234,6 +232,8 @@ materialReactSelect.defaultProps = {
     label: '',
     value: null,
     classes: null,
+    async: false,
+    isOptionDisabled: option => option.disabled
 };
 
 export default withStyles(styles, {withTheme: true})(materialReactSelect);
