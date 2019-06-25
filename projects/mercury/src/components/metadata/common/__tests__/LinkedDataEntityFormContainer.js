@@ -67,7 +67,7 @@ describe('LinkedDataEntityFormContainer', () => {
         expect(formProperties[1].values).toEqual([{value: "Some label"}]);
     });
 
-    it('tries to initialize the metadata and the vocabulary', () => {
+    it('tries to initialize the shapes and the content', () => {
         const store = mockStore({
             cache: {
                 jsonLdBySubject: {
@@ -83,17 +83,17 @@ describe('LinkedDataEntityFormContainer', () => {
         });
 
         const fetchShapes = jest.fn();
-        const fetchMetadata = jest.fn();
+        const fetchContent = jest.fn();
         mount(<LinkedDataEntityFormContainer
             subject="http://example.com/john"
             formKey="http://example.com/john"
             store={store}
             fetchShapes={fetchShapes}
-            fetchLinkedData={fetchMetadata}
+            fetchLinkedData={fetchContent}
             valueComponentFactory={mockComponentFactory}
         />);
 
-        expect(fetchMetadata.mock.calls.length).toEqual(1);
+        expect(fetchContent.mock.calls.length).toEqual(1);
         expect(fetchShapes.mock.calls.length).toEqual(1);
     });
 });

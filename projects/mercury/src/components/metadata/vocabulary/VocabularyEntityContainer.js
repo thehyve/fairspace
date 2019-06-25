@@ -112,8 +112,7 @@ const mapStateToProps = (state, ownProps) => {
         subject,
 
         isEditable,
-        buttonDisabled,
-        vocabulary: metaVocabulary
+        buttonDisabled
     };
 };
 
