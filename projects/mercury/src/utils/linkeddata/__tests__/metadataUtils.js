@@ -3,7 +3,7 @@ import nodeCrypto from "crypto";
 import {
     generateUuid,
     getLabel,
-    getLocalPart,
+    getLocalPart, getNamespacedIri,
     getTypeInfo,
     hasValue,
     linkLabel,
@@ -421,4 +421,35 @@ describe('Metadata Utils', () => {
             expect(getLocalPart('http://some.very.long.domain')).toEqual('some.very.long.domain');
         });
     });
+
+    describe('getNamespacedIri', () => {
+        const namespaces = [
+            {
+                namespace: 'http://prefix/',
+                prefix: 'pr'
+            },
+            {
+                namespace: 'http://multiple/',
+                prefix: 'm1'
+            },
+            {
+                namespace: 'http://multiple/',
+                prefix: 'm2'
+            }
+        ];
+        it('should shorten the iri if a namespace exists', () => {
+            expect(getNamespacedIri('http://prefix/blabla', namespaces)).toEqual('pr:blabla');
+            expect(getNamespacedIri('http://prefix/blabla/additional/paths#test', namespaces)).toEqual('pr:blabla/additional/paths#test');
+            expect(getNamespacedIri('http://prefix/', namespaces)).toEqual('pr:');
+        });
+        it('should return the iri itself if no namespace is found', () => {
+            expect(getNamespacedIri('http://other/blabla', namespaces)).toEqual('http://other/blabla');
+            expect(getNamespacedIri('https://prefix/blabla', namespaces)).toEqual('https://prefix/blabla');
+            expect(getNamespacedIri('http://prefix#blabla', namespaces)).toEqual('http://prefix#blabla');
+        });
+        it('should handle missing iri or namespaces', () => {
+            expect(getNamespacedIri(undefined, namespaces)).toBe(undefined);
+            expect(getNamespacedIri('http://prefix/blabla')).toEqual('http://prefix/blabla');
+        });
+    })
 });
