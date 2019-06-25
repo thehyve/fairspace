@@ -1,9 +1,16 @@
-import {connect} from "react-redux";
+import React from "react";
 
-import {getCombinedMetadataForSubject, isMetadataPending, hasMetadataError} from "../../../reducers/cache/jsonLdBySubjectReducers";
-import {getTypeInfo, linkLabel} from "../../../utils/linkeddata/metadataUtils";
+import {connect} from "react-redux";
+import {
+    getCombinedMetadataForSubject,
+    hasMetadataError,
+    isMetadataPending
+} from "../../../reducers/cache/jsonLdBySubjectReducers";
+import {getTypeInfo} from "../../../utils/linkeddata/metadataUtils";
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import LinkedDataEntityHeader from "../common/LinkedDataEntityHeader";
+import Iri from "../../common/Iri";
+import IriTooltip from "../../common/IriTooltip";
 
 const mapStateToProps = (state, {subject}) => {
     const metadata = getCombinedMetadataForSubject(state, subject);
@@ -16,7 +23,7 @@ const mapStateToProps = (state, {subject}) => {
     }
 
     const loading = isMetadataPending(state, subject) || isVocabularyPending(state);
-    const header = linkLabel(subject);
+    const header = <IriTooltip title={subject}><Iri iri={subject} /></IriTooltip>;
     const {label, description} = getTypeInfo(metadata, getVocabulary(state));
 
     return {

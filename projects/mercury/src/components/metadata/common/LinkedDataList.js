@@ -4,6 +4,7 @@ import styles from './LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
 import {TOOLTIP_ENTER_DELAY} from "../../../constants";
 import IriTooltip from "../../common/IriTooltip";
+import Iri from "../../common/Iri";
 
 const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, typeRender, footerRender}) => {
     const renderRow = (entry) => {
@@ -13,7 +14,7 @@ const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, type
             <IriTooltip
                 key={id}
                 enterDelay={TOOLTIP_ENTER_DELAY}
-                title={id}
+                title={<Iri iri={id} />}
             >
                 <TableRow
                     key={id}
