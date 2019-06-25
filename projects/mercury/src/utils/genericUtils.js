@@ -19,6 +19,21 @@ export function findById(itemList, itemId) {
  */
 export const flattenShallow = array => [].concat(...array);
 
+/**
+ * Adds a new entry to a given array, joining them with a separator.
+ *
+ * This method would typically be used to join an array of Jsx components into an array,
+ * with some construct like this:
+ *
+ *   arrayWithComponents.reduce(jsxArrayJoiner(','), null)
+ *
+ * @param separator
+ * @param prev
+ * @param curr
+ * @returns {*[]}
+ */
+export const jsxArrayJoiner = separator => (prev, curr) => (!prev ? curr : [...prev, separator, curr]);
+
 //* *********************************
 //* COMPARISION
 //* *********************************

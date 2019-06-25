@@ -202,6 +202,20 @@ export const url2iri = (iri) => {
 };
 
 /**
+ * Generates a namespaced iri, if the given iri is part of any of the namespaces
+ * @param iri
+ * @param namespaces
+ * @returns {string|*}
+ */
+export const getNamespacedIri = (iri, namespaces) => {
+    if (!iri || !namespaces) return iri;
+
+    const namespace = namespaces.find(n => iri.startsWith(n.namespace));
+
+    return namespace ? iri.replace(namespace.namespace, namespace.prefix + ':') : iri;
+};
+
+/**
  * Groups the validation errors of the same subject into a single array and the other array is the other errors
  * @returns {Object}
  */

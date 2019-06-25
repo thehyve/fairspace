@@ -2,9 +2,10 @@ import React from 'react';
 import {PropTypes} from 'prop-types';
 
 import searchAPI, {SORT_ALPHABETICALLY} from "../../../services/SearchAPI";
-import {linkLabel, propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
+import {propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
+import Iri from "../../common/Iri";
 
 const LinkedDataDropdown = ({property, fetchItems, types, debounce, ...otherProps}) => {
     let fetchRequest = null;
@@ -16,7 +17,7 @@ const LinkedDataDropdown = ({property, fetchItems, types, debounce, ...otherProp
             .then(
                 ({items}) => items.map(metadataItem => {
                     const {id, label, name} = metadataItem;
-                    const displayLabel = (label && label[0]) || (name && name[0]) || linkLabel(id, true);
+                    const displayLabel = (label && label[0]) || (name && name[0]) || <Iri iri={id} />;
 
                     return {
                         label: displayLabel,
