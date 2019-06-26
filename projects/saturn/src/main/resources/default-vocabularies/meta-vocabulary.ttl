@@ -19,9 +19,8 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:description "Shape of classes." ;
     sh:name "Class Shape" ;
     sh:property [
-        sh:datatype xsd:string ;
+        sh:datatype xsd:token ;
         sh:maxCount 1 ;
-        sh:maxLength 128 ;
         sh:minCount 1 ;
         sh:path sh:name ;
         sh:name "Class name" ;
@@ -172,7 +171,7 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
       sh:maxLength 24 ;
       sh:minCount 1 ; 
       sh:maxCount 1 ; 
-      sh:datatype xsd:string ;
+      sh:datatype xsd:token ;
       sh:path sh:prefix 
     ] ;
     sh:property [
@@ -228,9 +227,8 @@ fs:PathShape a sh:PropertyShape ;
   sh:order 0 .
 
 fs:PropertyNameShape a sh:PropertyShape ;
-  sh:datatype xsd:string ;
+  sh:datatype xsd:token ;
   sh:maxCount 1 ;
-  sh:maxLength 128 ;
   sh:minCount 1 ;
   sh:path sh:name ;
   sh:name "Property name" ;
@@ -273,7 +271,7 @@ fs:ImportantPropertyShape a sh:PropertyShape ;
 fs:DatatypeShape a sh:PropertyShape ;
     sh:path sh:datatype ;
     # direct controlled vocabulary approach
-    sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
+    sh:in ( xsd:string xsd:token xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
     sh:name "Datatype" ;
     fs:importantProperty true ;
     sh:maxCount 1 ;

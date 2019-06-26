@@ -174,9 +174,8 @@ fs:collectionTypeShape a fs:DatatypePropertyShape ;
 fs:labelShape a fs:DatatypePropertyShape ;
     sh:name "Label" ;
     sh:description "Human readable label for this resource." ;
-    sh:datatype xsd:string ;
+    sh:datatype xsd:token ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
     fs:fixedShape true ;
     fs:importantProperty true ;
     sh:path rdfs:label . 
