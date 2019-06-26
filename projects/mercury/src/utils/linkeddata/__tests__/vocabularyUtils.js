@@ -189,4 +189,15 @@ describe('vocabularyUtils', () => {
             });
         });
     });
+
+    describe('generatePropertyEntry', () => {
+        it('should mark string properties as multiline', () => {
+            const stringProperty = vocabulary.generatePropertyEntry('', {[constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}]});
+            expect(stringProperty.multiLine).toBe(true);
+        });
+        it('should mark token properties as not multiline', () => {
+            const stringProperty = vocabulary.generatePropertyEntry('', {[constants.SHACL_DATATYPE]: [{'@id': constants.TOKEN_URI}]});
+            expect(stringProperty.multiLine).toBe(false);
+        });
+    });
 });

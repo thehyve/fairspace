@@ -32,6 +32,7 @@ export const getInputComponent = (property) => {
     // as referring to another class
     switch (property.datatype) {
         case constants.STRING_URI:
+        case constants.TOKEN_URI:
             return StringValue;
         case constants.INTEGER_URI:
         case constants.DECIMAL_URI:

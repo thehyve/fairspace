@@ -57,6 +57,7 @@ export const SHACL_PREFIX_DECLARATION = SHACL_NS + 'PrefixDeclaration';
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
 
 export const STRING_URI = XMLSCHEMA_NS + 'string';
+export const TOKEN_URI = XMLSCHEMA_NS + 'token';
 export const BOOLEAN_URI = XMLSCHEMA_NS + 'boolean';
 export const DATETIME_URI = XMLSCHEMA_NS + 'dateTime';
 export const DATE_URI = XMLSCHEMA_NS + 'date';
