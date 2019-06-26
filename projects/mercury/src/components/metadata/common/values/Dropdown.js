@@ -8,7 +8,7 @@ const Dropdown = ({options, ...otherProps}) => (
     <MaterialReactSelect
         style={{width: '100%'}}
         {...otherProps}
-        options={options.sort(compareBy('disabled'))}
+        options={options ? options.sort(compareBy('disabled')) : options}
     />
 );
 
