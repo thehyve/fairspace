@@ -325,7 +325,7 @@ fs:CollectionShape sh:property
 <analysisCodeShape> a fs:DatatypePropertyShape ;
     sh:name "Analysis code" ;
     sh:description "The analysis run identifier" ;
-    sh:datatype xsd:tokenf ;
+    sh:datatype xsd:token ;
     sh:maxCount 1 ;
     sh:path <analysisCode> .
      
