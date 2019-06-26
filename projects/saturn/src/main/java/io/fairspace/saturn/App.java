@@ -2,8 +2,6 @@ package io.fairspace.saturn;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.auth.DummyAuthenticator;
-import io.fairspace.saturn.auth.SecurityUtil;
-import io.fairspace.saturn.auth.VocabularyAuthorizationVerifier;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
@@ -81,15 +79,12 @@ public class App {
         var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
-        var vocabularyAuthorizationVerifier = new VocabularyAuthorizationVerifier(SecurityUtil::userInfo, CONFIG.auth.dataStewardRole);
-
         var apiPathPrefix = "/api/" + API_VERSION;
         var fusekiServerBuilder = FusekiServer.create()
                 .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", new SaturnSparkFilter(
                         new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService, CONFIG.jena.metadataBaseIRI),
-                        new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService, CONFIG.jena.vocabularyBaseIRI)
-                            .withAuthorizationVerifier(apiPathPrefix + "/vocabulary/*", vocabularyAuthorizationVerifier),
+                        new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService, CONFIG.jena.vocabularyBaseIRI),
                         new ReadableMetadataApp(apiPathPrefix + "/meta-vocabulary/", metaVocabularyService),
                         new CollectionsApp(apiPathPrefix, collections),
                         new PermissionsApp(apiPathPrefix, permissions),
@@ -105,7 +100,7 @@ public class App {
         var authenticator = auth.enabled
                 ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
                 : new DummyAuthenticator(CONFIG.auth.developerRoles);
-        fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(authenticator));
+        fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator));
 
         fusekiServerBuilder
                 .build()

@@ -75,6 +75,7 @@ workspace:
       roles:
         user:
         datasteward:
+        sparql:
 
       # Groups to retrieve a list of users from
       groups:
