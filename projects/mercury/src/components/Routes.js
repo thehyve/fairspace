@@ -33,10 +33,10 @@ const routes = () => (
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
                 const iriParam = queryString.parse(location.search).iri;
-                const component = iriParam ? <MetadataEntityPage /> : <MetadataListPage />;
+                const component = iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <MetadataListPage />;
 
                 return (
-                    <LinkedDataProvider context={METADATA_CONTEXT} subject={decodeURIComponent(iriParam)}>
+                    <LinkedDataProvider context={METADATA_CONTEXT}>
                         <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
                             {component}
                         </LinkedDataValuesContext.Provider>

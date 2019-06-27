@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {Button, Grid} from "@material-ui/core";
@@ -13,88 +13,76 @@ import {
     validateLinkedDataProperty
 } from "../../../actions/linkedDataFormActions";
 import {propertiesToShow} from "../../../utils/linkeddata/metadataUtils";
-import LinkedDataContext from '../../../LinkedDataContext';
+import useLinkedData from '../../../UseLinkedData';
 
-export class LinkedDataEntityFormContainer extends React.Component {
-    static contextType = LinkedDataContext;
+const LinkedDataEntityFormContainer = ({formKey, isEditable, initializeForm, updates, errors, ...otherProps}) => {
+    console.log({formKey});
+    
+    const {
+        linkedDataLoading,
+        linkedDataError,
+        properties,
+        onSubmit,
+        hasFormUpdates,
+        hasFormValidationErrors,
+        hasEditRight
+    } = useLinkedData(formKey);
 
-    componentDidMount() {
-        this.initialize();
-        this.context.fetchLinkedData(this.props.subject);
-    }
+    useEffect(() => {
+        initializeForm(formKey);
+    }, [formKey]);
 
-    componentDidUpdate(prevProps) {
-        if (this.props.formKey !== prevProps.formKey) {
-            this.initialize();
-        }
-    }
+    // const {isEditable, onSubmit, getProperties, getLinkedDataError, isLinkedDataLoading, hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} = useContext(LinkedDataContext);
 
-    initialize() {
-        const {formKey, initializeForm, subject} = this.props;
+    const propertiesWithChanges = propertiesToShow(properties)
+        .filter(p => p.isEditable || p.values.length)
+        .map(p => ({
+            ...p,
+            values: updates[p.key] || p.values,
+            errors: errors[p.key]
+        }));
 
-        initializeForm(formKey || subject);
-    }
+    // <LinkedDataEntityForm
+    //     onAdd={this.props.onAdd}
+    //     onChange={this.props.onChange}
+    //     onDelete={this.props.onDelete}
 
-    render() {
-        const {subject} = this.props;
-        const {isEditable, onSubmit, getProperties, getLinkedDataError, isLinkedDataLoading, hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} = this.context;
+    //     error={this.props.error}
+    //     loading={this.props.loading}
 
-        const editable = ("isEditable" in this.props) ? this.props.isEditable : isEditable;
-        const properties = getProperties(subject);
+    //     properties={propertiesWithChanges}
+    //     {...otherProps}
+    // />
 
-        const propertiesWithChanges = propertiesToShow(properties)
-            .filter(p => p.isEditable || p.values.length)
-            .map(p => ({
-                ...p,
-                values: this.props.updates[p.key] || p.values,
-                errors: this.props.errors[p.key]
-            }));
+    return (
 
-        const error = getLinkedDataError(subject);
-        const loading = isLinkedDataLoading(subject);
-
-        // <LinkedDataEntityForm
-        //     onAdd={this.props.onAdd}
-        //     onChange={this.props.onChange}
-        //     onDelete={this.props.onDelete}
-
-        //     error={this.props.error}
-        //     loading={this.props.loading}
-
-        //     properties={propertiesWithChanges}
-        //     {...otherProps}
-        // />
-
-        return (
-
-            <Grid container>
-                <Grid item xs={12}>
-                    <LinkedDataEntityForm
-                        {...this.props}
-                        error={error}
-                        loading={loading}
-                        properties={propertiesWithChanges}
-                    />
-                </Grid>
-                {
-                    editable && !error
-                    && (
-                        <Grid item>
-                            <Button
-                                onClick={() => onSubmit(subject)}
-                                color="primary"
-                                disabled={!hasLinkedDataFormUpdates(subject) || hasLinkedDataFormValidationErrors(subject)}
-                            >
-                                Update
-                            </Button>
-                        </Grid>
-                    )
-                }
+        <Grid container>
+            <Grid item xs={12}>
+                <LinkedDataEntityForm
+                    {...otherProps}
+                    error={linkedDataError}
+                    loading={linkedDataLoading}
+                    properties={propertiesWithChanges}
+                />
             </Grid>
+            {
+                hasEditRight && isEditable && !linkedDataError
+                && (
+                    <Grid item>
+                        <Button
+                            onClick={() => onSubmit(formKey)}
+                            color="primary"
+                            disabled={!hasFormUpdates || hasFormValidationErrors}
+                        >
+                            Update
+                        </Button>
+                    </Grid>
+                )
+            }
+        </Grid>
 
-        );
-    }
-}
+    );
+};
 
 LinkedDataEntityFormContainer.propTypes = {
     initializeForm: PropTypes.func,

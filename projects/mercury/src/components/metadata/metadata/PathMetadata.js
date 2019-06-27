@@ -33,7 +33,7 @@ export class PathMetadata extends React.Component {
         }
         return (
             <LinkedDataEntityFormContainer
-                subject={subject}
+                formKey={subject}
                 {...otherProps}
             />
         );
