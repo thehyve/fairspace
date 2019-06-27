@@ -207,7 +207,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .iri(row.getResource("iri").getURI())
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
-                .isDirectory(!row.getLiteral("isDirectory").getBoolean())
+                .isDirectory(row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
                 .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
                 .build();
