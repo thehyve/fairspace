@@ -6,7 +6,6 @@ import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -22,7 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static java.util.Arrays.asList;
@@ -34,8 +32,8 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ManagedFileSystemTest {
@@ -43,8 +41,6 @@ public class ManagedFileSystemTest {
     private final byte[] content2 = new byte[]{1, 2, 3, 4};
     @Mock
     private CollectionsService collections;
-    @Mock
-    private PermissionsService permissions;
 
     private Dataset ds;
     private ManagedFileSystem fs;
@@ -57,15 +53,7 @@ public class ManagedFileSystemTest {
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
 
-        when(permissions.getPermission(any(Node.class))).thenReturn(Access.Manage);
-
-        when(permissions.getPermissions(any(java.util.Collection.class)))
-                .thenAnswer(invocation ->
-                        invocation.<java.util.Collection<Node>>getArgument(0)
-                                .stream()
-                                .collect(Collectors.toMap(node -> node, node -> Access.Manage)));
-
-        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus, permissions);
+        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
 
         var collection1 = new Collection();
         collection1.setLocation("coll");
@@ -88,8 +76,6 @@ public class ManagedFileSystemTest {
         assertEquals("", fs.stat("").getPath());
         assertTrue(fs.stat("").isDirectory());
         assertNull(fs.stat("").getIri());
-
-        verify(permissions, never()).getPermission(any());
     }
 
 
@@ -98,8 +84,6 @@ public class ManagedFileSystemTest {
         assertEquals("coll", fs.stat("coll").getPath());
         assertTrue(fs.stat("coll").isDirectory());
         assertNotNull(fs.stat("coll").getIri());
-
-        verify(permissions, never()).getPermission(createURI(fs.stat("coll").getIri()));
     }
 
     @Test
@@ -109,8 +93,6 @@ public class ManagedFileSystemTest {
         assertEquals("coll/aaa", stat.getPath());
         assertTrue(stat.isDirectory());
         assertNotNull(stat.getIri());
-
-        verify(permissions).getPermission(createURI(stat.getIri()));
     }
 
     @Test
@@ -384,6 +366,8 @@ public class ManagedFileSystemTest {
         var c = collections.getByLocation("coll");
         c.setLocation("newLocation");
         fs.onCollectionMoved(new CollectionMovedEvent(c, "coll"));
+
+        when(collections.getByLocation(eq("newLocation"))).thenReturn(c);
 
         assertEquals(0, fs.list("coll").size());
         assertEquals(2, fs.list("newLocation").size());

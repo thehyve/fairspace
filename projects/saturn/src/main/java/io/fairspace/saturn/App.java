@@ -57,7 +57,7 @@ public class App {
         var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, userService, mailService);
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
-        var fs = new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus, permissions);
+        var fs = new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus);
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 

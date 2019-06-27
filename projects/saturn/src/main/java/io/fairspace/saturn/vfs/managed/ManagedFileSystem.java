@@ -6,7 +6,6 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
-import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import lombok.SneakyThrows;
@@ -14,7 +13,6 @@ import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -26,7 +24,6 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
@@ -36,7 +33,6 @@ import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class ManagedFileSystem implements VirtualFileSystem {
     private static final FileInfo ROOT = FileInfo.builder().path("")
@@ -49,14 +45,12 @@ public class ManagedFileSystem implements VirtualFileSystem {
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
     private final CollectionsService collections;
-    private final PermissionsService permissions;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus, PermissionsService permissions) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
         this.rdf = rdf;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
         this.collections = collections;
-        this.permissions = permissions;
         eventBus.register(this);
     }
 
@@ -74,7 +68,11 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
         return selectSingle(rdf, storedQuery("fs_stat", path), this::fileInfo)
                 .map(fileInfo -> {
-                    var access = permissions.getPermission(createURI(fileInfo.getIri()));
+                    var collection = collections.getByLocation(splitPath(path)[0]);
+                    if (collection == null) {
+                        return null;
+                    }
+                    var access = collection.getAccess();
                     if (!access.canRead()) {
                         return null;
                     }
@@ -93,24 +91,15 @@ public class ManagedFileSystem implements VirtualFileSystem {
                     .collect(toList());
         }
 
+        var collectionLocation = splitPath(path)[0];
+        var collection = collections.getByLocation(collectionLocation);
+        if (collection == null) {
+            throw new AccessDeniedException("User has no access to collection " + collectionLocation);
+        }
+        var readOnly = !collection.canWrite();
         var files = select(rdf, storedQuery("fs_ls", path + '/'), this::fileInfo);
-        var nodes = files.stream()
-                .map(FileInfo::getIri)
-                .map(NodeFactory::createURI)
-                .collect(toList());
-        var filePermissions = permissions.getPermissions(nodes);
-
-        return files.stream()
-                .map(fileInfo -> {
-                    var access = filePermissions.get(createURI(fileInfo.getIri()));
-                    if (!access.canRead()) {
-                        return null;
-                    }
-                    fileInfo.setReadOnly(!access.canWrite());
-                    return fileInfo;
-                })
-                .filter(Objects::nonNull)
-                .collect(toList());
+        files.forEach(f -> f.setReadOnly(readOnly));
+        return files;
     }
 
     @Override
