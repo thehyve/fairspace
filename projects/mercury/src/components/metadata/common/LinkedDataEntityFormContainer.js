@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
+import {Button, Grid} from "@material-ui/core";
+
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import {getLinkedDataFormUpdates, getLinkedDataFormValidations} from "../../../reducers/linkedDataFormReducers";
 import {
@@ -11,10 +13,14 @@ import {
     validateLinkedDataProperty
 } from "../../../actions/linkedDataFormActions";
 import {propertiesToShow} from "../../../utils/linkeddata/metadataUtils";
+import LinkedDataContext from '../../../LinkedDataContext';
 
 export class LinkedDataEntityFormContainer extends React.Component {
+    static contextType = LinkedDataContext;
+
     componentDidMount() {
         this.initialize();
+        this.context.fetchLinkedData(this.props.subject);
     }
 
     componentDidUpdate(prevProps) {
@@ -24,17 +30,19 @@ export class LinkedDataEntityFormContainer extends React.Component {
     }
 
     initialize() {
-        const {formKey, initializeForm, fetchShapes, fetchLinkedData} = this.props;
+        const {formKey, initializeForm, subject} = this.props;
 
-        if (formKey) {
-            initializeForm(formKey);
-            fetchShapes();
-            fetchLinkedData();
-        }
+        initializeForm(formKey || subject);
     }
 
     render() {
-        const propertiesWithChanges = propertiesToShow(this.props.properties)
+        const {subject} = this.props;
+        const {isEditable, onSubmit, getProperties, getLinkedDataError, isLinkedDataLoading, hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} = this.context;
+
+        const editable = ("isEditable" in this.props) ? this.props.isEditable : isEditable;
+        const properties = getProperties(subject);
+
+        const propertiesWithChanges = propertiesToShow(properties)
             .filter(p => p.isEditable || p.values.length)
             .map(p => ({
                 ...p,
@@ -42,17 +50,48 @@ export class LinkedDataEntityFormContainer extends React.Component {
                 errors: this.props.errors[p.key]
             }));
 
+        const error = getLinkedDataError(subject);
+        const loading = isLinkedDataLoading(subject);
+
+        // <LinkedDataEntityForm
+        //     onAdd={this.props.onAdd}
+        //     onChange={this.props.onChange}
+        //     onDelete={this.props.onDelete}
+
+        //     error={this.props.error}
+        //     loading={this.props.loading}
+
+        //     properties={propertiesWithChanges}
+        //     {...otherProps}
+        // />
+
         return (
-            <LinkedDataEntityForm
-                onAdd={this.props.onAdd}
-                onChange={this.props.onChange}
-                onDelete={this.props.onDelete}
 
-                error={this.props.error}
-                loading={this.props.loading}
+            <Grid container>
+                <Grid item xs={12}>
+                    <LinkedDataEntityForm
+                        {...this.props}
+                        error={error}
+                        loading={loading}
+                        properties={propertiesWithChanges}
+                    />
+                </Grid>
+                {
+                    editable && !error
+                    && (
+                        <Grid item>
+                            <Button
+                                onClick={() => onSubmit(subject)}
+                                color="primary"
+                                disabled={!hasLinkedDataFormUpdates(subject) || hasLinkedDataFormValidationErrors(subject)}
+                            >
+                                Update
+                            </Button>
+                        </Grid>
+                    )
+                }
+            </Grid>
 
-                properties={propertiesWithChanges}
-            />
         );
     }
 }

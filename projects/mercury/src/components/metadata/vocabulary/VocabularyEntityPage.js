@@ -2,13 +2,11 @@ import React from 'react';
 
 import LinkedDataPage from '../common/LinkedDataPage';
 import VocabularyEntityHeaderContainer from './VocabularyEntityHeaderContainer';
-import VocabularyEntityContainer from './VocabularyEntityContainer';
+import LinkedDataEntityFormContainer from '../common/LinkedDataEntityFormContainer';
 
-export default ({subject}) => {
-    return (
-        <LinkedDataPage homeUrl="/vocabulary">
-            <VocabularyEntityHeaderContainer subject={subject} />
-            <VocabularyEntityContainer subject={subject} />
-        </LinkedDataPage>
-    );
-};
+export default ({subject}) => (
+    <LinkedDataPage homeUrl="/vocabulary">
+        <VocabularyEntityHeaderContainer subject={subject} />
+        <LinkedDataEntityFormContainer subject={subject} />
+    </LinkedDataPage>
+);

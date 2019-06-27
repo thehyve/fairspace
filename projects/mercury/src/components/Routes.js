@@ -13,6 +13,11 @@ import SearchPage from './search/SearchPage';
 import VocabularyListPage from "./metadata/vocabulary/VocabularyListPage";
 import VocabularyEntityPage from "./metadata/vocabulary/VocabularyEntityPage";
 import {createMetadataIri, createVocabularyIri} from "../utils/linkeddata/metadataUtils";
+import {LinkedDataProvider, METADATA_CONTEXT, VOCABULARY_CONTEXT} from '../LinkedDataContext';
+import {LinkedDataValuesContext} from "./metadata/common/LinkedDataValuesContext";
+import {METADATA_PATH, VOCABULARY_PATH} from "../constants";
+import MetadataValueComponentFactory from "./metadata/metadata/MetadataValueComponentFactory";
+import VocabularyValueComponentFactory from "./metadata/vocabulary/VocabularyValueComponentFactory";
 
 const routes = () => (
     <>
@@ -28,7 +33,15 @@ const routes = () => (
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
                 const iriParam = queryString.parse(location.search).iri;
-                return iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <MetadataListPage />;
+                const component = iriParam ? <MetadataEntityPage /> : <MetadataListPage />;
+
+                return (
+                    <LinkedDataProvider context={METADATA_CONTEXT} subject={decodeURIComponent(iriParam)}>
+                        <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
+                            {component}
+                        </LinkedDataValuesContext.Provider>
+                    </LinkedDataProvider>
+                );
             }}
         />
 
@@ -45,7 +58,15 @@ const routes = () => (
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
                 const iriParam = queryString.parse(location.search).iri;
-                return iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <VocabularyListPage />;
+                const component = iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <VocabularyListPage />;
+
+                return (
+                    <LinkedDataProvider context={VOCABULARY_CONTEXT}>
+                        <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
+                            {component}
+                        </LinkedDataValuesContext.Provider>
+                    </LinkedDataProvider>
+                );
             }}
         />
 

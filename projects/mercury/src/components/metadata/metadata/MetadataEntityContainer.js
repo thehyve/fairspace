@@ -15,10 +15,7 @@ import {hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/v
 import ErrorDialog from "../../common/ErrorDialog";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "../../../reducers/linkedDataFormReducers";
-import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
-import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
-import {METADATA_PATH} from "../../../constants";
 
 const MetadataEntityContainer = props => {
     const {isEditable, error, buttonDisabled, onSubmit, subject, fetchLinkedData, ...otherProps} = props;
@@ -34,6 +31,9 @@ const MetadataEntityContainer = props => {
             });
     };
 
+    console.log({subject});
+    
+
     return (
         <Grid
             style={{minHeight: '74vh'}}
@@ -43,14 +43,12 @@ const MetadataEntityContainer = props => {
             alignItems="stretch"
         >
             <Grid item>
-                <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
-                    <LinkedDataEntityFormContainer
-                        formKey={subject}
-                        fetchLinkedData={() => fetchLinkedData(subject)}
-                        error={error}
-                        {...otherProps}
-                    />
-                </LinkedDataValuesContext.Provider>
+                <LinkedDataEntityFormContainer
+                    formKey={subject}
+                    fetchLinkedData={() => fetchLinkedData(subject)}
+                    error={error}
+                    {...otherProps}
+                />
             </Grid>
             {isEditable && !error && (
                 <Grid item>

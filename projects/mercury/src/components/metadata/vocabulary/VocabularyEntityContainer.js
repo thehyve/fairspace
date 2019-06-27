@@ -50,14 +50,12 @@ const VocabularyEntityContainer = props => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
-                    <LinkedDataEntityFormContainer
-                        formKey={subject}
-                        fetchLinkedData={() => fetchLinkedData(subject)}
-                        error={error}
-                        {...otherProps}
-                    />
-                </LinkedDataValuesContext.Provider>
+                <LinkedDataEntityFormContainer
+                    formKey={subject}
+                    fetchLinkedData={() => fetchLinkedData(subject)}
+                    error={error}
+                    {...otherProps}
+                />
             </Grid>
             {
                 isEditable && !error
