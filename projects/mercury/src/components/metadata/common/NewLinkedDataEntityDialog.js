@@ -21,6 +21,8 @@ class NewLinkedDataEntityDialog extends React.Component {
         // Reset form key and new identifier when the
         // dialog opens to prevent reusing the same
         // identifier
+        console.log({prevProps});
+        
         if (!prevProps.open && this.props.open) {
             this.resetDialog();
         }

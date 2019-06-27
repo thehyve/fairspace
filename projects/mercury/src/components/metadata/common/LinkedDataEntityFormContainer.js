@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useCallback} from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {Button, Grid} from "@material-ui/core";
@@ -6,33 +6,25 @@ import {Button, Grid} from "@material-ui/core";
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import {getLinkedDataFormUpdates, getLinkedDataFormValidations} from "../../../reducers/linkedDataFormReducers";
 import {
-    addLinkedDataValue,
-    deleteLinkedDataValue,
-    initializeLinkedDataForm,
-    updateLinkedDataValue,
-    validateLinkedDataProperty
+    addLinkedDataValue, deleteLinkedDataValue, initializeLinkedDataForm,
+    updateLinkedDataValue, validateLinkedDataProperty
 } from "../../../actions/linkedDataFormActions";
 import {propertiesToShow} from "../../../utils/linkeddata/metadataUtils";
 import useLinkedData from '../../../UseLinkedData';
 
-const LinkedDataEntityFormContainer = ({formKey, isEditable, initializeForm, updates, errors, ...otherProps}) => {
-    console.log({formKey});
-    
+const LinkedDataEntityFormContainer = ({formKey, isEditable = true, initializeForm, updates, errors, ...otherProps}) => {
     const {
-        linkedDataLoading,
-        linkedDataError,
-        properties,
-        onSubmit,
-        hasFormUpdates,
-        hasFormValidationErrors,
-        hasEditRight
+        linkedDataLoading, linkedDataError, properties, onSubmit,
+        hasFormUpdates, hasFormValidationErrors, hasEditRight
     } = useLinkedData(formKey);
 
-    useEffect(() => {
+    const initForm = useCallback(() => {
         initializeForm(formKey);
-    }, [formKey]);
+    }, [initializeForm, formKey]);
 
-    // const {isEditable, onSubmit, getProperties, getLinkedDataError, isLinkedDataLoading, hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} = useContext(LinkedDataContext);
+    useEffect(() => {
+        initForm();
+    }, [initForm]);
 
     const propertiesWithChanges = propertiesToShow(properties)
         .filter(p => p.isEditable || p.values.length)
@@ -42,20 +34,7 @@ const LinkedDataEntityFormContainer = ({formKey, isEditable, initializeForm, upd
             errors: errors[p.key]
         }));
 
-    // <LinkedDataEntityForm
-    //     onAdd={this.props.onAdd}
-    //     onChange={this.props.onChange}
-    //     onDelete={this.props.onDelete}
-
-    //     error={this.props.error}
-    //     loading={this.props.loading}
-
-    //     properties={propertiesWithChanges}
-    //     {...otherProps}
-    // />
-
     return (
-
         <Grid container>
             <Grid item xs={12}>
                 <LinkedDataEntityForm
@@ -80,7 +59,6 @@ const LinkedDataEntityFormContainer = ({formKey, isEditable, initializeForm, upd
                 )
             }
         </Grid>
-
     );
 };
 

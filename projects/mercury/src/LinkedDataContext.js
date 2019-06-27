@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded} from "./actions/vocabularyActions";
 import {getVocabulary, hasVocabularyError, isVocabularyPending, isMetaVocabularyPending, getMetaVocabulary, hasMetaVocabularyError} from "./reducers/cache/vocabularyReducers";
 import {getAuthorizations} from "./reducers/account/authorizationsReducers";
+import {fromJsonLd} from "./utils/linkeddata/jsonLdConverter";
 
 const LinkedDataContext = React.createContext({});
 
@@ -34,6 +35,8 @@ export const LinkedDataProvider = ({children, context}) => {
 
     const authorizations = useSelector(state => getAuthorizations(state));
 
+    const getMetadataForVocabulary = (subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
+
     return (
         <LinkedDataContext.Provider
             value={{
@@ -41,11 +44,10 @@ export const LinkedDataProvider = ({children, context}) => {
                 isVocaularyLoading,
                 isMetaVocabularyLoading,
                 vocabulary,
-                metaVocabulary,
                 hasVocabularyErrorValue,
                 hasMetaVocabularyErrorValue,
                 authorizations,
-                fetchShapes,
+                getMetadataForVocabulary
             }}
         >
             {children}

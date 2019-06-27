@@ -19,11 +19,44 @@ import {METADATA_PATH, VOCABULARY_PATH} from "../constants";
 import MetadataValueComponentFactory from "./metadata/metadata/MetadataValueComponentFactory";
 import VocabularyValueComponentFactory from "./metadata/vocabulary/VocabularyValueComponentFactory";
 
+const MetadataWrapper = ({children}) => (
+    <LinkedDataProvider context={METADATA_CONTEXT}>
+        <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
+            {children}
+        </LinkedDataValuesContext.Provider>
+    </LinkedDataProvider>
+);
+
+const VocabularyWrapper = ({children}) => (
+    <LinkedDataProvider context={VOCABULARY_CONTEXT}>
+        <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
+            {children}
+        </LinkedDataValuesContext.Provider>
+    </LinkedDataProvider>
+);
+
 const routes = () => (
     <>
         <Route path="/" exact component={Home} />
-        <Route path="/collections" exact component={Collections} />
-        <Route path="/collections/:collection/:path(.*)?" component={FilesPage} />
+        <Route
+            path="/collections"
+            exact
+            render={() => (
+                <MetadataWrapper>
+                    <Collections />
+                </MetadataWrapper>
+            )}
+        />
+
+        <Route
+            path="/collections/:collection/:path(.*)?"
+            render={(props) => (
+                <MetadataWrapper>
+                    <FilesPage {...props} />
+                </MetadataWrapper>
+            )}
+        />
+
         <Route path="/notebooks" exact component={Notebooks} />
 
         <Route
@@ -36,11 +69,9 @@ const routes = () => (
                 const component = iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <MetadataListPage />;
 
                 return (
-                    <LinkedDataProvider context={METADATA_CONTEXT}>
-                        <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
-                            {component}
-                        </LinkedDataValuesContext.Provider>
-                    </LinkedDataProvider>
+                    <MetadataWrapper>
+                        {component}
+                    </MetadataWrapper>
                 );
             }}
         />
@@ -61,11 +92,9 @@ const routes = () => (
                 const component = iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <VocabularyListPage />;
 
                 return (
-                    <LinkedDataProvider context={VOCABULARY_CONTEXT}>
-                        <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
-                            {component}
-                        </LinkedDataValuesContext.Provider>
-                    </LinkedDataProvider>
+                    <VocabularyWrapper>
+                        {component}
+                    </VocabularyWrapper>
                 );
             }}
         />

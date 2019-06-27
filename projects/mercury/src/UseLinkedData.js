@@ -1,4 +1,4 @@
-import {useContext, useState, useEffect} from 'react';
+import {useContext, useState, useEffect, useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import LinkedDataContext from './LinkedDataContext';
@@ -6,7 +6,6 @@ import {fetchMetadataVocabularyIfNeeded, submitVocabularyChangesFromState} from 
 import {fetchMetadataBySubjectIfNeeded, submitMetadataChangesFromState} from "./actions/metadataActions";
 import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "./reducers/cache/jsonLdBySubjectReducers";
 import {hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors} from "./reducers/linkedDataFormReducers";
-import {fromJsonLd} from "./utils/linkeddata/jsonLdConverter";
 import {propertiesToShow, partitionErrors} from "./utils/linkeddata/metadataUtils";
 import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "./utils/linkeddata/vocabularyUtils";
 import ErrorDialog from "./components/common/ErrorDialog";
@@ -15,14 +14,13 @@ import {isDataSteward} from "./utils/userUtils";
 import Config from "./services/Config/Config";
 
 const useLinkedData = (subject) => {
-    const [linkedData, setLinkedData] = useState([]);
-
     const dispatch = useDispatch();
-
     const {
         isMetadataContext, isVocaularyLoading, isMetaVocabularyLoading, hasMetaVocabularyErrorValue,
-        hasVocabularyErrorValue, metaVocabulary, vocabulary, authorizations
+        hasVocabularyErrorValue, getMetadataForVocabulary, vocabulary, authorizations
     } = useContext(LinkedDataContext);
+
+    const [linkedData, setLinkedData] = useState([]);
 
     const isMetadataLoading = useSelector(state => isMetadataPending(state, subject));
     const linkedDataLoading = isVocaularyLoading || (isMetadataContext ? isMetadataLoading : isMetaVocabularyLoading);
@@ -31,13 +29,12 @@ const useLinkedData = (subject) => {
     const hasFormValidationErrors = useSelector(state => hasLinkedDataFormValidationErrors(state, subject));
 
     const metadata = useSelector(state => getCombinedMetadataForSubject(state, subject));
-    // getMetadataForVocab from Context (using function call)
-    const metadataForVocabulary = fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
-    const linkedDataForSubject = isMetadataContext ? metadata : metadataForVocabulary;
 
-    const hasMetadataErrorValue = useSelector((state) => hasMetadataError(state, subject));
+    const linkedDataForSubject = isMetadataContext ? metadata : getMetadataForVocabulary(subject);
+
+    const hasMetadataErrorForSubject = useSelector((state) => hasMetadataError(state, subject));
     const getLinkedDataError = () => {
-        const hasOtherErrors = hasVocabularyErrorValue || (isMetadataContext ? hasMetadataErrorValue : hasMetaVocabularyErrorValue);
+        const hasOtherErrors = hasVocabularyErrorValue || (isMetadataContext ? hasMetadataErrorForSubject : hasMetaVocabularyErrorValue);
 
         if (isMetadataContext) {
             const hasMetadata = linkedDataForSubject && linkedDataForSubject.length > 0;
@@ -53,10 +50,9 @@ const useLinkedData = (subject) => {
                 return 'An error occurred while loading vocabulary.';
             }
         }
-        return '';
+        return null;
     };
     const linkedDataError = getLinkedDataError();
-
 
     const hasEditRight = isMetadataContext || isDataSteward(authorizations, Config.get());
 
@@ -79,21 +75,18 @@ const useLinkedData = (subject) => {
         });
     };
 
-    const properties = getProperties();
-
-    const fetchLinkedData = () => dispatch(isMetadataContext ? fetchMetadataBySubjectIfNeeded(subject) : fetchMetadataVocabularyIfNeeded(subject));
+    const updateLinkedData = useCallback(() => {
+        const data = dispatch(isMetadataContext ? fetchMetadataBySubjectIfNeeded(subject) : fetchMetadataVocabularyIfNeeded(subject));
+        setLinkedData(data);
+    }, [subject, isMetadataContext, dispatch]);
 
     useEffect(() => {
-        const data = fetchLinkedData();
-        setLinkedData(data);
-    }, []);
+        updateLinkedData();
+    }, [updateLinkedData]);
 
-
-    const handleSubmit = () => dispatch(isMetadataContext ? submitMetadataChangesFromState(subject) : submitVocabularyChangesFromState(subject))
-        .then(() => fetchLinkedData());
-
-    const onSubmit = (sub) => {
-        handleSubmit(sub)
+    const onSubmit = () => {
+        dispatch(isMetadataContext ? submitMetadataChangesFromState(subject) : submitVocabularyChangesFromState(subject))
+            .then(() => updateLinkedData())
             .catch(e => {
                 if (e.details) {
                     ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, subject), e.message);
@@ -108,7 +101,7 @@ const useLinkedData = (subject) => {
         linkedDataLoading,
         linkedDataError,
         linkedDataForSubject,
-        properties,
+        properties: getProperties(),
         onSubmit,
         hasFormUpdates,
         hasFormValidationErrors,
