@@ -69,7 +69,7 @@ const Menu = ({location: {pathname}}) => (
             {Config.get().urls.dataverse ? (
                 <ListItem button component="a" href={Config.get().urls.dataverse}>
                     <ListItemIcon>
-                        <Icon>share</Icon>
+                        <Icon>open_in_new</Icon>
                     </ListItemIcon>
                     <ListItemText primary="Dataverse" />
                 </ListItem>
@@ -77,7 +77,7 @@ const Menu = ({location: {pathname}}) => (
             {Config.get().urls.cbioportal ? (
                 <ListItem component="a" href={Config.get().urls.cbioportal} button>
                     <ListItemIcon>
-                        <Icon>public</Icon>
+                        <Icon>open_in_new</Icon>
                     </ListItemIcon>
                     <ListItemText primary="cBioportal" />
                 </ListItem>
