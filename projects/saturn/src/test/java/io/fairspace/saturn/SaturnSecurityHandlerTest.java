@@ -36,7 +36,7 @@ public class SaturnSecurityHandlerTest {
 
     @Before
     public void before() {
-        handler = new SaturnSecurityHandler("/api/v1/", ConfigLoader.CONFIG.auth, authenticator);
+        handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator);
         handler.setHandler(nextHandler);
     }
 

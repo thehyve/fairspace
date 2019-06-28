@@ -28,9 +28,9 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
      * @param authenticator Authenticator returning a UserInfo for an incoming request
      */
     SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, UserInfo> authenticator) {
-        this.healthResource = apiPrefix + "health/";
-        this.sparqlResource = apiPrefix + "rdf/";
-        this.vocabularyResource = apiPrefix + "vocabulary/";
+        this.healthResource = apiPrefix + "/health/";
+        this.sparqlResource = apiPrefix + "/rdf/";
+        this.vocabularyResource = apiPrefix + "/vocabulary/";
 
         this.config = config;
         this.authenticator = authenticator;
