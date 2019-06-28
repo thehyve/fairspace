@@ -64,11 +64,6 @@ public class SingleTripleTextDocProducer extends AbstractDatasetChanges implemen
     private Entity createEntity(Node g, Node s, Node p, Node o) {
         var graphString = graphNodeToString(g);
         var entity = new Entity(subjectToString(s), graphString);
-        var graphField = defn.getGraphField();
-        if (graphField != null) {
-            entity.put(graphField, graphString);
-        }
-
         var field = defn.getField(p);
         if (field == null) {
             return null;

@@ -30,16 +30,16 @@ public class TextIndexESBulk extends TextIndexES {
      * ES Script for adding/updating the document in the index.
      * The main reason to use scripts is because we want to modify the values of the fields that contains an array of values
      */
-    private static final String ADD_UPDATE_SCRIPT = "if((ctx._source == null) || (ctx._source[params.fieldName] == null) || (ctx._source[params.fieldName].empty == true)) " +
-            "{ctx._source[params.fieldName]=[params.fieldValue]} else {ctx._source[params.fieldName].add(params.fieldValue)}";
+    private static final String ADD_UPDATE_SCRIPT = "if((ctx._source == null) || (ctx._source[params.field] == null) || ctx._source[params.field].empty) " +
+            "{ctx._source[params.field]=[params.value]} else {ctx._source[params.field].add(params.value)}";
 
     /**
      * ES Script for deleting a specific value in the field for the given document in the index.
      * The main reason to use scripts is because we want to delete specific value of the field that contains an array of values
      */
-    private static final String DELETE_SCRIPT = "if((ctx._source != null) && (ctx._source[params.fieldToRemove] != null) && (ctx._source[params.fieldToRemove].empty != true) " +
-            "&& (ctx._source[params.fieldToRemove].indexOf(params.valueToRemove) >= 0)) " +
-            "{ctx._source[params.fieldToRemove].remove(ctx._source[params.fieldToRemove].indexOf(params.valueToRemove))}";
+    private static final String DELETE_SCRIPT = "if((ctx._source != null) && (ctx._source[params.field] != null) && (!ctx._source[params.field].empty) " +
+            "&& (ctx._source[params.field].indexOf(params.value) >= 0)) " +
+            "{ctx._source[params.field].remove(ctx._source[params.field].indexOf(params.value))}";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextIndexESBulk.class);
     private static final int BULK_SIZE = 1000;
@@ -131,19 +131,16 @@ public class TextIndexESBulk extends TextIndexES {
         LOGGER.trace("Adding/Updating the entity {} in ES", entity.getId());
 
         try {
-            var entry = entity.getMap().entrySet().iterator().next();
+            var entry = getDataEntry(entity);
             var builder = jsonBuilder()
                     .startObject()
                     .field(entry.getKey(), List.of(entry.getValue()))
                     .endObject();
             var indexRequest = new IndexRequest(indexName, getDocDef().getEntityField(), entity.getId())
                     .source(builder);
-            var params = Map.of("fieldName", entry.getKey(), "fieldValue", entry.getValue());
-
             var upReq = new UpdateRequest(indexName, getDocDef().getEntityField(), entity.getId())
-                    .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, ADD_UPDATE_SCRIPT, params))
+                    .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, ADD_UPDATE_SCRIPT, toParams(entity)))
                     .upsert(indexRequest);
-
             updates.add(upReq);
         } catch (Exception e) {
             LOGGER.error("Unable to Index the Entity in ElasticSearch.", e);
@@ -158,12 +155,16 @@ public class TextIndexESBulk extends TextIndexES {
      */
     @Override
     public void deleteEntity(Entity entity) {
-        var entry = entity.getMap().entrySet().iterator().next();
-        var params = Map.of("fieldToRemove", entry.getKey(), "valueToRemove", entry.getValue());
+        updates.add(new UpdateRequest(indexName, getDocDef().getEntityField(), entity.getId())
+                .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, DELETE_SCRIPT, toParams(entity))));
+    }
 
-        var updateRequest = new UpdateRequest(indexName, getDocDef().getEntityField(), entity.getId())
-                .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, DELETE_SCRIPT, params));
+    private static Map<String, Object> toParams(Entity entity) {
+        var entry = getDataEntry(entity);
+        return Map.of("field", entry.getKey(), "value", entry.getValue());
+    }
 
-        updates.add(updateRequest);
+    private static Map.Entry<String, Object> getDataEntry(Entity entity) {
+        return entity.getMap().entrySet().iterator().next();
     }
 }
