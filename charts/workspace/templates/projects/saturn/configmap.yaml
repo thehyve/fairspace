@@ -32,7 +32,9 @@ data:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: "RS256"
+      workspaceUserRole: "{{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}"
       dataStewardRole: "{{ .Values.workspace.keycloak.roles.datasteward | default (printf "datasteward-%s" (include "workspace.name" .)) }}"
+      sparqlRole: "{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparql-%s" (include "workspace.name" .)) }}"
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     mail:

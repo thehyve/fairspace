@@ -7,7 +7,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.query.text.es.ESSettings;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public class Config {
     public int port = 8080;
@@ -46,13 +49,17 @@ public class Config {
     public static class Auth {
         public boolean enabled = false;
 
-        public final Set<String> developerRoles = new HashSet<>();
+        public Set<String> developerRoles = Set.of("user", "datasteward", "sparql");
 
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
         public String jwtAlgorithm = "RS256";
 
+        public String workspaceUserRole = "user";
+
         public String dataStewardRole = "datasteward";
+
+        public String sparqlRole = "sparql";
     }
 
     public static class WebDAV {
