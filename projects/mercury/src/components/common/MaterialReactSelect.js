@@ -38,6 +38,11 @@ const styles = theme => ({
     },
     singleValue: {
         fontSize: 16,
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        maxWidth: 'calc(100% - 40px)',
+        position: 'absolute'
     },
     placeholder: {
         position: 'absolute',
@@ -50,6 +55,7 @@ const styles = theme => ({
         marginTop: theme.spacing.unit,
         left: 0,
         right: 0,
+        minWidth: 300
     },
     divider: {
         height: theme.spacing.unit * 2,
