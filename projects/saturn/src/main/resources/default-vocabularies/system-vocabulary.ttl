@@ -7,6 +7,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
+@prefix dash: <http://datashapes.org/dash#> .
 
 ########################
 ### Fixed Namespaces ###
@@ -176,7 +177,7 @@ fs:labelShape a fs:DatatypePropertyShape ;
     sh:description "Human readable label for this resource." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     fs:fixedShape true ;
     fs:importantProperty true ;
     sh:path rdfs:label . 

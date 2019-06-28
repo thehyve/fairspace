@@ -10,6 +10,7 @@
 @prefix osiris: <http://osiris.fairspace.io/ontology#> .
 @prefix icdo3: <http://icdo3.fairspace.io/ontology#> .
 @prefix fhir: <http://hl7.org/fhir/STU3/> .
+@prefix dash: <http://datashapes.org/dash#> .
 
 ########################
 ###   User Shapes    ###
@@ -231,7 +232,7 @@ fs:CollectionShape sh:property
     sh:description "Specific project code." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <projectCode> .
      
 <investigationNatureShape> a fs:ControlledVocabularyPropertyShape ;
@@ -249,7 +250,7 @@ fs:CollectionShape sh:property
     sh:name "Project Manager" ;
     sh:description "Project manager" ;
     sh:datatype xsd:string ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <projectManager> .
      
 <AdministrativeGenderShape> a fs:ControlledVocabularyPropertyShape ;
@@ -276,7 +277,7 @@ fs:CollectionShape sh:property
     sh:description "The identifier of the patient" ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <patientIdentifier> .
      
 <EventTypeShape> a fs:ControlledVocabularyPropertyShape ;
@@ -330,7 +331,7 @@ fs:CollectionShape sh:property
     sh:description "The analysis run identifier" ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <analysisCode> .
      
 <analyticPipelineCodeShape> a fs:DatatypePropertyShape ;
@@ -338,7 +339,7 @@ fs:CollectionShape sh:property
     sh:description "Identifier of the pipeline used into the analysis (unique in the center)" ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <analyticPipelineCode> .
      
 <numberOfBreakPointsShape> a fs:DatatypePropertyShape ;
