@@ -26,8 +26,8 @@ data:
           replicas: 1
           indexName: "fairspace"
     users:
-      endpoint: http://{{ template "pluto.hostname" . }}/workspace/users
-
+      endpoint: https://{{ template "pluto.hostname" . }}/api/v1/workspace/users
+      synchronizationInterval: 60
     auth:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
