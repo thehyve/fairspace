@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
-class SaturnSecurityHandler extends ConstraintSecurityHandler { ;
+class SaturnSecurityHandler extends ConstraintSecurityHandler {
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
 
     private final String healthResource;
