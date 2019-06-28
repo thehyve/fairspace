@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.SaturnSecurityHandler.userInfo;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
-import static io.fairspace.saturn.auth.SecurityUtil.userInfo;
 import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
@@ -39,7 +39,7 @@ public class App {
     public static void main(String[] args) throws IOException {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, SaturnSecurityHandler::userInfo);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
@@ -79,8 +79,18 @@ public class App {
         var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
+        var auth = CONFIG.auth;
+        if (!auth.enabled) {
+            log.warn("Authentication is disabled");
+        }
+        var authenticator = auth.enabled
+                ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
+                : new DummyAuthenticator(CONFIG.auth.developerRoles);
         var apiPathPrefix = "/api/" + API_VERSION;
-        var fusekiServerBuilder = FusekiServer.create()
+        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator);
+
+        FusekiServer.create()
+                .securityHandler(securityHandler)
                 .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", new SaturnSparkFilter(
                         new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService, CONFIG.jena.metadataBaseIRI),
@@ -90,19 +100,7 @@ public class App {
                         new PermissionsApp(apiPathPrefix, permissions),
                         new HealthApp(apiPathPrefix)))
                 .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet("/webdav/" + API_VERSION + "/", fs))
-                .port(CONFIG.port);
-
-
-        var auth = CONFIG.auth;
-        if (!auth.enabled) {
-            log.warn("Authentication is disabled");
-        }
-        var authenticator = auth.enabled
-                ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
-                : new DummyAuthenticator(CONFIG.auth.developerRoles);
-        fusekiServerBuilder.securityHandler(new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator));
-
-        fusekiServerBuilder
+                .port(CONFIG.port)
                 .build()
                 .start();
 
