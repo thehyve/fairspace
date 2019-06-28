@@ -36,7 +36,6 @@ const MetadataEntityContainer = props => {
 
     return (
         <Grid
-            style={{minHeight: '74vh'}}
             container
             direction="column"
             justify="space-between"
