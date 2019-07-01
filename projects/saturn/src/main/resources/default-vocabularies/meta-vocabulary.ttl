@@ -189,13 +189,19 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
           sh:name "Use in metadata" ;
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
-          sh:path fs:useInMetadata
+          sh:path fs:usableInMetadata
         ] ,
         [
           sh:name "Use in vocabulary" ;
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
-          sh:path fs:useInVocabulary
+          sh:path fs:usableInVocabulary
+        ] ,
+        [
+          sh:name "Default namespace" ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:boolean ;
+          sh:path fs:defaultNamespace
         ] .
 
 fs:inverseRelationShape a fs:RelationShape ;
