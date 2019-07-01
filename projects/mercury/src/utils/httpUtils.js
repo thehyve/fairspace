@@ -32,6 +32,10 @@ function failOnHttpError(providedMessage) {
 
                             // If a message was provided by the backend, provide it to the calling party
                             throw Error(body && body.message ? body.message : defaultMessage);
+                        })
+                        .catch(() => {
+                            // If JSON parsing failed, apparently a non-JSON response was given
+                            throw Error(defaultMessage);
                         });
             }
         }
