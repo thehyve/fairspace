@@ -10,7 +10,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 
 # Create the target resource
-INSERT { ?newIRI fs:filePath %2$s; rdfs:label %3$s . }
+INSERT { ?newIRI fs:filePath %2$s; rdfs:label %3$s . ?s fs:tempNewIRI ?newIRI . }
 WHERE {
     ?s fs:filePath %1$s .
     FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
@@ -20,17 +20,14 @@ WHERE {
 # Copy statements
 INSERT { ?newIRI ?p ?o }
 WHERE {
-    ?newIRI fs:filePath %2$s .
+    ?s fs:tempNewIRI ?newIRI ; ?p ?o ;
 
-    ?s ?p ?o ;
-    fs:filePath %1$s .
-    FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
     FILTER( ?p != fs:filePath) # filePath has changed
     FILTER( ?p != rdfs:label)
 };
 
 # Create children
-INSERT { ?newIRI fs:filePath ?newPath }
+INSERT { ?newIRI fs:filePath ?newPath. ?s fs:tempNewIRI ?newIRI  }
 WHERE {
     ?s fs:filePath ?oldPath .
 
@@ -43,11 +40,9 @@ WHERE {
 # Copy children's statements
 INSERT { ?newIRI ?p ?o }
 WHERE {
-    ?newIRI fs:filePath ?newPath .
-    FILTER(STRSTARTS(?newPath, CONCAT(%2$s, '/')))
-    BIND(CONCAT(%1$s, '/', SUBSTR(?newPath, STRLEN(%2$s) + 2)) as ?oldPath)
-    ?s fs:filePath ?oldPath .
-    ?s ?p ?o .
-    FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
+    ?s fs:tempNewIRI ?newIRI ; ?p ?o ;
+
     FILTER((?p != fs:filePath)) # filePath has changed
 };
+
+DELETE { ?s fs:tempNewIRI ?o } WHERE { ?s fs:tempNewIRI ?o };
