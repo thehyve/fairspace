@@ -67,6 +67,8 @@ class FileAPI {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
+                        case 403:
+                            throw new Error("You do not have authorization to create a directory in this collection.");
                         case 405:
                             throw new Error("A directory or file with this name already exists. Please choose another name");
                     }
@@ -87,7 +89,20 @@ class FileAPI {
             return Promise.reject(Error("No files given"));
         }
 
-        const allPromises = files.map(({name, value}) => this.client().putFileContents(`${path}/${name}`, value, defaultOptions));
+        const allPromises = files.map(({name, value}) => {
+            return this.client().putFileContents(`${path}/${name}`, value, defaultOptions)
+                .catch(e => {
+                    if (e && e.response) {
+                        // eslint-disable-next-line default-case
+                        switch (e.response.status) {
+                            case 403:
+                                throw new Error("You do not have authorization to add files to this collection.");
+                        }
+                    }
+
+                    throw e;
+                });
+        });
 
         return Promise.all(allPromises).then(() => files);
     }
