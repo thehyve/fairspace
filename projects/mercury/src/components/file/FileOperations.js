@@ -114,7 +114,7 @@ export class FileOperations extends React.Component {
 
     render() {
         const {
-            allOperationsDisabled, clipboardItemsCount,
+            isWritingDisabled, clipboardItemsCount,
             classes, getDownloadLink, selectedItem = {}, disabledForMoreThanOneSelection, isPasteDisabled, noSelectedPath
         } = this.props;
 
@@ -142,12 +142,12 @@ export class FileOperations extends React.Component {
                             <RenameButton
                                 currentName={selectedItem.basename}
                                 onRename={newName => this.handlePathRename(selectedItem, newName)}
-                                disabled={disabledForMoreThanOneSelection || busy}
+                                disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
                             >
                                 <IconButton
                                     title={`Rename ${selectedItem.basename}`}
                                     aria-label={`Rename ${selectedItem.basename}`}
-                                    disabled={disabledForMoreThanOneSelection || busy}
+                                    disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
                                 >
                                     <Icon>border_color</Icon>
                                 </IconButton>
@@ -157,12 +157,12 @@ export class FileOperations extends React.Component {
                             <DeleteButton
                                 file={selectedItem.basename}
                                 onClick={() => this.handlePathDelete(selectedItem)}
-                                disabled={disabledForMoreThanOneSelection || busy}
+                                disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
                             >
                                 <IconButton
                                     title={`Delete ${selectedItem.basename}`}
                                     aria-label={`Delete ${selectedItem.basename}`}
-                                    disabled={disabledForMoreThanOneSelection || busy}
+                                    disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
                                 >
                                     <Icon>delete</Icon>
                                 </IconButton>
@@ -175,7 +175,7 @@ export class FileOperations extends React.Component {
                             aria-label="Copy"
                             title="Copy"
                             onClick={e => this.handleCopy(e)}
-                            disabled={allOperationsDisabled || noSelectedPath || busy}
+                            disabled={noSelectedPath || busy}
                         >
                             <ContentCopy />
                         </IconButton>
@@ -183,7 +183,7 @@ export class FileOperations extends React.Component {
                             aria-label="Cut"
                             title="Cut"
                             onClick={e => this.handleCut(e)}
-                            disabled={allOperationsDisabled || noSelectedPath || busy}
+                            disabled={isWritingDisabled || noSelectedPath || busy}
                         >
                             <ContentCut />
                         </IconButton>
@@ -209,7 +209,7 @@ export class FileOperations extends React.Component {
                                 <IconButton
                                     aria-label="Create directory"
                                     title="Create directory"
-                                    disabled={allOperationsDisabled || busy}
+                                    disabled={isWritingDisabled || busy}
                                 >
                                     <Icon>create_new_folder</Icon>
                                 </IconButton>
@@ -222,7 +222,7 @@ export class FileOperations extends React.Component {
                                 <IconButton
                                     title="Upload"
                                     aria-label="Upload"
-                                    disabled={allOperationsDisabled || busy}
+                                    disabled={isWritingDisabled || busy}
                                 >
                                     <Icon>cloud_upload</Icon>
                                 </IconButton>
@@ -236,7 +236,7 @@ export class FileOperations extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {match: {params}, disabled: allOperationsDisabled} = ownProps;
+    const {match: {params}, disabled: isWritingDisabled} = ownProps;
     const {collectionBrowser: {selectedPaths}, cache: {filesByPath}, clipboard} = state;
     const openedCollectionLocation = params.collection;
     const openedPath = params.path ? `/${openedCollectionLocation}/${params.path}` : `/${openedCollectionLocation}`;
@@ -248,8 +248,8 @@ const mapStateToProps = (state, ownProps) => {
     const filenamesInClipboard = clipboard.filenames;
     const clipboardItemsCount = clipboard.filenames ? clipboard.filenames.length : 0;
     const isClipboardItemsOnOpenedPath = filenamesInClipboard && filenamesInClipboard.map(f => getParentPath(f)).includes(openedPath);
-    const isPasteDisabled = allOperationsDisabled || clipboardItemsCount === 0 || (isClipboardItemsOnOpenedPath && clipboard.type === CUT);
-    const disabledForMoreThanOneSelection = allOperationsDisabled || noSelectedPath || moreThanOneItemSelected;
+    const isPasteDisabled = isWritingDisabled || clipboardItemsCount === 0 || (isClipboardItemsOnOpenedPath && clipboard.type === CUT);
+    const disabledForMoreThanOneSelection = noSelectedPath || moreThanOneItemSelected;
 
     return {
         selectedPaths,
@@ -257,7 +257,8 @@ const mapStateToProps = (state, ownProps) => {
         clipboardItemsCount,
         disabledForMoreThanOneSelection,
         noSelectedPath,
-        isPasteDisabled
+        isPasteDisabled,
+        isWritingDisabled
     };
 };
 
