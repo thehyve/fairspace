@@ -40,8 +40,11 @@ class LinkedDataAPI {
     }
 
     get(params = {}) {
-        const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
-        return fetch(`${this.getStatementsUrl()}?includeObjectProperties&${query}`, LinkedDataAPI.getParams)
+        const query = Object.entries(params).length > 0
+            ? Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&') + '&includeObjectProperties'
+            : '';
+
+        return fetch(`${this.getStatementsUrl()}?${query}`, LinkedDataAPI.getParams)
             .then(failOnHttpError("Failure when retrieving metadata"))
             .then(response => response.json())
             .then(expand)
