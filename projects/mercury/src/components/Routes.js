@@ -13,7 +13,7 @@ import SearchPage from './search/SearchPage';
 import VocabularyListPage from "./metadata/vocabulary/VocabularyListPage";
 import VocabularyEntityPage from "./metadata/vocabulary/VocabularyEntityPage";
 import {createMetadataIri, createVocabularyIri} from "../utils/linkeddata/metadataUtils";
-import {LinkedDataProvider, METADATA_CONTEXT, VOCABULARY_CONTEXT} from '../LinkedDataContext';
+import {LinkedDataProvider, METADATA_CONTEXT, VOCABULARY_CONTEXT} from './metadata/LinkedDataContext';
 import {LinkedDataValuesContext} from "./metadata/common/LinkedDataValuesContext";
 import {METADATA_PATH, VOCABULARY_PATH} from "../constants";
 import MetadataValueComponentFactory from "./metadata/metadata/MetadataValueComponentFactory";

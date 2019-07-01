@@ -59,7 +59,7 @@ class LinkedDataCreator extends React.Component {
     };
 
     render() {
-        const {children, loading, error, isEditable, shapes, generateInitialContent, requireIdentifier} = this.props;
+        const {children, loading, error, isEditable, shapes, requireIdentifier} = this.props;
         const {creationState, shape, creatingMetadataEntity} = this.state;
 
         if (loading) {
@@ -98,7 +98,6 @@ class LinkedDataCreator extends React.Component {
 
                 <NewLinkedDataEntityDialog
                     open={creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY}
-                    linkedData={generateInitialContent(shape)}
                     shape={shape}
                     onCreate={this.handleEntityCreation}
                     onClose={this.closeDialog}
@@ -122,8 +121,6 @@ LinkedDataCreator.propTypes = {
     shapes: PropTypes.array,
     isEditable: PropTypes.bool,
     requireIdentifier: PropTypes.bool,
-
-    generateInitialContent: PropTypes.func
 };
 
 LinkedDataCreator.defaultProps = {

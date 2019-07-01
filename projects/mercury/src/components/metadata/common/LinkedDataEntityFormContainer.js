@@ -1,57 +1,37 @@
-import React, {useEffect, useCallback} from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import {connect} from "react-redux";
 import {Button, Grid} from "@material-ui/core";
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
-import {getLinkedDataFormUpdates, getLinkedDataFormValidations} from "../../../reducers/linkedDataFormReducers";
-import {
-    addLinkedDataValue, deleteLinkedDataValue, initializeLinkedDataForm,
-    updateLinkedDataValue, validateLinkedDataProperty
-} from "../../../actions/linkedDataFormActions";
-import {propertiesToShow} from "../../../utils/linkeddata/metadataUtils";
-import useLinkedData from '../../../UseLinkedData';
+import useFormData from '../UseFormData';
 
-const LinkedDataEntityFormContainer = ({formKey, isEditable = true, initializeForm, updates, errors, ...otherProps}) => {
+const LinkedDataEntityFormContainer = ({formKey, isEditable = true, shape, ...otherProps}) => {
     const {
-        linkedDataLoading, linkedDataError, properties, onSubmit,
-        hasFormUpdates, hasFormValidationErrors, hasEditRight
-    } = useLinkedData(formKey);
-
-    const initForm = useCallback(() => {
-        initializeForm(formKey);
-    }, [initializeForm, formKey]);
-
-    useEffect(() => {
-        initForm();
-    }, [initForm]);
-
-    const propertiesWithChanges = propertiesToShow(properties)
-        .filter(p => p.isEditable || p.values.length)
-        .map(p => ({
-            ...p,
-            values: updates[p.key] || p.values,
-            errors: errors[p.key]
-        }));
+        properties, loading, error, canSubmit,
+        submitDisabled, onSubmit, onAdd, onChange, onDelete
+    } = useFormData({formKey, shape});
 
     return (
         <Grid container>
             <Grid item xs={12}>
                 <LinkedDataEntityForm
                     {...otherProps}
-                    error={linkedDataError}
-                    loading={linkedDataLoading}
-                    properties={propertiesWithChanges}
+                    error={error}
+                    loading={loading}
+                    properties={properties}
+                    onAdd={onAdd}
+                    onChange={onChange}
+                    onDelete={onDelete}
                 />
             </Grid>
             {
-                hasEditRight && isEditable && !linkedDataError
+                canSubmit && isEditable
                 && (
                     <Grid item>
                         <Button
-                            onClick={() => onSubmit(formKey)}
+                            onClick={onSubmit}
                             color="primary"
-                            disabled={!hasFormUpdates || hasFormValidationErrors}
+                            disabled={submitDisabled}
                         >
                             Update
                         </Button>
@@ -63,59 +43,7 @@ const LinkedDataEntityFormContainer = ({formKey, isEditable = true, initializeFo
 };
 
 LinkedDataEntityFormContainer.propTypes = {
-    initializeForm: PropTypes.func,
-    fetchShapes: PropTypes.func,
-    fetchLinkedData: PropTypes.func,
-
-    onAdd: PropTypes.func,
-    onChange: PropTypes.func,
-    onDelete: PropTypes.func,
-
-    error: PropTypes.string,
-
-    loading: PropTypes.bool,
-
     formKey: PropTypes.string.isRequired,
-
-    properties: PropTypes.array,
-    updates: PropTypes.object,
-    errors: PropTypes.object
-
 };
 
-LinkedDataEntityFormContainer.defaultProps = {
-    initializeForm: () => {},
-    fetchShapes: () => {},
-    fetchLinkedData: () => {},
-
-    onAdd: () => {},
-    onChange: () => {},
-    onDelete: () => {},
-
-    properties: [],
-    updates: {},
-    errors: {}
-};
-
-const mapStateToProps = (state, ownProps) => ({
-    updates: getLinkedDataFormUpdates(state, ownProps.formKey),
-    errors: getLinkedDataFormValidations(state, ownProps.formKey),
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-    initializeForm: (formKey) => dispatch(initializeLinkedDataForm(formKey)),
-    onAdd: (property, value) => {
-        dispatch(addLinkedDataValue(ownProps.formKey, property, value));
-        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
-    },
-    onChange: (property, value, index) => {
-        dispatch(updateLinkedDataValue(ownProps.formKey, property, value, index));
-        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
-    },
-    onDelete: (property, index) => {
-        dispatch(deleteLinkedDataValue(ownProps.formKey, property, index));
-        dispatch(validateLinkedDataProperty(ownProps.formKey, property));
-    }
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataEntityFormContainer);
+export default LinkedDataEntityFormContainer;
