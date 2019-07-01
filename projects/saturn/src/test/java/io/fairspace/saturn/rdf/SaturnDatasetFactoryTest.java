@@ -1,7 +1,5 @@
 package io.fairspace.saturn.rdf;
 
-import io.fairspace.saturn.Config;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -11,7 +9,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SaturnDatasetFactoryTest {
@@ -33,7 +32,14 @@ public class SaturnDatasetFactoryTest {
     @Test
     public void testIsRestoreNotNeededForFilledDirectory() throws IOException {
         File datasetPath = testFolder.newFolder();
-        new File(datasetPath, "database.tdb").createNewFile();
+        new File(datasetPath, "Data-0001").mkdirs();
         assertFalse(SaturnDatasetFactory.isRestoreNeeded(datasetPath));
+    }
+
+    @Test
+    public void testIsRestoreIfNoDataDirectoryIsPresent() throws IOException {
+        File datasetPath = testFolder.newFolder();
+        new File(datasetPath, "lost+found").mkdirs();
+        assertTrue(SaturnDatasetFactory.isRestoreNeeded(datasetPath));
     }
 }

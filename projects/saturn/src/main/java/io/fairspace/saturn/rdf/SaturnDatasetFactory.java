@@ -58,7 +58,7 @@ public class SaturnDatasetFactory {
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {
-        return !datasetPath.exists() || datasetPath.list().length == 0;
+        return !datasetPath.exists() || datasetPath.list((dir, name) -> name.startsWith("Data-")).length == 0;
     }
 
     private static DatasetGraph enableElasticSearch(DatasetGraph dsg, Config.Jena config, boolean recreateIndex) throws UnknownHostException {
