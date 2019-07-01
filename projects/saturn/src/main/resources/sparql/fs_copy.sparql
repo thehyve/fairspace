@@ -10,7 +10,10 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 
 # Create the target resource
-INSERT { ?newIRI fs:filePath %2$s; rdfs:label %3$s . ?s fs:tempNewIRI ?newIRI . }
+INSERT {
+    ?newIRI fs:filePath %2$s;
+            rdfs:label %3$s .
+    ?s fs:tempNewIRI ?newIRI . }
 WHERE {
     ?s fs:filePath %1$s .
     FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
@@ -27,7 +30,9 @@ WHERE {
 };
 
 # Create children
-INSERT { ?newIRI fs:filePath ?newPath. ?s fs:tempNewIRI ?newIRI  }
+INSERT {
+   ?newIRI fs:filePath ?newPath.
+   ?s fs:tempNewIRI ?newIRI  }
 WHERE {
     ?s fs:filePath ?oldPath .
 
