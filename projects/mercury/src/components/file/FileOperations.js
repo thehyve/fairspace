@@ -43,7 +43,7 @@ export class FileOperations extends React.Component {
         e.stopPropagation();
         return this.fileOperation(Operations.PASTE, this.props.paste(this.props.openedPath))
             .catch((err) => {
-                ErrorDialog.showError(err, "An error occurred while pasting your contents");
+                ErrorDialog.showError(err, err.message || "An error occurred while pasting your contents");
             });
     }
 
@@ -58,7 +58,7 @@ export class FileOperations extends React.Component {
 
             return this.fileOperation(Operations.UPLOAD, this.props.uploadFiles(this.props.openedPath, updatedFiles))
                 .catch((err) => {
-                    ErrorDialog.showError(err, "An error occurred while uploading files", () => this.handleUpload(files));
+                    ErrorDialog.showError(err, err.message || "An error occurred while uploading files", () => this.handleUpload(files));
                 });
         }
         return Promise.resolve([]);
@@ -67,19 +67,14 @@ export class FileOperations extends React.Component {
     handleCreateDirectory(name) {
         return this.fileOperation(Operations.MKDIR, this.props.createDirectory(joinPaths(this.props.openedPath, name)))
             .catch((err) => {
-                if (err.response.status === 405) {
-                    const message = "A directory or file with this name already exists. Please choose another name";
-                    ErrorDialog.showError(err, message, false);
-                    return false;
-                }
-                ErrorDialog.showError(err, "An error occurred while creating directory", () => this.handleCreateDirectory(name));
+                ErrorDialog.showError(err, err.message || "An error occurred while creating directory", () => this.handleCreateDirectory(name));
                 return true;
             });
     }
 
     handlePathDelete = (path) => this.fileOperation(Operations.DELETE, this.props.deleteFile(path.filename))
         .catch((err) => {
-            ErrorDialog.showError(err, "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
+            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
         })
 
     handlePathRename = (path, newName) => {
@@ -87,7 +82,7 @@ export class FileOperations extends React.Component {
 
         return this.fileOperation(Operations.RENAME, renameFile(openedPath, path.basename, newName))
             .catch((err) => {
-                ErrorDialog.showError(err, "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
+                ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
                 return false;
             });
     }
