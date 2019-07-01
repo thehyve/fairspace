@@ -36,7 +36,11 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     private final Map<String, Optional<Property>> inverseCache = new HashMap<>();
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        super(rdf, graph, vocabulary);
+        this(rdf, graph, vocabulary, 0, lifeCycleManager, validator);
+    }
+
+    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
+        super(rdf, graph, vocabulary, tripleLimit);
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
     }
