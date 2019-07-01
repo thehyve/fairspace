@@ -12,7 +12,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.Context.currentRequest;
+import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
 class SaturnSecurityHandler extends ConstraintSecurityHandler {
     private static final String USER_INFO_REQUEST_ATTRIBUTE = UserInfo.class.getName();
@@ -45,7 +47,8 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
         var error = authorize(pathInContext, request);
 
         if (error != null) {
-            response.sendError(SC_UNAUTHORIZED, error);
+            response.setContentType(APPLICATION_JSON.asString());
+            response.sendError(SC_UNAUTHORIZED, errorBody(SC_UNAUTHORIZED, error));
             baseRequest.setHandled(true);
         } else {
             getHandler().handle(pathInContext, baseRequest, request, response);
