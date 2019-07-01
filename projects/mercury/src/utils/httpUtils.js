@@ -9,7 +9,7 @@
 function failOnHttpError(providedMessage) {
     return (response) => {
         if (response && !response.ok) {
-            const defaultMessage = `${providedMessage} ${response.error || ''}`;
+            const defaultMessage = `${providedMessage} ${response.error || ''}`.trim();
             switch (response.status) {
                 case 401:
                     window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
@@ -21,6 +21,10 @@ function failOnHttpError(providedMessage) {
                     };
                 default:
                     return response.json()
+                        .catch(() => {
+                            // If JSON parsing failed, apparently a non-JSON response was given
+                            throw Error(defaultMessage);
+                        })
                         .then(body => {
                             if (response.status === 400 && body.details) {
                                 // eslint-disable-next-line no-throw-literal
@@ -32,10 +36,6 @@ function failOnHttpError(providedMessage) {
 
                             // If a message was provided by the backend, provide it to the calling party
                             throw Error(body && body.message ? body.message : defaultMessage);
-                        })
-                        .catch(() => {
-                            // If JSON parsing failed, apparently a non-JSON response was given
-                            throw Error(defaultMessage);
                         });
             }
         }
