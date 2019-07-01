@@ -14,37 +14,37 @@
 ########################
 
 fs:FOAF-Namespace a sh:PrefixDeclaration ;
-   sh:name "Friend of a friend (FOAF)" ;
+   sh:name "foaf: (Friend of a friend)" ;
    sh:prefix "foaf" ;
    fs:fixedShape true ;
    sh:namespace <http://xmlns.com/foaf/0.1/> .
 
 fs:RDF-Namespace a sh:PrefixDeclaration ;
-   sh:name "RDF" ;
+   sh:name "rdf: " ;
    sh:prefix "rdf" ;
    fs:fixedShape true ;
    sh:namespace <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
 fs:RDFS-Namespace a sh:PrefixDeclaration ;
-   sh:name "RDF Schema (RDFS)" ;
+   sh:name "rdfs: (RDF Schema)" ;
    sh:prefix "rdfs" ;
    fs:fixedShape true ;
    sh:namespace <http://www.w3.org/2000/01/rdf-schema#> .
 
 fs:XSD-Namespace a sh:PrefixDeclaration ;
-   sh:name "XSD" ; 
+   sh:name "xsd: (XML Schema Definition)" ; 
    sh:prefix "xsd" ;
    fs:fixedShape true ;
    sh:namespace <http://www.w3.org/2001/XMLSchema#> .
 
 fs:Schema-Namespace a sh:PrefixDeclaration ;
-   sh:name "schema.org" ; 
+   sh:name "schema: (schema.org)" ; 
    sh:prefix "schema" ;
    fs:fixedShape true ;
    sh:namespace <http://schema.org/> .
 
 fs:Fairspace-Namespace a sh:PrefixDeclaration ;
-   sh:name "Fairspace (global)" ; 
+   sh:name "fs: (Fairspace global)" ; 
    sh:prefix "fs" ;
    fs:fixedShape true ;
    sh:namespace <http://fairspace.io/ontology#> .
