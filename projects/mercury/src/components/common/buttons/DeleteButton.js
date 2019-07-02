@@ -26,13 +26,13 @@ class DeleteButton extends React.Component {
     }
 
     render() {
-        const {children, file, disabled} = this.props;
+        const {children, fileDescription, disabled} = this.props;
         const {verifying} = this.state;
         const dialog = verifying && !disabled ? (
             <ConfirmationDialog
                 open
                 title="Confirmation"
-                content={`Are you sure you want to remove ${file}?`}
+                content={`Are you sure you want to remove ${fileDescription}?`}
                 onAgree={this.handleAgreeClick}
                 onDisagree={this.closeDialog}
                 onClose={this.closeDialog}

@@ -57,6 +57,7 @@ const collectionBrowser = (state = defaultState, action) => {
         case actionTypes.DELETE_FILE_FULFILLED:
             return deselectPath(state, action.meta.path);
         case actionTypes.RENAME_FILE_FULFILLED:
+        case actionTypes.DELETE_FILES_FULFILLED:
             return {
                 ...state,
                 selectedPaths: [],

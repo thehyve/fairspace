@@ -35,6 +35,15 @@ export const deleteFile = (path) => (
         }
     });
 
+export const deleteMultiple = (paths) => (
+    {
+        type: actionTypes.DELETE_FILES,
+        payload: FileAPI.deleteMultiple(paths),
+        meta: {
+            paths
+        }
+    });
+
 export const uploadFiles = (path, files, nameMapping) => ({
     type: actionTypes.UPLOAD_FILES,
     payload: FileAPI.upload(path, files, nameMapping),
