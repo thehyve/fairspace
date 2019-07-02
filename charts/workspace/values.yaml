@@ -251,7 +251,7 @@ saturn:
       size: 50Gi
       mountPath: /data
 
-  metadataTripleLimit: 50000
+  maxTriplesToReturn: 50000
 
   mail:
     mail.from: info@fairspace.io

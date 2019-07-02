@@ -33,7 +33,7 @@ public class Config {
 
         public File transactionLogPath = new File("data/log");
 
-        public long metadataTripleLimit = 1000;
+        public long maxTriplesToReturn = 50000;
 
         public ElasticSearch elasticSearch = new ElasticSearch();
 
