@@ -71,7 +71,7 @@ public class WebDAVIT {
         var coll = new Collection();
         coll.setName("My Collection");
         coll.setLocation("coll1");
-        coll.setType("LOCAL");
+        coll.setType(ManagedFileSystem.TYPE);
         collections.create(coll);
         collectionIRI = coll.getIri();
 
@@ -423,7 +423,7 @@ public class WebDAVIT {
         var newCollection = new Collection();
         newCollection.setName("Collection 2");
         newCollection.setLocation("coll2");
-        newCollection.setType("LOCAL");
+        newCollection.setType(ManagedFileSystem.TYPE);
         collections.create(newCollection);
         var newCollectionIRI = newCollection.getIri();
 
