@@ -223,6 +223,15 @@ public class ReadableMetadataServiceTest {
         assertEquals(1, api.get(null, null, null, false).size());
     }
 
+    @Test
+    public void testTripleLimitByType() {
+        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI), 1);
+        setupModelForTypes();
+
+        // Test whether entities of a all types can be returned with a limit
+        assertEquals(2, api.getByType(null, false).size());
+    }
+
     private void setupModelForTypes() {
         Resource personConsent = createResource("http://fairspace.io/ontology#PersonConsent");
         Resource personConsentEx = createResource("http://fairspace.io/ontology#PersonConsentEx");

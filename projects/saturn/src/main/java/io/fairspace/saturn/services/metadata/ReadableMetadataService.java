@@ -61,13 +61,15 @@ class ReadableMetadataService {
      */
     Model getByType(String type, boolean filterOnCatalog) {
         String queryName = filterOnCatalog ? "catalog_entities_by_type" : "entities_by_type";
-
-        return rdf.queryConstruct(storedQuery(
+        String basicQuery = storedQuery(
                 queryName,
                 graph,
                 vocabulary,
                 asURI(type)
-        ));
+        );
+        String query = tripleLimit > 0 ? limit(basicQuery, tripleLimit) : basicQuery;
+
+        return rdf.queryConstruct(query);
     }
 
     protected static Node asURI(String uri) {
