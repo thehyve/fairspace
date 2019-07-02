@@ -71,8 +71,6 @@ const filesByPath = (state = defaultState, action) => {
                 creatingDirectory: false
             };
 
-        case actionTypes.DELETE_FILE_FULFILLED:
-            return invalidateFiles(state, getParentPath(action.meta.path));
         case actionTypes.DELETE_FILES_FULFILLED:
         case actionTypes.DELETE_FILES_REJECTED:
             return invalidateFiles(state, ...action.meta.paths.map(getParentPath));

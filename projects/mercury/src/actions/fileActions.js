@@ -26,15 +26,6 @@ export const renameFile = (path, currentFilename, newFilename) => {
     };
 };
 
-export const deleteFile = (path) => (
-    {
-        type: actionTypes.DELETE_FILE,
-        payload: FileAPI.delete(path),
-        meta: {
-            path
-        }
-    });
-
 export const deleteMultiple = (paths) => (
     {
         type: actionTypes.DELETE_FILES,
