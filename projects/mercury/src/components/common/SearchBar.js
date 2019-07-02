@@ -1,20 +1,20 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {InputBase, withStyles} from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
-import {withRouter} from "react-router-dom";
 import styles from './SearchBar.styles';
-import {getSearchQueryFromString} from "../../utils/searchUtils";
 
 const SearchBar = ({
-    classes, query = '', placeholder, history, onSearchChange = () => {}
+    classes, query = '', placeholder, onSearchChange = () => {}
 }) => {
+    const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
 
-    const resetValueFromLocation = () => setValue(getSearchQueryFromString(history.location.search));
-
-    useEffect(() => history.listen(resetValueFromLocation));
+    if (query !== origQuery) {
+        setOrigQuery(query);
+        setValue(query);
+    }
 
     const handleChange = (event) => {
         setValue(event.target.value);
@@ -52,4 +52,4 @@ SearchBar.propTypes = {
     placeholder: PropTypes.string
 };
 
-export default withStyles(styles)(withRouter(SearchBar));
+export default withStyles(styles)(SearchBar);
