@@ -13,26 +13,26 @@ import SearchPage from './search/SearchPage';
 import VocabularyListPage from "./metadata/vocabulary/VocabularyListPage";
 import VocabularyEntityPage from "./metadata/vocabulary/VocabularyEntityPage";
 import {createMetadataIri, createVocabularyIri} from "../utils/linkeddata/metadataUtils";
-import {LinkedDataProvider, METADATA_CONTEXT, VOCABULARY_CONTEXT} from './metadata/LinkedDataContext';
+import {LinkedDataVocabularyProvider, LinkedDataMetadataProvider} from './metadata/LinkedDataContext';
 import {LinkedDataValuesContext} from "./metadata/common/LinkedDataValuesContext";
 import {METADATA_PATH, VOCABULARY_PATH} from "../constants";
 import MetadataValueComponentFactory from "./metadata/metadata/MetadataValueComponentFactory";
 import VocabularyValueComponentFactory from "./metadata/vocabulary/VocabularyValueComponentFactory";
 
 const MetadataWrapper = ({children}) => (
-    <LinkedDataProvider context={METADATA_CONTEXT}>
+    <LinkedDataMetadataProvider>
         <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
             {children}
         </LinkedDataValuesContext.Provider>
-    </LinkedDataProvider>
+    </LinkedDataMetadataProvider>
 );
 
 const VocabularyWrapper = ({children}) => (
-    <LinkedDataProvider context={VOCABULARY_CONTEXT}>
+    <LinkedDataVocabularyProvider>
         <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
             {children}
         </LinkedDataValuesContext.Provider>
-    </LinkedDataProvider>
+    </LinkedDataVocabularyProvider>
 );
 
 const routes = () => (

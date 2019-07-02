@@ -8,52 +8,87 @@ import {
 } from "../../reducers/cache/vocabularyReducers";
 import {getAuthorizations} from "../../reducers/account/authorizationsReducers";
 import {fromJsonLd, emptyLinkedData} from "../../utils/linkeddata/jsonLdConverter";
+import {getCombinedMetadataForSubject} from "../../reducers/cache/jsonLdBySubjectReducers";
+import {isDataSteward} from "../../utils/userUtils";
+import Config from "../../services/Config/Config";
+import {fetchMetadataBySubjectIfNeeded} from "../../actions/metadataActions";
 
 const LinkedDataContext = React.createContext({});
 
-export const METADATA_CONTEXT = 'METADATA_CONTEXT';
-export const VOCABULARY_CONTEXT = 'VOCABULARY_CONTEXT';
-
-export const LinkedDataProvider = ({children, context}) => {
-    const isMetadataContext = context === METADATA_CONTEXT;
-    const isVocabularyContext = context === VOCABULARY_CONTEXT;
-
-    if (!isMetadataContext && !isVocabularyContext) {
-        throw new Error('Please provide a valid linked data context');
-    }
-
+export const LinkedDataVocabularyProvider = ({children}) => {
     const dispatch = useDispatch();
 
-    const fetchShapes = () => dispatch(isMetadataContext ? fetchMetadataVocabularyIfNeeded() : fetchMetaVocabularyIfNeeded());
+    const fetchShapes = () => dispatch(fetchMetaVocabularyIfNeeded());
     fetchShapes();
 
-    const isVocaularyLoading = useSelector(state => isVocabularyPending(state));
-    const isMetaVocabularyLoading = useSelector(state => isMetaVocabularyPending(state));
+    const shapesLoading = useSelector(state => isMetaVocabularyPending(state));
 
-    const vocabulary = useSelector(state => getVocabulary(state));
+    const hasShapesError = useSelector(state => hasMetaVocabularyError(state));
+
     const metaVocabulary = useSelector(state => getMetaVocabulary(state));
 
-    const hasVocabularyErrorValue = useSelector(state => hasVocabularyError(state));
-    const hasMetaVocabularyErrorValue = useSelector(state => hasMetaVocabularyError(state));
+    const vocabulary = useSelector(state => getVocabulary(state));
+
+    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading vocbulary';
 
     const authorizations = useSelector(state => getAuthorizations(state));
 
+    const hasEditRight = isDataSteward(authorizations, Config.get());
+
+    const getEmptyLinkedData = (shape) => emptyLinkedData(metaVocabulary, shape);
+
     const getMetadataForVocabulary = (subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
 
-    const getEmptyLinkedData = (shape) => emptyLinkedData(isMetadataContext ? vocabulary : metaVocabulary, shape);
+    const fetchLinkedData = (subject) => dispatch(fetchMetadataVocabularyIfNeeded(subject));
 
     return (
         <LinkedDataContext.Provider
             value={{
-                isMetadataContext,
-                isVocaularyLoading,
-                isMetaVocabularyLoading,
-                vocabulary,
-                hasVocabularyErrorValue,
-                hasMetaVocabularyErrorValue,
-                authorizations,
-                getMetadataForVocabulary,
-                getEmptyLinkedData
+                isMetadataContext: false,
+                shapesLoading,
+                shapesError,
+                getLinkedDataForSubject: getMetadataForVocabulary,
+                getEmptyLinkedData,
+                hasEditRight,
+                fetchLinkedData,
+            }}
+        >
+            {children}
+        </LinkedDataContext.Provider>
+    );
+};
+
+
+export const LinkedDataMetadataProvider = ({children}) => {
+    const dispatch = useDispatch();
+
+    const fetchShapes = () => dispatch(fetchMetadataVocabularyIfNeeded());
+    fetchShapes();
+
+    const shapesLoading = useSelector(state => isVocabularyPending(state));
+
+    const vocabulary = useSelector(state => getVocabulary(state));
+
+    const hasShapesError = useSelector(state => hasVocabularyError(state));
+
+    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading metadata';
+
+    const GetLinkedData = (subject) => useSelector(state => getCombinedMetadataForSubject(state, subject));
+
+    const getEmptyLinkedData = (shape) => emptyLinkedData(vocabulary, shape);
+
+    const fetchLinkedData = (subject) => dispatch(fetchMetadataBySubjectIfNeeded(subject));
+
+    return (
+        <LinkedDataContext.Provider
+            value={{
+                isMetadataContext: true,
+                shapesLoading,
+                shapesError,
+                getLinkedDataForSubject: GetLinkedData,
+                getEmptyLinkedData,
+                hasEditRight: true,
+                fetchLinkedData,
             }}
         >
             {children}

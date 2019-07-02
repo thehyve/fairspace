@@ -103,6 +103,9 @@ const useFormData = ({formKey, shape}) => {
         error = 'No metadata found for this subject';
     }
 
+    // console.log({hasFormUpdates, hasFormValidationErrors});
+
+
     return {
         properties: getPropertiesWithChanges(),
         loading: linkedDataLoading,

@@ -1,9 +1,11 @@
 import React from 'react';
 import {mount, shallow} from "enzyme";
 import configureStore from 'redux-mock-store';
+import {Provider} from "react-redux";
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
-import {LinkedDataEntityFormContainer} from "../LinkedDataEntityFormContainer";
+
+import LinkedDataEntityFormContainer from "../LinkedDataEntityFormContainer";
 import {LinkedDataEntityForm} from "../LinkedDataEntityForm";
 import {STRING_URI} from "../../../../constants";
 import StringValue from "../values/StringValue";
@@ -84,14 +86,17 @@ describe('LinkedDataEntityFormContainer', () => {
 
         const fetchShapes = jest.fn();
         const fetchContent = jest.fn();
-        mount(<LinkedDataEntityFormContainer
-            subject="http://example.com/john"
-            formKey="http://example.com/john"
-            store={store}
-            fetchShapes={fetchShapes}
-            fetchLinkedData={fetchContent}
-            valueComponentFactory={mockComponentFactory}
-        />);
+        mount(
+            <Provider store={store}>
+                <LinkedDataEntityFormContainer
+                    subject="http://example.com/john"
+                    formKey="http://example.com/john"
+                    fetchShapes={fetchShapes}
+                    fetchLinkedData={fetchContent}
+                    valueComponentFactory={mockComponentFactory}
+                />
+            </Provider>
+        );
 
         expect(fetchContent.mock.calls.length).toEqual(1);
         expect(fetchShapes.mock.calls.length).toEqual(1);

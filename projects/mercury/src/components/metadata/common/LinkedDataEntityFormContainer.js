@@ -5,7 +5,7 @@ import {Button, Grid} from "@material-ui/core";
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useFormData from '../UseFormData';
 
-const LinkedDataEntityFormContainer = ({formKey, isEditable = true, shape, ...otherProps}) => {
+const LinkedDataEntityFormContainer = ({formKey, isEditable = true, isNewEntity = false, shape, ...otherProps}) => {
     const {
         properties, loading, error, canSubmit,
         submitDisabled, onSubmit, onAdd, onChange, onDelete
@@ -25,7 +25,8 @@ const LinkedDataEntityFormContainer = ({formKey, isEditable = true, shape, ...ot
                 />
             </Grid>
             {
-                canSubmit && isEditable
+                // isNewEntity might be refactored out later
+                canSubmit && isEditable && !isNewEntity
                 && (
                     <Grid item>
                         <Button

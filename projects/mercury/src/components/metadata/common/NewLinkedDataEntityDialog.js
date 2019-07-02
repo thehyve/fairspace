@@ -10,6 +10,8 @@ import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import * as consts from "../../../constants";
 import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
 
+// TODO: most of the logic in this component should be in the form component and/or the form custom hook
+// we might not need this component at all
 class NewLinkedDataEntityDialog extends React.Component {
     state = {
         formKey: generateUuid(),
@@ -97,6 +99,7 @@ class NewLinkedDataEntityDialog extends React.Component {
                 formKey={this.state.formKey}
                 shape={this.props.shape}
                 key="form"
+                isNewEntity
             />
         );
 

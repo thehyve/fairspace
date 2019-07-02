@@ -42,5 +42,5 @@ export const getCombinedMetadataForSubject = (state, subject) => {
     return [];
 };
 
-export const isMetadataPending = (state, subject) => !state.cache || !state.cache.jsonLdBySubject || !state.cache.jsonLdBySubject[subject] || state.cache.jsonLdBySubject[subject].pending;
-export const hasMetadataError = (state, subject) => !state.cache || !state.cache.jsonLdBySubject || !state.cache.jsonLdBySubject[subject] || state.cache.jsonLdBySubject[subject].error;
+export const isMetadataPending = (state, subject) => state.cache && state.cache.jsonLdBySubject && state.cache.jsonLdBySubject[subject] && state.cache.jsonLdBySubject[subject].pending;
+export const hasMetadataError = (state, subject) => !!(state.cache && state.cache.jsonLdBySubject && state.cache.jsonLdBySubject[subject] && state.cache.jsonLdBySubject[subject].error);
