@@ -15,6 +15,7 @@ data:
       vocabularyBaseIRI: http://{{ template "pluto.hostname" . }}/vocabulary/
       datasetPath: "/data/saturn/db"
       transactionLogPath: "/data/saturn/files/log"
+      maxTriplesToReturn: {{ .Values.saturn.maxTriplesToReturn }}
       elasticSearch:
         enabled: {{ .Values.workspace.elasticsearch.enabled }}
         required: false

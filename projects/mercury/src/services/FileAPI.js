@@ -62,7 +62,20 @@ class FileAPI {
      * @returns {*}
      */
     createDirectory(path) {
-        return this.client().createDirectory(path, defaultOptions);
+        return this.client().createDirectory(path, defaultOptions)
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("You do not have authorization to create a directory in this collection.");
+                        case 405:
+                            throw new Error("A directory or file with this name already exists. Please choose another name");
+                    }
+                }
+
+                throw e;
+            });
     }
 
     /**
@@ -76,7 +89,20 @@ class FileAPI {
             return Promise.reject(Error("No files given"));
         }
 
-        const allPromises = files.map(({name, value}) => this.client().putFileContents(`${path}/${name}`, value, defaultOptions));
+        const allPromises = files.map(({name, value}) => {
+            return this.client().putFileContents(`${path}/${name}`, value, defaultOptions)
+                .catch(e => {
+                    if (e && e.response) {
+                        // eslint-disable-next-line default-case
+                        switch (e.response.status) {
+                            case 403:
+                                throw new Error("You do not have authorization to add files to this collection.");
+                        }
+                    }
+
+                    throw e;
+                });
+        });
 
         return Promise.all(allPromises).then(() => files);
     }
@@ -126,7 +152,22 @@ class FileAPI {
 
         // We have to specify the destination ourselves, as the client() adds the fullpath
         // to the
-        return this.client().moveFile(source, destination, defaultOptions);
+        return this.client().moveFile(source, destination, defaultOptions)
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("Could not move one or more files. Do you have write permission to both the source and destination collection?");
+                        case 409:
+                            throw new Error("Could not move one or more files. The destination can not be copied to.");
+                        case 412:
+                            throw new Error("Could not move one or more files. The destination file already exists.");
+                    }
+                }
+
+                throw e;
+            });
     }
 
     /**
@@ -143,7 +184,22 @@ class FileAPI {
             return Promise.reject(Error("No destination specified to copy to"));
         }
 
-        return this.client().copyFile(source, destination, defaultOptions);
+        return this.client().copyFile(source, destination, defaultOptions)
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
+                        case 409:
+                            throw new Error("Could not copy one or more files. The destination can not be copied to.");
+                        case 412:
+                            throw new Error("Could not copy one or more files. The destination file already exists.");
+                    }
+                }
+
+                throw e;
+            });
     }
 
 
@@ -166,7 +222,23 @@ class FileAPI {
      */
     copyPaths(filePaths, destinationDir) {
         return this.uniqueDestinationPaths(filePaths, destinationDir)
-            .then(mapping => Promise.all(mapping.map(([src, dst]) => this.copy(src, dst))));
+            .then(mapping => Promise.all(mapping.map(([src, dst]) => this.copy(src, dst))))
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
+                        case 409:
+                            throw new Error("Could not copy one or more files. The destination can not be copied to.");
+                        case 412:
+                            throw new Error("Could not copy one or more files. The destination file already exists.");
+                    }
+                }
+
+                throw e;
+            });
+
     }
 
     /**
