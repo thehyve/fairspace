@@ -29,7 +29,7 @@ export const LinkedDataVocabularyProvider = ({children}) => {
 
     const vocabulary = useSelector(state => getVocabulary(state));
 
-    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading vocbulary';
+    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the vocbulary';
 
     const authorizations = useSelector(state => getAuthorizations(state));
 
@@ -71,7 +71,7 @@ export const LinkedDataMetadataProvider = ({children}) => {
 
     const hasShapesError = useSelector(state => hasVocabularyError(state));
 
-    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading metadata';
+    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
 
     const GetLinkedData = (subject) => useSelector(state => getCombinedMetadataForSubject(state, subject));
 
