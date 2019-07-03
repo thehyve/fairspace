@@ -18,8 +18,7 @@ const LinkedDataContext = React.createContext({});
 export const LinkedDataVocabularyProvider = ({children}) => {
     const dispatch = useDispatch();
 
-    const fetchShapes = () => dispatch(fetchMetaVocabularyIfNeeded());
-    fetchShapes();
+    dispatch(fetchMetaVocabularyIfNeeded());
 
     const shapesLoading = useSelector(state => isMetaVocabularyPending(state));
 
@@ -62,8 +61,7 @@ export const LinkedDataVocabularyProvider = ({children}) => {
 export const LinkedDataMetadataProvider = ({children}) => {
     const dispatch = useDispatch();
 
-    const fetchShapes = () => dispatch(fetchMetadataVocabularyIfNeeded());
-    fetchShapes();
+    dispatch(fetchMetadataVocabularyIfNeeded());
 
     const shapesLoading = useSelector(state => isVocabularyPending(state));
 
