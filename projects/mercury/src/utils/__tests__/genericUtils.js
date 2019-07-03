@@ -1,7 +1,4 @@
-import {
-    findById, flattenShallow, compareBy,
-    comparing, isNonEmptyValue, jsxArrayJoiner, joinWithSeparator
-} from "../genericUtils";
+import {compareBy, comparing, findById, flattenShallow, isNonEmptyValue, joinWithSeparator} from "../genericUtils";
 
 describe('array Utils', () => {
     describe('findById', () => {
