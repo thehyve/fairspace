@@ -155,7 +155,7 @@ export class FileOperations extends React.Component {
                         </ProgressButton>
                         <ProgressButton active={op === Operations.DELETE}>
                             <DeleteButton
-                                fileDescription={`${selectedPaths ? selectedPaths.length : 0} item(s)`}
+                                numItems={selectedPaths ? selectedPaths.length : 0}
                                 onClick={this.handleDelete}
                                 disabled={noSelectedPath || isWritingDisabled || busy}
                             >
