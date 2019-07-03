@@ -1,7 +1,5 @@
 import FileAPI from "../FileAPI";
 import Config from "../Config/Config";
-import {shallow} from "enzyme/build";
-import {FileOperations} from "../../components/file/FileOperations";
 import React from "react";
 
 beforeAll(() => {
