@@ -223,21 +223,21 @@ class FileAPI {
     copyPaths(filePaths, destinationDir) {
         return this.uniqueDestinationPaths(filePaths, destinationDir)
             .then(mapping => Promise.all(mapping.map(([src, dst]) => this.copy(src, dst))))
-    .catch(e => {
-            if (e && e.response) {
-                // eslint-disable-next-line default-case
-                switch (e.response.status) {
-                    case 504:
-                        throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
-                    case 409:
-                        throw new Error("Could not copy one or more files. The destination can not be copied to.");
-                    case 412:
-                        throw new Error("Could not copy one or more files. The destination file already exists.");
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
+                        case 409:
+                            throw new Error("Could not copy one or more files. The destination can not be copied to.");
+                        case 412:
+                            throw new Error("Could not copy one or more files. The destination file already exists.");
+                    }
                 }
-            }
 
-            throw e;
-        });
+                throw e;
+            });
 
     }
 
