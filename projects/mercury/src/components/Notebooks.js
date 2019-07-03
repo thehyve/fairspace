@@ -7,8 +7,9 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core";
-import BreadCrumbs from "./common/BreadCrumbs";
 import Config from "../services/Config/Config";
+import BreadCrumbs from "./common/breadcrumbs/BreadCrumbs";
+import BreadcrumbsContext from "./common/breadcrumbs/BreadcrumbsContext";
 
 const styles = theme => ({
     card: {
@@ -22,7 +23,14 @@ const styles = theme => ({
 });
 
 const Notebooks = ({classes}) => (
-    <>
+    <BreadcrumbsContext.Provider value={{
+        segments: [{
+            label: 'Notebooks',
+            icon: 'bar_chart',
+            href: '/notebooks'
+        }]
+    }}
+    >
         <BreadCrumbs />
 
         <Card className={classes.card}>
@@ -60,8 +68,7 @@ const Notebooks = ({classes}) => (
                 </a>
             </CardActions>
         </Card>
-
-    </>
+    </BreadcrumbsContext.Provider>
 );
 
 export default withStyles(styles)(Notebooks);

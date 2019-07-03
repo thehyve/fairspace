@@ -4,11 +4,12 @@ import {connect} from 'react-redux';
 import LinkedDataListPage from "../common/LinkedDataListPage";
 import MetadataBrowserContainer from "./MetadataBrowserContainer";
 import {searchMetadata} from "../../../actions/searchActions";
-import {getVocabulary, isVocabularyPending, hasVocabularyError} from "../../../reducers/cache/vocabularyReducers";
+import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../../reducers/cache/vocabularyReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../constants";
 import {fetchMetadataVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 import {LoadingInlay, MessageDisplay} from "../../common";
+import MetadataBreadcrumbsContextProvider from "./MetadataBreadcrumbsContextProvider";
 
 const MetadataListPage = (
     {fetchVocabulary, loading, error, vocabulary, classesInCatalog, search}
@@ -37,19 +38,21 @@ const MetadataListPage = (
     }
 
     return (
-        <LinkedDataListPage
-            classesInCatalog={classesInCatalog}
-            performSearch={performSearch}
-            listRenderer={(footerRender) => (
-                targetClasses && targetClasses.length > 0 && (
-                    <MetadataBrowserContainer
-                        targetClasses={targetClasses}
-                        vocabulary={vocabulary}
-                        footerRender={footerRender}
-                    />
-                )
-            )}
-        />
+        <MetadataBreadcrumbsContextProvider>
+            <LinkedDataListPage
+                classesInCatalog={classesInCatalog}
+                performSearch={performSearch}
+                listRenderer={(footerRender) => (
+                    targetClasses && targetClasses.length > 0 && (
+                        <MetadataBrowserContainer
+                            targetClasses={targetClasses}
+                            vocabulary={vocabulary}
+                            footerRender={footerRender}
+                        />
+                    )
+                )}
+            />
+        </MetadataBreadcrumbsContextProvider>
     );
 };
 

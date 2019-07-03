@@ -1,14 +1,23 @@
 import React, {useState} from 'react';
 import {
-    withStyles, Paper, Select, MenuItem, FormControl,
-    Checkbox, ListItemText, Input, TableFooter, TablePagination, TableRow
+    Checkbox,
+    FormControl,
+    Input,
+    ListItemText,
+    MenuItem,
+    Paper,
+    Select,
+    TableFooter,
+    TablePagination,
+    TableRow,
+    withStyles
 } from "@material-ui/core";
 
 import SearchBar from "../../common/SearchBar";
-import BreadCrumbs from "../../common/BreadCrumbs";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
-import {SHACL_TARGET_CLASS, SEARCH_DEFAULT_SIZE} from "../../../constants";
+import {SEARCH_DEFAULT_SIZE, SHACL_TARGET_CLASS} from "../../../constants";
 import {getLabel} from "../../../utils/linkeddata/metadataUtils";
+import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
 
 const styles = theme => ({
     typeSelect: {
