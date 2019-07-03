@@ -8,7 +8,13 @@ import styles from './SearchBar.styles';
 const SearchBar = ({
     classes, query = '', placeholder, onSearchChange = () => {}
 }) => {
+    const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
+
+    if (query !== origQuery) { // check if query was reset by the owner
+        setOrigQuery(query);
+        setValue(query);
+    }
 
     const handleChange = (event) => {
         setValue(event.target.value);

@@ -4,14 +4,15 @@ import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 
 import FileBrowser from "./FileBrowser";
-import {BreadCrumbs} from "../common";
 import InformationDrawer from '../common/InformationDrawer';
-import {getDirectoryFromFullpath, splitPathIntoArray, getPathInfoFromParams} from "../../utils/fileUtils";
+import {getDirectoryFromFullpath, getPathInfoFromParams, splitPathIntoArray} from "../../utils/fileUtils";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
 import * as consts from '../../constants';
 import {getCollectionAbsolutePath} from "../../utils/collectionUtils";
+import BreadCrumbs from "../common/breadcrumbs/BreadCrumbs";
+import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 
 export class FilesPage extends React.Component {
     componentDidMount() {
@@ -28,16 +29,29 @@ export class FilesPage extends React.Component {
     }
 
     renderBreadcrumbs() {
-        const {openedCollection, openedPath, loading} = this.props;
+        const {openedCollection, openedPath} = this.props;
 
-        if (loading) {
-            return <BreadCrumbs />;
+        if (!openedCollection || !openedCollection.name) {
+            return (
+                <BreadCrumbs additionalSegments={[
+                    {label: '...', href: consts.COLLECTIONS_PATH + openedPath}
+                ]}
+                />
+            );
         }
 
-        const segments = splitPathIntoArray(openedPath).map(segment => ({segment, label: segment}));
+        const pathSegments = splitPathIntoArray(openedPath);
+        const segments = pathSegments.map((segment, idx) => ({
+            label: segment,
+            href: consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
+        }));
         segments[0].label = openedCollection.name;
 
-        return <BreadCrumbs segments={segments} />;
+        return (
+            <div style={{position: 'relative', zIndex: 1}}>
+                <BreadCrumbs additionalSegments={segments} />
+            </div>
+        );
     }
 
     handleCollectionLocationChange = (collection) => {
@@ -50,11 +64,11 @@ export class FilesPage extends React.Component {
     render() {
         const {
             openedCollection, fetchFilesIfNeeded, openedPath, files, loading, selectedPaths, selectPath,
-            deselectPath, renameFile, deleteFile, selectPaths, deselectAllPaths,
+            deselectPath, renameFile, selectPaths, deselectAllPaths,
         } = this.props;
 
         return (
-            <>
+            <CollectionBreadcrumbsContextProvider>
                 {this.renderBreadcrumbs()}
                 <Grid container spacing={8}>
                     <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
@@ -68,7 +82,6 @@ export class FilesPage extends React.Component {
                             selectedPaths={selectedPaths}
                             deselectPath={deselectPath}
                             renameFile={renameFile}
-                            deleteFile={deleteFile}
                             onSelectAll={() => selectPaths(files.map(f => f.filename))}
                             onDeselectAll={deselectAllPaths}
                         />
@@ -77,7 +90,7 @@ export class FilesPage extends React.Component {
                         <InformationDrawer onCollectionLocationChange={this.handleCollectionLocationChange} />
                     </Grid>
                 </Grid>
-            </>
+            </CollectionBreadcrumbsContextProvider>
         );
     }
 }
