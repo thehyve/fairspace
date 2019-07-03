@@ -35,6 +35,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:name "Properties" ; 
         sh:description "List of all properties and relations for this class." ;
         fs:showAsTable true ;
+        fs:inverseRelation fs:domainIncludes ;
         sh:order 3
     ], [
         # This nodeKind restriction could be replaced by something like
@@ -202,6 +203,8 @@ fs:domainIncludes a fs:RelationShape ;
         ] ;
     sh:path fs:domainIncludes ;
     sh:class fs:ClassShape ;
+    sh:order 3 ;
+    sh:maxCount 1 ;
     sh:name "Domain Includes" ;
     sh:description "All class shapes that have associate with this property." .
 
