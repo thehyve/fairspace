@@ -1,6 +1,5 @@
 import FileAPI from "../FileAPI";
 import Config from "../Config/Config";
-import React from "react";
 
 beforeAll(() => {
     Config.setConfig({
