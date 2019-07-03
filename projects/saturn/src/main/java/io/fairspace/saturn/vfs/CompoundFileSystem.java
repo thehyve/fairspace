@@ -7,9 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.stream.Collectors.toList;
@@ -93,10 +94,12 @@ public class CompoundFileSystem implements VirtualFileSystem {
         }
     }
 
-    private VirtualFileSystem fileSystemByPath(String path) throws FileNotFoundException {
-        return Optional.ofNullable(collections.getByLocation(splitPath(path)[0]))
-                .map(c -> fileSystemsByType.get(c.getType()))
-                .orElseThrow(() -> new FileNotFoundException(path));
+    private VirtualFileSystem fileSystemByPath(String path) throws IOException {
+        var collection = collections.getByLocation(splitPath(path)[0]);
+        if (collection == null) {
+            throw new FileNotFoundException(path);
+        }
+        return fileSystemsByType.get(collectionType(collection));
     }
 
     private static FileInfo fileInfo(Collection collection) {
@@ -109,5 +112,13 @@ public class CompoundFileSystem implements VirtualFileSystem {
                 .modified(collection.getDateCreated())
                 .readOnly(!collection.getAccess().canWrite())
                 .build();
+    }
+
+    private static String collectionType(Collection collection) throws IOException {
+        try {
+            return new URI(collection.getConnectionString()).getScheme();
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
     }
 }

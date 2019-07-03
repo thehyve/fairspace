@@ -20,7 +20,7 @@ class CollectionEditor extends React.Component {
         editing: true,
         name: this.props.name || '',
         description: this.props.description || '',
-        type: this.props.type || 'LOCAL_FILE',
+        connectionString: this.props.connectionString || 'managed:fairspace',
         location: this.props.location || ''
     };
 
@@ -30,7 +30,7 @@ class CollectionEditor extends React.Component {
         }
 
         if (this.props.onSave) {
-            this.props.onSave(this.state.name, this.state.description, this.state.location, this.state.type);
+            this.props.onSave(this.state.name, this.state.description, this.state.location, this.state.connectionString);
         }
     }
 
@@ -128,23 +128,17 @@ class CollectionEditor extends React.Component {
                         fullWidth
                         required
                     />
-                    {this.props.editType
-                        ? (
-                            <FormControl>
-                                <InputLabel>Type</InputLabel>
-                                <Select
-                                    name="type"
-                                    value={this.state.type}
-                                    onChange={(event) => this.handleInputChange('type', event.target.value)}
-                                >
-                                    <MenuItem value="LOCAL_FILE">On Premise</MenuItem>
-                                    <MenuItem value="AZURE_BLOB_STORAGE">Azure Blob Storage</MenuItem>
-                                    <MenuItem value="S3_BUCKET">Amazon S3 Bucket</MenuItem>
-                                    <MenuItem value="GOOGLE_CLOUD_BUCKET">Google Cloud Bucket</MenuItem>
-                                </Select>
-                            </FormControl>
-                        )
-                        : null}
+                    <TextField
+                        margin="dense"
+                        id="connectionString"
+                        label="Connection string"
+                        helperText="Provider-specific connection string, 'managed:fairspace' for managed collections"
+                        value={this.state.connectionString}
+                        name="connectionString"
+                        onChange={(event) => this.handleInputChange('connectionString', event.target.value)}
+                        fullWidth
+                        required
+                    />
 
                 </DialogContent>
                 <DialogActions>

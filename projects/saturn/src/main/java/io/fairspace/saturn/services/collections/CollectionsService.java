@@ -116,8 +116,8 @@ public class CollectionsService {
                 throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
             }
 
-            validate(patch.getType() == null || patch.getType().equals(collection.getType()),
-                    "Cannot change collection's type");
+            validate(patch.getConnectionString() == null || patch.getConnectionString().equals(collection.getConnectionString()),
+                    "Cannot change the connection string");
 
             var oldLocation = collection.getLocation();
             if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
@@ -146,7 +146,7 @@ public class CollectionsService {
         validate(isLocationValid(collection.getLocation()), "Invalid location");
         validate(isNotEmpty(collection.getName()), "Field name must be set");
         validate(collection.getName().length() <= 128, "Field name must contain no more than 128 characters");
-        validate(collection.getType() != null, "Field type must be set");
+        validate(collection.getConnectionString() != null, "Field type must be set");
     }
 
     private Collection addPermissionsToObject(Collection c) {

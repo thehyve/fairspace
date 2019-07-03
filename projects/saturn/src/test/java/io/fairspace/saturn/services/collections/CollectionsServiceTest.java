@@ -4,7 +4,6 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
@@ -63,7 +62,7 @@ public class CollectionsServiceTest {
         assertEquals(prototype.getName(), created.getName());
         assertEquals(prototype.getDescription(), created.getDescription());
         assertEquals(prototype.getLocation(), created.getLocation());
-        assertEquals(prototype.getType(), created.getType());
+        assertEquals(prototype.getConnectionString(), created.getConnectionString());
         assertEquals("http://example.com/user", created.getCreatedBy().getURI());
         assertNotNull(created.getDateCreated());
         assertEquals(created.getDateCreated(), created.getDateModified());
@@ -86,7 +85,7 @@ public class CollectionsServiceTest {
         c.setName("c1");
         c.setLocation("dir1");
         c.setDescription("descr");
-        c.setType(ManagedFileSystem.TYPE);
+        c.setConnectionString("managed:");;
         return c;
     }
 
@@ -151,7 +150,7 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("Az_1-2");
         c1.setDescription("descr");
-        c1.setType(ManagedFileSystem.TYPE);
+        c1.setConnectionString("managed://example.com");;
 
         assertEquals(c1.getLocation(), collections.create(c1).getLocation());
     }
@@ -163,7 +162,7 @@ public class CollectionsServiceTest {
             c1.setName("c1");
             c1.setLocation("dir?");
             c1.setDescription("descr");
-            c1.setType(ManagedFileSystem.TYPE);
+            c1.setConnectionString("managed://example.com");;
 
             collections.create(c1);
         } finally {
@@ -178,7 +177,7 @@ public class CollectionsServiceTest {
             c1.setName("c1");
             c1.setLocation("dir1");
             c1.setDescription("descr");
-            c1.setType(ManagedFileSystem.TYPE);
+            c1.setConnectionString("managed://example.com");;
 
             collections.create(c1);
             c1.setIri(null);
@@ -196,7 +195,7 @@ public class CollectionsServiceTest {
             c1.setName("c1");
             c1.setLocation("dir1");
             c1.setDescription("descr");
-            c1.setType(ManagedFileSystem.TYPE);
+            c1.setConnectionString("managed://example.com");;
 
             c1 = collections.create(c1);
 
@@ -204,7 +203,7 @@ public class CollectionsServiceTest {
             c2.setName("c2");
             c2.setLocation("dir2");
             c2.setDescription("descr");
-            c2.setType(ManagedFileSystem.TYPE);
+            c2.setConnectionString("managed://example.com");;
 
             collections.create(c2);
 
@@ -225,7 +224,7 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setType(ManagedFileSystem.TYPE);
+        c1.setConnectionString("managed://example.com");;
         c1 = collections.create(c1);
 
         mockPermissions(Access.None);
@@ -241,7 +240,7 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setType(ManagedFileSystem.TYPE);
+        c1.setConnectionString("managed://example.com");;
         c1 = collections.create(c1);
 
         mockPermissions(Access.Write);
@@ -257,7 +256,7 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setType(ManagedFileSystem.TYPE);
+        c1.setConnectionString("managed://example.com");;
         c1 = collections.create(c1);
 
         mockPermissions(Access.Read);
@@ -272,7 +271,7 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setType(ManagedFileSystem.TYPE);
+        c1.setConnectionString("managed:");
         c1 = collections.create(c1);
 
         mockPermissions(Access.Write);

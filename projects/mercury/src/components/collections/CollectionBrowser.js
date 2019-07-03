@@ -36,8 +36,8 @@ export class CollectionBrowser extends React.Component {
         this.props.history.push(getCollectionAbsolutePath(collection.location));
     }
 
-    handleAddCollection = (name, description, location, type) => {
-        this.props.addCollection(name, description, type, location)
+    handleAddCollection = (name, description, location, connectionString) => {
+        this.props.addCollection(name, description, connectionString, location)
             .then(this.props.fetchCollectionsIfNeeded)
             .then(() => this.setState({addingNewCollection: false}))
             .catch(err => {

@@ -51,8 +51,8 @@ public class FS {
     public static final String MD5_URI = NS + "md5";
     public static final Property md5 = createProperty(MD5_URI);
 
-    public static final String COLLECTION_TYPE_URI = NS + "collectionType";
-    public static final Property collectionType = createProperty(COLLECTION_TYPE_URI);
+    public static final String CONNECTION_STRING_URI = NS + "connectionString";
+    public static final Property connectionString = createProperty(CONNECTION_STRING_URI);
 
     public static final String MACHINE_ONLY_URI = NS + "machineOnly";
     public static final Property machineOnly = createProperty(MACHINE_ONLY_URI);
