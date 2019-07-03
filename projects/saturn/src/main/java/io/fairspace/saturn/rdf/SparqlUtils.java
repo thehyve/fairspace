@@ -58,6 +58,10 @@ public class SparqlUtils {
         return format(template, (Object[]) params);
     }
 
+    public static String limit(String inputQuery, long limit) {
+        return String.format("%s\nLIMIT %d", inputQuery, limit);
+    }
+
     private static Node toSerializableNode(Object value) {
         if (value instanceof Resource) {
             value = ((Resource) value).asNode();

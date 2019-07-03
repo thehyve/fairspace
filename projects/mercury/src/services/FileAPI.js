@@ -251,7 +251,7 @@ class FileAPI {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
-                        case 504:
+                        case 403:
                             throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
                         case 409:
                             throw new Error("Could not copy one or more files. The destination can not be copied to.");
