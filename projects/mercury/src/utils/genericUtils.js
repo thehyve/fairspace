@@ -25,14 +25,18 @@ export const flattenShallow = array => [].concat(...array);
  * This method would typically be used to join an array of Jsx components into an array,
  * with some construct like this:
  *
- *   arrayWithComponents.reduce(jsxArrayJoiner(','), null)
+ *   arrayWithComponents.reduce(jsxArrayJoiner(','), [])
  *
  * @param separator
  * @param prev
  * @param curr
  * @returns {*[]}
  */
-export const jsxArrayJoiner = separator => (prev, curr) => (!prev ? curr : [...prev, separator, curr]);
+export const jsxArrayJoiner = separator => (prev, curr) => {
+    if (!prev || prev.length === 0) return [curr];
+    if (separator) return [...prev, separator, curr];
+    return [...prev, curr];
+};
 
 //* *********************************
 //* COMPARISION

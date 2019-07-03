@@ -1,6 +1,6 @@
 import {
     findById, flattenShallow, compareBy,
-    comparing, isNonEmptyValue
+    comparing, isNonEmptyValue, jsxArrayJoiner
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -88,4 +88,20 @@ describe('isNonEmptyValue', () => {
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
     });
+});
+
+describe('jsxArrayJoiner', () => {
+    it('should join multiple values into an array', () => {
+        expect(['a', 'b', 'c'].reduce(jsxArrayJoiner(' '), [])).toEqual(['a', ' ', 'b', ' ', 'c']);
+    });
+    it('should work with empty arrays', () => {
+        expect([].reduce(jsxArrayJoiner(' '), [])).toEqual([]);
+    });
+    it('should work with single entry arrays', () => {
+        expect(['a'].reduce(jsxArrayJoiner(' '), [])).toEqual(['a']);
+    });
+    it('should work without a separator', () => {
+        expect(['a', 'b', 'c'].reduce(jsxArrayJoiner(), [])).toEqual(['a', 'b', 'c']);
+    });
+
 });
