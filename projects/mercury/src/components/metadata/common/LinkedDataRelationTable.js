@@ -5,7 +5,7 @@ import {SHACL_NAME, SHACL_ORDER, SHACL_PATH, TOOLTIP_ENTER_DELAY} from "../../..
 import {getFirstPredicateId, getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import {getLocalPart} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataValuesTable from "./LinkedDataValuesTable";
-import {compareBy, jsxArrayJoiner} from "../../../utils/genericUtils";
+import {compareBy, joinWithSeparator} from "../../../utils/genericUtils";
 import IriTooltip from "../../common/IriTooltip";
 import Iri from "../../common/Iri";
 import {isGenericIriResource, isRelationShape} from "../../../utils/linkeddata/vocabularyUtils";
@@ -32,11 +32,14 @@ export const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addC
                     label: getFirstPredicateValue(shape, SHACL_NAME),
                     getValue: entry => (
                         entry && entry.otherEntry && Array.isArray(entry.otherEntry[propertyPath])
-                            ? entry.otherEntry[propertyPath]
-                                .filter(e => e)
-                                .map(renderEntry)
-                                .reduce(jsxArrayJoiner(', '), null)
-                            : '')
+                            ? joinWithSeparator(
+                                entry.otherEntry[propertyPath]
+                                    .filter(e => e)
+                                    .map(renderEntry),
+                                ', '
+                            )
+                            : ''
+                    )
                 };
             });
     } else {
