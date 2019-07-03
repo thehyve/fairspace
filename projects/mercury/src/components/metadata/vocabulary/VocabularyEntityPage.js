@@ -6,7 +6,7 @@ import VocabularyEntityContainer from './VocabularyEntityContainer';
 
 export default ({subject}) => {
     return (
-        <LinkedDataPage homeUrl="/vocabulary">
+        <LinkedDataPage rootBreadCrumb={{label: "Vocabulary", href: "/vocabulary", icon: "code"}}>
             <VocabularyEntityHeaderContainer subject={subject} />
             <VocabularyEntityContainer subject={subject} />
         </LinkedDataPage>

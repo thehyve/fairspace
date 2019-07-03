@@ -1,14 +1,19 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-
-import {BreadCrumbs} from '../common';
 import InformationDrawer from '../common/InformationDrawer';
 import CollectionBrowserContainer from "./CollectionBrowserContainer";
 import * as consts from '../../constants';
+import BreadCrumbs from "../common/BreadCrumbs";
 
 const collectionsPage = () => (
     <>
-        <BreadCrumbs />
+        <BreadCrumbs
+            segments={[{
+                label: 'Collections',
+                icon: 'folder_open',
+                href: '/collections'
+            }]}
+        />
         <Grid container spacing={8}>
             <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                 <CollectionBrowserContainer />

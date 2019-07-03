@@ -4,14 +4,15 @@ import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 
 import FileBrowser from "./FileBrowser";
-import {BreadCrumbs} from "../common";
 import InformationDrawer from '../common/InformationDrawer';
-import {getDirectoryFromFullpath, splitPathIntoArray, getPathInfoFromParams} from "../../utils/fileUtils";
+import {getDirectoryFromFullpath, getPathInfoFromParams, splitPathIntoArray} from "../../utils/fileUtils";
 import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
 import * as consts from '../../constants';
+import {PATH_SEPARATOR} from '../../constants';
 import {getCollectionAbsolutePath} from "../../utils/collectionUtils";
+import BreadCrumbs from "../common/BreadCrumbs";
 
 export class FilesPage extends React.Component {
     componentDidMount() {
@@ -28,16 +29,33 @@ export class FilesPage extends React.Component {
     }
 
     renderBreadcrumbs() {
-        const {openedCollection, openedPath, loading} = this.props;
+        const {openedCollection, openedPath} = this.props;
 
-        if (loading) {
-            return <BreadCrumbs />;
+        const rootSegment = {
+            label: 'Collections',
+            icon: 'folder_open',
+            href: '/collections'
+        };
+
+        if (!openedCollection || !openedCollection.name) {
+            return (
+                <BreadCrumbs segments={[
+                    rootSegment,
+                    {label: '...'}
+                ]}
+                />
+            );
         }
 
-        const segments = splitPathIntoArray(openedPath).map(segment => ({segment, label: segment}));
+        const pathSegments = splitPathIntoArray(openedPath);
+        const segments = pathSegments.map((segment, idx) => ({label: segment, href: '/collections/' + pathSegments.slice(0, idx + 1).join(PATH_SEPARATOR)}));
         segments[0].label = openedCollection.name;
 
-        return <BreadCrumbs segments={segments} />;
+        return (
+            <div style={{position: 'relative', zIndex: 1}}>
+                <BreadCrumbs segments={[rootSegment, ...segments]} />
+            </div>
+        );
     }
 
     handleCollectionLocationChange = (collection) => {

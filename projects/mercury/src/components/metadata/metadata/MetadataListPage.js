@@ -38,6 +38,11 @@ const MetadataListPage = (
 
     return (
         <LinkedDataListPage
+            rootBreadCrumb={{
+                label: 'Metadata',
+                href: '/metadata',
+                icon: 'assignment'
+            }}
             classesInCatalog={classesInCatalog}
             performSearch={performSearch}
             listRenderer={(footerRender) => (

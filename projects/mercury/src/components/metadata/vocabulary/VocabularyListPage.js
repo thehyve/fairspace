@@ -45,6 +45,11 @@ const VocabularyListPage = (
 
     return (
         <LinkedDataListPage
+            rootBreadCrumb={{
+                label: 'Vocabulary',
+                href: '/vocabulary',
+                icon: 'code'
+            }}
             classesInCatalog={classesInCatalog}
             performSearch={performSearch}
             listRenderer={(footerRender) => (

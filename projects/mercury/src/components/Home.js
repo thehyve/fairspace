@@ -1,23 +1,23 @@
 import React from 'react';
 import WithRightDrawer from "./common/WithRightDrawer";
 import RecentActivity from "./RecentActivity";
-import BreadCrumbs from "./common/BreadCrumbs";
 import Config from "../services/Config/Config";
+import BreadCrumbs from "./common/BreadCrumbs";
 
-function Home() {
-    return Config.get().enableExperimentalFeatures
+const breadCrumbSegments = [{
+    label: 'Home',
+    icon: 'home',
+    href: '/'
+}];
+
+export default () => (
+    Config.get().enableExperimentalFeatures
         ? (
             <WithRightDrawer
                 collapsible={false}
-                mainContents={(
-                    <>
-                        <BreadCrumbs />
-                    </>
-                )}
+                mainContents={<BreadCrumbs segments={breadCrumbSegments} />}
                 drawerContents={<RecentActivity />}
             />
         )
-        : <BreadCrumbs />;
-}
-
-export default Home;
+        : <BreadCrumbs segments={breadCrumbSegments} />
+);
