@@ -12,7 +12,7 @@
    rdf:rest ( owl:sameAs sh:ignoredProperties sh:message fs:machineOnly
               fs:fixedShape fs:systemProperties sh:closed fs:createdBy
               fs:dateCreated fs:modifiedBy fs:dateModified
-              fs:deletedBy fs:dateDeleted ) .
+              fs:deletedBy fs:dateDeleted fs:domainIncludes ) .
 
 fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -145,6 +145,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:MaxCountShape, 
         fs:DescriptionShape,
         fs:PathShape,
+        fs:domainIncludes,
     [
         # This nodeKind restriction could be replaced by something like
         # sh:class fs:Class. Currently that restriction will limit our
