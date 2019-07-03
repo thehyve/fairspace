@@ -74,7 +74,7 @@ class FileAPI {
                     }
                 }
 
-                throw e;
+                return Promise.reject(e);
             });
     }
 
@@ -100,7 +100,7 @@ class FileAPI {
                         }
                     }
 
-                    throw e;
+                    return Promise.reject(e);
                 });
         });
 
@@ -139,7 +139,7 @@ class FileAPI {
                     }
                 }
 
-                throw e;
+                return Promise.reject(e);
             });
 
     }
@@ -178,7 +178,7 @@ class FileAPI {
                     }
                 }
 
-                throw e;
+                return Promise.reject(e);
             });
     }
 
@@ -210,18 +210,18 @@ class FileAPI {
                     }
                 }
 
-                throw e;
+                return Promise.reject(e);
             });
     }
 
     /**
      * Delete one or more files
      * @param filenames
-     * @returns {*}
+     * @returns {Promise}
      */
     deleteMultiple(filenames) {
         if (!filenames || filenames.length === 0) {
-            return Promise.resolve();
+            return Promise.reject(new Error("No filenames given to delete"));
         }
 
         return Promise.all(filenames.map(filename => this.delete(filename)));
@@ -260,7 +260,7 @@ class FileAPI {
                     }
                 }
 
-                throw e;
+                return Promise.reject(e);
             });
 
     }
