@@ -72,10 +72,10 @@ export class FileOperations extends React.Component {
             });
     }
 
-    handlePathDelete = (path) => this.fileOperation(Operations.DELETE, this.props.deleteFile(path.filename))
+    handleDelete = () => this.fileOperation(Operations.DELETE, this.props.deleteMultiple(this.props.selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => this.handlePathDelete(path));
-        })
+            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => this.handleDelete());
+        });
 
     handlePathRename = (path, newName) => {
         const {renameFile, openedPath} = this.props;
@@ -114,7 +114,7 @@ export class FileOperations extends React.Component {
 
     render() {
         const {
-            isWritingDisabled, clipboardItemsCount,
+            isWritingDisabled, clipboardItemsCount, selectedPaths,
             classes, getDownloadLink, selectedItem = {}, disabledForMoreThanOneSelection, isPasteDisabled, noSelectedPath
         } = this.props;
 
@@ -155,14 +155,14 @@ export class FileOperations extends React.Component {
                         </ProgressButton>
                         <ProgressButton active={op === Operations.DELETE}>
                             <DeleteButton
-                                file={selectedItem.basename}
-                                onClick={() => this.handlePathDelete(selectedItem)}
-                                disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
+                                numItems={selectedPaths ? selectedPaths.length : 0}
+                                onClick={this.handleDelete}
+                                disabled={noSelectedPath || isWritingDisabled || busy}
                             >
                                 <IconButton
-                                    title={`Delete ${selectedItem.basename}`}
-                                    aria-label={`Delete ${selectedItem.basename}`}
-                                    disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
+                                    title="Delete"
+                                    aria-label="Delete"
+                                    disabled={noSelectedPath || isWritingDisabled || busy}
                                 >
                                     <Icon>delete</Icon>
                                 </IconButton>

@@ -64,7 +64,7 @@ export class FilesPage extends React.Component {
     render() {
         const {
             openedCollection, fetchFilesIfNeeded, openedPath, files, loading, selectedPaths, selectPath,
-            deselectPath, renameFile, deleteFile, selectPaths, deselectAllPaths,
+            deselectPath, renameFile, selectPaths, deselectAllPaths,
         } = this.props;
 
         return (
@@ -82,7 +82,6 @@ export class FilesPage extends React.Component {
                             selectedPaths={selectedPaths}
                             deselectPath={deselectPath}
                             renameFile={renameFile}
-                            deleteFile={deleteFile}
                             onSelectAll={() => selectPaths(files.map(f => f.filename))}
                             onDeselectAll={deselectAllPaths}
                         />
