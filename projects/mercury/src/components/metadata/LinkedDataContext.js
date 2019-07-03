@@ -36,9 +36,9 @@ export const LinkedDataVocabularyProvider = ({children}) => {
 
     const getEmptyLinkedData = (shape) => emptyLinkedData(metaVocabulary, shape);
 
-    const getMetadataForVocabulary = (subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
+    const fetchLinkedDataForSubject = () => dispatch(fetchMetadataVocabularyIfNeeded());
 
-    const fetchLinkedData = (subject) => dispatch(fetchMetadataVocabularyIfNeeded(subject));
+    const combineLinkedDataForSubjectSelector = (state, subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
 
     return (
         <LinkedDataContext.Provider
@@ -46,10 +46,10 @@ export const LinkedDataVocabularyProvider = ({children}) => {
                 isMetadataContext: false,
                 shapesLoading,
                 shapesError,
-                getLinkedDataForSubject: getMetadataForVocabulary,
+                fetchLinkedDataForSubject,
+                combineLinkedDataForSubjectSelector,
                 getEmptyLinkedData,
                 hasEditRight,
-                fetchLinkedData,
             }}
         >
             {children}
@@ -71,11 +71,11 @@ export const LinkedDataMetadataProvider = ({children}) => {
 
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
 
-    const GetLinkedData = (subject) => useSelector(state => getCombinedMetadataForSubject(state, subject));
-
     const getEmptyLinkedData = (shape) => emptyLinkedData(vocabulary, shape);
 
-    const fetchLinkedData = (subject) => dispatch(fetchMetadataBySubjectIfNeeded(subject));
+    const fetchLinkedDataForSubject = (subject) => dispatch(fetchMetadataBySubjectIfNeeded(subject));
+
+    const combineLinkedDataForSubjectSelector = getCombinedMetadataForSubject;
 
     return (
         <LinkedDataContext.Provider
@@ -83,10 +83,10 @@ export const LinkedDataMetadataProvider = ({children}) => {
                 isMetadataContext: true,
                 shapesLoading,
                 shapesError,
-                getLinkedDataForSubject: GetLinkedData,
+                fetchLinkedDataForSubject,
+                combineLinkedDataForSubjectSelector,
                 getEmptyLinkedData,
                 hasEditRight: true,
-                fetchLinkedData,
             }}
         >
             {children}
