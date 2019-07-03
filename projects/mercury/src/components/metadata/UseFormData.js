@@ -13,10 +13,7 @@ import {
 import ErrorDialog from "../common/ErrorDialog";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import LinkedDataContext from './LinkedDataContext';
-import {submitVocabularyChangesFromState} from "../../actions/vocabularyActions";
-import {submitMetadataChangesFromState} from "../../actions/metadataActions";
 import {propertiesToShow, partitionErrors} from "../../utils/linkeddata/metadataUtils";
-import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../../utils/linkeddata/vocabularyUtils";
 
 const useFormData = ({formKey, shape}) => {
     if (!formKey && !shape) {
@@ -24,12 +21,11 @@ const useFormData = ({formKey, shape}) => {
     }
 
     const {
-        linkedDataForSubject, linkedDataLoading, linkedDataError, hasEditRight, updateLinkedData
+        linkedDataForSubject, linkedDataLoading, linkedDataError, getPropertiesForLinkedData
     } = useLinkedData(formKey);
 
     const dispatch = useDispatch();
 
-    // Only init form once or if initForm changes
     useEffect(() => {
         dispatch(initializeLinkedDataForm(formKey));
     }, [formKey, dispatch]);
@@ -37,11 +33,10 @@ const useFormData = ({formKey, shape}) => {
     const hasFormUpdates = useSelector(state => hasLinkedDataFormUpdates(state, formKey));
     const hasFormValidationErrors = useSelector(state => hasLinkedDataFormValidationErrors(state, formKey));
 
-    const {isMetadataContext, getEmptyLinkedData} = useContext(LinkedDataContext);
-    // TODO: Error handling I think should be done in the component
+    const {submitLinkedDataChanges, getEmptyLinkedData, hasEditRight} = useContext(LinkedDataContext);
+
     const onSubmit = () => {
-        dispatch(isMetadataContext ? submitMetadataChangesFromState(formKey) : submitVocabularyChangesFromState(formKey))
-            .then(() => updateLinkedData())
+        submitLinkedDataChanges((formKey))
             .catch(e => {
                 if (e.details) {
                     ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, formKey), e.message);
@@ -68,24 +63,7 @@ const useFormData = ({formKey, shape}) => {
     const errors = useSelector(state => getLinkedDataFormValidations(state, formKey));
 
     const getPropertiesWithChanges = () => {
-        const getProperties = () => {
-            if (isMetadataContext) {
-                return propertiesToShow(linkedDataForSubject)
-                    .map(p => ({
-                        ...p,
-                        isEditable: hasEditRight && !p.machineOnly
-                    }));
-            }
-
-            return extendPropertiesWithVocabularyEditingInfo({
-                properties: propertiesToShow(linkedDataForSubject),
-                isFixed: isFixedShape(shape),
-                systemProperties: getSystemProperties(shape),
-                hasEditRight
-            });
-        };
-
-        const propertiesForSubject = getProperties();
+        const propertiesForSubject = getPropertiesForLinkedData(shape);
         const propertiesOrinitalize = (propertiesForSubject && propertiesForSubject.length > 0) ? propertiesForSubject : getEmptyLinkedData(shape);
 
         return propertiesToShow(propertiesOrinitalize)
@@ -102,9 +80,6 @@ const useFormData = ({formKey, shape}) => {
     if (!shape && !linkedDataLoading && !(linkedDataForSubject && linkedDataForSubject.length > 0)) {
         error = 'No metadata found for this subject';
     }
-
-    // console.log({hasFormUpdates, hasFormValidationErrors});
-
 
     return {
         properties: getPropertiesWithChanges(),

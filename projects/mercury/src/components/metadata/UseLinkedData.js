@@ -7,19 +7,16 @@ import {hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBy
 const useLinkedData = (subject) => {
     const {
         shapesLoading, shapesError, fetchLinkedDataForSubject,
-        combineLinkedDataForSubjectSelector, hasEditRight
+        combineLinkedDataForSubjectSelector, getPropertiesForLinkedData
     } = useContext(LinkedDataContext);
 
     const isMetadataLoading = useSelector(state => isMetadataPending(state, subject));
-
-    const linkedDataLoading = shapesLoading || isMetadataLoading;
 
     const hasMetadataErrorForSubject = useSelector((state) => hasMetadataError(state, subject));
 
     const linkedDataForSubject = useSelector(state => combineLinkedDataForSubjectSelector(state, subject));
 
     // useCallback will return a memoized version of the callback that only changes if one of the inputs has changed.
-    // Function will not change unless on the given dependencies changes
     const updateLinkedData = useCallback(() => {
         fetchLinkedDataForSubject(subject);
     }, [fetchLinkedDataForSubject, subject]);
@@ -28,12 +25,14 @@ const useLinkedData = (subject) => {
         updateLinkedData();
     }, [updateLinkedData]);
 
+    const linkedDataLoading = shapesLoading || isMetadataLoading;
+
     return {
         linkedDataLoading,
         linkedDataError: shapesError || (hasMetadataErrorForSubject && `Unable to load metadata for ${subject}`) || '',
         linkedDataForSubject,
-        hasEditRight,
-        updateLinkedData
+        updateLinkedData,
+        getPropertiesForLinkedData: (shape) => getPropertiesForLinkedData(linkedDataForSubject, shape)
     };
 };
 

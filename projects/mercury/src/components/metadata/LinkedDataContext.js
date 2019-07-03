@@ -1,7 +1,8 @@
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded} from "../../actions/vocabularyActions";
+import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded, submitVocabularyChangesFromState} from "../../actions/vocabularyActions";
+import {fetchMetadataBySubjectIfNeeded, submitMetadataChangesFromState} from "../../actions/metadataActions";
 import {
     getVocabulary, hasVocabularyError, isVocabularyPending,
     isMetaVocabularyPending, getMetaVocabulary, hasMetaVocabularyError
@@ -11,7 +12,8 @@ import {fromJsonLd, emptyLinkedData} from "../../utils/linkeddata/jsonLdConverte
 import {getCombinedMetadataForSubject} from "../../reducers/cache/jsonLdBySubjectReducers";
 import {isDataSteward} from "../../utils/userUtils";
 import Config from "../../services/Config/Config";
-import {fetchMetadataBySubjectIfNeeded} from "../../actions/metadataActions";
+import {propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../../utils/linkeddata/vocabularyUtils";
 
 const LinkedDataContext = React.createContext({});
 
@@ -31,25 +33,33 @@ export const LinkedDataVocabularyProvider = ({children}) => {
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the vocbulary';
 
     const authorizations = useSelector(state => getAuthorizations(state));
-
-    const hasEditRight = isDataSteward(authorizations, Config.get());
-
     const getEmptyLinkedData = (shape) => emptyLinkedData(metaVocabulary, shape);
 
-    const fetchLinkedDataForSubject = () => dispatch(fetchMetadataVocabularyIfNeeded());
+    const fetchLinkedData = () => dispatch(fetchMetadataVocabularyIfNeeded());
 
-    const combineLinkedDataForSubjectSelector = (state, subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
+    const combineLinkedDataForSubjectSelector = (_, subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
+
+    const submitLinkedDataChanges = (subject) => dispatch(submitVocabularyChangesFromState(subject))
+        .then(() => fetchLinkedData());
+
+    const getPropertiesForLinkedData = (linkedData, shape) => extendPropertiesWithVocabularyEditingInfo({
+        properties: propertiesToShow(linkedData),
+        isFixed: isFixedShape(shape),
+        systemProperties: getSystemProperties(shape),
+        isEditable: isDataSteward
+    });
 
     return (
         <LinkedDataContext.Provider
             value={{
-                isMetadataContext: false,
                 shapesLoading,
                 shapesError,
-                fetchLinkedDataForSubject,
+                fetchLinkedDataForSubject: fetchLinkedData,
                 combineLinkedDataForSubjectSelector,
                 getEmptyLinkedData,
-                hasEditRight,
+                submitLinkedDataChanges,
+                getPropertiesForLinkedData,
+                hasEditRight: isDataSteward(authorizations, Config.get())
             }}
         >
             {children}
@@ -77,16 +87,26 @@ export const LinkedDataMetadataProvider = ({children}) => {
 
     const combineLinkedDataForSubjectSelector = getCombinedMetadataForSubject;
 
+    const submitLinkedDataChanges = (subject) => dispatch(submitMetadataChangesFromState(subject))
+        .then(() => fetchLinkedDataForSubject(subject));
+
+    const getPropertiesForLinkedData = (linkedData) => propertiesToShow(linkedData)
+        .map(p => ({
+            ...p,
+            isEditable: !p.machineOnly
+        }));
+
     return (
         <LinkedDataContext.Provider
             value={{
-                isMetadataContext: true,
                 shapesLoading,
                 shapesError,
                 fetchLinkedDataForSubject,
                 combineLinkedDataForSubjectSelector,
                 getEmptyLinkedData,
-                hasEditRight: true,
+                submitLinkedDataChanges,
+                getPropertiesForLinkedData,
+                hasEditRight: true
             }}
         >
             {children}
