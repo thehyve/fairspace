@@ -11,7 +11,7 @@ const SearchBar = ({
     const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
 
-    if (query !== origQuery) {
+    if (query !== origQuery) { // check if query was reset by the owner
         setOrigQuery(query);
         setValue(query);
     }
