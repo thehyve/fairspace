@@ -165,7 +165,7 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
     sh:closed true ;
     sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
     sh:name "Namespace" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:fixedShape ) ;
+    sh:ignoredProperties <ignoredPropertiesCollection> ;
     sh:property fs:PropertyNameShape ;
     sh:property [
       sh:name "Prefix" ;
@@ -193,6 +193,16 @@ fs:inverseRelationShape a fs:RelationShape ;
     sh:name "Inverse relation" ;
     sh:description "An inverse relation has at most a single relation shape instance as value. A shape with sh:path P1 and fs:inverseRelationShape S2 with sh:path P2 has equivalent meaning as P1 owl:inverseOf P2." ;
     sh:path fs:inverseRelation . 
+
+fs:domainIncludes a fs:RelationShape ;
+    fs:inverseRelation [
+        a sh:PropertyShape ;
+        sh:path sh:property 
+        ] ;
+    sh:path fs:domainIncludes ;
+    sh:class fs:ClassShape ;
+    sh:name "Domain Includes" ;
+    sh:description "All class shapes that have associate with this property." .
 
 fs:fixedShapeShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
