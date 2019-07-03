@@ -20,7 +20,7 @@ import Link from '@material-ui/core/Link';
  * @returns {Array}
  * @constructor
  */
-const breadCrumbs = ({segments, classes}) => (
+const breadCrumbs = ({segments = [], classes}) => (
     <Breadcrumbs aria-label="Breadcrumb" className={classes.root}>
         {segments.map(({label, icon, href}, idx) => (
             <Link
@@ -45,10 +45,6 @@ breadCrumbs.propTypes = {
             label: PropTypes.string.isRequired
         })
     )
-};
-
-breadCrumbs.defaultProps = {
-    segments: []
 };
 
 const styles = theme => ({
