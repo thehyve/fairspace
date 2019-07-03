@@ -6,14 +6,16 @@ import LinkedDataListPage from "../common/LinkedDataListPage";
 import {searchVocabulary} from "../../../actions/searchActions";
 import {
     getMetaVocabulary,
-    isMetaVocabularyPending,
     hasMetaVocabularyError,
-    isVocabularyPending, hasVocabularyError
+    hasVocabularyError,
+    isMetaVocabularyPending,
+    isVocabularyPending
 } from "../../../reducers/cache/vocabularyReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import * as constants from "../../../constants";
 import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded} from "../../../actions/vocabularyActions";
 import {LoadingInlay, MessageDisplay} from "../../common";
+import VocabularyBreadcrumbsContextProvider from "./VocabularyBreadcrumbsContextProvider";
 
 const VocabularyListPage = (
     {fetchVocabulary, fetchMetaVocabulary, loading, error, metaVocabulary, classesInCatalog, search}
@@ -44,24 +46,21 @@ const VocabularyListPage = (
     }
 
     return (
-        <LinkedDataListPage
-            rootBreadCrumb={{
-                label: 'Vocabulary',
-                href: '/vocabulary',
-                icon: 'code'
-            }}
-            classesInCatalog={classesInCatalog}
-            performSearch={performSearch}
-            listRenderer={(footerRender) => (
-                targetClasses && targetClasses.length > 0 && (
-                    <VocabularyBrowserContainer
-                        targetClasses={targetClasses}
-                        metaVocabulary={metaVocabulary}
-                        footerRender={footerRender}
-                    />
-                )
-            )}
-        />
+        <VocabularyBreadcrumbsContextProvider>
+            <LinkedDataListPage
+                classesInCatalog={classesInCatalog}
+                performSearch={performSearch}
+                listRenderer={(footerRender) => (
+                    targetClasses && targetClasses.length > 0 && (
+                        <VocabularyBrowserContainer
+                            targetClasses={targetClasses}
+                            metaVocabulary={metaVocabulary}
+                            footerRender={footerRender}
+                        />
+                    )
+                )}
+            />
+        </VocabularyBreadcrumbsContextProvider>
     );
 };
 

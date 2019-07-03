@@ -17,7 +17,7 @@ import SearchBar from "../../common/SearchBar";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {SEARCH_DEFAULT_SIZE, SHACL_TARGET_CLASS} from "../../../constants";
 import {getLabel} from "../../../utils/linkeddata/metadataUtils";
-import BreadCrumbs from "../../common/BreadCrumbs";
+import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
 
 const styles = theme => ({
     typeSelect: {
@@ -25,7 +25,7 @@ const styles = theme => ({
     }
 });
 
-const LinkedDataListPage = ({classes, listRenderer, classesInCatalog, performSearch, rootBreadCrumb}) => {
+const LinkedDataListPage = ({classes, listRenderer, classesInCatalog, performSearch}) => {
     const [types, setTypes] = useState([]);
     const [query, setQuery] = useState('');
     const [size, setSize] = useState(SEARCH_DEFAULT_SIZE);
@@ -94,7 +94,7 @@ const LinkedDataListPage = ({classes, listRenderer, classesInCatalog, performSea
 
     return (
         <>
-            <BreadCrumbs segments={[rootBreadCrumb]} />
+            <BreadCrumbs />
             <Paper>
                 <SearchBar
                     placeholder="Search"

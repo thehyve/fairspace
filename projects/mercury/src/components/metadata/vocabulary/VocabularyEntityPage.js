@@ -3,12 +3,15 @@ import React from 'react';
 import LinkedDataPage from '../common/LinkedDataPage';
 import VocabularyEntityHeaderContainer from './VocabularyEntityHeaderContainer';
 import VocabularyEntityContainer from './VocabularyEntityContainer';
+import VocabularyBreadcrumbsContextProvider from "./VocabularyBreadcrumbsContextProvider";
 
 export default ({subject}) => {
     return (
-        <LinkedDataPage rootBreadCrumb={{label: "Vocabulary", href: "/vocabulary", icon: "code"}}>
-            <VocabularyEntityHeaderContainer subject={subject} />
-            <VocabularyEntityContainer subject={subject} />
-        </LinkedDataPage>
+        <VocabularyBreadcrumbsContextProvider>
+            <LinkedDataPage>
+                <VocabularyEntityHeaderContainer subject={subject} />
+                <VocabularyEntityContainer subject={subject} />
+            </LinkedDataPage>
+        </VocabularyBreadcrumbsContextProvider>
     );
 };

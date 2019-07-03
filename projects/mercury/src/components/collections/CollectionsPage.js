@@ -3,17 +3,12 @@ import Grid from '@material-ui/core/Grid';
 import InformationDrawer from '../common/InformationDrawer';
 import CollectionBrowserContainer from "./CollectionBrowserContainer";
 import * as consts from '../../constants';
-import BreadCrumbs from "../common/BreadCrumbs";
+import BreadCrumbs from "../common/breadcrumbs/BreadCrumbs";
+import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
 
 const collectionsPage = () => (
-    <>
-        <BreadCrumbs
-            segments={[{
-                label: 'Collections',
-                icon: 'folder_open',
-                href: '/collections'
-            }]}
-        />
+    <CollectionBreadcrumbsContextProvider>
+        <BreadCrumbs />
         <Grid container spacing={8}>
             <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                 <CollectionBrowserContainer />
@@ -22,7 +17,7 @@ const collectionsPage = () => (
                 <InformationDrawer />
             </Grid>
         </Grid>
-    </>
+    </CollectionBreadcrumbsContextProvider>
 );
 
 export default (collectionsPage);

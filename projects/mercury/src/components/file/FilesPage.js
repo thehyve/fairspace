@@ -10,9 +10,9 @@ import * as collectionBrowserActions from "../../actions/collectionBrowserAction
 import * as fileActions from "../../actions/fileActions";
 import * as collectionActions from "../../actions/collectionActions";
 import * as consts from '../../constants';
-import {PATH_SEPARATOR} from '../../constants';
 import {getCollectionAbsolutePath} from "../../utils/collectionUtils";
-import BreadCrumbs from "../common/BreadCrumbs";
+import BreadCrumbs from "../common/breadcrumbs/BreadCrumbs";
+import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 
 export class FilesPage extends React.Component {
     componentDidMount() {
@@ -31,29 +31,25 @@ export class FilesPage extends React.Component {
     renderBreadcrumbs() {
         const {openedCollection, openedPath} = this.props;
 
-        const rootSegment = {
-            label: 'Collections',
-            icon: 'folder_open',
-            href: '/collections'
-        };
-
         if (!openedCollection || !openedCollection.name) {
             return (
-                <BreadCrumbs segments={[
-                    rootSegment,
-                    {label: '...'}
+                <BreadCrumbs additionalSegments={[
+                    {label: '...', href: consts.COLLECTIONS_PATH + openedPath}
                 ]}
                 />
             );
         }
 
         const pathSegments = splitPathIntoArray(openedPath);
-        const segments = pathSegments.map((segment, idx) => ({label: segment, href: '/collections/' + pathSegments.slice(0, idx + 1).join(PATH_SEPARATOR)}));
+        const segments = pathSegments.map((segment, idx) => ({
+            label: segment,
+            href: consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
+        }));
         segments[0].label = openedCollection.name;
 
         return (
             <div style={{position: 'relative', zIndex: 1}}>
-                <BreadCrumbs segments={[rootSegment, ...segments]} />
+                <BreadCrumbs additionalSegments={segments} />
             </div>
         );
     }
@@ -72,7 +68,7 @@ export class FilesPage extends React.Component {
         } = this.props;
 
         return (
-            <>
+            <CollectionBreadcrumbsContextProvider>
                 {this.renderBreadcrumbs()}
                 <Grid container spacing={8}>
                     <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
@@ -95,7 +91,7 @@ export class FilesPage extends React.Component {
                         <InformationDrawer onCollectionLocationChange={this.handleCollectionLocationChange} />
                     </Grid>
                 </Grid>
-            </>
+            </CollectionBreadcrumbsContextProvider>
         );
     }
 }
