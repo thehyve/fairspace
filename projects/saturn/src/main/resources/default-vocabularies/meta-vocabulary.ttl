@@ -170,7 +170,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         sh:path fs:domainIncludes ;
         sh:maxCount 1 ; 
       ]
-    )
+    ) ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
