@@ -4,7 +4,6 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
-import org.apache.commons.io.IOUtils;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -14,6 +13,7 @@ import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
+import org.irods.jargon.core.pub.io.IRODSFileOutputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,6 +25,7 @@ import java.util.List;
 
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
+import static org.apache.commons.io.IOUtils.copyLarge;
 
 public class IRODSVirtualFileSystem implements VirtualFileSystem {
     public static final String TYPE = "irods";
@@ -134,20 +135,33 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
 
     @Override
     public void create(String path, InputStream in) throws IOException {
-
+        var collection = collectionByPath(path);
+        var account = accountForCollection(collection);
+        try {
+            var f = getFile(path, account);
+            f.createNewFile();
+            modify(path, in);
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
-
+        try {
+            try (var out = getOutputStream(path)) {
+                copyLarge(in, out);
+            }
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
         try {
             try (var in = getInputStream(path)) {
-                IOUtils.copy(in, out);
-                out.flush();
+                copyLarge(in, out);
             }
         } catch (JargonException e) {
             throw new IOException(e);
@@ -157,6 +171,12 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     private IRODSFileInputStream getInputStream(String path) throws JargonException, IOException {
         var account = accountForCollection(collectionByPath(path));
         return getIrodsFileFactory(account).instanceIRODSFileInputStream(getIrodsPath(path, account));
+    }
+
+
+    private IRODSFileOutputStream getOutputStream(String path) throws JargonException, IOException {
+        var account = accountForCollection(collectionByPath(path));
+        return getIrodsFileFactory(account).instanceIRODSFileOutputStream(getIrodsPath(path, account));
     }
 
     private IRODSFileFactory getIrodsFileFactory(IRODSAccount account) throws JargonException {
