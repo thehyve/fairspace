@@ -217,7 +217,7 @@ fs:domainIncludes a fs:RelationShape ;
     sh:class fs:ClassShape ;
     sh:order 3 ;
     sh:name "Domain Includes" ;
-    sh:description "All class shapes that have associate with this property." .
+    sh:description "All class shapes that include this property." .
 
 fs:fixedShapeShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
