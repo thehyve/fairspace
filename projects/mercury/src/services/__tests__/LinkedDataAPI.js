@@ -25,8 +25,14 @@ beforeAll(() => {
 
 it('fetches metadata with provided parameters', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
-    MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c'});
-    expect(window.fetch.mock.calls[0][0]).toEqual("/meta/?includeObjectProperties&subject=a&predicate=b&object=c");
+    MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c', includeObjectProperties: true});
+    expect(window.fetch.mock.calls[0][0]).toEqual("/meta/?subject=a&predicate=b&object=c&includeObjectProperties=true");
+});
+
+it('calls the correct url without any parameters', () => {
+    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
+    MetadataAPI.get({});
+    expect(window.fetch.mock.calls[0][0]).toEqual("/meta/?");
 });
 
 it('stores metadata as jsonld', () => {
