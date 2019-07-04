@@ -12,7 +12,7 @@
    rdf:rest ( owl:sameAs sh:ignoredProperties sh:message fs:machineOnly
               fs:fixedShape fs:systemProperties sh:closed fs:createdBy
               fs:dateCreated fs:modifiedBy fs:dateModified
-              fs:deletedBy fs:dateDeleted fs:domainIncludes ) .
+              fs:deletedBy fs:dateDeleted ) .
 
 fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -71,6 +71,7 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         fs:DescriptionShape,
         fs:ImportantPropertyShape,
         fs:PathShape,
+        fs:domainIncludes,
     [
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -100,6 +101,7 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:PathShape,
         fs:DatatypeShape,
         fs:singleLineShape,
+        fs:domainIncludes,
     [
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
@@ -120,6 +122,7 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         fs:DescriptionShape,
         fs:ImportantPropertyShape,
         fs:PathShape,
+        fs:domainIncludes,
     [
         sh:path sh:in ;
         sh:maxCount 1 ;
@@ -159,6 +162,15 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:importantProperty true ;
         sh:order 3
     ] ;
+    sh:and (
+      [
+        # Additional validation for relations as we currently do not support
+        # linking more than 2 classes through a single relation. This fails
+        # in table redering and in the search box. Could be fixed later. 
+        sh:path fs:domainIncludes ;
+        sh:maxCount 1 ; 
+      ]
+    )
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -204,7 +216,6 @@ fs:domainIncludes a fs:RelationShape ;
     sh:path fs:domainIncludes ;
     sh:class fs:ClassShape ;
     sh:order 3 ;
-    sh:maxCount 1 ;
     sh:name "Domain Includes" ;
     sh:description "All class shapes that have associate with this property." .
 
