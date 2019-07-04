@@ -105,7 +105,8 @@ export const vocabularyUtils = (vocabulary = []) => {
             id: namespace['@id'],
             label: getFirstPredicateValue(namespace, constants.SHACL_NAME),
             prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
-            namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE)
+            namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE),
+            isDefault: getFirstPredicateValue(namespace, constants.DEFAULT_NAMESPACE_URI, false)
         }));
 
     /**

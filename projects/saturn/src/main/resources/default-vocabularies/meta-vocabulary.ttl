@@ -166,24 +166,43 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
     sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
     sh:name "Namespace" ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:fixedShape ) ;
-    sh:property fs:PropertyNameShape ;
-    sh:property [
-      sh:name "Prefix" ;
-      sh:maxLength 24 ;
-      sh:minCount 1 ; 
-      sh:maxCount 1 ; 
-      sh:datatype xsd:string ;
-      dash:singleLine true ;
-      sh:path sh:prefix 
-    ] ;
-    sh:property [
-      sh:name "Namespace IRI" ;
-      sh:minCount 1 ; 
-      sh:maxCount 1 ; 
-      sh:nodeKind sh:IRI ;
-      fs:externalLink true ; 
-      sh:path sh:namespace 
-    ] .
+    sh:property
+        fs:PropertyNameShape,
+        [
+          sh:name "Prefix" ;
+          sh:maxLength 24 ;
+          sh:minCount 1 ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:string ;
+          dash:singleLine true ;
+          sh:path sh:prefix
+        ] ,
+        [
+          sh:name "Namespace IRI" ;
+          sh:minCount 1 ;
+          sh:maxCount 1 ;
+          sh:nodeKind sh:IRI ;
+          fs:externalLink true ;
+          sh:path sh:namespace
+        ] ,
+        [
+          sh:name "Use in metadata" ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:boolean ;
+          sh:path fs:usableInMetadata
+        ] ,
+        [
+          sh:name "Use in vocabulary" ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:boolean ;
+          sh:path fs:usableInVocabulary
+        ] ,
+        [
+          sh:name "Default namespace" ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:boolean ;
+          sh:path fs:defaultNamespace
+        ] .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
