@@ -13,12 +13,31 @@ import SearchPage from './search/SearchPage';
 import VocabularyListPage from "./metadata/vocabulary/VocabularyListPage";
 import VocabularyEntityPage from "./metadata/vocabulary/VocabularyEntityPage";
 import {createMetadataIri, createVocabularyIri} from "../utils/linkeddata/metadataUtils";
+import LinkedDataWrapper from './metadata/LinkedDataWrapper';
 
 const routes = () => (
     <>
         <Route path="/" exact component={Home} />
-        <Route path="/collections" exact component={Collections} />
-        <Route path="/collections/:collection/:path(.*)?" component={FilesPage} />
+
+        <Route
+            path="/collections"
+            exact
+            render={({location}) => (
+                <LinkedDataWrapper location={location}>
+                    <Collections />
+                </LinkedDataWrapper>
+            )}
+        />
+
+        <Route
+            path="/collections/:collection/:path(.*)?"
+            render={(props) => (
+                <LinkedDataWrapper location={props.location}>
+                    <FilesPage {...props} />
+                </LinkedDataWrapper>
+            )}
+        />
+
         <Route path="/notebooks" exact component={Notebooks} />
 
         <Route
@@ -28,7 +47,12 @@ const routes = () => (
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
                 const iriParam = queryString.parse(location.search).iri;
-                return iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <MetadataListPage />;
+                const component = iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <MetadataListPage />;
+                return (
+                    <LinkedDataWrapper location={location}>
+                        {component}
+                    </LinkedDataWrapper>
+                );
             }}
         />
 
@@ -45,7 +69,13 @@ const routes = () => (
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
                 const iriParam = queryString.parse(location.search).iri;
-                return iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <VocabularyListPage />;
+                const component = iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <VocabularyListPage />;
+
+                return (
+                    <LinkedDataWrapper location={location}>
+                        {component}
+                    </LinkedDataWrapper>
+                );
             }}
         />
 

@@ -14,7 +14,6 @@ import Layout from "./common/Layout/Layout";
 import {LoadingInlay, ErrorDialog} from './common';
 import {UserProvider} from '../UserContext';
 import {UsersProvider} from "./permissions/UsersContext";
-import LinkedDataProvider from './metadata/LinkedDataProvider';
 
 class App extends React.Component {
     cancellable = {
@@ -58,9 +57,7 @@ class App extends React.Component {
                                 <Provider store={this.store}>
                                     <ErrorDialog>
                                         <Router>
-                                            <LinkedDataProvider>
-                                                <Layout />
-                                            </LinkedDataProvider>
+                                            <Layout />
                                         </Router>
                                     </ErrorDialog>
                                 </Provider>

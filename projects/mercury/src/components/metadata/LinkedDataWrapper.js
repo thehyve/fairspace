@@ -1,5 +1,4 @@
 import React from 'react';
-import {withRouter} from "react-router-dom";
 
 import {METADATA_PATH, VOCABULARY_PATH} from "../../constants";
 import {LinkedDataVocabularyProvider, LinkedDataMetadataProvider} from './LinkedDataContext';
@@ -25,7 +24,7 @@ const VocabularyWrapper = ({children}) => (
 );
 
 
-const LinkedDataProvider = ({children, location: {pathname}}) => {
+const LinkedDataWrapper = ({children, location: {pathname}}) => {
     const Provider = pathname.startsWith('/vocabulary') ? VocabularyWrapper : MetadataWrapper;
 
     return (
@@ -35,4 +34,4 @@ const LinkedDataProvider = ({children, location: {pathname}}) => {
     );
 };
 
-export default withRouter(LinkedDataProvider);
+export default LinkedDataWrapper;
