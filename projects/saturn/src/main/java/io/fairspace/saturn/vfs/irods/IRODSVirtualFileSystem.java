@@ -47,7 +47,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         try {
             var collection = collectionByPath(path);
             var account = accountForCollection(collection);
-            var f = getFile(path, account);
+            var f = getFile(path);
             if (!f.exists()) {
                 return null;
             }
@@ -68,8 +68,13 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         }
     }
 
-    private IRODSFile getFile(String path, IRODSAccount account) throws JargonException {
-        return getIrodsFileFactory(account).instanceIRODSFile(getIrodsPath(path, account));
+    private IRODSFile getFile(String path) throws IOException {
+        var account = accountForCollection(collectionByPath(path));
+        try {
+            return getIrodsFileFactory(account).instanceIRODSFile(getIrodsPath(path, account));
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
     }
 
     private String getIrodsPath(String path, IRODSAccount account) {
@@ -85,7 +90,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         try {
             var collection = collectionByPath(parentPath);
             var account = accountForCollection(collection);
-            var f = getFile(parentPath, account);
+            var f = getFile(parentPath);
 
             var cao = getAccessObject(account);
 
@@ -99,7 +104,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
                         .isDirectory(child.isDirectory())
                         .readOnly(!collection.canWrite() || !child.canWrite())
                         .created(ofEpochMilli(stat.getCreatedAt().getTime()))
-                        .modified(ofEpochMilli(f.lastModified()))
+                        .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                         .size(stat.getObjSize())
                         .build());
             }
@@ -110,7 +115,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     private static String getIri(Collection collection, ObjStat stat) throws IOException {
-        return "irods://" + collection.getLocation() + "/"  +  accountForCollection(collection).getHost() + "#" + stat.getDataId();
+        return "irods://" + collection.getLocation() + "/" + accountForCollection(collection).getHost() + "#" + stat.getDataId();
     }
 
     private Collection collectionByPath(String parentPath) throws FileNotFoundException {
@@ -123,65 +128,54 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
 
     @Override
     public void mkdir(String path) throws IOException {
-        var collection = collectionByPath(path);
-        var account = accountForCollection(collection);
-        try {
-            var f = getFile(path, account);
-            f.mkdir();
-        } catch (JargonException e) {
-            throw new IOException(e);
-        }
+        getFile(path).mkdir();
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
-        var collection = collectionByPath(path);
-        var account = accountForCollection(collection);
-        try {
-            var f = getFile(path, account);
-            f.createNewFile();
-            modify(path, in);
-        } catch (JargonException e) {
-            throw new IOException(e);
-        }
+        getFile(path).createNewFile();
+        modify(path, in);
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
-        try {
-            try (var out = getOutputStream(path)) {
-                copyLarge(in, out);
-            }
-        } catch (JargonException e) {
-            throw new IOException(e);
+        try (var out = getOutputStream(path)) {
+            copyLarge(in, out);
         }
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
+        try (var in = getInputStream(path)) {
+            copyLarge(in, out);
+        }
+    }
+
+    private IRODSFileInputStream getInputStream(String path) throws IOException {
+        var account = accountForCollection(collectionByPath(path));
         try {
-            try (var in = getInputStream(path)) {
-                copyLarge(in, out);
-            }
+            return getIrodsFileFactory(account).instanceIRODSFileInputStream(getIrodsPath(path, account));
         } catch (JargonException e) {
             throw new IOException(e);
         }
     }
 
-    private IRODSFileInputStream getInputStream(String path) throws JargonException, IOException {
+
+    private IRODSFileOutputStream getOutputStream(String path) throws IOException {
         var account = accountForCollection(collectionByPath(path));
-        return getIrodsFileFactory(account).instanceIRODSFileInputStream(getIrodsPath(path, account));
+        try {
+            return getIrodsFileFactory(account).instanceIRODSFileOutputStream(getIrodsPath(path, account));
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
     }
 
-
-    private IRODSFileOutputStream getOutputStream(String path) throws JargonException, IOException {
-        var account = accountForCollection(collectionByPath(path));
-        return getIrodsFileFactory(account).instanceIRODSFileOutputStream(getIrodsPath(path, account));
-    }
-
-    private IRODSFileFactory getIrodsFileFactory(IRODSAccount account) throws JargonException {
-        return fs.getIRODSAccessObjectFactory()
-                .getIRODSFileFactory(account);
+    private IRODSFileFactory getIrodsFileFactory(IRODSAccount account) throws IOException {
+        try {
+            return fs.getIRODSAccessObjectFactory().getIRODSFileFactory(account);
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -196,14 +190,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
 
     @Override
     public void delete(String path) throws IOException {
-        var collection = collectionByPath(path);
-        var account = accountForCollection(collection);
-        try {
-            var f = getFile(path, account);
-            f.delete();
-        } catch (JargonException e) {
-            throw new IOException(e);
-        }
+        getFile(path).delete();
     }
 
     @Override
