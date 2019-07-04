@@ -69,7 +69,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
         if (fileSystemByPath(from).equals(fileSystemByPath(to))) {
             fileSystemByPath(from).copy(from, to);
         } else {
-            throw new UnsupportedOperationException("Not implemented");
+            VirtualFileSystem.super.copy(from, to);
         }
     }
 
@@ -78,7 +78,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
         if (fileSystemByPath(from).equals(fileSystemByPath(to))) {
             fileSystemByPath(from).move(from, to);
         } else {
-            throw new UnsupportedOperationException("Not implemented");
+            VirtualFileSystem.super.move(from, to);
         }
     }
 

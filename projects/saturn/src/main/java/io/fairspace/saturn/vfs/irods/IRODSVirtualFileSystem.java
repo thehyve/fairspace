@@ -184,8 +184,13 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     @Override
     public void copy(String from, String to) throws IOException {
         try {
-            var account = getAccount(from);
-            fs.getIRODSAccessObjectFactory().getDataTransferOperations(account).copy(getIrodsPath(from), account.getDefaultStorageResource(), getIrodsPath(to), null, null);
+            var fromAccount = getAccount(from);
+            var toAccount = getAccount(to);
+            if (fromAccount.equals(toAccount)) {
+                fs.getIRODSAccessObjectFactory().getDataTransferOperations(fromAccount).copy(getIrodsPath(from), fromAccount.getDefaultStorageResource(), getIrodsPath(to), null, null);
+            } else {
+                VirtualFileSystem.super.copy(from, to);
+            }
         } catch (JargonException e) {
             throw new IOException(e);
         }
@@ -194,8 +199,13 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     @Override
     public void move(String from, String to) throws IOException {
         try {
-            var account = getAccount(from);
-            fs.getIRODSAccessObjectFactory().getDataTransferOperations(account).move(getIrodsPath(from), getIrodsPath(to));
+            var fromAccount = getAccount(from);
+            var toAccount = getAccount(to);
+            if (fromAccount.equals(toAccount)) {
+                fs.getIRODSAccessObjectFactory().getDataTransferOperations(fromAccount).move(getIrodsPath(from), getIrodsPath(to));
+            } else {
+                VirtualFileSystem.super.move(from, to);
+            }
         } catch (JargonException e) {
             throw new IOException(e);
         }
