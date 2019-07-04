@@ -1,13 +1,12 @@
-import {useEffect, useContext} from "react";
+import {useContext} from "react";
 import {useDispatch, useSelector} from 'react-redux';
 
-import useLinkedData from './UseLinkedData';
 import {
     getLinkedDataFormUpdates, getLinkedDataFormValidations,
     hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors
 } from "../../reducers/linkedDataFormReducers";
 import {
-    addLinkedDataValue, deleteLinkedDataValue, initializeLinkedDataForm,
+    addLinkedDataValue, deleteLinkedDataValue,
     updateLinkedDataValue, validateLinkedDataProperty
 } from "../../actions/linkedDataFormActions";
 import ErrorDialog from "../common/ErrorDialog";
@@ -15,25 +14,18 @@ import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import LinkedDataContext from './LinkedDataContext';
 import {propertiesToShow, partitionErrors} from "../../utils/linkeddata/metadataUtils";
 
-const useFormData = ({formKey, shape}) => {
-    if (!formKey && !shape) {
-        throw new Error('Forms depend on formKey or a shape');
+const useExistingEntity = (formKey) => {
+    if (!formKey) {
+        throw new Error('Please provide a valid form key.');
     }
-
-    const {
-        linkedDataForSubject, linkedDataLoading, linkedDataError, getPropertiesForLinkedData
-    } = useLinkedData(formKey);
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(initializeLinkedDataForm(formKey));
-    }, [formKey, dispatch]);
-
     const hasFormUpdates = useSelector(state => hasLinkedDataFormUpdates(state, formKey));
+
     const hasFormValidationErrors = useSelector(state => hasLinkedDataFormValidationErrors(state, formKey));
 
-    const {submitLinkedDataChanges, getEmptyLinkedData, hasEditRight} = useContext(LinkedDataContext);
+    const {submitLinkedDataChanges, hasEditRight} = useContext(LinkedDataContext);
 
     const onSubmit = () => {
         submitLinkedDataChanges((formKey))
@@ -62,30 +54,17 @@ const useFormData = ({formKey, shape}) => {
     const updates = useSelector(state => getLinkedDataFormUpdates(state, formKey));
     const errors = useSelector(state => getLinkedDataFormValidations(state, formKey));
 
-    const getPropertiesWithChanges = () => {
-        const propertiesForSubject = getPropertiesForLinkedData(shape);
-        const propertiesOrinitalize = (propertiesForSubject && propertiesForSubject.length > 0) ? propertiesForSubject : getEmptyLinkedData(shape);
-
-        return propertiesToShow(propertiesOrinitalize)
-            .filter(p => p.isEditable || p.values.length)
-            .map(p => ({
-                ...p,
-                values: updates[p.key] || p.values,
-                errors: errors[p.key]
-            }));
-    };
-
-    let error = linkedDataError;
-
-    if (!shape && !linkedDataLoading && !(linkedDataForSubject && linkedDataForSubject.length > 0)) {
-        error = 'No metadata found for this subject';
-    }
+    const extendPropertiesWithChanges = (properties) => propertiesToShow(properties)
+        .filter(p => p.isEditable || p.values.length)
+        .map(p => ({
+            ...p,
+            values: updates[p.key] || p.values,
+            errors: errors[p.key]
+        }));
 
     return {
-        properties: getPropertiesWithChanges(),
-        loading: linkedDataLoading,
-        error,
-        canSubmit: hasEditRight && !linkedDataError,
+        extendPropertiesWithChanges,
+        canSubmit: hasEditRight,
         onSubmit,
         submitDisabled: !hasFormUpdates || hasFormValidationErrors,
         onAdd,
@@ -94,4 +73,4 @@ const useFormData = ({formKey, shape}) => {
     };
 };
 
-export default useFormData;
+export default useExistingEntity;

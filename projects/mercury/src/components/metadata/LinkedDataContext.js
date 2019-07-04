@@ -42,12 +42,16 @@ export const LinkedDataVocabularyProvider = ({children}) => {
     const submitLinkedDataChanges = (subject) => dispatch(submitVocabularyChangesFromState(subject))
         .then(() => fetchLinkedData());
 
-    const getPropertiesForLinkedData = (linkedData, shape) => extendPropertiesWithVocabularyEditingInfo({
-        properties: propertiesToShow(linkedData),
-        isFixed: isFixedShape(shape),
-        systemProperties: getSystemProperties(shape),
-        isEditable: isDataSteward
-    });
+    const getPropertiesForLinkedData = (linkedData, subject) => {
+        const shape = vocabulary.get(subject);
+
+        return extendPropertiesWithVocabularyEditingInfo({
+            properties: propertiesToShow(linkedData),
+            isFixed: isFixedShape(shape),
+            systemProperties: getSystemProperties(shape),
+            isEditable: isDataSteward
+        });
+    };
 
     return (
         <LinkedDataContext.Provider

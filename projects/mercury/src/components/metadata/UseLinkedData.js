@@ -25,14 +25,12 @@ const useLinkedData = (subject) => {
         updateLinkedData();
     }, [updateLinkedData]);
 
-    const linkedDataLoading = shapesLoading || isMetadataLoading;
-
     return {
-        linkedDataLoading,
+        linkedDataLoading: shapesLoading || isMetadataLoading,
         linkedDataError: shapesError || (hasMetadataErrorForSubject && `Unable to load metadata for ${subject}`) || '',
         linkedDataForSubject,
         updateLinkedData,
-        getPropertiesForLinkedData: (shape) => getPropertiesForLinkedData(linkedDataForSubject, shape)
+        getPropertiesForLinkedData: () => getPropertiesForLinkedData(linkedDataForSubject, subject)
     };
 };
 
