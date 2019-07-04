@@ -1,9 +1,12 @@
 package io.fairspace.saturn.vfs;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
-import static java.io.File.createTempFile;
+import static io.fairspace.saturn.vfs.Pipe.pipe;
 import static org.apache.commons.io.FilenameUtils.getName;
 
 /**
@@ -41,19 +44,7 @@ public interface VirtualFileSystem extends Closeable {
                 copy(child.getPath(), to + '/' + getName(child.getPath()));
             }
         } else {
-            var temp = createTempFile("fairspace", "copy");
-            try {
-                try(var fos = new FileOutputStream(temp);
-                    var bos = new BufferedOutputStream(fos)) {
-                    read(from, bos);
-                }
-                try(var fis = new FileInputStream(temp);
-                    var bis = new BufferedInputStream(fis)) {
-                    create(to, bis);
-                }
-            } finally {
-                temp.delete();
-            }
+            pipe(out -> read(from, out), in -> create(to, in));
         }
     }
 
