@@ -96,11 +96,23 @@ describe('loading state', () => {
 
         expect(wrapper.find(LoadingInlay).length).toBe(1);
     });
+
+    it('is loading as long as the collections are pending', () => {
+        const wrapper = shallow(<CollectionBrowser loading />);
+
+        expect(wrapper.find(LoadingInlay).length).toBe(1);
+    });
 });
 
 describe('error state', () => {
     it('is in error state when user fetching failed', () => {
         const wrapper = shallow(<CollectionBrowser currentUserError={new Error()} />);
+
+        expect(wrapper.find(MessageDisplay).length).toBe(1);
+    });
+
+    it('is in error state when user fetching failed', () => {
+        const wrapper = shallow(<CollectionBrowser error="some error" />);
 
         expect(wrapper.find(MessageDisplay).length).toBe(1);
     });
