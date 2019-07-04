@@ -69,16 +69,20 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     private IRODSFile getFile(String path) throws IOException {
-        var account = accountForCollection(collectionByPath(path));
+        var account = getAccount(path);
         try {
-            return getIrodsFileFactory(account).instanceIRODSFile(getIrodsPath(path, account));
+            return getIrodsFileFactory(account).instanceIRODSFile(getIrodsPath(path));
         } catch (JargonException e) {
             throw new IOException(e);
         }
     }
 
-    private String getIrodsPath(String path, IRODSAccount account) {
-        return "/" + joinPaths(account.getHomeDirectory(), subPath(path));
+    private IRODSAccount getAccount(String path) throws IOException {
+        return accountForCollection(collectionByPath(path));
+    }
+
+    private String getIrodsPath(String path) throws IOException {
+        return "/" + joinPaths(getAccount(path).getHomeDirectory(), subPath(path));
     }
 
     private CollectionAndDataObjectListAndSearchAO getAccessObject(IRODSAccount account) throws JargonException {
@@ -152,19 +156,18 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     private IRODSFileInputStream getInputStream(String path) throws IOException {
-        var account = accountForCollection(collectionByPath(path));
+        var account = getAccount(path);
         try {
-            return getIrodsFileFactory(account).instanceIRODSFileInputStream(getIrodsPath(path, account));
+            return getIrodsFileFactory(account).instanceIRODSFileInputStream(getIrodsPath(path));
         } catch (JargonException e) {
             throw new IOException(e);
         }
     }
 
-
     private IRODSFileOutputStream getOutputStream(String path) throws IOException {
-        var account = accountForCollection(collectionByPath(path));
+        var account = getAccount(path);
         try {
-            return getIrodsFileFactory(account).instanceIRODSFileOutputStream(getIrodsPath(path, account));
+            return getIrodsFileFactory(account).instanceIRODSFileOutputStream(getIrodsPath(path));
         } catch (JargonException e) {
             throw new IOException(e);
         }
@@ -180,12 +183,22 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
 
     @Override
     public void copy(String from, String to) throws IOException {
-
+        try {
+            var account = getAccount(from);
+            fs.getIRODSAccessObjectFactory().getDataTransferOperations(account).copy(getIrodsPath(from), account.getDefaultStorageResource(), getIrodsPath(to), null, null);
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public void move(String from, String to) throws IOException {
-
+        try {
+            var account = getAccount(from);
+            fs.getIRODSAccessObjectFactory().getDataTransferOperations(account).move(getIrodsPath(from), getIrodsPath(to));
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
