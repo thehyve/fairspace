@@ -4,6 +4,7 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import org.apache.commons.io.IOUtils;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -11,6 +12,8 @@ import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
+import org.irods.jargon.core.pub.io.IRODSFileFactory;
+import org.irods.jargon.core.pub.io.IRODSFileInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -51,8 +54,8 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
             var stat = getAccessObject(account).retrieveObjectStatForPath(f.getAbsolutePath());
 
             return FileInfo.builder()
-                    .iri(getIri(stat, account))
-                    .path(stat.getAbsolutePath())
+                    .iri(getIri(collection, stat))
+                    .path(path)
                     .isDirectory(f.isDirectory())
                     .readOnly(!collection.canWrite() || !f.canWrite())
                     .created(ofEpochMilli(stat.getCreatedAt().getTime()))
@@ -65,11 +68,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     private IRODSFile getFile(String path, IRODSAccount account) throws JargonException {
-        var irodsPath = getIrodsPath(path, account);
-
-        return fs.getIRODSAccessObjectFactory()
-                .getIRODSFileFactory(account)
-                .instanceIRODSFile(irodsPath);
+        return getIrodsFileFactory(account).instanceIRODSFile(getIrodsPath(path, account));
     }
 
     private String getIrodsPath(String path, IRODSAccount account) {
@@ -94,8 +93,8 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
             for (var child : f.listFiles()) {
                 var stat = cao.retrieveObjectStatForPath(f.getAbsolutePath());
                 result.add(FileInfo.builder()
-                        .iri(getIri(stat, account))
-                        .path(stat.getAbsolutePath())
+                        .iri(getIri(collection, stat))
+                        .path(parentPath + "/" + child.getName())
                         .isDirectory(child.isDirectory())
                         .readOnly(!collection.canWrite() || !child.canWrite())
                         .created(ofEpochMilli(stat.getCreatedAt().getTime()))
@@ -109,8 +108,8 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         }
     }
 
-    private static String getIri(ObjStat stat, IRODSAccount account) {
-        return "irods://" + account.getHost() + "#" + stat.getDataId();
+    private static String getIri(Collection collection, ObjStat stat) throws IOException {
+        return "irods://" + collection.getLocation() + "/"  +  accountForCollection(collection).getHost() + "#" + stat.getDataId();
     }
 
     private Collection collectionByPath(String parentPath) throws FileNotFoundException {
@@ -145,7 +144,24 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
+        try {
+            try (var in = getInputStream(path)) {
+                IOUtils.copy(in, out);
+                out.flush();
+            }
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
+    }
 
+    private IRODSFileInputStream getInputStream(String path) throws JargonException, IOException {
+        var account = accountForCollection(collectionByPath(path));
+        return getIrodsFileFactory(account).instanceIRODSFileInputStream(getIrodsPath(path, account));
+    }
+
+    private IRODSFileFactory getIrodsFileFactory(IRODSAccount account) throws JargonException {
+        return fs.getIRODSAccessObjectFactory()
+                .getIRODSFileFactory(account);
     }
 
     @Override
@@ -179,7 +195,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         }
     }
 
-    private IRODSAccount accountForCollection(Collection collection) throws IOException {
+    private static IRODSAccount accountForCollection(Collection collection) throws IOException {
         try {
             var uri = new URI(collection.getConnectionString());
             var userInfo = uri.getUserInfo().split("[.:]");
