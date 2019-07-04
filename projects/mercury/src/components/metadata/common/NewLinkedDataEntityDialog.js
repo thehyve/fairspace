@@ -1,4 +1,4 @@
-import React, {useState} from "react"; import PropTypes from 'prop-types';
+import React, {useState, useEffect} from "react"; import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@material-ui/core";
 
@@ -10,14 +10,17 @@ import useNewEntity from '../UseNewEntity';
 import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 
-const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate}) => {
-    const formKey = generateUuid();
-
+const NewLinkedDataEntityDialog = ({open, shape, requireIdentifier = true, onClose, onCreate}) => {
+    const [formKey, setFormKey] = useState(generateUuid());
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
 
     const {properties} = useNewEntity(formKey, shape);
     const {extendPropertiesWithChanges, onAdd, onChange, onDelete, submitDisabled} = useFormData(formKey);
+
+    useEffect(() => {
+        setFormKey(generateUuid());
+    }, [open]);
 
     const closeDialog = (e) => {
         if (e) e.stopPropagation();
@@ -67,7 +70,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
     return (
         <Dialog
-            open
+            open={open}
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
             fullWidth

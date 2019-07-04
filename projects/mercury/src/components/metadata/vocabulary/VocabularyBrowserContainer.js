@@ -7,14 +7,12 @@ import {createVocabularyEntityFromState} from "../../../actions/vocabularyAction
 import {searchVocabulary} from "../../../actions/searchActions";
 import Config from "../../../services/Config/Config";
 import LinkedDataCreator from "../common/LinkedDataCreator";
-import VocabularyValueComponentFactory from "./VocabularyValueComponentFactory";
 import {isDataSteward} from "../../../utils/userUtils";
 import {getAuthorizations} from "../../../reducers/account/authorizationsReducers";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog, MessageDisplay} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
 import {getVocabularySearchResults} from "../../../reducers/searchReducers";
-import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 import LinkedDataList from "../common/LinkedDataList";
 import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
@@ -27,24 +25,22 @@ const VocabularyBrowserContainer = (
     {entities, hasHighlights, footerRender, total, history, ...otherProps}
 ) => {
     return (
-        <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
-            <LinkedDataCreator requireIdentifier={false} {...otherProps}>
-                {
-                    entities && entities.length > 0
-                        ? (
-                            <LinkedDataList
-                                items={entities}
-                                total={total}
-                                hasHighlights={hasHighlights}
-                                footerRender={footerRender}
-                                typeRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
-                                onOpen={id => openVocabulary(history, id)}
-                            />
-                        )
-                        : <MessageDisplay message="The vocabulary is empty" isError={false} />
-                }
-            </LinkedDataCreator>
-        </LinkedDataValuesContext.Provider>
+        <LinkedDataCreator requireIdentifier={false} {...otherProps}>
+            {
+                entities && entities.length > 0
+                    ? (
+                        <LinkedDataList
+                            items={entities}
+                            total={total}
+                            hasHighlights={hasHighlights}
+                            footerRender={footerRender}
+                            typeRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
+                            onOpen={id => openVocabulary(history, id)}
+                        />
+                    )
+                    : <MessageDisplay message="The vocabulary is empty" isError={false} />
+            }
+        </LinkedDataCreator>
     );
 };
 
