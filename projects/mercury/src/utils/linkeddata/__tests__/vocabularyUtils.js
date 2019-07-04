@@ -189,4 +189,21 @@ describe('vocabularyUtils', () => {
             });
         });
     });
+
+    describe('generatePropertyEntry', () => {
+        it('should mark non-single-line properties as multiline', () => {
+            const stringProperty = vocabulary.generatePropertyEntry('', {
+                [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
+                [constants.DASH_SINGLE_LINE]: [{'@value': false}]
+            });
+            expect(stringProperty.multiLine).toBe(true);
+        });
+        it('should mark single-line properties as not multiline', () => {
+            const stringProperty = vocabulary.generatePropertyEntry('', {
+                [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
+                [constants.DASH_SINGLE_LINE]: [{'@value': true}]
+            });
+            expect(stringProperty.multiLine).toBe(false);
+        });
+    });
 });

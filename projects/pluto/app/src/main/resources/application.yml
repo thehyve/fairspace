@@ -53,6 +53,7 @@ security:
     - /static/*
     - /config/*
     - /metadata/*
+    - /iri/*
     - /collections/*
     - /vocabulary/*
     - /notebooks/*

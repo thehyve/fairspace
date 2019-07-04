@@ -55,6 +55,7 @@ export const SHACL_NAMESPACE = SHACL_NS + 'namespace';
 export const SHACL_PREFIX_DECLARATION = SHACL_NS + 'PrefixDeclaration';
 
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
+export const DASH_SINGLE_LINE = DASH_NS + 'singleLine';
 
 export const STRING_URI = XMLSCHEMA_NS + 'string';
 export const BOOLEAN_URI = XMLSCHEMA_NS + 'boolean';

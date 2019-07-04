@@ -75,6 +75,7 @@ workspace:
       roles:
         user:
         datasteward:
+        sparql:
 
       # Groups to retrieve a list of users from
       groups:
@@ -249,6 +250,8 @@ saturn:
       accessMode: ReadWriteOnce
       size: 50Gi
       mountPath: /data
+
+  maxTriplesToReturn: 50000
 
   mail:
     mail.from: info@fairspace.io

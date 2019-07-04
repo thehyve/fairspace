@@ -14,14 +14,28 @@ export const PermissionProvider = ({iri, children}) => {
     const extendWithUsernames = rawPermissions => rawPermissions.map(permission => ({...permission, userName: getDisplayName(users.find(user => permission.user === user.iri))}));
 
     const refresh = () => {
-        setLoading(true);
-        PermissionAPI.getPermissions(iri, false)
-            .then(extendWithUsernames)
-            .then(setPermissions)
-            .catch(setError)
-            .finally(() => {
-                setLoading(false);
-            });
+        let didCancel = false;
+
+        const fetchData = async () => {
+            setLoading(true);
+
+            try {
+                const fetchedPermissions = await PermissionAPI.getPermissions(iri, false);
+                if (!didCancel) {
+                    setPermissions(extendWithUsernames(fetchedPermissions));
+                    setLoading(false);
+                }
+            } catch (e) {
+                if (!didCancel) {
+                    setError(e);
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchData();
+
+        return () => { didCancel = true; };
     };
 
     // Refresh the permissions whenever the iri changes

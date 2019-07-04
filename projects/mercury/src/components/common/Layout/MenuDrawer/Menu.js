@@ -42,15 +42,6 @@ const Menu = ({location: {pathname}}) => (
                 <ListItemText primary="Notebooks" />
             </ListItem>
             <ListItem
-                button
-                selected={pathname.startsWith('/workflows')}
-            >
-                <ListItemIcon>
-                    <Icon>transform</Icon>
-                </ListItemIcon>
-                <ListItemText primary="Workflows" />
-            </ListItem>
-            <ListItem
                 component={NavLink}
                 to="/metadata"
                 button
@@ -75,18 +66,22 @@ const Menu = ({location: {pathname}}) => (
         </List>
         <Divider />
         <List>
-            <ListItem button>
-                <ListItemIcon>
-                    <Icon>share</Icon>
-                </ListItemIcon>
-                <ListItemText primary="Dataverse" />
-            </ListItem>
-            <ListItem component="a" href={Config.get().urls.cbioportal} button>
-                <ListItemIcon>
-                    <Icon>public</Icon>
-                </ListItemIcon>
-                <ListItemText primary="cBioportal" />
-            </ListItem>
+            {Config.get().urls.dataverse ? (
+                <ListItem button component="a" href={Config.get().urls.dataverse}>
+                    <ListItemIcon>
+                        <Icon>open_in_new</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="Dataverse" />
+                </ListItem>
+            ) : null }
+            {Config.get().urls.cbioportal ? (
+                <ListItem component="a" href={Config.get().urls.cbioportal} button>
+                    <ListItemIcon>
+                        <Icon>open_in_new</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="cBioportal" />
+                </ListItem>
+            ) : null }
         </List>
     </>
 );

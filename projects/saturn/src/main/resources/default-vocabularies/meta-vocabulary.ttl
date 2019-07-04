@@ -21,7 +21,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:property [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
-        sh:maxLength 128 ;
+        dash:singleLine true ;
         sh:minCount 1 ;
         sh:path sh:name ;
         sh:name "Class name" ;
@@ -98,8 +98,8 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:ImportantPropertyShape,
         fs:PathShape,
         fs:DatatypeShape,
+        fs:singleLineShape,
     [
-
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
         sh:maxCount 1 ;
@@ -173,6 +173,7 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
       sh:minCount 1 ; 
       sh:maxCount 1 ; 
       sh:datatype xsd:string ;
+      dash:singleLine true ;
       sh:path sh:prefix 
     ] ;
     sh:property [
@@ -199,6 +200,12 @@ fs:fixedShapeShape a fs:DatatypePropertyShape ;
     fs:machineOnly true ; 
     sh:name "Fixed shape" ;
     sh:description "If this is true, a user can not make changes to this shape definition." .
+
+fs:singleLineShape a fs:DatatypePropertyShape ;
+    sh:datatype xsd:boolean ;
+    sh:path dash:singleLine ;
+    sh:name "Single line input (for string only)" ;
+    sh:description "Restricts the input field for this string field to a single line." .
 
 fs:machineOnlyShape a fs:DatatypePropertyShape ; 
     sh:datatype xsd:boolean ;
@@ -230,7 +237,7 @@ fs:PathShape a sh:PropertyShape ;
 fs:PropertyNameShape a sh:PropertyShape ;
   sh:datatype xsd:string ;
   sh:maxCount 1 ;
-  sh:maxLength 128 ;
+  dash:singleLine true ;
   sh:minCount 1 ;
   sh:path sh:name ;
   sh:name "Property name" ;

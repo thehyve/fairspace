@@ -5,6 +5,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.limit;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -15,6 +16,11 @@ class ReadableMetadataService {
     protected final RDFConnection rdf;
     protected final Node graph;
     protected final Node vocabulary;
+    protected final long tripleLimit;
+
+    public ReadableMetadataService(RDFConnection rdf, Node graph, Node vocabulary) {
+        this(rdf, graph, vocabulary, 0);
+    }
 
     /**
      * Returns a model with statements from the metadata database, based on the given selection criteria
@@ -30,8 +36,12 @@ class ReadableMetadataService {
      * @return
      */
     Model get(String subject, String predicate, String object, boolean withObjectProperties) {
-        var query = withObjectProperties ? "select_by_mask_with_important_properties" : "select_by_mask";
-        return rdf.queryConstruct(storedQuery(query, graph, asURI(subject), asURI(predicate), asURI(object), vocabulary));
+        var queryTemplate = withObjectProperties ? "select_by_mask_with_important_properties" : "select_by_mask";
+
+        var basicQuery = storedQuery(queryTemplate, graph, asURI(subject), asURI(predicate), asURI(object), vocabulary);
+        var query = tripleLimit > 0 ? limit(basicQuery, tripleLimit) : basicQuery;
+
+        return rdf.queryConstruct(query);
     }
 
     /**
@@ -51,13 +61,15 @@ class ReadableMetadataService {
      */
     Model getByType(String type, boolean filterOnCatalog) {
         String queryName = filterOnCatalog ? "catalog_entities_by_type" : "entities_by_type";
-
-        return rdf.queryConstruct(storedQuery(
+        String basicQuery = storedQuery(
                 queryName,
                 graph,
                 vocabulary,
                 asURI(type)
-        ));
+        );
+        String query = tripleLimit > 0 ? limit(basicQuery, tripleLimit) : basicQuery;
+
+        return rdf.queryConstruct(query);
     }
 
     protected static Node asURI(String uri) {

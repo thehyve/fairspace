@@ -30,12 +30,7 @@ class JWTAuthenticator {
         this.jwtProcessor = jwtProcessor;
     }
 
-    public UserInfo getUserInfo(HttpServletRequest request) {
-        var storedUserInfo = (UserInfo) request.getAttribute(SecurityUtil.USER_INFO_REQUEST_ATTRIBUTE);
-        if (storedUserInfo != null) {
-            return storedUserInfo;
-        }
-
+    UserInfo getUserInfo(HttpServletRequest request) {
         var authorizationHeader = request.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
@@ -53,7 +48,7 @@ class JWTAuthenticator {
 
         var claims = claimsSet.getClaims();
 
-        var userInfo = new UserInfo(
+        return new UserInfo(
                 getStringClaim(claims, SUBJECT_CLAIM),
                 getStringClaim(claims, USERNAME_CLAIM),
                 getStringClaim(claims, FULLNAME_CLAIM),
@@ -62,9 +57,6 @@ class JWTAuthenticator {
                         .stream()
                         .map(Object::toString)
                         .collect(toSet()));
-
-        request.setAttribute(SecurityUtil.USER_INFO_REQUEST_ATTRIBUTE, userInfo);
-        return userInfo;
     }
 
     private static String getStringClaim(Map<String, ?> claims, String key) {
