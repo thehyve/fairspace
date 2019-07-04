@@ -11,7 +11,7 @@ import static org.apache.commons.io.FilenameUtils.getName;
 
 /**
  * Virtual File System abstractions
- * Implementations are NOT supposed to do exhaustive safety checks. Use SafeFileSystem wrapper instead.
+ * Implementations are NOT supposed to do exhaustive safety checks.
  */
 public interface VirtualFileSystem extends Closeable {
     /**
