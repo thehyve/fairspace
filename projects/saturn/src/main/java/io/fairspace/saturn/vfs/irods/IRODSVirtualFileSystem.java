@@ -9,6 +9,7 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
 
 import java.io.FileNotFoundException;
@@ -16,11 +17,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.fairspace.saturn.vfs.PathUtils.*;
+import static java.time.Instant.ofEpochMilli;
 
 public class IRODSVirtualFileSystem implements VirtualFileSystem {
     public static final String TYPE = "irods";
@@ -50,12 +51,12 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
             var stat = getAccessObject(account).retrieveObjectStatForPath(f.getAbsolutePath());
 
             return FileInfo.builder()
-                    .iri(collection.getIri() + "-" + stat.getDataId())
-                    .path(path)
+                    .iri(getIri(stat, account))
+                    .path(stat.getAbsolutePath())
                     .isDirectory(f.isDirectory())
                     .readOnly(!collection.canWrite() || !f.canWrite())
-                    .created(Instant.ofEpochMilli(stat.getCreatedAt().getTime()))
-                    .modified(Instant.ofEpochMilli(stat.getModifiedAt().getTime()))
+                    .created(ofEpochMilli(stat.getCreatedAt().getTime()))
+                    .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                     .size(stat.getObjSize())
                     .build();
         } catch (JargonException e) {
@@ -93,12 +94,12 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
             for (var child : f.listFiles()) {
                 var stat = cao.retrieveObjectStatForPath(f.getAbsolutePath());
                 result.add(FileInfo.builder()
-                        .iri(collection.getIri() + "-" + stat.getDataId())
-                        .path(joinPaths(parentPath, child.getName()))
+                        .iri(getIri(stat, account))
+                        .path(stat.getAbsolutePath())
                         .isDirectory(child.isDirectory())
                         .readOnly(!collection.canWrite() || !child.canWrite())
-                        .created(Instant.ofEpochMilli(stat.getCreatedAt().getTime()))
-                        .modified(Instant.ofEpochMilli(f.lastModified()))
+                        .created(ofEpochMilli(stat.getCreatedAt().getTime()))
+                        .modified(ofEpochMilli(f.lastModified()))
                         .size(stat.getObjSize())
                         .build());
             }
@@ -106,6 +107,10 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         } catch (JargonException e) {
             throw new IOException(e);
         }
+    }
+
+    private static String getIri(ObjStat stat, IRODSAccount account) {
+        return "irods://" + account.getHost() + "#" + stat.getDataId();
     }
 
     private Collection collectionByPath(String parentPath) throws FileNotFoundException {
