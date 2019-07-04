@@ -62,7 +62,6 @@ class InputWithAddition extends React.Component {
                     onClose={this.handleCloseDialog}
                     requireIdentifier={this.props.requireIdentifier}
                 />
-                )
             </>
         );
     }
