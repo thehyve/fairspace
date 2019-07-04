@@ -46,6 +46,7 @@ const LinkedDataEntityFormContainer = ({formKey, isEditable = true, ...otherProp
 
 LinkedDataEntityFormContainer.propTypes = {
     formKey: PropTypes.string.isRequired,
+    isEditable: PropTypes.bool,
 };
 
 export default LinkedDataEntityFormContainer;
