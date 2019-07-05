@@ -2,14 +2,28 @@
 This application contains a portal UI for within a workspace. The UI is based on [Material UI](https://material-ui.com/).
 
 ### Running the app in development mode
-The app needs a backend to communicate with. For convenience, there are 2 npm/yarn scripts to use for local development:
+The app needs a backend to communicate with. For convenience, there are a few scripts to use for local development:
 
-`yarn server` starts the backend server at port 5000. It can be configured in the file `server/server.js`
+- `./start-elasticsearch` starts an ElasticSearch instance at port 9200 and 9300.
+- `yarn server:mock` starts a mock backend server at port 5000. It can be configured in the file `mock-server/server.js`
+- `yarn start` starts the frontend and exposes it at port 3000
 
-`yarn dev` starts the server and the app itself (`yarn start`) concurrently. To open the app point to http://localhost:3000/
+An additional command is available to start all components needed for local development at once: 
 
-This requires you to have [yarn](https://yarnpkg.com/lang/en/) installed. Alternatively, it should also
-work with npm (`npm server` and `npm dev`)
+    `yarn dev` 
+
+This will start:
+- ElasticSearch
+- Saturn (JDK 11 required)
+- Mock server
+- Frontend
+- Unit tests (yarn test)
+
+To open the app point to http://localhost:3000/
+
+All commands require you to have [yarn](https://yarnpkg.com/lang/en/) installed. 
+
+If there is no vocabulary in present in the workspace, you might have ran saturn prior to starting ES before. Stop the services, remove `../saturn/data/` and restart. The vocabulary should then be visible in the workspace.
 
 ### External configuration
 This application loads external configuration from the url `/config/config.json`. This file can locally be 
