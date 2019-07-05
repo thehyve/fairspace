@@ -24,6 +24,7 @@ To open the app point to http://localhost:3000/
 All commands require you to have [yarn](https://yarnpkg.com/lang/en/) installed. 
 
 If there is no vocabulary in present in the workspace, you might have ran saturn prior to starting ES before. Stop the services, remove `../saturn/data/` and restart. The vocabulary should then be visible in the workspace.
+
 ### External configuration
 This application loads external configuration from the url `/config/config.json`. This file can locally be 
 served by the `server/server.js` stub. By default it only contains the url to access the storage on.
