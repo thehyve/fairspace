@@ -116,7 +116,9 @@ public class CompoundFileSystem implements VirtualFileSystem {
 
     private static String collectionType(Collection collection) throws IOException {
         try {
-            return new URI(collection.getConnectionString()).getScheme();
+            return collection.getConnectionString().isEmpty()
+                    ? ""
+                    : new URI(collection.getConnectionString()).getScheme();
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }

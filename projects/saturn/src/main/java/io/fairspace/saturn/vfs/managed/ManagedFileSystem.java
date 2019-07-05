@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 public class ManagedFileSystem implements VirtualFileSystem {
-    public static final String TYPE = "managed";
+    public static final String TYPE = "";
 
     private static final FileInfo ROOT = FileInfo.builder().path("")
             .readOnly(false)

@@ -20,7 +20,7 @@ class CollectionEditor extends React.Component {
         editing: true,
         name: this.props.name || '',
         description: this.props.description || '',
-        connectionString: this.props.connectionString || 'managed:fairspace',
+        connectionString: this.props.connectionString || '',
         location: this.props.location || ''
     };
 
@@ -132,7 +132,7 @@ class CollectionEditor extends React.Component {
                         margin="dense"
                         id="connectionString"
                         label="Connection string"
-                        helperText="Provider-specific connection string, 'managed:fairspace' for managed collections"
+                        helperText="Provider-specific connection string, keep blank for managed collections"
                         value={this.state.connectionString}
                         name="connectionString"
                         onChange={(event) => this.handleInputChange('connectionString', event.target.value)}
