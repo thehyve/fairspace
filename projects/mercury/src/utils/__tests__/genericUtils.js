@@ -1,7 +1,4 @@
-import {
-    findById, flattenShallow, compareBy,
-    comparing, isNonEmptyValue
-} from "../genericUtils";
+import {compareBy, comparing, findById, flattenShallow, isNonEmptyValue, joinWithSeparator} from "../genericUtils";
 
 describe('array Utils', () => {
     describe('findById', () => {
@@ -88,4 +85,20 @@ describe('isNonEmptyValue', () => {
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
     });
+});
+
+describe('joinWithSeparator', () => {
+    it('should join multiple values into an array', () => {
+        expect(joinWithSeparator(['a', 'b', 'c'], ' ')).toEqual(['a', ' ', 'b', ' ', 'c']);
+    });
+    it('should work with empty arrays', () => {
+        expect(joinWithSeparator([], ' ')).toEqual([]);
+    });
+    it('should work with single entry arrays', () => {
+        expect(joinWithSeparator(['a'], ' ')).toEqual(['a']);
+    });
+    it('should work without a separator', () => {
+        expect(joinWithSeparator(['a', 'b', 'c'])).toEqual(['a', 'b', 'c']);
+    });
+
 });

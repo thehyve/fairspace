@@ -8,6 +8,7 @@ export const LEFT_MENU_EXPANSION_DELAY = 500;
 export const MAIN_CONTENT_WIDTH = '55%';
 export const SIDE_PANEL_WIDTH = '45%';
 export const MAIN_CONTENT_MAX_HEIGHT = '65vh';
+export const COLLECTIONS_PATH = '/collections';
 export const METADATA_PATH = '/metadata';
 export const VOCABULARY_PATH = '/vocabulary';
 export const TOOLTIP_ENTER_DELAY = 350;
@@ -78,5 +79,6 @@ export const EXTERNAL_LINK_URI = FAIRSPACE_NS + 'externalLink';
 export const SYSTEM_PROPERTIES_URI = FAIRSPACE_NS + 'systemProperties';
 export const RELATION_SHAPE_URI = FAIRSPACE_NS + 'RelationShape';
 export const IMPORTANT_PROPERTY_URI = FAIRSPACE_NS + 'importantProperty';
+export const DEFAULT_NAMESPACE_URI = FAIRSPACE_NS + 'defaultNamespace';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';

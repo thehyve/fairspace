@@ -74,7 +74,7 @@ class FileAPI {
                     }
                 }
 
-                throw e;
+                return Promise.reject(e);
             });
     }
 
@@ -100,7 +100,7 @@ class FileAPI {
                         }
                     }
 
-                    throw e;
+                    return Promise.reject(e);
                 });
         });
 
@@ -129,7 +129,19 @@ class FileAPI {
     delete(path) {
         if (!path) return Promise.reject(Error("No path specified for deletion"));
 
-        return this.client().deleteFile(path, defaultOptions);
+        return this.client().deleteFile(path, defaultOptions)
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("Could not delete file or directory. Do you have write permissions to the collection?");
+                    }
+                }
+
+                return Promise.reject(e);
+            });
+
     }
 
     /**
@@ -166,7 +178,7 @@ class FileAPI {
                     }
                 }
 
-                throw e;
+                return Promise.reject(e);
             });
     }
 
@@ -198,10 +210,22 @@ class FileAPI {
                     }
                 }
 
-                throw e;
+                return Promise.reject(e);
             });
     }
 
+    /**
+     * Delete one or more files
+     * @param filenames
+     * @returns {Promise}
+     */
+    deleteMultiple(filenames) {
+        if (!filenames || filenames.length === 0) {
+            return Promise.reject(new Error("No filenames given to delete"));
+        }
+
+        return Promise.all(filenames.map(filename => this.delete(filename)));
+    }
 
     /**
      * Move one or more files to a destinationdir
@@ -223,21 +247,21 @@ class FileAPI {
     copyPaths(filePaths, destinationDir) {
         return this.uniqueDestinationPaths(filePaths, destinationDir)
             .then(mapping => Promise.all(mapping.map(([src, dst]) => this.copy(src, dst))))
-    .catch(e => {
-            if (e && e.response) {
-                // eslint-disable-next-line default-case
-                switch (e.response.status) {
-                    case 504:
-                        throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
-                    case 409:
-                        throw new Error("Could not copy one or more files. The destination can not be copied to.");
-                    case 412:
-                        throw new Error("Could not copy one or more files. The destination file already exists.");
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
+                        case 409:
+                            throw new Error("Could not copy one or more files. The destination can not be copied to.");
+                        case 412:
+                            throw new Error("Could not copy one or more files. The destination file already exists.");
+                    }
                 }
-            }
 
-            throw e;
-        });
+                return Promise.reject(e);
+            });
 
     }
 
