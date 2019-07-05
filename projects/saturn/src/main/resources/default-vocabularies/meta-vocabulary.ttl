@@ -165,7 +165,7 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
     sh:closed true ;
     sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
     sh:name "Namespace" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:fixedShape ) ;
+    sh:ignoredProperties <ignoredPropertiesCollection> ;
     sh:property
         fs:PropertyNameShape,
         [
