@@ -4,7 +4,7 @@ This application contains a portal UI for within a workspace. The UI is based on
 ### Running the app in development mode
 The app needs a backend to communicate with. For convenience, there are 2 npm/yarn scripts to use for local development:
 
-`yarn server` starts the backend server at port 5000. It can be configured in the file `server/server.js`
+`yarn server` starts the backend server at port 5000. It can be configured in the file `mock-server/server.js`
 
 `yarn dev` starts the server and the app itself (`yarn start`) concurrently. To open the app point to http://localhost:3000/
 
