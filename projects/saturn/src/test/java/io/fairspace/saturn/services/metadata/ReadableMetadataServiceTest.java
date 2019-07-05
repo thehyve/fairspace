@@ -215,21 +215,20 @@ public class ReadableMetadataServiceTest {
         assertTrue(m4.contains(createResource("http://example.com/user"), RDF.type, user));
     }
 
-    @Test
+    @Test(expected = TooManyTriplesException.class)
     public void testTripleLimit() {
         api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI), 1);
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
-        assertEquals(1, api.get(null, null, null, false).size());
+        api.get(null, null, null, false);
     }
 
-    @Test
+    @Test(expected = TooManyTriplesException.class)
     public void testTripleLimitByType() {
         api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI), 1);
         setupModelForTypes();
 
-        // Test whether entities of a all types can be returned with a limit
-        assertEquals(2, api.getByType(null, false).size());
+        api.getByType(null, false);
     }
 
     private void setupModelForTypes() {

@@ -38,10 +38,9 @@ class ReadableMetadataService {
     Model get(String subject, String predicate, String object, boolean withObjectProperties) {
         var queryTemplate = withObjectProperties ? "select_by_mask_with_important_properties" : "select_by_mask";
 
-        var basicQuery = storedQuery(queryTemplate, graph, asURI(subject), asURI(predicate), asURI(object), vocabulary);
-        var query = tripleLimit > 0 ? limit(basicQuery, tripleLimit) : basicQuery;
+        var query = storedQuery(queryTemplate, graph, asURI(subject), asURI(predicate), asURI(object), vocabulary);
 
-        return rdf.queryConstruct(query);
+        return runWithLimit(query);
     }
 
     /**
@@ -61,15 +60,23 @@ class ReadableMetadataService {
      */
     Model getByType(String type, boolean filterOnCatalog) {
         String queryName = filterOnCatalog ? "catalog_entities_by_type" : "entities_by_type";
-        String basicQuery = storedQuery(
-                queryName,
-                graph,
-                vocabulary,
-                asURI(type)
-        );
-        String query = tripleLimit > 0 ? limit(basicQuery, tripleLimit) : basicQuery;
+        String query = storedQuery(queryName, graph, vocabulary, asURI(type));
 
-        return rdf.queryConstruct(query);
+        return runWithLimit(query);
+    }
+
+    private Model runWithLimit(String query) {
+        if (tripleLimit > 0) {
+            Model model = rdf.queryConstruct(limit(query, tripleLimit + 1));
+
+            if (model.size() > tripleLimit) {
+                throw new TooManyTriplesException();
+            }
+
+            return model;
+        } else {
+            return rdf.queryConstruct(query);
+        }
     }
 
     protected static Node asURI(String uri) {
