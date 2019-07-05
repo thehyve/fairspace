@@ -7,7 +7,7 @@ import MetadataValueComponentFactory from "./metadata/MetadataValueComponentFact
 import VocabularyValueComponentFactory from "./vocabulary/VocabularyValueComponentFactory";
 
 
-const MetadataWrapper = ({children}) => (
+export const MetadataWrapper = ({children}) => (
     <LinkedDataMetadataProvider>
         <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
             {children}
@@ -15,23 +15,10 @@ const MetadataWrapper = ({children}) => (
     </LinkedDataMetadataProvider>
 );
 
-const VocabularyWrapper = ({children}) => (
+export const VocabularyWrapper = ({children}) => (
     <LinkedDataVocabularyProvider>
         <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
             {children}
         </LinkedDataValuesContext.Provider>
     </LinkedDataVocabularyProvider>
 );
-
-
-const LinkedDataWrapper = ({children, location: {pathname}}) => {
-    const Provider = pathname.startsWith('/vocabulary') ? VocabularyWrapper : MetadataWrapper;
-
-    return (
-        <Provider>
-            {children}
-        </Provider>
-    );
-};
-
-export default LinkedDataWrapper;

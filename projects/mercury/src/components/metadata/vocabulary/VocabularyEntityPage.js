@@ -7,6 +7,6 @@ import LinkedDataEntityFormContainer from '../common/LinkedDataEntityFormContain
 export default ({subject}) => (
     <LinkedDataPage homeUrl="/vocabulary">
         <VocabularyEntityHeaderContainer subject={subject} />
-        <LinkedDataEntityFormContainer formKey={subject} />
+        <LinkedDataEntityFormContainer subject={subject} />
     </LinkedDataPage>
 );

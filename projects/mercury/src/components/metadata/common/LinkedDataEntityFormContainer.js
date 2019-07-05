@@ -6,12 +6,12 @@ import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useExistingEntity from '../UseExistingEntity';
 import useFormData from '../UseFormData';
 
-const LinkedDataEntityFormContainer = ({formKey, isEditable = true, ...otherProps}) => {
-    const {properties, loading, error} = useExistingEntity(formKey);
+const LinkedDataEntityFormContainer = ({subject, isEditable = true, ...otherProps}) => {
+    const {properties, loading, error} = useExistingEntity(subject);
     const {
         extendPropertiesWithChanges, canSubmit, onSubmit,
         submitDisabled, onAdd, onChange, onDelete,
-    } = useFormData(formKey);
+    } = useFormData(subject);
 
     return (
         <Grid container>

@@ -86,7 +86,7 @@ export class InformationDrawer extends React.Component {
                 />
                 <Paper style={{padding: 20, marginTop: 10}}>
                     <LinkedDataEntityFormContainer
-                        formKey={collection.iri}
+                        subject={collection.iri}
                         isEditable={isMetaDataEditable}
                     />
                 </Paper>

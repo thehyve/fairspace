@@ -43,7 +43,7 @@ export const LinkedDataVocabularyProvider = ({children}) => {
 
     const combineLinkedDataForSubjectSelector = (_, subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
 
-    const submitLinkedDataChanges = (subject) => dispatch(submitVocabularyChangesFromState(subject))
+    const submitLinkedDataChanges = (formKey) => dispatch(submitVocabularyChangesFromState(formKey))
         .then(() => fetchLinkedData());
 
     const getPropertiesForLinkedData = (linkedData, subject) => {
@@ -101,8 +101,8 @@ export const LinkedDataMetadataProvider = ({children}) => {
 
     const combineLinkedDataForSubjectSelector = getCombinedMetadataForSubject;
 
-    const submitLinkedDataChanges = (subject) => dispatch(submitMetadataChangesFromState(subject))
-        .then(() => fetchLinkedDataForSubject(subject));
+    const submitLinkedDataChanges = (formKey) => dispatch(submitMetadataChangesFromState(formKey))
+        .then(() => fetchLinkedDataForSubject(formKey));
 
     const getPropertiesForLinkedData = (linkedData) => propertiesToShow(linkedData)
         .map(p => ({

@@ -122,13 +122,9 @@ describe('AlterPermissionDialog', () => {
         );
         wrapper.setState({selectedUser: mockPermission.user});
 
-        // console.log(wrapper.debug());
-        // wrapper.update();
-
-
-        // TODO: fix test
         expect(wrapper.find('WithStyles(MaterialReactSelect)')).toHaveLength(0);
         expect(wrapper.find('WithStyles(Typography)').at(1).text()).toEqual('Michael Jackson');
+        // TODO: fix test
         // expect(wrapper.find('WithStyles(Button)').at(1).prop('disabled')).toBeFalsy(); // submit button enabled
     });
 });

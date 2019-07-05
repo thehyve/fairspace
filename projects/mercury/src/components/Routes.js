@@ -13,7 +13,7 @@ import SearchPage from './search/SearchPage';
 import VocabularyListPage from "./metadata/vocabulary/VocabularyListPage";
 import VocabularyEntityPage from "./metadata/vocabulary/VocabularyEntityPage";
 import {createMetadataIri, createVocabularyIri} from "../utils/linkeddata/metadataUtils";
-import LinkedDataWrapper from './metadata/LinkedDataWrapper';
+import {MetadataWrapper, VocabularyWrapper} from './metadata/LinkedDataWrapper';
 
 const routes = () => (
     <>
@@ -23,18 +23,18 @@ const routes = () => (
             path="/collections"
             exact
             render={({location}) => (
-                <LinkedDataWrapper location={location}>
+                <MetadataWrapper location={location}>
                     <Collections />
-                </LinkedDataWrapper>
+                </MetadataWrapper>
             )}
         />
 
         <Route
             path="/collections/:collection/:path(.*)?"
             render={(props) => (
-                <LinkedDataWrapper location={props.location}>
+                <MetadataWrapper location={props.location}>
                     <FilesPage {...props} />
-                </LinkedDataWrapper>
+                </MetadataWrapper>
             )}
         />
 
@@ -49,9 +49,9 @@ const routes = () => (
                 const iriParam = queryString.parse(location.search).iri;
                 const component = iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <MetadataListPage />;
                 return (
-                    <LinkedDataWrapper location={location}>
+                    <MetadataWrapper location={location}>
                         {component}
-                    </LinkedDataWrapper>
+                    </MetadataWrapper>
                 );
             }}
         />
@@ -72,9 +72,9 @@ const routes = () => (
                 const component = iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <VocabularyListPage />;
 
                 return (
-                    <LinkedDataWrapper location={location}>
+                    <VocabularyWrapper location={location}>
                         {component}
-                    </LinkedDataWrapper>
+                    </VocabularyWrapper>
                 );
             }}
         />

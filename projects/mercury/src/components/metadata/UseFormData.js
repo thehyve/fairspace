@@ -1,4 +1,4 @@
-import {useContext} from "react";
+import {useContext, useEffect} from "react";
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
@@ -7,19 +7,24 @@ import {
 } from "../../reducers/linkedDataFormReducers";
 import {
     addLinkedDataValue, deleteLinkedDataValue,
-    updateLinkedDataValue, validateLinkedDataProperty
+    updateLinkedDataValue, validateLinkedDataProperty,
+    initializeLinkedDataForm
 } from "../../actions/linkedDataFormActions";
 import ErrorDialog from "../common/ErrorDialog";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import LinkedDataContext from './LinkedDataContext';
 import {propertiesToShow, partitionErrors} from "../../utils/linkeddata/metadataUtils";
 
-const useExistingEntity = (formKey) => {
+const useFormData = (formKey) => {
     if (!formKey) {
         throw new Error('Please provide a valid form key.');
     }
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(initializeLinkedDataForm(formKey));
+    }, [formKey, dispatch]);
 
     const hasFormUpdates = useSelector(state => hasLinkedDataFormUpdates(state, formKey));
 
@@ -73,4 +78,4 @@ const useExistingEntity = (formKey) => {
     };
 };
 
-export default useExistingEntity;
+export default useFormData;

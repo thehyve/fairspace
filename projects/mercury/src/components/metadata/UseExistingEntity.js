@@ -1,23 +1,13 @@
-import {useEffect} from "react";
-import {useDispatch} from 'react-redux';
-
 import useLinkedData from './UseLinkedData';
-import {initializeLinkedDataForm} from "../../actions/linkedDataFormActions";
 
-const useExistingEntity = (formKey) => {
-    if (!formKey) {
+const useExistingEntity = (subject) => {
+    if (!subject) {
         throw new Error('Please provide a valid form key.');
     }
 
     const {
         linkedDataForSubject, linkedDataLoading, linkedDataError, getPropertiesForLinkedData
-    } = useLinkedData(formKey);
-
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(initializeLinkedDataForm(formKey));
-    }, [formKey, dispatch]);
+    } = useLinkedData(subject);
 
     let error = linkedDataError;
 
