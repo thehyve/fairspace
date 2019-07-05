@@ -47,16 +47,19 @@ const useFormData = (formKey) => {
         dispatch(addLinkedDataValue(formKey, property, value));
         dispatch(validateLinkedDataProperty(formKey, property));
     };
+
     const onChange = (property, value, index) => {
         dispatch(updateLinkedDataValue(formKey, property, value, index));
         dispatch(validateLinkedDataProperty(formKey, property));
     };
+
     const onDelete = (property, index) => {
         dispatch(deleteLinkedDataValue(formKey, property, index));
         dispatch(validateLinkedDataProperty(formKey, property));
     };
 
     const updates = useSelector(state => getLinkedDataFormUpdates(state, formKey));
+
     const errors = useSelector(state => getLinkedDataFormValidations(state, formKey));
 
     const extendPropertiesWithChanges = (properties) => propertiesToShow(properties)
