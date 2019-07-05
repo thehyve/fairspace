@@ -18,16 +18,19 @@ export const IriValue = props => {
         ...props.namespaces.map(namespace => ({
             id: namespace.id,
             label: namespace.label,
-            value: namespace.namespace
+            value: namespace.namespace,
+            isDefault: namespace.isDefault
         }))
     ];
+
+    const defaultNamespace = namespaceOptions.find(n => n.isDefault) || noNamespace;
 
     return (
         <Grid container justify="space-between" spacing={8}>
             <Grid item xs={4}>
                 <MaterialReactSelect
                     options={namespaceOptions}
-                    value={props.namespace || noNamespace}
+                    value={props.namespace || defaultNamespace}
                     onChange={props.onNamespaceChange}
                 />
             </Grid>

@@ -48,7 +48,7 @@ export const createMetadataEntityFromState = (formKey, subject, type) => (dispat
 
 const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({
     type: actionTypes.FETCH_METADATA,
-    payload: MetadataAPI.get({subject}),
+    payload: MetadataAPI.get({subject, includeObjectProperties: true}),
     meta: {
         subject
     }
