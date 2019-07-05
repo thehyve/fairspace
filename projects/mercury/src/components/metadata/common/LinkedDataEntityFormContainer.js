@@ -45,7 +45,7 @@ const LinkedDataEntityFormContainer = ({subject, isEditable = true, ...otherProp
 };
 
 LinkedDataEntityFormContainer.propTypes = {
-    formKey: PropTypes.string.isRequired,
+    subject: PropTypes.string.isRequired,
     isEditable: PropTypes.bool,
 };
 
