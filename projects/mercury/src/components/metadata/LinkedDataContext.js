@@ -9,7 +9,7 @@ import {
 } from "../../reducers/cache/vocabularyReducers";
 import {getAuthorizations} from "../../reducers/account/authorizationsReducers";
 import {fromJsonLd, emptyLinkedData} from "../../utils/linkeddata/jsonLdConverter";
-import {getCombinedMetadataForSubject} from "../../reducers/cache/jsonLdBySubjectReducers";
+import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
 import {isDataSteward} from "../../utils/userUtils";
 import Config from "../../services/Config/Config";
 import {propertiesToShow} from "../../utils/linkeddata/metadataUtils";
@@ -37,6 +37,10 @@ export const LinkedDataVocabularyProvider = ({children}) => {
 
     const fetchLinkedData = () => dispatch(fetchMetadataVocabularyIfNeeded());
 
+    const isLinkedDataLoadingSelector = isVocabularyPending;
+
+    const hasLinkedDataErrorForSubjectSelector = hasVocabularyError;
+
     const combineLinkedDataForSubjectSelector = (_, subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
 
     const submitLinkedDataChanges = (subject) => dispatch(submitVocabularyChangesFromState(subject))
@@ -59,6 +63,8 @@ export const LinkedDataVocabularyProvider = ({children}) => {
                 shapesLoading,
                 shapesError,
                 fetchLinkedDataForSubject: fetchLinkedData,
+                isLinkedDataLoadingSelector,
+                hasLinkedDataErrorForSubjectSelector,
                 combineLinkedDataForSubjectSelector,
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
@@ -89,6 +95,10 @@ export const LinkedDataMetadataProvider = ({children}) => {
 
     const fetchLinkedDataForSubject = (subject) => dispatch(fetchMetadataBySubjectIfNeeded(subject));
 
+    const isLinkedDataLoadingSelector = (state, subject) => isMetadataPending(state, subject);
+
+    const hasLinkedDataErrorForSubjectSelector = (state, subject) => hasMetadataError(state, subject);
+
     const combineLinkedDataForSubjectSelector = getCombinedMetadataForSubject;
 
     const submitLinkedDataChanges = (subject) => dispatch(submitMetadataChangesFromState(subject))
@@ -106,6 +116,8 @@ export const LinkedDataMetadataProvider = ({children}) => {
                 shapesLoading,
                 shapesError,
                 fetchLinkedDataForSubject,
+                isLinkedDataLoadingSelector,
+                hasLinkedDataErrorForSubjectSelector,
                 combineLinkedDataForSubjectSelector,
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
