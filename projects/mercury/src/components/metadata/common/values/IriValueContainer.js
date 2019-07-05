@@ -25,6 +25,10 @@ export const IriValue = props => {
 
     const defaultNamespace = namespaceOptions.find(n => n.isDefault) || noNamespace;
 
+    if (!props.namespace) {
+        props.onNamespaceChange(defaultNamespace);
+    }
+
     return (
         <Grid container justify="space-between" spacing={8}>
             <Grid item xs={4}>
