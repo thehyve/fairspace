@@ -14,21 +14,18 @@ Your workspace is named {{ template "workspace.name" . }} and can be accessed vi
 {{- if .Values.workspace.ingress.enabled }}
 
   - {{ template "workspace.url" . }}
-  - {{ template "jupyterhub.url" . }}
 
 {{- else }}
 
 * Run these commands in the same shell:
 
-  export JUPYTER_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services proxy-public)
   export PLUTO_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{.Release.Name}}-pluto)
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo JupyterHub at http://$NODE_IP:$JUPYTER_PORT
   echo Pluto at http://$NODE_IP:$PLUTO_PORT
 
 {{- end }}
 
-The installation contains instances of Mercury, Pluto, Saturn and Jupyterhub.
+The installation contains instances of Mercury, Pluto and Saturn.
 
 ----------------------------
 

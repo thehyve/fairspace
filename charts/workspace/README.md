@@ -1,9 +1,7 @@
 # A Helm chart for VRE workspaces
-This helm chart will install and setup a single VRE workspace. It includes
-an instance of JupyterHub.
+This helm chart will install and setup a single VRE workspace.
 
 Contains:
-- JupyterHub with Python 3 and R kernels and JupyterLab extension
 - Mercury
 - Pluto
 - Saturn
@@ -37,10 +35,6 @@ workspace:
     testuser:
         password: secret-password
 
-jupyterhub:
-    proxy:
-        secretToken: 3fca8159e7e0c07db4f6601799d961e82836965bf2b5d7a4310b7686cb18762e
-        
 pluto:
     keycloak:
         baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
@@ -91,7 +85,7 @@ installation.
 | `workspace.testuser.username`  | Username for the testuser that will be created for this workspace | `test-<workspace_name>` |
 | `workspace.testuser.password`  | Password for the testuser for this workspace | `fairspace123` |
 | `workspace.ingress.enabled`  | Whether or not an ingress is setup for the workspace components. Should be set to false when running locally.  | true |
-| `workspace.ingress.domain`   | Domain that is used for setting up the workspace. Is used as postfix for the hostname for the specific components. For example setting `fairspace.app` as domain will setup jupyterhub at `jupyterhub.fairspace.app`  | workspace.ci.test.fairdev.app  |
+| `workspace.ingress.domain`   | Domain that is used for setting up the workspace. Is used as postfix for the hostname for the specific components.  | workspace.ci.test.fairdev.app  |
 | `workspace.ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for workspace  | true  |
 | `workspace.ingress.tls.secretNameOverride`  | If set, this secret name is used for loading certificates for TLS. | `tls-<release name>` |
 | `workspace.ingress.tls.certificate.obtain`  | If set, a `Certificate` object will be created, such that [cert-manager](https://cert-manager.readthedocs.io/en/latest/) will request a certificate automatically. | true |
@@ -120,10 +114,6 @@ installation.
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:
 
-* Jupyterhub
-Settings for Jupyterhub should be in the section `jupyterhub`.
-See [the Jupyterhub docs](http://zero-to-jupyterhub.readthedocs.io/en/latest/user-environment.html) for more information on the specific settings
-
 * Pluto
 Settings for Pluto should be in the section `pluto`.
 See [the Pluto README](https://github.com/fairspace/workspace/blob/dev/projects/pluto/README.md) for more information on the specific settings
@@ -148,26 +138,6 @@ To use the secret for installing a workspace, follow these steps:
         imagePullSecrets:
         - name: <secret-name>
     ```
-- Add [credentials for jupyterhub](https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/jupyterhub/values.yaml#L55) separately:
-  ```yaml
-    jupyterhub:
-      hub:
-        imagePullSecret:
-          enabled: true
-          registry: eu.gcr.io
-          username: ...
-          email: ...
-          password: ...
-      singleuser:
-        imagePullSecret:
-          enabled: true
-          registry: eu.gcr.io
-          username: ...
-          email: ...
-          password: ...
-  ```
-  Please note that the version of the Jupyterhub helm chart currently in use (0.7) does not allow for setting the imagePullSecret for the
-  `hub`. That has to be set manually.
 
 ## Upgrading installations
 Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades

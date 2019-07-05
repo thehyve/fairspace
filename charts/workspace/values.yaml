@@ -47,9 +47,6 @@ workspace:
             kubernetes.io/ingress.class: nginx
             nginx.ingress.kubernetes.io/proxy-body-size: 10g
             nginx.ingress.kubernetes.io/rewrite-target: /zuul/$1
-          jupyter:
-            kubernetes.io/ingress.class: nginx
-            nginx.ingress.kubernetes.io/proxy-body-size: 10g
         tls:
             enabled: true
             secretNameOverride:
@@ -108,6 +105,7 @@ tracing:
 
 services:
   jupyterhub:
+  cbioportal:
 
 #####################################################################
 # Specific settings for Pluto subchart
@@ -298,75 +296,6 @@ mercury:
 
   urls:
     storage:
-
-#####################################################################
-# Specific settings for JupyterHub subchart
-#####################################################################
-jupyterhub:
-  auth:
-    type: custom
-    custom:
-      className: oauthenticator.openid.OpenIDConnectOAuthenticator
-      config:
-        enable_auth_state: True
-        client_id:
-        client_secret:
-        openid_url:
-        session_url:
-    scopes:
-      - offline_access
-  singleuser:
-    image:
-      name: eu.gcr.io/fairspace-207108/jupyterhub-singleuser
-      tag: RELEASEVERSION
-    defaultUrl: "/lab"
-    extraEnv:
-      WORKSPACE_URL:
-    cpu:
-      limit: 0.5
-      guarantee: 0.1
-    memory:
-      limit: 1G
-  hub:
-    image:
-      name: eu.gcr.io/fairspace-207108/jupyterhub-hub
-      tag: RELEASEVERSION
-    ingress:
-      enabled: false
-    extraEnv:
-      JUPYTERHUB_CRYPT_KEY:
-    extraConfig:
-      customConfig: |
-        c.KubeSpawner.cmd = ['/start']
-        c.KubeSpawner.singleuser_privileged = True
-        c.Authenticator.auto_login = True
-    # Requests values are set in Jupyterhub chart.
-    resources:
-      limits:
-        cpu: 200m
-        memory: 512Mi
-  proxy:
-    chp:
-      resources:
-        requests:
-          cpu: 10m
-          memory: 10Mi
-        limits:
-          cpu: 200m
-          memory: 512Mi
-    # The JupyterHub chart requires this value to be set here with the same
-    # length as the actual values
-    # Ensure to override this value with a 64-character hex string when installing
-    secretToken: "0000000000000000000000000000000000000000000000000000000000000000"
-  scheduling:
-    userScheduler:
-      enabled: false
-      pdb:
-        enabled: false
-    podPriority:
-      enabled: false
-    userPlaceholder:
-      enabled: false
 
 #####################################################################
 # Specific settings for ElasticSearch
