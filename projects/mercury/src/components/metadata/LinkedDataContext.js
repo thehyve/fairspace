@@ -1,5 +1,5 @@
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {connect} from 'react-redux';
 
 import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded, submitVocabularyChangesFromState} from "../../actions/vocabularyActions";
 import {fetchMetadataBySubjectIfNeeded, submitMetadataChangesFromState} from "../../actions/metadataActions";
@@ -17,34 +17,17 @@ import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedS
 
 const LinkedDataContext = React.createContext({});
 
-export const LinkedDataVocabularyProvider = ({children}) => {
-    const dispatch = useDispatch();
+const LinkedDataVocabularyProvider = ({
+    children, fetchMetaVocabulary, fetchMetadataVocabulary, submitVocabularyChanges,
+    shapesLoading, metaVocabulary, vocabulary, shapesError,
+    authorizations, isLinkedDataLoading, hasLinkedDataErrorForSubject, combineLinkedDataForSubject,
+}) => {
+    fetchMetaVocabulary();
 
-    dispatch(fetchMetaVocabularyIfNeeded());
-
-    const shapesLoading = useSelector(state => isMetaVocabularyPending(state));
-
-    const hasShapesError = useSelector(state => hasMetaVocabularyError(state));
-
-    const metaVocabulary = useSelector(state => getMetaVocabulary(state));
-
-    const vocabulary = useSelector(state => getVocabulary(state));
-
-    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the vocbulary';
-
-    const authorizations = useSelector(state => getAuthorizations(state));
     const getEmptyLinkedData = (shape) => emptyLinkedData(metaVocabulary, shape);
 
-    const fetchLinkedData = () => dispatch(fetchMetadataVocabularyIfNeeded());
-
-    const isLinkedDataLoadingSelector = isVocabularyPending;
-
-    const hasLinkedDataErrorForSubjectSelector = hasVocabularyError;
-
-    const combineLinkedDataForSubjectSelector = (_, subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
-
-    const submitLinkedDataChanges = (formKey) => dispatch(submitVocabularyChangesFromState(formKey))
-        .then(() => fetchLinkedData());
+    const submitLinkedDataChanges = (formKey) => submitVocabularyChanges(formKey)
+        .then(() => fetchMetadataVocabulary());
 
     const getPropertiesForLinkedData = (linkedData, subject) => {
         const shape = vocabulary.get(subject);
@@ -62,10 +45,10 @@ export const LinkedDataVocabularyProvider = ({children}) => {
             value={{
                 shapesLoading,
                 shapesError,
-                fetchLinkedDataForSubject: fetchLinkedData,
-                isLinkedDataLoadingSelector,
-                hasLinkedDataErrorForSubjectSelector,
-                combineLinkedDataForSubjectSelector,
+                fetchLinkedDataForSubject: fetchMetadataVocabulary,
+                isLinkedDataLoading,
+                hasLinkedDataErrorForSubject,
+                combineLinkedDataForSubject,
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
                 getPropertiesForLinkedData,
@@ -78,30 +61,18 @@ export const LinkedDataVocabularyProvider = ({children}) => {
 };
 
 
-export const LinkedDataMetadataProvider = ({children}) => {
-    const dispatch = useDispatch();
-
-    dispatch(fetchMetadataVocabularyIfNeeded());
-
-    const shapesLoading = useSelector(state => isVocabularyPending(state));
-
-    const vocabulary = useSelector(state => getVocabulary(state));
-
-    const hasShapesError = useSelector(state => hasVocabularyError(state));
-
-    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
+const LinkedDataMetadataProvider = ({
+    children, fetchMetadataVocabulary, fetchMetadataBySubject,
+    submitMetadataChanges, shapesLoading, vocabulary,
+    shapesError, isLinkedDataLoading, hasLinkedDataErrorForSubject,
+    combineLinkedDataForSubject,
+}) => {
+    fetchMetadataVocabulary();
 
     const getEmptyLinkedData = (shape) => emptyLinkedData(vocabulary, shape);
 
-    const fetchLinkedDataForSubject = (subject) => dispatch(fetchMetadataBySubjectIfNeeded(subject));
-
-    const isLinkedDataLoadingSelector = (state, subject) => isMetadataPending(state, subject);
-
-    const hasLinkedDataErrorForSubjectSelector = (state, subject) => hasMetadataError(state, subject);
-
-    const combineLinkedDataForSubjectSelector = getCombinedMetadataForSubject;
-
-    const submitLinkedDataChanges = (formKey) => dispatch(submitMetadataChangesFromState(formKey));
+    const submitLinkedDataChanges = (formKey) => submitMetadataChanges(formKey)
+        .then(() => fetchMetadataBySubject(formKey));
 
     const getPropertiesForLinkedData = (linkedData) => propertiesToShow(linkedData)
         .map(p => ({
@@ -114,10 +85,10 @@ export const LinkedDataMetadataProvider = ({children}) => {
             value={{
                 shapesLoading,
                 shapesError,
-                fetchLinkedDataForSubject,
-                isLinkedDataLoadingSelector,
-                hasLinkedDataErrorForSubjectSelector,
-                combineLinkedDataForSubjectSelector,
+                fetchLinkedDataForSubject: fetchMetadataBySubject,
+                isLinkedDataLoading,
+                hasLinkedDataErrorForSubject,
+                combineLinkedDataForSubject,
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
                 getPropertiesForLinkedData,
@@ -128,5 +99,60 @@ export const LinkedDataMetadataProvider = ({children}) => {
         </LinkedDataContext.Provider>
     );
 };
+
+const mapStateToPropsForVocabulary = (state) => {
+    const shapesLoading = isMetaVocabularyPending(state);
+    const hasShapesError = hasMetaVocabularyError(state);
+    const metaVocabulary = getMetaVocabulary(state);
+    const vocabulary = getVocabulary(state);
+    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the vocbulary';
+    const authorizations = getAuthorizations(state);
+    const isLinkedDataLoading = () => isVocabularyPending(state);
+    const hasLinkedDataErrorForSubject = () => hasVocabularyError(state);
+    const combineLinkedDataForSubject = (subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
+
+    return {
+        shapesLoading,
+        metaVocabulary,
+        vocabulary,
+        shapesError,
+        authorizations,
+        isLinkedDataLoading,
+        hasLinkedDataErrorForSubject,
+        combineLinkedDataForSubject,
+    };
+};
+
+const mapStateToPropsForMetadata = (state) => {
+    const shapesLoading = isVocabularyPending(state);
+    const vocabulary = getVocabulary(state);
+    const hasShapesError = hasVocabularyError(state);
+    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
+    const isLinkedDataLoading = (subject) => isMetadataPending(state, subject);
+    const hasLinkedDataErrorForSubject = (subject) => hasMetadataError(state, subject);
+    const combineLinkedDataForSubject = (subject) => getCombinedMetadataForSubject(state, subject);
+
+    return {
+        shapesLoading,
+        vocabulary,
+        shapesError,
+        isLinkedDataLoading,
+        hasLinkedDataErrorForSubject,
+        combineLinkedDataForSubject,
+    };
+};
+
+
+const mapDispatchToProps = {
+    fetchMetaVocabulary: fetchMetaVocabularyIfNeeded,
+    fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
+    submitVocabularyChanges: submitVocabularyChangesFromState,
+    fetchMetadataBySubject: fetchMetadataBySubjectIfNeeded,
+    submitMetadataChanges: submitMetadataChangesFromState
+};
+
+export const LinkedDataVocabularyProviderContainer = connect(mapStateToPropsForVocabulary, mapDispatchToProps)(LinkedDataVocabularyProvider);
+
+export const LinkedDataMetadataProviderContainer = connect(mapStateToPropsForMetadata, mapDispatchToProps)(LinkedDataMetadataProvider);
 
 export default LinkedDataContext;

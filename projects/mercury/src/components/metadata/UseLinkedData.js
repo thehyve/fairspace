@@ -1,13 +1,14 @@
 import {useContext, useEffect, useCallback} from 'react';
-import {useSelector} from 'react-redux';
 
 import LinkedDataContext from './LinkedDataContext';
 
 const useLinkedData = (subject) => {
     const {
         shapesLoading, shapesError, fetchLinkedDataForSubject,
-        combineLinkedDataForSubjectSelector, getPropertiesForLinkedData,
-        isLinkedDataLoadingSelector, hasLinkedDataErrorForSubjectSelector
+        getPropertiesForLinkedData,
+        isLinkedDataLoading,
+        hasLinkedDataErrorForSubject,
+        combineLinkedDataForSubject,
     } = useContext(LinkedDataContext);
 
     // useCallback will return a memoized version of the callback that only changes if one of the inputs has changed.
@@ -19,15 +20,11 @@ const useLinkedData = (subject) => {
         updateLinkedData();
     }, [updateLinkedData]);
 
-    const linkedDataForSubject = useSelector(state => combineLinkedDataForSubjectSelector(state, subject));
-
-    const isLinkedDataLoading = useSelector(state => isLinkedDataLoadingSelector(state, subject));
-
-    const hasLinkedDataErrorForSubject = useSelector(state => hasLinkedDataErrorForSubjectSelector(state, subject));
+    const linkedDataForSubject = combineLinkedDataForSubject(subject);
 
     return {
-        linkedDataLoading: shapesLoading || isLinkedDataLoading,
-        linkedDataError: shapesError || (hasLinkedDataErrorForSubject && `Unable to load metadata for ${subject}`) || '',
+        linkedDataLoading: shapesLoading || isLinkedDataLoading(subject),
+        linkedDataError: shapesError || (hasLinkedDataErrorForSubject(subject) && `Unable to load metadata for ${subject}`) || '',
         linkedDataForSubject,
         updateLinkedData,
         getPropertiesForLinkedData: () => getPropertiesForLinkedData(linkedDataForSubject, subject)
