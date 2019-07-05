@@ -101,8 +101,7 @@ export const LinkedDataMetadataProvider = ({children}) => {
 
     const combineLinkedDataForSubjectSelector = getCombinedMetadataForSubject;
 
-    const submitLinkedDataChanges = (formKey) => dispatch(submitMetadataChangesFromState(formKey))
-        .then(() => fetchLinkedDataForSubject(formKey));
+    const submitLinkedDataChanges = (formKey) => dispatch(submitMetadataChangesFromState(formKey));
 
     const getPropertiesForLinkedData = (linkedData) => propertiesToShow(linkedData)
         .map(p => ({
