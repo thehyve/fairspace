@@ -90,10 +90,6 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 {{- end -}}
 
-{{/* Jupyterhub external hostname */}}
-{{- define "jupyterhub.hostname" -}}
-{{- printf "jupyterhub.%s" .Values.workspace.ingress.domain -}}
-{{- end -}}
 
 {{/* Pluto external hostname */}}
 {{- define "pluto.hostname" -}}
@@ -107,14 +103,6 @@ Scheme to access workspace components (http or https)
 
 {{- define "workspace.url" -}}
 {{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}
-{{- end -}}
-
-{{- define "jupyterhub.url" -}}
-{{- if .Values.services.jupyterhub -}}
-{{- .Values.services.jupyterhub -}}
-{{- else -}}
-{{ template "workspace.scheme" . }}://{{ template "jupyterhub.hostname" . }}
-{{- end -}}
 {{- end -}}
 
 {{- define "storage.url" -}}

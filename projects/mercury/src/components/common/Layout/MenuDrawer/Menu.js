@@ -30,17 +30,19 @@ const Menu = ({location: {pathname}}) => (
                 </ListItemIcon>
                 <ListItemText primary="Collections" />
             </ListItem>
-            <ListItem
-                component={NavLink}
-                to="/notebooks"
-                button
-                selected={pathname.startsWith('/notebooks')}
-            >
-                <ListItemIcon>
-                    <Icon>bar_chart</Icon>
-                </ListItemIcon>
-                <ListItemText primary="Notebooks" />
-            </ListItem>
+            {Config.get().urls.jupyterhub ? (
+                <ListItem
+                    component={NavLink}
+                    to="/notebooks"
+                    button
+                    selected={pathname.startsWith('/notebooks')}
+                >
+                    <ListItemIcon>
+                        <Icon>bar_chart</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary="Notebooks" />
+                </ListItem>
+            ) : null }
             <ListItem
                 component={NavLink}
                 to="/metadata"
