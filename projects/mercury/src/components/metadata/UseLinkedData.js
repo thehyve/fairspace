@@ -26,8 +26,8 @@ const useLinkedData = (subject) => {
         linkedDataLoading: shapesLoading || isLinkedDataLoading(subject),
         linkedDataError: shapesError || (hasLinkedDataErrorForSubject(subject) && `Unable to load metadata for ${subject}`) || '',
         linkedDataForSubject,
-        label,
-        description,
+        typeLabel: label,
+        typeDescription: description,
         updateLinkedData,
         getPropertiesForLinkedData: () => getPropertiesForLinkedData(linkedDataForSubject, subject)
     };

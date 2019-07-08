@@ -6,7 +6,7 @@ import Iri from "../../common/Iri";
 import IriTooltip from "../../common/IriTooltip";
 
 const LinkedDataEntityHeader = ({subject}) => {
-    const {linkedDataError, label, description} = useLinkedData(subject);
+    const {linkedDataError, typeLabel, typeDescription} = useLinkedData(subject);
 
     return !linkedDataError && (
         <>
@@ -26,12 +26,12 @@ const LinkedDataEntityHeader = ({subject}) => {
                                 color="inherit"
                                 style={{whiteSpace: 'pre-line'}}
                             >
-                                {description}
+                                {typeDescription}
                             </Typography>
                         )}
-                        aria-label={description}
+                        aria-label={typeDescription}
                     >
-                        <Chip label={label || '........'} />
+                        <Chip label={typeLabel || '........'} />
                     </Tooltip>
                 </Grid>
             </Grid>
