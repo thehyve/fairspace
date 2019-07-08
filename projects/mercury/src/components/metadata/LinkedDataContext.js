@@ -37,14 +37,14 @@ const LinkedDataVocabularyProvider = ({
     const submitLinkedDataChanges = (formKey) => submitVocabularyChanges(formKey)
         .then(() => fetchMetadataVocabulary());
 
-    const getPropertiesForLinkedData = (linkedData, subject) => {
+    const getPropertiesForLinkedData = ({linkedData, subject, isEntityEditable = true}) => {
         const shape = vocabulary.get(subject);
 
         return extendPropertiesWithVocabularyEditingInfo({
             properties: propertiesToShow(linkedData),
             isFixed: isFixedShape(shape),
             systemProperties: getSystemProperties(shape),
-            isEditable: isDataSteward
+            isEditable: isEntityEditable && isDataSteward(authorizations, Config.get())
         });
     };
 
@@ -65,7 +65,6 @@ const LinkedDataVocabularyProvider = ({
                 getPropertiesForLinkedData,
                 namespaces,
                 getDescendants: metaVocabulary.getDescendants,
-                hasEditRight: isDataSteward(authorizations, Config.get()),
                 getTypeInfoForLinkedData
             }}
         >
@@ -88,10 +87,10 @@ const LinkedDataMetadataProvider = ({
     const submitLinkedDataChanges = (formKey) => submitMetadataChanges(formKey)
         .then(() => fetchMetadataBySubject(formKey));
 
-    const getPropertiesForLinkedData = (linkedData) => propertiesToShow(linkedData)
+    const getPropertiesForLinkedData = ({linkedData, isEditable = true}) => propertiesToShow(linkedData)
         .map(p => ({
             ...p,
-            isEditable: !p.machineOnly
+            isEditable: isEditable && !p.machineOnly
         }));
 
     const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_METADATA_URI));
@@ -111,7 +110,6 @@ const LinkedDataMetadataProvider = ({
                 namespaces,
                 getPropertiesForLinkedData,
                 getDescendants: vocabulary.getDescendants,
-                hasEditRight: true,
                 getTypeInfoForLinkedData
             }}
         >

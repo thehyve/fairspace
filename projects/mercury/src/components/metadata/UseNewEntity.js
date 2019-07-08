@@ -2,9 +2,9 @@ import {useContext} from "react";
 
 import LinkedDataContext from './LinkedDataContext';
 
-const useNewEntity = (formKey, shape) => {
-    if (!formKey && !shape) {
-        throw new Error('Formkey and/or shape are not provided');
+const useNewEntity = (shape) => {
+    if (!shape) {
+        throw new Error('Shape is not provided');
     }
 
     const {getEmptyLinkedData} = useContext(LinkedDataContext);

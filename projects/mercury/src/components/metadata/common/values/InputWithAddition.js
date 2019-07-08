@@ -54,14 +54,15 @@ class InputWithAddition extends React.Component {
                     <Icon>add</Icon>
                 </Button>
 
-                <NewLinkedDataEntityDialog
-                    open={this.state.adding}
-                    shape={this.props.shape}
-                    linkedData={this.props.emptyData}
-                    onCreate={this.handleEntityCreation}
-                    onClose={this.handleCloseDialog}
-                    requireIdentifier={this.props.requireIdentifier}
-                />
+                {this.state.adding && (
+                    <NewLinkedDataEntityDialog
+                        shape={this.props.shape}
+                        linkedData={this.props.emptyData}
+                        onCreate={this.handleEntityCreation}
+                        onClose={this.handleCloseDialog}
+                        requireIdentifier={this.props.requireIdentifier}
+                    />
+                )}
             </>
         );
     }

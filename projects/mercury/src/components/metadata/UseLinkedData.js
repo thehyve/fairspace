@@ -2,7 +2,11 @@ import {useContext, useEffect, useCallback} from 'react';
 
 import LinkedDataContext from './LinkedDataContext';
 
-const useLinkedData = (subject) => {
+const useLinkedData = (subject, isEditable) => {
+    if (!subject) {
+        throw new Error('Please provide a valid subject.');
+    }
+
     const {
         shapesLoading, shapesError, fetchLinkedDataForSubject,
         getPropertiesForLinkedData, isLinkedDataLoading, hasLinkedDataErrorForSubject,
@@ -22,14 +26,22 @@ const useLinkedData = (subject) => {
 
     const {label, description} = getTypeInfoForLinkedData(linkedDataForSubject);
 
+    const linkedDataLoading = shapesLoading || isLinkedDataLoading(subject);
+
+    let error = shapesError || (hasLinkedDataErrorForSubject(subject) && `Unable to load metadata for ${subject}`) || '';
+
+    if (!linkedDataLoading && !(linkedDataForSubject && linkedDataForSubject.length > 0)) {
+        error = 'No metadata found for this subject';
+    }
+
     return {
-        linkedDataLoading: shapesLoading || isLinkedDataLoading(subject),
-        linkedDataError: shapesError || (hasLinkedDataErrorForSubject(subject) && `Unable to load metadata for ${subject}`) || '',
+        linkedDataLoading,
+        linkedDataError: error,
         linkedDataForSubject,
         typeLabel: label,
         typeDescription: description,
         updateLinkedData,
-        getPropertiesForLinkedData: () => getPropertiesForLinkedData(linkedDataForSubject, subject)
+        properties: getPropertiesForLinkedData({linkedData: linkedDataForSubject, subject, isEditable})
     };
 };
 
