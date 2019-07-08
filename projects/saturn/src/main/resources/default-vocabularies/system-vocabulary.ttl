@@ -51,7 +51,7 @@ fs:Fairspace-Namespace a sh:PrefixDeclaration ;
    fs:fixedShape true ;
    sh:namespace <http://fairspace.io/ontology#> .
 
-fs:Fairspace-Namespace a sh:PrefixDeclaration ;
+fs:Shacl-Namespace a sh:PrefixDeclaration ;
   sh:name "sh: (SHACL)" ;
   sh:prefix "sh" ;
   fs:fixedShape true ;
