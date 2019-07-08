@@ -12,7 +12,7 @@ import {fromJsonLd, emptyLinkedData} from "../../utils/linkeddata/jsonLdConverte
 import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
 import {isDataSteward} from "../../utils/userUtils";
 import Config from "../../services/Config/Config";
-import {propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {propertiesToShow, getTypeInfo} from "../../utils/linkeddata/metadataUtils";
 import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../../utils/linkeddata/vocabularyUtils";
 
 const LinkedDataContext = React.createContext({});
@@ -40,6 +40,8 @@ const LinkedDataVocabularyProvider = ({
         });
     };
 
+    const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, metaVocabulary);
+
     return (
         <LinkedDataContext.Provider
             value={{
@@ -52,7 +54,8 @@ const LinkedDataVocabularyProvider = ({
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
                 getPropertiesForLinkedData,
-                hasEditRight: isDataSteward(authorizations, Config.get())
+                hasEditRight: isDataSteward(authorizations, Config.get()),
+                getTypeInfoForLinkedData
             }}
         >
             {children}
@@ -80,6 +83,8 @@ const LinkedDataMetadataProvider = ({
             isEditable: !p.machineOnly
         }));
 
+    const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, vocabulary);
+
     return (
         <LinkedDataContext.Provider
             value={{
@@ -92,7 +97,8 @@ const LinkedDataMetadataProvider = ({
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
                 getPropertiesForLinkedData,
-                hasEditRight: true
+                hasEditRight: true,
+                getTypeInfoForLinkedData
             }}
         >
             {children}

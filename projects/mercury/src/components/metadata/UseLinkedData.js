@@ -5,10 +5,8 @@ import LinkedDataContext from './LinkedDataContext';
 const useLinkedData = (subject) => {
     const {
         shapesLoading, shapesError, fetchLinkedDataForSubject,
-        getPropertiesForLinkedData,
-        isLinkedDataLoading,
-        hasLinkedDataErrorForSubject,
-        combineLinkedDataForSubject,
+        getPropertiesForLinkedData, isLinkedDataLoading, hasLinkedDataErrorForSubject,
+        combineLinkedDataForSubject, getTypeInfoForLinkedData,
     } = useContext(LinkedDataContext);
 
     // useCallback will return a memoized version of the callback that only changes if one of the inputs has changed.
@@ -22,10 +20,14 @@ const useLinkedData = (subject) => {
 
     const linkedDataForSubject = combineLinkedDataForSubject(subject);
 
+    const {label, description} = getTypeInfoForLinkedData(linkedDataForSubject);
+
     return {
         linkedDataLoading: shapesLoading || isLinkedDataLoading(subject),
         linkedDataError: shapesError || (hasLinkedDataErrorForSubject(subject) && `Unable to load metadata for ${subject}`) || '',
         linkedDataForSubject,
+        label,
+        description,
         updateLinkedData,
         getPropertiesForLinkedData: () => getPropertiesForLinkedData(linkedDataForSubject, subject)
     };
