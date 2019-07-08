@@ -52,6 +52,7 @@ const LinkedDataVocabularyProvider = ({
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
                 getPropertiesForLinkedData,
+                getDescendants: metaVocabulary.getDescendants,
                 hasEditRight: isDataSteward(authorizations, Config.get())
             }}
         >
@@ -92,6 +93,7 @@ const LinkedDataMetadataProvider = ({
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
                 getPropertiesForLinkedData,
+                getDescendants: vocabulary.getDescendants,
                 hasEditRight: true
             }}
         >
