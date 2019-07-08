@@ -1,6 +1,8 @@
 package io.fairspace.saturn;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.saturn.auth.UserInfo;
+import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.junit.Before;
@@ -13,9 +15,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
@@ -32,12 +39,17 @@ public class SaturnSecurityHandlerTest {
     @Mock
     private Handler nextHandler;
 
+    private StringWriter writer;
+
     private SaturnSecurityHandler handler;
 
     @Before
-    public void before() {
+    public void before() throws IOException {
         handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator);
         handler.setHandler(nextHandler);
+
+        writer = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(writer));
     }
 
     @Test
@@ -99,7 +111,6 @@ public class SaturnSecurityHandlerTest {
         verifyAuthenticated(true);
     }
 
-
     @Test
     public void otherEndpointsCanBeAccessedWithValidAuth() throws IOException, ServletException {
         when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null, Set.of("user")));
@@ -107,6 +118,24 @@ public class SaturnSecurityHandlerTest {
         handler.handle("/api/v1/some/", baseRequest, request, response);
 
         verifyAuthenticated(true);
+    }
+
+    @Test
+    public void errorMessageIsSentCorrectly() throws IOException, ServletException {
+        when(authenticator.apply(eq(request))).thenReturn(null);
+
+        handler.handle("/api", baseRequest, request, response);
+
+        verifyAuthenticated(false);
+
+        // Verify the response
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        verify(response).setContentType(MimeTypes.Type.APPLICATION_JSON.toString());
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map errorBody = mapper.readValue(writer.toString(), Map.class);
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, errorBody.get("status"));
+        assertNotNull(errorBody.get("message"));
     }
 
     private void verifyAuthenticated(boolean success) {
