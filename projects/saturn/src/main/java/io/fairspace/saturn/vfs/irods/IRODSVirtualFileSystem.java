@@ -8,6 +8,7 @@ import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
+import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
@@ -70,27 +71,6 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         }
     }
 
-    private IRODSFile getFile(String path) throws IOException {
-        var account = getAccount(path);
-        try {
-            return getIrodsFileFactory(account).instanceIRODSFile(getIrodsPath(path));
-        } catch (JargonException e) {
-            throw new IOException(e);
-        }
-    }
-
-    private IRODSAccount getAccount(String path) throws IOException {
-        return accountForCollection(collectionByPath(path));
-    }
-
-    private String getIrodsPath(String path) throws IOException {
-        return "/" + joinPaths(getAccount(path).getHomeDirectory(), subPath(path));
-    }
-
-    private CollectionAndDataObjectListAndSearchAO getAccessObject(IRODSAccount account) throws JargonException {
-        return fs.getIRODSAccessObjectFactory().getCollectionAndDataObjectListAndSearchAO(account);
-    }
-
     @Override
     public List<FileInfo> list(String parentPath) throws IOException {
         try {
@@ -120,22 +100,6 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         }
     }
 
-    private static boolean isDirectory(ObjStat stat) {
-        return stat.getObjectType() == COLLECTION || stat.getObjectType() == LOCAL_DIR;
-    }
-
-    private static String getIri(IRODSAccount account, ObjStat stat) {
-        return "irods://" + account.getHost() + "#" + stat.getDataId();
-    }
-
-    private Collection collectionByPath(String parentPath) throws FileNotFoundException {
-        var collection = collections.getByLocation(splitPath(parentPath)[0]);
-        if (collection == null) {
-            throw new FileNotFoundException(parentPath);
-        }
-        return collection;
-    }
-
     @Override
     public void mkdir(String path) throws IOException {
         getFile(path).mkdir();
@@ -161,41 +125,16 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         }
     }
 
-    private IRODSFileInputStream getInputStream(String path) throws IOException {
-        var account = getAccount(path);
-        try {
-            return getIrodsFileFactory(account).instanceIRODSFileInputStream(getIrodsPath(path));
-        } catch (JargonException e) {
-            throw new IOException(e);
-        }
-    }
-
-    private IRODSFileOutputStream getOutputStream(String path) throws IOException {
-        var account = getAccount(path);
-        try {
-            return getIrodsFileFactory(account).instanceIRODSFileOutputStream(getIrodsPath(path));
-        } catch (JargonException e) {
-            throw new IOException(e);
-        }
-    }
-
-    private IRODSFileFactory getIrodsFileFactory(IRODSAccount account) throws IOException {
-        try {
-            return fs.getIRODSAccessObjectFactory().getIRODSFileFactory(account);
-        } catch (JargonException e) {
-            throw new IOException(e);
-        }
-    }
-
     @Override
     public void copy(String from, String to) throws IOException {
         try {
             var fromAccount = getAccount(from);
             var toAccount = getAccount(to);
             if (fromAccount.equals(toAccount)) {
-                fs.getIRODSAccessObjectFactory().getDataTransferOperations(fromAccount).copy(getIrodsPath(from), fromAccount.getDefaultStorageResource(), getIrodsPath(to), null, null);
+                getDataTransferOperations(fromAccount).copy(getIrodsPath(from), fromAccount.getDefaultStorageResource(), getIrodsPath(to), null, null);
+                // TODO: Copy metadata as well
             } else {
-                VirtualFileSystem.super.copy(from, to);
+                throw new IOException("Copying files between different iRODS accounts is not implemented yet");
             }
         } catch (JargonException e) {
             throw new IOException(e);
@@ -208,9 +147,9 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
             var fromAccount = getAccount(from);
             var toAccount = getAccount(to);
             if (fromAccount.equals(toAccount)) {
-                fs.getIRODSAccessObjectFactory().getDataTransferOperations(fromAccount).move(getIrodsPath(from), getIrodsPath(to));
+                getDataTransferOperations(fromAccount).move(getIrodsPath(from), getIrodsPath(to));
             } else {
-                VirtualFileSystem.super.move(from, to);
+                throw new IOException("Moving files between different iRODS accounts is not implemented yet");
             }
         } catch (JargonException e) {
             throw new IOException(e);
@@ -229,6 +168,69 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         } catch (JargonException e) {
             throw new IOException(e);
         }
+    }
+
+    private IRODSFile getFile(String path) throws IOException {
+        var account = getAccount(path);
+        try {
+            return getIrodsFileFactory(account).instanceIRODSFile(getIrodsPath(path));
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private IRODSAccount getAccount(String path) throws IOException {
+        return accountForCollection(collectionByPath(path));
+    }
+
+    private Collection collectionByPath(String parentPath) throws FileNotFoundException {
+        var collection = collections.getByLocation(splitPath(parentPath)[0]);
+        if (collection == null) {
+            throw new FileNotFoundException(parentPath);
+        }
+        return collection;
+    }
+
+    private String getIrodsPath(String path) throws IOException {
+        return "/" + joinPaths(getAccount(path).getHomeDirectory(), subPath(path));
+    }
+
+    private IRODSFileInputStream getInputStream(String path) throws IOException {
+        var account = getAccount(path);
+        try {
+            return getIrodsFileFactory(account).instanceIRODSFileInputStream(getIrodsPath(path));
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private IRODSFileOutputStream getOutputStream(String path) throws IOException {
+        var account = getAccount(path);
+        try {
+            return getIrodsFileFactory(account).instanceIRODSFileOutputStream(getIrodsPath(path));
+        } catch (JargonException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private CollectionAndDataObjectListAndSearchAO getAccessObject(IRODSAccount account) throws JargonException {
+        return fs.getIRODSAccessObjectFactory().getCollectionAndDataObjectListAndSearchAO(account);
+    }
+
+    private DataTransferOperations getDataTransferOperations(IRODSAccount fromAccount) throws JargonException {
+        return fs.getIRODSAccessObjectFactory().getDataTransferOperations(fromAccount);
+    }
+
+    private IRODSFileFactory getIrodsFileFactory(IRODSAccount account) throws JargonException {
+        return fs.getIRODSAccessObjectFactory().getIRODSFileFactory(account);
+    }
+
+    private static boolean isDirectory(ObjStat stat) {
+        return stat.getObjectType() == COLLECTION || stat.getObjectType() == LOCAL_DIR;
+    }
+
+    private static String getIri(IRODSAccount account, ObjStat stat) {
+        return "irods://" + account.getHost() + "#" + stat.getDataId();
     }
 
     private static IRODSAccount accountForCollection(Collection collection) throws IOException {

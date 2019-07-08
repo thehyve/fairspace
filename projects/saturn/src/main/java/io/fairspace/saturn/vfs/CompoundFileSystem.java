@@ -70,7 +70,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
         if (fileSystemByPath(from).equals(fileSystemByPath(to))) {
             fileSystemByPath(from).copy(from, to);
         } else {
-            VirtualFileSystem.super.copy(from, to);
+            throw new IOException("Copying files between collections of different types is not implemented yet");
         }
     }
 
@@ -79,7 +79,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
         if (fileSystemByPath(from).equals(fileSystemByPath(to))) {
             fileSystemByPath(from).move(from, to);
         } else {
-            VirtualFileSystem.super.move(from, to);
+            throw new IOException("Moving files between collections of different types is not implemented yet");
         }
     }
 

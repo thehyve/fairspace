@@ -1,10 +1,10 @@
 package io.fairspace.saturn.vfs;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
-
-import static java.io.File.createTempFile;
-import static org.apache.commons.io.FilenameUtils.getName;
 
 /**
  * Virtual File System abstractions
@@ -33,34 +33,9 @@ public interface VirtualFileSystem extends Closeable {
 
     void read(String path, OutputStream out) throws IOException;
 
-    default void copy(String from, String to) throws IOException {
-        var src = stat(from);
-        if (src.isDirectory()) {
-            mkdir(to);
-            for (var child: list(from)) {
-                copy(child.getPath(), to + '/' + getName(child.getPath()));
-            }
-        } else {
-            var temp = createTempFile("fairspace", "copy");
-            try {
-                try(var fos = new FileOutputStream(temp);
-                    var bos = new BufferedOutputStream(fos)) {
-                    read(from, bos);
-                }
-                try(var fis = new FileInputStream(temp);
-                    var bis = new BufferedInputStream(fis)) {
-                    create(to, bis);
-                }
-            } finally {
-                temp.delete();
-            }
-        }
-    }
+    void copy(String from, String to) throws IOException;
 
-    default void move(String from, String to) throws IOException {
-        copy(from, to);
-        delete(from);
-    }
+    void move(String from, String to) throws IOException;
 
     void delete(String path) throws IOException;
 }
