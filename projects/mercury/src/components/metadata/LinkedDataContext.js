@@ -1,8 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded, submitVocabularyChangesFromState} from "../../actions/vocabularyActions";
-import {fetchMetadataBySubjectIfNeeded, submitMetadataChangesFromState} from "../../actions/metadataActions";
+import {
+    createVocabularyEntityFromState, fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded,
+    submitVocabularyChangesFromState
+} from "../../actions/vocabularyActions";
+import {
+    createMetadataEntityFromState, fetchMetadataBySubjectIfNeeded, submitMetadataChangesFromState
+} from "../../actions/metadataActions";
 import {
     getVocabulary, hasVocabularyError, isVocabularyPending,
     isMetaVocabularyPending, getMetaVocabulary, hasMetaVocabularyError
@@ -21,6 +26,7 @@ const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, submitVocabularyChanges,
     shapesLoading, metaVocabulary, vocabulary, shapesError,
     authorizations, isLinkedDataLoading, hasLinkedDataErrorForSubject, combineLinkedDataForSubject,
+    createVocabularyEntity
 }) => {
     fetchMetaVocabulary();
 
@@ -53,10 +59,13 @@ const LinkedDataVocabularyProvider = ({
                 combineLinkedDataForSubject,
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
+                createLinkedDataEntity: createVocabularyEntity,
                 getPropertiesForLinkedData,
                 getDescendants: metaVocabulary.getDescendants,
+                determineShapeForTypes: metaVocabulary.determineShapeForTypes,
                 hasEditRight: isDataSteward(authorizations, Config.get()),
-                getTypeInfoForLinkedData
+                getTypeInfoForLinkedData,
+                requireIdentifier: false
             }}
         >
             {children}
@@ -69,7 +78,7 @@ const LinkedDataMetadataProvider = ({
     children, fetchMetadataVocabulary, fetchMetadataBySubject,
     submitMetadataChanges, shapesLoading, vocabulary,
     shapesError, isLinkedDataLoading, hasLinkedDataErrorForSubject,
-    combineLinkedDataForSubject,
+    combineLinkedDataForSubject, createMetadataEntity
 }) => {
     fetchMetadataVocabulary();
 
@@ -97,10 +106,13 @@ const LinkedDataMetadataProvider = ({
                 combineLinkedDataForSubject,
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
+                createLinkedDataEntity: createMetadataEntity,
                 getPropertiesForLinkedData,
                 getDescendants: vocabulary.getDescendants,
+                determineShapeForTypes: vocabulary.determineShapeForTypes,
                 hasEditRight: true,
-                getTypeInfoForLinkedData
+                getTypeInfoForLinkedData,
+                requireIdentifier: true
             }}
         >
             {children}
@@ -156,7 +168,9 @@ const mapDispatchToProps = {
     fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
     submitVocabularyChanges: submitVocabularyChangesFromState,
     fetchMetadataBySubject: fetchMetadataBySubjectIfNeeded,
-    submitMetadataChanges: submitMetadataChangesFromState
+    submitMetadataChanges: submitMetadataChangesFromState,
+    createMetadataEntity: createMetadataEntityFromState,
+    createVocabularyEntity: createVocabularyEntityFromState
 };
 
 export const LinkedDataVocabularyProviderContainer = connect(mapStateToPropsForVocabulary, mapDispatchToProps)(LinkedDataVocabularyProvider);
