@@ -7,15 +7,12 @@ import {createMetadataEntityFromState} from "../../../actions/metadataActions";
 import {searchMetadata} from "../../../actions/searchActions";
 import {getMetadataSearchResults} from "../../../reducers/searchReducers";
 import LinkedDataCreator from "../common/LinkedDataCreator";
-import MetadataValueComponentFactory from "./MetadataValueComponentFactory";
 import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
 import {ErrorDialog, MessageDisplay} from "../../common";
 import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
-import {LinkedDataValuesContext} from "../common/LinkedDataValuesContext";
 import {METADATA_PATH, SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../../constants";
 import LinkedDataLink from "../common/LinkedDataLink";
 import LinkedDataList from "../common/LinkedDataList";
-import {emptyLinkedData} from "../../../utils/linkeddata/jsonLdConverter";
 import Iri from "../../common/Iri";
 
 const openMetadataEntry = (history, id) => {
@@ -23,24 +20,22 @@ const openMetadataEntry = (history, id) => {
 };
 
 const MetadataBrowserContainer = ({entities, hasHighlights, footerRender, total, history, ...otherProps}) => (
-    <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
-        <LinkedDataCreator requireIdentifier {...otherProps}>
-            {
-                entities && entities.length > 0
-                    ? (
-                        <LinkedDataList
-                            items={entities}
-                            total={total}
-                            hasHighlights={hasHighlights}
-                            footerRender={footerRender}
-                            typeRender={entry => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>}
-                            onOpen={id => openMetadataEntry(history, id)}
-                        />
-                    )
-                    : <MessageDisplay message="The metadata layer is empty" isError={false} />
-            }
-        </LinkedDataCreator>
-    </LinkedDataValuesContext.Provider>
+    <LinkedDataCreator requireIdentifier {...otherProps}>
+        {
+            entities && entities.length > 0
+                ? (
+                    <LinkedDataList
+                        items={entities}
+                        total={total}
+                        hasHighlights={hasHighlights}
+                        footerRender={footerRender}
+                        typeRender={entry => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>}
+                        onOpen={id => openMetadataEntry(history, id)}
+                    />
+                )
+                : <MessageDisplay message="The metadata layer is empty" isError={false} />
+        }
+    </LinkedDataCreator>
 );
 
 const mapStateToProps = (state, {vocabulary}) => {
@@ -70,8 +65,6 @@ const mapStateToProps = (state, {vocabulary}) => {
         }
     };
 
-    const generateInitialContent = (shape) => emptyLinkedData(vocabulary, shape);
-
     return {
         loading: pending,
         error,
@@ -79,7 +72,6 @@ const mapStateToProps = (state, {vocabulary}) => {
         total,
         hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         shapes: vocabulary.getClassesInCatalog(),
-        generateInitialContent,
         onEntityCreationError
     };
 };

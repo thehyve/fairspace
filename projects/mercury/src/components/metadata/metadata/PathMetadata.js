@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 import React from "react";
 import MessageDisplay from "../../common/MessageDisplay";
-import MetadataEntityContainer from "./MetadataEntityContainer";
+import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {statFile} from "../../../actions/fileActions";
 
 export class PathMetadata extends React.Component {
@@ -32,7 +32,7 @@ export class PathMetadata extends React.Component {
             return (<div>No metadata found</div>);
         }
         return (
-            <MetadataEntityContainer
+            <LinkedDataEntityFormContainer
                 subject={subject}
                 {...otherProps}
             />
@@ -47,7 +47,7 @@ const mapStateToProps = (state, ownProps) => {
     // If there is no subject by path (not even pending)
     // some error occurred.
     if (!subject) {
-        return { };
+        return {};
     }
 
     return {

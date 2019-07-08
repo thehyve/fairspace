@@ -2,7 +2,7 @@ import React from 'react';
 
 import LinkedDataPage from '../common/LinkedDataPage';
 import VocabularyEntityHeaderContainer from './VocabularyEntityHeaderContainer';
-import VocabularyEntityContainer from './VocabularyEntityContainer';
+import LinkedDataEntityFormContainer from '../common/LinkedDataEntityFormContainer';
 import VocabularyBreadcrumbsContextProvider from "./VocabularyBreadcrumbsContextProvider";
 
 export default ({subject}) => {
@@ -10,7 +10,7 @@ export default ({subject}) => {
         <VocabularyBreadcrumbsContextProvider>
             <LinkedDataPage>
                 <VocabularyEntityHeaderContainer subject={subject} />
-                <VocabularyEntityContainer subject={subject} />
+                <LinkedDataEntityFormContainer subject={subject} />
             </LinkedDataPage>
         </VocabularyBreadcrumbsContextProvider>
     );
