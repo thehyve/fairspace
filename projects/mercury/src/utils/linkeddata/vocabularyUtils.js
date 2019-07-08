@@ -98,9 +98,12 @@ export const vocabularyUtils = (vocabulary = []) => {
 
     /**
      * Returns a list of classes marked as fairspace entities
+     * @param namespaceFilter   Optional filter function on the jsonLD representation of the namespaces. By defaults passes everything
+     * @returns {{isDefault: *, prefix: *, namespace: *, id: *, label: *}[]}
      */
-    const getNamespaces = () => vocabulary
+    const getNamespaces = (namespaceFilter = () => true) => vocabulary
         .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
+        .filter(namespaceFilter)
         .map(namespace => ({
             id: namespace['@id'],
             label: getFirstPredicateValue(namespace, constants.SHACL_NAME),

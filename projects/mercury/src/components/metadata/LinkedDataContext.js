@@ -9,16 +9,22 @@ import {
     createMetadataEntityFromState, fetchMetadataBySubjectIfNeeded, submitMetadataChangesFromState
 } from "../../actions/metadataActions";
 import {
-    getVocabulary, hasVocabularyError, isVocabularyPending,
-    isMetaVocabularyPending, getMetaVocabulary, hasMetaVocabularyError
+    getMetaVocabulary, getVocabulary, hasMetaVocabularyError, hasVocabularyError, isMetaVocabularyPending,
+    isVocabularyPending
 } from "../../reducers/cache/vocabularyReducers";
 import {getAuthorizations} from "../../reducers/account/authorizationsReducers";
-import {fromJsonLd, emptyLinkedData} from "../../utils/linkeddata/jsonLdConverter";
-import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
+import {emptyLinkedData, fromJsonLd} from "../../utils/linkeddata/jsonLdConverter";
+import {
+    getCombinedMetadataForSubject, hasMetadataError, isMetadataPending
+} from "../../reducers/cache/jsonLdBySubjectReducers";
 import {isDataSteward} from "../../utils/userUtils";
 import Config from "../../services/Config/Config";
 import {propertiesToShow, getTypeInfo} from "../../utils/linkeddata/metadataUtils";
-import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../../utils/linkeddata/vocabularyUtils";
+import {
+    extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
+} from "../../utils/linkeddata/vocabularyUtils";
+import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
+import * as constants from "../../constants";
 
 const LinkedDataContext = React.createContext({});
 
@@ -46,6 +52,7 @@ const LinkedDataVocabularyProvider = ({
         });
     };
 
+    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_VOCABULARY_URI));
     const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, metaVocabulary);
 
     return (
@@ -61,6 +68,7 @@ const LinkedDataVocabularyProvider = ({
                 submitLinkedDataChanges,
                 createLinkedDataEntity: createVocabularyEntity,
                 getPropertiesForLinkedData,
+                namespaces,
                 getDescendants: metaVocabulary.getDescendants,
                 determineShapeForTypes: metaVocabulary.determineShapeForTypes,
                 hasEditRight: isDataSteward(authorizations, Config.get()),
@@ -93,6 +101,7 @@ const LinkedDataMetadataProvider = ({
             isEditable: !p.machineOnly
         }));
 
+    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_METADATA_URI));
     const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, vocabulary);
 
     return (
@@ -107,6 +116,7 @@ const LinkedDataMetadataProvider = ({
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
                 createLinkedDataEntity: createMetadataEntity,
+                namespaces,
                 getPropertiesForLinkedData,
                 getDescendants: vocabulary.getDescendants,
                 determineShapeForTypes: vocabulary.determineShapeForTypes,
