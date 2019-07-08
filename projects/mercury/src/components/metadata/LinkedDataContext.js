@@ -1,19 +1,27 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded, submitVocabularyChangesFromState} from "../../actions/vocabularyActions";
+import {
+    fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded, submitVocabularyChangesFromState
+} from "../../actions/vocabularyActions";
 import {fetchMetadataBySubjectIfNeeded, submitMetadataChangesFromState} from "../../actions/metadataActions";
 import {
-    getVocabulary, hasVocabularyError, isVocabularyPending,
-    isMetaVocabularyPending, getMetaVocabulary, hasMetaVocabularyError
+    getMetaVocabulary, getVocabulary, hasMetaVocabularyError, hasVocabularyError, isMetaVocabularyPending,
+    isVocabularyPending
 } from "../../reducers/cache/vocabularyReducers";
 import {getAuthorizations} from "../../reducers/account/authorizationsReducers";
-import {fromJsonLd, emptyLinkedData} from "../../utils/linkeddata/jsonLdConverter";
-import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
+import {emptyLinkedData, fromJsonLd} from "../../utils/linkeddata/jsonLdConverter";
+import {
+    getCombinedMetadataForSubject, hasMetadataError, isMetadataPending
+} from "../../reducers/cache/jsonLdBySubjectReducers";
 import {isDataSteward} from "../../utils/userUtils";
 import Config from "../../services/Config/Config";
 import {propertiesToShow, getTypeInfo} from "../../utils/linkeddata/metadataUtils";
-import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../../utils/linkeddata/vocabularyUtils";
+import {
+    extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
+} from "../../utils/linkeddata/vocabularyUtils";
+import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
+import * as constants from "../../constants";
 
 const LinkedDataContext = React.createContext({});
 
@@ -40,6 +48,7 @@ const LinkedDataVocabularyProvider = ({
         });
     };
 
+    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_VOCABULARY_URI));
     const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, metaVocabulary);
 
     return (
@@ -54,6 +63,7 @@ const LinkedDataVocabularyProvider = ({
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
                 getPropertiesForLinkedData,
+                namespaces,
                 getDescendants: metaVocabulary.getDescendants,
                 hasEditRight: isDataSteward(authorizations, Config.get()),
                 getTypeInfoForLinkedData
@@ -84,6 +94,7 @@ const LinkedDataMetadataProvider = ({
             isEditable: !p.machineOnly
         }));
 
+    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_METADATA_URI));
     const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, vocabulary);
 
     return (
@@ -97,6 +108,7 @@ const LinkedDataMetadataProvider = ({
                 combineLinkedDataForSubject,
                 getEmptyLinkedData,
                 submitLinkedDataChanges,
+                namespaces,
                 getPropertiesForLinkedData,
                 getDescendants: vocabulary.getDescendants,
                 hasEditRight: true,

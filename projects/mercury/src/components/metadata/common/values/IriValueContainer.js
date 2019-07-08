@@ -1,10 +1,9 @@
-import React from "react";
-import {connect} from "react-redux";
+import React, {useContext} from "react";
 import PropTypes from 'prop-types';
 import {Grid} from "@material-ui/core";
 import MaterialReactSelect from "../../../common/MaterialReactSelect";
 import BaseInputValue from "./BaseInputValue";
-import {getVocabulary} from "../../../../reducers/cache/vocabularyReducers";
+import LinkedDataContext from "../../LinkedDataContext";
 
 export const noNamespace = {
     id: '',
@@ -70,8 +69,7 @@ IriValue.propTypes = {
     )
 };
 
-const mapStateToProps = state => ({
-    namespaces: getVocabulary(state).getNamespaces()
-});
-
-export default connect(mapStateToProps)(IriValue);
+export default props => {
+    const {namespaces} = useContext(LinkedDataContext);
+    return <IriValue namespaces={namespaces} {...props} />;
+};
