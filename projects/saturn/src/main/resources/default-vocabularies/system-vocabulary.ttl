@@ -17,6 +17,7 @@ fs:FOAF-Namespace a sh:PrefixDeclaration ;
    sh:name "foaf: (Friend of a friend)" ;
    sh:prefix "foaf" ;
    fs:fixedShape true ;
+   fs:usableInVocabulary true ;
    sh:namespace <http://xmlns.com/foaf/0.1/> .
 
 fs:RDF-Namespace a sh:PrefixDeclaration ;
@@ -41,6 +42,7 @@ fs:Schema-Namespace a sh:PrefixDeclaration ;
    sh:name "schema: (schema.org)" ; 
    sh:prefix "schema" ;
    fs:fixedShape true ;
+   fs:usableInVocabulary true ;
    sh:namespace <http://schema.org/> .
 
 fs:Fairspace-Namespace a sh:PrefixDeclaration ;
@@ -48,6 +50,12 @@ fs:Fairspace-Namespace a sh:PrefixDeclaration ;
    sh:prefix "fs" ;
    fs:fixedShape true ;
    sh:namespace <http://fairspace.io/ontology#> .
+
+fs:Fairspace-Namespace a sh:PrefixDeclaration ;
+  sh:name "sh: (SHACL)" ;
+  sh:prefix "sh" ;
+  fs:fixedShape true ;
+  sh:namespace <http://www.w3.org/ns/shacl#> .
 
 ########################
 ###   Fixed Shapes   ###
