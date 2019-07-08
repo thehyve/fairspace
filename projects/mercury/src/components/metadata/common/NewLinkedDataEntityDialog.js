@@ -27,7 +27,19 @@ const NewLinkedDataEntityDialog = ({open, shape, requireIdentifier = true, onClo
         onClose();
     };
 
-    const getIdentifier = () => (namespace ? namespace.value + localPart : localPart);
+    const getIdentifier = () => {
+        // If no localPart is specified, treat the identifier as not being entered
+        // This allows other parts of the system to specify a sensible default in such a case
+        if (!localPart) {
+            return undefined;
+        }
+
+        if (!namespace) {
+            return localPart;
+        }
+
+        return namespace.value + localPart;
+    };
 
     const createEntity = (e) => {
         if (e) e.stopPropagation();
