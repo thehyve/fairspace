@@ -85,7 +85,7 @@ public class CollectionsServiceTest {
         c.setName("c1");
         c.setLocation("dir1");
         c.setDescription("descr");
-        c.setConnectionString("managed:");;
+        c.setConnectionString("");;
         return c;
     }
 
@@ -271,7 +271,7 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setConnectionString("managed:");
+        c1.setConnectionString("");
         c1 = collections.create(c1);
 
         mockPermissions(Access.Write);

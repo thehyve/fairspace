@@ -24,9 +24,13 @@ public class Collection extends LifecycleAwarePersistentEntity implements Access
     @RDFProperty(value = FILE_PATH_URI, required = true)
     private String location;
 
-    @RDFProperty(value = CONNECTION_STRING_URI, required = true)
+    @RDFProperty(value = CONNECTION_STRING_URI)
     private String connectionString;
 
 
     private Access access;
+
+    public String getConnectionString() {
+        return connectionString != null ? connectionString : "";
+    }
 }

@@ -122,7 +122,8 @@ fs:CollectionShape a fs:ClassShape ;
     fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:collectionType ) ;
     fs:fixedShape true ;
-    fs:systemProperties 
+    fs:systemProperties
+        fs:connectionStringShape,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -133,6 +134,7 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape ;
     sh:property
+        fs:connectionStringShape,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -215,7 +217,17 @@ fs:dateDeletedShape a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
     fs:fixedShape true ;
-    sh:path fs:dateDeleted . 
+    sh:path fs:dateDeleted .
+
+fs:connectionStringShape a fs:DatatypePropertyShape ;
+    sh:maxCount 1 ;
+    sh:minCount 0 ;
+    sh:name "Connection string" ;
+    sh:datatype xsd:string ;
+    sh:description "Connection string" ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:filePath .
 
 fs:filePathShape a fs:DatatypePropertyShape ; 
     sh:maxCount 1 ;

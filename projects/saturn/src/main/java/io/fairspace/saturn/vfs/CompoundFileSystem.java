@@ -2,6 +2,7 @@ package io.fairspace.saturn.vfs;
 
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -117,7 +118,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
     private static String collectionType(Collection collection) throws IOException {
         try {
             return collection.getConnectionString().isEmpty()
-                    ? ""
+                    ? ManagedFileSystem.TYPE
                     : new URI(collection.getConnectionString()).getScheme();
         } catch (URISyntaxException e) {
             throw new IOException(e);

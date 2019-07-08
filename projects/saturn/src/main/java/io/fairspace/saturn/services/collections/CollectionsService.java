@@ -120,9 +120,6 @@ public class CollectionsService {
                 throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
             }
 
-            validate(patch.getConnectionString() == null || patch.getConnectionString().equals(collection.getConnectionString()),
-                    "Cannot change the connection string");
-
             var oldLocation = collection.getLocation();
             if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
                 ensureLocationIsNotUsed(patch.getLocation());
