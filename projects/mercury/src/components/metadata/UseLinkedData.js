@@ -2,7 +2,7 @@ import {useContext, useEffect, useCallback} from 'react';
 
 import LinkedDataContext from './LinkedDataContext';
 
-const useLinkedData = (subject, isEditable) => {
+const useLinkedData = (subject, isEntityEditable) => {
     if (!subject) {
         throw new Error('Please provide a valid subject.');
     }
@@ -41,7 +41,7 @@ const useLinkedData = (subject, isEditable) => {
         typeLabel: label,
         typeDescription: description,
         updateLinkedData,
-        properties: getPropertiesForLinkedData({linkedData: linkedDataForSubject, subject, isEditable})
+        properties: getPropertiesForLinkedData({linkedData: linkedDataForSubject, subject, isEntityEditable})
     };
 };
 

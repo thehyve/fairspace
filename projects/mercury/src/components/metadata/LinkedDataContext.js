@@ -87,10 +87,10 @@ const LinkedDataMetadataProvider = ({
     const submitLinkedDataChanges = (formKey) => submitMetadataChanges(formKey)
         .then(() => fetchMetadataBySubject(formKey));
 
-    const getPropertiesForLinkedData = ({linkedData, isEditable = true}) => propertiesToShow(linkedData)
+    const getPropertiesForLinkedData = ({linkedData, isEntityEditable = true}) => propertiesToShow(linkedData)
         .map(p => ({
             ...p,
-            isEditable: isEditable && !p.machineOnly
+            isEditable: isEntityEditable && !p.machineOnly
         }));
 
     const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_METADATA_URI));
