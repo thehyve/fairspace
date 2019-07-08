@@ -17,7 +17,6 @@ import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
 import org.irods.jargon.core.pub.io.IRODSFileOutputStream;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -196,7 +195,6 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         rdf.update(storedQuery("copy_metadata", createURI(fromIri), createURI(toIri)));
     }
 
-
     private IRODSFile getFile(String path) throws IOException {
         var account = getAccount(path);
         try {
@@ -210,12 +208,8 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
         return accountForCollection(collectionByPath(path));
     }
 
-    private Collection collectionByPath(String parentPath) throws FileNotFoundException {
-        var collection = collections.getByLocation(splitPath(parentPath)[0]);
-        if (collection == null) {
-            throw new FileNotFoundException(parentPath);
-        }
-        return collection;
+    private Collection collectionByPath(String path) {
+        return collections.getByLocation(splitPath(path)[0]);
     }
 
     private String getIrodsPath(String path) throws IOException {

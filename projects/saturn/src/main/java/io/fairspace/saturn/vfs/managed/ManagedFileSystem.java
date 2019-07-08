@@ -29,7 +29,6 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
-import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
@@ -37,12 +36,6 @@ import static org.apache.commons.codec.binary.Hex.encodeHexString;
 public class ManagedFileSystem implements VirtualFileSystem {
     public static final String TYPE = "";
 
-    private static final FileInfo ROOT = FileInfo.builder().path("")
-            .readOnly(false)
-            .isDirectory(true)
-            .created(ofEpochMilli(0))
-            .modified(ofEpochMilli(0))
-            .build();
     private final RDFConnection rdf;
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
@@ -58,10 +51,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
 
     @Override
     public FileInfo stat(String path) throws IOException {
-        if (path.isEmpty()) {
-            return ROOT;
-        }
-
         if (isCollection(path)) {
             return ofNullable(collections.getByLocation(path))
                     .map(ManagedFileSystem::fileInfo)
@@ -212,7 +201,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .readOnly(!collection.getAccess().canWrite())
+                .readOnly(!collection.canWrite())
                 .build();
     }
 

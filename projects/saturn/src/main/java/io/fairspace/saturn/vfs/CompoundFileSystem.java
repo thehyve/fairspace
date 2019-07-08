@@ -10,13 +10,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
 
 public class CompoundFileSystem implements VirtualFileSystem {
+    private static final FileInfo ROOT = FileInfo.builder()
+            .path("")
+            .readOnly(false)
+            .isDirectory(true)
+            .created(ofEpochMilli(0))
+            .modified(ofEpochMilli(0))
+            .build();
+
     private final CollectionsService collections;
     private final Map<? super String, ? extends VirtualFileSystem> fileSystemsByType;
 
@@ -27,11 +37,10 @@ public class CompoundFileSystem implements VirtualFileSystem {
 
     @Override
     public FileInfo stat(String path) throws IOException {
-        var fs = fileSystemByPath(path);
-        if (fs == null) {
-            return null;
+        if (path.isEmpty()) {
+            return ROOT;
         }
-        return fs.stat(path);
+        return fileSystemByPath(path, false).stat(path);
     }
 
     @Override
@@ -42,33 +51,33 @@ public class CompoundFileSystem implements VirtualFileSystem {
                     .map(CompoundFileSystem::fileInfo)
                     .collect(toList());
         }
-        return fileSystemByPath(parentPath).list(parentPath);
+        return fileSystemByPath(parentPath, false).list(parentPath);
     }
 
     @Override
     public void mkdir(String path) throws IOException {
-        fileSystemByPath(path).mkdir(path);
+        fileSystemByPath(path, true).mkdir(path);
     }
 
     @Override
     public void create(String path, InputStream in) throws IOException {
-        fileSystemByPath(path).create(path, in);
+        fileSystemByPath(path, true).create(path, in);
     }
 
     @Override
     public void modify(String path, InputStream in) throws IOException {
-        fileSystemByPath(path).modify(path, in);
+        fileSystemByPath(path, true).modify(path, in);
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
-        fileSystemByPath(path).read(path, out);
+        fileSystemByPath(path, false).read(path, out);
     }
 
     @Override
     public void copy(String from, String to) throws IOException {
-        if (fileSystemByPath(from).equals(fileSystemByPath(to))) {
-            fileSystemByPath(from).copy(from, to);
+        if (fileSystemByPath(from, false).equals(fileSystemByPath(to, true))) {
+            fileSystemByPath(from, true).copy(from, to);
         } else {
             throw new IOException("Copying files between collections of different types is not implemented yet");
         }
@@ -76,8 +85,8 @@ public class CompoundFileSystem implements VirtualFileSystem {
 
     @Override
     public void move(String from, String to) throws IOException {
-        if (fileSystemByPath(from).equals(fileSystemByPath(to))) {
-            fileSystemByPath(from).move(from, to);
+        if (fileSystemByPath(from, true).equals(fileSystemByPath(to, true))) {
+            fileSystemByPath(from, true).move(from, to);
         } else {
             throw new IOException("Moving files between collections of different types is not implemented yet");
         }
@@ -85,7 +94,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
 
     @Override
     public void delete(String path) throws IOException {
-        fileSystemByPath(path).delete(path);
+        fileSystemByPath(path, true).delete(path);
     }
 
     @Override
@@ -95,12 +104,22 @@ public class CompoundFileSystem implements VirtualFileSystem {
         }
     }
 
-    private VirtualFileSystem fileSystemByPath(String path) throws IOException {
+    private VirtualFileSystem fileSystemByPath(String path, boolean mustBeWritable) throws IOException {
+        if (path.isEmpty()) {
+            throw new AccessDeniedException("File operations on the root directory are not allowed");
+        }
         var collection = collections.getByLocation(splitPath(path)[0]);
         if (collection == null) {
             throw new FileNotFoundException(path);
         }
-        return fileSystemsByType.get(collectionType(collection));
+        if (mustBeWritable && !collection.canWrite()) {
+            throw new IOException("Target path is read-only");
+        }
+        var fs = fileSystemsByType.get(collectionType(collection));
+        if (fs == null){
+            throw new FileNotFoundException(path);
+        }
+        return fs;
     }
 
     private static FileInfo fileInfo(Collection collection) {
@@ -111,7 +130,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
-                .readOnly(!collection.getAccess().canWrite())
+                .readOnly(!collection.canWrite())
                 .build();
     }
 
