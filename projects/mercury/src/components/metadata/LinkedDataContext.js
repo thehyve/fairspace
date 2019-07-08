@@ -16,7 +16,7 @@ import {
 } from "../../reducers/cache/jsonLdBySubjectReducers";
 import {isDataSteward} from "../../utils/userUtils";
 import Config from "../../services/Config/Config";
-import {propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {propertiesToShow, getTypeInfo} from "../../utils/linkeddata/metadataUtils";
 import {
     extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
 } from "../../utils/linkeddata/vocabularyUtils";
@@ -49,6 +49,7 @@ const LinkedDataVocabularyProvider = ({
     };
 
     const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_VOCABULARY_URI));
+    const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, metaVocabulary);
 
     return (
         <LinkedDataContext.Provider
@@ -63,7 +64,9 @@ const LinkedDataVocabularyProvider = ({
                 submitLinkedDataChanges,
                 getPropertiesForLinkedData,
                 namespaces,
-                hasEditRight: isDataSteward(authorizations, Config.get())
+                getDescendants: metaVocabulary.getDescendants,
+                hasEditRight: isDataSteward(authorizations, Config.get()),
+                getTypeInfoForLinkedData
             }}
         >
             {children}
@@ -92,6 +95,7 @@ const LinkedDataMetadataProvider = ({
         }));
 
     const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_METADATA_URI));
+    const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, vocabulary);
 
     return (
         <LinkedDataContext.Provider
@@ -106,7 +110,9 @@ const LinkedDataMetadataProvider = ({
                 submitLinkedDataChanges,
                 namespaces,
                 getPropertiesForLinkedData,
-                hasEditRight: true
+                getDescendants: vocabulary.getDescendants,
+                hasEditRight: true,
+                getTypeInfoForLinkedData
             }}
         >
             {children}
