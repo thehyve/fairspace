@@ -12,13 +12,17 @@ export const invalidateMetadata = subject => ({
 });
 
 export const submitVocabularyChangesFromState = (subject) => (dispatch, getState) => {
-    const values = getLinkedDataFormUpdates(getState(), subject);
+    // For vocabulary changes, the subject iri is used as form key
+    const formKey = subject;
+
+    const values = getLinkedDataFormUpdates(getState(), formKey);
     const metaVocabulary = getMetaVocabulary(getState());
     return dispatch({
         type: actionTypes.UPDATE_VOCABULARY,
         payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
         meta: {
-            subject
+            subject,
+            formKey
         }
     });
 };
@@ -46,7 +50,8 @@ export const createVocabularyEntityFromState = (formKey, providedSubject, type) 
             .then(() => ({subject, type, values})),
         meta: {
             subject,
-            type
+            type,
+            formKey
         }
     });
 };
