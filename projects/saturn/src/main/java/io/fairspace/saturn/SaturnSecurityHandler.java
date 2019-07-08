@@ -48,7 +48,10 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
 
         if (error != null) {
             response.setContentType(APPLICATION_JSON.asString());
-            response.sendError(SC_UNAUTHORIZED, errorBody(SC_UNAUTHORIZED, error));
+            response.setStatus(SC_UNAUTHORIZED);
+            response.getWriter().write(errorBody(SC_UNAUTHORIZED, error));
+            response.getWriter().flush();
+            response.getWriter().close();
             baseRequest.setHandled(true);
         } else {
             getHandler().handle(pathInContext, baseRequest, request, response);
