@@ -12,33 +12,43 @@ export const noNamespace = {
     value: ''
 };
 
-export const IriValue = props => {
+export const IriValue = ({
+    namespace,
+    namespaces = [],
+    localPart = '',
+    onNamespaceChange = () => {},
+    onLocalPartChange = () => {}
+}) => {
     const namespaceOptions = [
         noNamespace,
-        ...props.namespaces.map(namespace => ({
-            id: namespace.id,
-            label: namespace.label,
-            value: namespace.namespace,
-            isDefault: namespace.isDefault
+        ...namespaces.map(n => ({
+            id: n.id,
+            label: n.label,
+            value: n.namespace,
+            isDefault: n.isDefault
         }))
     ];
 
     const defaultNamespace = namespaceOptions.find(n => n.isDefault) || noNamespace;
+
+    if (!namespace) {
+        onNamespaceChange(defaultNamespace);
+    }
 
     return (
         <Grid container justify="space-between" spacing={8}>
             <Grid item xs={4}>
                 <MaterialReactSelect
                     options={namespaceOptions}
-                    value={props.namespace || defaultNamespace}
-                    onChange={props.onNamespaceChange}
+                    value={namespace || defaultNamespace}
+                    onChange={onNamespaceChange}
                 />
             </Grid>
             <Grid item xs={8} style={{paddingTop: 8, paddingBottom: 0}}>
                 <BaseInputValue
                     property={{}}
-                    entry={{value: props.localPart}}
-                    onChange={e => props.onLocalPartChange(e.value)}
+                    entry={{value: localPart}}
+                    onChange={e => onLocalPartChange(e.value)}
                     type="url"
                 />
             </Grid>
@@ -58,10 +68,6 @@ IriValue.propTypes = {
             namespace: PropTypes.string
         })
     )
-};
-
-IriValue.defaultProps = {
-    namespaces: []
 };
 
 const mapStateToProps = state => ({
