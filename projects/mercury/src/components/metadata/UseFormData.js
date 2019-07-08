@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {
     getLinkedDataFormUpdates, getLinkedDataFormValidations,
-    hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors
+    hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors, isLinkedDataFormPending
 } from "../../reducers/linkedDataFormReducers";
 import {
     addLinkedDataValue, deleteLinkedDataValue,
@@ -29,6 +29,8 @@ const useFormData = (formKey) => {
     const hasFormUpdates = useSelector(state => hasLinkedDataFormUpdates(state, formKey));
 
     const hasFormValidationErrors = useSelector(state => hasLinkedDataFormValidationErrors(state, formKey));
+
+    const isUpdating = useSelector(state => isLinkedDataFormPending(state, formKey));
 
     const {submitLinkedDataChanges, hasEditRight} = useContext(LinkedDataContext);
 
@@ -74,7 +76,8 @@ const useFormData = (formKey) => {
         extendPropertiesWithChanges,
         canSubmit: hasEditRight,
         onSubmit,
-        submitDisabled: !hasFormUpdates || hasFormValidationErrors,
+        isUpdating,
+        submitDisabled: isUpdating || !hasFormUpdates || hasFormValidationErrors,
         onAdd,
         onChange,
         onDelete,

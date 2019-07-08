@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {Button, Grid} from "@material-ui/core";
+import {Button, Grid, CircularProgress} from "@material-ui/core";
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useExistingEntity from '../UseExistingEntity';
@@ -11,7 +11,24 @@ const LinkedDataEntityFormContainer = ({subject, isEditable = true, ...otherProp
     const {
         extendPropertiesWithChanges, canSubmit, onSubmit,
         submitDisabled, onAdd, onChange, onDelete,
+        isUpdating
     } = useFormData(subject);
+
+    let footer;
+
+    if (isUpdating) {
+        footer = <CircularProgress />;
+    } else if (canSubmit && isEditable) {
+        footer = (
+            <Button
+                onClick={onSubmit}
+                color="primary"
+                disabled={submitDisabled}
+            >
+            Update
+            </Button>
+        );
+    }
 
     return (
         <Grid container>
@@ -26,20 +43,7 @@ const LinkedDataEntityFormContainer = ({subject, isEditable = true, ...otherProp
                     onDelete={onDelete}
                 />
             </Grid>
-            {
-                canSubmit && isEditable
-                && (
-                    <Grid item>
-                        <Button
-                            onClick={onSubmit}
-                            color="primary"
-                            disabled={submitDisabled}
-                        >
-                            Update
-                        </Button>
-                    </Grid>
-                )
-            }
+            { footer && <Grid item>{footer}</Grid> }
         </Grid>
     );
 };
