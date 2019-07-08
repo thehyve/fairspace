@@ -13,12 +13,11 @@ export const noNamespace = {
 
 export const IriValue = ({
     namespace,
+    namespaces = [],
     localPart = '',
     onNamespaceChange = () => {},
     onLocalPartChange = () => {}
 }) => {
-    const {namespaces} = useContext(LinkedDataContext);
-
     const namespaceOptions = [
         noNamespace,
         ...namespaces.map(n => ({
@@ -60,7 +59,17 @@ IriValue.propTypes = {
     localPart: PropTypes.string,
     namespace: PropTypes.object,
     onLocalPartChange: PropTypes.func,
-    onNamespaceChange: PropTypes.func
+    onNamespaceChange: PropTypes.func,
+    namespaces: PropTypes.arrayOf(
+        PropTypes.shape({
+            label: PropTypes.string,
+            prefix: PropTypes.string,
+            namespace: PropTypes.string
+        })
+    )
 };
 
-export default IriValue;
+export default props => {
+    const {namespaces} = useContext(LinkedDataContext);
+    return <IriValue namespaces={namespaces} {...props} />;
+};
