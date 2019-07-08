@@ -1,0 +1,5 @@
+# 0 - from
+# 1 - to
+
+INSERT { %1$s ?p ?o }
+WHERE { %2$s ?p ?os }

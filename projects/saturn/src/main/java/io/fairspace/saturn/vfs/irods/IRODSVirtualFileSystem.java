@@ -4,6 +4,7 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
+import org.apache.jena.rdfconnection.RDFConnection;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -24,19 +25,22 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;
-import static org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType.COLLECTION;
-import static org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType.LOCAL_DIR;
+import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class IRODSVirtualFileSystem implements VirtualFileSystem {
     public static final String TYPE = "irods";
 
     private final IRODSFileSystem fs;
     private final CollectionsService collections;
+    private final RDFConnection rdf;
 
-    public IRODSVirtualFileSystem(CollectionsService collections) {
+    public IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf) {
+        this.rdf = rdf;
         try {
             this.fs = IRODSFileSystem.instance();
         } catch (JargonException e) {
@@ -60,7 +64,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
             return FileInfo.builder()
                     .iri(getIri(account, stat))
                     .path(path)
-                    .isDirectory(isDirectory(stat))
+                    .isDirectory(stat.isSomeTypeOfCollection())
                     .readOnly(!collection.canWrite() || !f.canWrite())
                     .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                     .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
@@ -87,7 +91,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
                 result.add(FileInfo.builder()
                         .iri(getIri(account, stat))
                         .path(parentPath + "/" + child.getName())
-                        .isDirectory(isDirectory(stat))
+                        .isDirectory(stat.isSomeTypeOfCollection())
                         .readOnly(!collection.canWrite() || !child.canWrite())
                         .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                         .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
@@ -131,8 +135,10 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
             var fromAccount = getAccount(from);
             var toAccount = getAccount(to);
             if (fromAccount.equals(toAccount)) {
-                getDataTransferOperations(fromAccount).copy(getIrodsPath(from), fromAccount.getDefaultStorageResource(), getIrodsPath(to), null, null);
-                // TODO: Copy metadata as well
+                var src = getIrodsPath(from);
+                var dst = getIrodsPath(to);
+                getDataTransferOperations(fromAccount).copy(src, fromAccount.getDefaultStorageResource(), dst, null, null);
+                copyMetadata(src, dst, getAccessObject(fromAccount));
             } else {
                 throw new IOException("Copying files between different iRODS accounts is not implemented yet");
             }
@@ -169,6 +175,27 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
             throw new IOException(e);
         }
     }
+
+    // TODO: improve performance
+    private void copyMetadata(String src, String dst, CollectionAndDataObjectListAndSearchAO accessObject) throws JargonException {
+        var srcStat = accessObject.retrieveObjectStatForPath(src);
+        var dstStat = accessObject.retrieveObjectStatForPath(dst);
+
+        commit("Copy data" , rdf, () -> {
+            copyMetadata(getIri(accessObject.getIRODSAccount(), srcStat), getIri(accessObject.getIRODSAccount(), dstStat));
+
+            if (srcStat.isSomeTypeOfCollection()) {
+                for (var child: accessObject.listDataObjectsAndCollectionsUnderPath(srcStat)) {
+                    copyMetadata(child.getFormattedAbsolutePath(), dst + '/' +  child.getPathOrName(), accessObject);
+                }
+            }
+        });
+    }
+
+    private void copyMetadata(String fromIri, String toIri) {
+        rdf.update(storedQuery("copy_metadata", createURI(fromIri), createURI(toIri)));
+    }
+
 
     private IRODSFile getFile(String path) throws IOException {
         var account = getAccount(path);
@@ -223,10 +250,6 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
 
     private IRODSFileFactory getIrodsFileFactory(IRODSAccount account) throws JargonException {
         return fs.getIRODSAccessObjectFactory().getIRODSFileFactory(account);
-    }
-
-    private static boolean isDirectory(ObjStat stat) {
-        return stat.getObjectType() == COLLECTION || stat.getObjectType() == LOCAL_DIR;
     }
 
     private static String getIri(IRODSAccount account, ObjStat stat) {
