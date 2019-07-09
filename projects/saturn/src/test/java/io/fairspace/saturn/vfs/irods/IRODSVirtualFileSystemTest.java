@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -87,6 +88,7 @@ public class IRODSVirtualFileSystemTest {
 
         when(f.exists()).thenReturn(true);
         when(f.getAbsolutePath()).thenReturn("/zone/home/path");
+        when(f.listFiles()).thenReturn(new File[0]);
 
         when(aof.getCollectionAndDataObjectListAndSearchAO(any())).thenReturn(ao);
 
@@ -108,6 +110,7 @@ public class IRODSVirtualFileSystemTest {
     @Test
     public void testStatCollection() throws IOException, JargonException {
         assertNotNull(vfs.stat("rods"));
+        assertNull(vfs.stat("unknown"));
         verifyZeroInteractions(fs);
     }
 
@@ -141,6 +144,20 @@ public class IRODSVirtualFileSystemTest {
     }
 
     @Test
+    public void testMoving() throws IOException, JargonException {
+        vfs.move("rods/path", "rods/newpath");
+
+        verify(dto).move("/zone/home/path", "/zone/home/newpath");
+    }
+
+    @Test
+    public void testCopying() throws IOException, JargonException {
+        vfs.copy("rods/path", "rods/newpath");
+
+        verify(dto).copy("/zone/home/path", "", "/zone/home/newpath", null, null);
+    }
+
+    @Test
     public void testMetadataCopying() throws IOException {
         ds.getDefaultModel()
                 .add(createResource("irods://host.com#" + stat1.getDataId()), RDFS.comment, createStringLiteral("Comment"));
@@ -149,5 +166,26 @@ public class IRODSVirtualFileSystemTest {
 
         assertTrue(ds.getDefaultModel().contains(createResource("irods://host.com#" + stat1.getDataId()), RDFS.comment, createStringLiteral("Comment")));
         assertTrue(ds.getDefaultModel().contains(createResource("irods://host.com#" + stat2.getDataId()), RDFS.comment, createStringLiteral("Comment")));
+    }
+
+    @Test
+    public void testMkdir() throws IOException {
+        vfs.mkdir("rods/path");
+
+        verify(f).mkdir();
+    }
+
+    @Test
+    public void testDelete() throws IOException {
+        vfs.delete("rods/path");
+
+        verify(f).delete();
+    }
+
+    @Test
+    public void testList() throws IOException {
+        vfs.list("rods/path");
+
+        verify(f).listFiles();
     }
 }
