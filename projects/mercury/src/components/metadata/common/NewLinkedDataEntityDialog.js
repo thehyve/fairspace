@@ -1,6 +1,9 @@
-import React, {useState, useEffect} from "react"; import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@material-ui/core";
+import React, {useState, useEffect} from "react";
+import PropTypes from 'prop-types';
+import {
+    Button, Dialog, DialogActions,
+    DialogContent, DialogTitle, Typography
+} from "@material-ui/core";
 
 import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../../utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
@@ -122,8 +125,4 @@ NewLinkedDataEntityDialog.propTypes = {
     requireIdentifier: PropTypes.bool
 };
 
-const mapStateToProps = (state) => ({
-    storeState: state,
-});
-
-export default connect(mapStateToProps)(NewLinkedDataEntityDialog);
+export default NewLinkedDataEntityDialog;
