@@ -32,7 +32,7 @@ const useFormData = (formKey) => {
 
     const isUpdating = useSelector(state => isLinkedDataFormPending(state, formKey));
 
-    const {submitLinkedDataChanges, hasEditRight} = useContext(LinkedDataContext);
+    const {submitLinkedDataChanges} = useContext(LinkedDataContext);
 
     const onSubmit = () => {
         submitLinkedDataChanges((formKey))
@@ -74,7 +74,6 @@ const useFormData = (formKey) => {
 
     return {
         extendPropertiesWithChanges,
-        canSubmit: hasEditRight,
         onSubmit,
         isUpdating,
         submitDisabled: isUpdating || !hasFormUpdates || hasFormValidationErrors,

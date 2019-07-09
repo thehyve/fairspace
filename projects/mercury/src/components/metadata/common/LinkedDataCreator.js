@@ -97,13 +97,14 @@ class LinkedDataCreator extends React.Component {
                 />
 
 
-                <NewLinkedDataEntityDialog
-                    open={creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY}
-                    shape={shape}
-                    onCreate={this.handleEntityCreation}
-                    onClose={this.closeDialog}
-                    requireIdentifier={requireIdentifier}
-                />
+                {creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY && (
+                    <NewLinkedDataEntityDialog
+                        shape={shape}
+                        onCreate={this.handleEntityCreation}
+                        onClose={this.closeDialog}
+                        requireIdentifier={requireIdentifier}
+                    />
+                )}
 
                 {children}
 

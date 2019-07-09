@@ -3,29 +3,28 @@ import PropTypes from "prop-types";
 import {Button, Grid, CircularProgress} from "@material-ui/core";
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
-import useExistingEntity from '../UseExistingEntity';
+import useLinkedData from '../UseLinkedData';
 import useFormData from '../UseFormData';
 
 const LinkedDataEntityFormContainer = ({subject, isEditable = true, ...otherProps}) => {
-    const {properties, loading, error} = useExistingEntity(subject);
+    const {properties, linkedDataLoading, linkedDataError} = useLinkedData(subject, isEditable);
     const {
-        extendPropertiesWithChanges, canSubmit, onSubmit,
-        submitDisabled, onAdd, onChange, onDelete,
-        isUpdating
+        extendPropertiesWithChanges, onSubmit, submitDisabled,
+        onAdd, onChange, onDelete, isUpdating
     } = useFormData(subject);
 
     let footer;
 
     if (isUpdating) {
         footer = <CircularProgress />;
-    } else if (canSubmit && isEditable) {
+    } else if (isEditable) {
         footer = (
             <Button
                 onClick={onSubmit}
                 color="primary"
                 disabled={submitDisabled}
             >
-            Update
+                Update
             </Button>
         );
     }
@@ -35,15 +34,15 @@ const LinkedDataEntityFormContainer = ({subject, isEditable = true, ...otherProp
             <Grid item xs={12}>
                 <LinkedDataEntityForm
                     {...otherProps}
-                    error={error}
-                    loading={loading}
-                    properties={extendPropertiesWithChanges(properties)}
+                    error={linkedDataError}
+                    loading={linkedDataLoading}
+                    properties={isEditable ? extendPropertiesWithChanges(properties) : properties}
                     onAdd={onAdd}
                     onChange={onChange}
                     onDelete={onDelete}
                 />
             </Grid>
-            { footer && <Grid item>{footer}</Grid> }
+            {footer && <Grid item>{footer}</Grid>}
         </Grid>
     );
 };

@@ -41,14 +41,14 @@ const LinkedDataVocabularyProvider = ({
     const submitLinkedDataChanges = (formKey) => submitVocabularyChanges(formKey)
         .then(() => fetchMetadataVocabulary());
 
-    const getPropertiesForLinkedData = (linkedData, subject) => {
+    const getPropertiesForLinkedData = ({linkedData, subject, isEntityEditable = true}) => {
         const shape = vocabulary.get(subject);
 
         return extendPropertiesWithVocabularyEditingInfo({
             properties: propertiesToShow(linkedData),
             isFixed: isFixedShape(shape),
             systemProperties: getSystemProperties(shape),
-            isEditable: isDataSteward
+            isEditable: isEntityEditable && isDataSteward(authorizations, Config.get())
         });
     };
 
@@ -95,10 +95,10 @@ const LinkedDataMetadataProvider = ({
     const submitLinkedDataChanges = (formKey) => submitMetadataChanges(formKey)
         .then(() => fetchMetadataBySubject(formKey));
 
-    const getPropertiesForLinkedData = (linkedData) => propertiesToShow(linkedData)
+    const getPropertiesForLinkedData = ({linkedData, isEntityEditable = true}) => propertiesToShow(linkedData)
         .map(p => ({
             ...p,
-            isEditable: !p.machineOnly
+            isEditable: isEntityEditable && !p.machineOnly
         }));
 
     const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_METADATA_URI));

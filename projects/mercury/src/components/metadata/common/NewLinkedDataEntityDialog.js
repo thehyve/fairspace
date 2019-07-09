@@ -10,17 +10,17 @@ import useNewEntity from '../UseNewEntity';
 import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 
-const NewLinkedDataEntityDialog = ({open, shape, requireIdentifier = true, onClose, onCreate}) => {
+const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate}) => {
     const [formKey, setFormKey] = useState(generateUuid());
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
 
-    const {properties} = useNewEntity(formKey, shape);
+    const {properties} = useNewEntity(shape);
     const {extendPropertiesWithChanges, onAdd, onChange, onDelete, submitDisabled} = useFormData(formKey);
 
     useEffect(() => {
         setFormKey(generateUuid());
-    }, [open]);
+    }, []);
 
     const closeDialog = (e) => {
         if (e) e.stopPropagation();
@@ -82,7 +82,7 @@ const NewLinkedDataEntityDialog = ({open, shape, requireIdentifier = true, onClo
 
     return (
         <Dialog
-            open={open}
+            open
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
             fullWidth
