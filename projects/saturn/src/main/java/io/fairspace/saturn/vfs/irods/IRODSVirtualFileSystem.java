@@ -37,14 +37,15 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     private final IRODSFileSystem fs;
     private final RDFConnection rdf;
 
-    public IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf) {
+    public IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf) throws JargonException {
+        this(collections, rdf, IRODSFileSystem.instance());
+    }
+
+    IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf, IRODSFileSystem fs) {
         super(collections);
+
         this.rdf = rdf;
-        try {
-            this.fs = IRODSFileSystem.instance();
-        } catch (JargonException e) {
-            throw new RuntimeException(e);
-        }
+        this.fs = fs;
     }
 
     @Override
@@ -179,7 +180,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
         var srcStat = accessObject.retrieveObjectStatForPath(src);
         var dstStat = accessObject.retrieveObjectStatForPath(dst);
 
-        commit("Copy data" , rdf, () -> {
+        commit("Copy iRODS files" , rdf, () -> {
             copyMetadata(getIri(accessObject.getIRODSAccount(), srcStat), getIri(accessObject.getIRODSAccount(), dstStat));
 
             if (srcStat.isSomeTypeOfCollection()) {

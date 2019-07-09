@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -100,13 +101,12 @@ public class CompoundFileSystemTest {
         fs.stat("dir3/path");
     }
 
-    @Test(expected = FileNotFoundException.class)
     public void handlesUnknownLocations() throws IOException {
-        fs.stat("unknown");
+        assertNull(fs.stat("unknown"));
     }
 
     @Test(expected = IOException.class)
     public void handlesMalformedURLs() throws IOException {
-        fs.stat("dir4");
+        fs.stat("dir4/path");
     }
 }

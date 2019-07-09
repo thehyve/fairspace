@@ -25,7 +25,6 @@ import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -39,7 +38,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 public class App {
     private static final String API_VERSION = "v1";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
         var ds = SaturnDatasetFactory.connect(CONFIG.jena, SaturnSecurityHandler::userInfo);

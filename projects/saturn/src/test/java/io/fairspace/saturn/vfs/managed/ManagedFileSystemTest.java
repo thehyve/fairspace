@@ -6,7 +6,6 @@ import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.vfs.PathUtils;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -364,13 +363,5 @@ public class ManagedFileSystemTest {
 
         assertEquals(0, fs.list("coll").size());
         assertEquals(2, fs.list("newLocation").size());
-    }
-
-    @Test
-    public void isCollection() {
-        assertTrue(PathUtils.isCollection("coll"));
-        assertFalse(PathUtils.isCollection(""));
-        assertFalse(PathUtils.isCollection("coll/dir"));
-        assertFalse(PathUtils.isCollection("coll/dir/subdir"));
     }
 }

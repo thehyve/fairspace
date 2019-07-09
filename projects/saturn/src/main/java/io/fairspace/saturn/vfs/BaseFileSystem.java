@@ -95,7 +95,6 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
     public void close() throws IOException {
     }
 
-
     protected abstract FileInfo statRegularFile(String path) throws IOException;
 
     protected abstract List<FileInfo> listCollectionOrDirectory(String parentPath) throws IOException;
@@ -110,7 +109,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
 
     protected abstract void doDelete(String path) throws IOException;
 
-    protected static boolean isCollection(String path) {
+    private static boolean isCollection(String path) {
         return splitPath(path).length == 1;
     }
 
