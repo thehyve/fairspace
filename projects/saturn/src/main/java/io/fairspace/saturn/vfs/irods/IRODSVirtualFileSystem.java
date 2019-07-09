@@ -137,7 +137,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                 var src = getIrodsPath(from);
                 var dst = getIrodsPath(to);
                 getDataTransferOperations(fromAccount).copy(src, fromAccount.getDefaultStorageResource(), dst, null, null);
-                copyMetadata(src, dst, getAccessObject(fromAccount));
+                copyMetadata(src, dst, getAccessObject(fromAccount), fromAccount);
             } else {
                 throw new IOException("Copying files between different iRODS accounts is not implemented yet");
             }
@@ -176,16 +176,16 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     }
 
     // TODO: improve performance
-    private void copyMetadata(String src, String dst, CollectionAndDataObjectListAndSearchAO accessObject) throws JargonException {
+    private void copyMetadata(String src, String dst, CollectionAndDataObjectListAndSearchAO accessObject, IRODSAccount account) throws JargonException {
         var srcStat = accessObject.retrieveObjectStatForPath(src);
         var dstStat = accessObject.retrieveObjectStatForPath(dst);
 
         commit("Copy iRODS files" , rdf, () -> {
-            copyMetadata(getIri(accessObject.getIRODSAccount(), srcStat), getIri(accessObject.getIRODSAccount(), dstStat));
+            copyMetadata(getIri(account, srcStat), getIri(account, dstStat));
 
             if (srcStat.isSomeTypeOfCollection()) {
                 for (var child: accessObject.listDataObjectsAndCollectionsUnderPath(srcStat)) {
-                    copyMetadata(child.getFormattedAbsolutePath(), dst + '/' +  child.getPathOrName(), accessObject);
+                    copyMetadata(child.getFormattedAbsolutePath(), dst + '/' +  child.getPathOrName(), accessObject, account);
                 }
             }
         });

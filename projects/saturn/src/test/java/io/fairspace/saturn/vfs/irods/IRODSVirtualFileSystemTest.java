@@ -3,11 +3,14 @@ package io.fairspace.saturn.vfs.irods;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.vocabulary.RDFS;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
+import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.ObjStat;
@@ -24,8 +27,9 @@ import java.util.Date;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -50,9 +54,16 @@ public class IRODSVirtualFileSystemTest {
     @Mock
     private CollectionAndDataObjectListAndSearchAO ao;
 
-    private ObjStat stat = new ObjStat();
+    @Mock
+    private DataTransferOperations dto;
 
-    private RDFConnection rdf = new RDFConnectionLocal(createTxnMem(), Isolation.COPY);
+    private final ObjStat stat1 = new ObjStat();
+
+    private final ObjStat stat2 = new ObjStat();
+
+    private final Dataset ds = createTxnMem();
+
+    private final RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
 
     private IRODSVirtualFileSystem vfs;
 
@@ -79,11 +90,17 @@ public class IRODSVirtualFileSystemTest {
 
         when(aof.getCollectionAndDataObjectListAndSearchAO(any())).thenReturn(ao);
 
-        when(ao.retrieveObjectStatForPath(any())).thenReturn(stat);
+        when(ao.retrieveObjectStatForPath(eq("/zone/home/path"))).thenReturn(stat1);
 
-        stat.setDataId(123);
-        stat.setCreatedAt(new Date());
-        stat.setModifiedAt(new Date());
+        stat1.setDataId(123);
+        stat1.setCreatedAt(new Date());
+        stat1.setModifiedAt(new Date());
+
+        when(ao.retrieveObjectStatForPath(eq("/zone/home/newpath"))).thenReturn(stat2);
+
+        stat2.setDataId(234);
+
+        when(aof.getDataTransferOperations(any())).thenReturn(dto);
 
         vfs = new IRODSVirtualFileSystem(collections, rdf, fs);
     }
@@ -104,9 +121,7 @@ public class IRODSVirtualFileSystemTest {
                         account.getZone().equals("zone") &&
                         account.getUserName().equals("user") &&
                         account.getPassword().equals("password") &&
-                        account.getHomeDirectory().equals("/zone/home")
-
-        ));
+                        account.getHomeDirectory().equals("/zone/home")));
     }
 
     @Test
@@ -117,12 +132,22 @@ public class IRODSVirtualFileSystemTest {
         verify(ao).retrieveObjectStatForPath("/zone/home/path");
 
         assertEquals("rods/path", file.getPath());
-
     }
 
 
     @Test
     public void testIriGeneration() throws IOException {
-        assertEquals("irods://host.com#123", vfs.stat("rods/path").getIri());
+        assertEquals("irods://host.com#" + stat1.getDataId(), vfs.stat("rods/path").getIri());
+    }
+
+    @Test
+    public void testMetadataCopying() throws IOException {
+        ds.getDefaultModel()
+                .add(createResource("irods://host.com#" + stat1.getDataId()), RDFS.comment, createStringLiteral("Comment"));
+
+        vfs.copy("rods/path", "rods/newpath");
+
+        assertTrue(ds.getDefaultModel().contains(createResource("irods://host.com#" + stat1.getDataId()), RDFS.comment, createStringLiteral("Comment")));
+        assertTrue(ds.getDefaultModel().contains(createResource("irods://host.com#" + stat2.getDataId()), RDFS.comment, createStringLiteral("Comment")));
     }
 }
