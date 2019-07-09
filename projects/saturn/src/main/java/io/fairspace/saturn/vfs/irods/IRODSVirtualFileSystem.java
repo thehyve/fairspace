@@ -2,8 +2,8 @@ package io.fairspace.saturn.vfs.irods;
 
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
-import io.fairspace.saturn.vfs.VirtualFileSystem;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -31,25 +31,24 @@ import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
-public class IRODSVirtualFileSystem implements VirtualFileSystem {
+public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String TYPE = "irods";
 
     private final IRODSFileSystem fs;
-    private final CollectionsService collections;
     private final RDFConnection rdf;
 
     public IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf) {
+        super(collections);
         this.rdf = rdf;
         try {
             this.fs = IRODSFileSystem.instance();
         } catch (JargonException e) {
             throw new RuntimeException(e);
         }
-        this.collections = collections;
     }
 
     @Override
-    public FileInfo stat(String path) throws IOException {
+    protected FileInfo statRegularFile(String path) throws IOException {
         try {
             var collection = collectionByPath(path);
             var account = accountForCollection(collection);
@@ -75,7 +74,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public List<FileInfo> list(String parentPath) throws IOException {
+    protected List<FileInfo> listCollectionOrDirectory(String parentPath) throws IOException {
         try {
             var collection = collectionByPath(parentPath);
             var account = accountForCollection(collection);
@@ -104,12 +103,12 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void mkdir(String path) throws IOException {
+    protected void doMkdir(String path) throws IOException {
         getFile(path).mkdir();
     }
 
     @Override
-    public void create(String path, InputStream in) throws IOException {
+    protected void doCreate(String path, InputStream in) throws IOException {
         getFile(path).createNewFile();
         modify(path, in);
     }
@@ -129,7 +128,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void copy(String from, String to) throws IOException {
+    protected void doCopy(String from, String to) throws IOException {
         try {
             var fromAccount = getAccount(from);
             var toAccount = getAccount(to);
@@ -147,7 +146,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void move(String from, String to) throws IOException {
+    protected void doMove(String from, String to) throws IOException {
         try {
             var fromAccount = getAccount(from);
             var toAccount = getAccount(to);
@@ -162,7 +161,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void delete(String path) throws IOException {
+    protected void doDelete(String path) throws IOException {
         getFile(path).delete();
     }
 

@@ -15,52 +15,33 @@ import java.util.List;
 import java.util.Map;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
-import static java.time.Instant.ofEpochMilli;
-import static java.util.stream.Collectors.toList;
 
-public class CompoundFileSystem implements VirtualFileSystem {
-    private static final FileInfo ROOT = FileInfo.builder()
-            .path("")
-            .readOnly(false)
-            .isDirectory(true)
-            .created(ofEpochMilli(0))
-            .modified(ofEpochMilli(0))
-            .build();
+public class CompoundFileSystem extends BaseFileSystem {
 
-    private final CollectionsService collections;
     private final Map<? super String, ? extends VirtualFileSystem> fileSystemsByType;
 
     public CompoundFileSystem(CollectionsService collections, Map<? super String, ? extends VirtualFileSystem> fileSystemsByType) {
-        this.collections = collections;
+        super(collections);
         this.fileSystemsByType = fileSystemsByType;
     }
 
     @Override
-    public FileInfo stat(String path) throws IOException {
-        if (path.isEmpty()) {
-            return ROOT;
-        }
+    protected FileInfo statRegularFile(String path) throws IOException {
         return fileSystemByPath(path, false).stat(path);
     }
 
     @Override
-    public List<FileInfo> list(String parentPath) throws IOException {
-        if (parentPath.isEmpty()) {
-            return collections.list()
-                    .stream()
-                    .map(CompoundFileSystem::fileInfo)
-                    .collect(toList());
-        }
+    protected List<FileInfo> listCollectionOrDirectory(String parentPath) throws IOException {
         return fileSystemByPath(parentPath, false).list(parentPath);
     }
 
     @Override
-    public void mkdir(String path) throws IOException {
+    protected void doMkdir(String path) throws IOException {
         fileSystemByPath(path, true).mkdir(path);
     }
 
     @Override
-    public void create(String path, InputStream in) throws IOException {
+    protected void doCreate(String path, InputStream in) throws IOException {
         fileSystemByPath(path, true).create(path, in);
     }
 
@@ -75,7 +56,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void copy(String from, String to) throws IOException {
+    protected void doCopy(String from, String to) throws IOException {
         if (fileSystemByPath(from, false).equals(fileSystemByPath(to, true))) {
             fileSystemByPath(from, true).copy(from, to);
         } else {
@@ -84,7 +65,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void move(String from, String to) throws IOException {
+    protected void doMove(String from, String to) throws IOException {
         if (fileSystemByPath(from, true).equals(fileSystemByPath(to, true))) {
             fileSystemByPath(from, true).move(from, to);
         } else {
@@ -93,7 +74,7 @@ public class CompoundFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void delete(String path) throws IOException {
+    protected void doDelete(String path) throws IOException {
         fileSystemByPath(path, true).delete(path);
     }
 
@@ -120,18 +101,6 @@ public class CompoundFileSystem implements VirtualFileSystem {
             throw new FileNotFoundException(path);
         }
         return fs;
-    }
-
-    private static FileInfo fileInfo(Collection collection) {
-        return FileInfo.builder()
-                .iri(collection.getIri().getURI())
-                .path(collection.getLocation())
-                .size(0)
-                .isDirectory(true)
-                .created(collection.getDateCreated())
-                .modified(collection.getDateCreated())
-                .readOnly(!collection.canWrite())
-                .build();
     }
 
     private static String collectionType(Collection collection) throws IOException {
