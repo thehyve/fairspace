@@ -208,7 +208,9 @@ export const url2iri = (iri) => {
  * @returns {string|*}
  */
 export const getNamespacedIri = (iri, namespaces) => {
-    if (!iri || !namespaces) return iri;
+    if (!iri) return '';
+
+    if (!namespaces) return iri;
 
     const namespace = namespaces.find(n => iri.startsWith(n.namespace));
 
