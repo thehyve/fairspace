@@ -19,8 +19,8 @@ class LinkedDataCreator extends React.Component {
     unMounted = false;
 
     componentDidMount() {
-        this.props.fetchLinkedData();
-        this.props.fetchShapes();
+        // this.props.fetchLinkedData();
+        // this.props.fetchShapes();
     }
 
     componentWillUnmount() {
@@ -50,6 +50,7 @@ class LinkedDataCreator extends React.Component {
         const {create, onEntityCreationError} = this.props;
 
         create(formKey, shape, id)
+            // TODO: don't forget this
             .catch(e => onEntityCreationError(e, id))
             .finally(() => {
                 if (!this.unMounted) {
@@ -59,6 +60,7 @@ class LinkedDataCreator extends React.Component {
     };
 
     render() {
+        // TODO: don't forget isEditable
         const {children, loading, error, isEditable, shapes, requireIdentifier} = this.props;
         const {creationState, shape, creatingMetadataEntity} = this.state;
 
@@ -115,8 +117,8 @@ class LinkedDataCreator extends React.Component {
 }
 
 LinkedDataCreator.propTypes = {
-    fetchLinkedData: PropTypes.func.isRequired,
-    fetchShapes: PropTypes.func.isRequired,
+    // fetchLinkedData: PropTypes.func.isRequired,
+    // fetchShapes: PropTypes.func.isRequired,
     create: PropTypes.func.isRequired,
 
     loading: PropTypes.bool,

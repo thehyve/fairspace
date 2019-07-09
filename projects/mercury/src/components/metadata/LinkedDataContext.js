@@ -19,20 +19,40 @@ import {
 } from "../../reducers/cache/jsonLdBySubjectReducers";
 import {isDataSteward} from "../../utils/userUtils";
 import Config from "../../services/Config/Config";
-import {propertiesToShow, getTypeInfo} from "../../utils/linkeddata/metadataUtils";
+import {propertiesToShow, getTypeInfo, getLabel} from "../../utils/linkeddata/metadataUtils";
 import {
     extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
 } from "../../utils/linkeddata/vocabularyUtils";
-import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
-import * as constants from "../../constants";
+import {getFirstPredicateValue, getFirstPredicateId} from "../../utils/linkeddata/jsonLdUtils";
+import {USABLE_IN_VOCABULARY_URI, USABLE_IN_METADATA_URI, SHACL_TARGET_CLASS} from "../../constants";
+import {searchVocabulary, searchMetadata} from "../../actions/searchActions";
+// import MetadataBrowserContainer from "./metadata/MetadataBrowserContainer";
+// import VocabularyBrowserContainer from "./vocabulary/VocabularyBrowserContainer";
+import BreadcrumbsContext from '../common/breadcrumbs/BreadcrumbsContext';
+import {getMetadataSearchResults, getVocabularySearchResults} from "../../reducers/searchReducers";
+import Iri from "../common/Iri";
+
+const toTargetClasses = shapes => shapes.map(c => getFirstPredicateId(c, SHACL_TARGET_CLASS));
+
+// TODO: might be part of UseLinkedDataSearch
+// Generic search method, it needs search action and classesInCatalog
+const performSearch = (searchLinkedData, getClassesInCatalog) => {
+    const classesInCatalog = getClassesInCatalog();
+    return ({query, types = [], page, size}) => {
+        const shapes = types.length === 0 ? classesInCatalog : classesInCatalog.filter(c => {
+            const targetClass = getFirstPredicateId(c, SHACL_TARGET_CLASS);
+            return types.includes(targetClass);
+        });
+
+        searchLinkedData({query, types: toTargetClasses(shapes), size, page});
+    };
+};
 
 const LinkedDataContext = React.createContext({});
 
 const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, submitVocabularyChanges,
-    shapesLoading, metaVocabulary, vocabulary, shapesError,
-    authorizations, isLinkedDataLoading, hasLinkedDataErrorForSubject, combineLinkedDataForSubject,
-    createVocabularyEntity
+    metaVocabulary, vocabulary, authorizations, createVocabularyEntity, ...otherProps
 }) => {
     fetchMetaVocabulary();
 
@@ -52,41 +72,66 @@ const LinkedDataVocabularyProvider = ({
         });
     };
 
-    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_VOCABULARY_URI));
+    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, USABLE_IN_VOCABULARY_URI));
+
     const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, metaVocabulary);
 
+    const getClassesInCatalog = () => metaVocabulary.getClassesInCatalog();
+
+    // TODO: This is a temporary render prop, it will be refactored out once LinkedDataBrowser is create
+    // const listRenderer = (footerRender) => {
+    //     const targetClasses = toTargetClasses(getClassesInCatalog());
+
+    //     return (
+    //         targetClasses && targetClasses.length > 0 && (
+    //             <VocabularyBrowserContainer
+    //                 targetClasses={targetClasses}
+    //                 metaVocabulary={metaVocabulary}
+    //                 footerRender={footerRender}
+    //             />
+    //         )
+    //     );
+    // };
+
     return (
-        <LinkedDataContext.Provider
-            value={{
-                shapesLoading,
-                shapesError,
-                fetchLinkedDataForSubject: fetchMetadataVocabulary,
-                isLinkedDataLoading,
-                hasLinkedDataErrorForSubject,
-                combineLinkedDataForSubject,
-                getEmptyLinkedData,
-                submitLinkedDataChanges,
-                createLinkedDataEntity: createVocabularyEntity,
-                getPropertiesForLinkedData,
-                namespaces,
-                getDescendants: metaVocabulary.getDescendants,
-                determineShapeForTypes: metaVocabulary.determineShapeForTypes,
-                hasEditRight: isDataSteward(authorizations, Config.get()),
-                getTypeInfoForLinkedData,
-                requireIdentifier: false
-            }}
+        <BreadcrumbsContext.Provider value={{
+            segments: [
+                {
+                    label: 'Vocabulary',
+                    href: '/vocabulary',
+                    icon: 'code'
+                }
+            ]
+        }}
         >
-            {children}
-        </LinkedDataContext.Provider>
+            <LinkedDataContext.Provider
+                value={{
+                    ...otherProps,
+                    fetchLinkedDataForSubject: fetchMetadataVocabulary,
+                    getEmptyLinkedData,
+                    submitLinkedDataChanges,
+                    createLinkedDataEntity: createVocabularyEntity,
+                    getPropertiesForLinkedData,
+                    namespaces,
+                    getDescendants: metaVocabulary.getDescendants,
+                    determineShapeForTypes: metaVocabulary.determineShapeForTypes,
+                    hasEditRight: isDataSteward(authorizations, Config.get()),
+                    getTypeInfoForLinkedData,
+                    requireIdentifier: false,
+                    getClassesInCatalog,
+                    searchLinkedData: performSearch(searchVocabulary, getClassesInCatalog),
+                    // listRenderer
+                }}
+            >
+                {children}
+            </LinkedDataContext.Provider>
+        </BreadcrumbsContext.Provider>
     );
 };
 
-
 const LinkedDataMetadataProvider = ({
     children, fetchMetadataVocabulary, fetchMetadataBySubject,
-    submitMetadataChanges, shapesLoading, vocabulary,
-    shapesError, isLinkedDataLoading, hasLinkedDataErrorForSubject,
-    combineLinkedDataForSubject, createMetadataEntity
+    submitMetadataChanges, vocabulary, createMetadataEntity, linkedDataSearchResults, searchMetadataDispatch, ...otherProps
 }) => {
     fetchMetadataVocabulary();
 
@@ -101,32 +146,89 @@ const LinkedDataMetadataProvider = ({
             isEditable: isEntityEditable && !p.machineOnly
         }));
 
-    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, constants.USABLE_IN_METADATA_URI));
+    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, USABLE_IN_METADATA_URI));
+
     const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, vocabulary);
 
+    const getClassesInCatalog = () => vocabulary.getClassesInCatalog();
+
+
+    // TODO: This is a temporary render prop, it will be refactored out once LinkedDataBrowser is create
+    // const listRenderer = (footerRender) => {
+    //     const targetClasses = toTargetClasses(getClassesInCatalog());
+    //     return (
+    //         targetClasses && targetClasses.length > 0 && (
+    //             <MetadataBrowserContainer
+    //                 targetClasses={targetClasses}
+    //                 vocabulary={vocabulary}
+    //                 footerRender={footerRender}
+    //             />
+    //         )
+    //     );
+    // };
+
+    const getSearchEntities = () => {
+        const {items, total, pending, error} = linkedDataSearchResults;
+
+        const entities = items.map((
+            {id, label, comment, type, highlights}
+        ) => {
+            const shape = vocabulary.determineShapeForTypes(type);
+            const typeLabel = getLabel(shape, true);
+            const shapeUrl = shape['@id'];
+
+            return {
+                id,
+                primaryText: (label && label[0]) || <Iri iri={id} />,
+                secondaryText: (comment && comment[0]),
+                typeLabel,
+                shapeUrl,
+                highlights
+            };
+        });
+
+        return {
+            searchPending: pending,
+            searchError: error,
+            entities,
+            total,
+            hasHighlights: entities.some(({highlights}) => highlights.length > 0),
+        };
+    };
+
     return (
-        <LinkedDataContext.Provider
-            value={{
-                shapesLoading,
-                shapesError,
-                fetchLinkedDataForSubject: fetchMetadataBySubject,
-                isLinkedDataLoading,
-                hasLinkedDataErrorForSubject,
-                combineLinkedDataForSubject,
-                getEmptyLinkedData,
-                submitLinkedDataChanges,
-                createLinkedDataEntity: createMetadataEntity,
-                namespaces,
-                getPropertiesForLinkedData,
-                getDescendants: vocabulary.getDescendants,
-                determineShapeForTypes: vocabulary.determineShapeForTypes,
-                hasEditRight: true,
-                getTypeInfoForLinkedData,
-                requireIdentifier: true
-            }}
+        <BreadcrumbsContext.Provider value={{
+            segments: [
+                {
+                    label: 'Metadata',
+                    href: '/metadata',
+                    icon: 'assignment'
+                }
+            ]
+        }}
         >
-            {children}
-        </LinkedDataContext.Provider>
+            <LinkedDataContext.Provider
+                value={{
+                    ...otherProps,
+                    fetchLinkedDataForSubject: fetchMetadataBySubject,
+                    getEmptyLinkedData,
+                    submitLinkedDataChanges,
+                    createLinkedDataEntity: createMetadataEntity,
+                    namespaces,
+                    getPropertiesForLinkedData,
+                    getDescendants: vocabulary.getDescendants,
+                    determineShapeForTypes: vocabulary.determineShapeForTypes,
+                    hasEditRight: true,
+                    getTypeInfoForLinkedData,
+                    requireIdentifier: true,
+                    getClassesInCatalog,
+                    searchLinkedData: performSearch(searchMetadataDispatch, getClassesInCatalog),
+                    getSearchEntities,
+                }}
+            >
+                {children}
+            </LinkedDataContext.Provider>
+        </BreadcrumbsContext.Provider>
     );
 };
 
@@ -140,6 +242,7 @@ const mapStateToPropsForVocabulary = (state) => {
     const isLinkedDataLoading = () => isVocabularyPending(state);
     const hasLinkedDataErrorForSubject = () => hasVocabularyError(state);
     const combineLinkedDataForSubject = (subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
+    const linkedDataSearchResults = getVocabularySearchResults(state);
 
     return {
         shapesLoading,
@@ -150,6 +253,7 @@ const mapStateToPropsForVocabulary = (state) => {
         isLinkedDataLoading,
         hasLinkedDataErrorForSubject,
         combineLinkedDataForSubject,
+        linkedDataSearchResults,
     };
 };
 
@@ -161,6 +265,7 @@ const mapStateToPropsForMetadata = (state) => {
     const isLinkedDataLoading = (subject) => isMetadataPending(state, subject);
     const hasLinkedDataErrorForSubject = (subject) => hasMetadataError(state, subject);
     const combineLinkedDataForSubject = (subject) => getCombinedMetadataForSubject(state, subject);
+    const linkedDataSearchResults = getMetadataSearchResults(state);
 
     return {
         shapesLoading,
@@ -169,6 +274,7 @@ const mapStateToPropsForMetadata = (state) => {
         isLinkedDataLoading,
         hasLinkedDataErrorForSubject,
         combineLinkedDataForSubject,
+        linkedDataSearchResults,
     };
 };
 
@@ -180,7 +286,9 @@ const mapDispatchToProps = {
     fetchMetadataBySubject: fetchMetadataBySubjectIfNeeded,
     submitMetadataChanges: submitMetadataChangesFromState,
     createMetadataEntity: createMetadataEntityFromState,
-    createVocabularyEntity: createVocabularyEntityFromState
+    createVocabularyEntity: createVocabularyEntityFromState,
+    searchMetadataDispatch: searchMetadata,
+    searchVocabularyDispatch: searchVocabulary,
 };
 
 export const LinkedDataVocabularyProviderContainer = connect(mapStateToPropsForVocabulary, mapDispatchToProps)(LinkedDataVocabularyProvider);
