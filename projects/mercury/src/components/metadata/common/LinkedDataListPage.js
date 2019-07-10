@@ -1,15 +1,17 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {withRouter} from 'react-router-dom';
 import {
     Checkbox, FormControl, Input, ListItemText,
     MenuItem, Paper, Select, TableFooter, TablePagination,
     TableRow, withStyles
 } from "@material-ui/core";
 
-import {SearchBar, MessageDisplay} from "../../common";
+import {SearchBar, MessageDisplay, LoadingInlay} from "../../common";
 import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
 import UseLinkDataSearch from '../UseLinkDataSearch';
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataList from './LinkedDataList';
+import LinkedDataContext from '../LinkedDataContext';
 
 const styles = theme => ({
     typeSelect: {
@@ -17,12 +19,14 @@ const styles = theme => ({
     }
 });
 
-const LinkedDataListPage = ({classes}) => {
+const LinkedDataListPage = ({classes, history}) => {
     const {
         types, shapes, size, page, loading, error, onSearchChange,
         onTypesChange, onPageChange, onSizeChange, getTypeLabel,
-        allTypes, entities, total, hasHighlights, requireIdentifier,
+        allTypes, entities, total, hasHighlights,
     } = UseLinkDataSearch(true);
+
+    const {requireIdentifier, getEntityRelativeUrl, createLinkedDataEntity, onEntityCreationError} = useContext(LinkedDataContext);
 
     const renderTypeClass = ({targetClass, label}) => (
         <MenuItem key={targetClass} value={targetClass}>
@@ -47,6 +51,32 @@ const LinkedDataListPage = ({classes}) => {
         </TableFooter>
     );
 
+    const ListBody = () => {
+        if (loading) {
+            return <LoadingInlay />;
+        }
+
+        if (error) {
+            return <MessageDisplay message={error.message || 'An error occurred while loading metadata'} />;
+        }
+
+        if (entities && entities.length > 0) {
+            return (
+                <LinkedDataList
+                    items={entities}
+                    total={total}
+                    hasHighlights={hasHighlights}
+                    footerRender={footerRender}
+                    // TODO: don't forget
+                    typeRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
+                    onOpen={(id) => history.push(getEntityRelativeUrl(id))}
+                />
+            );
+        }
+
+        return <MessageDisplay message="The metadata is empty" isError={false} />;
+    };
+
     return (
         <>
             <BreadCrumbs />
@@ -63,34 +93,26 @@ const LinkedDataListPage = ({classes}) => {
                         value={types}
                         onChange={e => onTypesChange(e.target.value)}
                         input={<Input id="select-multiple-checkbox" />}
-                        renderValue={selected => (selected.length === 0 ? '[All types]'
-                            : selected.map(getTypeLabel).join(', '))}
+                        renderValue={selected => (selected.length === 0 ? '[All types]' : selected.map(getTypeLabel).join(', '))}
                     >
                         {allTypes.map(renderTypeClass)}
                     </Select>
                 </FormControl>
             </Paper>
-            <LinkedDataCreator shapes={shapes} requireIdentifie={requireIdentifier}>
-                {
-                    entities && entities.length > 0
-                        ? (
-                            <LinkedDataList
-                                loading={loading}
-                                error={error}
-                                items={entities}
-                                total={total}
-                                hasHighlights={hasHighlights}
-                                footerRender={footerRender}
-                                // TODO: don't forget
-                                typeRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
-                                onOpen={() => {}}
-                            />
-                        )
-                        : <MessageDisplay message="The metadata is empty" isError={false} />
+            <LinkedDataCreator
+                loading={loading}
+                shapes={shapes}
+                requireIdentifie={requireIdentifier}
+                create={
+                    (formKey, id, type) => createLinkedDataEntity(formKey, id, type)
+                        .then(() => history.push(getEntityRelativeUrl(id)))
                 }
+                onEntityCreationError={onEntityCreationError}
+            >
+                <ListBody />
             </LinkedDataCreator>
         </>
     );
 };
 
-export default withStyles(styles)(LinkedDataListPage);
+export default withRouter(withStyles(styles)(LinkedDataListPage));

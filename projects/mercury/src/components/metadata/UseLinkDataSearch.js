@@ -7,54 +7,64 @@ import {getLabel} from "../../utils/linkeddata/metadataUtils";
 
 const useLinkDataSearch = (doInitialFetch = false) => {
     const {
-        getClassesInCatalog,
-        searchLinkedData,
-        shapesLoading,
-        shapesError,
-        getSearchEntities,
-        requireIdentifier,
+        getClassesInCatalog, searchLinkedData, shapesLoading,
+        shapesError, getSearchEntities
     } = useContext(LinkedDataContext);
 
     const [types, setTypes] = useState([]);
-    const [query, setQuery] = useState('');
+    const [query, setQuery] = useState(null);
     const [size, setSize] = useState(SEARCH_DEFAULT_SIZE);
     const [page, setPage] = useState(0);
     const [initialFetchDone, setInitialFetchDone] = useState(false);
 
     const {searchPending, searchError, entities, total, hasHighlights} = getSearchEntities();
 
+    useEffect(() => {
+        if (query === null) {
+            return;
+        }
+
+        const getTypes = () => {
+            const classesInCatalog = getClassesInCatalog();
+
+            const shapes = types.length === 0 ? classesInCatalog : classesInCatalog.filter(c => {
+                const targetClass = getFirstPredicateId(c, SHACL_TARGET_CLASS);
+                return types.includes(targetClass);
+            });
+
+            return shapes.map(c => getFirstPredicateId(c, SHACL_TARGET_CLASS));
+        };
+
+        searchLinkedData({query, types: getTypes(), size, page});
+    }, [query, types, size, page, searchLinkedData]);
+
     const shapes = getClassesInCatalog();
 
+    // Single initial fetch to load LD list if doInitialFetch is true once shapes are loaded
     useEffect(() => {
         if (doInitialFetch && !initialFetchDone && shapes && shapes.length > 0) {
-            searchLinkedData({query: '*'});
+            setQuery('*');
             setInitialFetchDone(true);
         }
     }, [shapes, doInitialFetch, initialFetchDone, searchLinkedData]);
 
-    const getSearchState = () => ({types, query, size, page});
-
     const onSearchChange = (q) => {
         setQuery(q);
         setPage(0); // reset page to start from first page
-        searchLinkedData({...getSearchState(), page: 0, query: q});
     };
 
     const onTypesChange = (t) => {
         setTypes(t);
-        searchLinkedData({...getSearchState(), types: t});
     };
 
     const onPageChange = (_, p) => {
         setPage(p);
-        searchLinkedData({...getSearchState(), page: p});
     };
 
     const onSizeChange = (e) => {
         const s = e.target.value;
         setSize(s);
         setPage(0); // reset page to start from first page
-        searchLinkedData({...getSearchState(), page: 0, size: s});
     };
 
     const allTypes = shapes.map(type => {
@@ -81,7 +91,6 @@ const useLinkDataSearch = (doInitialFetch = false) => {
         entities,
         total,
         hasHighlights,
-        requireIdentifier,
     };
 };
 
