@@ -27,7 +27,13 @@ public class CompoundFileSystem extends BaseFileSystem {
 
     @Override
     protected FileInfo statRegularFile(String path) throws IOException {
-        return fileSystemByPath(path, false).stat(path);
+        VirtualFileSystem vfs;
+        try {
+            vfs = fileSystemByPath(path, false);
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+        return vfs.stat(path);
     }
 
     @Override
@@ -86,6 +92,16 @@ public class CompoundFileSystem extends BaseFileSystem {
     }
 
     private VirtualFileSystem fileSystemByPath(String path, boolean mustBeWritable) throws IOException {
+        var collection = collectionByPath(path);
+
+        if (mustBeWritable && !collection.canWrite()) {
+            throw new IOException("Target path is read-only");
+        }
+
+        return fileSystemForCollection(collection);
+    }
+
+    private Collection collectionByPath(String path) throws IOException {
         if (path.isEmpty()) {
             throw new AccessDeniedException("File operations on the root directory are not allowed");
         }
@@ -93,12 +109,14 @@ public class CompoundFileSystem extends BaseFileSystem {
         if (collection == null) {
             throw new FileNotFoundException(path);
         }
-        if (mustBeWritable && !collection.canWrite()) {
-            throw new IOException("Target path is read-only");
-        }
+
+        return collection;
+    }
+
+    private VirtualFileSystem fileSystemForCollection(Collection collection) throws IOException {
         var fs = fileSystemsByType.get(collectionType(collection));
         if (fs == null){
-            throw new FileNotFoundException(path);
+            throw new IOException("Unknown file system type for " + collection.getLocation());
         }
         return fs;
     }

@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +95,7 @@ public class CompoundFileSystemTest {
         verify(vfs3).mkdir("dir5/path");
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test(expected = IOException.class)
     public void handlesUnknownSchemes() throws IOException {
         fs.stat("dir3/path");
     }

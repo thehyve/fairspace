@@ -108,7 +108,7 @@ public class IRODSVirtualFileSystemTest {
     }
 
     @Test
-    public void testStatCollection() throws IOException, JargonException {
+    public void testStatCollection() throws IOException {
         assertNotNull(vfs.stat("rods"));
         assertNull(vfs.stat("unknown"));
         verifyZeroInteractions(fs);
