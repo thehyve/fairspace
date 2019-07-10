@@ -19,6 +19,11 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
 
     const {searchPending, searchError, entities, total, hasHighlights} = getSearchEntities();
 
+    // reset page to start from first page when query or size changes
+    useEffect(() => {
+        setPage(0);
+    }, [query, size]);
+
     useEffect(() => {
         if (query === null) {
             return;
@@ -51,24 +56,6 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         }
     }, [shapes, doInitialFetch, initialFetchDone, searchLinkedData]);
 
-    const onSearchChange = (q) => {
-        setQuery(q);
-        setPage(0); // reset page to start from first page
-    };
-
-    const onTypesChange = (t) => {
-        setTypes(t);
-    };
-
-    const onPageChange = (_, p) => {
-        setPage(p);
-    };
-
-    const onSizeChange = (s) => {
-        setSize(s);
-        setPage(0); // reset page to start from first page
-    };
-
     const allTypes = shapes.map(type => {
         const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS);
         const label = getLabel(type);
@@ -76,6 +63,7 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
     });
 
     return {
+        query,
         types,
         shapes,
         allTypes,
@@ -84,10 +72,10 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         loading: searchPending,
         shapesLoading,
         error: shapesError || searchError,
-        onSearchChange,
-        onTypesChange,
-        onPageChange,
-        onSizeChange,
+        onSearchChange: setQuery,
+        onTypesChange: setTypes,
+        onPageChange: setPage,
+        onSizeChange: setSize,
         entities,
         total,
         hasHighlights,

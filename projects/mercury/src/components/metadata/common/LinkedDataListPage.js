@@ -21,7 +21,7 @@ const styles = theme => ({
 
 const LinkedDataListPage = ({classes, history}) => {
     const {
-        types, shapes, size, page, shapesLoading, loading, error, onSearchChange,
+        query, types, shapes, size, page, shapesLoading, loading, error, onSearchChange,
         onTypesChange, onPageChange, onSizeChange, allTypes, entities, total, hasHighlights,
     } = useLinkedDataSearch(true);
 
@@ -46,7 +46,7 @@ const LinkedDataListPage = ({classes, history}) => {
                     colSpan={colSpan}
                     count={count}
                     page={page}
-                    onChangePage={onPageChange}
+                    onChangePage={(_, p) => onPageChange(p)}
                     onChangeRowsPerPage={(e) => onSizeChange(e.target.value)}
                 />
             </TableRow>
@@ -75,7 +75,7 @@ const LinkedDataListPage = ({classes, history}) => {
             );
         }
 
-        return <MessageDisplay message="The metadata is empty" isError={false} />;
+        return <MessageDisplay message={query && query !== '*' ? 'No results found' : 'The metadata is empty'} isError={false} />;
     };
 
     const getTypeLabel = (type) => allTypes.find(({targetClass}) => targetClass === type).label;
