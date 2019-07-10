@@ -48,7 +48,7 @@ const LinkedDataListPage = ({classes, history}) => {
                     count={count}
                     page={page}
                     onChangePage={onPageChange}
-                    onChangeRowsPerPage={onSizeChange}
+                    onChangeRowsPerPage={(e) => onSizeChange(e.target.value)}
                 />
             </TableRow>
         </TableFooter>

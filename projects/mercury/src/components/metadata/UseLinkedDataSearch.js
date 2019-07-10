@@ -64,8 +64,7 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         setPage(p);
     };
 
-    const onSizeChange = (e) => {
-        const s = e.target.value;
+    const onSizeChange = (s) => {
         setSize(s);
         setPage(0); // reset page to start from first page
     };
