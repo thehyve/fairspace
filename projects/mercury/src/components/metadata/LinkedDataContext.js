@@ -21,11 +21,11 @@ import {getFirstPredicateValue, getFirstPredicateId} from "../../utils/linkeddat
 
 // Other
 import {USABLE_IN_VOCABULARY_URI, USABLE_IN_METADATA_URI, SHACL_TARGET_CLASS, METADATA_PATH, VOCABULARY_PATH} from "../../constants";
-import BreadcrumbsContext from '../common/breadcrumbs/BreadcrumbsContext';
 import Config from "../../services/Config/Config";
 import Iri from "../common/Iri";
 import {ErrorDialog} from "../common";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
+import LinkedDataLink from "./common/LinkedDataLink";
 
 const LinkedDataContext = React.createContext({});
 
@@ -93,32 +93,33 @@ const LinkedDataVocabularyProvider = ({
         }
     };
 
+    const typeRender = (entry) => <a href={entry.typeUrl}> {entry.typeLabel} </a>;
+
     return (
-        <BreadcrumbsContext.Provider value={{segments: [{label: 'Vocabulary', href: '/vocabulary', icon: 'code'}]}}>
-            <LinkedDataContext.Provider
-                value={{
-                    ...otherProps,
-                    fetchLinkedDataForSubject: fetchMetadataVocabulary,
-                    getEmptyLinkedData,
-                    submitLinkedDataChanges,
-                    createLinkedDataEntity: createVocabularyEntity,
-                    getPropertiesForLinkedData,
-                    namespaces,
-                    getDescendants: metaVocabulary.getDescendants,
-                    determineShapeForTypes: metaVocabulary.determineShapeForTypes,
-                    hasEditRight: isDataSteward(authorizations, Config.get()),
-                    getTypeInfoForLinkedData,
-                    requireIdentifier: false,
-                    getClassesInCatalog,
-                    searchLinkedData: searchVocabularyDispatch,
-                    getSearchEntities,
-                    getEntityRelativeUrl: (id) => `${VOCABULARY_PATH}?iri=` + encodeURIComponent(id),
-                    onEntityCreationError,
-                }}
-            >
-                {children}
-            </LinkedDataContext.Provider>
-        </BreadcrumbsContext.Provider>
+        <LinkedDataContext.Provider
+            value={{
+                ...otherProps,
+                fetchLinkedDataForSubject: fetchMetadataVocabulary,
+                getEmptyLinkedData,
+                submitLinkedDataChanges,
+                createLinkedDataEntity: createVocabularyEntity,
+                getPropertiesForLinkedData,
+                namespaces,
+                getDescendants: metaVocabulary.getDescendants,
+                determineShapeForTypes: metaVocabulary.determineShapeForTypes,
+                hasEditRight: isDataSteward(authorizations, Config.get()),
+                getTypeInfoForLinkedData,
+                requireIdentifier: false,
+                getClassesInCatalog,
+                searchLinkedData: searchVocabularyDispatch,
+                getSearchEntities,
+                getEntityRelativeUrl: (id) => `${VOCABULARY_PATH}?iri=` + encodeURIComponent(id),
+                onEntityCreationError,
+                typeRender,
+            }}
+        >
+            {children}
+        </LinkedDataContext.Provider>
     );
 };
 
@@ -180,32 +181,33 @@ const LinkedDataMetadataProvider = ({
         }
     };
 
+    const typeRender = (entry) => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>;
+
     return (
-        <BreadcrumbsContext.Provider value={{segments: [{label: 'Metadata', href: '/metadata', icon: 'assignment'}]}}>
-            <LinkedDataContext.Provider
-                value={{
-                    ...otherProps,
-                    fetchLinkedDataForSubject: fetchMetadataBySubject,
-                    getEmptyLinkedData,
-                    submitLinkedDataChanges,
-                    createLinkedDataEntity: createMetadataEntity,
-                    namespaces,
-                    getPropertiesForLinkedData,
-                    getDescendants: vocabulary.getDescendants,
-                    determineShapeForTypes: vocabulary.determineShapeForTypes,
-                    hasEditRight: true,
-                    getTypeInfoForLinkedData,
-                    requireIdentifier: true,
-                    getClassesInCatalog,
-                    searchLinkedData: searchMetadataDispatch,
-                    getSearchEntities,
-                    getEntityRelativeUrl: (id) => `${METADATA_PATH}?iri=` + encodeURIComponent(id),
-                    onEntityCreationError,
-                }}
-            >
-                {children}
-            </LinkedDataContext.Provider>
-        </BreadcrumbsContext.Provider>
+        <LinkedDataContext.Provider
+            value={{
+                ...otherProps,
+                fetchLinkedDataForSubject: fetchMetadataBySubject,
+                getEmptyLinkedData,
+                submitLinkedDataChanges,
+                createLinkedDataEntity: createMetadataEntity,
+                namespaces,
+                getPropertiesForLinkedData,
+                getDescendants: vocabulary.getDescendants,
+                determineShapeForTypes: vocabulary.determineShapeForTypes,
+                hasEditRight: true,
+                getTypeInfoForLinkedData,
+                requireIdentifier: true,
+                getClassesInCatalog,
+                searchLinkedData: searchMetadataDispatch,
+                getSearchEntities,
+                getEntityRelativeUrl: (id) => `${METADATA_PATH}?iri=` + encodeURIComponent(id),
+                onEntityCreationError,
+                typeRender,
+            }}
+        >
+            {children}
+        </LinkedDataContext.Provider>
     );
 };
 

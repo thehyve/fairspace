@@ -21,12 +21,15 @@ const styles = theme => ({
 
 const LinkedDataListPage = ({classes, history}) => {
     const {
-        types, shapes, size, page, loading, error, onSearchChange,
+        types, shapes, size, page, shapesLoading, loading, error, onSearchChange,
         onTypesChange, onPageChange, onSizeChange, getTypeLabel,
         allTypes, entities, total, hasHighlights,
     } = UseLinkDataSearch(true);
 
-    const {requireIdentifier, getEntityRelativeUrl, createLinkedDataEntity, onEntityCreationError} = useContext(LinkedDataContext);
+    const {
+        requireIdentifier, getEntityRelativeUrl, createLinkedDataEntity,
+        onEntityCreationError, hasEditRight, typeRender
+    } = useContext(LinkedDataContext);
 
     const renderTypeClass = ({targetClass, label}) => (
         <MenuItem key={targetClass} value={targetClass}>
@@ -67,8 +70,7 @@ const LinkedDataListPage = ({classes, history}) => {
                     total={total}
                     hasHighlights={hasHighlights}
                     footerRender={footerRender}
-                    // TODO: don't forget
-                    typeRender={entry => <a href={entry.typeUrl}> {entry.typeLabel} </a>}
+                    typeRender={typeRender}
                     onOpen={(id) => history.push(getEntityRelativeUrl(id))}
                 />
             );
@@ -99,18 +101,23 @@ const LinkedDataListPage = ({classes, history}) => {
                     </Select>
                 </FormControl>
             </Paper>
-            <LinkedDataCreator
-                loading={loading}
-                shapes={shapes}
-                requireIdentifie={requireIdentifier}
-                create={
-                    (formKey, id, type) => createLinkedDataEntity(formKey, id, type)
-                        .then(() => history.push(getEntityRelativeUrl(id)))
-                }
-                onEntityCreationError={onEntityCreationError}
-            >
-                <ListBody />
-            </LinkedDataCreator>
+            {
+                hasEditRight ? (
+                    <LinkedDataCreator
+                        loading={shapesLoading}
+                        shapes={shapes}
+                        requireIdentifie={requireIdentifier}
+                        create={
+                            (formKey, id, type) => createLinkedDataEntity(formKey, id, type)
+                                .then(() => history.push(getEntityRelativeUrl(id)))
+                        }
+                        onEntityCreationError={onEntityCreationError}
+                    >
+                        <ListBody />
+                    </LinkedDataCreator>
+                ) : <ListBody />
+            }
+
         </>
     );
 };

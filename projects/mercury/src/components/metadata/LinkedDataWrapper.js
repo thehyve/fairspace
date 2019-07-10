@@ -5,20 +5,24 @@ import {LinkedDataVocabularyProviderContainer, LinkedDataMetadataProviderContain
 import {LinkedDataValuesContext} from "./common/LinkedDataValuesContext";
 import MetadataValueComponentFactory from "./metadata/MetadataValueComponentFactory";
 import VocabularyValueComponentFactory from "./vocabulary/VocabularyValueComponentFactory";
-
+import BreadcrumbsContext from '../common/breadcrumbs/BreadcrumbsContext';
 
 export const MetadataWrapper = ({children}) => (
-    <LinkedDataMetadataProviderContainer>
-        <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
-            {children}
-        </LinkedDataValuesContext.Provider>
-    </LinkedDataMetadataProviderContainer>
+    <BreadcrumbsContext.Provider value={{segments: [{label: 'Metadata', href: '/metadata', icon: 'assignment'}]}}>
+        <LinkedDataMetadataProviderContainer>
+            <LinkedDataValuesContext.Provider value={{editorPath: METADATA_PATH, componentFactory: MetadataValueComponentFactory}}>
+                {children}
+            </LinkedDataValuesContext.Provider>
+        </LinkedDataMetadataProviderContainer>
+    </BreadcrumbsContext.Provider>
 );
 
 export const VocabularyWrapper = ({children}) => (
-    <LinkedDataVocabularyProviderContainer>
-        <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
-            {children}
-        </LinkedDataValuesContext.Provider>
-    </LinkedDataVocabularyProviderContainer>
+    <BreadcrumbsContext.Provider value={{segments: [{label: 'Vocabulary', href: '/vocabulary', icon: 'code'}]}}>
+        <LinkedDataVocabularyProviderContainer>
+            <LinkedDataValuesContext.Provider value={{editorPath: VOCABULARY_PATH, componentFactory: VocabularyValueComponentFactory}}>
+                {children}
+            </LinkedDataValuesContext.Provider>
+        </LinkedDataVocabularyProviderContainer>
+    </BreadcrumbsContext.Provider>
 );

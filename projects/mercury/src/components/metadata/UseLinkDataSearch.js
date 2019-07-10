@@ -36,11 +36,14 @@ const useLinkDataSearch = (doInitialFetch = false) => {
         };
 
         searchLinkedData({query, types: getTypes(), size, page});
+
+        // Due to current setup of how vocabulary/meta-vocab is being store, getClassesInCatalog can't be added as dependency
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query, types, size, page, searchLinkedData]);
 
     const shapes = getClassesInCatalog();
 
-    // Single initial fetch to load LD list if doInitialFetch is true once shapes are loaded
+    // Single initial fetch to load LD list if doInitialFetch is true and only when shapes are loaded
     useEffect(() => {
         if (doInitialFetch && !initialFetchDone && shapes && shapes.length > 0) {
             setQuery('*');
@@ -81,7 +84,8 @@ const useLinkDataSearch = (doInitialFetch = false) => {
         allTypes,
         size,
         page,
-        loading: shapesLoading || searchPending,
+        loading: searchPending,
+        shapesLoading,
         error: shapesError || searchError,
         onSearchChange,
         onTypesChange,

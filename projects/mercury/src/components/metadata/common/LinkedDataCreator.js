@@ -58,28 +58,22 @@ class LinkedDataCreator extends React.Component {
     };
 
     render() {
-        // TODO: don't forget isEditable
-        const {children, loading, isEditable, shapes, requireIdentifier} = this.props;
+        const {children, loading, shapes, requireIdentifier} = this.props;
         const {creationState, shape, creatingMetadataEntity} = this.state;
 
         return (
             <>
-                {isEditable
-                    ? (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            aria-label="Add"
-                            title="Create a new metadata entity"
-                            onClick={this.startCreating}
-                            style={{margin: '10px 0'}}
-                            disabled={loading || !shapes}
-                        >
-                            Create
-                        </Button>
-                    )
-                    : null
-                }
+                <Button
+                    variant="contained"
+                    color="primary"
+                    aria-label="Add"
+                    title="Create a new metadata entity"
+                    onClick={this.startCreating}
+                    style={{margin: '10px 0'}}
+                    disabled={loading || !shapes}
+                >
+                    Create
+                </Button>
 
                 <LinkedDataShapeChooserDialog
                     open={creationState === LinkedDataCreator.CREATION_STATE_CHOOSE_SHAPE}
@@ -87,7 +81,6 @@ class LinkedDataCreator extends React.Component {
                     onChooseShape={this.chooseShape}
                     onClose={this.closeDialog}
                 />
-
 
                 {creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY && (
                     <NewLinkedDataEntityDialog
@@ -110,12 +103,10 @@ LinkedDataCreator.propTypes = {
     create: PropTypes.func.isRequired,
     loading: PropTypes.bool,
     shapes: PropTypes.array,
-    isEditable: PropTypes.bool,
     requireIdentifier: PropTypes.bool,
 };
 
 LinkedDataCreator.defaultProps = {
-    isEditable: true,
     requireIdentifier: true
 };
 
