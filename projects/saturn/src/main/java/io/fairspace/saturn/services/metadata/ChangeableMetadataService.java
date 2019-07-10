@@ -14,8 +14,9 @@ import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 
 import java.util.*;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
-import static io.fairspace.saturn.vocabulary.Vocabularies.getInverse;
+import static io.fairspace.saturn.vocabulary.Inference.applyInference;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
@@ -126,8 +127,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         // to ensure we retrieve the latest data
         inverseCache.clear();
 
-        applyInference(modelToRemove);
-        applyInference(modelToAdd);
+        var vocabularyModel = rdf.queryConstruct(storedQuery("select_by_mask", vocabulary, null, null, null));
+
+        applyInference(vocabularyModel, modelToRemove);
+        applyInference(vocabularyModel, modelToAdd);
 
         var violations = new LinkedHashSet<Violation>();
         validator.validate(modelToRemove, modelToAdd,
@@ -152,27 +155,4 @@ public class ChangeableMetadataService extends ReadableMetadataService {
                 .mapWith(s -> new Quad(graph, s.asTriple()))
                 .toList();
     }
-
-    private void applyInference(Model model) {
-        var toAdd = createDefaultModel();
-
-        model.listStatements().forEachRemaining(stmt -> {
-            if (stmt.getObject().isResource()) {
-                getInverseWithCache(stmt.getPredicate())
-                        .ifPresent(inverse ->
-                                toAdd.add(stmt.getObject().asResource(), inverse, stmt.getSubject())
-                        );
-            }
-        });
-
-        model.add(toAdd);
-    }
-
-    private Optional<Property> getInverseWithCache(Property property) {
-        return inverseCache.computeIfAbsent(
-                property.getURI(),
-                s -> Optional.ofNullable(getInverse(rdf, vocabulary, property))
-        );
-    }
-
 }

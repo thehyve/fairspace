@@ -12,12 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getViolations;
 import static io.fairspace.saturn.vocabulary.Vocabularies.*;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabulariesTest {
@@ -55,18 +53,5 @@ public class VocabulariesTest {
         engine.validateAll();
         getViolations(engine, violationHandler);
         assertTrue(isValid);
-    }
-
-    @Test
-    public void testGetInverseProperty() {
-        var provideMaterial = createProperty(generateVocabularyIri("providesMaterial").getURI());
-        var derivesFrom = createProperty(generateVocabularyIri("derivesFrom").getURI());
-        var unknown = createProperty(generateVocabularyIri("unknown").getURI());
-
-        assertEquals(provideMaterial, getInverse(rdf, VOCABULARY_GRAPH_URI, derivesFrom));
-        assertEquals(derivesFrom, getInverse(rdf, VOCABULARY_GRAPH_URI, provideMaterial));
-        assertNull(getInverse(rdf, VOCABULARY_GRAPH_URI, unknown));
-
-        assertEquals(FS.inverseRelation, getInverse(rdf, META_VOCABULARY_GRAPH_URI, FS.inverseRelation));
     }
 }
