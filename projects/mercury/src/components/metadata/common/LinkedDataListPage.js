@@ -104,7 +104,7 @@ const LinkedDataListPage = ({classes, history}) => {
             {
                 hasEditRight ? (
                     <LinkedDataCreator
-                        loading={shapesLoading}
+                        shapesLoading={shapesLoading}
                         shapes={shapes}
                         requireIdentifie={requireIdentifier}
                         create={
