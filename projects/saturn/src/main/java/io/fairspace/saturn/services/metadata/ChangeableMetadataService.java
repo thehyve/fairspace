@@ -14,7 +14,6 @@ import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 
 import java.util.*;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vocabulary.Inference.applyInference;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -127,7 +126,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         // to ensure we retrieve the latest data
         inverseCache.clear();
 
-        var vocabularyModel = rdf.queryConstruct(storedQuery("select_by_mask", vocabulary, null, null, null));
+        var vocabularyModel = rdf.fetch(vocabulary.getURI());
 
         applyInference(vocabularyModel, modelToRemove);
         applyInference(vocabularyModel, modelToAdd);
