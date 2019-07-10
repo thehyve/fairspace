@@ -23,15 +23,9 @@ import java.util.Arrays;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ShaclValidatorTest {
@@ -203,7 +197,7 @@ public class ShaclValidatorTest {
                 .add(resource1, RDFS.label, "collection")
                 .add(resource1, RDFS.comment, "bla")
                 .add(resource1, FS.filePath, "/")
-                .add(resource1, FS.collectionType, "a")
+                .add(resource1, FS.connectionString, "a")
                 .add(resource1, FS.createdBy, blankNode);
 
         //Resource newBlankNode = createResource();
@@ -227,7 +221,7 @@ public class ShaclValidatorTest {
                 .add(resource1, RDFS.label, "collection")
                 .add(resource1, RDFS.comment, "bla")
                 .add(resource1, FS.filePath, "/")
-                .add(resource1, FS.collectionType, "a")
+                .add(resource1, FS.connectionString, "a")
                 .add(resource1, FS.createdBy, blankNode);
 
         Resource newBlankNode = createResource();

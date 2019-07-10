@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Virtual File System abstractions
- * Implementations are NOT supposed to do exhaustive safety checks. Use SafeFileSystem wrapper instead.
+ * Implementations are NOT supposed to do exhaustive safety checks.
  */
 public interface VirtualFileSystem extends Closeable {
     /**

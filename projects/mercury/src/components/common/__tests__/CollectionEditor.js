@@ -87,10 +87,12 @@ describe('saving', () => {
     const originalName = 'Collection';
     const originalDescription = 'description';
     const originalLocation = 'location';
+    const originalConnectionString = 'scheme://info';
 
     const name = 'New collection';
     const description = 'new-description';
     const location = 'new-location';
+    const connectionString = 'scheme://new';
 
     beforeEach(() => {
         collectionEditor = (
@@ -99,7 +101,7 @@ describe('saving', () => {
                 title="title"
                 name={originalName}
                 description={originalDescription}
-                type="LOCAL_FILE"
+                connectionString={originalConnectionString}
                 location={originalLocation}
                 onClose={closeCallback}
                 onSave={saveCallback}
@@ -133,7 +135,7 @@ describe('saving', () => {
 
         // Make sure it is properly saved
         expect(saveCallback.mock.calls.length).toEqual(1);
-        expect(saveCallback.mock.calls[0]).toEqual([originalName, originalDescription, originalLocation, 'LOCAL_FILE']);
+        expect(saveCallback.mock.calls[0]).toEqual([originalName, originalDescription, originalLocation, originalConnectionString]);
     });
 
     it('invokes the save callback with parameters entered by the user', () => {
@@ -141,12 +143,13 @@ describe('saving', () => {
         wrapper.instance().handleInputChange('name', name);
         wrapper.instance().handleInputChange('description', description);
         wrapper.instance().handleInputChange('location', location);
+        wrapper.instance().handleInputChange('connectionString', connectionString);
 
         wrapper.instance().handleSave();
 
         // Make sure it is properly saved
         expect(saveCallback.mock.calls.length).toEqual(1);
-        expect(saveCallback.mock.calls[0]).toEqual([name, description, location, 'LOCAL_FILE']);
+        expect(saveCallback.mock.calls[0]).toEqual([name, description, location, connectionString]);
     });
 
     it('does not invoke the save callback when no name is present', () => {

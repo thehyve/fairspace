@@ -18,20 +18,22 @@ public class CommitMessages {
     private static final ThreadLocal<String> systemCommitMessage = new ThreadLocal<>();
 
     public static <E extends Exception> void withCommitMessage(String message, ThrowingRunnable<E> action) throws E {
+        var saved = systemCommitMessage.get();
         systemCommitMessage.set(message);
         try {
             action.run();
         } finally {
-            systemCommitMessage.set(null);
+            systemCommitMessage.set(saved);
         }
     }
 
     public static <T> T withCommitMessage(String message, Supplier<T> action) {
+        var saved = systemCommitMessage.get();
         systemCommitMessage.set(message);
         try {
             return action.get();
         } finally {
-            systemCommitMessage.set(null);
+            systemCommitMessage.set(saved);
         }
     }
 
