@@ -75,8 +75,6 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         return {targetClass, label};
     });
 
-    const getTypeLabel = (type) => allTypes.find(({targetClass}) => targetClass === type).label;
-
     return {
         types,
         shapes,
@@ -90,7 +88,6 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         onTypesChange,
         onPageChange,
         onSizeChange,
-        getTypeLabel,
         entities,
         total,
         hasHighlights,

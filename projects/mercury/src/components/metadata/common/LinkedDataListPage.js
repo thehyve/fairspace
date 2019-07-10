@@ -22,8 +22,7 @@ const styles = theme => ({
 const LinkedDataListPage = ({classes, history}) => {
     const {
         types, shapes, size, page, shapesLoading, loading, error, onSearchChange,
-        onTypesChange, onPageChange, onSizeChange, getTypeLabel,
-        allTypes, entities, total, hasHighlights,
+        onTypesChange, onPageChange, onSizeChange, allTypes, entities, total, hasHighlights,
     } = useLinkedDataSearch(true);
 
     const {
@@ -78,6 +77,8 @@ const LinkedDataListPage = ({classes, history}) => {
 
         return <MessageDisplay message="The metadata is empty" isError={false} />;
     };
+
+    const getTypeLabel = (type) => allTypes.find(({targetClass}) => targetClass === type).label;
 
     return (
         <>
