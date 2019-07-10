@@ -15,7 +15,7 @@ import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import LinkedDataContext from './LinkedDataContext';
 import {propertiesToShow, partitionErrors} from "../../utils/linkeddata/metadataUtils";
 
-const useFormData = (formKey) => {
+const useFormData = (formKey, fallbackType) => {
     if (!formKey) {
         throw new Error('Please provide a valid form key.');
     }
@@ -35,7 +35,7 @@ const useFormData = (formKey) => {
     const {submitLinkedDataChanges} = useContext(LinkedDataContext);
 
     const onSubmit = () => {
-        submitLinkedDataChanges((formKey))
+        submitLinkedDataChanges(formKey)
             .catch(e => {
                 if (e.details) {
                     ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, formKey), e.message);

@@ -21,7 +21,7 @@ export class PathMetadata extends React.Component {
     render() {
         // putting dispatch here to avoid it being passed down to children
         const {
-            subject, error, loading, ...otherProps
+            subject, type, error, loading, ...otherProps
         } = this.props;
 
         if (error) {
@@ -34,6 +34,7 @@ export class PathMetadata extends React.Component {
         return (
             <LinkedDataEntityFormContainer
                 subject={subject}
+                fallbackType={type === 'directory' ? "http://fairspace.io/ontology#ExternalDirectory" : "http://fairspace.io/ontology#ExternalFile"}
                 {...otherProps}
             />
         );
@@ -53,7 +54,8 @@ const mapStateToProps = (state, ownProps) => {
     return {
         loading: subject.pending,
         error: subject.error,
-        subject: subject.data
+        subject: subject.data && subject.data.props.iri,
+        type: subject.data && subject.data.type
     };
 };
 

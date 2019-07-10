@@ -153,6 +153,34 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape .
 
+fs:ExternalFileShape a fs:ClassShape ;
+    sh:description "A single file." ;
+    sh:name "External File" ;
+    sh:targetClass fs:ExternalFile ;
+    fs:machineOnly true ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
+    fs:fixedShape true ;
+    fs:systemProperties
+        fs:labelShape,
+        fs:commentShape ;
+    sh:property
+        fs:labelShape,
+        fs:commentShape .
+
+fs:ExternalDirectoryShape a fs:ClassShape ;
+    sh:description "A directory containing multiple files." ;
+    sh:name "External Directory" ;
+    sh:targetClass fs:ExternalDirectory ;
+    fs:machineOnly true ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:fixedShape true ;
+    fs:systemProperties
+        fs:labelShape,
+        fs:commentShape ;
+    sh:property
+        fs:labelShape,
+        fs:commentShape .
+
 fs:UserShape a sh:NodeShape ;
     sh:closed true ; 
     sh:description "Description for fs:User" ;

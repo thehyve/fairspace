@@ -139,7 +139,7 @@ const mapStateToPropsForVocabulary = (state) => {
     const authorizations = getAuthorizations(state);
     const isLinkedDataLoading = () => isVocabularyPending(state);
     const hasLinkedDataErrorForSubject = () => hasVocabularyError(state);
-    const combineLinkedDataForSubject = (subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
+    const combineLinkedDataForSubject = (subject, fallbackType) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary, fallbackType);
 
     return {
         shapesLoading,
@@ -160,7 +160,7 @@ const mapStateToPropsForMetadata = (state) => {
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
     const isLinkedDataLoading = (subject) => isMetadataPending(state, subject);
     const hasLinkedDataErrorForSubject = (subject) => hasMetadataError(state, subject);
-    const combineLinkedDataForSubject = (subject) => getCombinedMetadataForSubject(state, subject);
+    const combineLinkedDataForSubject = (subject, fallbackType) => getCombinedMetadataForSubject(state, subject, fallbackType);
 
     return {
         shapesLoading,

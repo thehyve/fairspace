@@ -32,11 +32,11 @@ export default reduceReducers(jsonLdFetchReducer, updateMetadataReducer, default
  * @see {Vocabulary.fromJsonLd}
  * @returns {*}
  */
-export const getCombinedMetadataForSubject = (state, subject) => {
+export const getCombinedMetadataForSubject = (state, subject, fallbackType) => {
     const {cache: {jsonLdBySubject}} = state;
     if (jsonLdBySubject && jsonLdBySubject[subject] && !jsonLdBySubject[subject].pending && !jsonLdBySubject[subject].error) {
         const vocabulary = getVocabulary(state);
-        return fromJsonLd(jsonLdBySubject[subject].data, subject, vocabulary);
+        return fromJsonLd(jsonLdBySubject[subject].data, subject, vocabulary, fallbackType);
     }
 
     return [];

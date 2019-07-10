@@ -6,12 +6,12 @@ import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useLinkedData from '../UseLinkedData';
 import useFormData from '../UseFormData';
 
-const LinkedDataEntityFormContainer = ({subject, isEditable = true, ...otherProps}) => {
-    const {properties, linkedDataLoading, linkedDataError} = useLinkedData(subject, isEditable);
+const LinkedDataEntityFormContainer = ({subject, fallbackType = null, isEditable = true, ...otherProps}) => {
+    const {properties, linkedDataLoading, linkedDataError} = useLinkedData(subject, fallbackType, isEditable);
     const {
         extendPropertiesWithChanges, onSubmit, submitDisabled,
         onAdd, onChange, onDelete, isUpdating
-    } = useFormData(subject);
+    } = useFormData(subject, fallbackType);
 
     let footer;
 

@@ -2,7 +2,7 @@ import {useContext, useEffect, useCallback} from 'react';
 
 import LinkedDataContext from './LinkedDataContext';
 
-const useLinkedData = (subject, isEntityEditable) => {
+const useLinkedData = (subject, fallbackType, isEntityEditable) => {
     if (!subject) {
         throw new Error('Please provide a valid subject.');
     }
@@ -22,7 +22,7 @@ const useLinkedData = (subject, isEntityEditable) => {
         updateLinkedData();
     }, [updateLinkedData]);
 
-    const linkedDataForSubject = combineLinkedDataForSubject(subject);
+    const linkedDataForSubject = combineLinkedDataForSubject(subject, fallbackType);
 
     const {label, description} = getTypeInfoForLinkedData(linkedDataForSubject);
 
@@ -34,6 +34,8 @@ const useLinkedData = (subject, isEntityEditable) => {
         error = 'No metadata found for this subject';
     }
 
+    const properties = getPropertiesForLinkedData({linkedData: linkedDataForSubject, subject, isEntityEditable});
+
     return {
         linkedDataLoading,
         linkedDataError: error,
@@ -41,7 +43,7 @@ const useLinkedData = (subject, isEntityEditable) => {
         typeLabel: label,
         typeDescription: description,
         updateLinkedData,
-        properties: getPropertiesForLinkedData({linkedData: linkedDataForSubject, subject, isEntityEditable})
+        properties
     };
 };
 
