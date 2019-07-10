@@ -59,7 +59,7 @@ public class App {
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new CompoundFileSystem(collections, Map.of(
                 ManagedFileSystem.TYPE, new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus),
-                IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(collections, rdf)));
+                IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(collections)));
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
 
