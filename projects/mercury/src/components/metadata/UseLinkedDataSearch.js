@@ -5,7 +5,7 @@ import {getFirstPredicateId} from "../../utils/linkeddata/jsonLdUtils";
 import {SEARCH_DEFAULT_SIZE, SHACL_TARGET_CLASS} from "../../constants";
 import {getLabel} from "../../utils/linkeddata/metadataUtils";
 
-const useLinkDataSearch = (doInitialFetch = false) => {
+const useLinkedDataSearch = (doInitialFetch = false) => {
     const {
         getClassesInCatalog, searchLinkedData, shapesLoading,
         shapesError, getSearchEntities
@@ -98,4 +98,4 @@ const useLinkDataSearch = (doInitialFetch = false) => {
     };
 };
 
-export default useLinkDataSearch;
+export default useLinkedDataSearch;

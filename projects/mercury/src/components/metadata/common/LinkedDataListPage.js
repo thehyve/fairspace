@@ -8,7 +8,7 @@ import {
 
 import {SearchBar, MessageDisplay, LoadingInlay} from "../../common";
 import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
-import UseLinkDataSearch from '../UseLinkDataSearch';
+import useLinkedDataSearch from '../UseLinkedDataSearch';
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataList from './LinkedDataList';
 import LinkedDataContext from '../LinkedDataContext';
@@ -24,7 +24,7 @@ const LinkedDataListPage = ({classes, history}) => {
         types, shapes, size, page, shapesLoading, loading, error, onSearchChange,
         onTypesChange, onPageChange, onSizeChange, getTypeLabel,
         allTypes, entities, total, hasHighlights,
-    } = UseLinkDataSearch(true);
+    } = useLinkedDataSearch(true);
 
     const {
         requireIdentifier, getEntityRelativeUrl, createLinkedDataEntity,
