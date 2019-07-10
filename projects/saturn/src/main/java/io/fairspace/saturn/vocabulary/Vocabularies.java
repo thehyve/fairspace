@@ -33,7 +33,6 @@ public class Vocabularies {
                         : oldVocabulary.difference(oldSystemVocabulary);
 
                 applyInference(META_VOCABULARY, userVocabulary);
-                applyInference(SYSTEM_VOCABULARY, userVocabulary);
 
                 rdf.put(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));
                 rdf.put(SYSTEM_VOCABULARY_GRAPH_BACKUP, SYSTEM_VOCABULARY);
