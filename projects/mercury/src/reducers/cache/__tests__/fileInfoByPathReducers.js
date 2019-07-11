@@ -1,4 +1,4 @@
-import reducer from '../subjectByPathReducers';
+import reducer from '../fileInfoByPathReducers';
 import * as actionTypes from "../../../actions/actionTypes";
 import {testNoChangedOnUnknownActionType} from '../../../utils/testUtils';
 
@@ -31,7 +31,11 @@ describe('Subject by path reducers', () => {
             },
         })).toEqual({
             "/dir": {
-                data: "https://workspace.ci.test.fairdev.app/iri/500"
+                data: {
+                    props: {
+                        iri: "https://workspace.ci.test.fairdev.app/iri/500"
+                    }
+                }
             }
         });
     });
