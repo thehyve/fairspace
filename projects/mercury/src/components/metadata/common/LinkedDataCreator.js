@@ -101,7 +101,6 @@ class LinkedDataCreator extends React.Component {
 
 LinkedDataCreator.propTypes = {
     create: PropTypes.func.isRequired,
-    loading: PropTypes.bool,
     shapes: PropTypes.array,
     requireIdentifier: PropTypes.bool,
 };

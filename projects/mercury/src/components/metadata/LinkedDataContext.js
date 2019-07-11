@@ -15,7 +15,7 @@ import {getMetadataSearchResults, getVocabularySearchResults} from "../../reduce
 // Utils
 import {emptyLinkedData, fromJsonLd} from "../../utils/linkeddata/jsonLdConverter";
 import {isDataSteward} from "../../utils/userUtils";
-import {propertiesToShow, getTypeInfo, getLabel, createMetadataIri, createVocabularyIri, partitionErrors} from "../../utils/linkeddata/metadataUtils";
+import {propertiesToShow, getTypeInfo, getLabel, partitionErrors} from "../../utils/linkeddata/metadataUtils";
 import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../../utils/linkeddata/vocabularyUtils";
 import {getFirstPredicateValue, getFirstPredicateId} from "../../utils/linkeddata/jsonLdUtils";
 
@@ -28,6 +28,14 @@ import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import LinkedDataLink from "./common/LinkedDataLink";
 
 const LinkedDataContext = React.createContext({});
+
+const onEntityCreationError = (e, id) => {
+    if (e.details) {
+        ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, id), e.message);
+    } else {
+        ErrorDialog.showError(e, `Error creating a new entity.\n${e.message}`);
+    }
+};
 
 const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, submitVocabularyChanges,
@@ -83,14 +91,6 @@ const LinkedDataVocabularyProvider = ({
             total,
             hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         };
-    };
-
-    const onEntityCreationError = (e, id) => {
-        if (e.details) {
-            ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createVocabularyIri(id)), e.message);
-        } else {
-            ErrorDialog.showError(e, `Error creating a new vocabulary entry.\n${e.message}`);
-        }
     };
 
     const typeRender = (entry) => <a href={entry.typeUrl}> {entry.typeLabel} </a>;
@@ -171,14 +171,6 @@ const LinkedDataMetadataProvider = ({
             total,
             hasHighlights: entities.some(({highlights}) => highlights.length > 0),
         };
-    };
-
-    const onEntityCreationError = (e, id) => {
-        if (e.details) {
-            ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, createMetadataIri(id)), e.message);
-        } else {
-            ErrorDialog.showError(e, `Error creating a new metadata entity.\n${e.message}`);
-        }
     };
 
     const typeRender = (entry) => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>;
