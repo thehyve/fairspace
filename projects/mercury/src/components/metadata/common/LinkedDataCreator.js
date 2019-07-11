@@ -3,8 +3,10 @@ import PropTypes from "prop-types";
 import {Button} from "@material-ui/core";
 
 import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
-import {LoadingInlay, LoadingOverlay, MessageDisplay} from "../../common";
+import {LoadingOverlay} from "../../common";
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
+import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
+import {SHACL_TARGET_CLASS} from "../../../constants";
 
 class LinkedDataCreator extends React.Component {
     static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
@@ -17,11 +19,6 @@ class LinkedDataCreator extends React.Component {
     };
 
     unMounted = false;
-
-    componentDidMount() {
-        this.props.fetchLinkedData();
-        this.props.fetchShapes();
-    }
 
     componentWillUnmount() {
         this.unMounted = true;
@@ -47,9 +44,11 @@ class LinkedDataCreator extends React.Component {
 
     handleEntityCreation = (formKey, shape, id) => {
         this.setState({creatingMetadataEntity: true});
-        const {create, onEntityCreationError} = this.props;
 
-        create(formKey, shape, id)
+        const {create, onEntityCreationError} = this.props;
+        const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
+
+        create(formKey, id, type)
             .catch(e => onEntityCreationError(e, id))
             .finally(() => {
                 if (!this.unMounted) {
@@ -59,35 +58,22 @@ class LinkedDataCreator extends React.Component {
     };
 
     render() {
-        const {children, loading, error, isEditable, shapes, requireIdentifier} = this.props;
+        const {children, shapesLoading, shapes, requireIdentifier} = this.props;
         const {creationState, shape, creatingMetadataEntity} = this.state;
-
-        if (loading) {
-            return <LoadingInlay />;
-        }
-
-        if (error) {
-            return <MessageDisplay message={error.message || 'An error occurred while loading metadata'} />;
-        }
 
         return (
             <>
-                {isEditable
-                    ? (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            aria-label="Add"
-                            title="Create a new metadata entity"
-                            onClick={this.startCreating}
-                            style={{margin: '10px 0'}}
-                            disabled={!shapes}
-                        >
-                            Create
-                        </Button>
-                    )
-                    : null
-                }
+                <Button
+                    variant="contained"
+                    color="primary"
+                    aria-label="Add"
+                    title="Create a new metadata entity"
+                    onClick={this.startCreating}
+                    style={{margin: '10px 0'}}
+                    disabled={shapesLoading || !shapes}
+                >
+                    Create
+                </Button>
 
                 <LinkedDataShapeChooserDialog
                     open={creationState === LinkedDataCreator.CREATION_STATE_CHOOSE_SHAPE}
@@ -95,7 +81,6 @@ class LinkedDataCreator extends React.Component {
                     onChooseShape={this.chooseShape}
                     onClose={this.closeDialog}
                 />
-
 
                 {creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY && (
                     <NewLinkedDataEntityDialog
@@ -115,18 +100,12 @@ class LinkedDataCreator extends React.Component {
 }
 
 LinkedDataCreator.propTypes = {
-    fetchLinkedData: PropTypes.func.isRequired,
-    fetchShapes: PropTypes.func.isRequired,
     create: PropTypes.func.isRequired,
-
-    loading: PropTypes.bool,
     shapes: PropTypes.array,
-    isEditable: PropTypes.bool,
     requireIdentifier: PropTypes.bool,
 };
 
 LinkedDataCreator.defaultProps = {
-    isEditable: true,
     requireIdentifier: true
 };
 
